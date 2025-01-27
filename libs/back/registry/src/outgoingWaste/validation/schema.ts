@@ -29,7 +29,7 @@ import {
   transportModeSchema,
   transportRecepisseIsExemptedSchema,
   transportRecepisseNumberSchema,
-  classicDateSchema
+  nullishDateSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingWasteItem = z.output<
@@ -52,7 +52,7 @@ const inputOutgoingWasteSchema = z.object({
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: classicDateSchema,
+  dispatchDate: nullishDateSchema,
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,

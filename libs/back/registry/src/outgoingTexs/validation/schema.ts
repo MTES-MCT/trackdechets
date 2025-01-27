@@ -36,7 +36,7 @@ import {
   transportModeSchema,
   transportRecepisseIsExemptedSchema,
   transportRecepisseNumberSchema,
-  classicDateSchema
+  nullishDateSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -59,7 +59,7 @@ const inputOutgoingTexsSchema = z.object({
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: classicDateSchema,
+  dispatchDate: nullishDateSchema,
   wasteDap: z
     .string()
     .max(50, "Le DAP ne doit pas excéder 50 caractères")

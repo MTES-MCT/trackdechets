@@ -1,5 +1,4 @@
 import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
-import { sub } from "date-fns";
 import { z } from "zod";
 import {
   actorAddressSchema,
@@ -20,7 +19,9 @@ import {
   wasteDescriptionSchema,
   weightIsEstimateSchema,
   weightValueSchema,
-  operationModeSchema
+  operationModeSchema,
+  nullishDateSchema,
+  dateSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
@@ -31,46 +32,8 @@ const inputSsdSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  useDate: z.union([
-    z.date().nullish(),
-    z
-      .string()
-      .nullish()
-      .transform(val => (val ? new Date(val) : undefined))
-      .pipe(
-        z
-          .date()
-          .min(
-            sub(new Date(), { years: 1 }),
-            "La date d'utilisation ne peut pas être antérieure à J-1 an"
-          )
-          .max(
-            new Date(),
-            "La date d'utilisation ne peut pas être dans le futur"
-          )
-          .nullish()
-      )
-  ]),
-  dispatchDate: z.union([
-    z.date().nullish(),
-    z
-      .string()
-      .nullish()
-      .transform(val => (val ? new Date(val) : undefined))
-      .pipe(
-        z
-          .date()
-          .min(
-            sub(new Date(), { years: 1 }),
-            "La date d'utilisation ne peut pas être antérieure à J-1 an"
-          )
-          .max(
-            new Date(),
-            "La date d'utilisation ne peut pas être dans le futur"
-          )
-          .nullish()
-      )
-  ]),
+  useDate: nullishDateSchema,
+  dispatchDate: nullishDateSchema,
   wasteCode: getWasteCodeSchema(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
@@ -126,33 +89,8 @@ const inputSsdSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  processingDate: z.coerce
-    .date()
-    .min(
-      sub(new Date(), { years: 1 }),
-      "La date de traitement ne peut pas être antérieure à J-1 an"
-    )
-    .max(new Date(), "La date de traitement ne peut pas être dans le futur"),
-  processingEndDate: z.union([
-    z.date().nullish(),
-    z
-      .string()
-      .nullish()
-      .transform(val => (val ? new Date(val) : undefined))
-      .pipe(
-        z
-          .date()
-          .min(
-            sub(new Date(), { years: 1 }),
-            "La date de fin de traitement ne peut pas être antérieure à J-1 an"
-          )
-          .max(
-            new Date(),
-            "La date de fin de traitement ne peut pas être dans le futur"
-          )
-          .nullish()
-      )
-  ]),
+  processingDate: dateSchema,
+  processingEndDate: nullishDateSchema,
   destinationCompanyType: actorTypeSchema.exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNE"

@@ -25,3 +25,27 @@ export async function transformReportForInfos<T extends ParsedLine>(
     reportForCompanyPostalCode: ""
   };
 }
+
+export async function transformAndRefineItemReason<
+  T extends ParsedLine & { id?: string | null }
+>(item: T, existingId: string | undefined, { addIssue }: RefinementCtx) {
+  // If we have an existing ID, set it
+  item.id = existingId;
+
+  // If the line alreary exists in DB and we dont have a reason, we can simply ignore it
+  if (existingId && !item.reason) {
+    item.reason = "IGNORER";
+    return item;
+  }
+
+  if (!existingId && item.reason) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le motif doit rester vide, l'identifiant unique "${item.publicId}" n'a jamais été importé.`,
+      path: ["reason"]
+    });
+    return z.NEVER;
+  }
+
+  return item;
+}

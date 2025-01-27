@@ -156,9 +156,10 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data } = await mutate<
-      Pick<Mutation, "addToOutgoingWasteRegistry">
-    >(ADD_TO_OUTGOING_WASTE_REGISTRY, { variables: { lines } });
+    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
+      ADD_TO_OUTGOING_WASTE_REGISTRY,
+      { variables: { lines } }
+    );
 
     expect(data.addToOutgoingWasteRegistry).toBe(true);
   });

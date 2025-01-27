@@ -120,7 +120,7 @@ model RegistryIncomingWaste {
     wasteCode                              String
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime
+    receptionDate                          DateTime @db.Timestamptz(6)
     weighingHour                           String?
     wasteDescription                       String
     wasteCodeBale                          String?
@@ -243,7 +243,7 @@ model RegistryIncomingTexs {
     wasteCode                              String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime
+    receptionDate                          DateTime @db.Timestamptz(6)
     wasteDescription                       String
     wasteCodeBale                          String?
     wasteDap                               String?
@@ -380,7 +380,7 @@ model RegistryOutgoingTexs {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?
+    dispatchDate                           DateTime? @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
@@ -510,7 +510,7 @@ model RegistryOutgoingWaste {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?
+    dispatchDate                           DateTime? @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
@@ -653,8 +653,8 @@ model RegistryExport {
     wasteTypes      RegistryExportWasteType[]      @default([])
     wasteCodes      String[]                       @default([])
     declarationType RegistryExportDeclarationType?
-    startDate       DateTime
-    endDate         DateTime?
+    startDate       DateTime                       @db.Timestamptz(6)
+    endDate         DateTime?                      @db.Timestamptz(6)
     format          RegistryExportFormat
 
     createdBy User @relation(fields: [createdById], references: [id])

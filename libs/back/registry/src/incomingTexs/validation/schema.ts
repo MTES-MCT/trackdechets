@@ -6,7 +6,7 @@ import {
   getWasteCodeSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
-  receptionDateSchema,
+  dateSchema,
   wasteDescriptionSchema,
   wasteCodeBaleSchema,
   weightValueSchema,
@@ -54,7 +54,7 @@ const inputIncomingTexsSchema = z.object({
   wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES).nullish(),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
-  receptionDate: receptionDateSchema,
+  receptionDate: dateSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   wasteDap: z

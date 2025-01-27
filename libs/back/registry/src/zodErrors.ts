@@ -34,7 +34,7 @@ export const registryErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (issue.code === z.ZodIssueCode.invalid_date) {
     return {
       message:
-        "Le format de date est invalide. Exemples de formats possibles: 2000-01-01T00:00:00.000Z, 2000-01-01T00:00:00.000, 2000-01-01"
+        "Le format de date est invalide. Exemple de format possible: 2000-01-22"
     };
   }
 
