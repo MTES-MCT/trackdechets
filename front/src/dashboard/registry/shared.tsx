@@ -47,7 +47,7 @@ export const TYPES: { [key in RegistryImportType]: string } = {
   INCOMING_WASTE: "D(N)D entrants",
   OUTGOING_WASTE: "D(N)D sortants",
   INCOMING_TEXS: "TEXS entrants",
-  OUTGOING_TEXS: "TEXS sortants",
+  OUTGOING_TEXS: "TEXS sortants"
 };
 
 export const badges = {

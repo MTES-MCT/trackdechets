@@ -5,7 +5,7 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
-  RegistryDownloadTarget,
+  RegistryDownloadTarget
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 

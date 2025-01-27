@@ -18,7 +18,7 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineReportForProfile,
+  refineReportForProfile
 } from "./refinement";
 import { incomingTexsSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
