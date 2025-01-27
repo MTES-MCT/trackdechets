@@ -204,7 +204,7 @@ input BsdaWasteInput {
 
 input BsdaPackagingInput {
   "Type de conditionnement"
-  type: BsdaPackagingType
+  type: BsdaPackagingType!
   "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
   other: String
   "Nombre de colis associés à ce conditionnement"
