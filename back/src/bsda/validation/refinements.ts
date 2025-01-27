@@ -612,3 +612,30 @@ export async function isWorkerRefinement(
     });
   }
 }
+
+export const validateDestinationReceptionWeight: (
+  validationContext: BsdaValidationContext
+) => Refinement<ParsedZodBsda> = validationContext => {
+  const currentSignatureType = validationContext.currentSignatureType;
+  return async (bsda, { addIssue }) => {
+    // Destination is freely editable until EMISSION signature.
+    // Once transported, destination is not editable for anyone.
+    // This is enforced by the sealing rules
+    if (currentSignatureType !== "OPERATION") {
+      return;
+    }
+
+    if (
+      !bsda.destinationReceptionWeight &&
+      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+        bsda.destinationReceptionAcceptationStatus ?? ""
+      )
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le poids du déchet reçu doit être renseigné et non nul.`,
+        fatal: true
+      });
+    }
+  };
+};
