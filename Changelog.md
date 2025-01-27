@@ -15,7 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
-- BSDD - Vérifier le type de profil du courtier et/ou négociant lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914)
+- Bordereau BSDD - Vérifier le type de profil du courtier et/ou négociant lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDD - Vérifier le type de profil du courtier et/ou négociant lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Bordereau BSDA - Vérifier le type de profil du courtier lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 
 # [2025.01.1] 14/01/2025
 
