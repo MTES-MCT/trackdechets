@@ -79,6 +79,12 @@ const reviewFragment = gql`
           code
           mode
           description
+          nextDestination {
+            cap
+            company {
+              orgId
+            }
+          }
         }
       }
     }
@@ -131,6 +137,9 @@ const reviewFragment = gql`
           code
           mode
           description
+          nextDestination {
+            cap
+          }
         }
       }
       isCanceled

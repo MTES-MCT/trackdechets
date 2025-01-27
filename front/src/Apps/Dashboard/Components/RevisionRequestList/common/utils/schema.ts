@@ -272,7 +272,10 @@ export const initialBsdaReview = {
     operation: {
       code: "",
       mode: null,
-      description: ""
+      description: "",
+      nextDestination: {
+        cap: ""
+      }
     }
   },
   isCanceled: false
@@ -350,7 +353,10 @@ export const validationBsdaSchema = z.object({
       operation: z.object({
         code: z.string().nullish(),
         mode: z.string().nullish(),
-        description: z.string().nullish()
+        description: z.string().nullish(),
+        nextDestination: z.object({
+          cap: z.string().nullish()
+        })
       })
     })
     .nullish()

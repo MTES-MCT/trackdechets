@@ -169,6 +169,8 @@ async function getUpdateFromRevisionRequest(
     destinationOperationDescription:
       revisionRequest.destinationOperationDescription,
     destinationOperationMode: revisionRequest.destinationOperationMode,
+    destinationOperationNextDestinationCap:
+      revisionRequest.destinationOperationNextDestinationCap,
     brokerCompanyName: revisionRequest.brokerCompanyName,
     brokerCompanySiret: revisionRequest.brokerCompanySiret,
     brokerCompanyAddress: revisionRequest.brokerCompanyAddress,

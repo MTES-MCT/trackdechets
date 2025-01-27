@@ -434,6 +434,14 @@ type BsdaRevisionRequestOperation {
 
   "Description de l'opération"
   description: String
+
+  "Informations relatives au TTR"
+  nextDestination: BsdaRevisionRequestOperationNextDestination
+}
+
+type BsdaRevisionRequestOperationNextDestination {
+  "N° de CAP"
+  cap: String
 }
 
 type BsdaRevisionRequestWaste {
