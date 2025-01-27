@@ -6,7 +6,6 @@ import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
   RegistryDownloadTarget,
-  RegistryImportType
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 
@@ -21,7 +20,8 @@ import {
   badges,
   downloadFromSignedUrl,
   GET_REGISTRY_IMPORTS,
-  REGISTRY_DOWNLOAD_SIGNED_URL
+  REGISTRY_DOWNLOAD_SIGNED_URL,
+  TYPES
 } from "./shared";
 
 const HEADERS = [
@@ -32,12 +32,6 @@ const HEADERS = [
   "Fichier importé",
   "Rapport d'erreur"
 ];
-
-const TYPES: { [key in RegistryImportType]: string } = {
-  INCOMING_TEXS: "TEXS entrants",
-  INCOMING_WASTE: "D(N)D entrants",
-  SSD: "SSD"
-};
 
 export function MyImports() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);

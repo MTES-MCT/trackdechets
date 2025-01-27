@@ -2,6 +2,7 @@ import {
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
+  refineOperationCodeWhenUpcycled,
   refineOperationMode,
   refineWeightAndVolume
 } from "../../shared/refinement";
@@ -27,6 +28,7 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
+    .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)

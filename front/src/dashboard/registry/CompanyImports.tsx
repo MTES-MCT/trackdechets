@@ -20,7 +20,8 @@ import {
   badges,
   downloadFromSignedUrl,
   GET_REGISTRY_IMPORTS,
-  REGISTRY_DOWNLOAD_SIGNED_URL
+  REGISTRY_DOWNLOAD_SIGNED_URL,
+  TYPES
 } from "./shared";
 
 const HEADERS = [
@@ -64,7 +65,7 @@ export function CompanyImports() {
       format(new Date(importData.node.createdAt), "dd/MM/yyyy HH'h'mm"),
       <div>
         {badges[importData.node.status]("import")}
-        <div>{importData.node.type}</div>
+        <div>{TYPES[importData.node.type]}</div>
       </div>,
       <ul>
         {importData.node.numberOfErrors > 0 && (
