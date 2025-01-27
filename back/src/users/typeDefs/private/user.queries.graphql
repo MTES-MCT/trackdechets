@@ -46,4 +46,10 @@ type Query {
     skip: Int
     first: Int
   ): MembershipRequestsConnection!
+
+  """
+  Permet de savoir si l'utilisateur est authentifié ou non.
+  Ne retourne pas d'erreur si l'utilisateur n'est pas authentifié
+  """
+  isAuthenticated: Boolean!
 }

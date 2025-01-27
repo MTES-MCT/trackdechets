@@ -30,6 +30,7 @@ const routes = {
   company: "/company/:orgId",
   wasteTree: "/wasteTree",
   dashboard: {
+    default: "/dashboard",
     index: "/dashboard/:siret",
     roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
@@ -163,6 +164,7 @@ export const titles = {
   "/password-reset": "Réinitialiser mon mot de passe — Trackdéchets",
   "/company/:orgId": "Fiche établissement — Trackdéchets",
   "/wasteTree": "Liste des codes déchets — Trackdéchets",
+  "/dashboard": "Tableau de bord — Trackdéchets",
   "/dashboard/:siret": "Tableau de bord — Trackdéchets",
   "/dashboard/:siret/road-control/:id": "Contrôle Routier — Trackdéchets",
   "/dashboard/:siret/bsds/all": "Tous mes bordereaux — Trackdéchets",

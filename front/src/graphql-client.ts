@@ -7,6 +7,7 @@ import {
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { removeOrgId } from "./common/helper";
+import { localAuthService } from "./login/auth.service";
 
 /**
  * Automatically erase `__typename` from variables
@@ -48,6 +49,12 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         // modify the response context to ignore the error
         // cf. https://www.apollographql.com/docs/react/data/error-handling/#ignoring-errors
         response!.errors = undefined;
+
+        // If we catch an UNAUTHENTICATED exception at this point,
+        // the user session has probably expired. Redirect to login
+        // page with a hint in the URL to display a message
+        localAuthService.locallySignOut();
+        window.location.href = "/login?session=expired";
       }
     }
   }
