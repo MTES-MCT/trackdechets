@@ -853,10 +853,10 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       opt: {
         emitterCompanySiret: company.siret,
         status: "SENT",
-        // Exutoire
+        // TTR
         destinationCompanySiret: ttr.siret,
         destinationCap: "TTR-CAP",
-        // TTR
+        // Exutoire
         destinationOperationNextDestinationCompanySiret: exutoire.siret,
         destinationOperationNextDestinationCap: "EXUTOIRE-CAP"
       }
