@@ -1207,7 +1207,7 @@ describe("signTransportForm", () => {
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1",
-            transporterNumberPlate: "TRANSPORTER-PLATE"
+            transporterNumberPlate: "QR-33-TY"
           }
         }
       });
@@ -1219,7 +1219,7 @@ describe("signTransportForm", () => {
         where: { formId: appendix1Item.id }
       });
       expect(appendix1ItemTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
+        "QR-33-TY"
       );
 
       // Should copy plate to next items
@@ -1227,16 +1227,14 @@ describe("signTransportForm", () => {
         where: { formId: appendix2Item.id }
       });
       expect(appendix2ItemTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
+        "QR-33-TY"
       );
 
       // Parent should have its plate updated as well
       const parentTransporters = await prisma.bsddTransporter.findFirst({
         where: { formId: parent.id }
       });
-      expect(parentTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
-      );
+      expect(parentTransporters?.transporterNumberPlate).toBe("QR-33-TY");
 
       // SECOND UPDATE (on the second child bsd)
 
@@ -1249,7 +1247,7 @@ describe("signTransportForm", () => {
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1",
-            transporterNumberPlate: "TRANSPORTER-PLATE-2"
+            transporterNumberPlate: "QR-33-TY-2"
           }
         }
       });
@@ -1260,7 +1258,7 @@ describe("signTransportForm", () => {
           where: { formId: appendix2Item.id }
         });
       expect(appendix2ItemTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
+        "QR-33-TY-2"
       );
 
       // Should override plate from child bsd 1
@@ -1269,16 +1267,14 @@ describe("signTransportForm", () => {
           where: { formId: appendix1Item.id }
         });
       expect(appendix1ItemTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
+        "QR-33-TY-2"
       );
 
       // Parent should have its plate updated as well
       const parentTransportersBis = await prisma.bsddTransporter.findFirst({
         where: { formId: parent.id }
       });
-      expect(parentTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
-      );
+      expect(parentTransportersBis?.transporterNumberPlate).toBe("QR-33-TY-2");
     });
 
     it("should disallow signing the appendix1 item if there is no quantity & packaging infos", async () => {

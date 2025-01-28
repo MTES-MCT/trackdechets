@@ -89,35 +89,35 @@ const createBsddWith5Transporters = async () => {
           data: [
             {
               transporterCompanySiret: transporter.company.siret,
-              transporterNumberPlate: "TRANSPORTER1-NBR-PLATES",
+              transporterNumberPlate: "TR-01-AA",
               transporterCompanyAddress: transporter.company.address,
               takenOverAt: new Date(),
               number: 1
             },
             {
               transporterCompanySiret: transporter2.company.siret,
-              transporterNumberPlate: "TRANSPORTER2-NBR-PLATES",
+              transporterNumberPlate: "TR-02-AA",
               transporterCompanyAddress: transporter2.company.address,
               takenOverAt: new Date(),
               number: 2
             },
             {
               transporterCompanySiret: transporter3.company.siret,
-              transporterNumberPlate: "TRANSPORTER3-NBR-PLATES",
+              transporterNumberPlate: "TR-03-AA",
               transporterCompanyAddress: transporter3.company.address,
               takenOverAt: new Date(),
               number: 3
             },
             {
               transporterCompanySiret: transporter4.company.siret,
-              transporterNumberPlate: "TRANSPORTER4-NBR-PLATES",
+              transporterNumberPlate: "TR-04-AA",
               transporterCompanyAddress: transporter4.company.address,
               takenOverAt: new Date(),
               number: 4
             },
             {
               transporterCompanyVatNumber: transporter5.company.vatNumber,
-              transporterNumberPlate: "TRANSPORTER5-NBR-PLATES",
+              transporterNumberPlate: "TR-05-AA",
               transporterCompanyAddress: transporter5.company.address,
               takenOverAt: new Date(),
               number: 5
@@ -717,29 +717,19 @@ describe("toTransportedWaste", () => {
 
     // Then
     expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
-    expect(waste.transporter2NumberPlates).toStrictEqual([
-      "TRANSPORTER2-NBR-PLATES"
-    ]);
+    expect(waste.transporter2NumberPlates).toStrictEqual(["TR-02-AA"]);
 
     expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
-    expect(waste.transporter3NumberPlates).toStrictEqual([
-      "TRANSPORTER3-NBR-PLATES"
-    ]);
+    expect(waste.transporter3NumberPlates).toStrictEqual(["TR-03-AA"]);
 
     expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
-    expect(waste.transporter4NumberPlates).toStrictEqual([
-      "TRANSPORTER4-NBR-PLATES"
-    ]);
+    expect(waste.transporter4NumberPlates).toStrictEqual(["TR-04-AA"]);
 
     expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
-    expect(waste.transporter5NumberPlates).toStrictEqual([
-      "TRANSPORTER5-NBR-PLATES"
-    ]);
+    expect(waste.transporter5NumberPlates).toStrictEqual(["TR-05-AA"]);
   });
 });
 
@@ -1228,30 +1218,20 @@ describe("toAllWaste", () => {
 
     // Then
     expect(waste.transporterCompanySiret).toBe(data.transporter1.siret);
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBe(data.transporter2.siret);
-    expect(waste.transporter2NumberPlates).toStrictEqual([
-      "TRANSPORTER2-NBR-PLATES"
-    ]);
+    expect(waste.transporter2NumberPlates).toStrictEqual(["TR-02-AA"]);
 
     expect(waste.transporter3CompanySiret).toBe(data.transporter3.siret);
-    expect(waste.transporter3NumberPlates).toStrictEqual([
-      "TRANSPORTER3-NBR-PLATES"
-    ]);
+    expect(waste.transporter3NumberPlates).toStrictEqual(["TR-03-AA"]);
 
     expect(waste.transporter4CompanySiret).toBe(data.transporter4.siret);
-    expect(waste.transporter4NumberPlates).toStrictEqual([
-      "TRANSPORTER4-NBR-PLATES"
-    ]);
+    expect(waste.transporter4NumberPlates).toStrictEqual(["TR-04-AA"]);
 
     // Foreign transporter
     expect(waste.transporter5CompanySiret).toBe(data.transporter5.vatNumber);
-    expect(waste.transporter5NumberPlates).toStrictEqual([
-      "TRANSPORTER5-NBR-PLATES"
-    ]);
+    expect(waste.transporter5NumberPlates).toStrictEqual(["TR-05-AA"]);
   });
 
   it("if forwarding BSD, should contain the info of the initial emitter", async () => {

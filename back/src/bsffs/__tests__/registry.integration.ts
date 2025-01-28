@@ -66,7 +66,7 @@ const createBsffWith5Transporters = async () => {
       data: { destinationCompanyMail: "destination@mail.com" },
       transporterData: {
         transporterCompanySiret: transporter1.company.siret,
-        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+        transporterTransportPlates: ["TR-01-AA"],
         transporterCompanyAddress: transporter1.company.address
       }
     }
@@ -75,22 +75,22 @@ const createBsffWith5Transporters = async () => {
   await addBsffTransporter({
     bsffId: bsff.id,
     transporter: transporter2,
-    opt: { transporterTransportPlates: ["TRANSPORTER2-NBR-PLATES"] }
+    opt: { transporterTransportPlates: ["TR-02-AA"] }
   });
   await addBsffTransporter({
     bsffId: bsff.id,
     transporter: transporter3,
-    opt: { transporterTransportPlates: ["TRANSPORTER3-NBR-PLATES"] }
+    opt: { transporterTransportPlates: ["TR-03-AA"] }
   });
   await addBsffTransporter({
     bsffId: bsff.id,
     transporter: transporter4,
-    opt: { transporterTransportPlates: ["TRANSPORTER4-NBR-PLATES"] }
+    opt: { transporterTransportPlates: ["TR-04-AA"] }
   });
   await addBsffTransporter({
     bsffId: bsff.id,
     transporter: transporter5,
-    opt: { transporterTransportPlates: ["TRANSPORTER5-NBR-PLATES"] }
+    opt: { transporterTransportPlates: ["TR-05-AA"] }
   });
 
   return {
@@ -559,37 +559,27 @@ describe("toTransportedWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       bsffForRegistry.transporters[0].transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBe(
       bsffForRegistry.transporters[1].transporterCompanySiret
     );
-    expect(waste.transporter2NumberPlates).toStrictEqual([
-      "TRANSPORTER2-NBR-PLATES"
-    ]);
+    expect(waste.transporter2NumberPlates).toStrictEqual(["TR-02-AA"]);
 
     expect(waste.transporter3CompanySiret).toBe(
       bsffForRegistry.transporters[2].transporterCompanySiret
     );
-    expect(waste.transporter3NumberPlates).toStrictEqual([
-      "TRANSPORTER3-NBR-PLATES"
-    ]);
+    expect(waste.transporter3NumberPlates).toStrictEqual(["TR-03-AA"]);
 
     expect(waste.transporter4CompanySiret).toBe(
       bsffForRegistry.transporters[3].transporterCompanySiret
     );
-    expect(waste.transporter4NumberPlates).toStrictEqual([
-      "TRANSPORTER4-NBR-PLATES"
-    ]);
+    expect(waste.transporter4NumberPlates).toStrictEqual(["TR-04-AA"]);
 
     expect(waste.transporter5CompanySiret).toBe(
       bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
-    expect(waste.transporter5NumberPlates).toStrictEqual([
-      "TRANSPORTER5-NBR-PLATES"
-    ]);
+    expect(waste.transporter5NumberPlates).toStrictEqual(["TR-05-AA"]);
   });
 });
 
@@ -843,37 +833,27 @@ describe("toAllWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       bsffForRegistry.transporters[0].transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBe(
       bsffForRegistry.transporters[1].transporterCompanySiret
     );
-    expect(waste.transporter2NumberPlates).toStrictEqual([
-      "TRANSPORTER2-NBR-PLATES"
-    ]);
+    expect(waste.transporter2NumberPlates).toStrictEqual(["TR-02-AA"]);
 
     expect(waste.transporter3CompanySiret).toBe(
       bsffForRegistry.transporters[2].transporterCompanySiret
     );
-    expect(waste.transporter3NumberPlates).toStrictEqual([
-      "TRANSPORTER3-NBR-PLATES"
-    ]);
+    expect(waste.transporter3NumberPlates).toStrictEqual(["TR-03-AA"]);
 
     expect(waste.transporter4CompanySiret).toBe(
       bsffForRegistry.transporters[3].transporterCompanySiret
     );
-    expect(waste.transporter4NumberPlates).toStrictEqual([
-      "TRANSPORTER4-NBR-PLATES"
-    ]);
+    expect(waste.transporter4NumberPlates).toStrictEqual(["TR-04-AA"]);
 
     expect(waste.transporter5CompanySiret).toBe(
       bsffForRegistry.transporters[4].transporterCompanyVatNumber
     );
-    expect(waste.transporter5NumberPlates).toStrictEqual([
-      "TRANSPORTER5-NBR-PLATES"
-    ]);
+    expect(waste.transporter5NumberPlates).toStrictEqual(["TR-05-AA"]);
   });
 });
 

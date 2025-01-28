@@ -161,7 +161,9 @@ describe("validation > parseBsff", () => {
 
     it("should throw if a transporter has more than 2 plates", () => {
       const zodBsff: ZodBsff = {
-        transporters: [{ transporterTransportPlates: ["1", "2", "3"] }]
+        transporters: [
+          { transporterTransportPlates: ["AA-12-AA", "AA-12-AB", "AA-12-AC"] }
+        ]
       };
       expect.assertions(1);
       try {
@@ -175,9 +177,71 @@ describe("validation > parseBsff", () => {
       }
     });
 
+    it("should throw if transporter plate number is too short", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["AA"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter plate number is too long", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["AZ-ER-TY-UI-09-LP-87"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter contains only whitespace", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["      "]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
+          })
+        ]);
+      }
+    });
+
     it("should parse correctly if a transporter has 2 plates or less", () => {
       const zodBsff: ZodBsff = {
-        transporters: [{ transporterTransportPlates: ["1", "2"] }]
+        transporters: [{ transporterTransportPlates: ["AA-12-AA", "AA-12-AB"] }]
       };
       expect(parseBsff(zodBsff)).toBeDefined();
     });
@@ -864,6 +928,30 @@ describe("validation > parseBsff", () => {
             ]
           },
           { currentSignatureType: "TRANSPORT" }
+        )
+      ).toBeDefined();
+    });
+
+    test("immat plates are not required at emitter signature when transport mode is road", async () => {
+      const bsff = await createBsffBeforeTransport({
+        emitter,
+        transporter,
+        destination
+      });
+      const zodBsff = prismaToZodBsff(bsff);
+      expect(
+        parseBsff(
+          {
+            ...zodBsff,
+            transporters: [
+              {
+                ...zodBsff.transporters![0],
+                transporterTransportPlates: [],
+                transporterTransportMode: TransportMode.ROAD
+              }
+            ]
+          },
+          { currentSignatureType: "EMISSION" }
         )
       ).toBeDefined();
     });

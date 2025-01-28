@@ -140,7 +140,7 @@ describe("Mutation.signBsdasri emission", () => {
       const data = {
         ...bsdasri,
         transporterTransportMode: "ROAD",
-        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+        transporterTransportPlates: ["AB-12-ZE"]
       };
       const validated = await validateBsdasri(data as any, {
         transportSignature: true

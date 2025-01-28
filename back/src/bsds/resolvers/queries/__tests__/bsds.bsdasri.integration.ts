@@ -154,7 +154,7 @@ describe("Query.bsds.dasris base workflow", () => {
                 takenOverAt: new Date().toISOString() as any,
 
                 weight: { value: 99, isEstimate: false },
-                plates: ["TRANSPORTER-PLATE"],
+                plates: ["AB-65-ML"],
                 packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
 
                 acceptation: { status: WasteAcceptationStatus.ACCEPTED }
