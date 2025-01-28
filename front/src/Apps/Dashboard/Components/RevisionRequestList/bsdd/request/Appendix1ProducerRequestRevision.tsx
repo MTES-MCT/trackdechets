@@ -47,13 +47,13 @@ const Appendix1ProducerRequestRevision = ({
       {bsdd.wasteDetails?.code &&
         BSDD_SAMPLE_NUMBER_WASTE_CODES.includes(bsdd.wasteDetails.code) && (
           <RhfReviewableField
-            title="Numéro d'achantillon"
+            title="Numéro d'échantillon"
             path="wasteDetails.sampleNumber"
             value={bsdd.wasteDetails?.sampleNumber}
             defaultValue={initialBsddReview.wasteDetails.sampleNumber}
           >
             <Input
-              label="Numéro d'achantillon"
+              label="Numéro d'échantillon"
               className="fr-col-3"
               nativeInputProps={{
                 ...register("wasteDetails.sampleNumber")
