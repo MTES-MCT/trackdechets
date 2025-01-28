@@ -7,6 +7,7 @@ import type {
 
 import { recipifyGeneric } from "../companies/recipify";
 import { BsddTransporter, Prisma } from "@prisma/client";
+import { prisma } from "@td/prisma";
 
 type Receipt = {
   number?: string | null;
@@ -22,25 +23,66 @@ const genericGetter = (input: FormInput) => () =>
     ? input?.transporter?.company
     : null;
 
-const formInputAccessors = (input: FormInput) => [
-  {
-    getter: genericGetter(input),
-    setter: (
-      input: FormInput,
-      transporterAutocompleted: Receipt
-    ): FormInput => {
-      const { number, department, validityLimit } = transporterAutocompleted;
-      return {
-        ...input,
+export const recipifyFormInput = async (input: FormInput) => {
+  let recipified = input;
+
+  if (input.transporter?.company?.siret) {
+    const transporterCompany = await prisma.company.findFirst({
+      where: { orgId: input.transporter.company.siret },
+      include: { transporterReceipt: true }
+    });
+    if (transporterCompany) {
+      recipified = {
+        ...recipified,
         transporter: {
           ...input.transporter,
-          ...{ receipt: number, department, validityLimit }
+          receipt: transporterCompany.transporterReceipt?.receiptNumber ?? null,
+          department: transporterCompany.transporterReceipt?.department ?? null,
+          validityLimit:
+            transporterCompany.transporterReceipt?.validityLimit ?? null
         }
       };
     }
   }
-];
-export const recipifyFormInput = recipifyGeneric(formInputAccessors);
+
+  if (input.trader?.company?.siret) {
+    const traderCompany = await prisma.company.findFirst({
+      where: { orgId: input.trader.company.siret },
+      include: { traderReceipt: true }
+    });
+    if (traderCompany) {
+      recipified = {
+        ...recipified,
+        trader: {
+          ...input.trader,
+          receipt: traderCompany.traderReceipt?.receiptNumber ?? null,
+          department: traderCompany.traderReceipt?.department ?? null,
+          validityLimit: traderCompany.traderReceipt?.validityLimit ?? null
+        }
+      };
+    }
+  }
+
+  if (input.broker?.company?.siret) {
+    const brokerCompany = await prisma.company.findFirst({
+      where: { orgId: input.broker.company.siret },
+      include: { brokerReceipt: true }
+    });
+    if (brokerCompany) {
+      recipified = {
+        ...recipified,
+        broker: {
+          ...input.broker,
+          receipt: brokerCompany.brokerReceipt?.receiptNumber ?? null,
+          department: brokerCompany.brokerReceipt?.department ?? null,
+          validityLimit: brokerCompany?.brokerReceipt?.validityLimit ?? null
+        }
+      };
+    }
+  }
+
+  return recipified;
+};
 
 const resealedFormInputAccessors = (input: ResealedFormInput) => [
   {

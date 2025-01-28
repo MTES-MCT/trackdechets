@@ -182,6 +182,7 @@ const updateFormResolver = async (
     ...form,
     transporters: transportersForValidation
   };
+
   // Construct form update payload
   // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
   // To remove those unknown values, we cast the object. This makes sure our input has a shape that fits our validator
@@ -195,6 +196,11 @@ const updateFormResolver = async (
   for (const key of Object.keys(formUpdateInput)) {
     if (!(key in form)) {
       delete formUpdateInput[key];
+    }
+    if (form[key] === null && formUpdateInput[key] === "") {
+      // Reverse le casting lorsque `null` est converti
+      // en chaine de caractère vide
+      formUpdateInput[key] = null;
     }
   }
 

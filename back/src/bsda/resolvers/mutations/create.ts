@@ -42,7 +42,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
 
   const zodBsda = await graphQlInputToZodBsda(input);
 
-  const bsda = await parseBsdaAsync(
+  const { createdAt, ...bsda } = await parseBsdaAsync(
     { ...zodBsda, isDraft },
     {
       user,

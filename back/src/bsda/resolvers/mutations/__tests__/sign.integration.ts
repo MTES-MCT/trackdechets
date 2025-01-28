@@ -1687,7 +1687,14 @@ describe("Mutation.Bsda.sign", () => {
         await userWithCompanyFactory("MEMBER", { name: "Worker" });
       const broker = await companyFactory({
         name: "Broker",
-        companyTypes: ["BROKER"]
+        companyTypes: ["BROKER"],
+        brokerReceipt: {
+          create: {
+            receiptNumber: "recepisse",
+            department: "07",
+            validityLimit: new Date()
+          }
+        }
       });
       const intermediary = await companyFactory({ name: "Intermediary" });
       const ecoOrganisme = await ecoOrganismeFactory({
