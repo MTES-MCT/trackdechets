@@ -33,6 +33,7 @@ import RhfOperationModeSelect from "../../../common/Components/OperationModeSele
 import Select from "@codegouvfr/react-dsfr/Select";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../common/queries/company/query";
 import { useParams } from "react-router-dom";
+import { SignatureTimestamp } from "../BSPaoh/WorkflowAction/components/Signature";
 
 const schema = z.object({
   author: z
@@ -169,11 +170,6 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
       <WasteVhuSummary bsvhu={bsvhu} />
       <BsvhuJourneySummary bsvhu={bsvhu} />
 
-      <p className="fr-text fr-mb-2w">
-        En qualité de <strong>destinataire du déchet</strong>, j'atteste que les
-        informations ci-dessus sont correctes. En signant, je confirme le
-        traitement des déchets pour la quantité indiquée dans ce bordereau.
-      </p>
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(async data => {
@@ -262,6 +258,13 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             </>
           )}
 
+          <p className="fr-text fr-mb-2w">
+            En qualité de <strong>destinataire du déchet</strong>, j'atteste que
+            les informations ci-dessus sont correctes. En signant, je confirme
+            le traitement des déchets pour la quantité indiquée dans ce
+            bordereau.
+          </p>
+
           <div className="fr-col-4 fr-mb-2w">
             <Input
               label="Date de traitement"
@@ -285,6 +288,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
               stateRelatedMessage={formState.errors.author?.message}
             />
           </div>
+          <SignatureTimestamp />
           <div className="fr-mb-8w">
             {updateError && <DsfrNotificationError apolloError={updateError} />}
             {error && <DsfrNotificationError apolloError={error} />}

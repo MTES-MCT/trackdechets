@@ -16,14 +16,6 @@
   &.error {
     box-shadow: inset 0 -2px 0 0 var(--border-plain-error);
   }
-
-  button {
-    background-color: var(--background-action-low-blue-france) !important;
-    color: var(--text-action-high-grey) !important;
-  }
-  button:hover {
-    background-color: var(--background-action-low-blue-france-hover) !important;
-  }
 }
 
 .multiTagsInput {
