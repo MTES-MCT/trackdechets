@@ -95,7 +95,3 @@ export default {
   },
   intermediaries: [getInitialCompany()]
 };
-
-export const ecoOrganismeList = [
-  { siret: "92474564900013", name: "Recycler mon véhicule" }
-];
