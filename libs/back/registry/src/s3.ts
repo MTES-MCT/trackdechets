@@ -46,7 +46,8 @@ export function getUploadWithWritableStream({
       Key: key,
       Body: s3Stream,
       Metadata: metadata,
-      ContentType: contentType
+      ContentType: contentType,
+      ContentEncoding: "utf-8"
     }
   });
 

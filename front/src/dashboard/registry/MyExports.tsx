@@ -482,7 +482,7 @@ export function MyExports() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="fr-container--fluid fr-mb-8v">
               <Select
-                label="Etablissement concerné"
+                label="Établissement concerné"
                 disabled={isLoading}
                 nativeSelectProps={{
                   ...register("companyOrgId")
@@ -770,7 +770,7 @@ export function MyExports() {
               }
               headers={[
                 "Date",
-                "Etablissements",
+                "Établissements",
                 "Type de registre",
                 "Type de déclaration",
                 "Période",

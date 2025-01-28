@@ -186,7 +186,7 @@ function Step1({ register }: StepProps) {
       </Select>
 
       <Upload
-        hint="Formats supportés: csv, xls, xlsx"
+        hint="Formats supportés : csv, xls, xlsx"
         state="default"
         stateRelatedMessage="Text de validation / d'explication de l'erreur"
         nativeInputProps={{

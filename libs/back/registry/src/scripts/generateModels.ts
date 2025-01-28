@@ -77,7 +77,7 @@ async function generateCsvModel({
     }
   });
 
-  const csvStream = format({ headers: false });
+  const csvStream = format({ headers: false, writeBOM: true }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
   csvStream.pipe(writableStream);
 
   csvStream.write(headers);
@@ -109,7 +109,8 @@ async function writeToS3({
     Bucket: envConfig.S3_REGISTRY_MODELS_BUCKET,
     Key: name,
     Body: buffer,
-    ContentType: contentType
+    ContentType: contentType,
+    ContentEncoding: "utf-8"
   };
 
   const command = new PutObjectCommand(params);

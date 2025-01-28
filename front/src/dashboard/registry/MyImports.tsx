@@ -29,7 +29,7 @@ const HEADERS = [
   "Importé le",
   "Registre",
   "Déclarations",
-  "Etablissements concernés",
+  "Établissements concernés",
   "Fichier importé",
   "Rapport d'erreur"
 ];
@@ -172,7 +172,7 @@ export function MyImports() {
                 iconPosition="right"
                 onClick={() => refetch()}
               >
-                Rafraichir
+                Rafraîchir
               </Button>
             </div>
             <div className="tw-flex tw-items-center">

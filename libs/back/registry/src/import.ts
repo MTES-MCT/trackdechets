@@ -50,6 +50,7 @@ export async function processStream({
     delimiter: CSV_DELIMITER,
     headers: ["errors", ...Object.keys(options.headers)],
     writeHeaders: false, // Use headers only to reorder the columns properly
+    writeBOM: true, // To help Excel recognize UTF-8 encoding
     transform: (row: Record<string, unknown>) => {
       return Object.fromEntries(
         Object.entries(row).map(([key, value]) => [

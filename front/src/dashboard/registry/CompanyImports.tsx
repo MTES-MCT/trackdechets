@@ -137,7 +137,7 @@ export function CompanyImports() {
           )}
           {data && tableData.length === 0 && (
             <p className="tw-mt-24 tw-text-xl tw-mb-4 tw-text-center">
-              Aucun import n'a encore été réalisé pour cette entreprise
+              Aucun import n'a encore été réalisé pour cet établissement
             </p>
           )}
           {data && tableData.length > 0 && (
