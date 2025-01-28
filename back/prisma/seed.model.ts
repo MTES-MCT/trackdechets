@@ -126,7 +126,8 @@ export default async () => {
     data: {
       address: "34 RUE DU DECHETS 13001 MARSEILLE",
       name: "ECOORG",
-      siret: siretify(5)
+      siret: siretify(5),
+      handleBsdd: true
     }
   });
 };
