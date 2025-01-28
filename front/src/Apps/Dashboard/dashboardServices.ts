@@ -112,6 +112,9 @@ export const getBsdStatusLabel = (
       if (bsdType === BsdType.Bspaoh) {
         return ACCEPTE;
       }
+      if (bsdType === BsdType.Bsvhu) {
+        return EN_ATTENTE_TRAITEMENT;
+      }
       return RECU;
     case BsdStatusCode.Accepted:
       return ACCEPTE;

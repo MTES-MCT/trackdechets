@@ -183,6 +183,8 @@ type BsvhuReception {
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
   identification: BsvhuIdentification
+  "Données relatives à la signature de la réception (optionelle)"
+  signature: Signature
 }
 
 type BsvhuOperation {

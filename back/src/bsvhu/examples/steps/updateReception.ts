@@ -2,19 +2,19 @@ import mutations from "../mutations";
 import fixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 
-export function updateDestination(company: string): WorkflowStep {
+export function updateReception(company: string): WorkflowStep {
   return {
-    description: `Le broyeur renseigne les données de traitement`,
+    description: `Le broyeur renseigne les données de réception (étape facultative)`,
     mutation: mutations.updateBsvhu,
     variables: ({ bsd }) => ({
       id: bsd.id,
       input: {
         destination: {
-          operation: fixtures.operationInput
+          reception: fixtures.receptionInput
         }
       }
     }),
-    expected: { status: "RECEIVED" },
+    expected: { status: "SENT" },
     data: response => response.updateBsvhu,
     company,
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
