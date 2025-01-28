@@ -15,7 +15,11 @@ input SignEmissionFormInput {
   "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
   nonRoadRegulationMention: String
 
-  "Numéro de la plaque d'immatriculation transporteur"
+  """
+  Numéro de la plaque d'immatriculation transporteur.
+  Jusqu'à 2 plaques séparées par une virgule ex: AZ-12-TR, AQ-34-JK
+  Format de chaque plaque: 4 à 12 caractères
+  """
   transporterNumberPlate: String
 
   "Date de signature de l'émetteur"
@@ -35,7 +39,11 @@ input SignTransportFormInput {
   "Nom de la personne signant pour le transporteur"
   takenOverBy: String!
 
-  "Numéro de la plaque d'immatriculation transporteur"
+  """
+  Numéro de la plaque d'immatriculation transporteur.
+  Jusqu'à 2 plaques séparées par une virgule ex: AZ-12-TR, AQ-34-JK
+  Format de chaque plaque: 4 à 12 caractères
+  """
   transporterNumberPlate: String
 
   "Le mode de transport utilisé par le transporteur"
@@ -548,7 +556,11 @@ input TransporterInput {
       reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
     )
 
-  "Numéro de plaque d'immatriculation"
+  """
+  Numéro de la plaque d'immatriculation transporteur.
+  Jusqu'à 2 plaques séparées par une virgule ex: AZ-12-TR, AQ-34-JK
+  Format de chaque plaque: 4 à 12 caractères
+  """
   numberPlate: String
 
   "Information libre, destinée aux transporteurs"

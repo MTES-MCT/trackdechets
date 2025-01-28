@@ -76,6 +76,12 @@ import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { isDefined, isDefinedStrict } from "../common/helpers";
+import { onlyWhiteSpace } from "../common/validation/zod/refinement";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../common/validation/messages";
 
 // set yup default error messages
 configureYup();
@@ -1005,7 +1011,9 @@ const requiredWhenTransporterSign: (
   }
 });
 
+//
 // 8 - Collecteur-transporteur
+
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
@@ -1032,6 +1040,33 @@ export const transporterSchemaFn: FactorySchemaOf<
         ) {
           return new yup.ValidationError(
             "La plaque d'immatriculation est requise"
+          );
+        }
+
+        if (!transporterNumberPlate) {
+          return true;
+        }
+
+        // convert plate  string to an array
+        const plates = formatInitialPlates(transporterNumberPlate);
+
+        if (plates.length > 2) {
+          return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_TOO_MANY);
+        }
+
+        if (
+          plates.some(
+            plate => (plate ?? "").length > 12 || (plate ?? "").length < 4
+          )
+        ) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+          );
+        }
+
+        if (plates.some(plate => onlyWhiteSpace(plate ?? ""))) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
           );
         }
 
@@ -2392,3 +2427,25 @@ export async function validateIntermediaries(
     await intermediarySchema.validate(companyInput, { abortEarly: false });
   }
 }
+
+const formatInitialPlates = (
+  transporterNumberPlate: string | null | undefined
+): string[] => {
+  if (!transporterNumberPlate) {
+    return [];
+  }
+  const regex = /,+|,\s+/;
+  const containsComma = regex.test(transporterNumberPlate);
+  if (containsComma) {
+    return transporterNumberPlate?.split(regex);
+  } else {
+    if (transporterNumberPlate) {
+      return [transporterNumberPlate];
+    }
+    return [];
+  }
+};
+
+export const transporterPlatesSchema = transporterSchemaFn({}).pick([
+  "transporterNumberPlate"
+]);

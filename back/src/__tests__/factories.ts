@@ -268,7 +268,7 @@ export const bsddTransporterData: Omit<
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterTransportMode: TransportMode.ROAD,
-  transporterNumberPlate: "aa22",
+  transporterNumberPlate: "AA-22", // valid plate
   transporterReceipt: "33AA",
   transporterValidityLimit: "2019-11-27T00:00:00.000Z",
   readyToTakeOver: true

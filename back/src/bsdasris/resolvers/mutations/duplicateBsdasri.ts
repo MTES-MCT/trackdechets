@@ -73,6 +73,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     transporterWasteWeightValue,
     transporterWasteWeightIsEstimate,
     transporterWasteVolume,
+    transporterTransportPlates,
     handedOverToRecipientAt,
     transportSignatoryId,
     transporterTransportSignatureDate,

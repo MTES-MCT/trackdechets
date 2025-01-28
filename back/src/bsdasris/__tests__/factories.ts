@@ -122,7 +122,7 @@ export const readyToTakeOverData = company => ({
   transporterRecepisseNumber: "xyz",
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: new Date(),
-  transporterTransportPlates: ["TRANSPORTER-PLATE"],
+  transporterTransportPlates: ["AB-65-ML"],
   transporterTransportMode: TransportMode.ROAD,
   transporterWastePackagings: [
     { type: "BOITE_CARTON", volume: 22, quantity: 3 }

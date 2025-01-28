@@ -595,6 +595,89 @@ describe("Mutation.Bsda.sign", () => {
       );
     });
 
+    it("should forbid invalid plates", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      await transporterReceiptFactory({
+        company: transporter.company
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          )
+        })
+      ]);
+    });
+
+    it("should allow invalid plates on bsda create before V2025020", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      await transporterReceiptFactory({
+        company: transporter.company
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date(),
+          createdAt: new Date("2025-01-04T00:00:00.000Z") // created before V2025020
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+    });
+
     it("should disallow transporter to sign transport when recepisse is missing", async () => {
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
 

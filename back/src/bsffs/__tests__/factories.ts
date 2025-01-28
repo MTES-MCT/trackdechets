@@ -198,7 +198,7 @@ export function createBsffBeforeTransport(
     ...opts,
     transporterData: {
       transporterTransportMode: TransportMode.ROAD,
-      transporterTransportPlates: ["TRANSPORTER-PLATE"],
+      transporterTransportPlates: ["AB-12-YZ"],
       transporterTransportTakenOverAt: new Date(),
       ...opts.transporterData
     }

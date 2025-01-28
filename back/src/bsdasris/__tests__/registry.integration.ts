@@ -148,7 +148,7 @@ describe("toIncomingWaste", () => {
       opt: {
         destinationCompanyMail: "destination@mail.com",
         transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        transporterTransportPlates: ["TR-12-AA"]
       }
     });
 
@@ -364,7 +364,7 @@ describe("toOutgoingWaste", () => {
       opt: {
         destinationCompanyMail: "destination@mail.com",
         transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        transporterTransportPlates: ["TR-12-AA"]
       }
     });
 
@@ -447,7 +447,7 @@ describe("toTransportedWaste", () => {
       opt: {
         destinationCompanyMail: "destination@mail.com",
         transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        transporterTransportPlates: ["TR-12-AA"]
       }
     });
 
@@ -462,9 +462,7 @@ describe("toTransportedWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       dasriForRegistry.transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-12-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();
@@ -514,7 +512,7 @@ describe("toManagedWaste", () => {
       opt: {
         destinationCompanyMail: "destination@mail.com",
         transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        transporterTransportPlates: ["TR-12-AA"]
       }
     });
 
@@ -686,7 +684,7 @@ describe("toAllWaste", () => {
       opt: {
         destinationCompanyMail: "destination@mail.com",
         transporterCompanySiret: transporter.siret,
-        transporterTransportPlates: ["TRANSPORTER-NBR-PLATES"]
+        transporterTransportPlates: ["TR-12-AA"]
       }
     });
 
@@ -701,9 +699,7 @@ describe("toAllWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       dasriForRegistry.transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-12-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();

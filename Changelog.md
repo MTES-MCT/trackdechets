@@ -23,6 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Révision BSDD - Vérifier le type de profil du courtier et/ou négociant lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 - Bordereau BSDA - Vérifier le type de profil du courtier lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 - Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Restrictions sur le format des plaques d'immatriculations sur le BSDA, BSDASRI, BSFF, BSPAOH, BSDD [PR 3935](https://github.com/MTES-MCT/trackdechets/pull/3935).
 
 # [2025.01.1] 14/01/2025
 

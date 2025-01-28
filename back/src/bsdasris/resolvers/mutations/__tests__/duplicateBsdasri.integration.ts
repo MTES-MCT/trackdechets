@@ -487,4 +487,34 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedDasri.destinationOperationCode).toBeNull();
     expect(duplicatedDasri.destinationOperationMode).toBeNull();
   });
+
+  it("should *not* duplicate transporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        transporterTransportPlates: ["AZ-12-RT"]
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+    expect(data.duplicateBsdasri.status).toBe("INITIAL");
+    expect(data.duplicateBsdasri.isDraft).toBe(true);
+
+    const duplicatedDasri = await prisma.bsdasri.findFirstOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+
+    expect(duplicatedDasri.transporterTransportPlates).toStrictEqual([]);
+  });
 });
