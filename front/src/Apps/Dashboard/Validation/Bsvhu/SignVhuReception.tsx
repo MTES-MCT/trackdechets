@@ -14,7 +14,7 @@ import {
 } from "@td/codegen-ui";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { subMonths } from "date-fns";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
@@ -49,21 +49,10 @@ const schema = z.object({
         )
     ),
   date: z.coerce
-    .date({
-      required_error: "La date de traitement est requise",
-      invalid_type_error: "Format de date invalide."
-    })
+    .date()
+    .nullish()
     .transform(v => v?.toISOString()),
   destination: z.object({
-    operation: z
-      .object({
-        date: z.coerce
-          .date()
-          .nullish()
-          .transform(v => v?.toISOString())
-      })
-      .nullish()
-      .nullish(),
     reception: z
       .object({
         acceptationStatus: z.enum(
@@ -75,7 +64,13 @@ const schema = z.object({
           }
         ),
         weight: z.coerce.number().nonnegative().nullish(),
-        refusalReason: z.string().nullish()
+        refusalReason: z.string().nullish(),
+        date: z.coerce
+          .date({
+            required_error: "La date de prise en charge est requise",
+            invalid_type_error: "Format de date invalide."
+          })
+          .transform(v => v?.toISOString())
       })
       .nullish()
   })
@@ -92,17 +87,17 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
     }
   );
 
-  const [updateBsvhu, { error: updateError }] = useMutation<
-    Pick<Mutation, "updateBsvhu">,
-    MutationUpdateBsvhuArgs
-  >(UPDATE_VHU_FORM);
+  const [updateBsvhu, { error: updateError, loading: loadingUpdate }] =
+    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+      UPDATE_VHU_FORM
+    );
 
   const [signBsvhu, { loading, error }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU);
 
-  const title = "Signer la réception et l'acceptation";
+  const title = "Signer la réception et le traitement";
   const TODAY = new Date();
 
   const initialState = {
@@ -160,15 +155,23 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
   }, [acceptationStatus, setValue]);
 
   const [isOperationModalOpended, setIsOperationModalOpened] = useState(false);
+  const isTwoStepSignature = useRef(false);
 
-  const onClickTwoStepValidation = event => {
+  const onClickTwoStepSignature = event => {
+    isTwoStepSignature.current = true;
     event.target.form.dispatchEvent(
       new Event("submit", { cancelable: true, bubbles: true })
     );
-    if (!formState.errors && !error && !updateError) {
-      setIsOperationModalOpened(true);
-    }
   };
+
+  const handleClose = useCallback(() => {
+    if (isTwoStepSignature.current) {
+      if (!!formState.errors && !error && !updateError)
+        setIsOperationModalOpened(true);
+    } else {
+      onClose();
+    }
+  }, [error, formState.errors, onClose, updateError]);
 
   if (data == null) {
     return <Loader />;
@@ -201,10 +204,14 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
               await signBsvhu({
                 variables: {
                   id: bsvhu.id,
-                  input: { author, date, type: SignatureTypeInput.Reception }
+                  input: {
+                    author,
+                    date: TODAY.toISOString(),
+                    type: SignatureTypeInput.Reception
+                  }
                 }
               });
-              onClose();
+              handleClose();
             })}
           >
             <p className="fr-text fr-mb-2w">Je souhaite effectuer</p>
@@ -274,7 +281,7 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
               )}
             </div>
 
-            <p className="fr-text fr-mt-4w fr-mb-2w">
+            <p className="fr-text fr-mb-2w">
               En qualité de <strong>destinataire du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant, je
               confirme le traitement des déchets pour la quantité indiquée dans
@@ -288,10 +295,16 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
                   type: "date",
                   min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
                   max: datetimeToYYYYMMDD(TODAY),
-                  ...register("date")
+                  ...register("destination.reception.date")
                 }}
-                state={formState.errors.date ? "error" : "default"}
-                stateRelatedMessage={formState.errors.date?.message}
+                state={
+                  formState.errors.destination?.reception?.date
+                    ? "error"
+                    : "default"
+                }
+                stateRelatedMessage={
+                  formState.errors.destination?.reception?.date?.message
+                }
               />
             </div>
 
@@ -314,17 +327,22 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
 
             <hr className="fr-mt-2w" />
             <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-              <Button type="button" priority="secondary" onClick={onCancel}>
-                Annuler
-              </Button>
-              <Button disabled={loading}>Signer</Button>
               <Button
                 type="button"
-                disabled={loading}
-                onClick={onClickTwoStepValidation}
+                priority="secondary"
+                onClick={onCancel}
+                disabled={loading || loadingUpdate}
               >
-                Signer et passer à la validation du traitement
+                Annuler
               </Button>
+              <Button
+                type="button"
+                disabled={loading || loadingUpdate}
+                onClick={onClickTwoStepSignature}
+              >
+                Signer et passer à l'étape traitement
+              </Button>
+              <Button disabled={loading || loadingUpdate}>Signer</Button>
             </div>
           </form>
         </FormProvider>

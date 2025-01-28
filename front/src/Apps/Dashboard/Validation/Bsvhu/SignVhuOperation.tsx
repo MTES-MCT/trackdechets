@@ -52,10 +52,8 @@ const schema = z.object({
         )
     ),
   date: z.coerce
-    .date({
-      required_error: "La date de traitement est requise",
-      invalid_type_error: "Format de date invalide."
-    })
+    .date()
+    .nullish()
     .transform(v => v?.toISOString()),
   destination: z.object({
     operation: z
@@ -64,8 +62,10 @@ const schema = z.object({
           message: "Le code de traitement est requis"
         }),
         date: z.coerce
-          .date()
-          .nullish()
+          .date({
+            required_error: "La date de traitement est requise",
+            invalid_type_error: "Format de date invalide."
+          })
           .transform(v => v?.toISOString()),
         mode: z
           .enum([
@@ -103,10 +103,10 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
     }
   );
 
-  const [updateBsvhu, { error: updateError }] = useMutation<
-    Pick<Mutation, "updateBsvhu">,
-    MutationUpdateBsvhuArgs
-  >(UPDATE_VHU_FORM);
+  const [updateBsvhu, { error: updateError, loading: loadingUpdate }] =
+    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+      UPDATE_VHU_FORM
+    );
 
   const [signBsvhu, { loading, error }] = useMutation<
     Pick<Mutation, "signBsvhu">,
@@ -183,7 +183,11 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             await signBsvhu({
               variables: {
                 id: bsvhu.id,
-                input: { author, date, type: SignatureTypeInput.Operation }
+                input: {
+                  author,
+                  date: TODAY.toISOString(),
+                  type: SignatureTypeInput.Operation
+                }
               }
             });
             onClose();
@@ -257,7 +261,6 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
               </div>
             </>
           )}
-
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
             les informations ci-dessus sont correctes. En signant, je confirme
@@ -272,7 +275,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
                 type: "date",
                 min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
                 max: datetimeToYYYYMMDD(TODAY),
-                ...register("date")
+                ...register("destination.operation.date")
               }}
               state={formState.errors.date ? "error" : "default"}
               stateRelatedMessage={formState.errors.date?.message}
@@ -296,10 +299,15 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
 
           <hr className="fr-mt-2w" />
           <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-            <Button type="button" priority="secondary" onClick={onCancel}>
+            <Button
+              type="button"
+              priority="secondary"
+              onClick={onCancel}
+              disabled={loading || loadingUpdate}
+            >
               Annuler
             </Button>
-            <Button disabled={loading}>Signer</Button>
+            <Button disabled={loading || loadingUpdate}>Signer</Button>
           </div>
         </form>
       </FormProvider>

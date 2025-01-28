@@ -24,11 +24,11 @@ const ActBsvhuValidation = ({
     return <SignVhuTransport bsvhuId={bsd.id} onClose={onClose} />;
   };
 
-  const renderSentModal = () => {
+  const renderReceivedModal = () => {
     return <SignVhuOperation bsvhuId={bsd.id} onClose={onClose} />;
   };
 
-  const renderReceivedModal = () => {
+  const renderSentModal = () => {
     return <SignVhuReception bsvhuId={bsd.id} onClose={onClose} />;
   };
 
@@ -67,8 +67,8 @@ const ActBsvhuValidation = ({
           (canIrregularSituationSignWithNoSiret ||
             canIrregularSituationSignWithSiretNotRegistered))) &&
         renderSignedByProducerModal()}
-      {status === BsvhuStatus.Received && renderReceivedModal()}
       {status === BsvhuStatus.Sent && renderSentModal()}
+      {status === BsvhuStatus.Received && renderReceivedModal()}
     </>
   );
 };
