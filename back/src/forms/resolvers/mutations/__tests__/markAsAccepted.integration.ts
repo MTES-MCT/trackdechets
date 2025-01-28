@@ -77,6 +77,7 @@ const createAndAcceptForm = async (createOpt, acceptOpt) => {
         signedBy: "Bill",
         wasteAcceptationStatus: "ACCEPTED",
         quantityReceived: 11,
+        quantityRefused: 0,
         ...acceptOpt
       }
     }
@@ -138,7 +139,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           signedBy: "Bill",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+          quantityReceived: 11,
+          quantityRefused: 0
         }
       }
     });
@@ -287,7 +289,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
-          quantityReceived: 0
+          quantityReceived: 0,
+          quantityRefused: 0
         }
       }
     });
@@ -384,7 +387,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "PARTIALLY_REFUSED",
           wasteRefusalReason: "Dolor sit amet",
-          quantityReceived: 12.5
+          quantityReceived: 12.5,
+          quantityRefused: 7
         }
       }
     });
@@ -396,6 +400,7 @@ describe("Test Form reception", () => {
     expect(frm.signedBy).toBe("Carol");
     expect(frm.wasteRefusalReason).toBe("Dolor sit amet");
     expect(frm.quantityReceived?.toNumber()).toBe(12.5);
+    expect(frm.quantityRefused?.toNumber()).toBe(7);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -452,7 +457,8 @@ describe("Test Form reception", () => {
             signedAt: format(signedAt, f),
             signedBy: "Bill",
             wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-            quantityReceived: 11
+            quantityReceived: 11,
+            quantityRefused: 0
           }
         }
       });
@@ -537,7 +543,8 @@ describe("Test Form reception", () => {
               wasteRefusalReason: "Parce que",
               signedAt: "2019-01-18" as any,
               signedBy: "John",
-              quantityReceived: 0
+              quantityReceived: 0,
+              quantityRefused: 0
             }
           }
         }
@@ -699,6 +706,7 @@ describe("Test Form reception", () => {
           acceptedInfo: {
             wasteAcceptationStatus: "ACCEPTED",
             quantityReceived: 1,
+            quantityRefused: 0,
             signedAt: new Date("2022-01-01").toISOString() as any,
             signedBy: "Collecteur annexe 1"
           }

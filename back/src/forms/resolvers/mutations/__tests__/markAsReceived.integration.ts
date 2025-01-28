@@ -166,7 +166,8 @@ describe("Test Form reception", () => {
           receivedAt: "2019-01-17T10:22:00+0100",
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+          quantityReceived: 11,
+          quantityRefused: 0
         }
       }
     });
@@ -218,7 +219,8 @@ describe("Test Form reception", () => {
           receivedAt: "2019-01-17T10:22:00+0100",
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 0
+          quantityReceived: 0,
+          quantityRefused: 0
         }
       }
     });
@@ -374,7 +376,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
-          quantityReceived: 0
+          quantityReceived: 0,
+          quantityRefused: 0
         }
       }
     });
@@ -420,7 +423,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "PARTIALLY_REFUSED",
           wasteRefusalReason: "Dolor sit amet",
-          quantityReceived: 12.5
+          quantityReceived: 12.5,
+          quantityRefused: 7
         }
       }
     });
@@ -432,6 +436,7 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Carol");
     expect(frm.wasteRefusalReason).toBe("Dolor sit amet");
     expect(frm.quantityReceived?.toNumber()).toBe(12.5);
+    expect(frm.quantityRefused?.toNumber()).toBe(7);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -563,7 +568,8 @@ describe("Test Form reception", () => {
           receivedBy: "Bill",
           receivedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+          quantityReceived: 11,
+          quantityRefused: 0
         }
       }
     });
@@ -632,7 +638,8 @@ describe("Test Form reception", () => {
           receivedBy: "Bill",
           receivedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+          quantityReceived: 11,
+          quantityRefused: 0
         }
       }
     });
@@ -791,7 +798,8 @@ describe("Test Form reception", () => {
               wasteRefusalReason: "Parce que",
               receivedAt: "2019-01-18" as any,
               receivedBy: "John",
-              quantityReceived: 0
+              quantityReceived: 0,
+              quantityRefused: 0
             }
           }
         }
@@ -882,7 +890,8 @@ describe("Test Form reception", () => {
           receivedAt: "2019-01-17T10:22:00+0100",
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 50
+          quantityReceived: 50,
+          quantityRefused: 0
         }
       }
     });
@@ -918,7 +927,8 @@ describe("Test Form reception", () => {
           receivedAt: "2019-01-17T10:22:00+0100",
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 30
+          quantityReceived: 30,
+          quantityRefused: 0
         }
       }
     });
@@ -1027,7 +1037,8 @@ describe("Test Form reception", () => {
             wasteAcceptationStatus: "ACCEPTED",
             receivedAt: new Date("2022-01-01").toISOString() as any,
             receivedBy: "John",
-            quantityReceived: 1
+            quantityReceived: 1,
+            quantityRefused: 0
           }
         }
       });
