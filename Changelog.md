@@ -14,6 +14,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout d'éco-organismes, filtrage des éco-organismes en front [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
 
+#### :boom: Breaking changes
+
+- Le champ GraphQL `BsdaPackagingInput.type` est rendu obligatoire [PR 3930](https://github.com/MTES-MCT/trackdechets/pull/3930).
+
 # [2025.01.1] 14/01/2025
 
 #### :rocket: Nouvelles fonctionnalités
