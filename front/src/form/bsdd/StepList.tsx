@@ -171,6 +171,7 @@ export default function StepsList(props: Props) {
       grouping,
       transporters,
       isDuplicateOf,
+      wasteDetails,
       ...rest
     } = values;
 
@@ -186,8 +187,18 @@ export default function StepsList(props: Props) {
       return;
     }
 
+    const packagingInfos = (wasteDetails?.packagingInfos ?? []).filter(
+      // Supprime le conditionnement vide par défaut ajouté dans l'état intitial
+      // Formik si celui-ci n'a pas été complété.
+      p => !!p.type
+    );
+
     const formInput: FormInput = {
       ...rest,
+      wasteDetails: {
+        ...wasteDetails,
+        packagingInfos
+      },
       // discard temporaryStorageDetail if recipient.isTempStorage === false
       ...(values.recipient?.isTempStorage === true
         ? { temporaryStorageDetail }
