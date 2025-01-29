@@ -38,10 +38,10 @@ import { SignatureTimestamp } from "../BSPaoh/WorkflowAction/components/Signatur
 const schema = z.object({
   author: z
     .string({
-      required_error: "Le nom et prénom de l'auteur de la signature est requis"
+      required_error: "Le nom et prénom de l'auteur de la signature sont requis"
     })
     .refine(val => val.trim() !== "", {
-      message: "Le nom et prénom de l'auteur de la signature est requis"
+      message: "Le nom et prénom de l'auteur de la signature sont requis"
     })
     .pipe(
       z
@@ -58,9 +58,12 @@ const schema = z.object({
   destination: z.object({
     operation: z
       .object({
-        code: z.string().refine(val => val.trim() !== "", {
-          message: "Le code de traitement est requis"
-        }),
+        code: z
+          .string()
+          .refine(val => val.trim() !== "", {
+            message: "Le code de traitement est requis"
+          })
+          .nullish(),
         date: z.coerce
           .date({
             required_error: "La date de traitement est requise",
@@ -84,6 +87,9 @@ const schema = z.object({
           .object({
             numbers: z.array(z.string()).nullish()
           })
+          .nullish(),
+        acceptationStatus: z
+          .enum(["ACCEPTED", "PARTIALLY_REFUSED", "REFUSED"])
           .nullish()
       })
       .nullish()
@@ -163,6 +169,27 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
     }
   }, [operationCode, setValue]);
 
+  const onSubmit = async data => {
+    const { author, date, ...update } = data;
+    await updateBsvhu({
+      variables: {
+        id: bsvhuId,
+        input: update as BsvhuInput
+      }
+    });
+    await signBsvhu({
+      variables: {
+        id: bsvhu.id,
+        input: {
+          author,
+          date: TODAY.toISOString(),
+          type: SignatureTypeInput.Operation
+        }
+      }
+    });
+    onClose();
+  };
+
   if (data == null) {
     return <Loader />;
   }
@@ -175,28 +202,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
       <BsvhuJourneySummary bsvhu={bsvhu} />
 
       <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(async data => {
-            const { author, date, ...update } = data;
-            await updateBsvhu({
-              variables: {
-                id: bsvhuId,
-                input: update as BsvhuInput
-              }
-            });
-            await signBsvhu({
-              variables: {
-                id: bsvhu.id,
-                input: {
-                  author,
-                  date: TODAY.toISOString(),
-                  type: SignatureTypeInput.Operation
-                }
-              }
-            });
-            onClose();
-          })}
-        >
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Select
             label="Traitement d'élimination / valorisation réalisée (code D/R)"
             className="fr-col-12 fr-mt-1w"
@@ -267,6 +273,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
               </div>
             </>
           )}
+
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
             les informations ci-dessus sont correctes et certifie que le

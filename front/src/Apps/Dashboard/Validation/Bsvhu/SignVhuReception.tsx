@@ -35,10 +35,10 @@ import SignVhuOperation from "./SignVhuOperation";
 const schema = z.object({
   author: z
     .string({
-      required_error: "Le nom et prénom de l'auteur de la signature est requis"
+      required_error: "Le nom et prénom de l'auteur de la signature sont requis"
     })
     .refine(val => val.trim() !== "", {
-      message: "Le nom et prénom de l'auteur de la signature est requis"
+      message: "Le nom et prénom de l'auteur de la signature sont requis"
     })
     .pipe(
       z
@@ -360,13 +360,15 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
               >
                 Annuler
               </Button>
-              <Button
-                type="button"
-                disabled={loading || loadingUpdate}
-                onClick={onClickTwoStepSignature}
-              >
-                Signer et passer à l'étape traitement
-              </Button>
+              {acceptationStatus !== "REFUSED" && (
+                <Button
+                  type="button"
+                  disabled={loading || loadingUpdate}
+                  onClick={onClickTwoStepSignature}
+                >
+                  Signer et passer à l'étape traitement
+                </Button>
+              )}
               <Button disabled={loading || loadingUpdate}>Signer</Button>
             </div>
           </form>

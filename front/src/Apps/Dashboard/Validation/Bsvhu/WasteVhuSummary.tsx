@@ -46,14 +46,15 @@ const WasteVhuSummary = ({ bsvhu }: WasteVhuSummaryProps) => {
           </DsfrDataListDescription>
         </DsfrDataListItem>
       )}
-      {bsvhu.destination?.reception?.weight && (
-        <DsfrDataListItem>
-          <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
-          <DsfrDataListDescription>
-            {`${bsvhu.destination?.reception?.weight}t`}
-          </DsfrDataListDescription>
-        </DsfrDataListItem>
-      )}
+      {bsvhu.destination?.reception?.weight !== null &&
+        bsvhu.destination?.reception?.weight !== undefined && (
+          <DsfrDataListItem>
+            <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
+            <DsfrDataListDescription>
+              {`${bsvhu.destination?.reception?.weight}t`}
+            </DsfrDataListDescription>
+          </DsfrDataListItem>
+        )}
     </DsfrDataList>
   );
 };
