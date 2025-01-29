@@ -21,6 +21,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FormFormikValues } from "./utils/initial-state";
+import PackagingList from "./components/packagings/PackagingList";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -180,11 +181,12 @@ export default function WasteInfo({ disabled }) {
       <h4 className="form__section-heading">Conditionnement</h4>
 
       {values.emitter?.type !== "APPENDIX1" && (
-        <Field
-          name="wasteDetails.packagingInfos"
-          component={Packagings}
-          disabled={disabled}
-        />
+        // <Field
+        //   name="wasteDetails.packagingInfos"
+        //   component={Packagings}
+        //   disabled={disabled}
+        // />
+        <PackagingList fieldName="wasteDetails.packagingInfos" />
       )}
 
       <div className="form__row">
