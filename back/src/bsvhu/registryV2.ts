@@ -95,6 +95,7 @@ export const toIncomingWasteV2 = (
     brokerCompanySiret: bsvhu.brokerCompanySiret,
     brokerCompanyMail: bsvhu.brokerCompanyMail,
     brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
+    isDirectSupply: false,
     transporter1CompanyName: bsvhu.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanySiret: bsvhu.transporterCompanySiret,

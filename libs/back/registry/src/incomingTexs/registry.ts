@@ -75,7 +75,9 @@ export const toIncomingWaste = (
     parcelInseeCodes: incomingTexs.parcelInseeCodes,
     parcelNumbers: incomingTexs.parcelNumbers,
     parcelCoordinates: incomingTexs.parcelCoordinates,
-    sisIdentifier: incomingTexs.sisIdentifier,
+    sisIdentifiers: incomingTexs.sisIdentifier
+      ? [incomingTexs.sisIdentifier]
+      : null,
     ecoOrganismeName: incomingTexs.ecoOrganismeName,
     ecoOrganismeSiret: incomingTexs.ecoOrganismeSiret,
     traderCompanyName: incomingTexs.traderCompanyName,

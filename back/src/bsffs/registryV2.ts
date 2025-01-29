@@ -173,6 +173,7 @@ export const toIncomingWasteV2 = (
     emitterCompanyCity,
     emitterCompanyCountry,
     emitterCompanyMail: bsff.emitterCompanyMail,
+    isDirectSupply: false,
     transporter1CompanyName: transporter?.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanySiret: getTransporterCompanyOrgId(transporter),

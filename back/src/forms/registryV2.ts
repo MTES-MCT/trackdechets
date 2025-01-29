@@ -174,7 +174,7 @@ export const toIncomingWasteV2 = (
     parcelInseeCodes: bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
-    sisIdentifier: null,
+    sisIdentifiers: bsdd.wasteDetailsLandIdentifiers,
     ecoOrganismeName: bsdd.ecoOrganismeName,
     ecoOrganismeSiret: bsdd.ecoOrganismeSiret,
     traderCompanyName: bsdd.traderCompanyName,
@@ -185,6 +185,7 @@ export const toIncomingWasteV2 = (
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
+    isDirectSupply: false,
     transporter1CompanyName: bsdd.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanySiret: bsdd.transporterCompanySiret?.length
@@ -221,8 +222,14 @@ export const toIncomingWasteV2 = (
     destinationOperationMode: bsdd.destinationOperationMode,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    declarationNumber: null,
-    notificationNumber: bsdd.nextDestinationNotificationNumber,
+    declarationNumber:
+      !bsdd.wasteIsDangerous && !bsdd.pop
+        ? bsdd.nextDestinationNotificationNumber
+        : null,
+    notificationNumber:
+      bsdd.wasteIsDangerous || bsdd.pop
+        ? bsdd.nextDestinationNotificationNumber
+        : null,
     movementNumber: null,
     nextOperationCode: bsdd.nextDestinationProcessingOperation,
     isUpcycled: null,

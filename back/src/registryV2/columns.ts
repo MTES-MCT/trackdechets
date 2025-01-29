@@ -166,7 +166,7 @@ export const EXPORT_COLUMNS: {
       label: "Code de traitement réalisé",
       format: formatOperationCode
     },
-    operationMode: { label: "Mode de traitement" },
+    operationMode: { label: "Mode de traitement réalisé" },
     administrativeActReference: { label: "Référence de l'acte administratif" },
     destinationType: { label: "Type de destinataire" },
     destinationOrgId: { label: "Numéro d'identification du destinataire" },
@@ -272,8 +272,9 @@ export const EXPORT_COLUMNS: {
       label: "Parcelle(s) - Coordonnées",
       format: formatArrayWithMissingElements
     },
-    sisIdentifier: {
-      label: "Identifiant SIS du terrain"
+    sisIdentifiers: {
+      label: "Identifiant SIS du terrain",
+      format: formatArray
     },
     ecoOrganismeSiret: { label: "Éco-organisme - SIRET" },
     ecoOrganismeName: { label: "Éco-organisme - Raison sociale" },
