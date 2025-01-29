@@ -279,7 +279,7 @@ export const updateRegistryLookup = async (
   if (bsff.destinationReceptionSignatureDate && bsff.destinationCompanySiret) {
     await tx.registryLookup.upsert({
       where: {
-        id_exportRegistryType_siret: {
+        idExportTypeAndSiret: {
           id: bsff.id,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: bsff.destinationCompanySiret

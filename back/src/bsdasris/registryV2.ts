@@ -190,7 +190,7 @@ export const updateRegistryLookup = async (
   ) {
     await tx.registryLookup.upsert({
       where: {
-        id_exportRegistryType_siret: {
+        idExportTypeAndSiret: {
           id: bsdasri.id,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: bsdasri.destinationCompanySiret

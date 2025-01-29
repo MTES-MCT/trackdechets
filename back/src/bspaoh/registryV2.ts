@@ -185,7 +185,7 @@ export const updateRegistryLookup = async (
   ) {
     await tx.registryLookup.upsert({
       where: {
-        id_exportRegistryType_siret: {
+        idExportTypeAndSiret: {
           id: bspaoh.id,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: bspaoh.destinationCompanySiret
@@ -218,7 +218,10 @@ export const rebuildRegistryLookup = async () => {
   while (!done) {
     const items = await prisma.bspaoh.findMany({
       where: {
-        isDeleted: false
+        isDeleted: false,
+        NOT: {
+          status: "DRAFT"
+        }
       },
       take: 100,
       skip: cursorId ? 1 : 0,

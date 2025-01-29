@@ -306,7 +306,7 @@ export const updateRegistryLookup = async (
   if (form.receivedAt && form.recipientCompanySiret) {
     await tx.registryLookup.upsert({
       where: {
-        id_exportRegistryType_siret: {
+        idExportTypeAndSiret: {
           id: form.id,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: form.recipientCompanySiret
@@ -342,7 +342,10 @@ export const rebuildRegistryLookup = async () => {
   while (!done) {
     const items = await prisma.form.findMany({
       where: {
-        isDeleted: false
+        isDeleted: false,
+        NOT: {
+          status: "DRAFT"
+        }
       },
       take: 100,
       skip: cursorId ? 1 : 0,

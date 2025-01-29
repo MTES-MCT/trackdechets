@@ -111,7 +111,7 @@ La table RegistryLookup sert d'intermédiaire "cherchable" entre les registres i
 
 Cette table rassemble toutes les lignes qui doivent apparaître dans des registres d'exports, que ce soit pour les registres déclarés ou les bordereaux (BSDs). Il y a donc 1 ligne RegistryLookup pour chaque ligne de registre importé (car les registres importés n'apparaissent que dans un seul registre d'export), mais il peut y avoir plusieurs lignes de RegistyLookup pour les BSDs (un BSD peut concerner le registre entrant, sortant, transporté,...).
 
-Elle permet de rechercher repidement les lignes à exporter, sans avoir à faire de recherche de toute la base à la recherche des BSD/registres concernés par un export. Afin d'arriver à cet objectif de rapidité, cette table possède certaines colonnes et index qui méritent d'être expliqués.
+Elle permet de rechercher rapidement les lignes à exporter, sans avoir à faire de recherche de toute la base à la recherche des BSD/registres concernés par un export. Afin d'arriver à cet objectif de rapidité, cette table possède certaines colonnes et index qui méritent d'être expliqués.
 
 - id
 

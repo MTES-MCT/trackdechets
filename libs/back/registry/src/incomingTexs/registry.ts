@@ -202,7 +202,7 @@ export const updateRegistryLookup = async (
         // and a specific siret
         // this is not strictly necessary on SSDs since they only appear in one export registry, for one siret
         // but is necessary on other types of registries that appear for multiple actors/ export registries
-        id_exportRegistryType_siret: {
+        idExportTypeAndSiret: {
           id: oldRegistryIncomingTexsId,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: registryIncomingTexs.reportForCompanySiret

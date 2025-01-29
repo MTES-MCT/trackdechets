@@ -714,8 +714,8 @@ model RegistryLookup {
     bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
     // the id itself is not unique, since a same BSD will appear in multiple export registries.
-    // so the unique index is made of id + exportRegistryType
-    @@id([id, exportRegistryType, siret])
+    // so the unique index is made of id + exportRegistryType + siret
+    @@id([id, exportRegistryType, siret], name: "idExportTypeAndSiret")
     // pseudo-random with only "=" lookups so hash index is appropriate
     @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
     // array of elements so gin index
