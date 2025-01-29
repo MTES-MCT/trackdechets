@@ -97,6 +97,15 @@ const sealedFromEmissionExceptForEmitter: GetBsvhuSignatureTypeFn<ZodBsvhu> = (
   return isEmitter ? "TRANSPORT" : "EMISSION";
 };
 
+/**
+ * format de la documentation générée:
+ * id                  | nom du champ              | chemin GraphQL        | requis à partir de | requis si                | scellé à partir de                | scellé si |
+ * emitterCompanySiret | Le N° SIRET de l'émetteur | emitter.company.siret | EMISSION           | il y a un SIRET émetteur | TRANSPORT ou EMISSION si émetteur | -         |
+ *
+ * Il faut placer un commentaire pour les conditions (from/when) qui sont des fonctions, et qui ne peuvent pas être
+ * parsées directement par le script de documentation
+ */
+
 export const bsvhuEditionRules: BsvhuEditionRules = {
   customId: {
     sealed: { from: "OPERATION" },
@@ -106,7 +115,10 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "EMISSION" }
   },
   emitterAgrementNumber: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
+    sealed: {
+      // TRANSPORT ou EMISSION si émetteur
+      from: sealedFromEmissionExceptForEmitter
+    },
     readableFieldName: "Le N° d'agrément de l'émetteur",
     path: ["emitter", "agrementNumber"]
   },
@@ -128,7 +140,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterNoSiret },
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET émetteur
+      when: bsvhu => !bsvhu.emitterNoSiret
+    },
     readableFieldName: "Le N° SIRET de l'émetteur",
     path: ["emitter", "company", "siret"]
   },
@@ -136,6 +152,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // il n'y a pas street/city/postalCode
       when: bsvhu =>
         !bsvhu.emitterCompanyStreet ||
         !bsvhu.emitterCompanyCity ||
@@ -146,19 +163,31 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterCompanyStreet: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress
+    },
     readableFieldName: "L'adresse de l'émetteur",
     path: ["emitter", "company", "street"]
   },
   emitterCompanyCity: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress
+    },
     readableFieldName: "L'adresse de l'émetteur",
     path: ["emitter", "company", "city"]
   },
   emitterCompanyPostalCode: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsvhu => !bsvhu.emitterCompanyAddress },
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress
+    },
     readableFieldName: "L'adresse de l'émetteur",
     path: ["emitter", "company", "postalCode"]
   },
@@ -166,6 +195,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // emitter.noSiret est false
       when: bsvhu => !bsvhu.emitterNoSiret
     },
     readableFieldName: "La personne à contacter chez l'émetteur",
@@ -175,6 +205,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // emitter.emitterIrregularSituation est false
       when: bsvhu => !bsvhu.emitterIrregularSituation
     },
     readableFieldName: "Le N° de téléphone de l'émetteur",
@@ -184,6 +215,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // emitter.emitterIrregularSituation est false
       when: bsvhu => !bsvhu.emitterIrregularSituation
     },
     readableFieldName: "L'adresse e-mail de l'émetteur",
@@ -252,7 +284,9 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationReceptionRefusalReason: {
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     readableFieldName: "La raison du refus par le destinataire",
-    required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
+    required: { from: "RECEPTION",
+      // le déchet est refusé ou partiellement refusé
+      when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
   },
   destinationReceptionWeight: {
@@ -283,6 +317,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "OPERATION",
+      // le déchet n'est pas refusé
       when: isNotRefused
     },
     readableFieldName: "L'opération réalisée par le destinataire",
@@ -290,10 +325,6 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   destinationOperationMode: {
     sealed: { from: "OPERATION" },
-    // required: {
-    //   from: "OPERATION",
-    //   when: isNotRefused // more precise check in checkOperationMode refinement
-    // },
     readableFieldName: "Le mode de traitement",
     path: ["destination", "operation", "mode"]
   },
@@ -323,6 +354,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
+      // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
@@ -333,6 +365,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
+      // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
@@ -343,6 +376,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
+      // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
@@ -353,6 +387,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
+      // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
@@ -363,6 +398,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     required: {
       from: "EMISSION",
+      // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
     },
@@ -396,6 +432,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     },
     required: {
       from: "EMISSION",
+      // le BSVHU a été créé après la MàJ 2024.10.1
       when: bsvhu => {
         return (bsvhu.createdAt || new Date()).getTime() >= v20241001.getTime();
       }
@@ -407,6 +444,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // le conditionnement est à l'unité
       when: bsvhu => bsvhu.packaging === "UNITE"
     },
 
@@ -435,6 +473,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
+      // le transporteur n'a pas de numéro de TVA renseigné
       when: bsvhu => !bsvhu.transporterCompanyVatNumber
     },
     path: ["transporter", "company", "siret"]
@@ -444,6 +483,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
+      // le transporteur n'a pas de SIRET renseigné
       when: bsvhu => !bsvhu.transporterCompanySiret
     },
     path: ["transporter", "company", "vatNumber"]
@@ -493,6 +533,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
+      // le transporteur est FR et non exempt de récépissé
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
@@ -545,6 +586,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["transporter", "transport", "plates"],
     required: {
       from: "TRANSPORT",
+      // le transport est routier et le BSVHU a été créé après la MàJ 2025.01.1
       when: bsvhu => {
         return (
           bsvhu.transporterTransportMode === "ROAD" &&
@@ -564,6 +606,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["ecoOrganisme", "name"],
     required: {
       from: "TRANSPORT",
+      // il y a un SIRET d'éco-organisme
       when: bsvhu => !!bsvhu.ecoOrganismeSiret
     }
   },
@@ -576,6 +619,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le nom du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "name"]
@@ -584,6 +628,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le SIRET du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "siret"]
@@ -592,6 +637,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "l'adresse du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "address"]
@@ -600,6 +646,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le nom de contact du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "contact"]
@@ -608,6 +655,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le téléphone du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "phone"]
@@ -616,6 +664,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le mail du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "company", "mail"]
@@ -624,6 +673,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le numéro de récépissé du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "recepisse", "number"]
@@ -632,6 +682,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le département du récépissé du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "recepisse", "department"]
@@ -640,6 +691,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "la date de validité du récépissé du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de courtier
       when: bsvhu => !!bsvhu.brokerCompanySiret
     },
     path: ["broker", "recepisse", "validityLimit"]
@@ -648,6 +700,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le nom du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "name"]
@@ -656,6 +709,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le SIRET du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "siret"]
@@ -664,6 +718,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "l'adresse du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "address"]
@@ -672,6 +727,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le nom de contact du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "contact"]
@@ -680,6 +736,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le téléphone du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "phone"]
@@ -688,6 +745,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le mail du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "company", "mail"]
@@ -696,6 +754,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le numéro de récépissé du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "recepisse", "number"]
@@ -704,6 +763,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "le département du récépissé du négociant",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "recepisse", "department"]
@@ -712,6 +772,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "la date de validité du récépissé du courtier",
     sealed: {
       from: "OPERATION",
+      // il y a un SIRET de négociant
       when: bsvhu => !!bsvhu.traderCompanySiret
     },
     path: ["trader", "recepisse", "validityLimit"]
