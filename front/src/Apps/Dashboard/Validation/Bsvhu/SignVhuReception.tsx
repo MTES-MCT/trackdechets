@@ -103,8 +103,12 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
     author: "",
-    destination: {}
-  };
+    destination: {
+      reception: {
+        date: datetimeToYYYYMMDD(TODAY)
+      }
+    }
+  } as ZodBsvhuReception;
 
   const methods = useForm<ZodBsvhuReception>({
     values: initialState,
@@ -214,7 +218,7 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
               handleClose();
             })}
           >
-            <p className="fr-text fr-mb-2w">Je souhaite effectuer</p>
+            <p className="fr-text fr-mt-1w fr-mb-2w">Je souhaite effectuer</p>
             <RadioButtons
               state={
                 formState.errors?.destination?.reception?.acceptationStatus &&
@@ -225,37 +229,55 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
                   ?.message as string) ?? ""
               }
               options={acceptationRadioOptions}
+              className="fr-mb-1w"
             />
 
             <h4 className="fr-h4">
               <strong>Réception et acceptation</strong>
             </h4>
             <div className="fr-grid-row fr-grid-row--top">
-              <div className="fr-col-12 fr-col-md-4">
-                <NonScrollableInput
-                  label="Poids total net en tonnes"
-                  className="fr-col-12"
-                  state={
-                    formState.errors?.destination?.reception?.weight && "error"
-                  }
-                  stateRelatedMessage={
-                    (formState.errors?.destination?.reception?.weight
-                      ?.message as string) ?? ""
-                  }
-                  nativeInputProps={{
-                    inputMode: "decimal",
-                    step: "0.000001",
-                    type: "number",
-                    ...register("destination.reception.weight")
-                  }}
-                  disabled={
-                    acceptationStatus === WasteAcceptationStatus.Refused
-                  }
-                />
-                <p className="fr-text fr-text--xs" style={{ color: "#0063CB" }}>
-                  <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                  {multiplyByRounded(receivedWeight)} kilos
-                </p>
+              <div className="fr-grid-row fr-grid-row--gutters fr-mb-0">
+                <div className="fr-col-12 fr-col-md-6">
+                  <NonScrollableInput
+                    label="En nombre"
+                    disabled
+                    nativeInputProps={{
+                      inputMode: "decimal",
+                      pattern: "[0-9]*",
+                      type: "number",
+                      value: bsvhu.identification?.numbers?.length
+                    }}
+                  />
+                </div>
+                <div className="fr-col-12 fr-col-md-6">
+                  <NonScrollableInput
+                    label="Poids total net en tonnes"
+                    state={
+                      formState.errors?.destination?.reception?.weight &&
+                      "error"
+                    }
+                    stateRelatedMessage={
+                      (formState.errors?.destination?.reception?.weight
+                        ?.message as string) ?? ""
+                    }
+                    nativeInputProps={{
+                      inputMode: "decimal",
+                      step: "0.000001",
+                      type: "number",
+                      ...register("destination.reception.weight")
+                    }}
+                    disabled={
+                      acceptationStatus === WasteAcceptationStatus.Refused
+                    }
+                  />
+                  <p
+                    className="fr-text fr-text--xs"
+                    style={{ color: "#0063CB" }}
+                  >
+                    <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
+                    {multiplyByRounded(receivedWeight)} kilos
+                  </p>
+                </div>
               </div>
 
               {[
@@ -263,9 +285,9 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
                 WasteAcceptationStatus.PartiallyRefused
               ].includes(acceptationStatus as WasteAcceptationStatus) && (
                 <Input
-                  label="Motif du refus"
+                  label="Motif de refus et numéro(s) de lot(s) / unité(s) refusé(s)"
                   textArea
-                  className="fr-col-12"
+                  className="fr-col-12 fr-mb-2w"
                   state={
                     formState.errors?.destination?.reception?.refusalReason &&
                     "error"
@@ -282,10 +304,13 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
             </div>
 
             <p className="fr-text fr-mb-2w">
-              En qualité de <strong>destinataire du déchet</strong>, j'atteste
-              que les informations ci-dessus sont correctes. En signant, je
-              confirme le traitement des déchets pour la quantité indiquée dans
-              ce bordereau.
+              En qualité de
+              <strong> destinataire du déchet</strong>, je confirme la réception
+              des déchets pour la quantité indiquée dans ce bordereau. En cas de
+              refus partiel ou total uniquement, un mail automatique
+              Trackdéchets informera le producteur de ce refus, accompagné du
+              récépissé PDF. L'inspection des ICPE et ma société en recevront
+              également une copie.
             </p>
 
             <div className="fr-col-4 fr-mb-2w">

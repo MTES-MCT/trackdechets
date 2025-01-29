@@ -119,8 +119,12 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
     author: "",
-    destination: {}
-  };
+    destination: {
+      operation: {
+        date: datetimeToYYYYMMDD(TODAY)
+      }
+    }
+  } as ZodBsvhuOperation;
 
   const methods = useForm<ZodBsvhuOperation>({
     values: initialState,
@@ -194,8 +198,8 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
           })}
         >
           <Select
-            label="Opération d'élimination / valorisation réalisée (code D/R)"
-            className="fr-col-12"
+            label="Traitement d'élimination / valorisation réalisée (code D/R)"
+            className="fr-col-12 fr-mt-1w"
             nativeSelectProps={{
               ...register("destination.operation.code")
             }}
@@ -250,7 +254,9 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             WasteVehiclesType.Demolisseur
           ) && (
             <>
-              <h5 className="fr-h5">Numéro de registre de police entrant</h5>
+              <h5 className="fr-h5 fr-mb-2w">
+                Numéro de registre de police entrant
+              </h5>
               <div className="fr-col-md-12 fr-mb-4w">
                 <IdentificationNumber
                   title="Codes d'identification utilisés par l'établissement"
@@ -263,9 +269,9 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
           )}
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
-            les informations ci-dessus sont correctes. En signant, je confirme
-            le traitement des déchets pour la quantité indiquée dans ce
-            bordereau.
+            les informations ci-dessus sont correctes et certifie que le
+            traitement indiquée ci-contre a bien été réalisée pour la quantité
+            de déchets renseignée.
           </p>
 
           <div className="fr-col-4 fr-mb-2w">

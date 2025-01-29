@@ -39,12 +39,13 @@ const RhfOperationModeSelect = ({
   return (
     <div className="form__row">
       <fieldset>
-        <legend className={`fr-pb-2w fr-grid-row ${addedDsfrClass}`}>
+        <legend className={`fr-pb-1w fr-grid-row ${addedDsfrClass}`}>
           Mode de traitement{" "}
           <Tooltip msg="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
         </legend>
 
         <RadioButtons
+          className="fr-mb-1w"
           orientation="horizontal"
           state={fieldError && "error"}
           stateRelatedMessage={(fieldError?.message as string) ?? ""}
