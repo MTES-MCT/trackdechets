@@ -933,6 +933,7 @@ model User {
   registryIncomingWastes     RegistryIncomingWaste[]
   registryIncomingTexs       RegistryIncomingTexs[]
   registryOutgoingTexs       RegistryOutgoingTexs[]
+  registryOutgoingWaste      RegistryOutgoingWaste[]
   registryExports            RegistryExport[]
 }
 

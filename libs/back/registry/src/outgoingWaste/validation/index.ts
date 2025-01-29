@@ -1,6 +1,4 @@
 import {
-  parcelRefinement,
-  refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
@@ -12,30 +10,26 @@ import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
   initialEmitterRefinement,
-  emitterRefinement,
+  destinationRefinement,
   transporter1Refinement,
   transporter2Refinement,
   transporter3Refinement,
   transporter4Refinement,
-  transporter5Refinement,
-  refineReportForProfile
+  transporter5Refinement
 } from "./refinement";
-import { incomingTexsSchema } from "./schema";
+import { outgoingWasteSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
 
-export function safeParseAsyncIncomingTexs(line: unknown) {
-  return incomingTexsSchema
-    .superRefine(refineReportForProfile)
+export function safeParseAsyncOutgoingWaste(line: unknown) {
+  return outgoingWasteSchema
     .superRefine(refineIsDangerous)
     .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)
-    .superRefine(emitterRefinement)
-    .superRefine(parcelRefinement)
+    .superRefine(destinationRefinement)
     .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)
-    .superRefine(refineFollowingTraceabilityInfos)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

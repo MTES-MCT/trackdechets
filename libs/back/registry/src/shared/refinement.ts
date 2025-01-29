@@ -566,3 +566,16 @@ export const parcelRefinement: Refinement<{
     });
   }
 };
+
+export const refineOperationCodeWhenUpcycled: Refinement<{
+  isUpcycled?: boolean | null;
+  operationCode: string;
+}> = async (item, { addIssue }) => {
+  if (item.isUpcycled && !item.operationCode.startsWith("R")) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Lorsque la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination)`,
+      path: ["operationCode"]
+    });
+  }
+};

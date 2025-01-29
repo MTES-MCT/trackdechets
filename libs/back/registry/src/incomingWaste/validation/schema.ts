@@ -22,7 +22,7 @@ import {
   actorSiretSchema,
   wastePopSchema,
   wasteIsDangerousSchema,
-  receptionDateSchema,
+  dateSchema,
   inseeCodesSchema,
   declarationNumberSchema,
   notificationNumberSchema,
@@ -50,7 +50,7 @@ const inputIncomingWasteSchema = z.object({
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  receptionDate: receptionDateSchema,
+  receptionDate: dateSchema,
   weighingHour: z
     .string()
     .refine(val => {

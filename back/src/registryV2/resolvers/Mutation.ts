@@ -5,6 +5,7 @@ import { addToIncomingTexsRegistry } from "./mutations/addToIncomingTexsRegistry
 import { importFile } from "./mutations/importFile";
 import { generateRegistryV2Export } from "./mutations/generateRegistryV2Export";
 import { addToOutgoingTexsRegistry } from "./mutations/addToOutgoingTexsRegistry";
+import { addToOutgoingWasteRegistry } from "./mutations/addToOutgoingWasteRegistry";
 
 export const Mutation: MutationResolvers = {
   importFile: importFile as any,
@@ -12,5 +13,6 @@ export const Mutation: MutationResolvers = {
   addToIncomingWasteRegistry,
   addToIncomingTexsRegistry,
   addToOutgoingTexsRegistry,
+  addToOutgoingWasteRegistry,
   generateRegistryV2Export: generateRegistryV2Export as any
 };

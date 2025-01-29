@@ -43,6 +43,15 @@ type Mutation {
     lines: [OutgoingTexsLineInput!]!
   ): Boolean!
 
+  """
+  Ajoute, modifie, ou supprime des lignes au registre de déchets dangereux ou non dangereux sortants
+  Il est possible de passer jusqu'à 1000 lignes par appel
+  """
+  addToOutgoingWasteRegistry(
+    "Lignes à ajouter, modifier, ou supprimer"
+    lines: [OutgoingWasteLineInput!]!
+  ): Boolean!
+
   "Renvoie un lien permettant de télécharger un registre au format CSV"
   generateRegistryV2Export(
     "Type de registre de déchets"

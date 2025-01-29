@@ -1,4 +1,5 @@
 import Badge from "@codegouvfr/react-dsfr/Badge";
+import { RegistryImportType } from "@td/codegen-ui";
 import gql from "graphql-tag";
 import React from "react";
 
@@ -13,6 +14,7 @@ export const GET_REGISTRY_IMPORTS = gql`
       ownImportsOnly: $ownImportsOnly
       first: $first
     ) {
+      totalCount
       edges {
         node {
           id
@@ -40,6 +42,14 @@ export const GET_REGISTRY_IMPORTS = gql`
     }
   }
 `;
+
+export const TYPES: { [key in RegistryImportType]: string } = {
+  SSD: "SSD",
+  INCOMING_WASTE: "D(N)D entrants",
+  OUTGOING_WASTE: "D(N)D sortants",
+  INCOMING_TEXS: "TEXS entrants",
+  OUTGOING_TEXS: "TEXS sortants"
+};
 
 export const badges = {
   PENDING: () => (

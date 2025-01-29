@@ -74,10 +74,14 @@ enum RegistryV2ExportStatus {
 enum RegistryImportType {
   "Sortie de statut de déchet"
   SSD
-  "Déchet dangereux et non dangereux entrant"
+  "Déchet dangereux et non dangereux entrants"
   INCOMING_WASTE
-  "Terres excavées et sédiments entrant"
+  "Terres excavées et sédiments entrants"
   INCOMING_TEXS
+  "Déchet dangereux et non dangereux sortants"
+  OUTGOING_WASTE
+  "Terres excavées et sédiments sortants"
+  OUTGOING_TEXS
 }
 
 enum RegistryImportStatus {
