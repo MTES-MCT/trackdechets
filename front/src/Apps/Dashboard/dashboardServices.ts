@@ -829,7 +829,7 @@ export const getSentBtnLabel = (
     isBsvhu(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
-    return VALIDER_TRAITEMENT;
+    return VALIDER_RECEPTION;
   }
   // PAOH
   if (isBspaoh(bsd.type)) {
