@@ -290,7 +290,7 @@ describe("toTransportedWaste", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanyMail: "destination@mail.com",
-        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
+        transporterTransportPlates: ["TR-01-AA"]
       }
     });
 
@@ -305,9 +305,7 @@ describe("toTransportedWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       bsvhuForRegistry.transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();
@@ -475,7 +473,7 @@ describe("toAllWaste", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanyMail: "destination@mail.com",
-        transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"]
+        transporterTransportPlates: ["TR-01-AA"]
       }
     });
 
@@ -490,9 +488,7 @@ describe("toAllWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       bsvhuForRegistry.transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();

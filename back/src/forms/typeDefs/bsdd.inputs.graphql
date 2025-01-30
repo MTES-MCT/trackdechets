@@ -15,7 +15,11 @@ input SignEmissionFormInput {
   "Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
   nonRoadRegulationMention: String
 
-  "Numéro de la plaque d'immatriculation transporteur"
+  """
+  Numéro de la plaque d'immatriculation transporteur.
+  Jusqu'à 2 plaques séparées par une virgule ex: AZ-12-TR, AQ-34-JK
+  Format de chaque plaque: 4 à 12 caractères
+  """
   transporterNumberPlate: String
 
   "Date de signature de l'émetteur"

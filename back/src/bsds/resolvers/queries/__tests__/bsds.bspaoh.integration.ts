@@ -170,7 +170,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
               transport: {
                 takenOverAt: new Date().toISOString() as any,
                 mode: "ROAD",
-                plates: ["TRANSPORTER-PLATE"]
+                plates: ["AB-12-TY"]
               }
             },
             destination: {

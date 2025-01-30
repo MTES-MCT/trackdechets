@@ -161,6 +161,7 @@ async function duplicateBspaoh(
     bspaohId,
     createdAt: trsCreatedAt,
     updatedAt: trsUpdatedAt,
+    transporterTransportPlates,
 
     ...trsFieldsToCopy
   } = bspaohTransporter;

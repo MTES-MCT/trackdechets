@@ -486,4 +486,56 @@ describe("Mutation.duplicateBspaoh", () => {
       }
     ]);
   });
+
+  it("should not duplicate tranporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "83T"
+        }
+      }
+    });
+    const bspaoh = await bspaohFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyName: transporterCompany.name,
+            transporterCompanyAddress: transporterCompany.address,
+            transporterCompanyContact: transporterCompany.contact,
+            transporterCompanyMail: transporterCompany.contactEmail,
+            transporterCompanyPhone: transporterCompany.contactPhone,
+            transporterTransportPlates: ["AZ-77-PO"]
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBspaoh">>(
+      DUPLICATE_BSPAOH,
+      {
+        variables: {
+          id: bspaoh.id
+        }
+      }
+    );
+
+    expect(data.duplicateBspaoh.status).toBe("INITIAL");
+    expect(data.duplicateBspaoh.isDraft).toBe(true);
+
+    const duplicated = await prisma.bspaoh.findUnique({
+      where: { id: data.duplicateBspaoh.id },
+      include: { transporters: true }
+    });
+
+    expect(duplicated?.transporters[0].transporterTransportPlates).toEqual([]);
+  });
 });

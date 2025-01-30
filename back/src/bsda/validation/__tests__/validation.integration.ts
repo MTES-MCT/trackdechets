@@ -124,6 +124,24 @@ describe("BSDA parsing", () => {
       expect(parsed).toBeDefined();
     });
 
+    test("when transporter plate is not present and transport mode is not ROAD before TRANSPORT signature", () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportPlates: [],
+            transporterTransportMode: "ROAD" as TransportMode
+          }
+        ]
+      };
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
     test("when transporter plate is not present and transport mode is not ROAD", () => {
       const data: ZodBsda = {
         ...bsda,
@@ -149,7 +167,7 @@ describe("BSDA parsing", () => {
           {
             ...bsda.transporters![0],
             transporterTransportMode: "ROAD" as TransportMode,
-            transporterTransportPlates: ["TRANSPORTER-PLATES"]
+            transporterTransportPlates: ["AZ-12-BA"]
           }
         ]
       };
@@ -448,8 +466,8 @@ describe("BSDA parsing", () => {
       }
     });
 
-    test.each([undefined, [], [""]])(
-      "when transporter plate is %p invalid and transporter mode is ROAD",
+    test.each([undefined, []])(
+      "when transporter plate is %p and transporter mode is ROAD",
       async invalidValue => {
         const data: ZodBsda = {
           ...bsda,
@@ -476,6 +494,113 @@ describe("BSDA parsing", () => {
         }
       }
     );
+
+    test("when transporter plate is an empty string and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: [""]
+          }
+        ]
+      };
+
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate is too short and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["x"]
+          }
+        ]
+      };
+
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate is too long and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["AZ-12-ER-98-AA-12"]
+          }
+        ]
+      };
+
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate only contains whitespace and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["      "]
+          }
+        ]
+      };
+
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
+          })
+        ]);
+      }
+    });
 
     test("when the grouped waste code is not equal to the grouping BSDA waste code", async () => {
       const grouping = [

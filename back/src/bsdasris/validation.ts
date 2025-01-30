@@ -33,6 +33,13 @@ import {
   WeightUnits,
   transporterRecepisseSchema
 } from "../common/validation";
+
+import { onlyWhiteSpace } from "../common/validation/zod/schema";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../common/validation/messages";
 import { destinationOperationModeValidation } from "../common/validation/operationMode";
 import { isDefined } from "../common/helpers";
 
@@ -310,7 +317,7 @@ export const transporterSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
       .test((transporterTransportPlates, ctx) => {
         const { transporterTransportMode } = ctx.parent;
 
@@ -322,6 +329,26 @@ export const transporterSchema: FactorySchemaOf<
         ) {
           return new yup.ValidationError(
             "La plaque d'immatriculation est requise"
+          );
+        }
+
+        if (
+          transporterTransportPlates &&
+          transporterTransportPlates.some(
+            plate => (plate ?? "").length > 12 || (plate ?? "").length < 4
+          )
+        ) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+          );
+        }
+
+        if (
+          transporterTransportPlates &&
+          transporterTransportPlates.some(plate => onlyWhiteSpace(plate ?? ""))
+        ) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
           );
         }
 
@@ -481,7 +508,7 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any,
+      .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY) as any,
     transporterTransportMode: yup
       .mixed<TransportMode>()
       .nullable()

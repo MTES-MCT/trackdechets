@@ -1,6 +1,11 @@
 import { z } from "zod";
 import { TransportMode } from "@prisma/client";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../messages";
 
 export enum CompanyRole {
   Emitter = "Émetteur",
@@ -92,6 +97,28 @@ export const foreignVatNumberSchema = (expectedCompanyRole?: CompanyRole) =>
     }
   );
 
+export const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
+
+export const validateTransporterPlates = (
+  plates: string[],
+  ctx: z.RefinementCtx
+) => {
+  if (plates.some(plate => plate.length > 12 || plate.length < 4)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+    });
+    return;
+  }
+
+  if (plates.some(plate => onlyWhiteSpace(plate))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+    });
+  }
+};
+
 export const rawTransporterSchema = z.object({
   id: z.string().nullish(),
   number: z.number().nullish(),
@@ -118,8 +145,9 @@ export const rawTransporterSchema = z.object({
   transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
   transporterTransportPlates: z
     .array(z.string())
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-    .default([]),
+    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
+    .default([])
+    .superRefine(validateTransporterPlates),
   transporterTransportTakenOverAt: z.coerce.date().nullish(),
   transporterTransportSignatureAuthor: z.string().nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish()
