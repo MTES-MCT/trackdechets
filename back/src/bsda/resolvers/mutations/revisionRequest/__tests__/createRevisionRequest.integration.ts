@@ -25,6 +25,7 @@ const CREATE_BSDA_REVISION_REQUEST = `
       }
       content {
         waste { code }
+        destination { cap }
       }
       authoringCompany {
         siret
@@ -353,6 +354,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(data.createBsdaRevisionRequest.content).toEqual({
+      destination: null,
       waste: { code: "16 01 11*" }
     });
   });
@@ -862,7 +864,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
+    const { errors, data } = await mutate<
       Pick<Mutation, "createBsdaRevisionRequest">,
       MutationCreateBsdaRevisionRequestArgs
     >(CREATE_BSDA_REVISION_REQUEST, {
@@ -886,7 +888,6 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         }
       }
     });
-
     expect(errors).toBeUndefined();
 
     const revisionRequest = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
@@ -954,5 +955,92 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           "Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets"
       })
     ]);
+  });
+
+  it("creating revision on CAP without TTR > should target exutoire's CAP", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const exutoire = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        // Exutoire
+        destinationCompanySiret: exutoire.siret,
+        destinationCap: "EXUTOIRE-CAP"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { destination: { cap: "NEW-EXUTOIRE-CAP" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(
+      "NEW-EXUTOIRE-CAP"
+    );
+
+    const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+    expect(revision.initialDestinationCap).toBe("EXUTOIRE-CAP");
+  });
+
+  it("creating revision on CAP with TTR > should target exutoire's CAP", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const exutoire = await companyFactory();
+    const ttr = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        // TTR
+        destinationCompanySiret: ttr.siret,
+        destinationCap: "TTR-CAP",
+        // Exutoire
+        destinationOperationNextDestinationCompanySiret: exutoire.siret,
+        destinationOperationNextDestinationCap: "EXUTOIRE-CAP"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { destination: { cap: "NEW-EXUTOIRE-CAP" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(
+      "NEW-EXUTOIRE-CAP"
+    );
+
+    const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+    expect(revision.initialDestinationCap).toBe("EXUTOIRE-CAP");
   });
 });

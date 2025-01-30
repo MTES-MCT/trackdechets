@@ -433,7 +433,7 @@ input BsdaRevisionRequestEmitterInput {
 }
 
 input BsdaRevisionRequestDestinationInput {
-  "N° de CAP (le cas échéant)"
+  "N° de CAP (le cas échéant). Modifie le CAP de l'exutoire même en cas de TTR"
   cap: String
 
   "Expédition reçue à l'installation de destination"

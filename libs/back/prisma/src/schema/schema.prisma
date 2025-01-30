@@ -1822,6 +1822,7 @@ model BsdaRevisionRequest {
   packagings                      Json?
   wasteSealNumbers                String[]
   wasteMaterialName               String?
+  // Nouveau CAP de *l'exutoire* (même si le bordereau a un TTR)
   destinationCap                  String?
   destinationReceptionWeight      Float?
   destinationOperationCode        String?

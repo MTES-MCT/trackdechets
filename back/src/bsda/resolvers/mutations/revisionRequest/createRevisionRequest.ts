@@ -335,7 +335,9 @@ function getBsdaHistory(bsda: Bsda) {
     initialPackagings: bsda.packagings,
     initialWasteSealNumbers: bsda.wasteSealNumbers,
     initialWasteMaterialName: bsda.wasteMaterialName,
-    initialDestinationCap: bsda.destinationCap,
+    // Attention: on révise le CAP de l'exutoire, jamais du TTR
+    initialDestinationCap:
+      bsda.destinationOperationNextDestinationCap ?? bsda.destinationCap,
     initialDestinationReceptionWeight: bsda.destinationReceptionWeight,
     initialDestinationOperationCode: bsda.destinationOperationCode,
     initialDestinationOperationDescription:
