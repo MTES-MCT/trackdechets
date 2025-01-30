@@ -24,7 +24,7 @@ import {
   saveOutgoingWasteLine
 } from "./outgoingWaste/database";
 import { safeParseAsyncOutgoingWaste } from "./outgoingWaste/validation";
-import { SSD_EXPORT_HEADERS, SSD_HEADERS } from "./ssd/constants";
+import { SSD_HEADERS } from "./ssd/constants";
 import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
 import { safeParseAsyncSsd } from "./ssd/validation";
 
