@@ -92,7 +92,7 @@ const PaohPackaging = ({ idx, remove, paohType, disabled }) => {
             disabled={disabled}
             name={`${name}.identificationCodes`}
             error={identificationCodesError && !identificationCodes.length}
-            type={paohType}
+            infoMessage={`Vous avez % ${paohType} pour ce contenant`}
           />
         </div>
       </div>

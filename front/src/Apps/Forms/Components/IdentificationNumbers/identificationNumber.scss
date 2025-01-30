@@ -26,6 +26,7 @@
 }
 
 .multiTags-title {
+  display: inline-flex;
   &.error {
     color: var(--text-default-error);
   }
