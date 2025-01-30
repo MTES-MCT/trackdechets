@@ -2,7 +2,8 @@ import {
   BsdaStatus,
   BsdaType,
   OperationMode,
-  TransportMode
+  TransportMode,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
@@ -184,9 +185,69 @@ describe("BSDA parsing", () => {
       });
       expect(parsed).toBeDefined();
     });
+
+    test("when a reception weight is filled and waste is accepted", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+        destinationReceptionWeight: 1.5
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when a reception weight is filled and waste is partially refused", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus:
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+        destinationReceptionWeight: 1.5,
+        destinationReceptionRefusalReason: "pas très très conforme"
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when a reception weight is 0 and waste is refused", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        destinationReceptionWeight: 0,
+        destinationReceptionRefusalReason: "non conforme"
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
   });
 
   describe("BSDA should not be valid", () => {
+    test("when a reception weight is 0", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 0
+      };
+
+      const parseFn = () =>
+        parseBsdaAsync(data, { ...context, currentSignatureType: "OPERATION" });
+
+      await expect(parseFn).rejects.toThrow(
+        "Le poids du déchet reçu doit être renseigné et non nul."
+      );
+    });
+
     test("when type is COLLECTION_2710 and unused company fields are empty strings", () => {
       // on COLLECTION_2710 Bsdas worker and transporter fields are not used
 

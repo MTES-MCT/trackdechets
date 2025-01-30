@@ -246,6 +246,9 @@ input BsdaReceptionInput {
   """
   Quantité présentée en tonnes
 
+  Doit être renseigné pour la signature OPERATION.
+  Doit être strictement supérieur à 0 lorsque le déchet est accepté ou partiellement refusé.
+
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
   """
   weight: Float
