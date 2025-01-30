@@ -133,6 +133,9 @@ module.exports = {
         },
         {
           Validation: [
+            "reference/validation/bsda",
+            "reference/validation/bsff",
+            "reference/validation/bspaoh",
             "reference/validation/bsvhu",
           ],
         },

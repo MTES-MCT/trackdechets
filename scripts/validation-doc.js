@@ -2,7 +2,26 @@ const ts = require("typescript");
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * TODO
+ * - gestion des objets de règles transporter/packaging séparés
+ * - ajout d'en-têtes custom ou de la possibilité d'insérer le tableau au sein d'un markdown avec d'autres textes
+ *   plutôt que remplacer tout le fichier
+ */
+
 const rules = {
+  BSDA: {
+    ruleObjName: "bsdaEditionRules",
+    path: "../back/src/bsda/validation/rules.ts"
+  },
+  BSFF: {
+    ruleObjName: "bsffEditionRules",
+    path: "../back/src/bsffs/validation/bsff/rules.ts"
+  },
+  BSPAOH: {
+    ruleObjName: "editionRules",
+    path: "../back/src/bspaoh/validation/rules.ts"
+  },
   BSVHU: {
     ruleObjName: "bsvhuEditionRules",
     path: "../back/src/bsvhu/validation/rules.ts"

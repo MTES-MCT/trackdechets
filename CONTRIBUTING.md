@@ -647,6 +647,57 @@ Il est possible de documenter les changements à venir en ajoutant une section "
 
 Les nouvelles fonctionnalités impactant l'API doivent être documentées dans la documentation technique `./doc` en même temps que leur développement. Si possible faire également un post sur le [forum technique](https://forum.trackdechets.beta.gouv.fr/).
 
+#### Mise à jour automatique de la documentation des règles de validation Zod
+
+Il y a un script qui permet de documenter automatiquement les règles de validation Zod des différents bordereaux.
+
+Pour l'exécuter:
+
+```
+node ./scripts/validation-doc.js
+```
+
+Les tables générées sont de la forme :
+
+| id                  | nom du champ              | chemin GraphQL        | requis à partir de | requis si                | scellé à partir de                | scellé si |
+| ------------------- | ------------------------- | --------------------- | ------------------ | ------------------------ | --------------------------------- | --------- |
+| emitterCompanySiret | Le N° SIRET de l'émetteur | emitter.company.siret | EMISSION           | il y a un SIRET émetteur | TRANSPORT ou EMISSION si émetteur | -         |
+
+Il faut placer un commentaire pour les conditions (from/when) qui sont des fonctions, et qui ne peuvent pas être parsées directement par le script de documentation. Le commentaire doit être placé juste au dessus du "from:" ou "when:" afin d'être détecté. Si une fonction nommée est commentée une fois, il n'est pas nécessaire de la re-commenter à chaque occurence car un cache du commentaire est conservé.
+
+Exemple:
+
+```js
+  emitterAgrementNumber: {
+    sealed: {
+      // EMISSION ou TRANSPORT si émetteur
+      from: sealedFromEmissionExceptForEmitter
+    },
+    readableFieldName: "Le N° d'agrément de l'émetteur",
+    path: ["emitter", "agrementNumber"]
+  },
+    emitterCompanyStreet: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },  //<-- pas besoin de réecrire le commentaire ici
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress
+    },
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "street"]
+  },
+  emitterCompanyCity: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress //<-- besoin de réécrire le commentaire car c'est une fonction anonyme
+    },
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "city"]
+  },
+```
+
 ### Utiliser un backup de base de donnée
 
 Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.

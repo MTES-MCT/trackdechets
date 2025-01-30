@@ -98,14 +98,11 @@ const sealedFromEmissionExceptForEmitter: GetBsvhuSignatureTypeFn<ZodBsvhu> = (
 };
 
 /**
- * format de la documentation générée:
- * id                  | nom du champ              | chemin GraphQL        | requis à partir de | requis si                | scellé à partir de                | scellé si |
- * emitterCompanySiret | Le N° SIRET de l'émetteur | emitter.company.siret | EMISSION           | il y a un SIRET émetteur | TRANSPORT ou EMISSION si émetteur | -         |
- *
- * Il faut placer un commentaire pour les conditions (from/when) qui sont des fonctions, et qui ne peuvent pas être
- * parsées directement par le script de documentation
+ * DOCUMENTATION AUTOMATIQUE
+ * /!\ à faire tourner si les règles changent
+ * voir CONTRIBUTING -> Mettre à jour la documentation
+ * pour plus de détails
  */
-
 export const bsvhuEditionRules: BsvhuEditionRules = {
   customId: {
     sealed: { from: "OPERATION" },
@@ -116,7 +113,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterAgrementNumber: {
     sealed: {
-      // TRANSPORT ou EMISSION si émetteur
+      // EMISSION ou TRANSPORT si émetteur
       from: sealedFromEmissionExceptForEmitter
     },
     readableFieldName: "Le N° d'agrément de l'émetteur",
