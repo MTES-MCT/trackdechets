@@ -11,7 +11,6 @@ import {
 } from "@prisma/client";
 import * as yup from "yup";
 import {
-  isSiret,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
   BSDD_APPENDIX1_WASTE_CODES,
@@ -35,7 +34,12 @@ import {
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
-import { packagingInfoFn, quantityRefused } from "../../validation";
+import {
+  brokerSchemaFn,
+  packagingInfoFn,
+  quantityRefused,
+  traderSchemaFn
+} from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import { isDangerous } from "@td/constants";
@@ -127,7 +131,11 @@ export default async function createFormRevisionRequest(
 
   await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
-  const flatContent = await getFlatContent(content, existingBsdd);
+  // auto-complète les récépissés négociant et courtier
+  const recipifiedContent = await recipify(content);
+
+  const flatContent = await getFlatContent(recipifiedContent, existingBsdd);
+
   const history = getBsddHistory(existingBsdd);
 
   const authoringCompany = await getAuthoringCompany(
@@ -372,7 +380,8 @@ async function getFlatContent(
     }
   } else {
     await bsddRevisionRequestSchema.validate(flatContent, {
-      strict: true
+      strict: true,
+      abortEarly: false
     });
   }
 
@@ -469,6 +478,47 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
   quantityRefused
 });
 
+async function recipify(
+  content: FormRevisionRequestContentInput
+): Promise<FormRevisionRequestContentInput> {
+  let recipified = content;
+  if (content.broker?.company?.siret) {
+    const brokerCompany = await prisma.company.findFirst({
+      where: { orgId: content.broker.company.siret },
+      include: { brokerReceipt: true }
+    });
+    if (brokerCompany) {
+      recipified = {
+        ...recipified,
+        broker: {
+          ...recipified.broker,
+          receipt: brokerCompany?.brokerReceipt?.receiptNumber ?? null,
+          department: brokerCompany?.brokerReceipt?.department ?? null,
+          validityLimit: brokerCompany?.brokerReceipt?.validityLimit ?? null
+        }
+      };
+    }
+  }
+  if (content.trader?.company?.siret) {
+    const traderCompany = await prisma.company.findFirst({
+      where: { orgId: content.trader.company.siret },
+      include: { traderReceipt: true }
+    });
+    if (traderCompany) {
+      recipified = {
+        ...recipified,
+        trader: {
+          ...recipified.trader,
+          receipt: traderCompany?.traderReceipt?.receiptNumber ?? null,
+          department: traderCompany?.traderReceipt?.department ?? null,
+          validityLimit: traderCompany?.traderReceipt?.validityLimit ?? null
+        }
+      };
+    }
+  }
+  return recipified;
+}
+
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
     isCanceled: yup.bool().transform(v => (v === null ? false : v)),
@@ -521,38 +571,6 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
         }
       ),
     processingOperationDescription: yup.string().nullable(),
-    brokerCompanyName: yup.string().nullable(),
-    brokerCompanySiret: yup
-      .string()
-      .nullable()
-      .test(
-        "is-siret",
-        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
-    brokerCompanyAddress: yup.string().nullable(),
-    brokerCompanyContact: yup.string().nullable(),
-    brokerCompanyPhone: yup.string().nullable(),
-    brokerCompanyMail: yup.string().email().nullable(),
-    brokerReceipt: yup.string().nullable(),
-    brokerDepartment: yup.string().nullable(),
-    brokerValidityLimit: yup.date().nullable(),
-    traderCompanyName: yup.string().nullable(),
-    traderCompanySiret: yup
-      .string()
-      .nullable()
-      .test(
-        "is-siret",
-        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
-    traderCompanyAddress: yup.string().nullable(),
-    traderCompanyContact: yup.string().nullable(),
-    traderCompanyPhone: yup.string().nullable(),
-    traderCompanyMail: yup.string().email().nullable(),
-    traderReceipt: yup.string().nullable(),
-    traderDepartment: yup.string().nullable(),
-    traderValidityLimit: yup.date().nullable(),
     temporaryStorageDestinationCap: yup.string().nullable(),
     temporaryStorageTemporaryStorerQuantityReceived: yup
       .number()
@@ -567,6 +585,8 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       .nullable()
   })
   .concat(bsddRevisionRequestWasteQuantitiesSchema)
+  .concat(traderSchemaFn({ isDraft: false }))
+  .concat(brokerSchemaFn({ isDraft: false }))
   .noUnknown(
     true,
     "Révision impossible, certains champs saisis ne sont pas modifiables"

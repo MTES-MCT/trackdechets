@@ -1,10 +1,11 @@
-import { RefinementCtx, z } from "zod";
+import { RefinementCtx } from "zod";
 import { ParsedZodOutgoingTexsItem } from "./schema";
 import { prisma } from "@td/prisma";
+import { transformAndRefineItemReason } from "../../shared/transform";
 
 export async function transformAndRefineReason(
   outgoingTexsItem: ParsedZodOutgoingTexsItem,
-  { addIssue }: RefinementCtx
+  ctx: RefinementCtx
 ) {
   const outgoingTexsItemInDb = await prisma.registryOutgoingTexs.findFirst({
     where: {
@@ -14,22 +15,9 @@ export async function transformAndRefineReason(
     }
   });
 
-  outgoingTexsItem.id = outgoingTexsItemInDb?.id;
-
-  // If the line alreary exists in DB and we dont have a reason, we can simply ignore it
-  if (outgoingTexsItemInDb && !outgoingTexsItem.reason) {
-    outgoingTexsItem.reason = "IGNORER";
-    return outgoingTexsItem;
-  }
-
-  if (!outgoingTexsItemInDb && outgoingTexsItem.reason) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `La raison doit rester vide, l'identifiant unique "${outgoingTexsItem.publicId}" n'a jamais été importé.`,
-      path: ["reason"]
-    });
-    return z.NEVER;
-  }
-
-  return outgoingTexsItem;
+  return transformAndRefineItemReason<ParsedZodOutgoingTexsItem>(
+    outgoingTexsItem,
+    outgoingTexsItemInDb?.id,
+    ctx
+  );
 }

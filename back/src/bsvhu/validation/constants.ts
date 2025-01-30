@@ -13,6 +13,10 @@ export const BSVHU_SIGNATURES_HIERARCHY: {
   },
   TRANSPORT: {
     isSigned: bsvhu => Boolean(bsvhu.transporterTransportSignatureDate),
+    next: "RECEPTION"
+  },
+  RECEPTION: {
+    isSigned: bsvhu => Boolean(bsvhu.destinationReceptionSignatureDate),
     next: "OPERATION"
   },
   OPERATION: {

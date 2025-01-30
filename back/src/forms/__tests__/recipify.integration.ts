@@ -45,7 +45,15 @@ describe("Test Bsdd Transporter Recipify Module for FormInput", () => {
     };
 
     const completedInput = await recipifyFormInput(mockInput);
-    expect(completedInput).toEqual(mockInput);
+    expect(completedInput).toEqual({
+      transporter: {
+        company,
+        isExemptedOfReceipt: true,
+        receipt: null,
+        department: null,
+        validityLimit: null
+      }
+    });
   });
 });
 

@@ -69,6 +69,7 @@ export default async function duplicate(
     intermediaries,
     transporters,
     transportersOrgIds,
+    createdAt,
     ...bsda
   } = parsedBsda;
 

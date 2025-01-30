@@ -933,6 +933,7 @@ model User {
   registryIncomingWastes     RegistryIncomingWaste[]
   registryIncomingTexs       RegistryIncomingTexs[]
   registryOutgoingTexs       RegistryOutgoingTexs[]
+  registryOutgoingWaste      RegistryOutgoingWaste[]
   registryExports            RegistryExport[]
 }
 
@@ -1067,6 +1068,8 @@ model Bsvhu {
   destinationOperationNextDestinationCompanyVatNumber String?
   destinationCustomInfo                               String?
   destinationOperationMode                            OperationMode?
+  destinationReceptionSignatureAuthor                 String?
+  destinationReceptionSignatureDate                   DateTime?                @db.Timestamptz(6)
   wasteCode                                           String?                  @default("16 01 06") @db.VarChar(10)
   packaging                                           BsvhuPackaging?
   identificationNumbers                               String[]
@@ -2117,6 +2120,7 @@ enum BsvhuStatus {
   INITIAL
   SIGNED_BY_PRODUCER
   SENT
+  RECEIVED
   PROCESSED
   REFUSED
 }
@@ -2129,6 +2133,7 @@ enum BsvhuPackaging {
 enum BsvhuIdentificationType {
   NUMERO_ORDRE_REGISTRE_POLICE
   NUMERO_IMMATRICULATION
+  NUMERO_FICHE_DROMCOM
   NUMERO_ORDRE_LOTS_SORTANTS // deprecated
 }
 

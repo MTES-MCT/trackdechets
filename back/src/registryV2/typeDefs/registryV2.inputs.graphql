@@ -1322,24 +1322,24 @@ input OutgoingTexsLineInput {
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
   """
-  emitterPickupSiteName: String
+  reportForPickupSiteName: String
   """
   Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
   """
-  emitterPickupSiteAddress: String
+  reportForPickupSiteAddress: String
   """
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   """
-  emitterPickupSitePostalCode: String
+  reportForPickupSitePostalCode: String
   """
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   """
-  emitterPickupSiteCity: String
+  reportForPickupSiteCity: String
   """
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   """
-  emitterPickupSiteCountryCode: String
+  reportForPickupSiteCountryCode: String
   """
   Dénomination du déchet
   Dénomination usuelle des déchets entrants
@@ -1585,6 +1585,480 @@ input OutgoingTexsLineInput {
   - pour séparer plusieurs coordonnées, une virgule doit être utilisée
   """
   destinationParcelCoordinates: [String!]
+  """
+  Numéro de déclaration GISTRID
+  N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre
+  """
+  declarationNumber: String
+  """
+  Numéro de notification GISTRID
+  Numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre
+  """
+  notificationNumber: String
+  """
+  Numéro de mouvement
+  Numéro de saisie du document déclaré sur GISTRID
+  """
+  movementNumber: String
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+  """
+  Raison sociale de l’éco-organisme
+  """
+  ecoOrganismeName: String
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+  """
+  Numéro de recépissé du courtier
+  """
+  brokerRecepisseNumber: String
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  Indique si les terres et sédiments ou déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
+
+  Si aucune valeur n'a été renseignée, il sera considéré que les terres et sédiments ou déchets entrants ne sont pas directement transportés et que donc la valeur est NON et qu'au moins un transporteur est attendu.
+  """
+  isDirectSupply: Boolean
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: String
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+  """
+  Pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: String
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+  """
+  Pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: String
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+  """
+  Pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: String
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+  """
+  Pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: String
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+  """
+  Pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
+
+"Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux sortants"
+input OutgoingWasteLineInput {
+  """
+  Motif
+  Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
+  """
+  reason: RegistryLineReason
+  """
+  Identifiant unique
+  Identifiant unique donné à chaque déclaration pour un établissement donné
+
+  Si un import comporte plusieurs mêmes identifiants uniques sans motif, seule la première ligne sera déclarée, les suivantes seront ignorées.
+  """
+  publicId: ID!
+  """
+  SIRET du déclarant
+  À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
+
+  Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET de l'émetteur et mon SIRET.
+  """
+  reportForCompanySiret: String!
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
+  """
+  reportForPickupSiteName: String
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
+  """
+  reportForPickupSiteAddress: String
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSitePostalCode: String
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCity: String
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCountryCode: String
+  """
+  SIRET du déclarant
+  À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
+
+  Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET de l'émetteur et mon SIRET.
+  """
+  reportAsCompanySiret: String
+  """
+  Dénomination du déchet
+  Dénomination usuelle des déchets entrants
+
+  La description renseignée ici peut ne pas correspondre à la définition du code déchet renseigné dans la colonne Code déchet.
+  """
+  wasteDescription: String!
+  """
+  Code déchet
+  Code du déchet sortant
+
+  Le code déchet mentionné doit faire partie de la liste des codes déchets officielle
+  """
+  wasteCode: String!
+  """
+  Code déchet Bâle
+  Code Bâle du déchet sortant
+
+  Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle
+  """
+  wasteCodeBale: String
+  """
+  POP
+  Indique si le déchet contient des polluants organiques persistants
+  """
+  wastePop: Boolean!
+  """
+  Dangereux
+  Indique si le déchet avec un code sans * est qualifié de dangereux
+
+  Si le code déchet est non dangereux et ne dispose pas de code miroir dangereux, il est possible de le forcer comme dangereux.
+  Si aucune valeur n'est ajoutée, c'est les valeurs du code déchet et POP qui permettent d'autocompléter le caractère dangereux ou non dangereux du déchet entrant.
+  """
+  wasteIsDangerous: Boolean
+  """
+  Date de réception des terres et sédiments ou des déchets sortants
+
+  La date d'expédition ne peut pas :
+  - être dans le futur,
+  - être antérieure à J-1 an
+  """
+  dispatchDate: DateTime!
+  """
+  Poids en tonnes
+  Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
+
+  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  """
+  weightValue: Float!
+  """
+  Type de poids
+  Indique si le poids du déchet faisant l'objet de la sortie de statut de déchet est estimé ou réel.
+  """
+  weightIsEstimate: Boolean!
+  """
+  Volume en M3
+  Volume en M3 du déchet faisant l'objet de la sortie de statut de déchet
+
+  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  """
+  volume: Float
+  """
+  Type de producteur initial
+  Type d'acteur correspondant au producteur des déchets sortants
+
+  Selon le type de producteur initial renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du producteur initial.
+  """
+  initialEmitterCompanyType: String!
+  """
+  Numéro d'identification du producteur initial
+  Numéro d'identification du producteur initial, selon son type de profil
+  """
+  initialEmitterCompanyOrgId: String
+  """
+  Raison sociale du producteur initial
+  Raison sociale du producteur initial des déchets sortants
+  """
+  initialEmitterCompanyName: String
+  """
+  Adresse du producteur initial
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des déchets entrants
+  """
+  initialEmitterCompanyAddress: String
+  """
+  Code postal du producteur initial
+  Code postal du producteur initial des déchets sortants
+  """
+  initialEmitterCompanyPostalCode: String
+  """
+  Commune du producteur initial
+  Commune du producteur initial des déchets sortants
+  """
+  initialEmitterCompanyCity: String
+  """
+  Code pays du producteur initial
+  Code pays du producteur initial des déchets sortants
+  """
+  initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  Le ou les codes INSEE de la ou des commune(s) de collecte des déchets sortants
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Commune(s)
+  Libellé de la ou des commune(s) de collecte des déchets sortants
+  """
+  initialEmitterMunicipalitiesNames: [String!]
+  """
+  Type de destinataire
+
+  Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
+  """
+  destinationCompanyType: String!
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+  """
+  Libellé de l'adresse du destinataire
+  """
+  destinationCompanyAddress: String
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+  """
+  Libellé de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteAddress: String
+  """
+  Code postal de l'adresse de dépôt du destinataire
+  """
+  destinationDropSitePostalCode: String
+  """
+  Commune de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCity: String
+  """
+  Pays de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCountryCode: String
+  """
+  Code de traitement réalisé
+  Code de traitement appliqué aux terres et sédiments ou déchets entrants
+  """
+  operationCode: String!
+  """
+  Mode de traitement
+  Qualification du traitement correspondant au code de traitement des terres et sédiments ou des déchets entrants
+
+  Le mode de traitement est requis si un code de traitement final a été renseigné comme code de traitement.
+  La valeur doit correspondre au code de traitement réalisé ajouté."
+  """
+  operationMode: OperationMode
   """
   Numéro de déclaration GISTRID
   N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre

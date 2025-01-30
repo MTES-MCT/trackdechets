@@ -97,6 +97,12 @@ const rawBsdaTransporterSchema = z
  */
 export const rawBsdaSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  // on ajoute `createdAt` au schéma de validation pour appliquer certaines
+  // règles de façon contextuelles en fonction de la date de création du BSDA.
+  // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
+  // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
+  // ancienne version du schéma.
+  createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),

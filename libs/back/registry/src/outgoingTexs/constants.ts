@@ -6,24 +6,24 @@ export const OUTGOING_TEXS_HEADERS: {
   reason: "Motif",
   publicId: "Identifiant unique",
   reportAsCompanySiret: "SIRET du déclarant",
-  reportForCompanySiret: "SIRET de l'expéditeur",
-  emitterPickupSiteName:
-    "Référence du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSiteAddress:
-    "Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSitePostalCode:
-    "Code postal du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSiteCity:
-    "Commune du chantier ou du lieu de collecte de l'expéditeur",
-  emitterPickupSiteCountryCode:
-    "Pays du chantier ou du lieu de collecte de l'expéditeur",
+  reportForCompanySiret: "SIRET de l'expéditeur ou du détenteur",
+  reportForPickupSiteName:
+    "Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+  reportForPickupSiteAddress:
+    "Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+  reportForPickupSitePostalCode:
+    "Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+  reportForPickupSiteCity:
+    "Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+  reportForPickupSiteCountryCode:
+    "Pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   wasteDescription: "Dénomination du déchet",
   wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",
   wastePop: "POP",
   wasteIsDangerous: "Dangereux",
-  dispatchDate: "Date d'expédition",
   wasteDap: "DAP",
+  dispatchDate: "Date d'expédition",
   weightValue: "Poids en tonnes",
   weightIsEstimate: "Type de poids",
   volume: "Volume en M3",
@@ -33,7 +33,7 @@ export const OUTGOING_TEXS_HEADERS: {
   initialEmitterCompanyAddress: "Libellé de l'adresse du producteur initial",
   initialEmitterCompanyPostalCode: "Code postal du producteur initial",
   initialEmitterCompanyCity: "Commune du producteur initial",
-  initialEmitterCompanyCountryCode: "Pays du producteur initial",
+  initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
   initialEmitterMunicipalitiesNames: "Commune(s)",
   parcelInseeCodes: "Codes INSEE des parcelles",
@@ -46,12 +46,16 @@ export const OUTGOING_TEXS_HEADERS: {
   destinationCompanyAddress: "Libellé de l'adresse du destinataire",
   destinationCompanyPostalCode: "Code postal du destinataire",
   destinationCompanyCity: "Commune du destinataire",
-  destinationCompanyCountryCode: "Pays du destinataire",
+  destinationCompanyCountryCode: "Code pays du destinataire",
   destinationDropSiteAddress: "Libellé de l'adresse de dépôt du destinataire",
   destinationDropSitePostalCode:
     "Code postal de l'adresse de dépôt du destinataire",
   destinationDropSiteCity: "Commune de l'adresse de dépôt du destinataire",
-  destinationDropSiteCountryCode: "Pays de l'adresse de dépôt du destinataire",
+  destinationDropSiteCountryCode:
+    "Code pays de l'adresse de dépôt du destinataire",
+  declarationNumber: "Numéro de déclaration GISTRID",
+  notificationNumber: "Numéro de notification GISTRID",
+  movementNumber: "Numéro de mouvement",
   operationCode: "Code de traitement prévu",
   operationMode: "Mode de traitement prévu",
   isUpcycled: "Terre valorisée",
@@ -61,9 +65,6 @@ export const OUTGOING_TEXS_HEADERS: {
     "Numéro(s) des parcelles de destination si valorisation",
   destinationParcelCoordinates:
     "Coordonnées des parcelles de destination si valorisation",
-  declarationNumber: "Numéro de déclaration",
-  notificationNumber: "Numéro de notification ",
-  movementNumber: "Numéro de mouvement",
   ecoOrganismeSiret: "SIRET de l'éco-organisme",
   ecoOrganismeName: "Raison sociale de l'éco-organisme",
   brokerCompanySiret: "SIRET du courtier",

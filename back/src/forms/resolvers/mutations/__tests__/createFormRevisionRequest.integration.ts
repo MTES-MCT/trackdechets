@@ -310,7 +310,6 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    console.log(data.createFormRevisionRequest.approvals.length);
     // only one approval is created
     expect(data.createFormRevisionRequest.approvals).toStrictEqual([
       { approverSiret: recipientCompany.siret, status: "PENDING" }
@@ -1601,6 +1600,226 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(errors).toBeUndefined();
+  });
+
+  it("should fail when trying to add a broker with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const brokerCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { broker: { company: { siret: brokerCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          `Le courtier saisi sur le bordereau (SIRET: ${brokerCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+        )
+      })
+    ]);
+  });
+
+  it("should fail when trying to add a trader with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const traderCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { trader: { company: { siret: traderCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          `Le négociant saisi sur le bordereau (SIRET: ${traderCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+        )
+      })
+    ]);
+  });
+
+  it("should auto-complete broker receipt", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const recepisse = {
+      receiptNumber: "rec-courtier",
+      department: "13",
+      validityLimit: new Date()
+    };
+
+    const brokerCompany = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: recepisse
+      }
+    });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {
+            broker: {
+              company: {
+                siret: brokerCompany.siret,
+                address: brokerCompany.address,
+                name: brokerCompany.name,
+                mail: "courtier@trackdechets.fr",
+                contact: "Courtier",
+                phone: "00 00 00 00 00"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsddRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createFormRevisionRequest.id }
+    });
+
+    expect(revisionRequest.brokerReceipt).toEqual(recepisse.receiptNumber);
+    expect(revisionRequest.brokerDepartment).toEqual(recepisse.department);
+    expect(revisionRequest.brokerValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
+  });
+
+  it("should auto-complete trader receipt", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const recepisse = {
+      receiptNumber: "rec-négociant",
+      department: "13",
+      validityLimit: new Date()
+    };
+
+    const traderCompany = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: recepisse
+      }
+    });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {
+            trader: {
+              company: {
+                siret: traderCompany.siret,
+                address: traderCompany.address,
+                name: traderCompany.name,
+                mail: "negociant@trackdechets.fr",
+                contact: "Négociant",
+                phone: "00 00 00 00 00"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsddRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createFormRevisionRequest.id }
+    });
+
+    expect(revisionRequest.traderReceipt).toEqual(recepisse.receiptNumber);
+    expect(revisionRequest.traderDepartment).toEqual(recepisse.department);
+    expect(revisionRequest.traderValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
   });
 
   describe("wasteAcceptationStatus & quantityRefused", () => {

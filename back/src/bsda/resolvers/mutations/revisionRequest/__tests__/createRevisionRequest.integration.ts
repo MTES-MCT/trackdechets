@@ -802,6 +802,161 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     );
   });
 
+  it("should fail when adding a broker whith wrong profile", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const broker = await companyFactory({
+      companyTypes: [
+        // missing BROKER profile
+      ]
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Cet établissement n'a pas le profil Courtier."
+        )
+      })
+    ]);
+  });
+
+  it("should auto-complete broker recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const recepisse = {
+      receiptNumber: "recepisse-courtier",
+      department: "13",
+      validityLimit: new Date()
+    };
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: { create: recepisse }
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+
+    expect(revisionRequest.brokerRecepisseNumber).toEqual(
+      recepisse.receiptNumber
+    );
+    expect(revisionRequest.brokerRecepisseDepartment).toEqual(
+      recepisse.department
+    );
+    expect(revisionRequest.brokerRecepisseValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
+  });
+
+  it("should throw error if broker has no recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"]
+      // le récépissé n'est pas complété sur le profil
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              },
+              // même si l'utilisateur API tente de renseigner
+              // les champs, ils ne doivent pas être pris en compte.
+              recepisse: {
+                number: "rec-courtier",
+                department: "07",
+                validityLimit: new Date().toISOString() as any as Date
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets"
+      })
+    ]);
+  });
+
   it("creating revision on CAP without TTR > should target exutoire's CAP", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -877,7 +1032,6 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         }
       }
     });
-
     // Then
     expect(errors).toBeUndefined();
     expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(

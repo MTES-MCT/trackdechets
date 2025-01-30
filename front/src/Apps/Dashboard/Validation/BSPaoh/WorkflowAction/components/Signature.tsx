@@ -14,7 +14,7 @@ export const useNow = () => {
     };
   }, []);
 
-  const dt = format(now, "dd/MM/yy HH:mm");
+  const dt = format(now, "dd/MM/yyyy à HH:mm");
 
   return dt;
 };

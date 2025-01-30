@@ -96,8 +96,10 @@ export const transporter5Refinement =
 
 export const refineReportForProfile: Refinement<
   ParsedZodIncomingTexsItem
-> = async (ssdItem, { addIssue }) => {
-  const company = await getCachedCompany(ssdItem.reportForCompanySiret);
+> = async (incomingTexsItem, { addIssue }) => {
+  const company = await getCachedCompany(
+    incomingTexsItem.reportForCompanySiret
+  );
   if (!company) {
     return;
   }
