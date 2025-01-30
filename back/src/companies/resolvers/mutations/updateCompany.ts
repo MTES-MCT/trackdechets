@@ -17,6 +17,7 @@ import { SiretNotFoundError } from "../../sirene/errors";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../converters";
+import { getCompanyRepository } from "../../repository";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -148,7 +149,13 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  const updatedCompany = await prisma.company.update({
+  // const updatedCompany = await prisma.company.update({
+  //   where: { id: existingCompany.id },
+  //   data
+  // });
+
+  const { updateCompany } = await getCompanyRepository(user);
+  const updatedCompany = await updateCompany({
     where: { id: existingCompany.id },
     data
   });
