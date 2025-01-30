@@ -456,7 +456,8 @@ describe("simpleFormToBsdd", () => {
       status: fullForwardedInForm.status,
       wasteCode: fullForwardedInForm.wasteDetailsCode,
       wasteIsDangerous: true,
-      wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
+      wasteDetailsLandIdentifiers:
+        fullForwardedInForm.wasteDetailsLandIdentifiers,
       wasteDescription: fullForwardedInForm.wasteDetailsName,
       pop: false,
       traderCompanyName: fullForwardedInForm.traderCompanyName,
@@ -654,6 +655,7 @@ describe("simpleFormToBsdd", () => {
         status: form.status,
         wasteCode: form.wasteDetailsCode,
         wasteIsDangerous: true,
+        wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
         wasteDescription: form.wasteDetailsName,
         pop: false,
         traderCompanyName: form.traderCompanyName,
