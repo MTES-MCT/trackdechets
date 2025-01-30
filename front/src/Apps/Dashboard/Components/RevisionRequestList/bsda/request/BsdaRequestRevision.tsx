@@ -6,20 +6,18 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bsda,
-  FavoriteType,
+  BsdType,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
 import { BSDA_WASTES } from "@td/constants";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { removeEmptyKeys } from "../../../../../../common/helper";
 import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
-import RhfCompanyContactInfo from "../../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { Loader } from "../../../../../common/Components";
-import CompanySelectorWrapper from "../../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
@@ -34,6 +32,7 @@ import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCance
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 type Props = {
   bsda: Bsda;
 };
@@ -107,45 +106,6 @@ export function BsdaRequestRevision({ bsda }: Props) {
   const formValues = watch();
 
   const areModificationsDisabled = formValues.isCanceled;
-
-  const orgId = useMemo(
-    () => bsda?.broker?.company?.orgId ?? bsda?.broker?.company?.siret ?? null,
-    [bsda?.broker?.company?.orgId, bsda?.broker?.company?.siret]
-  );
-
-  const onCompanyBrokerSeleted = company => {
-    const field = "broker";
-    if (company) {
-      setValue(`${field}.company.orgId`, company.orgId);
-      setValue(`${field}.company.siret`, company.siret);
-      setValue(`${field}.company.name`, company.name);
-      setValue(`${field}.company.vatNumber`, company.vatNumber);
-      setValue(`${field}.company.address`, company.address);
-      setValue(
-        `${field}.company.contact`,
-        company.contact || bsda.broker?.company?.contact
-      );
-      setValue(
-        `${field}.company.phone`,
-        company.contactPhone || bsda.broker?.company?.phone
-      );
-
-      setValue(
-        `${field}.company.mail`,
-        company.contactEmail || bsda.broker?.company?.mail
-      );
-    }
-    const receipt = company?.brokerReceipt;
-    if (receipt) {
-      setValue(`${field}.recepisse.number`, receipt.receiptNumber);
-      setValue(`${field}.recepisse.validityLimit`, receipt.validityLimit);
-      setValue(`${field}.recepisse.department`, receipt.department);
-    } else {
-      setValue(`${field}.recepisse.number`, "");
-      setValue(`${field}.recepisse.validityLimit`, null);
-      setValue(`${field}.recepisse.department`, "");
-    }
-  };
 
   const handleAddSealNumbers = value => {
     if (value && ![...sealNumbersTags]?.includes(value)) {
@@ -255,8 +215,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="CAP"
-                value={bsda.destination?.cap}
+                title="CAP de l'exutoire"
+                value={
+                  bsda.destination?.operation?.nextDestination?.cap ??
+                  bsda.destination?.cap
+                }
                 path="destination.cap"
                 defaultValue={initialBsdaReview.destination.cap}
               >
@@ -386,35 +349,10 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 }
                 defaultValue={initialBsdaReview.broker}
               >
-                <CompanySelectorWrapper
-                  orgId={siret}
-                  favoriteType={FavoriteType.Broker}
-                  onCompanySelected={onCompanyBrokerSeleted}
-                />
-                <RhfCompanyContactInfo
-                  fieldName={"broker.company"}
-                  key={orgId}
-                />
-                <Input
-                  label="Numéro de récépissé"
-                  nativeInputProps={{
-                    ...register("broker.recepisse.number")
-                  }}
-                  className="fr-col-6"
-                />
-                <Input
-                  label="Département"
-                  nativeInputProps={{
-                    ...register("broker.recepisse.department")
-                  }}
-                  className="fr-col-6"
-                />
-                <Input
-                  label="Limite de validité"
-                  nativeInputProps={{
-                    type: "date",
-                    ...register("broker.recepisse.validityLimit")
-                  }}
+                <RhfBroker
+                  bsdType={BsdType.Bsda}
+                  siret={siret}
+                  showSwitch={false}
                 />
               </RhfReviewableField>
 

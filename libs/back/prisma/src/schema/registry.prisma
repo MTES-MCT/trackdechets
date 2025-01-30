@@ -44,6 +44,10 @@ enum RegistryImportType {
     SSD
     INCOMING_WASTE
     INCOMING_TEXS
+    OUTGOING_WASTE
+    OUTGOING_TEXS
+    TRANSPORTED_WASTE
+    MANAGED_WASTE
 }
 
 model RegistrySsd {
@@ -116,7 +120,7 @@ model RegistryIncomingWaste {
     wasteCode                              String
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime
+    receptionDate                          DateTime @db.Timestamptz(6)
     weighingHour                           String?
     wasteDescription                       String
     wasteCodeBale                          String?
@@ -239,7 +243,7 @@ model RegistryIncomingTexs {
     wasteCode                              String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime
+    receptionDate                          DateTime @db.Timestamptz(6)
     wasteDescription                       String
     wasteCodeBale                          String?
     wasteDap                               String?
@@ -365,18 +369,18 @@ model RegistryOutgoingTexs {
     reportForCompanyAddress                String
     reportForCompanyCity                   String
     reportForCompanyPostalCode             String
+    reportForPickupSiteName                String?
+    reportForPickupSiteAddress             String?
+    reportForPickupSitePostalCode          String?
+    reportForPickupSiteCity                String?
+    reportForPickupSiteCountryCode         String?
     reportAsCompanySiret                   String?
-    emitterPickupSiteName                  String?
-    emitterPickupSiteAddress               String?
-    emitterPickupSitePostalCode            String?
-    emitterPickupSiteCity                  String?
-    emitterPickupSiteCountryCode           String?
     wasteDescription                       String
     wasteCode                              String
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?
+    dispatchDate                           DateTime? @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
@@ -478,6 +482,127 @@ model RegistryOutgoingTexs {
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
 }
 
+model RegistryOutgoingWaste {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+    importId  String?
+
+    isLatest    Boolean @default(true)
+    isCancelled Boolean @default(false)
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
+
+    publicId                               String
+    reportForCompanySiret                  String
+    reportForCompanyName                   String
+    reportForCompanyAddress                String
+    reportForCompanyCity                   String
+    reportForCompanyPostalCode             String
+    reportForPickupSiteName                String?
+    reportForPickupSiteAddress             String?
+    reportForPickupSitePostalCode          String?
+    reportForPickupSiteCity                String?
+    reportForPickupSiteCountryCode         String?
+    reportAsCompanySiret                   String?
+    wasteDescription                       String
+    wasteCode                              String
+    wasteCodeBale                          String?
+    wastePop                               Boolean
+    wasteIsDangerous                       Boolean?
+    dispatchDate                           DateTime? @db.Timestamptz(6)
+    weightValue                            Float
+    weightIsEstimate                       Boolean
+    volume                                 Float?
+    initialEmitterCompanyType              String
+    initialEmitterCompanyOrgId             String?
+    initialEmitterCompanyName              String?
+    initialEmitterCompanyAddress           String?
+    initialEmitterCompanyPostalCode        String?
+    initialEmitterCompanyCity              String?
+    initialEmitterCompanyCountryCode       String?
+    initialEmitterMunicipalitiesInseeCodes String[]
+    initialEmitterMunicipalitiesNames      String[]
+    destinationCompanyType                 String
+    destinationCompanyOrgId                String?
+    destinationCompanyName                 String?
+    destinationCompanyAddress              String?
+    destinationCompanyCity                 String?
+    destinationCompanyPostalCode           String?
+    destinationCompanyCountryCode          String?
+    destinationDropSiteAddress             String?
+    destinationDropSitePostalCode          String?
+    destinationDropSiteCity                String?
+    destinationDropSiteCountryCode         String?
+    declarationNumber                      String?
+    notificationNumber                     String?
+    movementNumber                         String?
+    operationCode                          String
+    operationMode                          OperationMode?
+    ecoOrganismeSiret                      String?
+    ecoOrganismeName                       String?
+    brokerCompanySiret                     String?
+    brokerCompanyName                      String?
+    brokerRecepisseNumber                  String?
+    traderCompanySiret                     String?
+    traderCompanyName                      String?
+    traderRecepisseNumber                  String?
+    isDirectSupply                         Boolean?
+    transporter1TransportMode              TransportMode?
+    transporter1CompanyType                String?
+    transporter1CompanyOrgId               String?
+    transporter1RecepisseIsExempted        Boolean?
+    transporter1RecepisseNumber            String?
+    transporter1CompanyName                String?
+    transporter1CompanyAddress             String?
+    transporter1CompanyPostalCode          String?
+    transporter1CompanyCity                String?
+    transporter1CompanyCountryCode         String?
+    transporter2TransportMode              TransportMode?
+    transporter2CompanyType                String?
+    transporter2CompanyOrgId               String?
+    transporter2RecepisseIsExempted        Boolean?
+    transporter2RecepisseNumber            String?
+    transporter2CompanyName                String?
+    transporter2CompanyAddress             String?
+    transporter2CompanyPostalCode          String?
+    transporter2CompanyCity                String?
+    transporter2CompanyCountryCode         String?
+    transporter3TransportMode              TransportMode?
+    transporter3CompanyType                String?
+    transporter3CompanyOrgId               String?
+    transporter3RecepisseIsExempted        Boolean?
+    transporter3RecepisseNumber            String?
+    transporter3CompanyName                String?
+    transporter3CompanyAddress             String?
+    transporter3CompanyPostalCode          String?
+    transporter3CompanyCity                String?
+    transporter3CompanyCountryCode         String?
+    transporter4TransportMode              TransportMode?
+    transporter4CompanyType                String?
+    transporter4CompanyOrgId               String?
+    transporter4RecepisseIsExempted        Boolean?
+    transporter4RecepisseNumber            String?
+    transporter4CompanyName                String?
+    transporter4CompanyAddress             String?
+    transporter4CompanyPostalCode          String?
+    transporter4CompanyCity                String?
+    transporter4CompanyCountryCode         String?
+    transporter5TransportMode              TransportMode?
+    transporter5CompanyType                String?
+    transporter5CompanyOrgId               String?
+    transporter5RecepisseIsExempted        Boolean?
+    transporter5RecepisseNumber            String?
+    transporter5CompanyName                String?
+    transporter5CompanyAddress             String?
+    transporter5CompanyPostalCode          String?
+    transporter5CompanyCity                String?
+    transporter5CompanyCountryCode         String?
+
+    @@index([importId], map: "_RegistryOutgoingWasteImportIdIdx")
+    @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIdx")
+}
+
 enum RegistryExportType {
     SSD
     INCOMING
@@ -528,8 +653,8 @@ model RegistryExport {
     wasteTypes      RegistryExportWasteType[]      @default([])
     wasteCodes      String[]                       @default([])
     declarationType RegistryExportDeclarationType?
-    startDate       DateTime
-    endDate         DateTime?
+    startDate       DateTime                       @db.Timestamptz(6)
+    endDate         DateTime?                      @db.Timestamptz(6)
     format          RegistryExportFormat
 
     createdBy User @relation(fields: [createdById], references: [id])

@@ -16,6 +16,7 @@ import React, { useState } from "react";
 import { useForm, UseFormGetValues, UseFormRegister } from "react-hook-form";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { Modal } from "../../common/components";
+import { pluralize } from "@td/constants";
 
 type Props = { isOpen: boolean; onClose: () => void };
 
@@ -39,7 +40,7 @@ const steps = [
     buttons: ["CANCEL", "VALIDATE"]
   },
   { title: "Téléversement en cours", component: Step2 },
-  { title: "Import en cours", component: Step3, buttons: ["CANCEL", "CLOSE"] }
+  { title: "Importation", component: Step3, buttons: ["CLOSE"] }
 ];
 
 const REGISTRY_UPLOAD_SIGNED_URL = gql`
@@ -176,10 +177,16 @@ function Step1({ register }: StepProps) {
         <option value="INCOMING_TEXS">
           Terres excavées et sédiments, dangereux et non dangereux entrants
         </option>
+        <option value="OUTGOING_WASTE">
+          Déchets dangereux et non dangereux sortants
+        </option>
+        <option value="OUTGOING_TEXS">
+          Terres excavées et sédiments, dangereux et non dangereux sortants
+        </option>
       </Select>
 
       <Upload
-        hint="Formats supportés: csv, xls, xlsx"
+        hint="Formats supportés : csv, xls, xlsx"
         state="default"
         stateRelatedMessage="Text de validation / d'explication de l'erreur"
         nativeInputProps={{
@@ -309,23 +316,58 @@ function Step3({ registryImportId }) {
     stopPolling();
   }
 
+  const {
+    numberOfErrors = 0,
+    numberOfInsertions = 0,
+    numberOfEdits = 0,
+    numberOfCancellations = 0,
+    numberOfSkipped = 0
+  } = data?.registryImport || {};
+
   const stats = [
-    `${
-      data?.registryImport?.numberOfErrors ?? 0
-    } lignes n'ont pas pu être traitées car elles comportent au moins une erreur`,
-    `${
-      data?.registryImport?.numberOfInsertions ?? 0
-    } nouvelles lignes ont été importées`,
-    `${
-      data?.registryImport?.numberOfEdits ?? 0
-    } lignes existantes ont été modifées`,
-    `${
-      data?.registryImport?.numberOfCancellations ?? 0
-    } lignes existantes ont été annulées`,
-    `${
-      data?.registryImport?.numberOfSkipped ?? 0
-    } lignes ont été ignorées (numéro unique déjà déclaré et aucun motif présent)`
-  ].filter(v => !v.startsWith("0"));
+    [
+      numberOfErrors,
+      pluralize(
+        "ligne n'a pas pu être traitée car elle comporte au moins une erreur",
+        numberOfErrors,
+        "lignes n'ont pas pu être traitées car elles comportent au moins une erreur"
+      )
+    ],
+    [
+      numberOfInsertions,
+      pluralize(
+        "nouvelle ligne a été importée",
+        numberOfErrors,
+        "nouvelles lignes ont été importées"
+      )
+    ],
+    [
+      numberOfEdits,
+      pluralize(
+        "ligne existante a été modifée",
+        numberOfErrors,
+        "lignes existantes ont été modifées"
+      )
+    ],
+    [
+      numberOfCancellations,
+      pluralize(
+        "ligne existante a été annulée",
+        numberOfErrors,
+        "lignes existantes ont été annulées"
+      )
+    ],
+    [
+      numberOfSkipped,
+      pluralize(
+        "ligne a été ignorée (numéro unique déjà déclaré et aucun motif présent)",
+        numberOfErrors,
+        "lignes ont été ignorées (numéro unique déjà déclaré et aucun motif présent)"
+      )
+    ]
+  ]
+    .map(parts => parts.join(" "))
+    .filter(line => !line.startsWith("0"));
 
   return (
     <div>

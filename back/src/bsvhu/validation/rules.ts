@@ -31,6 +31,8 @@ export type BsvhuEditableFields = Required<
     | "transporterTransportSignatureAuthor"
     | "destinationOperationSignatureDate"
     | "destinationOperationSignatureAuthor"
+    | "destinationReceptionSignatureDate"
+    | "destinationReceptionSignatureAuthor"
     | "intermediariesOrgIds"
   >
 >;
@@ -60,7 +62,10 @@ export type EditionRule<T extends ZodBsvhu> = {
   // permettant de calculer cette signature
   from: SignatureTypeInput | GetBsvhuSignatureTypeFn<T>;
   // Condition supplémentaire à vérifier pour que le champ soit requis.
-  when?: (bsvhu: T) => boolean;
+  when?: (
+    bsvhu: T,
+    currentSignatureType: SignatureTypeInput | undefined
+  ) => boolean;
   customErrorMessage?: string;
 };
 
@@ -238,16 +243,28 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["destination", "company", "mail"]
   },
   destinationReceptionAcceptationStatus: {
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    required: { from: "RECEPTION" },
     readableFieldName: "Le statut d'acceptation du destinataire",
     path: ["destination", "reception", "acceptationStatus"]
   },
   destinationReceptionRefusalReason: {
-    sealed: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     readableFieldName: "La raison du refus par le destinataire",
-    required: { from: "OPERATION", when: isRefusedOrPartiallyRefused },
+    required: { from: "RECEPTION", when: isRefusedOrPartiallyRefused },
     path: ["destination", "reception", "refusalReason"]
+  },
+  destinationReceptionWeight: {
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    required: { from: "RECEPTION" },
+    readableFieldName: "Le poids réel reçu",
+    path: ["destination", "reception", "weight"]
+  },
+  destinationReceptionDate: {
+    readableFieldName: "la date de réception",
+    required: { from: "RECEPTION", when: isReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    path: ["destination", "reception", "date"]
   },
   destinationReceptionIdentificationNumbers: {
     sealed: { from: "OPERATION" },
@@ -355,18 +372,6 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     sealed: { from: "OPERATION" },
     readableFieldName: "La quantité de VHUs reçue",
     path: ["destination", "reception", "quantity"]
-  },
-  destinationReceptionWeight: {
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" },
-    readableFieldName: "Le poids réel reçu",
-    path: ["destination", "reception", "weight"]
-  },
-  destinationReceptionDate: {
-    readableFieldName: "la date de réception",
-    sealed: { from: "OPERATION" },
-    path: ["destination", "reception", "date"]
-    // required: { from: "OPERATION" }
   },
   wasteCode: {
     sealed: {
@@ -762,6 +767,17 @@ function isRefusedOrPartiallyRefused(bsvhu: ZodBsvhu) {
   );
 }
 
+function isReceptionSignatureStep(_, currentSignatureType: SignatureTypeInput) {
+  return currentSignatureType === "RECEPTION";
+}
+
+function isReceptionDataSealed(bsvhu: ZodBsvhu) {
+  return (
+    Boolean(bsvhu.destinationReceptionSignatureDate) ||
+    Boolean(bsvhu.destinationOperationSignatureDate)
+  );
+}
+
 function isNotRefused(bsvhu: ZodBsvhu) {
   return (
     bsvhu.destinationReceptionAcceptationStatus !==
@@ -832,6 +848,7 @@ export async function getSealedFields(
   }
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(bsvhu);
+
   // Some signatures may be skipped, so always check all the hierarchy
   const signaturesToCheck = getSignatureAncestors(currentSignatureType);
 
@@ -863,7 +880,8 @@ function isRuleApplied<T extends ZodBsvhu>(
   rule: EditionRule<T>,
   resource: T,
   signatures: SignatureTypeInput[],
-  context?: RuleContext<T>
+  context?: RuleContext<T>,
+  currentSignatureType?: SignatureTypeInput | undefined
 ) {
   const from =
     typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
@@ -871,7 +889,7 @@ function isRuleApplied<T extends ZodBsvhu>(
   const isApplied =
     from &&
     signatures.includes(from) &&
-    (rule.when === undefined || rule.when(resource));
+    (rule.when === undefined || rule.when(resource, currentSignatureType));
 
   return isApplied;
 }
@@ -888,7 +906,14 @@ function isBsvhuFieldSealed(
 export function isBsvhuFieldRequired(
   rule: EditionRule<ZodBsvhu>,
   bsvhu: ZodBsvhu,
-  signatures: SignatureTypeInput[]
+  signatures: SignatureTypeInput[],
+  currentSignatureType: SignatureTypeInput | undefined
 ) {
-  return isRuleApplied(rule, bsvhu, signatures);
+  return isRuleApplied(
+    rule,
+    bsvhu,
+    signatures,
+    undefined,
+    currentSignatureType
+  );
 }

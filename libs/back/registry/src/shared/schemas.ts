@@ -195,8 +195,8 @@ export const weightValueSchema = z
         required_error: "Le poids est requis",
         invalid_type_error: "Le poids doit être un nombre"
       })
-      .min(0, "Le poids ne peut pas être inférieur à 0 tonnes")
-      .max(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
+      .gt(0, "Le poids ne peut pas être inférieur à 0 tonnes")
+      .lte(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
       .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales")
   );
 
@@ -238,19 +238,52 @@ export const volumeSchema = z
         required_error: "Le volume est requis",
         invalid_type_error: "Le volume doit être un nombre"
       })
-      .min(0, "Le volume ne peut pas être inférieur à 0")
-      .max(1_000, "Le volume ne peut pas dépasser 1 000 M3")
+      .gt(0, "Le volume ne peut pas être inférieur à 0")
+      .lte(1_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .nullish()
   );
 
-export const receptionDateSchema = z.coerce
+export const dateSchema = z.coerce
   .date()
   .min(
     sub(new Date(), { years: 1 }),
-    "La date réception ne peut pas être antérieure à J-1 an"
+    "La date ne peut pas être antérieure à J-1 an"
   )
-  .max(new Date(), "La date réception ne peut pas être dans le futur");
+  .max(new Date(), "La date ne peut pas être dans le futur");
+
+export const nullishDateSchema = z.union([
+  z.date().nullish(),
+  z
+    .string()
+    .nullish()
+    .transform((val, ctx) => {
+      if (val) {
+        const timestamp = Date.parse(val);
+        if (isNaN(timestamp)) {
+          ctx.addIssue({
+            code: "invalid_date",
+            message:
+              "Le format de date est invalide. Exemple de format possible: 2000-01-22"
+          });
+          return z.NEVER;
+        }
+        return new Date(timestamp);
+      }
+
+      return undefined;
+    })
+    .pipe(
+      z
+        .date()
+        .min(
+          sub(new Date(), { years: 1 }),
+          "La date ne peut pas être antérieure à J-1 an"
+        )
+        .max(new Date(), "La date ne peut pas être dans le futur")
+        .nullish()
+    )
+]);
 
 export const inseeCodesSchema = z
   .string()

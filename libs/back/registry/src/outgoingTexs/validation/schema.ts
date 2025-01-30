@@ -2,7 +2,6 @@ import {
   INCOMING_TEXS_WASTE_CODES,
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
-import { sub } from "date-fns";
 import { z } from "zod";
 import {
   reasonSchema,
@@ -36,7 +35,8 @@ import {
   actorSiretSchema,
   transportModeSchema,
   transportRecepisseIsExemptedSchema,
-  transportRecepisseNumberSchema
+  transportRecepisseNumberSchema,
+  nullishDateSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -49,33 +49,17 @@ const inputOutgoingTexsSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  emitterPickupSiteName: z.string().nullish(),
-  emitterPickupSiteAddress: actorAddressSchema.nullish(),
-  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
-  emitterPickupSiteCity: actorCitySchema.nullish(),
-  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  reportForPickupSiteName: z.string().nullish(),
+  reportForPickupSiteAddress: actorAddressSchema.nullish(),
+  reportForPickupSitePostalCode: actorPostalCodeSchema.nullish(),
+  reportForPickupSiteCity: actorCitySchema.nullish(),
+  reportForPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
   wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
   wastePop: wastePopSchema,
   wasteIsDangerous: wasteIsDangerousSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: z.union([
-    z.date().nullish(),
-    z
-      .string()
-      .nullish()
-      .transform(val => (val ? new Date(val) : undefined))
-      .pipe(
-        z
-          .date()
-          .min(
-            sub(new Date(), { years: 1 }),
-            "La date ne peut pas être antérieure à J-1 an"
-          )
-          .max(new Date(), "La date ne peut pas être dans le futur")
-          .nullish()
-      )
-  ]),
+  dispatchDate: nullishDateSchema,
   wasteDap: z
     .string()
     .max(50, "Le DAP ne doit pas excéder 50 caractères")

@@ -223,7 +223,9 @@ describe("ActBsddValidation", () => {
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
     await waitFor(async () => {
-      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
+      expect(
+        await screen.getByText("Signer la réception et l'acceptation")
+      ).toBeInTheDocument();
     });
   });
 
@@ -300,7 +302,9 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
+      expect(
+        await screen.getByText("Signer la réception et l'acceptation")
+      ).toBeInTheDocument();
     });
   });
 

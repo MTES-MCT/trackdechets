@@ -4,6 +4,7 @@ import {
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
+  refineOperationCodeWhenUpcycled,
   refineOperationMode,
   refineWeightAndVolume
 } from "../../shared/refinement";
@@ -32,6 +33,7 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(parcelRefinement)
+    .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)
     .superRefine(refineFollowingTraceabilityInfos)
     .superRefine(transporter1Refinement)

@@ -17,12 +17,14 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
 import { AllBsdaSignatureType } from "../types";
+import { v20250201 } from "../../common/validation";
 
 // Liste des champs éditables sur l'objet Bsda
 export type BsdaEditableFields = Required<
   Omit<
     ZodBsda,
     | "id"
+    | "createdAt"
     | "isDraft"
     | "isDeleted"
     | "emitterEmissionSignatureAuthor"
@@ -718,15 +720,18 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   brokerRecepisseNumber: {
     readableFieldName: "le numéro de récépissé du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: { from: "EMISSION", when: requireBrokerRecepisse }
   },
   brokerRecepisseDepartment: {
     readableFieldName: "le département du récépissé du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: { from: "EMISSION", when: requireBrokerRecepisse }
   },
   brokerRecepisseValidityLimit: {
     readableFieldName: "la date de validité du récépissé du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    required: { from: "EMISSION", when: requireBrokerRecepisse }
   },
   wasteCode: {
     sealed: {
@@ -794,6 +799,14 @@ function requireTransporterRecepisse(transporter: ZodBsdaTransporter) {
     !transporter.transporterRecepisseIsExempted &&
     transporter.transporterTransportMode === TransportMode.ROAD &&
     !isForeignVat(transporter.transporterCompanyVatNumber)
+  );
+}
+
+function requireBrokerRecepisse(bsda: ZodBsda) {
+  return (
+    !!bsda.brokerCompanySiret &&
+    !!bsda.createdAt &&
+    bsda.createdAt.getTime() > v20250201.getTime()
   );
 }
 

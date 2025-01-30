@@ -112,6 +112,9 @@ export const getBsdStatusLabel = (
       if (bsdType === BsdType.Bspaoh) {
         return ACCEPTE;
       }
+      if (bsdType === BsdType.Bsvhu) {
+        return EN_ATTENTE_TRAITEMENT;
+      }
       return RECU;
     case BsdStatusCode.Accepted:
       return ACCEPTE;
@@ -826,7 +829,7 @@ export const getSentBtnLabel = (
     isBsvhu(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
-    return VALIDER_TRAITEMENT;
+    return VALIDER_RECEPTION;
   }
   // PAOH
   if (isBspaoh(bsd.type)) {

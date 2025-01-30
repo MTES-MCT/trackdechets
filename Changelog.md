@@ -9,9 +9,16 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
-
+- BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
+- BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
 - Ajout d'éco-organismes, filtrage des éco-organismes en front [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+
+#### :boom: Breaking changes
+
+- Bordereau BSDD - Vérifier le type de profil du courtier et/ou négociant lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDD - Vérifier le type de profil du courtier et/ou négociant lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Bordereau BSDA - Vérifier le type de profil du courtier lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 
 # [2025.01.1] 14/01/2025
 

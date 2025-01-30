@@ -43,6 +43,7 @@ export enum DataNameEnum {
   POLLUANTS_ORG = "Présence de polluants organiques persistants",
   CAP_FINAL_DEST = "CAP (destination finale)",
   CAP = "CAP",
+  CAP_EXUTOIRE = "CAP de l'exutoire",
   SAMPLE_NUMBER = "Numéro d'échantillon",
   CAP_TEMP_STORAGE = "CAP (entreposage provisoire ou reconditionnement)",
   QTY_ESTIMATED = "Poids estimé (en tonnes)",
@@ -264,7 +265,7 @@ export const mapRevision = (
         dataNewValue: review?.content?.temporaryStorageDetail?.destination?.cap
       },
       {
-        dataName: DataNameEnum.CAP,
+        dataName: DataNameEnum.CAP_EXUTOIRE,
         dataOldValue: review?.[bsdName]?.destination?.cap,
         dataNewValue: review?.content?.destination?.cap
       },

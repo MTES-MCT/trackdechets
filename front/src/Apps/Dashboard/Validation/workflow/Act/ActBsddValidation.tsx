@@ -93,7 +93,7 @@ const ActBsddValidation = ({
     }
 
     if (bsd.status === FormStatus.Resent) {
-      return "Signer la réception";
+      return "Signer la réception et l'acceptation";
     }
 
     if (bsd.status === FormStatus.Sealed) {
@@ -145,7 +145,7 @@ const ActBsddValidation = ({
       if (isTempStorage) {
         return "Signer l'entreposage provisoire";
       } else {
-        return "Signer la réception";
+        return "Signer la réception et l'acceptation";
       }
     }
 

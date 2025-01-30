@@ -113,6 +113,9 @@ input BsdaInput {
 
   "Courtier"
   broker: BsdaBrokerInput
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
+    )
 
   "Dénomination du déchet"
   waste: BsdaWasteInput
@@ -407,6 +410,9 @@ input BsdaRevisionRequestContentInput {
 
   "Courtier"
   broker: BsdaBrokerInput
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
+    )
 
   "Installation de destination"
   destination: BsdaRevisionRequestDestinationInput
@@ -427,7 +433,7 @@ input BsdaRevisionRequestEmitterInput {
 }
 
 input BsdaRevisionRequestDestinationInput {
-  "N° de CAP (le cas échéant)"
+  "N° de CAP (le cas échéant). Modifie le CAP de l'exutoire même en cas de TTR"
   cap: String
 
   "Expédition reçue à l'installation de destination"

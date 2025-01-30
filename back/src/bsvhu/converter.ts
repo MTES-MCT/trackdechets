@@ -117,7 +117,11 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
         weight: bsvhu.destinationReceptionWeight
           ? bsvhu.destinationReceptionWeight / 1000
           : bsvhu.destinationReceptionWeight,
-        refusalReason: bsvhu.destinationReceptionRefusalReason
+        refusalReason: bsvhu.destinationReceptionRefusalReason,
+        signature: nullIfNoValues<Signature>({
+          date: processDate(bsvhu.destinationReceptionSignatureDate),
+          author: bsvhu.destinationReceptionSignatureAuthor
+        })
       }),
       operation: nullIfNoValues<BsvhuOperation>({
         code: bsvhu.destinationOperationCode,
