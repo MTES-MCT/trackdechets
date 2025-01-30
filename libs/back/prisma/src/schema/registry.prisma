@@ -217,6 +217,8 @@ model RegistryIncomingWaste {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
 }
@@ -347,6 +349,8 @@ model RegistryIncomingTexs {
     transporter5CompanyPostalCode          String?
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
+
+    registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
@@ -678,7 +682,7 @@ model RegistryLookup {
     exportRegistryType RegistryExportType
     declarationType    RegistryExportDeclarationType
     wasteType          RegistryExportWasteType
-    wasteCode          String
+    wasteCode          String?
     date               DateTime
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
@@ -688,6 +692,12 @@ model RegistryLookup {
     // foreign keys to registry models
     registrySsdId String?
     registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+    registryIncomingWasteId String?
+    registryIncomingWaste   RegistryIncomingWaste? @relation(fields: [registryIncomingWasteId], references: [id], onDelete: Cascade)
+
+    registryIncomingTexsId String?
+    registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?
@@ -704,8 +714,8 @@ model RegistryLookup {
     bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
     // the id itself is not unique, since a same BSD will appear in multiple export registries.
-    // so the unique index is made of id + exportRegistryType
-    @@id([id, exportRegistryType, siret])
+    // so the unique index is made of id + exportRegistryType + siret
+    @@id([id, exportRegistryType, siret], name: "idExportTypeAndSiret")
     // pseudo-random with only "=" lookups so hash index is appropriate
     @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
     // array of elements so gin index

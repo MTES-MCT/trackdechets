@@ -19,29 +19,32 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
   return async (where, data, logMetadata) => {
     const { prisma, user } = deps;
 
-    const updatedBsdas = await prisma.bsda.findMany({
-      where,
-      select: { id: true }
-    });
-    const ids = updatedBsdas.map(({ id }) => id);
-
     const update = await prisma.bsda.updateMany({
       where,
       data
     });
 
-    for (const id of ids) {
-      await prisma.event.create({
-        data: {
-          streamId: id,
-          actor: user.id,
-          type: bsdaEventTypes.updated,
-          data: data as Prisma.InputJsonObject,
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
+    const updatedBsdas = await prisma.bsda.findMany({
+      where
+    });
 
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    const ids = updatedBsdas.map(({ id }) => id);
+
+    const eventsData = ids.map(id => ({
+      streamId: id,
+      actor: user.id,
+      type: bsdaEventTypes.updated,
+      data: data as Prisma.InputJsonObject,
+      metadata: { ...logMetadata, authType: user.auth }
+    }));
+
+    await prisma.event.createMany({
+      data: eventsData
+    });
+    for (const updatedBsda of updatedBsdas) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsda.id)
+      );
     }
 
     return update;

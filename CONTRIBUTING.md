@@ -583,6 +583,39 @@ Depuis un one-off container de taille XL
 - Si ES est surchargé, il peut être opportun de diminuer le nombre de workers.
 - À la fin de la réindexation, set le nombre de workers `bulkindexqueuemaster` et `bulkindexqueue` à 0.
 
+## Recontruction de la table RegistryLookup
+
+La table RegistryLookup est utilisée afin de générer les registres d'export V2. Elle est normalement censée être synchronisée avec les différents bordereaux et registres RNDTS. Si ce n'est plus le cas, il est possible de la reconstruire à partir des bordereaux et registres.
+
+**Pour reconstruire toute la table**
+
+`npx nx run back:rebuild-registry-lookup`
+
+**Pour reconstruire uniquement pour certains types de registres RNDTS/BSDs**
+
+`npx nx run back:rebuild-registry-lookup SSD BSDA`
+
+valeurs possibles :
+
+- BSDD
+- BSDA
+- BSDASRI
+- BSVHU
+- BSFF
+- BSPAOH
+- INCOMING_TEXS
+- INCOMING_WASTE
+- SSD
+
+### Vérification de l'intégrité
+
+Tant que les registres V1 continuent d'exister et d'être indexés dans elastic, il est possible de comparer l'indexation elastic et celle de la table de lookup pour vérifier qu'il n'y as pas de désynchronisation (en supposant que l'index elastic est correct).
+Pour faire cette vérification, il est possible d'utiliser cette commande:
+
+`npx nx run back:rebuild-registry-lookup --integrity`
+
+Cette commande ne fait pas de modification de la DB, mais va lister les mismatch entre elastic et la table de lookup.
+
 ## Rattrapage SIRENE
 
 Si les données de raison sociale et d'adresses enregistrés sur les bordereaux sont erronnées suite à un dysfonctionnement de l'index SIRENE, un rattrapage peut être effectué à postériori grâce au script suivante. Tous les bordereaux qui ont été crées ou modifiés entre ces deux dates seront mis à jour.

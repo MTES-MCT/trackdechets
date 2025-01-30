@@ -46,7 +46,6 @@ export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsda.id));
 
     const linkedBsdaIds = [

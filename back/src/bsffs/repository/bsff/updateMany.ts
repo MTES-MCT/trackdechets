@@ -18,24 +18,26 @@ export function buildUpdateManyBsff(deps: RepositoryFnDeps): UpdateManyBsffFn {
     const batchPayload = await prisma.bsff.updateMany(args);
 
     const updatedBsffs = await prisma.bsff.findMany({
-      where: args.where,
-      select: { id: true }
+      where: args.where
+      // select: { id: true }
     });
 
     const ids = updatedBsffs.map(({ id }) => id);
 
-    for (const id of ids) {
-      await prisma.event.create({
-        data: {
-          streamId: id,
-          actor: user.id,
-          type: bsffEventTypes.updated,
-          data: args.data as Prisma.InputJsonObject,
-          metadata: { ...logMetadata, authType: user.auth }
-        }
-      });
-
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    const eventsData = ids.map(id => ({
+      streamId: id,
+      actor: user.id,
+      type: bsffEventTypes.updated,
+      data: args.data as Prisma.InputJsonObject,
+      metadata: { ...logMetadata, authType: user.auth }
+    }));
+    await prisma.event.createMany({
+      data: eventsData
+    });
+    for (const updatedBsff of updatedBsffs) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsff.id)
+      );
     }
 
     return batchPayload;
