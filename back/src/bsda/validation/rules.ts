@@ -164,6 +164,12 @@ function transporterSignature(
   return "TRANSPORT";
 }
 
+/**
+ * DOCUMENTATION AUTOMATIQUE
+ * /!\ à faire tourner si les règles changent
+ * voir CONTRIBUTING -> Mettre à jour la documentation
+ * pour plus de détails
+ */
 export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
   id: {
     readableFieldName: "Le transporteur",

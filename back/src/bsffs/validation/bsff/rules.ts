@@ -257,6 +257,12 @@ const sealedFromEmissionExceptForEmitter: GetBsffSignatureTypeFn<ZodBsff> = (
   return isEmitter ? "TRANSPORT" : "EMISSION";
 };
 
+/**
+ * DOCUMENTATION AUTOMATIQUE
+ * /!\ à faire tourner si les règles changent
+ * voir CONTRIBUTING -> Mettre à jour la documentation
+ * pour plus de détails
+ */
 export const bsffEditionRules: BsffEditionRules = {
   createdAt: {
     sealed: { from: "EMISSION" }
