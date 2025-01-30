@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { isDefined } from "../../../common/helpers";
+import { getCompanySplittedAddress } from "../../companyUtils";
 
 export type UpdateCompanyFn = <Args extends Prisma.CompanyUpdateArgs>(
   args: Args,
@@ -14,12 +15,17 @@ export function buildUpdateCompany(deps: RepositoryFnDeps): UpdateCompanyFn {
   return async <Args extends Prisma.CompanyUpdateArgs>(args: Args) => {
     const { prisma } = deps;
 
-    const updatedCompany = await prisma.company.update(args);
+    // Update the company
+    let updatedCompany = await prisma.company.update(args);
 
-    // User is changing the adress! We need to update 
-    // the splitted adress fields
-    if(isDefined(args.data.address)){
-        // TODO
+    // User is changing the address! We need to update the splitted adress fields
+    if (isDefined(args.data.address)) {
+      const splittedAddress = await getCompanySplittedAddress(updatedCompany);
+
+      updatedCompany = await prisma.company.update({
+        where: { id: updatedCompany.id },
+        data: splittedAddress
+      });
     }
 
     return updatedCompany as Prisma.CompanyGetPayload<Args>;
