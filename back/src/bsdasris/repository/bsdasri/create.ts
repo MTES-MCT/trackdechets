@@ -5,7 +5,6 @@ import {
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
-import { lookupUtils } from "../../registryV2";
 
 export type CreateBsdasriFn = (
   data: Prisma.BsdasriCreateInput,
@@ -55,7 +54,6 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-    await lookupUtils.update(bsdasri, prisma);
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsdasri.id));
 
     return bsdasri;

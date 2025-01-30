@@ -136,24 +136,17 @@ export const toIncomingWasteV2 = (
   };
 };
 
-export const updateRegistryLookup = async (
+const performRegistryLookupUpdate = async (
   bsvhu: Bsvhu,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
+  await deleteRegistryLookup(bsvhu.id, tx);
   if (
     bsvhu.destinationOperationSignatureDate &&
     bsvhu.destinationCompanySiret
   ) {
-    await tx.registryLookup.upsert({
-      where: {
-        idExportTypeAndSiret: {
-          id: bsvhu.id,
-          exportRegistryType: RegistryExportType.INCOMING,
-          siret: bsvhu.destinationCompanySiret
-        }
-      },
-      update: {},
-      create: {
+    await tx.registryLookup.create({
+      data: {
         id: bsvhu.id,
         readableId: bsvhu.id,
         siret: bsvhu.destinationCompanySiret,
@@ -163,8 +156,22 @@ export const updateRegistryLookup = async (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(bsvhu.destinationOperationSignatureDate),
         bsvhuId: bsvhu.id
-      }
+      },
+      select: { id: true }
     });
+  }
+};
+
+export const updateRegistryLookup = async (
+  bsvhu: Bsvhu,
+  tx?: Omit<PrismaClient, ITXClientDenyList>
+): Promise<void> => {
+  if (!tx) {
+    await prisma.$transaction(async transaction => {
+      await performRegistryLookupUpdate(bsvhu, transaction);
+    });
+  } else {
+    await performRegistryLookupUpdate(bsvhu, tx);
   }
 };
 

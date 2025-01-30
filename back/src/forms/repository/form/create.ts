@@ -7,7 +7,6 @@ import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { getUserCompanies } from "../../../users/database";
 import { FormWithTransporters } from "../../types";
-import { lookupUtils } from "../../registryV2";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
@@ -95,7 +94,6 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
       }
     });
 
-    await lookupUtils.update(form, prisma);
     // Do not index an APPENDIX1_PRODUCER on creation.
     // It will be indexed when the appendix1 is attached to its container.
     if (form.emitterType !== "APPENDIX1_PRODUCER") {

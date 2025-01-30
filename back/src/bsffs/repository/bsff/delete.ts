@@ -7,7 +7,6 @@ import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { buildUpdateManyBsffPackagings } from "../bsffPackaging/updateMany";
 import { bsffEventTypes } from "../types";
 import { buildFindUniqueBsffGetPackagings } from "./findUnique";
-import { lookupUtils } from "../../registryV2";
 
 export type DeleteBsffFn = <Args extends Prisma.BsffDeleteArgs>(
   args: Args,
@@ -52,7 +51,6 @@ export function buildDeleteBsff(deps: RepositoryFnDeps): DeleteBsffFn {
       }
     });
 
-    await lookupUtils.delete(deletedBsff.id, prisma);
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsff.id));
 
     return deletedBsff as Prisma.BsffGetPayload<Args>;

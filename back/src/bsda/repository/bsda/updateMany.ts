@@ -5,7 +5,6 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdaEventTypes } from "./eventTypes";
-import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyBsdaFn = (
   where: Prisma.BsdaWhereInput,
@@ -43,7 +42,6 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
       data: eventsData
     });
     for (const updatedBsda of updatedBsdas) {
-      await lookupUtils.update(updatedBsda, prisma);
       prisma.addAfterCommitCallback(() =>
         enqueueUpdatedBsdToIndex(updatedBsda.id)
       );

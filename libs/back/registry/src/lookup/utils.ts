@@ -1,4 +1,5 @@
 import { Prisma, PrismaClient, RegistryExportType } from "@prisma/client";
+import { prisma } from "@td/prisma";
 import { v7 as uuidv7 } from "uuid";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 
@@ -73,9 +74,9 @@ export const updateRegistryDelegateSirets = async (
 
 export const deleteRegistryLookup = async (
   id: string,
-  tx: Omit<PrismaClient, ITXClientDenyList>
+  tx?: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
-  await tx.registryLookup.deleteMany({
+  await (tx ?? prisma).registryLookup.deleteMany({
     where: {
       id: id
     }

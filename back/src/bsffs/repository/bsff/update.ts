@@ -11,7 +11,6 @@ import {
   updateTransporterOrgIds
 } from "../../database";
 import { getCanAccessDraftOrgIds } from "../../utils";
-import { lookupUtils } from "../../registryV2";
 
 export type UpdateBsffFn = <Args extends Prisma.BsffUpdateArgs>(
   args: Args,
@@ -117,7 +116,6 @@ export function buildUpdateBsff(deps: RepositoryFnDeps): UpdateBsffFn {
       }
     }
 
-    await lookupUtils.update(updatedBsff, prisma);
     prisma.addAfterCommitCallback(() =>
       enqueueUpdatedBsdToIndex(updatedBsff.id)
     );

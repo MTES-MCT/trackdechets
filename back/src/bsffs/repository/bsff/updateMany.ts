@@ -5,7 +5,6 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsffEventTypes } from "../types";
-import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyBsffFn = (
   args: Prisma.BsffUpdateManyArgs,
@@ -36,7 +35,6 @@ export function buildUpdateManyBsff(deps: RepositoryFnDeps): UpdateManyBsffFn {
       data: eventsData
     });
     for (const updatedBsff of updatedBsffs) {
-      await lookupUtils.update(updatedBsff, prisma);
       prisma.addAfterCommitCallback(() =>
         enqueueUpdatedBsdToIndex(updatedBsff.id)
       );

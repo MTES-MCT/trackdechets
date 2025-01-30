@@ -5,7 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
-import { lookupUtils } from "../../registryV2";
+
 export type DeleteBsvhuFn = (
   where: Prisma.BsvhuWhereUniqueInput,
   logMetadata?: LogMetadata
@@ -31,7 +31,6 @@ export function buildDeleteBsvhu(deps: RepositoryFnDeps): DeleteBsvhuFn {
       }
     });
 
-    await lookupUtils.delete(deletedBsvhu.id, prisma);
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsvhu.id));
 
     return deletedBsvhu;

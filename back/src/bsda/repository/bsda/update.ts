@@ -8,7 +8,6 @@ import { bsdaEventTypes } from "./eventTypes";
 import { BsdaWithTransporters } from "../../types";
 import { getTransportersSync } from "../../database";
 import { objectDiff } from "../../../forms/workflow/diff";
-import { lookupUtils } from "../../registryV2";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -111,7 +110,6 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       });
     }
 
-    await lookupUtils.update(updatedBsda, prisma);
     prisma.addAfterCommitCallback(() =>
       enqueueUpdatedBsdToIndex(updatedBsda.id)
     );

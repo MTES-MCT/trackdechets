@@ -5,7 +5,6 @@ import {
 } from "../../../common/repository/types";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
-import { lookupUtils } from "../../registryV2";
 
 export type UpdateManyBsvhuFn = (
   where: Prisma.BsvhuWhereInput,
@@ -46,7 +45,6 @@ export function buildUpdateManyBsvhus(
       data: eventsData
     });
     for (const updatedBsvhu of updatedBsvhus) {
-      await lookupUtils.update(updatedBsvhu, prisma);
       prisma.addAfterCommitCallback(() =>
         enqueueUpdatedBsdToIndex(updatedBsvhu.id)
       );

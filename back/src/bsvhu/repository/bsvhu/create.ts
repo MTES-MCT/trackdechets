@@ -6,7 +6,6 @@ import {
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
 import { getCanAccessDraftOrgIds } from "../../utils";
-import { lookupUtils } from "../../registryV2";
 export type CreateBsvhuFn = (
   data: Prisma.BsvhuCreateInput,
   logMetadata?: LogMetadata
@@ -46,7 +45,6 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
       }
     });
 
-    await lookupUtils.update(bsvhu, prisma);
     prisma.addAfterCommitCallback(() =>
       enqueueCreatedBsdToIndex(updatedBsvhu.id)
     );

@@ -180,24 +180,17 @@ export const toIncomingWasteV2 = (
   };
 };
 
-export const updateRegistryLookup = async (
+const performRegistryLookupUpdate = async (
   bsdasri: Bsdasri,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
+  await deleteRegistryLookup(bsdasri.id, tx);
   if (
     bsdasri.destinationReceptionSignatureDate &&
     bsdasri.destinationCompanySiret
   ) {
-    await tx.registryLookup.upsert({
-      where: {
-        idExportTypeAndSiret: {
-          id: bsdasri.id,
-          exportRegistryType: RegistryExportType.INCOMING,
-          siret: bsdasri.destinationCompanySiret
-        }
-      },
-      update: {},
-      create: {
+    await tx.registryLookup.create({
+      data: {
         id: bsdasri.id,
         readableId: bsdasri.id,
         siret: bsdasri.destinationCompanySiret,
@@ -207,8 +200,22 @@ export const updateRegistryLookup = async (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
         bsdasriId: bsdasri.id
-      }
+      },
+      select: { id: true }
     });
+  }
+};
+
+export const updateRegistryLookup = async (
+  bsdasri: Bsdasri,
+  tx?: Omit<PrismaClient, ITXClientDenyList>
+): Promise<void> => {
+  if (!tx) {
+    await prisma.$transaction(async transaction => {
+      await performRegistryLookupUpdate(bsdasri, transaction);
+    });
+  } else {
+    await performRegistryLookupUpdate(bsdasri, tx);
   }
 };
 

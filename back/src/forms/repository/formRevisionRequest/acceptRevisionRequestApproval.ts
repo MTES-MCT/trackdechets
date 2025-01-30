@@ -27,7 +27,6 @@ import { ForbiddenError } from "../../../common/errors";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import { operationHook } from "../../operationHook";
 import { areDefined } from "../../../common/helpers";
-import { lookupUtils } from "../../registryV2";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -424,12 +423,6 @@ export async function approveAndApplyRevisionRequest(
         where: { readableId: { in: appendix1ProducerIds } },
         data: appendix1ProducerUpdate
       });
-      const updatedAppendix1Producers = await prisma.form.findMany({
-        where: { readableId: { in: appendix1ProducerIds } }
-      });
-      for (const updatedAppendix1Producer of updatedAppendix1Producers) {
-        await lookupUtils.update(updatedAppendix1Producer, prisma);
-      }
 
       prisma.addAfterCommitCallback?.(() => {
         for (const readableId in appendix1ProducerIds) {
@@ -458,7 +451,6 @@ export async function approveAndApplyRevisionRequest(
     }
   });
 
-  await lookupUtils.update(updatedBsdd, prisma);
   prisma.addAfterCommitCallback?.(() =>
     enqueueUpdatedBsdToIndex(updatedBsdd.readableId)
   );

@@ -7,7 +7,6 @@ import buildRemoveAppendix2 from "./removeAppendix2";
 import buildUpdateManyForms from "./updateMany";
 import { enqueueDeletedFormWebhook } from "../../../queue/producers/webhooks";
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
-import { lookupUtils } from "../../registryV2";
 
 export type DeleteFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -66,7 +65,6 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       }
     });
 
-    await lookupUtils.delete(deletedForm.id, prisma);
     prisma.addAfterCommitCallback(() => {
       enqueueBsdToDelete(deletedForm.id);
       if (deletedForm.forwardedInId) {
