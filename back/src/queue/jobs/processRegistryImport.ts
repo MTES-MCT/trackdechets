@@ -10,6 +10,7 @@ import {
 } from "@td/registry";
 import { Job } from "bull";
 import { format } from "date-fns";
+import { parse } from "node:path";
 
 import { getUserCompanies } from "../../users/database";
 
@@ -92,14 +93,14 @@ export async function processRegistryImportJob(
     return map;
   }, new Map<string, string[]>());
 
+  const parsedOriginalFileName = parse(registryImport.originalFileName);
   const { s3Stream: outputErrorStream, upload } = getUploadWithWritableStream({
     bucketName: process.env.S3_REGISTRY_ERRORS_BUCKET!,
     key: registryImport.s3FileKey,
     metadata: {
-      filename: `${format(
-        new Date(),
-        "yyyyMMdd"
-      )}_TD_rapport_erreur_${importId}.csv`
+      filename: `${format(new Date(), "yyyyMMdd")}_TD_rapport_erreur_${
+        parsedOriginalFileName.name
+      }.csv`
     }
   });
 

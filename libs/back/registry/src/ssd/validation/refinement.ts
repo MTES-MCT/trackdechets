@@ -58,12 +58,9 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 };
 
-export const refineDestination: Refinement<ParsedZodSsdItem> = (
-  item,
-  { addIssue }
-) => {
+export const refineDestination: Refinement<ParsedZodSsdItem> = (item, ctx) => {
   if (item.dispatchDate && !item.useDate && !item.destinationCompanyType) {
-    addIssue({
+    ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
         "Vous devez saisir les informations de l'entreprise de destination lorsqu'une date d'expédition est renseignée",
@@ -79,7 +76,7 @@ export const refineDestination: Refinement<ParsedZodSsdItem> = (
     cityKey: "destinationCompanyCity",
     postalCodeKey: "destinationCompanyPostalCode",
     countryKey: "destinationCompanyCountryCode"
-  });
+  })(item, ctx);
 };
 
 export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (

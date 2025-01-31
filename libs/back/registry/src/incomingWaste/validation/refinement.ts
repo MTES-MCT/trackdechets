@@ -39,12 +39,12 @@ export const refineWeighingHour: Refinement<
 
 export const initialEmitterRefinement: Refinement<
   ParsedZodIncomingWasteItem
-> = async (incomingWasteItem, { addIssue }) => {
+> = async (incomingWasteItem, ctx) => {
   if (
     !incomingWasteItem.emitterNoTraceability &&
     !incomingWasteItem.initialEmitterCompanyOrgId
   ) {
-    addIssue({
+    ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `L'organisme initial émetteur doit être renseigné`,
       path: ["initialEmitterCompanyOrgId"]
@@ -59,7 +59,7 @@ export const initialEmitterRefinement: Refinement<
     postalCodeKey: "initialEmitterCompanyPostalCode",
     cityKey: "initialEmitterCompanyCity",
     countryKey: "initialEmitterCompanyCountryCode"
-  });
+  })(incomingWasteItem, ctx);
 };
 
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingWasteItem>({
