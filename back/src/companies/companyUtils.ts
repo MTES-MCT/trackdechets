@@ -6,15 +6,18 @@ export const getCompanySplittedAddress = async (company: Company) => {
   // First try SIRENE data
   const searchedCompany = await searchCompany(company.orgId);
 
-  if (searchedCompany) {
-    return {
-      street: searchedCompany.addressVoie,
-      postalCode: searchedCompany.addressPostalCode,
-      city: searchedCompany.addressCity,
-      country: searchedCompany.codePaysEtrangerEtablissement ?? "FR"
-    };
+  // If no data or foreign company, try the manual split method
+  if (
+    !searchedCompany ||
+    searchedCompany.codePaysEtrangerEtablissement !== ""
+  ) {
+    return splitAddress(company.address, company.vatNumber);
   }
 
-  // If no data, try the manual split method
-  return splitAddress(company.address);
+  return {
+    street: searchedCompany.addressVoie,
+    postalCode: searchedCompany.addressPostalCode,
+    city: searchedCompany.addressCity,
+    country: "FR"
+  };
 };

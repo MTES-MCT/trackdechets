@@ -5,6 +5,7 @@ import {
   RepositoryFnBuilder,
   RepositoryTransaction
 } from "../../common/repository/types";
+import { buildCreateCompany, CreateCompanyFn } from "./company/create";
 
 export type CompanyRepository = CompanyActions;
 
@@ -16,6 +17,7 @@ export function getCompanyRepository(
     return transactionWrapper(builder, { user, transaction });
   }
   return {
-    updateCompany: useTransaction(buildUpdateCompany) as UpdateCompanyFn
+    updateCompany: useTransaction(buildUpdateCompany) as UpdateCompanyFn,
+    createCompany: useTransaction(buildCreateCompany) as CreateCompanyFn
   };
 }

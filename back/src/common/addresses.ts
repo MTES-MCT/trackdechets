@@ -15,7 +15,7 @@ const POSTAL_CODE_REGEX_PER_COUNTRY = {
   AU: "[0-9]{4}",
   IT: "[0-9]{5}",
   CH: "[0-9]{4}",
-  AT: "[0-9]{4}",
+  AT: "(AT-)?[0-9]{4}",
   ES: "[0-9]{5}",
   NL: "[0-9]{4}[ ]?[A-Z]{2}",
   BE: "[0-9]{4}",
@@ -179,7 +179,8 @@ export function extractPostalCode(
   );
 
   if (address) {
-    let addressUp = address.toUpperCase();
+    let formattedAddress = address.replace("\n", " ").toUpperCase();
+
     // Kind of a complex machine here because matches might overlap and not be
     // detected by RegExp.matches()
     // ex: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
@@ -187,12 +188,12 @@ export function extractPostalCode(
     const matches: string[] = [];
     let match: RegExpExecArray | null = null;
     do {
-      match = regex.exec(addressUp);
+      match = regex.exec(formattedAddress);
 
       if (match?.length) {
         const cleanedMatch = match[0].replace(/,/g, " ").trim();
         matches.push(cleanedMatch);
-        addressUp = addressUp.replace(cleanedMatch, "");
+        formattedAddress = formattedAddress.replace(cleanedMatch, "");
       }
     } while (match?.length);
 
