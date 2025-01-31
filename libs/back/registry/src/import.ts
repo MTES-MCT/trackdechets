@@ -44,7 +44,7 @@ export async function processStream({
     skipped: 0
   };
 
-  const errorStream = getCsvErrorStream(options)
+  const errorStream = getCsvErrorStream(options);
   errorStream.pipe(outputErrorStream);
 
   const transformStream =

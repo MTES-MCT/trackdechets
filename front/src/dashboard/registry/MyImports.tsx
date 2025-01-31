@@ -205,7 +205,9 @@ export function MyImports() {
           {data && tableData.length > 0 && (
             <div className="tw-mt-8">
               <div className="tw-flex tw-justify-between">
-                <h2 className="tw-text-2xl tw-font-bold">Historique de mes imports</h2>
+                <h2 className="tw-text-2xl tw-font-bold">
+                  Historique de mes imports
+                </h2>
                 <div>
                   <Button
                     priority="secondary"
