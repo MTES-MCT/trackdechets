@@ -84,7 +84,7 @@ model RegistrySsd {
     operationMode                 OperationMode?
     product                       String
     administrativeActReference    String
-    destinationCompanyType        String
+    destinationCompanyType        String?
     destinationCompanyOrgId       String?
     destinationCompanyName        String?
     destinationCompanyAddress     String?
