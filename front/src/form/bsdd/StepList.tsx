@@ -187,11 +187,19 @@ export default function StepsList(props: Props) {
       return;
     }
 
-    const packagingInfos = (wasteDetails?.packagingInfos ?? []).filter(
-      // Supprime le conditionnement vide par défaut ajouté dans l'état intitial
-      // Formik si celui-ci n'a pas été complété.
-      p => !!p.type
-    );
+    const packagingInfos = (wasteDetails?.packagingInfos ?? [])
+      .filter(
+        // Supprime le conditionnement vide par défaut ajouté dans l'état intitial
+        // Formik si celui-ci n'a pas été complété.
+        p => !!p.type
+      )
+      .map(p => ({
+        ...p,
+        // Convertit "" vers 0 dans le cas où l'input est laissé vide
+        quantity: (p.quantity as any) === "" ? Number(p.quantity) : p.quantity,
+        // Convertit "" vers null dans le cas où l'input est laissé vide
+        volume: (p.volume as any) === "" ? null : p.volume
+      }));
 
     const formInput: FormInput = {
       ...rest,

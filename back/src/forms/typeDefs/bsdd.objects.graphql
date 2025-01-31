@@ -519,6 +519,12 @@ type PackagingInfo {
 
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
+
+  "Volume du conditionnement en litre"
+  volume: Float
+
+  "Numéros des contenants"
+  identificationNumbers: [String!]!
 }
 
 "Détails du déchet (case 3, 4, 5, 6)"
