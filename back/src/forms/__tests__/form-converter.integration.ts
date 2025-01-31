@@ -391,4 +391,20 @@ describe("expandFormFromDb", () => {
       takenOverBy: null
     });
   });
+
+  it("should set packagingInfos.numeros to empty array if not present", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }] }
+    });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
+    const expanded = expandFormFromDb(fullForm);
+    expect(expanded.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({ volume: null, identificationNumbers: [] })
+    ]);
+  });
 });

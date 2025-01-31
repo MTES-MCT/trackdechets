@@ -189,10 +189,12 @@ export function getInitialState(f?: Form | null): FormFormikValues {
       onuCode: f?.wasteDetails?.onuCode ?? "",
       nonRoadRegulationMention:
         f?.wasteDetails?.nonRoadRegulationMention ?? null,
-      packagingInfos: f?.wasteDetails?.packagingInfos ?? [
-        // affiche un formulaire de conditionnement vide par défaut
-        { type: "", quantity: "" } as any
-      ],
+      packagingInfos: f?.wasteDetails?.packagingInfos?.length
+        ? f.wasteDetails.packagingInfos
+        : [
+            // affiche un formulaire de conditionnement vide par défaut
+            { type: "", quantity: "", volume: "" } as any
+          ],
       quantity: f?.wasteDetails?.quantity ?? null,
       quantityType: f?.wasteDetails?.quantityType ?? QuantityType.Estimated,
       consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,

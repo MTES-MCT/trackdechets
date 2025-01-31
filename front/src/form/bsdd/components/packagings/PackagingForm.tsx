@@ -3,22 +3,28 @@ import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
 import React from "react";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { numberToString } from "../../../../Apps/Dashboard/Creation/bspaoh/utils/numbers";
 
 type PackagingFormProps = {
   packaging: PackagingInfoInput;
   setPackaging: (packaging: PackagingInfoInput) => void;
+  packagingTypeOptions: { value: Packagings; label: string }[];
 };
 
-const packagingTypeOptions = [
-  { value: Packagings.Benne, label: "Benne" },
-  { value: Packagings.Citerne, label: "Citerne" },
-  { value: Packagings.Fut, label: "Fût" },
-  { value: Packagings.Grv, label: "Grand Récipient Vrac (GRV)" },
-  { value: Packagings.Pipeline, label: "Conditionné pour pipeline" },
-  { value: Packagings.Autre, label: "Autre" }
-];
+function PackagingForm({
+  packaging,
+  setPackaging,
+  packagingTypeOptions
+}: PackagingFormProps) {
+  const quantityError =
+    (packaging.type === Packagings.Citerne ||
+      packaging.type === Packagings.Benne) &&
+    packaging.quantity > 2
+      ? `Impossible de saisir plus de 2 ${packaging.type.toLocaleLowerCase()}s`
+      : null;
 
-function PackagingForm({ packaging, setPackaging }: PackagingFormProps) {
+  const volumeUnit = packaging.type === Packagings.Benne ? "m3" : "litres";
+
   return (
     <>
       <div className="fr-grid-row fr-grid-row--gutters">
@@ -36,33 +42,62 @@ function PackagingForm({ packaging, setPackaging }: PackagingFormProps) {
                 });
               }
             }}
+            className="fr-mb-2w"
           >
             <option value="">...</option>
-            {packagingTypeOptions.map(({ value, label }) => (
-              <option value={value}>{label}</option>
+            {packagingTypeOptions.map(({ value, label }, idx) => (
+              <option value={value} key={idx}>
+                {label}
+              </option>
             ))}
           </Select>
+          {(packaging.type === Packagings.Citerne ||
+            packaging.type === Packagings.Benne) && (
+            <p className="fr-info-text">
+              Un conditionnement en {packaging.type.toLowerCase()} exclut le
+              mélange avec tout autre type de conditionnement
+            </p>
+          )}
         </div>
         <div className="fr-col-md-4 fr-col-12">
           <NonScrollableInput
-            label="Volume en litres (optionnel)"
+            label={`Volume en ${volumeUnit} (optionnel)`}
             className="fr-mb-2w"
             nativeInputProps={{
               type: "number",
               inputMode: "decimal",
-              step: "0.001" // mili-litres
+              step: "0.001", // mili-litres
+              value: packaging.volume ?? "",
+              onChange: event => {
+                const volume = event.target.value;
+                setPackaging({
+                  ...packaging,
+                  volume: volume === "" ? (volume as any) : Number(volume)
+                });
+              }
             }}
           />
-          <p className="fr-info-text">Soit X m3</p>
+
+          <p className="fr-info-text">
+            {volumeUnit === "litres"
+              ? `Soit ${numberToString((packaging.volume || 0) / 1000)} m3`
+              : `Soit ${numberToString(
+                  (packaging.volume || 0) * 1000,
+                  0
+                )} litres`}
+          </p>
         </div>
         <div className="fr-col-md-2 fr-col-12">
           <NonScrollableInput
             label="Nombre"
             className="fr-mb-2w"
+            state={quantityError ? "error" : "default"}
+            stateRelatedMessage={quantityError}
             nativeInputProps={{
               type: "number",
               inputMode: "numeric",
               step: "1", // mili-litres
+              max: 2,
               value: packaging.quantity,
               onChange: event => {
                 const quantity = event.target.value;
@@ -90,11 +125,11 @@ function PackagingForm({ packaging, setPackaging }: PackagingFormProps) {
           </div>
         </div>
       )}
-      <div className="fr-grid-row fr-grid-row--gutters">
+      {/* <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12">
           <Input label="N° de contenant (optionnel)" />
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

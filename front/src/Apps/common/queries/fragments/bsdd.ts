@@ -73,6 +73,8 @@ export const wasteDetailsFragment = gql`
       type
       other
       quantity
+      volume
+      identificationNumbers
     }
     quantity
     quantityType

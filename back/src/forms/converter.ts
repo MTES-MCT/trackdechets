@@ -685,7 +685,13 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos: (
+        (form.wasteDetailsPackagingInfos as PackagingInfo[]) ?? []
+      ).map(p => ({
+        ...p,
+        volume: p.volume ?? null,
+        identificationNumbers: p.identificationNumbers ?? []
+      })),
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]

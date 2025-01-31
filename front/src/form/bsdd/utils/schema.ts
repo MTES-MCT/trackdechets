@@ -9,14 +9,13 @@ import {
   mixed,
   SchemaOf
 } from "yup";
-
 import {
-  PackagingInfo,
   Packagings,
   Consistence,
   WasteAcceptationStatus,
   CompanyType,
-  CompanyInput
+  CompanyInput,
+  PackagingInfoInput
 } from "@td/codegen-ui";
 import graphlClient from "../../../graphql-client";
 import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
@@ -72,7 +71,7 @@ export const transporterSchema = object().shape({
   company: transporterCompanySchema
 });
 
-const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
+const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
   object().shape({
     type: mixed<Packagings>().required(
       "Le type de conditionnement doit être précisé."
@@ -104,7 +103,9 @@ const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
               "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
             )
           : schema
-      )
+      ),
+    volume: number().nullable(),
+    identificationNumbers: array<String>().nullable()
   });
 
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
