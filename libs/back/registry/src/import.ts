@@ -1,18 +1,16 @@
-import { format } from "@fast-csv/format";
 import { logger } from "@td/logger";
 import { Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
 import { endImport, startImport, updateImportStats } from "./database";
 import {
-  CSV_DELIMITER,
-  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
   UNAUTHORIZED_ERROR
 } from "./options";
 import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
+import { getCsvErrorStream } from "./errors";
 
 export async function processStream({
   importId,
@@ -46,23 +44,8 @@ export async function processStream({
     skipped: 0
   };
 
-  const errorStream = format({
-    delimiter: CSV_DELIMITER,
-    headers: ["errors", ...Object.keys(options.headers)],
-    writeHeaders: false, // Use headers only to reorder the columns properly
-    writeBOM: true, // To help Excel recognize UTF-8 encoding
-    transform: (row: Record<string, unknown>) => {
-      return Object.fromEntries(
-        Object.entries(row).map(([key, value]) => [
-          key,
-          value instanceof Date ? value.toISOString() : value
-        ])
-      );
-    }
-  });
+  const errorStream = getCsvErrorStream(options)
   errorStream.pipe(outputErrorStream);
-  // Write the headers ourself, as the keys dont match the labels
-  errorStream.write({ errors: ERROR_HEADER, ...options.headers });
 
   const transformStream =
     fileType === "CSV"

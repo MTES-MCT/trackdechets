@@ -11,7 +11,7 @@ export async function transformReportForInfos<T extends ParsedLine>(
   if (!company) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le siret "${line.reportForCompanySiret}" n'est pas inscrit sur Trackdéchets`,
+      message: `Le SIRET "${line.reportForCompanySiret}" n'est pas inscrit sur Trackdéchets`,
       path: ["reportForCompanySiret"]
     });
     return z.NEVER;

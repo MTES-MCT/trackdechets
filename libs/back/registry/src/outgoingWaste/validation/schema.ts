@@ -42,7 +42,7 @@ const inputOutgoingWasteSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  reportForPickupSiteName: z.string().nullish(),
+  reportForPickupSiteName: z.string().trim().nullish(),
   reportForPickupSiteAddress: actorAddressSchema.nullish(),
   reportForPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   reportForPickupSiteCity: actorCitySchema.nullish(),
@@ -80,6 +80,7 @@ const inputOutgoingWasteSchema = z.object({
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
+    .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   operationCode: getOperationCodeSchema(),
@@ -90,6 +91,7 @@ const inputOutgoingWasteSchema = z.object({
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
@@ -99,6 +101,7 @@ const inputOutgoingWasteSchema = z.object({
   traderCompanyName: actorNameSchema.nullish(),
   traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"

@@ -59,6 +59,7 @@ const inputIncomingTexsSchema = z.object({
   wasteCodeBale: wasteCodeBaleSchema,
   wasteDap: z
     .string()
+    .trim()
     .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .nullish(),
   weightValue: weightValueSchema,
@@ -69,6 +70,7 @@ const inputIncomingTexsSchema = z.object({
   parcelCoordinates: parcelCoordinatesSchema,
   sisIdentifier: z
     .string()
+    .trim()
     .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
     .nullish(),
   initialEmitterCompanyType: actorTypeSchema.nullish(),
@@ -88,7 +90,7 @@ const inputIncomingTexsSchema = z.object({
   emitterCompanyCity: actorCitySchema,
   emitterCompanyCountryCode: actorCountryCodeSchema,
   emitterNoTraceability: z.boolean(),
-  emitterPickupSiteName: z.string().nullish(),
+  emitterPickupSiteName: z.string().trim().nullish(),
   emitterPickupSiteAddress: actorAddressSchema.nullish(),
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   emitterPickupSiteCity: actorCitySchema.nullish(),
@@ -99,6 +101,7 @@ const inputIncomingTexsSchema = z.object({
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
@@ -108,6 +111,7 @@ const inputIncomingTexsSchema = z.object({
   traderCompanyName: actorNameSchema.nullish(),
   traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
@@ -123,6 +127,7 @@ const inputIncomingTexsSchema = z.object({
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
+    .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   nextOperationCode: getOperationCodeSchema(

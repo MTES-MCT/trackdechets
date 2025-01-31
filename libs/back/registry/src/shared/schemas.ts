@@ -71,11 +71,13 @@ export const reportAsCompanySiretSchema = z
 export const getWasteCodeSchema = (
   wasteCodes: WasteCodeEnum = BSDD_WASTE_CODES_ENUM
 ) =>
-  z.enum(wasteCodes, {
-    required_error: "Le code déchet est requis",
-    invalid_type_error:
-      "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
-  });
+  z.coerce.string().pipe(
+    z.enum(wasteCodes, {
+      required_error: "Le code déchet est requis",
+      invalid_type_error:
+        "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
+    })
+  );
 
 export const wastePopSchema = z.union(
   [
@@ -131,6 +133,7 @@ export const getOperationCodeSchema = (
 ) =>
   z
     .string()
+    .trim()
     .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
     .pipe(
       z.enum(operationCodes, {
@@ -142,6 +145,7 @@ export const getOperationCodeSchema = (
 
 export const operationModeSchema = z
   .string()
+  .trim()
   .transform(val =>
     val
       .normalize("NFD")
@@ -186,6 +190,7 @@ export const weightValueSchema = z
     z.number().nullish(),
     z
       .string()
+      .trim()
       .nullish()
       .transform(val => (val ? Number(val.replace(",", ".")) : undefined))
   ]) // No coercion to keep .nullish()
@@ -195,7 +200,7 @@ export const weightValueSchema = z
         required_error: "Le poids est requis",
         invalid_type_error: "Le poids doit être un nombre"
       })
-      .gt(0, "Le poids ne peut pas être inférieur à 0 tonnes")
+      .gt(0, "Le poids ne peut pas être inférieur ou égal à 0 tonnes")
       .lte(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
       .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales")
   );
@@ -204,6 +209,7 @@ export const weightIsEstimateSchema = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val =>
         val
           .normalize("NFD")
@@ -229,6 +235,7 @@ export const volumeSchema = z
     z.number().nullish(),
     z
       .string()
+      .trim()
       .nullish()
       .transform(val => (val ? Number(val.replace(",", ".")) : undefined))
   ]) // No coercion to keep .nullish()
@@ -238,7 +245,7 @@ export const volumeSchema = z
         required_error: "Le volume est requis",
         invalid_type_error: "Le volume doit être un nombre"
       })
-      .gt(0, "Le volume ne peut pas être inférieur à 0")
+      .gt(0, "Le volume ne peut pas être inférieur ou égal à 0")
       .lte(1_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .nullish()
@@ -252,41 +259,44 @@ export const dateSchema = z.coerce
   )
   .max(new Date(), "La date ne peut pas être dans le futur");
 
-export const nullishDateSchema = z.union([
-  z.date().nullish(),
-  z
-    .string()
-    .nullish()
-    .transform((val, ctx) => {
-      if (val) {
-        const timestamp = Date.parse(val);
-        if (isNaN(timestamp)) {
-          ctx.addIssue({
-            code: "invalid_date",
-            message:
-              "Le format de date est invalide. Exemple de format possible: 2000-01-22"
-          });
-          return z.NEVER;
+export const nullishDateSchema = z
+  .union([
+    z.date().nullish(),
+    z
+      .string()
+      .trim()
+      .nullish()
+      .transform((val, ctx) => {
+        if (val) {
+          const timestamp = Date.parse(val);
+          if (isNaN(timestamp)) {
+            ctx.addIssue({
+              code: "invalid_date",
+              message:
+                "Le format de date est invalide. Exemple de format possible: 2000-01-22"
+            });
+            return z.NEVER;
+          }
+          return new Date(timestamp);
         }
-        return new Date(timestamp);
-      }
 
-      return undefined;
-    })
-    .pipe(
-      z
-        .date()
-        .min(
-          sub(new Date(), { years: 1 }),
-          "La date ne peut pas être antérieure à J-1 an"
-        )
-        .max(new Date(), "La date ne peut pas être dans le futur")
-        .nullish()
-    )
-]);
+        return undefined;
+      })
+  ])
+  .pipe(
+    z
+      .date()
+      .min(
+        sub(new Date(), { years: 1 }),
+        "La date ne peut pas être antérieure à J-1 an"
+      )
+      .max(new Date(), "La date ne peut pas être dans le futur")
+      .nullish()
+  );
 
 export const inseeCodesSchema = z
   .string()
+  .trim()
   .nullish()
   .transform(val =>
     val
@@ -299,6 +309,7 @@ export const inseeCodesSchema = z
     z.array(
       z
         .string()
+        .trim()
         .refine(
           val => val.length === 5,
           "Le code INSEE d'une commune doit faire 5 caractères"
@@ -308,6 +319,7 @@ export const inseeCodesSchema = z
 
 export const municipalitiesNamesSchema = z
   .string()
+  .trim()
   .nullish()
   .transform(val =>
     val
@@ -320,6 +332,7 @@ export const municipalitiesNamesSchema = z
     z.array(
       z
         .string()
+        .trim()
         .min(
           1,
           "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
@@ -335,6 +348,7 @@ export const noTraceability = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val => val.toUpperCase())
       .pipe(
         z
@@ -358,6 +372,7 @@ export const nextDestinationIsAbroad = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val => val.toUpperCase())
       .pipe(
         z
@@ -379,6 +394,7 @@ export const nextDestinationIsAbroad = z.union(
 
 export const declarationNumberSchema = z
   .string()
+  .trim()
   .regex(
     /^A7[EI][0-9]{10}$/,
     "Le numéro de déclaration GISTRID ne respecte pas le format attendu"
@@ -387,6 +403,7 @@ export const declarationNumberSchema = z
 
 export const notificationNumberSchema = z
   .string()
+  .trim()
   .regex(
     /^[A-Z]{2}[0-9]{10}$/,
     "Le numéro de notification GISTRID ne respecte pas le format attendu"
@@ -396,6 +413,7 @@ export const notificationNumberSchema = z
 const parcelNumbersArraySchema = z.array(
   z
     .string()
+    .trim()
     .regex(
       /^\d{3}-[A-Z]{2}-\d{2}$/,
       "Le numéro de parcelle ne respecte pas le format attendu"
@@ -405,6 +423,7 @@ const parcelNumbersArraySchema = z.array(
 export const parcelNumbersSchema = z.union([
   z
     .string()
+    .trim()
     .nullish()
     .transform(val =>
       val
@@ -420,6 +439,7 @@ export const parcelNumbersSchema = z.union([
 const parcelCoordinatesArraySchema = z.array(
   z
     .string()
+    .trim()
     .regex(
       /^-?\d+(\.\d+)? -?\d+(\.\d+)?$/,
       "La coordonnée ne respecte pas le format attendu"
@@ -429,6 +449,7 @@ const parcelCoordinatesArraySchema = z.array(
 export const parcelCoordinatesSchema = z.union([
   z
     .string()
+    .trim()
     .nullish()
     .transform(val =>
       val
@@ -458,6 +479,7 @@ export const actorTypeSchema = z.enum(
 
 export const actorOrgIdSchema = z.coerce
   .string()
+  .trim()
   .min(1, `Le numéro d'identification doit faire plus d'1 caractère`)
   .max(27, `Le numéro d'identification ne peut pas dépasser 27 caractères`);
 
@@ -465,28 +487,37 @@ export const actorSiretSchema = siretSchema.nullish();
 
 export const actorNameSchema = z
   .string()
+  .trim()
   .min(1, `La raison sociale ne peut pas faire moins de 1 caractère`)
   .max(150, `La raison sociale ne peut pas dépasser 150 caractères`);
 
 export const actorAddressSchema = z
   .string()
+  .trim()
   .min(1, `Le libellé de l'adresse ne peut pas faire moins de 1 caractère`)
   .max(150, `Le libellé de l'adresse ne peut pas dépasser 150 caractères`);
 
 export const actorCitySchema = z
   .string()
+  .trim()
   .min(1, `La commune ne peut pas faire moins de 1 caractère`)
   .max(45, `La commune ne peut pas dépasser 45 caractères`);
 
-export const actorPostalCodeSchema = z.coerce.string().refine(val => {
-  if (!val) return true;
-  return /^[0-9]{5,6}$/.test(val);
-}, `Le code postal n'est pas valide. Il doit être composé de 5 ou 6 chiffres`);
+export const actorPostalCodeSchema = z.coerce
+  .string()
+  .trim()
+  .refine(val => {
+    if (!val) return true;
+    return /^[0-9]{5,6}$/.test(val);
+  }, `Le code postal n'est pas valide. Il doit être composé de 5 ou 6 chiffres`);
 
-export const actorCountryCodeSchema = z.string().refine(val => {
-  if (!val) return true;
-  return /^[A-Z]{2}$/.test(val);
-}, `Le code du pays n'est pas valide. Il doit être composé de 2 lettres majuscules`);
+export const actorCountryCodeSchema = z
+  .string()
+  .trim()
+  .refine(val => {
+    if (!val) return true;
+    return /^[A-Z]{2}$/.test(val);
+  }, `Le code du pays n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
 export const transportModeSchema = z
   .enum(
@@ -533,6 +564,7 @@ export const transportRecepisseIsExemptedSchema = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val => val.toUpperCase())
       .pipe(
         z
@@ -554,6 +586,7 @@ export const transportRecepisseIsExemptedSchema = z.union(
 
 export const transportRecepisseNumberSchema = z
   .string()
+  .trim()
   .min(
     5,
     "Le numéro de récépissé de transport doit faire au moins 5 caractères"
@@ -567,6 +600,7 @@ export const isUpcycledSchema = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val => val.toUpperCase())
       .pipe(
         z

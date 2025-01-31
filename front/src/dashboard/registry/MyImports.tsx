@@ -34,7 +34,7 @@ const HEADERS = [
   "Rapport d'erreur"
 ];
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 
 export function MyImports() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
@@ -72,9 +72,7 @@ export function MyImports() {
     setPageIndex(page);
 
     refetch({
-      ownImportsOnly: true,
-      skip: page * PAGE_SIZE,
-      first: PAGE_SIZE
+      skip: page * PAGE_SIZE
     });
   }
 
@@ -87,25 +85,34 @@ export function MyImports() {
         {badges[importData.node.status]("import")}
       </div>,
       TYPES[importData.node.type],
-      <ul>
-        {importData.node.numberOfErrors > 0 && (
-          <li>
-            <strong>{importData.node.numberOfErrors} en erreur</strong>
-          </li>
-        )}
-        {importData.node.numberOfInsertions > 0 && (
-          <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
-        )}
-        {importData.node.numberOfEdits > 0 && (
-          <li>{importData.node.numberOfEdits} modifiée(s)</li>
-        )}
-        {importData.node.numberOfCancellations > 0 && (
-          <li>{importData.node.numberOfCancellations} annulée(s)</li>
-        )}
-        {importData.node.numberOfSkipped > 0 && (
-          <li>{importData.node.numberOfSkipped} ignorées(s)</li>
-        )}
-      </ul>,
+      importData.node.numberOfErrors +
+        importData.node.numberOfInsertions +
+        importData.node.numberOfEdits +
+        importData.node.numberOfCancellations +
+        importData.node.numberOfSkipped ===
+      0 ? (
+        "Fichier d'import vide"
+      ) : (
+        <ul>
+          {importData.node.numberOfErrors > 0 && (
+            <li>
+              <strong>{importData.node.numberOfErrors} en erreur</strong>
+            </li>
+          )}
+          {importData.node.numberOfInsertions > 0 && (
+            <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
+          )}
+          {importData.node.numberOfEdits > 0 && (
+            <li>{importData.node.numberOfEdits} modifiée(s)</li>
+          )}
+          {importData.node.numberOfCancellations > 0 && (
+            <li>{importData.node.numberOfCancellations} annulée(s)</li>
+          )}
+          {importData.node.numberOfSkipped > 0 && (
+            <li>{importData.node.numberOfSkipped} ignorées(s)</li>
+          )}
+        </ul>
+      ),
       importData.node.associations
         .map(
           association =>
@@ -165,22 +172,12 @@ export function MyImports() {
                 Importer
               </Button>
             </div>
-            <div>
-              <Button
-                priority="secondary"
-                iconId="fr-icon-refresh-line"
-                iconPosition="right"
-                onClick={() => refetch()}
-              >
-                Rafraîchir
-              </Button>
-            </div>
             <div className="tw-flex tw-items-center">
               <a
                 href="https://faq.trackdechets.fr/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="fr-link"
+                className="fr-link fr-text--sm"
               >
                 Retrouvez les modèles de registres dans la documentation
               </a>
@@ -206,11 +203,25 @@ export function MyImports() {
             </div>
           )}
           {data && tableData.length > 0 && (
-            <div>
+            <div className="tw-mt-8">
+              <div className="tw-flex tw-justify-between">
+                <h2 className="tw-text-2xl tw-font-bold">Historique de mes imports</h2>
+                <div>
+                  <Button
+                    priority="secondary"
+                    iconId="fr-icon-refresh-line"
+                    iconPosition="right"
+                    size="small"
+                    onClick={() => refetch()}
+                  >
+                    Rafraîchir
+                  </Button>
+                </div>
+              </div>
               <Table
                 bordered
                 fixed
-                caption="Historique de mes imports"
+                noCaption
                 data={tableData}
                 headers={HEADERS}
               />
@@ -240,7 +251,7 @@ export function MyImports() {
         isOpen={isImportModalOpen}
         onClose={() => {
           setIsImportModalOpen(false);
-          refetch();
+          gotoPage(0);
         }}
       />
     </div>
