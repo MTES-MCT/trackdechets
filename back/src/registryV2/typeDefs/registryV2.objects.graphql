@@ -386,7 +386,7 @@ type SsdWasteV2 {
   product: String
   processingDate: DateTime!
   processingEndDate: DateTime
-  destinationType: String!
+  destinationType: String
   destinationOrgId: String
   destinationName: String
   destinationAddress: String
