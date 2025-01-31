@@ -11,7 +11,7 @@ export const getCompanySplittedAddress = async (company: Company) => {
     !searchedCompany ||
     searchedCompany.codePaysEtrangerEtablissement !== ""
   ) {
-    return splitAddress(company.address, company.vatNumber);
+    return splitAddress(company.address, company.orgId);
   }
 
   return {

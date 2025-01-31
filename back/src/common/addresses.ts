@@ -193,7 +193,7 @@ export function extractPostalCode(
       if (match?.length) {
         const cleanedMatch = match[0].replace(/,/g, " ").trim();
         matches.push(cleanedMatch);
-        formattedAddress = formattedAddress.replace(cleanedMatch, "");
+        formattedAddress = formattedAddress.replace(match[0], "");
       }
     } while (match?.length);
 
