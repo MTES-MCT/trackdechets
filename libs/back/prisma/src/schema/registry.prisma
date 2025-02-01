@@ -120,7 +120,7 @@ model RegistryIncomingWaste {
     wasteCode                              String
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime @db.Timestamptz(6)
+    receptionDate                          DateTime       @db.Timestamptz(6)
     weighingHour                           String?
     wasteDescription                       String
     wasteCodeBale                          String?
@@ -245,7 +245,7 @@ model RegistryIncomingTexs {
     wasteCode                              String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime @db.Timestamptz(6)
+    receptionDate                          DateTime       @db.Timestamptz(6)
     wasteDescription                       String
     wasteCodeBale                          String?
     wasteDap                               String?
@@ -384,7 +384,7 @@ model RegistryOutgoingTexs {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime? @db.Timestamptz(6)
+    dispatchDate                           DateTime?      @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
@@ -514,7 +514,7 @@ model RegistryOutgoingWaste {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime? @db.Timestamptz(6)
+    dispatchDate                           DateTime?      @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
@@ -687,7 +687,7 @@ model RegistryLookup {
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
-    dateId             String                        @unique @db.Uuid
+    dateId             String                        @db.Uuid
 
     // foreign keys to registry models
     registrySsdId String?
@@ -716,14 +716,13 @@ model RegistryLookup {
     // the id itself is not unique, since a same BSD will appear in multiple export registries.
     // so the unique index is made of id + exportRegistryType + siret
     @@id([id, exportRegistryType, siret], name: "idExportTypeAndSiret")
-    // pseudo-random with only "=" lookups so hash index is appropriate
-    @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+    // UUIDv7 unique index used for sorting/pagination on exports
+    @@unique([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
     // array of elements so gin index
     @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
     // multi-column index because those columns are mandatory for any export
     @@index([date(sort: Asc), exportRegistryType, siret], map: "_RegistryLookupMainIdx")
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
-    @@index([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }

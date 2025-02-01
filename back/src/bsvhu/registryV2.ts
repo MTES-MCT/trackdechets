@@ -1,5 +1,5 @@
 import {
-  Bsvhu,
+  Prisma,
   PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -136,34 +136,58 @@ export const toIncomingWasteV2 = (
   };
 };
 
-const performRegistryLookupUpdate = async (
-  bsvhu: Bsvhu,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsvhu.id, tx);
+const minimalBsvhuForLookupSelect = {
+  id: true,
+  destinationOperationSignatureDate: true,
+  destinationCompanySiret: true,
+  wasteCode: true
+};
+
+type MinimalBsvhuForLookup = Prisma.BsvhuGetPayload<{
+  select: typeof minimalBsvhuForLookupSelect;
+}>;
+
+const bsvhuToLookupCreateInputs = (
+  bsvhu: MinimalBsvhuForLookup
+): { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } => {
+  const res: { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } = {
+    incoming: null
+  };
   if (
     bsvhu.destinationOperationSignatureDate &&
     bsvhu.destinationCompanySiret
   ) {
+    res.incoming = {
+      id: bsvhu.id,
+      readableId: bsvhu.id,
+      siret: bsvhu.destinationCompanySiret,
+      exportRegistryType: RegistryExportType.INCOMING,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: RegistryExportWasteType.DD,
+      wasteCode: bsvhu.wasteCode,
+      ...generateDateInfos(bsvhu.destinationOperationSignatureDate),
+      bsvhuId: bsvhu.id
+    };
+  }
+  return res;
+};
+
+const performRegistryLookupUpdate = async (
+  bsvhu: MinimalBsvhuForLookup,
+  tx: Omit<PrismaClient, ITXClientDenyList>
+): Promise<void> => {
+  await deleteRegistryLookup(bsvhu.id, tx);
+  const lookupInputs = bsvhuToLookupCreateInputs(bsvhu);
+  if (lookupInputs.incoming) {
     await tx.registryLookup.create({
-      data: {
-        id: bsvhu.id,
-        readableId: bsvhu.id,
-        siret: bsvhu.destinationCompanySiret,
-        exportRegistryType: RegistryExportType.INCOMING,
-        declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: RegistryExportWasteType.DD,
-        wasteCode: bsvhu.wasteCode,
-        ...generateDateInfos(bsvhu.destinationOperationSignatureDate),
-        bsvhuId: bsvhu.id
-      },
+      data: lookupInputs.incoming,
       select: { id: true }
     });
   }
 };
 
 export const updateRegistryLookup = async (
-  bsvhu: Bsvhu,
+  bsvhu: MinimalBsvhuForLookup,
   tx?: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (!tx) {
@@ -194,13 +218,19 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalBsvhuForLookupSelect
     });
+    const createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsvhu of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(bsvhu, tx);
-      });
+      const createInputs = bsvhuToLookupCreateInputs(bsvhu);
+      if (createInputs.incoming) {
+        createArray.push(createInputs.incoming);
+      }
     }
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
     if (items.length < 100) {
       done = true;
       return;

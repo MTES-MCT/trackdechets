@@ -14,6 +14,7 @@ import {
   generateDateInfos,
   updateRegistryDelegateSirets
 } from "../lookup/utils";
+import { performance } from "perf_hooks";
 
 export const toSsdWaste = (ssd: RegistrySsd): SsdWasteV2 => {
   return {
@@ -52,8 +53,40 @@ export const toSsdWaste = (ssd: RegistrySsd): SsdWasteV2 => {
   };
 };
 
+const minimalRegistryForLookupSelect = {
+  id: true,
+  publicId: true,
+  reportForCompanySiret: true,
+  reportAsCompanySiret: true,
+  wasteCode: true,
+  useDate: true,
+  dispatchDate: true
+};
+
+type MinimalRegistryForLookup = Prisma.RegistrySsdGetPayload<{
+  select: typeof minimalRegistryForLookupSelect;
+}>;
+
+const registryToLookupCreateInput = (
+  registrySsd: MinimalRegistryForLookup
+): Prisma.RegistryLookupUncheckedCreateInput => {
+  return {
+    id: registrySsd.id,
+    readableId: registrySsd.publicId,
+    siret: registrySsd.reportForCompanySiret,
+    exportRegistryType: RegistryExportType.SSD,
+    declarationType: RegistryExportDeclarationType.REGISTRY,
+    wasteType: RegistryExportWasteType.DND,
+    wasteCode: registrySsd.wasteCode,
+    ...generateDateInfos(
+      (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
+    ),
+    registrySsdId: registrySsd.id
+  };
+};
+
 export const updateRegistryLookup = async (
-  registrySsd: RegistrySsd,
+  registrySsd: MinimalRegistryForLookup,
   oldRegistrySsdId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
@@ -95,19 +128,7 @@ export const updateRegistryLookup = async (
     });
   } else {
     registryLookup = await tx.registryLookup.create({
-      data: {
-        id: registrySsd.id,
-        readableId: registrySsd.publicId,
-        siret: registrySsd.reportForCompanySiret,
-        exportRegistryType: RegistryExportType.SSD,
-        declarationType: RegistryExportDeclarationType.REGISTRY,
-        wasteType: RegistryExportWasteType.DND,
-        wasteCode: registrySsd.wasteCode,
-        ...generateDateInfos(
-          (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
-        ),
-        registrySsdId: registrySsd.id
-      },
+      data: registryToLookupCreateInput(registrySsd),
       select: {
         // lean selection to improve performances
         reportAsSirets: true
@@ -124,15 +145,23 @@ export const updateRegistryLookup = async (
 };
 
 export const rebuildRegistryLookup = async () => {
+  const deleteStart = performance.now();
   await prisma.registryLookup.deleteMany({
     where: {
       registrySsdId: { not: null }
     }
   });
+  const deleteEnd = performance.now();
+  console.log(`global delete: ${deleteEnd - deleteStart}ms`);
+
   // reindex registrySSD
   let done = false;
   let cursorId: string | null = null;
+  let accuFetch = 0;
+  let accuUpdate = 0;
+  let iters = 0;
   while (!done) {
+    const fetchStart = performance.now();
     const items = await prisma.registrySsd.findMany({
       where: {
         isCancelled: false,
@@ -143,18 +172,42 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalRegistryForLookupSelect
     });
-    for (const registrySsd of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(registrySsd, null, tx);
-      });
-    }
+    const fetchEnd = performance.now();
+
+    const updateStart = performance.now();
+    const createArray = items.map((registrySsd: RegistrySsd) => {
+      const res = registryToLookupCreateInput(registrySsd);
+      if (
+        registrySsd.reportAsCompanySiret &&
+        registrySsd.reportAsCompanySiret !== registrySsd.reportForCompanySiret
+      ) {
+        res.reportAsSirets = [registrySsd.reportAsCompanySiret];
+      }
+      return res;
+    });
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
+
+    const updateEnd = performance.now();
     if (items.length < 100) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
+    accuFetch += fetchEnd - fetchStart;
+    accuUpdate += updateEnd - updateStart;
+    iters += 1;
+  }
+
+  if (iters > 0) {
+    const meanFetch = accuFetch / iters;
+    const meanUpdate = accuUpdate / iters;
+    console.log(`mean fetch (100 rows): ${meanFetch}ms`);
+    console.log(`mean update (100 rows): ${meanUpdate}ms`);
   }
 };
 
