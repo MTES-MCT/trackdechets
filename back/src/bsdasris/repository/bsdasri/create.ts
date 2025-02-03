@@ -54,7 +54,6 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsdasri.id));
 
     return bsdasri;

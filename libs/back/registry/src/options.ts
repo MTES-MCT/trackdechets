@@ -1,5 +1,3 @@
-import { RegistryExportType } from "@prisma/client";
-import type { SsdWasteV2 } from "@td/codegen-back";
 import { SafeParseReturnType } from "zod";
 import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
 import {
@@ -25,10 +23,14 @@ import {
   saveOutgoingWasteLine
 } from "./outgoingWaste/database";
 import { safeParseAsyncOutgoingWaste } from "./outgoingWaste/validation";
-import { SSD_EXPORT_HEADERS, SSD_HEADERS } from "./ssd/constants";
+import { SSD_HEADERS } from "./ssd/constants";
 import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
-import { toSsdWaste } from "./ssd/registry";
 import { safeParseAsyncSsd } from "./ssd/validation";
+
+import { toSsdWaste as SsdToSsdWaste } from "./ssd/registry";
+import { toIncomingWaste as IncomingWasteToIncomingWaste } from "./incomingWaste/registry";
+import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingWaste/registry";
+import type { IncomingWasteV2, SsdWasteV2 } from "@td/codegen-back";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
@@ -101,15 +103,38 @@ export const CSV_DELIMITER = ";";
 export const UNAUTHORIZED_ERROR =
   "Vous n'avez pas le droit de faire une déclaration pour ce SIRET";
 
-export type ExportOptions = {
-  headers: Record<string, string>;
+export type InputExportOptions = {
   toSsdWaste?: (registry: unknown) => SsdWasteV2;
+  toIncomingWaste?: (registry: unknown) => IncomingWasteV2;
 };
 
-export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =
-  {
-    SSD: {
-      headers: SSD_EXPORT_HEADERS,
-      toSsdWaste
-    }
-  };
+export const INPUT_EXPORT_TYPES = [
+  "SSD",
+  "INCOMING_WASTE",
+  "INCOMING_TEXS",
+  "BSDD",
+  "BSDA",
+  "BSDASRI",
+  "BSFF",
+  "BSPAOH",
+  "BSVHU"
+] as const;
+export type InputExportType = (typeof INPUT_EXPORT_TYPES)[number];
+
+export type OutputExportOptions = {
+  headers: Record<string, string>;
+};
+
+export const exportOptions: Partial<
+  Record<InputExportType, InputExportOptions>
+> = {
+  SSD: {
+    toSsdWaste: SsdToSsdWaste
+  },
+  INCOMING_WASTE: {
+    toIncomingWaste: IncomingWasteToIncomingWaste
+  },
+  INCOMING_TEXS: {
+    toIncomingWaste: IncomingTexsToIncomingWaste
+  }
+};

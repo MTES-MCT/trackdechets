@@ -40,4 +40,13 @@ jobs:
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}
           OTEL_SDK_DISABLED: true
           ELASTIC_SEARCH_URL: http://elasticsearch:9200
+          S3_ENDPOINT: http://localhost:9000
+          S3_REGION: fr-par
+          S3_BUCKET: unset
+          S3_ACCESS_KEY_ID: trackdechets
+          S3_SECRET_ACCESS_KEY: password
+          S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
+          S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
+          S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
+          S3_REGISTRY_MODELS_BUCKET: registry-models-integration
       - run: npx nx affected -t build --parallel=3

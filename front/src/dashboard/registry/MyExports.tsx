@@ -47,6 +47,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Table from "@codegouvfr/react-dsfr/Table";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
+import { WasteCodeSwitcher } from "./WasteCodeSwitcher";
 
 type ExportCompany = {
   orgId: string;
@@ -287,7 +288,8 @@ const getSchema = () =>
       declarationType: z.nativeEnum(DeclarationType),
       wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
         message: "Veullez sélectionner au moins un type de déchet"
-      })
+      }),
+      wasteCodes: z.string().array()
     })
     .refine(
       data => {
@@ -363,7 +365,8 @@ export function MyExports() {
         RegistryV2ExportWasteType.Dd,
         RegistryV2ExportWasteType.Dnd,
         RegistryV2ExportWasteType.Texs
-      ]
+      ],
+      wasteCodes: []
     },
     resolver: zodResolver(validationSchema)
   });
@@ -421,7 +424,8 @@ export function MyExports() {
       startDate,
       endDate,
       declarationType,
-      wasteTypes
+      wasteTypes,
+      wasteCodes
     } = input;
     const siret = companyOrgId === "all" ? null : companyOrgId;
     let delegateSiret: string | null = null;
@@ -436,8 +440,13 @@ export function MyExports() {
         delegateSiret = company.delegate;
       }
     }
-    if (registryType !== RegistryV2ExportType.Ssd) {
-      toast.error("Seul l'export SSD est supporté pour le moment");
+    if (
+      registryType !== RegistryV2ExportType.Ssd &&
+      registryType !== RegistryV2ExportType.Incoming
+    ) {
+      toast.error(
+        "Seuls les exports SSD et entrants sont supportés pour le moment"
+      );
       return;
     }
     await generateExport({
@@ -452,7 +461,7 @@ export function MyExports() {
         },
         declarationType, // DeclarationType.All
         wasteTypes, //RegistryV2ExportWasteType[]
-        wasteCodes: null
+        wasteCodes
       },
       onCompleted: () => toast.success("Génération de l'export lancée !"),
       onError: err => toast.error(err.message)
@@ -587,6 +596,17 @@ export function MyExports() {
                     }
                   }
                 ]}
+              />
+            </div>
+            <div className="fr-mb-8v">
+              <WasteCodeSwitcher
+                id={"wasteCodeSwitcher"}
+                onSelectChange={wasteCodes => {
+                  setValue(
+                    "wasteCodes",
+                    wasteCodes.map(({ code }) => code)
+                  );
+                }}
               />
             </div>
             <h6 className="fr-h6">{`Période concernée`}</h6>

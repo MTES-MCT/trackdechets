@@ -27,8 +27,8 @@ export function buildUpdateManyBsvhus(
     });
 
     const updatedBsvhus = await prisma.bsvhu.findMany({
-      where,
-      select: { id: true }
+      where
+      // select: { id: true }
     });
 
     const ids = updatedBsvhus.map(({ id }) => id);
@@ -44,8 +44,10 @@ export function buildUpdateManyBsvhus(
     await prisma.event.createMany({
       data: eventsData
     });
-    for (const id of ids) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    for (const updatedBsvhu of updatedBsvhus) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsvhu.id)
+      );
     }
 
     return update;

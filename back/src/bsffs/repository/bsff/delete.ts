@@ -50,6 +50,7 @@ export function buildDeleteBsff(deps: RepositoryFnDeps): DeleteBsffFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsff.id));
 
     return deletedBsff as Prisma.BsffGetPayload<Args>;
