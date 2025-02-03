@@ -179,7 +179,7 @@ export function extractPostalCode(
   );
 
   if (address) {
-    let formattedAddress = address.replace("\n", " ").toUpperCase();
+    let formattedAddress = address.replace(/\n/g, " ").toUpperCase();
 
     // Kind of a complex machine here because matches might overlap and not be
     // detected by RegExp.matches()

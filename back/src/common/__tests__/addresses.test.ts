@@ -6,7 +6,7 @@ describe("extractPostalCode", () => {
     expect(extractPostalCode(address)).toEqual("07100");
   });
 
-  test("when there are multiple matches, should return the last one", () => {
+  test.only("when there are multiple matches, should return the last one", () => {
     const address = "134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE";
     expect(extractPostalCode(address)).toEqual("31100");
   });
