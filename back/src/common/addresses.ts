@@ -171,7 +171,10 @@ export function extractPostalCode(
   address: string | null | undefined,
   country: Country = "FR"
 ) {
-  const postalCodeRegex = POSTAL_CODE_REGEX_PER_COUNTRY[country];
+  const postalCodeRegex =
+    POSTAL_CODE_REGEX_PER_COUNTRY[country] ??
+    POSTAL_CODE_REGEX_PER_COUNTRY["FR"];
+
   const regex = new RegExp(
     new RegExp(/(^| |,)/).source + // There can be a space, a comma or beginning of string BEFORE
       new RegExp(postalCodeRegex).source + // The postalCode regex
@@ -179,7 +182,7 @@ export function extractPostalCode(
   );
 
   if (address) {
-    let formattedAddress = address.replace(/\n/g, " ").toUpperCase();
+    let addressUp = address.replace(/\n/g, " ").toUpperCase();
 
     // Kind of a complex machine here because matches might overlap and not be
     // detected by RegExp.matches()
@@ -188,12 +191,12 @@ export function extractPostalCode(
     const matches: string[] = [];
     let match: RegExpExecArray | null = null;
     do {
-      match = regex.exec(formattedAddress);
+      match = regex.exec(addressUp);
 
       if (match?.length) {
         const cleanedMatch = match[0].replace(/,/g, " ").trim();
         matches.push(cleanedMatch);
-        formattedAddress = formattedAddress.replace(match[0], "");
+        addressUp = addressUp.replace(cleanedMatch, "");
       }
     } while (match?.length);
 

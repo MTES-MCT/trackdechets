@@ -1,5 +1,6 @@
 import { prisma } from "@td/prisma";
 import { getCompanySplittedAddress } from "../../companies/companyUtils";
+import { Company } from "@prisma/client";
 
 // TODO: important: comment out the ClosedCompanyError!!!
 
@@ -51,7 +52,9 @@ import { getCompanySplittedAddress } from "../../companies/companyUtils";
       console.log(`[${companiesTotal}] Updating company ${company.orgId}`);
 
       try {
-        const splittedAddress = await getCompanySplittedAddress(company);
+        const splittedAddress = await getCompanySplittedAddress(
+          company as Company
+        );
 
         await prisma.company.update({
           where: { id: company.id },
