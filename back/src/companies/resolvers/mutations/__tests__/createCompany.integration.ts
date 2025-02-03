@@ -2135,7 +2135,7 @@ describe("Mutation.createCompany", () => {
         website: "https://testcompany.fr"
       };
 
-      (searchCompany as jest.Mock).mockResolvedValueOnce({
+      (searchCompany as jest.Mock).mockResolvedValue({
         orgId,
         siret: orgId,
         etatAdministratif: "A",
@@ -2174,7 +2174,6 @@ describe("Mutation.createCompany", () => {
       const user = await userFactory();
       const orgId = "BE0894129667";
       const companyInput = {
-        orgId,
         vatNumber: orgId,
         gerepId: "1234",
         companyName: "Acme BE",
@@ -2183,7 +2182,7 @@ describe("Mutation.createCompany", () => {
         website: "https://testcompany.be"
       };
 
-      (searchCompany as jest.Mock).mockResolvedValueOnce({
+      (searchCompany as jest.Mock).mockResolvedValue({
         orgId,
         vatNumber: orgId,
         etatAdministratif: "A",
