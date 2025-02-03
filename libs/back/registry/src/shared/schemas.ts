@@ -37,7 +37,7 @@ export const reasonSchema = z
   )
   .nullish();
 
-export const publicIdSchema = z
+export const publicIdSchema = z.coerce
   .string({
     required_error: "L'identifiant unique est requis",
     invalid_type_error:
@@ -256,8 +256,7 @@ export const dateSchema = z.coerce
   .min(
     sub(new Date(), { years: 1 }),
     "La date ne peut pas être antérieure à J-1 an"
-  )
-  .max(new Date(), "La date ne peut pas être dans le futur");
+  ).refine((date) => date <= new Date(), "La date ne peut pas être dans le futur") // Dont use max() as the date must be dynamic
 
 export const nullishDateSchema = z
   .union([
@@ -290,7 +289,7 @@ export const nullishDateSchema = z
         sub(new Date(), { years: 1 }),
         "La date ne peut pas être antérieure à J-1 an"
       )
-      .max(new Date(), "La date ne peut pas être dans le futur")
+      .refine((date) => date <= new Date(), "La date ne peut pas être dans le futur")
       .nullish()
   );
 
