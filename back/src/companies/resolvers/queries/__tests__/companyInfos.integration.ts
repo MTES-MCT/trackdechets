@@ -460,4 +460,38 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(errors[0].message).toBe("Cet établissement est fermé");
     expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
   });
+
+  it("should return isDormant = true if company is dormant", async () => {
+    // Given
+    const company = await companyFactory({
+      isDormantSince: new Date()
+    });
+
+    mockSearchSirene.mockResolvedValueOnce({
+      siret: company.siret,
+      etatAdministratif: "A",
+      name: "CODE EN STOCK",
+      address: "4 Boulevard Longchamp 13001 Marseille",
+      codeCommune: "13201",
+      naf: "62.01Z",
+      libelleNaf: "Programmation informatique",
+      addressVoie: "4 boulevard Longchamp",
+      addressCity: "Marseille",
+      addressPostalCode: "13001"
+    });
+
+    // When
+    const gqlquery = `
+      query {
+        companyInfos(siret: "${company.siret}") {
+          siret
+          isDormant
+        }
+      }`;
+    const { errors, data } = await query<any>(gqlquery);
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.companyInfos.isDormant).toBeTruthy();
+  });
 });
