@@ -97,6 +97,59 @@ describe("signTransportForm", () => {
     );
   });
 
+  it.each(["XX", "AZ-ER-TY-UI-09-LP-87"])(
+    "should not sign transport if plate is invalid (%p)",
+    async plate => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({ company: transporter.company });
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+      const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+      const form = await formFactory({
+        ownerId: emitter.user.id,
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          signedByTransporter: null,
+          sentAt: null,
+          sentBy: null,
+          emittedAt: emittedAt,
+          emittedBy: emitter.user.name,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.company.siret,
+              transporterCompanyName: transporter.company.name,
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signTransportForm">,
+        MutationSignTransportFormArgs
+      >(SIGN_TRANSPORT_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            takenOverAt: takenOverAt.toISOString() as unknown as Date,
+            takenOverBy: transporter.user.name,
+            transporterNumberPlate: plate
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+        })
+      ]);
+    }
+  );
+
   it("should sign transport for transporter N", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("ADMIN");
@@ -1207,7 +1260,7 @@ describe("signTransportForm", () => {
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1",
-            transporterNumberPlate: "TRANSPORTER-PLATE"
+            transporterNumberPlate: "QR-33-TY"
           }
         }
       });
@@ -1219,7 +1272,7 @@ describe("signTransportForm", () => {
         where: { formId: appendix1Item.id }
       });
       expect(appendix1ItemTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
+        "QR-33-TY"
       );
 
       // Should copy plate to next items
@@ -1227,16 +1280,14 @@ describe("signTransportForm", () => {
         where: { formId: appendix2Item.id }
       });
       expect(appendix2ItemTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
+        "QR-33-TY"
       );
 
       // Parent should have its plate updated as well
       const parentTransporters = await prisma.bsddTransporter.findFirst({
         where: { formId: parent.id }
       });
-      expect(parentTransporters?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE"
-      );
+      expect(parentTransporters?.transporterNumberPlate).toBe("QR-33-TY");
 
       // SECOND UPDATE (on the second child bsd)
 
@@ -1249,7 +1300,7 @@ describe("signTransportForm", () => {
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1",
-            transporterNumberPlate: "TRANSPORTER-PLATE-2"
+            transporterNumberPlate: "QR-33-TY-2"
           }
         }
       });
@@ -1260,7 +1311,7 @@ describe("signTransportForm", () => {
           where: { formId: appendix2Item.id }
         });
       expect(appendix2ItemTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
+        "QR-33-TY-2"
       );
 
       // Should override plate from child bsd 1
@@ -1269,16 +1320,14 @@ describe("signTransportForm", () => {
           where: { formId: appendix1Item.id }
         });
       expect(appendix1ItemTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
+        "QR-33-TY-2"
       );
 
       // Parent should have its plate updated as well
       const parentTransportersBis = await prisma.bsddTransporter.findFirst({
         where: { formId: parent.id }
       });
-      expect(parentTransportersBis?.transporterNumberPlate).toBe(
-        "TRANSPORTER-PLATE-2"
-      );
+      expect(parentTransportersBis?.transporterNumberPlate).toBe("QR-33-TY-2");
     });
 
     it("should disallow signing the appendix1 item if there is no quantity & packaging infos", async () => {

@@ -43,6 +43,7 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import { validateMultiTransporterPlates } from "../../common/validation/zod/refinement";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -266,7 +267,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
-  .superRefine(checkTransporters);
+  .superRefine(checkTransporters)
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

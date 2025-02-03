@@ -72,7 +72,11 @@ export default function Transport({ status, editionDisabled = false }) {
             Immatriculations
             <Tooltip msg={customInfoToolTip} />
           </label>
-          <TagsInput name="transporter.transport.plates" disabled={disabled} />
+          <TagsInput
+            name="transporter.transport.plates"
+            disabled={disabled}
+            limit={2}
+          />
         </div>
       )}
       {showTransportFields && (

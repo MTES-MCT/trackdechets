@@ -747,6 +747,55 @@ describe("Mutation.updateForm", () => {
     }
   );
 
+  it("should forbid invalid transporter plates", async () => {
+    const emitter = await companyFactory();
+
+    const { user, company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: destination.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        numberPlate: "XX" //too short
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should autocomplete transporter receipt with receipt pulled from db", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
