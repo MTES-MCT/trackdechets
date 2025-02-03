@@ -461,10 +461,10 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
   });
 
-  it("should return isDormant = true if company is dormant", async () => {
+  it.each([true, false])("should return isDormant = %p", async isDormant => {
     // Given
     const company = await companyFactory({
-      isDormantSince: new Date()
+      isDormantSince: isDormant ? new Date() : null
     });
 
     mockSearchSirene.mockResolvedValueOnce({
@@ -492,6 +492,6 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
     // Then
     expect(errors).toBeUndefined();
-    expect(data.companyInfos.isDormant).toBeTruthy();
+    expect(data.companyInfos.isDormant).toBe(isDormant);
   });
 });
