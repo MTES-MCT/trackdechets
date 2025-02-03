@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
+import { subMonths } from "date-fns";
 
 const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   mutation AddToIncomingTexsRegistry($lines: [IncomingTexsLineInput!]!) {
@@ -23,7 +24,7 @@ function getCorrectLine(siret: string) {
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
-    receptionDate: "2024-02-01",
+    receptionDate: subMonths(new Date(), 3).toISOString().split("T")[0], // receptionDate must not be older to J-1 year
     weightValue: 1.4,
     weightIsEstimate: true,
     volume: 1.2,
@@ -161,11 +162,10 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
-      ADD_TO_INCOMING_TEXS_REGISTRY,
-      { variables: { lines } }
-    );
-
+    const { data, errors } = await mutate<
+      Pick<Mutation, "addToIncomingTexsRegistry">
+    >(ADD_TO_INCOMING_TEXS_REGISTRY, { variables: { lines } });
+    console.log(JSON.stringify(errors));
     expect(data.addToIncomingTexsRegistry).toBe(true);
   });
 

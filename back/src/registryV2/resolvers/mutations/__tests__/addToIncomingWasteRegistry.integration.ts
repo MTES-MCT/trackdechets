@@ -5,6 +5,7 @@ import gql from "graphql-tag";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
+import { subMonths } from "date-fns";
 
 const ADD_TO_INCOMING_WASTE_REGISTRY = gql`
   mutation AddToIncomingWasteRegistry($lines: [IncomingWasteLineInput!]!) {
@@ -23,7 +24,7 @@ function getCorrectLine(siret: string) {
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
-    receptionDate: "2024-02-01",
+    receptionDate: subMonths(new Date(), 3).toISOString().split("T")[0], // receptionDate must not be older to J-1 year
     weighingHour: "08:25",
     weightValue: 1.4,
     weightIsEstimate: true,
