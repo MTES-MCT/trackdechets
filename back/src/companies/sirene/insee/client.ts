@@ -99,9 +99,9 @@ export async function searchCompany(
   try {
     const company = await searchCompanySirene(siret);
 
-    if (company.etatAdministratif === ("F" as EtatAdministratif)) {
-      throw new ClosedCompanyError();
-    }
+    // if (company.etatAdministratif === ("F" as EtatAdministratif)) {
+    //   throw new ClosedCompanyError();
+    // }
 
     if (
       company.statutDiffusionEtablissement ===

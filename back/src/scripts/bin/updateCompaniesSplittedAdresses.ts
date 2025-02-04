@@ -3,14 +3,22 @@ import { getCompanySplittedAddress } from "../../companies/companyUtils";
 import { Company } from "@prisma/client";
 
 // TODO: important: comment out the ClosedCompanyError!!!
+// back/src/companies/sirene/insee/client.ts
+// back/src/companies/sirene/trackdechets/client.ts
+
+// TODO entreprises sans libellé de voie?
+// ex: https://annuaire-entreprises.data.gouv.fr/etablissement/31368228800011?redirected=1
 
 (async function () {
-  console.log(">> Starting script to update companies' splitted addresses");
+  console.log(">> Lancement du script de mise à jour des adresses splittées");
 
   let companiesTotal = 0;
+  let errors = 0;
+  let ignored = 0;
+
   const startDate = new Date();
 
-  const BATCH_SIZE = 1000;
+  const BATCH_SIZE = 100;
   let lastId: string | null = null;
   let finished = false;
   let skip = 0;
@@ -50,27 +58,50 @@ import { Company } from "@prisma/client";
     for (const company of companies) {
       companiesTotal += 1;
 
-      console.log(`[${companiesTotal}] Updating company ${company.orgId}`);
+      if (company.address === "Adresse test") continue;
 
       try {
         const splittedAddress = await getCompanySplittedAddress(
           company as Company
         );
 
+        if (splittedAddress.street === null) {
+          ignored++;
+          console.log(
+            `Impossible d'extraire l'adresse pour l'entreprise ${
+              company.orgId
+            } (adresse: ${JSON.stringify(company.address)})`
+          );
+          continue;
+        }
+
+        // Apparently we cannot update multiple records at once
+        // https://github.com/prisma/prisma/issues/6862
         await prisma.company.update({
           where: { id: company.id },
           data: splittedAddress
         });
       } catch (e) {
+        errors++;
+
         console.log(
           `/!\\ Erreur pour l'entreprise ${company.orgId}: ${e.message}`
         );
       }
     }
+
+    console.log(`${companiesTotal} entreprises mises à jour`);
   }
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  console.log(`${companiesTotal} updated in ${duration}ms!`);
-  console.log("Done!");
+  console.log(
+    `${companiesTotal} mises à jour, ${errors} erreurs (${Math.round(
+      (errors / companiesTotal) * 100
+    )}%), ${ignored} ignorées (${Math.round(
+      (ignored / companiesTotal) * 100
+    )}%) en ${duration}ms!`
+  );
+
+  console.log("Terminée!");
 })().then(() => process.exit());
