@@ -193,11 +193,7 @@ export async function processRegistryExportJob(
       siret: {
         in: registryExport.sirets
       },
-      reportAsSirets: registryExport.delegateSiret
-        ? {
-            has: registryExport.delegateSiret
-          }
-        : undefined,
+      reportAsSiret: registryExport.delegateSiret ?? undefined,
       exportRegistryType: registryExport.registryType ?? undefined,
       wasteType: registryExport.wasteTypes?.length
         ? {

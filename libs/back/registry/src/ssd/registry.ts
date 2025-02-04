@@ -9,11 +9,7 @@ import {
 import type { SsdWasteV2 } from "@td/codegen-back";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { prisma } from "@td/prisma";
-import {
-  deleteRegistryLookup,
-  generateDateInfos,
-  updateRegistryDelegateSirets
-} from "../lookup/utils";
+import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { performance } from "perf_hooks";
 
 export const toSsdWaste = (ssd: RegistrySsd): SsdWasteV2 => {
@@ -74,6 +70,7 @@ const registryToLookupCreateInput = (
     id: registrySsd.id,
     readableId: registrySsd.publicId,
     siret: registrySsd.reportForCompanySiret,
+    reportAsSiret: registrySsd.reportAsCompanySiret,
     exportRegistryType: RegistryExportType.SSD,
     declarationType: RegistryExportDeclarationType.REGISTRY,
     wasteType: RegistryExportWasteType.DND,
@@ -90,16 +87,13 @@ export const updateRegistryLookup = async (
   oldRegistrySsdId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
-  let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
-  }>;
   if (oldRegistrySsdId) {
     // note for future implementations:
     // if there is a possibility that the siret changes between updates (BSDs),
     // you should use an upsert.
     // This is because the index would point to an empty lookup in that case, so we need to create it.
     // the cleanup method will remove the lookup with the old siret afterward
-    registryLookup = await tx.registryLookup.update({
+    await tx.registryLookup.update({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
@@ -115,6 +109,7 @@ export const updateRegistryLookup = async (
         // only those properties can change during an update
         // the id changes because a new RegistrySsd entry is created on each update
         id: registrySsd.id,
+        reportAsSiret: registrySsd.reportAsCompanySiret,
         wasteCode: registrySsd.wasteCode,
         ...generateDateInfos(
           (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
@@ -123,25 +118,18 @@ export const updateRegistryLookup = async (
       },
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   } else {
-    registryLookup = await tx.registryLookup.create({
+    await tx.registryLookup.create({
       data: registryToLookupCreateInput(registrySsd),
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   }
-
-  await updateRegistryDelegateSirets(
-    RegistryExportType.SSD,
-    registrySsd,
-    registryLookup,
-    tx
-  );
 };
 
 export const rebuildRegistryLookup = async () => {
@@ -178,16 +166,9 @@ export const rebuildRegistryLookup = async () => {
     const fetchEnd = performance.now();
 
     const updateStart = performance.now();
-    const createArray = items.map((registrySsd: RegistrySsd) => {
-      const res = registryToLookupCreateInput(registrySsd);
-      if (
-        registrySsd.reportAsCompanySiret &&
-        registrySsd.reportAsCompanySiret !== registrySsd.reportForCompanySiret
-      ) {
-        res.reportAsSirets = [registrySsd.reportAsCompanySiret];
-      }
-      return res;
-    });
+    const createArray = items.map((registrySsd: MinimalRegistryForLookup) =>
+      registryToLookupCreateInput(registrySsd)
+    );
     await prisma.registryLookup.createMany({
       data: createArray
     });

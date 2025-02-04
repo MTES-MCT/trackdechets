@@ -7,11 +7,7 @@ import {
   RegistryIncomingWaste
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import {
-  deleteRegistryLookup,
-  generateDateInfos,
-  updateRegistryDelegateSirets
-} from "../lookup/utils";
+import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 
@@ -181,21 +177,51 @@ export const toIncomingWaste = (
   };
 };
 
+const minimalRegistryForLookupSelect = {
+  id: true,
+  publicId: true,
+  reportForCompanySiret: true,
+  reportAsCompanySiret: true,
+  wasteIsDangerous: true,
+  wasteCode: true,
+  receptionDate: true
+};
+
+type MinimalRegistryForLookup = Prisma.RegistryIncomingWasteGetPayload<{
+  select: typeof minimalRegistryForLookupSelect;
+}>;
+
+const registryToLookupCreateInput = (
+  registryIncomingWaste: MinimalRegistryForLookup
+): Prisma.RegistryLookupUncheckedCreateInput => {
+  return {
+    id: registryIncomingWaste.id,
+    readableId: registryIncomingWaste.publicId,
+    siret: registryIncomingWaste.reportForCompanySiret,
+    reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
+    exportRegistryType: RegistryExportType.INCOMING,
+    declarationType: RegistryExportDeclarationType.REGISTRY,
+    wasteType: registryIncomingWaste.wasteIsDangerous
+      ? RegistryExportWasteType.DD
+      : RegistryExportWasteType.DND,
+    wasteCode: registryIncomingWaste.wasteCode,
+    ...generateDateInfos(registryIncomingWaste.receptionDate),
+    registryIncomingWasteId: registryIncomingWaste.id
+  };
+};
+
 export const updateRegistryLookup = async (
-  registryIncomingWaste: RegistryIncomingWaste,
+  registryIncomingWaste: MinimalRegistryForLookup,
   oldRegistryIncomingWasteId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
-  let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
-  }>;
   if (oldRegistryIncomingWasteId) {
     // note for future implementations:
     // if there is a possibility that the siret changes between updates (BSDs),
     // you should use an upsert.
     // This is because the index would point to an empty lookup in that case, so we need to create it.
     // the cleanup method will remove the lookup with the old siret afterward
-    registryLookup = await tx.registryLookup.update({
+    await tx.registryLookup.update({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
@@ -211,43 +237,25 @@ export const updateRegistryLookup = async (
         // only those properties can change during an update
         // the id changes because a new RegistrySsd entry is created on each update
         id: registryIncomingWaste.id,
+        reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
         wasteCode: registryIncomingWaste.wasteCode,
         ...generateDateInfos(registryIncomingWaste.receptionDate),
         registryIncomingWasteId: registryIncomingWaste.id
       },
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   } else {
-    registryLookup = await tx.registryLookup.create({
-      data: {
-        id: registryIncomingWaste.id,
-        readableId: registryIncomingWaste.publicId,
-        siret: registryIncomingWaste.reportForCompanySiret,
-        exportRegistryType: RegistryExportType.INCOMING,
-        declarationType: RegistryExportDeclarationType.REGISTRY,
-        wasteType: registryIncomingWaste.wasteIsDangerous
-          ? RegistryExportWasteType.DD
-          : RegistryExportWasteType.DND,
-        wasteCode: registryIncomingWaste.wasteCode,
-        ...generateDateInfos(registryIncomingWaste.receptionDate),
-        registryIncomingWasteId: registryIncomingWaste.id
-      },
+    await tx.registryLookup.create({
+      data: registryToLookupCreateInput(registryIncomingWaste),
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   }
-
-  await updateRegistryDelegateSirets(
-    RegistryExportType.INCOMING,
-    registryIncomingWaste,
-    registryLookup,
-    tx
-  );
 };
 
 export const rebuildRegistryLookup = async () => {
@@ -270,13 +278,16 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalRegistryForLookupSelect
     });
-    for (const registryIncomingWaste of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(registryIncomingWaste, null, tx);
-      });
-    }
+    const createArray = items.map(
+      (registryIncomingWaste: MinimalRegistryForLookup) =>
+        registryToLookupCreateInput(registryIncomingWaste)
+    );
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
     if (items.length < 100) {
       done = true;
       return;

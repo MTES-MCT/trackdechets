@@ -121,9 +121,9 @@ la colonne "id" de RegistryLookup n'est pas, contrairement à la plupart des aut
 
 La colonne readableId contient le publicId dans le cas des registres, et le readableId dans le cas des BSD. Cette colonne est surtout utile pour le debug/support, et rend plus "lisible" la table.
 
-- reportAsSirets
+- reportAsSiret
 
-Cette colonne contient les délégataires ayant ajouté/modifié la ligne de registre correspondant à l'objet RegistryLookup. Elle permet de retrouver les lignes de registre à exporter chez un délégataire. Il peut sembler étrange que cette colonne soit une array, alors que lors de l'ajout d'une ligne de registre, il n'y a qu'un seul délégataire qui fait l'import. Cependant, il est possible qu'un établissement ait plusieurs délégataires, et que l'un crée la ligne de registre, et qu'un autre la modifie. Or dans ce cas il faut que les 2 délégataires voient cette ligne dans leurs exports, ce qui justifie donc que tous les délégaitaires ayant touché à cette ligne soient ajoutés au RegistryLookup dans cette array.
+Cette colonne contient le délégataire identifié sur la ligne de registre correspondant à l'objet RegistryLookup. Elle permet de retrouver les lignes de registre à exporter chez un délégataire.
 
 - dateId
 

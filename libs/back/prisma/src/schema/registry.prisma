@@ -677,7 +677,7 @@ model RegistryLookup {
     // contains the publicId of the registry or the readableId of the BSD
     // for support/display
     readableId         String
-    reportAsSirets     String[]                      @default([])
+    reportAsSiret      String?
     siret              String
     exportRegistryType RegistryExportType
     declarationType    RegistryExportDeclarationType
@@ -719,7 +719,7 @@ model RegistryLookup {
     // UUIDv7 unique index used for sorting/pagination on exports
     @@unique([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
     // array of elements so gin index
-    @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
+    @@index([reportAsSiret], map: "_RegistryLookupReportAsSiretIdx")
     // multi-column index because those columns are mandatory for any export
     @@index([date(sort: Asc), exportRegistryType, siret], map: "_RegistryLookupMainIdx")
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
