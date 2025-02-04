@@ -4,6 +4,8 @@ import React from "react";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { numberToString } from "../../../../Apps/Dashboard/Creation/bspaoh/utils/numbers";
+import TagsInput from "../../../../Apps/Forms/Components/TagsInput/TagsInput";
+import { pluralize } from "@td/constants";
 
 type PackagingFormProps = {
   packaging: PackagingInfoInput;
@@ -24,6 +26,9 @@ function PackagingForm({
       : null;
 
   const volumeUnit = packaging.type === Packagings.Benne ? "m3" : "litres";
+
+  const identificationNumbersLength =
+    packaging.identificationNumbers?.length ?? 0;
 
   return (
     <>
@@ -126,7 +131,36 @@ function PackagingForm({
         </div>
       )}
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-md-10 fr-col-12"></div>
+        <div className="fr-col-md-10 fr-col-12">
+          <TagsInput
+            label="N° de contenant (optionnel)"
+            tags={packaging.identificationNumbers ?? []}
+            onAddTag={tag =>
+              setPackaging({
+                ...packaging,
+                identificationNumbers: [
+                  ...(packaging.identificationNumbers ?? []),
+                  tag
+                ]
+              })
+            }
+            onDeleteTag={idx =>
+              setPackaging({
+                ...packaging,
+                identificationNumbers: packaging.identificationNumbers?.filter(
+                  (_, index) => index !== idx
+                )
+              })
+            }
+          />
+
+          <p className="fr-info-text">
+            Vous avez saisi {identificationNumbersLength}{" "}
+            {pluralize("numéro", identificationNumbersLength)} pour{" "}
+            {Number(packaging.quantity)}{" "}
+            {pluralize("contenant", packaging.quantity)}
+          </p>
+        </div>
       </div>
     </>
   );

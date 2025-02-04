@@ -49,15 +49,17 @@ function PackagingList({ fieldName }: PackagingListProps) {
                   packagingTypeOptions={options}
                 />
                 {packagings.length > 1 && (
-                  <button
-                    type="button"
-                    className="fr-btn fr-btn--tertiary fr-mb-2w"
-                    onClick={() => remove(idx)}
-                  >
-                    Supprimer
-                  </button>
+                  <>
+                    <button
+                      type="button"
+                      className="fr-btn fr-btn--tertiary fr-mb-2w"
+                      onClick={() => remove(idx)}
+                    >
+                      Supprimer
+                    </button>
+                    <hr />
+                  </>
                 )}
-                <hr />
               </div>
             ))}
           {showAddButton && (

@@ -7,6 +7,7 @@ import {
 import { prisma } from "@td/prisma";
 import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { getFirstTransporter } from "../database";
+import { PackagingInfo } from "@td/codegen-back";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
@@ -123,7 +124,13 @@ describe("expandFormFromDb", () => {
         isSubjectToADR: form.wasteDetailsIsSubjectToADR,
         onuCode: form.wasteDetailsOnuCode,
         nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-        packagingInfos: form.wasteDetailsPackagingInfos,
+        packagingInfos: (
+          form.wasteDetailsPackagingInfos as PackagingInfo[]
+        ).map(p => ({
+          ...p,
+          identificationNumbers: [],
+          volume: null
+        })),
         packagings: ["CITERNE"],
         otherPackaging: undefined,
         numberOfPackages: 1,

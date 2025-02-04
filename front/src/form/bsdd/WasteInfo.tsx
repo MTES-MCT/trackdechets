@@ -196,11 +196,6 @@ export default function WasteInfo({ disabled }) {
       </div>
 
       {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
-        // <Field
-        //   name="wasteDetails.packagingInfos"
-        //   component={Packagings}
-        //   disabled={disabled}
-        // />
         <>
           <h4 className="form__section-heading">Conditionnement</h4>
           <PackagingList fieldName="wasteDetails.packagingInfos" />

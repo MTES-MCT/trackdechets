@@ -108,7 +108,7 @@ const CREATE_FORM = `
           other
           quantity
           volume 
-          numeros
+          identificationNumbers
         }
         isDangerous
         onuCode

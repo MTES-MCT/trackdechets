@@ -172,4 +172,21 @@ describe("<PackagingList />", () => {
       screen.getByLabelText("Nom du type de contenant")
     ).toBeInTheDocument();
   });
+
+  it("should display identification numbers", async () => {
+    renderComponent({
+      packagings: [
+        {
+          type: Packagings.Fut,
+          quantity: 2,
+          identificationNumbers: ["identifiant1", "identifiant2"]
+        }
+      ]
+    });
+    expect(screen.getByText("identifiant1")).toBeInTheDocument();
+    expect(screen.getByText("identifiant2")).toBeInTheDocument();
+    expect(
+      screen.getByText("Vous avez saisi 2 numéros pour 2 contenants")
+    ).toBeInTheDocument();
+  });
 });
