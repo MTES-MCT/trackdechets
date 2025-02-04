@@ -109,10 +109,9 @@ export function getTransformXlsxStream(options: ImportOptions) {
               key
             ])
           );
-          const nbOfColumnsToRead = reverseHeadersMap.size + 5; // Take a margin in case we have some blank columns
           const errors: string[] = [];
 
-          for (let index = 0; index < nbOfColumnsToRead; index++) {
+          for (let index = 0; index < row.cellCount; index++) {
             const { value, col } = row.getCell(index + 1);
 
             const colLetter = getColumnLetterFromIndex(parseInt(col, 10));
