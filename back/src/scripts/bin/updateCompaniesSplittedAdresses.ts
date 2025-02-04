@@ -32,7 +32,8 @@ import { Company } from "@prisma/client";
       select: {
         id: true,
         orgId: true,
-        address: true
+        address: true,
+        vatNumber: true
       }
     });
 

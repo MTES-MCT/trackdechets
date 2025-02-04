@@ -2207,7 +2207,7 @@ describe("Mutation.createCompany", () => {
       expect(errors).toBeUndefined();
 
       const company = await prisma.company.findFirst({
-        where: { orgId: companyInput.orgId }
+        where: { orgId: companyInput.vatNumber }
       });
 
       expect(company?.street).toBe("Rue Bois de Goesnes 3");
