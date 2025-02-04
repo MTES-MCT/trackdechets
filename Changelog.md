@@ -26,6 +26,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 - Restrictions sur le format des plaques d'immatriculations sur le BSDA, BSDASRI, BSFF, BSPAOH, BSDD [PR 3935](https://github.com/MTES-MCT/trackdechets/pull/3935).
 
+#### :boom: Breaking changes
+
+- Le champ GraphQL `BsdaPackagingInput.type` est rendu obligatoire [PR 3930](https://github.com/MTES-MCT/trackdechets/pull/3930).
+
 # [2025.01.1] 14/01/2025
 
 #### :rocket: Nouvelles fonctionnalités
