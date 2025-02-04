@@ -2,7 +2,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
@@ -23,14 +24,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       "MEMBER",
       { securityCode: 7777 }
     );
-
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret!,
-        handleBsdasri: true
-      }
+    await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsdasri: true }
     });
     const emitterCompany = await companyFactory();
     const { user: transporter, company: transporterCompany } =
@@ -80,13 +76,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       { securityCode: 7777 }
     );
     const destination = await companyFactory();
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret!,
-        handleBsdasri: true
-      }
+    await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsdasri: true }
     });
     const emitterCompany = await companyFactory();
     const { user: transporter, company: transporterCompany } =

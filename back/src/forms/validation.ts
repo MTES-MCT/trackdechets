@@ -561,7 +561,7 @@ export const ecoOrganismeSchema = yup.object().shape({
         ecoOrganismeSiret
           ? prisma.ecoOrganisme
               .findFirst({
-                where: { siret: ecoOrganismeSiret }
+                where: { siret: ecoOrganismeSiret, handleBsdd: true }
               })
               .then(el => el != null)
           : true

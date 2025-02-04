@@ -1703,7 +1703,10 @@ describe("draftFormSchema", () => {
   });
 
   it("should not be valid when passing eco-organisme as emitter", async () => {
-    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: siretify(),
+      handle: { handleBsdd: true }
+    });
 
     const partialForm: Partial<Form> = {
       emitterCompanySiret: ecoOrganisme.siret
