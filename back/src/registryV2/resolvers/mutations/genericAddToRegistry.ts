@@ -1,10 +1,11 @@
+import { pluralize } from "@td/constants";
+import { prisma } from "@td/prisma";
+import { UNAUTHORIZED_ERROR, type ImportOptions } from "@td/registry";
+import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { UserInputError } from "../../../common/errors";
-import { UNAUTHORIZED_ERROR, type ImportOptions } from "@td/registry";
-import { prisma } from "@td/prisma";
 
 const LINES_LIMIT = 1_000;
 
@@ -89,7 +90,11 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   if (errors.size > 0) {
     throw new UserInputError(
-      `${errors.size} ligne(s) en erreur n'ont pas pu être importées.`,
+      `${errors.size} ${pluralize(
+        "ligne en erreur n'a pas pu être importée",
+        errors.size,
+        "lignes en erreur n'ont pas pu être importées"
+      )}.`,
       {
         errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
           message: errors,

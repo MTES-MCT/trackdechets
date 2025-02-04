@@ -8,11 +8,13 @@ export const GET_REGISTRY_IMPORTS = gql`
     $siret: String
     $ownImportsOnly: Boolean
     $first: Int
+    $skip: Int
   ) {
     registryImports(
       siret: $siret
       ownImportsOnly: $ownImportsOnly
       first: $first
+      skip: $skip
     ) {
       totalCount
       edges {

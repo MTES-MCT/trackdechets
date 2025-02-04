@@ -1,4 +1,7 @@
-import { BSDD_WASTE_CODES_ENUM } from "@td/constants";
+import {
+  BSDD_WASTE_CODES_ENUM,
+  SSD_PROCESSING_OPERATIONS_CODES
+} from "@td/constants";
 import { z } from "zod";
 import {
   actorAddressSchema,
@@ -39,6 +42,7 @@ const inputSsdSchema = z.object({
   wasteCodeBale: wasteCodeBaleSchema,
   secondaryWasteCodes: z
     .string()
+    .trim()
     .nullish()
     .transform(val =>
       val
@@ -60,6 +64,7 @@ const inputSsdSchema = z.object({
     ),
   secondaryWasteDescriptions: z
     .string()
+    .trim()
     .nullish()
     .transform(val =>
       val
@@ -72,6 +77,7 @@ const inputSsdSchema = z.object({
       z.array(
         z
           .string()
+          .trim()
           .min(
             2,
             "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
@@ -84,6 +90,7 @@ const inputSsdSchema = z.object({
     ),
   product: z
     .string()
+    .trim()
     .min(2, "Le produit doit faire au moins 2 caractères")
     .max(300, "Le produit ne peut pas dépasser 300 caractères"),
   weightValue: weightValueSchema,
@@ -91,17 +98,16 @@ const inputSsdSchema = z.object({
   volume: volumeSchema,
   processingDate: dateSchema,
   processingEndDate: nullishDateSchema,
-  destinationCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNE"
-  ]),
+  destinationCompanyType: actorTypeSchema
+    .exclude(["PERSONNE_PHYSIQUE", "COMMUNE"])
+    .nullish(),
   destinationCompanyOrgId: actorOrgIdSchema.nullish(),
   destinationCompanyName: actorNameSchema.nullish(),
   destinationCompanyAddress: actorAddressSchema.nullish(),
   destinationCompanyCity: actorCitySchema.nullish(),
   destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
   destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  operationCode: getOperationCodeSchema(),
+  operationCode: getOperationCodeSchema(SSD_PROCESSING_OPERATIONS_CODES),
   operationMode: operationModeSchema,
   administrativeActReference: z.enum([
     "Implicite",

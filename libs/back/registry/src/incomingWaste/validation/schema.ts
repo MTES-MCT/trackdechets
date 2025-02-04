@@ -53,6 +53,7 @@ const inputIncomingWasteSchema = z.object({
   receptionDate: dateSchema,
   weighingHour: z
     .string()
+    .trim()
     .refine(val => {
       if (!val) {
         return true;
@@ -98,6 +99,7 @@ const inputIncomingWasteSchema = z.object({
   emitterNoTraceability: z.boolean(),
   emitterPickupSiteName: z
     .string()
+    .trim()
     .max(
       300,
       "La référence du chantier ou du lieu de collecte de l'expéditeur ne peut pas faire plus de 300 caractères"
@@ -111,6 +113,7 @@ const inputIncomingWasteSchema = z.object({
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
       50,
       "Le numéro de récépissé du courtier ne doit pas excéder 50 caractères"
@@ -120,6 +123,7 @@ const inputIncomingWasteSchema = z.object({
   traderCompanyName: actorNameSchema.nullish(),
   traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
       50,
       "Le numéro de récépissé du négociant ne doit pas excéder 50 caractères"
@@ -137,6 +141,7 @@ const inputIncomingWasteSchema = z.object({
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
+    .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   nextOperationCode: getOperationCodeSchema(

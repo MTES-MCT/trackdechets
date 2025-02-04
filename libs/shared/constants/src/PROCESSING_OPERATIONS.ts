@@ -270,3 +270,15 @@ export const INCOMING_TEXS_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
   "R 12",
   "R 13"
 ];
+
+export const SSD_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "R 2",
+  "R 3",
+  "R 4",
+  "R 5",
+  "R 6",
+  "R 7",
+  "R 8",
+  "R 12",
+  "R 13"
+];

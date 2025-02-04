@@ -101,7 +101,7 @@ export const importOptions: Record<ImportType, ImportOptions> = {
 
 export const CSV_DELIMITER = ";";
 export const UNAUTHORIZED_ERROR =
-  "Vous n'avez pas le droit de faire une déclaration pour ce SIRET";
+  "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours";
 
 export type InputExportOptions = {
   toSsdWaste?: (registry: unknown) => SsdWasteV2;
