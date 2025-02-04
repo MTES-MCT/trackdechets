@@ -229,6 +229,43 @@ const objects = [
       handleBsda: false,
       handleBsvhu: true
     }
+  } as CreationObject<"ecoOrganisme">,
+
+  {
+    type: "ecoOrganisme",
+    object: {
+      siret: "42512736200043",
+      name: "FMC AUTOMOBILES",
+      address: "IMMEUBLE AXE SEINE, 1 RUE DU 1ER MAI, 92000 NANTERRE",
+      handleBsdd: false,
+      handleBsdasri: false,
+      handleBsda: false,
+      handleBsvhu: true
+    }
+  } as CreationObject<"ecoOrganisme">,
+  {
+    type: "ecoOrganisme",
+    object: {
+      siret: "43445596000022",
+      name: "MAZDA AUTOMOBILES FRANCE",
+      address: "34 RUE DE LA CROIX DE FER, 78100 SAINT-GERMAIN-EN-LAYE",
+      handleBsdd: false,
+      handleBsdasri: false,
+      handleBsda: false,
+      handleBsvhu: true
+    }
+  } as CreationObject<"ecoOrganisme">,
+  {
+    type: "ecoOrganisme",
+    object: {
+      siret: "41139489300043",
+      name: "HYUNDAI MOTOR FRANCE",
+      address: "TOUR NOVA, 71 BOULEVARD NATIONAL, 92250 LA GARENNE-COLOMBES",
+      handleBsdd: false,
+      handleBsdasri: false,
+      handleBsda: false,
+      handleBsvhu: true
+    }
   } as CreationObject<"ecoOrganisme">
 ];
 
