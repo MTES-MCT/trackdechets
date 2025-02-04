@@ -28,7 +28,7 @@ export default function CompaniesRoutes() {
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
-  if (loading) return <Loader />;
+  if (loading || data?.me == null) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
 
