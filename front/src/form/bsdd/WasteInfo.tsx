@@ -1,4 +1,4 @@
-import { FieldSwitch } from "../../common/components";
+import { FieldSwitch, Switch } from "../../common/components";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import Tooltip from "../../common/components/Tooltip";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
@@ -9,7 +9,6 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import React, { useEffect } from "react";
-import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import {
   WasteCodeSelect,
@@ -22,6 +21,7 @@ import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSel
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FormFormikValues } from "./utils/initial-state";
 import PackagingList from "./components/packagings/PackagingList";
+import { Packagings } from "@td/codegen-ui";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -50,6 +50,10 @@ export default function WasteInfo({ disabled }) {
   }, [values.wasteDetails?.code, setFieldValue]);
 
   const showDuplicateWarning = !!values.isDuplicateOf && !disabled;
+
+  const isPipeline = (values.wasteDetails?.packagingInfos ?? []).some(
+    p => p.type === Packagings.Pipeline
+  );
 
   return (
     <>
@@ -178,15 +182,29 @@ export default function WasteInfo({ disabled }) {
         </>
       )}
 
-      <h4 className="form__section-heading">Conditionnement</h4>
+      <div className="form__row" style={{ flexDirection: "row" }}>
+        <Switch
+          label="Le déchet est conditionné pour pipeline"
+          checked={isPipeline}
+          onChange={checked => {
+            const updatedPackagings = checked
+              ? [{ type: Packagings.Pipeline, quantity: 1 }]
+              : [{ type: "", quantity: "", volume: "" }];
+            setFieldValue("wasteDetails.packagingInfos", updatedPackagings);
+          }}
+        />
+      </div>
 
-      {values.emitter?.type !== "APPENDIX1" && (
+      {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
         // <Field
         //   name="wasteDetails.packagingInfos"
         //   component={Packagings}
         //   disabled={disabled}
         // />
-        <PackagingList fieldName="wasteDetails.packagingInfos" />
+        <>
+          <h4 className="form__section-heading">Conditionnement</h4>
+          <PackagingList fieldName="wasteDetails.packagingInfos" />
+        </>
       )}
 
       <div className="form__row">

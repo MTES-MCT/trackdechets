@@ -125,11 +125,9 @@ function PackagingForm({
           </div>
         </div>
       )}
-      {/* <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-12">
-          <Input label="N° de contenant (optionnel)" />
-        </div>
-      </div> */}
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-md-10 fr-col-12"></div>
+      </div>
     </>
   );
 }
