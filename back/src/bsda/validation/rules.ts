@@ -166,7 +166,6 @@ function transporterSignature(
 
 /**
  * DOCUMENTATION AUTOMATIQUE
- * /!\ à faire tourner si les règles changent
  * voir CONTRIBUTING -> Mettre à jour la documentation
  * pour plus de détails
  */

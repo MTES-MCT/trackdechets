@@ -364,9 +364,7 @@ const run = () => {
     let infos;
     setInfos = input => (infos = input);
     findEditionRules(sourceFile, rules[bsd].ruleObjName, setInfos);
-    // console.log(JSON.stringify(infos, null, 2));
     const structured = buildStructure(infos);
-    // console.log(structured);
     const table = `---\ntitle: ${bsd}\n---\n${toMDTable(structured)}`;
     writeToFile(bsd, table);
   }
