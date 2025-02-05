@@ -79,7 +79,7 @@ export const getWasteCodeSchema = (
     })
   );
 
-export const wastePopSchema = z.union(
+export const booleanSchema = z.union(
   [
     z
       .string()
@@ -87,35 +87,15 @@ export const wastePopSchema = z.union(
       .pipe(
         z
           .enum(["OUI", "NON"], {
-            required_error: "Le champ POP est requis",
+            required_error: "Le champ est requis",
             invalid_type_error:
-              "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
+              "Le champ n'est pas valide. Valeurs possibles: OUI, NON"
           })
           .transform(val => val === "OUI")
       ),
     z.boolean()
   ],
-  { invalid_type_error: "Le champ POP saisi n'est pas valide" }
-);
-
-export const wasteIsDangerousSchema = z.union(
-  [
-    z
-      .string()
-      .transform(val => val.toUpperCase())
-      .pipe(
-        z
-          .enum(["OUI", "NON"], {
-            required_error: "Le champ Dangereux est requis",
-            invalid_type_error:
-              "Le champ Dangereux n'est pas valide. Valeurs possibles: OUI, NON"
-          })
-          .transform(val => val === "OUI")
-      )
-      .nullish(),
-    z.boolean().nullish()
-  ],
-  { invalid_type_error: "Le champ Dangereux saisi n'est pas valide" }
+  { invalid_type_error: "La valeur saisie n'est pas valide" }
 );
 
 export const wasteDescriptionSchema = z
@@ -347,54 +327,6 @@ export const municipalitiesNamesSchema = z
     )
   );
 
-export const noTraceability = z.union(
-  [
-    z
-      .string()
-      .trim()
-      .transform(val => val.toUpperCase())
-      .pipe(
-        z
-          .enum(["OUI", "NON"], {
-            required_error:
-              "Le champ rupture de traçabilité autorisée est requis",
-            invalid_type_error:
-              "Le champ rupture de traçabilité autorisée n'est pas valide. Valeurs possibles: OUI, NON"
-          })
-          .transform(val => val === "OUI")
-      ),
-    z.boolean()
-  ],
-  {
-    invalid_type_error:
-      "Le champ rupture de traçabilité autorisée saisi n'est pas valide"
-  }
-);
-
-export const nextDestinationIsAbroad = z.union(
-  [
-    z
-      .string()
-      .trim()
-      .transform(val => val.toUpperCase())
-      .pipe(
-        z
-          .enum(["OUI", "NON"], {
-            required_error:
-              "Le champ destination ultérieure à l'étranger est requis",
-            invalid_type_error:
-              "Le champ destination ultérieure à l'étranger n'est pas valide. Valeurs possibles: OUI, NON"
-          })
-          .transform(val => val === "OUI")
-      ),
-    z.boolean()
-  ],
-  {
-    invalid_type_error:
-      "Le champ destination ultérieure à l'étranger saisi n'est pas valide"
-  }
-);
-
 export const declarationNumberSchema = z
   .string()
   .trim()
@@ -472,7 +404,7 @@ export const actorTypeSchema = z.enum(
     "ENTREPRISE_HORS_UE",
     "ASSOCIATION",
     "PERSONNE_PHYSIQUE",
-    "COMMUNE"
+    "COMMUNES"
   ],
   {
     required_error: `Le type est requis`,
@@ -511,8 +443,8 @@ export const actorPostalCodeSchema = z.coerce
   .trim()
   .refine(val => {
     if (!val) return true;
-    return /^[0-9]{5,6}$/.test(val);
-  }, `Le code postal n'est pas valide. Il doit être composé de 5 ou 6 chiffres`);
+    return /^[A-Za-z0-9][A-Za-z0-9\- ]{2,9}[A-Za-z0-9]$/.test(val);
+  }, `Le code postal n'est pas dans un format valide`);
 
 export const actorCountryCodeSchema = z
   .string()
@@ -563,30 +495,6 @@ export const transportModeSchema = z
     }
   });
 
-export const transportRecepisseIsExemptedSchema = z.union(
-  [
-    z
-      .string()
-      .trim()
-      .transform(val => val.toUpperCase())
-      .pipe(
-        z
-          .enum(["OUI", "NON"], {
-            required_error:
-              "Le champ exemption de récépissé transporteur est requis",
-            invalid_type_error:
-              "Le champ exemption de récépissé transporteur n'est pas valide. Valeurs possibles: OUI, NON"
-          })
-          .transform(val => val === "OUI")
-      ),
-    z.boolean()
-  ],
-  {
-    invalid_type_error:
-      "Le champ exemption de récépissé transporteur saisi n'est pas valide"
-  }
-);
-
 export const transportRecepisseNumberSchema = z
   .string()
   .trim()
@@ -598,25 +506,3 @@ export const transportRecepisseNumberSchema = z
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"
   );
-
-export const isUpcycledSchema = z.union(
-  [
-    z
-      .string()
-      .trim()
-      .transform(val => val.toUpperCase())
-      .pipe(
-        z
-          .enum(["OUI", "NON"], {
-            required_error: "Le champ terre valorisée est requis",
-            invalid_type_error:
-              "Le champ terre valorisée n'est pas valide. Valeurs possibles: OUI, NON"
-          })
-          .transform(val => val === "OUI")
-      ),
-    z.boolean()
-  ],
-  {
-    invalid_type_error: "Le champ terre valorisée saisi n'est pas valide"
-  }
-);

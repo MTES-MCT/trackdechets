@@ -12,9 +12,6 @@ import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
-import { MyImports } from "../../../../dashboard/registry/MyImports";
-import { CompanyImports } from "../../../../dashboard/registry/CompanyImports";
-import { MyExports } from "../../../../dashboard/registry/MyExports";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -22,6 +19,9 @@ const DashboardRoutes = lazy(
 );
 const CompaniesRoutes = lazy(
   () => import("../../../Companies/CompaniesRoutes")
+);
+const RegistryRoutes = lazy(
+  () => import("../../../../dashboard/registry/RegistryRoutes")
 );
 const Account = lazy(() => import("../../../Account/Account"));
 const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
@@ -281,28 +281,10 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.registry_new.myImports}
+            path={`${routes.registry_new.index}/*`}
             element={
               <RequireAuth>
-                <MyImports />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.registry_new.companyImports}
-            element={
-              <RequireAuth>
-                <CompanyImports />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.registry_new.export}
-            element={
-              <RequireAuth>
-                <MyExports />
+                <RegistryRoutes />
               </RequireAuth>
             }
           />

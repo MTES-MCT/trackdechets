@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
-import RegistryMenu from "./RegistryMenu";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
 import { Loader } from "../../Apps/common/Components";
@@ -474,331 +473,324 @@ export function MyExports() {
   const isLoading = loading || isSubmitting || generateLoading;
   const dateButtons = getDateButtons();
   return (
-    <div id="my-registry-exports" className="dashboard">
-      {!isMobile && <RegistryMenu />}
+    <div
+      className={classNames([
+        "tw-flex-grow",
+        styles.myRegistryExportsContainer
+      ])}
+    >
       <div
         className={classNames([
-          "tw-flex-grow",
-          styles.myRegistryExportsContainer
+          "tw-p-6",
+          isMobile ? null : styles.myExportsForm
         ])}
       >
-        <div
-          className={classNames([
-            "tw-p-6",
-            isMobile ? null : styles.myExportsForm
-          ])}
-        >
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="fr-container--fluid fr-mb-8v">
-              <Select
-                label="Établissement concerné"
-                disabled={isLoading}
-                nativeSelectProps={{
-                  ...register("companyOrgId")
-                }}
-              >
-                <option value="all" key="all">
-                  Tous les établissements
-                </option>
-                {companies.map((company, key) => {
-                  const name =
-                    company.givenName && company.givenName !== ""
-                      ? company.givenName
-                      : company.name;
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="fr-container--fluid fr-mb-8v">
+            <Select
+              label="Établissement concerné"
+              disabled={isLoading}
+              nativeSelectProps={{
+                ...register("companyOrgId")
+              }}
+            >
+              <option value="all" key="all">
+                Tous les établissements
+              </option>
+              {companies.map((company, key) => {
+                const name =
+                  company.givenName && company.givenName !== ""
+                    ? company.givenName
+                    : company.name;
 
-                  return (
-                    <option value={company.orgId} key={key}>
-                      {`${name} - ${company.orgId}${
-                        company.delegate ? ` (délégataire)` : ""
-                      }`}
-                    </option>
-                  );
-                })}
-              </Select>
-            </div>
-            <div className="fr-container--fluid fr-mb-8v">
-              <Select
-                label="Type de registre"
-                disabled={isLoading}
-                nativeSelectProps={{
-                  ...register("registryType")
-                }}
-              >
-                {Object.keys(RegistryV2ExportType).map(key => (
-                  <option
-                    value={RegistryV2ExportType[key]}
-                    key={RegistryV2ExportType[key]}
-                  >
-                    {getRegistryTypeWording(RegistryV2ExportType[key])}
+                return (
+                  <option value={company.orgId} key={key}>
+                    {`${name} - ${company.orgId}${
+                      company.delegate ? ` (délégataire)` : ""
+                    }`}
                   </option>
-                ))}
-              </Select>
-            </div>
-            <div className="fr-container--fluid fr-mb-8v">
-              <Select
-                label="Type de déclaration"
-                disabled={
-                  isLoading ||
-                  getFilterStateForRegistryType(registryType, "declarationType")
-                    .disabled
-                }
-                nativeSelectProps={{
-                  ...register("declarationType")
-                }}
-              >
-                {Object.keys(DeclarationType).map(key => (
-                  <option
-                    value={DeclarationType[key]}
-                    key={DeclarationType[key]}
-                  >
-                    {getDeclarationTypeWording(DeclarationType[key])}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div className="fr-container--fluid">
-              <Checkbox
-                hintText="Sélectionner au moins un type de déchets"
-                legend="Type de déchets"
-                disabled={isLoading}
-                options={[
-                  {
-                    label: "Déchets non dangereux",
-                    nativeInputProps: {
-                      value: RegistryV2ExportWasteType.Dnd,
-                      disabled: getFilterStateForRegistryType(
-                        registryType,
-                        "wasteTypes.dnd"
-                      ).disabled,
-                      ...register("wasteTypes")
-                    }
-                  },
-                  {
-                    label: "Déchets dangereux",
-                    nativeInputProps: {
-                      value: RegistryV2ExportWasteType.Dd,
-                      disabled: getFilterStateForRegistryType(
-                        registryType,
-                        "wasteTypes.dd"
-                      ).disabled,
-                      ...register("wasteTypes")
-                    }
-                  },
-                  {
-                    label: "Terres et sédiments",
-                    nativeInputProps: {
-                      value: RegistryV2ExportWasteType.Texs,
-                      disabled: getFilterStateForRegistryType(
-                        registryType,
-                        "wasteTypes.texs"
-                      ).disabled,
-                      ...register("wasteTypes")
-                    }
-                  }
-                ]}
-              />
-            </div>
-            <div className="fr-mb-8v">
-              <WasteCodeSwitcher
-                id={"wasteCodeSwitcher"}
-                onSelectChange={wasteCodes => {
-                  setValue(
-                    "wasteCodes",
-                    wasteCodes.map(({ code }) => code)
-                  );
-                }}
-              />
-            </div>
-            <h6 className="fr-h6">{`Période concernée`}</h6>
-            <div className={classNames(["fr-mb-8v", styles.dateButtons])}>
-              {dateButtons.map((dateButton, key) => (
-                <Button
-                  onClick={() => {
-                    setValue("startDate", dateButton.startDate);
-                    if (dateButton.endDate) {
-                      setValue("endDate", dateButton.endDate);
-                    } else {
-                      setValue("endDate", null);
-                    }
-                  }}
-                  disabled={isLoading}
-                  type="button"
-                  priority="tertiary"
-                  key={key}
+                );
+              })}
+            </Select>
+          </div>
+          <div className="fr-container--fluid fr-mb-8v">
+            <Select
+              label="Type de registre"
+              disabled={isLoading}
+              nativeSelectProps={{
+                ...register("registryType")
+              }}
+            >
+              {Object.keys(RegistryV2ExportType).map(key => (
+                <option
+                  value={RegistryV2ExportType[key]}
+                  key={RegistryV2ExportType[key]}
                 >
-                  {dateButton.label}
-                </Button>
+                  {getRegistryTypeWording(RegistryV2ExportType[key])}
+                </option>
               ))}
-            </div>
-            <div className="fr-container--fluid fr-mb-8v">
-              <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-                <div className="fr-col-6">
-                  <Input
-                    label="Date de début"
-                    state={errors?.startDate && "error"}
-                    stateRelatedMessage={displayError(errors?.startDate)}
-                    disabled={isLoading}
-                    nativeInputProps={{
-                      type: "date",
-                      max: datetimeToYYYYMMDD(new Date()),
-                      ...register("startDate")
-                    }}
-                  />
-                </div>
-                <div className="fr-col-6">
-                  <Input
-                    label="Date de fin (optionnelle)"
-                    hintText="Jusqu'à aujourd'hui s'il n'y a pas de date renseignée"
-                    state={errors?.endDate && "error"}
-                    stateRelatedMessage={displayError(errors?.endDate)}
-                    disabled={isLoading}
-                    nativeInputProps={{
-                      type: "date",
-                      max: datetimeToYYYYMMDD(new Date()),
-                      ...register("endDate")
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="fr-container--fluid fr-mb-8v">
-              <Select
-                label="Format d'export"
-                disabled={isLoading}
-                nativeSelectProps={{
-                  ...register("format")
-                }}
-              >
-                <option
-                  value={FormsRegisterExportFormat.Csv}
-                  key={FormsRegisterExportFormat.Csv}
-                >
-                  {`Texte (.csv)`}
-                </option>
-                <option
-                  value={FormsRegisterExportFormat.Xlsx}
-                  key={FormsRegisterExportFormat.Xlsx}
-                >
-                  {`Excel (.xlsx)`}
-                </option>
-              </Select>
-            </div>
-            <div className="fr-container--fluid">
-              <Button
-                priority="primary"
-                iconId="fr-icon-download-line"
-                iconPosition="right"
-                disabled={isLoading}
-              >
-                Exporter
-              </Button>
-            </div>
-          </form>
-        </div>
-        <div className="tw-p-6">
-          {!exportsLoading ? (
-            <Table
-              caption="Exports récents"
-              data={
-                registryExports
-                  ? registryExports.map(registryExport => [
-                      <div>
-                        <div>
-                          {format(
-                            new Date(registryExport.node.createdAt),
-                            "dd/MM/yyyy HH:mm"
-                          )}
-                        </div>
-                        {badges[registryExport.node.status]("export")}
-                      </div>,
-                      <div>
-                        {[
-                          `${
-                            registryExport.node.companies[0]?.givenName &&
-                            registryExport.node.companies[0]?.givenName !== ""
-                              ? registryExport.node.companies[0]?.givenName
-                              : registryExport.node.companies[0]?.name
-                          } - ${registryExport.node.companies[0]?.orgId}`,
-                          ...(registryExport.node.companies.length > 1
-                            ? [
-                                `et ${
-                                  registryExport.node.companies.length - 1
-                                } autre${
-                                  registryExport.node.companies.length > 2
-                                    ? "s"
-                                    : ""
-                                } `
-                              ]
-                            : [])
-                        ].join(", ")}
-                        {registryExport.node.companies.length > 1 ? (
-                          <Tooltip
-                            kind="hover"
-                            className={styles.prewrap}
-                            title={registryExport.node.companies
-                              .slice(1)
-                              .map(
-                                company =>
-                                  `${
-                                    company.givenName &&
-                                    company.givenName !== ""
-                                      ? company.givenName
-                                      : company.name
-                                  } - ${company.orgId}`
-                              )
-                              .join(",\n")}
-                          />
-                        ) : null}
-                      </div>,
-                      getRegistryTypeWording(registryExport.node.registryType),
-                      getDeclarationTypeWording(
-                        registryExport.node.declarationType
-                      ),
-                      formatRegistryDates(
-                        registryExport.node.createdAt,
-                        registryExport.node.startDate,
-                        registryExport.node.endDate
-                      ),
-                      registryExport.node.status ===
-                      RegistryV2ExportStatus.Successful ? (
-                        <Button
-                          title="Télécharger"
-                          priority="secondary"
-                          iconId="fr-icon-download-line"
-                          onClick={() =>
-                            downloadRegistryExportFile(registryExport.node.id)
-                          }
-                          size="small"
-                        />
-                      ) : registryExport.node.status ===
-                          RegistryV2ExportStatus.Pending ||
-                        registryExport.node.status ===
-                          RegistryV2ExportStatus.Started ? (
-                        <Button
-                          title="Rafraîchir"
-                          disabled={exportsLoading}
-                          priority="secondary"
-                          iconId="fr-icon-refresh-line"
-                          onClick={() => refetch()}
-                          size="small"
-                        />
-                      ) : (
-                        ""
-                      )
-                    ])
-                  : []
+            </Select>
+          </div>
+          <div className="fr-container--fluid fr-mb-8v">
+            <Select
+              label="Type de déclaration"
+              disabled={
+                isLoading ||
+                getFilterStateForRegistryType(registryType, "declarationType")
+                  .disabled
               }
-              headers={[
-                "Date",
-                "Établissements",
-                "Type de registre",
-                "Type de déclaration",
-                "Période",
-                "Fichier"
+              nativeSelectProps={{
+                ...register("declarationType")
+              }}
+            >
+              {Object.keys(DeclarationType).map(key => (
+                <option value={DeclarationType[key]} key={DeclarationType[key]}>
+                  {getDeclarationTypeWording(DeclarationType[key])}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div className="fr-container--fluid">
+            <Checkbox
+              hintText="Sélectionner au moins un type de déchets"
+              legend="Type de déchets"
+              disabled={isLoading}
+              options={[
+                {
+                  label: "Déchets non dangereux",
+                  nativeInputProps: {
+                    value: RegistryV2ExportWasteType.Dnd,
+                    disabled: getFilterStateForRegistryType(
+                      registryType,
+                      "wasteTypes.dnd"
+                    ).disabled,
+                    ...register("wasteTypes")
+                  }
+                },
+                {
+                  label: "Déchets dangereux",
+                  nativeInputProps: {
+                    value: RegistryV2ExportWasteType.Dd,
+                    disabled: getFilterStateForRegistryType(
+                      registryType,
+                      "wasteTypes.dd"
+                    ).disabled,
+                    ...register("wasteTypes")
+                  }
+                },
+                {
+                  label: "Terres et sédiments",
+                  nativeInputProps: {
+                    value: RegistryV2ExportWasteType.Texs,
+                    disabled: getFilterStateForRegistryType(
+                      registryType,
+                      "wasteTypes.texs"
+                    ).disabled,
+                    ...register("wasteTypes")
+                  }
+                }
               ]}
             />
-          ) : null}
-        </div>
+          </div>
+          <div className="fr-mb-8v">
+            <WasteCodeSwitcher
+              id={"wasteCodeSwitcher"}
+              onSelectChange={wasteCodes => {
+                setValue(
+                  "wasteCodes",
+                  wasteCodes.map(({ code }) => code)
+                );
+              }}
+            />
+          </div>
+          <h6 className="fr-h6">{`Période concernée`}</h6>
+          <div className={classNames(["fr-mb-8v", styles.dateButtons])}>
+            {dateButtons.map((dateButton, key) => (
+              <Button
+                onClick={() => {
+                  setValue("startDate", dateButton.startDate);
+                  if (dateButton.endDate) {
+                    setValue("endDate", dateButton.endDate);
+                  } else {
+                    setValue("endDate", null);
+                  }
+                }}
+                disabled={isLoading}
+                type="button"
+                priority="tertiary"
+                key={key}
+              >
+                {dateButton.label}
+              </Button>
+            ))}
+          </div>
+          <div className="fr-container--fluid fr-mb-8v">
+            <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+              <div className="fr-col-6">
+                <Input
+                  label="Date de début"
+                  state={errors?.startDate && "error"}
+                  stateRelatedMessage={displayError(errors?.startDate)}
+                  disabled={isLoading}
+                  nativeInputProps={{
+                    type: "date",
+                    max: datetimeToYYYYMMDD(new Date()),
+                    ...register("startDate")
+                  }}
+                />
+              </div>
+              <div className="fr-col-6">
+                <Input
+                  label="Date de fin (optionnelle)"
+                  hintText="Jusqu'à aujourd'hui s'il n'y a pas de date renseignée"
+                  state={errors?.endDate && "error"}
+                  stateRelatedMessage={displayError(errors?.endDate)}
+                  disabled={isLoading}
+                  nativeInputProps={{
+                    type: "date",
+                    max: datetimeToYYYYMMDD(new Date()),
+                    ...register("endDate")
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="fr-container--fluid fr-mb-8v">
+            <Select
+              label="Format d'export"
+              disabled={isLoading}
+              nativeSelectProps={{
+                ...register("format")
+              }}
+            >
+              <option
+                value={FormsRegisterExportFormat.Csv}
+                key={FormsRegisterExportFormat.Csv}
+              >
+                {`Texte (.csv)`}
+              </option>
+              <option
+                value={FormsRegisterExportFormat.Xlsx}
+                key={FormsRegisterExportFormat.Xlsx}
+              >
+                {`Excel (.xlsx)`}
+              </option>
+            </Select>
+          </div>
+          <div className="fr-container--fluid">
+            <Button
+              priority="primary"
+              iconId="fr-icon-download-line"
+              iconPosition="right"
+              disabled={isLoading}
+            >
+              Exporter
+            </Button>
+          </div>
+        </form>
+      </div>
+      <div className="tw-p-6">
+        {!exportsLoading ? (
+          <Table
+            caption="Exports récents"
+            data={
+              registryExports
+                ? registryExports.map(registryExport => [
+                    <div>
+                      <div>
+                        {format(
+                          new Date(registryExport.node.createdAt),
+                          "dd/MM/yyyy HH:mm"
+                        )}
+                      </div>
+                      {badges[registryExport.node.status]("export")}
+                    </div>,
+                    <div>
+                      {[
+                        `${
+                          registryExport.node.companies[0]?.givenName &&
+                          registryExport.node.companies[0]?.givenName !== ""
+                            ? registryExport.node.companies[0]?.givenName
+                            : registryExport.node.companies[0]?.name
+                        } - ${registryExport.node.companies[0]?.orgId}`,
+                        ...(registryExport.node.companies.length > 1
+                          ? [
+                              `et ${
+                                registryExport.node.companies.length - 1
+                              } autre${
+                                registryExport.node.companies.length > 2
+                                  ? "s"
+                                  : ""
+                              } `
+                            ]
+                          : [])
+                      ].join(", ")}
+                      {registryExport.node.companies.length > 1 ? (
+                        <Tooltip
+                          kind="hover"
+                          className={styles.prewrap}
+                          title={registryExport.node.companies
+                            .slice(1)
+                            .map(
+                              company =>
+                                `${
+                                  company.givenName && company.givenName !== ""
+                                    ? company.givenName
+                                    : company.name
+                                } - ${company.orgId}`
+                            )
+                            .join(",\n")}
+                        />
+                      ) : null}
+                    </div>,
+                    getRegistryTypeWording(registryExport.node.registryType),
+                    getDeclarationTypeWording(
+                      registryExport.node.declarationType
+                    ),
+                    formatRegistryDates(
+                      registryExport.node.createdAt,
+                      registryExport.node.startDate,
+                      registryExport.node.endDate
+                    ),
+                    registryExport.node.status ===
+                    RegistryV2ExportStatus.Successful ? (
+                      <Button
+                        title="Télécharger"
+                        priority="secondary"
+                        iconId="fr-icon-download-line"
+                        onClick={() =>
+                          downloadRegistryExportFile(registryExport.node.id)
+                        }
+                        size="small"
+                      />
+                    ) : registryExport.node.status ===
+                        RegistryV2ExportStatus.Pending ||
+                      registryExport.node.status ===
+                        RegistryV2ExportStatus.Started ? (
+                      <Button
+                        title="Rafraîchir"
+                        disabled={exportsLoading}
+                        priority="secondary"
+                        iconId="fr-icon-refresh-line"
+                        onClick={() => refetch()}
+                        size="small"
+                      />
+                    ) : (
+                      ""
+                    )
+                  ])
+                : []
+            }
+            headers={[
+              "Date",
+              "Établissements",
+              "Type de registre",
+              "Type de déclaration",
+              "Période",
+              "Fichier"
+            ]}
+          />
+        ) : null}
       </div>
     </div>
   );

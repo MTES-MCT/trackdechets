@@ -18,8 +18,7 @@ import {
   actorCountryCodeSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
-  wastePopSchema,
-  wasteIsDangerousSchema,
+  booleanSchema,
   operationModeSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
@@ -108,32 +107,20 @@ describe("Schemas", () => {
     expect(() => volumeSchema.parse("1001")).toThrow();
   });
 
-  test("wastePopSchema", () => {
-    expect(wastePopSchema.parse("OUI")).toBe(true);
-    expect(wastePopSchema.parse("Oui")).toBe(true);
-    expect(wastePopSchema.parse("oui")).toBe(true);
-    expect(wastePopSchema.parse("NON")).toBe(false);
-    expect(wastePopSchema.parse("Non")).toBe(false);
-    expect(wastePopSchema.parse("non")).toBe(false);
-    expect(wastePopSchema.parse(false)).toBe(false);
-    expect(wastePopSchema.parse(true)).toBe(true);
-    expect(() => wastePopSchema.parse("foo")).toThrow();
-    expect(() => wastePopSchema.parse("")).toThrow();
-    expect(() => wastePopSchema.parse(undefined)).toThrow();
+  test("booleanSchema", () => {
+    expect(booleanSchema.parse("OUI")).toBe(true);
+    expect(booleanSchema.parse("Oui")).toBe(true);
+    expect(booleanSchema.parse("oui")).toBe(true);
+    expect(booleanSchema.parse("NON")).toBe(false);
+    expect(booleanSchema.parse("Non")).toBe(false);
+    expect(booleanSchema.parse("non")).toBe(false);
+    expect(booleanSchema.parse(false)).toBe(false);
+    expect(booleanSchema.parse(true)).toBe(true);
+    expect(() => booleanSchema.parse("foo")).toThrow();
+    expect(() => booleanSchema.parse("")).toThrow();
+    expect(() => booleanSchema.parse(undefined)).toThrow();
   });
 
-  test("wasteIsDangerousSchema", () => {
-    expect(wasteIsDangerousSchema.parse("OUI")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("Oui")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("oui")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("NON")).toBe(false);
-    expect(wasteIsDangerousSchema.parse("Non")).toBe(false);
-    expect(wasteIsDangerousSchema.parse("non")).toBe(false);
-    expect(wasteIsDangerousSchema.parse(false)).toBe(false);
-    expect(wasteIsDangerousSchema.parse(true)).toBe(true);
-    expect(() => wasteIsDangerousSchema.parse("foo")).toThrow();
-    expect(() => wasteIsDangerousSchema.parse("")).toThrow();
-  });
 
   test("actorTypeSchema", () => {
     expect(actorTypeSchema.parse("ETABLISSEMENT_FR")).toBe("ETABLISSEMENT_FR");

@@ -34,7 +34,7 @@ export const RegistryMenuContent = () => (
         </li>
       </ul>
     </Accordion>
-    <Accordion defaultExpanded label="Exports" className="fr-mt-4w">
+    <Accordion defaultExpanded label="Exports">
       <ul>
         <li className="tw-mb-1">
           <NavLink
