@@ -12,10 +12,7 @@ import React, { useState } from "react";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { format } from "date-fns";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
-import { MEDIA_QUERIES } from "../../common/config";
-import { useMedia } from "../../common/use-media";
 import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
-import RegistryMenu from "./RegistryMenu";
 import {
   badges,
   downloadFromSignedUrl,
@@ -35,7 +32,6 @@ const HEADERS = [
 
 export function CompanyImports() {
   const [siret, setSiret] = useState<string | undefined>();
-  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   const { loading, error, data } = useQuery<Pick<Query, "registryImports">>(
     GET_REGISTRY_IMPORTS,
@@ -119,40 +115,35 @@ export function CompanyImports() {
     ]) ?? [];
 
   return (
-    <div id="companies" className="companies dashboard">
-      {!isMobile && <RegistryMenu />}
-      <div className="dashboard-content tw-flex-grow">
-        <div className="tw-p-6">
-          <div>
-            <RegistryCompanySwitcher onCompanySelect={v => setSiret(v)} />
-          </div>
-          {loading && <InlineLoader />}
-          {error && (
-            <Alert
-              closable
-              description={error.message}
-              severity="error"
-              title="Erreur lors du chargement"
-            />
-          )}
-          {data && tableData.length === 0 && (
-            <p className="tw-mt-24 tw-text-xl tw-mb-4 tw-text-center">
-              Aucun import n'a encore été réalisé pour cet établissement
-            </p>
-          )}
-          {data && tableData.length > 0 && (
-            <div>
-              <Table
-                bordered
-                fixed
-                caption="Historique des imports par entreprise"
-                data={tableData}
-                headers={HEADERS}
-              />
-            </div>
-          )}
-        </div>
+    <div className="tw-p-6">
+      <div>
+        <RegistryCompanySwitcher onCompanySelect={v => setSiret(v)} />
       </div>
+      {loading && <InlineLoader />}
+      {error && (
+        <Alert
+          closable
+          description={error.message}
+          severity="error"
+          title="Erreur lors du chargement"
+        />
+      )}
+      {data && tableData.length === 0 && (
+        <p className="tw-mt-24 tw-text-xl tw-mb-4 tw-text-center">
+          Aucun import n'a encore été réalisé pour cet établissement
+        </p>
+      )}
+      {data && tableData.length > 0 && (
+        <div>
+          <Table
+            bordered
+            fixed
+            caption="Historique des imports par entreprise"
+            data={tableData}
+            headers={HEADERS}
+          />
+        </div>
+      )}
     </div>
   );
 }

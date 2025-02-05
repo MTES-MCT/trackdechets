@@ -549,7 +549,7 @@ const getDesktopMenuEntries = (
       ? [
           {
             caption: "Mes registres (v2)",
-            href: routes.registry_new.myImports,
+            href: routes.registry_new.index,
             navlink: true
           }
         ]

@@ -99,7 +99,7 @@ const inputSsdSchema = z.object({
   processingDate: dateSchema,
   processingEndDate: nullishDateSchema,
   destinationCompanyType: actorTypeSchema
-    .exclude(["PERSONNE_PHYSIQUE", "COMMUNE"])
+    .exclude(["PERSONNE_PHYSIQUE", "COMMUNES"])
     .nullish(),
   destinationCompanyOrgId: actorOrgIdSchema.nullish(),
   destinationCompanyName: actorNameSchema.nullish(),

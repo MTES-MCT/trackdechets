@@ -20,18 +20,14 @@ import {
   transportRecepisseNumberSchema,
   getOperationCodeSchema,
   actorSiretSchema,
-  wastePopSchema,
-  wasteIsDangerousSchema,
+  booleanSchema,
   dateSchema,
   inseeCodesSchema,
   declarationNumberSchema,
   notificationNumberSchema,
   siretSchema,
   municipalitiesNamesSchema,
-  nextDestinationIsAbroad,
-  noTraceability,
-  operationModeSchema,
-  transportRecepisseIsExemptedSchema
+  operationModeSchema
 } from "../../shared/schemas";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
@@ -46,8 +42,8 @@ const inputIncomingWasteSchema = z.object({
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
   wasteCode: getWasteCodeSchema(),
-  wastePop: wastePopSchema,
-  wasteIsDangerous: wasteIsDangerousSchema,
+  wastePop: booleanSchema,
+  wasteIsDangerous: booleanSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   receptionDate: dateSchema,
@@ -59,7 +55,8 @@ const inputIncomingWasteSchema = z.object({
         return true;
       }
       // 00:00 or 00:00:00 or 00:00:00.000
-      const timeRegex = /^\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/;
+      const timeRegex =
+        /^([0-9]|[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9](?:\.\d{1,3})?)?$/;
 
       if (!timeRegex.test(val)) {
         return false; // Invalid format
@@ -96,7 +93,7 @@ const inputIncomingWasteSchema = z.object({
   emitterCompanyPostalCode: actorPostalCodeSchema,
   emitterCompanyCity: actorCitySchema,
   emitterCompanyCountryCode: actorCountryCodeSchema,
-  emitterNoTraceability: z.boolean(),
+  emitterNoTraceability: booleanSchema,
   emitterPickupSiteName: z
     .string()
     .trim()
@@ -135,8 +132,8 @@ const inputIncomingWasteSchema = z.object({
     INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
   ),
   operationMode: operationModeSchema,
-  noTraceability: noTraceability.nullish(),
-  nextDestinationIsAbroad: nextDestinationIsAbroad.nullish(),
+  noTraceability: booleanSchema.nullish(),
+  nextDestinationIsAbroad: booleanSchema.nullish(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z
@@ -147,11 +144,11 @@ const inputIncomingWasteSchema = z.object({
   nextOperationCode: getOperationCodeSchema(
     INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
   ).nullish(),
-  isDirectSupply: z.boolean().nullish(),
+  isDirectSupply: booleanSchema.nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
   transporter1CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter1RecepisseIsExempted: booleanSchema.nullish(),
   transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter1CompanyName: actorNameSchema.nullish(),
   transporter1CompanyAddress: actorAddressSchema.nullish(),
@@ -161,7 +158,7 @@ const inputIncomingWasteSchema = z.object({
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: actorTypeSchema.nullish(),
   transporter2CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter2RecepisseIsExempted: booleanSchema.nullish(),
   transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: actorNameSchema.nullish(),
   transporter2CompanyAddress: actorAddressSchema.nullish(),
@@ -171,7 +168,7 @@ const inputIncomingWasteSchema = z.object({
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: actorTypeSchema.nullish(),
   transporter3CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter3RecepisseIsExempted: booleanSchema.nullish(),
   transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: actorNameSchema.nullish(),
   transporter3CompanyAddress: actorAddressSchema.nullish(),
@@ -181,7 +178,7 @@ const inputIncomingWasteSchema = z.object({
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: actorTypeSchema.nullish(),
   transporter4CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter4RecepisseIsExempted: booleanSchema.nullish(),
   transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: actorNameSchema.nullish(),
   transporter4CompanyAddress: actorAddressSchema.nullish(),
@@ -191,7 +188,7 @@ const inputIncomingWasteSchema = z.object({
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: actorTypeSchema.nullish(),
   transporter5CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter5RecepisseIsExempted: booleanSchema.nullish(),
   transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: actorNameSchema.nullish(),
   transporter5CompanyAddress: actorAddressSchema.nullish(),

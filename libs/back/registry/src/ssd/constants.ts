@@ -25,7 +25,7 @@ export const SSD_HEADERS: { [key in keyof ParsedZodInputSsdItem]: string } = {
   destinationCompanyOrgId: "Numéro d'identification du destinataire",
   destinationCompanyName: "Raison sociale du destinataire",
   destinationCompanyAddress: "Libellé de l'adresse du destinataire",
-  destinationCompanyCity: "Commune du destinataire",
   destinationCompanyPostalCode: "Code postal du destinataire",
+  destinationCompanyCity: "Commune du destinataire",
   destinationCompanyCountryCode: "Code pays du destinataire"
 };

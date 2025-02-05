@@ -132,9 +132,10 @@ const routes = {
   },
   registry: "/registre",
   registry_new: {
-    myImports: "/registre-v2/own",
-    companyImports: "/registre-v2/list",
-    export: "/registre-v2/export"
+    index: "/registry",
+    myImports: "/registry/own",
+    companyImports: "/registry/list",
+    export: "/registry/export"
   }
 };
 
@@ -245,7 +246,10 @@ export const titles = {
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
   "/registre": "Mes registres — Trackdéchets",
-  "/registre-v2": "Mes registres — Trackdéchets"
+  "/registry/own": "Mes imports au registre national — Trackdéchets",
+  "/registry/list":
+    "Imports au registre national par établissement — Trackdéchets",
+  "/registry/export": "Mes exports de registres — Trackdéchets"
 };
 
 export default routes;

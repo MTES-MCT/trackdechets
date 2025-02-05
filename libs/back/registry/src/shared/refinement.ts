@@ -29,7 +29,7 @@ export function refineActorInfos<T>({
       | "ENTREPRISE_HORS_UE"
       | "ASSOCIATION"
       | "PERSONNE_PHYSIQUE"
-      | "COMMUNE" = item[typeKey];
+      | "COMMUNES" = item[typeKey];
 
     if (!type) {
       return;
@@ -42,10 +42,16 @@ export function refineActorInfos<T>({
 
     switch (type) {
       case "ETABLISSEMENT_FR": {
-        if (!isSiret(orgId)) {
+        if (!orgId) {
           addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Le SIRET saisi n'est pas un SIRET valide.",
+            message: "Le SIRET doit être saisi pour un établissement français",
+            path: [orgIdKey]
+          });
+        } else if (!isSiret(orgId)) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Le SIRET saisi n'est pas un SIRET valide",
             path: [orgIdKey]
           });
         }
@@ -55,6 +61,17 @@ export function refineActorInfos<T>({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une entreprise française",
             path: [countryKey]
+          });
+        }
+
+        const postalCode = item[postalCodeKey];
+        const isValidPostalCode = /^[0-9]{5,6}$/.test(postalCode);
+        if (!isValidPostalCode) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "Le code postal doit être composé de 5 ou 6 chiffres pour une entreprise française",
+            path: [postalCodeKey]
           });
         }
         break;
@@ -127,7 +144,7 @@ export function refineActorInfos<T>({
         }
         break;
       }
-      case "COMMUNE":
+      case "COMMUNES":
         break;
       default:
         throw new Error(`Unhandled destination type ${type}`);
@@ -159,7 +176,7 @@ function refineActorDetails<T>({
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
-    | "COMMUNE";
+    | "COMMUNES";
   nameKey: string;
   addressKey: string;
   postalCodeKey: string;
@@ -167,7 +184,7 @@ function refineActorDetails<T>({
   countryKey: string;
 }): Refinement<T> {
   return (item, { addIssue }) => {
-    if (type === "COMMUNE") {
+    if (type === "COMMUNES") {
       return;
     }
 
@@ -320,13 +337,13 @@ export const refineMunicipalities: Refinement<{
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
-    | "COMMUNE"
+    | "COMMUNES"
     | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
   initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
-    item.initialEmitterCompanyType === "COMMUNE" &&
+    item.initialEmitterCompanyType === "COMMUNES" &&
     !item.initialEmitterMunicipalitiesInseeCodes?.length
   ) {
     addIssue({
@@ -337,7 +354,7 @@ export const refineMunicipalities: Refinement<{
   }
 
   if (
-    item.initialEmitterCompanyType === "COMMUNE" &&
+    item.initialEmitterCompanyType === "COMMUNES" &&
     !item.initialEmitterMunicipalitiesNames?.length
   ) {
     addIssue({
