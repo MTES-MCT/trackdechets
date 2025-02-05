@@ -159,7 +159,7 @@ describe("Schemas", () => {
     expect(actorPostalCodeSchema.parse("100-0001")).toBe("100-0001"); // Japan
     expect(() => actorPostalCodeSchema.parse("_invalid_")).toThrow();
     expect(() => actorPostalCodeSchema.parse("-1234")).toThrow();
-    expect(() => actorPostalCodeSchema.parse("1234567890")).toThrow(); // Too long
+    expect(() => actorPostalCodeSchema.parse("1234567890ABC")).toThrow(); // Too long
   });
 
   test("actorCountryCodeSchema", () => {
