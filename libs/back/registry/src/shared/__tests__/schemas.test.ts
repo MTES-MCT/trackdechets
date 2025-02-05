@@ -121,7 +121,6 @@ describe("Schemas", () => {
     expect(() => booleanSchema.parse(undefined)).toThrow();
   });
 
-
   test("actorTypeSchema", () => {
     expect(actorTypeSchema.parse("ETABLISSEMENT_FR")).toBe("ETABLISSEMENT_FR");
     expect(() => actorTypeSchema.parse("INVALID")).toThrow();

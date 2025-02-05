@@ -29,7 +29,7 @@ import {
   parcelCoordinatesSchema,
   parcelNumbersSchema,
   municipalitiesNamesSchema,
-  operationModeSchema,
+  operationModeSchema
 } from "../../shared/schemas";
 import {
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
