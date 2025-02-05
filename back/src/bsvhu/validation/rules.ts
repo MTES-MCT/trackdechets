@@ -281,9 +281,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationReceptionRefusalReason: {
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     readableFieldName: "La raison du refus par le destinataire",
-    required: { from: "RECEPTION",
+    required: {
+      from: "RECEPTION",
       // le déchet est refusé ou partiellement refusé
-      when: isRefusedOrPartiallyRefused },
+      when: isRefusedOrPartiallyRefused
+    },
     path: ["destination", "reception", "refusalReason"]
   },
   destinationReceptionWeight: {

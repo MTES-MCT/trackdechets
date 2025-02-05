@@ -756,7 +756,11 @@ export const bsdaEditionRules: BsdaEditionRules = {
   brokerRecepisseNumber: {
     readableFieldName: "Le numéro de récépissé du courtier",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION", when: requireBrokerRecepisse }
+    required: {
+      from: "EMISSION",
+      // un courtier est désigné sur le bordereau
+      when: requireBrokerRecepisse
+    }
   },
   brokerRecepisseDepartment: {
     readableFieldName: "Le département du récépissé du courtier",
