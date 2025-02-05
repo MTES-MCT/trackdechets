@@ -47,6 +47,8 @@ const reviewFragment = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
         quantity
         sampleNumber

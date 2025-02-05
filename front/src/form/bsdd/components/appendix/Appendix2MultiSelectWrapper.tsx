@@ -26,6 +26,8 @@ const APPENDIX2_FORMS = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
       }
       signedAt

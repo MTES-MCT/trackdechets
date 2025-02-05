@@ -145,6 +145,8 @@ export const temporaryStorageDetailFragment = gql`
         type
         other
         quantity
+        volume
+        identificationNumbers
       }
       quantity
       quantityType
@@ -240,6 +242,8 @@ const mutableFieldsFragment = gql`
             type
             other
             quantity
+            volume
+            identificationNumbers
           }
         }
         emitter {
@@ -426,6 +430,8 @@ export const dashboardFormFragment = gql`
         type
         other
         quantity
+        volume
+        identificationNumbers
       }
       quantity
     }
@@ -530,6 +536,8 @@ export const dashboardFormFragment = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
         quantity
         quantityType
