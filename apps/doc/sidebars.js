@@ -131,6 +131,14 @@ module.exports = {
             "reference/statuts/bspaoh",
           ],
         },
+        {
+          Validation: [
+            "reference/validation/bsda",
+            "reference/validation/bsff",
+            "reference/validation/bspaoh",
+            "reference/validation/bsvhu",
+          ],
+        },
         "reference/multi-bsd",
         "reference/environments/environments",
         "reference/authentification",

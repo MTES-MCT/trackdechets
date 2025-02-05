@@ -647,6 +647,57 @@ Il est possible de documenter les changements à venir en ajoutant une section "
 
 Les nouvelles fonctionnalités impactant l'API doivent être documentées dans la documentation technique `./doc` en même temps que leur développement. Si possible faire également un post sur le [forum technique](https://forum.trackdechets.beta.gouv.fr/).
 
+#### Mise à jour automatique de la documentation des règles de validation Zod
+
+Il y a un script qui permet de documenter automatiquement les règles de validation Zod des différents bordereaux.
+
+Pour l'exécuter:
+
+```
+node ./scripts/validation-doc.js
+```
+
+Les tables générées sont de la forme :
+
+| id                  | nom du champ              | chemin GraphQL        | requis à partir de | requis si                | scellé à partir de                | scellé si |
+| ------------------- | ------------------------- | --------------------- | ------------------ | ------------------------ | --------------------------------- | --------- |
+| emitterCompanySiret | Le N° SIRET de l'émetteur | emitter.company.siret | EMISSION           | il y a un SIRET émetteur | TRANSPORT ou EMISSION si émetteur | -         |
+
+Il faut placer un commentaire pour les conditions (from/when) qui sont des fonctions, et qui ne peuvent pas être parsées directement par le script de documentation. Le commentaire doit être placé juste au dessus du "from:" ou "when:" afin d'être détecté. Si une fonction nommée est commentée une fois, il n'est pas nécessaire de la re-commenter à chaque occurence car un cache du commentaire est conservé.
+
+Exemple:
+
+```js
+  emitterAgrementNumber: {
+    sealed: {
+      // EMISSION ou TRANSPORT si émetteur
+      from: sealedFromEmissionExceptForEmitter
+    },
+    readableFieldName: "Le N° d'agrément de l'émetteur",
+    path: ["emitter", "agrementNumber"]
+  },
+    emitterCompanyStreet: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },  //<-- pas besoin de réecrire le commentaire ici
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress
+    },
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "street"]
+  },
+  emitterCompanyCity: {
+    sealed: { from: sealedFromEmissionExceptForEmitter },
+    required: {
+      from: "EMISSION",
+      // il n'y a pas d'adresse
+      when: bsvhu => !bsvhu.emitterCompanyAddress //<-- besoin de réécrire le commentaire car c'est une fonction anonyme
+    },
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "city"]
+  },
+```
+
 ### Utiliser un backup de base de donnée
 
 Il est possible d'importer un backup d'une base de donnée d'un environnement afin de le tester en local.
@@ -909,176 +960,8 @@ redémarrez ensuite nginx pour appliquer la config.
 
 ### Process de validation avec Zod
 
-La validation et le parsing des données entrantes est gérée en interne par la librairie Zod.
+voir [Documentation de la validation Zod](./docs/ZodValidation.md)
 
-#### Déclaration du schéma
+### Registres V2 (fusion RNDTS + Trackdéchets)
 
-La déclaration d'un schéma Zod pour un type de bordereau donnée se fait en composant plusieurs étapes :
-
-- Déclaration d'un schéma de validation "statique" permettant de définir les types de chaque champ et des règles de validation simples (ex: un email doit ressembler à un email, un N°SIRET doit faire 14 caractères, il peut y avoir au maximum 2 plaques d'immatriculations) ainsi que des valeurs par défaut.
-- Déclaration de règles de validation plus complexes (via la méthode `superRefine`) faisant intervenir plusieurs champs ou des appels asynchrones à la base de données (ex: la raison du refus doit être renseignée si le déchet est refusé, la date de l'opération doit être postérieure à la date de l'acceptation, les identifiants des bordereaux à regrouper doivent correspondre à des bordereaux en attente de regroupement, etc).
-- Déclaration de `transformers` permettant de modifier les données (ex: auto-compléter les récépissés transporteurs à partir de la base de données, auto-compléter le nom et l'adresse à partir de la base SIRENE, etc).
-
-#### Inférence du type
-
-Le schéma ainsi obtenu permet de centraliser tout le process de validation et de transformation des données et Zod nous permet d'inférer deux types :
-
-- le type attendu en entrée du parsing Zod.
-- le type obtenu en sortie du parsing Zod.
-
-Ces types nous servent de "pivots" entre les données entrantes provenant de la couche GraphQL et le format de données de la couche Prisma.
-
-#### Utilisation des les mutations `create` et `update`
-
-Deux méthodes permettant respectivement de convertir les données GraphQL ou les données Prisma vers le format Zod :
-
-- `graphQlInputToZodBsd(input: GraphQLBsdInput): ZodBsd` : permet de convertir les données d'input GraphQL vers le format Zod.
-- `prismaToZodBsda(bsd: PrismaBsd): ZodBsd` : permet de convertir les données
-
-Dans le cas d'une mutation de création, une version simplifiée du process pourra ressembler à :
-
-```typescript
-function createBsdResolver(_, { input }: MutationCreateBsdArgs, context: GraphQLContext) {
-  const user = checkIsAuthenticated(context);
-  await checkCanCreate(user, input);
-  const zodBsd = await graphQlInputToZodBsd(input);
-  const bsd = await parseBsdAsync(
-    { ...zodBsd, isDraft },
-    {
-      user,
-      //
-      currentSignatureType: !isDraft ? "EMISSION" : undefined
-    }
-  );
-  const bsdData: Prisma.CreateBsdInput = {...
-   // calcule ici le payload prisma à partir des données
-   // obtenues en sortie de parsing, il faut notament gérer
-   // la création / connexion / déconnexion d'objets liés (ex: transporteurs, packagings, etc).
-  }
-  const created = await repository.create({data: bsdData})
-
-
-    // [...]
-}
-```
-
-Dans le cas d'une mutation d'update, on ne peut pas simplement valider les données entrantes, il faut aussi vérifier que le bordereau obtenu suite à l'update sera toujours valide. En effet beaucoup de règles de validation s'appliquent sur plusieurs champs, si je modifie un des champ je veux m'assurer que sa valeur est toujours cohérente avec les données persistées en base. Je dois par ailleurs vérifier qu'on n'est pas en train de modifier un champ qui a été verrouillée par signature tout en permettant de renvoyer les mêmes données. On passe alors par une méthode dont la signature est la suivante :
-
-```typescript
-type Output = {
-  parsedBsd: ParsedZodBsd;
-  updatedFields: string[];
-};
-
-function mergeInputAndParseBsdAsync(persisted: PrismaBsd, input: GraphQLBsdInput, context: BsdValidationContext): Output {
-  const zodPersisted = prismaToZodBsd(persisted);
-  const zodInput = await graphQlInputToZodBsd(input);
-
-  // On voit ici l'utilité du schéma Zod comme type pivot entre les données
-  // entrantes de la couche GraphQL et les données de la couche prisma
-  const bsd: ZodBsff = {
-    ...zodPersisted,
-    ...zodInput
-  };
-
-  // Calcule la signature courante à partir des données si elle n'est
-  // pas fourni via le contexte
-  const currentSignatureType = context.currentSignatureType ?? getCurrentSignatureType(zodPersisted);
-
-  const contextWithSignature = {
-    ...context,
-    currentSignatureType
-  };
-
-  // Vérifie que l'on n'est pas en train de modifier des données
-  // vérrouillées par signature.
-  const updatedFields = await checkBsdSealedFields(
-    zodPersisted
-    bsd,
-    contextWithSignature
-  );
-
-  const parsedBsd = await parseBsdAsync(bsd, contextWithSignature);
-
-  return { parsedBsff, updatedFields };
-}
-```
-
-Le workflow simplifié dans la mutation d'`update` ressemble alors à ça :
-
-```typescript
-function updateBsdResolver(_, { id, input }: MutationUpdateBsdArgs, context: GraphQLContext) {
-
-   const user = checkIsAuthenticated(context);
-   await checkCanUpdate(user, input);
-
-   const persisted = await getBsdOrNotFound({id})
-
-   const { parsedBsd, updatedFields } = mergeInputAndParseBsdAsync(persisted, input, {})
-
-   if (updatedFields.length === 0){
-      // évite de faire un update "à blanc" si l'input ne modifie rien
-      return expandBsdFromDb(persisted)
-   }
-
-  const bsdData: Prisma.CreateBsdInput = {...
-   // calcule ici le payload prisma à partir des données
-   // obtenues en sortie de parsing, il faut notament gérer
-   // la création / connexion / déconnexion d'objets liés (ex: transporteurs, packagings, etc).
-  }
-  const updated = await repository.update({ data: bsdData })
-
-  // [...]
-}
-```
-
-#### Utilisation dans les mutations `sign`
-
-Une modification de signature ne modifie pas les données mais nécessite quand même de réaliser le parsing car on va vérifier que les données sont toujours cohérentes avec le type de signature apposée, pour vérifier par exemple que les champs requis à cette étape sont bien présents. La signature courant est alors passée explicitement via le contexte de validation.
-
-```typescript
-function signBsdResolver(_, { id, input }: MutationUpdateBsdArgs, context: GraphQLContext) {
-  const user = checkIsAuthenticated(context);
-  await checkCanSign(user, input);
-
-  const persisted = await getBsdOrNotFound({ id: input.id });
-
-  const signatureType = getBsdSignatureType(input.type);
-
-  const zodBsd = prismaToZodBsd(persisted);
-
-  // Check that all necessary fields are filled
-  await parseBsdAsync(zodBsd, {
-    user,
-    currentSignatureType: signatureType
-  });
-
-  const signed = await repository.update({ data: { ...input, signatureDate: new Date() } });
-}
-```
-
-#### Définition des règles de champs requis et de verrouillage des champs
-
-Le cycle de vie du bordereau implique que le remplissage des champs se fasse au fur et à mesure et que des signatures viennent "verrouiller" certains champs. Les règles métier relatives aux champs requis et verrouillés sont définies dans des tableurs (ex pour le BSFF : [BSFF - Informations requises et scellées](https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit?gid=0#gid=0)).
-
-La sémantique de définition pour chaque champ requis / verrouillée est très similaire : ¨un champ est requis / scellé à partir de telle signature si telle condition est remplie sur le bordereau¨. D'où l'idée de créer un fichier de définition commun `rules` permettant de regrouper la définition des champs verrouillés / requis. Exemple pour le BSDA
-
-```typescript
-export const bsdaEditionRules: BsdaEditionRules = {
-   // [...]
-  emitterCompanySiret: {
-    readableFieldName: "le SIRET de l'entreprise émettrice",
-    sealed: { from: "EMISSION" },
-    required: {
-      from: "EMISSION",
-      when: bsda => !bsda.emitterIsPrivateIndividual
-    }
-  }
-  /// [...]
-```
-
-La vérification sur les champs requis se fait dans un `refinement` synchrone `checkRequiredRules` tandis que la vérification sur les champs scellés se fait via la méthode `checkSealedFields` dans la fonction `mergeInputAndParseBsdAsync`.
-
-#### Schema recap (ex avec le BSDA)
-
-![Validation BSDA](https://github.com/MTES-MCT/trackdechets/assets/2269165/0b99d30b-2a4e-4e23-b328-5309ea49bf8d)
+voir [Documentation des registres V2](./docs/RegistryExportV2.md)
