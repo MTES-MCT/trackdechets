@@ -100,7 +100,7 @@ export async function processRegistryImportJob(
     metadata: {
       filename: `${format(new Date(), "yyyyMMdd")}_TD_rapport_erreur_${
         parsedOriginalFileName.name
-      }.csv`
+      }.${fileType === "CSV" ? "csv" : "xlsx"}`
     }
   });
 

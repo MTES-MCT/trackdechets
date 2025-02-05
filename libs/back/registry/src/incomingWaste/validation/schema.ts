@@ -43,11 +43,11 @@ const inputIncomingWasteSchema = z.object({
   reportForCompanySiret: siretSchema,
   wasteCode: getWasteCodeSchema(),
   wastePop: booleanSchema,
-  wasteIsDangerous: booleanSchema,
+  wasteIsDangerous: booleanSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   receptionDate: dateSchema,
-  weighingHour: z
+  weighingHour: z.coerce
     .string()
     .trim()
     .refine(val => {

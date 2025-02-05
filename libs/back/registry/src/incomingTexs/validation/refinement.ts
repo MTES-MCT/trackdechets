@@ -9,12 +9,12 @@ export const initialEmitterRefinement: Refinement<
 > = async (incomingTexsItem, ctx) => {
   if (
     !incomingTexsItem.emitterNoTraceability &&
-    !incomingTexsItem.initialEmitterCompanyOrgId
+    !incomingTexsItem.initialEmitterCompanyType
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `L'organisme initial émetteur doit être renseigné`,
-      path: ["initialEmitterCompanyOrgId"]
+      message: `Le producteur initial doit être renseigné lorsqu'il n'y a pas rupture de traçabilité pour l'expéditeur ou détenteur`,
+      path: ["initialEmitterCompanyType"]
     });
   }
 
