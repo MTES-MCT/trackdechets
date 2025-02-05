@@ -151,8 +151,15 @@ describe("Schemas", () => {
   });
 
   test("actorPostalCodeSchema", () => {
-    expect(actorPostalCodeSchema.parse("12345")).toBe("12345");
-    expect(() => actorPostalCodeSchema.parse("invalid")).toThrow();
+    expect(actorPostalCodeSchema.parse("12345")).toBe("12345"); // US ZIP code
+    expect(actorPostalCodeSchema.parse("12345-6789")).toBe("12345-6789"); // US ZIP+4
+    expect(actorPostalCodeSchema.parse("W1A 1AA")).toBe("W1A 1AA"); // UK
+    expect(actorPostalCodeSchema.parse("K1A 0B1")).toBe("K1A 0B1"); // Canada
+    expect(actorPostalCodeSchema.parse("75008")).toBe("75008"); // France
+    expect(actorPostalCodeSchema.parse("100-0001")).toBe("100-0001"); // Japan
+    expect(() => actorPostalCodeSchema.parse("_invalid_")).toThrow();
+    expect(() => actorPostalCodeSchema.parse("-1234")).toThrow();
+    expect(() => actorPostalCodeSchema.parse("1234567890")).toThrow(); // Too long
   });
 
   test("actorCountryCodeSchema", () => {
