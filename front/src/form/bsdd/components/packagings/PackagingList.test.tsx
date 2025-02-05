@@ -136,11 +136,21 @@ describe("<PackagingList />", () => {
     }
   );
 
-  it("should display unit in m3 when packaging type is benne", async () => {
+  it("should convert volume from litres to m3  when packaging type is benne", async () => {
     renderComponent({
-      packagings: [{ type: Packagings.Benne, quantity: 1, volume: 1 }]
+      packagings: [
+        {
+          type: Packagings.Benne,
+          quantity: 1,
+          // le volume reçu est en litres
+          volume: 1000
+        }
+      ]
     });
-    expect(screen.getByText(`Volume en m3 (optionnel)`)).toBeInTheDocument();
+    // L'affichage doit se faire en m3
+    const volumeInputInM3 = screen.getByLabelText("Volume en m3 (optionnel)");
+    expect(volumeInputInM3).toBeInTheDocument();
+    expect(volumeInputInM3).toHaveValue(1);
     expect(screen.getByText(`Soit 1000 litres`)).toBeInTheDocument();
   });
 

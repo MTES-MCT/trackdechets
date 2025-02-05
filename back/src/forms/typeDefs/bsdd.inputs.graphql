@@ -632,7 +632,7 @@ input PackagingInfoInput {
   """
   quantity: Int!
 
-  "Volume du conditionnement en litre"
+  "Volume du conditionnement en litre(s)"
   volume: Float
 
   "Numéros des contenants"

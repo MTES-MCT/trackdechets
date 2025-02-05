@@ -6,6 +6,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { numberToString } from "../../../../Apps/Dashboard/Creation/bspaoh/utils/numbers";
 import TagsInput from "../../../../Apps/Forms/Components/TagsInput/TagsInput";
 import { pluralize } from "@td/constants";
+import Decimal from "decimal.js";
 
 type PackagingFormProps = {
   packaging: PackagingInfoInput;
@@ -29,6 +30,11 @@ function PackagingForm({
       : null;
 
   const volumeUnit = packaging.type === Packagings.Benne ? "m3" : "litres";
+  const packagingVolume =
+    packaging.type === Packagings.Benne && packaging.volume
+      ? // convertit l'affichage du volume en m3
+        new Decimal(packaging.volume).dividedBy(1000).toNumber()
+      : packaging.volume;
 
   const identificationNumbersLength =
     packaging.identificationNumbers?.length ?? 0;
@@ -75,12 +81,21 @@ function PackagingForm({
               type: "number",
               inputMode: "decimal",
               step: "0.001", // mili-litres
-              value: packaging.volume ?? "",
+              value: packagingVolume ?? "",
               onChange: event => {
-                const volume = event.target.value;
+                const volume = () => {
+                  const v = event.target.value;
+                  if (v === "") return v;
+                  if (packaging.type === Packagings.Benne) {
+                    // le volume doit être passé en litres à l'API
+                    return new Decimal(v).times(1000).toNumber();
+                  }
+                  return Number(v);
+                };
+
                 setPackaging({
                   ...packaging,
-                  volume: volume === "" ? (volume as any) : Number(volume)
+                  volume: volume() as number
                 });
               }
             }}
@@ -89,10 +104,7 @@ function PackagingForm({
           <p className="fr-info-text">
             {volumeUnit === "litres"
               ? `Soit ${numberToString((packaging.volume || 0) / 1000)} m3`
-              : `Soit ${numberToString(
-                  (packaging.volume || 0) * 1000,
-                  0
-                )} litres`}
+              : `Soit ${numberToString(packaging.volume || 0, 0)} litres`}
           </p>
         </div>
         <div className="fr-col-md-2 fr-col-12">
