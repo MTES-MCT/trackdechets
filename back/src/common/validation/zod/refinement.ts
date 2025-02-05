@@ -368,10 +368,16 @@ export const onlyWhiteSpace = (str: string) => !str.trim().length; // check whit
 
 export const validateTransporterPlates = (
   transporter,
-  ctx: z.RefinementCtx
+  ctx: z.RefinementCtx,
+  transporterIndex?: number
 ) => {
   const { transporterTransportPlates: plates } = transporter;
   const bsdCreatedAt = transporter.createdAt || new Date();
+
+  const path =
+    transporterIndex !== undefined
+      ? ["transporters", transporterIndex, "transporter", "transport", "plates"]
+      : ["transporter", "transport", "plates"];
 
   const createdAfterV20250201 = bsdCreatedAt.getTime() > v20250201.getTime();
 
@@ -381,7 +387,8 @@ export const validateTransporterPlates = (
   if (plates.some(plate => plate.length > 12 || plate.length < 4)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+      path
     });
     return;
   }
@@ -389,7 +396,8 @@ export const validateTransporterPlates = (
   if (plates.some(plate => onlyWhiteSpace(plate))) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT,
+      path
     });
   }
 };
@@ -403,7 +411,7 @@ export const validateMultiTransporterPlates = (bsd, ctx: z.RefinementCtx) => {
     return;
   }
 
-  for (const transporter of bsd.transporters ?? []) {
-    validateTransporterPlates(transporter, ctx);
+  for (const [index, transporter] of (bsd.transporters ?? []).entries()) {
+    validateTransporterPlates(transporter, ctx, index);
   }
 };
