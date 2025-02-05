@@ -1,14 +1,17 @@
 import { FormInput, PackagingInfo, Packagings } from "@td/codegen-ui";
+import { pluralize } from "@td/constants";
 
 export const PACKAGINGS_NAMES = {
-  [Packagings.Benne]: "Benne(s)",
-  [Packagings.Citerne]: "Citerne(s)",
-  [Packagings.Fut]: "Fût(s)",
-  [Packagings.Grv]: "GRV(s)",
+  [Packagings.Benne]: "Benne",
+  [Packagings.Citerne]: "Citerne",
+  [Packagings.Fut]: "Fût",
+  [Packagings.Grv]: "GRV",
   [Packagings.Pipeline]: "Conditionné pour Pipeline",
-  [Packagings.Autre]: "Autre(s)"
+  [Packagings.Autre]: "Autre"
 };
 
+// Renvoie un résumé des conditionnements de la forme suivante :
+// 7 colis : 2 Fûts de 50 litres (n° cont1, cont2), 5 GRVs de 1 litre (n° GRV1, GRV2, GRV3)
 export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
   const total = packagingInfos.reduce(
     (acc, packagingInfo) => acc + packagingInfo.quantity,
@@ -26,7 +29,25 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
               .filter(Boolean)
               .join(" ")
           : PACKAGINGS_NAMES[packagingInfo.type];
-      return `${packagingInfo.quantity} ${name}`;
+
+      let summary = `${packagingInfo.quantity} ${pluralize(
+        name,
+        packagingInfo.quantity
+      )}`;
+
+      if (packagingInfo.volume) {
+        const volumeUnit =
+          packagingInfo.type === Packagings.Benne
+            ? "m3"
+            : pluralize("litre", packagingInfo.volume);
+        summary += ` de ${packagingInfo.volume} ${volumeUnit}`;
+      }
+
+      if (packagingInfo.identificationNumbers) {
+        summary += ` (n° ${packagingInfo.identificationNumbers.join(", ")})`;
+      }
+
+      return summary;
     })
     .join(", ");
 

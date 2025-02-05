@@ -124,7 +124,9 @@ function SignEmissionFormModalContent({
             form.temporaryStorageDetail?.transporter?.numberPlate ?? ""
         }
       : {
-          packagingInfos: form.wasteDetails?.packagingInfos,
+          packagingInfos: form.wasteDetails?.packagingInfos?.length
+            ? form.wasteDetails?.packagingInfos
+            : [{ type: "", quantity: "", volume: "" }],
           quantity: form.wasteDetails?.quantity ?? 0,
           onuCode: form.wasteDetails?.onuCode ?? "",
           transporterNumberPlate: form.transporter?.numberPlate ?? ""

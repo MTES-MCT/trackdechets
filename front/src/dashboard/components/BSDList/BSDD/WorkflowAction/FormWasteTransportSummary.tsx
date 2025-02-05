@@ -19,10 +19,10 @@ import {
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
 import { getFormWasteDetailsADRMention } from "@td/constants";
+import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -89,10 +89,8 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   ),
   packagingInfos: () => (
     <div className="form__row">
-      <label>
-        Conditionnement(s)
-        <Field name="update.packagingInfos" component={Packagings} />
-      </label>
+      <h6 className="fr-h6">Conditionnement</h6>
+      <PackagingList fieldName="update.packagingInfos" />
     </div>
   ),
   sampleNumber: () => (

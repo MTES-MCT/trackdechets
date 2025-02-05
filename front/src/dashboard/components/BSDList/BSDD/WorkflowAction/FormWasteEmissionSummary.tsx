@@ -14,9 +14,9 @@ import {
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
+import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -47,10 +47,8 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   ),
   packagingInfos: () => (
     <div className="form__row">
-      <label>
-        Conditionnement(s)
-        <Field name="packagingInfos" component={Packagings} />
-      </label>
+      <h6 className="fr-h6">Conditionnement</h6>
+      <PackagingList fieldName="packagingInfos" />
     </div>
   ),
   transporterNumberPlate: () => (
@@ -109,7 +107,11 @@ export function FormWasteEmissionSummary({
           <DataListTerm>Contenant(s)</DataListTerm>
           <DataListDescription>
             {values.packagingInfos
-              ?.map(packaging => `${packaging.quantity} ${packaging.type}(s)`)
+              ?.map(packaging =>
+                packaging?.type
+                  ? `${packaging.quantity} ${packaging.type}(s)`
+                  : ""
+              )
               .join(", ")}
 
             <button

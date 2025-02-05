@@ -141,7 +141,9 @@ export default function SignTransportFormModalContent({
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
           sampleNumber: form.wasteDetails?.sampleNumber ?? "",
-          packagingInfos: form.wasteDetails?.packagingInfos ?? []
+          packagingInfos: form.wasteDetails?.packagingInfos?.length
+            ? form.wasteDetails?.packagingInfos
+            : [{ type: "", quantity: "", volume: "" } as any]
         }
       }}
       validationSchema={validationSchema}

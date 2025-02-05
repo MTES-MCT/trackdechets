@@ -18,10 +18,13 @@ function PackagingForm({
   setPackaging,
   packagingTypeOptions
 }: PackagingFormProps) {
+  const maxQuantity =
+    packaging.type === Packagings.Citerne || packaging.type === Packagings.Benne
+      ? 2
+      : null;
+
   const quantityError =
-    (packaging.type === Packagings.Citerne ||
-      packaging.type === Packagings.Benne) &&
-    packaging.quantity > 2
+    maxQuantity && packaging.quantity > maxQuantity
       ? `Impossible de saisir plus de 2 ${packaging.type.toLocaleLowerCase()}s`
       : null;
 
@@ -102,7 +105,7 @@ function PackagingForm({
               type: "number",
               inputMode: "numeric",
               step: "1", // mili-litres
-              max: 2,
+              ...(maxQuantity ? { max: maxQuantity } : {}),
               value: packaging.quantity,
               onChange: event => {
                 const quantity = event.target.value;

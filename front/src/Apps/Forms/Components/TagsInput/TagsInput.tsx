@@ -44,7 +44,7 @@ const TagsInput = ({
         label={label}
         hintText={hintText}
         disabled={disabled}
-        style={{ marginBottom: "10px" }}
+        className="fr-mb-2w"
         nativeInputProps={{
           value: tag,
           onChange: e => setTag(e.target.value),
@@ -71,10 +71,11 @@ const TagsInput = ({
           </Button>
         }
       />
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
         {tags?.map((plate, idx) => (
-          <div key={idx} style={{ padding: "0 2px" }}>
+          <div key={idx}>
             <Tag
+              className="fr-mb-1v"
               dismissible
               nativeButtonProps={{
                 type: "button",
