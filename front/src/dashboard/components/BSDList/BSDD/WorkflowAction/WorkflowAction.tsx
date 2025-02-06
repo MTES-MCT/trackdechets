@@ -9,6 +9,7 @@ import routes from "../../../../../Apps/routes";
 import { useMatch } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
 import { SignReception } from "../../../../../Apps/Dashboard/Validation/BSDD/SignReception";
+import { SignOperation } from "../../../../../Apps/Dashboard/Validation/BSDD/SignOperation";
 
 export interface WorkflowActionProps {
   form: Form;
@@ -138,7 +139,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
       ) {
         return (
           <div className="tw-flex tw-space-x-2">
-            <MarkAsProcessed {...props} />
+            <SignOperation
+              title={"Signer le traitement"}
+              formId={form.id}
+              displayActionButton={false}
+            />
+
             <MarkAsResealed {...props} />
           </div>
         );

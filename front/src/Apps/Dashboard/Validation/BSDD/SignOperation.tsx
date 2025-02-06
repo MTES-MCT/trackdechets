@@ -1,0 +1,558 @@
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  Form,
+  OperationMode,
+  Mutation,
+  MutationMarkAsProcessedArgs,
+  FormStatus,
+  FavoriteType
+} from "@td/codegen-ui";
+import {
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  PROCESSING_AND_REUSE_OPERATIONS,
+  isDangerous
+} from "@td/constants";
+import { useMutation, gql } from "@apollo/client";
+import { useForm, FormProvider } from "react-hook-form";
+import { useParams } from "react-router-dom";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { statusChangeFragment } from "../../../../Apps/common/queries/fragments";
+import { SignForm } from "./SignForm";
+import { datetimeToYYYYMMDD } from "../../../../common/datetime";
+import { subMonths } from "date-fns";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import RhfOperationModeSelect from "../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
+import Select from "@codegouvfr/react-dsfr/Select";
+import { toCompanyInput } from "../../Signature/bsff/SignBsffPackagingForm";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput.tsx/RhfExtraEuropeanCompanyManualInput.tsx";
+
+const MARK_AS_PROCESSED = gql`
+  mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
+    markAsProcessed(id: $id, processedInfo: $processedInfo) {
+      ...StatusChange
+    }
+  }
+  ${statusChangeFragment}
+`;
+
+const schema = z.object({
+  processedBy: z
+    .string({
+      required_error: "Le nom et prénom de l'auteur de la signature est requis"
+    })
+    .refine(val => val.trim() !== "", {
+      message: "Le nom et prénom de l'auteur de la signature est requis"
+    })
+    .pipe(
+      z
+        .string()
+        .min(
+          2,
+          "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
+        )
+    ),
+  processedAt: z.coerce
+    .date({
+      required_error: "La date de traitement est requise",
+      invalid_type_error: "Format de date invalide."
+    })
+    .transform(v => v?.toISOString()),
+  noTraceability: z.boolean().nullish(),
+  destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
+  processingOperationDescription: z.string().nullish(),
+  processingOperationDone: z.string().nullish(),
+  nextDestination: z
+    .object({
+      company: z
+        .object({
+          siret: z.string().nullish(),
+          vatNumber: z.string().nullish(),
+          extraEuropeanId: z.string().nullish(),
+          name: z.string().nullish(),
+          contact: z.string().nullish(),
+          phone: z.string().nullish(),
+          mail: z.string().nullish(),
+          address: z.string().nullish(),
+          city: z.string().nullish(),
+          street: z.string().nullish(),
+          postalCode: z.string().nullish(),
+          country: z.string().nullish()
+        })
+        .nullish(),
+      notificationNumber: z.string().nullish(),
+      processingOperation: z.string().nullish()
+    })
+    .nullish()
+});
+export type ZodFormOperation = z.infer<typeof schema>;
+
+interface SignOperationProps {
+  formId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+  title: string;
+}
+
+export function SignOperation({
+  formId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+  title
+}: Readonly<SignOperationProps>) {
+  return (
+    <SignForm
+      title={title}
+      formId={formId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+      size="L"
+    >
+      {({ form, onClose }) => (
+        <SignOperationModal form={form} onClose={onClose} />
+      )}
+    </SignForm>
+  );
+}
+
+interface SignOperationModalProps {
+  form: Form;
+  onClose: () => void;
+}
+
+function SignOperationModal({
+  form,
+  onClose
+}: Readonly<SignOperationModalProps>) {
+  const { siret } = useParams<{ siret: string }>();
+
+  const [markAsProcessed, { loading, error }] = useMutation<
+    Pick<Mutation, "markAsProcessed">,
+    MutationMarkAsProcessedArgs
+  >(MARK_AS_PROCESSED);
+
+  const TODAY = new Date();
+
+  const initialState = {
+    processedAt: datetimeToYYYYMMDD(TODAY),
+    processedBy: "",
+    processingOperationDone: "",
+    destinationOperationMode: undefined,
+    processingOperationDescription: "",
+    nextDestination: null,
+    noTraceability: null
+  } as ZodFormOperation;
+
+  const methods = useForm<ZodFormOperation>({
+    values: initialState,
+    resolver: async (data, context, options) => {
+      return zodResolver(schema)(data, context, options);
+    }
+  });
+
+  const {
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    register,
+    watch,
+    setValue
+  } = methods;
+
+  const isFormValid = !Object.keys(errors ?? {}).length;
+
+  const onSubmit = async data => {
+    const { nextDestination, ...values } = data;
+
+    await markAsProcessed({
+      variables: {
+        id: data?.form.id,
+        processedInfo: {
+          ...values,
+          nextDestination
+        }
+      }
+    });
+    onClose();
+  };
+
+  const initNextDestination = useMemo(
+    () => ({
+      processingOperation: "",
+      destinationOperationMode: undefined,
+      notificationNumber: "",
+      company: {
+        siret: "",
+        name: "",
+        address: "",
+        contact: "",
+        mail: "",
+        phone: "",
+        vatNumber: ""
+      }
+    }),
+    []
+  );
+
+  const processingOperationDone = watch("processingOperationDone");
+  const nextDestination = watch("nextDestination");
+  const noTraceability = watch("noTraceability");
+  const vatNumber = watch("nextDestination.company.vatNumber");
+
+  const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId ? true : false
+  );
+  const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(
+    nextDestination?.company?.extraEuropeanId
+  );
+
+  /**
+   * Hack the API requirement for any value in nextDestination.company.extraEuropeanId
+   */
+  useEffect(() => {
+    if (isExtraEuropeanCompany) {
+      setValue("nextDestination.company", initNextDestination.company);
+      setValue("nextDestination.company.country", "");
+      setValue(
+        "nextDestination.company.extraEuropeanId",
+        !extraEuropeanCompany ? "" : extraEuropeanCompany
+      );
+      setValue("nextDestination.company.vatNumber", vatNumber);
+    } else {
+      setIsExtraEuropeanCompany(false);
+      setValue("nextDestination.company.extraEuropeanId", "");
+      setExtraEuropeanCompany("");
+    }
+  }, [
+    isExtraEuropeanCompany,
+    extraEuropeanCompany,
+    initNextDestination.company,
+    setValue,
+    vatNumber
+  ]);
+
+  const isGroupement =
+    processingOperationDone &&
+    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(processingOperationDone);
+
+  useEffect(() => {
+    if (isGroupement) {
+      if (nextDestination == null) {
+        setValue("nextDestination", initNextDestination);
+      }
+      if (noTraceability == null) {
+        setValue("noTraceability", false);
+      }
+    } else {
+      setValue("nextDestination", null);
+      setValue("noTraceability", null);
+    }
+  }, [
+    isGroupement,
+    nextDestination,
+    noTraceability,
+    initNextDestination,
+    setValue
+  ]);
+
+  const isFRCompany = Boolean(nextDestination?.company?.siret);
+  const hasVatNumber = Boolean(nextDestination?.company?.vatNumber);
+
+  const isDangerousWaste =
+    isDangerous(form.wasteDetails?.code ?? "") ||
+    (form.wasteDetails?.isDangerous && " (dangereux)");
+  const isPop = form?.wasteDetails?.pop;
+
+  // le déchet: comporte un code * || est marqué comme dangereux || est marqué POP
+  const isDangerousOrPop = isDangerousWaste || isPop;
+
+  // Notification number
+  const showNotificationNumber =
+    isExtraEuropeanCompany || (!isFRCompany && noTraceability) || hasVatNumber;
+
+  // Le numéro de notif est obligatoire quand:
+  // - le code de traitement est non final
+  // - que le déchet est DD, pop ou marqué comme dangereux
+  // Si  sansrupture de traçabilité:
+  // - entreprise (destination ultérieure) non française
+  // Si avec rupture de traçabilité:
+  // - entreprise (destination ultérieure) UE non française renseignée (via TVA ou n° d'identifiant)
+
+  const hasNextDestinationCompany = !!(
+    nextDestination?.company?.extraEuropeanId ||
+    nextDestination?.company?.siret ||
+    nextDestination?.company?.vatNumber
+  );
+
+  const notificationNumberIsMandatory =
+    isDangerousOrPop && nextDestination && noTraceability
+      ? hasNextDestinationCompany
+      : isExtraEuropeanCompany || hasVatNumber;
+
+  const notificationNumberIsOptional = !notificationNumberIsMandatory;
+  // nextDestination + hasVatNumber + isDangerousOrPop
+  const notificationNumberPlaceHolder = isDangerousOrPop
+    ? "PPAAAADDDRRR"
+    : "A7E AAAA DDDRRR";
+  const notificationNumberLabel = isDangerousOrPop
+    ? `Numéro de notification ${
+        notificationNumberIsOptional ? "(Optionnel)" : ""
+      }`
+    : "Numéro de déclaration Annexe 7 (optionnel)";
+  const notificationNumberTooltip = isDangerousOrPop
+    ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PPAAAADDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
+    : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
+
+  return (
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {form.status === FormStatus.TempStorerAccepted && (
+          <div className="notification notification--warning">
+            Attention, vous vous apprêtez à valider un traitement ou un
+            regroupement sur lequel votre établissement était identifié en tant
+            qu'installation d'entreposage provisoire et/ou de reconditionnement.
+            Votre entreprise sera désormais uniquement destinataire du bordereau
+            et l'étape d'entreposage provisoire va disparaitre.
+          </div>
+        )}
+
+        <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+          <div className="fr-col-12">
+            <Select
+              label="Opération d’élimination / valorisation effectuée"
+              nativeSelectProps={register("processingOperationDone")}
+              state={errors.processingOperationDone ? "error" : "default"}
+              stateRelatedMessage={errors.processingOperationDone?.message}
+              className="fr-mb-2w"
+            >
+              {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                <option value={operation.code} key={operation.code}>
+                  {operation.code} - {operation.description}
+                </option>
+              ))}
+            </Select>
+            <p className="fr-info-text">
+              Code de traitement prévu :{" "}
+              {form.temporaryStorageDetail?.destination?.processingOperation ??
+                form.recipient?.processingOperation}
+            </p>
+          </div>
+        </div>
+        <RhfOperationModeSelect
+          operationCode={processingOperationDone}
+          path={"destinationOperationMode"}
+        />
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <div className="fr-col-12">
+            <Input
+              label="Description de l'opération réalisée"
+              textArea
+              className="fr-col-12"
+              state={errors?.processingOperationDescription && "error"}
+              stateRelatedMessage={
+                (errors?.processingOperationDescription?.message as string) ??
+                ""
+              }
+              nativeTextAreaProps={{
+                ...register("processingOperationDescription")
+              }}
+            />
+          </div>
+        </div>
+        {isGroupement && noTraceability !== null && (
+          <div className="fr-grid-row fr-grid-row--gutters">
+            <div className="fr-col-12 fr-pb-0">
+              <Checkbox
+                options={[
+                  {
+                    label:
+                      "Rupture de traçabilité autorisée par arrêté préfectoral pour ce déchet - la responsabilité du producteur du déchet est transférée",
+                    nativeInputProps: {
+                      ...register("noTraceability")
+                    }
+                  }
+                ]}
+              />
+            </div>
+            {noTraceability && (
+              <div className="fr-col-12 fr-pt-0">
+                <Alert
+                  small={true}
+                  severity="info"
+                  description={
+                    "La destination ultérieure prévue est optionnelle si les déchets sont envoyés vers des destinations différentes et que vous n'êtes pas en mesure de déterminer l'exutoire final à ce stade. Le code de traitement final prévu reste obligatoire."
+                  }
+                />
+              </div>
+            )}
+          </div>
+        )}
+
+        {nextDestination && (
+          <>
+            <h6 className="fr-h6">Destination ultérieure prévue</h6>
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-12">
+                <Select
+                  label="Opération d’élimination / valorisation (code D/R)"
+                  nativeSelectProps={register(
+                    "nextDestination.processingOperation"
+                  )}
+                  state={
+                    errors.nextDestination?.processingOperation
+                      ? "error"
+                      : "default"
+                  }
+                  stateRelatedMessage={
+                    errors.nextDestination?.processingOperation?.message
+                  }
+                >
+                  {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                    <option value={operation.code} key={operation.code}>
+                      {operation.code} - {operation.description}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            </div>
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-12">
+                <Checkbox
+                  options={[
+                    {
+                      label: "Destinataire hors Union Européenne",
+                      hintText:
+                        "Si le numéro de TVA n'est pas reconnu, veuillez aussi cocher ce champ et indiquer manuellement le numéro",
+                      nativeInputProps: {
+                        checked: isExtraEuropeanCompany,
+                        onChange: e =>
+                          setIsExtraEuropeanCompany(e.target.checked)
+                      }
+                    }
+                  ]}
+                />
+              </div>
+            </div>
+            {!isExtraEuropeanCompany && (
+              <CompanySelectorWrapper
+                favoriteType={FavoriteType.NextDestination}
+                orgId={siret}
+                selectedCompanyOrgId={nextDestination?.company?.siret}
+                allowForeignCompanies={true}
+                onCompanySelected={company => {
+                  setValue("nextDestination.company", company);
+                  if (company) {
+                    setValue(
+                      "nextDestination.company",
+                      toCompanyInput(company)
+                    );
+                  }
+                }}
+              />
+            )}
+
+            <div className="fr-grid-row fr-grid-row--gutters">
+              {isExtraEuropeanCompany && (
+                <div className="fr-col-12">
+                  <RhfExtraEuropeanCompanyManualInput
+                    fieldName="nextDestination.company"
+                    optional={noTraceability === true}
+                    extraEuropeanCompanyId={extraEuropeanCompany}
+                    onExtraEuropeanCompanyId={setExtraEuropeanCompany}
+                  />
+                </div>
+              )}
+              {showNotificationNumber && (
+                <div className="fr-col-12">
+                  <Input
+                    label={notificationNumberLabel}
+                    hintText={notificationNumberTooltip}
+                    className="fr-col-12"
+                    state={
+                      errors?.nextDestination?.notificationNumber && "error"
+                    }
+                    stateRelatedMessage={
+                      (errors?.nextDestination?.notificationNumber
+                        ?.message as string) ?? ""
+                    }
+                    nativeInputProps={{
+                      ...register("nextDestination.notificationNumber"),
+                      placeholder: notificationNumberPlaceHolder
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        <hr />
+        <p className="fr-text fr-text--md fr-mb-2w">
+          En qualité de <strong>destinataire du déchet</strong>, je confirme la
+          réception des déchets pour la quantité indiquée dans ce bordereau. En
+          cas de refus partiel ou total uniquement, un mail automatique
+          Trackdéchets informera le producteur de ce refus, accompagné du
+          récépissé PDF. L’inspection des ICPE et ma société en recevront
+          également une copie.
+        </p>
+
+        <Input
+          label="Date de prise en charge"
+          className="fr-col-sm-6 fr-col-lg-4 "
+          state={errors?.processedAt && "error"}
+          stateRelatedMessage={(errors?.processedAt?.message as string) ?? ""}
+          nativeInputProps={{
+            type: "date",
+            min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
+            max: datetimeToYYYYMMDD(TODAY),
+            ...register("processedAt")
+          }}
+        />
+
+        <div className="fr-grid-row fr-grid-row--gutters">
+          <Input
+            label="Nom et prénom"
+            className="fr-col-sm-6"
+            state={errors?.processedBy && "error"}
+            stateRelatedMessage={(errors?.processedBy?.message as string) ?? ""}
+            nativeInputProps={{
+              ...register("processedBy")
+            }}
+          />
+        </div>
+
+        {error && (
+          <Alert
+            severity="error"
+            title="Erreur"
+            className="fr-mt-5v"
+            description={error.message}
+          />
+        )}
+
+        <div className="dsfr-modal-actions fr-mt-3w">
+          <Button
+            disabled={isSubmitting || loading}
+            priority="secondary"
+            onClick={onClose}
+            type="button"
+          >
+            Annuler
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting || loading || !isFormValid}
+          >
+            {loading ? "Signature en cours..." : "Valider"}
+          </Button>
+        </div>
+      </form>
+    </FormProvider>
+  );
+}

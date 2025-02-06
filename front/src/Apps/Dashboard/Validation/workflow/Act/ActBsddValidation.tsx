@@ -15,13 +15,13 @@ import {
   isSignTransportCanSkipEmission
 } from "../../../dashboardServices";
 import { Appendix1ProducerForm } from "../../../../../form/bsdd/appendix1Producer/form";
-import MarkAsProcessedModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/MarkAsProcessedModalContent";
 import SignEmissionFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignEmissionFormModalContent";
 import SignTransportFormModalContent from "../../../../../dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportFormModalContent";
 import { mapBsdd } from "../../../bsdMapper";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../../common/queries/company/query";
 import { GET_FORM } from "../../../../common/queries/bsdd/queries";
 import { SignReception } from "../../BSDD/SignReception";
+import { SignOperation } from "../../BSDD/SignOperation";
 
 interface ActBsddValidationProps {
   bsd: Form;
@@ -207,15 +207,13 @@ const ActBsddValidation = ({
 
   const renderMarkAsProcessedModal = () => {
     return (
-      <TdModal
-        isOpen={isOpen}
-        onClose={onClose}
-        ariaLabel={renderTitle()}
-        size={modalSize}
-      >
-        <h2 className="td-modal-title">{renderTitle()}</h2>
-        <MarkAsProcessedModalContent data={data} onClose={onClose} />
-      </TdModal>
+      <SignOperation
+        title={renderTitle()}
+        formId={bsd.id}
+        onModalCloseFromParent={onClose}
+        isModalOpenFromParent={isOpen}
+        displayActionButton={false}
+      />
     );
   };
 
