@@ -101,39 +101,39 @@ La requête doit être authentifiée, 2 méthodes sont possibles :
 
 ```json
  {
-  name: "Jean Dupont",
-  phone: "06876543",
-  email: "foo@barr.fr",
-  email_verified: true,
-  companies: [
+  "name": "Jean Dupont",
+  "phone": "06876543",
+  "email": "foo@barr.fr",
+  "email_verified": true,
+  "companies": [
     {
-      id: "wxcgh123",
-      role: "ADMIN",
-      siret: "1234",
-      vat_number: null,
-      name: "une entreprise A",
-      given_name: "Succursale Marseille",
-      types: ["PRODUCER"],
-      verified: true
+      "id": "wxcgh123",
+      "role": "ADMIN",
+      "siret": "1234",
+      "vat_number": null,
+      "name": "une entreprise A",
+      "given_name": "Succursale Marseille",
+      "types": ["PRODUCER"],
+      "verified": true
     },
 
     {
-      id: "mlkj953",
-      role: "MEMBER",
-      siret: "9876",
-      vat_number: null,
-      name: "une entreprise B",
-      given_name: "Succursale Rouen",
-      types: ["COLLECTOR", "WASTEPROCESSOR"],
-      verified: false
+      "id": "mlkj953",
+      "role": "MEMBER",
+      "siret": "9876",
+      "vat_number": null,
+      "name": "une entreprise B",
+      "given_name": "Succursale Rouen",
+      "types": ["COLLECTOR", "WASTEPROCESSOR"],
+      "verified": false
     }
   ],
-  nonce: "CYCTdEHKQAqB2ahOVWiOFSMbjdxUhGBb",
-  iat: 1672650576,
-  iss: "trackdechets",
-  aud: "your-app",
-  exp: 1672654176,
-  sub: "ck03yr7q000di0728m7uwhc1i"
+  "nonce": "CYCTdEHKQAqB2ahOVWiOFSMbjdxUhGBb",
+  "iat": 1672650576,
+  "iss": "trackdechets",
+  "aud": "your-app",
+  "exp": 1672654176,
+  "sub": "ck03yr7q000di0728m7uwhc1i"
 };
 ```
 
