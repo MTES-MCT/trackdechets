@@ -1,7 +1,7 @@
 import { IncomingWasteV2 } from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
-  Bsdasri,
+  Prisma,
   PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -180,34 +180,58 @@ export const toIncomingWasteV2 = (
   };
 };
 
-const performRegistryLookupUpdate = async (
-  bsdasri: Bsdasri,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsdasri.id, tx);
+const minimalBsdasriForLookupSelect = {
+  id: true,
+  destinationReceptionSignatureDate: true,
+  destinationCompanySiret: true,
+  wasteCode: true
+};
+
+type MinimalBsdasriForLookup = Prisma.BsdasriGetPayload<{
+  select: typeof minimalBsdasriForLookupSelect;
+}>;
+
+const bsdasriToLookupCreateInputs = (
+  bsdasri: MinimalBsdasriForLookup
+): { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } => {
+  const res: { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } = {
+    incoming: null
+  };
   if (
     bsdasri.destinationReceptionSignatureDate &&
     bsdasri.destinationCompanySiret
   ) {
+    res.incoming = {
+      id: bsdasri.id,
+      readableId: bsdasri.id,
+      siret: bsdasri.destinationCompanySiret,
+      exportRegistryType: RegistryExportType.INCOMING,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: RegistryExportWasteType.DD,
+      wasteCode: bsdasri.wasteCode,
+      ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
+      bsdasriId: bsdasri.id
+    };
+  }
+  return res;
+};
+
+const performRegistryLookupUpdate = async (
+  bsdasri: MinimalBsdasriForLookup,
+  tx: Omit<PrismaClient, ITXClientDenyList>
+): Promise<void> => {
+  await deleteRegistryLookup(bsdasri.id, tx);
+  const lookupInputs = bsdasriToLookupCreateInputs(bsdasri);
+  if (lookupInputs.incoming) {
     await tx.registryLookup.create({
-      data: {
-        id: bsdasri.id,
-        readableId: bsdasri.id,
-        siret: bsdasri.destinationCompanySiret,
-        exportRegistryType: RegistryExportType.INCOMING,
-        declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: RegistryExportWasteType.DD,
-        wasteCode: bsdasri.wasteCode,
-        ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
-        bsdasriId: bsdasri.id
-      },
+      data: lookupInputs.incoming,
       select: { id: true }
     });
   }
 };
 
 export const updateRegistryLookup = async (
-  bsdasri: Bsdasri,
+  bsdasri: MinimalBsdasriForLookup,
   tx?: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (!tx) {
@@ -238,13 +262,19 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalBsdasriForLookupSelect
     });
+    const createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsdasri of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(bsdasri, tx);
-      });
+      const createInputs = bsdasriToLookupCreateInputs(bsdasri);
+      if (createInputs.incoming) {
+        createArray.push(createInputs.incoming);
+      }
     }
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
     if (items.length < 100) {
       done = true;
       return;

@@ -3,7 +3,6 @@ import {
   incomingWasteLookupUtils,
   incomingTexsLookupUtils
 } from "@td/registry";
-import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { lookupUtils as bsddLookupUtils } from "../../forms/registryV2";
 import { lookupUtils as bsdaLookupUtils } from "../../bsda/registryV2";
@@ -32,7 +31,7 @@ const bsdOrRegistryTypes: (BsdType | RegistryImportType)[] = [
 ];
 
 async function exitScript() {
-  logger.info("Done rebuildRegistryLookup script, exiting");
+  console.info("Done rebuildRegistryLookup script, exiting");
   await prisma.$disconnect();
   process.exit(0);
 }
@@ -167,67 +166,67 @@ const runIntegrityTest = async () => {
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("SSD")
     ) {
-      logger.info("Rebuilding SSD registry lookup");
+      console.info("Rebuilding SSD registry lookup");
       await ssdLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_WASTE")
     ) {
-      logger.info("Rebuilding incoming waste registry lookup");
+      console.info("Rebuilding incoming waste registry lookup");
       await incomingWasteLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_TEXS")
     ) {
-      logger.info("Rebuilding incoming texs registry lookup");
+      console.info("Rebuilding incoming texs registry lookup");
       await incomingTexsLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDD")
     ) {
-      logger.info("Rebuilding BSDD lookup");
+      console.info("Rebuilding BSDD lookup");
       await bsddLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDA")
     ) {
-      logger.info("Rebuilding BSDA lookup");
+      console.info("Rebuilding BSDA lookup");
       await bsdaLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDASRI")
     ) {
-      logger.info("Rebuilding BSDASRI lookup");
+      console.info("Rebuilding BSDASRI lookup");
       await bsdasriLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSFF")
     ) {
-      logger.info("Rebuilding BSFF lookup");
+      console.info("Rebuilding BSFF lookup");
       await bsffLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSPAOH")
     ) {
-      logger.info("Rebuilding BSPAOH lookup");
+      console.info("Rebuilding BSPAOH lookup");
       await bspaohLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSVHU")
     ) {
-      logger.info("Rebuilding BSVHU lookup");
+      console.info("Rebuilding BSVHU lookup");
       await bsvhuLookupUtils.rebuildLookup();
     }
   } catch (error) {
-    logger.error("Error in rebuildRegistryLookup script, exiting", error);
+    console.error("Error in rebuildRegistryLookup script, exiting", error);
     throw new Error(`Error in rebuildRegistryLookup script : ${error}`);
   } finally {
     await exitScript();

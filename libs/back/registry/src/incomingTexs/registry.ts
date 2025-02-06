@@ -7,11 +7,7 @@ import {
   RegistryIncomingTexs
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import {
-  deleteRegistryLookup,
-  generateDateInfos,
-  updateRegistryDelegateSirets
-} from "../lookup/utils";
+import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 
@@ -182,21 +178,48 @@ export const toIncomingWaste = (
   };
 };
 
+const minimalRegistryForLookupSelect = {
+  id: true,
+  publicId: true,
+  reportForCompanySiret: true,
+  reportAsCompanySiret: true,
+  wasteCode: true,
+  receptionDate: true
+};
+
+type MinimalRegistryForLookup = Prisma.RegistryIncomingTexsGetPayload<{
+  select: typeof minimalRegistryForLookupSelect;
+}>;
+
+const registryToLookupCreateInput = (
+  registryIncomingTexs: MinimalRegistryForLookup
+): Prisma.RegistryLookupUncheckedCreateInput => {
+  return {
+    id: registryIncomingTexs.id,
+    readableId: registryIncomingTexs.publicId,
+    siret: registryIncomingTexs.reportForCompanySiret,
+    reportAsSiret: registryIncomingTexs.reportAsCompanySiret,
+    exportRegistryType: RegistryExportType.INCOMING,
+    declarationType: RegistryExportDeclarationType.REGISTRY,
+    wasteType: RegistryExportWasteType.TEXS,
+    wasteCode: registryIncomingTexs.wasteCode,
+    ...generateDateInfos(registryIncomingTexs.receptionDate),
+    registryIncomingTexsId: registryIncomingTexs.id
+  };
+};
+
 export const updateRegistryLookup = async (
-  registryIncomingTexs: RegistryIncomingTexs,
+  registryIncomingTexs: MinimalRegistryForLookup,
   oldRegistryIncomingTexsId: string | null,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
-  let registryLookup: Prisma.RegistryLookupGetPayload<{
-    select: { reportAsSirets: true };
-  }>;
   if (oldRegistryIncomingTexsId) {
     // note for future implementations:
     // if there is a possibility that the siret changes between updates (BSDs),
     // you should use an upsert.
     // This is because the index would point to an empty lookup in that case, so we need to create it.
     // the cleanup method will remove the lookup with the old siret afterward
-    registryLookup = await tx.registryLookup.update({
+    await tx.registryLookup.update({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
@@ -212,41 +235,25 @@ export const updateRegistryLookup = async (
         // only those properties can change during an update
         // the id changes because a new RegistrySsd entry is created on each update
         id: registryIncomingTexs.id,
+        reportAsSiret: registryIncomingTexs.reportAsCompanySiret,
         wasteCode: registryIncomingTexs.wasteCode,
         ...generateDateInfos(registryIncomingTexs.receptionDate),
         registryIncomingTexsId: registryIncomingTexs.id
       },
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   } else {
-    registryLookup = await tx.registryLookup.create({
-      data: {
-        id: registryIncomingTexs.id,
-        readableId: registryIncomingTexs.publicId,
-        siret: registryIncomingTexs.reportForCompanySiret,
-        exportRegistryType: RegistryExportType.INCOMING,
-        declarationType: RegistryExportDeclarationType.REGISTRY,
-        wasteType: RegistryExportWasteType.TEXS,
-        wasteCode: registryIncomingTexs.wasteCode,
-        ...generateDateInfos(registryIncomingTexs.receptionDate),
-        registryIncomingTexsId: registryIncomingTexs.id
-      },
+    await tx.registryLookup.create({
+      data: registryToLookupCreateInput(registryIncomingTexs),
       select: {
         // lean selection to improve performances
-        reportAsSirets: true
+        id: true
       }
     });
   }
-
-  await updateRegistryDelegateSirets(
-    RegistryExportType.INCOMING,
-    registryIncomingTexs,
-    registryLookup,
-    tx
-  );
 };
 
 export const rebuildRegistryLookup = async () => {
@@ -269,13 +276,16 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalRegistryForLookupSelect
     });
-    for (const registryIncomingTexs of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(registryIncomingTexs, null, tx);
-      });
-    }
+    const createArray = items.map(
+      (registryIncomingTexs: MinimalRegistryForLookup) =>
+        registryToLookupCreateInput(registryIncomingTexs)
+    );
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
     if (items.length < 100) {
       done = true;
       return;

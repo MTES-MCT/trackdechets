@@ -4,7 +4,7 @@ import {
   RegistryExportType,
   RegistryExportDeclarationType,
   RegistryExportWasteType,
-  Form
+  Prisma
 } from "@prisma/client";
 import { emptyIncomingWasteV2, RegistryV2Bsdd } from "../registryV2/types";
 import { formToBsdd } from "./compat";
@@ -299,33 +299,59 @@ export const toIncomingWasteV2 = (
   };
 };
 
+const minimalBsddForLookupSelect = {
+  id: true,
+  readableId: true,
+  receivedAt: true,
+  recipientCompanySiret: true,
+  wasteDetailsIsDangerous: true,
+  wasteDetailsCode: true
+};
+
+type MinimalBsddForLookup = Prisma.FormGetPayload<{
+  select: typeof minimalBsddForLookupSelect;
+}>;
+
+const bsddToLookupCreateInputs = (
+  form: MinimalBsddForLookup
+): { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } => {
+  const res: { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } = {
+    incoming: null
+  };
+  if (form.receivedAt && form.recipientCompanySiret) {
+    res.incoming = {
+      id: form.id,
+      readableId: form.readableId,
+      siret: form.recipientCompanySiret,
+      exportRegistryType: RegistryExportType.INCOMING,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: form.wasteDetailsIsDangerous
+        ? RegistryExportWasteType.DD
+        : RegistryExportWasteType.DND,
+      wasteCode: form.wasteDetailsCode,
+      ...generateDateInfos(form.receivedAt),
+      bsddId: form.id
+    };
+  }
+  return res;
+};
+
 const performRegistryLookupUpdate = async (
-  form: Form,
+  form: MinimalBsddForLookup,
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   await deleteRegistryLookup(form.id, tx);
-  if (form.receivedAt && form.recipientCompanySiret) {
+  const lookupInputs = bsddToLookupCreateInputs(form);
+  if (lookupInputs.incoming) {
     await tx.registryLookup.create({
-      data: {
-        id: form.id,
-        readableId: form.readableId,
-        siret: form.recipientCompanySiret,
-        exportRegistryType: RegistryExportType.INCOMING,
-        declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: form.wasteDetailsIsDangerous
-          ? RegistryExportWasteType.DD
-          : RegistryExportWasteType.DND,
-        wasteCode: form.wasteDetailsCode,
-        ...generateDateInfos(form.receivedAt),
-        bsddId: form.id
-      },
+      data: lookupInputs.incoming,
       select: { id: true }
     });
   }
 };
 
 export const updateRegistryLookup = async (
-  form: Form,
+  form: MinimalBsddForLookup,
   tx?: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (!tx) {
@@ -359,13 +385,19 @@ export const rebuildRegistryLookup = async () => {
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
         id: "desc"
-      }
+      },
+      select: minimalBsddForLookupSelect
     });
+    const createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsdd of items) {
-      await prisma.$transaction(async tx => {
-        await updateRegistryLookup(bsdd, tx);
-      });
+      const createInputs = bsddToLookupCreateInputs(bsdd);
+      if (createInputs.incoming) {
+        createArray.push(createInputs.incoming);
+      }
     }
+    await prisma.registryLookup.createMany({
+      data: createArray
+    });
     if (items.length < 100) {
       done = true;
       return;
