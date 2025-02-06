@@ -83,6 +83,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   // perform validation
   for (const company of companiesRows) {
+    console.info(`Validate company ${company.siret}`);
     try {
       const validCompany = await companyValidationSchema.validate(company);
       companies.push(validCompany);
