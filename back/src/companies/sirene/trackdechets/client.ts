@@ -103,9 +103,9 @@ export const searchCompany = async (
   try {
     const company = await searchCompanyTD(siret);
 
-    // if (company.etatAdministratif === ("F" as EtatAdministratif)) {
-    //   throw new ClosedCompanyError();
-    // }
+    if (company.etatAdministratif === ("F" as EtatAdministratif)) {
+      throw new ClosedCompanyError();
+    }
 
     if (
       company.statutDiffusionEtablissement ===

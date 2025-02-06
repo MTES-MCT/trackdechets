@@ -54,7 +54,6 @@ export interface CompanyInfo {
 describe("bulk create users and companies from csv files", () => {
   beforeAll(async () => {
     await resetDatabase();
-    jest.resetAllMocks();
   });
 
   afterAll(async () => {
@@ -63,8 +62,6 @@ describe("bulk create users and companies from csv files", () => {
   });
 
   (searchCompany as jest.Mock).mockImplementation((cue: string) => {
-    console.log("!!! APPELLE !!!");
-
     if (cue === "85001946400021") {
       return {
         siret: "85001946400021",
@@ -339,7 +336,7 @@ describe("bulk create users and companies from csv files", () => {
     // Given
 
     // When
-    // await bulkCreateIdempotent();
+    await bulkCreateIdempotent();
 
     // Then
     // Check fields are OK for first company
