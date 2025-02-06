@@ -29,6 +29,10 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../../../../Apps/common/queries/bsdd/queries";
+import {
+  cleanPackagings,
+  emptyPackaging
+} from "../../../../../form/bsdd/components/packagings/helpers";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -141,19 +145,18 @@ export default function SignTransportFormModalContent({
         update: {
           quantity: form.wasteDetails?.quantity ?? 0,
           sampleNumber: form.wasteDetails?.sampleNumber ?? "",
-          packagingInfos: form.wasteDetails?.packagingInfos?.length
-            ? form.wasteDetails?.packagingInfos
-            : [{ type: "", quantity: "", volume: "" } as any]
+          packagingInfos: form.wasteDetails?.packagingInfos ?? []
         }
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
         try {
           const { update } = values;
+          const packagingsInfoUpdate = cleanPackagings(update.packagingInfos);
           if (
             update.sampleNumber ||
             (form.emitter?.type === EmitterType.Appendix1Producer &&
-              (update.quantity || update.packagingInfos.length > 0))
+              (update.quantity || packagingsInfoUpdate.length > 0))
           ) {
             await updateForm({
               variables: {
@@ -165,7 +168,7 @@ export default function SignTransportFormModalContent({
                       sampleNumber: update.sampleNumber
                     }),
                     ...(update.packagingInfos.length > 0 && {
-                      packagingInfos: update.packagingInfos
+                      packagingInfos: packagingsInfoUpdate
                     })
                   }
                 }

@@ -23,6 +23,10 @@ import SignatureCodeInput from "../../../../../form/common/components/custom-inp
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
+import {
+  cleanPackagings,
+  emptyPackaging
+} from "../../../../../form/bsdd/components/packagings/helpers";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -114,23 +118,12 @@ function SignEmissionFormModalContent({
     emittedByType: EmitterType.Emitter,
     securityCode: "",
     emitter: { type: form?.emitter?.type },
-    ...(form.status === FormStatus.Resealed
-      ? {
-          packagingInfos:
-            form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
-          quantity: form.temporaryStorageDetail?.wasteDetails?.quantity ?? 0,
-          onuCode: form.temporaryStorageDetail?.wasteDetails?.onuCode ?? "",
-          transporterNumberPlate:
-            form.temporaryStorageDetail?.transporter?.numberPlate ?? ""
-        }
-      : {
-          packagingInfos: form.wasteDetails?.packagingInfos?.length
-            ? form.wasteDetails?.packagingInfos
-            : [{ type: "", quantity: "", volume: "" }],
-          quantity: form.wasteDetails?.quantity ?? 0,
-          onuCode: form.wasteDetails?.onuCode ?? "",
-          transporterNumberPlate: form.transporter?.numberPlate ?? ""
-        })
+    packagingInfos: form.wasteDetails?.packagingInfos?.length
+      ? form.wasteDetails?.packagingInfos
+      : [emptyPackaging],
+    quantity: form.wasteDetails?.quantity ?? 0,
+    onuCode: form.wasteDetails?.onuCode ?? "",
+    transporterNumberPlate: form.transporter?.numberPlate ?? ""
   };
 
   const handlesubmit = async values => {
@@ -141,7 +134,7 @@ function SignEmissionFormModalContent({
           input: {
             quantity: values.quantity,
             onuCode: values.onuCode,
-            packagingInfos: values.packagingInfos,
+            packagingInfos: cleanPackagings(values.packagingInfos),
             transporterNumberPlate: values.transporterNumberPlate,
             emittedAt: values.emittedAt,
             emittedBy: values.emittedBy,

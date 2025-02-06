@@ -43,7 +43,7 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
         summary += ` de ${packagingInfo.volume} ${volumeUnit}`;
       }
 
-      if (packagingInfo.identificationNumbers) {
+      if (packagingInfo.identificationNumbers?.length) {
         summary += ` (n° ${packagingInfo.identificationNumbers.join(", ")})`;
       }
 

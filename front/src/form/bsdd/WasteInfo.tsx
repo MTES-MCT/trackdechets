@@ -22,6 +22,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FormFormikValues } from "./utils/initial-state";
 import PackagingList from "./components/packagings/PackagingList";
 import { Packagings } from "@td/codegen-ui";
+import { emptyPackaging } from "./components/packagings/helpers";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -190,7 +191,7 @@ export default function WasteInfo({ disabled }) {
           onChange={checked => {
             const updatedPackagings = checked
               ? [{ type: Packagings.Pipeline, quantity: 1 }]
-              : [{ type: "", quantity: "", volume: "" }];
+              : [emptyPackaging];
             setFieldValue("wasteDetails.packagingInfos", updatedPackagings);
           }}
         />

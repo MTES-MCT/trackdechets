@@ -23,6 +23,7 @@ import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
+import { emptyPackaging } from "../../../../../form/bsdd/components/packagings/helpers";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -202,7 +203,15 @@ export function FormWasteTransportSummary({
               {form.emitter?.type === EmitterType.Appendix1Producer && (
                 <button
                   type="button"
-                  onClick={() => addField("packagingInfos")}
+                  onClick={() => {
+                    addField("packagingInfos");
+                    setFieldValue(
+                      "update.packagingInfos",
+                      form.wasteDetails?.packagingInfos?.length
+                        ? form.wasteDetails?.packagingInfos
+                        : [emptyPackaging]
+                    );
+                  }}
                   className="tw-ml-2"
                 >
                   <IconPaperWrite color="blue" />
