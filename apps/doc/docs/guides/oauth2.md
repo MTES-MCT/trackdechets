@@ -112,9 +112,9 @@ Pragma: no-cache
 {
   "access_token":"*****************",
   "token_type":"bearer",
-    user: {
-      email: "foo@bar.com",
-      name: "Foo Bar"
+    "user": {
+      "email": "foo@bar.com",
+      "name": "Foo Bar"
     }
 }
 ```
