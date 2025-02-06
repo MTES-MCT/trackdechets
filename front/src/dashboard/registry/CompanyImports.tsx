@@ -47,13 +47,13 @@ export function CompanyImports() {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ErrorFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
   async function downloadImportFile(importId: string) {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ImportFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
 
   const tableData =
