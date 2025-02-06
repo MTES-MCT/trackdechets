@@ -71,13 +71,16 @@ export const reportAsCompanySiretSchema = z
 export const getWasteCodeSchema = (
   wasteCodes: WasteCodeEnum = BSDD_WASTE_CODES_ENUM
 ) =>
-  z.coerce.string().pipe(
-    z.enum(wasteCodes, {
-      required_error: "Le code déchet est requis",
-      invalid_type_error:
-        "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
-    })
-  );
+  z.coerce
+    .string()
+    .nullish() // So that coercion is a no-op for null & undefined. This enables the use of .nullish() on getWasteCodeSchema
+    .pipe(
+      z.enum(wasteCodes, {
+        required_error: "Le code déchet est requis",
+        invalid_type_error:
+          "Le code déchet n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces."
+      })
+    );
 
 export const booleanSchema = z.union(
   [
@@ -329,18 +332,19 @@ export const municipalitiesNamesSchema = z
 
 export const declarationNumberSchema = z
   .string()
-  .trim()
-  .regex(
-    /^A7[EI][0-9]{10}$/,
+  .transform(v => v.replace(/\s+/g, ""))
+  .refine(
+    v => /^A7[EI][0-9]{10}$/.test(v),
     "Le numéro de déclaration GISTRID ne respecte pas le format attendu"
   )
+
   .nullish();
 
 export const notificationNumberSchema = z
   .string()
-  .trim()
-  .regex(
-    /^[A-Z]{2}[0-9]{10}$/,
+  .transform(v => v.replace(/\s+/g, ""))
+  .refine(
+    v => /^[A-Z]{2}[0-9]{10}$/.test(v),
     "Le numéro de notification GISTRID ne respecte pas le format attendu"
   )
   .nullish();
@@ -348,9 +352,9 @@ export const notificationNumberSchema = z
 const parcelNumbersArraySchema = z.array(
   z
     .string()
-    .trim()
-    .regex(
-      /^\d{3}-[A-Z]{2}-\d{2}$/,
+    .transform(v => v.replace(/\s+/g, ""))
+    .refine(
+      v => /^\d{3}-[A-Z]{2}-\d{2}$/.test(v),
       "Le numéro de parcelle ne respecte pas le format attendu"
     )
 );
@@ -495,7 +499,7 @@ export const transportModeSchema = z
     }
   });
 
-export const transportRecepisseNumberSchema = z
+export const transportRecepisseNumberSchema = z.coerce
   .string()
   .trim()
   .min(

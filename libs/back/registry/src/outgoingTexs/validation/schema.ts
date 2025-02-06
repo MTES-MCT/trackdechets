@@ -54,7 +54,7 @@ const inputOutgoingTexsSchema = z.object({
   wasteDescription: wasteDescriptionSchema,
   wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
   wastePop: booleanSchema,
-  wasteIsDangerous: booleanSchema,
+  wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
   dispatchDate: nullishDateSchema,
   wasteDap: z
@@ -130,7 +130,7 @@ const inputOutgoingTexsSchema = z.object({
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .nullish(),
-  isDirectSupply: z.boolean().nullish(),
+  isDirectSupply: booleanSchema.nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
   transporter1CompanyOrgId: actorOrgIdSchema.nullish(),

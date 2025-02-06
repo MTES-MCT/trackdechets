@@ -1,6 +1,10 @@
 import { pluralize } from "@td/constants";
 import { prisma } from "@td/prisma";
-import { UNAUTHORIZED_ERROR, type ImportOptions } from "@td/registry";
+import {
+  UNAUTHORIZED_ERROR,
+  type ImportOptions,
+  isAuthorized
+} from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
@@ -63,13 +67,14 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     if (result.success) {
       const { reportAsCompanySiret, reportForCompanySiret } = result.data;
 
-      // Check rights
-      const contextualAllowedSirets = [
-        ...userSirets,
-        ...(delegateToDelegatorsMap.get(reportAsCompanySiret ?? "") ?? [])
-      ];
-
-      if (!contextualAllowedSirets.includes(reportForCompanySiret)) {
+      if (
+        !isAuthorized({
+          reportAsCompanySiret,
+          delegateToDelegatorsMap,
+          reportForCompanySiret,
+          allowedSirets: userSirets
+        })
+      ) {
         errors.set(line.publicId, UNAUTHORIZED_ERROR);
         continue;
       }

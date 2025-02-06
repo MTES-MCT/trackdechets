@@ -263,6 +263,7 @@ export const INCOMING_TEXS_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
   "D 14",
   "D 15",
   "R 1",
+  "R 2",
   "R 3",
   "R 5",
   "R 10",

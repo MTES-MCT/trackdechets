@@ -7,7 +7,8 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
-  RegistryDownloadTarget
+  RegistryDownloadTarget,
+  RegistryImportStatus
 } from "@td/codegen-ui";
 import { format } from "date-fns";
 import React, { useState } from "react";
@@ -86,7 +87,10 @@ export function MyImports() {
         importData.node.numberOfEdits +
         importData.node.numberOfCancellations +
         importData.node.numberOfSkipped ===
-      0 ? (
+        0 &&
+      ![RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
+        importData.node.status
+      ) ? (
         "Fichier d'import vide"
       ) : (
         <ul>
