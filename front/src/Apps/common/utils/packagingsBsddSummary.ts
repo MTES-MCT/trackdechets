@@ -17,6 +17,11 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     (acc, packagingInfo) => acc + packagingInfo.quantity,
     0
   );
+
+  if (total === 0) {
+    return "";
+  }
+
   const packages = [...packagingInfos]
     .sort((p1, p2) => p1.type.localeCompare(p2.type))
     .map(packagingInfo => {
@@ -51,13 +56,17 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     })
     .join(", ");
 
-  return formTransportIsPipeline({
+  const isPipeline = formTransportIsPipeline({
     wasteDetails: {
       packagingInfos
     }
-  })
-    ? `${packages}`
-    : `${total} colis : ${packages}`;
+  });
+
+  if (isPipeline) {
+    return packages;
+  }
+
+  return `${total} colis : ${packages}`;
 }
 
 export const formTransportIsPipeline = (

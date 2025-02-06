@@ -3,7 +3,7 @@ import {
   Form,
   InitialForm,
   InitialFormFraction,
-  Packagings
+  PackagingInfo
 } from "@td/codegen-ui";
 import {
   FieldArray,
@@ -20,6 +20,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { totalPackagings } from "./helpers";
 
 type Appendix2MultiSelectProps = {
   // Résultat de la query `appendixForms` executé
@@ -30,13 +31,7 @@ type Appendix2MultiSelectProps = {
   updateTotalQuantity: (totalQuantity: number) => void;
   // callback permettant de mettre à jour la liste de contenants
   // du bordereau en fonction des annexes 2 sélectionnées
-  updatePackagings: (
-    packagings: {
-      type: string;
-      other: string;
-      quantity: any;
-    }[]
-  ) => void;
+  updatePackagings: (packagings: PackagingInfo[]) => void;
 };
 
 // Limite le nombre de bordereaux que l'on peut afficher dans le tableau
@@ -186,49 +181,8 @@ export default function Appendix2MultiSelect({
       }, new Decimal(0))
       .toNumber();
 
-    // Auto-complète les contenants à partir des annexes 2 sélectionnés
-    const totalPackagings = (() => {
-      const quantityByType = currentlyAnnexedForms.reduce(
-        (acc1, { form, quantity }) => {
-          if (!form.wasteDetails?.packagingInfos || !quantity) {
-            return acc1;
-          }
-
-          return form.wasteDetails.packagingInfos.reduce(
-            (acc2, packagingInfo) => {
-              if (!acc2[packagingInfo.type]) {
-                return {
-                  ...acc2,
-                  [packagingInfo.type]: packagingInfo.quantity
-                };
-              }
-              return {
-                ...acc2,
-                [packagingInfo.type]: [
-                  Packagings.Benne,
-                  Packagings.Citerne
-                ].includes(packagingInfo.type)
-                  ? Math.min(
-                      packagingInfo.quantity + acc2[packagingInfo.type],
-                      2
-                    )
-                  : packagingInfo.quantity + acc2[packagingInfo.type]
-              };
-            },
-            acc1
-          );
-        },
-        {}
-      );
-      return Object.keys(quantityByType).map(type => ({
-        type,
-        other: "",
-        quantity: quantityByType[type]
-      }));
-    })();
-
     updateTotalQuantity(totalQuantity);
-    updatePackagings(totalPackagings);
+    updatePackagings(totalPackagings(currentlyAnnexedForms));
   }, [currentlyAnnexedForms, updateTotalQuantity, updatePackagings]);
 
   // Auto-complète la quantité totale à partir des annexes 2 sélectionnées

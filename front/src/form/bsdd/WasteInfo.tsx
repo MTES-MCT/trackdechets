@@ -183,19 +183,21 @@ export default function WasteInfo({ disabled }) {
         </>
       )}
 
-      <div className="form__row" style={{ flexDirection: "row" }}>
-        <Switch
-          label="Le déchet est conditionné pour pipeline"
-          disabled={disabled}
-          checked={isPipeline}
-          onChange={checked => {
-            const updatedPackagings = checked
-              ? [{ type: Packagings.Pipeline, quantity: 1 }]
-              : [emptyPackaging];
-            setFieldValue("wasteDetails.packagingInfos", updatedPackagings);
-          }}
-        />
-      </div>
+      {values.emitter?.type !== "APPENDIX1" && (
+        <div className="form__row" style={{ flexDirection: "row" }}>
+          <Switch
+            label="Le déchet est conditionné pour pipeline"
+            disabled={disabled}
+            checked={isPipeline}
+            onChange={checked => {
+              const updatedPackagings = checked
+                ? [{ type: Packagings.Pipeline, quantity: 1 }]
+                : [emptyPackaging];
+              setFieldValue("wasteDetails.packagingInfos", updatedPackagings);
+            }}
+          />
+        </div>
+      )}
 
       {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
         <>

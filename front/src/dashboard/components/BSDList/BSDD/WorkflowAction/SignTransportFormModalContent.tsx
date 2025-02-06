@@ -29,10 +29,7 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../../../../Apps/common/queries/bsdd/queries";
-import {
-  cleanPackagings,
-  emptyPackaging
-} from "../../../../../form/bsdd/components/packagings/helpers";
+import { cleanPackagings } from "../../../../../form/bsdd/components/packagings/helpers";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
