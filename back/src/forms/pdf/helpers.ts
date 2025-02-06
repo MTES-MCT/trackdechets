@@ -70,9 +70,10 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
         ")"
       ].join("");
     } else if (volumes.length === 1) {
-      // Un seul type de volume ou de conditionnement de type Autre
-      // On ajoute ces valeurs après le type de conditionnement
-      // Exemple  GRV 30l ou Benne 20m3 ou Autre Caisse plastique
+      // Un seul type de volume :
+      // On ajoute la valeur après le type de conditionnement
+      // en faisant un cas particulier pour le type Benne qui s'exprime en m3
+      // Exemple  GRV 30l ou Benne 20m3
       const volume = packagings[0].volume;
       conditionnement = [
         conditionnement,

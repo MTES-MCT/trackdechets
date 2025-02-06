@@ -5,6 +5,7 @@ import PackagingForm from "./PackagingForm";
 
 type PackagingListProps = {
   fieldName: string;
+  disabled?: boolean;
 };
 
 const packagingTypeOptions = [
@@ -15,7 +16,7 @@ const packagingTypeOptions = [
   { value: Packagings.Autre, label: "Autre" }
 ];
 
-function PackagingList({ fieldName }: PackagingListProps) {
+function PackagingList({ fieldName, disabled = false }: PackagingListProps) {
   const [field] = useField<PackagingInfoInput[]>(fieldName);
 
   const packagings = field.value;
@@ -47,11 +48,13 @@ function PackagingList({ fieldName }: PackagingListProps) {
                   packaging={p}
                   setPackaging={p => replace(idx, p)}
                   packagingTypeOptions={options}
+                  disabled={disabled}
                 />
                 {packagings.length > 1 && (
                   <>
                     <button
                       type="button"
+                      disabled={disabled}
                       className="fr-btn fr-btn--tertiary fr-mb-2w"
                       onClick={() => remove(idx)}
                     >
@@ -66,6 +69,7 @@ function PackagingList({ fieldName }: PackagingListProps) {
             <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
               <button
                 type="button"
+                disabled={disabled}
                 className="fr-btn fr-btn--secondary"
                 onClick={() => {
                   push({ type: "", quantity: "" });

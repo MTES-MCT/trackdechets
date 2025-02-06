@@ -12,12 +12,14 @@ type PackagingFormProps = {
   packaging: PackagingInfoInput;
   setPackaging: (packaging: PackagingInfoInput) => void;
   packagingTypeOptions: { value: Packagings; label: string }[];
+  disabled?: boolean;
 };
 
 function PackagingForm({
   packaging,
   setPackaging,
-  packagingTypeOptions
+  packagingTypeOptions,
+  disabled = false
 }: PackagingFormProps) {
   const maxQuantity =
     packaging.type === Packagings.Citerne || packaging.type === Packagings.Benne
@@ -45,6 +47,7 @@ function PackagingForm({
         <div className="fr-col-md-6 fr-col-12">
           <Select
             label="Type"
+            disabled={disabled}
             nativeSelectProps={{
               value: packaging.type,
               onChange: event => {
@@ -77,6 +80,7 @@ function PackagingForm({
           <NonScrollableInput
             label={`Volume en ${volumeUnit} (optionnel)`}
             className="fr-mb-2w"
+            disabled={disabled}
             nativeInputProps={{
               type: "number",
               inputMode: "decimal",
@@ -113,6 +117,7 @@ function PackagingForm({
             className="fr-mb-2w"
             state={quantityError ? "error" : "default"}
             stateRelatedMessage={quantityError}
+            disabled={disabled}
             nativeInputProps={{
               type: "number",
               inputMode: "numeric",
@@ -136,6 +141,7 @@ function PackagingForm({
           <div className="fr-col-12">
             <Input
               label="Nom du type de contenant"
+              disabled={disabled}
               nativeInputProps={{
                 value: packaging.other ?? "",
                 onChange: event =>
@@ -150,6 +156,7 @@ function PackagingForm({
           <TagsInput
             label="N° de contenant (optionnel)"
             tags={packaging.identificationNumbers ?? []}
+            disabled={disabled}
             onAddTag={tag =>
               setPackaging({
                 ...packaging,

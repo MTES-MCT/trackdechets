@@ -185,6 +185,7 @@ export default function WasteInfo({ disabled }) {
       <div className="form__row" style={{ flexDirection: "row" }}>
         <Switch
           label="Le déchet est conditionné pour pipeline"
+          disabled={disabled}
           checked={isPipeline}
           onChange={checked => {
             const updatedPackagings = checked
@@ -198,7 +199,10 @@ export default function WasteInfo({ disabled }) {
       {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
         <>
           <h4 className="form__section-heading">Conditionnement</h4>
-          <PackagingList fieldName="wasteDetails.packagingInfos" />
+          <PackagingList
+            fieldName="wasteDetails.packagingInfos"
+            disabled={disabled}
+          />
         </>
       )}
 

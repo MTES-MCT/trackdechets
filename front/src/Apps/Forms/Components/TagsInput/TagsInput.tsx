@@ -76,9 +76,10 @@ const TagsInput = ({
           <div key={idx}>
             <Tag
               className="fr-mb-1v"
-              dismissible
+              dismissible={!disabled}
               nativeButtonProps={{
                 type: "button",
+                disabled,
                 onClick: () => {
                   onDeleteTag(idx);
                 }
