@@ -136,7 +136,7 @@ model RegistryIncomingWaste {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean
+    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -265,7 +265,7 @@ model RegistryIncomingTexs {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean
+    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
