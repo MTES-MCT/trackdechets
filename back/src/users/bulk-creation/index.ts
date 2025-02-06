@@ -23,6 +23,7 @@ import {
 } from "@prisma/client";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 import { UserInputError } from "../../common/errors";
+import { getCompanyRepository } from "../../companies/repository";
 
 function printHelp() {
   console.log(`
@@ -82,7 +83,6 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   // perform validation
   for (const company of companiesRows) {
-    console.info(`Validate company ${company.siret}`);
     try {
       const validCompany = await companyValidationSchema.validate(company);
       companies.push(validCompany);
@@ -158,40 +158,43 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
-      await prisma.company.create({
-        data: {
-          orgId: company.siret,
-          siret: company.siret,
-          verificationStatus: CompanyVerificationStatus.VERIFIED,
-          verificationMode: CompanyVerificationMode.MANUAL,
-          verifiedAt: new Date(),
-          verificationComment: "Import en masse",
-          codeNaf: company.codeNaf,
-          gerepId: company.gerepId,
-          name: company.name!,
-          companyTypes: {
-            set: company.companyTypes as CompanyType[]
-          },
-          collectorTypes: {
-            set: company.collectorTypes as CollectorType[]
-          },
-          wasteProcessorTypes: {
-            set: company.wasteProcessorTypes as WasteProcessorType[]
-          },
-          wasteVehiclesTypes: {
-            set: company.wasteVehiclesTypes as WasteVehiclesType[]
-          },
-          securityCode: randomNumber(4),
-          givenName: company.givenName,
-          contactEmail: company.contactEmail,
-          contactPhone: company.contactPhone,
-          contact: company.contact,
-          website: company.website,
-          verificationCode: randomNumber(5).toString(),
-          address: company.address,
-          latitude: company.latitude,
-          longitude: company.longitude
-        }
+
+      const { createCompany } = await getCompanyRepository({
+        id: "support_tech"
+      } as Express.User);
+
+      await createCompany({
+        orgId: company.siret,
+        siret: company.siret,
+        verificationStatus: CompanyVerificationStatus.VERIFIED,
+        verificationMode: CompanyVerificationMode.MANUAL,
+        verifiedAt: new Date(),
+        verificationComment: "Import en masse",
+        codeNaf: company.codeNaf,
+        gerepId: company.gerepId,
+        name: company.name!,
+        companyTypes: {
+          set: company.companyTypes as CompanyType[]
+        },
+        collectorTypes: {
+          set: company.collectorTypes as CollectorType[]
+        },
+        wasteProcessorTypes: {
+          set: company.wasteProcessorTypes as WasteProcessorType[]
+        },
+        wasteVehiclesTypes: {
+          set: company.wasteVehiclesTypes as WasteVehiclesType[]
+        },
+        securityCode: randomNumber(4),
+        givenName: company.givenName,
+        contactEmail: company.contactEmail,
+        contactPhone: company.contactPhone,
+        contact: company.contact,
+        website: company.website,
+        verificationCode: randomNumber(5).toString(),
+        address: company.address,
+        latitude: company.latitude,
+        longitude: company.longitude
       });
     }
   }

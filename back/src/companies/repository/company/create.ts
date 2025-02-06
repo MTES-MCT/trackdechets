@@ -10,9 +10,6 @@ export type CreateCompanyFn = (
   logMetadata?: LogMetadata
 ) => Promise<Company>;
 
-// TODO: anonymous Company
-// TODO: batch creation
-
 export const buildCreateCompany = (deps: RepositoryFnDeps): CreateCompanyFn => {
   return async data => {
     const { prisma } = deps;
