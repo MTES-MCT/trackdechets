@@ -6,8 +6,8 @@ import { Company } from "@prisma/client";
 // back/src/companies/sirene/insee/client.ts
 // back/src/companies/sirene/trackdechets/client.ts
 
-// TODO entreprises sans libellé de voie?
-// ex: https://annuaire-entreprises.data.gouv.fr/etablissement/31368228800011?redirected=1
+// Résultat avec la DB de sandbox:
+// 30162 entreprises mises à jour, 0 erreurs (0%), 108 ignorées (0%) en 713504ms!
 
 (async function () {
   console.log(">> Lancement du script de mise à jour des adresses splittées");
@@ -96,12 +96,12 @@ import { Company } from "@prisma/client";
   const duration = new Date().getTime() - startDate.getTime();
 
   console.log(
-    `${companiesTotal} mises à jour, ${errors} erreurs (${Math.round(
+    `${companiesTotal} entreprises mises à jour, ${errors} erreurs (${Math.round(
       (errors / companiesTotal) * 100
     )}%), ${ignored} ignorées (${Math.round(
       (ignored / companiesTotal) * 100
     )}%) en ${duration}ms!`
   );
 
-  console.log("Terminée!");
+  console.log("Terminé!");
 })().then(() => process.exit());

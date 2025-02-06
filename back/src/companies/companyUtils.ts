@@ -3,8 +3,24 @@ import { splitAddress } from "../common/addresses";
 import { Company } from "@prisma/client";
 import { isDefinedStrict } from "../common/helpers";
 
+/**
+ * Retourne l'adresse splittée d'une entreprise ('street', 'postalCode', 'city', 'country').
+ *
+ * Essaie d'abord d'interroger les APIs / ES pour avoir l'adresse splittée,
+ * et en cas de souci, essaie de splitter l'adresse manuellement.
+ *
+ * Si le split n'a pas fonctionné, retourne tous les champs à null.
+ *
+ * Attention: certaines entreprises ont des addresses du genre "codePostal ville",
+ * auquel cas on retourne "" pour la rue.
+ */
 export const getCompanySplittedAddress = async (company: Company) => {
-  const searchedCompany = await searchCompany(company.orgId);
+  let searchedCompany;
+  try {
+    searchedCompany = await searchCompany(company.orgId);
+  } catch (_) {
+    // Peut potentiellement soulever une ClosedCompanyError
+  }
 
   let res;
 
@@ -14,12 +30,12 @@ export const getCompanySplittedAddress = async (company: Company) => {
     !searchedCompany ||
     // ...si entreprise étrangère
     isDefinedStrict(searchedCompany.codePaysEtrangerEtablissement) ||
-    // ...si le retour des APIs ne comprend pas d'adresse
-    !isDefinedStrict(searchedCompany?.addressVoie?.trim())
+    // ...si le retour des APIs ne comprend pas d'adresse fiable
+    !isDefinedStrict(searchedCompany?.addressPostalCode?.trim())
   ) {
     res = splitAddress(company.address, company.vatNumber);
   }
-  // Split automatique avec les données retournées par l'API
+  // Sinon, split avec les données retournées par les APIs
   else {
     res = {
       street: searchedCompany.addressVoie,
@@ -29,10 +45,11 @@ export const getCompanySplittedAddress = async (company: Company) => {
     };
   }
 
-  // On ne retourne pas de demi-résultat. Si le split n'a pas marché, on
-  // ne sauvegarde rien en base
+  // Un certain nombre d'entreprises ont des addresses du genre "codePostal ville"
+  // (donc on tolère l'absence de libellé de voie)
+  // Mais s'il manque le code postal ou la ville, on considère l'adresse comme invalide.
+  // On retourne null plutôt qu'une adrese semi-complète.
   if (
-    !isDefinedStrict(res.street?.trim()) ||
     !isDefinedStrict(res.postalCode?.trim()) ||
     !isDefinedStrict(res.city?.trim())
   ) {

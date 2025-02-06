@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { getCompanySplittedAddress } from "../companyUtils";
 import { searchCompany } from "../search";
+import { ClosedCompanyError } from "../sirene/errors";
 
 jest.mock("../search", () => ({
   searchCompany: jest.fn().mockResolvedValue({ etatAdministratif: "A" })
@@ -70,7 +71,7 @@ describe("getCompanySplittedAddress", () => {
     expect(splittedAddress?.country).toBe("BE");
   });
 
-  it("[edge-case] no address is returned > should update with company's address", async () => {
+  it("no address is returned > should update with company's address manual split", async () => {
     // Given
     const { company } = await userWithCompanyFactory("ADMIN", {
       name: "Acme FR",
@@ -95,7 +96,7 @@ describe("getCompanySplittedAddress", () => {
     expect(splittedAddress?.country).toBe("FR");
   });
 
-  it("[edge-case] aberrant address > should return null", async () => {
+  it("aberrant address > should return null", async () => {
     // Given
     const { company } = await userWithCompanyFactory("ADMIN", {
       name: "Acme FR",
@@ -118,5 +119,79 @@ describe("getCompanySplittedAddress", () => {
     expect(splittedAddress?.postalCode).toBe(null);
     expect(splittedAddress?.city).toBe(null);
     expect(splittedAddress?.country).toBe(null);
+  });
+
+  it("searchCompany throws error > should do manual split", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory("ADMIN", {
+      name: "Acme FR",
+      vatNumber: null,
+      address: "4 boulevard pasteur 44100 Nantes"
+    });
+
+    (searchCompany as jest.Mock).mockRejectedValueOnce(
+      new ClosedCompanyError()
+    );
+
+    // When
+    const splittedAddress = await getCompanySplittedAddress(company);
+
+    // Then
+    expect(splittedAddress?.street).toBe("4 boulevard pasteur");
+    expect(splittedAddress?.postalCode).toBe("44100");
+    expect(splittedAddress?.city).toBe("Nantes");
+    expect(splittedAddress?.country).toBe("FR");
+  });
+
+  it("partial addresses with no street > should return postalCode and city (API split)", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory("ADMIN", {
+      name: "Acme FR",
+      vatNumber: null,
+      address: "48170 CHAUDEYRAC"
+    });
+
+    (searchCompany as jest.Mock).mockReturnValueOnce({
+      orgId: company.orgId,
+      siret: company.orgId,
+      etatAdministratif: "A",
+      addressVoie: "",
+      addressPostalCode: "48170",
+      addressCity: "CHAUDEYRAC",
+      codePaysEtrangerEtablissement: ""
+    });
+
+    // When
+    const splittedAddress = await getCompanySplittedAddress(company);
+
+    // Then
+    expect(splittedAddress?.street).toBe("");
+    expect(splittedAddress?.postalCode).toBe("48170");
+    expect(splittedAddress?.city).toBe("CHAUDEYRAC");
+    expect(splittedAddress?.country).toBe("FR");
+  });
+
+  it("partial addresses with no street > should return postalCode and city (manual split)", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory("ADMIN", {
+      name: "Acme FR",
+      vatNumber: null,
+      address: "48170 CHAUDEYRAC"
+    });
+
+    (searchCompany as jest.Mock).mockRejectedValueOnce(
+      new ClosedCompanyError()
+    );
+
+    // When
+    const splittedAddress = await getCompanySplittedAddress(company);
+
+    console.log("splittedAddress", splittedAddress);
+
+    // Then
+    expect(splittedAddress?.street).toBe("");
+    expect(splittedAddress?.postalCode).toBe("48170");
+    expect(splittedAddress?.city).toBe("CHAUDEYRAC");
+    expect(splittedAddress?.country).toBe("FR");
   });
 });
