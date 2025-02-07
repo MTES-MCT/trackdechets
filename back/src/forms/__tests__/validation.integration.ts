@@ -1084,12 +1084,29 @@ describe("receivedInfosSchema", () => {
   describe("quantityRefused", () => {
     const form = {
       receivedBy: "Bill",
-      createdAt: new Date("2020-01-17T10:12:00+0100"),
+      createdAt: new Date("2025-03-20T10:12:00+0100"),
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it.only("quantityRefused is required if wasteAcceptationStatus + quantityReceived (PARTIALLY_REFUSED)", async () => {
+    it("quantityRefused is NOT required for legacy BSDs", async () => {
+      // Given
+      const update = {
+        ...form,
+        createdAt: new Date("2025-02-20T10:12:00+0100"),
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        wasteRefusalReason: "Reason",
+        quantityReceived: 10
+      };
+
+      // When
+      const isValid = await receivedInfoSchema.validate(update);
+
+      // Then
+      expect(isValid).toBeTruthy();
+    });
+
+    it("quantityRefused is required if wasteAcceptationStatus + quantityReceived (PARTIALLY_REFUSED)", async () => {
       // Given
       const update = {
         ...form,
