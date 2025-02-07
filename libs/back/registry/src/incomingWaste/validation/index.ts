@@ -4,7 +4,8 @@ import {
   refineMunicipalities,
   refineNotificationNumber,
   refineOperationMode,
-  refineWeightAndVolume
+  refineWeightAndVolume,
+  refineWeightIsEstimate
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -28,6 +29,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineIsDangerous)
     .superRefine(refineWeighingHour)
     .superRefine(refineWeightAndVolume)
+    .superRefine(refineWeightIsEstimate)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)

@@ -16,14 +16,14 @@ import {
   RegistryImportJobArgs
 } from "../processRegistryImport";
 
-const getCorrectLine = (siret: string) => {
+const getCorrectLine = (siret: string, reportAsSiret?: string) => {
   const sixMonthsAgo = subMonths(new Date(), 6);
   const processingDate = format(sixMonthsAgo, "yyyy-MM-dd");
   const useDate = format(addDays(sixMonthsAgo, 1), "yyyy-MM-dd");
   const value = {
     reason: "",
     publicId: 1,
-    reportAsCompanySiret: "",
+    reportAsCompanySiret: reportAsSiret,
     reportForCompanySiret: siret,
     useDate,
     dispatchDate: "",
@@ -412,7 +412,9 @@ describe("Process registry import job", () => {
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
-        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+        Object.values(
+          getCorrectLine(company.orgId, delegationCompany.orgId)
+        ).join(";") + "\n"
       );
 
       await upload.done();

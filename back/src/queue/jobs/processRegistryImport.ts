@@ -75,10 +75,11 @@ export async function processRegistryImportJob(
   });
   const creatorCompanies = await getUserCompanies(registryImport.createdById);
   const allowedSirets = creatorCompanies.map(company => company.orgId);
+  const allowedCompanyIds = creatorCompanies.map(company => company.id);
 
   const givenDelegations = await prisma.registryDelegation.findMany({
     where: {
-      delegateId: { in: allowedSirets },
+      delegateId: { in: allowedCompanyIds },
       revokedBy: null,
       cancelledBy: null,
       startDate: { lte: new Date() },

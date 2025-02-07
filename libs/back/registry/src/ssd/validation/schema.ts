@@ -40,7 +40,7 @@ const inputSsdSchema = z.object({
   wasteCode: getWasteCodeSchema(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  secondaryWasteCodes: z
+  secondaryWasteCodes: z.coerce
     .string()
     .trim()
     .nullish()
