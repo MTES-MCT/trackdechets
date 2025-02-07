@@ -300,16 +300,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -349,16 +344,12 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -398,16 +389,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -447,16 +433,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -577,6 +558,7 @@ describe("Mutation.createFormRevisionRequest", () => {
             readableId: getReadableId(),
             ownerId: user.id,
             quantityReceived: 2.4,
+            quantityRefused: 0,
             wasteAcceptationStatus: "ACCEPTED",
             receivedAt: "2022-03-20T00:00:00.000Z",
             receivedBy: "John Doe",
