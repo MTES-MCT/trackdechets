@@ -337,7 +337,7 @@ function Step3({ registryImportId }) {
       numberOfInsertions,
       pluralize(
         "nouvelle ligne a été importée",
-        numberOfErrors,
+        numberOfInsertions,
         "nouvelles lignes ont été importées"
       )
     ],
@@ -345,7 +345,7 @@ function Step3({ registryImportId }) {
       numberOfEdits,
       pluralize(
         "ligne existante a été modifée",
-        numberOfErrors,
+        numberOfEdits,
         "lignes existantes ont été modifées"
       )
     ],
@@ -353,7 +353,7 @@ function Step3({ registryImportId }) {
       numberOfCancellations,
       pluralize(
         "ligne existante a été annulée",
-        numberOfErrors,
+        numberOfCancellations,
         "lignes existantes ont été annulées"
       )
     ],
@@ -361,7 +361,7 @@ function Step3({ registryImportId }) {
       numberOfSkipped,
       pluralize(
         "ligne a été ignorée (numéro unique déjà déclaré et aucun motif présent)",
-        numberOfErrors,
+        numberOfSkipped,
         "lignes ont été ignorées (numéro unique déjà déclaré et aucun motif présent)"
       )
     ]

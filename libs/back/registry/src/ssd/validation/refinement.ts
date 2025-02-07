@@ -46,6 +46,32 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 
   if (
+    ssdItem.useDate &&
+    ssdItem.processingEndDate &&
+    ssdItem.useDate < ssdItem.processingEndDate
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La date d'utilisation ne peut pas être antérieure à la date de fin traitement.",
+      path: ["useDate"]
+    });
+  }
+
+  if (
+    ssdItem.dispatchDate &&
+    ssdItem.processingEndDate &&
+    ssdItem.dispatchDate < ssdItem.processingEndDate
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La date d'expédition ne peut pas être antérieure à la date de fin traitement.",
+      path: ["dispatchDate"]
+    });
+  }
+
+  if (
     ssdItem.processingEndDate &&
     ssdItem.processingEndDate < ssdItem.processingDate
   ) {
@@ -90,7 +116,7 @@ export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (
   if (wasteCodesLength !== wasteDescriptionsLength) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le nombre de code déchets secondaites doit correspondre au nombre de descriptions secondaires. ${wasteCodesLength} code(s) et ${wasteDescriptionsLength} description(s) fournis.`,
+      message: `Le nombre de code déchets secondaires doit correspondre au nombre de descriptions secondaires. ${wasteCodesLength} code(s) et ${wasteDescriptionsLength} description(s) fournis.`,
       path: ["secondaryWasteCodes"]
     });
   }

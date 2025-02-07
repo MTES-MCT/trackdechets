@@ -354,7 +354,7 @@ const parcelNumbersArraySchema = z.array(
     .string()
     .transform(v => v.replace(/\s+/g, ""))
     .refine(
-      v => /^\d{3}-[A-Z]{2}-\d{2}$/.test(v),
+      v => /^\d{1,3}-[A-Z]{2}-\d{1,4}$/.test(v),
       "Le numéro de parcelle ne respecte pas le format attendu"
     )
 );
@@ -419,7 +419,7 @@ export const actorTypeSchema = z.enum(
 export const actorOrgIdSchema = z.coerce
   .string()
   .trim()
-  .min(1, `Le numéro d'identification doit faire plus d'1 caractère`)
+  .min(1, `Le numéro d'identification doit faire plus de 1 caractère`)
   .max(27, `Le numéro d'identification ne peut pas dépasser 27 caractères`);
 
 export const actorSiretSchema = siretSchema.nullish();

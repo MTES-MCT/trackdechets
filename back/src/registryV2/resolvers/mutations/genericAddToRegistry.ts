@@ -41,9 +41,10 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
   }
 
   const userSirets = userCompanies.map(company => company.orgId);
+  const userCompanyIds = userCompanies.map(company => company.id);
   const givenDelegations = await prisma.registryDelegation.findMany({
     where: {
-      delegateId: { in: userSirets },
+      delegateId: { in: userCompanyIds },
       revokedBy: null,
       cancelledBy: null,
       startDate: { lte: new Date() },

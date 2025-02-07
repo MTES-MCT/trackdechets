@@ -301,17 +301,6 @@ export const refineWeightAndVolume: Refinement<{
       path: ["volume"]
     });
   }
-
-  if (
-    item.weightIsEstimate &&
-    ["R 1", "D 10", "D 5"].includes(item.operationCode)
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Pour les codes de traitement R 1, D 10 et D 5, le poids ne peut pas être estimé`,
-      path: ["weightIsEstimate"]
-    });
-  }
 };
 
 export const refineWeightIsEstimate: Refinement<{
