@@ -12,6 +12,7 @@ import { allowedFormats } from "../../../../common/dates";
 import {
   CompanyType,
   Status,
+  User,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -357,306 +358,328 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     expect(appendix2Forms).toEqual([]);
   });
 
-  test("user can mark BSD as ACCEPTED and specify quantityRefused = 0", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+  describe("quanityRefused", () => {
+    const createBSDD = async () => {
+      const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
 
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
+      const emitterCompany = await companyFactory();
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.TEMP_STORED,
+          emitterCompanySiret: emitterCompany.siret,
+          recipientCompanySiret: tempStorerCompany.siret,
+          recipientIsTempStorage: true,
+          forwardedIn: {
+            create: { readableId: getReadableId(), ownerId: user.id }
+          },
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z"
+        }
+      });
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-            wasteRefusalReason: "",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityRefused: 0,
-            quantityType: "REAL"
+      return { user, form };
+    };
+
+    const markBSDDAsAccepted = async (
+      user: User,
+      formId: string,
+      wasteAcceptationStatus: WasteAcceptationStatus,
+      quantityReceived: number,
+      quantityRefused: number | null,
+      wasteRefusalReason?: string | null
+    ) => {
+      const { mutate } = makeClient(user);
+      return await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
+        MARK_AS_TEMP_STORER_ACCEPTED,
+        {
+          variables: {
+            id: formId,
+            tempStorerAcceptedInfo: {
+              wasteAcceptationStatus,
+              wasteRefusalReason,
+              signedAt: "2019-01-18" as any,
+              signedBy: "John Doe",
+              quantityReceived,
+              quantityRefused,
+              quantityType: "REAL"
+            }
           }
         }
-      }
-    );
+      );
+    };
 
-    // Then
-    expect(errors).toBeUndefined();
+    describe("wasteAcceptationStatus = ACCEPTED", () => {
+      it("waste should be accepted", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-    const formAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.ACCEPTED,
+          2.4,
+          0
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+
+        expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual("ACCEPTED");
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(0);
+
+        const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.forwardedIn?.id }
+        });
+
+        expect(
+          forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()
+        ).toEqual(2.4);
+      });
+
+      it("quantityRefused is required", async () => {
+        // Given
+        const { user, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.ACCEPTED,
+          2.4,
+          null
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
+
+      it("quantityRefused must be zero", async () => {
+        // Given
+        const { user, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.ACCEPTED,
+          2.4,
+          1
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+        );
+      });
     });
 
-    expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
-    expect(formAfterMutation.wasteAcceptationStatus).toEqual("ACCEPTED");
-    expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
-    expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(0);
+    describe("wasteAcceptationStatus = REFUSED", () => {
+      it("waste should be refused", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-    const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.forwardedIn?.id }
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.REFUSED,
+          2.4,
+          2.4,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+
+        expect(formAfterMutation.status).toEqual("REFUSED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual("REFUSED");
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(2.4);
+
+        const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.forwardedIn?.id }
+        });
+
+        expect(
+          forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()
+        ).toEqual(0);
+
+        expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`
+          })
+        );
+      });
+
+      it("quantityRefused is required", async () => {
+        // Given
+        const { user, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.REFUSED,
+          2.4,
+          null,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
+
+      it("quantityRefused must = quantityReceived", async () => {
+        // Given
+        const { user, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.REFUSED,
+          2.4,
+          1,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
+        );
+      });
     });
 
-    expect(forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()).toEqual(
-      2.4
-    );
-  });
+    describe("wasteAcceptationStatus = PARTIALLY_REFUSED", () => {
+      it("waste should be partially refused", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-  test("user cannot mark BSD as ACCEPTED and specify quantityRefused != 0", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+          2.4,
+          1.1,
+          "Pas bon"
+        );
 
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
+        // Then
+        expect(errors).toBeUndefined();
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-            wasteRefusalReason: "",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityRefused: 1,
-            quantityType: "REAL"
-          }
-        }
-      }
-    );
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
-    );
-  });
+        expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual(
+          "PARTIALLY_REFUSED"
+        );
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(1.1);
 
-  test("user can mark BSD as REFUSED and specify quantityRefused = quantityReceived", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+        const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.forwardedIn?.id }
+        });
 
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
+        expect(
+          forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()
+        ).toEqual(1.3);
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
-            wasteRefusalReason: "Thats isn't what I was expecting man !",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityRefused: 2.4,
-            quantityType: "REAL"
-          }
-        }
-      }
-    );
+        // Mail
+        expect.objectContaining({
+          subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
+          body: expect.stringContaining(`<li>Quantité réelle présentée nette : 2.4 tonnes</li>
+        <li>Quantité refusée nette : 1.1 tonnes</li>
+        <li>Quantité acceptée nette : 1.3 tonnes</li>`)
+        });
+      });
 
-    // Then
-    expect(errors).toBeUndefined();
+      it("quantityRefused is required", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-    const formAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
-    });
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+          2.4,
+          null,
+          "Pas bon"
+        );
 
-    expect(formAfterMutation.status).toEqual("REFUSED");
-    expect(formAfterMutation.wasteAcceptationStatus).toEqual("REFUSED");
-    expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
-    expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(2.4);
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
 
-    const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.forwardedIn?.id }
-    });
+      it("quantityRefused cannot = 0", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-    expect(forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()).toEqual(
-      0
-    );
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+          2.4,
+          0,
+          "Pas bon"
+        );
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`
-      })
-    );
-  });
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
 
-  test("user cannot mark BSD as REFUSED and specify quantityRefused != quantityReceived", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
+      it("quantityRefused cannot = quantityReceived", async () => {
+        // Given
+        const { user, form } = await createBSDD();
 
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+          2.4,
+          2.4,
+          "Pas bon"
+        );
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
-            wasteRefusalReason: "Thats isn't what I was expecting man !",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityRefused: 2.3,
-            quantityType: "REAL"
-          }
-        }
-      }
-    );
-
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
-    );
-  });
-
-  test("user can mark BSD as PARTIALLY_REFUSED and specify quantityRefused", async () => {
-    // Given
-    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-
-    const emitterCompany = await companyFactory();
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.TEMP_STORED,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: tempStorerCompany.siret,
-        recipientIsTempStorage: true,
-        forwardedIn: {
-          create: { readableId: getReadableId(), ownerId: user.id }
-        },
-        receivedBy: "John Doe",
-        receivedAt: "2018-12-11T00:00:00.000Z"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "markAsTempStorerAccepted">>(
-      MARK_AS_TEMP_STORER_ACCEPTED,
-      {
-        variables: {
-          id: form.id,
-          tempStorerAcceptedInfo: {
-            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
-            wasteRefusalReason: "Thats isn't what I was expecting man !",
-            signedAt: "2019-01-18" as any,
-            signedBy: "John Doe",
-            quantityReceived: 2.4,
-            quantityRefused: 1.1,
-            quantityType: "REAL"
-          }
-        }
-      }
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-
-    const formAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
-    });
-
-    expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
-    expect(formAfterMutation.wasteAcceptationStatus).toEqual(
-      "PARTIALLY_REFUSED"
-    );
-    expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
-    expect(formAfterMutation.quantityRefused?.toNumber()).toEqual(1.1);
-
-    const forwardedFormAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.forwardedIn?.id }
-    });
-
-    expect(forwardedFormAfterMutation.wasteDetailsQuantity?.toNumber()).toEqual(
-      1.3
-    );
-
-    // Mail
-    expect.objectContaining({
-      subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
-      body: expect.stringContaining(`<li>Quantité réelle présentée nette : 2.4 tonnes</li>
-  <li>Quantité refusée nette : 1.1 tonnes</li>
-  <li>Quantité acceptée nette : 1.3 tonnes</li>`)
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
     });
   });
 });

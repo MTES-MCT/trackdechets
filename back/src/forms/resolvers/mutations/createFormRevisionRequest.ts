@@ -467,7 +467,7 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
             .nullable()
             .test(
               "is-empty",
-              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+              "Le champ wasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
               v => !v
             )
     ),

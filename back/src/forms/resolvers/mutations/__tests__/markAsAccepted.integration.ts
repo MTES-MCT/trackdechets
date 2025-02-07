@@ -5,6 +5,7 @@ import {
   EmptyReturnADR,
   Status,
   TransportMode,
+  User,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -725,52 +726,6 @@ describe("Test Form reception", () => {
     });
   });
 
-  it("should accept quantityRefused", async () => {
-    // Given
-    const {
-      emitterCompany,
-      recipient,
-      recipientCompany,
-      form: initialForm
-    } = await prepareDB();
-    const form = await prisma.form.update({
-      where: { id: initialForm.id },
-      data: {
-        status: "RECEIVED",
-        receivedBy: "Bill",
-        receivedAt: new Date("2019-01-17T10:22:00+0100")
-      }
-    });
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-
-    // When
-    const { mutate } = makeClient(recipient);
-    const { errors } = await mutate(MARK_AS_ACCEPTED, {
-      variables: {
-        id: form.id,
-        acceptedInfo: {
-          signedAt: "2019-01-17T10:22:00+0100",
-          signedBy: "Bill",
-          wasteAcceptationStatus: "PARTIALLY_REFUSED",
-          wasteRefusalReason: "Parce que",
-          quantityReceived: 11,
-          quantityRefused: 7
-        }
-      }
-    });
-
-    // Then
-    expect(errors).toBeUndefined();
-    const acceptedForm = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
-    });
-    expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
-    expect(acceptedForm.quantityRefused?.toNumber()).toEqual(7);
-  });
-
   // Bug was "Cannot destructure property 'prepareVariables' of 'mailTemplate' as it is undefined."
   // Use-case:
   // - Create a tmp storage BSD
@@ -1188,5 +1143,281 @@ describe("Test Form reception", () => {
     expect(errors[0].message).toBe(
       "Vous ne pouvez préciser de retour à vide ADR que si le mode de transport est route (ROAD) ou null"
     );
+  });
+
+  describe("quantityRefused", () => {
+    const createBSDD = async () => {
+      const {
+        emitterCompany,
+        recipient,
+        recipientCompany,
+        form: initialForm
+      } = await prepareDB();
+
+      const form = await prisma.form.update({
+        where: { id: initialForm.id },
+        data: {
+          status: "RECEIVED",
+          receivedBy: "Bill",
+          receivedAt: new Date("2019-01-17T10:22:00+0100")
+        }
+      });
+
+      await prepareRedis({
+        emitterCompany,
+        recipientCompany
+      });
+
+      return { recipient, form };
+    };
+
+    const markBSDDAsAccepted = async (
+      recipient: User,
+      formId: string,
+      wasteAcceptationStatus: WasteAcceptationStatus,
+      quantityReceived: number,
+      quantityRefused: number | null,
+      wasteRefusalReason?: string | null
+    ) => {
+      const { mutate } = makeClient(recipient);
+      return await mutate(MARK_AS_ACCEPTED, {
+        variables: {
+          id: formId,
+          acceptedInfo: {
+            signedAt: "2019-01-17T10:22:00+0100",
+            signedBy: "Bill",
+            wasteAcceptationStatus,
+            wasteRefusalReason,
+            quantityReceived,
+            quantityRefused
+          }
+        }
+      });
+    };
+
+    describe("wasteAcceptationStatus = ACCEPTED", () => {
+      it("waste should be accepted", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "ACCEPTED",
+          11,
+          0
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const acceptedForm = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
+        expect(acceptedForm.quantityRefused?.toNumber()).toEqual(0);
+        expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
+        expect(acceptedForm.status).toBe("ACCEPTED");
+      });
+
+      it("quantityRefused is required", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "ACCEPTED",
+          11,
+          null
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
+
+      it("quantityRefused cannot be > 0", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "ACCEPTED",
+          11,
+          5
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+        );
+      });
+    });
+
+    describe("wasteAcceptationStatus = REFUSED", () => {
+      it("waste should be refused", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "REFUSED",
+          11,
+          11,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const acceptedForm = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
+        expect(acceptedForm.quantityRefused?.toNumber()).toEqual(11);
+        expect(acceptedForm.wasteAcceptationStatus).toBe("REFUSED");
+        expect(acceptedForm.status).toBe("REFUSED");
+      });
+
+      it("quantityRefused is required", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "REFUSED",
+          11,
+          null,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
+
+      it("quantityRefused cannot be != quantityReceived", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "REFUSED",
+          11,
+          5,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
+        );
+      });
+    });
+
+    describe("wasteAcceptationStatus = PARTIALLY_REFUSED", () => {
+      it("waste should be partially refused", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "PARTIALLY_REFUSED",
+          11,
+          6,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const acceptedForm = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
+        expect(acceptedForm.quantityRefused?.toNumber()).toEqual(6);
+        expect(acceptedForm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
+        expect(acceptedForm.status).toBe("ACCEPTED");
+      });
+
+      it("quantityRefused is required", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "PARTIALLY_REFUSED",
+          11,
+          null,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) est requise"
+        );
+      });
+
+      it("quantityRefused cannot be = quantityReceived", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "PARTIALLY_REFUSED",
+          11,
+          11,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
+
+      it("quantityRefused cannot be zero", async () => {
+        // Given
+        const { recipient, form } = await createBSDD();
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          recipient,
+          form.id,
+          "PARTIALLY_REFUSED",
+          11,
+          0,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
+    });
   });
 });
