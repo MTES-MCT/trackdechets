@@ -2,7 +2,6 @@ import React from "react";
 import Select from "@codegouvfr/react-dsfr/Select";
 import countries from "world-countries";
 import { useFormContext } from "react-hook-form";
-import "./RhfCountrySelector.scss";
 
 interface RhfCountrySelectorProps {
   label: string;

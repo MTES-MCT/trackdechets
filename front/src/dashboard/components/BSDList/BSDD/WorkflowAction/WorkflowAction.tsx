@@ -1,7 +1,6 @@
 import React from "react";
 import { EmitterType, Form, FormStatus, UserPermission } from "@td/codegen-ui";
 import MarkAsSealed from "./MarkAsSealed";
-import MarkAsProcessed from "./MarkAsProcessed";
 import MarkAsResealed from "./MarkAsResealed";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
@@ -221,7 +220,11 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return (
           <div className="tw-flex tw-space-x-2">
             {!isAppendix1 && <MarkAsResealed {...props} />}
-            <MarkAsProcessed {...props} />
+            <SignOperation
+              title={"Signer le traitement"}
+              formId={form.id}
+              displayActionButton={false}
+            />
           </div>
         );
       } else if (
@@ -229,7 +232,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
         siret === form.temporaryStorageDetail?.destination?.company?.siret &&
         permissions.includes(UserPermission.BsdCanSignOperation)
       ) {
-        return <MarkAsProcessed {...props} />;
+        return (
+          <SignOperation
+            title={"Signer le traitement"}
+            formId={form.id}
+            displayActionButton={false}
+          />
+        );
       }
       return null;
     }
