@@ -108,7 +108,8 @@ describe("mutation / importPaperForm", () => {
           signedAt: "2019-12-20T00:00:00.000Z" as any,
           receivedBy: "Mr Destination",
           wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-          quantityReceived: 1.0
+          quantityReceived: 1.0,
+          quantityRefused: 0
         },
         processedInfo: {
           processedAt: "2019-12-22T00:00:00.000Z" as any,
