@@ -172,7 +172,7 @@ function SignOperationModal({
 
     await markAsProcessed({
       variables: {
-        id: data?.form.id,
+        id: form.id,
         processedInfo: {
           ...values,
           nextDestination
