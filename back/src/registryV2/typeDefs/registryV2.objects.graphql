@@ -363,6 +363,398 @@ type IncomingWasteV2 {
   destinationParcelCoordinates: [String]
 }
 
+"""
+Déchet sortant : https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884583.
+Les champs notés "Extra" ne figurent pas dans l'arrêté registre.
+"""
+type OutgoingWasteV2 {
+  id: ID!
+  source: RegistryV2ExportSource!
+  publicId: String
+  """
+  Le numéro du ou des bordereaux de suivi de déchets mentionnés aux articles R. 541-45 du code de l'environnement et R. 1335-4 du code de la santé publique
+  https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006839119&dateTexte=&categorieLien=cid
+  https://www.legifrance.gouv.fr/affichCode.do?cidTexte=LEGITEXT000006072665&dateTexte=&categorieLien=cid
+  """
+  bsdId: ID
+
+  reportAsSiret: String
+
+  "Extra - Date de création du bordereau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
+
+  "La date de l'expédition du déchet"
+  transporterTakenOverAt: DateTime
+
+  "Extra - Date de réalisation de l'opération"
+  destinationOperationDate: DateTime
+
+  "Extra - Type de bordereau"
+  bsdType: BsdType
+
+  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  bsdSubType: BsdSubType
+
+  "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
+  customId: String
+
+  "Extra - Statut du bordereau"
+  status: String
+
+  "La dénomination usuelle du déchet"
+  wasteDescription: String
+
+  "Le code du déchet sortant au regard de l'article R. 541-7 du code de l'environnement"
+  wasteCode: String
+
+  "Code Bâle du déchet"
+  wasteCodeBale: String
+
+  "S'il s'agit, de déchets POP au sens de l'article R. 541-8 du code de l'environnement"
+  wastePop: Boolean
+
+  """
+  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  """
+  wasteIsDangerous: Boolean
+
+  "La quantité de déchet sortant en tonne"
+  weight: Float
+
+  weightIsEstimate: Boolean
+  volume: Float
+
+  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanySiret: String
+  "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyName: String
+  "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyAddress: String
+  "Le code postal du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyPostalCode: String
+  "La ville du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCity: String
+  "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  initialEmitterCompanyCountry: String
+
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  initialEmitterMunicipalitiesNames: [String!]
+
+  "Indique si l'émetteur est en situation irrégulière"
+  emitterCompanyIrregularSituation: Boolean
+  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  emitterCompanySiret: String
+  "La raison sociale de l'établissement expéditeur des déchets"
+  emitterCompanyName: String
+  "Le nom usuel de l'établissement expéditeur des déchets"
+  emitterCompanyGivenName: String
+  "L'adresse de l'établissement expéditeur des déchets"
+  emitterCompanyAddress: String
+  "Le code postal de l'établissement expéditeur des déchets"
+  emitterCompanyPostalCode: String
+  "La ville de l'établissement expéditeur des déchets"
+  emitterCompanyCity: String
+  "Le pays de l'établissement expéditeur des déchets"
+  emitterCompanyCountry: String
+  "Extra - Adresse email de contact de l'expéditeur du déchet"
+  emitterCompanyMail: String
+
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
+  "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
+  emitterPickupsiteAddress: String
+  "Le code postal de prise en charge"
+  emitterPickupsitePostalCode: String
+  "La ville de prise en charge"
+  emitterPickupsiteCity: String
+  "Le pays de prise en charge"
+  emitterPickupsiteCountry: String
+
+  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  workerCompanySiret: String
+  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyName: String
+  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyAddress: String
+  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyPostalCode: String
+  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCity: String
+  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  workerCompanyCountry: String
+
+  "La ville de localisation de la/des parcelles"
+  parcelCities: [String!]
+  "Le code INSEE de la/des parcelles"
+  parcelInseeCodes: [String!]
+  """
+  Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par coordonnées.
+  """
+  parcelNumbers: [String]
+  """
+  Les coordonnées Lat/Long de la/des parcelles au format WGS 84 sous la forme 'N latitude E longitude'.
+  Une parcelle peut être localisée par son numéro ou par ses coordonnées,
+  donc cette liste peut contenir des valeurs null si certaines parcelles sont localisées par leur numéro.
+  """
+  parcelCoordinates: [String]
+
+  sisIdentifiers: [String]
+
+  """
+  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
+  https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
+  """
+  ecoOrganismeSiret: String
+  """
+  la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
+  https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
+  """
+  ecoOrganismeName: String
+
+  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  brokerCompanySiret: String
+  "La raison sociale du courtier si le déchet est géré par un courtier"
+  brokerCompanyName: String
+  "Le numéro de récépissé du courtier mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un courtier"
+  brokerRecepisseNumber: String
+  "L'adresse email du contact du courtier"
+  brokerCompanyMail: String
+
+  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  traderCompanySiret: String
+  "La raison sociale du négociant si le déchet est géré par un négociant"
+  traderCompanyName: String
+  "Le numéro de récépissé du négociant mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un négociant"
+  traderRecepisseNumber: String
+  "L'adresse email du contact du négociant"
+  traderCompanyMail: String
+
+  "Approvisionnement direct (pipeline, convoyeur)"
+  isDirectSupply: Boolean
+
+  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  transporter1CompanySiret: String
+  "La raison sociale du transporteur"
+  transporter1CompanyName: String
+  "Le nom usuel du transporteur"
+  transporter1CompanyGivenName: String
+  "L'adresse du transporteur"
+  transporter1CompanyAddress: String
+  "Le code postal du transporteur"
+  transporter1CompanyPostalCode: String
+  "La ville du transporteur"
+  transporter1CompanyCity: String
+  "Le pays du transporteur"
+  transporter1CompanyCountry: String
+  "Exemption de récépissé transporteur"
+  transporter1RecepisseIsExempted: Boolean
+  "Le numéro de récépissé du trasnporteur mentionné à l'article R. 541-53 du code de l'environnement"
+  transporter1RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur"
+  transporter1TransportMode: TransportMode
+  "Adresse email de contact du transporteur"
+  transporter1CompanyMail: String
+
+  "La raison sociale du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyName: String
+  "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
+  transporter2CompanyGivenName: String
+  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  transporter2CompanySiret: String
+  "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyAddress: String
+  "Le code postal du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyPostalCode: String
+  "La ville du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCity: String
+  "Le pays du transporteur n°2 (en cas de transport multi-modal)"
+  transporter2CompanyCountry: String
+  "Extra - Exemption de récépissé transporteur n°2"
+  transporter2RecepisseIsExempted: Boolean
+  "Le récepissé transporteur n°2 (en cas de transport multimodal)"
+  transporter2RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
+  transporter2TransportMode: TransportMode
+  "Extra - Adresse email de contact du transporteur n°2"
+  transporter2CompanyMail: String
+
+  "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyName: String
+  "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
+  transporter3CompanyGivenName: String
+  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  transporter3CompanySiret: String
+  "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyAddress: String
+  "Le code postal du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyPostalCode: String
+  "La ville du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCity: String
+  "Le pays du transporteur n°3 (en cas de transport multi-modal)"
+  transporter3CompanyCountry: String
+  "Extra - Exemption de récépissé transporteur n°3"
+  transporter3RecepisseIsExempted: Boolean
+  "Le récepissé transporteur n°3 (en cas de transport multimodal)"
+  transporter3RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
+  transporter3TransportMode: TransportMode
+  "Extra - Adresse email de contact du transporteur n°3"
+  transporter3CompanyMail: String
+
+  "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyName: String
+  "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
+  transporter4CompanyGivenName: String
+  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  transporter4CompanySiret: String
+  "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyAddress: String
+  "Le code postal du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyPostalCode: String
+  "La ville du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCity: String
+  "Le pays du transporteur n°4 (en cas de transport multi-modal)"
+  transporter4CompanyCountry: String
+  "Extra - Exemption de récépissé transporteur n°4"
+  transporter4RecepisseIsExempted: Boolean
+  "Le récepissé transporteur n°4 (en cas de transport multimodal)"
+  transporter4RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
+  transporter4TransportMode: TransportMode
+  "Extra - Adresse email de contact du transporteur n°4"
+  transporter4CompanyMail: String
+
+  "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyName: String
+  "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
+  transporter5CompanyGivenName: String
+  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  transporter5CompanySiret: String
+  "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyAddress: String
+  "Le code postal du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyPostalCode: String
+  "La ville du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCity: String
+  "Le pays du transporteur n°5 (en cas de transport multi-modal)"
+  transporter5CompanyCountry: String
+  "Extra - Exemption de récépissé transporteur n°5"
+  transporter5RecepisseIsExempted: Boolean
+  "Le récepissé transporteur n°5 (en cas de transport multimodal)"
+  transporter5RecepisseNumber: String
+  "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
+  transporter5TransportMode: TransportMode
+  "Extra - Adresse email de contact du transporteur n°5"
+  transporter5CompanyMail: String
+
+  """
+  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  relatives au transport international des marchandises dangereuses par route, au transport international
+  ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
+  transport maritime de marchandises dangereuses
+  """
+  wasteAdr: String
+
+  """
+  Mention au titre des règlements RID, ADNR, IMDG
+  """
+  nonRoadRegulationMention: String
+
+  "Extra - N° de CAP (Certificat d'acceptation préalable)"
+  destinationCap: String
+
+  wasteDap: String
+
+  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  destinationCompanySiret: String
+  "La raison sociale de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyName: String
+  "Le nom usuel de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyGivenName: String
+  "L'adresse de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyAddress: String
+  "Le code postal de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyPostalCode: String
+  "La ville de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCity: String
+  "Le pays de l'établissement vers lequel le déchet est expédié"
+  destinationCompanyCountry: String
+  "Extra - L'adresse email du contact de l'établissement de destination"
+  destinationCompanyMail: String
+
+  "Libellé de l'adresse de dépôt du destinataire"
+  destinationDropSiteAddress: String
+  "Code postal de l'adresse de dépôt du destinataire"
+  destinationDropSitePostalCode: String
+  "Commune de l'adresse de dépôt du destinataire"
+  destinationDropSiteCity: String
+  "Pays de l'adresse de dépôt du destinataire"
+  destinationDropSiteCountryCode: String
+
+  "Destination post entreposage provisoire SIRET"
+  postTempStorageDestinationSiret: String
+  "Destination post entreposage provisoire Raison Sociale"
+  postTempStorageDestinationName: String
+  "Destination post entreposage provisoire Adresse"
+  postTempStorageDestinationAddress: String
+  "Destination post entreposage provisoire Code Postal"
+  postTempStorageDestinationPostalCode: String
+  "Destination post entreposage provisoire Ville"
+  postTempStorageDestinationCity: String
+  "Destination post entreposage provisoire Pays"
+  postTempStorageDestinationCountry: String
+
+  "Extra - Statut d'acceptation du déchet"
+  destinationReceptionAcceptationStatus: WasteAcceptationStatus
+  "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
+  destinationReceptionWeight: Float
+  "Extra - La quantité de déchet entrant acceptée exprimée en tonne"
+  destinationReceptionAcceptedWeight: Float
+  "Extra - La quantité de déchet entrant refusée exprimée en tonne"
+  destinationReceptionRefusedWeight: Float
+
+  "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
+  destinationPlannedOperationCode: String
+  "NON IMPLÉMENTÉ - La qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
+  destinationPlannedOperationMode: OperationMode
+
+  "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
+  destinationOperationCode: String
+  "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
+  destinationOperationMode: OperationMode
+  "Charte citerne - Est-ce que la citerne a été rincée ou non?"
+  destinationHasCiterneBeenWashedOut: Boolean
+  "Extra - Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
+  destinationOperationNoTraceability: Boolean
+
+  "Extra - Installation(s) de traitement dans le ou lesquelles le traitement final a été réalisé"
+  destinationFinalOperationCompanySirets: [String!]
+  "Extra - Code(s) de l'opération prévue par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  destinationFinalPlannedOperationCodes: [String!]
+  "Extra - Code(s) de traitement renseigné(s) par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  destinationFinalOperationCodes: [String!]
+  "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
+  destinationFinalOperationWeights: [Float!]
+
+  declarationNumber: String
+  movementNumber: String
+  "N° de notification"
+  notificationNumber: String
+
+  isUpcycled: Boolean
+
+  destinationParcelInseeCodes: [String]
+  destinationParcelNumbers: [String]
+  destinationParcelCoordinates: [String]
+}
+
 type SsdWasteV2 {
   id: ID!
   source: RegistryV2ExportSource!
