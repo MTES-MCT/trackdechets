@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de l'export du registre entrant V2 [PR 3910](https://github.com/MTES-MCT/trackdechets/pull/3910)
+- BSVHU - Il est désormais possible de signer la réception indépendamment de l'opération [PR 3909](https://github.com/MTES-MCT/trackdechets/pull/3909)
 
 #### :nail_care: Améliorations
 
@@ -17,6 +18,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
 - Ajout d'éco-organismes, filtrage des éco-organismes en front. Mise à jour des SIRET de certains éco-organismes en base de donnée [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
 - Il ne devrait pas être possible de valider la réception d'un BSDA avec un poids à 0 [PR 3934](https://github.com/MTES-MCT/trackdechets/pull/3934)
+
+#### :bug: Corrections de bugs
+
+- La révision du BSDA permet de modifier le CAP de l'exutoire [PR 3932](https://github.com/MTES-MCT/trackdechets/pull/3932)
+- La requête companyInfos renvoie la bonne valeur pour isDormant [PR 3943](https://github.com/MTES-MCT/trackdechets/pull/3943)
+- BSDD - Renommage de "COLIS (totaux)" par "Total conditionnement" sur le PDF [PR 3892](https://github.com/MTES-MCT/trackdechets/pull/3892)
 
 #### :boom: Breaking changes
 
