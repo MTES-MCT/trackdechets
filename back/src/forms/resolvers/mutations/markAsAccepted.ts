@@ -29,6 +29,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsCode: form.wasteDetailsCode,
     transporters: form.transporters,
+    createdAt: form.createdAt,
     ...acceptedInfo
   });
 

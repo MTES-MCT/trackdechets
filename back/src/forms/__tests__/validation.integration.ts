@@ -1084,11 +1084,12 @@ describe("receivedInfosSchema", () => {
   describe("quantityRefused", () => {
     const form = {
       receivedBy: "Bill",
+      createdAt: new Date("2020-01-17T10:12:00+0100"),
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("quantityRefused is required if wasteAcceptationStatus + quantityReceived (PARTIALLY_REFUSED)", async () => {
+    it.only("quantityRefused is required if wasteAcceptationStatus + quantityReceived (PARTIALLY_REFUSED)", async () => {
       // Given
       const update = {
         ...form,

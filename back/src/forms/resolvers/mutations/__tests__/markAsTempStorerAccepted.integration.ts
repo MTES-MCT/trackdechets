@@ -359,7 +359,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
   });
 
   describe("quanityRefused", () => {
-    const createBSDD = async () => {
+    const createBSDD = async (opt?) => {
       const { user, company: tempStorerCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -376,7 +376,9 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
             create: { readableId: getReadableId(), ownerId: user.id }
           },
           receivedBy: "John Doe",
-          receivedAt: "2018-12-11T00:00:00.000Z"
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          createdAt: new Date("2025-03-20"),
+          ...opt
         }
       });
 
@@ -446,9 +448,11 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         ).toEqual(2.4);
       });
 
-      it("quantityRefused is required", async () => {
+      it("quantityRefused is required for new BSDs", async () => {
         // Given
-        const { user, form } = await createBSDD();
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-03-20")
+        });
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -464,6 +468,33 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
+      });
+
+      it("quantityRefused is NOT required for legacy BSDs", async () => {
+        // Given
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-01-20")
+        });
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.ACCEPTED,
+          2.4,
+          null
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+
+        expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual("ACCEPTED");
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused).toBeNull();
       });
 
       it("quantityRefused must be zero", async () => {
@@ -529,9 +560,11 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         );
       });
 
-      it("quantityRefused is required", async () => {
+      it("quantityRefused is required for new BSDs", async () => {
         // Given
-        const { user, form } = await createBSDD();
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-03-20")
+        });
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -548,6 +581,34 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
+      });
+
+      it("quantityRefused is NOT required for legacy BSDs", async () => {
+        // Given
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-01-20")
+        });
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.REFUSED,
+          2.4,
+          null,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+
+        expect(formAfterMutation.status).toEqual("REFUSED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual("REFUSED");
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused).toBeNull();
       });
 
       it("quantityRefused must = quantityReceived", async () => {
@@ -618,9 +679,11 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         });
       });
 
-      it("quantityRefused is required", async () => {
+      it("quantityRefused is required for new BSDs", async () => {
         // Given
-        const { user, form } = await createBSDD();
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-03-20")
+        });
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -637,6 +700,36 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
+      });
+
+      it("quantityRefused is NOT required for legacy BSDs", async () => {
+        // Given
+        const { user, form } = await createBSDD({
+          createdAt: new Date("2025-01-20")
+        });
+
+        // When
+        const { errors } = await markBSDDAsAccepted(
+          user,
+          form.id,
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+          2.4,
+          null,
+          "Pas bon"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        const formAfterMutation = await prisma.form.findUniqueOrThrow({
+          where: { id: form.id }
+        });
+
+        expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
+        expect(formAfterMutation.wasteAcceptationStatus).toEqual(
+          "PARTIALLY_REFUSED"
+        );
+        expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(2.4);
+        expect(formAfterMutation.quantityRefused).toBeNull();
       });
 
       it("quantityRefused cannot = 0", async () => {

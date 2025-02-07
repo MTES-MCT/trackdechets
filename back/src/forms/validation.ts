@@ -78,6 +78,10 @@ import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { isDefined, isDefinedStrict } from "../common/helpers";
 
+// Date de la MAJ 2025.03.1 rendant la quantité refusée obligatoire
+// pour tous les BSDD
+const v2024031 = new Date("2025-03-11");
+
 // set yup default error messages
 configureYup();
 
@@ -279,7 +283,13 @@ export const quantityRefused = weight(WeightUnits.Tonne)
     "quantity-is-required",
     "La quantité refusée (quantityRefused) est requise",
     (value, context) => {
-      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+      const { wasteAcceptationStatus, quantityReceived, createdAt } =
+        context.parent;
+
+      // La quantité refusée n'est pas obligatoire pour les BSDs legacy
+      if (new Date(createdAt).getTime() < new Date(v2024031).getTime()) {
+        return true;
+      }
 
       // Si le déchet a été accepté ou refusé, il faut préciser la quantité refusée
       // On ajoute le check sur la quantityReceived pour laisser les erreurs sur ce champ
