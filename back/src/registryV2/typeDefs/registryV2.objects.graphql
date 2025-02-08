@@ -761,9 +761,6 @@ type SsdWasteV2 {
   publicId: String!
   reportForSiret: String!
   reportForName: String!
-  reportForAddress: String!
-  reportForCity: String!
-  reportForPostalCode: String!
   reportAsSiret: String
   weightValue: Float!
   weightIsEstimate: Boolean!
