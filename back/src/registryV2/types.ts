@@ -75,7 +75,14 @@ export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
       finalOperations: {
         include: {
           finalBsffPackaging: {
-            include: { bsff: { select: { destinationCompanySiret: true } } }
+            include: {
+              bsff: {
+                select: {
+                  destinationCompanySiret: true,
+                  destinationPlannedOperationCode: true
+                }
+              }
+            }
           }
         }
       },
