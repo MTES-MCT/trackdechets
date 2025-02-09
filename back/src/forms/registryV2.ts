@@ -11,7 +11,7 @@ import {
   emptyOutgoingWasteV2,
   RegistryV2Bsdd
 } from "../registryV2/types";
-import { formToBsdd } from "./compat";
+import { formToBsddV2, BsddV2 } from "./compat";
 import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
@@ -19,7 +19,7 @@ import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 
-const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
+const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyCity: null,
@@ -48,8 +48,8 @@ const getInitialEmitterData = (bsdd: ReturnType<typeof formToBsdd>) => {
   return initialEmitter;
 };
 
-const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
-  if (!bsdd.forwardedIn)
+const getPostTempStorageDestination = (bsdd: BsddV2) => {
+  if (!bsdd.forwardedIn) {
     return {
       postTempStorageDestinationName: null,
       postTempStorageDestinationSiret: null,
@@ -58,7 +58,7 @@ const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
       postTempStorageDestinationCity: null,
       postTempStorageDestinationCountry: null
     };
-
+  }
   const splittedAddress = splitAddress(
     bsdd.forwardedIn.destinationCompanyAddress
   );
@@ -74,7 +74,7 @@ const getPostTempStorageDestination = (bsdd: ReturnType<typeof formToBsdd>) => {
   };
 };
 
-const getFinalOperationsData = (bsdd: ReturnType<typeof formToBsdd>) => {
+const getFinalOperationsData = (bsdd: BsddV2) => {
   const destinationFinalPlannedOperationCodes: string[] = [];
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
@@ -100,6 +100,11 @@ const getFinalOperationsData = (bsdd: ReturnType<typeof formToBsdd>) => {
           ope.finalForm.recipientCompanySiret
         );
       }
+      if (ope.finalForm.recipientProcessingOperation) {
+        destinationFinalPlannedOperationCodes.push(
+          ope.finalForm.recipientProcessingOperation
+        );
+      }
     });
   }
   return {
@@ -113,7 +118,7 @@ const getFinalOperationsData = (bsdd: ReturnType<typeof formToBsdd>) => {
 export const toIncomingWasteV2 = (
   form: RegistryV2Bsdd
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
-  const bsdd = formToBsdd(form);
+  const bsdd = formToBsddV2(form);
 
   const {
     initialEmitterCompanyName,
@@ -369,7 +374,7 @@ export const toIncomingWasteV2 = (
 export const toOutgoingWasteV2 = (
   form: RegistryV2Bsdd
 ): Omit<Required<OutgoingWasteV2>, "__typename"> => {
-  const bsdd = formToBsdd(form);
+  const bsdd = formToBsddV2(form);
   const {
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -659,6 +664,7 @@ const minimalBsddForLookupSelect = {
   sentAt: true,
   recipientCompanySiret: true,
   emitterCompanySiret: true,
+  ecoOrganismeSiret: true,
   wasteDetailsIsDangerous: true,
   wasteDetailsCode: true
 };
@@ -669,19 +675,10 @@ type MinimalBsddForLookup = Prisma.FormGetPayload<{
 
 const bsddToLookupCreateInputs = (
   form: MinimalBsddForLookup
-): {
-  incoming: Prisma.RegistryLookupUncheckedCreateInput | null;
-  outgoing: Prisma.RegistryLookupUncheckedCreateInput | null;
-} => {
-  const res: {
-    incoming: Prisma.RegistryLookupUncheckedCreateInput | null;
-    outgoing: Prisma.RegistryLookupUncheckedCreateInput | null;
-  } = {
-    incoming: null,
-    outgoing: null
-  };
+): Prisma.RegistryLookupUncheckedCreateInput[] => {
+  const res: Prisma.RegistryLookupUncheckedCreateInput[] = [];
   if (form.receivedAt && form.recipientCompanySiret) {
-    res.incoming = {
+    res.push({
       id: form.id,
       readableId: form.readableId,
       siret: form.recipientCompanySiret,
@@ -693,10 +690,10 @@ const bsddToLookupCreateInputs = (
       wasteCode: form.wasteDetailsCode,
       ...generateDateInfos(form.receivedAt),
       bsddId: form.id
-    };
+    });
   }
   if (form.sentAt && form.emitterCompanySiret) {
-    res.outgoing = {
+    res.push({
       id: form.id,
       readableId: form.readableId,
       siret: form.emitterCompanySiret,
@@ -708,7 +705,22 @@ const bsddToLookupCreateInputs = (
       wasteCode: form.wasteDetailsCode,
       ...generateDateInfos(form.sentAt),
       bsddId: form.id
-    };
+    });
+  }
+  if (form.sentAt && form.ecoOrganismeSiret) {
+    res.push({
+      id: form.id,
+      readableId: form.readableId,
+      siret: form.ecoOrganismeSiret,
+      exportRegistryType: RegistryExportType.OUTGOING,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: form.wasteDetailsIsDangerous
+        ? RegistryExportWasteType.DD
+        : RegistryExportWasteType.DND,
+      wasteCode: form.wasteDetailsCode,
+      ...generateDateInfos(form.sentAt),
+      bsddId: form.id
+    });
   }
   return res;
 };
@@ -719,16 +731,9 @@ const performRegistryLookupUpdate = async (
 ): Promise<void> => {
   await deleteRegistryLookup(form.id, tx);
   const lookupInputs = bsddToLookupCreateInputs(form);
-  if (lookupInputs.incoming) {
-    await tx.registryLookup.create({
-      data: lookupInputs.incoming,
-      select: { id: true }
-    });
-  }
-  if (lookupInputs.outgoing) {
-    await tx.registryLookup.create({
-      data: lookupInputs.outgoing,
-      select: { id: true }
+  if (lookupInputs.length > 0) {
+    await prisma.registryLookup.createMany({
+      data: lookupInputs
     });
   }
 };
@@ -771,15 +776,10 @@ export const rebuildRegistryLookup = async () => {
       },
       select: minimalBsddForLookupSelect
     });
-    const createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsdd of items) {
       const createInputs = bsddToLookupCreateInputs(bsdd);
-      if (createInputs.incoming) {
-        createArray.push(createInputs.incoming);
-      }
-      if (createInputs.outgoing) {
-        createArray.push(createInputs.outgoing);
-      }
+      createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
       data: createArray

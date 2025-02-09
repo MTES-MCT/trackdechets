@@ -13,7 +13,7 @@ import { prisma } from "@td/prisma";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { emptyIncomingWasteV2, RegistryV2Bsff } from "../registryV2/types";
-import { getTransportersSync } from "./database";
+import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { splitAddress } from "../common/addresses";
 import { toBsffDestination } from "./compat";
 import { getBsffSubType } from "../common/subTypes";
@@ -276,7 +276,16 @@ const minimalBsffForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
   destinationCompanySiret: true,
-  wasteCode: true
+  wasteCode: true,
+  emitterCompanySiret: true,
+  detenteurCompanySirets: true,
+  transporters: {
+    select: {
+      id: true,
+      number: true,
+      transporterTransportSignatureDate: true
+    }
+  }
 };
 
 type MinimalBsffForLookup = Prisma.BsffGetPayload<{
@@ -285,12 +294,11 @@ type MinimalBsffForLookup = Prisma.BsffGetPayload<{
 
 const bsffToLookupCreateInputs = (
   bsff: MinimalBsffForLookup
-): { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } => {
-  const res: { incoming: Prisma.RegistryLookupUncheckedCreateInput | null } = {
-    incoming: null
-  };
+): Prisma.RegistryLookupUncheckedCreateInput[] => {
+  const res: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+  const transporter = getFirstTransporterSync(bsff);
   if (bsff.destinationReceptionSignatureDate && bsff.destinationCompanySiret) {
-    res.incoming = {
+    res.push({
       id: bsff.id,
       readableId: bsff.id,
       siret: bsff.destinationCompanySiret,
@@ -300,7 +308,41 @@ const bsffToLookupCreateInputs = (
       wasteCode: bsff.wasteCode,
       ...generateDateInfos(bsff.destinationReceptionSignatureDate),
       bsffId: bsff.id
-    };
+    });
+  }
+  if (
+    transporter?.transporterTransportSignatureDate &&
+    bsff.emitterCompanySiret
+  ) {
+    res.push({
+      id: bsff.id,
+      readableId: bsff.id,
+      siret: bsff.emitterCompanySiret,
+      exportRegistryType: RegistryExportType.OUTGOING,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: RegistryExportWasteType.DD,
+      wasteCode: bsff.wasteCode,
+      ...generateDateInfos(transporter.transporterTransportSignatureDate),
+      bsffId: bsff.id
+    });
+  }
+  if (
+    transporter?.transporterTransportSignatureDate &&
+    bsff.detenteurCompanySirets?.length
+  ) {
+    res.push(
+      ...bsff.detenteurCompanySirets.map(detenteurCompanySiret => ({
+        id: bsff.id,
+        readableId: bsff.id,
+        siret: detenteurCompanySiret,
+        exportRegistryType: RegistryExportType.OUTGOING,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: RegistryExportWasteType.DD,
+        wasteCode: bsff.wasteCode,
+        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        bsffId: bsff.id
+      }))
+    );
   }
   return res;
 };
@@ -311,10 +353,9 @@ const performRegistryLookupUpdate = async (
 ): Promise<void> => {
   await deleteRegistryLookup(bsff.id, tx);
   const lookupInputs = bsffToLookupCreateInputs(bsff);
-  if (lookupInputs.incoming) {
-    await tx.registryLookup.create({
-      data: lookupInputs.incoming,
-      select: { id: true }
+  if (lookupInputs.length > 0) {
+    await prisma.registryLookup.createMany({
+      data: lookupInputs
     });
   }
 };
@@ -354,12 +395,10 @@ export const rebuildRegistryLookup = async () => {
       },
       select: minimalBsffForLookupSelect
     });
-    const createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsff of items) {
       const createInputs = bsffToLookupCreateInputs(bsff);
-      if (createInputs.incoming) {
-        createArray.push(createInputs.incoming);
-      }
+      createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
       data: createArray

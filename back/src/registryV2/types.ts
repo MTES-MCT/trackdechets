@@ -14,7 +14,14 @@ export const RegistryV2BsddInclude = Prisma.validator<Prisma.FormInclude>()({
   intermediaries: true,
   forwardedIn: { include: { transporters: true } },
   finalOperations: {
-    include: { finalForm: { select: { recipientCompanySiret: true } } }
+    include: {
+      finalForm: {
+        select: {
+          recipientCompanySiret: true,
+          recipientProcessingOperation: true
+        }
+      }
+    }
   },
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
@@ -32,7 +39,14 @@ export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
   forwardedIn: true,
   transporters: true,
   finalOperations: {
-    include: { finalBsda: { select: { destinationCompanySiret: true } } }
+    include: {
+      finalBsda: {
+        select: {
+          destinationCompanySiret: true,
+          destinationPlannedOperationCode: true
+        }
+      }
+    }
   }
 });
 
