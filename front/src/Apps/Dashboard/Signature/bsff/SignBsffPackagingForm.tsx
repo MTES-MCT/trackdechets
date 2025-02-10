@@ -289,7 +289,7 @@ function hasNextDestinationFn(
 
 // Permet de convertir le résultat d'une recherche obtenue
 // dans le CompanySelect vers un input GraphQL
-function toCompanyInput(company: CompanySearchResult): CompanyInput {
+export function toCompanyInput(company: CompanySearchResult): CompanyInput {
   return {
     siret: company.siret,
     vatNumber: company.vatNumber,
