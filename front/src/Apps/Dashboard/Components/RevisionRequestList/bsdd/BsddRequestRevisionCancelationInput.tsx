@@ -41,7 +41,7 @@ export function BsddRequestRevisionCancelationInput({ bsdd, onChange }: Props) {
     CANCELLABLE_BSDD_STATUSES.includes(bsdd.status) && !isAppendix1;
 
   return (
-    <>
+    <div className="fr-mb-4v">
       <ToggleSwitch
         label={CAN_BE_CANCELLED_LABEL}
         disabled={!canBeCancelled}
@@ -49,11 +49,13 @@ export function BsddRequestRevisionCancelationInput({ bsdd, onChange }: Props) {
         onChange={onChange}
         showCheckedHint={false}
       />
-      {isAppendix1
-        ? CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG
-        : canBeCancelled
-        ? CANCELATION_MSG
-        : CANCELATION_NOT_POSSIBLE_MSG}
-    </>
+      <div className="fr-mt-2v">
+        {isAppendix1
+          ? CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG
+          : canBeCancelled
+          ? CANCELATION_MSG
+          : CANCELATION_NOT_POSSIBLE_MSG}
+      </div>
+    </div>
   );
 }
