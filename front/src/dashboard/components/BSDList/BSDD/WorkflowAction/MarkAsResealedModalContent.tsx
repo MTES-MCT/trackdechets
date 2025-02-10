@@ -24,7 +24,7 @@ import { TransporterForm } from "../../../../../Apps/Forms/Components/Transporte
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { companySchema } from "../../../../../common/validation/schema";
-import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
+import PackagingList from "../../../../../Apps/Forms/Components/PackagingList/PackagingList";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {

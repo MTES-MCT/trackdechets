@@ -29,7 +29,8 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../../../../Apps/common/queries/bsdd/queries";
-import { cleanPackagings } from "../../../../../form/bsdd/components/packagings/helpers";
+import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
+import { packagingInfo } from "../../../../../form/bsdd/utils/schema";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -40,7 +41,8 @@ const validationSchema = yup.object({
   securityCode: yup
     .string()
     .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres")
+    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+  update: yup.object({ packagingInfos: yup.array().of(packagingInfo) })
 });
 interface SignTransportFormModalProps {
   title: string;

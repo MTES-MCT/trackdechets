@@ -9,6 +9,7 @@ import {
 } from "../../../../../Apps/common/Components/Error/Error";
 import { fullFormFragment } from "../../../../../Apps/common/queries/fragments";
 import {
+  Form,
   FormStatus,
   Mutation,
   MutationSignEmissionFormArgs,
@@ -23,10 +24,8 @@ import SignatureCodeInput from "../../../../../form/common/components/custom-inp
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
-import {
-  cleanPackagings,
-  emptyPackaging
-} from "../../../../../form/bsdd/components/packagings/helpers";
+import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
+import { packagingInfo } from "../../../../../form/bsdd/utils/schema";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -35,17 +34,28 @@ interface SignEmissionFormModalProps {
   onClose: () => void;
 }
 
-const validationSchema = yup.object({
-  emittedAt: yup.date().required("La date d'émission est requise"),
-  emittedBy: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  securityCode: yup
-    .string()
-    .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres")
-});
+const validationSchema = (form: Form) => {
+  let packagingInfosSchema = yup.array().of(packagingInfo);
+
+  if (form.emitter?.type !== "APPENDIX1_PRODUCER") {
+    packagingInfosSchema = packagingInfosSchema
+      .required()
+      .min(1, "Vous devez préciser le conditionnement");
+  }
+
+  return yup.object({
+    emittedAt: yup.date().required("La date d'émission est requise"),
+    emittedBy: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    securityCode: yup
+      .string()
+      .nullable()
+      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+    packagingInfos: packagingInfosSchema
+  });
+};
 
 enum EmitterType {
   Emitter = "Emitter",
@@ -118,9 +128,7 @@ function SignEmissionFormModalContent({
     emittedByType: EmitterType.Emitter,
     securityCode: "",
     emitter: { type: form?.emitter?.type },
-    packagingInfos: form.wasteDetails?.packagingInfos?.length
-      ? form.wasteDetails?.packagingInfos
-      : [emptyPackaging],
+    packagingInfos: form.wasteDetails?.packagingInfos ?? [],
     quantity: form.wasteDetails?.quantity ?? 0,
     onuCode: form.wasteDetails?.onuCode ?? "",
     transporterNumberPlate: form.transporter?.numberPlate ?? ""
@@ -153,12 +161,12 @@ function SignEmissionFormModalContent({
   };
 
   return (
-    <Formik
+    <Formik<typeof initialValues>
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validationSchema={validationSchema(form)}
       onSubmit={handlesubmit}
     >
-      {({ values }) => {
+      {({ values, errors }) => {
         let signatureAuthorSiret: string | null | undefined = undefined;
 
         if (form.status === FormStatus.Resealed) {
@@ -183,6 +191,10 @@ function SignEmissionFormModalContent({
         return (
           <FormikForm>
             <FormWasteEmissionSummary form={form} />
+            {errors.packagingInfos &&
+              typeof errors.packagingInfos === "string" && (
+                <RedErrorMessage name="packagingInfos" />
+              )}
             <FormJourneySummary form={form} />
 
             {form.status === FormStatus.Sealed && form.ecoOrganisme && (

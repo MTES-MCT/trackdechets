@@ -16,7 +16,8 @@ import NumberInput from "../../../../../form/common/components/custom-inputs/Num
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
-import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
+import PackagingList from "../../../../../Apps/Forms/Components/PackagingList/PackagingList";
+import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -64,7 +65,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteEmissionSummary({
   form
 }: FormWasteEmissionSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
 
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
@@ -116,7 +117,10 @@ export function FormWasteEmissionSummary({
 
             <button
               type="button"
-              onClick={() => addField("packagingInfos")}
+              onClick={() => {
+                addField("packagingInfos");
+                setFieldValue("packagingInfos", [emptyPackaging]);
+              }}
               className="tw-ml-2"
             >
               <IconPaperWrite color="blue" />

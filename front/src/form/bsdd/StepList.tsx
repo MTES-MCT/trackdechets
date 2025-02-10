@@ -33,7 +33,7 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../Apps/common/queries/bsdd/queries";
-import { cleanPackagings } from "./components/packagings/helpers";
+import { cleanPackagings } from "../../Apps/Forms/Components/PackagingList/helpers";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;

@@ -20,9 +20,9 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FormFormikValues } from "./utils/initial-state";
-import PackagingList from "./components/packagings/PackagingList";
+import PackagingList from "../../Apps/Forms/Components/PackagingList/PackagingList";
 import { Packagings } from "@td/codegen-ui";
-import { emptyPackaging } from "./components/packagings/helpers";
+import { emptyPackaging } from "../../Apps/Forms/Components/PackagingList/helpers";
 
 const SOIL_CODES = [
   "17 05 03*",

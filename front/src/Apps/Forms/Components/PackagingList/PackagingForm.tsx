@@ -1,34 +1,42 @@
-import Select from "@codegouvfr/react-dsfr/Select";
+import Select, { SelectProps } from "@codegouvfr/react-dsfr/Select";
 import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
 import React from "react";
-import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
-import Input from "@codegouvfr/react-dsfr/Input";
-import { numberToString } from "../../../../Apps/Dashboard/Creation/bspaoh/utils/numbers";
-import TagsInput from "../../../../Apps/Forms/Components/TagsInput/TagsInput";
+import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
+import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
+import { numberToString } from "../../../Dashboard/Creation/bspaoh/utils/numbers";
+import TagsInput from "../TagsInput/TagsInput";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
 
 type PackagingFormProps = {
   packaging: PackagingInfoInput;
-  setPackaging: (packaging: PackagingInfoInput) => void;
+  inputProps: {
+    type: SelectProps["nativeSelectProps"];
+    volume: InputProps["nativeInputProps"];
+    quantity: InputProps["nativeInputProps"];
+    other: InputProps["nativeInputProps"];
+    identificationNumbers: {
+      push: (v: string) => void;
+      remove: (index: number) => void;
+    };
+  };
   packagingTypeOptions: { value: Packagings; label: string }[];
   disabled?: boolean;
+  errors?: Partial<Record<keyof PackagingInfoInput, string>>;
+  touched?: Partial<Record<keyof PackagingInfoInput, boolean>>;
 };
 
 function PackagingForm({
   packaging,
-  setPackaging,
+  inputProps,
   packagingTypeOptions,
-  disabled = false
+  disabled = false,
+  errors,
+  touched
 }: PackagingFormProps) {
   const maxQuantity =
     packaging.type === Packagings.Citerne || packaging.type === Packagings.Benne
       ? 2
-      : null;
-
-  const quantityError =
-    maxQuantity && packaging.quantity > maxQuantity
-      ? `Impossible de saisir plus de 2 ${packaging.type.toLocaleLowerCase()}s`
       : null;
 
   const volumeUnit = packaging.type === Packagings.Benne ? "m3" : "litres";
@@ -48,17 +56,9 @@ function PackagingForm({
           <Select
             label="Type"
             disabled={disabled}
-            nativeSelectProps={{
-              value: packaging.type,
-              onChange: event => {
-                const packagingType = event.target.value as Packagings;
-                setPackaging({
-                  ...packaging,
-                  type: packagingType,
-                  other: packagingType === Packagings.Autre ? "" : null
-                });
-              }
-            }}
+            state={errors?.type && touched?.type ? "error" : "default"}
+            stateRelatedMessage={errors?.type}
+            nativeSelectProps={inputProps.type}
             className="fr-mb-2w"
           >
             <option value="">...</option>
@@ -81,27 +81,14 @@ function PackagingForm({
             label={`Volume en ${volumeUnit} (optionnel)`}
             className="fr-mb-2w"
             disabled={disabled}
+            state={errors?.volume && touched?.volume ? "error" : "default"}
+            stateRelatedMessage={errors?.volume}
             nativeInputProps={{
               type: "number",
               inputMode: "decimal",
               step: "0.001", // mili-litres
               value: packagingVolume ?? "",
-              onChange: event => {
-                const volume = () => {
-                  const v = event.target.value;
-                  if (v === "") return v;
-                  if (packaging.type === Packagings.Benne) {
-                    // le volume doit être passé en litres à l'API
-                    return new Decimal(v).times(1000).toNumber();
-                  }
-                  return Number(v);
-                };
-
-                setPackaging({
-                  ...packaging,
-                  volume: volume() as number
-                });
-              }
+              ...inputProps.volume
             }}
           />
 
@@ -115,23 +102,15 @@ function PackagingForm({
           <NonScrollableInput
             label="Nombre"
             className="fr-mb-2w"
-            state={quantityError ? "error" : "default"}
-            stateRelatedMessage={quantityError}
+            state={errors?.quantity && touched?.quantity ? "error" : "default"}
+            stateRelatedMessage={errors?.quantity}
             disabled={disabled}
             nativeInputProps={{
               type: "number",
               inputMode: "numeric",
               step: "1", // mili-litres
               ...(maxQuantity ? { max: maxQuantity } : {}),
-              value: packaging.quantity,
-              onChange: event => {
-                const quantity = event.target.value;
-                setPackaging({
-                  ...packaging,
-                  quantity:
-                    quantity === "" ? (quantity as any) : Number(quantity)
-                });
-              }
+              ...inputProps.quantity
             }}
           />
         </div>
@@ -142,11 +121,9 @@ function PackagingForm({
             <Input
               label="Nom du type de contenant"
               disabled={disabled}
-              nativeInputProps={{
-                value: packaging.other ?? "",
-                onChange: event =>
-                  setPackaging({ ...packaging, other: event.target.value })
-              }}
+              state={errors?.other && touched?.other ? "error" : "default"}
+              stateRelatedMessage={errors?.other}
+              nativeInputProps={inputProps.other}
             />
           </div>
         </div>
@@ -157,23 +134,8 @@ function PackagingForm({
             label="N° de contenant (optionnel)"
             tags={packaging.identificationNumbers ?? []}
             disabled={disabled}
-            onAddTag={tag =>
-              setPackaging({
-                ...packaging,
-                identificationNumbers: [
-                  ...(packaging.identificationNumbers ?? []),
-                  tag
-                ]
-              })
-            }
-            onDeleteTag={idx =>
-              setPackaging({
-                ...packaging,
-                identificationNumbers: packaging.identificationNumbers?.filter(
-                  (_, index) => index !== idx
-                )
-              })
-            }
+            onAddTag={tag => inputProps.identificationNumbers.push(tag)}
+            onDeleteTag={idx => inputProps.identificationNumbers.remove(idx)}
           />
 
           <p className="fr-info-text">

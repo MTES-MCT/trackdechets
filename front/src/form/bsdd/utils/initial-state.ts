@@ -14,7 +14,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../Apps/common/data/initialState";
-import { emptyPackaging } from "../components/packagings/helpers";
+import { emptyPackaging } from "../../../Apps/Forms/Components/PackagingList/helpers";
 
 /**
  * Computes initial values for trader fields in Formik's form

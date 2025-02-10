@@ -71,7 +71,7 @@ export const transporterSchema = object().shape({
   company: transporterCompanySchema
 });
 
-const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
+export const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
   object().shape({
     type: mixed<Packagings>().required(
       "Le type de conditionnement doit être précisé."
@@ -104,7 +104,9 @@ const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
             )
           : schema
       ),
-    volume: number().nullable(),
+    volume: number()
+      .nullable()
+      .moreThan(0, "Le volume doit être supérieur à 0"),
     identificationNumbers: array<String>().nullable()
   });
 
@@ -210,31 +212,7 @@ export const formSchema = object().shape({
     name: string().nullable(true),
     isSubjectToADR: boolean(),
     onuCode: string().nullable(),
-    packagingInfos: array()
-      .required()
-      .min(1)
-      .of(packagingInfo)
-      .test(
-        "is-valid-packaging-infos",
-        "Le conditionnement ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        infos => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE") != null;
-          const hasBenne = infos?.find(i => i.type === "BENNE") != null;
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => i.type && !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
+    packagingInfos: array().required().min(1).of(packagingInfo),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,

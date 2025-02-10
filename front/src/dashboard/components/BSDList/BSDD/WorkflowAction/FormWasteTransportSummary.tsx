@@ -22,8 +22,8 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
 import { getFormWasteDetailsADRMention } from "@td/constants";
-import PackagingList from "../../../../../form/bsdd/components/packagings/PackagingList";
-import { emptyPackaging } from "../../../../../form/bsdd/components/packagings/helpers";
+import PackagingList from "../../../../../Apps/Forms/Components/PackagingList/PackagingList";
+import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
