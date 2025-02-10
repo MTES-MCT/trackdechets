@@ -205,7 +205,7 @@ export default function CompanySelectorWrapper({
         disabled={disabled}
         searchHint={
           allowForeignCompanies
-            ? "ou numéro TVA pour un transporteur de l'UE"
+            ? "ou numéro TVA pour un établissement de l'UE"
             : undefined
         }
         departmentHint={

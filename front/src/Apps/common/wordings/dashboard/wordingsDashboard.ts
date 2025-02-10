@@ -1,5 +1,5 @@
 // boutons d'actions primaire bsd card
-export const VALIDER_TRAITEMENT = "Valider le traitement";
+export const VALIDER_TRAITEMENT = "Signer le traitement";
 export const VALIDER_ACCEPTATION = "Valider l'acceptation";
 export const PUBLIER = "Publier";
 export const SIGNER = "Signer";
