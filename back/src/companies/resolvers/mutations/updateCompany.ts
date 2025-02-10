@@ -6,7 +6,6 @@ import {
   getUpdatedCompanyNameAndAddress,
   updateFavorites
 } from "../../database";
-
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 import { Prisma } from "@prisma/client";
@@ -15,8 +14,8 @@ import { safeInput } from "../../../common/converter";
 import { parseCompanyAsync } from "../../validation/index";
 import { SiretNotFoundError } from "../../sirene/errors";
 import { logger } from "@td/logger";
-import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../converters";
+import { getCompanyRepository } from "../../repository";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -148,7 +147,8 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  const updatedCompany = await prisma.company.update({
+  const { updateCompany } = await getCompanyRepository(user);
+  const updatedCompany = await updateCompany({
     where: { id: existingCompany.id },
     data
   });

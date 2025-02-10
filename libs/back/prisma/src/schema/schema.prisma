@@ -276,6 +276,10 @@ model Company {
   wasteProcessorTypes                  WasteProcessorType[]
   wasteVehiclesTypes                   WasteVehiclesType[]
   address                              String?
+  street                               String?
+  postalCode                           String?
+  city                                 String?
+  country                              String?
   latitude                             Float?
   longitude                            Float?
   verificationCode                     String

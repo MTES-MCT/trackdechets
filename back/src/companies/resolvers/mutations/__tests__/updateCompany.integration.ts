@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import { searchCompany } from "../../../search";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation, MutationUpdateCompanyArgs } from "@td/codegen-back";
 import { libelleFromCodeNaf } from "../../../sirene/utils";
@@ -20,6 +21,10 @@ jest.mock("../../../database", () => ({
   ...jest.requireActual("../../../database"),
   getUpdatedCompanyNameAndAddress: (...args) =>
     mockGetUpdatedCompanyNameAndAddress(...args)
+}));
+
+jest.mock("../../../search", () => ({
+  searchCompany: jest.fn().mockResolvedValue({ etatAdministratif: "A" })
 }));
 
 const UPDATE_COMPANY = gql`
@@ -1073,6 +1078,108 @@ describe("mutation updateCompany", () => {
     expect(updatedCompany).toMatchObject({
       companyTypes: [CompanyType.WASTE_VEHICLES],
       wasteVehiclesTypes: [WasteVehiclesType.BROYEUR]
+    });
+  });
+
+  describe("splitted address", () => {
+    it("should update company's splitted address (FR)", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        name: "Acme FR",
+        address: "4 boulevard Pasteur 44100 Nantes"
+      });
+
+      // Address is different!
+      mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
+        name: "Acme FR",
+        address: "72 rue du Barbâtre 37100 Reims",
+        codeNaf: "0112Z"
+      });
+
+      (searchCompany as jest.Mock).mockResolvedValueOnce({
+        orgId: company.orgId,
+        siret: company.orgId,
+        etatAdministratif: "A",
+        addressVoie: "72 rue du Barbâtre",
+        addressPostalCode: "37100",
+        addressCity: "Reims",
+        codePaysEtrangerEtablissement: ""
+      });
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables: {
+            id: company.id
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedCompany = await prisma.company.findFirst({
+        where: { siret: company.siret }
+      });
+
+      expect(updatedCompany?.street).toBe("72 rue du Barbâtre");
+      expect(updatedCompany?.postalCode).toBe("37100");
+      expect(updatedCompany?.city).toBe("Reims");
+      expect(updatedCompany?.country).toBe("FR");
+    });
+
+    it("should update company's splitted address (foreign)", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        siret: null,
+        vatNumber: "BE0894129667",
+        orgId: "BE0894129667",
+        name: "Acme BE",
+        address: "Rue Bois de Goesnes 4 4570 Marchin",
+        companyTypes: [CompanyType.TRANSPORTER]
+      });
+
+      // Address is different!
+      mockGetUpdatedCompanyNameAndAddress.mockResolvedValueOnce({
+        name: "Acme BE",
+        address: "Rue Bois de Goesnes 3 4570 Marchin",
+        codeNaf: "0112Z"
+      });
+
+      (searchCompany as jest.Mock).mockResolvedValueOnce({
+        orgId: "BE0894129667",
+        vatNumber: "BE0894129667",
+        etatAdministratif: "A",
+        addressVoie: "",
+        addressPostalCode: "",
+        addressCity: "",
+        codePaysEtrangerEtablissement: "BE"
+      });
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables: {
+            id: company.id
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedCompany = await prisma.company.findFirst({
+        where: { siret: company.siret }
+      });
+
+      expect(updatedCompany?.street).toBe("Rue Bois de Goesnes 3");
+      expect(updatedCompany?.postalCode).toBe("4570");
+      expect(updatedCompany?.city).toBe("Marchin");
+      expect(updatedCompany?.country).toBe("BE");
     });
   });
 });
