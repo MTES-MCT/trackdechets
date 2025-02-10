@@ -9,7 +9,7 @@ import {
 } from "@td/codegen-ui";
 import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  PROCESSING_AND_REUSE_OPERATIONS,
+  PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE,
   isDangerous
 } from "@td/constants";
 import { useMutation, gql } from "@apollo/client";
@@ -29,7 +29,8 @@ import RhfOperationModeSelect from "../../../common/Components/OperationModeSele
 import Select from "@codegouvfr/react-dsfr/Select";
 import { toCompanyInput } from "../../Signature/bsff/SignBsffPackagingForm";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput.tsx/RhfExtraEuropeanCompanyManualInput.tsx";
+import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput/RhfExtraEuropeanCompanyManualInput";
+import CompanyContactInfo from "../../../../Apps/Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -323,15 +324,29 @@ function SignOperationModal({
         )}
 
         <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+          <p className="fr-text fr-text--md fr-col-12 fr-mb-0">
+            Vous hésitez sur le type d'opération à choisir ? Vous pouvez
+            consulter la liste de traitement des déchets sur{" "}
+            <a
+              className="fr-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"
+            >
+              Légifrance
+            </a>
+            . Le type d'opération figure sur le CAP qui a été émis par le
+            destinataire.
+          </p>
           <div className="fr-col-12">
             <Select
-              label="Opération d’élimination / valorisation effectuée"
+              label="Traitement d’élimination / valorisation effectuée (code D/R)"
               nativeSelectProps={register("processingOperationDone")}
               state={errors.processingOperationDone ? "error" : "default"}
               stateRelatedMessage={errors.processingOperationDone?.message}
               className="fr-mb-2w"
             >
-              {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+              {PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE.map(operation => (
                 <option value={operation.code} key={operation.code}>
                   {operation.code} - {operation.description}
                 </option>
@@ -351,7 +366,7 @@ function SignOperationModal({
         <div className="fr-grid-row fr-grid-row--gutters">
           <div className="fr-col-12">
             <Input
-              label="Description de l'opération réalisée"
+              label="Description du traitement réalisé"
               textArea
               className="fr-col-12"
               state={errors?.processingOperationDescription && "error"}
@@ -398,9 +413,23 @@ function SignOperationModal({
           <>
             <h6 className="fr-h6">Destination ultérieure prévue</h6>
             <div className="fr-grid-row fr-grid-row--gutters">
+              <p className="fr-text fr-text--md fr-col-12 fr-mb-0">
+                Vous hésitez sur le type d'opération à choisir ? Vous pouvez
+                consulter la liste de traitement des déchets sur{" "}
+                <a
+                  className="fr-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"
+                >
+                  Légifrance
+                </a>
+                . Le type d'opération figure sur le CAP qui a été émis par le
+                destinataire.
+              </p>
               <div className="fr-col-12">
                 <Select
-                  label="Opération d’élimination / valorisation (code D/R)"
+                  label="Opération d’élimination / valorisation prévue (code D/R)"
                   nativeSelectProps={register(
                     "nextDestination.processingOperation"
                   )}
@@ -413,7 +442,7 @@ function SignOperationModal({
                     errors.nextDestination?.processingOperation?.message
                   }
                 >
-                  {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                  {PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE.map(operation => (
                     <option value={operation.code} key={operation.code}>
                       {operation.code} - {operation.description}
                     </option>
@@ -426,7 +455,7 @@ function SignOperationModal({
                 <Checkbox
                   options={[
                     {
-                      label: "Destinataire hors Union Européenne",
+                      label: "L'entreprise est située hors UE",
                       hintText:
                         "Si le numéro de TVA n'est pas reconnu, veuillez aussi cocher ce champ et indiquer manuellement le numéro",
                       nativeInputProps: {
@@ -440,21 +469,31 @@ function SignOperationModal({
               </div>
             </div>
             {!isExtraEuropeanCompany && (
-              <CompanySelectorWrapper
-                favoriteType={FavoriteType.NextDestination}
-                orgId={siret}
-                selectedCompanyOrgId={nextDestination?.company?.siret}
-                allowForeignCompanies={true}
-                onCompanySelected={company => {
-                  setValue("nextDestination.company", company);
-                  if (company) {
-                    setValue(
-                      "nextDestination.company",
-                      toCompanyInput(company)
-                    );
+              <>
+                <CompanySelectorWrapper
+                  favoriteType={FavoriteType.NextDestination}
+                  orgId={siret}
+                  selectedCompanyOrgId={
+                    nextDestination?.company?.siret ??
+                    nextDestination.company?.vatNumber
                   }
-                }}
-              />
+                  allowForeignCompanies={true}
+                  onCompanySelected={company => {
+                    setValue("nextDestination.company", company);
+                    if (company) {
+                      setValue(
+                        "nextDestination.company",
+                        toCompanyInput(company)
+                      );
+                    }
+                  }}
+                />
+
+                <CompanyContactInfo
+                  fieldName={"nextDestination.company"}
+                  errorObject={errors?.nextDestination?.company}
+                />
+              </>
             )}
 
             <div className="fr-grid-row fr-grid-row--gutters">
@@ -494,16 +533,14 @@ function SignOperationModal({
 
         <hr />
         <p className="fr-text fr-text--md fr-mb-2w">
-          En qualité de <strong>destinataire du déchet</strong>, je confirme la
-          réception des déchets pour la quantité indiquée dans ce bordereau. En
-          cas de refus partiel ou total uniquement, un mail automatique
-          Trackdéchets informera le producteur de ce refus, accompagné du
-          récépissé PDF. L’inspection des ICPE et ma société en recevront
-          également une copie.
+          En qualité de <strong>destinataire du déchet</strong>, j'atteste que
+          les informations ci-dessus sont correctes et certifie que le
+          traitement indiqué ci-contre a bien été réalisé pour la quantité de
+          déchets renseignée.
         </p>
 
         <Input
-          label="Date de prise en charge"
+          label="Date du traitement"
           className="fr-col-sm-6 fr-col-lg-4 "
           state={errors?.processedAt && "error"}
           stateRelatedMessage={(errors?.processedAt?.message as string) ?? ""}

@@ -157,7 +157,7 @@ const ActBsddValidation = ({
       bsd.status === FormStatus.TempStorerAccepted ||
       bsd.status === FormStatus.Accepted
     ) {
-      return "Valider le traitement";
+      return "Signer le traitement";
     }
 
     if (bsd.status === FormStatus.Received) {
