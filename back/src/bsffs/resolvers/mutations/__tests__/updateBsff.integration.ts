@@ -897,6 +897,42 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
+  test("it should forbid invalid plates", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            transport: {
+              takenOverAt: "2022-11-02" as any,
+              mode: "ROAD",
+              plates: ["BG"]
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("prevent user from removing their own company from the bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await createBsff(
@@ -1090,7 +1126,7 @@ describe("Mutation.updateBsff", () => {
     expect(updatedBsff.packagings[0].numero).toEqual("1234");
   });
 
-  test("after emitter signature > it should be possible to update trasport fields", async () => {
+  test("after emitter signature > it should be possible to update transport fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
