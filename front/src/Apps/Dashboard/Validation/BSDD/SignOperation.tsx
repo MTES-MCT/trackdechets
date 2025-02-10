@@ -9,7 +9,7 @@ import {
 } from "@td/codegen-ui";
 import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  PROCESSING_AND_REUSE_OPERATIONS,
+  PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE,
   isDangerous
 } from "@td/constants";
 import { useMutation, gql } from "@apollo/client";
@@ -346,7 +346,7 @@ function SignOperationModal({
               stateRelatedMessage={errors.processingOperationDone?.message}
               className="fr-mb-2w"
             >
-              {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+              {PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE.map(operation => (
                 <option value={operation.code} key={operation.code}>
                   {operation.code} - {operation.description}
                 </option>
@@ -442,7 +442,7 @@ function SignOperationModal({
                     errors.nextDestination?.processingOperation?.message
                   }
                 >
-                  {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                  {PROCESSING_AND_REUSE_OPERATIONS_SIGNATURE.map(operation => (
                     <option value={operation.code} key={operation.code}>
                       {operation.code} - {operation.description}
                     </option>
