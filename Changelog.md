@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout de l'export du registre entrant V2 [PR 3910](https://github.com/MTES-MCT/trackdechets/pull/3910)
 - BSVHU - Il est désormais possible de signer la réception indépendamment de l'opération [PR 3909](https://github.com/MTES-MCT/trackdechets/pull/3909)
+- Mes établissements : possibilité pour les admins de voir les demandes de rattachement [PR 3904](https://github.com/MTES-MCT/trackdechets/pull/3904)
 
 #### :nail_care: Améliorations
 
@@ -18,6 +19,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
 - Ajout d'éco-organismes, filtrage des éco-organismes en front. Mise à jour des SIRET de certains éco-organismes en base de donnée [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
 - Il ne devrait pas être possible de valider la réception d'un BSDA avec un poids à 0 [PR 3934](https://github.com/MTES-MCT/trackdechets/pull/3934)
+- Revoir les informations transporteurs scellées en cas de multimodal (récépissé, exemption de récépissé et mode de transport pour transporteur étranger) [PR 3933](https://github.com/MTES-MCT/trackdechets/pull/3933)
+- Redirection de l'utilisateur vers la page de login en cas de déconnexion [PR 3729](https://github.com/MTES-MCT/trackdechets/pull/3729)
+- BSDD : passage au DSFR de la modale de signature du traitement [PR 3951](https://github.com/MTES-MCT/trackdechets/pull/3951)
 
 #### :bug: Corrections de bugs
 
