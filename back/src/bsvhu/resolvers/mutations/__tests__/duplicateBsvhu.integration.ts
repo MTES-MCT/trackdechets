@@ -150,6 +150,7 @@ describe("mutation.duplicateBsvhu", () => {
         transporterTransportSignatureAuthor: "John",
         destinationReceptionSignatureDate: new Date(),
         destinationReceptionSignatureAuthor: "John",
+        destinationReceptionDate: new Date(),
         destinationOperationSignatureDate: new Date(),
         destinationOperationSignatureAuthor: "John",
         intermediaries: {
@@ -419,6 +420,7 @@ describe("mutation.duplicateBsvhu", () => {
     expect(duplicatedBsvhu.transporterTransportSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionSignatureDate).toBeNull();
+    expect(duplicatedBsvhu.destinationReceptionDate).toBeNull();
   });
 
   it("should duplicate without the transporter receipt when it was emptied", async () => {
