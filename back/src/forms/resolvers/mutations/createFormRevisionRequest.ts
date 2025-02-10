@@ -376,9 +376,15 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(flatContent, {
-      strict: true
-    });
+    await bsddRevisionRequestSchema.validate(
+      {
+        ...flatContent,
+        createdAt: bsdd.createdAt
+      },
+      {
+        strict: true
+      }
+    );
   }
 
   // Double-check the waste quantities
@@ -477,6 +483,9 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
 
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
+    // On a besoin de la date de création pour faire des checks sur
+    // certains champs (comme quantityRefused)
+    createdAt: yup.date(),
     isCanceled: yup.bool().transform(v => (v === null ? false : v)),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup

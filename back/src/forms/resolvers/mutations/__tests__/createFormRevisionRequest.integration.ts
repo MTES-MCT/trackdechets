@@ -1438,7 +1438,73 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: recipientCompany.siret,
             wasteAcceptationStatus: Status.ACCEPTED,
             quantityReceived: 10,
-            receivedAt: new Date()
+            receivedAt: new Date(),
+            createdAt: new Date("2025-04-01")
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "createFormRevisionRequest">,
+          MutationCreateFormRevisionRequestArgs
+        >(CREATE_FORM_REVISION_REQUEST, {
+          variables: {
+            input: {
+              formId: bsdd.id,
+              content: {
+                wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+                wasteRefusalReason: "Raison",
+                quantityReceived: 10,
+                quantityRefused: 10
+              },
+              comment: "A comment",
+              authoringCompanySiret: company.siret!
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(revisionRequest.wasteAcceptationStatus).toEqual(
+          WasteAcceptationStatus.REFUSED
+        );
+        expect(revisionRequest.wasteRefusalReason).toEqual("Raison");
+        expect(revisionRequest.quantityReceived).toEqual(10);
+        expect(revisionRequest.quantityRefused).toEqual(10);
+      }
+    );
+
+    it.each([Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED])(
+      "can review BSD wasteAcceptationStatus without quantityRefused if status is %p for legacy BSDs",
+      async status => {
+        // Given
+        const { company: recipientCompany } = await userWithCompanyFactory(
+          "ADMIN",
+          {
+            companyTypes: [CompanyType.WASTEPROCESSOR],
+            wasteProcessorTypes: [
+              WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+            ]
+          }
+        );
+        const { user, company } = await userWithCompanyFactory("ADMIN");
+        const bsdd = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status,
+            emitterCompanySiret: company.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteAcceptationStatus: Status.ACCEPTED,
+            quantityReceived: 10,
+            receivedAt: new Date(),
+            createdAt: new Date("2025-01-01")
           }
         });
 
