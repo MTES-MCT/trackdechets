@@ -3,7 +3,8 @@ import {
   Form,
   InitialForm,
   InitialFormFraction,
-  PackagingInfo
+  PackagingInfo,
+  PackagingInfoInput
 } from "@td/codegen-ui";
 import {
   FieldArray,
@@ -31,7 +32,7 @@ type Appendix2MultiSelectProps = {
   updateTotalQuantity: (totalQuantity: number) => void;
   // callback permettant de mettre à jour la liste de contenants
   // du bordereau en fonction des annexes 2 sélectionnées
-  updatePackagings: (packagings: PackagingInfo[]) => void;
+  updatePackagings: (packagings: PackagingInfoInput[]) => void;
 };
 
 // Limite le nombre de bordereaux que l'on peut afficher dans le tableau

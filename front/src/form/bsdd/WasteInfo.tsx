@@ -20,7 +20,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { FormFormikValues } from "./utils/initial-state";
-import PackagingList from "../../Apps/Forms/Components/PackagingList/PackagingList";
+import FormikPackagingList from "../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { Packagings } from "@td/codegen-ui";
 import { emptyPackaging } from "../../Apps/Forms/Components/PackagingList/helpers";
 
@@ -202,7 +202,7 @@ export default function WasteInfo({ disabled }) {
       {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
         <>
           <h4 className="form__section-heading">Conditionnement</h4>
-          <PackagingList
+          <FormikPackagingList
             fieldName="wasteDetails.packagingInfos"
             disabled={disabled}
           />

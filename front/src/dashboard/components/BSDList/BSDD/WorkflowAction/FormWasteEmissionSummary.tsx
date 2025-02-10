@@ -16,7 +16,7 @@ import NumberInput from "../../../../../form/common/components/custom-inputs/Num
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
-import PackagingList from "../../../../../Apps/Forms/Components/PackagingList/PackagingList";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteEmissionSummaryProps {
@@ -49,7 +49,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   packagingInfos: () => (
     <div className="form__row">
       <h6 className="fr-h6">Conditionnement</h6>
-      <PackagingList fieldName="packagingInfos" />
+      <FormikPackagingList fieldName="packagingInfos" />
     </div>
   ),
   transporterNumberPlate: () => (

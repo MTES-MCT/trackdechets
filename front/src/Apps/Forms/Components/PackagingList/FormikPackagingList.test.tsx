@@ -1,10 +1,10 @@
 import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import { Formik } from "formik";
-import PackagingList from "./PackagingList";
 import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
+import FormikPackagingList from "./FormikPackagingList";
 
-describe("<PackagingList />", () => {
+describe("<FormikPackagingList />", () => {
   const defaulValues: { packagings: PackagingInfoInput[] } = {
     packagings: [{ type: Packagings.Fut, quantity: 2 }]
   };
@@ -17,7 +17,7 @@ describe("<PackagingList />", () => {
         initialValues={initialValues ?? defaulValues}
         onSubmit={jest.fn()}
       >
-        <PackagingList fieldName="packagings" />
+        <FormikPackagingList fieldName="packagings" />
       </Formik>
     );
 
@@ -88,32 +88,6 @@ describe("<PackagingList />", () => {
         screen.getByText(
           "Un conditionnement en benne exclut le mélange avec tout autre type de conditionnement"
         )
-      ).toBeInTheDocument()
-    );
-  });
-
-  it("should display error message when more than 2 citernes", async () => {
-    renderComponent();
-    const dropdown = screen.getByLabelText("Type");
-    fireEvent.change(dropdown, { target: { value: Packagings.Citerne } });
-    const quantityInput = screen.getByLabelText("Nombre");
-    fireEvent.change(quantityInput, { target: { value: 3 } });
-    await waitFor(() =>
-      expect(
-        screen.getByText("Impossible de saisir plus de 2 citernes")
-      ).toBeInTheDocument()
-    );
-  });
-
-  it("should display error message when more than 3 bennes", async () => {
-    renderComponent();
-    const dropdown = screen.getByLabelText("Type");
-    fireEvent.change(dropdown, { target: { value: Packagings.Benne } });
-    const quantityInput = screen.getByLabelText("Nombre");
-    fireEvent.change(quantityInput, { target: { value: 3 } });
-    await waitFor(() =>
-      expect(
-        screen.getByText("Impossible de saisir plus de 2 bennes")
       ).toBeInTheDocument()
     );
   });

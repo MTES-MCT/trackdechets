@@ -22,7 +22,7 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
 import { getFormWasteDetailsADRMention } from "@td/constants";
-import PackagingList from "../../../../../Apps/Forms/Components/PackagingList/PackagingList";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteTransportSummaryProps {
@@ -91,7 +91,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   packagingInfos: () => (
     <div className="form__row">
       <h6 className="fr-h6">Conditionnement</h6>
-      <PackagingList fieldName="update.packagingInfos" />
+      <FormikPackagingList fieldName="update.packagingInfos" />
     </div>
   ),
   sampleNumber: () => (
