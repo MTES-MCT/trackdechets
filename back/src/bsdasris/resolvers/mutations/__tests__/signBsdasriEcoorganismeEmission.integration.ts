@@ -2,7 +2,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import {
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
@@ -13,7 +14,7 @@ import {
   readyToPublishData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 
 describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);
@@ -21,13 +22,9 @@ describe("Mutation.signBsdasri emission", () => {
   it("should put emission signature on a dasri signed by eco-organisme", async () => {
     const { company: ecoOrganismeCompany, user: ecoOrganismeUser } =
       await userWithCompanyFactory("MEMBER");
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret!,
-        handleBsdasri: true
-      }
+    await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsdasri: true }
     });
     const emitterCompany = await companyFactory();
     const destinationCompany = await companyFactory();

@@ -1,7 +1,7 @@
 import { BsdaStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
+import type { MutationDuplicateBsdaArgs } from "@td/codegen-back";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
@@ -69,6 +69,7 @@ export default async function duplicate(
     intermediaries,
     transporters,
     transportersOrgIds,
+    createdAt,
     ...bsda
   } = parsedBsda;
 
@@ -114,6 +115,7 @@ export default async function duplicate(
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
+    isDuplicateOf: prismaBsda.id,
     // Emitter company info
     emitterCompanyMail: emitter?.contactEmail ?? bsda.emitterCompanyMail,
     emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,

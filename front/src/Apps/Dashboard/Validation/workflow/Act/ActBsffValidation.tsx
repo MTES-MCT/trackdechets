@@ -3,9 +3,8 @@ import { Bsff, BsffStatus } from "@td/codegen-ui";
 import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
 import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
 import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
-import { SignBsffAcceptationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignAcceptation";
-import { SignPackagings } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignPackagings";
-import { SignBsffOperationOnePackaging } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignOperation";
+import { SignPackagings } from "../../../Signature/bsff/SignPackagings";
+import SignBsffPackagingModal from "../../../Signature/bsff/SignBsffPackagingModal";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
@@ -48,39 +47,42 @@ const ActBsffValidation = ({
   const renderReceivedModal = () => {
     if (bsd.packagings?.length === 1) {
       return (
-        <SignBsffAcceptationOnePackaging
-          bsffId={bsd.id}
-          {...actionButtonAdapterProps}
+        <SignBsffPackagingModal
+          packagingId={bsd.packagings[0].id}
+          onClose={onClose}
         />
       );
     }
     return <SignPackagings bsffId={bsd.id} {...actionButtonAdapterProps} />;
   };
 
-  const renderAcceptedModal = () => {
-    if (bsd.packagings?.length === 1) {
-      return (
-        <SignBsffOperationOnePackaging
-          bsffId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
-    }
-    return <SignPackagings bsffId={bsd.id} {...actionButtonAdapterProps} />;
-  };
-  const renderPartiallyRefusedModal = () => {
-    return <SignPackagings bsffId={bsd.id} {...actionButtonAdapterProps} />;
-  };
+  const status =
+    bsd["bsffStatus"] ??
+    // Lors du clic sur un bouton primaire, `bsd` correspond à
+    // un node de la query `bsds` qui fait un mapping status -> bsffStatus
+    // alors que lors du clic sur le bouton secondaire `Corriger`, bsd
+    // correspond à `BsdDisplay`. Il faudrait revoir un peu le typing.
+    bsd.status;
 
-  const status = bsd["bsffStatus"];
   return (
     <>
       {status === BsffStatus.Initial && renderInitialModal()}
       {status === BsffStatus.SignedByEmitter && renderSignedByEmitterModal()}
       {status === BsffStatus.Sent && renderSentModal()}
-      {status === BsffStatus.Received && renderReceivedModal()}
-      {status === BsffStatus.Accepted && renderAcceptedModal()}
-      {status === BsffStatus.PartiallyRefused && renderPartiallyRefusedModal()}
+      {[
+        BsffStatus.Received,
+        BsffStatus.Accepted,
+        BsffStatus.Refused,
+        BsffStatus.PartiallyRefused,
+        BsffStatus.Processed,
+        BsffStatus.IntermediatelyProcessed
+      ].includes(status) &&
+        // La modale de signature et de correction par contenant est la même
+        // à partir de la réception du BSFF. L'affichage des différents
+        // champs du formulaire en fonction du statut est géré directement
+        // au sein des modales <SignBsffPackagingModal /> (1 seul contenant) ou
+        // <SignPackagings /> (plusieurs contenants).
+        renderReceivedModal()}
     </>
   );
 };

@@ -15,7 +15,7 @@ import {
   safeInput,
   undefinedOrDefault
 } from "../common/converter";
-import {
+import type {
   InitialForm,
   Broker,
   BrokerInput,
@@ -57,7 +57,7 @@ import {
   WasteDetails,
   WasteDetailsInput,
   WorkSite
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
@@ -637,6 +637,7 @@ export function expandFormFromDb(
     readableId: form.readableId,
     customId: form.customId,
     isImportedFromPaper: form.isImportedFromPaper,
+    isDuplicateOf: form.isDuplicateOf,
     emitter: nullIfNoValues<Emitter>({
       type: form.emitterType,
       workSite: nullIfNoValues<WorkSite>({
@@ -935,9 +936,9 @@ export function expandInitialFormFromDb(
     transporter,
     takenOverAt,
     signedAt,
-    wasteAcceptationStatus,
     quantityReceived,
     quantityRefused,
+    quantityAccepted,
     processingOperationDone,
     quantityGrouped
   } = expandFormFromDb({
@@ -948,12 +949,6 @@ export function expandInitialFormFromDb(
 
   const hasPickupSite =
     emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
-
-  const wasteQuantities = bsddWasteQuantities({
-    wasteAcceptationStatus,
-    quantityReceived,
-    quantityRefused
-  });
 
   return {
     id,
@@ -970,7 +965,7 @@ export function expandInitialFormFromDb(
     transporter,
     quantityReceived,
     quantityRefused,
-    quantityAccepted: wasteQuantities?.quantityAccepted?.toNumber() ?? null,
+    quantityAccepted,
     quantityGrouped,
     processingOperationDone
   };

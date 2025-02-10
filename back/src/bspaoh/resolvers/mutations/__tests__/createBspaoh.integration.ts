@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { BspaohInput, Mutation } from "../../../../generated/graphql/types";
+import type { BspaohInput, Mutation } from "@td/codegen-back";
 import {
   siretify,
   userFactory,

@@ -161,6 +161,7 @@ export const staticFieldsFragment = gql`
     customId
     createdAt
     status
+    isDuplicateOf
     stateSummary {
       packagingInfos {
         type
@@ -411,6 +412,7 @@ export const dashboardFormFragment = gql`
     emittedBy
     emittedByEcoOrganisme
     takenOverAt
+    updatedAt
     status
     quantityReceived
     wasteDetails {

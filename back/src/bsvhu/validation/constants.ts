@@ -1,4 +1,4 @@
-import { SignatureTypeInput } from "../../generated/graphql/types";
+import type { SignatureTypeInput } from "@td/codegen-back";
 import { ZodBsvhu } from "./schema";
 
 export const BSVHU_SIGNATURES_HIERARCHY: {
@@ -13,6 +13,10 @@ export const BSVHU_SIGNATURES_HIERARCHY: {
   },
   TRANSPORT: {
     isSigned: bsvhu => Boolean(bsvhu.transporterTransportSignatureDate),
+    next: "RECEPTION"
+  },
+  RECEPTION: {
+    isSigned: bsvhu => Boolean(bsvhu.destinationReceptionSignatureDate),
     next: "OPERATION"
   },
   OPERATION: {

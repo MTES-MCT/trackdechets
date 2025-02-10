@@ -14,6 +14,7 @@ import { prisma } from "@td/prisma";
 import { UserWithCompany } from "../../__tests__/factories";
 import { OPERATION } from "../constants";
 import { BSFF_WASTE_CODES } from "@td/constants";
+import { getCanAccessDraftOrgIds } from "../utils";
 
 interface BsffFactoryCompanies {
   emitter?: UserWithCompany;
@@ -22,6 +23,7 @@ interface BsffFactoryCompanies {
 }
 
 interface BsffFactoryOpts {
+  userId?: string;
   data?: Partial<Prisma.BsffCreateInput>;
   transporterData?: Partial<Prisma.BsffTransporterCreateInput>;
   packagingData?: Partial<Prisma.BsffPackagingCreateInput>;
@@ -45,7 +47,8 @@ export async function createBsff(
     data,
     transporterData,
     packagingData,
-    previousPackagings
+    previousPackagings,
+    userId
   }: BsffFactoryOpts = {}
 ) {
   let input: Prisma.BsffCreateInput = {
@@ -124,15 +127,32 @@ export async function createBsff(
       destinationCompanyMail: destination.company.contactEmail
     };
   }
+  const include = {
+    packagings: { include: { previousPackagings: true } },
+    transporters: true,
+    ficheInterventions: true
+  };
 
-  return prisma.bsff.create({
+  const created = await prisma.bsff.create({
     data: input,
-    include: {
-      packagings: { include: { previousPackagings: true } },
-      transporters: true,
-      ficheInterventions: true
-    }
+    include
   });
+
+  if (created.isDraft) {
+    if (!userId) {
+      throw Error("Missing: userId is required for draft bsff factory");
+    }
+    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(created, userId);
+
+    return prisma.bsff.update({
+      where: { id: created.id },
+      data: {
+        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
+      },
+      include
+    });
+  }
+  return created;
 }
 
 export function createBsffBeforeEmission(
@@ -178,7 +198,7 @@ export function createBsffBeforeTransport(
     ...opts,
     transporterData: {
       transporterTransportMode: TransportMode.ROAD,
-      transporterTransportPlates: ["TRANSPORTER-PLATE"],
+      transporterTransportPlates: ["AB-12-YZ"],
       transporterTransportTakenOverAt: new Date(),
       ...opts.transporterData
     }
@@ -283,6 +303,21 @@ export function createBsffAfterAcceptation(
   return createBsffBeforeAcceptation(companies, {
     ...opts,
     data: { status: BsffStatus.ACCEPTED, ...opts.data },
+    packagingData: {
+      acceptationSignatureAuthor: "Juste Leblanc",
+      acceptationSignatureDate: new Date().toISOString(),
+      ...opts.packagingData
+    }
+  });
+}
+
+export function createBsffAfterRefusal(
+  companies: Required<BsffFactoryCompanies>,
+  opts: BsffFactoryOpts = {}
+) {
+  return createBsffBeforeRefusal(companies, {
+    ...opts,
+    data: { status: BsffStatus.REFUSED, ...opts.data },
     packagingData: {
       acceptationSignatureAuthor: "Juste Leblanc",
       acceptationSignatureDate: new Date().toISOString(),

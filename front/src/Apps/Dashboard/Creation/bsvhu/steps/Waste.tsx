@@ -10,7 +10,13 @@ import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { setFieldError, TabError } from "../../utils";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
 
-const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
+const WasteBsvhu = ({
+  errors,
+  createdBeforeV20241201 = false
+}: {
+  errors: TabError[];
+  createdBeforeV20241201: boolean;
+}) => {
   const { register, watch, setValue, formState, setError } =
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
 
@@ -20,11 +26,19 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
   const identificationNumbersDefaultValue =
     formState.defaultValues?.identification?.numbers;
   const identificationNumbers = watch("identification.numbers");
+  const packaging = watch("packaging");
+
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
     setValue("quantity", identificationNumbers?.length);
   }, [setValue, identificationNumbers]);
+
+  useEffect(() => {
+    if (packaging === "LOT") {
+      setValue("identification.type", null);
+    }
+  }, [setValue, packaging]);
 
   useEffect(() => {
     if (errors?.length) {
@@ -40,9 +54,50 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
         formState.errors?.identification?.numbers?.length,
         setError
       );
+      setFieldError(
+        errors,
+        "identification.type",
+        formState.errors?.identification?.type,
+        setError
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
+
+  const identificationTypeOptions = [
+    {
+      label:
+        "Identification par N° d'ordre tels qu'ils figurent dans le registre de police",
+      nativeInputProps: {
+        ...register("identification.type"),
+        value: "NUMERO_ORDRE_REGISTRE_POLICE"
+      }
+    },
+    {
+      label: "Identification par numéro d'immatriculation",
+      nativeInputProps: {
+        ...register("identification.type"),
+        value: "NUMERO_IMMATRICULATION"
+      }
+    },
+    {
+      label: "Identification par numéro de fiche VHU DROMCOM",
+      nativeInputProps: {
+        ...register("identification.type"),
+        value: "NUMERO_FICHE_DROMCOM"
+      }
+    }
+  ];
+  // deprecated, kept for bsvhu created before release
+  if (createdBeforeV20241201) {
+    identificationTypeOptions.push({
+      label: "Identification par N° d'ordre des lots sortants",
+      nativeInputProps: {
+        ...register("identification.type"),
+        value: "NUMERO_ORDRE_LOTS_SORTANTS"
+      }
+    });
+  }
 
   return (
     <>
@@ -77,47 +132,47 @@ const WasteBsvhu = ({ errors }: { errors: TabError[] }) => {
         ]}
       />
       <h4 className="fr-h4">Conditionnement</h4>
-      <RadioButtons
-        disabled={sealedFields.includes("packaging")}
-        className="fr-col-sm-10"
-        options={[
-          {
-            label: "En unités",
-            nativeInputProps: {
-              ...register("packaging"),
-              value: "UNITE"
-            }
-          },
-          {
-            label: "En lots",
-            nativeInputProps: {
-              ...register("packaging"),
-              value: "LOT"
-            }
+
+      <fieldset className="fr-fieldset">
+        <div className="fr_fieldset__content">
+          <div className="fr-radio-group">
+            <input
+              type="radio"
+              id="fr-fieldset-radio-unite"
+              value="UNITE"
+              {...register("packaging")}
+            />
+            <label className="fr-label" htmlFor="fr-fieldset-radio-unite">
+              En unités
+            </label>
+          </div>
+        </div>
+      </fieldset>
+      {packaging === "UNITE" && (
+        <RadioButtons
+          disabled={sealedFields.includes("identification.type")}
+          className="fr-col-sm-10 fr-ml-3w"
+          options={identificationTypeOptions}
+          state={formState.errors?.identification?.type && "error"}
+          stateRelatedMessage={
+            formState.errors?.identification?.type?.["message"]
           }
-        ]}
-      />
-      <RadioButtons
-        disabled={sealedFields.includes("identification.type")}
-        className="fr-col-sm-10"
-        legend="Identification par N° d'ordre"
-        options={[
-          {
-            label: "tels qu'ils figurent dans le registre de police",
-            nativeInputProps: {
-              ...register("identification.type"),
-              value: "NUMERO_ORDRE_REGISTRE_POLICE"
-            }
-          },
-          {
-            label: "des lots sortants",
-            nativeInputProps: {
-              ...register("identification.type"),
-              value: "NUMERO_ORDRE_LOTS_SORTANTS"
-            }
-          }
-        ]}
-      />
+        />
+      )}
+      <fieldset className="fr-fieldset">
+        <div className="fr_fieldset__content"></div>
+        <div className="fr-radio-group">
+          <input
+            type="radio"
+            id="fr-fieldset-radio-lot"
+            value="LOT"
+            {...register("packaging")}
+          />
+          <label className="fr-label" htmlFor="fr-fieldset-radio-lot">
+            En lots (identification par numéro de lot)
+          </label>
+        </div>
+      </fieldset>
 
       <div className="fr-col-md-12 fr-mb-4w">
         <IdentificationNumber

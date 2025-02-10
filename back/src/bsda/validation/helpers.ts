@@ -1,10 +1,10 @@
 import { User } from "@prisma/client";
 import { objectDiff } from "../../forms/workflow/diff";
-import {
+import type {
   BsdaInput,
   BsdaPackaging,
   BsdaTransporterInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsdaInput, flattenBsdaTransporterInput } from "../converter";
 import { SIGNATURES_HIERARCHY } from "./constants";
 import { AllBsdaSignatureType } from "../types";
@@ -130,7 +130,6 @@ export async function graphQlInputToZodBsda(
  */
 export function prismaToZodBsda(bsda: PrismaBsdaForParsing): ZodBsda {
   const {
-    createdAt,
     updatedAt,
     rowNumber,
     transporters,

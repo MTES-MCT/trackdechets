@@ -16,16 +16,17 @@ import {
   siretify,
   userFactory,
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
-import {
+import type {
   ImportPaperFormInput,
   Mutation,
   Packagings
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 
 const IMPORT_PAPER_FORM = `
   mutation ImportPaperForm($input: ImportPaperFormInput!){
@@ -208,12 +209,8 @@ describe("mutation / importPaperForm", () => {
         companyTypes: [CompanyType.WASTEPROCESSOR],
         wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
       });
-      const ecoOrganisme = await prisma.ecoOrganisme.create({
-        data: {
-          name: "EO",
-          siret: siretify(3),
-          address: "Somewhere"
-        }
+      const ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsdd: true }
       });
 
       const { mutate } = makeClient(user);

@@ -142,7 +142,6 @@ const DestinationBsvhu = ({ errors }) => {
 
   const selectedCompanyError = (company?: CompanySearchResult) => {
     // Le destinatiare doit être inscrit et avec un profil crématorium ou sous-type crémation
-    // Le profil crématorium sera bientôt supprimé
     if (company) {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
@@ -216,17 +215,11 @@ const DestinationBsvhu = ({ errors }) => {
               } else {
                 setValue(
                   `${actor}.company.contact`,
-                  destination?.company?.contact || company.contact
+                  destination?.company?.contact
                 );
-                setValue(
-                  `${actor}.company.phone`,
-                  destination?.company?.phone || company.contactPhone
-                );
+                setValue(`${actor}.company.phone`, destination?.company?.phone);
 
-                setValue(
-                  `${actor}.company.mail`,
-                  destination?.company?.mail || company.contactEmail
-                );
+                setValue(`${actor}.company.mail`, destination?.company?.mail);
               }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
@@ -247,7 +240,7 @@ const DestinationBsvhu = ({ errors }) => {
           )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          name={actor}
+          errorObject={formState.errors?.destination?.["company"]}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />

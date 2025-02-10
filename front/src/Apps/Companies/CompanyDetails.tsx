@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import Badge from "@codegouvfr/react-dsfr/Badge";
 import CompanyInfo from "./CompanyInfo/CompanyInfo";
@@ -10,7 +10,7 @@ import {
   UserRole,
   CompanyPrivate
 } from "@td/codegen-ui";
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams, useLocation } from "react-router-dom";
 import { userRole } from "./CompaniesList/CompaniesList";
 import { MY_COMPANIES } from "./common/queries";
 import { Loader } from "../common/Components";
@@ -44,53 +44,53 @@ const buildTabs = (
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
     {
-      tabId: "tab1",
+      tabId: "informations",
       label: "Informations",
       iconId
     },
     {
-      tabId: "tab2",
+      tabId: "signature",
       label: "Signature",
       iconId
     },
     {
-      tabId: "tab3",
+      tabId: "membres",
       label: "Membres",
       iconId
     },
     {
-      tabId: "tab4",
+      tabId: "contact",
       label: "Contact",
       iconId
     },
     {
-      tabId: "tab5",
+      tabId: "fiche",
       label: "Fiche",
       iconId
     }
   ];
   const tabsContent = {
-    tab1: CompanyInfo,
-    tab2: CompanySignature,
-    tab3: CompanyMembers,
-    tab4: CompanyContactForm,
-    tab5: CompanyDigestSheetForm
+    informations: CompanyInfo,
+    signature: CompanySignature,
+    membres: CompanyMembers,
+    contact: CompanyContactForm,
+    fiche: CompanyDigestSheetForm
   };
   if (canViewRndtsFeatures) {
     tabs.push({
-      tabId: "tab6",
+      tabId: "delegations",
       label: "Délégations",
       iconId
     });
-    tabsContent["tab6"] = CompanyRegistryDelegation;
+    tabsContent["delegations"] = CompanyRegistryDelegation;
   }
   if (isAdmin) {
     tabs.push({
-      tabId: "tab7",
+      tabId: "avance",
       label: "Avancé",
       iconId
     });
-    tabsContent["tab7"] = CompanyAdvanced;
+    tabsContent["avance"] = CompanyAdvanced;
   }
 
   return { tabs, tabsContent };
@@ -100,7 +100,24 @@ const Dummy = () => <p></p>;
 
 export default function CompanyDetails() {
   const { siret } = useParams<{ siret: string }>();
-  const [selectedTabId, setSelectedTabId] = useState("tab1");
+  const location = useLocation();
+  const [selectedTabId, setSelectedTabId] = useState(
+    [
+      "informations",
+      "signature",
+      "membres",
+      "contact",
+      "fiche",
+      "delegations",
+      "avance"
+    ].includes(location.hash.substring(1))
+      ? location.hash.substring(1)
+      : "informations"
+  );
+
+  useEffect(() => {
+    window.location.replace(`#${selectedTabId}`);
+  }, [selectedTabId]);
 
   const { data, loading, error } = useQuery<
     Pick<Query, "myCompanies">,
@@ -127,7 +144,12 @@ export default function CompanyDetails() {
 
   const { tabs, tabsContent } = buildTabs(company);
 
-  const CurrenComponent = tabsContent[selectedTabId] ?? Dummy;
+  let CurrentComponent = tabsContent[selectedTabId];
+  if (CurrentComponent === undefined) {
+    setSelectedTabId("informations");
+    CurrentComponent = Dummy;
+  }
+
   return (
     <AccountContentWrapper
       title={`${company.name}${
@@ -149,7 +171,7 @@ export default function CompanyDetails() {
           tabs={tabs}
           onTabChange={setSelectedTabId}
         >
-          <CurrenComponent company={company} />
+          <CurrentComponent company={company} />
         </Tabs>
       </div>
     </AccountContentWrapper>

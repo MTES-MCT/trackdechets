@@ -158,9 +158,9 @@ export function RequestAdministrativeTranfer({ company }: Props) {
               l'onglet "avancé de son établissement
             </li>
             <li>
-              L'ensemble des bordereaux (BSDD) au statut "awaiting-group" (En
-              attente de regroupement) sera transféré. (pas de sélection
-              possible)
+              L'ensemble des bordereaux (BSDD au statut "awaiting-group" et BSDA
+              au statut "awaiting-child" soit En attente de regroupement) sera
+              transféré (pas de sélection possible).
             </li>
             <li>L'opération est irréversible.</li>
           </ul>

@@ -26,7 +26,8 @@ import {
   checkTransporters,
   checkWorkerSubSectionThree,
   validateDestination,
-  validatePreviousBsdas
+  validatePreviousBsdas,
+  validateDestinationReceptionWeight
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -42,6 +43,7 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import { validateMultiTransporterPlates } from "../../common/validation/zod/refinement";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -97,10 +99,18 @@ const rawBsdaTransporterSchema = z
  */
 export const rawBsdaSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  // on ajoute `createdAt` au schéma de validation pour appliquer certaines
+  // règles de façon contextuelles en fonction de la date de création du BSDA.
+  // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
+  // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
+  // ancienne version du schéma.
+  createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),
-  emitterIsPrivateIndividual: z.coerce
+  // We don't use z.coerce.boolean() because the infered input type would then be boolean only, not allowing null or undefined
+  // and setting z.coerce.boolean().nullish() would have an infered output type of boolean | null | undefined instead of boolean
+  emitterIsPrivateIndividual: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -126,7 +136,7 @@ export const rawBsdaSchema = z.object({
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteAdr: z.string().nullish(),
-  wastePop: z.coerce
+  wastePop: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -135,7 +145,7 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .default([])
     .transform(val => (val == null ? [] : val)),
-  weightIsEstimate: z.coerce
+  weightIsEstimate: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -188,7 +198,7 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyMail: z.string().nullish(),
   destinationOperationNextDestinationCap: z.string().nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z.string().nullish(),
-  workerIsDisabled: z.coerce
+  workerIsDisabled: z
     .boolean()
     .default(false)
     .nullish()
@@ -199,18 +209,18 @@ export const rawBsdaSchema = z.object({
   workerCompanyContact: z.string().nullish(),
   workerCompanyPhone: z.string().nullish(),
   workerCompanyMail: z.string().nullish(),
-  workerCertificationHasSubSectionFour: z.coerce
+  workerCertificationHasSubSectionFour: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  workerCertificationHasSubSectionThree: z.coerce
+  workerCertificationHasSubSectionThree: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
   workerCertificationCertificationNumber: z.string().nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
   workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
-  workerWorkHasEmitterPaperSignature: z.coerce
+  workerWorkHasEmitterPaperSignature: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -257,7 +267,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
-  .superRefine(checkTransporters);
+  .superRefine(checkTransporters)
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -297,8 +308,11 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
 
   // refinement asynchrones
   const refinedAsyncSchema = schema
-    .superRefine(checkCompanies)
+    .superRefine((bsda, zodContext) =>
+      checkCompanies(bsda, zodContext, context)
+    )
     .superRefine(validateDestination(context))
+    .superRefine(validateDestinationReceptionWeight(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs

@@ -9,7 +9,7 @@ interface IdentificationNumberProps {
   name: string;
   disabled: boolean;
   error?: {};
-  type?: string;
+  infoMessage?: string;
   defaultValue?: (string | undefined)[] | null | undefined;
 }
 const IdentificationNumber = ({
@@ -17,7 +17,7 @@ const IdentificationNumber = ({
   name,
   disabled,
   error,
-  type,
+  infoMessage,
   defaultValue
 }: IdentificationNumberProps) => {
   const { setValue, getValues, clearErrors } = useFormContext();
@@ -29,22 +29,27 @@ const IdentificationNumber = ({
   function identificationNumberReducer(state, action) {
     switch (action.type) {
       case SET_INPUT_CODE:
-        return { ...state, inputCode: action.payload };
+        return { ...state, inputCode: action.payload, touched: true };
+
       case ADD_CODE: {
-        if (!state.codes.length && defaultValue?.length) {
+        if (!state.codes.length && defaultValue?.length && !state.touched) {
+          // initial
           return {
             ...state,
             codes: [...state.codes, ...defaultValue],
-            inputCode: ""
+            inputCode: "",
+            touched: true
           };
         }
         if (!state.inputCode || state.codes.includes(state.inputCode)) {
           return state;
         }
+
         return {
           ...state,
           codes: [...state.codes, state.inputCode],
-          inputCode: ""
+          inputCode: "",
+          touched: true
         };
       }
       case REMOVE_CODE: {
@@ -53,7 +58,7 @@ const IdentificationNumber = ({
 
         return {
           ...state,
-          codes
+          codes: [...codes]
         };
       }
     }
@@ -81,7 +86,8 @@ const IdentificationNumber = ({
 
   const [state, dispatch] = useReducer(identificationNumberReducer, {
     codes: getValues(name),
-    inputCode: ""
+    inputCode: "",
+    touched: false
   });
 
   useEffect(() => {
@@ -116,8 +122,11 @@ const IdentificationNumber = ({
             className="fr-mr-2v"
             nativeButtonProps={{
               type: "button",
-              onClick: () =>
-                !disabled && dispatch({ type: REMOVE_CODE, payload: idx }),
+              onClick: () => {
+                return (
+                  !disabled && dispatch({ type: REMOVE_CODE, payload: idx })
+                );
+              },
               ...{ "data-testid": "tagInputIdentificationNumber" }
             }}
           >
@@ -152,14 +161,14 @@ const IdentificationNumber = ({
           />
         )}
       </div>
-      {type && (
+      {infoMessage && (
         <p
           className={classNames(
             "fr-mt-5v",
             error ? "fr-error-text" : "fr-info-text"
           )}
         >
-          Vous avez {state.codes.length} {type} pour ce contenant
+          {infoMessage.replace("%", state.codes.length)}
         </p>
       )}
     </>

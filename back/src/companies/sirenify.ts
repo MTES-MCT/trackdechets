@@ -1,11 +1,11 @@
 import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
-import { CompanySearchResult } from "../companies/types";
-import {
+import type {
+  CompanySearchResult,
   CompanyInput,
   StatutDiffusionEtablissement
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
@@ -117,6 +117,8 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
+  // an optional function that will be run if the company is not found or not registered on trackdechet
+  setterIfNotRegistered?: (input: T) => void;
   setter: (
     input: T,
     data: {
@@ -152,7 +154,16 @@ export function nextBuildSirenify<T>(
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      const { setter } = accessors[idx];
+      const { siret, skip, setter, setterIfNotRegistered } = accessors[idx];
+      if (
+        siret &&
+        !skip &&
+        (!companySearchResult || !companySearchResult.isRegistered)
+      ) {
+        if (setterIfNotRegistered) {
+          setterIfNotRegistered(sirenifiedInput);
+        }
+      }
       if (!companySearchResult) {
         continue;
       }

@@ -232,7 +232,7 @@ app.use(
           "'sha256-LFhQK3cog1BLYeE/LUUJthR1mUCLSLwgkyqlF+epuq8='"
         ],
         connectSrc: [process.env.API_HOST],
-        formAction: ["self"],
+        formAction: ["'self'"],
         upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
     }

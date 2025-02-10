@@ -1,7 +1,7 @@
 import { Prisma, Form, Status, User, EmitterType } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { objectDiff } from "../forms/workflow/diff";
-import { UpdateFormInput } from "../generated/graphql/types";
+import type { UpdateFormInput } from "@td/codegen-back";
 import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
@@ -21,6 +21,7 @@ type EditableBsddFields = Required<
     | "updatedAt"
     | "rowNumber"
     | "readableId"
+    | "isDuplicateOf"
     | "status"
     | "emittedBy"
     | "emittedAt"
@@ -79,6 +80,7 @@ type EditableBsddFields = Required<
     | "finalOperations"
     | "FinalOperationToFinalForm"
     | "emptyReturnADR"
+    | "registryLookups"
   >
 >;
 

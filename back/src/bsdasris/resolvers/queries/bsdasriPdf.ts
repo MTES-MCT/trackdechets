@@ -1,7 +1,4 @@
-import {
-  QueryBsdasriPdfArgs,
-  QueryResolvers
-} from "../../../generated/graphql/types";
+import type { QueryBsdasriPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsdasriOrNotFound } from "../../database";

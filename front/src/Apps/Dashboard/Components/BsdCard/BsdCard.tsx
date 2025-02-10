@@ -45,7 +45,10 @@ import {
   useBsvhuDuplicate,
   useBspaohDuplicate
 } from "../Duplicate/useDuplicate";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../../../common/queries/company/query";
+import {
+  COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
+  COMPANY_SELECTOR_PRIVATE_INFOS
+} from "../../../common/queries/company/query";
 import { Loader } from "../../../common/Components";
 import { BsdDisplay, BsdStatusCode } from "../../../common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
@@ -93,6 +96,7 @@ function BsdCard({
     onOverview,
     onUpdate,
     onRevision,
+    onCorrection,
     onBsdSuite,
     onAppendix1,
     onConsultReview,
@@ -186,6 +190,16 @@ function BsdCard({
     )?.length
   );
 
+  const { data: dataEmitterRegistered } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: { clue: bsd.emitter?.company?.siret! }
+  });
+
+  const isEmitterRegistered =
+    dataEmitterRegistered?.companyPrivateInfos?.isRegistered;
+
   const actionsLabel = useMemo(
     () =>
       getPrimaryActionsLabelFromBsdStatus(
@@ -194,7 +208,8 @@ function BsdCard({
         permissions,
         bsdCurrentTab,
         hasAutomaticSignature,
-        emitterIsExutoireOrTtr
+        emitterIsExutoireOrTtr,
+        isEmitterRegistered
       ),
     [
       bsdCurrentTab,
@@ -202,7 +217,8 @@ function BsdCard({
       currentSiret,
       hasAutomaticSignature,
       permissions,
-      emitterIsExutoireOrTtr
+      emitterIsExutoireOrTtr,
+      isEmitterRegistered
     ]
   );
   const ctaPrimaryLabel = bsdDisplay?.type ? actionsLabel : "";
@@ -325,11 +341,11 @@ function BsdCard({
     bsdDisplay?.transporter?.company?.siret !== null &&
     bsdDisplay?.emitter?.company?.siret ===
       bsdDisplay?.transporter?.company?.siret;
-  const transporterNameEmmiter = emitterIsTransporter
+  const transporterNameEmitter = emitterIsTransporter
     ? bsdDisplay?.emitter?.company?.name
     : bsdDisplay?.transporter?.company?.name;
 
-  const transporterName = transporterNameEmmiter || NON_RENSEIGNE;
+  const transporterName = transporterNameEmitter || NON_RENSEIGNE;
 
   const unitOfMeasure =
     isBsdasri(bsdDisplay?.type!) ||
@@ -525,6 +541,7 @@ function BsdCard({
                     onDuplicate,
                     onUpdate,
                     onRevision,
+                    onCorrection,
                     onClone,
                     onPdf,
                     onAppendix1,

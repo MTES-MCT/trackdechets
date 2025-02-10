@@ -31,6 +31,7 @@ export const VHU_VERBOSE_STATUSES: Record<string, string> = {
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SENT: "En cours d'acheminement",
   PROCESSED: "Traité",
+  RECEIVED: "En attente de traitement",
   REFUSED: "Refusé"
 };
 

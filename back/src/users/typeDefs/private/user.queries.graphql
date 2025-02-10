@@ -36,4 +36,20 @@ type Query {
   Par exemple lorsqu'un administrateur personnifie un compte utilisateur.
   """
   warningMessage: String
+
+  """
+  Récupère toutes les demandes de rattachement en cours qui concernent un établissement
+  (ciblé par ID ou orgId)
+  """
+  membershipRequests(
+    where: MembershipRequestsWhere
+    skip: Int
+    first: Int
+  ): MembershipRequestsConnection!
+
+  """
+  Permet de savoir si l'utilisateur est authentifié ou non.
+  Ne retourne pas d'erreur si l'utilisateur n'est pas authentifié
+  """
+  isAuthenticated: Boolean!
 }

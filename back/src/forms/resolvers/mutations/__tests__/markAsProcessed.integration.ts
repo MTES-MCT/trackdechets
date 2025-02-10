@@ -12,10 +12,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { OperationMode, Status } from "@prisma/client";
-import {
-  Mutation,
-  MutationMarkAsProcessedArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationMarkAsProcessedArgs } from "@td/codegen-back";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
@@ -82,6 +79,71 @@ describe("mutation.markAsProcessed", () => {
         quantityReceived: 10,
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    await new Promise(resolve => {
+      operationHooksQueue.once("global:drained", () => resolve(true));
+    });
+
+    const resultingForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { finalOperations: true }
+    });
+    expect(resultingForm.status).toBe("PROCESSED");
+    expect(resultingForm.destinationOperationMode).toBe(
+      OperationMode.VALORISATION_ENERGETIQUE
+    );
+
+    // final operation should be set
+    expect(resultingForm.finalOperations).toHaveLength(1);
+
+    // check relevant statusLog is created
+    const statusLogs = await prisma.statusLog.findMany({
+      where: {
+        form: { id: resultingForm.id },
+        user: { id: user.id },
+        status: "PROCESSED"
+      }
+    });
+    expect(statusLogs.length).toEqual(1);
+    expect(statusLogs[0].loggedAt).toBeTruthy();
+  });
+
+  it("ensure an older ACCEPTED bsdd with invalid plates can still be processed", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterNumberPlate: "XY", // invalid plate number
+            number: 1
+          }
+        }
       }
     });
 

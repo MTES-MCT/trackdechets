@@ -20,7 +20,6 @@ import {
   UserPermission,
   Transporter,
   BsdaTransporter,
-  BsdasriStatus,
   BsffTransporter,
   BsvhuStatus
 } from "@td/codegen-ui";
@@ -67,10 +66,11 @@ import {
   completer_bsd_suite
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
-import { sub } from "date-fns";
+import { sub, differenceInDays } from "date-fns";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
+
   return bsdView;
 };
 
@@ -111,6 +111,9 @@ export const getBsdStatusLabel = (
       }
       if (bsdType === BsdType.Bspaoh) {
         return ACCEPTE;
+      }
+      if (bsdType === BsdType.Bsvhu) {
+        return EN_ATTENTE_TRAITEMENT;
       }
       return RECU;
     case BsdStatusCode.Accepted:
@@ -289,6 +292,13 @@ const isSameSiretDestination = (
   bsd: BsdDisplay
 ): boolean => currentSiret === bsd.destination?.company?.siret;
 
+// destination finale après entreposage provisoire
+const isSameSiretFinalBsddDestination = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): boolean =>
+  currentSiret === bsd.temporaryStorageDetail?.destination?.company?.siret;
+
 const isSameSiretWorker = (currentSiret: string, bsd: BsdDisplay): boolean =>
   currentSiret === bsd.worker?.company?.siret;
 
@@ -405,44 +415,64 @@ const canIrregularSituationSignWithNoSiret = (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     bsd.emitter?.noSiret &&
-    isSameSiretTransporter(currentSiret, bsd)
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Transporter, strict: true }
+    ])
   );
 };
 
-// emitter is irregular but has registered siret, he can sign
+// emitter is irregular and has registered siret, he can sign
 const canIrregularSituationSignWithSiretRegistered = (
   bsd: BsdDisplay,
-  currentSiret: string
+  currentSiret: string,
+  isEmitterRegistered?: boolean
 ) => {
   return (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     !bsd.emitter?.noSiret &&
-    isSameSiretEmitter(currentSiret, bsd) &&
-    !isSameSiretTransporter(currentSiret, bsd)
+    isEmitterRegistered &&
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Emitter, strict: true }
+    ])
   );
 };
 
-// emitter is irregular but has not registered siret, transporter signature is needed
+// emitter is irregular and has no registered siret, transporter signature is needed
 const canIrregularSituationSignWithSiretNotRegistered = (
   bsd: BsdDisplay,
-  currentSiret: string
+  currentSiret: string,
+  isEmitterRegistered?: boolean
 ) => {
   return (
     bsd.status === BsvhuStatus.Initial &&
     isIrregularSituation(bsd) &&
     !bsd.emitter?.noSiret &&
-    !isSameSiretEmitter(currentSiret, bsd) &&
-    isSameSiretTransporter(currentSiret, bsd)
+    !isEmitterRegistered &&
+    isSiretActorForBsd(bsd, currentSiret, [
+      { type: ActorType.Transporter, strict: true }
+    ])
   );
 };
 
-export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
+export const isBsvhuSign = (
+  bsd: BsdDisplay,
+  currentSiret: string,
+  isEmitterRegistered?: boolean
+) =>
   isBsvhu(bsd.type) &&
   ((isSameSiretEmitter(currentSiret, bsd) && !isIrregularSituation(bsd)) ||
     canIrregularSituationSignWithNoSiret(bsd, currentSiret) ||
-    canIrregularSituationSignWithSiretRegistered(bsd, currentSiret) ||
-    canIrregularSituationSignWithSiretNotRegistered(bsd, currentSiret));
+    canIrregularSituationSignWithSiretRegistered(
+      bsd,
+      currentSiret,
+      isEmitterRegistered
+    ) ||
+    canIrregularSituationSignWithSiretNotRegistered(
+      bsd,
+      currentSiret,
+      isEmitterRegistered
+    ));
 
 export const isBsffSign = (
   bsd: BsdDisplay,
@@ -463,7 +493,8 @@ export const getIsNonDraftLabel = (
   bsd: BsdDisplay,
   currentSiret: string,
   permissions: UserPermission[],
-  bsdCurrentTab: BsdCurrentTab
+  bsdCurrentTab: BsdCurrentTab,
+  isEmitterRegistered?: boolean
 ): string => {
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isFollowTab = bsdCurrentTab === "followTab";
@@ -481,7 +512,7 @@ export const getIsNonDraftLabel = (
 
   if (
     !isFollowTab &&
-    (isBsvhuSign(bsd, currentSiret) ||
+    (isBsvhuSign(bsd, currentSiret, isEmitterRegistered) ||
       isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
       isBsdaSign(bsd, currentSiret)) &&
     permissions.includes(UserPermission.BsdCanSignEmission)
@@ -552,10 +583,17 @@ export const getDraftOrInitialBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   permissions: UserPermission[],
-  bsdCurrentTab: BsdCurrentTab
+  bsdCurrentTab: BsdCurrentTab,
+  isEmitterRegistered?: boolean
 ): string => {
   if (!bsd.isDraft) {
-    return getIsNonDraftLabel(bsd, currentSiret, permissions, bsdCurrentTab);
+    return getIsNonDraftLabel(
+      bsd,
+      currentSiret,
+      permissions,
+      bsdCurrentTab,
+      isEmitterRegistered
+    );
   } else {
     return permissions.includes(UserPermission.BsdCanUpdate) ? PUBLIER : "";
   }
@@ -791,7 +829,7 @@ export const getSentBtnLabel = (
     isBsvhu(bsd.type) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
-    return VALIDER_TRAITEMENT;
+    return VALIDER_RECEPTION;
   }
   // PAOH
   if (isBspaoh(bsd.type)) {
@@ -1141,7 +1179,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
   permissions: UserPermission[],
   bsdCurrentTab?: BsdCurrentTab,
   hasAutomaticSignature?: boolean,
-  emitterIsExutoireOrTtr?: boolean
+  emitterIsExutoireOrTtr?: boolean,
+  isEmitterRegistered?: boolean
 ) => {
   const isReturnTab = bsdCurrentTab === "returnTab";
 
@@ -1154,7 +1193,8 @@ export const getPrimaryActionsLabelFromBsdStatus = (
         currentSiret,
         bsd,
         permissions,
-        bsdCurrentTab!
+        bsdCurrentTab!,
+        isEmitterRegistered
       );
     case BsdStatusCode.Sealed:
       return getSealedBtnLabel(
@@ -1339,10 +1379,11 @@ const canDeleteBsdasri = (bsd, siret) =>
     (isSameSiretEmitter(siret, bsd) &&
       bsd.status === BsdStatusCode.SignedByProducer));
 
-const canDeleteBsvhu = bsd =>
+const canDeleteBsvhu = (bsd, siret) =>
   bsd.type === BsdType.Bsvhu &&
   (bsd.status === BsdStatusCode.Initial ||
-    bsd.status === BsdStatusCode.SignedByProducer);
+    (isSameSiretEmitter(siret, bsd) &&
+      bsd.status === BsdStatusCode.SignedByProducer));
 
 const canDeleteBspaoh = bsd =>
   bsd.type === BsdType.Bspaoh && bsd.status === BsdStatusCode.Initial;
@@ -1397,7 +1438,7 @@ export const canDeleteBsd = (bsd, siret) =>
   canDeleteBsdasri(bsd, siret) ||
   canDeleteBsff(bsd, siret) ||
   canDeleteBspaoh(bsd) ||
-  canDeleteBsvhu(bsd);
+  canDeleteBsvhu(bsd, siret);
 
 const canUpdateBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
@@ -1408,108 +1449,106 @@ const canUpdateBsff = (bsd, siret) =>
   ].includes(bsd.status) &&
   canDuplicateBsff(bsd, siret);
 
-const canReviewBsda = (bsd, siret) => {
-  const isTransporter = isSameSiretTransporter(siret, bsd);
+export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
+  if (bsd.type !== BsdType.Bsda || bsd.status === BsdStatusCode.Initial) {
+    return false;
+  }
+
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isWorker = isSameSiretWorker(siret, bsd);
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
 
   return (
-    bsd.type === BsdType.Bsda &&
-    !canDeleteBsda(bsd, siret) &&
-    (isTransporter || isDestination || isProducer || isWorker)
+    (isEmitter &&
+      // On ne propose pas le bouton "Réviser" à l'émetteur
+      // lorsqu'il est le seul à avoir signé car il peut encore
+      // modifier le BSDA
+      bsd.status !== BsdStatusCode.SignedByProducer) ||
+    isDestination ||
+    isWorker ||
+    isEcoOrganisme
   );
 };
 
-const canReviewBsdasri = (bsd, siret) => {
-  // You can't review a SYNTHESIS dasri with RECEIVED status
+export const canReviewBsdasri = (bsd: BsdDisplay, siret: string) => {
+  if (bsd.type !== BsdType.Bsdasri || bsd.status === BsdStatusCode.Initial) {
+    return false;
+  }
+
+  // TRA-14348 tous les champs de révision sont grisés dans ce cas
+  // donc on enlève le bouton
   if (
-    [BsdasriType.Synthesis].includes(bsd.bsdWorkflowType?.toString()) &&
-    bsd.status === BsdasriStatus.Received
+    bsd.bsdWorkflowType === BsdasriType.Synthesis &&
+    bsd.status === BsdStatusCode.Received
   ) {
     return false;
   }
 
+  // TRA-15009 tous les champs de révision sont grisés dans ce cas
+  // donc on enlève le bouton
   if (bsd.groupedIn || bsd.synthesizedIn) {
     return false;
   }
 
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
 
   return (
-    bsd.type === BsdType.Bsdasri &&
-    !canDeleteBsdasri(bsd, siret) &&
-    (isDestination || isProducer || isEcoOrganisme)
+    (isEmitter &&
+      // On ne propose pas le bouton "Réviser" à l'émetteur
+      // lorsqu'il est le seul à avoir signé car il peut encore
+      // modifier le BSDASRI
+      bsd.status !== BsdStatusCode.SignedByProducer) ||
+    isDestination ||
+    isEcoOrganisme
   );
 };
 
-export const canReviewBsdd = (bsd, siret) => {
-  const isSentStatus = BsdStatusCode.Sent === bsd.status;
+export const canReviewBsdd = (bsd: BsdDisplay, siret: string) => {
+  if (
+    bsd.type !== BsdType.Bsdd ||
+    bsd.status === BsdStatusCode.Draft ||
+    bsd.status === BsdStatusCode.Sealed ||
+    bsd.status === BsdStatusCode.Refused
+  ) {
+    return false;
+  }
 
-  const isMultimodalTransporter =
-    !!bsd.transporters &&
-    bsd.transporters.length > 1 &&
-    (bsd.transporters as Transporter[]).some(t => t.company?.orgId === siret);
-
-  return (
-    bsd.type === BsdType.Bsdd &&
-    ![
-      BsdStatusCode.Draft,
-      BsdStatusCode.Sealed,
-      BsdStatusCode.Refused
-    ].includes(bsd.status) &&
-    !(
-      bsd.emitterType === EmitterType.Producer &&
-      !isSentStatus &&
-      isSameSiretEmitter(siret, bsd) &&
-      canUpdateBsd(bsd, siret)
-    ) &&
-    !(
-      bsd.emitterType === EmitterType.Appendix2 &&
-      !isSentStatus &&
-      isSameSiretDestination(siret, bsd) &&
-      canUpdateBsd(bsd, siret)
-    ) &&
-    !(
-      bsd.emitterType === EmitterType.Appendix2 &&
-      isSameSiretEmitter(siret, bsd) &&
-      canUpdateBsd(bsd, siret) &&
-      bsd.status === BsdStatusCode.SignedByProducer
-    ) &&
-    !isMultimodalTransporter
-  );
-};
-
-const canReviewBsddAppendix1 = (bsd, siret) => {
-  const transporterHasSigned = ![
-    BsdStatusCode.Draft,
-    BsdStatusCode.Sealed
-  ].includes(bsd.status);
-
-  return (
-    bsd.type === BsdType.Bsdd &&
-    isAppendix1Producer(bsd) &&
-    transporterHasSigned &&
-    isSameSiretTransporter(siret, bsd)
-  );
-};
-
-export const canReviewBsd = (bsd, siret) => {
-  const isTransporter = isSameSiretTransporter(siret, bsd);
+  const isEmitter = isSameSiretEmitter(siret, bsd);
   const isDestination = isSameSiretDestination(siret, bsd);
-  const isProducer = isSameSiretEmitter(siret, bsd);
-  const isWorker = isSameSiretWorker(siret, bsd);
-  const isTransporterOnly =
-    isTransporter && !isDestination && !isProducer && !isWorker;
+  const isEcoOrganisme = isSameSiretEcorganisme(siret, bsd);
+  const isDestinationFinale = isSameSiretFinalBsddDestination(siret, bsd);
 
+  if (bsd.emitterType === EmitterType.Appendix1Producer) {
+    const isTransporter = isSameSiretTransporter(siret, bsd);
+    return (
+      // On n'autorise les révisions qu'à partir de la signature transporteur
+      bsd.status !== BsdStatusCode.SignedByProducer &&
+      (isEmitter || isTransporter)
+    );
+  } else {
+    // vérifier que ça s'applique aussi au bordereau de tournée dédié
+    return (
+      isDestination ||
+      isEcoOrganisme ||
+      isDestinationFinale ||
+      (isEmitter &&
+        // On ne propose pas le bouton "Réviser" à l'émetteur
+        // lorsqu'il est le seul à avoir signé car il peut encore
+        // modifier le BSDD
+        bsd.status !== BsdStatusCode.SignedByProducer)
+    );
+  }
+};
+
+// Specs révision https://docs.google.com/spreadsheets/d/1Mp2Q2Esn3jFa3RT1NtW7WAYq0vh9-iv-xoppEoW80Hk/edit?gid=0#gid=0
+export const canReviewBsd = (bsd: BsdDisplay, siret: string) => {
   return (
-    ((canReviewBsdd(bsd, siret) ||
-      canReviewBsda(bsd, siret) ||
-      canReviewBsdasri(bsd, siret)) &&
-      !isTransporterOnly) ||
-    canReviewBsddAppendix1(bsd, siret)
+    (bsd.type === BsdType.Bsdd && canReviewBsdd(bsd, siret)) ||
+    (bsd.type === BsdType.Bsda && canReviewBsda(bsd, siret)) ||
+    (bsd.type === BsdType.Bsdasri && canReviewBsdasri(bsd, siret))
   );
 };
 
@@ -1556,6 +1595,40 @@ export const canUpdateBsd = (bsd, siret) =>
   canUpdateBspaoh(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
+
+export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
+  const lastSignatureDate = () =>
+    (bsd.packagings ?? []).reduce((lastDate, packaging) => {
+      const signatureDate =
+        packaging?.operation?.signature?.date ??
+        packaging?.acceptation?.signature?.date;
+      if (signatureDate) {
+        const date = new Date(signatureDate);
+        if (lastDate) {
+          return date > lastDate ? date : lastDate;
+        }
+        return date;
+      }
+      return lastDate;
+    }, new Date(0));
+
+  // On ne permet pas la correction des contenants qui sont
+  // déjà inclut dans un bordereau suite
+  const haveNextBsff = () =>
+    !!bsd.packagings && bsd.packagings.every(p => !!p.nextBsff);
+
+  return (
+    bsd.type === BsdType.Bsff &&
+    isSameSiretDestination(siret, bsd) &&
+    (bsd.status === BsdStatusCode.Processed ||
+      bsd.status === BsdStatusCode.Refused ||
+      (bsd.status === BsdStatusCode.IntermediatelyProcessed &&
+        !haveNextBsff())) &&
+    // On autorise la correction d'un BSFF pendant 60 jours après
+    // la dernière signature de l'opération sur les contenants
+    differenceInDays(new Date(), lastSignatureDate()) <= 60
+  );
+};
 
 export const hasAppendix1Cta = (
   bsd: BsdDisplay,
@@ -1622,10 +1695,14 @@ export const hasRoadControlButton = (
   isCollectedTab: boolean,
   isReturnTab?: boolean
 ) => {
-  if (isReturnTab) return true;
+  const isAppendix1 = bsd.emitterType === "APPENDIX1_PRODUCER";
+  if (!isAppendix1 && isReturnTab) return true;
 
   // L'action principale sur le paoh collecté est la déclaration de dépôt par le transporteur
   if (bsd.type === BsdType.Bspaoh) {
+    return false;
+  }
+  if (isAppendix1 && isCollectedTab) {
     return false;
   }
   return ["SENT", "RESENT"].includes(bsd.status) && isCollectedTab;

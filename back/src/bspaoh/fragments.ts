@@ -7,6 +7,7 @@ export const fullBspaoh = gql`
     isDraft
     createdAt
     updatedAt
+    isDuplicateOf
     waste {
       code
       adr

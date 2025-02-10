@@ -1,7 +1,7 @@
 import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
+import type { Query, QueryBsffsArgs } from "@td/codegen-back";
 import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory,
@@ -78,6 +78,65 @@ describe("Query.bsffs", () => {
 
     expect(data.bsffs.edges.length).toBe(1);
     expect(data.bsffs.edges.map(edge => edge.node.id)).toEqual([bsff.id]);
+  });
+
+  it("should return draft bsffs for the user's company", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    await createBsff(
+      { emitter },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS
+    );
+
+    expect(data.bsffs.edges.length).toBe(1);
+  });
+
+  it("should not return draft bsffs for the user's company when created by somebody else", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    // draft bsd created by emitter
+    await createBsff(
+      { emitter, destination },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
+    // requested by destination
+    const { query } = makeClient(destination.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS
+    );
+    // not available
+    expect(data.bsffs.edges.length).toBe(0);
+  });
+
+  it("should return draft bsffs created by somebody else when belonging to the same companies", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    // associate destination user to emittter company
+    await prisma.companyAssociation.create({
+      data: {
+        company: { connect: { id: emitter.company.id } },
+        user: { connect: { id: destination.user.id } },
+        role: UserRole.ADMIN
+      }
+    });
+    // draft bsff created by emitter
+    await createBsff(
+      { emitter, destination },
+      { data: { isDraft: true }, userId: emitter.user.id }
+    );
+    for (const client of [emitter.user, destination.user]) {
+      const { query } = makeClient(client);
+      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+        GET_BSFFS
+      );
+
+      expect(data.bsffs.edges.length).toBe(1);
+    }
   });
 
   it("should filter out bsffs where the user's company doesn't appear", async () => {

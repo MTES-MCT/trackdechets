@@ -1,21 +1,17 @@
 import React, { lazy, Suspense } from "react";
-import { Route, Routes, Navigate, generatePath } from "react-router-dom";
-import * as Sentry from "@sentry/browser";
+import { Route, Routes, Navigate } from "react-router-dom";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
 import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
-import { Query, UserRole } from "@td/codegen-ui";
+import { Query } from "@td/codegen-ui";
+
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import { getDefaultOrgId } from "../CompanySwitcher/CompanySwitcher";
-import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
-import { MyImports } from "../../../../dashboard/registry/MyImports";
-import { CompanyImports } from "../../../../dashboard/registry/CompanyImports";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -24,10 +20,10 @@ const DashboardRoutes = lazy(
 const CompaniesRoutes = lazy(
   () => import("../../../Companies/CompaniesRoutes")
 );
-const Account = lazy(() => import("../../../Account/Account"));
-const AccountMembershipRequest = lazy(
-  () => import("../../../Account/AccountMembershipRequest")
+const RegistryRoutes = lazy(
+  () => import("../../../../dashboard/registry/RegistryRoutes")
 );
+const Account = lazy(() => import("../../../Account/Account"));
 const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
 
 const BsffFormContainer = lazy(
@@ -52,44 +48,23 @@ const Signup = lazy(() => import("../../../../login/Signup"));
 const Company = lazy(() => import("../../../../company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
-const GET_ME = gql`
-  query GetMe {
-    me {
-      id
-      email
-      isAdmin
-      companies {
-        orgId
-        siret
-        securityCode
-      }
-      featureFlags
-    }
+const BANNER_MESSAGES = [
+  `Abonnez-vous à notre lettre d'information mensuelle pour suivre les nouveautés de la plateforme, la programmation des formations, des conseils pratiques, ainsi que les évolutions réglementaires liées à la traçabilité des déchets.`
+];
+
+const IS_AUTHENTICATED = gql`
+  query IsAuthenticated {
+    isAuthenticated
   }
 `;
-const BANNER_MESSAGES = [
-  `La cohérence entre le type de déchet (dangereux, non dangereux) et le sous-profil sélectionné par l’installation de destination est désormais vérifiée sur les BSDD.
-   Nous invitons les installations de destinations à vérifier et mettre à jour leur sous-profil dans l'onglet Mes établissements > Profil.`
-];
-export default function LayoutContainer() {
-  const { orgId } = usePermissions();
-  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: ({ me }) => {
-      if (import.meta.env.VITE_SENTRY_DSN && me.email) {
-        Sentry.setUser({ email: me.email });
-      }
-    }
-  });
 
-  const isAuthenticated = !loading && data != null;
-  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
+export default function LayoutContainer() {
+  const { data, loading } =
+    useQuery<Pick<Query, "isAuthenticated">>(IS_AUTHENTICATED);
 
   if (loading) {
     return <Loader />;
   }
-
-  const defaultOrgId =
-    isAuthenticated && data && (orgId ?? getDefaultOrgId(data.me.companies));
 
   return (
     <Suspense fallback={<Loader />}>
@@ -97,7 +72,7 @@ export default function LayoutContainer() {
         <Route
           path="/oauth2/authorize/dialog"
           element={
-            <RequireAuth isAuthenticated={isAuthenticated}>
+            <RequireAuth>
               <Oauth2Dialog />
             </RequireAuth>
           }
@@ -106,39 +81,34 @@ export default function LayoutContainer() {
         <Route
           path="/oidc/authorize/dialog"
           element={
-            <RequireAuth isAuthenticated={isAuthenticated}>
+            <RequireAuth>
               <OidcDialog />
             </RequireAuth>
           }
         />
+
         <Route
           element={
             <Layout
-              isAuthenticated={isAuthenticated}
-              isAdmin={isAdmin}
+              isAuthenticated={data?.isAuthenticated}
               v2banner={
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Consulter la FAQ",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/questions-frequentes#quel-s-sous-profil-s-selectionner"
+                    title: "Je m'abonne",
+                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT"
                   }}
-                  persistedSurveyName="td-20241119"
+                  persistedSurveyName="td-20240114"
                 />
               }
-              defaultOrgId={defaultOrgId}
             />
           }
         >
           <Route
             path={`${routes.admin.index}/*`}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                {isAdmin ? (
-                  <Admin />
-                ) : (
-                  <div>Vous n'êtes pas autorisé à consulter cette page</div>
-                )}
+              <RequireAuth needsAdminPrivilege>
+                <Admin />
               </RequireAuth>
             }
           />
@@ -165,9 +135,23 @@ export default function LayoutContainer() {
             element={<ResendActivationEmail />}
           />
 
-          <Route path={routes.company} element={<Company />} />
+          <Route
+            path={routes.company}
+            element={
+              <RequireAuth>
+                <Company />
+              </RequireAuth>
+            }
+          />
 
-          <Route path={routes.wasteTree} element={<WasteTree />} />
+          <Route
+            path={routes.wasteTree}
+            element={
+              <RequireAuth>
+                <WasteTree />
+              </RequireAuth>
+            }
+          />
 
           <Route
             path={"/dashboard/:siret/bsds/edit/:id"}
@@ -177,7 +161,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdds.edit}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <FormContainer />
               </RequireAuth>
             }
@@ -191,7 +175,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdds.create}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <FormContainer />
               </RequireAuth>
             }
@@ -200,7 +184,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsffs.create}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsffFormContainer />
               </RequireAuth>
             }
@@ -209,7 +193,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsffs.edit}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsffFormContainer />
               </RequireAuth>
             }
@@ -218,7 +202,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdasris.create}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsdasriFormContainer />
               </RequireAuth>
             }
@@ -227,7 +211,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdasris.edit}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsdasriFormContainer />
               </RequireAuth>
             }
@@ -236,7 +220,7 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdas.create}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsdaFormContainer />
               </RequireAuth>
             }
@@ -245,8 +229,17 @@ export default function LayoutContainer() {
           <Route
             path={routes.dashboard.bsdas.edit}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <BsdaFormContainer />
+              </RequireAuth>
+            }
+          />
+
+          <Route
+            path={routes.dashboard.default}
+            element={
+              <RequireAuth>
+                <DashboardRoutes />
               </RequireAuth>
             }
           />
@@ -254,7 +247,7 @@ export default function LayoutContainer() {
           <Route
             path={`${routes.dashboard.index}/*`}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <DashboardRoutes />
               </RequireAuth>
             }
@@ -263,7 +256,7 @@ export default function LayoutContainer() {
           <Route
             path={`${routes.account.index}/*`}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <Account />
               </RequireAuth>
             }
@@ -272,17 +265,8 @@ export default function LayoutContainer() {
           <Route
             path={`${routes.companies.index}/*`}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <CompaniesRoutes />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.membershipRequest}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <AccountMembershipRequest />
               </RequireAuth>
             }
           />
@@ -290,26 +274,17 @@ export default function LayoutContainer() {
           <Route
             path={routes.registry}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
+              <RequireAuth>
                 <Exports />
               </RequireAuth>
             }
           />
 
           <Route
-            path={routes.registry_new.myImports}
+            path={`${routes.registry_new.index}/*`}
             element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <MyImports />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.registry_new.companyImports}
-            element={
-              <RequireAuth isAuthenticated={isAuthenticated}>
-                <CompanyImports />
+              <RequireAuth>
+                <RegistryRoutes />
               </RequireAuth>
             }
           />
@@ -319,19 +294,8 @@ export default function LayoutContainer() {
             element={
               <Navigate
                 to={
-                  data
-                    ? data.me.companies.length > 0
-                      ? generatePath(
-                          data?.me.companies[0].userRole?.includes(
-                            UserRole.Driver
-                          )
-                            ? routes.dashboard.transport.toCollect
-                            : routes.dashboard.index,
-                          {
-                            siret: defaultOrgId
-                          }
-                        )
-                      : routes.companies.index
+                  data?.isAuthenticated
+                    ? routes.dashboard.default
                     : routes.login
                 }
                 replace

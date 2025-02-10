@@ -24,6 +24,7 @@ export { operationHooksQueue } from "./queue/producers/operationHook";
 export { administrativeTransferQueue } from "./queue/producers/administrativeTransfer";
 export { updateAppendix2Queue } from "./queue/producers/updateAppendix2";
 export { registryImportQueue } from "./queue/producers/registryImport";
+export { registryExportQueue } from "./queue/producers/registryExport";
 export {
   indexBsdJob,
   operationHookJob,
@@ -31,7 +32,8 @@ export {
   sendMailJob,
   postGericoJob,
   processAdministrativeTransferJob,
-  processRegistryImportJob
+  processRegistryImportJob,
+  processRegistryExportJob
 } from "./queue/jobs";
 
 export {
@@ -64,14 +66,12 @@ export { deleteBsdJob } from "./queue/jobs/deleteBsd";
 export { indexFavoritesJob } from "./queue/jobs/indexFavorites";
 export { indexChunkBsdJob, indexAllInBulkJob } from "./queue/jobs/indexAllBsds";
 export { sendHookJob } from "./queue/jobs/sendHook";
-
 export {
   webhooksQueue,
   SEND_WEBHOOK_JOB_NAME
 } from "./queue/producers/webhooks";
 export { sirenifyBsdJob } from "./queue/jobs/sirenifyBsd";
 export { associateUserToCompany } from "./users/database";
-export { Mutation, MutationDeleteCompanyArgs } from "./generated/graphql/types";
 export { redisClient } from "./common/redis";
 export { client as esClient, index as esIndex } from "./common/elastic";
 export { closeMongoClient } from "./events/mongodb";

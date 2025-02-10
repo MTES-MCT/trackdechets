@@ -18,10 +18,7 @@ import {
   CollectorType,
   WasteProcessorType
 } from "@prisma/client";
-import {
-  Mutation,
-  MutationMarkAsResealedArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationMarkAsResealedArgs } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { sirenifyResealedFormInput } from "../../../sirenify";
 import { getFirstTransporterSync } from "../../../database";
@@ -856,5 +853,52 @@ describe("Mutation markAsResealed", () => {
       where: { id: form.forwardedInId! }
     });
     expect(resealedForm.wasteDetailsQuantity?.toNumber()).toEqual(3.3);
+  });
+
+  test("tra-15576 - it should work when updating destination (previous destination is dormant and new one is not)", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const dormantDestination = await destinationFactory({
+      isDormantSince: new Date()
+    });
+    const { mutate } = makeClient(user);
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        wasteAcceptationStatus: "PARTIALLY_REFUSED",
+        quantityReceived: 10.5,
+        quantityRefused: 7.2
+      },
+      forwardedInOpts: { recipientCompanySiret: dormantDestination.siret }
+    });
+
+    const newDestination = await destinationFactory();
+
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsResealed">,
+      MutationMarkAsResealedArgs
+    >(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          destination: { company: { siret: newDestination.siret } }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.forwardedInId! }
+    });
+
+    expect(resealedForm.recipientCompanySiret).toEqual(newDestination.siret);
   });
 });

@@ -10,7 +10,7 @@ import {
   transporterReceiptFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import { TransportMode } from "../../generated/graphql/types";
+import type { TransportMode } from "@td/codegen-back";
 import { getFirstTransporter } from "../database";
 
 describe("Test Bsdd Transporter Recipify Module for FormInput", () => {
@@ -45,7 +45,15 @@ describe("Test Bsdd Transporter Recipify Module for FormInput", () => {
     };
 
     const completedInput = await recipifyFormInput(mockInput);
-    expect(completedInput).toEqual(mockInput);
+    expect(completedInput).toEqual({
+      transporter: {
+        company,
+        isExemptedOfReceipt: true,
+        receipt: null,
+        department: null,
+        validityLimit: null
+      }
+    });
   });
 });
 

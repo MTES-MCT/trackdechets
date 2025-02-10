@@ -37,6 +37,9 @@ export default function Emitter({ disabled }) {
   // TRA-13753 - Un seul transporteur est autorisé en cas de bordereau de tournée dédiée
   const lockAppendix1 = (values.transporters ?? []).length > 1;
 
+  const hasEcoOrganisme = values.ecoOrganisme;
+  const emitterType = values.emitter?.type;
+
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
       setFieldValue("emitter.type", "PRODUCER");
@@ -48,7 +51,7 @@ export default function Emitter({ disabled }) {
     setFieldValue
   ]);
 
-  const [emitterTypeField] = useField("emitter.type");
+  const [emitterTypeField] = useField("emitter.type") ?? "";
 
   function onChangeEmitterType(e) {
     const previousEmitterType = values.emitter?.type;
@@ -147,6 +150,43 @@ export default function Emitter({ disabled }) {
             disabled={lockEmitterProducer || lockAppendix1}
           />
         </fieldset>
+        {hasEcoOrganisme &&
+          emitterType &&
+          [EmitterType.Producer, EmitterType.Other].includes(emitterType) && (
+            <div className="fr-alert fr-alert--info fr-mt-2w fr-mb-2w">
+              <p>
+                Dans la partie <strong>Établissement émetteur</strong>, indiquez
+                l'établissement (SIRET), la personne (particulier) ou le navire
+                étranger (via le numéro OMI) qui est le producteur du déchet.
+                L'éco-organisme ne doit pas être mentionné à la place de
+                l’émetteur.
+              </p>
+            </div>
+          )}
+        {hasEcoOrganisme &&
+          emitterType &&
+          [EmitterType.Appendix2].includes(emitterType) && (
+            <div className="fr-alert fr-alert--info fr-mt-2w fr-mb-2w">
+              <p>
+                Dans la partie <strong>Établissement émetteur</strong>, indiquez
+                l'établissement (SIRET) ayant, par exemple, réalisé une
+                opération de regroupement. L'éco-organisme ne doit pas être
+                mentionné à la place de l’émetteur.
+              </p>
+            </div>
+          )}
+        {hasEcoOrganisme &&
+          emitterType &&
+          [EmitterType.Appendix1].includes(emitterType) && (
+            <div className="fr-alert fr-alert--info fr-mt-2w fr-mb-2w">
+              <p>
+                Dans la partie <strong>Établissement émetteur</strong>, indiquez
+                l'établissement (SIRET) du collecteur, et non celui du client ou
+                producteur chez qui la collecte sera effectuée. L'éco-organisme
+                ne doit pas être mentionné à la place de l’émetteur.
+              </p>
+            </div>
+          )}
       </div>
       {!isGrouping && (
         <div className="form__row">
@@ -294,7 +334,7 @@ export default function Emitter({ disabled }) {
 
       {isGrouping && (
         <div className="tw-my-6">
-          <h4 className="form__section-heading">Entreprise émettrice</h4>
+          <h4 className="form__section-heading">Établissement émetteur</h4>
 
           <MyCompanySelector
             fieldName="emitter.company"
@@ -338,7 +378,7 @@ export default function Emitter({ disabled }) {
         !values.emitter?.isForeignShip && (
           <CompanySelector
             name="emitter.company"
-            heading="Entreprise émettrice"
+            heading="Établissement émetteur"
             disabled={disabled}
           />
         )}

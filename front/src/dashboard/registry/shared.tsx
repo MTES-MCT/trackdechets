@@ -1,4 +1,5 @@
 import Badge from "@codegouvfr/react-dsfr/Badge";
+import { RegistryImportType } from "@td/codegen-ui";
 import gql from "graphql-tag";
 import React from "react";
 
@@ -7,12 +8,15 @@ export const GET_REGISTRY_IMPORTS = gql`
     $siret: String
     $ownImportsOnly: Boolean
     $first: Int
+    $skip: Int
   ) {
     registryImports(
       siret: $siret
       ownImportsOnly: $ownImportsOnly
       first: $first
+      skip: $skip
     ) {
+      totalCount
       edges {
         node {
           id
@@ -41,33 +45,41 @@ export const GET_REGISTRY_IMPORTS = gql`
   }
 `;
 
+export const TYPES: { [key in RegistryImportType]: string } = {
+  SSD: "SSD",
+  INCOMING_WASTE: "D(N)D entrants",
+  OUTGOING_WASTE: "D(N)D sortants",
+  INCOMING_TEXS: "TEXS entrants",
+  OUTGOING_TEXS: "TEXS sortants"
+};
+
 export const badges = {
-  PENDING: (
+  PENDING: () => (
     <Badge small severity="info">
       En attente
     </Badge>
   ),
-  STARTED: (
+  STARTED: () => (
     <Badge small severity="info">
       En cours
     </Badge>
   ),
-  SUCCESSFUL: (
+  SUCCESSFUL: (context: "import" | "export") => (
     <Badge small severity="success">
-      Complet
+      {context === "import" ? "Complet" : "Terminé"}
     </Badge>
   ),
-  PARTIALLY_SUCCESSFUL: (
+  PARTIALLY_SUCCESSFUL: () => (
     <Badge small severity="warning">
       Partiel
     </Badge>
   ),
-  FAILED: (
+  FAILED: (context: "import" | "export") => (
     <Badge small severity="error">
-      Refus
+      {context === "import" ? "Refus" : "Echec"}
     </Badge>
   ),
-  CANCELED: (
+  CANCELED: () => (
     <Badge small severity="error">
       Annulé
     </Badge>
@@ -96,3 +108,101 @@ export async function downloadFromSignedUrl(signedUrl: string | undefined) {
   link.click();
   link.remove();
 }
+
+const registryV2ExportFragment = gql`
+  fragment RegistryV2ExportFragment on RegistryV2Export {
+    id
+    registryType
+    startDate
+    endDate
+    format
+    declarationType
+    status
+    companies {
+      name
+      orgId
+    }
+    createdAt
+  }
+`;
+
+export const GENERATE_REGISTRY_V2_EXPORT = gql`
+  mutation GenerateRegistryV2Export(
+    $registryType: RegistryV2ExportType!
+    $format: FormsRegisterExportFormat!
+    $siret: String
+    $delegateSiret: String
+    $dateRange: DateFilter!
+    $declarationType: DeclarationType
+    $wasteTypes: [RegistryV2ExportWasteType!]
+    $wasteCodes: [String!]
+  ) {
+    generateRegistryV2Export(
+      dateRange: $dateRange
+      format: $format
+      registryType: $registryType
+      delegateSiret: $delegateSiret
+      siret: $siret
+      where: {
+        declarationType: { _eq: $declarationType }
+        wasteType: { _in: $wasteTypes }
+        wasteCode: { _in: $wasteCodes }
+      }
+    ) {
+      ...RegistryV2ExportFragment
+    }
+  }
+  ${registryV2ExportFragment}
+`;
+
+export const GET_REGISTRY_V2_EXPORTS = gql`
+  query RegistryV2Exports($first: Int = 5) {
+    registryV2Exports(first: $first) {
+      edges {
+        node {
+          ...RegistryV2ExportFragment
+        }
+      }
+    }
+  }
+  ${registryV2ExportFragment}
+`;
+
+export const GET_REGISTRY_V2_EXPORT = gql`
+  query RegistryV2Export($id: ID!) {
+    registryV2Export(id: $id) {
+      ...RegistryV2ExportFragment
+    }
+  }
+  ${registryV2ExportFragment}
+`;
+
+export const REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL = gql`
+  query RegistryV2ExportDownloadSignedUrl($exportId: String!) {
+    registryV2ExportDownloadSignedUrl(exportId: $exportId) {
+      fileKey
+      signedUrl
+    }
+  }
+`;
+
+export const GET_MY_COMPANIES_WITH_DELEGATORS = gql`
+  query MyCompaniesWithDelegators {
+    myCompanies {
+      edges {
+        node {
+          id
+          givenName
+          name
+          orgId
+          userRole
+          delegators {
+            orgId
+            givenName
+            name
+          }
+        }
+      }
+    }
+  }
+`;

@@ -1,4 +1,4 @@
-import { BsvhuInput } from "../../generated/graphql/types";
+import type { BsvhuInput } from "@td/codegen-back";
 import {
   getCurrentSignatureType,
   graphQlInputToZodBsvhu,
@@ -21,7 +21,7 @@ import { BsvhuValidationContext, PrismaBsvhuForParsing } from "./types";
  * par signature.
  */
 export async function mergeInputAndParseBsvhuAsync(
-  // BSFF déjà stockée en base de données.
+  // Bsvhu déjà stocké en base de données.
   persisted: PrismaBsvhuForParsing,
   // Données entrantes provenant de la couche GraphQL.
   input: BsvhuInput,
@@ -35,8 +35,37 @@ export async function mergeInputAndParseBsvhuAsync(
     ...zodInput
   };
 
+  // keep address fields coherent while we have both address and street/city/postalCode
+  // if the address changes, and the street/city/postalCode is not in input, clean it
+  // if street/city/postalCode changes, cleanup address field.
+  if (
+    zodInput.emitterCompanyAddress !== undefined &&
+    zodInput.emitterCompanyAddress !== zodPersisted.emitterCompanyAddress
+  ) {
+    if (!zodInput.emitterCompanyStreet) {
+      bsvhu.emitterCompanyStreet = null;
+    }
+    if (!zodInput.emitterCompanyCity) {
+      bsvhu.emitterCompanyCity = null;
+    }
+    if (!zodInput.emitterCompanyPostalCode) {
+      bsvhu.emitterCompanyPostalCode = null;
+    }
+  } else if (
+    ((zodInput.emitterCompanyStreet !== undefined &&
+      zodInput.emitterCompanyStreet !== zodPersisted.emitterCompanyStreet) ||
+      (zodInput.emitterCompanyCity !== undefined &&
+        zodInput.emitterCompanyCity !== zodPersisted.emitterCompanyCity) ||
+      (zodInput.emitterCompanyPostalCode !== undefined &&
+        zodInput.emitterCompanyPostalCode !==
+          zodPersisted.emitterCompanyPostalCode)) &&
+    !zodInput.emitterCompanyAddress
+  ) {
+    bsvhu.emitterCompanyAddress = null;
+  }
+
   // Calcule la signature courante à partir des données si elle n'est
-  // pas fourni via le contexte
+  // pas fournie via le contexte
   const currentSignatureType =
     context.currentSignatureType ?? getCurrentSignatureType(zodPersisted);
 
@@ -46,7 +75,7 @@ export async function mergeInputAndParseBsvhuAsync(
   };
 
   // Vérifie que l'on n'est pas en train de modifier des données
-  // vérrouillées par signature.
+  // verrouillées par signature.
   const updatedFields = await checkBsvhuSealedFields(
     zodPersisted,
     bsvhu,

@@ -1,5 +1,12 @@
-import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
-import React, { useEffect, useMemo, useContext } from "react";
+import {
+  CompanySearchResult,
+  CompanyType,
+  FavoriteType,
+  TransportMode,
+  BsvhuRecepisse
+} from "@td/codegen-ui";
+
+import React, { useEffect, useMemo, useContext, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import RecepisseExemption from "../../../../Forms/Components/RecepisseExemption/RecepiceExemption";
@@ -8,11 +15,17 @@ import CompanySelectorWrapper from "../../../../common/Components/CompanySelecto
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { clearCompanyError, setFieldError } from "../../utils";
+import TransporterRecepisse from "../../../../Forms/Components/TransporterRecepisse/TransporterRecepisse";
+import { isForeignVat } from "@td/constants";
+import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
+import { RhfTransportModeSelect } from "../../../../Forms/Components/TransportMode/TransportMode";
 
 const TransporterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
   const { register, setValue, watch, formState, setError, clearErrors } =
     useFormContext(); // retrieve all hook methods
+  const [recepisse, setRecepisse] = useState<BsvhuRecepisse>({});
+
   const actor = "transporter";
   const transporter = watch("transporter") ?? {};
   const sealedFields = useContext(SealedFieldsContext);
@@ -32,14 +45,13 @@ const TransporterBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (errors?.length) {
-      if (!transporter?.company?.siret) {
-        setFieldError(
-          errors,
-          `${actor}.company.siret`,
-          formState.errors?.[actor]?.["company"]?.siret,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+
       if (transporter?.company?.contact) {
         setFieldError(
           errors,
@@ -80,6 +92,14 @@ const TransporterBsvhu = ({ errors }) => {
           setError
         );
       }
+      if (transporter?.transport?.plates) {
+        setFieldError(
+          errors,
+          `${actor}.transport.plates`,
+          formState.errors?.[actor]?.["transport"]?.plates,
+          setError
+        );
+      }
     }
   }, [
     errors,
@@ -92,13 +112,17 @@ const TransporterBsvhu = ({ errors }) => {
     transporter?.company?.mail,
     transporter?.company?.phone,
     transporter?.company?.siret,
-    transporter?.company?.vatNumber
+    transporter?.company?.vatNumber,
+    transporter?.transport?.plates
   ]);
 
   const orgId = useMemo(
     () => transporter?.company?.orgId ?? transporter?.company?.siret ?? null,
     [transporter?.company?.orgId, transporter?.company?.siret]
   );
+
+  const isForeign = React.useMemo(() => isForeignVat(orgId), [orgId]);
+
   const selectedCompanyError = (company?: CompanySearchResult) => {
     if (company) {
       if (!company.isRegistered) {
@@ -107,7 +131,9 @@ const TransporterBsvhu = ({ errors }) => {
         !transporter?.recepisse?.isExempted &&
         !company.companyTypes?.includes(CompanyType.Transporter)
       ) {
-        return "Cet établissement n'a pas le profil Transporteur. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption.";
+        return "Cet établissement n'a pas le profil Transporteur. Il ne pourra pas être visé comme tel sur le bordereau, il lui appartient de compléter cette information dans son profil. Si vous transportez vos propres déchets, veuillez cocher la case d'exemption.";
+      } else if (formState.errors?.transporter?.["company"]?.siret?.message) {
+        return formState.errors?.transporter?.["company"]?.siret?.message;
       }
     }
     return null;
@@ -117,12 +143,13 @@ const TransporterBsvhu = ({ errors }) => {
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
-        <h4 className="fr-h4">Entreprise</h4>
+        <h4 className="fr-h4">Transporteur</h4>
         <CompanySelectorWrapper
           orgId={siret}
           favoriteType={FavoriteType.Transporter}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           selectedCompanyOrgId={orgId}
+          allowForeignCompanies={true}
           selectedCompanyError={selectedCompanyError}
           onCompanySelected={company => {
             if (company) {
@@ -137,52 +164,72 @@ const TransporterBsvhu = ({ errors }) => {
               } else {
                 setValue(
                   `${actor}.company.contact`,
-                  transporter?.company?.contact || company.contact
+                  transporter?.company?.contact
                 );
-                setValue(
-                  `${actor}.company.phone`,
-                  transporter?.company?.phone || company.contactPhone
-                );
+                setValue(`${actor}.company.phone`, transporter?.company?.phone);
 
-                setValue(
-                  `${actor}.company.mail`,
-                  transporter?.company?.mail || company.contactEmail
-                );
+                setValue(`${actor}.company.mail`, transporter?.company?.mail);
               }
               setValue(`${actor}.company.orgId`, company.orgId);
               setValue(`${actor}.company.siret`, company.siret);
               setValue(`${actor}.company.name`, company.name);
               setValue(`${actor}.company.vatNumber`, company.vatNumber);
               setValue(`${actor}.company.address`, company.address);
+              setRecepisse({
+                number: company.transporterReceipt?.receiptNumber,
+                department: company.transporterReceipt?.department,
+                validityLimit: company.transporterReceipt?.validityLimit
+              });
             }
           }}
         />
-        {formState.errors?.transporter?.["company"]?.orgId?.message && (
-          <p
-            id="text-input-error-desc-error"
-            className="fr-mb-4v fr-error-text"
-          >
-            {formState.errors?.transporter?.["company"]?.orgId?.message}
-          </p>
-        )}
-        {formState.errors?.transporter?.["company"]?.siret && (
-          <p className="fr-mb-4v fr-error-text">
-            {formState.errors?.transporter?.["company"]?.siret?.message}
-          </p>
-        )}
+        {!transporter?.company?.siret &&
+          formState.errors?.transporter?.["company"]?.siret && (
+            <p className="fr-text--sm fr-error-text fr-mb-4v">
+              {formState.errors?.transporter?.["company"]?.siret?.message}
+            </p>
+          )}
         <CompanyContactInfo
           fieldName={`${actor}.company`}
-          name={actor}
+          errorObject={formState.errors?.transporter?.["company"]}
           disabled={sealedFields.includes(`${actor}.company.siret`)}
           key={orgId}
         />
       </div>
+      {!!orgId &&
+        !isForeign &&
+        transporter.transport.mode === TransportMode.Road &&
+        !transporter.recepisse.isExempted && (
+          <TransporterRecepisse
+            number={recepisse?.number}
+            department={recepisse?.department}
+            validityLimit={recepisse?.validityLimit}
+          />
+        )}
       <div className="fr-col-md-12 fr-mt-4w">
         <RecepisseExemption
           onChange={v => setValue(`${actor}.recepisse.isExempted`, v)}
           checked={transporter.recepisse?.isExempted}
           disabled={sealedFields.includes(`${actor}.recepisse.isExempted`)}
         />
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-6">
+          <RhfTransportModeSelect
+            disabled={sealedFields.includes(`transporter.transport.mode`)}
+            fieldPath={`transporter.transport.mode`}
+          />
+        </div>
+      </div>
+      <div className="fr-grid-row">
+        <div className="fr-col-6">
+          <RhfTagsInputWrapper
+            maxTags={2}
+            label="Immatriculations"
+            fieldName={`transporter.transport.plates`}
+            hintText="2 max : Véhicule, remorque"
+          />
+        </div>
       </div>
     </>
   );

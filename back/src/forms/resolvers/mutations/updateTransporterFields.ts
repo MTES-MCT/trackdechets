@@ -1,4 +1,4 @@
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { isBsddTransporterFieldEditable } from "@td/constants";
 import { getFormOrFormNotFound } from "../../database";
@@ -6,6 +6,7 @@ import { checkCanUpdateTransporterFields } from "../../permissions";
 import { getAndExpandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 import { ForbiddenError } from "../../../common/errors";
+import { transporterPlatesSchema } from "../../validation";
 
 const updateTransporterFieldsResolver: MutationResolvers["updateTransporterFields"] =
   async (
@@ -24,6 +25,8 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
     }
 
     await checkCanUpdateTransporterFields(user, form);
+
+    await transporterPlatesSchema.validate({ transporterNumberPlate });
 
     const updatedForm = await getFormRepository(user).update(
       { id },

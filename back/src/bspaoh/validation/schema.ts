@@ -1,14 +1,17 @@
 import { z } from "zod";
-import { WasteAcceptationStatus, TransportMode } from "@prisma/client";
+import { WasteAcceptationStatus } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { isCrematoriumRefinement } from "./dynamicRefinements";
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 import {
   CompanyRole,
-  foreignVatNumberSchema,
-  siretSchema
+  siretSchema,
+  rawTransporterSchema
 } from "../../common/validation/zod/schema";
-import { isRegisteredVatNumberRefinement } from "../../common/validation/zod/refinement";
+import {
+  isRegisteredVatNumberRefinement,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 
 export const BSPAOH_OPERATIONS = ["R 1", "D 10"] as const;
 
@@ -125,41 +128,16 @@ const rawBspaohSchema = z.object({
 
 export type ZodBspaoh = z.infer<typeof rawBspaohSchema>;
 
-const rawBspaohTransporterSchema = z.object({
-  transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(), // Further verifications done here under in superRefine
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyMail: z.string().nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema(CompanyRole.Transporter)
-    .nullish()
-    .superRefine(isRegisteredVatNumberRefinement),
-  transporterCustomInfo: z.string().nullish(),
-  transporterRecepisseIsExempted: z.coerce
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
-  transporterTakenOverAt: z.coerce.date().nullish(),
-  transporterTransportPlates: z
-    .array(z.string())
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-    .default([]),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish()
-});
+const rawBspaohTransporterSchema = rawTransporterSchema
+  .omit({ id: true, number: true })
+  .merge(z.object({ transporterTakenOverAt: z.coerce.date().nullish() }));
 
 export type ZodBspaohTransporter = z.infer<typeof rawBspaohTransporterSchema>;
 
 const rawFullBspaohSchema = rawBspaohSchema.merge(rawBspaohTransporterSchema);
 
 export const fullBspaohSchema = rawFullBspaohSchema
-  .superRefine((val, ctx) => {
+  .superRefine(async (val, ctx) => {
     // refine date order
     if (
       val.destinationReceptionDate &&
@@ -181,7 +159,11 @@ export const fullBspaohSchema = rawFullBspaohSchema
         message: `La consistance ne peut être liquide pour ce type de déchet`
       });
     }
+    // refine transporter vat
+    await isRegisteredVatNumberRefinement(val.transporterCompanyVatNumber, ctx);
   })
+
+  .superRefine(validateTransporterPlates)
   .transform(val => {
     return val;
   });

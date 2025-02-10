@@ -37,15 +37,36 @@ import {
 } from "../utils";
 import OtherActors from "./steps/OtherActors";
 
-const vhuToInput = (vhu: BsvhuInput): BsvhuInput => {
-  return omitDeep(vhu, [
+const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
+  const addressCleanup: string[] = [];
+  // the emitter company object (FormCompany) doesn't support street/city/postalCode
+  // so on updates, even if the address hasn't changed, those fields will be null.
+  // in order to avoid erasing the street/city/postalCode fields on updates, we remove them
+  // from the input.
+  if (vhu.emitter.company.address) {
+    if (!vhu.emitter.company.street) {
+      addressCleanup.push("emitter.company.street");
+    }
+    if (!vhu.emitter.company.city) {
+      addressCleanup.push("emitter.company.city");
+    }
+    if (!vhu.emitter.company.postalCode) {
+      addressCleanup.push("emitter.company.postalCode");
+    }
+  }
+  const omitted = omitDeep(vhu, [
     "isDraft",
-    "emitter.emission.signature",
-    "transporter.transport.signature",
-    "destination.reception.signature",
-    "destination.operation.signature",
-    "ecoOrganisme.hasEcoOrganisme"
+    "ecoOrganisme.hasEcoOrganisme",
+    "hasTrader",
+    "hasBroker",
+    "hasIntermediaries",
+    ...addressCleanup
   ]);
+  // clear the intermediaries array if it only contains the default value
+  if (vhu.intermediaries?.length === 1 && !vhu.intermediaries[0].siret) {
+    omitted.intermediaries = [];
+  }
+  return omitted;
 };
 interface Props {
   bsdId?: string;
@@ -119,12 +140,11 @@ const BsvhuFormSteps = ({
   const mainCtaLabel = formState.id ? "Enregistrer" : "Publier";
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
 
-  const saveForm = (input: BsvhuInput, draft: boolean): Promise<any> => {
+  const saveForm = (input: ZodBsvhu, draft: boolean): Promise<any> => {
     const cleanedInput = vhuToInput(input);
     if (formState.id!) {
-      const cleanedPayload = cleanPayload(omitDeep(cleanedInput));
       return updateVhuForm({
-        variables: { id: formState.id, input: cleanedPayload }
+        variables: { id: formState.id, input: cleanedInput }
       });
     } else {
       const cleanedPayload = cleanPayload(cleanedInput);
@@ -153,6 +173,19 @@ const BsvhuFormSteps = ({
     () => getPublishErrorMessages(BsdType.Bsvhu, errorsFromPublishApi),
     [errorsFromPublishApi]
   );
+  const createdAt = formQuery.data?.bsvhu.createdAt
+    ? new Date(formQuery.data?.bsvhu.createdAt)
+    : null;
+
+  // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
+  const v20241201Date =
+    import.meta.env.VITE_OVERRIDE_V20241201 || "2024-12-18T00:00:00.000";
+
+  const v20241201 = new Date(v20241201Date);
+
+  const createdBeforeV20241201 = Boolean(
+    createdAt && createdAt.getTime() < v20241201.getTime()
+  );
 
   const tabsContent = useMemo(
     () => ({
@@ -161,6 +194,7 @@ const BsvhuFormSteps = ({
           errors={publishErrorMessages.filter(
             error => error.tabId === TabId.waste
           )}
+          createdBeforeV20241201={createdBeforeV20241201}
         />
       ),
       emitter: (
@@ -186,7 +220,7 @@ const BsvhuFormSteps = ({
       ),
       other: <OtherActors />
     }),
-    [publishErrorMessages]
+    [publishErrorMessages, createdBeforeV20241201]
   );
 
   return (

@@ -9,6 +9,5 @@ export async function getBsvhuOrNotFound<
   if (bsvhu == null || !!bsvhu.isDeleted) {
     throw new FormNotFound(id.toString());
   }
-
   return bsvhu;
 }

@@ -8,10 +8,7 @@ import {
   OperationMode,
   EmitterType
 } from "@prisma/client";
-import {
-  CiterneNotWashedOutReason,
-  FormStatus
-} from "../generated/graphql/types";
+import type { CiterneNotWashedOutReason, FormStatus } from "@td/codegen-back";
 
 export const FormWithTransportersInclude =
   Prisma.validator<Prisma.FormInclude>()({
@@ -176,6 +173,7 @@ export type Bsdd = {
   packagings: Prisma.JsonValue;
   wasteCode: string | null;
   wasteDescription: string | null;
+  wasteDetailsLandIdentifiers: string[] | null;
   wasteAdr: string | null;
   nonRoadRegulationMention: string | null;
   wasteIsDangerous: boolean;

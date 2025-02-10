@@ -1,10 +1,7 @@
 import { ApolloServerPlugin } from "@apollo/server";
 import { GraphQLContext } from "../../types";
 import { logger } from "@td/logger";
-import {
-  MutationResolvers,
-  QueryResolvers
-} from "../../generated/graphql/types";
+import type { MutationResolvers, QueryResolvers } from "@td/codegen-back";
 import { rateLimiterMiddleware } from "../middlewares/rateLimiter";
 import rateLimit from "express-rate-limit";
 

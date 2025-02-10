@@ -7,11 +7,15 @@ import {
   checkRequiredFields,
   checkOperationMode,
   checkReceptionWeight,
-  checkEmitterSituation
+  checkEmitterSituation,
+  checkPackagingAndIdentificationType,
+  checkTransportModeAndWeight,
+  checkTransportModeAndReceptionWeight
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
+import { validateTransporterPlates } from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
   foreignVatNumberSchema,
@@ -30,6 +34,8 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
+import { TransportMode } from "@prisma/client";
+import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../../common/validation/messages";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -80,11 +86,15 @@ const rawBsvhuSchema = z.object({
   isDeleted: z.boolean().default(false),
 
   emitterAgrementNumber: z.string().max(100).nullish(),
-  emitterIrregularSituation: z.coerce
+  emitterIrregularSituation: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterNoSiret: z.coerce
+  emitterNoSiret: z
+    .boolean()
+    .nullish()
+    .transform(v => Boolean(v)),
+  emitterNotOnTD: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -145,10 +155,12 @@ const rawBsvhuSchema = z.object({
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationCustomInfo: z.string().nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
+  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
   identificationNumbers: z.array(z.string()).optional(),
-  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(),
+  identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(), // see refinements
   quantity: z.number().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
@@ -166,21 +178,28 @@ const rawBsvhuSchema = z.object({
     .string()
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.Transporter
   ).nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportPlates: z.array(z.string()).optional(),
+  transporterRecepisseNumber: z.string().nullish(),
+  transporterRecepisseDepartment: z.string().nullish(),
+  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterRecepisseIsExempted: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
+
+  transporterTransportSignatureAuthor: z.string().nullish(),
+  transporterTransportSignatureDate: z.coerce.date().nullish(),
+  transporterTransportTakenOverAt: z.coerce.date().nullish(),
+  transporterCustomInfo: z.string().nullish(),
+  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
+
+  transporterTransportPlates: z
+    .array(z.string())
+    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
+    .default([]),
+
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   brokerCompanyName: z.string().nullish(),
@@ -223,7 +242,11 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkWeights)
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
-  .superRefine(checkEmitterSituation);
+  .superRefine(checkEmitterSituation)
+  .superRefine(checkPackagingAndIdentificationType)
+  .superRefine(checkTransportModeAndWeight)
+  .superRefine(checkTransportModeAndReceptionWeight)
+  .superRefine(validateTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -252,7 +275,7 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
     .transform((bsvhu: ParsedZodBsvhu) => runTransformers(bsvhu, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
-      // au cas où des transformations auto-complète certains champs
+      // au cas où des transformations auto-complètent certains champs
       checkRequiredFields(context)
     );
 };

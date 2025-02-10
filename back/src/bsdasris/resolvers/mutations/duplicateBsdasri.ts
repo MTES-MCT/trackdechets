@@ -1,10 +1,10 @@
 import { Bsdasri, BsdasriStatus, BsdasriType, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
+import type {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { getBsdasriRepository } from "../../repository";
@@ -51,6 +51,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     createdAt,
     updatedAt,
     rowNumber,
+    isDuplicateOf,
 
     emissionSignatoryId,
     emitterEmissionSignatureDate,
@@ -72,6 +73,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     transporterWasteWeightValue,
     transporterWasteWeightIsEstimate,
     transporterWasteVolume,
+    transporterTransportPlates,
     handedOverToRecipientAt,
     transportSignatoryId,
     transporterTransportSignatureDate,
@@ -115,6 +117,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true,
+    isDuplicateOf: bsdasri.id,
     // Emitter company info
     emitterCompanyAddress: emitter?.address ?? bsdasri.emitterCompanyAddress,
     emitterCompanyMail: emitter?.contactEmail ?? bsdasri.emitterCompanyMail,

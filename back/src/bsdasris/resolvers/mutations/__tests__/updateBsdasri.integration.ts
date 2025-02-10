@@ -2,7 +2,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   bsdasriFactory,
-  readyToPublishData
+  readyToPublishData,
+  readyToTakeOverData
 } from "../../../__tests__/factories";
 import {
   userWithCompanyFactory,
@@ -13,7 +14,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { sirenify } from "../../../sirenify";
@@ -203,6 +204,72 @@ describe("Mutation.updateBsdasri", () => {
       expect(sirenify).toHaveBeenCalledTimes(1);
     }
   );
+
+  it("should forbid invalid transporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        isDraft: false,
+        emitterCompanySiret: company.siret,
+        ...readyToPublishData(await companyFactory()),
+        ...readyToTakeOverData(company)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: { transport: { plates: "AA" } }
+    };
+
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
+  it("should forbid invalid transporter plates if bsd was create before V2025020", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        isDraft: false,
+        emitterCompanySiret: company.siret,
+        ...readyToPublishData(await companyFactory()),
+        ...readyToTakeOverData(company),
+        createdAt: new Date("2025-01-04T00:00:00.000Z") // created before V2025020
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: { transport: { plates: "AA" } }
+    };
+
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+  });
 
   it("should update transporter recepisse with data pulled from db", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

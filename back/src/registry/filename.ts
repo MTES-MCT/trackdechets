@@ -1,13 +1,14 @@
 import { format } from "date-fns";
-import { WasteRegistryType } from "../generated/graphql/types";
+import type { WasteRegistryType } from "@td/codegen-back";
 
 export function getRegistryFileName(
   registryType: WasteRegistryType,
-  sirets: string[]
+  sirets: string[],
+  date?: Date
 ) {
   const components = [
     "TD-Registre",
-    format(new Date(), "yyyyMMdd"),
+    format(date ?? new Date(), "yyyyMMdd"),
     formatRegistryType(registryType)
   ];
 

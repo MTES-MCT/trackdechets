@@ -1,9 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCreateFormRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
+  companyFactory,
   formFactory,
   siretify,
   userWithCompanyFactory
@@ -259,6 +260,57 @@ describe("Mutation.createFormRevisionRequest", () => {
       company.siret
     );
     // one approval is created
+    expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+      { approverSiret: recipientCompany.siret, status: "PENDING" }
+    ]);
+  });
+
+  it("should not include trader, broker nor intermediary in the approvals list", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      }
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const traderCompany = await companyFactory();
+    const brokerCompany = await companyFactory();
+    const intermediaryCompany = await companyFactory();
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        brokerCompanySiret: brokerCompany.siret,
+        traderCompanySiret: traderCompany.siret,
+        intermediaries: {
+          create: {
+            siret: intermediaryCompany.siret!,
+            name: intermediaryCompany.name!,
+            contact: intermediaryCompany.contact!
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { wasteDetails: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // only one approval is created
     expect(data.createFormRevisionRequest.approvals).toStrictEqual([
       { approverSiret: recipientCompany.siret, status: "PENDING" }
     ]);
@@ -770,6 +822,123 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
     expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
   });
+
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "should be possible for the destination to create a revision request " +
+      "when %p and an eco-organisme is present",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          ecoOrganismeSiret: ecoOrganismeCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.status).toEqual("PENDING");
+
+      // one approval is created
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([
+        { approverSiret: ecoOrganismeCompany.siret, status: "PENDING" }
+      ]);
+    }
+  );
+
+  it.each(["emitterIsPrivateIndividual", "emitterIsForeignShip"])(
+    "revision request should be automatically approved if %p " +
+      "and there is no eco-organisme",
+    async field => {
+      const { company: recipientCompany, user } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          emitterCompanySiret: null,
+          [field]: true,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsQuantity: 1,
+          quantityReceived: 1,
+          sentAt: new Date(),
+          receivedAt: new Date(),
+          processedAt: new Date(),
+          status: "PROCESSED"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { quantityReceived: 2 },
+            comment: "A comment",
+            authoringCompanySiret: recipientCompany.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        recipientCompany.siret
+      );
+      expect(data.createFormRevisionRequest.approvals).toStrictEqual([]);
+      expect(data.createFormRevisionRequest.status).toEqual("ACCEPTED");
+    }
+  );
 
   it("should fail if unknown fields are provided", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
@@ -1413,6 +1582,226 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(errors).toBeUndefined();
+  });
+
+  it("should fail when trying to add a broker with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const brokerCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { broker: { company: { siret: brokerCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          `Le courtier saisi sur le bordereau (SIRET: ${brokerCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+        )
+      })
+    ]);
+  });
+
+  it("should fail when trying to add a trader with wrong profile", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const traderCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { trader: { company: { siret: traderCompany.siret } } },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          `Le négociant saisi sur le bordereau (SIRET: ${traderCompany.siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+        )
+      })
+    ]);
+  });
+
+  it("should auto-complete broker receipt", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const recepisse = {
+      receiptNumber: "rec-courtier",
+      department: "13",
+      validityLimit: new Date()
+    };
+
+    const brokerCompany = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: recepisse
+      }
+    });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {
+            broker: {
+              company: {
+                siret: brokerCompany.siret,
+                address: brokerCompany.address,
+                name: brokerCompany.name,
+                mail: "courtier@trackdechets.fr",
+                contact: "Courtier",
+                phone: "00 00 00 00 00"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsddRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createFormRevisionRequest.id }
+    });
+
+    expect(revisionRequest.brokerReceipt).toEqual(recepisse.receiptNumber);
+    expect(revisionRequest.brokerDepartment).toEqual(recepisse.department);
+    expect(revisionRequest.brokerValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
+  });
+
+  it("should auto-complete trader receipt", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const recepisse = {
+      receiptNumber: "rec-négociant",
+      department: "13",
+      validityLimit: new Date()
+    };
+
+    const traderCompany = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: recepisse
+      }
+    });
+
+    const bsdd = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {
+            trader: {
+              company: {
+                siret: traderCompany.siret,
+                address: traderCompany.address,
+                name: traderCompany.name,
+                mail: "negociant@trackdechets.fr",
+                contact: "Négociant",
+                phone: "00 00 00 00 00"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: emitter.company.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsddRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createFormRevisionRequest.id }
+    });
+
+    expect(revisionRequest.traderReceipt).toEqual(recepisse.receiptNumber);
+    expect(revisionRequest.traderDepartment).toEqual(recepisse.department);
+    expect(revisionRequest.traderValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
   });
 
   describe("wasteAcceptationStatus & quantityRefused", () => {

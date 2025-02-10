@@ -8,16 +8,21 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import gql from "graphql-tag";
+import { BsvhuIdentificationType } from "@prisma/client";
 
 const UPDATE_VHU_FORM = gql`
   mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
     updateBsvhu(id: $id, input: $input) {
       id
       isDraft
+      packaging
+      identification {
+        type
+      }
       destination {
         company {
           siret
@@ -453,6 +458,7 @@ describe("Mutation.Vhu.update", () => {
       opt: {
         emitterCompanySiret: company.siret,
         transporterTransportSignatureDate: new Date(),
+        transporterTransportPlates: ["XY-23-TR"],
         intermediaries: {
           create: {
             siret: company.siret!,
@@ -500,7 +506,7 @@ describe("Mutation.Vhu.update", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanySiret: company.siret,
-        transporterTransportSignatureDate: new Date(),
+        destinationOperationSignatureDate: new Date(),
         intermediaries: {
           create: {
             siret: company.siret!,
@@ -514,8 +520,6 @@ describe("Mutation.Vhu.update", () => {
 
     const { mutate } = makeClient(user);
 
-    // We pass an update with the same value as before.
-    // Even if the field is locked, this should be ignored
     const input = {
       intermediaries: [
         {
@@ -539,4 +543,273 @@ describe("Mutation.Vhu.update", () => {
         "Les intermédiaires"
     );
   });
+
+  it("should fail when deprecated identificationType is used", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_LOTS_SORTANTS"
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : La valeur du type d'identification est dépréciée",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should success when deprecated identificationType is used on a bsvhu create before release date", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        createdAt: new Date("2024-01-01:00:00.000Z"), // before v20241201
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_LOTS_SORTANTS"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(data.updateBsvhu.packaging).toEqual("UNITE");
+    expect(data.updateBsvhu.identification?.type).toEqual(
+      "NUMERO_ORDRE_LOTS_SORTANTS"
+    );
+  });
+
+  it("should fail when packaging is LOT and identificationType is not null", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "LOT",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : Le type d'identification doit être null quand le conditionnement est en lot",
+
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should succeed when packaging is LOT and identificationType is not null on a bsvhu created before release date", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        createdAt: new Date("2024-01-01:00:00.000Z"), // before v20241201
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "LOT",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(data.updateBsvhu.packaging).toEqual("LOT");
+    expect(data.updateBsvhu.identification?.type).toEqual(
+      "NUMERO_ORDRE_REGISTRE_POLICE"
+    );
+  });
+
+  it("should succeed when packaging is LOT and identificationType is null", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "LOT",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(data.updateBsvhu.packaging).toEqual("LOT");
+    expect(data.updateBsvhu.identification?.type).toEqual(null);
+  });
+
+  it("should fail when packaging is UNITE and identificationType is null", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité",
+
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should succeed when packaging is UNITE and identificationType is null on a bsvhu created before release date", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret,
+        createdAt: new Date("2024-01-01:00:00.000Z") // before v20241201
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(data.updateBsvhu.packaging).toEqual("UNITE");
+    expect(data.updateBsvhu.identification?.type).toEqual(null);
+  });
+
+  it.each([
+    BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
+    BsvhuIdentificationType.NUMERO_IMMATRICULATION
+  ])(
+    "should succeed when packaging is UNITE and identificationType is %p",
+    async identificationType => {
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsvhu = await bsvhuFactory({
+        userId: user.id,
+        opt: {
+          isDraft: true,
+          status: "INITIAL",
+          emitterCompanySiret: company.siret
+        }
+      });
+      const { mutate } = makeClient(user);
+      const input = {
+        packaging: "UNITE",
+        identification: {
+          numbers: ["123", "456"],
+          type: identificationType
+        }
+      };
+      const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
+        UPDATE_VHU_FORM,
+        {
+          variables: { id: bsvhu.id, input }
+        }
+      );
+
+      expect(data.updateBsvhu.packaging).toEqual("UNITE");
+      expect(data.updateBsvhu.identification?.type).toEqual(identificationType);
+    }
+  );
 });

@@ -1,6 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { renewSecurityCodeFn } from "./renewSecurityCodeService";

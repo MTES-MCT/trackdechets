@@ -5,7 +5,7 @@ import duplicateBspaohResolver from "./mutations/duplicate";
 import publishBspaohResolver from "./mutations/publish";
 import updateBspaohResolver from "./mutations/update";
 import signeBspaohResolver from "./mutations/sign";
-import { MutationResolvers } from "../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 
 const Mutation: MutationResolvers = {
   createDraftBspaoh: createDraftBspaohResolver,

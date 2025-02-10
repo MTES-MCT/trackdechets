@@ -1,5 +1,5 @@
 import { RegistryDelegation } from "@prisma/client";
-import { RegistryDelegationResolvers } from "../../../generated/graphql/types";
+import type { RegistryDelegationResolvers } from "@td/codegen-back";
 import { getDelegationStatus } from "../utils";
 
 /**

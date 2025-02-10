@@ -2,6 +2,8 @@ import * as React from "react";
 import { formatDate } from "../../../../common/datetime";
 import "./TransporterDisplay.scss";
 import { BsdTransporterInput } from "../../types";
+import { TransportMode } from "@td/codegen-ui";
+import { transportModeLabels } from "../../../../dashboard/constants";
 
 type TransporterFieldProps = {
   label: string;
@@ -73,37 +75,50 @@ export default function TransporterDisplay({ transporter }: TransporterProps) {
           <TransporterField label="E-mail" value={transporter.company?.mail} />
         </div>
       </div>
+      {(!transporter.recepisse?.isExempted ||
+        transporter.company?.vatNumber ||
+        !transporter.transport?.mode?.includes(TransportMode.Road)) && (
+        <div className="fr-grid-row fr-grid-row--gutters ">
+          <div className="fr-col-12 fr-col-md-4">
+            <TransporterField
+              label="Récépissé n°"
+              value={transporter.recepisse?.number}
+            />
+          </div>
+          <div className="fr-col-12 fr-col-md-4">
+            <TransporterField
+              label="Récépissé département"
+              value={transporter.recepisse?.department}
+            />
+          </div>
+          <div className="fr-col-12 fr-col-md-4">
+            <TransporterField
+              label="Récépissé valide jusqu'au"
+              value={
+                transporter.recepisse?.validityLimit
+                  ? formatDate(transporter.recepisse?.validityLimit)
+                  : ""
+              }
+            />
+          </div>
+        </div>
+      )}
+      {transporter.recepisse?.isExempted && (
+        <div className="fr-grid-row fr-grid-row--gutters ">
+          <div className="fr-col-12 fr-col-md-4">
+            <TransporterField label="Exemption de récépissé" value="Oui" />
+          </div>
+        </div>
+      )}
       <div className="fr-grid-row fr-grid-row--gutters ">
-        <div className="fr-col-12 fr-col-md-4">
-          <TransporterField
-            label="Récépissé n°"
-            value={transporter.recepisse?.number}
-          />
-        </div>
-        <div className="fr-col-12 fr-col-md-4">
-          <TransporterField
-            label="Récépissé département"
-            value={transporter.recepisse?.department}
-          />
-        </div>
-        <div className="fr-col-12 fr-col-md-4">
-          <TransporterField
-            label="Récépissé valide jusqu'au"
-            value={
-              transporter.recepisse?.validityLimit
-                ? formatDate(transporter.recepisse?.validityLimit)
-                : ""
-            }
-          />
-        </div>
-      </div>
-      <div className="fr-grid-row fr-grid-row--gutters ">
-        <div className="fr-col-12 fr-col-md-4">
-          <TransporterField
-            label="Mode de transport"
-            value={transporter?.transport?.mode}
-          />
-        </div>
+        {transporter?.transport?.mode && (
+          <div className="fr-col-12 fr-col-md-4">
+            <TransporterField
+              label="Mode de transport"
+              value={transportModeLabels[transporter.transport.mode]}
+            />
+          </div>
+        )}
         <div className="fr-col-12 fr-col-md-4">
           <TransporterField
             label="Immatriculation"

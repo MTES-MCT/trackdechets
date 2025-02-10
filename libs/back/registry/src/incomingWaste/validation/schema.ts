@@ -1,232 +1,211 @@
-import { isSiret } from "@td/constants";
 import { z } from "zod";
 import {
   reasonSchema,
   publicIdSchema,
-  reportAsSiretSchema,
-  wasteCodeSchema,
+  reportAsCompanySiretSchema,
+  getWasteCodeSchema,
   wasteCodeBaleSchema,
   wasteDescriptionSchema,
   volumeSchema,
   weightIsEstimateSchema,
   weightValueSchema,
-  getActorTypeSchema,
-  getActorOrgIdSchema,
-  getActorAddressSchema,
-  getActorCitySchema,
-  getActorCountryCodeSchema,
-  getActorNameSchema,
-  getActorPostalCodeSchema,
+  actorTypeSchema,
+  actorOrgIdSchema,
+  actorAddressSchema,
+  actorCitySchema,
+  actorCountryCodeSchema,
+  actorNameSchema,
+  actorPostalCodeSchema,
   transportModeSchema,
-  transportReceiptNumberSchema,
-  operationCodeSchema,
-  getActorSiretSchema
+  transportRecepisseNumberSchema,
+  getOperationCodeSchema,
+  actorSiretSchema,
+  booleanSchema,
+  dateSchema,
+  inseeCodesSchema,
+  declarationNumberSchema,
+  notificationNumberSchema,
+  siretSchema,
+  municipalitiesNamesSchema,
+  operationModeSchema
 } from "../../shared/schemas";
-import { sub } from "date-fns";
+import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
+export type ParsedZodInputIncomingWasteItem = z.output<
+  typeof inputIncomingWasteSchema
+>;
 export type ParsedZodIncomingWasteItem = z.output<typeof incomingWasteSchema>;
 
 const inputIncomingWasteSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
-  reportAsSiret: reportAsSiretSchema,
-  reportForSiret: z.coerce
-    .string({
-      invalid_type_error:
-        "Le SIRET du destinataire doit être une chaîne de caractères"
-    })
-    .min(14, "Le SIRET du destinataire ne doit pas faire moins de 14 chiffres")
-    .max(14, "Le SIRET du destinataire ne doit pas faire plus de 14 chiffres")
-    .refine(value => {
-      return isSiret(value);
-    }, "Le SIRET du destinataire n'est pas un SIRET valide"),
-  wasteCode: wasteCodeSchema,
-  wastePop: z.union(
-    [
-      z
-        .enum(["OUI", "NON"], {
-          required_error: "Le champ POP est requis",
-          invalid_type_error:
-            "Le champ POP n'est pas valide. Valeurs possibles: OUI, NON"
-        })
-        .transform(val => val === "OUI"),
-      z.boolean()
-    ],
-    { invalid_type_error: "Le champ POP saisi n'est pas valide" }
-  ),
-  wasteIsDangerous: z.union(
-    [
-      z
-        .enum(["OUI", "NON"], {
-          required_error: "Le champ Dangereux est requis",
-          invalid_type_error:
-            "Le champ Dangereux n'est pas valide. Valeurs possibles: OUI, NON"
-        })
-        .transform(val => val === "OUI")
-        .optional(),
-      z.boolean().optional()
-    ],
-    { invalid_type_error: "Le champ Dangereux saisi n'est pas valide" }
-  ),
+  reportAsCompanySiret: reportAsCompanySiretSchema,
+  reportForCompanySiret: siretSchema,
+  wasteCode: getWasteCodeSchema(),
+  wastePop: booleanSchema,
+  wasteIsDangerous: booleanSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  receptionDate: z.coerce
-    .date()
-    .min(
-      sub(new Date(), { years: 1 }),
-      "La date réception ne peut pas être antérieure à J-1an"
-    )
-    .max(new Date(), "La date réception ne peut pas être dans le futur"),
-  weighingHour: z
+  receptionDate: dateSchema,
+  weighingHour: z.coerce
     .string()
+    .trim()
     .refine(val => {
       if (!val) {
         return true;
       }
       // 00:00 or 00:00:00 or 00:00:00.000
-      return /^\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/.test(val);
-    }, `L'heure de pesée n'est pas valide. Format attendu: 00:00, 00:00:00 ou 00:00:00.000`)
-    .optional(),
+      const timeRegex =
+        /^([0-9]|[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9](?:\.\d{1,3})?)?$/;
+
+      if (!timeRegex.test(val)) {
+        return false; // Invalid format
+      }
+
+      const [hours, minutes, seconds] = val.split(":");
+      const hour = parseInt(hours, 10);
+      const minute = parseInt(minutes, 10);
+      const second = seconds ? parseFloat(seconds) : 0;
+
+      if (hour < 0 || hour >= 24) return false;
+      if (minute < 0 || minute >= 60) return false;
+      if (second < 0 || second >= 60) return false;
+
+      return true;
+    }, `Le format d'heure saisi n'est pas valide. Format attendu: 00:00, 00:00:00 ou 00:00:00.000`)
+    .nullish(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  producerType: getActorTypeSchema("de producteur"),
-  producerOrgId: getActorOrgIdSchema("du producteur"),
-  producerName: getActorNameSchema("du producteur"),
-  producerAddress: getActorAddressSchema("du producteur"),
-  producerPostalCode: getActorCitySchema("du producteur"),
-  producerCity: getActorPostalCodeSchema("du producteur"),
-  producerCountryCode: getActorCountryCodeSchema("du producteur"),
-  municipalitiesInseeCodes: z
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
+  initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  initialEmitterCompanyName: actorNameSchema.nullish(),
+  initialEmitterCompanyAddress: actorAddressSchema.nullish(),
+  initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  initialEmitterCompanyCity: actorCitySchema.nullish(),
+  initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
+  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
+  emitterCompanyType: actorTypeSchema,
+  emitterCompanyOrgId: actorOrgIdSchema,
+  emitterCompanyName: actorNameSchema,
+  emitterCompanyAddress: actorAddressSchema,
+  emitterCompanyPostalCode: actorPostalCodeSchema,
+  emitterCompanyCity: actorCitySchema,
+  emitterCompanyCountryCode: actorCountryCodeSchema,
+  emitterNoTraceability: booleanSchema.nullish(),
+  emitterPickupSiteName: z
     .string()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(z.array(z.string())),
-  municipalitiesNames: z
-    .string()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(
-      z.array(
-        z
-          .string()
-          .min(
-            1,
-            "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
-          )
-          .max(
-            300,
-            "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
-          )
-      )
-    ),
-  senderType: getActorTypeSchema("d'expéditeur"),
-  senderOrgId: getActorOrgIdSchema("d'expéditeur"),
-  senderName: getActorNameSchema("d'expéditeur'"),
-  senderTakeOverFullAddress: z
-    .string()
-    .min(
-      1,
-      "L'adresse de prise en charge de l'expéditeur doit faire plus de 1 caractère"
-    )
+    .trim()
     .max(
-      150,
-      "L'adresse de prise en charge de l'expéditeur doit faire moins de 150 caractères"
+      300,
+      "La référence du chantier ou du lieu de collecte de l'expéditeur ne peut pas faire plus de 300 caractères"
     )
-    .optional(),
-  senderAddress: getActorAddressSchema("d'expéditeur'"),
-  senderPostalCode: getActorCitySchema("d'expéditeur'"),
-  senderCity: getActorPostalCodeSchema("d'expéditeur'"),
-  senderCountryCode: getActorCountryCodeSchema("d'expéditeur'"),
-  brokerSiret: getActorSiretSchema("du courtier").optional(),
-  brokerName: getActorNameSchema("du courtier").optional(),
-  brokerReceiptNumber: z
+    .nullish(),
+  emitterPickupSiteAddress: actorAddressSchema.nullish(),
+  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
+  emitterPickupSiteCity: actorCitySchema.nullish(),
+  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  brokerCompanySiret: actorSiretSchema.nullish(),
+  brokerCompanyName: actorNameSchema.nullish(),
+  brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
-      150,
-      "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
+      50,
+      "Le numéro de récépissé du courtier ne doit pas excéder 50 caractères"
     )
-    .optional(),
-  traderSiret: getActorSiretSchema("du négociant").optional(),
-  traderName: getActorNameSchema("du négociant").optional(),
-  traderReceiptNumber: z
+    .nullish(),
+  traderCompanySiret: actorSiretSchema.nullish(),
+  traderCompanyName: actorNameSchema.nullish(),
+  traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
-      150,
-      "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
+      50,
+      "Le numéro de récépissé du négociant ne doit pas excéder 50 caractères"
     )
-    .optional(),
-  ecoOrganismeSiret: getActorSiretSchema("de l'éco-organisme").optional(),
-  ecoOrganismeName: getActorNameSchema("de l'éco-organisme").optional(),
-  operationCode: operationCodeSchema,
-  documentNumber: z.string().optional(), // TODO 12 caractères & rule
-  notificationNumber: z.string().optional(), // TODO 12 caractères & rule
-  notificationDocumentInputNumber: z.string().optional(), // TODO rule
-  transporter1TransportMode: transportModeSchema,
-  transporter1Type: getActorTypeSchema("de transporteur 1"),
-  transporter1OrgId: getActorOrgIdSchema("du transporteur 1"),
-  transporter1ReceiptNumber: transportReceiptNumberSchema,
-  transporter1Name: getActorNameSchema("du transporteur 1"),
-  transporter1Address: getActorAddressSchema("du transporteur 1"),
-  transporter1PostalCode: getActorCitySchema("du transporteur 1"),
-  transporter1City: getActorPostalCodeSchema("du transporteur 1"),
-  transporter1CountryCode: getActorCountryCodeSchema("du transporteur 1"),
-  transporter2TransportMode: transportModeSchema.optional(),
-  transporter2Type: getActorTypeSchema("de transporteur 2"),
-  transporter2OrgId: getActorOrgIdSchema("du transporteur 2"),
-  transporter2ReceiptNumber: transportReceiptNumberSchema,
-  transporter2Name: getActorNameSchema("du transporteur 2"),
-  transporter2Address: getActorAddressSchema("du transporteur 2"),
-  transporter2PostalCode: getActorCitySchema("du transporteur 2"),
-  transporter2City: getActorPostalCodeSchema("du transporteur 2"),
-  transporter2CountryCode: getActorCountryCodeSchema("du transporteur 2"),
-  transporter3TransportMode: transportModeSchema.optional(),
-  transporter3Type: getActorTypeSchema("de transporteur 3"),
-  transporter3OrgId: getActorOrgIdSchema("du transporteur 3"),
-  transporter3ReceiptNumber: transportReceiptNumberSchema,
-  transporter3Name: getActorNameSchema("du transporteur 3"),
-  transporter3Address: getActorAddressSchema("du transporteur 3"),
-  transporter3PostalCode: getActorCitySchema("du transporteur 3"),
-  transporter3City: getActorPostalCodeSchema("du transporteur 3"),
-  transporter3CountryCode: getActorCountryCodeSchema("du transporteur 3"),
-  transporter4TransportMode: transportModeSchema.optional(),
-  transporter4Type: getActorTypeSchema("de transporteur 4"),
-  transporter4OrgId: getActorOrgIdSchema("du transporteur 4"),
-  transporter4ReceiptNumber: transportReceiptNumberSchema,
-  transporter4Name: getActorNameSchema("du transporteur 4"),
-  transporter4Address: getActorAddressSchema("du transporteur 4"),
-  transporter4PostalCode: getActorCitySchema("du transporteur 4"),
-  transporter4City: getActorPostalCodeSchema("du transporteur 4"),
-  transporter4CountryCode: getActorCountryCodeSchema("du transporteur 4"),
-  transporter5TransportMode: transportModeSchema.optional(),
-  transporter5Type: getActorTypeSchema("de transporteur 5"),
-  transporter5OrgId: getActorOrgIdSchema("du transporteur 5"),
-  transporter5ReceiptNumber: transportReceiptNumberSchema,
-  transporter5Name: getActorNameSchema("du transporteur 5"),
-  transporter5Address: getActorAddressSchema("du transporteur 5"),
-  transporter5PostalCode: getActorCitySchema("du transporteur 5"),
-  transporter5City: getActorPostalCodeSchema("du transporteur 5"),
-  transporter5CountryCode: getActorCountryCodeSchema("du transporteur 5")
+    .nullish(),
+  ecoOrganismeSiret: actorSiretSchema.nullish(),
+  ecoOrganismeName: actorNameSchema.nullish(),
+  operationCode: getOperationCodeSchema(
+    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+  ),
+  operationMode: operationModeSchema,
+  noTraceability: booleanSchema.nullish(),
+  nextDestinationIsAbroad: booleanSchema.nullish(),
+  declarationNumber: declarationNumberSchema,
+  notificationNumber: notificationNumberSchema,
+  movementNumber: z
+    .string()
+    .trim()
+    .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
+    .nullish(),
+  nextOperationCode: getOperationCodeSchema(
+    INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+  ).nullish(),
+  isDirectSupply: booleanSchema.nullish(),
+  transporter1TransportMode: transportModeSchema.nullish(),
+  transporter1CompanyType: actorTypeSchema.nullish(),
+  transporter1CompanyOrgId: actorOrgIdSchema.nullish(),
+  transporter1RecepisseIsExempted: booleanSchema.nullish(),
+  transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
+  transporter1CompanyName: actorNameSchema.nullish(),
+  transporter1CompanyAddress: actorAddressSchema.nullish(),
+  transporter1CompanyPostalCode: actorPostalCodeSchema.nullish(),
+  transporter1CompanyCity: actorCitySchema.nullish(),
+  transporter1CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter2TransportMode: transportModeSchema.nullish(),
+  transporter2CompanyType: actorTypeSchema.nullish(),
+  transporter2CompanyOrgId: actorOrgIdSchema.nullish(),
+  transporter2RecepisseIsExempted: booleanSchema.nullish(),
+  transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
+  transporter2CompanyName: actorNameSchema.nullish(),
+  transporter2CompanyAddress: actorAddressSchema.nullish(),
+  transporter2CompanyPostalCode: actorPostalCodeSchema.nullish(),
+  transporter2CompanyCity: actorCitySchema.nullish(),
+  transporter2CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter3TransportMode: transportModeSchema.nullish(),
+  transporter3CompanyType: actorTypeSchema.nullish(),
+  transporter3CompanyOrgId: actorOrgIdSchema.nullish(),
+  transporter3RecepisseIsExempted: booleanSchema.nullish(),
+  transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
+  transporter3CompanyName: actorNameSchema.nullish(),
+  transporter3CompanyAddress: actorAddressSchema.nullish(),
+  transporter3CompanyPostalCode: actorPostalCodeSchema.nullish(),
+  transporter3CompanyCity: actorCitySchema.nullish(),
+  transporter3CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter4TransportMode: transportModeSchema.nullish(),
+  transporter4CompanyType: actorTypeSchema.nullish(),
+  transporter4CompanyOrgId: actorOrgIdSchema.nullish(),
+  transporter4RecepisseIsExempted: booleanSchema.nullish(),
+  transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
+  transporter4CompanyName: actorNameSchema.nullish(),
+  transporter4CompanyAddress: actorAddressSchema.nullish(),
+  transporter4CompanyPostalCode: actorPostalCodeSchema.nullish(),
+  transporter4CompanyCity: actorCitySchema.nullish(),
+  transporter4CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  transporter5TransportMode: transportModeSchema.nullish(),
+  transporter5CompanyType: actorTypeSchema.nullish(),
+  transporter5CompanyOrgId: actorOrgIdSchema.nullish(),
+  transporter5RecepisseIsExempted: booleanSchema.nullish(),
+  transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
+  transporter5CompanyName: actorNameSchema.nullish(),
+  transporter5CompanyAddress: actorAddressSchema.nullish(),
+  transporter5CompanyPostalCode: actorPostalCodeSchema.nullish(),
+  transporter5CompanyCity: actorCitySchema.nullish(),
+  transporter5CompanyCountryCode: actorCountryCodeSchema.nullish()
 });
 
 // Props added through transform
-const transformedSsdSchema = z.object({
+const transformedIncomingWasteSchema = z.object({
   id: z.string().optional(),
-  reportForAddress: z.string().default(""),
-  reportForCity: z.string().default(""),
-  reportForPostalCode: z.string().default(""),
-  reportForName: z.coerce.string().default("")
+  reportForCompanyAddress: z.string().default(""),
+  reportForCompanyCity: z.string().default(""),
+  reportForCompanyPostalCode: z.string().default(""),
+  reportForCompanyName: z.coerce.string().default("")
 });
 
-export const incomingWasteSchema =
-  inputIncomingWasteSchema.merge(transformedSsdSchema);
+export const incomingWasteSchema = inputIncomingWasteSchema.merge(
+  transformedIncomingWasteSchema
+);

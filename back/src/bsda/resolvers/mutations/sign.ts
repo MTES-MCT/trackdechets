@@ -13,12 +13,12 @@ import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
 import { InvalidTransition } from "../../../forms/errors";
-import {
+import type {
   BsdaSignatureInput,
   BsdaSignatureType,
   MutationResolvers,
   MutationSignBsdaArgs
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { sendMail } from "../../../mailer/mailing";
 import { Mail, finalDestinationModified, renderMail } from "@td/mail";
 import { checkCanSignFor } from "../../../permissions";
@@ -34,7 +34,11 @@ import {
 import { machine } from "../../machine";
 import { renderBsdaRefusedEmail } from "../../mails/refused";
 import { BsdaRepository, getBsdaRepository } from "../../repository";
-import { AllBsdaSignatureType, BsdaWithTransporters } from "../../types";
+import {
+  AllBsdaSignatureType,
+  BsdaWithIntermediaries,
+  BsdaWithTransporters
+} from "../../types";
 import { parseBsdaAsync } from "../../validation";
 import { prismaToZodBsda } from "../../validation/helpers";
 import { AlreadySignedError } from "../../../bsvhu/errors";
@@ -89,6 +93,7 @@ const signBsda: MutationResolvers["signBsda"] = async (
     { ...zodBsda, ...transporterReceipt },
     {
       user,
+      enableCompletionTransformers: true,
       currentSignatureType: signatureType
     }
   );
@@ -146,7 +151,7 @@ export function getAuthorizedOrgIds(
   return getAuthorizedSiretsFn(bsda).filter(Boolean);
 }
 
-type BsdaForSignature = Bsda & BsdaWithTransporters;
+type BsdaForSignature = Bsda & BsdaWithTransporters & BsdaWithIntermediaries;
 
 // Defines different signature function based on signature type
 const signatures: Record<

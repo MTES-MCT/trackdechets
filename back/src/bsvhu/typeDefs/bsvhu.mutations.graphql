@@ -80,10 +80,27 @@ type Mutation {
   }
   ```
 
+  **Champs requis pour `RECEPTION` :**
+  Cette étape est optionnelle, mais si elle est renseignée, les champs
+  associés seront scellés
+
+  ```
+  destination {
+    reception {
+      weight # doit être 0 si acceptationStatus est REFUSED
+      acceptationStatus
+      refusalReason
+      date
+    }
+  }
+  ```
+
   **Champs requis pour `OPERATION` :**
 
   ```
   destination {
+    # Si le bordereau n'est pas passé par l'étape de réception,
+    # renseigner ici les données de réception
     reception {
       weight # doit être 0 si acceptationStatus est REFUSED
       acceptationStatus

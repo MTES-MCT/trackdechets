@@ -16,14 +16,6 @@
         "integration": {}
       }
     },
-    "codegen": {
-      "inputs": ["{projectRoot}/**/*.graphql"],
-      "cache": true,
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "graphql-codegen --config back/codegen.yml"
-      }
-    },
     "lint": {
       "executor": "@nx/eslint:lint",
       "configurations": {
@@ -68,6 +60,15 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/bulkSirenify.ts"
+      },
+      "configurations": {
+        "integration": {}
+      }
+    },
+    "rebuild-registry-lookup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/rebuildRegistryLookup.ts"
       },
       "configurations": {
         "integration": {}

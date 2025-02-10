@@ -223,7 +223,9 @@ describe("ActBsddValidation", () => {
     );
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
     await waitFor(async () => {
-      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
+      expect(
+        await screen.getByText("Signer la réception et l'acceptation")
+      ).toBeInTheDocument();
     });
   });
 
@@ -300,7 +302,9 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(await screen.getByText("Signer la réception")).toBeInTheDocument();
+      expect(
+        await screen.getByText("Signer la réception et l'acceptation")
+      ).toBeInTheDocument();
     });
   });
 
@@ -330,7 +334,7 @@ describe("ActBsddValidation", () => {
     });
   });
 
-  it("renders with expected text when status is TempStorerAccepted", () => {
+  it("renders with expected text when status is TempStorerAccepted", async () => {
     const currentSiret = "12345678901234";
     const tempStorerAcceptedBsd = {
       id: "1",
@@ -348,7 +352,11 @@ describe("ActBsddValidation", () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+    expect(await screen.getByTestId("loader")).toBeInTheDocument();
+
+    await waitFor(async () => {
+      expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+    });
   });
 
   it("renders with expected text when status is SignedByTempStorer", () => {
@@ -397,7 +405,7 @@ describe("ActBsddValidation", () => {
     });
   });
 
-  it("renders with expected text when status is Accepted", () => {
+  it("renders with expected text when status is Accepted", async () => {
     const currentSiret = "12345678901234";
     const acceptedBsd = {
       id: "1",
@@ -414,7 +422,11 @@ describe("ActBsddValidation", () => {
       </MockedProvider>
     );
 
-    expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+    expect(await screen.getByTestId("loader")).toBeInTheDocument();
+
+    await waitFor(async () => {
+      expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+    });
   });
 
   it("renders bsd suite modal", () => {

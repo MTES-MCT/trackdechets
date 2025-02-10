@@ -4,10 +4,14 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { sendMail } from "../../../mailer/mailing";
 import { getAndExpandFormFromDb } from "../../converter";
-import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
+import {
+  getFirstTransporter,
+  getFirstTransporterSync,
+  getFormOrFormNotFound
+} from "../../database";
 import { checkCanMarkAsSealed } from "../../permissions";
 import { FormRepository, getFormRepository } from "../../repository";
 import {
@@ -18,6 +22,7 @@ import {
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
+import { FormWithForwardedInWithTransportersInclude } from "../../types";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -25,14 +30,27 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const form = await getFormOrFormNotFound({ id });
+  const form = await getFormOrFormNotFound(
+    { id },
+    FormWithForwardedInWithTransportersInclude
+  );
   await checkCanMarkAsSealed(user, form);
 
   const transporter = await getFirstTransporter(form);
   // validate form data
   await checkCanBeSealed({ ...form, ...transporter });
 
-  await validateForwardedInCompanies(form);
+  const transporterAfterTempStorage = form.forwardedIn
+    ? getFirstTransporterSync(form.forwardedIn)
+    : null;
+  await validateForwardedInCompanies({
+    destinationCompanySiret: form?.forwardedIn?.recipientCompanySiret,
+    transporterCompanySiret:
+      transporterAfterTempStorage?.transporterCompanySiret,
+    transporterCompanyVatNumber:
+      transporterAfterTempStorage?.transporterCompanyVatNumber
+  });
+
   let formUpdateInput;
 
   if (

@@ -56,9 +56,12 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     | "grouping"
     | "rowNumber"
     // Done manually
+    // TODO(registry): clone associated registryLookup
     | "finalOperations"
+    | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.BSDA),
+    isDuplicateOf: null,
     brokerCompanyAddress: bsda.brokerCompanyAddress,
     brokerCompanyContact: bsda.brokerCompanyContact,
     brokerCompanyMail: bsda.brokerCompanyMail,
@@ -244,9 +247,11 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
     | "rowNumber"
     // Done manually
     | "finalOperations"
+    | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.DASRI),
     createdAt: bsdasri.createdAt,
+    isDuplicateOf: null,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyContact: bsdasri.destinationCompanyContact,
     destinationCompanyMail: bsdasri.destinationCompanyMail,
@@ -419,7 +424,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
   const newBsffCreateInput: Omit<
     Required<Prisma.BsffCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.FF),
     createdAt: bsff.createdAt,
@@ -456,6 +461,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
       : {},
     isDeleted: bsff.isDeleted,
     isDraft: bsff.isDraft,
+    isDuplicateOf: null,
     packagings: bsff.packagings.length
       ? {
           createMany: {
@@ -485,6 +491,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
     wasteCode: bsff.wasteCode,
     wasteDescription: bsff.wasteDescription,
     weightIsEstimate: bsff.weightIsEstimate,
+    canAccessDraftOrgIds: [], // filled in repository
     weightValue: bsff.weightValue
   };
 
@@ -541,11 +548,12 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   const newBsvhuCreateInput: Omit<
     Required<Prisma.BsvhuCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
     customId: null,
+    isDuplicateOf: null,
     destinationAgrementNumber: bsvhu.destinationAgrementNumber,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyContact: bsvhu.destinationCompanyContact,
@@ -602,6 +610,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     emitterEmissionSignatureDate: bsvhu.emitterEmissionSignatureDate,
     emitterIrregularSituation: bsvhu.emitterIrregularSituation,
     emitterNoSiret: bsvhu.emitterNoSiret,
+    emitterNotOnTD: bsvhu.emitterNotOnTD,
     identificationNumbers: bsvhu.identificationNumbers,
     identificationType: bsvhu.identificationType,
     intermediaries: bsvhu.intermediaries.length
@@ -630,6 +639,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
     transporterRecepisseValidityLimit: bsvhu.transporterRecepisseValidityLimit,
+    transporterTransportMode: bsvhu.transporterTransportMode,
     transporterTransportPlates: bsvhu.transporterTransportPlates,
     transporterTransportSignatureAuthor:
       bsvhu.transporterTransportSignatureAuthor,
@@ -658,7 +668,10 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     weightIsEstimate: bsvhu.weightIsEstimate,
     weightValue: bsvhu.weightValue,
     ecoOrganismeName: bsvhu.ecoOrganismeName,
-    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
+    destinationReceptionSignatureAuthor:
+      bsvhu.destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate: bsvhu.destinationReceptionSignatureDate
   };
 
   const newBsvhu = await create(newBsvhuCreateInput);
@@ -685,11 +698,12 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
   const newBspaohCreateInput: Omit<
     Required<Prisma.BspaohCreateInput>,
     // Ignored for the time being
-    "rowNumber"
+    "rowNumber" | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.PAOH),
     canAccessDraftSirets: bspaoh.canAccessDraftSirets,
     createdAt: bspaoh.createdAt,
+    isDuplicateOf: null,
     currentTransporterOrgId: bspaoh.currentTransporterOrgId,
     destinationCap: bspaoh.destinationCap,
     destinationCompanyAddress: bspaoh.destinationCompanyAddress,
@@ -820,6 +834,7 @@ export const cloneBsdd = async (
     | "bsddRevisionRequests"
     // Done manually
     | "finalOperations"
+    | "registryLookups"
   > = {
     owner: {
       connect: {
@@ -827,6 +842,7 @@ export const cloneBsdd = async (
       }
     },
     readableId: getReadableId(),
+    isDuplicateOf: null,
     brokerCompanyAddress: bsdd.brokerCompanyAddress,
     brokerCompanyContact: bsdd.brokerCompanyContact,
     brokerCompanyMail: bsdd.brokerCompanyMail,

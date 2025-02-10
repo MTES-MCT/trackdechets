@@ -10,7 +10,7 @@ import { getInitialEcoOrganisme } from "../../utils/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
   {
-    ecoOrganismes {
+    ecoOrganismes(handleBsdd: true) {
       id
       name
       siret
@@ -58,17 +58,24 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
           {error && <p>Erreur lors du chargement des éco-organismes...</p>}
           {data && (
             <>
-              <div className="form__row notification notification--info">
-                Veuillez sélectionner ci-dessous un des éco-organismes
-                enregistrés dans Trackdéchets. Si votre éco-organisme n'apparait
-                pas et que vous pensez que c'est une erreur,{" "}
-                <a
-                  href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  contactez le support
-                </a>
+              <div className="fr-alert fr-alert--info fr-mt-2w fr-mb-2w">
+                <p>
+                  Veuillez sélectionner dans la liste ci-dessous l’éco-organisme
+                  inscrit sur Trackdéchets que vous souhaitez indiquer sur le
+                  bordereau. Si un éco-organisme est renseigné, il prend la
+                  responsabilité du déchet. Si l’éco-organisme recherché ne
+                  figure pas dans la liste et que vous pensez qu’il s’agit d’une
+                  erreur,{" "}
+                  <a
+                    href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                    className="fr-link"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    contactez le support
+                  </a>
+                  .
+                </p>
               </div>
               <SearchInput
                 id="eco-search"
@@ -104,20 +111,6 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
               </div>
             </>
           )}
-          <div className="notification warning">
-            Si l'éco-organisme a bien été renseigné, il prend la responsabilité
-            du déchet.
-            <br />
-            Indiquez dans la partie <strong>Entreprise émettrice</strong>{" "}
-            ci-dessous l'entreprise qui est le producteur du déchet en
-            renseignant le SIRET.
-            <br />
-            Si l'adresse de collecte / chantier est différente de celle du
-            producteur, vous pouvez utiliser les champs{" "}
-            <strong>Adresse chantier</strong> en bas de page.
-            <br />
-            L'éco-organisme ne doit pas être mentionné à la place de l'émetteur.
-          </div>
         </>
       )}
     </>

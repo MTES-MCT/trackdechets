@@ -20,6 +20,7 @@ import {
 } from "../../../../common/components";
 import { RefreshButton } from "./Common";
 import { aggregatePackagings } from "./utils";
+import { verbosePackagings } from "../../../../dashboard/detail/bsdasri/BsdasriDetailContent";
 
 const GET_ELIGIBLE_BSDASRIS = gql`
   query Bsdasris($where: BsdasriWhere) {
@@ -68,7 +69,7 @@ const SelectedBsdasrisDigest = ({ selectedItems }) => {
         <TableHead>
           <TableRow>
             <TableHeaderCell>{""}</TableHeaderCell>
-            <TableHeaderCell>Quantité (kg)</TableHeaderCell>
+            <TableHeaderCell>Nombre</TableHeaderCell>
             <TableHeaderCell>Type</TableHeaderCell>
 
             <TableHeaderCell> Volume unitaire (l)</TableHeaderCell>
@@ -80,7 +81,7 @@ const SelectedBsdasrisDigest = ({ selectedItems }) => {
               <TableCell>{""}</TableCell>
               <TableCell>{row.quantity}</TableCell>
               <TableCell>
-                {row.type} {!!row.other && `: ${row.other}`}
+                {verbosePackagings[row.type]} {!!row.other && `: ${row.other}`}
               </TableCell>
 
               <TableCell>{row.volume}</TableCell>

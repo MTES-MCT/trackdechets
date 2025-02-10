@@ -1,5 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodIncomingWasteItem } from "./validation/schema";
+import { lookupUtils } from "./registry";
 
 export async function saveIncomingWasteLine({
   line,
@@ -14,25 +15,35 @@ export async function saveIncomingWasteLine({
       await prisma.$transaction(async tx => {
         await tx.registryIncomingWaste.update({
           where: { id },
-          data: { isActive: false }
+          data: { isLatest: false }
         });
-        await tx.registryIncomingWaste.create({
+        const registryIncomingWaste = await tx.registryIncomingWaste.create({
           data: { ...persistedData, importId }
         });
+        await lookupUtils.update(registryIncomingWaste, id ?? null, tx);
       });
       return;
     case "ANNULER":
-      await prisma.registryIncomingWaste.update({
-        where: { id },
-        data: { isCancelled: true }
+      await prisma.$transaction(async tx => {
+        await tx.registryIncomingWaste.update({
+          where: { id },
+          data: { isCancelled: true }
+        });
+        if (id) {
+          await lookupUtils.delete(id, tx);
+        }
       });
       return;
     case "IGNORER":
       return;
     default:
-      await prisma.registryIncomingWaste.create({
-        data: { ...persistedData, importId }
+      await prisma.$transaction(async tx => {
+        const registryIncomingWaste = await tx.registryIncomingWaste.create({
+          data: { ...persistedData, importId }
+        });
+        await lookupUtils.update(registryIncomingWaste, null, tx);
       });
+
       return;
   }
 }
@@ -41,18 +52,18 @@ export async function getIncomingWasteImportSiretsAssociations(
   importId: string
 ) {
   const importSirets = await prisma.registryIncomingWaste.findMany({
-    distinct: ["reportForSiret"],
+    distinct: ["reportForCompanySiret"],
     where: { importId },
-    select: { reportForSiret: true, reportAsSiret: true }
+    select: { reportForCompanySiret: true, reportAsCompanySiret: true }
   });
 
   const siretsMap = importSirets.reduce(
-    (list, { reportForSiret, reportAsSiret }) => {
-      const as = reportAsSiret ?? reportForSiret;
-      const key = `${reportForSiret}-${as}`;
+    (list, { reportForCompanySiret, reportAsCompanySiret }) => {
+      const as = reportAsCompanySiret ?? reportForCompanySiret;
+      const key = `${reportForCompanySiret}-${as}`;
 
       if (!list.has(key)) {
-        list.set(key, { for: reportForSiret, as });
+        list.set(key, { for: reportForCompanySiret, as });
       }
 
       return list;

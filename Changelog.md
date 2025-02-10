@@ -5,15 +5,111 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.02.1] 11/02/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export du registre entrant V2 [PR 3910](https://github.com/MTES-MCT/trackdechets/pull/3910)
+- BSVHU - Il est désormais possible de signer la réception indépendamment de l'opération [PR 3909](https://github.com/MTES-MCT/trackdechets/pull/3909)
+- Mes établissements : possibilité pour les admins de voir les demandes de rattachement [PR 3904](https://github.com/MTES-MCT/trackdechets/pull/3904)
+
+#### :nail_care: Améliorations
+
+- BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
+- BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
+- Ajout d'éco-organismes, filtrage des éco-organismes en front. Mise à jour des SIRET de certains éco-organismes en base de donnée [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+- Il ne devrait pas être possible de valider la réception d'un BSDA avec un poids à 0 [PR 3934](https://github.com/MTES-MCT/trackdechets/pull/3934)
+- Revoir les informations transporteurs scellées en cas de multimodal (récépissé, exemption de récépissé et mode de transport pour transporteur étranger) [PR 3933](https://github.com/MTES-MCT/trackdechets/pull/3933)
+- Redirection de l'utilisateur vers la page de login en cas de déconnexion [PR 3729](https://github.com/MTES-MCT/trackdechets/pull/3729)
+- BSDD : passage au DSFR de la modale de signature du traitement [PR 3951](https://github.com/MTES-MCT/trackdechets/pull/3951)
+
+#### :bug: Corrections de bugs
+
+- La révision du BSDA permet de modifier le CAP de l'exutoire [PR 3932](https://github.com/MTES-MCT/trackdechets/pull/3932)
+- La requête companyInfos renvoie la bonne valeur pour isDormant [PR 3943](https://github.com/MTES-MCT/trackdechets/pull/3943)
+- BSDD - Renommage de "COLIS (totaux)" par "Total conditionnement" sur le PDF [PR 3892](https://github.com/MTES-MCT/trackdechets/pull/3892)
+
+#### :boom: Breaking changes
+
+- Bordereau BSDD - Vérifier le type de profil du courtier et/ou négociant lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDD - Vérifier le type de profil du courtier et/ou négociant lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Bordereau BSDA - Vérifier le type de profil du courtier lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Restrictions sur le format des plaques d'immatriculations sur le BSDA, BSDASRI, BSFF, BSPAOH, BSDD [PR 3935](https://github.com/MTES-MCT/trackdechets/pull/3935).
+
+#### :boom: Breaking changes
+
+- Le champ GraphQL `BsdaPackagingInput.type` est rendu obligatoire [PR 3930](https://github.com/MTES-MCT/trackdechets/pull/3930).
+
+# [2025.01.1] 14/01/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- BSFF - Permettre la modification des informations d'un contenant à la signature de son opération et après son traitement pendant 60 jours. [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853)
+
+#### :nail_care: Améliorations
+
+- Ajout de "2795" à la suite de Installation de traitement > Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780) sur le type de profil Installation de traitement. [PR 3845](https://github.com/MTES-MCT/trackdechets/pull/3845)
+- BSFF - Mettre à jour les informations du contenant modifié (code déchet, description, poids) dans l'aperçu et dans le tableau de bord lorsque le BSFF a un seul contenant [PR 3853](https://github.com/MTES-MCT/trackdechets/pull/3853).
+- Permettre d'ajouter un intermédiaire sur le VHU jusqu'au traitement du bordereau [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+- Retirer la possibilité de publier un BSVHU si l'émetteur visé n'est pas inscrit sur Trackdéchets et qu'il n'est pas en situation irrégulière [PR 3855](https://github.com/MTES-MCT/trackdechets/pull/3855)
+- Correction du CSS pour la section "Signature automatique (annexe 1)" [PR 3835](https://github.com/MTES-MCT/trackdechets/pull/3835)
+- Plus besoin de préciser de code d'opération prévue pour l'entreposage provisoire pour le BSDD [PR 3841](https://github.com/MTES-MCT/trackdechets/pull/3841)
+- ETQ utilisateur je ne peux pas créer un BSDA avec un siret fermé, mais je peux finaliser un BSDA avec un siret fermé [PR 3761](https://github.com/MTES-MCT/trackdechets/pull/3761)
+- Il n'est plus possible de dupliquer une Annexe 1 sur le BSDD [PR 3854](https://github.com/MTES-MCT/trackdechets/pull/3854)
+
+#### :bug: Corrections de bugs
+
+- Supprimer l'annexe 2 d'un BSDD de regroupement lorsque celle-ci a bien été retirée [PR 3874](https://github.com/MTES-MCT/trackdechets/pull/3874).
+- Au chargement des quantités du tableau des Annexes 2, bien récupérer la quantité acceptée par l'installation de destination finale et non par l'entreposage provisoire (si BSDD-suite à regrouper) à la modification [PR 3875](https://github.com/MTES-MCT/trackdechets/pull/3875)
+- Correction de la mise à jour des numéros d'identification sur le bsvhu [PR 3876](https://github.com/MTES-MCT/trackdechets/pull/3876)
+- Correction des permissions d'accès à un Bsff lors de la modification du détenteur d'une fiche d'inspection associée [PR 3880](https://github.com/MTES-MCT/trackdechets/pull/3880)
+- Traduction des intitulés des packagings des DASRI dans le PDF [PR 3833](https://github.com/MTES-MCT/trackdechets/pull/3833)
+- Les DASRI annulés vont dans l'onglet "Archives" et non "Suivis" [PR 3832](https://github.com/MTES-MCT/trackdechets/pull/3832)
+- Le champ "Modifié le" des BSDD dans le dashboard affiche la valeur du updatedAt, pas du lastActionOn [PR 3834](https://github.com/MTES-MCT/trackdechets/pull/3834)
+- Seul l'émetteur peut supprimer un BSVHU s'il l'a signé (SIGNED_BY_PRODUCER) [PR 3837](https://github.com/MTES-MCT/trackdechets/pull/3837)
+- Correction pour les cas particuliers pour le mail sur le changement de CAP: ajout ou suppression de la nextDestination [PR 3858](https://github.com/MTES-MCT/trackdechets/pull/3858)
+- Les numéros d'identification du bsvhus ne devraient pas être obligatoires pour les vhus créés avant l'ajout de la règle [PR 3877](https://github.com/MTES-MCT/trackdechets/pull/3877)
+- Permettre d'ajouter un 0 après la virgule dans la quantité à regrouper d'une Annexe 2 [PR 3903](https://github.com/MTES-MCT/trackdechets/pull/3903)
+
+#### :boom: Breaking changes
+
+- Pour le Bsvhu lors d'un transport routier, la plaque d'immatriculation est désormais obligatoire et les poids de déchets sont limités à 40 T (50 kT pour les autres modes) [PR 3719](https://github.com/MTES-MCT/trackdechets/pull/3719)
+
 # [2024.12.1] 17/12/2024
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Permettre aux éco-organismes de réviser un BSDA [PR 3790](https://github.com/MTES-MCT/trackdechets/pull/3790)
+- Permettre l'ajout de courtier, négociant et intermédiaires sur le BSVHU [PR 3795](https://github.com/MTES-MCT/trackdechets/pull/3795)
+- Ajout de l'export v2 des registres SSD [PR 3755](https://github.com/MTES-MCT/trackdechets/pull/3755)
+- Permettre de faire une demande de révision BSDD lorsque le l'émetteur est un particulier ou un navire étranger [PR 3785](https://github.com/MTES-MCT/trackdechets/pull/3785)
+- ETQ utilisateur je suis alerté si une délégation expire dans 7 jours [PR 3772](https://github.com/MTES-MCT/trackdechets/pull/3772)
+- ETQ utilisateur je peux m'inscrire / me désinscrire aux alertes e-mails en lien avec les délégations registre [PR 3771](https://github.com/MTES-MCT/trackdechets/pull/3771)
+- ETQ que producteur d'un BSDA, je suis alerté par mail si le destinationCap est modifié (et je peux désactiver la notification) [PR 3780](https://github.com/MTES-MCT/trackdechets/pull/3780)
 
 #### :nail_care: Améliorations
 
 - Permettre au transporteur étranger d'avoir les mêmes droits qu'un transporteur FR concernant la révision sur une Annexe 1 [PR 3770](https://github.com/MTES-MCT/trackdechets/pull/3770)
+- Remonter le VHU en situation irrégulière (sans émetteur TD) dans l'onglet À collecter du transporteur [PR 3792](https://github.com/MTES-MCT/trackdechets/pull/3792)
+- Mise à jour des règles de validations pour le conditionnement et l'identifications des bsvhus [PR 3807](https://github.com/MTES-MCT/trackdechets/pull/3807)
+- Rendre les BSFFs en brouillon inaccessibles aux entreprises dont l'auteur ne fait pas partie [PR 3793](https://github.com/MTES-MCT/trackdechets/pull/3793)
+- Passage au DSFR de la modale de signature transporteur du BSVHU [PR 3809](https://github.com/MTES-MCT/trackdechets/pull/3809)
+- Le champ destinationCap du BSDA est scellé à partir de l'étape de transport (ou émission si pas d'entreprise de travaux) [PR 3778](https://github.com/MTES-MCT/trackdechets/pull/3778)
+- Les BSDA sont désormais inclus dans les transferts de bordereaux d'un SIRET mis en sommeil vers un autre SIRET [PR 3777](https://github.com/MTES-MCT/trackdechets/pull/3777)
 
 #### :bug: Corrections de bugs
 
 - Ne pas doubler les quantités restantes à regrouper lorsqu'on modifie un bordereau de groupement [PR 3760](https://github.com/MTES-MCT/trackdechets/pull/3760)
+- Retirer la possibilité de réviser une Annexe 1 avant la signature de l'enlèvement pour tous les acteurs [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Retirer les accès à la révision pour les profils Négociant, Courtier et Autre intermédiaire [PR 3784](https://github.com/MTES-MCT/trackdechets/pull/3784)
+- Impossible de changer de destination finale sur un BSDD avec entreposage provisoire si la destination finale initialement renseignée a été mise en sommeil [PR 3804](https://github.com/MTES-MCT/trackdechets/pull/3804)
+- Les intermédiaires n'apparaissent pas sur le récépissé PDF du BSDA [PR 3796](https://github.com/MTES-MCT/trackdechets/pull/3796)
+- Corrige l'affichage des décimales sur le poids du PAOH [PR 3808](https://github.com/MTES-MCT/trackdechets/pull/3808)
+- La vérification de l'avis de situation SIRENE ne fonctionne pas pour les établissements anonymes lorsque le SIRET du siège est différent du SIRET de l'établissement [PR 3794](https://github.com/MTES-MCT/trackdechets/pull/3794)
+- Corrige la sélection d'un organisme de certification amiante dans la création d'un établissement [PR 3797](https://github.com/MTES-MCT/trackdechets/pull/3797)
+- Corrige le sélecteur d'entreprise sur le dashboard n'affichant qu'un seul résultat [PR 3799](https://github.com/MTES-MCT/trackdechets/pull/3799)
+- Amélioration d'affichange de la page Mes établissements [PR 3798](https://github.com/MTES-MCT/trackdechets/pull/3798)
 
 # [2024.11.1] 19/11/2024
 

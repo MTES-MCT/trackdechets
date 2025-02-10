@@ -1,0 +1,107 @@
+"Type de registre"
+enum RegistryV2ExportType {
+  """
+  Registre Sortie de statut de déchet.
+  """
+  SSD
+  """
+  Registre sortant.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet.
+  https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884583
+  """
+  OUTGOING
+  """
+  Registre entrant.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date de réception du déchet.
+  https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884574
+  """
+  INCOMING
+  """
+  Registre de transport.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet.
+  https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884592
+  """
+  TRANSPORTED
+  """
+  Registre de gestion.
+  Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
+  a été signé et sont triés par date d'enlèvement du déchet (la date d'acquisition ou
+  de début de gestion du déchet n'apparaissant pas sur les bordereaux de suivi de déchet,
+  il n'est pas possible de trier le registre suivant cette date).
+  https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884599
+  """
+  MANAGED
+  """
+  Registre exhaustif.
+  Registre qui n'est pas réglementaire et qui est indépendant des autres registres. Il permet
+  d'exporter un nombre d'informations conséquent sur l'ensemble des bordereaux sur lesquels un
+  acteur a été visé à partir du moment où l'enlèvement a été signé. Dans cet export, les bordereaux
+  sont triés par date d'enlèvement du déchet.
+  """
+  ALL
+}
+
+"Type de déchets"
+enum RegistryV2ExportWasteType {
+  "Déchets non dangereux"
+  DND
+  "Déchets dangereux"
+  DD
+  "Terres et sédiments"
+  TEXS
+}
+
+"Source de la ligne de registre"
+enum RegistryV2ExportSource {
+  "Bordereau"
+  BSD
+  "Déclaration au registre"
+  REGISTRY
+}
+
+enum RegistryV2ExportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+"Type d'import au registre"
+enum RegistryImportType {
+  "Sortie de statut de déchet"
+  SSD
+  "Déchet dangereux et non dangereux entrants"
+  INCOMING_WASTE
+  "Terres excavées et sédiments entrants"
+  INCOMING_TEXS
+  "Déchet dangereux et non dangereux sortants"
+  OUTGOING_WASTE
+  "Terres excavées et sédiments sortants"
+  OUTGOING_TEXS
+}
+
+enum RegistryImportStatus {
+  PENDING
+  STARTED
+  SUCCESSFUL
+  PARTIALLY_SUCCESSFUL
+  FAILED
+  CANCELED
+}
+
+enum RegistryDownloadTarget {
+  ERROR_FILE
+  IMPORT_FILE
+}
+
+"Type de raison pour spécifier si la ligne doit être modifiée ou supprimée"
+enum RegistryLineReason {
+  "Spécifie que la ligne doit être modifiée dans le registre"
+  EDIT
+  "Spécifie que la ligne doit être supprimée du registre"
+  CANCEL
+}

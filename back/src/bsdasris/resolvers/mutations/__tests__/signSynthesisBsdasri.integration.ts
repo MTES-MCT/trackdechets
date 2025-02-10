@@ -18,7 +18,7 @@ import {
   readyToPublishData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 
 import { SIGN_DASRI } from "./signUtils";
@@ -74,6 +74,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       })
     ]);
   });
+
   it("should put transport signature on an INITIAL synthesis dasri and cascade on associated bsds", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
@@ -137,6 +138,54 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     expect(updatedSynthesizeBsdasri.transportSignatoryId).toEqual(
       transporter.id
     );
+  });
+
+  it("should forbid transport signature on an INITIAL synthesis dasri if plates are invalid", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    await transporterReceiptFactory({ company: transporterCompany });
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    // this dasri will be grouped by the synthesis dasris
+    const synthesizeBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        status: BsdasriStatus.SENT
+      }
+    });
+
+    // synthesis dasris
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(transporterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        transporterTransportPlates: ["XY"], // too short
+        status: BsdasriStatus.INITIAL,
+        type: BsdasriType.SYNTHESIS,
+
+        synthesizing: { connect: [{ id: synthesizeBsdasri.id }] }
+      }
+    });
+    const { mutate } = makeClient(transporter); // transporter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "TRANSPORT", author: "Jimmy" }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
   });
 
   it.each([

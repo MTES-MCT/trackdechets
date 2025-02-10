@@ -257,12 +257,20 @@ const sealedFromEmissionExceptForEmitter: GetBsffSignatureTypeFn<ZodBsff> = (
   return isEmitter ? "TRANSPORT" : "EMISSION";
 };
 
+/**
+ * DOCUMENTATION AUTOMATIQUE
+ * voir CONTRIBUTING -> Mettre à jour la documentation
+ * pour plus de détails
+ */
 export const bsffEditionRules: BsffEditionRules = {
   createdAt: {
     sealed: { from: "EMISSION" }
   },
   type: {
-    sealed: { from: sealedFromEmissionExceptForEmitter },
+    sealed: {
+      // EMISSION ou TRANSPORT si émetteur
+      from: sealedFromEmissionExceptForEmitter
+    },
     required: { from: "EMISSION" },
     readableFieldName: "Le type de bordereau"
   },
@@ -438,26 +446,36 @@ export const bsffEditionRules: BsffEditionRules = {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // il ne s'agit ni d'un groupement ni d'une réexpédition
+      when: bsff => bsff.type !== "GROUPEMENT" && bsff.type !== "REEXPEDITION"
       // les contenants sont auto-complétés par un transformer en cas de réexpedition
       // ou de groupement
-      when: bsff => bsff.type !== "GROUPEMENT" && bsff.type !== "REEXPEDITION"
     },
     readableFieldName: "La liste des contenants"
   },
   forwarding: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsff => bsff.type === "REEXPEDITION" },
+    required: {
+      from: "EMISSION",
+      // il s'agit d'une réexpédition
+      when: bsff => bsff.type === "REEXPEDITION"
+    },
     readableFieldName: "La liste des contenants à réexpedier"
   },
   grouping: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    required: { from: "EMISSION", when: bsff => bsff.type === "GROUPEMENT" },
+    required: {
+      from: "EMISSION",
+      // il s'agit d'un groupement
+      when: bsff => bsff.type === "GROUPEMENT"
+    },
     readableFieldName: "La liste des contenants à grouper"
   },
   repackaging: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
+      // il s'agit d'un reconditionnement
       when: bsff => bsff.type === "RECONDITIONNEMENT"
     },
     readableFieldName: "La liste des contenants à regrouper"
@@ -540,7 +558,7 @@ export async function checkBsffSealedFields(
     if (isSealed) {
       sealedFieldErrors.push(
         [
-          `${fieldDescription} a été vérouillé via signature et ne peut pas être modifié.`,
+          `${fieldDescription} a été verrouillé via signature et ne peut pas être modifié.`,
           sealedRule.customErrorMessage
         ]
           .filter(Boolean)
@@ -615,7 +633,7 @@ export async function checkBsffSealedFields(
 
           if (isSealed) {
             sealedFieldErrors.push(
-              `${fieldDescription} n°1 a été vérouillé via signature et ne peut pas être modifié.`
+              `${fieldDescription} n°1 a été verrouillé via signature et ne peut pas être modifié.`
             );
           }
         }

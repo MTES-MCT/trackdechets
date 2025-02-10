@@ -743,7 +743,8 @@ export default function BSDDetailContent({
   const isAppendix1Producer: boolean =
     form?.emitter?.type === EmitterType.Appendix1Producer;
 
-  const canDuplicate = permissions.includes(UserPermission.BsdCanCreate);
+  const canDuplicate =
+    permissions.includes(UserPermission.BsdCanCreate) && !isAppendix1Producer;
 
   const canDelete =
     ([FormStatus.Draft, FormStatus.Sealed].includes(form.status) ||
@@ -844,6 +845,12 @@ export default function BSDDetailContent({
                 <>
                   <dt>Numéro d'échantillon</dt>
                   <dd>{form.wasteDetails.sampleNumber}</dd>
+                </>
+              )}
+              {form?.emitter?.type === "APPENDIX1" && (
+                <>
+                  <dt>CAP</dt>
+                  <dd>{form.recipient?.cap}</dd>
                 </>
               )}
             </div>

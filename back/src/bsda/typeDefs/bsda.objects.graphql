@@ -18,8 +18,14 @@ type Bsda {
   updatedAt: DateTime!
   "Indique si le bordereau est à l'état de brouillon"
   isDraft: Boolean!
-  "Statur du bordereau"
+  "Statut du bordereau"
   status: BsdaStatus!
+
+  """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
 
   """
   Type de bordereau

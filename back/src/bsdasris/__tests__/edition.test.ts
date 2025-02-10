@@ -1,5 +1,5 @@
 import { Bsdasri } from "@prisma/client";
-import {
+import type {
   BsdasriAcceptationInput,
   BsdasriDestinationInput,
   BsdasriEmissionInput,
@@ -16,7 +16,7 @@ import {
   CompanyInput,
   EcoOrganismeInput,
   PickupSiteInput
-} from "../../generated/graphql/types";
+} from "@td/codegen-back";
 import { flattenBsdasriInput } from "../converter";
 import { editionRules, isAwaitingSignature } from "../edition";
 

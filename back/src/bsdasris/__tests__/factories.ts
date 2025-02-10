@@ -7,7 +7,7 @@ import {
   OperationMode,
   TransportMode
 } from "@prisma/client";
-import { BsdasriPackagingsInput } from "../../generated/graphql/types";
+import type { BsdasriPackagingsInput } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
 import { computeTotalVolume } from "../converter";
@@ -122,7 +122,7 @@ export const readyToTakeOverData = company => ({
   transporterRecepisseNumber: "xyz",
   transporterRecepisseDepartment: "83",
   transporterRecepisseValidityLimit: new Date(),
-  transporterTransportPlates: ["TRANSPORTER-PLATE"],
+  transporterTransportPlates: ["AB-65-ML"],
   transporterTransportMode: TransportMode.ROAD,
   transporterWastePackagings: [
     { type: "BOITE_CARTON", volume: 22, quantity: 3 }

@@ -1,8 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  BsdaInput,
-  MutationCreateBsdaArgs
-} from "../../../generated/graphql/types";
+import type { BsdaInput, MutationCreateBsdaArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { companyToIntermediaryInput, expandBsdaFromDb } from "../../converter";
@@ -45,12 +42,16 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
 
   const zodBsda = await graphQlInputToZodBsda(input);
 
-  const bsda = await parseBsdaAsync(
+  const { createdAt, ...bsda } = await parseBsdaAsync(
     { ...zodBsda, isDraft },
     {
       user,
       enableCompletionTransformers: true,
       enablePreviousBsdasChecks: true,
+      // L'UI utilise 'createDraft', 'create' est juste utilisé côté API
+      // On part du principe que le BSD doit être prêt pour la signature
+      // émetteur, donc on remonte déjà toutes les erreurs de l'étape
+      // de signature émetteur (d'où currentSignatureType: EMISSION)
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }
   );

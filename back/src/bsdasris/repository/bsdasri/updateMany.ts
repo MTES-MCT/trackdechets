@@ -27,8 +27,8 @@ export function buildUpdateManyBsdasris(
     });
 
     const updatedBsdasris = await prisma.bsdasri.findMany({
-      where,
-      select: { id: true }
+      where
+      // select: { id: true }
     });
 
     const ids = updatedBsdasris.map(({ id }) => id);
@@ -44,8 +44,10 @@ export function buildUpdateManyBsdasris(
     await prisma.event.createMany({
       data: eventsData
     });
-    for (const id of ids) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(id));
+    for (const updatedBsdasri of updatedBsdasris) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(updatedBsdasri.id)
+      );
     }
 
     return update;

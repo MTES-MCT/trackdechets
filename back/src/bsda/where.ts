@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 
 import { safeInput } from "../common/converter";
 
-import { BsdaWhere } from "../generated/graphql/types";
+import type { BsdaWhere } from "@td/codegen-back";
 import {
   toPrismaDateFilter,
   toPrismaStringFilter,
@@ -67,7 +67,7 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret),
     groupedInId: toPrismaStringNullableFilter(where.groupedIn),
     forwardedIn: toPrismaRelationIdFilter(where.forwardedIn) as Prisma.XOR<
-      Prisma.BsdaRelationFilter,
+      Prisma.BsdaScalarRelationFilter,
       Prisma.BsdaWhereInput
     >
   });

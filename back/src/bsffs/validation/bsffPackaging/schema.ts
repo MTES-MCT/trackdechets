@@ -44,7 +44,7 @@ const rawBsffPackagingSchema = z.object({
   acceptationSignatureAuthor: z.string().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationDate: z.coerce.date().nullish(),
-  operationNoTraceability: z.coerce
+  operationNoTraceability: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
@@ -68,7 +68,8 @@ const rawBsffPackagingSchema = z.object({
   operationNextDestinationCompanyMail: z
     .string()
     .email("E-mail destination ultérieure invalide")
-    .nullish()
+    .nullish(),
+  nextPackagingId: z.string().nullish()
 });
 
 // Type inféré par Zod - avant parsing

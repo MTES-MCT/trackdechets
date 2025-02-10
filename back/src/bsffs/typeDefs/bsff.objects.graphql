@@ -22,6 +22,12 @@ type Bsff {
   isDraft: Boolean!
 
   """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
+
+  """
   Type de BSFF, voir l'enum pour plus de détails.
   """
   type: BsffType!

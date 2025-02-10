@@ -12,10 +12,7 @@ import {
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
-import {
-  Mutation,
-  MutationMarkAsAcceptedArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationMarkAsAcceptedArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   formFactory,
@@ -151,6 +148,68 @@ describe("Test Form reception", () => {
 
     const acceptedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
+    });
+
+    expect(acceptedForm.status).toBe("ACCEPTED");
+    expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
+    expect(acceptedForm.signedBy).toBe("Bill");
+    expect(acceptedForm.quantityReceived?.toNumber()).toBe(11);
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLog.findMany({
+      where: { form: { id: acceptedForm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("ACCEPTED");
+  });
+
+  it("ensure an older RECEIVED bsdd with invalid plates can still be accepted", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const recipient = await userWithCompanyFactory("ADMIN");
+    const initialForm = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "RECEIVED",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+
+        emittedBy: emitter.user.name,
+
+        recipientCompanySiret: recipient.company.siret,
+        recipientsSirets: [recipient.company.siret!],
+        receivedBy: "Bill",
+        receivedAt: new Date("2019-01-17T10:22:00+0100"),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterNumberPlate: "XY", // invalid plate number
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(recipient.user);
+
+    await mutate(MARK_AS_ACCEPTED, {
+      variables: {
+        id: initialForm.id,
+        acceptedInfo: {
+          signedAt: "2019-01-17T10:22:00+0100",
+          signedBy: "Bill",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 11
+        }
+      }
+    });
+
+    const acceptedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: initialForm.id }
     });
 
     expect(acceptedForm.status).toBe("ACCEPTED");

@@ -2,14 +2,11 @@ import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
-import {
-  Mutation,
-  MutationPublishBsffArgs
-} from "../../../../generated/graphql/types";
+import type { Mutation, MutationPublishBsffArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-
+import { createBsff } from "../../../__tests__/factories";
 const PUBLISH_BSFF = gql`
   mutation PublishBsff($id: ID!) {
     publishBsff(id: $id) {
@@ -28,7 +25,8 @@ describe("publishBsff", () => {
         isDraft: true,
         id: getReadableId(ReadableIdPrefix.FF),
         type: "TRACER_FLUIDE",
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        canAccessDraftOrgIds: [emitter.company.siret!]
       }
     });
 
@@ -109,7 +107,8 @@ describe("publishBsff", () => {
             transporterCompanyPhone: "0000000000",
             transporterCompanyMail: "john.snow@trackdechets.fr"
           }
-        }
+        },
+        canAccessDraftOrgIds: [emitter.company.siret!]
       }
     });
 
@@ -159,7 +158,8 @@ describe("publishBsff", () => {
             weight: 1,
             volume: 1
           }
-        }
+        },
+        canAccessDraftOrgIds: [emitter.company.siret!]
       }
     });
 
@@ -173,5 +173,30 @@ describe("publishBsff", () => {
     expect(errors).toBeUndefined();
 
     expect(data.publishBsff.isDraft).toEqual(false);
+  });
+
+  it("should forbid to publish a BSFF when user is not initial creator", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsff = await createBsff(
+      { emitter, transporter, destination },
+      { data: { isDraft: true }, userId: destination.user.id }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "publishBsff">,
+      MutationPublishBsffArgs
+    >(PUBLISH_BSFF, { variables: { id: bsff.id } });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+      })
+    ]);
   });
 });

@@ -82,7 +82,9 @@ export const companyFactory = async (
           "TRANSPORTER",
           "WASTEPROCESSOR",
           "WORKER",
-          "WASTE_VEHICLES"
+          "WASTE_VEHICLES",
+          "TRADER",
+          "BROKER"
         ]
       },
       name: `company_${companyIndex}`,
@@ -162,15 +164,17 @@ export const userWithCompanyFactory = async (
 export const userInCompany = async (
   role: UserRole = "ADMIN",
   companyId: string,
-  userOpts: Partial<Prisma.UserCreateInput> = {}
+  userOpts: Partial<Prisma.UserCreateInput> = {},
+  associationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ) => {
   const user = await userFactory({
     ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: companyId } },
-        role: role,
-        ...getDefaultNotifications(role)
+        role,
+        ...getDefaultNotifications(role),
+        ...associationOpts
       }
     }
   });
@@ -264,7 +268,7 @@ export const bsddTransporterData: Omit<
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterTransportMode: TransportMode.ROAD,
-  transporterNumberPlate: "aa22",
+  transporterNumberPlate: "AA-22", // valid plate
   transporterReceipt: "33AA",
   transporterValidityLimit: "2019-11-27T00:00:00.000Z",
   readyToTakeOver: true
@@ -617,19 +621,21 @@ export const ecoOrganismeFactory = async ({
 }: {
   siret?: string;
   handle?: {
+    handleBsdd?: boolean;
     handleBsdasri?: boolean;
     handleBsda?: boolean;
     handleBsvhu?: boolean;
   };
   createAssociatedCompany?: boolean;
 }) => {
-  const { handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
+  const { handleBsdd, handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
   const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
       siret: siret ?? siretify(),
+      handleBsdd,
       handleBsdasri,
       handleBsda,
       handleBsvhu

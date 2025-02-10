@@ -10,7 +10,7 @@ import {
   toElasticStringQuery,
   toElasticTextQuery
 } from "../common/where";
-import { BsdWhere } from "../generated/graphql/types";
+import type { BsdWhere } from "@td/codegen-back";
 import { transportPlateFilter } from "../common/elastic";
 import { estypes } from "@elastic/elasticsearch";
 import { UserInputError } from "../common/errors";

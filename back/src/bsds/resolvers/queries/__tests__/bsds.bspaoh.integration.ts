@@ -5,7 +5,7 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import {
+import type {
   Query,
   QueryBsdsArgs,
   Mutation,
@@ -14,7 +14,7 @@ import {
   MutationSignBspaohArgs,
   MutationDeleteBspaohArgs,
   MutationDuplicateBspaohArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   resetDatabase,
   refreshElasticSearch
@@ -170,7 +170,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
               transport: {
                 takenOverAt: new Date().toISOString() as any,
                 mode: "ROAD",
-                plates: ["TRANSPORTER-PLATE"]
+                plates: ["AB-12-TY"]
               }
             },
             destination: {

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import {
+  EmitterType,
   Form,
   FormInput,
   Mutation,
@@ -169,6 +170,7 @@ export default function StepsList(props: Props) {
       ecoOrganisme,
       grouping,
       transporters,
+      isDuplicateOf,
       ...rest
     } = values;
 
@@ -192,7 +194,7 @@ export default function StepsList(props: Props) {
         : { temporaryStorageDetail: null }),
       // discard ecoOrganisme if not selected
       ...(ecoOrganisme?.siret ? { ecoOrganisme } : { ecoOrganisme: null }),
-      ...(grouping?.length
+      ...(grouping
         ? {
             grouping: grouping
               .map(({ form, quantity }) => ({
@@ -202,7 +204,12 @@ export default function StepsList(props: Props) {
                 // d'annexes 2
                 quantity: Number(quantity)
               }))
-              .filter(g => g.quantity > 0)
+              .filter(g =>
+                rest?.emitter?.type === EmitterType.Appendix2
+                  ? // Ne permet pas d'ajouter une annexe 2 avec une quantité égale à 0
+                    g.quantity > 0
+                  : true
+              )
           }
         : {}),
       transporters: transporterIds

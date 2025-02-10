@@ -1,8 +1,9 @@
-import {
+import type {
   FileDownload,
   QueryResolvers,
-  QueryWastesRegistryCsvArgs
-} from "../../../generated/graphql/types";
+  QueryWastesRegistryCsvArgs,
+  WasteRegistryType
+} from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";
@@ -17,7 +18,7 @@ export const wastesRegistryCsvDownloadHandler: DownloadHandler<QueryWastesRegist
     name: "wastesRegistryCsv",
     handler: (_, res, args) => {
       const reader = wastesReader({
-        registryType: args.registryType,
+        registryType: args.registryType as WasteRegistryType,
         sirets: args.sirets,
         where: args.where,
         chunk: 100

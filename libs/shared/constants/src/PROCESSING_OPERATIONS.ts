@@ -170,15 +170,116 @@ export const PROCESSING_OPERATIONS_CODES = PROCESSING_OPERATIONS.map(
   operation => operation.code
 );
 
-type OperationCodes = (typeof PROCESSING_OPERATIONS_CODES)[number];
+type OperationCode = (typeof PROCESSING_OPERATIONS_CODES)[number];
+export type TdOperationCode = OperationCode | "R 0";
+export type TdOperationCodeEnum = Readonly<
+  [TdOperationCode, ...TdOperationCode[]]
+>;
+
 // Build an object that zods nativeEnum can ingest
-export const PROCESSING_OPERATIONS_CODES_ENUM =
+export const PROCESSING_OPERATIONS_CODES_NATIVE_ENUM =
   PROCESSING_OPERATIONS_CODES.reduce((obj, cur) => {
     obj[cur] = cur;
     return obj;
-  }, {} as Record<OperationCodes, OperationCodes>);
+  }, {} as Record<OperationCode, OperationCode>);
 
 export const PROCESSING_OPERATIONS_GROUPEMENT_CODES: string[] =
   PROCESSING_OPERATIONS.filter(
     operation => operation.type === ProcessingOperationType.Groupement
   ).map(operation => operation.code);
+
+export const PROCESSING_OPERATIONS_CODES_ENUM: TdOperationCodeEnum = [
+  "R 1",
+  "R 2",
+  "R 3",
+  "R 4",
+  "R 5",
+  "R 6",
+  "R 7",
+  "R 8",
+  "R 9",
+  "R 10",
+  "R 11",
+  "R 12",
+  "R 13",
+  "D 1",
+  "D 2",
+  "D 3",
+  "D 4",
+  "D 5",
+  "D 6",
+  "D 7",
+  "D 8",
+  "D 9",
+  "D 9 F",
+  "D 10",
+  "D 12",
+  "D 13",
+  "D 14",
+  "D 15"
+];
+
+export const ALL_TD_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "R 0",
+  ...PROCESSING_OPERATIONS_CODES_ENUM
+];
+
+export const INCOMING_WASTE_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "D 1",
+  "D 3",
+  "D 4",
+  "D 5",
+  "D 8",
+  "D 9",
+  "D 10",
+  "D 12",
+  "D 13",
+  "D 14",
+  "D 15",
+  "R 1",
+  "R 2",
+  "R 3",
+  "R 4",
+  "R 5",
+  "R 6",
+  "R 7",
+  "R 8",
+  "R 9",
+  "R 10",
+  "R 11",
+  "R 12",
+  "R 13"
+];
+
+export const INCOMING_TEXS_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "D 1",
+  "D 4",
+  "D 5",
+  "D 8",
+  "D 9",
+  "D 10",
+  "D 12",
+  "D 13",
+  "D 14",
+  "D 15",
+  "R 1",
+  "R 2",
+  "R 3",
+  "R 5",
+  "R 10",
+  "R 11",
+  "R 12",
+  "R 13"
+];
+
+export const SSD_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "R 2",
+  "R 3",
+  "R 4",
+  "R 5",
+  "R 6",
+  "R 7",
+  "R 8",
+  "R 12",
+  "R 13"
+];

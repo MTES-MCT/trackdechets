@@ -8,10 +8,10 @@ import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";
-import {
+import type {
   BsdaRevisionRequestContentInput,
   MutationCreateBsdaRevisionRequestArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";
@@ -21,6 +21,8 @@ import { getBsdaRepository } from "../../../repository";
 import { rawBsdaSchema } from "../../../validation/schema";
 import { bsdaEditionRules } from "../../../validation/rules";
 import { capitalize } from "../../../../common/strings";
+import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
+import { prisma } from "@td/prisma";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -41,7 +43,8 @@ export const NON_CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = Object.values(
 const BSDA_REVISION_REQUESTER_FIELDS = [
   "emitterCompanySiret",
   "destinationCompanySiret",
-  "workerCompanySiret"
+  "workerCompanySiret",
+  "ecoOrganismeSiret"
 ];
 
 export type RevisionRequestContent = Pick<
@@ -101,7 +104,10 @@ export async function createBsdaRevisionRequest(
     authoringCompany.siret
   );
 
-  const flatContent = await getFlatContent(content, bsda);
+  const recipified = await recipify(content);
+
+  const flatContent = await getFlatContent(recipified, bsda);
+
   const history = getBsdaHistory(bsda);
 
   return bsdaRepository.createRevisionRequest({
@@ -222,7 +228,7 @@ async function getFlatContent(
     );
   }
 
-  schema.parse(flatContent); // Validate but don't parse as we want to keep empty fields empty
+  await schema.parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
 
   return flatContent;
 }
@@ -305,6 +311,21 @@ const schema = rawBsdaSchema
         });
       }
     }
+  })
+  .superRefine(async (bsda, zodContext) => {
+    await isBrokerRefinement(bsda.brokerCompanySiret, zodContext);
+    if (
+      bsda.brokerCompanySiret &&
+      (!bsda.brokerRecepisseNumber ||
+        !bsda.brokerRecepisseDepartment ||
+        !bsda.brokerRecepisseValidityLimit)
+    ) {
+      zodContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["broker", "recepisse"],
+        message: `Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets`
+      });
+    }
   });
 
 function getBsdaHistory(bsda: Bsda) {
@@ -314,7 +335,9 @@ function getBsdaHistory(bsda: Bsda) {
     initialPackagings: bsda.packagings,
     initialWasteSealNumbers: bsda.wasteSealNumbers,
     initialWasteMaterialName: bsda.wasteMaterialName,
-    initialDestinationCap: bsda.destinationCap,
+    // Attention: on révise le CAP de l'exutoire, jamais du TTR
+    initialDestinationCap:
+      bsda.destinationOperationNextDestinationCap ?? bsda.destinationCap,
     initialDestinationReceptionWeight: bsda.destinationReceptionWeight,
     initialDestinationOperationCode: bsda.destinationOperationCode,
     initialDestinationOperationDescription:
@@ -335,4 +358,31 @@ function getBsdaHistory(bsda: Bsda) {
     initialEmitterPickupSitePostalCode: bsda.emitterPickupSitePostalCode,
     initialEmitterPickupSiteInfos: bsda.emitterPickupSiteInfos
   };
+}
+
+async function recipify(
+  content: BsdaRevisionRequestContentInput
+): Promise<BsdaRevisionRequestContentInput> {
+  let recipified = content;
+  if (content.broker?.company?.siret) {
+    const brokerCompany = await prisma.company.findFirst({
+      where: { orgId: content.broker.company.siret },
+      include: { brokerReceipt: true }
+    });
+    if (brokerCompany) {
+      recipified = {
+        ...recipified,
+        broker: {
+          ...recipified.broker,
+          recepisse: {
+            number: brokerCompany?.brokerReceipt?.receiptNumber ?? null,
+            department: brokerCompany?.brokerReceipt?.department ?? null,
+            validityLimit: brokerCompany?.brokerReceipt?.validityLimit ?? null
+          }
+        }
+      };
+    }
+  }
+
+  return recipified;
 }

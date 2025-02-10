@@ -5,6 +5,7 @@ import {
   SSD_HEADERS
 } from "@td/registry";
 import { Job } from "bull";
+import { subMonths, format, addDays } from "date-fns";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   userFactory,
@@ -15,13 +16,16 @@ import {
   RegistryImportJobArgs
 } from "../processRegistryImport";
 
-const getCorrectLine = (siret: string) => {
-  return {
+const getCorrectLine = (siret: string, reportAsSiret?: string) => {
+  const sixMonthsAgo = subMonths(new Date(), 6);
+  const processingDate = format(sixMonthsAgo, "yyyy-MM-dd");
+  const useDate = format(addDays(sixMonthsAgo, 1), "yyyy-MM-dd");
+  const value = {
     reason: "",
     publicId: 1,
-    reportAsSiret: "",
-    reportForSiret: siret,
-    useDate: "2024-02-01",
+    reportAsCompanySiret: reportAsSiret,
+    reportForCompanySiret: siret,
+    useDate,
     dispatchDate: "",
     wasteCode: "06 07 01*",
     wasteDescription: "Description déchet",
@@ -32,19 +36,24 @@ const getCorrectLine = (siret: string) => {
     weightValue: 1.4,
     weightIsEstimate: "REEL",
     volume: 1.2,
-    processingDate: "2024-01-01",
+    processingDate,
     processingEndDate: "",
-    destinationType: "ENTREPRISE_FR",
-    destinationOrgId: "78467169500103",
-    destinationName: "Nom destination",
-    destinationAddress: "Adresse destination",
-    destinationCity: "Ville destination",
-    destinationPostalCode: "75001",
-    destinationCountryCode: "FR",
+    destinationCompanyType: "ETABLISSEMENT_FR",
+    destinationCompanyOrgId: "78467169500103",
+    destinationCompanyName: "Nom destination",
+    destinationCompanyAddress: "Adresse destination",
+    destinationCompanyCity: "Ville destination",
+    destinationCompanyPostalCode: "75001",
+    destinationCompanyCountryCode: "FR",
     operationCode: "R 5",
     qualificationCode: "Recyclage",
     administrativeActReference: "Arrêté du 24 août 2016"
   };
+
+  return Object.keys(SSD_HEADERS).reduce((row, key) => {
+    row[key] = value[key];
+    return row;
+  }, {});
 };
 
 describe("Process registry import job", () => {
@@ -134,7 +143,9 @@ describe("Process registry import job", () => {
 
     it("should return correct stats when the SSD file only has insertions", async () => {
       const fileKey = "one-insertion.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -180,7 +191,9 @@ describe("Process registry import job", () => {
 
     it("should return correct stats when the SSD file only has a mix of several actions", async () => {
       const fileKey = "mixed.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -192,7 +205,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       ); // Correct line
-      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1)); // Error line
+      s3Stream.end("I'm not a correct line\n"); // Error line
 
       await upload.done();
 
@@ -227,7 +240,9 @@ describe("Process registry import job", () => {
 
     it("should write an error file with detailed errors when the SSD file contains data errors", async () => {
       const fileKey = "check-errors.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -239,7 +254,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       ); // Correct line
-      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1)); // Error line
+      s3Stream.end("I'm not a correct line\n"); // Error line
 
       await upload.done();
 
@@ -277,7 +292,9 @@ describe("Process registry import job", () => {
 
     it("should work if the export has correct lines and lines with missing columns", async () => {
       const fileKey = "missing-column.csv";
-      const { company, user } = await userWithCompanyFactory();
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
 
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
@@ -289,7 +306,7 @@ describe("Process registry import job", () => {
       s3Stream.write(
         Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
       );
-      s3Stream.end(";;;;;\n");
+      s3Stream.end("I'm not a correct line\n");
 
       await upload.done();
 
@@ -324,7 +341,9 @@ describe("Process registry import job", () => {
 
     it("should fail if the current user doesnt have the rights on the reportFor siret", async () => {
       const fileKey = "missing-colon.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user } = await userWithCompanyFactory();
 
       const { s3Stream, upload } = getUploadWithWritableStream({
@@ -371,7 +390,9 @@ describe("Process registry import job", () => {
 
     it("should work if the current user has delegation rights on the reportFor siret", async () => {
       const fileKey = "missing-colon.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user, company: delegationCompany } =
         await userWithCompanyFactory();
 
@@ -391,7 +412,9 @@ describe("Process registry import job", () => {
 
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
-        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+        Object.values(
+          getCorrectLine(company.orgId, delegationCompany.orgId)
+        ).join(";") + "\n"
       );
 
       await upload.done();
@@ -427,7 +450,9 @@ describe("Process registry import job", () => {
 
     it("should fail if the uploaded file is not in a valid format", async () => {
       const fileKey = "invalid-file.csv";
-      const { company } = await userWithCompanyFactory();
+      const { company } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
       const { user, company: delegationCompany } =
         await userWithCompanyFactory();
 
@@ -477,6 +502,108 @@ describe("Process registry import job", () => {
       expect(result.numberOfCancellations).toBe(0);
       expect(result.numberOfEdits).toBe(0);
       expect(result.numberOfErrors).toBe(1);
+    });
+
+    it("should ignore the first column if its called Erreur", async () => {
+      const fileKey = "one-insertion-with-error.csv";
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
+
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
+
+      s3Stream.write(
+        ["Erreur", ...Object.values(SSD_HEADERS)].join(";") + "\n"
+      );
+      s3Stream.end(
+        ["Une erreur", ...Object.values(getCorrectLine(company.orgId))].join(
+          ";"
+        ) + "\n"
+      );
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "one-insertion-with-error.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(0);
+    });
+
+    it("should ignore empty lines", async () => {
+      const fileKey = "one-insertion-with-empty-lines.csv";
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
+
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
+
+      s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
+      s3Stream.write(";".repeat(Object.values(SSD_HEADERS).length - 1) + "\n");
+      s3Stream.write(
+        Object.values(getCorrectLine(company.orgId)).join(";") + "\n"
+      );
+      s3Stream.end(";".repeat(Object.values(SSD_HEADERS).length - 1) + "\n");
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "one-insertion-with-empty-lines.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(0);
     });
   });
 });

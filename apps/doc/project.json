@@ -5,14 +5,14 @@
   "sourceRoot": "apps/doc/src",
   "targets": {
     "build": {
-      "dependsOn": ["gql-docs"],
+      "dependsOn": ["gql-docs", "zod-docs"],
       "executor": "nx:run-commands",
       "options": {
         "command": "npx docusaurus build {projectRoot} --out-dir ../../dist/apps/doc"
       }
     },
     "serve": {
-      "dependsOn": ["gql-docs"],
+      "dependsOn": ["gql-docs", "zod-docs"],
       "executor": "nx:run-commands",
       "options": {
         "command": "npx docusaurus serve {projectRoot} --port 3000 --dir ../../dist/apps/doc"
@@ -41,8 +41,17 @@
           "cd apps/doc && docusaurus docs:generate:graphql:bsda",
           "cd apps/doc && docusaurus docs:generate:graphql:bsvhu",
           "cd apps/doc && docusaurus docs:generate:graphql:registry",
+          "cd apps/doc && docusaurus docs:generate:graphql:registryV2",
           "cd apps/doc && docusaurus docs:generate:graphql:webhooks",
           "cd apps/doc && docusaurus docs:generate:graphql:bspaoh"
+        ]
+      }
+    },
+    "zod-docs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "node ./scripts/validation-doc.js"
         ]
       }
     }

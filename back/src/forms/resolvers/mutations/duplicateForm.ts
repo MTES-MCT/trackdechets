@@ -1,6 +1,6 @@
-import { Form, Prisma, Status, User } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import type { MutationResolvers } from "@td/codegen-back";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import { getAndExpandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
@@ -10,6 +10,7 @@ import { FullForm } from "../../types";
 import { prismaJsonNoNull } from "../../../common/converter";
 import { prisma } from "@td/prisma";
 import { sirenifyFormCreateInput } from "../../sirenify";
+import { UserInputError } from "../../../common/errors";
 
 /**
  * Retrieves companies present on the form that a registered in TD
@@ -87,6 +88,7 @@ async function getDuplicateFormInput(
 
   return {
     readableId: getReadableId(),
+    isDuplicateOf: form.readableId,
     status: Status.DRAFT,
     owner: { connect: { id: user.id } },
     emitterType: form.emitterType,
@@ -116,7 +118,9 @@ async function getDuplicateFormInput(
     recipientCompanyMail: recipient?.contactEmail ?? form.recipientCompanyMail,
     recipientIsTempStorage: form.recipientIsTempStorage,
     wasteDetailsCode: form.wasteDetailsCode,
-    wasteDetailsPackagingInfos: Prisma.JsonNull,
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      form.wasteDetailsPackagingInfos
+    ),
     wasteDetailsQuantity: 0,
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
     wasteDetailsPop: form.wasteDetailsPop,
@@ -127,9 +131,11 @@ async function getDuplicateFormInput(
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsConsistence: form.wasteDetailsConsistence,
     wasteDetailsSampleNumber: form.wasteDetailsSampleNumber,
-    wasteDetailsIsSubjectToADR: form.wasteDetailsIsDangerous
-      ? true
-      : form.wasteDetailsIsSubjectToADR,
+    wasteDetailsIsSubjectToADR:
+      form.wasteDetailsIsDangerous || form.wasteDetailsPop
+        ? true
+        : form.wasteDetailsIsSubjectToADR,
+    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     traderCompanyName: trader?.name ?? form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,
     traderCompanyAddress: trader?.address ?? form.traderCompanyAddress,
@@ -260,6 +266,10 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingForm = await getFormOrFormNotFound({ id });
+
+  if (existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    throw new UserInputError("Impossible de dupliquer un bordereau d'annexe 1");
+  }
 
   await checkCanDuplicate(user, existingForm);
 

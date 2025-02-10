@@ -1,7 +1,4 @@
-import {
-  QueryResolvers,
-  QueryFormArgs
-} from "../../../generated/graphql/types";
+import type { QueryResolvers, QueryFormArgs } from "@td/codegen-back";
 import { expandableFormIncludes, expandFormFromDb } from "../../converter";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -30,7 +27,16 @@ const formResolver: QueryResolvers["form"] = async (_, args, context) => {
   const form = await getFormOrFormNotFound(validArgs, {
     ...expandableFormIncludes,
     intermediaries: true,
-    grouping: { include: { initialForm: { include: { transporters: true } } } }
+    grouping: {
+      include: {
+        initialForm: {
+          include: {
+            transporters: true,
+            forwardedIn: true
+          }
+        }
+      }
+    }
   });
 
   await checkCanRead(user, form);

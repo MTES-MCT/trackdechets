@@ -1,6 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 
-import { BsvhuCompanyInput } from "@td/codegen-ui";
+import { BsvhuCompanyInput, TransportMode } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (company?: BsvhuCompanyInput | null) => {
@@ -60,7 +60,7 @@ export default {
   wasteCode: "16 01 06",
   identification: {
     numbers: [],
-    type: "NUMERO_ORDRE_REGISTRE_POLICE"
+    type: null
   },
   quantity: null,
   weight: {
@@ -75,6 +75,8 @@ export default {
       isExempted: false
     },
     transport: {
+      mode: TransportMode.Road,
+      plates: [],
       signature: {
         author: null,
         takenOverAt: null
@@ -84,9 +86,12 @@ export default {
   ecoOrganisme: {
     name: "",
     siret: ""
-  }
+  },
+  broker: {
+    company: getInitialCompany()
+  },
+  trader: {
+    company: getInitialCompany()
+  },
+  intermediaries: [getInitialCompany()]
 };
-
-export const ecoOrganismeList = [
-  { siret: "92474564900013", name: "Recycler mon véhicule" }
-];

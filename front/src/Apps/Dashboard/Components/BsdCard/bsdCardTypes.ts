@@ -28,6 +28,7 @@ export interface BsdCardProps {
     onUpdate?: Function;
     onOverview: Function;
     onRevision?: Function;
+    onCorrection?: Function;
     onBsdSuite?: Function;
     onAppendix1?: Function;
     onConsultReview?: Function;

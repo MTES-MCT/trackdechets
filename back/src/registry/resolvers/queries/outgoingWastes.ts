@@ -1,4 +1,4 @@
-import { QueryResolvers } from "../../../generated/graphql/types";
+import type { QueryResolvers } from "@td/codegen-back";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
 

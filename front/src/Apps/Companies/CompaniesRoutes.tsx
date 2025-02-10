@@ -13,6 +13,7 @@ import CompanyDetails from "./CompanyDetails";
 import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../routes";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";
+import "../Dashboard/dashboard.scss";
 
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
@@ -27,7 +28,7 @@ export default function CompaniesRoutes() {
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
-  if (loading) return <Loader />;
+  if (loading || data?.me == null) return <Loader />;
 
   if (error) return <InlineError apolloError={error} />;
 

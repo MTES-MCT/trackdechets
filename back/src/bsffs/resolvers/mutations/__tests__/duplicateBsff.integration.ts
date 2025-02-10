@@ -1,14 +1,20 @@
 import { UserRole } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   CompanySearchResult,
   Mutation,
   MutationDuplicateBsffArgs
-} from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+} from "@td/codegen-back";
+import {
+  userWithCompanyFactory,
+  companyAssociatedToExistingUserFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { createBsff } from "../../../__tests__/factories";
+import {
+  createBsff,
+  createBsffAfterOperation
+} from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../utils";
 import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
@@ -24,6 +30,7 @@ const DUPLICATE_BSFF = gql`
     duplicateBsff(id: $id) {
       id
       status
+      isDuplicateOf
     }
   }
 `;
@@ -46,6 +53,7 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     expect(data.duplicateBsff.status).toEqual("INITIAL");
+    expect(data.duplicateBsff.isDuplicateOf).toEqual(bsff.id);
   });
 
   it("should disallow unauthenticated user from duplicating a bsff", async () => {
@@ -354,5 +362,47 @@ describe("Mutation.duplicateBsff", () => {
     expect(duplicatedBsff.destinationCompanyAddress).toEqual(
       "updated destination address"
     );
+  });
+
+  it("should fill canAccessDraftOrgIds according to user", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await companyAssociatedToExistingUserFactory(
+      emitter.user,
+      UserRole.ADMIN
+    );
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const { mutate } = makeClient(emitter.user);
+
+    const bsff = await createBsffAfterOperation(
+      {
+        emitter,
+        transporter,
+        destination: { company: destination, user: emitter.user }
+      },
+      {
+        userId: emitter.user.id
+      }
+    );
+
+    expect(bsff?.canAccessDraftOrgIds).toEqual([]);
+
+    const { data } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    const duplicated = await prisma.bsff.findUnique({
+      where: { id: data.duplicateBsff.id }
+    });
+    // user belongs to emitter and destination companies, their sirets are stored in canAccessDraftOrgIds
+    expect(duplicated?.canAccessDraftOrgIds).toEqual([
+      emitter.company.siret,
+      destination.siret
+    ]);
   });
 });

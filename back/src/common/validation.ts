@@ -6,13 +6,15 @@ import {
 import * as yup from "yup";
 import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {
+  isBroker,
   isCollector,
+  isTrader,
   isTransporter,
   isWasteCenter,
   isWasteProcessor,
   isWasteVehicles
 } from "../companies/validation";
-import { CompanyInput } from "../generated/graphql/types";
+import type { CompanyInput } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   isForeignVat,
@@ -184,7 +186,12 @@ type SiretConditions = {
 // Different tests that can be applied to a siret number
 type SiretTests = {
   isRegistered: (
-    role?: "DESTINATION" | "TRANSPORTER" | "WASTE_VEHICLES"
+    role?:
+      | "DESTINATION"
+      | "TRANSPORTER"
+      | "WASTE_VEHICLES"
+      | "BROKER"
+      | "TRADER"
   ) => yup.TestConfig<string>;
   isNotDormant: yup.TestConfig<string>;
   destinationHasAppropriateSubProfiles: yup.TestConfig<string>;
@@ -226,13 +233,23 @@ export const siretConditions: SiretConditions = {
   }
 };
 
-const { VERIFY_COMPANY, VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER } =
-  process.env;
+const {
+  VERIFY_COMPANY,
+  VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER,
+  OVERRIDE_V20250201
+} = process.env;
 
 // Date de la MAJ 2024.11.1 qui rend obligatoire certtains sous profils pour traiter les déchets dangereux et non dangereux
 export const v20241101 = new Date(
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER ||
     "2024-11-19T00:00:00.000Z"
+);
+
+// Date de la MAJ 2025.02.1 qui rend obligatoire pour les
+// courtiers et négociants d'être inscrit avec le bon profil
+// et d'avoir renseigné un récépissé
+export const v20250201 = new Date(
+  OVERRIDE_V20250201 || "2025-02-12T00:00:00.000Z"
 );
 
 export const siretTests: SiretTests = {
@@ -302,6 +319,36 @@ export const siretTests: SiretTests = {
             ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
             ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
             ` de l'établissement depuis l'interface Trackdéchets dans Mes établissements`
+        });
+      }
+
+      // On ne vérifie les profils courtier et négociant que pour les bordereaux crées
+      // à partir de la release 2025021 pour ne pas bloquer les bordereaux existants
+      // pour lesquels ces données ne sont plus modifiables.
+      const isCreatedAfterV2025021 = () => {
+        const bsddCreatedAt =
+          ctx.parent.createdAt ||
+          // pas de date renseignée sur les nouveaux BSDD
+          new Date();
+        return bsddCreatedAt.getTime() > v20250201.getTime();
+      };
+
+      if (role === "BROKER" && !isBroker(company) && isCreatedAfterV2025021()) {
+        return ctx.createError({
+          message:
+            `Le courtier saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+        });
+      }
+      if (role === "TRADER" && !isTrader(company) && isCreatedAfterV2025021()) {
+        return ctx.createError({
+          message:
+            `Le négociant saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+            " modifie le profil de l'établissement depuis l'interface Trackdéchets"
         });
       }
       return true;

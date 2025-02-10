@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import Input from "@codegouvfr/react-dsfr/Input";
+import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
 
-export default function NonScrollableInput(props) {
+export default function NonScrollableInput(props: InputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

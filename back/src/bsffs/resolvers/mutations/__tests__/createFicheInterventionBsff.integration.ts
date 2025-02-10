@@ -1,10 +1,10 @@
 import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import {
+import type {
   BsffFicheInterventionInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   siretify,
   userWithCompanyFactory

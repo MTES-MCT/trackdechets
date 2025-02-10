@@ -7,6 +7,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Status as FormStatus } from "@prisma/client";
 import { getFirstTransporter } from "../../../database";
+
 jest.mock("axios", () => ({
   default: {
     get: jest.fn(() => Promise.resolve({ data: {} }))
@@ -55,6 +56,40 @@ describe("Forms -> updateTransporterFields mutation", () => {
       expect(formTransporter!.transporterNumberPlate).toEqual("ZBLOP 83");
     }
   );
+
+  it("should not update transporter with invalid plates ", async () => {
+    const { user: emitter } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        status: FormStatus.SEALED,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
+      }
+    });
+    const { mutate } = makeClient(transporter);
+    const mutation = `
+    mutation {
+      updateTransporterFields(id: "${form.id}", transporterNumberPlate: "AZ") {
+        id
+      }
+    }
+  `;
+    const { errors } = await mutate(mutation);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
 
   it.each([FormStatus.SEALED, FormStatus.SIGNED_BY_PRODUCER])(
     "should update transporter custom info (%p status)",

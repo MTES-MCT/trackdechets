@@ -50,12 +50,14 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
     });
 
     const forms = await prisma.form.findMany({
-      where: { id: { in: ids } },
-      select: { readableId: true }
+      where: { id: { in: ids } }
+      // select: { readableId: true }
     });
 
-    for (const { readableId } of forms) {
-      prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(readableId));
+    for (const form of forms) {
+      prisma.addAfterCommitCallback(() =>
+        enqueueUpdatedBsdToIndex(form.readableId)
+      );
     }
 
     return update;

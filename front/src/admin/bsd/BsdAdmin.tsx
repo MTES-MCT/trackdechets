@@ -26,6 +26,7 @@ import {
 import { Modal } from "../../common/components";
 import { PermissionsContext } from "../../common/contexts/PermissionsContext";
 import { BsdDetailContent } from "./BsdDetailContent";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const BSD = gql`
   query Bsd($id: String!) {
@@ -173,7 +174,7 @@ export function BsdAdmin() {
           bsd({ variables: { id: formData.get("id") } });
         }}
       >
-        <div className="fr-grid-row fr-grid-row--bottom">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-4v">
           <div className="fr-col-8">
             <Input
               label="Identifiant du bordereau"
@@ -187,10 +188,23 @@ export function BsdAdmin() {
             <Button size="medium">Rechercher</Button>
           </div>
         </div>
+
+        {loading && <div>Chargement...</div>}
+        {error && (
+          <div className="fr-grid-row">
+            {loading && <div>Chargement...</div>}
+            {error && (
+              <Alert
+                className="fr-mb-3w"
+                small
+                description={error.message}
+                severity="error"
+              />
+            )}
+          </div>
+        )}
       </form>
 
-      {loading && <div>Chargement...</div>}
-      {error && <div>Une erreur s'est produite...</div>}
       {data && (
         <div>
           <h4 className="fr-h4 fr-mt-4w">Carte comme dans le dashboard</h4>

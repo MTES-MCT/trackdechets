@@ -146,7 +146,7 @@ export function Emitter({ errors }) {
 
       <CompanyContactInfo
         fieldName={`${actor}.company`}
-        name={actor}
+        errorObject={formState.errors?.emitter?.["company"]}
         disabled={sealedFields.includes(`emitter.company.siret`)}
         key={orgId}
       />

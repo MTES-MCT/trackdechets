@@ -1,5 +1,7 @@
 import {
+  Bsda,
   BsdaRevisionRequest,
+  BsdaRevisionRequestApproval,
   BsdaStatus,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
@@ -24,6 +26,75 @@ export type AcceptRevisionRequestApprovalFn = (
   logMetadata?: LogMetadata
 ) => Promise<void>;
 
+/**
+ * Si l'émetteur (resp éco-organisme) approuve
+ * sa voix compte comme celle de l'éco-organisme (resp émetteur)
+ */
+async function handleEcoOrganismeApprovals(
+  prisma: RepositoryTransaction,
+  approval: BsdaRevisionRequestApproval & {
+    revisionRequest: BsdaRevisionRequest;
+  }
+) {
+  const bsda = await prisma.bsda.findUniqueOrThrow({
+    where: { id: approval.revisionRequest.bsdaId }
+  });
+
+  if (bsda.emitterCompanySiret && bsda.ecoOrganismeSiret) {
+    // Il y a à la fois un émetteur et un éco-organisme
+
+    let otherApproval: BsdaRevisionRequestApproval | null = null;
+
+    if (approval.approverSiret === bsda.emitterCompanySiret) {
+      // L'émetteur approuve, il faut également approuver pour
+      // l'éco-organisme
+      otherApproval = await prisma.bsdaRevisionRequestApproval.findFirst({
+        where: {
+          revisionRequestId: approval.revisionRequestId,
+          approverSiret: bsda.ecoOrganismeSiret
+        }
+      });
+    }
+
+    if (approval.approverSiret === bsda.ecoOrganismeSiret) {
+      // L'éco-organisme approuve, il faut également approuver pour
+      // l'émetteur
+      otherApproval = await prisma.bsdaRevisionRequestApproval.findFirst({
+        where: {
+          revisionRequestId: approval.revisionRequestId,
+          approverSiret: bsda.emitterCompanySiret
+        }
+      });
+    }
+
+    if (otherApproval) {
+      await prisma.bsdaRevisionRequestApproval.update({
+        where: {
+          id: otherApproval.id
+        },
+        data: {
+          status: RevisionRequestApprovalStatus.ACCEPTED,
+          comment: "Auto approval"
+        }
+      });
+
+      await prisma.event.create({
+        data: {
+          streamId: otherApproval.revisionRequestId,
+          actor: "system",
+          type: "BsdaRevisionRequestAccepted",
+          data: {
+            content: {
+              status: RevisionRequestApprovalStatus.ACCEPTED,
+              comment: "Auto"
+            }
+          }
+        }
+      });
+    }
+  }
+}
+
 export function buildAcceptRevisionRequestApproval(
   deps: RepositoryFnDeps
 ): AcceptRevisionRequestApprovalFn {
@@ -35,7 +106,8 @@ export function buildAcceptRevisionRequestApproval(
       data: {
         status: RevisionRequestApprovalStatus.ACCEPTED,
         comment
-      }
+      },
+      include: { revisionRequest: true }
     });
 
     await prisma.event.create({
@@ -50,6 +122,8 @@ export function buildAcceptRevisionRequestApproval(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    await handleEcoOrganismeApprovals(prisma, updatedApproval);
 
     // If it was the last approval:
     // - mark the revision as approved
@@ -71,6 +145,7 @@ export function buildAcceptRevisionRequestApproval(
 }
 
 async function getUpdateFromRevisionRequest(
+  bsdaBeforeRevision: Bsda,
   revisionRequest: BsdaRevisionRequest,
   prisma: PrismaTransaction
 ) {
@@ -84,13 +159,24 @@ async function getUpdateFromRevisionRequest(
     revisionRequest.isCanceled
   );
 
+  const hasTTR = Boolean(
+    bsdaBeforeRevision.destinationOperationNextDestinationCompanySiret
+  );
+
   const result = removeEmpty({
     wasteCode: revisionRequest.wasteCode,
     wastePop: revisionRequest.wastePop,
     packagings: revisionRequest.packagings,
     wasteSealNumbers: revisionRequest.wasteSealNumbers,
     wasteMaterialName: revisionRequest.wasteMaterialName,
-    destinationCap: revisionRequest.destinationCap,
+    // Attention, quand on a ajoute un TTR à un bsda il se retrouve dans destinationXXX,
+    // et l'exutoire est bougé dans destinationOperationNextDestinationXXX
+    // Les révisions n'autorisent que la modification du CAP de l'exutoire, qui est
+    // systématiquement dans le champ destinationCAP
+    destinationCap: hasTTR ? null : revisionRequest.destinationCap,
+    destinationOperationNextDestinationCap: hasTTR
+      ? revisionRequest.destinationCap
+      : null,
     destinationReceptionWeight: revisionRequest.destinationReceptionWeight,
     destinationOperationCode: revisionRequest.destinationOperationCode,
     destinationOperationDescription:
@@ -181,6 +267,7 @@ export async function approveAndApplyRevisionRequest(
     where: { id: updatedRevisionRequest.bsdaId }
   });
   const updateData = await getUpdateFromRevisionRequest(
+    bsdaBeforeRevision,
     updatedRevisionRequest,
     prisma
   );

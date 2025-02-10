@@ -157,7 +157,7 @@ describe("toIncomingWaste", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.siret,
-            transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+            transporterTransportPlates: ["TR-01-AA"],
             number: 1
           }
         }
@@ -247,7 +247,7 @@ describe("toOutgoingWaste", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.siret,
-            transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+            transporterTransportPlates: ["TR-01-AA"],
             number: 1
           }
         }
@@ -335,7 +335,7 @@ describe("toTransportedWaste", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.siret,
-            transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+            transporterTransportPlates: ["TR-01-AA"],
             number: 1
           }
         }
@@ -353,9 +353,7 @@ describe("toTransportedWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       paohForRegistry.transporters[0].transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();
@@ -383,7 +381,7 @@ describe("toManagedWaste", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.siret,
-            transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+            transporterTransportPlates: ["TR-01-AA"],
             number: 1
           }
         }
@@ -453,7 +451,7 @@ describe("toAllWaste", () => {
         transporters: {
           create: {
             transporterCompanySiret: transporter.siret,
-            transporterTransportPlates: ["TRANSPORTER1-NBR-PLATES"],
+            transporterTransportPlates: ["TR-01-AA"],
             number: 1
           }
         }
@@ -471,9 +469,7 @@ describe("toAllWaste", () => {
     expect(waste.transporterCompanySiret).toBe(
       paohForRegistry.transporters[0].transporterCompanySiret
     );
-    expect(waste.transporterNumberPlates).toStrictEqual([
-      "TRANSPORTER1-NBR-PLATES"
-    ]);
+    expect(waste.transporterNumberPlates).toStrictEqual(["TR-01-AA"]);
 
     expect(waste.transporter2CompanySiret).toBeNull();
     expect(waste.transporter2NumberPlates).toBeNull();

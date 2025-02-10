@@ -23,6 +23,7 @@ describe("TransporterAccordion", () => {
       onTransporterShiftUp={onTransporterShiftUp}
       onTransporterShiftDown={onTransporterShiftDown}
       onExpanded={onExpanded}
+      deleteLabel="Supprimer"
     >
       {foldableContent}
     </TransporterAccordion>

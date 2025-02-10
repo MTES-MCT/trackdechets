@@ -157,8 +157,8 @@ const SurveyBanner = ({
           <div className="survey-banner__subgroup">
             <div className="survey-banner__icon">{iconSurvey}</div>
             <div className="survey-banner__message">
-              {messages.map(message => (
-                <p>{message}</p>
+              {messages.map((message, idx) => (
+                <p key={idx}>{message}</p>
               ))}
             </div>
           </div>

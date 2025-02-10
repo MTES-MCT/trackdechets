@@ -1,9 +1,12 @@
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import {
+import type {
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
-} from "../../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../../__tests__/factories";
+} from "@td/codegen-back";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
 import {
@@ -11,6 +14,7 @@ import {
   NON_CANCELLABLE_BSDA_STATUSES
 } from "../createRevisionRequest";
 import { BsdaStatus } from "@prisma/client";
+import { prisma } from "@td/prisma";
 
 const CREATE_BSDA_REVISION_REQUEST = `
   mutation CreateBsdaRevisionRequest($input: CreateBsdaRevisionRequestInput!) {
@@ -21,6 +25,7 @@ const CREATE_BSDA_REVISION_REQUEST = `
       }
       content {
         waste { code }
+        destination { cap }
       }
       authoringCompany {
         siret
@@ -94,7 +99,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     );
   });
 
-  it("should fail if current user is neither emitter or recipient of the bsda", async () => {
+  it("should fail if current user is neither emitter, recipient, worker or ecoorg of the bsda", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
@@ -154,6 +159,89 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(data.createBsdaRevisionRequest.authoringCompany.siret).toBe(
       company.siret
     );
+  });
+
+  it("should be possible for eco-organisme to create a revision request", async () => {
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+
+    const { user, company: ecoOrganisme } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: ecoOrganisme.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    expect(data.createBsdaRevisionRequest.authoringCompany.siret).toBe(
+      ecoOrganisme.siret
+    );
+  });
+
+  it("should include eco-organisme in approvers", async () => {
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const { company: ecoOrganisme } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: emitterCompany.siret!
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    const approverSirets = data.createBsdaRevisionRequest.approvals.map(
+      a => a.approverSiret
+    );
+    expect(approverSirets).toContain(ecoOrganisme.siret);
   });
 
   it("should create a revisionRequest and an approval targetting the company not requesting the revisionRequest", async () => {
@@ -266,6 +354,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(data.createBsdaRevisionRequest.content).toEqual({
+      destination: null,
       waste: { code: "16 01 11*" }
     });
   });
@@ -711,5 +800,247 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(errors[0].message).toBe(
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
     );
+  });
+
+  it("should fail when adding a broker whith wrong profile", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const broker = await companyFactory({
+      companyTypes: [
+        // missing BROKER profile
+      ]
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining(
+          "Cet établissement n'a pas le profil Courtier."
+        )
+      })
+    ]);
+  });
+
+  it("should auto-complete broker recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const recepisse = {
+      receiptNumber: "recepisse-courtier",
+      department: "13",
+      validityLimit: new Date()
+    };
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: { create: recepisse }
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+
+    expect(revisionRequest.brokerRecepisseNumber).toEqual(
+      recepisse.receiptNumber
+    );
+    expect(revisionRequest.brokerRecepisseDepartment).toEqual(
+      recepisse.department
+    );
+    expect(revisionRequest.brokerRecepisseValidityLimit).toEqual(
+      recepisse.validityLimit
+    );
+  });
+
+  it("should throw error if broker has no recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"]
+      // le récépissé n'est pas complété sur le profil
+    });
+    const bsda = await bsdaFactory({
+      opt: { emitterCompanySiret: company.siret, status: "SENT" }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            broker: {
+              company: {
+                siret: broker.siret,
+                name: broker.name,
+                address: broker.address,
+                contact: "Courtier",
+                phone: "00 00 00 00 00",
+                mail: "broker@trackdechets.fr"
+              },
+              // même si l'utilisateur API tente de renseigner
+              // les champs, ils ne doivent pas être pris en compte.
+              recepisse: {
+                number: "rec-courtier",
+                department: "07",
+                validityLimit: new Date().toISOString() as any as Date
+              }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le courtier n'a pas renseigné de récépissé sur son profil Trackdéchets"
+      })
+    ]);
+  });
+
+  it("creating revision on CAP without TTR > should target exutoire's CAP", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const exutoire = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        // Exutoire
+        destinationCompanySiret: exutoire.siret,
+        destinationCap: "EXUTOIRE-CAP"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { destination: { cap: "NEW-EXUTOIRE-CAP" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(
+      "NEW-EXUTOIRE-CAP"
+    );
+
+    const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+    expect(revision.initialDestinationCap).toBe("EXUTOIRE-CAP");
+  });
+
+  it("creating revision on CAP with TTR > should target exutoire's CAP", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const exutoire = await companyFactory();
+    const ttr = await companyFactory();
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT",
+        // TTR
+        destinationCompanySiret: ttr.siret,
+        destinationCap: "TTR-CAP",
+        // Exutoire
+        destinationOperationNextDestinationCompanySiret: exutoire.siret,
+        destinationOperationNextDestinationCap: "EXUTOIRE-CAP"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { destination: { cap: "NEW-EXUTOIRE-CAP" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsdaRevisionRequest?.content?.destination?.cap).toBe(
+      "NEW-EXUTOIRE-CAP"
+    );
+
+    const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+      where: { id: data.createBsdaRevisionRequest.id }
+    });
+    expect(revision.initialDestinationCap).toBe("EXUTOIRE-CAP");
   });
 });

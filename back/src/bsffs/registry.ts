@@ -1,13 +1,13 @@
 import { BsffType, OperationMode } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic } from "../common/elastic";
-import {
+import type {
   AllWaste,
   IncomingWaste,
   ManagedWaste,
   OutgoingWaste,
   TransportedWaste
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   GenericWaste,
   RegistryFields,
@@ -313,9 +313,22 @@ export function toGenericWaste(bsff: RegistryBsff): GenericWaste {
     country: emitterCompanyCountry
   } = splitAddress(bsff.emitterCompanyAddress);
 
+  let wasteCode = bsff.wasteCode;
+  let wasteDescription = bsff.wasteDescription;
+
+  if (
+    bsff.packagings.length === 1 &&
+    bsff.packagings[0].acceptationSignatureDate
+  ) {
+    const packaging = bsff.packagings[0];
+    wasteCode = packaging.acceptationWasteCode ?? wasteCode;
+    wasteDescription =
+      packaging.acceptationWasteDescription ?? wasteDescription;
+  }
+
   return {
-    wasteDescription: bsff.wasteDescription,
-    wasteCode: bsff.wasteCode,
+    wasteDescription,
+    wasteCode,
     wasteIsDangerous: true,
     pop: false,
     id: bsff.id,

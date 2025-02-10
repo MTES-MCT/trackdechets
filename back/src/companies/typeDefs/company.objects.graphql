@@ -154,6 +154,11 @@ type CompanyPrivate {
   Liste des transferts administratifs reçus par l'établissement
   """
   receivedAdministrativeTransfers: [AdministrativeTransfer!]
+
+  """
+  Liste des entreprises ayant délégué la déclaration de leurs registres
+  """
+  delegators: [CompanyPublic!]
 }
 
 type CompanyPrivateEdge {
@@ -498,7 +503,7 @@ type EcoOrganisme {
 
   "Adresse de l'éco-organisme"
   address: String!
-
+  handleBsdd: Boolean
   handleBsdasri: Boolean
   handleBsda: Boolean
   handleBsvhu: Boolean

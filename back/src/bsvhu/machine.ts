@@ -1,6 +1,6 @@
 import { Bsvhu, BsvhuStatus } from "@prisma/client";
 import { Machine } from "xstate";
-import { SignatureTypeInput } from "../generated/graphql/types";
+import type { SignatureTypeInput } from "@td/codegen-back";
 
 type Event = {
   type: SignatureTypeInput;
@@ -35,11 +35,29 @@ export const machine = Machine<never, Event>(
       },
       [BsvhuStatus.SENT]: {
         on: {
+          RECEPTION: [
+            {
+              target: BsvhuStatus.REFUSED,
+              cond: "isBsvhuRefused"
+            },
+            {
+              target: BsvhuStatus.RECEIVED
+            }
+          ],
           OPERATION: [
             {
               target: BsvhuStatus.REFUSED,
               cond: "isBsvhuRefused"
             },
+            {
+              target: BsvhuStatus.PROCESSED
+            }
+          ]
+        }
+      },
+      [BsvhuStatus.RECEIVED]: {
+        on: {
+          OPERATION: [
             {
               target: BsvhuStatus.PROCESSED
             }

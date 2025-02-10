@@ -29,37 +29,3 @@ input BsdTypeFilter {
   _in: [BsdType!]
   _eq: BsdType
 }
-
-input SsdLineInput {
-  reason: RegistryLineReason
-  publicId: ID!
-  reportForSiret: String!
-  reportForName: String!
-  reportForAddress: String!
-  reportForCity: String!
-  reportForPostalCode: String!
-  reportAsSiret: String
-  weightValue: Float!
-  weightIsEstimate: Boolean!
-  volume: Float
-  wasteCode: String!
-  wasteCodeBale: String
-  wasteDescription: String!
-  secondaryWasteCodes: [String!]
-  secondaryWasteDescriptions: [String!]
-  dispatchDate: DateTime
-  useDate: DateTime
-  processingDate: DateTime!
-  processingEndDate: DateTime
-  operationCode: String!
-  operationMode: OperationMode!
-  product: String!
-  administrativeActReference: String!
-  destinationType: String!
-  destinationOrgId: String
-  destinationName: String
-  destinationAddress: String
-  destinationCity: String
-  destinationPostalCode: String
-  destinationCountryCode: String
-}

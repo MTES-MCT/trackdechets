@@ -18,7 +18,7 @@ import {
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { Mutation } from "../../../../generated/graphql/types";
+import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 
@@ -111,6 +111,76 @@ describe("Mutation.signBsdasri transport", () => {
     );
     expect(readyTotakeOverDasri.transporterTransportSignatureDate).toBeTruthy();
     expect(readyTotakeOverDasri.transportSignatoryId).toEqual(transporter.id);
+  });
+
+  it("should forbid transport signature on a SIGNED_BY_PRODUCER dasri if plates are invalid", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        emitterEmissionSignatureDate: new Date(),
+        transporterRecepisseIsExempted: true,
+        emitterEmissionSignatureAuthor: "Producteur",
+        transporterTransportPlates: ["XY"], // too short
+        status: BsdasriStatus.SIGNED_BY_PRODUCER
+      }
+    });
+    const { mutate } = makeClient(transporter); // transporter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "TRANSPORT", author: "Jimmy" }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
+  it("should put transport signature on a SIGNED_BY_PRODUCER dasri wihth invalid plates", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        emitterEmissionSignatureDate: new Date(),
+        transporterRecepisseIsExempted: true,
+        emitterEmissionSignatureAuthor: "Producteur",
+        transporterTransportPlates: ["XY"], // too short
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        createdAt: new Date("2025-01-04T00:00:00.000Z") // created before V2025020
+      }
+    });
+    const { mutate } = makeClient(transporter); // transporter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "TRANSPORT", author: "Jimmy" }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it("should not allow the transport signature when recepisse is absent", async () => {

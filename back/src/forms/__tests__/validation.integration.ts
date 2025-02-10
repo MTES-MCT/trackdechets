@@ -13,9 +13,10 @@ import {
   receivedInfoSchema,
   processedInfoSchema,
   transporterSchemaFn,
-  beforeTransportSchemaFn
+  beforeTransportSchemaFn,
+  recipientSchemaFn
 } from "../validation";
-import { ReceivedFormInput } from "../../generated/graphql/types";
+import type { ReceivedFormInput } from "@td/codegen-back";
 import {
   companyFactory,
   ecoOrganismeFactory,
@@ -734,14 +735,18 @@ describe("beforeTransportSchema", () => {
     transporters: Partial<BsddTransporter>[];
   };
 
+  let transporterCompany;
+
   afterAll(resetDatabase);
   beforeAll(async () => {
     const emitterCompany = await companyFactory({
       companyTypes: ["PRODUCER"]
     });
-    const transporterCompany = await companyFactory({
+
+    transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
+
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTEPROCESSOR"]
     });
@@ -920,6 +925,124 @@ describe("beforeTransportSchema", () => {
     );
   });
 
+  it("transporter plate is required if transporter mode is ROAD - too short", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "ab"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - too long", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "abcdefghijklm"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - 2 plates provided", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "AZ-12-TY, TY-LK-34"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    const isValid = await validateFn();
+
+    expect(isValid).toBeTruthy();
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - too many plates", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "AZ-12-TY, TY-LK-34, QS-23-TY"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Un maximum de 2 plaques d'immatriculation est accepté"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - only whitespace", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      createdAt: new Date("2025-01-10T00:00:00Z"),
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "      "
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro de plaque fourni est incorrect"
+    );
+  });
+
   it("transporter plate is not required if transport mode is not ROAD", async () => {
     const testForm: Partial<Form> & {
       transporters: Partial<BsddTransporter>[];
@@ -971,7 +1094,7 @@ describe("beforeTransportSchema", () => {
         {
           ...transporterData,
           transporterTransportMode: "ROAD",
-          transporterNumberPlate: "TRANSPORTER-PLATES"
+          transporterNumberPlate: "AZ-45-TR"
         }
       ]
     };
@@ -1654,7 +1777,10 @@ describe("draftFormSchema", () => {
   });
 
   it("should not be valid when passing eco-organisme as emitter", async () => {
-    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: siretify(),
+      handle: { handleBsdd: true }
+    });
 
     const partialForm: Partial<Form> = {
       emitterCompanySiret: ecoOrganisme.siret
@@ -2374,5 +2500,110 @@ describe("processedInfoSchema", () => {
         expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
       }
     );
+  });
+
+  describe("recipientSchemaFn", () => {
+    it.each([false, null, undefined])(
+      "recipientProcessingOperation must be defined if no temp storage and not draft (recipientIsTempStorage: %p)",
+      async recipientIsTempStorage => {
+        // Given
+        const recipientCompany = await companyFactory({
+          companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+          collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+        });
+        const recipient = {
+          recipientCompanySiret: recipientCompany.siret,
+          recipientCompanyName: recipientCompany.name,
+          recipientCompanyAddress: "Test",
+          recipientCompanyContact: "Test",
+          recipientCompanyPhone: "06 00 00 00 00",
+          recipientCompanyMail: recipientCompany.contactEmail,
+          recipientProcessingOperation: undefined, // < Operation not defined
+          recipientIsTempStorage
+        };
+
+        // Then
+        expect.assertions(1);
+        try {
+          await recipientSchemaFn({ isDraft: false }).validate(recipient);
+        } catch (err) {
+          expect(err.message).toBe(
+            "Opération d’élimination / valorisation est un champ requis et doit avoir une valeur"
+          );
+        }
+      }
+    );
+
+    it.each([false, null, undefined])(
+      "recipientProcessingOperation can be undefined if no temp storage and draft (recipientIsTempStorage: %p)",
+      async recipientIsTempStorage => {
+        // Given
+        const recipientCompany = await companyFactory({
+          companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+          collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+        });
+        const recipient = {
+          recipientCompanySiret: recipientCompany.siret,
+          recipientCompanyName: recipientCompany.name,
+          recipientCompanyAddress: "Test",
+          recipientCompanyContact: "Test",
+          recipientCompanyPhone: "06 00 00 00 00",
+          recipientCompanyMail: recipientCompany.contactEmail,
+          recipientProcessingOperation: undefined, // < Operation not defined
+          recipientIsTempStorage
+        };
+
+        // Then
+        expect(
+          await recipientSchemaFn({ isDraft: true }).isValid(recipient)
+        ).toBeTruthy();
+      }
+    );
+
+    it("recipientProcessingOperation can be undefined if temp storage and not draft", async () => {
+      // Given
+      const recipientCompany = await companyFactory({
+        companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+        collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+      });
+      const recipient = {
+        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanyName: recipientCompany.name,
+        recipientCompanyAddress: "Test",
+        recipientCompanyContact: "Test",
+        recipientCompanyPhone: "06 00 00 00 00",
+        recipientCompanyMail: recipientCompany.contactEmail,
+        recipientProcessingOperation: undefined, // < Operation not defined
+        recipientIsTempStorage: true
+      };
+
+      // Then
+      expect(
+        await recipientSchemaFn({ isDraft: false }).isValid(recipient)
+      ).toBeTruthy();
+    });
+
+    it("no error if recipientProcessingOperation is defined and no temp storage and not draft", async () => {
+      // Given
+      const recipientCompany = await companyFactory({
+        companyTypes: ["WASTEPROCESSOR", "COLLECTOR", "WASTEPROCESSOR"],
+        collectorTypes: ["DANGEROUS_WASTES", "NON_DANGEROUS_WASTES"]
+      });
+      const recipient = {
+        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanyName: recipientCompany.name,
+        recipientCompanyAddress: "Test",
+        recipientCompanyContact: "Test",
+        recipientCompanyPhone: "06 00 00 00 00",
+        recipientCompanyMail: recipientCompany.contactEmail,
+        recipientProcessingOperation: "R 1", // < Defined
+        recipientIsTempStorage: false
+      };
+
+      // Then
+      expect(
+        await recipientSchemaFn({ isDraft: false }).isValid(recipient)
+      ).toBeTruthy();
+    });
   });
 });

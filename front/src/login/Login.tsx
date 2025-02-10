@@ -76,7 +76,7 @@ export default function Login() {
     return <Navigate to={{ pathname: routes.login }} state={state} />;
   }
 
-  const { returnTo, errorCode, username } = location.state || {};
+  const { returnTo, errorCode, username = "" } = location.state || {};
 
   const showCaptcha = displayCaptcha(errorCode);
 
@@ -100,6 +100,17 @@ export default function Login() {
     </div>
   ) : null;
 
+  const disconnectedAlert =
+    queries["session"] === "expired" ? (
+      <div className="fr-grid-row fr-mb-2w">
+        <Alert
+          title="Votre session a expiré"
+          description="Vous avez été déconnecté, veuillez vous connecter à nouveau."
+          severity="warning"
+        />
+      </div>
+    ) : null;
+
   return (
     <div className={styles.onboardingWrapper}>
       <form
@@ -110,6 +121,7 @@ export default function Login() {
       >
         <div className={`fr-container fr-pt-10w ${styles.centralContainer}`}>
           {createdAlert}
+          {disconnectedAlert}
           {alert}
           <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
             <div className="fr-col fr-m-auto">

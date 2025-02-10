@@ -169,7 +169,6 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
         }
       });
     }
-
     let needsReindex = true;
     // APPENDIX1_PRODUCER forms are not indexed if they don't belong to a container
     if (updatedForm.emitterType === "APPENDIX1_PRODUCER") {

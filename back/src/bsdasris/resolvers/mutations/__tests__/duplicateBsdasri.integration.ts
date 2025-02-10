@@ -6,10 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { BsdasriType } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
@@ -26,6 +23,7 @@ mutation DuplicateDasri($id: ID!){
     id
     status
     isDraft
+    isDuplicateOf
   }
 }
 `;
@@ -147,6 +145,7 @@ describe("Mutation.duplicateBsdasri", () => {
 
     expect(data.duplicateBsdasri.status).toBe("INITIAL");
     expect(data.duplicateBsdasri.isDraft).toBe(true);
+    expect(data.duplicateBsdasri.isDuplicateOf).toBe(dasri.id);
   });
 
   test("duplicated BSDASRI should have the updated data when company info changes", async () => {
@@ -487,5 +486,35 @@ describe("Mutation.duplicateBsdasri", () => {
 
     expect(duplicatedDasri.destinationOperationCode).toBeNull();
     expect(duplicatedDasri.destinationOperationMode).toBeNull();
+  });
+
+  it("should *not* duplicate transporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        transporterTransportPlates: ["AZ-12-RT"]
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+    expect(data.duplicateBsdasri.status).toBe("INITIAL");
+    expect(data.duplicateBsdasri.isDraft).toBe(true);
+
+    const duplicatedDasri = await prisma.bsdasri.findFirstOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+
+    expect(duplicatedDasri.transporterTransportPlates).toStrictEqual([]);
   });
 });

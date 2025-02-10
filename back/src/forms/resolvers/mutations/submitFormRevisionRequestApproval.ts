@@ -6,14 +6,14 @@ import {
   User
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { MutationSubmitFormRevisionRequestApprovalArgs } from "../../../generated/graphql/types";
+import type { MutationSubmitFormRevisionRequestApprovalArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormRepository } from "../../repository";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 
 const formRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsddRevisionRequestArgs>()({
+  Prisma.validator<Prisma.BsddRevisionRequestDefaultArgs>()({
     include: { approvals: true }
   });
 type BsddRevisionRequestWithApprovals = Prisma.BsddRevisionRequestGetPayload<

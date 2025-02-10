@@ -23,7 +23,7 @@ import { useForm, FormProvider } from "react-hook-form";
 import { datetimeToYYYYMMDDHHSS } from "../paohUtils";
 import { SignatureTimestamp } from "./components/Signature";
 
-import { RhfTagsInputWrapper } from "../../../../../Apps/Forms/Components/TagsInput/TagsInputWrapper";
+import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
 
 // instanciate schema in component to have an up-to-date max datetime validaton
 const getSchema = () =>

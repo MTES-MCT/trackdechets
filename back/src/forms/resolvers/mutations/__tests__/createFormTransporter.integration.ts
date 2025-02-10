@@ -1,10 +1,10 @@
 import { gql } from "graphql-tag";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
+import type {
   Mutation,
   MutationCreateFormTransporterArgs
-} from "../../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth";
@@ -70,6 +70,47 @@ describe("Mutation.createFormTransporter", () => {
         message:
           "Transporteur: 123 n'est pas un numéro de SIRET valide\n" +
           "Transporteur : l'établissement avec le SIRET 123 n'est pas inscrit sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should throw error if plates are invalid", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormTransporter">,
+      MutationCreateFormTransporterArgs
+    >(CREATE_FORM_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          mode: "ROAD",
+          receipt: "receipt", // should be ignored
+          department: "07", // should be ignored
+          numberPlate: "AB",
+          validityLimit: new Date().toISOString() as any // should be ignored
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
       })
     ]);
   });

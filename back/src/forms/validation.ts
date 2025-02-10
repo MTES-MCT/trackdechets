@@ -45,13 +45,13 @@ import {
 } from "../common/validation";
 
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import {
+import type {
   CiterneNotWashedOutReason,
   CompanyInput,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   EXTRANEOUS_NEXT_DESTINATION,
@@ -69,7 +69,6 @@ import {
   MISSING_PROCESSING_OPERATION
 } from "./errors";
 import { format, sub } from "date-fns";
-import { getFirstTransporterSync } from "./database";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
 import { getOperationModesFromOperationCode } from "../common/operationModes";
@@ -77,6 +76,12 @@ import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { isDefined, isDefinedStrict } from "../common/helpers";
+import { onlyWhiteSpace } from "../common/validation/zod/refinement";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../common/validation/messages";
 
 // Date de la MAJ 2025.03.1 rendant la quantité refusée obligatoire
 // pour tous les BSDD
@@ -580,7 +585,7 @@ export const ecoOrganismeSchema = yup.object().shape({
         ecoOrganismeSiret
           ? prisma.ecoOrganisme
               .findFirst({
-                where: { siret: ecoOrganismeSiret }
+                where: { siret: ecoOrganismeSiret, handleBsdd: true }
               })
               .then(el => el != null)
           : true
@@ -589,9 +594,10 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
-  isDraft
-}) =>
+export const recipientSchemaFn: FactorySchemaOf<
+  FormValidationContext,
+  Recipient
+> = ({ isDraft }) =>
   yup.object({
     recipientCap: yup
       .string()
@@ -617,7 +623,10 @@ const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft)
+      .when("recipientIsTempStorage", {
+        is: recipientIsTempStorage => !recipientIsTempStorage,
+        then: s => s.requiredIf(!isDraft)
+      })
       .when("emitterType", (value, schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2
@@ -1026,7 +1035,9 @@ const requiredWhenTransporterSign: (
   }
 });
 
+//
 // 8 - Collecteur-transporteur
+
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
@@ -1053,6 +1064,33 @@ export const transporterSchemaFn: FactorySchemaOf<
         ) {
           return new yup.ValidationError(
             "La plaque d'immatriculation est requise"
+          );
+        }
+
+        if (!transporterNumberPlate) {
+          return true;
+        }
+
+        // convert plate  string to an array
+        const plates = formatInitialPlates(transporterNumberPlate);
+
+        if (plates.length > 2) {
+          return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_TOO_MANY);
+        }
+
+        if (
+          plates.some(
+            plate => (plate ?? "").length > 12 || (plate ?? "").length < 4
+          )
+        ) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+          );
+        }
+
+        if (plates.some(plate => onlyWhiteSpace(plate ?? ""))) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
           );
         }
 
@@ -1214,7 +1252,9 @@ export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
   isDraft
 }) =>
   yup.object({
-    traderCompanySiret: siret.label("Négociant"),
+    traderCompanySiret: siret
+      .label("Négociant")
+      .test(siretTests.isRegistered("TRADER")),
     traderCompanyName: yup.string().when("traderCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -1286,7 +1326,9 @@ export const brokerSchemaFn: FactorySchemaOf<FormValidationContext, Broker> = ({
   isDraft
 }) =>
   yup.object({
-    brokerCompanySiret: siret.label("Courtier"),
+    brokerCompanySiret: siret
+      .label("Courtier")
+      .test(siretTests.isRegistered("BROKER")),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -2042,33 +2084,33 @@ export async function checkCanBeSealed(form: PrismaForm) {
  * is consistent with the role they play on the form
  * (producer, trader, destination, etc)
  */
-export async function validateForwardedInCompanies(
-  form: PrismaForm
-): Promise<void> {
-  const forwardedIn = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .forwardedIn({ include: { transporters: true } });
-
-  const transporter = forwardedIn ? getFirstTransporterSync(forwardedIn) : null;
-
-  if (forwardedIn?.recipientCompanySiret) {
+export async function validateForwardedInCompanies({
+  destinationCompanySiret,
+  transporterCompanySiret,
+  transporterCompanyVatNumber
+}: {
+  destinationCompanySiret: string | null | undefined;
+  transporterCompanySiret: string | null | undefined;
+  transporterCompanyVatNumber: string | null | undefined;
+}): Promise<void> {
+  if (destinationCompanySiret) {
     await siret
       .label("Destination finale")
       .test(siretTests.isRegistered("DESTINATION"))
       .test(siretTests.isNotDormant)
-      .validate(forwardedIn.recipientCompanySiret);
+      .validate(destinationCompanySiret);
   }
-  if (transporter?.transporterCompanySiret) {
+  if (transporterCompanySiret) {
     await siret
       .label("Transporteur après entreposage provisoire")
       .test(siretTests.isRegistered("TRANSPORTER"))
-      .validate(transporter.transporterCompanySiret);
+      .validate(transporterCompanySiret);
   }
-  if (transporter?.transporterCompanyVatNumber) {
+  if (transporterCompanyVatNumber) {
     await foreignVatNumber
       .label("Transporteur après entreposage provisoire")
       .test(vatNumberTests.isRegisteredTransporter)
-      .validate(transporter.transporterCompanyVatNumber);
+      .validate(transporterCompanyVatNumber);
   }
 }
 
@@ -2409,3 +2451,25 @@ export async function validateIntermediaries(
     await intermediarySchema.validate(companyInput, { abortEarly: false });
   }
 }
+
+const formatInitialPlates = (
+  transporterNumberPlate: string | null | undefined
+): string[] => {
+  if (!transporterNumberPlate) {
+    return [];
+  }
+  const regex = /,+|,\s+/;
+  const containsComma = regex.test(transporterNumberPlate);
+  if (containsComma) {
+    return transporterNumberPlate?.split(regex);
+  } else {
+    if (transporterNumberPlate) {
+      return [transporterNumberPlate];
+    }
+    return [];
+  }
+};
+
+export const transporterPlatesSchema = transporterSchemaFn({}).pick([
+  "transporterNumberPlate"
+]);

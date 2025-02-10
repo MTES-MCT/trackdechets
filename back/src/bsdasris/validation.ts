@@ -14,10 +14,10 @@ import {
 } from "@td/constants";
 import configureYup from "../common/yup/configureYup";
 import { prisma } from "@td/prisma";
-import {
+import type {
   BsdasriPackagingType,
   BsdasriSignatureType
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -33,8 +33,15 @@ import {
   WeightUnits,
   transporterRecepisseSchema
 } from "../common/validation";
+import { onlyWhiteSpace } from "../common/validation/zod/refinement";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../common/validation/messages";
 import { destinationOperationModeValidation } from "../common/validation/operationMode";
 import { isDefined } from "../common/helpers";
+import { v20250201 } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -310,18 +317,41 @@ export const transporterSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
       .test((transporterTransportPlates, ctx) => {
-        const { transporterTransportMode } = ctx.parent;
+        const { transporterTransportMode, createdAt = new Date() } = ctx.parent;
+        const createdAfterV20250201 = createdAt.getTime() > v20250201.getTime();
 
+        if (context.transportSignature) {
+          if (
+            transporterTransportMode === "ROAD" &&
+            (!transporterTransportPlates ||
+              !transporterTransportPlates?.filter(p => Boolean(p)).length)
+          ) {
+            return new yup.ValidationError(
+              "La plaque d'immatriculation est requise"
+            );
+          }
+        }
         if (
-          context.transportSignature &&
-          transporterTransportMode === "ROAD" &&
-          (!transporterTransportPlates ||
-            !transporterTransportPlates?.filter(p => Boolean(p)).length)
+          createdAfterV20250201 &&
+          transporterTransportPlates &&
+          transporterTransportPlates.some(
+            plate => (plate ?? "").length > 12 || (plate ?? "").length < 4
+          )
         ) {
           return new yup.ValidationError(
-            "La plaque d'immatriculation est requise"
+            ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
+          );
+        }
+
+        if (
+          createdAfterV20250201 &&
+          transporterTransportPlates &&
+          transporterTransportPlates.some(plate => onlyWhiteSpace(plate ?? ""))
+        ) {
+          return new yup.ValidationError(
+            ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
           );
         }
 
@@ -481,7 +511,7 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any,
+      .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY) as any,
     transporterTransportMode: yup
       .mixed<TransportMode>()
       .nullable()

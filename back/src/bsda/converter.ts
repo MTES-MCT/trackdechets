@@ -7,7 +7,7 @@ import {
   processDecimal
 } from "../common/converter";
 
-import {
+import type {
   FormCompany,
   Signature,
   Bsda as GraphqlBsda,
@@ -41,7 +41,7 @@ import {
   CompanyInput,
   Bsda,
   BsdaTransporterInput
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   Prisma,
   BsdaTransporter as PrismaBsdaTransporter,
@@ -62,6 +62,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
     isDraft: bsda.isDraft,
     status: bsda.status,
     type: bsda.type,
+    isDuplicateOf: bsda.isDuplicateOf,
     emitter: nullIfNoValues<BsdaEmitter>({
       isPrivateIndividual: bsda.emitterIsPrivateIndividual,
       company: nullIfNoValues<FormCompany>({

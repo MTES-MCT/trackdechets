@@ -30,7 +30,6 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-
     prisma.addAfterCommitCallback(() => enqueueUpdatedBsdToIndex(bsvhu.id));
 
     return bsvhu;

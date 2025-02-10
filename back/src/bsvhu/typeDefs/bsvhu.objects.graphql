@@ -43,6 +43,12 @@ type Bsvhu {
   "Status du bordereau"
   status: BsvhuStatus!
 
+  """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
+
   "Émetteur du bordereau"
   emitter: BsvhuEmitter
 
@@ -86,7 +92,7 @@ type BsvhuEmitter {
   irregularSituation: Boolean!
   "Indique si l'émetteur est un particulier ou une entreprise sans SIRET"
   noSiret: Boolean!
-  "Coordonnées de l'entreprise émétrice"
+  "Coordonnées de l'entreprise émettrice"
   company: FormCompany
   "Déclaration générale de l'émetteur du bordereau"
   emission: BsvhuEmission
@@ -107,11 +113,17 @@ type BsvhuTransporter {
   company: FormCompany
   "Récépissé transporteur"
   recepisse: BsvhuRecepisse
+  "Champ libre"
+  customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransport
 }
 
 type BsvhuTransport {
+  "Mode de transport"
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime
   signature: Signature
@@ -171,6 +183,8 @@ type BsvhuReception {
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
   identification: BsvhuIdentification
+  "Données relatives à la signature de la réception (optionelle)"
+  signature: Signature
 }
 
 type BsvhuOperation {

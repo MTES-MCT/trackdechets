@@ -30,10 +30,16 @@ jobs:
         run: docker compose up -d
       - name: Init DB & ES index
         run: |
-          npx nx run back:codegen
+          npx nx run @td/codegen-back:build
           npx nx run @td/prisma:generate
           npx nx run @td/codegen-ui:build
           TERM=xterm bash ./scripts/deploy-db.sh
+      - name: Create MinIO buckets
+        run: |
+          docker exec trackdechets-minio-1 mc alias set myminio http://localhost:9000 trackdechets password
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_ERRORS_BUCKET"
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_IMPORTS_BUCKET"
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_EXPORTS_BUCKET"
       - name: Start TD applications
         run: |
           npx nx run api:serve >> /tmp/td-api.log &
@@ -164,6 +170,8 @@ env:
   S3_SECRET_ACCESS_KEY: password
   S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
   S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
+  S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
+  S3_REGISTRY_MODELS_BUCKET: registry-models-integration
 
   S3_BSD_TEMPLATES_ACCESS_KEY_ID: unset
   S3_BSD_TEMPLATES_SECRET_ACCESS_KEY: unset

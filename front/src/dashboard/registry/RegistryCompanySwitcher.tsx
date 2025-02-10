@@ -49,6 +49,7 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
   const { data: myCompaniesData, refetch: refetchMyCompanies } = useQuery<
     Pick<Query, "myCompanies">
   >(MY_COMPANIES, {
+    fetchPolicy: "network-only",
     variables: { first: 10 },
     onCompleted: data => {
       if (!selectedItem) {
@@ -111,6 +112,7 @@ export function RegistryCompanySwitcher({ onCompanySelect }: Props) {
       className="tw-relative tw-w-1/2"
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
+      <span className="fr-label">Établissement concerné</span>
       <div
         className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
         onClick={() => setIsOpen(!isOpen)}

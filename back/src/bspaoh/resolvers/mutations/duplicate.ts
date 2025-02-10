@@ -1,10 +1,10 @@
 import { Bspaoh, BspaohStatus, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import {
+import type {
   MutationDuplicateBspaohArgs,
   MutationResolvers
-} from "../../../generated/graphql/types";
+} from "@td/codegen-back";
 import { expandBspaohFromDb } from "../../converter";
 import { getBspaohOrNotFound, getBspaohFirstTransporter } from "../../database";
 
@@ -123,6 +123,7 @@ async function duplicateBspaoh(
     id,
     createdAt,
     updatedAt,
+    isDuplicateOf,
 
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
@@ -160,6 +161,7 @@ async function duplicateBspaoh(
     bspaohId,
     createdAt: trsCreatedAt,
     updatedAt: trsUpdatedAt,
+    transporterTransportPlates,
 
     ...trsFieldsToCopy
   } = bspaohTransporter;
@@ -173,6 +175,7 @@ async function duplicateBspaoh(
     wastePackagings: cleanPackagings(wastePackagings),
     id: getReadableId(ReadableIdPrefix.PAOH),
     status: BspaohStatus.DRAFT,
+    isDuplicateOf: bspaoh.id,
 
     // Emitter company info
 

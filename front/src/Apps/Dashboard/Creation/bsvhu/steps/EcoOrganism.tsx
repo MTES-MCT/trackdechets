@@ -3,9 +3,21 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { useFormContext } from "react-hook-form";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { ZodBsvhu } from "../schema";
-import { ecoOrganismeList } from "../utils/initial-state";
-import { BsvhuEcoOrganismeInput } from "@td/codegen-ui";
+import { BsvhuEcoOrganismeInput, Query } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
+import { useQuery, gql } from "@apollo/client";
+
+const GET_ECO_ORGANISMES = gql`
+  {
+    ecoOrganismes(handleBsvhu: true) {
+      id
+      name
+      siret
+      address
+      handleBsvhu
+    }
+  }
+`;
 
 const EcoOrganism = () => {
   const [selectedEcoOrg, setSelectedEcoOrg] =
@@ -13,12 +25,13 @@ const EcoOrganism = () => {
   const { register, watch, setValue, formState, clearErrors } =
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
   const sealedFields = useContext(SealedFieldsContext);
+  const { data } = useQuery<Pick<Query, "ecoOrganismes">>(GET_ECO_ORGANISMES);
 
   const ecoOrganisme = watch("ecoOrganisme");
   const hasEcoOrganisme = ecoOrganisme.hasEcoOrganisme;
 
   const onChangeEcoOrganisme = e => {
-    const ecoOrgSelected = ecoOrganismeList.find(
+    const ecoOrgSelected = data?.ecoOrganismes.find(
       ecoOrg => ecoOrg.siret === e.currentTarget.value
     );
     if (ecoOrgSelected?.name) {
@@ -51,10 +64,10 @@ const EcoOrganism = () => {
 
   return (
     <>
-      <h4 className="fr-h4">Éco-organisme</h4>
+      <h4 className="fr-h4">Éco-organisme ou système individuel</h4>
 
       <ToggleSwitch
-        label="Présence d'un éco-organisme"
+        label="Présence d'un éco-organisme ou système individuel"
         checked={!!hasEcoOrganisme}
         showCheckedHint={false}
         onChange={onToggleEcoOrganisme}
@@ -64,7 +77,7 @@ const EcoOrganism = () => {
       {hasEcoOrganisme && (
         <>
           <Select
-            label="Nom de l'éco-organisme"
+            label="Nom de l'éco-organisme ou système individuel"
             nativeSelectProps={{
               ...register("ecoOrganisme.siret"),
               onChange: onChangeEcoOrganisme
@@ -74,9 +87,11 @@ const EcoOrganism = () => {
             disabled={sealedFields.includes(`ecoOrganisme.siret`)}
             className="fr-mt-2w"
           >
-            <option value="">Sélectionner un éco-organisme</option>
+            <option value="">
+              Sélectionner un éco-organisme ou système individuel
+            </option>
 
-            {ecoOrganismeList?.map(ecoOrg => {
+            {data?.ecoOrganismes?.map(ecoOrg => {
               return (
                 <option
                   key={ecoOrg.siret}

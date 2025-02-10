@@ -4,13 +4,15 @@ import {
   GraphqlPaginationArgs,
   validateGqlPaginationArgs
 } from "../common/pagination";
-import { OrderType, WasteRegistryType } from "../generated/graphql/types";
+import type { OrderType, WasteRegistryType } from "@td/codegen-back";
 
 function buildSort(
   registryType: WasteRegistryType,
   order: OrderType
 ): { [key in keyof BsdElastic]?: OrderType }[] {
-  const sortKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
+  const sortKey: {
+    [key in WasteRegistryType]: keyof BsdElastic;
+  } = {
     OUTGOING: "transporterTransportTakenOverAt",
     INCOMING: "destinationReceptionDate",
     TRANSPORTED: "transporterTransportTakenOverAt",
@@ -61,7 +63,9 @@ async function buildSearchAfter(
 export async function getElasticPaginationArgs({
   registryType,
   ...args
-}: GraphqlPaginationArgs & { registryType: WasteRegistryType }) {
+}: GraphqlPaginationArgs & {
+  registryType: WasteRegistryType;
+}) {
   validateGqlPaginationArgs({
     first: args.first,
     after: args.after,

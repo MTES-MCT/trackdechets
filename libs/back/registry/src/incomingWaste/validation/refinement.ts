@@ -2,33 +2,14 @@ import { Refinement, z } from "zod";
 import { ParsedZodIncomingWasteItem } from "./schema";
 import { getCachedCompany } from "../../shared/helpers";
 import { $Enums } from "@prisma/client";
-import { refineActorOrgId } from "../../shared/refinement";
-
-export const refineIsDangerous: Refinement<ParsedZodIncomingWasteItem> = (
-  incomingWasteItem,
-  { addIssue }
-) => {
-  // No check if the value is not set
-  if (incomingWasteItem.wasteIsDangerous == null) {
-    return;
-  }
-
-  if (
-    (incomingWasteItem.wastePop || incomingWasteItem.wasteCode.includes("*")) &&
-    !incomingWasteItem.wasteIsDangerous
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le déchet contient des POP ou a un code déchet avec étoile, il ne peut pas être indiqué comme non dangereux`,
-      path: ["wasteIsDangerous"]
-    });
-  }
-};
+import { refineActorInfos } from "../../shared/refinement";
 
 export const refineWeighingHour: Refinement<
   ParsedZodIncomingWasteItem
 > = async (incomingWasteItem, { addIssue }) => {
-  const company = await getCachedCompany(incomingWasteItem.reportForSiret);
+  const company = await getCachedCompany(
+    incomingWasteItem.reportForCompanySiret
+  );
 
   const isIncineration = company?.wasteProcessorTypes.some(
     type =>
@@ -56,119 +37,117 @@ export const refineWeighingHour: Refinement<
   }
 };
 
-export const refineWeightAndVolume: Refinement<ParsedZodIncomingWasteItem> = (
-  incomingWasteItem,
-  { addIssue }
-) => {
-  const isUsingRoad = [
-    incomingWasteItem.transporter1TransportMode,
-    incomingWasteItem.transporter2TransportMode,
-    incomingWasteItem.transporter3TransportMode,
-    incomingWasteItem.transporter4TransportMode,
-    incomingWasteItem.transporter5TransportMode
-  ].some(transportMode => transportMode === "ROUTE");
-
-  if (isUsingRoad && incomingWasteItem.weightValue > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
-      path: ["weightValue"]
-    });
-  }
-
-  if (
-    isUsingRoad &&
-    incomingWasteItem.volume &&
-    incomingWasteItem.volume > 40
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
-      path: ["volume"]
-    });
-  }
-
-  if (
-    incomingWasteItem.weightIsEstimate &&
-    ["R 1", "D 10", "D 5"].includes(incomingWasteItem.operationCode)
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Pour les codes opération R 1, D 10 et D 5, le poids ne peut pas être estimé`,
-      path: ["weightIsEstimate"]
-    });
-  }
-};
-
-export const refineMunicipalities: Refinement<ParsedZodIncomingWasteItem> = (
-  incomingWasteItem,
-  { addIssue }
-) => {
-  if (
-    incomingWasteItem.municipalitiesInseeCodes?.length !==
-    incomingWasteItem.municipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
-      path: ["municipalitiesNames"]
-    });
-  }
-};
-
-export const refineNotificationNumber: Refinement<
+export const initialEmitterRefinement: Refinement<
   ParsedZodIncomingWasteItem
-> = (incomingWasteItem, { addIssue }) => {
-  const isDangerous =
-    incomingWasteItem.wasteIsDangerous ||
-    incomingWasteItem.wastePop ||
-    incomingWasteItem.wasteCode.includes("*");
-
-  if (!incomingWasteItem.notificationNumber && isDangerous) {
-    addIssue({
+> = async (incomingWasteItem, ctx) => {
+  if (
+    !incomingWasteItem.emitterNoTraceability &&
+    !incomingWasteItem.initialEmitterCompanyType
+  ) {
+    ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le uméro de notification est obligatoire lorsque le déchet est dangereux`,
-      path: ["notificationNumber"]
+      message: `Le producteur initial doit être renseigné lorsqu'il n'y a pas rupture de traçabilité pour l'expéditeur ou détenteur`,
+      path: ["initialEmitterCompanyType"]
     });
   }
+
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "initialEmitterCompanyType",
+    orgIdKey: "initialEmitterCompanyOrgId",
+    nameKey: "initialEmitterCompanyName",
+    addressKey: "initialEmitterCompanyAddress",
+    postalCodeKey: "initialEmitterCompanyPostalCode",
+    cityKey: "initialEmitterCompanyCity",
+    countryKey: "initialEmitterCompanyCountryCode"
+  })(incomingWasteItem, ctx);
 };
 
-export const producerRefinement = refineActorOrgId<ParsedZodIncomingWasteItem>({
-  typeKey: "producerType",
-  orgIdKey: "producerOrgId"
-});
-
-export const senderRefinement = refineActorOrgId<ParsedZodIncomingWasteItem>({
-  typeKey: "senderType",
-  orgIdKey: "senderOrgId"
+export const emitterRefinement = refineActorInfos<ParsedZodIncomingWasteItem>({
+  typeKey: "emitterCompanyType",
+  orgIdKey: "emitterCompanyOrgId",
+  nameKey: "emitterCompanyName",
+  addressKey: "emitterCompanyAddress",
+  postalCodeKey: "emitterCompanyPostalCode",
+  cityKey: "emitterCompanyCity",
+  countryKey: "emitterCompanyCountryCode"
 });
 
 export const transporter1Refinement =
-  refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter1Type",
-    orgIdKey: "transporter1OrgId"
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "transporter1CompanyType",
+    orgIdKey: "transporter1CompanyOrgId",
+    nameKey: "transporter1CompanyName",
+    addressKey: "transporter1CompanyAddress",
+    postalCodeKey: "transporter1CompanyPostalCode",
+    cityKey: "transporter1CompanyCity",
+    countryKey: "transporter1CompanyCountryCode"
   });
 
 export const transporter2Refinement =
-  refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter2Type",
-    orgIdKey: "transporter2OrgId"
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "transporter2CompanyType",
+    orgIdKey: "transporter2CompanyOrgId",
+    nameKey: "transporter2CompanyName",
+    addressKey: "transporter2CompanyAddress",
+    postalCodeKey: "transporter2CompanyPostalCode",
+    cityKey: "transporter2CompanyCity",
+    countryKey: "transporter2CompanyCountryCode"
   });
 
 export const transporter3Refinement =
-  refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter3Type",
-    orgIdKey: "transporter3OrgId"
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "transporter3CompanyType",
+    orgIdKey: "transporter3CompanyOrgId",
+    nameKey: "transporter3CompanyName",
+    addressKey: "transporter3CompanyAddress",
+    postalCodeKey: "transporter3CompanyPostalCode",
+    cityKey: "transporter3CompanyCity",
+    countryKey: "transporter3CompanyCountryCode"
   });
 
 export const transporter4Refinement =
-  refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter4Type",
-    orgIdKey: "transporter4OrgId"
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "transporter4CompanyType",
+    orgIdKey: "transporter4CompanyOrgId",
+    nameKey: "transporter4CompanyName",
+    addressKey: "transporter4CompanyAddress",
+    postalCodeKey: "transporter4CompanyPostalCode",
+    cityKey: "transporter4CompanyCity",
+    countryKey: "transporter4CompanyCountryCode"
   });
 
 export const transporter5Refinement =
-  refineActorOrgId<ParsedZodIncomingWasteItem>({
-    typeKey: "transporter5Type",
-    orgIdKey: "transporter5OrgId"
+  refineActorInfos<ParsedZodIncomingWasteItem>({
+    typeKey: "transporter5CompanyType",
+    orgIdKey: "transporter5CompanyOrgId",
+    nameKey: "transporter5CompanyName",
+    addressKey: "transporter5CompanyAddress",
+    postalCodeKey: "transporter5CompanyPostalCode",
+    cityKey: "transporter5CompanyCity",
+    countryKey: "transporter5CompanyCountryCode"
   });
+
+export const refineReportForProfile: Refinement<
+  ParsedZodIncomingWasteItem
+> = async (incomingWasteItem, { addIssue }) => {
+  const company = await getCachedCompany(
+    incomingWasteItem.reportForCompanySiret
+  );
+  if (!company) {
+    return;
+  }
+
+  const allowedProfiles: $Enums.CompanyType[] = [
+    $Enums.CompanyType.WASTEPROCESSOR,
+    $Enums.CompanyType.WASTE_VEHICLES,
+    $Enums.CompanyType.COLLECTOR,
+    $Enums.CompanyType.WASTE_CENTER
+  ];
+  if (!company.companyTypes.some(type => allowedProfiles.includes(type))) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `L'établissement doit avoir le profil TTR et/ou Installation de traitement et/ou Installation de traitement VHU et/ou Déchetterie pour émettre une déclaration`,
+      path: ["reportForCompanySiret"]
+    });
+  }
+};

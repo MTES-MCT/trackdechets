@@ -1,10 +1,7 @@
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  CompanySearchResult,
-  Mutation
-} from "../../../../generated/graphql/types";
+import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -22,6 +19,7 @@ export const DUPLICATE_BSDA = gql`
   mutation DuplicateBsda($id: ID!) {
     duplicateBsda(id: $id) {
       id
+      isDuplicateOf
     }
   }
 `;
@@ -42,6 +40,7 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
     where: { id: transporter.company.transporterReceiptId! }
   });
   const broker = await userWithCompanyFactory("ADMIN", {
+    companyTypes: ["BROKER"],
     brokerReceipt: {
       create: {
         receiptNumber: "BROKER-RECEIPT-NUMBER",
@@ -154,6 +153,7 @@ describe("Mutation.Bsda.duplicate", () => {
 
     // Then
     expect(errors).toBeUndefined();
+    expect(data.duplicateBsda.isDuplicateOf).toEqual(bsda.id);
     const duplicatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: data.duplicateBsda.id },
       include: { transporters: true }
@@ -253,6 +253,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "isDraft",
       "isDeleted",
       "status",
+      "isDuplicateOf",
       "emitterEmissionSignatureAuthor",
       "emitterEmissionSignatureDate",
       "emitterCustomInfo",
@@ -301,6 +302,7 @@ describe("Mutation.Bsda.duplicate", () => {
 
     expect(duplicatedBsda).toMatchObject({
       type,
+      isDuplicateOf: bsda.id,
       emitterIsPrivateIndividual,
       emitterCompanyName,
       emitterCompanySiret,
@@ -443,7 +445,7 @@ describe("Mutation.Bsda.duplicate", () => {
     const { bsda, transporter, emitter, worker, broker } = await createBsda();
 
     // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
-    // soit sautée pour cause de champ vérouillé
+    // soit sautée pour cause de champ verrouillé
     await prisma.bsda.update({
       where: { id: bsda.id },
       data: {
@@ -711,7 +713,7 @@ describe("Mutation.Bsda.duplicate", () => {
       });
 
     // On s'assure que toutes les signatures sont nulles pour ne pas que l'auto-complétion
-    // soit sautée pour cause de champ vérouillé
+    // soit sautée pour cause de champ verrouillé
     await prisma.bsda.update({
       where: { id: bsda.id },
       data: {

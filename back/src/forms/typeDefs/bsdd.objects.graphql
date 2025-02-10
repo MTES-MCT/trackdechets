@@ -22,6 +22,12 @@ type Form {
   customId: String
 
   """
+  Identifiant lisible du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
+
+  """
   Permet de savoir si les données du BSD ont été importées depuis un
   bordereau signé papier via la mutation `importPaperForm`
   """

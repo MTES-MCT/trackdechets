@@ -80,6 +80,18 @@ export function BsffDetailContent({ form: bsff }: Props) {
 
   const isMultiModal = bsff?.transporters.length > 1;
 
+  let wasteCode = bsff.waste?.code;
+  let wasteDescription = bsff.waste?.description;
+  if (bsff.packagings.length === 1) {
+    // TRA-11553 - Lorsqu'on a un BSFF avec un seul contenant, on veut que les informations
+    // de l'acceptation de ce contenant s'affiche en lieu et place des informations
+    // qui ont été renseignés sur le BSFF.
+    wasteCode = bsff.packagings[0].acceptation?.wasteCode ?? bsff.waste?.code;
+    wasteDescription =
+      bsff.packagings[0].acceptation?.wasteDescription ??
+      bsff.waste?.description;
+  }
+
   return (
     <>
       <div>
@@ -120,10 +132,10 @@ export function BsffDetailContent({ form: bsff }: Props) {
                 />
               )}
               <DetailRow value={totalWeight} label="Poids total" units="kg" />
-              <dt>Déchet</dt>
-              <dd>
-                {bsff.waste?.code} {bsff.waste?.description}
-              </dd>
+              <DetailRow
+                value={`${wasteCode} ${wasteDescription}`}
+                label="Déchet"
+              />
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import {
+import type {
   Bsdasri as GqlBsdasri,
   BsdasriEmitter,
   BsdasriTransporter,
@@ -38,7 +38,7 @@ import {
   BsdasriRevisionRequestDestination,
   BsdasriRevisionRequestOperation,
   BsdasriRevisionRequestReception
-} from "../generated/graphql/types";
+} from "@td/codegen-back";
 import {
   nullIfNoValues,
   safeInput,
@@ -57,7 +57,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     id: bsdasri.id,
     isDraft: Boolean(bsdasri.isDraft),
     type: bsdasri.type,
-
+    isDuplicateOf: bsdasri.isDuplicateOf,
     waste: nullIfNoValues<BsdasriWaste>({
       code: bsdasri.wasteCode,
       adr: bsdasri.wasteAdr
