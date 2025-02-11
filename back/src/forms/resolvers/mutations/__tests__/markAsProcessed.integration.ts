@@ -2293,4 +2293,71 @@ describe("mutation.markAsProcessed", () => {
       })
     ]);
   });
+
+  it.each(["D 6", "D 7"])("should not allow operation code %p", async code => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: code,
+          destinationOperationMode: OperationMode.ELIMINATION,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Cette opération d’élimination / valorisation n'existe pas."
+    );
+  });
+
+  it("should allow operation code D 8", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 8",
+          destinationOperationMode: OperationMode.ELIMINATION,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
 });

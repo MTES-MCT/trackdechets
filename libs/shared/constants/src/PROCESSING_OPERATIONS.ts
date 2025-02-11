@@ -170,6 +170,10 @@ export const PROCESSING_OPERATIONS_CODES = PROCESSING_OPERATIONS.map(
   operation => operation.code
 );
 
+// TRA-15738: D 6 and D 7 are not allowed for BSDs
+export const BSDD_PROCESSING_OPERATIONS_CODES =
+  PROCESSING_OPERATIONS_CODES.filter(code => code !== "D 6" && code !== "D 7");
+
 type OperationCode = (typeof PROCESSING_OPERATIONS_CODES)[number];
 export type TdOperationCode = OperationCode | "R 0";
 export type TdOperationCodeEnum = Readonly<

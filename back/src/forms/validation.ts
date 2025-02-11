@@ -25,8 +25,9 @@ import {
   BSDD_WASTE_CODES,
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES,
+  BSDD_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import {
   foreignVatNumber,
@@ -607,14 +608,14 @@ export const recipientSchemaFn: FactorySchemaOf<
         const oneOf =
           value === EmitterType.APPENDIX2
             ? [
-                ...PROCESSING_AND_REUSE_OPERATIONS_CODES,
-                ...PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
+                ...BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES,
+                ...BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
                   c.replace(" ", "")
                 )
               ]
             : [
-                ...PROCESSING_OPERATIONS_CODES,
-                ...PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
+                ...BSDD_PROCESSING_OPERATIONS_CODES,
+                ...BSDD_PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
               ];
 
         return schema.oneOf(
@@ -1588,7 +1589,7 @@ const withNextDestination = (required: boolean) =>
         .string()
         .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
         .oneOf(
-          PROCESSING_AND_REUSE_OPERATIONS_CODES,
+          BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES,
           `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
         ),
       nextDestinationCompanyName: yup
@@ -1834,7 +1835,7 @@ const processedInfoSchemaFn: (
     processingOperationDone: yup
       .string()
       .oneOf(
-        PROCESSING_AND_REUSE_OPERATIONS_CODES,
+        BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES,
         INVALID_PROCESSING_OPERATION
       ),
     destinationOperationMode: yup

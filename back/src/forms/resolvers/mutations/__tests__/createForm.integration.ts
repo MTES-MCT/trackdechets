@@ -3300,4 +3300,98 @@ describe("Mutation.createForm", () => {
       expect(updatedAppendix2_3.quantityGrouped).toEqual(10);
     });
   });
+
+  it.each(["D 6", "D 7"])(
+    "should not allow recipientProcessingOperation %p",
+    async code => {
+      // Given
+      const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+      const transporter = await companyFactory();
+
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "PRODUCER",
+              company: {
+                siret: emitter.siret
+              }
+            },
+            recipient: {
+              processingOperation: code,
+              company: {
+                siret: destination.siret
+              }
+            },
+            transporter: {
+              company: {
+                siret: transporter.siret
+              }
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Destination : Cette opération d’élimination / valorisation n'existe pas."
+      );
+    }
+  );
+
+  it("should allow recipientProcessingOperation D 8", async () => {
+    // Given
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "PRODUCER",
+            company: {
+              siret: emitter.siret
+            }
+          },
+          recipient: {
+            processingOperation: "D 8",
+            company: {
+              siret: destination.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
 });

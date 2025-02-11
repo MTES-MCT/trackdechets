@@ -47,7 +47,7 @@ const formData: Partial<Form> = {
   emitterCompanyAddress: "8 rue du Général de Gaulle",
   emitterCompanyMail: "e@e.fr",
   recipientCap: "1234",
-  recipientProcessingOperation: "D 6",
+  recipientProcessingOperation: "D 8",
   recipientCompanyName: "A company 3",
   recipientCompanySiret: siret2,
   recipientCompanyAddress: "8 rue du Général de Gaulle",
@@ -338,6 +338,25 @@ describe("sealedFormSchema", () => {
         "Émetteur: 123 n'est pas un numéro de SIRET valide"
       );
     });
+
+    it.each(["D 6", "D 7"])(
+      "when recipientProcessingOperation is %p",
+      async code => {
+        // Given
+        const partialForm: Partial<Form> = {
+          ...sealedForm,
+          recipientProcessingOperation: code
+        };
+
+        // When
+        const validateFn = () => sealedFormSchema.validate(partialForm);
+
+        // Then
+        await expect(validateFn()).rejects.toThrow(
+          "Destination : Cette opération d’élimination / valorisation n'existe pas."
+        );
+      }
+    );
 
     it("when transporterCompanySiret is not well formatted", async () => {
       const partialForm: Partial<Form> & {
@@ -1750,6 +1769,40 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
+  it.each(["D 6", "D 7"])(
+    "should fail when processingOperation is %p",
+    async code => {
+      // Given
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: code,
+        destinationOperationMode: OperationMode.ELIMINATION
+      };
+
+      // When
+      const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "Cette opération d’élimination / valorisation n'existe pas."
+      );
+    }
+  );
+
+  it("should work when processingOperation is D 8", async () => {
+    // Given
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 8",
+      destinationOperationMode: OperationMode.ELIMINATION
+    };
+
+    // Then
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
+
   it("noTraceability can be false when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
@@ -1784,6 +1837,55 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
     };
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
+  });
+
+  it.each(["D 6", "D 7"])(
+    "nextDestinationProcessingOperation cannot be %p",
+    async code => {
+      // Given
+      const processedInfo = {
+        processedBy: "John Snow",
+        processedAt: new Date(),
+        processingOperationDone: "D 13",
+        processingOperationDescription: "Regroupement",
+        nextDestinationProcessingOperation: code,
+        nextDestinationCompanyName: "Exutoire",
+        nextDestinationCompanySiret: siretify(1),
+        nextDestinationCompanyAddress: "4 rue du déchet",
+        nextDestinationCompanyCountry: "FR",
+        nextDestinationCompanyContact: "Arya Stark",
+        nextDestinationCompanyPhone: "06 XX XX XX XX",
+        nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+      };
+
+      // Then
+      const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Destination ultérieure : Cette opération d’élimination / valorisation n'existe pas."
+      );
+    }
+  );
+
+  it("nextDestinationProcessingOperation can be D 8", async () => {
+    // Given
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanySiret: siretify(1),
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+
+    // Then
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 

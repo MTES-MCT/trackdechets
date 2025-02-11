@@ -14,3 +14,9 @@ export const PROCESSING_AND_REUSE_OPERATIONS = [
 
 export const PROCESSING_AND_REUSE_OPERATIONS_CODES: string[] =
   PROCESSING_AND_REUSE_OPERATIONS.map(operation => operation.code);
+
+// TRA-15738: D 6 and D 7 are not allowed for BSDs
+export const BSDD_PROCESSING_AND_REUSE_OPERATIONS_CODES: string[] =
+  PROCESSING_AND_REUSE_OPERATIONS_CODES.filter(
+    code => code !== "D 6" && code !== "D 7"
+  );
