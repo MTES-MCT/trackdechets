@@ -74,8 +74,18 @@ export async function processStream({
     for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
         stats.errors++;
+        
+        // Build an ordering map that we rely on to sort the errors by the order of the columns
+        const orderMap = Object.keys(options.headers).reduce(
+          (acc, key, index) => {
+            acc[key] = index;
+            return acc;
+          },
+          {}
+        );
 
         const errors = result.error.issues
+          .sort((a, b) => orderMap[a.path[0]] - orderMap[b.path[0]])
           .map(issue => {
             const columnName = options.headers[issue.path[0]] ?? issue.path[0];
             return `${columnName} : ${issue.message}`;

@@ -60,6 +60,10 @@ describe("Schemas", () => {
 
   test("getWasteCodeSchema", () => {
     expect(() => getWasteCodeSchema().parse("17 02 01")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("170201")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01*")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01 *")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("070301*")).not.toThrow();
     expect(() => getWasteCodeSchema().parse("invalid")).toThrow();
     expect(() =>
       getWasteCodeSchema().nullish().parse("17 02 01")

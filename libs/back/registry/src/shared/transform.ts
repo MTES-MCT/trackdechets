@@ -41,7 +41,7 @@ export async function transformAndRefineItemReason<
   if (!existingId && item.reason) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le motif doit rester vide, l'identifiant unique "${item.publicId}" n'a jamais été importé.`,
+      message: `Le motif doit rester vide, l'identifiant unique "${item.publicId}" n'a jamais été importé pour cet établissement`,
       path: ["reason"]
     });
     return z.NEVER;

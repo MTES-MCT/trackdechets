@@ -172,9 +172,9 @@ export function MyImports() {
           </div>
           <div className="tw-flex tw-items-center">
             <a
-              href="https://faq.trackdechets.fr/"
+              href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
               className="fr-link fr-text--sm"
             >
               Retrouvez les modèles de registres dans la documentation
