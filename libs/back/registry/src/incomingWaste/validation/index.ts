@@ -1,5 +1,5 @@
 import {
-    refineEcoOrgBrokerAndTrader,
+  refineEcoOrgBrokerAndTrader,
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,

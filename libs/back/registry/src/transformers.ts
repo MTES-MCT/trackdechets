@@ -221,7 +221,7 @@ function applyDateFormat(value: Date, formatStr: string) {
   if (formatStr === "hh:mm") {
     return format(value, "HH:mm");
   }
-  
+
   // Could be a misinterpretation of the waste code
   if (formatStr === "dd mm yy") {
     return format(value, "dd MM yy");
