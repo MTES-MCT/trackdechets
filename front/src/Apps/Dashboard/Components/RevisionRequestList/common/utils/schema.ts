@@ -200,10 +200,12 @@ export const validationBsddSchema = z.object({
                 invalid_type_error: "Ce champ est requis"
               }
             ),
-            other: z.string(),
+            volume: z.number().positive().nullish(),
+            other: z.string().nullish(),
             quantity: z.coerce
               .number()
-              .positive("Ce champ est requis est doit être supérieur à 0")
+              .positive("Ce champ est requis est doit être supérieur à 0"),
+            identificationNumbers: z.array(z.string()).nullish()
           })
           .superRefine((values, context) => {
             if (values.type === "AUTRE" && !values.other) {

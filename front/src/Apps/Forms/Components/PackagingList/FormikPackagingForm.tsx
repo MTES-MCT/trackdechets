@@ -17,7 +17,7 @@ function FormikPackagingForm({
   errors,
   touched
 }: RenderPackagingFormProps) {
-  const { getFieldProps, setFieldValue } = useFormikContext();
+  const { getFieldProps, setFieldValue, errors, touched } = useFormikContext();
 
   const typeInputProps = getFieldProps(`${fieldName}.${idx}.type`);
   const volumeInputProps = getFieldProps(`${fieldName}.${idx}.volume`);
@@ -49,6 +49,9 @@ function FormikPackagingForm({
         <PackagingForm
           packaging={packaging}
           packagingsLength={packagingsLength}
+          disabled={disabled}
+          errors={errors}
+          touched={touched}
           inputProps={{
             type: typeInputProps,
             volume: volumeInputProps,
@@ -59,9 +62,6 @@ function FormikPackagingForm({
               remove: removeIdentificationNumber
             }
           }}
-          disabled={disabled}
-          errors={errors}
-          touched={touched}
         />
       )}
     />
