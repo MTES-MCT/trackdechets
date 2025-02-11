@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodSsdItem } from "./validation/schema";
-import LookupUtils from "../lookup/utils";
+import { lookupUtils } from "./registry";
 
 export async function saveSsdLine({
   line,
@@ -15,22 +15,22 @@ export async function saveSsdLine({
       await prisma.$transaction(async tx => {
         await tx.registrySsd.update({
           where: { id },
-          data: { isActive: false }
+          data: { isLatest: false }
         });
         const registrySsd = await tx.registrySsd.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistrySsd.update(registrySsd, id ?? null, tx);
+        await lookupUtils.update(registrySsd, id ?? null, tx);
       });
       return;
     case "ANNULER":
       await prisma.$transaction(async tx => {
-        await prisma.registrySsd.update({
+        await tx.registrySsd.update({
           where: { id },
           data: { isCancelled: true }
         });
         if (id) {
-          await LookupUtils.RegistrySsd.delete(id, tx);
+          await lookupUtils.delete(id, tx);
         }
       });
 
@@ -42,7 +42,7 @@ export async function saveSsdLine({
         const registrySsd = await tx.registrySsd.create({
           data: { ...persistedData, importId }
         });
-        await LookupUtils.RegistrySsd.update(registrySsd, null, tx);
+        await lookupUtils.update(registrySsd, null, tx);
       });
 
       return;

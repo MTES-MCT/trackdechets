@@ -111,14 +111,16 @@ const company_schema = z.object({
   omiNumber: z.string().nullish()
 });
 
-const bsdd_broker_trader_Schema = z.object({
-  receipt: z.string().nullish(),
-  department: z.string().nullish(),
-  validityLimit: z.string().nullish(),
-  company: company_schema
-});
+const bsdd_broker_trader_Schema = z
+  .object({
+    receipt: z.string().nullish(),
+    department: z.string().nullish(),
+    validityLimit: z.string().nullish(),
+    company: company_schema
+  })
+  .nullable();
 
-export const initialBsddReview = {
+export const initialBsddReview: BsddRevisionRequestValidationSchema = {
   wasteDetails: {
     code: "",
     name: "",
@@ -238,6 +240,10 @@ export const validationBsddSchema = z.object({
     })
   })
 });
+
+export type BsddRevisionRequestValidationSchema = z.infer<
+  typeof validationBsddSchema
+>;
 
 export const initialBsdaReview = {
   emitter: {

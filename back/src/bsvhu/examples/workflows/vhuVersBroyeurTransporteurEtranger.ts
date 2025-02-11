@@ -6,6 +6,8 @@ import { signTransport } from "../steps/signTransport";
 import { updateForeignTransporter } from "../steps/updateTransporter";
 import { updateDestination } from "../steps/updateDestination";
 import fixtures from "../fixturesForeignTransporter";
+import { updateReception } from "../steps/updateReception";
+import { signReception } from "../steps/signReception";
 
 const workflow: Workflow = {
   title: `Acheminement d'un centre VHU vers un broyeur par un transporteur étranger`,
@@ -30,6 +32,8 @@ const workflow: Workflow = {
     signForProducer("producteur"),
     updateForeignTransporter("transporteur"),
     signTransport("transporteur"),
+    updateReception("broyeur"),
+    signReception("broyeur"),
     updateDestination("broyeur"),
     signOperation("broyeur")
   ],

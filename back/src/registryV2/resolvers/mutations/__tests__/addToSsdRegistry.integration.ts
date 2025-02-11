@@ -86,7 +86,9 @@ describe("Registry - addToSsdRegistry", () => {
   });
 
   it("should create an ssd item", async () => {
-    const { user, company } = await userWithCompanyFactory();
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const lines = [getCorrectLine(company.siret!)];
@@ -100,7 +102,9 @@ describe("Registry - addToSsdRegistry", () => {
   });
 
   it("should create several ssd items", async () => {
-    const { user, company } = await userWithCompanyFactory();
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const lines = Array.from({ length: 100 }, () =>
@@ -116,7 +120,9 @@ describe("Registry - addToSsdRegistry", () => {
   });
 
   it("should create and edit an ssd item in one go", async () => {
-    const { user, company } = await userWithCompanyFactory();
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const line = getCorrectLine(company.siret!);
@@ -131,7 +137,7 @@ describe("Registry - addToSsdRegistry", () => {
     expect(data.addToSsdRegistry).toBe(true);
 
     const result = await prisma.registrySsd.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });

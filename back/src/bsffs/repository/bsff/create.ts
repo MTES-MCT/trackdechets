@@ -55,21 +55,6 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
       );
     }
 
-    if (args.data.transporters) {
-      // compute transporterOrgIds
-      await prisma.bsff.update({
-        where: { id: bsff.id },
-        data: {
-          transportersOrgIds: fullBsff.transporters
-            .flatMap(t => [
-              t.transporterCompanySiret,
-              t.transporterCompanyVatNumber
-            ])
-            .filter(Boolean)
-        }
-      });
-    }
-
     await prisma.event.create({
       data: {
         streamId: bsff.id,
@@ -94,7 +79,6 @@ export function buildCreateBsff(deps: RepositoryFnDeps): CreateBsffFn {
         }
       });
     }
-
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsff.id));
 
     return bsff as Prisma.BsffGetPayload<Args>;

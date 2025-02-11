@@ -187,6 +187,12 @@ type Bsdasri {
   updatedAt: DateTime
   isDraft: Boolean!
 
+  """
+  Identifiant du bordereau à partir duquel ce celui-ci a été dupliqué.
+  Est égal à `null` si le bordereau n'est pas issue d'une duplication.
+  """
+  isDuplicateOf: String
+
   waste: BsdasriWaste
 
   emitter: BsdasriEmitter

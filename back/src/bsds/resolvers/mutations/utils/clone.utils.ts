@@ -61,6 +61,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.BSDA),
+    isDuplicateOf: null,
     brokerCompanyAddress: bsda.brokerCompanyAddress,
     brokerCompanyContact: bsda.brokerCompanyContact,
     brokerCompanyMail: bsda.brokerCompanyMail,
@@ -250,6 +251,7 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
   > = {
     id: getReadableId(ReadableIdPrefix.DASRI),
     createdAt: bsdasri.createdAt,
+    isDuplicateOf: null,
     destinationCompanyAddress: bsdasri.destinationCompanyAddress,
     destinationCompanyContact: bsdasri.destinationCompanyContact,
     destinationCompanyMail: bsdasri.destinationCompanyMail,
@@ -459,6 +461,7 @@ export const cloneBsff = async (user: Express.User, id: string) => {
       : {},
     isDeleted: bsff.isDeleted,
     isDraft: bsff.isDraft,
+    isDuplicateOf: null,
     packagings: bsff.packagings.length
       ? {
           createMany: {
@@ -550,6 +553,7 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
     customId: null,
+    isDuplicateOf: null,
     destinationAgrementNumber: bsvhu.destinationAgrementNumber,
     destinationCompanyAddress: bsvhu.destinationCompanyAddress,
     destinationCompanyContact: bsvhu.destinationCompanyContact,
@@ -664,7 +668,10 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     weightIsEstimate: bsvhu.weightIsEstimate,
     weightValue: bsvhu.weightValue,
     ecoOrganismeName: bsvhu.ecoOrganismeName,
-    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
+    destinationReceptionSignatureAuthor:
+      bsvhu.destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate: bsvhu.destinationReceptionSignatureDate
   };
 
   const newBsvhu = await create(newBsvhuCreateInput);
@@ -696,6 +703,7 @@ export const cloneBspaoh = async (user: Express.User, id: string) => {
     id: getReadableId(ReadableIdPrefix.PAOH),
     canAccessDraftSirets: bspaoh.canAccessDraftSirets,
     createdAt: bspaoh.createdAt,
+    isDuplicateOf: null,
     currentTransporterOrgId: bspaoh.currentTransporterOrgId,
     destinationCap: bspaoh.destinationCap,
     destinationCompanyAddress: bspaoh.destinationCompanyAddress,
@@ -834,6 +842,7 @@ export const cloneBsdd = async (
       }
     },
     readableId: getReadableId(),
+    isDuplicateOf: null,
     brokerCompanyAddress: bsdd.brokerCompanyAddress,
     brokerCompanyContact: bsdd.brokerCompanyContact,
     brokerCompanyMail: bsdd.brokerCompanyMail,

@@ -5,7 +5,7 @@ import {
   Mutation,
   MutationUpdateBsdaTransporterArgs,
   MutationUpdateBsdasriArgs,
-  MutationUpdateBsffArgs,
+  MutationUpdateBsffTransporterArgs,
   MutationUpdateBspaohArgs,
   MutationUpdateFormTransporterArgs,
   MutationUpdateBsvhuArgs
@@ -18,7 +18,7 @@ import {
 } from "../../../common/types/bsdTypes";
 import { UPDATE_BSDA_TRANSPORTER } from "../../../common/queries/bsda/queries";
 import { UPDATE_BSDD_TRANSPORTER } from "../../../common/queries/bsdd/queries";
-import { UPDATE_BSFF_FORM } from "../../../common/queries/bsff/queries";
+import { UPDATE_BSFF_TRANSPORTER } from "../../../Forms/Components/query";
 import { UPDATE_BSDASRI } from "../../../common/queries/bsdasri/queries";
 import { UPDATE_BSPAOH } from "../../../common/queries/bspaoh/queries";
 import { UPDATE_VHU_FORM } from "../../../common/queries/bsvhu/queries";
@@ -57,9 +57,10 @@ const TransporterInfoEditModal = ({
   const [
     updateTransporterInfoBsff,
     { error: errorBsff, loading: loadingBsff }
-  ] = useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
-    UPDATE_BSFF_FORM
-  );
+  ] = useMutation<
+    Pick<Mutation, "updateBsffTransporter">,
+    MutationUpdateBsffTransporterArgs
+  >(UPDATE_BSFF_TRANSPORTER);
 
   const [
     updateTransporterInfoBsdasri,
@@ -116,12 +117,10 @@ const TransporterInfoEditModal = ({
     } else if (bsd.type === BsdType.Bsff) {
       await updateTransporterInfoBsff({
         variables: {
-          id: bsd.id,
+          id: currentTransporter.transporterId!,
           input: {
-            transporter: {
-              customInfo: data.customInfo,
-              transport: { plates: formattedPlates }
-            }
+            customInfo: data.customInfo,
+            transport: { plates: formattedPlates }
           }
         }
       });

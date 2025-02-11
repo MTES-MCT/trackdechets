@@ -170,6 +170,7 @@ export default function StepsList(props: Props) {
       ecoOrganisme,
       grouping,
       transporters,
+      isDuplicateOf,
       ...rest
     } = values;
 

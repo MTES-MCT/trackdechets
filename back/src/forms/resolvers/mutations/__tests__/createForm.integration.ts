@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
@@ -14,7 +13,6 @@ import {
   bsddTransporterData
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { allowedFormats } from "../../../../common/dates";
 import type {
   CreateFormInput,
   Mutation,
@@ -31,7 +29,6 @@ import {
 } from "@prisma/client";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
-import { getFirstTransporterSync } from "../../../database";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
 
@@ -377,6 +374,208 @@ describe("Mutation.createForm", () => {
       ]);
     }
   );
+
+  test("broker should be registered to Trackdechets", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+
+    const brokerSiret = "88792840600032";
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          broker: { company: { siret: brokerSiret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Courtier : l'établissement avec le SIRET ${brokerSiret} n'est pas inscrit sur Trackdéchets`
+      })
+    ]);
+  });
+
+  test("broker should have BROKER profile", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const broker = await companyFactory({ companyTypes: [] });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          broker: { company: { siret: broker.siret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le courtier saisi sur le bordereau (SIRET: ${broker.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de courtage et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
+  });
+
+  test("broker recepisse should be auto-completed from company table", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const trader = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: {
+          receiptNumber: "AAA",
+          department: "07",
+          validityLimit: new Date("2026-01-01")
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          broker: {
+            company: { siret: trader.siret },
+            receipt: "BBB",
+            department: "13",
+            validityLimit: "2027-01-01" as any as Date
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const createdForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.createForm.id }
+    });
+
+    expect(createdForm.brokerReceipt).toEqual("AAA");
+    expect(createdForm.brokerDepartment).toEqual("07");
+    expect(createdForm.brokerValidityLimit).toEqual(new Date("2026-01-01"));
+  });
+
+  test("trader should be registered to Trackdechets", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+
+    const traderSiret = "88792840600032";
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          trader: { company: { siret: traderSiret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Négociant : l'établissement avec le SIRET ${traderSiret} n'est pas inscrit sur Trackdéchets`
+      })
+    ]);
+  });
+
+  test("trader should have TRADER profile", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const trader = await companyFactory({ companyTypes: [] });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          trader: { company: { siret: trader.siret } }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Le négociant saisi sur le bordereau (SIRET: ${trader.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'établissement de négoce et ne peut donc pas être visé sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'elle ou il" +
+          " modifie le profil de l'établissement depuis l'interface Trackdéchets"
+      })
+    ]);
+  });
+
+  test("trader recepisse should be auto-completed from company table", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const trader = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: {
+          receiptNumber: "AAA",
+          department: "07",
+          validityLimit: new Date("2026-01-01")
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          trader: {
+            company: { siret: trader.siret },
+            receipt: "BBB",
+            department: "13",
+            validityLimit: "2027-01-01" as any as Date
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const createdForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.createForm.id }
+    });
+
+    expect(createdForm.traderReceipt).toEqual("AAA");
+    expect(createdForm.traderDepartment).toEqual("07");
+    expect(createdForm.traderValidityLimit).toEqual(new Date("2026-01-01"));
+  });
 
   it("should allow a transporter listed in the transporters list to create a form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -731,14 +930,10 @@ describe("Mutation.createForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        siret: eo.siret!,
-        name: eo.name
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
-
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
@@ -766,6 +961,38 @@ describe("Mutation.createForm", () => {
       ecoOrganisme: {
         name: "",
         siret: siretify(6)
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'éco-organisme avec le siret "${createFormInput.ecoOrganisme.siret}" n'est pas reconnu.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should return an error when trying to create a form with an ecoorganisme not allowed to handle BSDDs", async () => {
+    const ecoOrg = await ecoOrganismeFactory({});
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      ecoOrganisme: {
+        name: ecoOrg.name,
+        siret: ecoOrg.siret
       }
     };
     const { mutate } = makeClient(user);
@@ -1208,64 +1435,6 @@ describe("Mutation.createForm", () => {
       "2055-01-01T00:00:00.000Z"
     );
   });
-
-  test.each(allowedFormats)(
-    "%p should be a valid format for transporter and trader receipt validity limit",
-    async f => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
-      const { company: transporterCompany } = await userWithCompanyFactory(
-        "MEMBER"
-      );
-
-      const validityLimit = new Date("2040-01-01");
-      const createFormInput = {
-        emitter: {
-          company: {
-            siret: company.siret
-          }
-        },
-        transporter: {
-          company: {
-            siret: transporterCompany.siret,
-            name: "Transporter",
-            address: "123 whatever street, Somewhere",
-            contact: "Jane Doe",
-            mail: "janedoe@transporter.com",
-            phone: "06"
-          },
-          isExemptedOfReceipt: false,
-          numberPlate: "AX-123-69",
-          customInfo: "T-456"
-        },
-        trader: {
-          company: {
-            siret: siretify(1),
-            name: "Trader",
-            address: "123 Wall Street, NY",
-            contact: "Jane Doe",
-            mail: "janedoe@trader.com",
-            phone: "06"
-          },
-          validityLimit: format(validityLimit, f),
-          receipt: "8043",
-          department: "07"
-        }
-      };
-      const { mutate } = makeClient(user);
-      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-        variables: {
-          createFormInput
-        }
-      });
-      const form = await prisma.form.findUniqueOrThrow({
-        where: { id: data.createForm.id },
-        include: { transporters: true }
-      });
-      const transporter = getFirstTransporterSync(form);
-      expect(transporter!.transporterValidityLimit).toEqual(null);
-      expect(form.traderValidityLimit).toEqual(validityLimit);
-    }
-  );
 
   it("should create a form from deprecated packagings fields", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

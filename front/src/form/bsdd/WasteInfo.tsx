@@ -3,7 +3,7 @@ import RedErrorMessage from "../../common/components/RedErrorMessage";
 import Tooltip from "../../common/components/Tooltip";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
-import { connect, Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import {
   isDangerous,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
@@ -19,18 +19,8 @@ import "./WasteInfo.scss";
 import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityTooltip";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
-
-type Values = {
-  wasteDetails: {
-    isSubjectToADR: boolean | null;
-    code: string;
-    packagings: string[];
-    parcelNumbers: any[];
-    landIdentifiers: string[];
-    analysisReferences: string[];
-  };
-  emitter: { company: { siret: string }; type: string };
-};
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import { FormFormikValues } from "./utils/initial-state";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -49,20 +39,16 @@ const SOIL_CODES = [
   "20 02 02"
 ];
 
-export default connect<{ disabled }, Values>(function WasteInfo({
-  formik,
-  disabled
-}) {
-  const { values, setFieldValue } = formik;
+export default function WasteInfo({ disabled }) {
+  const { values, setFieldValue } = useFormikContext<FormFormikValues>();
 
-  if (!values.wasteDetails.packagings) {
-    values.wasteDetails.packagings = [];
-  }
   useEffect(() => {
-    if (isDangerous(values.wasteDetails.code)) {
+    if (isDangerous(values.wasteDetails?.code)) {
       setFieldValue("wasteDetails.isDangerous", true);
     }
-  }, [values.wasteDetails.code, setFieldValue]);
+  }, [values.wasteDetails?.code, setFieldValue]);
+
+  const showDuplicateWarning = !!values.isDuplicateOf && !disabled;
 
   return (
     <>
@@ -110,7 +96,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           type="checkbox"
           component={FieldSwitch}
           name="wasteDetails.isDangerous"
-          disabled={disabled || isDangerous(values.wasteDetails.code)}
+          disabled={disabled || isDangerous(values.wasteDetails?.code)}
           label={
             <span>
               Le déchet est{" "}
@@ -158,7 +144,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         </div>
       </div>
 
-      {values.emitter.type === "APPENDIX1" && (
+      {values.emitter?.type === "APPENDIX1" && (
         <div>
           <h4 className="form__section-heading">Bordereau de tournée dédiée</h4>
           <div className="notification warning">
@@ -172,7 +158,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         </div>
       )}
 
-      {values.emitter.type === "APPENDIX2" && (
+      {values.emitter?.type === "APPENDIX2" && (
         <>
           <h4 className="form__section-heading">Annexe 2</h4>
           <p className="tw-my-2">
@@ -193,7 +179,7 @@ export default connect<{ disabled }, Values>(function WasteInfo({
 
       <h4 className="form__section-heading">Conditionnement</h4>
 
-      {values.emitter.type !== "APPENDIX1" && (
+      {values.emitter?.type !== "APPENDIX1" && (
         <Field
           name="wasteDetails.packagingInfos"
           component={Packagings}
@@ -239,7 +225,18 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         <RedErrorMessage name="wasteDetails.consistence" />
       </div>
 
-      {values.emitter.type !== "APPENDIX1" && (
+      {showDuplicateWarning && (
+        // [tra-15504] Si le bordereau provient d'une duplication, on affiche un message informatif
+        // pour inviter l'utilisateur à bien vérifier le conditionnement qui a été dupliqué
+        <Alert
+          className="fr-mt-2w"
+          title=""
+          severity="warning"
+          description="Ce bordereau provient d'une duplication, merci de vérifier le conditionnement présent."
+        />
+      )}
+
+      {values.emitter?.type !== "APPENDIX1" && (
         <>
           <h4 className="form__section-heading">Quantité en tonnes</h4>
           <div className="form__row">
@@ -294,11 +291,11 @@ export default connect<{ disabled }, Values>(function WasteInfo({
           }}
           inputTitle={"Test"}
           label="Le déchet est soumis à l'ADR"
-          checked={values.wasteDetails.isSubjectToADR ?? false}
+          checked={values.wasteDetails?.isSubjectToADR ?? false}
           disabled={disabled}
         />
 
-        {values.wasteDetails.isSubjectToADR && (
+        {values.wasteDetails?.isSubjectToADR && (
           <div className="fr-ml-18v">
             <label>
               Mention au titre du règlement ADR{" "}
@@ -329,10 +326,22 @@ export default connect<{ disabled }, Values>(function WasteInfo({
         <RedErrorMessage name="wasteDetails.nonRoadRegulationMention" />
       </div>
 
-      {SOIL_CODES.includes(values.wasteDetails.code) ||
-      values.wasteDetails.parcelNumbers?.length ||
-      values.wasteDetails.landIdentifiers?.length ||
-      values.wasteDetails.analysisReferences?.length ? (
+      {showDuplicateWarning && (
+        // [tra-15504] Si le bordereau provient d'une duplication, on affiche un message informatif
+        // pour inviter l'utilisateur à bien vérifier la mention ADR qui a été dupliquée
+        <Alert
+          className="fr-mt-2w"
+          title=""
+          severity="warning"
+          description="Ce bordereau provient d'une duplication, merci de vérifier la mention au titre du règlement ADR présente."
+        />
+      )}
+
+      {(values.wasteDetails?.code &&
+        SOIL_CODES.includes(values.wasteDetails.code)) ||
+      values.wasteDetails?.parcelNumbers?.length ||
+      values.wasteDetails?.landIdentifiers?.length ||
+      values.wasteDetails?.analysisReferences?.length ? (
         <>
           <h4 className="form__section-heading">Terres et sédiments</h4>
 
@@ -346,4 +355,4 @@ export default connect<{ disabled }, Values>(function WasteInfo({
       ) : null}
     </>
   );
-});
+}

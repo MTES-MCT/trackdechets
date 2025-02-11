@@ -34,15 +34,14 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsda, input);
 
-  const { parsedBsda: bsda, updatedFields } = await mergeInputAndParseBsdaAsync(
-    existingBsda,
-    input,
-    {
-      user,
-      enableCompletionTransformers: true,
-      enablePreviousBsdasChecks: true
-    }
-  );
+  const {
+    parsedBsda: { createdAt, ...bsda },
+    updatedFields
+  } = await mergeInputAndParseBsdaAsync(existingBsda, input, {
+    user,
+    enableCompletionTransformers: true,
+    enablePreviousBsdasChecks: true
+  });
 
   if (updatedFields.length === 0) {
     // Évite de faire un update "à blanc" si l'input

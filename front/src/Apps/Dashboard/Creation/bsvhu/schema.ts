@@ -88,6 +88,7 @@ const zodDestination = z.object({
             .enum([
               "NUMERO_ORDRE_LOTS_SORTANTS",
               "NUMERO_IMMATRICULATION",
+              "NUMERO_FICHE_DROMCOM",
               "NUMERO_ORDRE_REGISTRE_POLICE"
             ])
             .nullish()
@@ -115,6 +116,7 @@ export const rawBsvhuSchema = z
         .enum([
           "NUMERO_ORDRE_LOTS_SORTANTS",
           "NUMERO_ORDRE_REGISTRE_POLICE",
+          "NUMERO_FICHE_DROMCOM",
           "NUMERO_IMMATRICULATION"
         ])
         .nullish()

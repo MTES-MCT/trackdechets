@@ -24,6 +24,7 @@ const DUPLICATE_BVHU = gql`
     duplicateBsvhu(id: $id) {
       id
       status
+      isDuplicateOf
     }
   }
 `;
@@ -147,6 +148,9 @@ describe("mutation.duplicateBsvhu", () => {
         emitterEmissionSignatureAuthor: "John",
         transporterTransportSignatureDate: new Date(),
         transporterTransportSignatureAuthor: "John",
+        destinationReceptionSignatureDate: new Date(),
+        destinationReceptionSignatureAuthor: "John",
+        destinationReceptionDate: new Date(),
         destinationOperationSignatureDate: new Date(),
         destinationOperationSignatureAuthor: "John",
         intermediaries: {
@@ -294,7 +298,7 @@ describe("mutation.duplicateBsvhu", () => {
       "isDraft",
       "isDeleted",
       "status",
-
+      "isDuplicateOf",
       "emitterEmissionSignatureAuthor",
       "emitterEmissionSignatureDate",
       "transporterTransportSignatureAuthor",
@@ -304,6 +308,8 @@ describe("mutation.duplicateBsvhu", () => {
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
       "destinationReceptionRefusalReason",
+      "destinationReceptionSignatureAuthor",
+      "destinationReceptionSignatureDate",
       "destinationReceptionIdentificationNumbers",
       "destinationReceptionIdentificationType",
       "destinationReceptionDate",
@@ -312,7 +318,6 @@ describe("mutation.duplicateBsvhu", () => {
       "destinationOperationMode",
       "destinationOperationSignatureAuthor",
       "destinationOperationSignatureDate",
-
       "intermediaries",
       "intermediariesOrgIds",
       "canAccessDraftOrgIds"
@@ -320,6 +325,7 @@ describe("mutation.duplicateBsvhu", () => {
 
     expect(duplicatedBsvhu.status).toEqual("INITIAL");
     expect(duplicatedBsvhu.isDraft).toBe(true);
+    expect(duplicatedBsvhu.isDuplicateOf).toBe(bsvhu.id);
 
     expect(duplicatedBsvhu).toMatchObject({
       emitterIrregularSituation,
@@ -412,6 +418,9 @@ describe("mutation.duplicateBsvhu", () => {
     expect(duplicatedBsvhu.destinationOperationSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.transporterTransportSignatureDate).toBeNull();
     expect(duplicatedBsvhu.transporterTransportSignatureAuthor).toBeNull();
+    expect(duplicatedBsvhu.destinationReceptionSignatureAuthor).toBeNull();
+    expect(duplicatedBsvhu.destinationReceptionSignatureDate).toBeNull();
+    expect(duplicatedBsvhu.destinationReceptionDate).toBeNull();
   });
 
   it("should duplicate without the transporter receipt when it was emptied", async () => {

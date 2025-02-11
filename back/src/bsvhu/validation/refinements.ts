@@ -172,12 +172,13 @@ export const v20241201 = new Date(
 
 // Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des palques d'immatriculations et la quantité transportée
 export const v20250101 = new Date(
-  process.env.OVERRIDE_V20250101 || "2025-15-01T00:00:00.000"
+  process.env.OVERRIDE_V20250101 || "2025-01-15T00:00:00.000"
 );
 
 const BsvhuIdentificationTypesAfterV20241201 = [
   BsvhuIdentificationType.NUMERO_ORDRE_REGISTRE_POLICE,
-  BsvhuIdentificationType.NUMERO_IMMATRICULATION
+  BsvhuIdentificationType.NUMERO_IMMATRICULATION,
+  BsvhuIdentificationType.NUMERO_FICHE_DROMCOM
 ];
 
 export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (
@@ -309,42 +310,6 @@ export const checkTransportModeAndReceptionWeight: Refinement<
   );
 };
 
-const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
-
-export const checkTransportPlates: Refinement<ParsedZodBsvhu> = (
-  bsvhu,
-  ctx
-) => {
-  const { transporterTransportPlates } = bsvhu;
-  const path = ["transporter", "transport", "plates"];
-  if (transporterTransportPlates.length > 2) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path,
-      message: "Un maximum de 2 plaques d'immatriculation est accepté"
-    });
-  }
-
-  if (
-    transporterTransportPlates.some(plate => plate.length > 12) ||
-    transporterTransportPlates.some(plate => plate.length < 4)
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path,
-      message: "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
-    });
-  }
-
-  if (transporterTransportPlates.some(plate => onlyWhiteSpace(plate))) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path,
-      message: "Le numéro de plaque fourni est incorrect"
-    });
-  }
-};
-
 export const checkRequiredFields: (
   validationContext: BsvhuValidationContext
 ) => Refinement<ParsedZodBsvhu> = validationContext => {
@@ -362,7 +327,8 @@ export const checkRequiredFields: (
         const isRequired = isBsvhuFieldRequired(
           required,
           bsvhu,
-          signaturesToCheck
+          signaturesToCheck,
+          validationContext.currentSignatureType
         );
         if (isRequired) {
           checkFieldIsDefined({

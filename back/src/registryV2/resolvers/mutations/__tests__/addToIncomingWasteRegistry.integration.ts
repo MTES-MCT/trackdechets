@@ -1,10 +1,11 @@
 import type { Mutation } from "@td/codegen-back";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import makeClient from "../../../../__tests__/testClient";
-import gql from "graphql-tag";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
+import { sub } from "date-fns";
+import gql from "graphql-tag";
+import { randomUUID } from "node:crypto";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_WASTE_REGISTRY = gql`
   mutation AddToIncomingWasteRegistry($lines: [IncomingWasteLineInput!]!) {
@@ -23,7 +24,7 @@ function getCorrectLine(siret: string) {
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
-    receptionDate: "2024-02-01",
+    receptionDate: sub(new Date(), { days: 5 }).toISOString(),
     weighingHour: "08:25",
     weightValue: 1.4,
     weightIsEstimate: true,
@@ -37,6 +38,7 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
     initialEmitterMunicipalitiesNames: null,
+    emitterNoTraceability: false,
     emitterCompanyType: "ETABLISSEMENT_FR",
     emitterCompanyOrgId: "78467169500103",
     emitterCompanyName: "Raison sociale de l'expéditeur",
@@ -201,7 +203,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
     expect(data.addToIncomingWasteRegistry).toBe(true);
 
     const result = await prisma.registryIncomingWaste.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });

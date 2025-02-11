@@ -1,4 +1,5 @@
 import {
+  Bsda,
   BsdaRevisionRequest,
   BsdaRevisionRequestApproval,
   BsdaStatus,
@@ -144,6 +145,7 @@ export function buildAcceptRevisionRequestApproval(
 }
 
 async function getUpdateFromRevisionRequest(
+  bsdaBeforeRevision: Bsda,
   revisionRequest: BsdaRevisionRequest,
   prisma: PrismaTransaction
 ) {
@@ -157,13 +159,24 @@ async function getUpdateFromRevisionRequest(
     revisionRequest.isCanceled
   );
 
+  const hasTTR = Boolean(
+    bsdaBeforeRevision.destinationOperationNextDestinationCompanySiret
+  );
+
   const result = removeEmpty({
     wasteCode: revisionRequest.wasteCode,
     wastePop: revisionRequest.wastePop,
     packagings: revisionRequest.packagings,
     wasteSealNumbers: revisionRequest.wasteSealNumbers,
     wasteMaterialName: revisionRequest.wasteMaterialName,
-    destinationCap: revisionRequest.destinationCap,
+    // Attention, quand on a ajoute un TTR à un bsda il se retrouve dans destinationXXX,
+    // et l'exutoire est bougé dans destinationOperationNextDestinationXXX
+    // Les révisions n'autorisent que la modification du CAP de l'exutoire, qui est
+    // systématiquement dans le champ destinationCAP
+    destinationCap: hasTTR ? null : revisionRequest.destinationCap,
+    destinationOperationNextDestinationCap: hasTTR
+      ? revisionRequest.destinationCap
+      : null,
     destinationReceptionWeight: revisionRequest.destinationReceptionWeight,
     destinationOperationCode: revisionRequest.destinationOperationCode,
     destinationOperationDescription:
@@ -254,6 +267,7 @@ export async function approveAndApplyRevisionRequest(
     where: { id: updatedRevisionRequest.bsdaId }
   });
   const updateData = await getUpdateFromRevisionRequest(
+    bsdaBeforeRevision,
     updatedRevisionRequest,
     prisma
   );

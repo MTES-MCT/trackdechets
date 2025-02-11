@@ -32,6 +32,7 @@ export function buildDeleteBsdasri(deps: RepositoryFnDeps): DeleteBsdasriFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
     prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsdasri.id));
 
     return deletedBsdasri;

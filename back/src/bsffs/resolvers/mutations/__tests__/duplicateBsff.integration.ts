@@ -30,6 +30,7 @@ const DUPLICATE_BSFF = gql`
     duplicateBsff(id: $id) {
       id
       status
+      isDuplicateOf
     }
   }
 `;
@@ -52,6 +53,7 @@ describe("Mutation.duplicateBsff", () => {
     });
 
     expect(data.duplicateBsff.status).toEqual("INITIAL");
+    expect(data.duplicateBsff.isDuplicateOf).toEqual(bsff.id);
   });
 
   it("should disallow unauthenticated user from duplicating a bsff", async () => {

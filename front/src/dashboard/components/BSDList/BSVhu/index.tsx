@@ -8,6 +8,7 @@ const vhuVerboseStatuses: Record<BsvhuStatus, string> = {
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SENT: "En cours d'acheminement",
   PROCESSED: "Traité",
+  RECEIVED: "EN ATTENTE DE TRAITEMENT",
   REFUSED: "Refusé"
 };
 

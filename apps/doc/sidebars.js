@@ -28,7 +28,8 @@ const referenceDefs = [
   { id: "bsvhu", label: "VHU" },
 
   { id: "user-company", label: "Utilisateurs et Établissements" },
-  { id: "registre", label: "Registre" },
+  { id: "registre", label: "Registre (legacy)" },
+  { id: "registreV2", label: "RNDTS & exports" },
   { id: "webhooks", label: "Webhooks" },
 ];
 
@@ -128,6 +129,14 @@ module.exports = {
             "reference/statuts/bsdd",
             "reference/statuts/bsff",
             "reference/statuts/bspaoh",
+          ],
+        },
+        {
+          Validation: [
+            "reference/validation/bsda",
+            "reference/validation/bsff",
+            "reference/validation/bspaoh",
+            "reference/validation/bsvhu",
           ],
         },
         "reference/multi-bsd",

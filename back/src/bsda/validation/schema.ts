@@ -26,7 +26,8 @@ import {
   checkTransporters,
   checkWorkerSubSectionThree,
   validateDestination,
-  validatePreviousBsdas
+  validatePreviousBsdas,
+  validateDestinationReceptionWeight
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -42,6 +43,10 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -97,6 +102,12 @@ const rawBsdaTransporterSchema = z
  */
 export const rawBsdaSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  // on ajoute `createdAt` au schéma de validation pour appliquer certaines
+  // règles de façon contextuelles en fonction de la date de création du BSDA.
+  // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
+  // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
+  // ancienne version du schéma.
+  createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
   type: z.nativeEnum(BsdaType).default(BsdaType.OTHER_COLLECTIONS),
@@ -259,7 +270,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
-  .superRefine(checkTransporters);
+  .superRefine(checkTransporters)
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -303,6 +315,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
       checkCompanies(bsda, zodContext, context)
     )
     .superRefine(validateDestination(context))
+    .superRefine(validateDestinationReceptionWeight(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs
@@ -327,6 +340,10 @@ export type ParsedZodBsdaTransporter = z.output<
   typeof rawBsdaTransporterSchema
 >;
 
-export const transformedBsdaTransporterSchema = rawBsdaTransporterSchema
+const refinedBsdaTransporter = rawBsdaTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsdaTransporterSchema = refinedBsdaTransporter
   .transform(updateTransporterRecepisse)
   .transform(sirenifyBsdaTransporter);

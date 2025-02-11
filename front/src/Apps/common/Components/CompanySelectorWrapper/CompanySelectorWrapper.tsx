@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import CompanySelector from "../CompanySelector/CompanySelector";
 import {
   CompanySearchResult,
+  CompanyType,
   FavoriteType,
   Query,
   QueryFavoritesArgs,
@@ -204,7 +205,7 @@ export default function CompanySelectorWrapper({
         disabled={disabled}
         searchHint={
           allowForeignCompanies
-            ? "ou numéro TVA pour un transporteur de l'UE"
+            ? "ou numéro TVA pour un établissement de l'UE"
             : undefined
         }
         departmentHint={
@@ -213,4 +214,41 @@ export default function CompanySelectorWrapper({
       />
     </>
   );
+}
+
+/**
+ * Fonction utilitaire permettant d'afficher un message d'erreur par défaut
+ * lorsqu'un établissement est sélectionné en fonction de son profil
+ */
+export function selectedCompanyError(
+  company: CompanySearchResult,
+  expectedCompanyType?: CompanyType
+) {
+  if (company.etatAdministratif !== "A") {
+    // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
+    // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité
+    // dans le futur, on pourra s'abstenir de gérer cette erreur.
+    return "Cet établissement est fermé";
+  }
+  if (!company.isRegistered) {
+    return "Cet établissement n'est pas inscrit sur Trackdéchets.";
+  }
+  if (
+    expectedCompanyType &&
+    !company.companyTypes?.includes(expectedCompanyType)
+  ) {
+    const translatedType = () => {
+      if (expectedCompanyType === CompanyType.Broker) {
+        return "courtier";
+      }
+      if (expectedCompanyType === CompanyType.Trader) {
+        return "négociant";
+      }
+      // On peut implémenter ici d'autres types de profils
+      return "";
+    };
+
+    return `Cet établissement n'a pas le profil ${translatedType()}`;
+  }
+  return null;
 }

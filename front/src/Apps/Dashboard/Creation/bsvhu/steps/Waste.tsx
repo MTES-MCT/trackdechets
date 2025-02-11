@@ -79,6 +79,13 @@ const WasteBsvhu = ({
         ...register("identification.type"),
         value: "NUMERO_IMMATRICULATION"
       }
+    },
+    {
+      label: "Identification par numéro de fiche VHU DROMCOM",
+      nativeInputProps: {
+        ...register("identification.type"),
+        value: "NUMERO_FICHE_DROMCOM"
+      }
     }
   ];
   // deprecated, kept for bsvhu created before release

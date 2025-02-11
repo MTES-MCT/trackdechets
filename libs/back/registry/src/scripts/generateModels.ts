@@ -8,11 +8,15 @@ import { INCOMING_TEXS_HEADERS } from "../incomingTexs/constants";
 import { INCOMING_WASTE_HEADERS } from "../incomingWaste/constants";
 import { registryS3Client } from "../s3";
 import { SSD_HEADERS } from "../ssd/constants";
+import { OUTGOING_WASTE_HEADERS } from "../outgoingWaste/constants";
+import { OUTGOING_TEXS_HEADERS } from "../outgoingTexs/constants";
 
 const MODEL_SOURCES = [
   { headers: SSD_HEADERS, name: "Modele SSD" },
   { headers: INCOMING_WASTE_HEADERS, name: "Modele DND entrant" },
-  { headers: INCOMING_TEXS_HEADERS, name: "Modele TEXS entrant" }
+  { headers: INCOMING_TEXS_HEADERS, name: "Modele TEXS entrant" },
+  { headers: OUTGOING_WASTE_HEADERS, name: "Modele DND sortant" },
+  { headers: OUTGOING_TEXS_HEADERS, name: "Modele TEXS sortant" }
 ];
 
 /**
@@ -73,7 +77,7 @@ async function generateCsvModel({
     }
   });
 
-  const csvStream = format({ headers: false });
+  const csvStream = format({ headers: false, writeBOM: true }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
   csvStream.pipe(writableStream);
 
   csvStream.write(headers);
@@ -105,7 +109,8 @@ async function writeToS3({
     Bucket: envConfig.S3_REGISTRY_MODELS_BUCKET,
     Key: name,
     Body: buffer,
-    ContentType: contentType
+    ContentType: contentType,
+    ContentEncoding: "utf-8"
   };
 
   const command = new PutObjectCommand(params);

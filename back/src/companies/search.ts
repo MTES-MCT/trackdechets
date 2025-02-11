@@ -85,7 +85,8 @@ const companySelectedFields = {
   contactPhone: true,
   website: true,
   ecoOrganismeAgreements: true,
-  allowBsdasriTakeOverWithoutSignature: true
+  allowBsdasriTakeOverWithoutSignature: true,
+  isDormantSince: true
 };
 
 /**

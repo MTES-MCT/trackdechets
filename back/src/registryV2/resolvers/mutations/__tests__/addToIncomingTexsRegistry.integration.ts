@@ -1,10 +1,11 @@
 import type { Mutation } from "@td/codegen-back";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import makeClient from "../../../../__tests__/testClient";
-import gql from "graphql-tag";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
+import { sub } from "date-fns";
+import gql from "graphql-tag";
+import { randomUUID } from "node:crypto";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   mutation AddToIncomingTexsRegistry($lines: [IncomingTexsLineInput!]!) {
@@ -23,10 +24,11 @@ function getCorrectLine(siret: string) {
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
-    receptionDate: "2024-02-01",
+    receptionDate: sub(new Date(), { days: 5 }).toISOString(),
     weightValue: 1.4,
     weightIsEstimate: true,
     volume: 1.2,
+    parcelCoordinates: ["47.829864 1.937389", "48.894258 2.240027"],
     initialEmitterCompanyType: "ETABLISSEMENT_FR",
     initialEmitterCompanyOrgId: "78467169500103",
     initialEmitterCompanyName: "Raison sociale du producteur",
@@ -36,6 +38,7 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
     initialEmitterMunicipalitiesNames: null,
+    emitterNoTraceability: false,
     emitterCompanyType: "ETABLISSEMENT_FR",
     emitterCompanyOrgId: "78467169500103",
     emitterCompanyName: "Raison sociale de l'expéditeur",
@@ -60,6 +63,7 @@ function getCorrectLine(siret: string) {
     operationMode: "RECYCLAGE",
     noTraceability: false,
     nextDestinationIsAbroad: false,
+    isUpcycled: false,
     declarationNumber: null,
     notificationNumber: null,
     movementNumber: null,
@@ -198,7 +202,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     expect(data.addToIncomingTexsRegistry).toBe(true);
 
     const result = await prisma.registryIncomingTexs.findFirstOrThrow({
-      where: { publicId: line.publicId, isActive: true }
+      where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });

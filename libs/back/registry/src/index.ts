@@ -4,6 +4,7 @@ export {
   ImportOptions,
   ParsedLine,
   IMPORT_TYPES,
+  UNAUTHORIZED_ERROR,
   importOptions,
   exportOptions
 } from "./options";
@@ -11,4 +12,10 @@ export * from "./s3";
 
 export { SSD_HEADERS } from "./ssd/constants";
 
-export { default as LookupUtils } from "./lookup/utils";
+export { generateDateInfos, deleteRegistryLookup } from "./lookup/utils";
+
+export { lookupUtils as ssdLookupUtils } from "./ssd/registry";
+
+export { lookupUtils as incomingWasteLookupUtils } from "./incomingWaste/registry";
+
+export { lookupUtils as incomingTexsLookupUtils } from "./incomingTexs/registry";

@@ -735,14 +735,18 @@ describe("beforeTransportSchema", () => {
     transporters: Partial<BsddTransporter>[];
   };
 
+  let transporterCompany;
+
   afterAll(resetDatabase);
   beforeAll(async () => {
     const emitterCompany = await companyFactory({
       companyTypes: ["PRODUCER"]
     });
-    const transporterCompany = await companyFactory({
+
+    transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
+
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTEPROCESSOR"]
     });
@@ -921,6 +925,124 @@ describe("beforeTransportSchema", () => {
     );
   });
 
+  it("transporter plate is required if transporter mode is ROAD - too short", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "ab"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - too long", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "abcdefghijklm"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - 2 plates provided", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "AZ-12-TY, TY-LK-34"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    const isValid = await validateFn();
+
+    expect(isValid).toBeTruthy();
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - too many plates", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "AZ-12-TY, TY-LK-34, QS-23-TY"
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Un maximum de 2 plaques d'immatriculation est accepté"
+    );
+  });
+
+  it("transporter plate is required if transporter mode is ROAD - only whitespace", async () => {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
+      ...beforeTransportForm,
+      createdAt: new Date("2025-01-10T00:00:00Z"),
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "      "
+        }
+      ]
+    };
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le numéro de plaque fourni est incorrect"
+    );
+  });
+
   it("transporter plate is not required if transport mode is not ROAD", async () => {
     const testForm: Partial<Form> & {
       transporters: Partial<BsddTransporter>[];
@@ -972,7 +1094,7 @@ describe("beforeTransportSchema", () => {
         {
           ...transporterData,
           transporterTransportMode: "ROAD",
-          transporterNumberPlate: "TRANSPORTER-PLATES"
+          transporterNumberPlate: "AZ-45-TR"
         }
       ]
     };
@@ -1581,7 +1703,10 @@ describe("draftFormSchema", () => {
   });
 
   it("should not be valid when passing eco-organisme as emitter", async () => {
-    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: siretify(),
+      handle: { handleBsdd: true }
+    });
 
     const partialForm: Partial<Form> = {
       emitterCompanySiret: ecoOrganisme.siret

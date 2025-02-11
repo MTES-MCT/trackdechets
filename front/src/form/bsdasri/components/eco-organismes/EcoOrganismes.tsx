@@ -13,7 +13,7 @@ import TdSwitch from "../../../../common/components/Switch";
 
 const GET_ECO_ORGANISMES = gql`
   {
-    ecoOrganismes {
+    ecoOrganismes(handleBsdasri: true) {
       id
       name
       siret
@@ -88,12 +88,10 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                       orgId: eo.orgId
                     })
                   }
-                  results={data.ecoOrganismes
-                    .filter(eo => !!eo.handleBsdasri)
-                    .map(eo => ({
-                      ...eo,
-                      orgId: eo.siret
-                    }))}
+                  results={data.ecoOrganismes.map(eo => ({
+                    ...eo,
+                    orgId: eo.siret
+                  }))}
                   selectedItem={
                     data.ecoOrganismes
                       .map(eo => ({

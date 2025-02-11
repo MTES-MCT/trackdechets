@@ -16,6 +16,12 @@ import { toBsdElastic as toBspaohElastic } from "../../bspaoh/elastic";
 import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
 import { getFormForElastic, indexForm } from "../../forms/elastic";
 import { prisma } from "@td/prisma";
+import { lookupUtils as bsdaLookupUtils } from "../../bsda/registryV2";
+import { lookupUtils as bsdasriLookupUtils } from "../../bsdasris/registryV2";
+import { lookupUtils as bsddLookupUtils } from "../../forms/registryV2";
+import { lookupUtils as bsffLookupUtils } from "../../bsffs/registryV2";
+import { lookupUtils as bspaohLookupUtils } from "../../bspaoh/registryV2";
+import { lookupUtils as bsvhuLookupUtils } from "../../bsvhu/registryV2";
 
 export async function indexBsdJob(
   job: Job<string>
@@ -33,12 +39,13 @@ export async function indexBsdJob(
 
     const elasticBsda = toBsdaElastic(bsda);
     await indexBsd(elasticBsda);
-
+    await bsdaLookupUtils.update(bsda);
     return { ...elasticBsda, siretsBeforeUpdate };
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
     const rawForm = await getFormForElastic({ readableId: bsdId });
     const elasticBsdd = await indexForm(rawForm);
+    await bsddLookupUtils.update(rawForm);
     return { ...elasticBsdd, siretsBeforeUpdate };
   }
 
@@ -47,7 +54,7 @@ export async function indexBsdJob(
 
     const elasticBsdasri = toBsdasriElastic(bsdasri);
     await indexBsd(elasticBsdasri);
-
+    await bsdasriLookupUtils.update(bsdasri);
     return { ...elasticBsdasri, siretsBeforeUpdate };
   }
 
@@ -56,6 +63,7 @@ export async function indexBsdJob(
 
     const elasticBsvhu = toBsvhuElastic(bsvhu);
     await indexBsd(elasticBsvhu);
+    await bsvhuLookupUtils.update(bsvhu);
 
     return { ...elasticBsvhu, siretsBeforeUpdate };
   }
@@ -72,6 +80,7 @@ export async function indexBsdJob(
 
     const elasticBsff = toBsffElastic(bsff);
     await indexBsd(elasticBsff);
+    await bsffLookupUtils.update(bsff);
 
     return { ...elasticBsff, siretsBeforeUpdate };
   }
@@ -85,6 +94,7 @@ export async function indexBsdJob(
     const elasticBspaoh = toBspaohElastic(bspaoh);
 
     await indexBsd(elasticBspaoh);
+    await bspaohLookupUtils.update(bspaoh);
 
     return { ...elasticBspaoh, siretsBeforeUpdate };
   }

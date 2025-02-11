@@ -1,9 +1,11 @@
+import { signReception } from "../steps/signReception";
 import { Workflow } from "../../../common/workflow";
 import { createBsvhu } from "../steps/createBsvhu";
 import { signForProducer } from "../steps/signForProducer";
 import { signOperation } from "../steps/signOperation";
 import { signTransport } from "../steps/signTransport";
 import { updateDestination } from "../steps/updateDestination";
+import { updateReception } from "../steps/updateReception";
 import { updateTransporter } from "../steps/updateTransporter";
 
 const workflow: Workflow = {
@@ -22,6 +24,8 @@ const workflow: Workflow = {
     signForProducer("producteur"),
     updateTransporter("transporteur"),
     signTransport("transporteur"),
+    updateReception("broyeur"),
+    signReception("broyeur"),
     updateDestination("broyeur"),
     signOperation("broyeur")
   ],
@@ -38,7 +42,9 @@ A -->|"signBsvhu (EMISSION)"| B(SIGNED_BY_PRODUCTER)
 B -->|updateBsvhu| B
 B -->|"signBsvhu (TRANSPORT)"| C(SENT)
 C -->|updateBsvhu| C
-C -->|"signBsvhu (OPERATION)"| D(PROCESSED)`
+C -->|"signBsvhu (RECEPTION)" | D(RECEIVED)
+D -->|updateBsvhu| D
+D -->|"signBsvhu (OPERATION)"| E(PROCESSED)`
 };
 
 export default workflow;

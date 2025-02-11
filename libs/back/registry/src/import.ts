@@ -1,18 +1,16 @@
-import { format } from "@fast-csv/format";
 import { logger } from "@td/logger";
 import { Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
 import { endImport, startImport, updateImportStats } from "./database";
 import {
-  CSV_DELIMITER,
-  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
   UNAUTHORIZED_ERROR
 } from "./options";
 import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
+import { getCsvErrorStream, getXlsxErrorStream } from "./errors";
 
 export async function processStream({
   importId,
@@ -46,11 +44,10 @@ export async function processStream({
     skipped: 0
   };
 
-  const errorStream = format({
-    delimiter: CSV_DELIMITER,
-    headers: [ERROR_HEADER, ...Object.values(options.headers)],
-    writeHeaders: true
-  });
+  const errorStream =
+    fileType === "CSV"
+      ? getCsvErrorStream(options)
+      : getXlsxErrorStream(options);
   errorStream.pipe(outputErrorStream);
 
   const transformStream =
@@ -64,58 +61,63 @@ export async function processStream({
   try {
     await startImport(importId);
 
-    const dataStream: AsyncIterable<{
+    const parsedLinesStream: AsyncIterable<{
       rawLine: Record<string, string>;
       result: SafeParseReturnType<unknown, ParsedLine>;
     }> = inputStream.pipe(transformStream).on("error", error => {
       stats.errors++;
       if (errorStream.writable) {
-        errorStream.write([["errors", formatErrorMessage(error.message)]]);
+        errorStream.write({ errors: formatErrorMessage(error.message) });
       }
     });
 
-    for await (const { rawLine, result } of dataStream) {
+    for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
         stats.errors++;
 
+        // Build an ordering map that we rely on to sort the errors by the order of the columns
+        const orderMap = Object.keys(options.headers).reduce(
+          (acc, key, index) => {
+            acc[key] = index;
+            return acc;
+          },
+          {}
+        );
+
         const errors = result.error.issues
+          .sort((a, b) => orderMap[a.path[0]] - orderMap[b.path[0]])
           .map(issue => {
             const columnName = options.headers[issue.path[0]] ?? issue.path[0];
             return `${columnName} : ${issue.message}`;
           })
           .join("\n");
 
-        // As we are renaming headers we need to provide an hash array
-        errorStream.write([["errors", errors], ...Object.entries(rawLine)]);
+        errorStream.write({ errors, ...rawLine });
         continue;
       }
 
-      // Check rights
-      const contextualSiretsWithDelegation =
-        delegateToDelegatorsMap.get(result.data.reportAsCompanySiret ?? "") ??
-        [];
-      const contextualAllowedSirets = [
-        ...allowedSirets,
-        ...contextualSiretsWithDelegation
-      ];
+      const { reportAsCompanySiret, reportForCompanySiret, reason } =
+        result.data;
 
       if (
-        !contextualAllowedSirets.includes(result.data.reportForCompanySiret)
+        !isAuthorized({
+          reportAsCompanySiret,
+          delegateToDelegatorsMap,
+          reportForCompanySiret,
+          allowedSirets
+        })
       ) {
         stats.errors++;
 
-        errorStream.write([
-          ["errors", UNAUTHORIZED_ERROR],
-          ...Object.entries(rawLine)
-        ]);
+        errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
         continue;
       }
 
-      if (result.data.reason === "MODIFIER") {
+      if (reason === "MODIFIER") {
         stats.edits++;
-      } else if (result.data.reason === "ANNULER") {
+      } else if (reason === "ANNULER") {
         stats.cancellations++;
-      } else if (result.data.reason === "IGNORER") {
+      } else if (reason === "IGNORER") {
         stats.skipped++;
         continue;
       } else {
@@ -151,4 +153,26 @@ function formatErrorMessage(message: string) {
   }
 
   return message;
+}
+
+export function isAuthorized({
+  reportAsCompanySiret,
+  delegateToDelegatorsMap,
+  reportForCompanySiret,
+  allowedSirets
+}: {
+  reportAsCompanySiret: string | null | undefined;
+  delegateToDelegatorsMap: Map<string, string[]>;
+  reportForCompanySiret: string;
+  allowedSirets: string[];
+}) {
+  if (reportAsCompanySiret) {
+    return (
+      delegateToDelegatorsMap
+        .get(reportAsCompanySiret)
+        ?.includes(reportForCompanySiret) ?? false
+    );
+  }
+
+  return allowedSirets.includes(reportForCompanySiret);
 }

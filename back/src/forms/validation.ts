@@ -76,6 +76,12 @@ import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { isDefined, isDefinedStrict } from "../common/helpers";
+import { onlyWhiteSpace } from "../common/validation/zod/refinement";
+import {
+  ERROR_TRANSPORTER_PLATES_TOO_MANY,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../common/validation/messages";
 
 // set yup default error messages
 configureYup();
@@ -555,7 +561,7 @@ export const ecoOrganismeSchema = yup.object().shape({
         ecoOrganismeSiret
           ? prisma.ecoOrganisme
               .findFirst({
-                where: { siret: ecoOrganismeSiret }
+                where: { siret: ecoOrganismeSiret, handleBsdd: true }
               })
               .then(el => el != null)
           : true
@@ -1005,7 +1011,43 @@ const requiredWhenTransporterSign: (
   }
 });
 
+//
 // 8 - Collecteur-transporteur
+
+// utility fn
+export const validatePlates = (transporterNumberPlate: string) => {
+  // convert plate  string to an array
+  const plates = formatInitialPlates(transporterNumberPlate);
+
+  if (plates.length > 2) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_TOO_MANY);
+  }
+
+  if (
+    plates.some(plate => (plate ?? "").length > 12 || (plate ?? "").length < 4)
+  ) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH);
+  }
+
+  if (plates.some(plate => onlyWhiteSpace(plate ?? ""))) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT);
+  }
+  return true;
+};
+
+// Schema dedicated to validate plates on signTransportForm SIGNED_BY_TEMP_STORER
+export const plateSchemaFn = () =>
+  yup.object({
+    transporterNumberPlate: yup
+      .string()
+      .nullable()
+      .test(transporterNumberPlate => {
+        return transporterNumberPlate
+          ? validatePlates(transporterNumberPlate)
+          : true;
+      })
+  });
+
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
@@ -1035,7 +1077,11 @@ export const transporterSchemaFn: FactorySchemaOf<
           );
         }
 
-        return true;
+        if (!transporterNumberPlate) {
+          return true;
+        }
+
+        return validatePlates(transporterNumberPlate);
       }),
     transporterCompanyName: yup
       .string()
@@ -1193,7 +1239,9 @@ export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
   isDraft
 }) =>
   yup.object({
-    traderCompanySiret: siret.label("Négociant"),
+    traderCompanySiret: siret
+      .label("Négociant")
+      .test(siretTests.isRegistered("TRADER")),
     traderCompanyName: yup.string().when("traderCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -1265,7 +1313,9 @@ export const brokerSchemaFn: FactorySchemaOf<FormValidationContext, Broker> = ({
   isDraft
 }) =>
   yup.object({
-    brokerCompanySiret: siret.label("Courtier"),
+    brokerCompanySiret: siret
+      .label("Courtier")
+      .test(siretTests.isRegistered("BROKER")),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -2388,3 +2438,25 @@ export async function validateIntermediaries(
     await intermediarySchema.validate(companyInput, { abortEarly: false });
   }
 }
+
+const formatInitialPlates = (
+  transporterNumberPlate: string | null | undefined
+): string[] => {
+  if (!transporterNumberPlate) {
+    return [];
+  }
+  const regex = /,+|,\s+/;
+  const containsComma = regex.test(transporterNumberPlate);
+  if (containsComma) {
+    return transporterNumberPlate?.split(regex);
+  } else {
+    if (transporterNumberPlate) {
+      return [transporterNumberPlate];
+    }
+    return [];
+  }
+};
+
+export const transporterPlatesSchema = transporterSchemaFn({}).pick([
+  "transporterNumberPlate"
+]);

@@ -34,6 +34,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
     isDraft: true,
     type: existingBsff.type,
     status: BsffStatus.INITIAL,
+    isDuplicateOf: existingBsff.id,
     emitterCompanyName: emitter?.name ?? existingBsff.emitterCompanyName,
     emitterCompanySiret: emitter?.siret ?? existingBsff.emitterCompanySiret,
     emitterCompanyAddress:

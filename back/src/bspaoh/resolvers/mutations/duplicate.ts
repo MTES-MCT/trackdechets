@@ -123,6 +123,7 @@ async function duplicateBspaoh(
     id,
     createdAt,
     updatedAt,
+    isDuplicateOf,
 
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
@@ -160,6 +161,7 @@ async function duplicateBspaoh(
     bspaohId,
     createdAt: trsCreatedAt,
     updatedAt: trsUpdatedAt,
+    transporterTransportPlates,
 
     ...trsFieldsToCopy
   } = bspaohTransporter;
@@ -173,6 +175,7 @@ async function duplicateBspaoh(
     wastePackagings: cleanPackagings(wastePackagings),
     id: getReadableId(ReadableIdPrefix.PAOH),
     status: BspaohStatus.DRAFT,
+    isDuplicateOf: bspaoh.id,
 
     // Emitter company info
 

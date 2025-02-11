@@ -167,7 +167,7 @@ input BspaohRecepisseInput {
 input BspaohTransportInput {
   "Mode de transport"
   mode: TransportMode
-  "Plaque(s) d'immatriculation - maximum 2"
+  "Plaque(s) d'immatriculation - maximum 2 - 4 à 12 caractères."
   plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime

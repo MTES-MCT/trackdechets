@@ -7,7 +7,7 @@ title: Authentification
 L'authentification à l'API se fait avec un token qui doit être passé via l'en-tête `Authorization` de chacune de vos requêtes de la façon suivante :
 
 ```json
-{ Authorization: "Bearer YOUR_TOKEN" }
+{ "Authorization": "Bearer YOUR_TOKEN" }
 ```
 
 Chaque utilisateur inscrit sur la plateforme peut obtenir un token depuis l'interface Trackdéchets en allant sur *Mon Compte* > *Intégration API* puis *Générer une clé*. Les tokens ont une durée de vie inifinie. Il est possible de les révoquer depuis son compte Trackdéchets.

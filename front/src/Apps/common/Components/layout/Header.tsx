@@ -33,12 +33,15 @@ import {
 
 import routes from "../../../routes";
 import styles from "./Header.module.scss";
-import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
+import CompanySwitcher, {
+  getDefaultOrgId
+} from "../CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
   {
     me {
       id
+      isAdmin
       companies {
         id
         name
@@ -349,7 +352,7 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
             aria-current={matchRegistryV2Tab}
             aria-controls="menu-registry"
           >
-            {"Mes registres (v2)"}
+            {"🆕 Mes registres (beta)"}
           </button>
           <div className="fr-collapse fr-menu" id="menu-registry">
             <ul className="fr-menu__list">
@@ -545,8 +548,8 @@ const getDesktopMenuEntries = (
     ...(canViewNewRegistry
       ? [
           {
-            caption: "Mes registres (v2)",
-            href: routes.registry_new.myImports,
+            caption: "🆕 Mes registres (beta)",
+            href: routes.registry_new.index,
             navlink: true
           }
         ]
@@ -556,9 +559,7 @@ const getDesktopMenuEntries = (
     {
       caption: allBsdsMenuEntryLbl,
       href: currentSiret
-        ? generatePath(routes.dashboard.index, {
-            siret: currentSiret
-          })
+        ? generatePath(routes.dashboard.index, { siret: currentSiret })
         : "/",
 
       navlink: true
@@ -581,22 +582,12 @@ const getDesktopMenuEntries = (
   return [...(isAuthenticated ? connected : []), ...(isAdmin ? admin : [])];
 };
 
-type HeaderProps = {
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  defaultOrgId?: string;
-};
-
 /**
  * Main nav
  * Contains External and internal links
  * On mobile appear as a sliding panel and includes other items
  */
-export default function Header({
-  isAuthenticated,
-  isAdmin,
-  defaultOrgId
-}: HeaderProps) {
+export default function Header() {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const location = useLocation();
   const { updatePermissions, role, permissions } = usePermissions();
@@ -611,10 +602,15 @@ export default function Header({
     location.pathname
   );
 
+  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
+
+  const isAuthenticated = !loading && data != null;
+  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
+
+  const defaultOrgId = getDefaultOrgId(data?.me.companies ?? []);
+
   // Catching siret from url when not available from props (just after login)
   const currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
-
-  const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   useEffect(() => {
     if (isAuthenticated && data && currentSiret) {
@@ -648,6 +644,8 @@ export default function Header({
     [navigate, role]
   );
 
+  if (loading) return null;
+
   const showRegistry =
     permissions.includes(UserPermission.RegistryCanRead) &&
     [UserRole.Admin, UserRole.Member].includes(role!);
@@ -673,7 +671,153 @@ export default function Header({
     canViewNewRegistry
   );
 
-  return !isAuthenticated ? (
+  return (
+    <>
+      <div id="header" className={`fr-header ${styles.header}`}>
+        <div className={styles.headerContent}>
+          <div className={`fr-enlarge-link ${styles.headerBranding}`}>
+            <Link to="/dashboard">
+              <img
+                src="/marianne.svg"
+                alt=""
+                style={{ height: "40px", width: "40px", marginRight: "24px" }}
+              />
+
+              <img
+                src="/trackdechets.png"
+                alt="trackdechets.data.gouv.fr"
+                style={{ height: "40px", width: "40px" }}
+              />
+            </Link>
+          </div>
+
+          <nav className={`fr-nav ${styles.headerNav}`}>
+            <ul
+              className={`fr-nav__list ${styles.headerNavList}`}
+              style={{ margin: "initial", maxWidth: "initial" }}
+            >
+              {menuEntries.map((e, idx) => (
+                <li
+                  id={
+                    e.caption === allBsdsMenuEntryLbl
+                      ? "header-all-bsds-link"
+                      : ""
+                  }
+                  className="fr-nav__item"
+                  key={idx}
+                >
+                  <MenuLink entry={e} />
+                </li>
+              ))}
+
+              <li className="fr-nav__item">
+                <button
+                  className="fr-nav__btn"
+                  style={{ width: "fit-content" }}
+                  aria-expanded="false"
+                  aria-controls="aidemenu"
+                >
+                  Aide
+                </button>
+                <div className="fr-collapse fr-menu" id="aidemenu">
+                  <ul className="fr-menu__list">
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://faq.trackdechets.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Foire aux questions
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://sandbox.trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Site de démonstration
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className="fr-nav__link"
+                        href="https://trackdechets.beta.gouv.fr/"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Page d'accueil / Formations
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </nav>
+
+          <div className={styles.headerActions}>
+            <form
+              name="logout"
+              action={`${VITE_API_ENDPOINT}/logout`}
+              method="post"
+            >
+              <Button
+                iconId="fr-icon-logout-box-r-line"
+                onClick={() => {
+                  localAuthService.locallySignOut();
+                  document.forms["logout"].submit();
+                  return false;
+                }}
+                priority="tertiary no outline"
+                title="Se déconnecter"
+              />
+            </form>
+          </div>
+
+          <button
+            className={`fr-btn fr-btn--tertiary fr-icon-menu-fill ${styles.headerToggle}`}
+            data-fr-opened="false"
+            aria-controls="header-menu-modal-fr-header-simple-header"
+            aria-haspopup="menu"
+            id="fr-header-simple-header-menu-button"
+            title="Menu"
+            data-fr-js-modal-button="true"
+          >
+            Menu
+          </button>
+        </div>
+
+        <MobileSubNav
+          currentCompany={currentCompany}
+          canViewNewRegistry={canViewNewRegistry}
+        />
+      </div>
+
+      {/* Company switcher on top of the page */}
+      {!!matchDashboard && companies && currentCompany && (
+        <div className={styles.companySelector}>
+          <div className="company-select">
+            <CompanySwitcher
+              currentOrgId={currentCompany.orgId}
+              companies={companies}
+              handleCompanyChange={handleCompanyChange}
+            />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Main nav when logged out
+ * Contains External and internal links
+ * On mobile appear as a sliding panel and includes other items
+ */
+export function UnauthenticatedHeader() {
+  return (
     <header
       role="banner"
       id="fr-header-with-horizontal-operator-logo"
@@ -692,9 +836,11 @@ export default function Header({
                     <br />
                     écologique,
                     <br />
-                    de l'énergie, du climat, <br />
-                    et de la prévention <br />
-                    des risques
+                    de la biodiversité,
+                    <br />
+                    de la forêt, de la mer
+                    <br />
+                    et de la pêche
                   </p>
                 </div>
                 <div className="fr-header__operator">
@@ -852,142 +998,5 @@ export default function Header({
         </div>
       </div>
     </header>
-  ) : (
-    <>
-      <div id="header" className={`fr-header ${styles.header}`}>
-        <div className={styles.headerContent}>
-          <div className={`fr-enlarge-link ${styles.headerBranding}`}>
-            <Link to="/">
-              <img
-                src="/marianne.svg"
-                alt=""
-                style={{ height: "40px", width: "40px", marginRight: "24px" }}
-              />
-
-              <img
-                src="/trackdechets.png"
-                alt="trackdechets.data.gouv.fr"
-                style={{ height: "40px", width: "40px" }}
-              />
-            </Link>
-          </div>
-
-          <nav className={`fr-nav ${styles.headerNav}`}>
-            <ul
-              className={`fr-nav__list ${styles.headerNavList}`}
-              style={{ margin: "initial", maxWidth: "initial" }}
-            >
-              {menuEntries.map((e, idx) => (
-                <li
-                  id={
-                    e.caption === allBsdsMenuEntryLbl
-                      ? "header-all-bsds-link"
-                      : ""
-                  }
-                  className="fr-nav__item"
-                  key={idx}
-                >
-                  <MenuLink entry={e} />
-                </li>
-              ))}
-
-              <li className="fr-nav__item">
-                <button
-                  className="fr-nav__btn"
-                  style={{ width: "fit-content" }}
-                  aria-expanded="false"
-                  aria-controls="aidemenu"
-                >
-                  Aide
-                </button>
-                <div className="fr-collapse fr-menu" id="aidemenu">
-                  <ul className="fr-menu__list">
-                    <li>
-                      <a
-                        className="fr-nav__link"
-                        href="https://faq.trackdechets.fr/"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Foire aux questions
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="fr-nav__link"
-                        href="https://sandbox.trackdechets.beta.gouv.fr/"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Site de démonstration
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className="fr-nav__link"
-                        href="https://trackdechets.beta.gouv.fr/"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Page d'accueil / Formations
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </nav>
-
-          <div className={styles.headerActions}>
-            <form
-              name="logout"
-              action={`${VITE_API_ENDPOINT}/logout`}
-              method="post"
-            >
-              <Button
-                iconId="fr-icon-logout-box-r-line"
-                onClick={() => {
-                  localAuthService.locallySignOut();
-                  document.forms["logout"].submit();
-                  return false;
-                }}
-                priority="tertiary no outline"
-                title="Se déconnecter"
-              />
-            </form>
-          </div>
-
-          <button
-            className={`fr-btn fr-btn--tertiary fr-icon-menu-fill ${styles.headerToggle}`}
-            data-fr-opened="false"
-            aria-controls="header-menu-modal-fr-header-simple-header"
-            aria-haspopup="menu"
-            id="fr-header-simple-header-menu-button"
-            title="Menu"
-            data-fr-js-modal-button="true"
-          >
-            Menu
-          </button>
-        </div>
-
-        <MobileSubNav
-          currentCompany={currentCompany}
-          canViewNewRegistry={canViewNewRegistry}
-        />
-      </div>
-
-      {/* Company switcher on top of the page */}
-      {!!matchDashboard && companies && currentCompany && (
-        <div className={styles.companySelector}>
-          <div className="company-select">
-            <CompanySwitcher
-              currentOrgId={currentCompany.orgId}
-              companies={companies}
-              handleCompanyChange={handleCompanyChange}
-            />
-          </div>
-        </div>
-      )}
-    </>
   );
 }

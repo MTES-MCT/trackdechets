@@ -21,3 +21,24 @@ type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
 }
+
+"Représente un utilisateur sur la plateforme Trackdéchets"
+type User {
+  "Identifiant opaque"
+  id: ID!
+
+  "Email de l'utiliateur"
+  email: String!
+
+  "Nom de l'utilisateur"
+  name: String
+
+  "Qualité d'administrateur. Rôle reservé aux agents de l'administration"
+  isAdmin: Boolean
+
+  "Numéro de téléphone de l'utilisateur"
+  phone: String
+
+  "Liste des fonctionnalités optionelles activées"
+  featureFlags: [String!]!
+}

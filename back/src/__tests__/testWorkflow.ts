@@ -23,7 +23,12 @@ async function testWorkflow(workflow: Workflow) {
       // create ecoOrganisme to allow its user to perform api calls
       await ecoOrganismeFactory({
         siret: company.siret!,
-        handle: { handleBsdasri: true }
+        handle: {
+          handleBsdd: true,
+          handleBsdasri: true,
+          handleBsda: true,
+          handleBsvhu: true
+        }
       });
     }
     if (

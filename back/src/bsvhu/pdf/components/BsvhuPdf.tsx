@@ -14,7 +14,8 @@ import { Recepisse } from "../../../common/pdf/components/Recepisse";
 const UNITE_IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
     "identification par n° d'ordre tels qu'ils figurent dans le registre de police",
-  NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation"
+  NUMERO_IMMATRICULATION: "identification par numéro d’immatriculation",
+  NUMERO_FICHE_DROMCOM: "identification par numéro de fiche VHU DROMCOM"
 };
 
 const getIdentificationTypeLabel = (bsvhu: Bsvhu) => {
@@ -132,7 +133,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </p>
             {bsvhu?.ecoOrganisme?.siret && (
               <p>
-                <strong>Eco-organisme désigné :</strong>{" "}
+                <strong>Eco-organisme ou système individuel désigné :</strong>{" "}
                 <p>
                   Raison sociale : {bsvhu.ecoOrganisme?.name}
                   <br />

@@ -1,22 +1,36 @@
 import { SafeParseReturnType } from "zod";
-import { SSD_EXPORT_HEADERS, SSD_HEADERS } from "./ssd/constants";
-import { safeParseAsyncSsd } from "./ssd/validation";
-import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
-import { INCOMING_WASTE_HEADERS } from "./incomingWaste/constants";
-import {
-  saveIncomingWasteLine,
-  getIncomingWasteImportSiretsAssociations
-} from "./incomingWaste/database";
-import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
-import { RegistryExportType } from "@prisma/client";
-import { toSsdWaste } from "./ssd/registry";
-import type { SsdWasteV2 } from "@td/codegen-back";
 import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
 import {
-  saveIncomingTexsLine,
-  getIncomingTexsImportSiretsAssociations
+  getIncomingTexsImportSiretsAssociations,
+  saveIncomingTexsLine
 } from "./incomingTexs/database";
 import { safeParseAsyncIncomingTexs } from "./incomingTexs/validation";
+import { INCOMING_WASTE_HEADERS } from "./incomingWaste/constants";
+import {
+  getIncomingWasteImportSiretsAssociations,
+  saveIncomingWasteLine
+} from "./incomingWaste/database";
+import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
+import { OUTGOING_TEXS_HEADERS } from "./outgoingTexs/constants";
+import {
+  getOutgoingTexsImportSiretsAssociations,
+  saveOutgoingTexsLine
+} from "./outgoingTexs/database";
+import { safeParseAsyncOutgoingTexs } from "./outgoingTexs/validation";
+import { OUTGOING_WASTE_HEADERS } from "./outgoingWaste/constants";
+import {
+  getOutgoingWasteImportSiretsAssociations,
+  saveOutgoingWasteLine
+} from "./outgoingWaste/database";
+import { safeParseAsyncOutgoingWaste } from "./outgoingWaste/validation";
+import { SSD_HEADERS } from "./ssd/constants";
+import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
+import { safeParseAsyncSsd } from "./ssd/validation";
+
+import { toSsdWaste as SsdToSsdWaste } from "./ssd/registry";
+import { toIncomingWaste as IncomingWasteToIncomingWaste } from "./incomingWaste/registry";
+import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingWaste/registry";
+import type { IncomingWasteV2, SsdWasteV2 } from "@td/codegen-back";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
@@ -43,7 +57,13 @@ export type ImportOptions = {
 };
 
 export const ERROR_HEADER = "Erreur";
-export const IMPORT_TYPES = ["SSD", "INCOMING_WASTE", "INCOMING_TEXS"] as const;
+export const IMPORT_TYPES = [
+  "SSD",
+  "INCOMING_WASTE",
+  "INCOMING_TEXS",
+  "OUTGOING_TEXS",
+  "OUTGOING_WASTE"
+] as const;
 export type ImportType = (typeof IMPORT_TYPES)[number];
 
 export const importOptions: Record<ImportType, ImportOptions> = {
@@ -64,22 +84,57 @@ export const importOptions: Record<ImportType, ImportOptions> = {
     safeParseAsync: safeParseAsyncIncomingTexs,
     saveLine: saveIncomingTexsLine,
     getImportSiretsAssociations: getIncomingTexsImportSiretsAssociations
+  },
+  OUTGOING_TEXS: {
+    headers: OUTGOING_TEXS_HEADERS,
+    safeParseAsync: safeParseAsyncOutgoingTexs,
+    saveLine: saveOutgoingTexsLine,
+    getImportSiretsAssociations: getOutgoingTexsImportSiretsAssociations
+  },
+  OUTGOING_WASTE: {
+    headers: OUTGOING_WASTE_HEADERS,
+    safeParseAsync: safeParseAsyncOutgoingWaste,
+    saveLine: saveOutgoingWasteLine,
+    getImportSiretsAssociations: getOutgoingWasteImportSiretsAssociations
   }
 };
 
 export const CSV_DELIMITER = ";";
 export const UNAUTHORIZED_ERROR =
-  "Vous n'avez pas le droit de faire une déclaration pour ce SIRET";
+  "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours";
 
-export type ExportOptions = {
-  headers: Record<string, string>;
+export type InputExportOptions = {
   toSsdWaste?: (registry: unknown) => SsdWasteV2;
+  toIncomingWaste?: (registry: unknown) => IncomingWasteV2;
 };
 
-export const exportOptions: Partial<Record<RegistryExportType, ExportOptions>> =
-  {
-    SSD: {
-      headers: SSD_EXPORT_HEADERS,
-      toSsdWaste
-    }
-  };
+export const INPUT_EXPORT_TYPES = [
+  "SSD",
+  "INCOMING_WASTE",
+  "INCOMING_TEXS",
+  "BSDD",
+  "BSDA",
+  "BSDASRI",
+  "BSFF",
+  "BSPAOH",
+  "BSVHU"
+] as const;
+export type InputExportType = (typeof INPUT_EXPORT_TYPES)[number];
+
+export type OutputExportOptions = {
+  headers: Record<string, string>;
+};
+
+export const exportOptions: Partial<
+  Record<InputExportType, InputExportOptions>
+> = {
+  SSD: {
+    toSsdWaste: SsdToSsdWaste
+  },
+  INCOMING_WASTE: {
+    toIncomingWaste: IncomingWasteToIncomingWaste
+  },
+  INCOMING_TEXS: {
+    toIncomingWaste: IncomingTexsToIncomingWaste
+  }
+};
