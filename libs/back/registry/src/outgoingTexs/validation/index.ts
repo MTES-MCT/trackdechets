@@ -4,7 +4,7 @@ import {
   refineMunicipalities,
   refineNotificationNumber,
   refineOperationCodeWhenUpcycled,
-  refineOperationMode,
+  refineOperationMode
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";

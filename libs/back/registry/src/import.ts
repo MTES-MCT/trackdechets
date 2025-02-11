@@ -74,7 +74,7 @@ export async function processStream({
     for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
         stats.errors++;
-        
+
         // Build an ordering map that we rely on to sort the errors by the order of the columns
         const orderMap = Object.keys(options.headers).reduce(
           (acc, key, index) => {
