@@ -366,7 +366,7 @@ function SignOperationModal({
         <div className="fr-grid-row fr-grid-row--gutters">
           <div className="fr-col-12">
             <Input
-              label="Description du traitement réalisé"
+              label="Description du traitement réalisé (optionnel)"
               textArea
               className="fr-col-12"
               state={errors?.processingOperationDescription && "error"}
