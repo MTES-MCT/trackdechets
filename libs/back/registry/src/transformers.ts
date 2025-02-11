@@ -5,6 +5,7 @@ import * as Excel from "exceljs";
 import { PassThrough, Readable } from "node:stream";
 
 import { CSV_DELIMITER, ERROR_HEADER, ImportOptions } from "./options";
+import { format } from "date-fns";
 
 export function getTransformCsvStream(options: ImportOptions) {
   const parseStream = parse({
@@ -151,9 +152,12 @@ export function getTransformXlsxStream(options: ImportOptions) {
         let isEmptyLine = true;
         const rawLine = {};
         for (const [index, key] of indexToHeaderMapping.entries()) {
-          const { value, text } = row.getCell(index + 1);
-          // Keep the raw value of the cell to avoid formating problems (dates, number, etc)
-          rawLine[key] = text === "" ? null : text;
+          const { value, type, style } = row.getCell(index + 1);
+          rawLine[key] =
+            value && type === Excel.ValueType.Date && style.numFmt
+              ? applyDateFormat(value as Date, style.numFmt)
+              : value;
+
           if (value) {
             isEmptyLine = false;
           }
@@ -196,4 +200,14 @@ function normalizeHeader(header: string) {
 
 function isLiteralCellValue(value: unknown) {
   return typeof value !== "object";
+}
+
+function applyDateFormat(value: Date, formatStr: string) {
+  if (formatStr === "hh:mm") {
+    return format(value, "HH:mm");
+  }
+
+  // Excel passes MM as mm for dates (and minutes...)
+  // And this way if we receive dd/mm/yyyy its okay
+  return format(value, "yyyy-MM-dd");
 }
