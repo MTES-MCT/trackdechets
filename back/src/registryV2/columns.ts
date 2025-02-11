@@ -701,15 +701,19 @@ export const EXPORT_COLUMNS: {
     destinationFinalOperationCodes: {
       label: "Destination finale - Code de traitement final réalisé",
       format: (codes: string[]) =>
-        formatArray(codes.map(c => formatOperationCode(c)))
+        Array.isArray(codes)
+          ? formatArray(codes.map(c => formatOperationCode(c)))
+          : ""
     },
     destinationFinalOperationWeights: {
       label: "Quantité finale (tonnes)",
       format: (quantities: number[]) =>
-        formatArray(
-          quantities.map(q => q.toLocaleString("fr")),
-          { separator: " - " }
-        )
+        Array.isArray(quantities)
+          ? formatArray(
+              quantities.map(q => q.toLocaleString("fr")),
+              { separator: " - " }
+            )
+          : ""
     },
 
     declarationNumber: { label: "Numéro de déclaration GISTRID" },

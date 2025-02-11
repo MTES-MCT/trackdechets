@@ -398,10 +398,11 @@ export function ExportModal({ isOpen, onClose }: Props) {
     }
     if (
       registryType !== RegistryV2ExportType.Ssd &&
-      registryType !== RegistryV2ExportType.Incoming
+      registryType !== RegistryV2ExportType.Incoming &&
+      registryType !== RegistryV2ExportType.Outgoing
     ) {
       toast.error(
-        "Seuls les exports SSD et entrants sont supportés pour le moment"
+        "Seuls les exports SSD, entrants et sortants sont supportés pour le moment"
       );
       return;
     }
