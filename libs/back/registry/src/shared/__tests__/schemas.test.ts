@@ -21,7 +21,8 @@ import {
   booleanSchema,
   operationModeSchema,
   notificationNumberSchema,
-  parcelNumbersSchema
+  parcelNumbersSchema,
+  declarationNumberSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -207,8 +208,20 @@ describe("Schemas", () => {
     expect(operationModeSchema.parse(null)).toBe(null);
   });
 
+  test("declarationNumberSchema", () => {
+    expect(() =>
+      declarationNumberSchema.parse("A7E 2024 063125")
+    ).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 06312")).toThrow();
+  });
+
   test("notificationNumberSchema", () => {
     expect(() => notificationNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() =>
+      notificationNumberSchema.parse("FR 2023 077002")
+    ).not.toThrow();
     expect(() =>
       notificationNumberSchema.parse("AA 1234 567890")
     ).not.toThrow();

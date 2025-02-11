@@ -585,3 +585,58 @@ export const refineOperationCodeWhenUpcycled: Refinement<{
     });
   }
 };
+
+export const refineEcoOrgBrokerAndTrader: Refinement<{
+  ecoOrganismeSiret?: string | null;
+  ecoOrganismeName?: string | null;
+  brokerCompanySiret?: string | null;
+  brokerCompanyName?: string | null;
+  brokerRecepisseNumber?: string | null;
+  traderCompanySiret?: string | null;
+  traderCompanyName?: string | null;
+  traderRecepisseNumber?: string | null;
+}> = async (item, { addIssue }) => {
+  if (item.ecoOrganismeSiret && !item.ecoOrganismeName) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `La raison sociale de l'éco-organisme est obligatoire si le SIRET est renseigné`,
+      path: ["ecoOrganismeName"]
+    });
+  }
+
+  if (item.brokerCompanySiret) {
+    if (!item.brokerCompanyName) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `La raison sociale du courtier est obligatoire si le SIRET est renseigné`,
+        path: ["brokerCompanyName"]
+      });
+    }
+
+    if (!item.brokerRecepisseNumber) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le numéro de récépissé du courtier est obligatoire si le SIRET est renseigné`,
+        path: ["brokerRecepisseNumber"]
+      });
+    }
+  }
+
+  if (item.traderCompanySiret) {
+    if (!item.traderCompanyName) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `La raison sociale du négociant est obligatoire si le SIRET est renseigné`,
+        path: ["traderCompanyName"]
+      });
+    }
+
+    if (!item.traderRecepisseNumber) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le numéro de récépissé du négociant est obligatoire si le SIRET est renseigné`,
+        path: ["traderRecepisseNumber"]
+      });
+    }
+  }
+};

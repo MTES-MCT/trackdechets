@@ -1,5 +1,6 @@
 import {
   parcelRefinement,
+  refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
@@ -30,6 +31,7 @@ export function safeParseAsyncOutgoingTexs(line: unknown) {
     .superRefine(parcelRefinement)
     .superRefine(refineOperationMode)
     .superRefine(refineOperationCodeWhenUpcycled)
+    .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

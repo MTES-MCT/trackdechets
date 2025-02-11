@@ -1,4 +1,5 @@
 import {
+  refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
@@ -28,6 +29,7 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
     .superRefine(refineOperationMode)
+    .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)
