@@ -693,15 +693,7 @@ enum GerepType {
   Producteur
   Traiteur
 }
-"Type de déchets autorisé pour une rubrique"
-enum WasteType {
-  "Déchet inerte"
-  INERTE
-  "Déchet non dangereux"
-  NOT_DANGEROUS
-  "Déchet dangereux"
-  DANGEROUS
-}
+
 "Représente une ligne dans une déclaration GEREP"
 type Declaration {
   "Année de la déclaration"

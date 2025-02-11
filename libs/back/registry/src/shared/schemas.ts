@@ -10,14 +10,17 @@ import {
 import { sub } from "date-fns";
 import { z } from "zod";
 
-export const reasonSchema = z
+const enumValueAsStringSchema = z
   .string()
+  .trim()
   .transform(val =>
     val
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toUpperCase()
-  )
+  );
+
+export const reasonSchema = enumValueAsStringSchema
   .pipe(
     z
       .enum(["MODIFIER", "EDIT", "ANNULER", "CANCEL", "IGNORER"], {
@@ -54,6 +57,7 @@ export const siretSchema = z.coerce
   .string({
     invalid_type_error: `Le SIRET doit être une chaîne de caractères`
   })
+  .transform(v => v.replace(/\s+/g, ""))
   .refine(value => {
     return isSiret(value);
   }, `Le SIRET n'est pas valide`);
@@ -74,6 +78,22 @@ export const getWasteCodeSchema = (
   z.coerce
     .string()
     .nullish() // So that coercion is a no-op for null & undefined. This enables the use of .nullish() on getWasteCodeSchema
+    .transform(val => {
+      if (!val) {
+        return val;
+      }
+      const noSpaceVal = val.replace(/\s+/g, "");
+
+      if (noSpaceVal.length !== 6 && noSpaceVal.length !== 7) {
+        return val;
+      }
+
+      return [
+        noSpaceVal.slice(0, 2),
+        noSpaceVal.slice(2, 4),
+        noSpaceVal.slice(4)
+      ].join(" ");
+    })
     .pipe(
       z.enum(wasteCodes, {
         required_error: "Le code déchet est requis",
@@ -86,6 +106,7 @@ export const booleanSchema = z.union(
   [
     z
       .string()
+      .trim()
       .transform(val => val.toUpperCase())
       .pipe(
         z
@@ -126,16 +147,8 @@ export const getOperationCodeSchema = (
       })
     );
 
-export const operationModeSchema = z
-  .string()
-  .trim()
-  .transform(val =>
-    val
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toUpperCase()
-      .replace(/ /g, "_")
-  )
+export const operationModeSchema = enumValueAsStringSchema
+  .transform(val => val.replace(/ /g, "_"))
   .pipe(
     z
       .enum(
@@ -168,15 +181,14 @@ export const operationModeSchema = z
   )
   .nullish();
 
+const numberAsStringSchema = z
+  .string()
+  .trim()
+  .nullish()
+  .transform(val => (val ? Number(val.replace(",", ".")) : undefined));
+
 export const weightValueSchema = z
-  .union([
-    z.number().nullish(),
-    z
-      .string()
-      .trim()
-      .nullish()
-      .transform(val => (val ? Number(val.replace(",", ".")) : undefined))
-  ]) // No coercion to keep .nullish()
+  .union([z.number().nullish(), numberAsStringSchema]) // No coercion to keep .nullish()
   .pipe(
     z
       .number({
@@ -190,38 +202,22 @@ export const weightValueSchema = z
 
 export const weightIsEstimateSchema = z.union(
   [
-    z
-      .string()
-      .trim()
-      .transform(val =>
-        val
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toUpperCase()
-      )
-      .pipe(
-        z
-          .enum(["ESTIME", "REEL"], {
-            required_error: "Le type de poids est requis",
-            invalid_type_error:
-              "Le type de poids n'est pas valide. Valeurs possibles (sans accent): ESTIME, REEL"
-          })
-          .transform(val => val === "ESTIME")
-      ),
+    enumValueAsStringSchema.pipe(
+      z
+        .enum(["ESTIME", "REEL"], {
+          required_error: "Le type de poids est requis",
+          invalid_type_error:
+            "Le type de poids n'est pas valide. Valeurs possibles (sans accent): ESTIME, REEL"
+        })
+        .transform(val => val === "ESTIME")
+    ),
     z.boolean()
   ],
   { invalid_type_error: "Le type de poids saisi n'est pas valide" }
 );
 
 export const volumeSchema = z
-  .union([
-    z.number().nullish(),
-    z
-      .string()
-      .trim()
-      .nullish()
-      .transform(val => (val ? Number(val.replace(",", ".")) : undefined))
-  ]) // No coercion to keep .nullish()
+  .union([z.number().nullish(), numberAsStringSchema]) // No coercion to keep .nullish()
   .pipe(
     z
       .number({
@@ -280,55 +276,55 @@ export const nullishDateSchema = z
       .nullish()
   );
 
-export const inseeCodesSchema = z
+const stringToArraySchema = z
   .string()
   .trim()
   .nullish()
+  .refine(
+    val => !val || !val.includes(";"),
+    "Les valeurs doivent être séparées par une virgule"
+  )
   .transform(val =>
     val
       ? String(val)
           .split(",")
           .map(val => val.trim())
       : []
-  )
-  .pipe(
-    z.array(
-      z
-        .string()
-        .trim()
-        .refine(
-          val => val.length === 5,
-          "Le code INSEE d'une commune doit faire 5 caractères"
-        )
-    )
   );
 
-export const municipalitiesNamesSchema = z
-  .string()
-  .trim()
-  .nullish()
-  .transform(val =>
-    val
-      ? String(val)
-          .split(",")
-          .map(val => val.trim())
-      : []
-  )
-  .pipe(
-    z.array(
-      z
-        .string()
-        .trim()
-        .min(
-          1,
-          "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
-        )
-        .max(
-          300,
-          "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
-        )
+const inseeCodesArraySchema = z.array(
+  z
+    .string()
+    .trim()
+    .refine(
+      val => val.length === 5,
+      "Le code INSEE d'une commune doit faire 5 caractères"
     )
-  );
+);
+
+export const inseeCodesSchema = z.union([
+  stringToArraySchema.pipe(inseeCodesArraySchema),
+  inseeCodesArraySchema
+]);
+
+const municipalitiesNamesArraySchema = z.array(
+  z
+    .string()
+    .trim()
+    .min(
+      1,
+      "Le libellé de la commune de collecte de déchet doit faire plus de 1 caractère"
+    )
+    .max(
+      300,
+      "Le libellé de la commune de collecte de déchet doit faire moins de 300 caractères"
+    )
+);
+
+export const municipalitiesNamesSchema = z.union([
+  stringToArraySchema.pipe(municipalitiesNamesArraySchema),
+  municipalitiesNamesArraySchema
+]);
 
 export const declarationNumberSchema = z
   .string()
@@ -360,18 +356,7 @@ const parcelNumbersArraySchema = z.array(
 );
 
 export const parcelNumbersSchema = z.union([
-  z
-    .string()
-    .trim()
-    .nullish()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(parcelNumbersArraySchema),
+  stringToArraySchema.pipe(parcelNumbersArraySchema),
   parcelNumbersArraySchema
 ]);
 
@@ -386,18 +371,7 @@ const parcelCoordinatesArraySchema = z.array(
 );
 
 export const parcelCoordinatesSchema = z.union([
-  z
-    .string()
-    .trim()
-    .nullish()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(parcelCoordinatesArraySchema),
+  stringToArraySchema.pipe(parcelCoordinatesArraySchema),
   parcelCoordinatesArraySchema
 ]);
 

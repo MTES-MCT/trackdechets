@@ -16,7 +16,7 @@ export const OUTGOING_TEXS_HEADERS: {
   reportForPickupSiteCity:
     "Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   reportForPickupSiteCountryCode:
-    "Pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+    "Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   wasteDescription: "Dénomination du déchet",
   wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",

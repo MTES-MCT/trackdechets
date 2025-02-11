@@ -120,7 +120,7 @@ export function refineActorInfos<T>({
           addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Le numéro d'identification doit faire 10 caractères pour une assoxiation. Il commence par un W suivi de 9 chiffres.",
+              "Le numéro d'identification doit faire 10 caractères pour une association. Il commence par un W suivi de 9 chiffres.",
             path: [orgIdKey]
           });
         }

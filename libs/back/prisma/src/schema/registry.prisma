@@ -380,7 +380,7 @@ model RegistryOutgoingTexs {
     reportForPickupSiteCountryCode         String?
     reportAsCompanySiret                   String?
     wasteDescription                       String
-    wasteCode                              String
+    wasteCode                              String?
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
