@@ -1014,6 +1014,40 @@ const requiredWhenTransporterSign: (
 //
 // 8 - Collecteur-transporteur
 
+// utility fn
+export const validatePlates = (transporterNumberPlate: string) => {
+  // convert plate  string to an array
+  const plates = formatInitialPlates(transporterNumberPlate);
+
+  if (plates.length > 2) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_TOO_MANY);
+  }
+
+  if (
+    plates.some(plate => (plate ?? "").length > 12 || (plate ?? "").length < 4)
+  ) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH);
+  }
+
+  if (plates.some(plate => onlyWhiteSpace(plate ?? ""))) {
+    return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT);
+  }
+  return true;
+};
+
+// Schema dedicated to validate plates on signTransportForm SIGNED_BY_TEMP_STORER
+export const plateSchemaFn = () =>
+  yup.object({
+    transporterNumberPlate: yup
+      .string()
+      .nullable()
+      .test(transporterNumberPlate => {
+        return transporterNumberPlate
+          ? validatePlates(transporterNumberPlate)
+          : true;
+      })
+  });
+
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
@@ -1047,30 +1081,7 @@ export const transporterSchemaFn: FactorySchemaOf<
           return true;
         }
 
-        // convert plate  string to an array
-        const plates = formatInitialPlates(transporterNumberPlate);
-
-        if (plates.length > 2) {
-          return new yup.ValidationError(ERROR_TRANSPORTER_PLATES_TOO_MANY);
-        }
-
-        if (
-          plates.some(
-            plate => (plate ?? "").length > 12 || (plate ?? "").length < 4
-          )
-        ) {
-          return new yup.ValidationError(
-            ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH
-          );
-        }
-
-        if (plates.some(plate => onlyWhiteSpace(plate ?? ""))) {
-          return new yup.ValidationError(
-            ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
-          );
-        }
-
-        return true;
+        return validatePlates(transporterNumberPlate);
       }),
     transporterCompanyName: yup
       .string()

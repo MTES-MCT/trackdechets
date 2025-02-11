@@ -172,7 +172,7 @@ export const v20241201 = new Date(
 
 // Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des palques d'immatriculations et la quantité transportée
 export const v20250101 = new Date(
-  process.env.OVERRIDE_V20250101 || "2025-01-01T00:00:00.000"
+  process.env.OVERRIDE_V20250101 || "2025-01-15T00:00:00.000"
 );
 
 const BsvhuIdentificationTypesAfterV20241201 = [

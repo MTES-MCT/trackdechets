@@ -162,10 +162,11 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data, errors } = await mutate<
-      Pick<Mutation, "addToIncomingTexsRegistry">
-    >(ADD_TO_INCOMING_TEXS_REGISTRY, { variables: { lines } });
-    console.log(JSON.stringify(errors));
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
     expect(data.addToIncomingTexsRegistry).toBe(true);
   });
 
