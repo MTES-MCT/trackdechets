@@ -162,8 +162,12 @@ export const toIncomingWaste = (
     destinationReceptionWeightIsEstimate: incomingWaste.weightIsEstimate,
     destinationReceptionVolume: incomingWaste.volume,
     destinationPlannedOperationCode: null,
-    destinationOperationMode: incomingWaste.operationMode,
-    destinationOperationCode: incomingWaste.operationCode,
+    destinationOperationModes: incomingWaste.operationMode
+      ? [incomingWaste.operationMode]
+      : null,
+    destinationOperationCodes: incomingWaste.operationCode
+      ? [incomingWaste.operationCode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingWaste.noTraceability,
     declarationNumber: incomingWaste.declarationNumber,

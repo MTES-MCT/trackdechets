@@ -61,11 +61,10 @@ const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
 type BsffDestinationV2 = {
   destinationReceptionAcceptationStatus: WasteAcceptationStatus;
   destinationReceptionWeight: number;
-  destinationReceptionVolume: number;
   destinationReceptionRefusedWeight: number;
   destinationReceptionAcceptedWeight: number;
-  destinationOperationCode: string;
-  destinationOperationMode: string;
+  destinationOperationCodes: string[];
+  destinationOperationModes: OperationMode[];
   destinationOperationDate: Date;
 };
 
@@ -77,12 +76,6 @@ export function toBsffDestination(
       return weight + packaging.weight;
     }
     return weight;
-  }, 0);
-  const destinationReceptionVolume = packagings.reduce((vol, packaging) => {
-    if (packaging.volume) {
-      return vol + packaging.volume;
-    }
-    return vol;
   }, 0);
 
   const hasAnyReception = packagings.some(p => !!p.acceptationSignatureDate);
@@ -132,23 +125,23 @@ export function toBsffDestination(
   );
 
   const operationCodes = hasAnyOperation
-    ? packagings
+    ? (packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationCode)
-        .map(p => p.operationCode)
+        .map(p => p.operationCode) as string[])
     : [];
 
-  const destinationOperationCode = hasAnyOperation
-    ? [...new Set(operationCodes)].join(" ")
+  const destinationOperationCodes = hasAnyOperation
+    ? [...new Set(operationCodes)]
     : null;
 
   const operationModes = hasAnyOperation
-    ? packagings
+    ? (packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationMode)
-        .map(p => p.operationMode)
+        .map(p => p.operationMode) as OperationMode[])
     : [];
 
-  const destinationOperationMode = hasAnyOperation
-    ? [...new Set(operationModes)].join(" ")
+  const destinationOperationModes = hasAnyOperation
+    ? [...new Set(operationModes)]
     : null;
 
   // returns last date
@@ -161,22 +154,26 @@ export function toBsffDestination(
   return {
     destinationReceptionAcceptationStatus,
     destinationReceptionWeight,
-    destinationReceptionVolume,
     destinationReceptionRefusedWeight,
     destinationReceptionAcceptedWeight,
-    destinationOperationCode,
-    destinationOperationMode,
+    destinationOperationCodes,
+    destinationOperationModes,
     destinationOperationDate
   };
 }
 
 const getFinalOperationsData = (bsff: RegistryV2Bsff) => {
-  const destinationFinalPlannedOperationCodes: string[] = [];
+  const nextDestinationPlannedOperationCodes: string[] = [];
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
   const destinationFinalOperationCompanySirets: string[] = [];
   // Check if finalOperations is defined and has elements
   for (const packaging of bsff.packagings) {
+    if (packaging.operationNextDestinationPlannedOperationCode) {
+      nextDestinationPlannedOperationCodes.push(
+        packaging.operationNextDestinationPlannedOperationCode
+      );
+    }
     if (
       packaging.operationSignatureDate &&
       packaging.operationCode &&
@@ -192,6 +189,7 @@ const getFinalOperationsData = (bsff: RegistryV2Bsff) => {
       // Iterate through each operation once and fill both arrays
       packaging.finalOperations.forEach(ope => {
         destinationFinalOperationCodes.push(ope.operationCode);
+
         // conversion en tonnes
         destinationFinalOperationWeights.push(
           ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -202,17 +200,12 @@ const getFinalOperationsData = (bsff: RegistryV2Bsff) => {
             ope.finalBsffPackaging.bsff.destinationCompanySiret
           );
         }
-        if (ope.finalBsffPackaging.bsff.destinationPlannedOperationCode) {
-          destinationFinalPlannedOperationCodes.push(
-            ope.finalBsffPackaging.bsff.destinationPlannedOperationCode
-          );
-        }
       });
     }
   }
 
   return {
-    destinationFinalPlannedOperationCodes,
+    nextDestinationPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -287,11 +280,10 @@ export const toIncomingWasteV2 = (
   const {
     destinationReceptionAcceptationStatus,
     destinationReceptionWeight,
-    destinationReceptionVolume,
     destinationReceptionRefusedWeight,
     destinationReceptionAcceptedWeight,
-    destinationOperationCode,
-    destinationOperationMode,
+    destinationOperationCodes,
+    destinationOperationModes,
     destinationOperationDate
   } = toBsffDestination(bsff.packagings);
 
@@ -384,10 +376,10 @@ export const toIncomingWasteV2 = (
     destinationReceptionRefusedWeight,
     destinationReceptionAcceptedWeight,
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionVolume,
+    destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
-    destinationOperationCode,
-    destinationOperationMode: destinationOperationMode as OperationMode, // this can actually be malformed ("ACCEPTED REFUSED")
+    destinationOperationCodes,
+    destinationOperationModes,
     // >switch to array and destinationOperationModes?
     destinationOperationNoTraceability: false,
     declarationNumber: null,
@@ -465,7 +457,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry
   } = getInitialEmitterData(bsff);
   const {
-    destinationFinalPlannedOperationCodes,
+    nextDestinationPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -523,11 +515,10 @@ export const toOutgoingWasteV2 = (
   const {
     destinationReceptionAcceptationStatus,
     destinationReceptionWeight,
-    destinationReceptionVolume,
     destinationReceptionRefusedWeight,
     destinationReceptionAcceptedWeight,
-    destinationOperationCode,
-    destinationOperationMode,
+    destinationOperationCodes,
+    destinationOperationModes,
     destinationOperationDate
   } = toBsffDestination(bsff.packagings);
 
@@ -569,7 +560,7 @@ export const toOutgoingWasteV2 = (
       ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     weightIsEstimate: bsff.weightIsEstimate,
-    volume: destinationReceptionVolume,
+    volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
     initialEmitterCompanyAddress,
@@ -713,12 +704,12 @@ export const toOutgoingWasteV2 = (
     destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: destinationOperationCode,
-    destinationOperationMode: destinationOperationMode as OperationMode,
+    destinationOperationCodes,
+    destinationOperationModes,
+    nextDestinationPlannedOperationCodes,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     destinationFinalOperationCompanySirets,
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     declarationNumber: null,

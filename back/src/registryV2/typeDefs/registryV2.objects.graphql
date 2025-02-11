@@ -15,10 +15,10 @@ type IncomingWasteV2 {
 
   reportAsSiret: String
 
-  "Extra - Date de création du bordereau"
+  "Date de création du bordereau"
   createdAt: DateTime
 
-  "Extra - Date de dernière modification du bordereau"
+  "Date de dernière modification du bordereau"
   updatedAt: DateTime
 
   transporterTakenOverAt: DateTime
@@ -28,19 +28,19 @@ type IncomingWasteV2 {
 
   weighingHour: String
 
-  "Extra - Date de réalisation de l'opération"
+  "Date de réalisation de l'opération"
   destinationOperationDate: DateTime
 
-  "Extra - Type de bordereau"
+  "Type de bordereau"
   bsdType: BsdType
 
-  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  "Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
   bsdSubType: BsdSubType
 
-  "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
+  "Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Statut du bordereau"
+  "Statut du bordereau"
   status: String
 
   "Dénomination usuelle du déchet"
@@ -52,7 +52,7 @@ type IncomingWasteV2 {
   wasteCode: String
 
   """
-  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
   """
   wasteIsDangerous: Boolean
 
@@ -99,7 +99,7 @@ type IncomingWasteV2 {
   emitterCompanyCity: String
   "Le pays de l'établissement expéditeur des déchets"
   emitterCompanyCountry: String
-  "Extra - Adresse email de contact de l'expéditeur du déchet"
+  "Adresse email de contact de l'expéditeur du déchet"
   emitterCompanyMail: String
 
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
@@ -113,17 +113,17 @@ type IncomingWasteV2 {
   "Le pays de prise en charge"
   emitterPickupsiteCountry: String
 
-  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
-  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
-  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  "L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
-  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  "Le code postal de l'entreprise de travaux (amiante uniquement)"
   workerCompanyPostalCode: String
-  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  "La ville de l'entreprise de travaux (amiante uniquement)"
   workerCompanyCity: String
-  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  "Le pays de l'entreprise de travaux (amiante uniquement)"
   workerCompanyCountry: String
 
   "La ville de localisation de la/des parcelles"
@@ -214,13 +214,13 @@ type IncomingWasteV2 {
   transporter2CompanyCity: String
   "Le pays du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°2"
+  "Exemption de récépissé transporteur n°2"
   transporter2RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
   transporter2TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°2"
+  "Adresse email de contact du transporteur n°2"
   transporter2CompanyMail: String
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
@@ -237,13 +237,13 @@ type IncomingWasteV2 {
   transporter3CompanyCity: String
   "Le pays du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°3"
+  "Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
   transporter3TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°3"
+  "Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
@@ -260,13 +260,13 @@ type IncomingWasteV2 {
   transporter4CompanyCity: String
   "Le pays du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°4"
+  "Exemption de récépissé transporteur n°4"
   transporter4RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
   transporter4RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
   transporter4TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°4"
+  "Adresse email de contact du transporteur n°4"
   transporter4CompanyMail: String
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
@@ -283,17 +283,17 @@ type IncomingWasteV2 {
   transporter5CompanyCity: String
   "Le pays du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°5"
+  "Exemption de récépissé transporteur n°5"
   transporter5RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
   transporter5RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
   transporter5TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°5"
+  "Adresse email de contact du transporteur n°5"
   transporter5CompanyMail: String
 
   """
-  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
   relatives au transport international des marchandises dangereuses par route, au transport international
   ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
   transport maritime de marchandises dangereuses
@@ -305,7 +305,7 @@ type IncomingWasteV2 {
   """
   nonRoadRegulationMention: String
 
-  "Extra - N° de CAP (Certificat d'acceptation préalable)"
+  "N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
   wasteDap: String
@@ -322,10 +322,10 @@ type IncomingWasteV2 {
   destinationCompanyPostalCode: String
   "La ville de l'établissement vers lequel le déchet est expédié"
   destinationCompanyCity: String
-  "Extra - L'adresse email du contact de l'établissement de destination"
+  "L'adresse email du contact de l'établissement de destination"
   destinationCompanyMail: String
 
-  "Extra - Statut d'acceptation du déchet"
+  "Statut d'acceptation du déchet"
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
   "La quantité de déchet entrant exprimée en tonne"
   destinationReceptionWeight: Float
@@ -339,14 +339,14 @@ type IncomingWasteV2 {
 
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
   destinationPlannedOperationCode: String
-  "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
-  destinationOperationMode: OperationMode
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
-  destinationOperationCode: String
+  destinationOperationCodes: [String!]
+  "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
+  destinationOperationModes: [OperationMode!]
   "Charte citerne - Est-ce que la citerne a été rincée ou non?"
   destinationHasCiterneBeenWashedOut: Boolean
 
-  "Extra - Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
+  "Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
   declarationNumber: String
@@ -380,28 +380,28 @@ type OutgoingWasteV2 {
 
   reportAsSiret: String
 
-  "Extra - Date de création du bordereau"
+  "Date de création du bordereau"
   createdAt: DateTime
 
-  "Extra - Date de dernière modification du bordereau"
+  "Date de dernière modification du bordereau"
   updatedAt: DateTime
 
   "La date de l'expédition du déchet"
   transporterTakenOverAt: DateTime
 
-  "Extra - Date de réalisation de l'opération"
+  "Date de réalisation de l'opération"
   destinationOperationDate: DateTime
 
-  "Extra - Type de bordereau"
+  "Type de bordereau"
   bsdType: BsdType
 
-  "Extra - Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
+  "Sous-type de bordereau (Initial, Annexe 1, Groupement etc.)"
   bsdSubType: BsdSubType
 
-  "Extra - Identifiant secondaire du bordereau (BSDD uniquement)"
+  "Identifiant secondaire du bordereau (BSDD uniquement)"
   customId: String
 
-  "Extra - Statut du bordereau"
+  "Statut du bordereau"
   status: String
 
   "La dénomination usuelle du déchet"
@@ -417,7 +417,7 @@ type OutgoingWasteV2 {
   wastePop: Boolean
 
   """
-  Extra - Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
+  Certains déchets avec un code déchet sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.
   """
   wasteIsDangerous: Boolean
 
@@ -459,7 +459,7 @@ type OutgoingWasteV2 {
   emitterCompanyCity: String
   "Le pays de l'établissement expéditeur des déchets"
   emitterCompanyCountry: String
-  "Extra - Adresse email de contact de l'expéditeur du déchet"
+  "Adresse email de contact de l'expéditeur du déchet"
   emitterCompanyMail: String
 
   "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
@@ -473,17 +473,17 @@ type OutgoingWasteV2 {
   "Le pays de prise en charge"
   emitterPickupsiteCountry: String
 
-  "Extra - Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
-  "Extra - La raison sociale de l'entreprise de travaux (amiante uniquement)"
+  "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
-  "Extra - L'adresse de l'entreprise de travaux (amiante uniquement)"
+  "L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
-  "Extra - Le code postal de l'entreprise de travaux (amiante uniquement)"
+  "Le code postal de l'entreprise de travaux (amiante uniquement)"
   workerCompanyPostalCode: String
-  "Extra - La ville de l'entreprise de travaux (amiante uniquement)"
+  "La ville de l'entreprise de travaux (amiante uniquement)"
   workerCompanyCity: String
-  "Extra - Le pays de l'entreprise de travaux (amiante uniquement)"
+  "Le pays de l'entreprise de travaux (amiante uniquement)"
   workerCompanyCountry: String
 
   "La ville de localisation de la/des parcelles"
@@ -576,13 +576,13 @@ type OutgoingWasteV2 {
   transporter2CompanyCity: String
   "Le pays du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°2"
+  "Exemption de récépissé transporteur n°2"
   transporter2RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°2 (en cas de transport multimodal)"
   transporter2RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°2 (en cas de transport multimodal)"
   transporter2TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°2"
+  "Adresse email de contact du transporteur n°2"
   transporter2CompanyMail: String
 
   "La raison sociale du transporteur n°3 (en cas de transport multimodal)"
@@ -599,13 +599,13 @@ type OutgoingWasteV2 {
   transporter3CompanyCity: String
   "Le pays du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°3"
+  "Exemption de récépissé transporteur n°3"
   transporter3RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°3 (en cas de transport multimodal)"
   transporter3RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°3 (en cas de transport multimodal)"
   transporter3TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°3"
+  "Adresse email de contact du transporteur n°3"
   transporter3CompanyMail: String
 
   "La raison sociale du transporteur n°4 (en cas de transport multimodal)"
@@ -622,13 +622,13 @@ type OutgoingWasteV2 {
   transporter4CompanyCity: String
   "Le pays du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°4"
+  "Exemption de récépissé transporteur n°4"
   transporter4RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°4 (en cas de transport multimodal)"
   transporter4RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°4 (en cas de transport multimodal)"
   transporter4TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°4"
+  "Adresse email de contact du transporteur n°4"
   transporter4CompanyMail: String
 
   "La raison sociale du transporteur n°5 (en cas de transport multimodal)"
@@ -645,17 +645,17 @@ type OutgoingWasteV2 {
   transporter5CompanyCity: String
   "Le pays du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyCountry: String
-  "Extra - Exemption de récépissé transporteur n°5"
+  "Exemption de récépissé transporteur n°5"
   transporter5RecepisseIsExempted: Boolean
   "Le récepissé transporteur n°5 (en cas de transport multimodal)"
   transporter5RecepisseNumber: String
   "Le mode de transport utilisé par le transporteur n°5 (en cas de transport multimodal)"
   transporter5TransportMode: TransportMode
-  "Extra - Adresse email de contact du transporteur n°5"
+  "Adresse email de contact du transporteur n°5"
   transporter5CompanyMail: String
 
   """
-  Extra - Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
+  Dans le cas de déchets dangereux, selon le cas, le code transport lié aux réglementations internationales
   relatives au transport international des marchandises dangereuses par route, au transport international
   ferroviaire des marchandises dangereuses, au transport de matières dangereuses sur le Rhin, ou au
   transport maritime de marchandises dangereuses
@@ -667,7 +667,7 @@ type OutgoingWasteV2 {
   """
   nonRoadRegulationMention: String
 
-  "Extra - N° de CAP (Certificat d'acceptation préalable)"
+  "N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
   wasteDap: String
@@ -686,7 +686,7 @@ type OutgoingWasteV2 {
   destinationCompanyCity: String
   "Le pays de l'établissement vers lequel le déchet est expédié"
   destinationCompanyCountry: String
-  "Extra - L'adresse email du contact de l'établissement de destination"
+  "L'adresse email du contact de l'établissement de destination"
   destinationCompanyMail: String
 
   "Libellé de l'adresse de dépôt du destinataire"
@@ -711,13 +711,13 @@ type OutgoingWasteV2 {
   "Destination post entreposage provisoire Pays"
   postTempStorageDestinationCountry: String
 
-  "Extra - Statut d'acceptation du déchet"
+  "Statut d'acceptation du déchet"
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
-  "Extra - La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
+  "La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
-  "Extra - La quantité de déchet entrant acceptée exprimée en tonne"
+  "La quantité de déchet entrant acceptée exprimée en tonne"
   destinationReceptionAcceptedWeight: Float
-  "Extra - La quantité de déchet entrant refusée exprimée en tonne"
+  "La quantité de déchet entrant refusée exprimée en tonne"
   destinationReceptionRefusedWeight: Float
 
   "Le code du traitement qui va être opéré dans l'installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;"
@@ -726,21 +726,21 @@ type OutgoingWasteV2 {
   destinationPlannedOperationMode: OperationMode
 
   "Le code du traitement qui va être opéré dans l'établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets"
-  destinationOperationCode: String
+  destinationOperationCodes: [String!]
   "Qualification du traitement final vis-à-vis de la hiérarchie des modes de traitement définie à l'article L. 541-1 du code de l'environnement"
-  destinationOperationMode: OperationMode
+  destinationOperationModes: [OperationMode!]
+  "Code(s) de l'opération prévue par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  nextDestinationPlannedOperationCodes: [String!]
   "Charte citerne - Est-ce que la citerne a été rincée ou non?"
   destinationHasCiterneBeenWashedOut: Boolean
-  "Extra - Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
+  "Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  "Extra - Installation(s) de traitement dans le ou lesquelles le traitement final a été réalisé"
+  "Installation(s) de traitement dans le ou lesquelles le traitement final a été réalisé"
   destinationFinalOperationCompanySirets: [String!]
-  "Extra - Code(s) de l'opération prévue par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
-  destinationFinalPlannedOperationCodes: [String!]
-  "Extra - Code(s) de traitement renseigné(s) par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
+  "Code(s) de traitement renseigné(s) par l'exutoire finale (ou les exutoires finaux en cas de ventilation des quantités sur plusieurs BSDDs de regroupement)"
   destinationFinalOperationCodes: [String!]
-  "Extra - Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
+  "Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
   destinationFinalOperationWeights: [Float!]
 
   declarationNumber: String

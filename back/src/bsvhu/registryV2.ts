@@ -135,8 +135,12 @@ export const toIncomingWasteV2 = (
     destinationReceptionAcceptedWeight: null,
     destinationReceptionWeightIsEstimate: false,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
-    destinationOperationCode: bsvhu.destinationOperationCode,
-    destinationOperationMode: bsvhu.destinationOperationMode,
+    destinationOperationCodes: bsvhu.destinationOperationCode
+      ? [bsvhu.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsvhu.destinationOperationMode
+      ? [bsvhu.destinationOperationMode]
+      : null,
     destinationOperationNoTraceability: false
   };
 };
@@ -294,12 +298,16 @@ export const toOutgoingWasteV2 = (
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bsvhu.destinationOperationCode,
-    destinationOperationMode: bsvhu.destinationOperationMode,
+    destinationOperationCodes: bsvhu.destinationOperationCode
+      ? [bsvhu.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsvhu.destinationOperationMode
+      ? [bsvhu.destinationOperationMode]
+      : null,
+    nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     destinationFinalOperationCompanySirets: null,
-    destinationFinalPlannedOperationCodes: null,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
     declarationNumber: null,
