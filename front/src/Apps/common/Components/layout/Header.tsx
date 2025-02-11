@@ -558,7 +558,9 @@ const getDesktopMenuEntries = (
   const connected = [
     {
       caption: allBsdsMenuEntryLbl,
-      href: currentSiret ? routes.dashboard.index : "/",
+      href: currentSiret
+        ? generatePath(routes.dashboard.index, { siret: currentSiret })
+        : "/",
 
       navlink: true
     },
