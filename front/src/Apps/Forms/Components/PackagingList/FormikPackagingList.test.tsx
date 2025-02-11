@@ -106,7 +106,7 @@ describe("<FormikPackagingList />", () => {
       expect(
         screen.getByText(`Volume en litres (optionnel)`)
       ).toBeInTheDocument();
-      expect(screen.getByText(`Soit 0.001000 m3`)).toBeInTheDocument();
+      expect(screen.getByText(`Soit 0.001 m3`)).toBeInTheDocument();
     }
   );
 
@@ -148,12 +148,12 @@ describe("<FormikPackagingList />", () => {
     });
   });
 
-  it("should display input 'Nom du type de contenant' when Type 'Autre' is selected", async () => {
+  it("should display input 'Nom du type de conditionnement' when Type 'Autre' is selected", async () => {
     renderComponent({
       packagings: [{ type: Packagings.Autre, quantity: 1 }]
     });
     expect(
-      screen.getByLabelText("Nom du type de contenant")
+      screen.getByLabelText("Nom du type de conditionnement")
     ).toBeInTheDocument();
   });
 
