@@ -113,14 +113,14 @@ function PackagingForm({
             nativeInputProps={{
               type: "number",
               inputMode: "decimal",
-              step: "1",
+              step: "0.001",
               ...inputProps.volume
             }}
           />
 
           <p className="fr-info-text">
             {volumeUnit === "litres"
-              ? `Soit ${numberToString((packaging.volume || 0) / 1000)} m3`
+              ? `Soit ${numberToString((packaging.volume || 0) / 1000, 3)} m3`
               : `Soit ${numberToString(packaging.volume || 0, 0)} litres`}
           </p>
         </div>
@@ -145,7 +145,7 @@ function PackagingForm({
         <div className="fr-grid-row fr-grid-row--gutters">
           <div className="fr-col-12">
             <Input
-              label="Nom du type de contenant"
+              label="Nom du type de conditionnement"
               disabled={disabled}
               state={errors?.other && touched?.other ? "error" : "default"}
               stateRelatedMessage={errors?.other}

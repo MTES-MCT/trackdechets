@@ -1,12 +1,6 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { PackagingInfoInput } from "@td/codegen-ui";
-import {
-  FieldArray,
-  FormikErrors,
-  FormikTouched,
-  useField,
-  useFormikContext
-} from "formik";
+import { FieldArray, useField } from "formik";
 import PackagingList, { PackagingListProps } from "./PackagingList";
 import FormikPackagingForm from "./FormikPackagingForm";
 
@@ -17,21 +11,9 @@ function FormikPackagingList({
   fieldName,
   disabled = false
 }: Pick<PackagingListProps, "fieldName" | "disabled">) {
-  const [field, { error }] = useField<PackagingInfoInput[]>(fieldName);
-
-  const { touched } = useFormikContext();
-
-  // Le type des erreurs et de touched n'est pas correctement inféré par Formik ici
-  // Peut-être en lien avec https://github.com/jaredpalmer/formik/issues/2347
-  const errors = error as any as FormikErrors<PackagingInfoInput[]> | undefined;
+  const [field] = useField<PackagingInfoInput[]>(fieldName);
 
   const packagings = field.value;
-
-  const packagingsTouched: FormikTouched<PackagingInfoInput[]> = useMemo(() => {
-    return fieldName.split(".").reduce((acc, path) => {
-      return acc?.[path];
-    }, touched);
-  }, [touched, fieldName]);
 
   return (
     <FieldArray
@@ -42,8 +24,6 @@ function FormikPackagingList({
           fieldName={fieldName}
           push={push}
           remove={remove}
-          touched={packagingsTouched}
-          errors={errors}
           disabled={disabled}
         >
           {props => <FormikPackagingForm {...props} />}

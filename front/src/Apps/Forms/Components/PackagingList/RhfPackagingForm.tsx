@@ -3,20 +3,54 @@ import { RenderPackagingFormProps } from "./PackagingList";
 import { useFormContext, useFieldArray } from "react-hook-form";
 import PackagingForm from "./PackagingForm";
 
+/**
+ * Wrapper qui permet de contrôler le composant <PackagingForm /> avec React Hook Form
+ */
 function RhfPackagingForm({
   fieldName,
   packaging,
   packagingsLength,
   idx,
-  disabled = false,
-  errors,
-  touched
+  disabled = false
 }: RenderPackagingFormProps) {
-  const { control, register } = useFormContext();
+  const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
+
+  const { control, register, getFieldState, formState } = useFormContext();
   const { append, remove } = useFieldArray({
     control,
-    name: `${fieldName}.${idx}.identificationNumbers`
+    name: fieldPath("identificationNumbers")
   });
+
+  const { error: errorType, isTouched: isTouchedType } = getFieldState(
+    fieldPath("type")
+  );
+  const { error: errorVolume, isTouched: isTouchedVolume } = getFieldState(
+    fieldPath("volume")
+  );
+  const { error: errorQuantity, isTouched: isTouchedQuantity } = getFieldState(
+    fieldPath("quantity")
+  );
+  const { error: errorOther, isTouched: isTouchedOther } = getFieldState(
+    fieldPath("other")
+  );
+
+  const errors = {
+    type: errorType?.message,
+    volume: errorVolume?.message,
+    quantity: errorQuantity?.message,
+    other: errorOther?.message
+  };
+
+  // Affiche les erreurs uniquement une première
+  // tentative d'envoi du formulaire
+  const hasBeenSubmitted = formState.submitCount > 0;
+
+  const touched = {
+    type: isTouchedType && hasBeenSubmitted,
+    volume: isTouchedVolume && hasBeenSubmitted,
+    quantity: isTouchedQuantity && hasBeenSubmitted,
+    other: isTouchedOther && hasBeenSubmitted
+  };
 
   return (
     <PackagingForm
@@ -26,10 +60,10 @@ function RhfPackagingForm({
       errors={errors}
       touched={touched}
       inputProps={{
-        type: register(`${fieldName}.${idx}.type`),
-        volume: register(`${fieldName}.${idx}.volume`),
-        quantity: register(`${fieldName}.${idx}.quantity`),
-        other: register(`${fieldName}.${idx}.other`),
+        type: register(fieldPath("type")),
+        volume: register(fieldPath("volume")),
+        quantity: register(fieldPath("quantity")),
+        other: register(fieldPath("other")),
         identificationNumbers: {
           push: append,
           remove

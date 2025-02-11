@@ -7,7 +7,7 @@ import { PackagingFormProps } from "./PackagingForm";
 // de PackagingForm dans le composant fonction enfant.
 export type RenderPackagingFormProps = Omit<
   PackagingFormProps,
-  "inputProps"
+  "inputProps" | "errors" | "touched"
 > & {
   // Nom du champ de liste des conditionnements
   fieldName: string;
@@ -26,10 +26,6 @@ export type PackagingListProps = {
   push: (packaging: PackagingInfoInput) => void;
   // Supprime le conditionnement situé à l'index `idx`
   remove: (idx: number) => void;
-  // Erreurs sur la liste des conditionnements
-  errors?: (Partial<Record<keyof PackagingInfoInput, string>> | undefined)[];
-  // Est-ce que les différents champs des conditionnements ont été visités
-  touched?: (Partial<Record<keyof PackagingInfoInput, boolean>> | undefined)[];
   // Implémentation concrète de <PackagingForm />
   children: React.FC<RenderPackagingFormProps>;
 };
@@ -40,8 +36,6 @@ function PackagingList({
   push,
   remove,
   disabled = false,
-  errors,
-  touched,
   children
 }: PackagingListProps) {
   const showAddButton = packagingInfos.every(
@@ -62,9 +56,7 @@ function PackagingList({
               packagingsLength: packagingInfos.length,
               idx,
               packaging: p,
-              disabled,
-              errors: errors?.[idx],
-              touched: touched?.[idx]
+              disabled
             })}
             {packagingInfos.length > 1 && (
               <>

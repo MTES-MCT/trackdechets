@@ -1,5 +1,5 @@
 import React from "react";
-import { FieldArray, useFormikContext } from "formik";
+import { FieldArray, useField } from "formik";
 import PackagingForm from "./PackagingForm";
 import { Packagings } from "@td/codegen-ui";
 import Decimal from "decimal.js";
@@ -13,14 +13,29 @@ function FormikPackagingForm({
   packaging,
   packagingsLength,
   idx,
-  disabled = false,
-  errors,
-  touched
+  disabled = false
 }: RenderPackagingFormProps) {
-  const { getFieldProps, setFieldValue, errors, touched } = useFormikContext();
+  const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const typeInputProps = getFieldProps(`${fieldName}.${idx}.type`);
-  const volumeInputProps = getFieldProps(`${fieldName}.${idx}.volume`);
+  const [typeInputProps, { error: errorType, touched: touchedType }] =
+    useField<Packagings>(fieldPath("type"));
+
+  const [
+    volumeInputProps,
+    { error: errorVolume, touched: touchedVolume },
+    { setValue: setVolumeValue }
+  ] = useField<number | string>(fieldPath("volume"));
+
+  const [
+    quantityInputProps,
+    { error: errorQuantity, touched: touchedQuantity }
+  ] = useField<number | string>(fieldPath("quantity"));
+
+  const [otherInputProps, { error: errorOther, touched: touchedOther }] =
+    useField<string>(fieldPath("other"));
+
+  // const typeInputProps = getFieldProps(`${fieldName}.${idx}.type`);
+  // const volumeInputProps = getFieldProps(`${fieldName}.${idx}.volume`);
 
   if (typeInputProps.value === Packagings.Benne) {
     // Dans le cas d'une benne, on veut pouvoir afficher et entrer
@@ -35,9 +50,23 @@ function FormikPackagingForm({
       const newValue = event.target.value
         ? new Decimal(event.target.value).times(1000).toNumber()
         : "";
-      setFieldValue(volumeInputProps.name, newValue);
+      setVolumeValue(newValue);
     };
   }
+
+  const errors = {
+    type: errorType,
+    quantity: errorQuantity,
+    volume: errorVolume,
+    other: errorOther
+  };
+
+  const touched = {
+    type: touchedType,
+    quantity: touchedQuantity,
+    volume: touchedVolume,
+    other: touchedOther
+  };
 
   return (
     <FieldArray
@@ -55,8 +84,8 @@ function FormikPackagingForm({
           inputProps={{
             type: typeInputProps,
             volume: volumeInputProps,
-            quantity: getFieldProps(`${fieldName}.${idx}.quantity`),
-            other: getFieldProps(`${fieldName}.${idx}.other`),
+            quantity: quantityInputProps,
+            other: otherInputProps,
             identificationNumbers: {
               push: pushIdentificationNumber,
               remove: removeIdentificationNumber

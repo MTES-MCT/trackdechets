@@ -193,14 +193,14 @@ export const validationBsddSchema = z.object({
       .array(
         z
           .object({
-            type: z.enum(
-              ["BENNE", "FUT", "CITERNE", "PIPELINE", "GRV", "AUTRE"],
-              {
-                required_error: "Ce champ est requis",
-                invalid_type_error: "Ce champ est requis"
-              }
-            ),
-            volume: z.number().positive().nullish(),
+            type: z.string().min(1, "Ce champ est requis"),
+            volume: z
+              .union([z.string(), z.number()])
+              .transform(val => (val === "" ? null : Number(val)))
+              .refine(
+                v => v === null || v > 0,
+                "Le volume doit être supérieur à 0"
+              ),
             other: z.string().nullish(),
             quantity: z.coerce
               .number()
@@ -212,7 +212,7 @@ export const validationBsddSchema = z.object({
               context.addIssue({
                 code: z.ZodIssueCode.custom,
 
-                message: "Veuillez préciser le conditionnement",
+                message: "Veuillez préciser le type de conditionnement",
 
                 path: ["other"]
               });

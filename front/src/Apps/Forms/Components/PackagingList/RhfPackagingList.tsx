@@ -1,13 +1,16 @@
-import React, { useMemo } from "react";
+import React from "react";
 import PackagingList, { PackagingListProps } from "./PackagingList";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import RhfPackagingForm from "./RHFPackagingForm";
+import RhfPackagingForm from "./RhfPackagingForm";
 
+/**
+ * Wrapper qui permet de contrôler <PackagingList /> avec React Hook Form
+ */
 function RhfPackagingList({
   fieldName,
   disabled = false
 }: Pick<PackagingListProps, "fieldName" | "disabled">) {
-  const { control, watch, formState } = useFormContext();
+  const { control, watch } = useFormContext();
   const { append, remove } = useFieldArray({
     control,
     name: fieldName
@@ -22,8 +25,6 @@ function RhfPackagingList({
       push={append}
       remove={remove}
       disabled={disabled}
-      errors={[]}
-      touched={[]}
     >
       {props => <RhfPackagingForm {...props} />}
     </PackagingList>

@@ -20,7 +20,6 @@ import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelecto
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
-import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import {
   BsddRevisionRequestValidationSchema,
   initialBsddReview,
