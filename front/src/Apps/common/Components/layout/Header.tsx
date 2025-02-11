@@ -352,7 +352,7 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
             aria-current={matchRegistryV2Tab}
             aria-controls="menu-registry"
           >
-            {"Mes registres (v2)"}
+            {"🆕 Mes registres (beta)"}
           </button>
           <div className="fr-collapse fr-menu" id="menu-registry">
             <ul className="fr-menu__list">
@@ -548,7 +548,7 @@ const getDesktopMenuEntries = (
     ...(canViewNewRegistry
       ? [
           {
-            caption: "Mes registres (v2)",
+            caption: "🆕 Mes registres (beta)",
             href: routes.registry_new.index,
             navlink: true
           }

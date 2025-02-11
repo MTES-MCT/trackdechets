@@ -152,7 +152,8 @@ export function getTransformXlsxStream(options: ImportOptions) {
         const rawLine = {};
         for (const [index, key] of indexToHeaderMapping.entries()) {
           const { value, text } = row.getCell(index + 1);
-          rawLine[key] = text;
+          // Keep the raw value of the cell to avoid formating problems (dates, number, etc)
+          rawLine[key] = text === "" ? null : text;
           if (value) {
             isEmptyLine = false;
           }
