@@ -18,7 +18,7 @@ const AccountInfoActionBar = ({
   isDisabled
 }: AccountInfoActionBarProps) => (
   <div className="account-info">
-    {title && <h3 className="fr-h4 fr-mr-1w">{title}</h3>}
+    {title && <h3 className="fr-h3 fr-mr-1w">{title}</h3>}
     <div className="account-info__bar">
       {!isEditing && (
         <div>
