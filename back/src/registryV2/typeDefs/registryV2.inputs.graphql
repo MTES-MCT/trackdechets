@@ -117,24 +117,24 @@ input SsdLineInput {
   secondaryWasteCodes: [String!]
   """
   Produit
-  Nature du produit ou de la matière faisant l'objet de la sortie de statut de déchet
+  Nature du produit ou de la matière issue de l'opération de valorisation
   """
   product: String!
   """
   Poids en tonnes
-  Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
+  Poids en tonnes du produit ou de la matière issue de l'opération de valorisation
 
   La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
   Type de poids
-  Indique si le poids du déchet faisant l'objet de la sortie de statut de déchet est estimé ou réel.
+  Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel
   """
   weightIsEstimate: Boolean!
   """
   Volume en M3
-  Volume en M3 du déchet faisant l'objet de la sortie de statut de déchet
+  Volume en M3 du produit ou de la matière issue de l'opération de valorisation
 
   La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
