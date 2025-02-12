@@ -119,7 +119,9 @@ export function FormWasteEmissionSummary({
               type="button"
               onClick={() => {
                 addField("packagingInfos");
-                setFieldValue("packagingInfos", [emptyPackaging]);
+                if (!values.packagingInfos?.length) {
+                  setFieldValue("packagingInfos", [emptyPackaging]);
+                }
               }}
               className="tw-ml-2"
             >

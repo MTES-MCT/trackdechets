@@ -1,7 +1,9 @@
 import React from "react";
 import { RenderPackagingFormProps } from "./PackagingList";
-import { useFormContext, useFieldArray } from "react-hook-form";
+import { useFormContext, useFieldArray, useController } from "react-hook-form";
 import PackagingForm from "./PackagingForm";
+import { Packagings } from "@td/codegen-ui";
+import Decimal from "decimal.js";
 
 /**
  * Wrapper qui permet de contrôler le composant <PackagingForm /> avec React Hook Form
@@ -15,18 +17,29 @@ function RhfPackagingForm({
 }: RenderPackagingFormProps) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const { control, register, getFieldState, formState } = useFormContext();
+  const { control, register, getFieldState, formState, watch, setValue } =
+    useFormContext();
   const { append, remove } = useFieldArray({
     control,
     name: fieldPath("identificationNumbers")
   });
 
+  // On ne peut pas utiliser directement `register` pour le volume
+  // car on veut pouvoir faire la conversion m3 <-> litres lorsque
+  // le type est Benne (voir ci-dessous la construction des props
+  // d'input pour le volume)
+  const {
+    field: volumeField,
+    fieldState: { error: errorVolume, isTouched: isTouchedVolume }
+  } = useController({
+    name: fieldPath("volume"),
+    control
+  });
+
   const { error: errorType, isTouched: isTouchedType } = getFieldState(
     fieldPath("type")
   );
-  const { error: errorVolume, isTouched: isTouchedVolume } = getFieldState(
-    fieldPath("volume")
-  );
+
   const { error: errorQuantity, isTouched: isTouchedQuantity } = getFieldState(
     fieldPath("quantity")
   );
@@ -52,6 +65,36 @@ function RhfPackagingForm({
     other: isTouchedOther && hasBeenSubmitted
   };
 
+  const volumeInputProps = {
+    onChange: volumeField.onChange,
+    onBlur: volumeField.onBlur,
+    value: volumeField.value,
+    name: volumeField.name,
+    inputRef: volumeField.ref
+  };
+
+  const packagingType = watch(fieldPath("type"));
+
+  if (packagingType === Packagings.Benne) {
+    // Dans le cas d'une benne, on veut pouvoir afficher et saisir
+    // le volume en m3 tout en gardant des litres côté API. Il faut donc
+    // faire la conversion m3 <-> litres dans les deux sens.
+    volumeInputProps.value = volumeInputProps.value
+      ? new Decimal(volumeInputProps.value).dividedBy(1000).toNumber()
+      : "";
+    volumeInputProps.onChange = (
+      event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+      const newValue = event.target.value
+        ? new Decimal(event.target.value).times(1000).toNumber()
+        : "";
+      setValue(fieldPath("volume"), newValue, {
+        shouldTouch: true,
+        shouldDirty: true
+      });
+    };
+  }
+
   return (
     <PackagingForm
       packaging={packaging}
@@ -61,7 +104,7 @@ function RhfPackagingForm({
       touched={touched}
       inputProps={{
         type: register(fieldPath("type")),
-        volume: register(fieldPath("volume")),
+        volume: volumeInputProps,
         quantity: register(fieldPath("quantity")),
         other: register(fieldPath("other")),
         identificationNumbers: {

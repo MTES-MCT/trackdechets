@@ -1,5 +1,6 @@
 import { FormInput, PackagingInfo, Packagings } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
+import Decimal from "decimal.js";
 
 export const PACKAGINGS_NAMES = {
   [Packagings.Benne]: "Benne",
@@ -45,7 +46,11 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
           packagingInfo.type === Packagings.Benne
             ? "m3"
             : pluralize("litre", packagingInfo.volume);
-        summary += ` de ${packagingInfo.volume} ${volumeUnit}`;
+        const volumeValue =
+          packagingInfo.type === Packagings.Benne
+            ? new Decimal(packagingInfo.volume).dividedBy(1000).toNumber()
+            : packagingInfo.volume;
+        summary += ` de ${volumeValue} ${volumeUnit}`;
       }
 
       if (packagingInfo.identificationNumbers?.length) {

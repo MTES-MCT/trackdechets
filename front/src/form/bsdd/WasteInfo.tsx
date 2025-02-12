@@ -193,7 +193,11 @@ export default function WasteInfo({ disabled }) {
               const updatedPackagings = checked
                 ? [{ type: Packagings.Pipeline, quantity: 1 }]
                 : [emptyPackaging];
-              setFieldValue("wasteDetails.packagingInfos", updatedPackagings);
+              setFieldValue(
+                "wasteDetails.packagingInfos",
+                updatedPackagings,
+                false
+              );
             }}
           />
         </div>

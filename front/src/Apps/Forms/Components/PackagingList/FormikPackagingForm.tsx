@@ -38,7 +38,7 @@ function FormikPackagingForm({
   // const volumeInputProps = getFieldProps(`${fieldName}.${idx}.volume`);
 
   if (typeInputProps.value === Packagings.Benne) {
-    // Dans le cas d'une benne, on veut pouvoir afficher et entrer
+    // Dans le cas d'une benne, on veut pouvoir afficher et saisir
     // le volume en m3 tout en gardant des litres côté API. Il faut donc
     // faire la conversion m3 <-> litres dans les deux sens.
     volumeInputProps.value = volumeInputProps.value
