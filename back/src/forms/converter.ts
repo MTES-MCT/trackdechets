@@ -667,6 +667,7 @@ export function expandFormFromDb(
       .map(segment => expandTransportSegmentFromDb(segment)),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
+    isDirectSupply: form.isDirectSupply,
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,

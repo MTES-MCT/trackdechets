@@ -121,13 +121,13 @@ const createFormResolver = async (
   // Pipeline erases transporter EXCEPT for transporterTransportMode
   // FIXME here we have a silent side effect. It would be be better to throw an
   // exception is the transporter data sent by the user does not comply
-  if (hasPipeline(form as any)) {
-    transporters = {
-      create: {
-        number: 1,
-        transporterTransportMode: TransportMode.OTHER
-      }
-    };
+  if (hasPipeline(form)) {
+    // transporters = {
+    //   create: {
+    //     number: 1,
+    //     transporterTransportMode: TransportMode.OTHER
+    //   }
+    // };
     transportersForValidation = [];
   }
 

@@ -258,12 +258,12 @@ type FormValidationContext = {
   signingTransporterOrgId?: string | null;
 };
 
-export const hasPipeline = (value: {
-  wasteDetailsPackagingInfos: Array<{
-    type: Packagings;
-  }>;
-}): boolean =>
-  value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
+export const hasPipeline = (
+  value: Pick<Form, "wasteDetailsPackagingInfos">
+): boolean =>
+  ((value.wasteDetailsPackagingInfos ?? []) as PackagingInfo[]).some(
+    i => i.type === "PIPELINE"
+  );
 
 export const quantityRefusedNotRequired = weight(WeightUnits.Tonne)
   .min(0)
