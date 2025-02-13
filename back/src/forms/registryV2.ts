@@ -75,7 +75,6 @@ const getPostTempStorageDestination = (bsdd: BsddV2) => {
 };
 
 const getFinalOperationsData = (bsdd: BsddV2) => {
-  const destinationFinalPlannedOperationCodes: string[] = [];
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
   const destinationFinalOperationCompanySirets: string[] = [];
@@ -100,15 +99,9 @@ const getFinalOperationsData = (bsdd: BsddV2) => {
           ope.finalForm.recipientCompanySiret
         );
       }
-      if (ope.finalForm.recipientProcessingOperation) {
-        destinationFinalPlannedOperationCodes.push(
-          ope.finalForm.recipientProcessingOperation
-        );
-      }
     });
   }
   return {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -290,8 +283,12 @@ export const toIncomingWasteV2 = (
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
-    destinationOperationCode: bsdd.destinationOperationCode,
-    destinationOperationMode: bsdd.destinationOperationMode,
+    destinationOperationCodes: bsdd.destinationOperationCode
+      ? [bsdd.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsdd.destinationOperationMode
+      ? [bsdd.destinationOperationMode]
+      : null,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
     declarationNumber:
@@ -394,7 +391,6 @@ export const toOutgoingWasteV2 = (
   } = getPostTempStorageDestination(bsdd);
 
   const {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -634,12 +630,19 @@ export const toOutgoingWasteV2 = (
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bsdd.destinationOperationCode,
-    destinationOperationMode: bsdd.destinationOperationMode,
+    destinationOperationCodes: bsdd.destinationOperationCode
+      ? [bsdd.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsdd.destinationOperationMode
+      ? [bsdd.destinationOperationMode]
+      : null,
+    nextDestinationPlannedOperationCodes:
+      bsdd.nextDestinationProcessingOperation
+        ? [bsdd.nextDestinationProcessingOperation]
+        : null,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
     destinationFinalOperationCompanySirets,
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     declarationNumber:

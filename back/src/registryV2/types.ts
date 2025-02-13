@@ -42,8 +42,7 @@ export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
     include: {
       finalBsda: {
         select: {
-          destinationCompanySiret: true,
-          destinationPlannedOperationCode: true
+          destinationCompanySiret: true
         }
       }
     }
@@ -78,8 +77,7 @@ export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
             include: {
               bsff: {
                 select: {
-                  destinationCompanySiret: true,
-                  destinationPlannedOperationCode: true
+                  destinationCompanySiret: true
                 }
               }
             }
@@ -216,8 +214,8 @@ export const emptyIncomingWasteV2: Omit<
   destinationReceptionWeightIsEstimate: null,
   destinationReceptionVolume: null,
   destinationPlannedOperationCode: null,
-  destinationOperationCode: null,
-  destinationOperationMode: null,
+  destinationOperationCodes: null,
+  destinationOperationModes: null,
   destinationHasCiterneBeenWashedOut: null,
   destinationOperationNoTraceability: null,
   declarationNumber: null,
@@ -426,12 +424,12 @@ export const emptyOutgoingWasteV2: Omit<
   destinationReceptionRefusedWeight: null,
   destinationPlannedOperationCode: null,
   destinationPlannedOperationMode: null,
-  destinationOperationCode: null,
-  destinationOperationMode: null,
+  destinationOperationCodes: null,
+  destinationOperationModes: null,
+  nextDestinationPlannedOperationCodes: null,
   destinationHasCiterneBeenWashedOut: null,
   destinationOperationNoTraceability: null,
   destinationFinalOperationCompanySirets: null,
-  destinationFinalPlannedOperationCodes: null,
   destinationFinalOperationCodes: null,
   destinationFinalOperationWeights: null,
   declarationNumber: null,

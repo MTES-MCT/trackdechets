@@ -171,9 +171,11 @@ export const toIncomingWasteV2 = (
         : bspaoh.destinationReceptionWasteAcceptedWeightValue,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
-    destinationPlannedOperationCode: bspaoh.destinationOperationCode,
-    destinationOperationCode: bspaoh.destinationOperationCode,
-    destinationOperationMode: "ELIMINATION",
+    destinationPlannedOperationCode: null,
+    destinationOperationCodes: bspaoh.destinationOperationCode
+      ? [bspaoh.destinationOperationCode]
+      : null,
+    destinationOperationModes: ["ELIMINATION"],
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false
   };
@@ -340,14 +342,16 @@ export const toOutgoingWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteRefusedWeightValue,
-    destinationPlannedOperationCode: bspaoh.destinationOperationCode,
+    destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bspaoh.destinationOperationCode,
-    destinationOperationMode: "ELIMINATION",
+    destinationOperationCodes: bspaoh.destinationOperationCode
+      ? [bspaoh.destinationOperationCode]
+      : null,
+    destinationOperationModes: ["ELIMINATION"],
+    nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     destinationFinalOperationCompanySirets: null,
-    destinationFinalPlannedOperationCodes: null,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
     declarationNumber: null,

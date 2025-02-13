@@ -355,11 +355,17 @@ export const EXPORT_COLUMNS: {
       label: "Code opération prévu",
       format: formatOperationCode
     },
-    destinationOperationCode: {
-      label: "Code de traitement réalisé",
-      format: formatOperationCode
+    destinationOperationCodes: {
+      label: "Code(s) de traitement réalisé(s)",
+      format: (codes: string[]) =>
+        Array.isArray(codes)
+          ? formatArray(codes.map(c => formatOperationCode(c)))
+          : ""
     },
-    destinationOperationMode: { label: "Mode de traitement" },
+    destinationOperationModes: {
+      label: "Mode(s) de traitement réalisé(s)",
+      format: formatArray
+    },
     destinationHasCiterneBeenWashedOut: {
       label: "Rinçage citerne",
       format: formatHasCiterneBeenWashedOut
@@ -676,11 +682,24 @@ export const EXPORT_COLUMNS: {
     destinationPlannedOperationMode: {
       label: "Mode opération prévu"
     },
-    destinationOperationCode: {
-      label: "Code de traitement réalisé",
-      format: formatOperationCode
+    destinationOperationCodes: {
+      label: "Code(s) de traitement réalisé(s)",
+      format: (codes: string[]) =>
+        Array.isArray(codes)
+          ? formatArray(codes.map(c => formatOperationCode(c)))
+          : ""
     },
-    destinationOperationMode: { label: "Mode de traitement" },
+    destinationOperationModes: {
+      label: "Mode(s) de traitement réalisé(s)",
+      format: formatArray
+    },
+    nextDestinationPlannedOperationCodes: {
+      label: "Destination ultérieure - Code(s) de traitement prévu(s)",
+      format: (codes: string[]) =>
+        Array.isArray(codes)
+          ? formatArray(codes.map(c => formatOperationCode(c)))
+          : ""
+    },
     destinationHasCiterneBeenWashedOut: {
       label: "Rinçage citerne",
       format: formatHasCiterneBeenWashedOut
@@ -689,17 +708,12 @@ export const EXPORT_COLUMNS: {
       label: "Rupture de traçabilité autorisée",
       format: formatBoolean
     },
-
     destinationFinalOperationCompanySirets: {
       label: "Destination finale - N° d'identification",
       format: formatArray
     },
-    destinationFinalPlannedOperationCodes: {
-      label: "Destination finale - Code de traitement ultérieur",
-      format: formatArray
-    },
     destinationFinalOperationCodes: {
-      label: "Destination finale - Code de traitement final réalisé",
+      label: "Destination finale - Code(s) de traitement final réalisé(s)",
       format: (codes: string[]) =>
         Array.isArray(codes)
           ? formatArray(codes.map(c => formatOperationCode(c)))
@@ -716,8 +730,8 @@ export const EXPORT_COLUMNS: {
           : ""
     },
 
-    declarationNumber: { label: "Numéro de déclaration GISTRID" },
-    notificationNumber: { label: "Numéro de notification GISTRID" },
+    declarationNumber: { label: "N° de déclaration GISTRID" },
+    notificationNumber: { label: "N° de notification GISTRID" },
     movementNumber: { label: "N° de mouvement" },
     isUpcycled: { label: "Terres valorisées", format: formatBoolean },
     destinationParcelInseeCodes: {

@@ -21,7 +21,6 @@ import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
-  const destinationFinalPlannedOperationCodes: string[] = [];
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
   const destinationFinalOperationCompanySirets: string[] = [];
@@ -38,7 +37,6 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   ) {
     // Iterate through each operation once and fill both arrays
     bsdasri.finalOperations.forEach(ope => {
-      destinationFinalPlannedOperationCodes.push(ope.operationCode);
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(
         // conversion en tonnes
@@ -53,7 +51,6 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
     });
   }
   return {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -212,9 +209,13 @@ export const toIncomingWasteV2 = (
         : null,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
+    destinationPlannedOperationCode: null,
+    destinationOperationCodes: bsdasri.destinationOperationCode
+      ? [bsdasri.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsdasri.destinationOperationMode
+      ? [bsdasri.destinationOperationMode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     declarationNumber: null,
@@ -229,7 +230,6 @@ export const toOutgoingWasteV2 = (
   bsdasri: RegistryV2Bsdasri
 ): Omit<Required<OutgoingWasteV2>, "__typename"> => {
   const {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -395,14 +395,18 @@ export const toOutgoingWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : null,
-    destinationPlannedOperationCode: bsdasri.destinationOperationCode,
+    destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bsdasri.destinationOperationCode,
-    destinationOperationMode: bsdasri.destinationOperationMode,
+    destinationOperationCodes: bsdasri.destinationOperationCode
+      ? [bsdasri.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsdasri.destinationOperationMode
+      ? [bsdasri.destinationOperationMode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     destinationFinalOperationCompanySirets,
-    destinationFinalPlannedOperationCodes,
+    nextDestinationPlannedOperationCodes: null,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     declarationNumber: null,

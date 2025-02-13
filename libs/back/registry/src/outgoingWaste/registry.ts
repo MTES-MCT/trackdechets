@@ -193,11 +193,13 @@ export const toOutgoingWaste = (
 
     destinationPlannedOperationCode: outgoingWaste.operationCode,
     destinationPlannedOperationMode: outgoingWaste.operationMode,
+    destinationOperationCodes: null,
+    destinationOperationModes: null,
+    nextDestinationPlannedOperationCodes: null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: null,
 
     destinationFinalOperationCompanySirets: null,
-    destinationFinalPlannedOperationCodes: null,
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
 

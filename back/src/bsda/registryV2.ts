@@ -77,7 +77,6 @@ const getPostTempStorageDestination = (bsda: RegistryV2Bsda) => {
 };
 
 const getFinalOperationsData = (bsda: RegistryV2Bsda) => {
-  const destinationFinalPlannedOperationCodes: string[] = [];
   const destinationFinalOperationCodes: string[] = [];
   const destinationFinalOperationWeights: number[] = [];
   const destinationFinalOperationCompanySirets: string[] = [];
@@ -105,15 +104,9 @@ const getFinalOperationsData = (bsda: RegistryV2Bsda) => {
           ope.finalBsda.destinationCompanySiret
         );
       }
-      if (ope.finalBsda.destinationPlannedOperationCode) {
-        destinationFinalPlannedOperationCodes.push(
-          ope.finalBsda.destinationPlannedOperationCode
-        );
-      }
     });
   }
   return {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -310,8 +303,12 @@ export const toIncomingWasteV2 = (
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
+    destinationOperationCodes: bsda.destinationOperationCode
+      ? [bsda.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsda.destinationOperationMode
+      ? [bsda.destinationOperationMode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     declarationNumber: null,
@@ -398,7 +395,6 @@ export const toOutgoingWasteV2 = (
     postTempStorageDestinationCountry
   } = getPostTempStorageDestination(bsda);
   const {
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     destinationFinalOperationCompanySirets
@@ -638,12 +634,19 @@ export const toOutgoingWasteV2 = (
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
-    destinationOperationCode: bsda.destinationOperationCode,
-    destinationOperationMode: bsda.destinationOperationMode,
+    destinationOperationCodes: bsda.destinationOperationCode
+      ? [bsda.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsda.destinationOperationMode
+      ? [bsda.destinationOperationMode]
+      : null,
+    nextDestinationPlannedOperationCodes:
+      bsda.destinationOperationNextDestinationPlannedOperationCode
+        ? [bsda.destinationOperationNextDestinationPlannedOperationCode]
+        : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
     destinationFinalOperationCompanySirets,
-    destinationFinalPlannedOperationCodes,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     declarationNumber: null,
