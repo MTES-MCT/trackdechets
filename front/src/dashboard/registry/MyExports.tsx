@@ -24,6 +24,7 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
@@ -102,12 +103,12 @@ export function MyExports() {
   const {
     data: exportsData,
     loading: exportsLoading,
+    error,
     refetch,
     startPolling,
     stopPolling
   } = useQuery<Pick<Query, "registryV2Exports">>(GET_REGISTRY_V2_EXPORTS, {
-    variables: { first: PAGE_SIZE },
-    fetchPolicy: "no-cache"
+    variables: { first: PAGE_SIZE }
   });
   const registryExports = exportsData?.registryV2Exports?.edges;
   const totalCount = exportsData?.registryV2Exports?.totalCount;
@@ -138,8 +139,6 @@ export function MyExports() {
   const gotoPage = useCallback(
     (page: number) => {
       setPageIndex(page);
-      console.log("gotopage", page);
-
       refetch({
         skip: page * PAGE_SIZE
       });
@@ -252,10 +251,12 @@ export function MyExports() {
       <div
         className={classNames([
           "tw-flex-grow",
+          "tw-px-6",
+          "tw-py-4",
           styles.myRegistryExportsContainer
         ])}
       >
-        <div className="tw-p-6 tw-pb-0">
+        <div>
           <div className="tw-flex">
             <div>
               <Button
@@ -269,7 +270,61 @@ export function MyExports() {
             </div>
           </div>
         </div>
-        <div className="tw-p-6">
+        {error && (
+          <Alert
+            closable
+            description={error.message}
+            severity="error"
+            title="Erreur lors du chargement"
+          />
+        )}
+        {registryExports && registryExports.length === 0 && (
+          <div className="tw-text-center">
+            <p className="tw-mt-24 tw-text-xl tw-mb-4">
+              Vous n'avez pas encore fait d'export
+            </p>
+            <p className="tw-text-sm">
+              Utilisez le bouton "Exporter" ci-dessus pour réaliser un export
+            </p>
+          </div>
+        )}
+        <div className="tw-mt-8">
+          <div className="tw-flex tw-justify-between">
+            <h2 className="tw-text-2xl tw-font-bold">Exports récents</h2>
+            <div>
+              <Button
+                priority="secondary"
+                iconId="fr-icon-refresh-line"
+                iconPosition="right"
+                size="small"
+                onClick={() => refetch()}
+              >
+                Rafraîchir
+              </Button>
+            </div>
+          </div>
+          {!exportsLoading ? (
+            <Table
+              bordered
+              noCaption
+              // caption="Exports récents"
+              className={styles.fullWidthTable}
+              data={tableData}
+              headers={[
+                "Date",
+                "Établissements",
+                "Type de registre",
+                "Type de déclaration",
+                "Période",
+                "Fichier"
+              ]}
+            />
+          ) : (
+            <InlineLoader />
+          )}
+        </div>
+
+        {/* <div className="tw-p-6">
           {!exportsLoading ? (
             <Table
               bordered
@@ -285,8 +340,8 @@ export function MyExports() {
                 "Fichier"
               ]}
             />
-          ) : null}
-        </div>
+          ) : <InlineLoader />}
+        </div> */}
         <div className="tw-flex tw-justify-center">
           <Pagination
             showFirstLast
