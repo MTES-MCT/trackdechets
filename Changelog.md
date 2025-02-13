@@ -11,6 +11,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
 
+#### :bug: Corrections de bugs
+
+- BSDD : Affiche sur le PDF les informations du courtier ET du négociant lorsque ces deux acteurs sont renseignés [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
+- BSVHU : Le courtier apparaît deux fois sur le récépissé PDF lorsqu'aucun négociant n'est sélectionné [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
+
 # [2025.02.1] 11/02/2025
 
 #### :rocket: Nouvelles fonctionnalités
