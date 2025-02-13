@@ -287,7 +287,7 @@ export const toIncomingWasteV2 = (
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
-    destinationReceptionWeightIsEstimate: bsdd.weightIsEstimate,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
     destinationOperationCode: bsdd.destinationOperationCode,
@@ -626,6 +626,7 @@ export const toOutgoingWasteV2 = (
     postTempStorageDestinationPostalCode,
     postTempStorageDestinationCity,
     postTempStorageDestinationCountry,
+
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
