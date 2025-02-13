@@ -98,7 +98,7 @@ export const REGISTRY_DOWNLOAD_SIGNED_URL = gql`
   }
 `;
 
-export async function downloadFromSignedUrl(signedUrl: string | undefined) {
+export function downloadFromSignedUrl(signedUrl: string | undefined) {
   if (!signedUrl) {
     return;
   }

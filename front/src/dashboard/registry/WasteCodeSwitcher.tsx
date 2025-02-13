@@ -52,7 +52,7 @@ export function WasteCodeSwitcher({ id, onSelectChange }: Props) {
 
   return (
     <div
-      className="tw-relative tw-w-1/2"
+      className="tw-relative"
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
       <label className={"fr-label"} htmlFor={id ?? fieldId}>
