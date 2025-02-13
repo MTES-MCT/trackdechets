@@ -71,7 +71,6 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
 
   await receivedInfoSchema.validate({
     ...receivedInfo,
-    createdAt: form.createdAt,
     transporters
   });
 

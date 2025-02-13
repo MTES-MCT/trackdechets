@@ -1212,14 +1212,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("quantityRefused is NOT required for legacy BSDs", async () => {
+    it("quantityRefused is not required if reception only", async () => {
       // Given
       const update = {
         ...form,
-        createdAt: new Date("2025-02-20T10:12:00+0100"),
-        wasteAcceptationStatus: "PARTIALLY_REFUSED",
-        wasteRefusalReason: "Reason",
         quantityReceived: 10
+        // No acceptation data, just plain reception
       };
 
       // When

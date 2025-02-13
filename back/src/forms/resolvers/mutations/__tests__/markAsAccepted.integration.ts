@@ -154,6 +154,7 @@ describe("Test Form reception", () => {
     expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(acceptedForm.signedBy).toBe("Bill");
     expect(acceptedForm.quantityReceived?.toNumber()).toBe(11);
+    expect(acceptedForm.quantityRefused?.toNumber()).toBe(0);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -203,7 +204,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           signedBy: "Bill",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 11
+          quantityReceived: 11,
+          quantityRefused: 0
         }
       }
     });
@@ -216,6 +218,7 @@ describe("Test Form reception", () => {
     expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
     expect(acceptedForm.signedBy).toBe("Bill");
     expect(acceptedForm.quantityReceived?.toNumber()).toBe(11);
+    expect(acceptedForm.quantityRefused?.toNumber()).toBe(0);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -1281,11 +1284,9 @@ describe("Test Form reception", () => {
         expect(acceptedForm.status).toBe("ACCEPTED");
       });
 
-      it("quantityRefused is required for new BSDs", async () => {
+      it("quantityRefused is required", async () => {
         // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-03-20")
-        });
+        const { recipient, form } = await createBSDD();
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -1301,32 +1302,6 @@ describe("Test Form reception", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
-      });
-
-      it("quantityRefused is NOT required for legacy BSDs", async () => {
-        // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-02-20")
-        });
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "ACCEPTED",
-          11,
-          null
-        );
-
-        // Then
-        expect(errors).toBeUndefined();
-        const acceptedForm = await prisma.form.findUniqueOrThrow({
-          where: { id: form.id }
-        });
-        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
-        expect(acceptedForm.quantityRefused).toBeNull();
-        expect(acceptedForm.wasteAcceptationStatus).toBe("ACCEPTED");
-        expect(acceptedForm.status).toBe("ACCEPTED");
       });
 
       it("quantityRefused cannot be > 0", async () => {
@@ -1376,11 +1351,9 @@ describe("Test Form reception", () => {
         expect(acceptedForm.status).toBe("REFUSED");
       });
 
-      it("quantityRefused is required for new BSDs", async () => {
+      it("quantityRefused is required", async () => {
         // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-03-20")
-        });
+        const { recipient, form } = await createBSDD();
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -1397,33 +1370,6 @@ describe("Test Form reception", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
-      });
-
-      it("quantityRefused is NOT required for legacy BSDs", async () => {
-        // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-01-20")
-        });
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "REFUSED",
-          11,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).toBeUndefined();
-        const acceptedForm = await prisma.form.findUniqueOrThrow({
-          where: { id: form.id }
-        });
-        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
-        expect(acceptedForm.quantityRefused).toBeNull();
-        expect(acceptedForm.wasteAcceptationStatus).toBe("REFUSED");
-        expect(acceptedForm.status).toBe("REFUSED");
       });
 
       it("quantityRefused cannot be != quantityReceived", async () => {
@@ -1474,11 +1420,9 @@ describe("Test Form reception", () => {
         expect(acceptedForm.status).toBe("ACCEPTED");
       });
 
-      it("quantityRefused is required for new BSDs", async () => {
+      it("quantityRefused is required", async () => {
         // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-03-20")
-        });
+        const { recipient, form } = await createBSDD();
 
         // When
         const { errors } = await markBSDDAsAccepted(
@@ -1495,33 +1439,6 @@ describe("Test Form reception", () => {
         expect(errors[0].message).toBe(
           "La quantité refusée (quantityRefused) est requise"
         );
-      });
-
-      it("quantityRefused is NOT required for legacy BSDs", async () => {
-        // Given
-        const { recipient, form } = await createBSDD({
-          createdAt: new Date("2025-01-20")
-        });
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "PARTIALLY_REFUSED",
-          11,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).toBeUndefined();
-        const acceptedForm = await prisma.form.findUniqueOrThrow({
-          where: { id: form.id }
-        });
-        expect(acceptedForm.quantityReceived?.toNumber()).toEqual(11);
-        expect(acceptedForm.quantityRefused).toBeNull();
-        expect(acceptedForm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
-        expect(acceptedForm.status).toBe("ACCEPTED");
       });
 
       it("quantityRefused cannot be = quantityReceived", async () => {
