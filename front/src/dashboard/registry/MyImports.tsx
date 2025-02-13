@@ -13,6 +13,7 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 
+import styles from "./MyImports.module.scss";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { ImportModal } from "./ImportModal";
 import {
@@ -220,7 +221,7 @@ export function MyImports() {
             </div>
             <Table
               bordered
-              fixed
+              className={styles.fullWidthTable}
               noCaption
               data={tableData}
               headers={HEADERS}

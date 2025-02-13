@@ -156,13 +156,14 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
 `;
 
 export const GET_REGISTRY_V2_EXPORTS = gql`
-  query RegistryV2Exports($first: Int = 5) {
-    registryV2Exports(first: $first) {
+  query RegistryV2Exports($first: Int = 20, $skip: Int = 0) {
+    registryV2Exports(first: $first, skip: $skip) {
       edges {
         node {
           ...RegistryV2ExportFragment
         }
       }
+      totalCount
     }
   }
   ${registryV2ExportFragment}
