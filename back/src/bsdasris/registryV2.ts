@@ -485,7 +485,7 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bsdasri.id, tx);
   const lookupInputs = bsdasriToLookupCreateInputs(bsdasri);
   if (lookupInputs.length > 0) {
-    await prisma.registryLookup.createMany({
+    await tx.registryLookup.createMany({
       data: lookupInputs
     });
   }

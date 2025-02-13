@@ -386,7 +386,7 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bsvhu.id, tx);
   const lookupInputs = bsvhuToLookupCreateInputs(bsvhu);
   if (lookupInputs.length > 0) {
-    await prisma.registryLookup.createMany({
+    await tx.registryLookup.createMany({
       data: lookupInputs
     });
   }
