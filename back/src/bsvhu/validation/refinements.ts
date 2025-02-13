@@ -170,7 +170,7 @@ export const v20241201 = new Date(
   process.env.OVERRIDE_V20241201 || "2024-12-18T00:00:00.000"
 );
 
-// Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des palques d'immatriculations et la quantité transportée
+// Date de la MAJ 2025.01.1 qui modifie les règles de validation du mode de transport, des plaques d'immatriculations et la quantité transportée
 export const v20250101 = new Date(
   process.env.OVERRIDE_V20250101 || "2025-01-15T00:00:00.000"
 );
