@@ -1,7 +1,9 @@
 import {
   ssdLookupUtils,
   incomingWasteLookupUtils,
-  incomingTexsLookupUtils
+  incomingTexsLookupUtils,
+  outgoingWasteLookupUtils,
+  outgoingTexsLookupUtils
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { lookupUtils as bsddLookupUtils } from "../../forms/registryV2";
@@ -182,6 +184,20 @@ const runIntegrityTest = async () => {
     ) {
       console.info("Rebuilding incoming texs registry lookup");
       await incomingTexsLookupUtils.rebuildLookup();
+    }
+    if (
+      bsdOrRegistryTypesToIndex.length === 0 ||
+      bsdOrRegistryTypesToIndex.includes("OUTGOING_WASTE")
+    ) {
+      console.info("Rebuilding outgoing waste registry lookup");
+      await outgoingWasteLookupUtils.rebuildLookup();
+    }
+    if (
+      bsdOrRegistryTypesToIndex.length === 0 ||
+      bsdOrRegistryTypesToIndex.includes("OUTGOING_TEXS")
+    ) {
+      console.info("Rebuilding outgoing texs registry lookup");
+      await outgoingTexsLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
