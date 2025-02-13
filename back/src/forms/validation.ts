@@ -346,8 +346,6 @@ export const quantityRefused = quantityRefusedNotRequired.test(
   (value, context) => {
     const { wasteAcceptationStatus } = context.parent;
 
-    console.log("context.parent", context.parent);
-
     // La quantity refusée est obligatoire à l'étape d'acceptation,
     // donc si wasteAcceptationStatus est renseigné
     if (isDefined(wasteAcceptationStatus) && !isDefined(value)) {

@@ -451,7 +451,8 @@ describe("mutation / importPaperForm", () => {
         receivedAt: "2019-12-21T00:00:00.000Z" as any,
         receivedBy: "Mr Destination",
         wasteAcceptationStatus: "ACCEPTED",
-        quantityReceived: 1.0
+        quantityReceived: 1.0,
+        quantityRefused: 0
       },
       processedInfo: {
         processedAt: "2019-12-22T00:00:00.000Z" as any,
@@ -544,6 +545,10 @@ describe("mutation / importPaperForm", () => {
         receivedBy: importedData.receivedInfo.receivedBy,
         receivedAt: importedData.receivedInfo.receivedAt,
         quantityReceived: importedData.receivedInfo.quantityReceived,
+        quantityAccepted:
+          Number(importedData.receivedInfo.quantityReceived) -
+          Number(importedData.receivedInfo.quantityRefused),
+        quantityRefused: importedData.receivedInfo.quantityRefused,
         processingOperationDone:
           importedData.processedInfo.processingOperationDone,
         processingOperationDescription:
