@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.03.1] 11/03/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Permet l'ajout du volume et des numéros d'identification sur le BSDD partout où le formulaire de conditionnement apparait (création, modification, bordereau suite, signature émetteur/transporteur, révision) & Passage du formulaire conditionnement au DSFR [PR 3936](https://github.com/MTES-MCT/trackdechets/pull/3936).
+
 #### :nail_care: Améliorations
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)

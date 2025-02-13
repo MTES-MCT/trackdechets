@@ -107,6 +107,8 @@ const CREATE_FORM = `
           type
           other
           quantity
+          volume 
+          identificationNumbers
         }
         isDangerous
         onuCode
@@ -2636,6 +2638,78 @@ describe("Mutation.createForm", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toBeNull();
+  });
+
+  it("should create BSDD with volume and numeros on packagingsInfos and return it", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            packagingInfos: [
+              {
+                type: "FUT",
+                quantity: 1,
+                volume: 1,
+                identificationNumbers: ["numero", "numerobis"]
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({
+        volume: 1,
+        identificationNumbers: ["numero", "numerobis"]
+      })
+    ]);
+  });
+
+  it("should return BSDD with volume (resp. numeros) set to null (resp. empty array) if omitted", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            packagingInfos: [
+              {
+                type: "FUT",
+                quantity: 1
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({
+        volume: null,
+        identificationNumbers: []
+      })
+    ]);
   });
 
   describe("Annexe 1", () => {

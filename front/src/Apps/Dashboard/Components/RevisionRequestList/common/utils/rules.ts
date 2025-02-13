@@ -76,13 +76,3 @@ export const selectPackagingRules = (
   }
   return false;
 };
-
-export const disableAddPackagingCta = packagingInfos => {
-  const arr = packagingInfos!.filter(
-    p =>
-      ![BsddPackagingsType.Citerne, BsddPackagingsType.Benne].includes(p.type)
-  );
-  const rule = packagingInfos?.length! > 0 && arr.length === 0;
-
-  return rule;
-};

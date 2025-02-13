@@ -33,6 +33,7 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../Apps/common/queries/bsdd/queries";
+import { cleanPackagings } from "../../Apps/Forms/Components/PackagingList/helpers";
 const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (form: Form | undefined) => ReactElement;
@@ -171,6 +172,7 @@ export default function StepsList(props: Props) {
       grouping,
       transporters,
       isDuplicateOf,
+      wasteDetails,
       ...rest
     } = values;
 
@@ -186,8 +188,14 @@ export default function StepsList(props: Props) {
       return;
     }
 
+    const packagingInfos = cleanPackagings(wasteDetails?.packagingInfos ?? []);
+
     const formInput: FormInput = {
       ...rest,
+      wasteDetails: {
+        ...wasteDetails,
+        packagingInfos
+      },
       // discard temporaryStorageDetail if recipient.isTempStorage === false
       ...(values.recipient?.isTempStorage === true
         ? { temporaryStorageDetail }
