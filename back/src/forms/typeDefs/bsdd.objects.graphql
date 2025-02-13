@@ -43,6 +43,13 @@ type Form {
   transporter: Transporter
 
   """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean!
+
+  """
   Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'achemniment direct.
   Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
   """
