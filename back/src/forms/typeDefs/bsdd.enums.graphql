@@ -111,7 +111,7 @@ enum Packagings {
   BENNE
 
   "Conditionné pour pipeline"
-  PIPELINE
+  PIPELINE @deprecated(reason: "Utiliser `FormInput.isDirectSupply`")
 
   "Autre"
   AUTRE
