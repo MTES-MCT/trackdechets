@@ -192,7 +192,8 @@ async function getDuplicateFormInput(
         number: 1,
         readyToTakeOver: true
       }
-    }
+    },
+    isDirectSupply: form.isDirectSupply
   };
 }
 

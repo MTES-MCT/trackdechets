@@ -1,4 +1,4 @@
-import { EmitterType, Prisma, TransportMode } from "@prisma/client";
+import { EmitterType, Prisma } from "@prisma/client";
 import { isDangerous } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
@@ -18,7 +18,7 @@ import { getFormRepository } from "../../repository";
 import {
   Transporter,
   draftFormSchema,
-  hasPipeline,
+  hasPipelinePackaging,
   validateGroupement,
   validateIntermediaries
 } from "../../validation";
@@ -118,25 +118,20 @@ const createFormResolver = async (
     };
   }
 
-  // Pipeline erases transporter EXCEPT for transporterTransportMode
-  // FIXME here we have a silent side effect. It would be be better to throw an
-  // exception is the transporter data sent by the user does not comply
-  if (hasPipeline(form)) {
-    // transporters = {
-    //   create: {
-    //     number: 1,
-    //     transporterTransportMode: TransportMode.OTHER
-    //   }
-    // };
-    transportersForValidation = [];
-  }
-
   // Do not take into account user sent transporter data in case of APPENDIX1_PRODUCER
   // Transporter data will be copied from the bordereau chapeau
   if (form.emitterType === "APPENDIX1_PRODUCER") {
     delete transporters.create;
     delete transporters.connect;
     transportersForValidation = [];
+  }
+
+  // Rétro-compatibilité avec l'utilisation d'un conditionnement "Pipeline"
+  // Cela permet de ne pas faire de breaking change lors de l'implémentation
+  // de tra-15674 - Sortir Conditionné pour pipeline de la liste des conditionnements
+  if (hasPipelinePackaging(form)) {
+    form.wasteDetailsPackagingInfos = [];
+    form.isDirectSupply = true;
   }
 
   const readableId = getReadableId();

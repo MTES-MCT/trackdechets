@@ -426,6 +426,7 @@ export function flattenFormInput(
   formInput: Pick<
     FormInput,
     | "customId"
+    | "isDirectSupply"
     | "emitter"
     | "recipient"
     | "wasteDetails"
@@ -436,6 +437,7 @@ export function flattenFormInput(
 ): Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">> {
   return safeInput({
     customId: formInput.customId,
+    isDirectSupply: formInput.isDirectSupply ?? false,
     ...flattenEmitterInput(formInput),
     ...flattenRecipientInput(formInput),
     ...flattenWasteDetailsInput(formInput),
