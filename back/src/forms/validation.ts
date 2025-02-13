@@ -41,7 +41,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  v20250201
 } from "../common/validation";
 
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -1061,7 +1062,8 @@ export const transporterSchemaFn: FactorySchemaOf<
         const {
           transporterTransportMode,
           transporterCompanySiret,
-          transporterCompanyVatNumber
+          transporterCompanyVatNumber,
+          createdAt
         } = ctx.parent;
 
         if (
@@ -1078,6 +1080,9 @@ export const transporterSchemaFn: FactorySchemaOf<
         }
 
         if (!transporterNumberPlate) {
+          return true;
+        }
+        if (createdAt.getTime() < v20250201.getTime()) {
           return true;
         }
 
