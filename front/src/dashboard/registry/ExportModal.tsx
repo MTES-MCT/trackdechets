@@ -20,7 +20,6 @@ import {
 import { FieldError, useForm } from "react-hook-form";
 import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import toast from "react-hot-toast";
 import {
   format,
   getYear,
@@ -39,6 +38,7 @@ import classNames from "classnames";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { WasteCodeSwitcher } from "./WasteCodeSwitcher";
 import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type Props = { isOpen: boolean; onClose: () => void };
 
@@ -289,11 +289,11 @@ const getDefaultValues = () => ({
 
 export function ExportModal({ isOpen, onClose }: Props) {
   const [companies, setCompanies] = useState<ExportCompany[]>([]);
-
+  const [error, setError] = useState<string | null>(null);
   const {
     data: companiesData,
     loading,
-    error
+    error: companiesError
   } = useQuery<Pick<Query, "myCompanies">>(GET_MY_COMPANIES_WITH_DELEGATORS);
 
   const [generateExport, { loading: generateLoading }] = useMutation<
@@ -321,6 +321,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
   });
 
   const closeAndReset = () => {
+    setError(null);
     reset(getDefaultValues());
     onClose();
   };
@@ -372,6 +373,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
   }, [registryType]);
 
   const onSubmit = async (input: z.infer<typeof validationSchema>) => {
+    setError(null);
     const {
       companyOrgId,
       registryType,
@@ -400,7 +402,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
       registryType !== RegistryV2ExportType.Ssd &&
       registryType !== RegistryV2ExportType.Incoming
     ) {
-      toast.error(
+      setError(
         "Seuls les exports SSD et entrants sont supportés pour le moment"
       );
       return;
@@ -420,10 +422,9 @@ export function ExportModal({ isOpen, onClose }: Props) {
         wasteCodes
       },
       onCompleted: () => {
-        toast.success("Génération de l'export lancée !");
         closeAndReset();
       },
-      onError: err => toast.error(err.message)
+      onError: err => setError(err.message)
     });
   };
 
@@ -439,8 +440,8 @@ export function ExportModal({ isOpen, onClose }: Props) {
       isOpen={isOpen}
       size="M"
     >
-      {error ? (
-        <InlineError apolloError={error} />
+      {companiesError ? (
+        <InlineError apolloError={companiesError} />
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="fr-mb-8v">
@@ -644,6 +645,14 @@ export function ExportModal({ isOpen, onClose }: Props) {
               </option>
             </Select>
           </div>
+          {error && (
+            <Alert
+              className="fr-mb-3w"
+              small
+              description={error}
+              severity="error"
+            />
+          )}
         </form>
       )}
       <div className="td-modal-actions">
