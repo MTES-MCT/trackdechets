@@ -165,6 +165,41 @@ describe("Mutation.updateBsffTransporter", () => {
     ]);
   });
 
+  it("should forbid invalid plates", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const bsffTransporter = await prisma.bsffTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyName: transporter.name,
+        transporterTransportMode: "ROAD"
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsffTransporter">,
+      MutationUpdateBsffTransporterArgs
+    >(UPDATE_BSFF_TRANSPORTER, {
+      variables: {
+        id: bsffTransporter.id,
+        input: {
+          transport: {
+            plates: ["XY"]
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should not be possible to update a transporter that has already signed", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");

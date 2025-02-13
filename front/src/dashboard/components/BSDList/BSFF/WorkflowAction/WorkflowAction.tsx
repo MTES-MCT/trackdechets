@@ -74,7 +74,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         return (
           <SignBsffPackagingButton
             packagingId={form.packagings[0].id}
-            btnLabel="Valider le traitement"
+            btnLabel="Signer le traitement"
           />
         );
       }

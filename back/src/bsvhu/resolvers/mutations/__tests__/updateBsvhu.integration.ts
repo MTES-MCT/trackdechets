@@ -368,6 +368,44 @@ describe("Mutation.Vhu.update", () => {
     );
   });
 
+  it("should forbid invalid transporter plates", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({
+      company: transporter
+    });
+    const form = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: "The Signatory",
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      transporter: {
+        transport: { plates: ["XY"] }
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: form.id, input }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should empty transporter recepisse with data pulled from db", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

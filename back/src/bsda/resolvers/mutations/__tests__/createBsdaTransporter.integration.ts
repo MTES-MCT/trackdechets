@@ -70,6 +70,47 @@ describe("Mutation.createBsdaTransporter", () => {
     ]);
   });
 
+  it("should throw error if plate is invalid", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaTransporter">,
+      MutationCreateBsdaTransporterArgs
+    >(CREATE_BSDA_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          transport: {
+            mode: "ROAD",
+            plates: ["A"]
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should create a BSDA transporter", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);

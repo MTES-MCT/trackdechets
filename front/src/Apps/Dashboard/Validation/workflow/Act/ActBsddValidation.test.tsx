@@ -355,7 +355,7 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+      expect(screen.getByText("Signer le traitement")).toBeInTheDocument();
     });
   });
 
@@ -425,7 +425,7 @@ describe("ActBsddValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
 
     await waitFor(async () => {
-      expect(screen.getByText("Valider le traitement")).toBeInTheDocument();
+      expect(screen.getByText("Signer le traitement")).toBeInTheDocument();
     });
   });
 

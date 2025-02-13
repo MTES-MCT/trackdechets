@@ -139,6 +139,37 @@ describe("Mutation.updateBsda", () => {
     expect(updatedBsda.wasteMaterialName).toEqual("new name");
   });
 
+  it("should fail if plate numbers are invalid ", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          transporter: { transport: { plates: ["AZ"] } }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should disallow unauthenticated user from updating a bsda", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<
