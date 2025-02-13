@@ -186,7 +186,7 @@ export default function WasteInfo({ disabled }) {
       {values.emitter?.type !== "APPENDIX1" && (
         <div className="form__row" style={{ flexDirection: "row" }}>
           <Switch
-            label="Le déchet est conditionné pour pipeline"
+            label="Le déchet est acheminé directement par pipeline ou convoyeur"
             disabled={disabled}
             checked={isPipeline}
             onChange={checked => {

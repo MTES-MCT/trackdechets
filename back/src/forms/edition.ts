@@ -120,6 +120,7 @@ export const editionRules: {
   wasteDetailsOnuCode: "EMISSION",
   wasteDetailsIsSubjectToADR: "EMISSION",
   wasteDetailsNonRoadRegulationMention: "EMISSION",
+  isDirectSupply: "EMISSION",
   wasteDetailsPackagingInfos: "EMISSION",
   wasteDetailsQuantity: "EMISSION",
   wasteDetailsQuantityType: "EMISSION",
