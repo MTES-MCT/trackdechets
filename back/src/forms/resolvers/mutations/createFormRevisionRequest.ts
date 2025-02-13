@@ -48,7 +48,6 @@ import {
   canProcessNonDangerousWaste
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
-import { isDefined } from "../../../common/helpers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
