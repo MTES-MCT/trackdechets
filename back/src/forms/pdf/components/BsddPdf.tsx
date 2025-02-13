@@ -755,43 +755,54 @@ export function BsddPdf({
           </div>
         </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                7.{" "}
-                <input
-                  type="checkbox"
-                  checked={Boolean(form.trader) && renderCheckboxState}
-                  readOnly
-                />{" "}
-                Négociant{" "}
-                <input
-                  type="checkbox"
-                  checked={Boolean(form.broker) && renderCheckboxState}
-                  readOnly
-                />{" "}
-                Courtier
-              </strong>
-            </p>
-            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
-              appendix1ProducerPlaceholder
-            ) : (
-              <>
-                <div className="Row">
-                  <div className="Col">
-                    <FormCompanyFields
-                      company={form.trader?.company ?? form.broker?.company}
-                    />
+        {form.trader && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>7.{form.broker ? "1" : ""} Négociant</strong>
+              </p>
+              {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+                appendix1ProducerPlaceholder
+              ) : (
+                <>
+                  <div className="Row">
+                    <div className="Col">
+                      <FormCompanyFields company={form.trader.company} />
+                    </div>
+                    <div className="Col">
+                      <ReceiptFields {...form.trader} />
+                    </div>
                   </div>
-                  <div className="Col">
-                    <ReceiptFields {...(form.trader ?? form.broker ?? {})} />
-                  </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {form.broker && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>7.{form.trader ? "2" : ""} Courtier</strong>
+              </p>
+              {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+                appendix1ProducerPlaceholder
+              ) : (
+                <>
+                  <div className="Row">
+                    <div className="Col">
+                      <FormCompanyFields company={form.broker.company} />
+                    </div>
+                    <div className="Col">
+                      <ReceiptFields {...form.broker} />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {form.intermediaries?.length ? (
           <div className="BoxRow">
             <div className="BoxCol">
