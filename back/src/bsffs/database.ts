@@ -357,9 +357,9 @@ export async function getTransporters(
   return transporters ?? [];
 }
 
-export function getTransportersSync(bsff: {
-  transporters: BsffTransporter[] | null;
-}): BsffTransporter[] {
+export function getTransportersSync<
+  T extends Pick<BsffTransporter, "number">
+>(bsff: { transporters: T[] | null }): T[] {
   return (bsff.transporters ?? []).sort((t1, t2) => t1.number - t2.number);
 }
 
@@ -375,9 +375,9 @@ export async function getFirstTransporter(
   return null;
 }
 
-export function getFirstTransporterSync(bsff: {
-  transporters: BsffTransporter[] | null;
-}): BsffTransporter | null {
+export function getFirstTransporterSync<
+  T extends Pick<BsffTransporter, "number">
+>(bsff: { transporters: T[] | null }): T | null {
   const transporters = getTransportersSync(bsff);
   const firstTransporter = transporters.find(t => t.number === 1);
   return firstTransporter ?? null;

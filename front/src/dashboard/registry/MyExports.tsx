@@ -72,7 +72,11 @@ const formatRegistryDates = (
     format(endOfYear(endDateObj), "yyyy-MM-dd") ===
       format(endDateObj, "yyyy-MM-dd")
   ) {
-    return `${getYear(startDateObj)}`;
+    if (getYear(startDateObj) === getYear(endDateObj)) {
+      return `${getYear(startDateObj)}`;
+    } else {
+      return `${getYear(startDateObj)} - ${getYear(endDateObj)}`;
+    }
   }
   if (!endDateObj) {
     return `du ${format(startDateObj, "dd/MM/yyyy")} au ${format(
@@ -182,43 +186,52 @@ export function MyExports() {
                         {badges[registryExport.node.status]("export")}
                       </div>,
                       <div>
-                        {[
-                          `${
-                            registryExport.node.companies[0]?.givenName &&
-                            registryExport.node.companies[0]?.givenName !== ""
-                              ? registryExport.node.companies[0]?.givenName
-                              : registryExport.node.companies[0]?.name
-                          } - ${registryExport.node.companies[0]?.orgId}`,
-                          ...(registryExport.node.companies.length > 1
-                            ? [
-                                `et ${
-                                  registryExport.node.companies.length - 1
-                                } autre${
-                                  registryExport.node.companies.length > 2
-                                    ? "s"
-                                    : ""
-                                } `
-                              ]
-                            : [])
-                        ].join(", ")}
-                        {registryExport.node.companies.length > 1 ? (
-                          <Tooltip
-                            kind="hover"
-                            className={styles.prewrap}
-                            title={registryExport.node.companies
-                              .slice(1)
-                              .map(
-                                company =>
-                                  `${
-                                    company.givenName &&
-                                    company.givenName !== ""
-                                      ? company.givenName
-                                      : company.name
-                                  } - ${company.orgId}`
-                              )
-                              .join(",\n")}
-                          />
-                        ) : null}
+                        {(registryExport.node.status ===
+                          RegistryV2ExportStatus.Started ||
+                          registryExport.node.status ===
+                            RegistryV2ExportStatus.Pending) &&
+                        registryExport.node.companies.length > 1 ? null : (
+                          <>
+                            {[
+                              `${
+                                registryExport.node.companies[0]?.givenName &&
+                                registryExport.node.companies[0]?.givenName !==
+                                  ""
+                                  ? registryExport.node.companies[0]?.givenName
+                                  : registryExport.node.companies[0]?.name
+                              } - ${registryExport.node.companies[0]?.orgId}`,
+                              ...(registryExport.node.companies.length > 1
+                                ? [
+                                    `et ${
+                                      registryExport.node.companies.length - 1
+                                    } autre${
+                                      registryExport.node.companies.length > 2
+                                        ? "s"
+                                        : ""
+                                    } `
+                                  ]
+                                : [])
+                            ].join(", ")}
+                            {registryExport.node.companies.length > 1 ? (
+                              <Tooltip
+                                kind="hover"
+                                className={styles.prewrap}
+                                title={registryExport.node.companies
+                                  .slice(1)
+                                  .map(
+                                    company =>
+                                      `${
+                                        company.givenName &&
+                                        company.givenName !== ""
+                                          ? company.givenName
+                                          : company.name
+                                      } - ${company.orgId}`
+                                  )
+                                  .join(",\n")}
+                              />
+                            ) : null}
+                          </>
+                        )}
                       </div>,
                       getRegistryTypeWording(registryExport.node.registryType),
                       getDeclarationTypeWording(
