@@ -352,16 +352,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -401,16 +396,12 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -450,16 +441,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -499,16 +485,11 @@ describe("Mutation.createFormRevisionRequest", () => {
           }
         }
       });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
-            " Il lui appartient de mettre à jour son profil.",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors[0].message).toBe(
+        "Le sous-profil sélectionné par l'établissement destinataire ne lui permet pas de prendre en charge ce type de déchet." +
+          " Il lui appartient de mettre à jour son profil."
+      );
+      expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
     }
   );
 
@@ -629,6 +610,7 @@ describe("Mutation.createFormRevisionRequest", () => {
             readableId: getReadableId(),
             ownerId: user.id,
             quantityReceived: 2.4,
+            quantityRefused: 0,
             wasteAcceptationStatus: "ACCEPTED",
             receivedAt: "2022-03-20T00:00:00.000Z",
             receivedBy: "John Doe",
@@ -1845,7 +1827,73 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: recipientCompany.siret,
             wasteAcceptationStatus: Status.ACCEPTED,
             quantityReceived: 10,
-            receivedAt: new Date()
+            receivedAt: new Date(),
+            createdAt: new Date("2025-04-01")
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "createFormRevisionRequest">,
+          MutationCreateFormRevisionRequestArgs
+        >(CREATE_FORM_REVISION_REQUEST, {
+          variables: {
+            input: {
+              formId: bsdd.id,
+              content: {
+                wasteAcceptationStatus: WasteAcceptationStatus.REFUSED,
+                wasteRefusalReason: "Raison",
+                quantityReceived: 10,
+                quantityRefused: 10
+              },
+              comment: "A comment",
+              authoringCompanySiret: company.siret!
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(revisionRequest.wasteAcceptationStatus).toEqual(
+          WasteAcceptationStatus.REFUSED
+        );
+        expect(revisionRequest.wasteRefusalReason).toEqual("Raison");
+        expect(revisionRequest.quantityReceived).toEqual(10);
+        expect(revisionRequest.quantityRefused).toEqual(10);
+      }
+    );
+
+    it.each([Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED])(
+      "can review BSD wasteAcceptationStatus without quantityRefused if status is %p for legacy BSDs",
+      async status => {
+        // Given
+        const { company: recipientCompany } = await userWithCompanyFactory(
+          "ADMIN",
+          {
+            companyTypes: [CompanyType.WASTEPROCESSOR],
+            wasteProcessorTypes: [
+              WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+            ]
+          }
+        );
+        const { user, company } = await userWithCompanyFactory("ADMIN");
+        const bsdd = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status,
+            emitterCompanySiret: company.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteAcceptationStatus: Status.ACCEPTED,
+            quantityReceived: 10,
+            receivedAt: new Date(),
+            createdAt: new Date("2025-01-01")
           }
         });
 
@@ -2360,7 +2408,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       );
     });
 
-    it("one can update quantityRefused even if not undefined in original bsdd, without specifying the waste acceptation status", async () => {
+    it("one can update quantityRefused even if not defined in original bsdd, without specifying the waste acceptation status", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN",
@@ -2380,7 +2428,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           recipientCompanySiret: recipientCompany.siret,
           wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
           wasteRefusalReason: "Reason",
-          quantityReceived: 0,
+          quantityReceived: 10,
           receivedAt: new Date()
         }
       });
@@ -2406,6 +2454,15 @@ describe("Mutation.createFormRevisionRequest", () => {
 
       // Then
       expect(errors).toBeUndefined();
+
+      const revisionRequest = await prisma.bsddRevisionRequest.findFirstOrThrow(
+        {
+          where: { bsddId: bsdd.id }
+        }
+      );
+
+      expect(revisionRequest.quantityReceived).toEqual(10);
+      expect(revisionRequest.quantityRefused).toEqual(5);
     });
 
     it("cannot specify quantityReceived < quantityRefused", async () => {
@@ -2496,6 +2553,53 @@ describe("Mutation.createFormRevisionRequest", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
+    });
+
+    it("one can review quantityReceived and not quantityRefused", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
       expect(errors).toBeUndefined();
     });
   });

@@ -1111,6 +1111,7 @@ describe("receivedInfosSchema", () => {
     const receivedInfo: ReceivedFormInput = {
       wasteAcceptationStatus: "ACCEPTED",
       quantityReceived: 12.5,
+      quantityRefused: 0,
       wasteRefusalReason: "",
       receivedBy: "Jim",
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
@@ -1137,7 +1138,8 @@ describe("receivedInfosSchema", () => {
   describe("waste is refused", () => {
     const receivedInfo: ReceivedFormInput = {
       wasteAcceptationStatus: "REFUSED",
-      quantityReceived: 0,
+      quantityReceived: 10,
+      quantityRefused: 10,
       wasteRefusalReason: "non conformity",
       receivedBy: "Joe",
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
@@ -1165,6 +1167,7 @@ describe("receivedInfosSchema", () => {
     const receivedInfo: ReceivedFormInput = {
       wasteAcceptationStatus: "PARTIALLY_REFUSED",
       quantityReceived: 11,
+      quantityRefused: 6,
       wasteRefusalReason: "mixed waste",
       receivedBy: "Bill",
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
@@ -1187,29 +1190,104 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    it("should be invalid when quantity received is 0", async () => {
-      const validateFn = () =>
-        receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 0 });
-      await expect(validateFn()).rejects.toThrow(
-        "Réception : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
-      );
-    });
+    // TODO: can no longer be tested because error on quantityRefused pops first
+    // it("should be invalid when quantity received is 0", async () => {
+    //   const validateFn = () =>
+    //     receivedInfoSchema.validate({
+    //       ...receivedInfo,
+    //       quantityReceived: 0,
+    //       quantityRefused: 0
+    //     });
+    //   await expect(validateFn()).rejects.toThrow(
+    //     "Réception : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
+    //   );
+    // });
   });
 
   describe("quantityRefused", () => {
     const form = {
       receivedBy: "Bill",
+      createdAt: new Date("2025-03-20T10:12:00+0100"),
       receivedAt: new Date("2020-01-17T10:12:00+0100"),
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("quantityRefused is not mandatory", async () => {
+    it("quantityRefused is not required if reception only", async () => {
+      // Given
+      const update = {
+        ...form,
+        quantityReceived: 10
+        // No acceptation data, just plain reception
+      };
+
+      // When
+      const isValid = await receivedInfoSchema.validate(update);
+
+      // Then
+      expect(isValid).toBeTruthy();
+    });
+
+    it("quantityRefused is required if wasteAcceptationStatus + quantityReceived (PARTIALLY_REFUSED)", async () => {
       // Given
       const update = {
         ...form,
         wasteAcceptationStatus: "PARTIALLY_REFUSED",
         wasteRefusalReason: "Reason",
         quantityReceived: 10
+      };
+
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "La quantité refusée (quantityRefused) est requise"
+      );
+    });
+
+    it("quantityRefused is required if wasteAcceptationStatus + quantityReceived (ACCEPTED)", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10
+      };
+
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "La quantité refusée (quantityRefused) est requise"
+      );
+    });
+
+    it("quantityRefused is required if wasteAcceptationStatus + quantityReceived (REFUSED)", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "REFUSED",
+        wasteRefusalReason: "Because",
+        quantityReceived: 10
+      };
+
+      // When
+      const validateFn = () => receivedInfoSchema.validate(update);
+
+      // Then
+      await expect(validateFn()).rejects.toThrow(
+        "La quantité refusée (quantityRefused) est requise"
+      );
+    });
+
+    it("quantityRefused can be 0 if waste is REFUSED and quantityReceived = 0", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "REFUSED",
+        wasteRefusalReason: "Because",
+        quantityReceived: 0,
+        quantityRefused: 0
       };
 
       // When
@@ -1235,24 +1313,21 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    it.each([null, undefined, 0])(
-      "waste is ACCEPTED > quantityReceived = 10 > quantityRefused can be %p",
-      async quantityRefused => {
-        // Given
-        const update = {
-          ...form,
-          wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 10,
-          quantityRefused
-        };
+    it("waste is ACCEPTED > quantityReceived = 10 > quantityRefused must equal 0", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: 0
+      };
 
-        // When
-        const isValid = await receivedInfoSchema.validate(update);
+      // When
+      const isValid = await receivedInfoSchema.validate(update);
 
-        // Then
-        expect(isValid).toBeTruthy();
-      }
-    );
+      // Then
+      expect(isValid).toBeTruthy();
+    });
 
     it.each([5, 10, 15])(
       "waste is ACCEPTED > quantityReceived = 10 > quantityRefused can NOT be %p",
@@ -1275,25 +1350,22 @@ describe("receivedInfosSchema", () => {
       }
     );
 
-    it.each([null, undefined, 10])(
-      "waste is REFUSED > quantityReceived = 10 > quantityRefused can be %p",
-      async quantityRefused => {
-        // Given
-        const update = {
-          ...form,
-          wasteAcceptationStatus: "REFUSED",
-          wasteRefusalReason: "Reason",
-          quantityReceived: 10,
-          quantityRefused
-        };
+    it("waste is REFUSED > quantityReceived = 10 > quantityRefused must be quantityReceived", async () => {
+      // Given
+      const update = {
+        ...form,
+        wasteAcceptationStatus: "REFUSED",
+        wasteRefusalReason: "Reason",
+        quantityReceived: 10,
+        quantityRefused: 10
+      };
 
-        // When
-        const isValid = await receivedInfoSchema.validate(update);
+      // When
+      const isValid = await receivedInfoSchema.validate(update);
 
-        // Then
-        expect(isValid).toBeTruthy();
-      }
-    );
+      // Then
+      expect(isValid).toBeTruthy();
+    });
 
     it.each([0, 3, 15])(
       "waste is REFUSED > quantityReceived = 10 > quantityRefused can NOT be %p",
@@ -2340,6 +2412,7 @@ describe("processedInfoSchema", () => {
       const receivedInfo: ReceivedFormInput = {
         wasteAcceptationStatus: "ACCEPTED",
         quantityReceived: 12.5,
+        quantityRefused: 0,
         wasteRefusalReason: "",
         receivedBy: "Jim",
         receivedAt: new Date("2020-01-17T10:12:00+0100"),

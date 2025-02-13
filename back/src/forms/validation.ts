@@ -265,7 +265,7 @@ export const hasPipeline = (value: {
 }): boolean =>
   value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
 
-export const quantityRefused = weight(WeightUnits.Tonne)
+export const quantityRefusedNotRequired = weight(WeightUnits.Tonne)
   .min(0)
   .test(
     "not-defined-if-no-quantity-received",
@@ -273,9 +273,8 @@ export const quantityRefused = weight(WeightUnits.Tonne)
     (value, context) => {
       const { quantityReceived } = context.parent;
 
-      const quantityReceivedIsDefined =
-        quantityReceived !== null && quantityReceived !== undefined;
-      const quantityRefusedIsDefined = value !== null && value !== undefined;
+      const quantityReceivedIsDefined = isDefined(quantityReceived);
+      const quantityRefusedIsDefined = isDefined(value);
 
       if (!quantityReceivedIsDefined && quantityRefusedIsDefined) return false;
       return true;
@@ -332,8 +331,7 @@ export const quantityRefused = weight(WeightUnits.Tonne)
     (value, context) => {
       const { quantityReceived } = context.parent;
 
-      if (quantityReceived === null || quantityReceived === undefined)
-        return true;
+      if (!isDefined(quantityReceived)) return true;
 
       // Legacy
       if (value === null || value === undefined) return true;
@@ -341,6 +339,22 @@ export const quantityRefused = weight(WeightUnits.Tonne)
       return value <= quantityReceived;
     }
   );
+
+export const quantityRefused = quantityRefusedNotRequired.test(
+  "quantity-is-required",
+  "La quantité refusée (quantityRefused) est requise",
+  (value, context) => {
+    const { wasteAcceptationStatus } = context.parent;
+
+    // La quantity refusée est obligatoire à l'étape d'acceptation,
+    // donc si wasteAcceptationStatus est renseigné
+    if (isDefined(wasteAcceptationStatus) && !isDefined(value)) {
+      return false;
+    }
+
+    return true;
+  }
+);
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1

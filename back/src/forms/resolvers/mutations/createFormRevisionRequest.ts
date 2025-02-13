@@ -37,7 +37,7 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import {
   brokerSchemaFn,
   packagingInfoFn,
-  quantityRefused,
+  quantityRefusedNotRequired,
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
@@ -470,12 +470,12 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
             .nullable()
             .test(
               "is-empty",
-              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+              "Le champ wasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
               v => !v
             )
     ),
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused
+  quantityRefused: quantityRefusedNotRequired
 });
 
 async function recipify(
