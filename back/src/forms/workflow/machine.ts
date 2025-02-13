@@ -6,7 +6,7 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import { Event, EventType } from "./types";
-import { hasPipeline } from "../validation";
+import { hasPipelinePackaging } from "../validation";
 
 /**
  * Workflow state machine
@@ -306,10 +306,10 @@ const machine = Machine<any, Event>(
       },
       hasPipeline: (_, event) =>
         !!event.formUpdateInput?.wasteDetailsPackagingInfos &&
-        hasPipeline(event.formUpdateInput as any),
+        hasPipelinePackaging(event.formUpdateInput as any),
       notPipeline: (_, event) =>
         !event.formUpdateInput?.wasteDetailsPackagingInfos ||
-        !hasPipeline(event.formUpdateInput as any)
+        !hasPipelinePackaging(event.formUpdateInput as any)
     }
   }
 );

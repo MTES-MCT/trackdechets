@@ -23,7 +23,7 @@ import { getFormRepository } from "../../repository";
 import {
   Transporter,
   draftFormSchema,
-  hasPipeline,
+  hasPipelinePackaging,
   sealedFormSchema,
   validateGroupement,
   validateIntermediaries
@@ -166,7 +166,7 @@ const updateFormResolver = async (
   // Pipeline erases transporter EXCEPT for transporterTransportMode
   // FIXME here we have a silent side effect. It would be be better to throw an
   // exception is the transporter data sent by the user does not comply
-  if (hasPipeline(form as any)) {
+  if (hasPipelinePackaging(form as any)) {
     transporters = {
       deleteMany: {},
       create: {

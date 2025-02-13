@@ -258,7 +258,7 @@ type FormValidationContext = {
   signingTransporterOrgId?: string | null;
 };
 
-export const hasPipeline = (
+export const hasPipelinePackaging = (
   value: Pick<Form, "wasteDetailsPackagingInfos">
 ): boolean =>
   ((value.wasteDetailsPackagingInfos ?? []) as PackagingInfo[]).some(
@@ -1963,16 +1963,14 @@ const baseFormSchemaFn = (context: FormValidationContext) =>
           transporters: yup
             .array<Transporter>()
             .of(transporterSchema)
-            .when(
-              "wasteDetailsPackagingInfos",
-              (wasteDetailsPackagingInfos, schema) =>
-                hasPipeline({ wasteDetailsPackagingInfos })
-                  ? schema.length(
-                      0,
-                      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
-                    )
-                  : schema
-            )
+            .when("isDirectSupply", {
+              is: true,
+              then: schema =>
+                schema.length(
+                  0,
+                  "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+                )
+            })
             .max(5, "Vous ne pouvez pas ajouter plus de ${max} transporteurs")
         })
       );
