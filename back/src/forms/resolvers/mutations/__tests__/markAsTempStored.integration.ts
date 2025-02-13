@@ -458,7 +458,8 @@ describe("{ mutation { markAsTempStored } }", () => {
               receivedAt: "2019-01-18" as any,
               receivedBy: "John",
               quantityType: "REAL",
-              quantityReceived: 0
+              quantityReceived: 2,
+              quantityRefused: 2
             }
           }
         }

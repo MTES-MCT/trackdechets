@@ -2408,7 +2408,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       );
     });
 
-    it("one can update quantityRefused even if not undefined in original bsdd, without specifying the waste acceptation status", async () => {
+    it("one can update quantityRefused even if not defined in original bsdd, without specifying the waste acceptation status", async () => {
       // Given
       const { company: recipientCompany } = await userWithCompanyFactory(
         "ADMIN",
@@ -2428,7 +2428,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           recipientCompanySiret: recipientCompany.siret,
           wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
           wasteRefusalReason: "Reason",
-          quantityReceived: 0,
+          quantityReceived: 10,
           receivedAt: new Date()
         }
       });
@@ -2454,6 +2454,15 @@ describe("Mutation.createFormRevisionRequest", () => {
 
       // Then
       expect(errors).toBeUndefined();
+
+      const revisionRequest = await prisma.bsddRevisionRequest.findFirstOrThrow(
+        {
+          where: { bsddId: bsdd.id }
+        }
+      );
+
+      expect(revisionRequest.quantityReceived).toEqual(10);
+      expect(revisionRequest.quantityRefused).toEqual(5);
     });
 
     it("cannot specify quantityReceived < quantityRefused", async () => {
@@ -2544,6 +2553,53 @@ describe("Mutation.createFormRevisionRequest", () => {
         }
       });
 
+      expect(errors).toBeUndefined();
+    });
+
+    it("one can review quantityReceived and not quantityRefused", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.ACCEPTED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+          wasteRefusalReason: "Reason",
+          quantityReceived: 0,
+          receivedAt: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              quantityReceived: 10
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
       expect(errors).toBeUndefined();
     });
   });

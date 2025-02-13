@@ -37,7 +37,7 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import {
   brokerSchemaFn,
   packagingInfoFn,
-  quantityRefused,
+  quantityRefusedNotRequired,
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
@@ -48,6 +48,7 @@ import {
   canProcessNonDangerousWaste
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
+import { isDefined } from "../../../common/helpers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -379,16 +380,10 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(
-      {
-        ...flatContent,
-        createdAt: bsdd.createdAt
-      },
-      {
-        strict: true,
-        abortEarly: false
-      }
-    );
+    await bsddRevisionRequestSchema.validate(flatContent, {
+      strict: true,
+      abortEarly: false
+    });
   }
 
   // Double-check the waste quantities
@@ -481,7 +476,7 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
             )
     ),
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused
+  quantityRefused: quantityRefusedNotRequired
 });
 
 async function recipify(
@@ -527,9 +522,6 @@ async function recipify(
 
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
-    // On a besoin de la date de création pour faire des checks sur
-    // certains champs (comme quantityRefused)
-    createdAt: yup.date(),
     isCanceled: yup.bool().transform(v => (v === null ? false : v)),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup

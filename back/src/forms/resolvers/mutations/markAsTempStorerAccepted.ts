@@ -22,9 +22,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
 
     await checkCanMarkAsTempStored(user, form);
 
-    await acceptedInfoSchema.validate({
-      ...tempStorerAcceptedInfo
-    });
+    await acceptedInfoSchema.validate(tempStorerAcceptedInfo);
 
     const { quantityType, ...tmpStorerAcceptedInfo } = tempStorerAcceptedInfo;
 
