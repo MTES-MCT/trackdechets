@@ -769,39 +769,27 @@ const bsffToLookupCreateInputs = (
       bsffId: bsff.id
     });
   }
-  if (
-    transporter?.transporterTransportSignatureDate &&
-    bsff.emitterCompanySiret
-  ) {
-    res.push({
-      id: bsff.id,
-      readableId: bsff.id,
-      siret: bsff.emitterCompanySiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsff.wasteCode,
-      ...generateDateInfos(transporter.transporterTransportSignatureDate),
-      bsffId: bsff.id
-    });
-  }
-  if (
-    transporter?.transporterTransportSignatureDate &&
-    bsff.detenteurCompanySirets?.length
-  ) {
-    res.push(
-      ...bsff.detenteurCompanySirets.map(detenteurCompanySiret => ({
+  if (transporter?.transporterTransportSignatureDate) {
+    const sirets = new Set([
+      bsff.emitterCompanySiret,
+      ...bsff.detenteurCompanySirets
+    ]);
+    sirets.forEach(siret => {
+      if (!siret) {
+        return;
+      }
+      res.push({
         id: bsff.id,
         readableId: bsff.id,
-        siret: detenteurCompanySiret,
+        siret,
         exportRegistryType: RegistryExportType.OUTGOING,
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsff.wasteCode,
         ...generateDateInfos(transporter.transporterTransportSignatureDate!),
         bsffId: bsff.id
-      }))
-    );
+      });
+    });
   }
   return res;
 };

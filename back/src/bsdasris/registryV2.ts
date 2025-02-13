@@ -449,33 +449,26 @@ const bsdasriToLookupCreateInputs = (
       bsdasriId: bsdasri.id
     });
   }
-  if (
-    bsdasri.transporterTransportSignatureDate &&
-    bsdasri.emitterCompanySiret
-  ) {
-    res.push({
-      id: bsdasri.id,
-      readableId: bsdasri.id,
-      siret: bsdasri.emitterCompanySiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsdasri.wasteCode,
-      ...generateDateInfos(bsdasri.transporterTransportSignatureDate),
-      bsdasriId: bsdasri.id
-    });
-  }
-  if (bsdasri.transporterTransportSignatureDate && bsdasri.ecoOrganismeSiret) {
-    res.push({
-      id: bsdasri.id,
-      readableId: bsdasri.id,
-      siret: bsdasri.ecoOrganismeSiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsdasri.wasteCode,
-      ...generateDateInfos(bsdasri.transporterTransportSignatureDate),
-      bsdasriId: bsdasri.id
+  if (bsdasri.transporterTransportSignatureDate) {
+    const sirets = new Set([
+      bsdasri.emitterCompanySiret,
+      bsdasri.ecoOrganismeSiret
+    ]);
+    sirets.forEach(siret => {
+      if (!siret) {
+        return;
+      }
+      res.push({
+        id: bsdasri.id,
+        readableId: bsdasri.id,
+        siret,
+        exportRegistryType: RegistryExportType.OUTGOING,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: RegistryExportWasteType.DD,
+        wasteCode: bsdasri.wasteCode,
+        ...generateDateInfos(bsdasri.transporterTransportSignatureDate!),
+        bsdasriId: bsdasri.id
+      });
     });
   }
   return res;

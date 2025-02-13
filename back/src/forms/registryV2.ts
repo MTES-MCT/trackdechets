@@ -693,34 +693,25 @@ const bsddToLookupCreateInputs = (
       bsddId: form.id
     });
   }
-  if (form.sentAt && form.emitterCompanySiret) {
-    res.push({
-      id: form.id,
-      readableId: form.readableId,
-      siret: form.emitterCompanySiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: form.wasteDetailsIsDangerous
-        ? RegistryExportWasteType.DD
-        : RegistryExportWasteType.DND,
-      wasteCode: form.wasteDetailsCode,
-      ...generateDateInfos(form.sentAt),
-      bsddId: form.id
-    });
-  }
-  if (form.sentAt && form.ecoOrganismeSiret) {
-    res.push({
-      id: form.id,
-      readableId: form.readableId,
-      siret: form.ecoOrganismeSiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: form.wasteDetailsIsDangerous
-        ? RegistryExportWasteType.DD
-        : RegistryExportWasteType.DND,
-      wasteCode: form.wasteDetailsCode,
-      ...generateDateInfos(form.sentAt),
-      bsddId: form.id
+  if (form.sentAt) {
+    const sirets = new Set([form.emitterCompanySiret, form.ecoOrganismeSiret]);
+    sirets.forEach(siret => {
+      if (!siret) {
+        return;
+      }
+      res.push({
+        id: form.id,
+        readableId: form.readableId,
+        siret,
+        exportRegistryType: RegistryExportType.OUTGOING,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: form.wasteDetailsIsDangerous
+          ? RegistryExportWasteType.DD
+          : RegistryExportWasteType.DND,
+        wasteCode: form.wasteDetailsCode,
+        ...generateDateInfos(form.sentAt!),
+        bsddId: form.id
+      });
     });
   }
   return res;

@@ -698,52 +698,27 @@ const bsdaToLookupCreateInputs = (
       bsdaId: bsda.id
     });
   }
-  if (
-    transporter?.transporterTransportSignatureDate &&
-    bsda.emitterCompanySiret
-  ) {
-    res.push({
-      id: bsda.id,
-      readableId: bsda.id,
-      siret: bsda.emitterCompanySiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsda.wasteCode,
-      ...generateDateInfos(transporter.transporterTransportSignatureDate),
-      bsdaId: bsda.id
-    });
-  }
-  if (
-    transporter?.transporterTransportSignatureDate &&
-    bsda.ecoOrganismeSiret
-  ) {
-    res.push({
-      id: bsda.id,
-      readableId: bsda.id,
-      siret: bsda.ecoOrganismeSiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsda.wasteCode,
-      ...generateDateInfos(transporter.transporterTransportSignatureDate),
-      bsdaId: bsda.id
-    });
-  }
-  if (
-    transporter?.transporterTransportSignatureDate &&
-    bsda.workerCompanySiret
-  ) {
-    res.push({
-      id: bsda.id,
-      readableId: bsda.id,
-      siret: bsda.workerCompanySiret,
-      exportRegistryType: RegistryExportType.OUTGOING,
-      declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: RegistryExportWasteType.DD,
-      wasteCode: bsda.wasteCode,
-      ...generateDateInfos(transporter?.transporterTransportSignatureDate),
-      bsdaId: bsda.id
+  if (transporter?.transporterTransportSignatureDate) {
+    const sirets = new Set([
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret
+    ]);
+    sirets.forEach(siret => {
+      if (!siret) {
+        return;
+      }
+      res.push({
+        id: bsda.id,
+        readableId: bsda.id,
+        siret,
+        exportRegistryType: RegistryExportType.OUTGOING,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: RegistryExportWasteType.DD,
+        wasteCode: bsda.wasteCode,
+        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        bsdaId: bsda.id
+      });
     });
   }
   return res;
