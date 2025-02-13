@@ -107,16 +107,17 @@ export const PROCESSING_OPERATIONS = [
     description:
       "Mise en décharge spécialement aménagée (par exemple, placement dans des alvéoles étanches séparées, recouvertes et isolées les unes et les autres et de l’environnement, etc …)"
   },
-  {
-    type: ProcessingOperationType.Eliminiation,
-    code: "D 6",
-    description: "Rejet dans le milieu aquatique sauf l’immersion"
-  },
-  {
-    type: ProcessingOperationType.Eliminiation,
-    code: "D 7",
-    description: "Immersion, y compris enfouissement dans le sous-sol marin"
-  },
+  // TRA-15738: on retire ces codes de traitement car illégaux en France.
+  // {
+  //   type: ProcessingOperationType.Eliminiation,
+  //   code: "D 6",
+  //   description: "Rejet dans le milieu aquatique sauf l’immersion"
+  // },
+  // {
+  //   type: ProcessingOperationType.Eliminiation,
+  //   code: "D 7",
+  //   description: "Immersion, y compris enfouissement dans le sous-sol marin"
+  // },
   {
     type: ProcessingOperationType.Eliminiation,
     code: "D 8",
@@ -207,8 +208,9 @@ export const PROCESSING_OPERATIONS_CODES_ENUM: TdOperationCodeEnum = [
   "D 3",
   "D 4",
   "D 5",
-  "D 6",
-  "D 7",
+  // TRA-15738: on retire ces codes de traitement car illégaux en France.
+  // "D 6",
+  // "D 7",
   "D 8",
   "D 9",
   "D 9 F",

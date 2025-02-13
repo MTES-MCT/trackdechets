@@ -317,7 +317,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   recipientCompanyName: "WASTE COMPANY",
   recipientCompanyPhone: "06 18 76 02 99",
   recipientCompanySiret: siretify(2),
-  recipientProcessingOperation: "D 6",
+  recipientProcessingOperation: "D 8",
   sentAt: "2019-11-20T00:00:00.000Z",
   sentBy: "signe",
   signedByTransporter: true,

@@ -92,7 +92,7 @@ describe("ActivityEvent.Bsdd", () => {
           },
           recipient: {
             cap: "1234",
-            processingOperation: "D 6",
+            processingOperation: "D 8",
             company: {
               name: destinationCompany.name,
               siret: destinationCompany.siret,
