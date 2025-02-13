@@ -29,8 +29,14 @@ import { safeParseAsyncSsd } from "./ssd/validation";
 
 import { toSsdWaste as SsdToSsdWaste } from "./ssd/registry";
 import { toIncomingWaste as IncomingWasteToIncomingWaste } from "./incomingWaste/registry";
-import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingWaste/registry";
-import type { IncomingWasteV2, SsdWasteV2 } from "@td/codegen-back";
+import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingTexs/registry";
+import { toOutgoingWaste as OutgoingWasteToOutgoingWaste } from "./outgoingWaste/registry";
+import { toOutgoingWaste as OutgoingTexsToOutgoingWaste } from "./outgoingTexs/registry";
+import type {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  SsdWasteV2
+} from "@td/codegen-back";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
@@ -106,12 +112,15 @@ export const UNAUTHORIZED_ERROR =
 export type InputExportOptions = {
   toSsdWaste?: (registry: unknown) => SsdWasteV2;
   toIncomingWaste?: (registry: unknown) => IncomingWasteV2;
+  toOutgoingWaste?: (registry: unknown) => OutgoingWasteV2;
 };
 
 export const INPUT_EXPORT_TYPES = [
   "SSD",
   "INCOMING_WASTE",
   "INCOMING_TEXS",
+  "OUTGOING_WASTE",
+  "OUTGOING_TEXS",
   "BSDD",
   "BSDA",
   "BSDASRI",
@@ -136,5 +145,11 @@ export const exportOptions: Partial<
   },
   INCOMING_TEXS: {
     toIncomingWaste: IncomingTexsToIncomingWaste
+  },
+  OUTGOING_WASTE: {
+    toOutgoingWaste: OutgoingWasteToOutgoingWaste
+  },
+  OUTGOING_TEXS: {
+    toOutgoingWaste: OutgoingTexsToOutgoingWaste
   }
 };

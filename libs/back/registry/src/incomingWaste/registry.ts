@@ -238,6 +238,9 @@ export const updateRegistryLookup = async (
         // the id changes because a new RegistrySsd entry is created on each update
         id: registryIncomingWaste.id,
         reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
+        wasteType: registryIncomingWaste.wasteIsDangerous
+          ? RegistryExportWasteType.DD
+          : RegistryExportWasteType.DND,
         wasteCode: registryIncomingWaste.wasteCode,
         ...generateDateInfos(registryIncomingWaste.receptionDate),
         registryIncomingWasteId: registryIncomingWaste.id
