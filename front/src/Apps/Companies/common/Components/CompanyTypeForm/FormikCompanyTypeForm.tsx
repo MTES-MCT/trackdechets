@@ -282,26 +282,6 @@ const FormikCompanyTypeForm = ({
               ? (errors?.traderReceipt as any)?.department
               : null
         },
-        vhuAgrementDemolisseur: {
-          agrementNumber:
-            isSubmitted && touched?.vhuAgrementDemolisseur
-              ? (errors?.vhuAgrementDemolisseur as any)?.agrementNumber
-              : null,
-          department:
-            isSubmitted && touched?.vhuAgrementDemolisseur
-              ? (errors?.vhuAgrementDemolisseur as any)?.department
-              : null
-        },
-        vhuAgrementBroyeur: {
-          agrementNumber:
-            isSubmitted && touched?.vhuAgrementBroyeur
-              ? (errors?.vhuAgrementBroyeur as any)?.agrementNumber
-              : null,
-          department:
-            isSubmitted && touched?.vhuAgrementBroyeur
-              ? (errors?.vhuAgrementBroyeur as any)?.department
-              : null
-        },
         workerCertification: {
           certificationNumber:
             isSubmitted && touched?.workerCertification

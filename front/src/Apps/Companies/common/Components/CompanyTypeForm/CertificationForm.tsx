@@ -90,7 +90,6 @@ const CertificationForm = ({
         <VhuAgrementForm
           title="Agrément broyeur"
           inputProps={inputProps?.vhuAgrementBroyeur}
-          inputErrors={inputErrors?.vhuAgrementBroyeur}
         />
       </div>
     );
@@ -99,7 +98,6 @@ const CertificationForm = ({
       <VhuAgrementForm
         title="Agrément démolisseur / casse automobile"
         inputProps={inputProps?.vhuAgrementDemolisseur}
-        inputErrors={inputErrors?.vhuAgrementDemolisseur}
       />
     );
   } else {

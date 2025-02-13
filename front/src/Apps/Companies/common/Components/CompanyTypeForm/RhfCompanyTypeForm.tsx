@@ -305,32 +305,12 @@ const RhfCompanyTypeForm = ({
           })
         },
         vhuAgrementBroyeur: {
-          agrementNumber: register("vhuAgrementBroyeur.agrementNumber", {
-            validate: requiredWhenCompanyType(
-              CompanyType.WasteVehicles,
-              WasteVehiclesType.Broyeur
-            )
-          }),
-          department: register("vhuAgrementBroyeur.department", {
-            validate: requiredWhenCompanyType(
-              CompanyType.WasteVehicles,
-              WasteVehiclesType.Broyeur
-            )
-          })
+          agrementNumber: register("vhuAgrementBroyeur.agrementNumber"),
+          department: register("vhuAgrementBroyeur.department")
         },
         vhuAgrementDemolisseur: {
-          agrementNumber: register("vhuAgrementDemolisseur.agrementNumber", {
-            validate: requiredWhenCompanyType(
-              CompanyType.WasteVehicles,
-              WasteVehiclesType.Demolisseur
-            )
-          }),
-          department: register("vhuAgrementDemolisseur.department", {
-            validate: requiredWhenCompanyType(
-              CompanyType.WasteVehicles,
-              WasteVehiclesType.Demolisseur
-            )
-          })
+          agrementNumber: register("vhuAgrementDemolisseur.agrementNumber"),
+          department: register("vhuAgrementDemolisseur.department")
         },
         workerCertification: {
           hasSubSectionThree: register(
@@ -388,15 +368,6 @@ const RhfCompanyTypeForm = ({
           receiptNumber: errors?.traderReceipt?.receiptNumber?.message,
           validityLimit: errors?.traderReceipt?.validityLimit?.message,
           department: errors?.traderReceipt?.department?.message
-        },
-        vhuAgrementBroyeur: {
-          agrementNumber: errors?.vhuAgrementBroyeur?.agrementNumber?.message,
-          department: errors?.vhuAgrementBroyeur?.department?.message
-        },
-        vhuAgrementDemolisseur: {
-          agrementNumber:
-            errors?.vhuAgrementDemolisseur?.agrementNumber?.message,
-          department: errors?.vhuAgrementDemolisseur?.department?.message
         },
         workerCertification: {
           certificationNumber:

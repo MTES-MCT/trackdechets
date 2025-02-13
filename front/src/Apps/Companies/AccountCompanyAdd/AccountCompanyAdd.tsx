@@ -434,22 +434,6 @@ export default function AccountCompanyAdd() {
                     !values.brokerReceipt?.validityLimit ||
                     !values.brokerReceipt?.receiptNumber);
 
-                const missingVhuBroyeurAgrementField =
-                  isVhuBroyeur(
-                    values.companyTypes,
-                    values.wasteVehiclesTypes
-                  ) &&
-                  (!values.vhuAgrementBroyeur?.agrementNumber ||
-                    !values.vhuAgrementBroyeur?.department);
-
-                const missingVhuDemolisseurAgrementField =
-                  isVhuDemolisseur(
-                    values.companyTypes,
-                    values.wasteVehiclesTypes
-                  ) &&
-                  (!values.vhuAgrementDemolisseur?.agrementNumber ||
-                    !values.vhuAgrementDemolisseur?.department);
-
                 const missingCertification =
                   isWorker(values.companyTypes) &&
                   values.workerCertification?.hasSubSectionThree &&
@@ -547,32 +531,6 @@ export default function AccountCompanyAdd() {
                             ? "Champ requis"
                             : undefined,
                           department: !values.brokerReceipt?.department
-                            ? "Champ requis"
-                            : undefined
-                        }
-                      }
-                    : {}),
-                  ...(missingVhuBroyeurAgrementField
-                    ? {
-                        vhuAgrementBroyeur: {
-                          agrementNumber: !values.vhuAgrementBroyeur
-                            ?.agrementNumber
-                            ? "Champ requis"
-                            : undefined,
-                          department: !values.vhuAgrementBroyeur?.department
-                            ? "Champ requis"
-                            : undefined
-                        }
-                      }
-                    : {}),
-                  ...(missingVhuDemolisseurAgrementField
-                    ? {
-                        vhuAgrementDemolisseur: {
-                          agrementNumber: !values.vhuAgrementDemolisseur
-                            ?.agrementNumber
-                            ? "Champ requis"
-                            : undefined,
-                          department: !values.vhuAgrementDemolisseur?.department
                             ? "Champ requis"
                             : undefined
                         }
