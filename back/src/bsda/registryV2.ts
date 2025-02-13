@@ -307,7 +307,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationReceptionRefusedWeight: null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionWeightIsEstimate: bsda.weightIsEstimate,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationOperationCode: bsda.destinationOperationCode,
