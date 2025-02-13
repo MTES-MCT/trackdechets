@@ -10,9 +10,14 @@ import {
 } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { ForbiddenError, UserInputError } from "../../../common/errors";
+import {
+  ForbiddenError,
+  TooManyRequestsError,
+  UserInputError
+} from "../../../common/errors";
 import { getDelegatesOfCompany } from "../../../registryDelegation/resolvers/queries/utils/registryDelegations.utils";
 import { enqueueRegistryExportJob } from "../../../queue/producers/registryExport";
+import { subMinutes } from "date-fns";
 
 export async function generateRegistryV2Export(
   _,
@@ -29,6 +34,7 @@ export async function generateRegistryV2Export(
   const user = checkIsAuthenticated(context);
   const sirets: string[] = [];
   let delegate: string | null = null;
+  let isForAllCompanies = false;
   if (delegateSiret && !siret) {
     throw new UserInputError(
       "Le champ siret est obligatoire si l'export est demandé en tant que délégataire."
@@ -84,6 +90,7 @@ export async function generateRegistryV2Export(
     }
     sirets.push(siret);
   } else {
+    isForAllCompanies = true;
     const orgIds = userCompanies.map(company => company.orgId);
     const userRoles = await context.dataloaders.userRoles.load(user.id);
 
@@ -100,6 +107,69 @@ export async function generateRegistryV2Export(
       }
     }
   }
+  console.log({
+    createdById: user.id,
+    createdAt: { gte: subMinutes(new Date(), 5) },
+    isForAllCompanies,
+    sirets: isForAllCompanies ? undefined : { equals: sirets },
+    registryType: registryType === "ALL" ? null : registryType,
+    wasteTypes: where?.wasteType?._eq
+      ? { equals: [where.wasteType._eq] }
+      : where?.wasteType?._in?.length
+      ? { equals: where.wasteType._in }
+      : { isEmpty: true },
+    wasteCodes: where?.wasteCode?._eq
+      ? { equals: [where.wasteCode._eq] }
+      : where?.wasteCode?._in?.length
+      ? { equals: where.wasteCode._in }
+      : { isEmpty: true },
+    declarationType: where?.declarationType?._eq
+      ? where.declarationType._eq === "ALL"
+        ? null
+        : where.declarationType._eq
+      : null,
+    startDate: dateRange._gt ?? dateRange._gte ?? dateRange._eq ?? undefined,
+    endDate: dateRange._lt ?? dateRange._lte ?? dateRange._eq ?? undefined,
+    format
+  });
+
+  const recentSameExport = await prisma.registryExport.findFirst({
+    where: {
+      createdById: user.id,
+      createdAt: { gte: subMinutes(new Date(), 5) },
+      isForAllCompanies,
+      sirets: isForAllCompanies ? undefined : { equals: sirets },
+      registryType: registryType === "ALL" ? null : registryType,
+      wasteTypes: where?.wasteType?._eq
+        ? { equals: [where.wasteType._eq] }
+        : where?.wasteType?._in?.length
+        ? { equals: where.wasteType._in.sort() }
+        : { isEmpty: true },
+      wasteCodes: where?.wasteCode?._eq
+        ? { equals: [where.wasteCode._eq] }
+        : where?.wasteCode?._in?.length
+        ? { equals: where.wasteCode._in.sort() }
+        : { isEmpty: true },
+      declarationType: where?.declarationType?._eq
+        ? where.declarationType._eq === "ALL"
+          ? null
+          : where.declarationType._eq
+        : null,
+      startDate: dateRange._gt ?? dateRange._gte ?? dateRange._eq ?? undefined,
+      endDate: dateRange._lt ?? dateRange._lte ?? dateRange._eq ?? undefined,
+      format
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (recentSameExport) {
+    throw new TooManyRequestsError(
+      "Vous avez déjà réalisé cet export il y a moins de 5 minutes"
+    );
+  }
+
   if (!dateRange._gt && !dateRange._gte && !dateRange._eq) {
     throw new UserInputError(
       "Une date de début pour la période d'export est obligatoire"
@@ -130,16 +200,17 @@ export async function generateRegistryV2Export(
       status: RegistryExportStatus.PENDING,
       delegateSiret: delegate,
       sirets,
+      isForAllCompanies,
       registryType: registryType === "ALL" ? null : registryType,
       wasteTypes: where?.wasteType?._eq
         ? [where.wasteType._eq]
         : where?.wasteType?._in?.length
-        ? where.wasteType._in
+        ? where.wasteType._in.sort()
         : [],
       wasteCodes: where?.wasteCode?._eq
         ? [where.wasteCode._eq]
         : where?.wasteCode?._in?.length
-        ? where.wasteCode._in
+        ? where.wasteCode._in.sort()
         : [],
       declarationType: where?.declarationType?._eq
         ? where.declarationType._eq === "ALL"

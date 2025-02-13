@@ -655,15 +655,16 @@ model RegistryExport {
     s3FileKey   String?
 
     // if this export is made as a delegate
-    delegateSiret   String?
-    sirets          String[]
-    registryType    RegistryExportType?
-    wasteTypes      RegistryExportWasteType[]      @default([])
-    wasteCodes      String[]                       @default([])
-    declarationType RegistryExportDeclarationType?
-    startDate       DateTime                       @db.Timestamptz(6)
-    endDate         DateTime?                      @db.Timestamptz(6)
-    format          RegistryExportFormat
+    delegateSiret     String?
+    sirets            String[]
+    isForAllCompanies Boolean                        @default(false)
+    registryType      RegistryExportType?
+    wasteTypes        RegistryExportWasteType[]      @default([])
+    wasteCodes        String[]                       @default([])
+    declarationType   RegistryExportDeclarationType?
+    startDate         DateTime                       @db.Timestamptz(6)
+    endDate           DateTime?                      @db.Timestamptz(6)
+    format            RegistryExportFormat
 
     createdBy User @relation(fields: [createdById], references: [id])
 

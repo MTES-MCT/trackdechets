@@ -276,7 +276,7 @@ const getSchema = () =>
 const getDefaultValues = () => ({
   companyOrgId: "all",
   startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
-  registryType: RegistryV2ExportType.Ssd,
+  registryType: RegistryV2ExportType.Incoming,
   format: FormsRegisterExportFormat.Csv,
   declarationType: DeclarationType.All,
   wasteTypes: [
