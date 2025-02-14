@@ -58,7 +58,10 @@ import { Company } from "@prisma/client";
     for (const company of companies) {
       companiesTotal += 1;
 
-      if (company.address === "Adresse test") continue;
+      if (company.address === "Adresse test") {
+        ignored++;
+        continue;
+      }
 
       try {
         const splittedAddress = await getCompanySplittedAddress(

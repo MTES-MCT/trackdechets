@@ -48,7 +48,7 @@ export const getCompanySplittedAddress = async (company: Company) => {
   // Un certain nombre d'entreprises ont des addresses du genre "codePostal ville"
   // (donc on tolère l'absence de libellé de voie)
   // Mais s'il manque le code postal ou la ville, on considère l'adresse comme invalide.
-  // On retourne null plutôt qu'une adrese semi-complète.
+  // On retourne null plutôt qu'une adresse semi-complète.
   if (
     !isDefinedStrict(res.postalCode?.trim()) ||
     !isDefinedStrict(res.city?.trim())
