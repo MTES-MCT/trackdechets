@@ -30,6 +30,7 @@ const routes = {
   company: "/company/:orgId",
   wasteTree: "/wasteTree",
   dashboard: {
+    default: "/dashboard",
     index: "/dashboard/:siret",
     roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
@@ -131,9 +132,10 @@ const routes = {
   },
   registry: "/registre",
   registry_new: {
-    myImports: "/registre-v2/own",
-    companyImports: "/registre-v2/list",
-    export: "/registre-v2/export"
+    index: "/registry",
+    myImports: "/registry/own",
+    companyImports: "/registry/list",
+    export: "/registry/export"
   }
 };
 
@@ -163,6 +165,7 @@ export const titles = {
   "/password-reset": "Réinitialiser mon mot de passe — Trackdéchets",
   "/company/:orgId": "Fiche établissement — Trackdéchets",
   "/wasteTree": "Liste des codes déchets — Trackdéchets",
+  "/dashboard": "Tableau de bord — Trackdéchets",
   "/dashboard/:siret": "Tableau de bord — Trackdéchets",
   "/dashboard/:siret/road-control/:id": "Contrôle Routier — Trackdéchets",
   "/dashboard/:siret/bsds/all": "Tous mes bordereaux — Trackdéchets",
@@ -243,7 +246,10 @@ export const titles = {
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
   "/registre": "Mes registres — Trackdéchets",
-  "/registre-v2": "Mes registres — Trackdéchets"
+  "/registry/own": "Mes imports au registre national — Trackdéchets",
+  "/registry/list":
+    "Imports au registre national par établissement — Trackdéchets",
+  "/registry/export": "Mes exports de registres — Trackdéchets"
 };
 
 export default routes;

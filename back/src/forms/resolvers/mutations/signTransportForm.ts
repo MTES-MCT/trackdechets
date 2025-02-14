@@ -21,7 +21,7 @@ import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
-import { validateBeforeTransport } from "../../validation";
+import { validateBeforeTransport, plateSchemaFn } from "../../validation";
 import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { recipifyFormInput } from "../../recipify";
@@ -364,6 +364,17 @@ const signatures: Partial<
         }
       }
     };
+
+    await plateSchemaFn().validate(
+      {
+        transporterNumberPlate:
+          args.input.transporterNumberPlate ??
+          transporter?.transporterNumberPlate
+      },
+      {
+        abortEarly: false
+      }
+    );
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingFullForm.id, status: existingFullForm.status },

@@ -18,9 +18,11 @@ import {
   actorCountryCodeSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
-  wastePopSchema,
-  wasteIsDangerousSchema,
-  operationModeSchema
+  booleanSchema,
+  operationModeSchema,
+  notificationNumberSchema,
+  parcelNumbersSchema,
+  declarationNumberSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -59,7 +61,19 @@ describe("Schemas", () => {
 
   test("getWasteCodeSchema", () => {
     expect(() => getWasteCodeSchema().parse("17 02 01")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("170201")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01*")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01 *")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("070301*")).not.toThrow();
     expect(() => getWasteCodeSchema().parse("invalid")).toThrow();
+    expect(() =>
+      getWasteCodeSchema().nullish().parse("17 02 01")
+    ).not.toThrow();
+    expect(() => getWasteCodeSchema().nullish().parse("invalid")).toThrow();
+    expect(() => getWasteCodeSchema().nullish().parse(null)).not.toThrow();
+    expect(() => getWasteCodeSchema().nullish().parse(undefined)).not.toThrow();
+    expect(() => getWasteCodeSchema().parse(null)).toThrow();
+    expect(() => getWasteCodeSchema().parse(undefined)).toThrow();
   });
 
   test("wasteDescriptionSchema", () => {
@@ -108,31 +122,18 @@ describe("Schemas", () => {
     expect(() => volumeSchema.parse("1001")).toThrow();
   });
 
-  test("wastePopSchema", () => {
-    expect(wastePopSchema.parse("OUI")).toBe(true);
-    expect(wastePopSchema.parse("Oui")).toBe(true);
-    expect(wastePopSchema.parse("oui")).toBe(true);
-    expect(wastePopSchema.parse("NON")).toBe(false);
-    expect(wastePopSchema.parse("Non")).toBe(false);
-    expect(wastePopSchema.parse("non")).toBe(false);
-    expect(wastePopSchema.parse(false)).toBe(false);
-    expect(wastePopSchema.parse(true)).toBe(true);
-    expect(() => wastePopSchema.parse("foo")).toThrow();
-    expect(() => wastePopSchema.parse("")).toThrow();
-    expect(() => wastePopSchema.parse(undefined)).toThrow();
-  });
-
-  test("wasteIsDangerousSchema", () => {
-    expect(wasteIsDangerousSchema.parse("OUI")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("Oui")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("oui")).toBe(true);
-    expect(wasteIsDangerousSchema.parse("NON")).toBe(false);
-    expect(wasteIsDangerousSchema.parse("Non")).toBe(false);
-    expect(wasteIsDangerousSchema.parse("non")).toBe(false);
-    expect(wasteIsDangerousSchema.parse(false)).toBe(false);
-    expect(wasteIsDangerousSchema.parse(true)).toBe(true);
-    expect(() => wasteIsDangerousSchema.parse("foo")).toThrow();
-    expect(() => wasteIsDangerousSchema.parse("")).toThrow();
+  test("booleanSchema", () => {
+    expect(booleanSchema.parse("OUI")).toBe(true);
+    expect(booleanSchema.parse("Oui")).toBe(true);
+    expect(booleanSchema.parse("oui")).toBe(true);
+    expect(booleanSchema.parse("NON")).toBe(false);
+    expect(booleanSchema.parse("Non")).toBe(false);
+    expect(booleanSchema.parse("non")).toBe(false);
+    expect(booleanSchema.parse(false)).toBe(false);
+    expect(booleanSchema.parse(true)).toBe(true);
+    expect(() => booleanSchema.parse("foo")).toThrow();
+    expect(() => booleanSchema.parse("")).toThrow();
+    expect(() => booleanSchema.parse(undefined)).toThrow();
   });
 
   test("actorTypeSchema", () => {
@@ -165,8 +166,15 @@ describe("Schemas", () => {
   });
 
   test("actorPostalCodeSchema", () => {
-    expect(actorPostalCodeSchema.parse("12345")).toBe("12345");
-    expect(() => actorPostalCodeSchema.parse("invalid")).toThrow();
+    expect(actorPostalCodeSchema.parse("12345")).toBe("12345"); // US ZIP code
+    expect(actorPostalCodeSchema.parse("12345-6789")).toBe("12345-6789"); // US ZIP+4
+    expect(actorPostalCodeSchema.parse("W1A 1AA")).toBe("W1A 1AA"); // UK
+    expect(actorPostalCodeSchema.parse("K1A 0B1")).toBe("K1A 0B1"); // Canada
+    expect(actorPostalCodeSchema.parse("75008")).toBe("75008"); // France
+    expect(actorPostalCodeSchema.parse("100-0001")).toBe("100-0001"); // Japan
+    expect(() => actorPostalCodeSchema.parse("_invalid_")).toThrow();
+    expect(() => actorPostalCodeSchema.parse("-1234")).toThrow();
+    expect(() => actorPostalCodeSchema.parse("1234567890ABC")).toThrow(); // Too long
   });
 
   test("actorCountryCodeSchema", () => {
@@ -198,5 +206,40 @@ describe("Schemas", () => {
     );
     expect(() => operationModeSchema.parse("Valo énergétique")).toThrow();
     expect(operationModeSchema.parse(null)).toBe(null);
+  });
+
+  test("declarationNumberSchema", () => {
+    expect(() =>
+      declarationNumberSchema.parse("A7E 2024 063125")
+    ).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 06312")).toThrow();
+  });
+
+  test("notificationNumberSchema", () => {
+    expect(() => notificationNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() =>
+      notificationNumberSchema.parse("FR 2023 077002")
+    ).not.toThrow();
+    expect(() =>
+      notificationNumberSchema.parse("AA 1234 567890")
+    ).not.toThrow();
+    expect(() => notificationNumberSchema.parse("AAA 1234567890")).toThrow();
+    expect(() => notificationNumberSchema.parse("AA 12345 678901")).toThrow();
+  });
+
+  test("parcelNumbersSchema", () => {
+    expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("123-AA-1234")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("12-AA-12")).not.toThrow();
+    expect(() =>
+      parcelNumbersSchema.parse("123-AA-1234,123-AA-1234")
+    ).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("AAA")).toThrow();
+    expect(() =>
+      parcelNumbersSchema.parse("123-AA-1234;123 AA 1234")
+    ).toThrow();
   });
 });

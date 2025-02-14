@@ -6,15 +6,15 @@ import { getCachedCompany } from "../../shared/helpers";
 
 export const initialEmitterRefinement: Refinement<
   ParsedZodIncomingTexsItem
-> = async (incomingTexsItem, { addIssue }) => {
+> = async (incomingTexsItem, ctx) => {
   if (
     !incomingTexsItem.emitterNoTraceability &&
-    !incomingTexsItem.initialEmitterCompanyOrgId
+    !incomingTexsItem.initialEmitterCompanyType
   ) {
-    addIssue({
+    ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `L'organisme initial émetteur doit être renseigné`,
-      path: ["initialEmitterCompanyOrgId"]
+      message: `Le producteur initial doit être renseigné lorsqu'il n'y a pas rupture de traçabilité pour l'expéditeur ou détenteur`,
+      path: ["initialEmitterCompanyType"]
     });
   }
 
@@ -26,7 +26,7 @@ export const initialEmitterRefinement: Refinement<
     postalCodeKey: "initialEmitterCompanyPostalCode",
     cityKey: "initialEmitterCompanyCity",
     countryKey: "initialEmitterCompanyCountryCode"
-  });
+  })(incomingTexsItem, ctx);
 };
 
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({

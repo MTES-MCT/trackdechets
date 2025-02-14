@@ -1,18 +1,16 @@
-import { format } from "@fast-csv/format";
 import { logger } from "@td/logger";
 import { Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
 import { endImport, startImport, updateImportStats } from "./database";
 import {
-  CSV_DELIMITER,
-  ERROR_HEADER,
   importOptions,
   ImportType,
   ParsedLine,
   UNAUTHORIZED_ERROR
 } from "./options";
 import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
+import { getCsvErrorStream, getXlsxErrorStream } from "./errors";
 
 export async function processStream({
   importId,
@@ -46,23 +44,11 @@ export async function processStream({
     skipped: 0
   };
 
-  const errorStream = format({
-    delimiter: CSV_DELIMITER,
-    headers: ["errors", ...Object.keys(options.headers)],
-    writeHeaders: false, // Use headers only to reorder the columns properly
-    writeBOM: true, // To help Excel recognize UTF-8 encoding
-    transform: (row: Record<string, unknown>) => {
-      return Object.fromEntries(
-        Object.entries(row).map(([key, value]) => [
-          key,
-          value instanceof Date ? value.toISOString() : value
-        ])
-      );
-    }
-  });
+  const errorStream =
+    fileType === "CSV"
+      ? getCsvErrorStream(options)
+      : getXlsxErrorStream(options);
   errorStream.pipe(outputErrorStream);
-  // Write the headers ourself, as the keys dont match the labels
-  errorStream.write({ errors: ERROR_HEADER, ...options.headers });
 
   const transformStream =
     fileType === "CSV"
@@ -89,7 +75,17 @@ export async function processStream({
       if (!result.success) {
         stats.errors++;
 
+        // Build an ordering map that we rely on to sort the errors by the order of the columns
+        const orderMap = Object.keys(options.headers).reduce(
+          (acc, key, index) => {
+            acc[key] = index;
+            return acc;
+          },
+          {}
+        );
+
         const errors = result.error.issues
+          .sort((a, b) => orderMap[a.path[0]] - orderMap[b.path[0]])
           .map(issue => {
             const columnName = options.headers[issue.path[0]] ?? issue.path[0];
             return `${columnName} : ${issue.message}`;
@@ -100,17 +96,16 @@ export async function processStream({
         continue;
       }
 
-      // Check rights
-      const contextualSiretsWithDelegation =
-        delegateToDelegatorsMap.get(result.data.reportAsCompanySiret ?? "") ??
-        [];
-      const contextualAllowedSirets = [
-        ...allowedSirets,
-        ...contextualSiretsWithDelegation
-      ];
+      const { reportAsCompanySiret, reportForCompanySiret, reason } =
+        result.data;
 
       if (
-        !contextualAllowedSirets.includes(result.data.reportForCompanySiret)
+        !isAuthorized({
+          reportAsCompanySiret,
+          delegateToDelegatorsMap,
+          reportForCompanySiret,
+          allowedSirets
+        })
       ) {
         stats.errors++;
 
@@ -118,11 +113,11 @@ export async function processStream({
         continue;
       }
 
-      if (result.data.reason === "MODIFIER") {
+      if (reason === "MODIFIER") {
         stats.edits++;
-      } else if (result.data.reason === "ANNULER") {
+      } else if (reason === "ANNULER") {
         stats.cancellations++;
-      } else if (result.data.reason === "IGNORER") {
+      } else if (reason === "IGNORER") {
         stats.skipped++;
         continue;
       } else {
@@ -158,4 +153,26 @@ function formatErrorMessage(message: string) {
   }
 
   return message;
+}
+
+export function isAuthorized({
+  reportAsCompanySiret,
+  delegateToDelegatorsMap,
+  reportForCompanySiret,
+  allowedSirets
+}: {
+  reportAsCompanySiret: string | null | undefined;
+  delegateToDelegatorsMap: Map<string, string[]>;
+  reportForCompanySiret: string;
+  allowedSirets: string[];
+}) {
+  if (reportAsCompanySiret) {
+    return (
+      delegateToDelegatorsMap
+        .get(reportAsCompanySiret)
+        ?.includes(reportForCompanySiret) ?? false
+    );
+  }
+
+  return allowedSirets.includes(reportForCompanySiret);
 }

@@ -14,6 +14,12 @@ import { prisma } from "@td/prisma";
 import { BsdType, Company, CompanyVerificationStatus } from "@prisma/client";
 import { getOperationModesFromOperationCode } from "../../operationModes";
 import { CompanyRole, pathFromCompanyRole } from "./schema";
+import { v20250201 } from "../../validation";
+
+import {
+  ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+  ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
+} from "../messages";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -357,3 +363,55 @@ export async function isTraderRefinement(
     });
   }
 }
+
+export const onlyWhiteSpace = (str: string) => !str.trim().length; // check whitespaces, tabs, newlines and invisible chars
+
+export const validateTransporterPlates = (
+  transporter,
+  ctx: z.RefinementCtx,
+  transporterIndex?: number
+) => {
+  const { transporterTransportPlates: plates } = transporter;
+  const bsdCreatedAt = transporter.createdAt || new Date();
+
+  const path =
+    transporterIndex !== undefined
+      ? ["transporters", transporterIndex, "transporter", "transport", "plates"]
+      : ["transporter", "transport", "plates"];
+
+  const createdAfterV20250201 = bsdCreatedAt.getTime() > v20250201.getTime();
+
+  if (!createdAfterV20250201 || !plates) {
+    return;
+  }
+  if (plates.some(plate => plate.length > 12 || plate.length < 4)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
+      path
+    });
+    return;
+  }
+
+  if (plates.some(plate => onlyWhiteSpace(plate))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT,
+      path
+    });
+  }
+};
+
+export const validateMultiTransporterPlates = (bsd, ctx: z.RefinementCtx) => {
+  const bsdCreatedAt = bsd.createdAt || new Date();
+
+  const createdAfterV20250201 = bsdCreatedAt.getTime() > v20250201.getTime();
+
+  if (!createdAfterV20250201) {
+    return;
+  }
+
+  for (const [index, transporter] of (bsd.transporters ?? []).entries()) {
+    validateTransporterPlates(transporter, ctx, index);
+  }
+};

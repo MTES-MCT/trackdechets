@@ -2,7 +2,8 @@ import {
   BsdaStatus,
   BsdaType,
   OperationMode,
-  TransportMode
+  TransportMode,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
@@ -124,6 +125,24 @@ describe("BSDA parsing", () => {
       expect(parsed).toBeDefined();
     });
 
+    test("when transporter plate is not present and transport mode is not ROAD before TRANSPORT signature", () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportPlates: [],
+            transporterTransportMode: "ROAD" as TransportMode
+          }
+        ]
+      };
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
     test("when transporter plate is not present and transport mode is not ROAD", () => {
       const data: ZodBsda = {
         ...bsda,
@@ -149,7 +168,7 @@ describe("BSDA parsing", () => {
           {
             ...bsda.transporters![0],
             transporterTransportMode: "ROAD" as TransportMode,
-            transporterTransportPlates: ["TRANSPORTER-PLATES"]
+            transporterTransportPlates: ["AZ-12-BA"]
           }
         ]
       };
@@ -184,9 +203,69 @@ describe("BSDA parsing", () => {
       });
       expect(parsed).toBeDefined();
     });
+
+    test("when a reception weight is filled and waste is accepted", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+        destinationReceptionWeight: 1.5
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when a reception weight is filled and waste is partially refused", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus:
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+        destinationReceptionWeight: 1.5,
+        destinationReceptionRefusalReason: "pas très très conforme"
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when a reception weight is 0 and waste is refused", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+        destinationReceptionWeight: 0,
+        destinationReceptionRefusalReason: "non conforme"
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
   });
 
   describe("BSDA should not be valid", () => {
+    test("when a reception weight is 0", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 0
+      };
+
+      const parseFn = () =>
+        parseBsdaAsync(data, { ...context, currentSignatureType: "OPERATION" });
+
+      await expect(parseFn).rejects.toThrow(
+        "Le poids du déchet reçu doit être renseigné et non nul."
+      );
+    });
+
     test("when type is COLLECTION_2710 and unused company fields are empty strings", () => {
       // on COLLECTION_2710 Bsdas worker and transporter fields are not used
 
@@ -448,8 +527,8 @@ describe("BSDA parsing", () => {
       }
     });
 
-    test.each([undefined, [], [""]])(
-      "when transporter plate is %p invalid and transporter mode is ROAD",
+    test.each([undefined, []])(
+      "when transporter plate is %p and transporter mode is ROAD",
       async invalidValue => {
         const data: ZodBsda = {
           ...bsda,
@@ -461,7 +540,7 @@ describe("BSDA parsing", () => {
             }
           ]
         };
-
+        expect.assertions(1);
         try {
           parseBsda(data, {
             ...context,
@@ -474,6 +553,137 @@ describe("BSDA parsing", () => {
             })
           ]);
         }
+      }
+    );
+
+    test("when transporter plate is an empty string and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: [""]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate is too short and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["x"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate is too long and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["AZ-12-ER-98-AA-12"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    test("when transporter plate only contains whitespace and transporter mode is ROAD", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        transporters: [
+          {
+            ...bsda.transporters![0],
+            transporterTransportMode: "ROAD" as TransportMode,
+            transporterTransportPlates: ["      "]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
+          })
+        ]);
+      }
+    });
+
+    test.each(["XX", "AZ-ER-TY-UI-09-LP-87", "     "])(
+      "when plate is incorrect (%p) on a bsda created before V20250201",
+      async plate => {
+        const data: ZodBsda = {
+          ...bsda,
+          createdAt: new Date("2025-01-10T00:00:00Z"),
+          transporters: [
+            {
+              ...bsda.transporters![0],
+              transporterTransportMode: "ROAD" as TransportMode,
+              transporterTransportPlates: [plate] // should throw, but bsda was created before V20250201
+            }
+          ]
+        };
+
+        const parsed = parseBsda(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+
+        expect(parsed).toBeDefined();
       }
     );
 
@@ -528,7 +738,7 @@ describe("BSDA parsing", () => {
           }
         ]
       };
-
+      expect.assertions(1);
       try {
         await parseBsdaAsync(data, {
           ...context,

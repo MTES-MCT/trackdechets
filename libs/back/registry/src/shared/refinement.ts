@@ -29,7 +29,7 @@ export function refineActorInfos<T>({
       | "ENTREPRISE_HORS_UE"
       | "ASSOCIATION"
       | "PERSONNE_PHYSIQUE"
-      | "COMMUNE" = item[typeKey];
+      | "COMMUNES" = item[typeKey];
 
     if (!type) {
       return;
@@ -42,10 +42,16 @@ export function refineActorInfos<T>({
 
     switch (type) {
       case "ETABLISSEMENT_FR": {
-        if (!isSiret(orgId)) {
+        if (!orgId) {
           addIssue({
             code: z.ZodIssueCode.custom,
-            message: "Le SIRET saisi n'est pas un SIRET valide.",
+            message: "Le SIRET doit être saisi pour un établissement français",
+            path: [orgIdKey]
+          });
+        } else if (!isSiret(orgId)) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Le SIRET saisi n'est pas un SIRET valide",
             path: [orgIdKey]
           });
         }
@@ -55,6 +61,17 @@ export function refineActorInfos<T>({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une entreprise française",
             path: [countryKey]
+          });
+        }
+
+        const postalCode = item[postalCodeKey];
+        const isValidPostalCode = /^[0-9]{5,6}$/.test(postalCode);
+        if (!isValidPostalCode) {
+          addIssue({
+            code: z.ZodIssueCode.custom,
+            message:
+              "Le code postal doit être composé de 5 ou 6 chiffres pour une entreprise française",
+            path: [postalCodeKey]
           });
         }
         break;
@@ -103,7 +120,7 @@ export function refineActorInfos<T>({
           addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Le numéro d'identification doit faire 10 caractères pour une assoxiation. Il commence par un W suivi de 9 chiffres.",
+              "Le numéro d'identification doit faire 10 caractères pour une association. Il commence par un W suivi de 9 chiffres.",
             path: [orgIdKey]
           });
         }
@@ -127,7 +144,7 @@ export function refineActorInfos<T>({
         }
         break;
       }
-      case "COMMUNE":
+      case "COMMUNES":
         break;
       default:
         throw new Error(`Unhandled destination type ${type}`);
@@ -159,7 +176,7 @@ function refineActorDetails<T>({
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
-    | "COMMUNE";
+    | "COMMUNES";
   nameKey: string;
   addressKey: string;
   postalCodeKey: string;
@@ -167,7 +184,7 @@ function refineActorDetails<T>({
   countryKey: string;
 }): Refinement<T> {
   return (item, { addIssue }) => {
-    if (type === "COMMUNE") {
+    if (type === "COMMUNES") {
       return;
     }
 
@@ -284,17 +301,6 @@ export const refineWeightAndVolume: Refinement<{
       path: ["volume"]
     });
   }
-
-  if (
-    item.weightIsEstimate &&
-    ["R 1", "D 10", "D 5"].includes(item.operationCode)
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Pour les codes de traitement R 1, D 10 et D 5, le poids ne peut pas être estimé`,
-      path: ["weightIsEstimate"]
-    });
-  }
 };
 
 export const refineWeightIsEstimate: Refinement<{
@@ -320,13 +326,13 @@ export const refineMunicipalities: Refinement<{
     | "ENTREPRISE_HORS_UE"
     | "ASSOCIATION"
     | "PERSONNE_PHYSIQUE"
-    | "COMMUNE"
+    | "COMMUNES"
     | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
   initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
-    item.initialEmitterCompanyType === "COMMUNE" &&
+    item.initialEmitterCompanyType === "COMMUNES" &&
     !item.initialEmitterMunicipalitiesInseeCodes?.length
   ) {
     addIssue({
@@ -337,7 +343,7 @@ export const refineMunicipalities: Refinement<{
   }
 
   if (
-    item.initialEmitterCompanyType === "COMMUNE" &&
+    item.initialEmitterCompanyType === "COMMUNES" &&
     !item.initialEmitterMunicipalitiesNames?.length
   ) {
     addIssue({
@@ -577,5 +583,60 @@ export const refineOperationCodeWhenUpcycled: Refinement<{
       message: `Lorsque la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination)`,
       path: ["operationCode"]
     });
+  }
+};
+
+export const refineEcoOrgBrokerAndTrader: Refinement<{
+  ecoOrganismeSiret?: string | null;
+  ecoOrganismeName?: string | null;
+  brokerCompanySiret?: string | null;
+  brokerCompanyName?: string | null;
+  brokerRecepisseNumber?: string | null;
+  traderCompanySiret?: string | null;
+  traderCompanyName?: string | null;
+  traderRecepisseNumber?: string | null;
+}> = async (item, { addIssue }) => {
+  if (item.ecoOrganismeSiret && !item.ecoOrganismeName) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `La raison sociale de l'éco-organisme est obligatoire si le SIRET est renseigné`,
+      path: ["ecoOrganismeName"]
+    });
+  }
+
+  if (item.brokerCompanySiret) {
+    if (!item.brokerCompanyName) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `La raison sociale du courtier est obligatoire si le SIRET est renseigné`,
+        path: ["brokerCompanyName"]
+      });
+    }
+
+    if (!item.brokerRecepisseNumber) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le numéro de récépissé du courtier est obligatoire si le SIRET est renseigné`,
+        path: ["brokerRecepisseNumber"]
+      });
+    }
+  }
+
+  if (item.traderCompanySiret) {
+    if (!item.traderCompanyName) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `La raison sociale du négociant est obligatoire si le SIRET est renseigné`,
+        path: ["traderCompanyName"]
+      });
+    }
+
+    if (!item.traderRecepisseNumber) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le numéro de récépissé du négociant est obligatoire si le SIRET est renseigné`,
+        path: ["traderRecepisseNumber"]
+      });
+    }
   }
 };

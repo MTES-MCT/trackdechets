@@ -930,14 +930,10 @@ describe("Mutation.createForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        siret: eo.siret!,
-        name: eo.name
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
-
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
       variables: {
@@ -965,6 +961,38 @@ describe("Mutation.createForm", () => {
       ecoOrganisme: {
         name: "",
         siret: siretify(6)
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'éco-organisme avec le siret "${createFormInput.ecoOrganisme.siret}" n'est pas reconnu.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should return an error when trying to create a form with an ecoorganisme not allowed to handle BSDDs", async () => {
+    const ecoOrg = await ecoOrganismeFactory({});
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      ecoOrganisme: {
+        name: ecoOrg.name,
+        siret: ecoOrg.siret
       }
     };
     const { mutate } = makeClient(user);

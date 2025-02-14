@@ -8,11 +8,13 @@ export const GET_REGISTRY_IMPORTS = gql`
     $siret: String
     $ownImportsOnly: Boolean
     $first: Int
+    $skip: Int
   ) {
     registryImports(
       siret: $siret
       ownImportsOnly: $ownImportsOnly
       first: $first
+      skip: $skip
     ) {
       totalCount
       edges {
@@ -96,7 +98,7 @@ export const REGISTRY_DOWNLOAD_SIGNED_URL = gql`
   }
 `;
 
-export async function downloadFromSignedUrl(signedUrl: string | undefined) {
+export function downloadFromSignedUrl(signedUrl: string | undefined) {
   if (!signedUrl) {
     return;
   }

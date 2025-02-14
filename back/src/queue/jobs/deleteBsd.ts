@@ -24,6 +24,13 @@ import {
   toBsdElastic as toBspaohElastic
 } from "../../bspaoh/elastic";
 
+import { lookupUtils as bsdaLookupUtils } from "../../bsda/registryV2";
+import { lookupUtils as bsdasriLookupUtils } from "../../bsdasris/registryV2";
+import { lookupUtils as bsddLookupUtils } from "../../forms/registryV2";
+import { lookupUtils as bsffLookupUtils } from "../../bsffs/registryV2";
+import { lookupUtils as bspaohLookupUtils } from "../../bspaoh/registryV2";
+import { lookupUtils as bsvhuLookupUtils } from "../../bsvhu/registryV2";
+
 import { BsdElastic, deleteBsd } from "../../common/elastic";
 import { prisma } from "@td/prisma";
 
@@ -34,6 +41,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
 
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await getBsdaForElastic({ id: bsdId });
+    await bsdaLookupUtils.delete(bsda.id);
 
     return toBsdaElastic(bsda);
   }
@@ -43,12 +51,13 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
       where: { id: bsdId },
       include: BsdasriForElasticInclude
     });
-
+    await bsdasriLookupUtils.delete(bsdasri.id);
     return toBsdasriElastic(bsdasri);
   }
 
   if (bsdId.startsWith("VHU-")) {
     const bsvhu = await getBsvhuForElastic({ id: bsdId });
+    await bsvhuLookupUtils.delete(bsvhu.id);
 
     return toBsvhuElastic(bsvhu);
   }
@@ -58,6 +67,8 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
       where: { id: bsdId },
       include: BsffForElasticInclude
     });
+    await bsffLookupUtils.delete(bsff.id);
+
     return toBsffElastic(bsff);
   }
 
@@ -66,6 +77,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
       where: { id: bsdId },
       include: BspaohForElasticInclude
     });
+    await bspaohLookupUtils.delete(bspaoh.id);
     return toBspaohElastic(bspaoh);
   }
 
@@ -74,9 +86,6 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
     where: { id: bsdId },
     include: FormForElasticInclude
   });
-  if (bsdd) {
-    return toBsddElastic(bsdd);
-  }
-
-  throw new Error("Indexing this type of BSD is not handled by this worker.");
+  await bsddLookupUtils.delete(bsdd.id);
+  return toBsddElastic(bsdd);
 }

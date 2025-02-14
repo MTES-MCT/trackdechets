@@ -86,6 +86,8 @@ async function getDuplicateData(
     destinationOperationMode,
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
+    destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate,
     intermediariesOrgIds,
     ...zodBsvhu
   } = prismaToZodBsvhu(bsvhu);

@@ -5,13 +5,35 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.03.1] 11/03/2025
+
+#### :nail_care: Améliorations
+
+- Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
+
 # [2025.02.1] 11/02/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export du registre entrant V2 [PR 3910](https://github.com/MTES-MCT/trackdechets/pull/3910)
+- BSVHU - Il est désormais possible de signer la réception indépendamment de l'opération [PR 3909](https://github.com/MTES-MCT/trackdechets/pull/3909)
+- Mes établissements : possibilité pour les admins de voir les demandes de rattachement [PR 3904](https://github.com/MTES-MCT/trackdechets/pull/3904)
 
 #### :nail_care: Améliorations
 
 - BSDD - Dupliquer le(s) conditionnement(s) et la mention ADR et afficher un message informatif en cas de BSDD provenant d'une duplication [PR 3881](https://github.com/MTES-MCT/trackdechets/pull/3881)
 - BSVHU - Ajout d'un nouveau type de conditionnement "Identification par numéro de fiche VHU DROMCOM" [PR 3019](https://github.com/MTES-MCT/trackdechets/pull/3919)
-- Ajout d'éco-organismes, filtrage des éco-organismes en front [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+- Ajout d'éco-organismes, filtrage des éco-organismes en front. Mise à jour des SIRET de certains éco-organismes en base de donnée [PR 3916](https://github.com/MTES-MCT/trackdechets/pull/3916)
+- Il ne devrait pas être possible de valider la réception d'un BSDA avec un poids à 0 [PR 3934](https://github.com/MTES-MCT/trackdechets/pull/3934)
+- Revoir les informations transporteurs scellées en cas de multimodal (récépissé, exemption de récépissé et mode de transport pour transporteur étranger) [PR 3933](https://github.com/MTES-MCT/trackdechets/pull/3933)
+- Redirection de l'utilisateur vers la page de login en cas de déconnexion [PR 3729](https://github.com/MTES-MCT/trackdechets/pull/3729)
+- BSDD : passage au DSFR de la modale de signature du traitement [PR 3951](https://github.com/MTES-MCT/trackdechets/pull/3951)
+
+#### :bug: Corrections de bugs
+
+- La révision du BSDA permet de modifier le CAP de l'exutoire [PR 3932](https://github.com/MTES-MCT/trackdechets/pull/3932)
+- La requête companyInfos renvoie la bonne valeur pour isDormant [PR 3943](https://github.com/MTES-MCT/trackdechets/pull/3943)
+- BSDD - Renommage de "COLIS (totaux)" par "Total conditionnement" sur le PDF [PR 3892](https://github.com/MTES-MCT/trackdechets/pull/3892)
 
 #### :boom: Breaking changes
 
@@ -19,6 +41,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Révision BSDD - Vérifier le type de profil du courtier et/ou négociant lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 - Bordereau BSDA - Vérifier le type de profil du courtier lors de l'ajout sur un bordereau et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
 - Révision BSDA - Vérifier le type de profil du courtier lors d'une révision et retirer les champs liés aux récépissés [PR 3914](https://github.com/MTES-MCT/trackdechets/pull/3914).
+- Restrictions sur le format des plaques d'immatriculations sur le BSDA, BSDASRI, BSFF, BSPAOH, BSDD [PR 3935](https://github.com/MTES-MCT/trackdechets/pull/3935).
+
+#### :boom: Breaking changes
+
+- Le champ GraphQL `BsdaPackagingInput.type` est rendu obligatoire [PR 3930](https://github.com/MTES-MCT/trackdechets/pull/3930).
 
 # [2025.01.1] 14/01/2025
 

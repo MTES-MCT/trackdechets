@@ -46,6 +46,32 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 
   if (
+    ssdItem.useDate &&
+    ssdItem.processingEndDate &&
+    ssdItem.useDate < ssdItem.processingEndDate
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La date d'utilisation ne peut pas être antérieure à la date de fin traitement.",
+      path: ["useDate"]
+    });
+  }
+
+  if (
+    ssdItem.dispatchDate &&
+    ssdItem.processingEndDate &&
+    ssdItem.dispatchDate < ssdItem.processingEndDate
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La date d'expédition ne peut pas être antérieure à la date de fin traitement.",
+      path: ["dispatchDate"]
+    });
+  }
+
+  if (
     ssdItem.processingEndDate &&
     ssdItem.processingEndDate < ssdItem.processingDate
   ) {
@@ -58,12 +84,9 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
   }
 };
 
-export const refineDestination: Refinement<ParsedZodSsdItem> = (
-  item,
-  { addIssue }
-) => {
+export const refineDestination: Refinement<ParsedZodSsdItem> = (item, ctx) => {
   if (item.dispatchDate && !item.useDate && !item.destinationCompanyType) {
-    addIssue({
+    ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
         "Vous devez saisir les informations de l'entreprise de destination lorsqu'une date d'expédition est renseignée",
@@ -79,7 +102,7 @@ export const refineDestination: Refinement<ParsedZodSsdItem> = (
     cityKey: "destinationCompanyCity",
     postalCodeKey: "destinationCompanyPostalCode",
     countryKey: "destinationCompanyCountryCode"
-  });
+  })(item, ctx);
 };
 
 export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (
@@ -93,7 +116,7 @@ export const refineSecondaryWasteCodes: Refinement<ParsedZodSsdItem> = (
   if (wasteCodesLength !== wasteDescriptionsLength) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le nombre de code déchets secondaites doit correspondre au nombre de descriptions secondaires. ${wasteCodesLength} code(s) et ${wasteDescriptionsLength} description(s) fournis.`,
+      message: `Le nombre de code déchets secondaires doit correspondre au nombre de descriptions secondaires. ${wasteCodesLength} code(s) et ${wasteDescriptionsLength} description(s) fournis.`,
       path: ["secondaryWasteCodes"]
     });
   }

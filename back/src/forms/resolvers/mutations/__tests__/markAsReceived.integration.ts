@@ -102,6 +102,70 @@ describe("Test Form reception", () => {
     expect(logs[0].status).toBe("RECEIVED");
   });
 
+  it("ensure an older SENT bsdd with invalid plates can still be accepted", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const recipient = await userWithCompanyFactory("ADMIN");
+    const initialForm = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+
+        emittedBy: emitter.user.name,
+
+        recipientCompanySiret: recipient.company.siret,
+        recipientsSirets: [recipient.company.siret!],
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterNumberPlate: "XY", // invalid plate number
+            number: 1
+          }
+        }
+      }
+    });
+
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: { currentTransporterOrgId: siretify(3) }
+    });
+
+    const { mutate } = makeClient(recipient.user);
+
+    await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100"
+        }
+      }
+    });
+
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
+
+    expect(frm.status).toBe("RECEIVED");
+    expect(frm.wasteAcceptationStatus).toBe(null);
+    expect(frm.receivedBy).toBe("Bill");
+    expect(frm.quantityReceived).toBe(null);
+
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
+
+    // A StatusLog object is created
+    const logs = await prisma.statusLog.findMany({
+      where: { form: { id: frm.id }, user: { id: recipient.id } }
+    });
+    expect(logs.length).toBe(1);
+    expect(logs[0].status).toBe("RECEIVED");
+  });
+
   it("should be possible to specify a quantityReceived=0 when acceptation status is not specified", async () => {
     const {
       emitterCompany,

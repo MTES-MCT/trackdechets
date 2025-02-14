@@ -26,7 +26,8 @@ import {
   checkTransporters,
   checkWorkerSubSectionThree,
   validateDestination,
-  validatePreviousBsdas
+  validatePreviousBsdas,
+  validateDestinationReceptionWeight
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -42,6 +43,10 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -265,7 +270,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoTransporterWhenCollection2710)
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
-  .superRefine(checkTransporters);
+  .superRefine(checkTransporters)
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -309,6 +315,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
       checkCompanies(bsda, zodContext, context)
     )
     .superRefine(validateDestination(context))
+    .superRefine(validateDestinationReceptionWeight(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs
@@ -333,6 +340,10 @@ export type ParsedZodBsdaTransporter = z.output<
   typeof rawBsdaTransporterSchema
 >;
 
-export const transformedBsdaTransporterSchema = rawBsdaTransporterSchema
+const refinedBsdaTransporter = rawBsdaTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsdaTransporterSchema = refinedBsdaTransporter
   .transform(updateTransporterRecepisse)
   .transform(sirenifyBsdaTransporter);

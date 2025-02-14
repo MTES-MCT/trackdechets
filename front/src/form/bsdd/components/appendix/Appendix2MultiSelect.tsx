@@ -450,7 +450,7 @@ export default function Appendix2MultiSelect({
                 {currentlyAnnexedForms.map(({ form, quantity }) => (
                   <div>
                     {form.readableId}
-                    {quantity ? ` - ${quantity.toFixed(6)} T` : ""}
+                    {quantity ? ` - ${new Decimal(quantity).toFixed(6)} T` : ""}
                   </div>
                 ))}
               </Accordion>

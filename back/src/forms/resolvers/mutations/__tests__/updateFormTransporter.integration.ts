@@ -165,6 +165,40 @@ describe("Mutation.updateFormTransporter", () => {
     ]);
   });
 
+  it("should throw error if plates are invalid", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        readyToTakeOver: true,
+        transporterCompanySiret: transporter.siret,
+        transporterCompanyName: transporter.name,
+        transporterTransportMode: "ROAD"
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "updateFormTransporter">,
+      MutationUpdateFormTransporterArgs
+    >(UPDATE_FORM_TRANSPORTER, {
+      variables: {
+        id: bsddTransporter.id,
+        input: {
+          numberPlate: "AZ"
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should not be possible to update a transporter that has already signed", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });

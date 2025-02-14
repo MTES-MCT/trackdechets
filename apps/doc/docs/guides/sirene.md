@@ -73,7 +73,7 @@ query {
       "naf": "84.13Z",
       "address": "51 Rue Arthur Ranc 86000 Poitiers",
       "isRegistered": true,
-      allowBsdasriTakeOverWithoutSignature: false
+      "allowBsdasriTakeOverWithoutSignature": false
     }
   }
 }

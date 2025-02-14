@@ -159,9 +159,26 @@ describe("validation > parseBsff", () => {
       expect(parseBsff(zodBsff)).toBeDefined();
     });
 
+    it("should be valid if transporter plate number is too short on a bsff created before V20250201", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["AA"]
+          }
+        ],
+        createdAt: new Date("2025-01-10T00:00:00Z")
+      };
+
+      const parsed = parseBsff(zodBsff);
+
+      expect(parsed).toBeDefined();
+    });
+
     it("should throw if a transporter has more than 2 plates", () => {
       const zodBsff: ZodBsff = {
-        transporters: [{ transporterTransportPlates: ["1", "2", "3"] }]
+        transporters: [
+          { transporterTransportPlates: ["AA-12-AA", "AA-12-AB", "AA-12-AC"] }
+        ]
       };
       expect.assertions(1);
       try {
@@ -175,9 +192,88 @@ describe("validation > parseBsff", () => {
       }
     });
 
+    it("should throw if transporter plate number is too short", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["AA"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter plate number is too long", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["AZ-ER-TY-UI-09-LP-87"]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter contains only whitespace", () => {
+      const zodBsff: ZodBsff = {
+        transporters: [
+          {
+            transporterTransportPlates: ["      "]
+          }
+        ]
+      };
+      expect.assertions(1);
+      try {
+        parseBsff(zodBsff);
+      } catch (e) {
+        expect(e.errors).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
+          })
+        ]);
+      }
+    });
+
+    it.each(["XX", "AZ-ER-TY-UI-09-LP-87", "     "])(
+      "should be valid if transporter plate number is incorrect (%p) on a bsff created before V20250201",
+      plate => {
+        const zodBsff: ZodBsff = {
+          createdAt: new Date("2025-01-10T00:00:00Z"),
+          transporters: [
+            {
+              transporterTransportPlates: [plate]
+            }
+          ]
+        };
+
+        const parsed = parseBsff(zodBsff);
+        expect(parsed).toBeDefined();
+      }
+    );
+
     it("should parse correctly if a transporter has 2 plates or less", () => {
       const zodBsff: ZodBsff = {
-        transporters: [{ transporterTransportPlates: ["1", "2"] }]
+        transporters: [{ transporterTransportPlates: ["AA-12-AA", "AA-12-AB"] }]
       };
       expect(parseBsff(zodBsff)).toBeDefined();
     });
@@ -864,6 +960,30 @@ describe("validation > parseBsff", () => {
             ]
           },
           { currentSignatureType: "TRANSPORT" }
+        )
+      ).toBeDefined();
+    });
+
+    test("immat plates are not required at emitter signature when transport mode is road", async () => {
+      const bsff = await createBsffBeforeTransport({
+        emitter,
+        transporter,
+        destination
+      });
+      const zodBsff = prismaToZodBsff(bsff);
+      expect(
+        parseBsff(
+          {
+            ...zodBsff,
+            transporters: [
+              {
+                ...zodBsff.transporters![0],
+                transporterTransportPlates: [],
+                transporterTransportMode: TransportMode.ROAD
+              }
+            ]
+          },
+          { currentSignatureType: "EMISSION" }
         )
       ).toBeDefined();
     });

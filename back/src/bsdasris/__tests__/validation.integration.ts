@@ -1,4 +1,4 @@
-import { Bsdasri, Company } from "@prisma/client";
+import { Bsdasri, Company, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
@@ -140,12 +140,107 @@ describe("Mutation.signBsdasri emission", () => {
       const data = {
         ...bsdasri,
         transporterTransportMode: "ROAD",
-        transporterTransportPlates: ["TRANSPORTER-PLATES"]
+        transporterTransportPlates: ["AB-12-ZE"]
       };
       const validated = await validateBsdasri(data as any, {
         transportSignature: true
       });
       expect(validated).toBeDefined();
+    });
+
+    it("should throw if plates number is too short", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["AB"]
+      };
+
+      expect.assertions(1);
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+        ]);
+      }
+    });
+
+    it.each(["AB", "abcdefghjklmopnqr", "     "])(
+      "should be valid if plates number is invalid )(%p) on bsdasri created before v20250201",
+      async plate => {
+        const data = {
+          ...bsdasri,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: [plate],
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.ACCEPTED,
+          destinationWastePackagings: [
+            { type: "BOITE_CARTON", other: null, volume: 1, quantity: 1 }
+          ],
+          destinationReceptionDate: new Date(),
+          createdAt: new Date("2025-01-10T00:00:00Z")
+        };
+
+        const validated = await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+        expect(validated).toBeDefined();
+      }
+    );
+
+    it("should throw if plates number is too long", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["AB-KL-ML-PO-IO-7-PO"]
+      };
+
+      expect.assertions(1);
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+        ]);
+      }
+    });
+
+    it("should throw if plates number is made of whitespaces", async () => {
+      const data = {
+        ...bsdasri,
+        transporterTransportMode: "ROAD",
+        transporterTransportPlates: ["      "]
+      };
+
+      expect.assertions(1);
+      try {
+        await validateBsdasri(data as any, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Le numéro de plaque fourni est incorrect"
+        ]);
+      }
+    });
+
+    test("should work if operation code & mode are missing", async () => {
+      const data = {
+        ...bsdasri,
+        destinationOperationCode: undefined,
+        destinationOperationMode: undefined,
+        destinationOperationDate: new Date(),
+        destinationReceptionWasteWeightValue: 10
+      };
+
+      const res = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(res).not.toBeUndefined();
     });
   });
 

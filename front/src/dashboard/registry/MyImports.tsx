@@ -7,16 +7,14 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
-  RegistryDownloadTarget
+  RegistryDownloadTarget,
+  RegistryImportStatus
 } from "@td/codegen-ui";
 import { format } from "date-fns";
 import React, { useState } from "react";
 
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
-import { MEDIA_QUERIES } from "../../common/config";
-import { useMedia } from "../../common/use-media";
 import { ImportModal } from "./ImportModal";
-import RegistryMenu from "./RegistryMenu";
 import {
   badges,
   downloadFromSignedUrl,
@@ -34,10 +32,9 @@ const HEADERS = [
   "Rapport d'erreur"
 ];
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 20;
 
 export function MyImports() {
-  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const [pageIndex, setPageIndex] = useState(0);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -56,13 +53,13 @@ export function MyImports() {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ErrorFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
   async function downloadImportFile(importId: string) {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ImportFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
 
   const totalCount = data?.registryImports.totalCount;
@@ -72,9 +69,7 @@ export function MyImports() {
     setPageIndex(page);
 
     refetch({
-      ownImportsOnly: true,
-      skip: page * PAGE_SIZE,
-      first: PAGE_SIZE
+      skip: page * PAGE_SIZE
     });
   }
 
@@ -87,25 +82,37 @@ export function MyImports() {
         {badges[importData.node.status]("import")}
       </div>,
       TYPES[importData.node.type],
-      <ul>
-        {importData.node.numberOfErrors > 0 && (
-          <li>
-            <strong>{importData.node.numberOfErrors} en erreur</strong>
-          </li>
-        )}
-        {importData.node.numberOfInsertions > 0 && (
-          <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
-        )}
-        {importData.node.numberOfEdits > 0 && (
-          <li>{importData.node.numberOfEdits} modifiée(s)</li>
-        )}
-        {importData.node.numberOfCancellations > 0 && (
-          <li>{importData.node.numberOfCancellations} annulée(s)</li>
-        )}
-        {importData.node.numberOfSkipped > 0 && (
-          <li>{importData.node.numberOfSkipped} ignorées(s)</li>
-        )}
-      </ul>,
+      importData.node.numberOfErrors +
+        importData.node.numberOfInsertions +
+        importData.node.numberOfEdits +
+        importData.node.numberOfCancellations +
+        importData.node.numberOfSkipped ===
+        0 &&
+      ![RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
+        importData.node.status
+      ) ? (
+        "Fichier d'import vide"
+      ) : (
+        <ul>
+          {importData.node.numberOfErrors > 0 && (
+            <li>
+              <strong>{importData.node.numberOfErrors} en erreur</strong>
+            </li>
+          )}
+          {importData.node.numberOfInsertions > 0 && (
+            <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
+          )}
+          {importData.node.numberOfEdits > 0 && (
+            <li>{importData.node.numberOfEdits} modifiée(s)</li>
+          )}
+          {importData.node.numberOfCancellations > 0 && (
+            <li>{importData.node.numberOfCancellations} annulée(s)</li>
+          )}
+          {importData.node.numberOfSkipped > 0 && (
+            <li>{importData.node.numberOfSkipped} ignorées(s)</li>
+          )}
+        </ul>
+      ),
       importData.node.associations
         .map(
           association =>
@@ -150,89 +157,92 @@ export function MyImports() {
     ]) ?? [];
 
   return (
-    <div id="companies" className="companies dashboard">
-      {!isMobile && <RegistryMenu />}
-      <div className="dashboard-content tw-flex-grow">
-        <div className="tw-px-6 tw-py-4">
-          <div className="tw-flex tw-gap-6">
-            <div>
-              <Button
-                priority="primary"
-                iconId="fr-icon-upload-line"
-                iconPosition="right"
-                onClick={() => setIsImportModalOpen(true)}
-              >
-                Importer
-              </Button>
-            </div>
-            <div>
-              <Button
-                priority="secondary"
-                iconId="fr-icon-refresh-line"
-                iconPosition="right"
-                onClick={() => refetch()}
-              >
-                Rafraîchir
-              </Button>
-            </div>
-            <div className="tw-flex tw-items-center">
-              <a
-                href="https://faq.trackdechets.fr/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="fr-link"
-              >
-                Retrouvez les modèles de registres dans la documentation
-              </a>
-            </div>
+    <>
+      <div className="tw-px-6 tw-py-4">
+        <div className="tw-flex tw-gap-6">
+          <div>
+            <Button
+              priority="primary"
+              iconId="fr-icon-upload-line"
+              iconPosition="right"
+              onClick={() => setIsImportModalOpen(true)}
+            >
+              Importer
+            </Button>
           </div>
-          {loading && <InlineLoader />}
-          {error && (
-            <Alert
-              closable
-              description={error.message}
-              severity="error"
-              title="Erreur lors du chargement"
+          <div className="tw-flex tw-items-center">
+            <a
+              href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
+              target="_blank"
+              rel="noreferrer"
+              className="fr-link fr-text--sm"
+            >
+              Retrouvez les modèles de registres dans la documentation
+            </a>
+          </div>
+        </div>
+        {loading && <InlineLoader />}
+        {error && (
+          <Alert
+            closable
+            description={error.message}
+            severity="error"
+            title="Erreur lors du chargement"
+          />
+        )}
+        {data && tableData.length === 0 && (
+          <div className="tw-text-center">
+            <p className="tw-mt-24 tw-text-xl tw-mb-4">
+              Vous n'avez pas encore fait d'import
+            </p>
+            <p className="tw-text-sm">
+              Utilisez le bouton "Importer" ci-dessus pour réaliser un import
+            </p>
+          </div>
+        )}
+        {data && tableData.length > 0 && (
+          <div className="tw-mt-8">
+            <div className="tw-flex tw-justify-between">
+              <h2 className="tw-text-2xl tw-font-bold">
+                Historique de mes imports
+              </h2>
+              <div>
+                <Button
+                  priority="secondary"
+                  iconId="fr-icon-refresh-line"
+                  iconPosition="right"
+                  size="small"
+                  onClick={() => refetch()}
+                >
+                  Rafraîchir
+                </Button>
+              </div>
+            </div>
+            <Table
+              bordered
+              fixed
+              noCaption
+              data={tableData}
+              headers={HEADERS}
             />
-          )}
-          {data && tableData.length === 0 && (
-            <div className="tw-text-center">
-              <p className="tw-mt-24 tw-text-xl tw-mb-4">
-                Vous n'avez pas encore fait d'import
-              </p>
-              <p className="tw-text-sm">
-                Utilisez le bouton "Importer" ci-dessus pour réaliser un import
-              </p>
-            </div>
-          )}
-          {data && tableData.length > 0 && (
-            <div>
-              <Table
-                bordered
-                fixed
-                caption="Historique de mes imports"
-                data={tableData}
-                headers={HEADERS}
-              />
-            </div>
-          )}
+          </div>
+        )}
 
-          <div className="tw-flex tw-justify-center">
-            <Pagination
-              showFirstLast
-              count={pageCount}
-              defaultPage={pageIndex + 1}
-              getPageLinkProps={pageNumber => ({
-                onClick: event => {
-                  event.preventDefault();
-                  gotoPage(pageNumber - 1);
-                },
-                href: "#",
-                key: `pagination-link-${pageNumber}`
-              })}
-              className={"fr-mt-1w"}
-            />
-          </div>
+        <div className="tw-flex tw-justify-center">
+          <Pagination
+            showFirstLast
+            count={pageCount}
+            defaultPage={pageIndex + 1}
+            getPageLinkProps={pageNumber => ({
+              onClick: event => {
+                event.preventDefault();
+                gotoPage(pageNumber - 1);
+              },
+              href: "#",
+              key: `pagination-link-${pageNumber}`
+            })}
+            className={"fr-mt-1w"}
+          />
         </div>
       </div>
 
@@ -240,9 +250,9 @@ export function MyImports() {
         isOpen={isImportModalOpen}
         onClose={() => {
           setIsImportModalOpen(false);
-          refetch();
+          gotoPage(0);
         }}
       />
-    </div>
+    </>
   );
 }

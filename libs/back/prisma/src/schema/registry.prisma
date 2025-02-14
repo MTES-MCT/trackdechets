@@ -84,7 +84,7 @@ model RegistrySsd {
     operationMode                 OperationMode?
     product                       String
     administrativeActReference    String
-    destinationCompanyType        String
+    destinationCompanyType        String?
     destinationCompanyOrgId       String?
     destinationCompanyName        String?
     destinationCompanyAddress     String?
@@ -120,7 +120,7 @@ model RegistryIncomingWaste {
     wasteCode                              String
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime @db.Timestamptz(6)
+    receptionDate                          DateTime       @db.Timestamptz(6)
     weighingHour                           String?
     wasteDescription                       String
     wasteCodeBale                          String?
@@ -136,7 +136,7 @@ model RegistryIncomingWaste {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean
+    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -217,6 +217,8 @@ model RegistryIncomingWaste {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
 }
@@ -243,7 +245,7 @@ model RegistryIncomingTexs {
     wasteCode                              String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    receptionDate                          DateTime @db.Timestamptz(6)
+    receptionDate                          DateTime       @db.Timestamptz(6)
     wasteDescription                       String
     wasteCodeBale                          String?
     wasteDap                               String?
@@ -263,7 +265,7 @@ model RegistryIncomingTexs {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean
+    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -348,6 +350,8 @@ model RegistryIncomingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
 }
@@ -376,11 +380,11 @@ model RegistryOutgoingTexs {
     reportForPickupSiteCountryCode         String?
     reportAsCompanySiret                   String?
     wasteDescription                       String
-    wasteCode                              String
+    wasteCode                              String?
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime? @db.Timestamptz(6)
+    dispatchDate                           DateTime?      @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
@@ -510,7 +514,7 @@ model RegistryOutgoingWaste {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime? @db.Timestamptz(6)
+    dispatchDate                           DateTime?      @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
@@ -673,21 +677,27 @@ model RegistryLookup {
     // contains the publicId of the registry or the readableId of the BSD
     // for support/display
     readableId         String
-    reportAsSirets     String[]                      @default([])
+    reportAsSiret      String?
     siret              String
     exportRegistryType RegistryExportType
     declarationType    RegistryExportDeclarationType
     wasteType          RegistryExportWasteType
-    wasteCode          String
+    wasteCode          String?
     date               DateTime
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
-    dateId             String                        @unique @db.Uuid
+    dateId             String                        @db.Uuid
 
     // foreign keys to registry models
     registrySsdId String?
     registrySsd   RegistrySsd? @relation(fields: [registrySsdId], references: [id], onDelete: Cascade)
+
+    registryIncomingWasteId String?
+    registryIncomingWaste   RegistryIncomingWaste? @relation(fields: [registryIncomingWasteId], references: [id], onDelete: Cascade)
+
+    registryIncomingTexsId String?
+    registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?
@@ -704,16 +714,15 @@ model RegistryLookup {
     bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
 
     // the id itself is not unique, since a same BSD will appear in multiple export registries.
-    // so the unique index is made of id + exportRegistryType
-    @@id([id, exportRegistryType, siret])
-    // pseudo-random with only "=" lookups so hash index is appropriate
-    @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+    // so the unique index is made of id + exportRegistryType + siret
+    @@id([id, exportRegistryType, siret], name: "idExportTypeAndSiret")
+    // UUIDv7 unique index used for sorting/pagination on exports
+    @@unique([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
     // array of elements so gin index
-    @@index([reportAsSirets], map: "_RegistryLookupReportAsSiretsIdx", type: Gin)
+    @@index([reportAsSiret], map: "_RegistryLookupReportAsSiretIdx")
     // multi-column index because those columns are mandatory for any export
     @@index([date(sort: Asc), exportRegistryType, siret], map: "_RegistryLookupMainIdx")
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
-    @@index([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
 }

@@ -25,6 +25,10 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../../common/validation/zod/schema";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../../common/validation/zod/refinement";
 
 export const ZodWasteCodeEnum = z
   .enum(BSFF_WASTE_CODES, {
@@ -174,7 +178,8 @@ export type ParsedZodBsff = z.output<typeof rawBsffSchema>;
 
 const refinedBsffSchema = rawBsffSchema
   .superRefine(checkPackagings)
-  .superRefine(checkWeights);
+  .superRefine(checkWeights)
+  .superRefine(validateMultiTransporterPlates);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et
@@ -217,6 +222,10 @@ export type ParsedZodBsffTransporter = z.output<
   typeof rawBsffTransporterSchema
 >;
 
-export const transformedBsffTransporterSchema = rawBsffTransporterSchema
+const refinedBsffTransporterSchema = rawBsffTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsffTransporterSchema = refinedBsffTransporterSchema
   .transform(updateTransporterRecepisse)
   .transform(sirenifyBsffTransporter);

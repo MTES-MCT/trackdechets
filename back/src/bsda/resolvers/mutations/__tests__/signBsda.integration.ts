@@ -402,7 +402,6 @@ describe("Mutation.Bsda.sign", () => {
           }
         }
       });
-
       expect(errors).toEqual([
         expect.objectContaining({
           extensions: expect.objectContaining({
@@ -593,6 +592,89 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.transporter?.recepisse?.validityLimit).toBe(
         receipt.validityLimit.toISOString()
       );
+    });
+
+    it("should forbid invalid plates", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      await transporterReceiptFactory({
+        company: transporter.company
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date()
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          )
+        })
+      ]);
+    });
+
+    it("should allow invalid plates on bsda create before V2025020", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      await transporterReceiptFactory({
+        company: transporter.company
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_WORKER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "worker",
+          workerWorkSignatureDate: new Date(),
+          createdAt: new Date("2025-01-04T00:00:00.000Z") // created before V2025020
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
     });
 
     it("should disallow transporter to sign transport when recepisse is missing", async () => {
@@ -1116,6 +1198,124 @@ describe("Mutation.Bsda.sign", () => {
 
       // final operation should be set
       expect(signedBsda.finalOperations).toHaveLength(1);
+    });
+
+    it.each([
+      WasteAcceptationStatus.ACCEPTED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ])(
+      "should forbid operation signature when weight is 0 ans status is %p",
+      async destinationReceptionAcceptationStatus => {
+        const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+        const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+        const transporterReceipt = await transporterReceiptFactory({
+          company: transporter.company
+        });
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SENT",
+            emitterEmissionSignatureAuthor: "Emétteur",
+            emitterEmissionSignatureDate: new Date(),
+            workerWorkSignatureAuthor: "Worker",
+            workerWorkSignatureDate: new Date(),
+            destinationCompanySiret: company.siret,
+            destinationOperationCode: "R 5",
+            destinationOperationMode: "RECYCLAGE",
+            destinationReceptionWeight: 0,
+            destinationReceptionAcceptationStatus
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterTransportSignatureAuthor: "Transporter",
+            transporterTransportSignatureDate: new Date(),
+            transporterRecepisseNumber: transporterReceipt.receiptNumber,
+            transporterRecepisseDepartment: transporterReceipt.department,
+            transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+          }
+        });
+
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              type: "OPERATION",
+              author: user.name
+            }
+          }
+        });
+
+        expect(errors).toEqual([
+          expect.objectContaining({
+            message: "Le poids du déchet reçu doit être renseigné et non nul."
+          })
+        ]);
+
+        const updateBsda = await prisma.bsda.findUniqueOrThrow({
+          where: { id: bsda.id }
+        });
+
+        expect(updateBsda.status).toBe("SENT");
+      }
+    );
+
+    it("should forbid operation signature when weight is 0 ans status is %p", async () => {
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionWeight: 0,
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          destinationReceptionRefusalReason: "non conforme"
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(errors).toEqual(undefined);
+
+      expect(data.signBsda.id).toBeTruthy();
+      expect(data.signBsda.status).toBe(BsdaStatus.REFUSED);
+
+      const updateBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id }
+      });
+
+      expect(updateBsda.status).toBe("REFUSED");
     });
 
     it("should mark as AWAITING_CHILD if operation code implies it", async () => {

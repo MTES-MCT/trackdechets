@@ -107,7 +107,7 @@ export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
         </DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>
-        <DsfrDataListTerm>Nom usuel</DsfrDataListTerm>
+        <DsfrDataListTerm>Dénomination usuelle</DsfrDataListTerm>
         <DsfrDataListDescription>
           {form.wasteDetails?.name}
         </DsfrDataListDescription>

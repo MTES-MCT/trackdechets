@@ -700,6 +700,119 @@ describe("Mutation.Vhu.sign", () => {
       expect(data.signBsvhu.status).toBe("RECEIVED");
     });
 
+    it("if signing reception after transport with status = REFUSED > new BSD status should be REFUSED", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
+        }
+      });
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateVhu(
+        destinationUser,
+        bsvhu.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "REFUSED",
+              weight: 0,
+              refusalReason: "Not good enough mate",
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors, data } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "RECEPTION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(
+        SIGNATURE_DATE
+      );
+      expect(data.signBsvhu.status).toBe("REFUSED");
+    });
+
+    it("should not be able to sign OPERATION if RECEPTION was REFUSED", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
+        }
+      });
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateVhu(
+        destinationUser,
+        bsvhu.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "REFUSED",
+              weight: 0,
+              refusalReason: "Not good enough mate",
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors: receptionErrors, data: receptionData } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "RECEPTION"
+      );
+
+      // Then
+      expect(receptionErrors).toBeUndefined();
+      expect(
+        receptionData.signBsvhu.destination?.reception?.signature?.author
+      ).toBe(destinationUser.name);
+      expect(
+        receptionData.signBsvhu.destination?.reception?.signature?.date
+      ).toBe(SIGNATURE_DATE);
+      expect(receptionData.signBsvhu.status).toBe("REFUSED");
+
+      // Step 3: sign operation
+      const { errors: operationErrors } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "OPERATION"
+      );
+      expect(operationErrors).not.toBeUndefined();
+      expect(operationErrors[0].message).toBe(
+        "Vous ne pouvez pas apposer cette signature sur le bordereau."
+      );
+    });
+
     it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
@@ -782,6 +895,57 @@ describe("Mutation.Vhu.sign", () => {
         undefined
       );
       expect(data.signBsvhu.status).toBe("PROCESSED");
+    });
+
+    it("should be able to REFUSE vhu at operation step, skipping reception", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"]
+        }
+      });
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateVhu(
+        destinationUser,
+        bsvhu.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "REFUSED",
+              refusalReason: "Not good enough",
+              weight: 0
+              // date: null, // Not required!
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign operation
+      const { errors, data } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "OPERATION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(
+        undefined
+      );
+      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(
+        undefined
+      );
+      expect(data.signBsvhu.status).toBe("REFUSED");
     });
 
     it("should not be able to sign operation after transport, skipping reception, if missing reception params", async () => {

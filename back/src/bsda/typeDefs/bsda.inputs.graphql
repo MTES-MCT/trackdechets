@@ -207,7 +207,7 @@ input BsdaWasteInput {
 
 input BsdaPackagingInput {
   "Type de conditionnement"
-  type: BsdaPackagingType
+  type: BsdaPackagingType!
   "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
   other: String
   "Nombre de colis associés à ce conditionnement"
@@ -245,6 +245,9 @@ input BsdaReceptionInput {
   date: DateTime
   """
   Quantité présentée en tonnes
+
+  Doit être renseigné pour la signature OPERATION.
+  Doit être strictement supérieur à 0 lorsque le déchet est accepté ou partiellement refusé.
 
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
   """
@@ -367,7 +370,7 @@ input BsdaBrokerRecepisseInput {
 input BsdaTransportInput {
   "Mode de transport"
   mode: TransportMode
-  "Plaque(s) d'immatriculation - maximum 2"
+  "Plaque(s) d'immatriculation - maximum 2 - 4 à 12 caractères."
   plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime

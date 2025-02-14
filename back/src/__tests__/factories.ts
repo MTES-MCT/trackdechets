@@ -268,7 +268,7 @@ export const bsddTransporterData: Omit<
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterTransportMode: TransportMode.ROAD,
-  transporterNumberPlate: "aa22",
+  transporterNumberPlate: "AA-22", // valid plate
   transporterReceipt: "33AA",
   transporterValidityLimit: "2019-11-27T00:00:00.000Z",
   readyToTakeOver: true
@@ -621,19 +621,21 @@ export const ecoOrganismeFactory = async ({
 }: {
   siret?: string;
   handle?: {
+    handleBsdd?: boolean;
     handleBsdasri?: boolean;
     handleBsda?: boolean;
     handleBsvhu?: boolean;
   };
   createAssociatedCompany?: boolean;
 }) => {
-  const { handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
+  const { handleBsdd, handleBsdasri, handleBsda, handleBsvhu } = handle ?? {};
   const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
       siret: siret ?? siretify(),
+      handleBsdd,
       handleBsdasri,
       handleBsda,
       handleBsvhu

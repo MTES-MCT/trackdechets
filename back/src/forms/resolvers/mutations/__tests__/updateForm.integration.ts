@@ -17,7 +17,8 @@ import {
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
@@ -746,6 +747,55 @@ describe("Mutation.updateForm", () => {
       expect(errors).toBe(undefined);
     }
   );
+
+  it("should forbid invalid transporter plates", async () => {
+    const emitter = await companyFactory();
+
+    const { user, company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: ["TRANSPORTER"]
+      }
+    );
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: destination.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        numberPlate: "XX" //too short
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
 
   it("should autocomplete transporter receipt with receipt pulled from db", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -1599,12 +1649,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: eo.name,
-        siret: eo.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
 
     // recipient needs appropriate profiles and subprofiles
@@ -1715,13 +1762,11 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: originalEO.name,
-        siret: originalEO.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: originalEO.siret!,
+      handle: { handleBsdd: true }
     });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -1737,12 +1782,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: newEO.name,
-        siret: newEO.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: newEO.siret!,
+      handle: { handleBsdd: true }
     });
 
     const { mutate } = makeClient(user);
@@ -1771,12 +1813,10 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: eo.name,
-        siret: eo.siret!
-      }
+
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
     // recipient needs appropriate profiles and subprofiles
     const destination = await companyFactory({
@@ -3916,12 +3956,9 @@ describe("Mutation.updateForm", () => {
         set: ["ECO_ORGANISME"]
       }
     });
-    await prisma.ecoOrganisme.create({
-      data: {
-        address: "",
-        name: ecoOrganisme.company.name,
-        siret: ecoOrganisme.company.siret!
-      }
+    await ecoOrganismeFactory({
+      siret: ecoOrganisme.company.siret!,
+      handle: { handleBsdd: true }
     });
 
     const { mutate } = makeClient(user);

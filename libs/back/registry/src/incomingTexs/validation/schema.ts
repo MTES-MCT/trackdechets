@@ -4,8 +4,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   getWasteCodeSchema,
-  wastePopSchema,
-  wasteIsDangerousSchema,
+  booleanSchema,
   dateSchema,
   wasteDescriptionSchema,
   wasteCodeBaleSchema,
@@ -20,7 +19,6 @@ import {
   actorCitySchema,
   actorCountryCodeSchema,
   inseeCodesSchema,
-  isUpcycledSchema,
   actorSiretSchema,
   getOperationCodeSchema,
   transportModeSchema,
@@ -31,10 +29,7 @@ import {
   parcelCoordinatesSchema,
   parcelNumbersSchema,
   municipalitiesNamesSchema,
-  nextDestinationIsAbroad,
-  noTraceability,
-  operationModeSchema,
-  transportRecepisseIsExemptedSchema
+  operationModeSchema
 } from "../../shared/schemas";
 import {
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
@@ -52,13 +47,14 @@ const inputIncomingTexsSchema = z.object({
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
   wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES).nullish(),
-  wastePop: wastePopSchema,
-  wasteIsDangerous: wasteIsDangerousSchema,
+  wastePop: booleanSchema,
+  wasteIsDangerous: booleanSchema.nullish(),
   receptionDate: dateSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
   wasteDap: z
     .string()
+    .trim()
     .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .nullish(),
   weightValue: weightValueSchema,
@@ -69,6 +65,7 @@ const inputIncomingTexsSchema = z.object({
   parcelCoordinates: parcelCoordinatesSchema,
   sisIdentifier: z
     .string()
+    .trim()
     .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
     .nullish(),
   initialEmitterCompanyType: actorTypeSchema.nullish(),
@@ -80,15 +77,18 @@ const inputIncomingTexsSchema = z.object({
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema,
-  emitterCompanyOrgId: actorOrgIdSchema,
-  emitterCompanyName: actorNameSchema,
-  emitterCompanyAddress: actorAddressSchema,
-  emitterCompanyPostalCode: actorPostalCodeSchema,
-  emitterCompanyCity: actorCitySchema,
-  emitterCompanyCountryCode: actorCountryCodeSchema,
-  emitterNoTraceability: z.boolean(),
-  emitterPickupSiteName: z.string().nullish(),
+  emitterCompanyType: actorTypeSchema.exclude([
+    "PERSONNE_PHYSIQUE",
+    "COMMUNES"
+  ]),
+  emitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  emitterCompanyName: actorNameSchema.nullish(),
+  emitterCompanyAddress: actorAddressSchema.nullish(),
+  emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  emitterCompanyCity: actorCitySchema.nullish(),
+  emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  emitterNoTraceability: booleanSchema.nullish(),
+  emitterPickupSiteName: z.string().trim().nullish(),
   emitterPickupSiteAddress: actorAddressSchema.nullish(),
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   emitterPickupSiteCity: actorCitySchema.nullish(),
@@ -99,6 +99,7 @@ const inputIncomingTexsSchema = z.object({
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
@@ -108,6 +109,7 @@ const inputIncomingTexsSchema = z.object({
   traderCompanyName: actorNameSchema.nullish(),
   traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
@@ -117,26 +119,27 @@ const inputIncomingTexsSchema = z.object({
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
   operationMode: operationModeSchema,
-  noTraceability: noTraceability.nullish(),
-  nextDestinationIsAbroad: nextDestinationIsAbroad.nullish(),
+  noTraceability: booleanSchema.nullish(),
+  nextDestinationIsAbroad: booleanSchema.nullish(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
+    .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   nextOperationCode: getOperationCodeSchema(
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ).nullish(),
-  isUpcycled: isUpcycledSchema.nullish(),
+  isUpcycled: booleanSchema.nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
   destinationParcelCoordinates: parcelCoordinatesSchema,
-  isDirectSupply: z.boolean().nullish(),
+  isDirectSupply: booleanSchema.nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
   transporter1CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter1RecepisseIsExempted: booleanSchema.nullish(),
   transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter1CompanyName: actorNameSchema.nullish(),
   transporter1CompanyAddress: actorAddressSchema.nullish(),
@@ -146,7 +149,7 @@ const inputIncomingTexsSchema = z.object({
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: actorTypeSchema.nullish(),
   transporter2CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter2RecepisseIsExempted: booleanSchema.nullish(),
   transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: actorNameSchema.nullish(),
   transporter2CompanyAddress: actorAddressSchema.nullish(),
@@ -156,7 +159,7 @@ const inputIncomingTexsSchema = z.object({
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: actorTypeSchema.nullish(),
   transporter3CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter3RecepisseIsExempted: booleanSchema.nullish(),
   transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: actorNameSchema.nullish(),
   transporter3CompanyAddress: actorAddressSchema.nullish(),
@@ -166,7 +169,7 @@ const inputIncomingTexsSchema = z.object({
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: actorTypeSchema.nullish(),
   transporter4CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter4RecepisseIsExempted: booleanSchema.nullish(),
   transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: actorNameSchema.nullish(),
   transporter4CompanyAddress: actorAddressSchema.nullish(),
@@ -176,7 +179,7 @@ const inputIncomingTexsSchema = z.object({
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: actorTypeSchema.nullish(),
   transporter5CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter5RecepisseIsExempted: booleanSchema.nullish(),
   transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: actorNameSchema.nullish(),
   transporter5CompanyAddress: actorAddressSchema.nullish(),

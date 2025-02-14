@@ -173,6 +173,7 @@ export type Bsdd = {
   packagings: Prisma.JsonValue;
   wasteCode: string | null;
   wasteDescription: string | null;
+  wasteDetailsLandIdentifiers: string[] | null;
   wasteAdr: string | null;
   nonRoadRegulationMention: string | null;
   wasteIsDangerous: boolean;

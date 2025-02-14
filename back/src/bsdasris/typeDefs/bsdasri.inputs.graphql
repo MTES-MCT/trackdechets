@@ -191,7 +191,7 @@ input BsdasriTransportInput {
   "Mode de transport"
   acceptation: BsdasriAcceptationInput
   mode: TransportMode
-  "Plaque(s) d'immatriculation - maximum 2"
+  "Plaque(s) d'immatriculation - maximum 2 - 4 à 12 caractères."
   plates: [String!]
 }
 

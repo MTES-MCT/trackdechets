@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { TransportMode } from "@prisma/client";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
+import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../messages";
 
 export enum CompanyRole {
   Emitter = "Émetteur",
@@ -118,7 +119,7 @@ export const rawTransporterSchema = z.object({
   transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
   transporterTransportPlates: z
     .array(z.string())
-    .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
     .default([]),
   transporterTransportTakenOverAt: z.coerce.date().nullish(),
   transporterTransportSignatureAuthor: z.string().nullish(),

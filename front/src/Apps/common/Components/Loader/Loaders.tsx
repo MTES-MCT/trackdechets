@@ -11,8 +11,22 @@ export default function Loader() {
   );
 }
 
-export function InlineLoader() {
-  return <div className={styles.loader}></div>;
+export function InlineLoader({ size }: { size?: number }) {
+  return (
+    <div
+      className={styles.loader}
+      style={
+        size
+          ? {
+              width: `${size}px`,
+              height: `${size}px`,
+              borderWidth: Math.ceil((size * 8) / 60),
+              borderTopWidth: Math.ceil((size * 8) / 60)
+            }
+          : undefined
+      }
+    ></div>
+  );
 }
 
 export const ModalLoader = () => (

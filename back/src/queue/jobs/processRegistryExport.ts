@@ -17,9 +17,16 @@ import {
   RegistryExportStatus
 } from "@prisma/client";
 import { toWaste } from "../../registryV2/converters";
-import { wasteFormatter } from "../../registryV2/streams";
-import { getXlsxHeaders } from "../../registryV2/columns";
-import { exportOptions } from "@td/registry";
+import { wasteFormatterV2 } from "../../registryV2/streams";
+import { EXPORT_COLUMNS } from "../../registryV2/columns";
+import {
+  RegistryV2BsdaInclude,
+  RegistryV2BsdasriInclude,
+  RegistryV2BsddInclude,
+  RegistryV2BsffInclude,
+  RegistryV2BspaohInclude,
+  RegistryV2BsvhuInclude
+} from "../../registryV2/types";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -51,16 +58,58 @@ const streamLookup = (
             dateId: "asc"
           },
           include: {
-            registrySsd: true
+            registrySsd: true,
+            registryIncomingWaste: true,
+            registryIncomingTexs: true,
+            bsdd: {
+              include: RegistryV2BsddInclude
+            },
+            bsda: {
+              include: RegistryV2BsdaInclude
+            },
+            bsdasri: {
+              include: RegistryV2BsdasriInclude
+            },
+            bsff: {
+              include: RegistryV2BsffInclude
+            },
+            bspaoh: {
+              include: RegistryV2BspaohInclude
+            },
+            bsvhu: {
+              include: RegistryV2BsvhuInclude
+            }
           }
         });
         for (const item of items) {
           const lookup = item as Prisma.RegistryLookupGetPayload<{
-            include: { registrySsd: true };
+            include: {
+              registrySsd: true;
+              registryIncomingWaste: true;
+              registryIncomingTexs: true;
+              bsdd: true;
+              bsda: true;
+              bsdasri: true;
+              bsff: true;
+              bspaoh: {
+                include: {
+                  transporters: true;
+                };
+              };
+              bsvhu: true;
+            };
           }>;
           addEncounteredSiret(lookup.siret);
           const mapped = toWaste(registryType, {
-            SSD: lookup.registrySsd
+            SSD: lookup.registrySsd,
+            INCOMING_WASTE: lookup.registryIncomingWaste,
+            INCOMING_TEXS: lookup.registryIncomingTexs,
+            BSDD: lookup.bsdd,
+            BSDA: lookup.bsda,
+            BSDASRI: lookup.bsdasri,
+            BSFF: lookup.bsff,
+            BSPAOH: lookup.bspaoh,
+            BSVHU: lookup.bsvhu
           });
           if (mapped) {
             this.push(mapped);
@@ -126,7 +175,8 @@ export async function processRegistryExportJob(
     if (!registryExport) {
       throw new UserInputError(`L'export ${exportId} est introuvable`);
     }
-    const { headers } = exportOptions[registryExport.registryType ?? "ALL"];
+    const exportType = registryExport.registryType ?? "ALL";
+    const columns = EXPORT_COLUMNS[exportType];
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
       bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET,
@@ -143,11 +193,7 @@ export async function processRegistryExportJob(
       siret: {
         in: registryExport.sirets
       },
-      reportAsSirets: registryExport.delegateSiret
-        ? {
-            has: registryExport.delegateSiret
-          }
-        : undefined,
+      reportAsSiret: registryExport.delegateSiret ?? undefined,
       exportRegistryType: registryExport.registryType ?? undefined,
       wasteType: registryExport.wasteTypes?.length
         ? {
@@ -181,24 +227,20 @@ export async function processRegistryExportJob(
       {
         where: query
       },
-      registryExport.registryType ?? "ALL",
+      exportType,
       addEncounteredSiret
     );
 
     // handle CSV exports
     if (registryExport.format === RegistryExportFormat.CSV) {
       const csvStream = csvFormat({
-        headers: Object.keys(headers).map(key => headers[key]),
+        headers: Object.keys(columns).map(key => columns[key].label),
         delimiter: ";",
         alwaysWriteHeaders: true
       });
-      const transformer = wasteFormatter({
-        useLabelAsKey: false,
-        columnSorter: (line: Record<string, string>) => {
-          return Object.fromEntries(
-            Object.keys(headers).map(key => [headers[key], line[key]])
-          );
-        }
+      const transformer = wasteFormatterV2({
+        exportType,
+        useLabelAsKey: true
       });
       pipeline(
         inputStream,
@@ -221,20 +263,18 @@ export async function processRegistryExportJob(
         stream: outputStream
       });
       const worksheet = workbook.addWorksheet("registre");
-      const transformer = wasteFormatter({
-        useLabelAsKey: false,
-        columnSorter: (line: Record<string, string>) => {
-          return Object.fromEntries(
-            Object.keys(headers).map(key => [key, line[key]])
-          );
-        }
+      const transformer = wasteFormatterV2({
+        exportType
       });
       transformer.on("data", waste => {
         if (worksheet.columns === null) {
           // write headers if not present
-          const columns = getXlsxHeaders(waste);
-          worksheet.columns = Object.keys(headers)
-            .map(key => columns.find(col => col.key === key))
+          worksheet.columns = Object.keys(columns)
+            .map(key => ({
+              key,
+              header: columns[key].label,
+              width: 20
+            }))
             .filter(Boolean);
         }
 

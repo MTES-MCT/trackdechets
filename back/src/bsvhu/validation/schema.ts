@@ -10,12 +10,12 @@ import {
   checkEmitterSituation,
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
-  checkTransportModeAndReceptionWeight,
-  checkTransportPlates
+  checkTransportModeAndReceptionWeight
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
+import { validateTransporterPlates } from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
   foreignVatNumberSchema,
@@ -35,6 +35,7 @@ import {
 } from "@prisma/client";
 import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
 import { TransportMode } from "@prisma/client";
+import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../../common/validation/messages";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -194,7 +195,10 @@ const rawBsvhuSchema = z.object({
   transporterCustomInfo: z.string().nullish(),
   transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
 
-  transporterTransportPlates: z.array(z.string()).default([]),
+  transporterTransportPlates: z
+    .array(z.string())
+    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
+    .default([]),
 
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
@@ -242,7 +246,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
-  .superRefine(checkTransportPlates);
+  .superRefine(validateTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

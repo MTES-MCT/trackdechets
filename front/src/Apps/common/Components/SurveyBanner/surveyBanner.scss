@@ -23,6 +23,10 @@
   &__message {
     align-self: center;
     font-weight: 700;
+
+    strong {
+      font-weight: 1100;
+    }
   }
 
   &__icon {

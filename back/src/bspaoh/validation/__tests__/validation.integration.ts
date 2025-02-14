@@ -87,39 +87,13 @@ describe("BSPAOH validation", () => {
       expect(success).toBe(true);
     });
 
-    it("transporter plates is not required if transport mode is not ROAD", async () => {
-      const bspaoh = await bspaohFactory({
-        opt: {
-          status: BspaohStatus.SIGNED_BY_PRODUCER,
-
-          transporters: {
-            create: {
-              transporterTransportPlates: [],
-              transporterTransportMode: "AIR",
-              transporterTakenOverAt: new Date(),
-
-              number: 1
-            }
-          }
-        }
-      });
-
-      const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
-      await parseBspaohInContext(
-        { persisted: preparedExistingBspaoh },
-        {
-          currentSignatureType: "TRANSPORT"
-        }
-      );
-    });
-
-    it("transporter plates is required if transport mode is ROAD", async () => {
+    it("should throw if transporter plate number is too short", async () => {
       const bspaoh = await bspaohFactory({
         opt: {
           status: BspaohStatus.SENT,
           transporters: {
             create: {
-              transporterTransportPlates: [],
+              transporterTransportPlates: ["AA"],
               transporterTransportMode: "ROAD",
               transporterTakenOverAt: new Date(),
 
@@ -139,7 +113,73 @@ describe("BSPAOH validation", () => {
       } catch (error) {
         expect(error.issues).toEqual([
           expect.objectContaining({
-            message: "La plaque d'immatriculation est requise"
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter plate number is too long", async () => {
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SENT,
+          transporters: {
+            create: {
+              transporterTransportPlates: ["AZ-ER-TY-UI-09-LP-87"],
+              transporterTransportMode: "ROAD",
+              transporterTakenOverAt: new Date(),
+
+              number: 1
+            }
+          }
+        }
+      });
+
+      expect.assertions(1);
+      try {
+        const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+        await parseBspaohInContext(
+          { persisted: preparedExistingBspaoh },
+          { currentSignatureType: "TRANSPORT" }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message:
+              "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if transporter contains only whitespace", async () => {
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SENT,
+          transporters: {
+            create: {
+              transporterTransportPlates: ["      "],
+              transporterTransportMode: "ROAD",
+              transporterTakenOverAt: new Date(),
+
+              number: 1
+            }
+          }
+        }
+      });
+
+      expect.assertions(1);
+      try {
+        const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+        await parseBspaohInContext(
+          { persisted: preparedExistingBspaoh },
+          { currentSignatureType: "TRANSPORT" }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message: "Le numéro de plaque fourni est incorrect"
           })
         ]);
       }
@@ -151,7 +191,7 @@ describe("BSPAOH validation", () => {
       });
       const data = {
         ...bspaoh,
-        transporterTransportPlates: ["xyz"],
+        transporterTransportPlates: ["AA-12-AB"],
         transporterTransportMode: "ROAD",
         transporterTakenOverAt: new Date()
       };
@@ -464,6 +504,97 @@ describe("BSPAOH validation", () => {
           {}
         );
       });
+    });
+
+    it("transporter plates is not required if transport mode is not ROAD", async () => {
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SIGNED_BY_PRODUCER,
+
+          transporters: {
+            create: {
+              transporterTransportPlates: [],
+              transporterTransportMode: "AIR",
+              transporterTakenOverAt: new Date(),
+
+              number: 1
+            }
+          }
+        }
+      });
+
+      const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+
+      await parseBspaohInContext(
+        { persisted: preparedExistingBspaoh },
+        {
+          currentSignatureType: "TRANSPORT"
+        }
+      );
+    });
+
+    it("transporter plates is required if transport mode is ROAD", async () => {
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SENT,
+          transporters: {
+            create: {
+              transporterTransportPlates: [],
+              transporterTransportMode: "ROAD",
+              transporterTakenOverAt: new Date(),
+
+              number: 1
+            }
+          }
+        }
+      });
+
+      expect.assertions(1);
+      try {
+        const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+        await parseBspaohInContext(
+          { persisted: preparedExistingBspaoh },
+          { currentSignatureType: "TRANSPORT" }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message: "La plaque d'immatriculation est requise"
+          })
+        ]);
+      }
+    });
+
+    it("should throw if a transporter has more than 2 plates", async () => {
+      const bspaoh = await bspaohFactory({
+        opt: {
+          status: BspaohStatus.SENT,
+          transporters: {
+            create: {
+              transporterTransportPlates: ["AA-12-AA", "AA-12-AB", "AA-12-AC"],
+              transporterTransportMode: "ROAD",
+              transporterTakenOverAt: new Date(),
+
+              number: 1
+            }
+          }
+        }
+      });
+
+      expect.assertions(1);
+      try {
+        const { preparedExistingBspaoh } = prepareBspaohForParsing(bspaoh);
+        await parseBspaohInContext(
+          { persisted: preparedExistingBspaoh },
+          { currentSignatureType: "TRANSPORT" }
+        );
+      } catch (error) {
+        expect(error.issues).toEqual([
+          expect.objectContaining({
+            message: "Un maximum de 2 plaques d'immatriculation est accepté"
+          })
+        ]);
+      }
     });
   });
 

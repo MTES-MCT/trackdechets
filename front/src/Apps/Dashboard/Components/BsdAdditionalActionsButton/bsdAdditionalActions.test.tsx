@@ -308,7 +308,7 @@ describe("BsdAdditionalActionsButton", () => {
       expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
     });
   });
-  it("calls the `onBsdSuite` function when the 'Valider le traitement' button is clicked", async () => {
+  it("calls the `onBsdSuite` function when the 'Signer le traitement' button is clicked", async () => {
     const permissions = [UserPermission.BsdCanSignOperation];
     const bsdSuite = {
       ...bsd,

@@ -604,7 +604,7 @@ export const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD93 (Unité Départementale de Seine-Saint-Denis)",
     Dept: "93",
-    email: "ud93-driee.ud93.drieat-if@developpement-durable.gouv.fr"
+    email: "sric.ud93.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",

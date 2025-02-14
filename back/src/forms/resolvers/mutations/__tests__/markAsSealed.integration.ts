@@ -11,6 +11,7 @@ import { prisma } from "@td/prisma";
 import {
   companyFactory,
   destinationFactory,
+  ecoOrganismeFactory,
   formFactory,
   formWithTempStorageFactory,
   siretify,
@@ -200,12 +201,9 @@ describe("Mutation.markAsSealed", () => {
       "MEMBER"
     );
 
-    const eo = await prisma.ecoOrganisme.create({
-      data: {
-        name: "An EO",
-        siret: ecoOrganismeCompany.siret!,
-        address: "An address"
-      }
+    const eo = await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsdd: true }
     });
 
     let form = await formFactory({
@@ -239,12 +237,9 @@ describe("Mutation.markAsSealed", () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
-    await prisma.ecoOrganisme.create({
-      data: {
-        name: eo.name,
-        siret: eo.siret!,
-        address: "An address"
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
 
     let form = await formFactory({
@@ -278,12 +273,9 @@ describe("Mutation.markAsSealed", () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
-    await prisma.ecoOrganisme.create({
-      data: {
-        name: eo.name,
-        siret: eo.siret!,
-        address: "An address"
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
 
     let form = await formFactory({
@@ -318,12 +310,9 @@ describe("Mutation.markAsSealed", () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
-    await prisma.ecoOrganisme.create({
-      data: {
-        name: eo.name,
-        siret: eo.siret!,
-        address: "An address"
-      }
+    await ecoOrganismeFactory({
+      siret: eo.siret!,
+      handle: { handleBsdd: true }
     });
 
     const groupedForm1 = await formFactory({

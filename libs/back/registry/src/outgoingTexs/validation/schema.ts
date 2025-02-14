@@ -14,8 +14,7 @@ import {
   actorCountryCodeSchema,
   wasteDescriptionSchema,
   getWasteCodeSchema,
-  wastePopSchema,
-  wasteIsDangerousSchema,
+  booleanSchema,
   wasteCodeBaleSchema,
   weightValueSchema,
   weightIsEstimateSchema,
@@ -29,12 +28,10 @@ import {
   parcelCoordinatesSchema,
   getOperationCodeSchema,
   operationModeSchema,
-  isUpcycledSchema,
   declarationNumberSchema,
   notificationNumberSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseIsExemptedSchema,
   transportRecepisseNumberSchema,
   nullishDateSchema
 } from "../../shared/schemas";
@@ -49,31 +46,32 @@ const inputOutgoingTexsSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  reportForPickupSiteName: z.string().nullish(),
+  reportForPickupSiteName: z.string().trim().nullish(),
   reportForPickupSiteAddress: actorAddressSchema.nullish(),
   reportForPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   reportForPickupSiteCity: actorCitySchema.nullish(),
   reportForPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
-  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
-  wastePop: wastePopSchema,
-  wasteIsDangerous: wasteIsDangerousSchema,
+  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES).nullish(),
+  wastePop: booleanSchema,
+  wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
   dispatchDate: nullishDateSchema,
   wasteDap: z
     .string()
+    .trim()
     .max(50, "Le DAP ne doit pas excéder 50 caractères")
     .nullish(),
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
   initialEmitterCompanyType: actorTypeSchema,
-  initialEmitterCompanyOrgId: actorOrgIdSchema,
-  initialEmitterCompanyName: actorNameSchema,
-  initialEmitterCompanyAddress: actorAddressSchema,
-  initialEmitterCompanyPostalCode: actorPostalCodeSchema,
-  initialEmitterCompanyCity: actorCitySchema,
-  initialEmitterCompanyCountryCode: actorCountryCodeSchema,
+  initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  initialEmitterCompanyName: actorNameSchema.nullish(),
+  initialEmitterCompanyAddress: actorAddressSchema.nullish(),
+  initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  initialEmitterCompanyCity: actorCitySchema.nullish(),
+  initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   parcelInseeCodes: inseeCodesSchema,
@@ -81,15 +79,16 @@ const inputOutgoingTexsSchema = z.object({
   parcelCoordinates: parcelCoordinatesSchema,
   sisIdentifier: z
     .string()
+    .trim()
     .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
     .nullish(),
   destinationCompanyType: actorTypeSchema,
-  destinationCompanyOrgId: actorOrgIdSchema,
-  destinationCompanyName: actorNameSchema,
-  destinationCompanyAddress: actorAddressSchema,
-  destinationCompanyPostalCode: actorPostalCodeSchema,
-  destinationCompanyCity: actorCitySchema,
-  destinationCompanyCountryCode: actorCountryCodeSchema,
+  destinationCompanyOrgId: actorOrgIdSchema.nullish(),
+  destinationCompanyName: actorNameSchema.nullish(),
+  destinationCompanyAddress: actorAddressSchema.nullish(),
+  destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  destinationCompanyCity: actorCitySchema.nullish(),
+  destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   destinationDropSiteAddress: actorAddressSchema.nullish(),
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
@@ -98,7 +97,7 @@ const inputOutgoingTexsSchema = z.object({
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
   operationMode: operationModeSchema,
-  isUpcycled: isUpcycledSchema.nullish(),
+  isUpcycled: booleanSchema.nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
   destinationParcelCoordinates: parcelCoordinatesSchema,
@@ -106,6 +105,7 @@ const inputOutgoingTexsSchema = z.object({
   notificationNumber: notificationNumberSchema,
   movementNumber: z
     .string()
+    .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   ecoOrganismeSiret: actorSiretSchema.nullish(),
@@ -114,6 +114,7 @@ const inputOutgoingTexsSchema = z.object({
   brokerCompanyName: actorNameSchema.nullish(),
   brokerRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
@@ -123,16 +124,17 @@ const inputOutgoingTexsSchema = z.object({
   traderCompanyName: actorNameSchema.nullish(),
   traderRecepisseNumber: z
     .string()
+    .trim()
     .max(
       150,
       "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
     )
     .nullish(),
-  isDirectSupply: z.boolean().nullish(),
+  isDirectSupply: booleanSchema.nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
   transporter1CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter1RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter1RecepisseIsExempted: booleanSchema.nullish(),
   transporter1RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter1CompanyName: actorNameSchema.nullish(),
   transporter1CompanyAddress: actorAddressSchema.nullish(),
@@ -142,7 +144,7 @@ const inputOutgoingTexsSchema = z.object({
   transporter2TransportMode: transportModeSchema.nullish(),
   transporter2CompanyType: actorTypeSchema.nullish(),
   transporter2CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter2RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter2RecepisseIsExempted: booleanSchema.nullish(),
   transporter2RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter2CompanyName: actorNameSchema.nullish(),
   transporter2CompanyAddress: actorAddressSchema.nullish(),
@@ -152,7 +154,7 @@ const inputOutgoingTexsSchema = z.object({
   transporter3TransportMode: transportModeSchema.nullish(),
   transporter3CompanyType: actorTypeSchema.nullish(),
   transporter3CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter3RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter3RecepisseIsExempted: booleanSchema.nullish(),
   transporter3RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter3CompanyName: actorNameSchema.nullish(),
   transporter3CompanyAddress: actorAddressSchema.nullish(),
@@ -162,7 +164,7 @@ const inputOutgoingTexsSchema = z.object({
   transporter4TransportMode: transportModeSchema.nullish(),
   transporter4CompanyType: actorTypeSchema.nullish(),
   transporter4CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter4RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter4RecepisseIsExempted: booleanSchema.nullish(),
   transporter4RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter4CompanyName: actorNameSchema.nullish(),
   transporter4CompanyAddress: actorAddressSchema.nullish(),
@@ -172,7 +174,7 @@ const inputOutgoingTexsSchema = z.object({
   transporter5TransportMode: transportModeSchema.nullish(),
   transporter5CompanyType: actorTypeSchema.nullish(),
   transporter5CompanyOrgId: actorOrgIdSchema.nullish(),
-  transporter5RecepisseIsExempted: transportRecepisseIsExemptedSchema.nullish(),
+  transporter5RecepisseIsExempted: booleanSchema.nullish(),
   transporter5RecepisseNumber: transportRecepisseNumberSchema.nullish(),
   transporter5CompanyName: actorNameSchema.nullish(),
   transporter5CompanyAddress: actorAddressSchema.nullish(),
