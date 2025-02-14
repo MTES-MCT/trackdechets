@@ -793,6 +793,9 @@ type FormRevisionRequestContent {
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
 
+  "Quantité refusée par l'installation de destination, en tonnes"
+  quantityRefused: Float
+
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 

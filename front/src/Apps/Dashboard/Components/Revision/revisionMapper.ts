@@ -48,6 +48,7 @@ export enum DataNameEnum {
   CAP_TEMP_STORAGE = "CAP (entreposage provisoire ou reconditionnement)",
   QTY_ESTIMATED = "Poids estimé (en tonnes)",
   QTY_RECEIVED = "Quantité reçue (tonnes)",
+  QTY_REFUSED = "Quantité refusée (tonnes)",
   QTY_PROCESSED = "Quantité traitée (en tonnes)",
   QTY_PROCESSED_KG = "Quantité traitée (en kg)",
   QTY_RECEIVED_TEMP_STORAGE = "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)",
@@ -280,6 +281,11 @@ export const mapRevision = (
         dataName: DataNameEnum.QTY_RECEIVED,
         dataOldValue: review?.[bsdName]?.quantityReceived,
         dataNewValue: review?.content?.quantityReceived
+      },
+      {
+        dataName: DataNameEnum.QTY_REFUSED,
+        dataOldValue: review?.[bsdName]?.quantityRefused,
+        dataNewValue: review?.content?.quantityRefused
       },
       {
         dataName: DataNameEnum.QTY_PROCESSED,

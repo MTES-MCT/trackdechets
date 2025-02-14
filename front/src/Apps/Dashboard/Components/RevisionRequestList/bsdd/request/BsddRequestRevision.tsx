@@ -106,17 +106,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const onSubmit: SubmitHandler<
     BsddRevisionRequestValidationSchema
   > = async data => {
-    // If you review quantityRefused, you must provide quantityReceived
-    if (isDefined(data.quantityRefused)) {
-      await onSubmitForm({
-        ...data,
-        quantityReceived: isDefined(data.quantityReceived)
-          ? data.quantityReceived
-          : bsdd.quantityReceived
-      });
-    } else {
-      await onSubmitForm(data);
-    }
+    await onSubmitForm(data);
 
     resetAndClose();
   };
