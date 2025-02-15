@@ -350,7 +350,7 @@ const parcelNumbersArraySchema = z.array(
     .string()
     .transform(v => v.replace(/\s+/g, ""))
     .refine(
-      v => /^\d{1,3}-[A-Z]{2}-\d{1,4}$/.test(v),
+      v => /^\d{1,3}-[A-Z]{1,2}-\d{1,4}$/.test(v),
       "Le numéro de parcelle ne respecte pas le format attendu"
     )
 );
@@ -484,3 +484,16 @@ export const transportRecepisseNumberSchema = z.coerce
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"
   );
+
+const transportPlatesArraySchema = z.array(
+  z
+    .string()
+    .trim()
+    .min(4, "Une plaque d'immatriculation doit faire au moins 4 cacatères")
+    .min(12, "Une plaque d'immatriculation ne peut pas dépasser 12 cacatères")
+);
+
+export const transportPlatesSchema = z.union([
+  stringToArraySchema.pipe(transportPlatesArraySchema),
+  transportPlatesArraySchema
+]);

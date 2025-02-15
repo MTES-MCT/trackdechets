@@ -1,24 +1,75 @@
 import { Refinement, z } from "zod";
+import { ParsedZodManagedItem } from "./schema";
 import {
   refineActorInfos,
   refineTransporterInfos
 } from "../../shared/refinement";
-import { ParsedZodIncomingTexsItem } from "./schema";
-import { $Enums } from "@prisma/client";
-import { getCachedCompany } from "../../shared/helpers";
 
-export const initialEmitterRefinement: Refinement<ParsedZodIncomingTexsItem> =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
-    typeKey: "initialEmitterCompanyType",
-    orgIdKey: "initialEmitterCompanyOrgId",
-    nameKey: "initialEmitterCompanyName",
-    addressKey: "initialEmitterCompanyAddress",
-    postalCodeKey: "initialEmitterCompanyPostalCode",
-    cityKey: "initialEmitterCompanyCity",
-    countryKey: "initialEmitterCompanyCountryCode"
-  });
+export const refineDates: Refinement<ParsedZodManagedItem> = (
+  transportedItem,
+  { addIssue }
+) => {
+  if (transportedItem.managingEndDate < transportedItem.managingStartDate) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Vous devez saisir une date de fin de gestion antérieure à la date de début de gestion",
+      path: ["managingEndDate"]
+    });
+  }
+};
 
-export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
+export const refineNotificationNumber: Refinement<ParsedZodManagedItem> = (
+  transportedItem,
+  { addIssue }
+) => {
+  const isDangerous =
+    transportedItem.wasteIsDangerous ||
+    transportedItem.wastePop ||
+    transportedItem.wasteCode?.includes("*");
+
+  const isAbroad = ["ENTREPRISE_HORS_UE", "ENTREPRISE_UE"].includes(
+    transportedItem.destinationCompanyType
+  );
+
+  if (!transportedItem.notificationNumber && isDangerous && isAbroad) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["notificationNumber"]
+    });
+  }
+
+  if (!transportedItem.declarationNumber && !isDangerous && isAbroad) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["declarationNumber"]
+    });
+  }
+};
+
+export const refineInitialEmitter = refineActorInfos<ParsedZodManagedItem>({
+  typeKey: "initialEmitterCompanyType",
+  orgIdKey: "initialEmitterCompanyOrgId",
+  nameKey: "initialEmitterCompanyName",
+  addressKey: "initialEmitterCompanyAddress",
+  postalCodeKey: "initialEmitterCompanyPostalCode",
+  cityKey: "initialEmitterCompanyCity",
+  countryKey: "initialEmitterCompanyCountryCode"
+});
+
+export const refineDestination = refineActorInfos<ParsedZodManagedItem>({
+  typeKey: "destinationCompanyType",
+  orgIdKey: "destinationCompanyOrgId",
+  nameKey: "destinationCompanyName",
+  addressKey: "destinationCompanyAddress",
+  postalCodeKey: "destinationCompanyPostalCode",
+  cityKey: "destinationCompanyCity",
+  countryKey: "destinationCompanyCountryCode"
+});
+
+export const refineEmitter = refineActorInfos<ParsedZodManagedItem>({
   typeKey: "emitterCompanyType",
   orgIdKey: "emitterCompanyOrgId",
   nameKey: "emitterCompanyName",
@@ -29,7 +80,7 @@ export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
 });
 
 export const transporter1Refinement =
-  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodManagedItem>({
     typeKey: "transporter1CompanyType",
     orgIdKey: "transporter1CompanyOrgId",
     nameKey: "transporter1CompanyName",
@@ -42,7 +93,7 @@ export const transporter1Refinement =
   });
 
 export const transporter2Refinement =
-  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodManagedItem>({
     typeKey: "transporter2CompanyType",
     orgIdKey: "transporter2CompanyOrgId",
     nameKey: "transporter2CompanyName",
@@ -55,7 +106,7 @@ export const transporter2Refinement =
   });
 
 export const transporter3Refinement =
-  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodManagedItem>({
     typeKey: "transporter3CompanyType",
     orgIdKey: "transporter3CompanyOrgId",
     nameKey: "transporter3CompanyName",
@@ -68,7 +119,7 @@ export const transporter3Refinement =
   });
 
 export const transporter4Refinement =
-  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodManagedItem>({
     typeKey: "transporter4CompanyType",
     orgIdKey: "transporter4CompanyOrgId",
     nameKey: "transporter4CompanyName",
@@ -81,7 +132,7 @@ export const transporter4Refinement =
   });
 
 export const transporter5Refinement =
-  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodManagedItem>({
     typeKey: "transporter5CompanyType",
     orgIdKey: "transporter5CompanyOrgId",
     nameKey: "transporter5CompanyName",
@@ -92,27 +143,3 @@ export const transporter5Refinement =
     recepisseIsExemptedKey: "transporter5RecepisseIsExempted",
     recepisseNumberKey: "transporter5RecepisseNumber"
   });
-
-export const refineReportForProfile: Refinement<
-  ParsedZodIncomingTexsItem
-> = async (incomingTexsItem, { addIssue }) => {
-  const company = await getCachedCompany(
-    incomingTexsItem.reportForCompanySiret
-  );
-  if (!company) {
-    return;
-  }
-
-  const allowedProfiles: $Enums.CompanyType[] = [
-    $Enums.CompanyType.WASTEPROCESSOR,
-    $Enums.CompanyType.COLLECTOR,
-    $Enums.CompanyType.DISPOSAL_FACILITY
-  ];
-  if (!company.companyTypes.some(type => allowedProfiles.includes(type))) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `L'établissement doit avoir le profil TTR et/ou Installation de traitement et/ou Installation de valorisation de terres et sédiments pour émettre une déclaration`,
-      path: ["reportForCompanySiret"]
-    });
-  }
-};

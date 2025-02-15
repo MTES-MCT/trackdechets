@@ -3,9 +3,9 @@ import {
   reasonSchema,
   publicIdSchema,
   reportAsCompanySiretSchema,
+  siretSchema,
   getWasteCodeSchema,
   booleanSchema,
-  dateSchema,
   wasteDescriptionSchema,
   wasteCodeBaleSchema,
   weightValueSchema,
@@ -18,56 +18,34 @@ import {
   actorPostalCodeSchema,
   actorCitySchema,
   actorCountryCodeSchema,
-  inseeCodesSchema,
-  actorSiretSchema,
-  getOperationCodeSchema,
-  transportModeSchema,
-  transportRecepisseNumberSchema,
   declarationNumberSchema,
   notificationNumberSchema,
-  siretSchema,
-  parcelCoordinatesSchema,
-  parcelNumbersSchema,
-  municipalitiesNamesSchema,
-  operationModeSchema
+  getOperationCodeSchema,
+  operationModeSchema,
+  actorSiretSchema,
+  transportModeSchema,
+  transportRecepisseNumberSchema,
+  dateSchema
 } from "../../shared/schemas";
-import {
-  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
-  INCOMING_TEXS_WASTE_CODES
-} from "@td/constants";
 
-export type ParsedZodInputIncomingTexsItem = z.output<
-  typeof inputIncomingTexsSchema
->;
-export type ParsedZodIncomingTexsItem = z.output<typeof incomingTexsSchema>;
+export type ParsedZodInputManagedItem = z.output<typeof inputManagedSchema>;
+export type ParsedZodManagedItem = z.output<typeof managedSchema>;
 
-const inputIncomingTexsSchema = z.object({
+const inputManagedSchema = z.object({
   reason: reasonSchema,
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES).nullish(),
+  wasteCode: getWasteCodeSchema(),
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
-  receptionDate: dateSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  wasteDap: z
-    .string()
-    .trim()
-    .max(50, "Le DAP ne doit pas excéder 50 caractères")
-    .nullish(),
+  managingStartDate: dateSchema,
+  managingEndDate: dateSchema,
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  parcelInseeCodes: inseeCodesSchema,
-  parcelNumbers: parcelNumbersSchema,
-  parcelCoordinates: parcelCoordinatesSchema,
-  sisIdentifier: z
-    .string()
-    .trim()
-    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
-    .nullish(),
   initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
@@ -75,51 +53,17 @@ const inputIncomingTexsSchema = z.object({
   initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNES"
-  ]),
-  emitterCompanyOrgId: actorOrgIdSchema.nullish(),
-  emitterCompanyName: actorNameSchema.nullish(),
-  emitterCompanyAddress: actorAddressSchema.nullish(),
-  emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
-  emitterCompanyCity: actorCitySchema.nullish(),
-  emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterPickupSiteName: z.string().trim().nullish(),
-  emitterPickupSiteAddress: actorAddressSchema.nullish(),
-  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
-  emitterPickupSiteCity: actorCitySchema.nullish(),
-  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
-  ecoOrganismeSiret: actorSiretSchema.nullish(),
-  ecoOrganismeName: actorNameSchema.nullish(),
-  brokerCompanySiret: actorSiretSchema.nullish(),
-  brokerCompanyName: actorNameSchema.nullish(),
-  brokerRecepisseNumber: z
-    .string()
-    .trim()
-    .max(
-      150,
-      "Le numéro de récépissé du courtier ne doit pas excéder 150 caractères"
-    )
-    .nullish(),
-  traderCompanySiret: actorSiretSchema.nullish(),
-  traderCompanyName: actorNameSchema.nullish(),
-  traderRecepisseNumber: z
-    .string()
-    .trim()
-    .max(
-      150,
-      "Le numéro de récépissé du négociant ne doit pas excéder 150 caractères"
-    )
-    .nullish(),
-  operationCode: getOperationCodeSchema(
-    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
-  ),
-  operationMode: operationModeSchema,
-  noTraceability: booleanSchema.nullish(),
-  nextDestinationIsAbroad: booleanSchema.nullish(),
+  destinationCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
+  destinationCompanyOrgId: actorOrgIdSchema.nullish(),
+  destinationCompanyName: actorNameSchema.nullish(),
+  destinationCompanyAddress: actorAddressSchema.nullish(),
+  destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  destinationCompanyCity: actorCitySchema.nullish(),
+  destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  destinationDropSiteAddress: actorAddressSchema.nullish(),
+  destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
+  destinationDropSiteCity: actorCitySchema.nullish(),
+  destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
   declarationNumber: declarationNumberSchema,
   notificationNumber: notificationNumberSchema,
   movementNumber: z
@@ -127,13 +71,29 @@ const inputIncomingTexsSchema = z.object({
     .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
-  nextOperationCode: getOperationCodeSchema(
-    INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
-  ).nullish(),
-  isUpcycled: booleanSchema.nullish(),
-  destinationParcelInseeCodes: inseeCodesSchema,
-  destinationParcelNumbers: parcelNumbersSchema,
-  destinationParcelCoordinates: parcelCoordinatesSchema,
+  operationCode: getOperationCodeSchema(),
+  operationMode: operationModeSchema,
+  emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
+  emitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  emitterCompanyName: actorNameSchema.nullish(),
+  emitterCompanyAddress: actorAddressSchema.nullish(),
+  emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  emitterCompanyCity: actorCitySchema.nullish(),
+  emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  emitterPickupSiteName: z
+    .string()
+    .trim()
+    .max(
+      300,
+      "La référence du chantier ou du lieu de collecte de l'expéditeur ne peut pas faire plus de 300 caractères"
+    )
+    .nullish(),
+  emitterPickupSiteAddress: actorAddressSchema.nullish(),
+  emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
+  emitterPickupSiteCity: actorCitySchema.nullish(),
+  emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  ecoOrganismeSiret: actorSiretSchema.nullish(),
+  ecoOrganismeName: actorNameSchema.nullish(),
   isDirectSupply: booleanSchema.nullish(),
   transporter1TransportMode: transportModeSchema.nullish(),
   transporter1CompanyType: actorTypeSchema.nullish(),
@@ -188,7 +148,7 @@ const inputIncomingTexsSchema = z.object({
 });
 
 // Props added through transform
-const transformedIncomingTexsSchema = z.object({
+const transformedManagedïSchema = z.object({
   id: z.string().optional(),
   reportForCompanyAddress: z.string().default(""),
   reportForCompanyCity: z.string().default(""),
@@ -196,6 +156,6 @@ const transformedIncomingTexsSchema = z.object({
   reportForCompanyName: z.coerce.string().default("")
 });
 
-export const incomingTexsSchema = inputIncomingTexsSchema.merge(
-  transformedIncomingTexsSchema
+export const managedSchema = inputManagedSchema.merge(
+  transformedManagedïSchema
 );

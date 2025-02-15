@@ -82,6 +82,10 @@ enum RegistryImportType {
   OUTGOING_WASTE
   "Terres excavées et sédiments sortants"
   OUTGOING_TEXS
+  "Transportés"
+  TRANSPORTED
+  "Gérés"
+  MANAGED
 }
 
 enum RegistryImportStatus {

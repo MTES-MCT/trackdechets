@@ -190,6 +190,8 @@ function Step1({ register }: StepProps) {
         <option value="OUTGOING_TEXS">
           Terres excavées et sédiments, dangereux et non dangereux sortants
         </option>
+        <option value="TRANSPORTED">Transportés</option>
+        <option value="MANAGED">Gérés</option>
       </Select>
 
       <Upload

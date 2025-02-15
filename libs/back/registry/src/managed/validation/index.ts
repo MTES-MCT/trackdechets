@@ -1,36 +1,28 @@
-import {
-  parcelRefinement,
-  refineEcoOrgBrokerAndTrader,
-  refineIsDangerous,
-  refineMunicipalities,
-  refineNotificationNumber,
-  refineOperationCodeWhenUpcycled,
-  refineTransportersConsistency
-} from "../../shared/refinement";
+import { refineTransportersConsistency } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
-  initialEmitterRefinement,
-  destinationRefinement,
+  refineDates,
+  refineEmitter,
+  refineDestination,
+  refineInitialEmitter,
   transporter1Refinement,
   transporter2Refinement,
   transporter3Refinement,
   transporter4Refinement,
-  transporter5Refinement
+  transporter5Refinement,
+  refineNotificationNumber
 } from "./refinement";
-import { outgoingTexsSchema } from "./schema";
+import { managedSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
 
-export function safeParseAsyncOutgoingTexs(line: unknown) {
-  return outgoingTexsSchema
-    .superRefine(refineIsDangerous)
-    .superRefine(refineMunicipalities)
+export function safeParseAsyncManaged(line: unknown) {
+  return managedSchema
+    .superRefine(refineDates)
+    .superRefine(refineInitialEmitter)
+    .superRefine(refineEmitter)
+    .superRefine(refineDestination)
     .superRefine(refineNotificationNumber)
-    .superRefine(initialEmitterRefinement)
-    .superRefine(destinationRefinement)
-    .superRefine(parcelRefinement)
-    .superRefine(refineOperationCodeWhenUpcycled)
-    .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

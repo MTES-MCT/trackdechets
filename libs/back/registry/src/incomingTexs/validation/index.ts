@@ -7,6 +7,7 @@ import {
   refineNotificationNumber,
   refineOperationCodeWhenUpcycled,
   refineOperationMode,
+  refineTransportersConsistency,
   refineWeightAndVolume
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -43,6 +44,7 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(transporter3Refinement)
     .superRefine(transporter4Refinement)
     .superRefine(transporter5Refinement)
+    .superRefine(refineTransportersConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .safeParseAsync(line, { errorMap: registryErrorMap });
