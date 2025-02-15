@@ -46,8 +46,8 @@ enum RegistryImportType {
     INCOMING_TEXS
     OUTGOING_WASTE
     OUTGOING_TEXS
-    TRANSPORTED_WASTE
-    MANAGED_WASTE
+    TRANSPORTED
+    MANAGED
 }
 
 model RegistrySsd {
