@@ -23,6 +23,7 @@ import {
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
 } from "./shared";
+import { pluralize } from "@td/constants";
 
 const HEADERS = [
   "Importé le",
@@ -101,16 +102,44 @@ export function MyImports() {
             </li>
           )}
           {importData.node.numberOfInsertions > 0 && (
-            <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
+            <li>
+              {importData.node.numberOfInsertions}{" "}
+              {pluralize(
+                "ajoutée",
+                importData.node.numberOfInsertions,
+                "ajoutées"
+              )}
+            </li>
           )}
           {importData.node.numberOfEdits > 0 && (
-            <li>{importData.node.numberOfEdits} modifiée(s)</li>
+            <li>
+              {importData.node.numberOfEdits}{" "}
+              {pluralize(
+                "modifiée",
+                importData.node.numberOfEdits,
+                "modifiées"
+              )}
+            </li>
           )}
           {importData.node.numberOfCancellations > 0 && (
-            <li>{importData.node.numberOfCancellations} annulée(s)</li>
+            <li>
+              {importData.node.numberOfCancellations}{" "}
+              {pluralize(
+                "annulée",
+                importData.node.numberOfCancellations,
+                "annulées"
+              )}
+            </li>
           )}
           {importData.node.numberOfSkipped > 0 && (
-            <li>{importData.node.numberOfSkipped} ignorées(s)</li>
+            <li>
+              {importData.node.numberOfSkipped}{" "}
+              {pluralize(
+                "ignorée",
+                importData.node.numberOfSkipped,
+                "ignorées"
+              )}
+            </li>
           )}
         </ul>
       ),

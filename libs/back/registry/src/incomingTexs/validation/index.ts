@@ -7,8 +7,7 @@ import {
   refineNotificationNumber,
   refineOperationCodeWhenUpcycled,
   refineOperationMode,
-  refineTransportersConsistency,
-  refineWeightAndVolume
+  refineTransportersConsistency
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -29,7 +28,6 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
   return incomingTexsSchema
     .superRefine(refineReportForProfile)
     .superRefine(refineIsDangerous)
-    .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)
