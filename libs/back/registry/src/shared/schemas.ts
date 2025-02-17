@@ -490,7 +490,7 @@ const transportPlatesArraySchema = z.array(
     .string()
     .trim()
     .min(4, "Une plaque d'immatriculation doit faire au moins 4 cacatères")
-    .min(12, "Une plaque d'immatriculation ne peut pas dépasser 12 cacatères")
+    .max(12, "Une plaque d'immatriculation ne peut pas dépasser 12 cacatères")
 );
 
 export const transportPlatesSchema = z.union([

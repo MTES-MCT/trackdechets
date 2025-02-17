@@ -26,6 +26,10 @@ export function refineTransporterInfos<T>({
   recepisseNumberKey: string;
 }): Refinement<T> {
   return (item, context) => {
+    if (!item[typeKey]) {
+      return;
+    }
+
     if (!item[recepisseIsExemptedKey] && !item[recepisseNumberKey]) {
       context.addIssue({
         code: z.ZodIssueCode.custom,

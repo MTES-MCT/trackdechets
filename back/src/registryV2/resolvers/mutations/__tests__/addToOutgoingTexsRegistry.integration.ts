@@ -7,9 +7,9 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
-const ADD_TO_OUTGOING_WASTE_REGISTRY = gql`
-  mutation AddToOutgoingWasteRegistry($lines: [OutgoingWasteLineInput!]!) {
-    addToOutgoingWasteRegistry(lines: $lines)
+const ADD_TO_OUTGOING_TEXS_REGISTRY = gql`
+  mutation AddToOutgoingTexsRegistry($lines: [OutgoingTexsLineInput!]!) {
+    addToOutgoingTexsRegistry(lines: $lines)
   }
 `;
 
@@ -19,12 +19,18 @@ function getCorrectLine(siret: string) {
     publicId: randomUUID(),
     reportAsCompanySiret: undefined,
     reportForCompanySiret: siret,
+    reportForPickupSiteName: undefined,
+    reportForPickupSiteAddress: undefined,
+    reportForPickupSitePostalCode: undefined,
+    reportForPickupSiteCity: undefined,
+    reportForPickupSiteCountryCode: undefined,
     wasteDescription: "Dénomination du déchet",
-    wasteCode: "06 07 01*",
+    wasteCode: "17 05 03*",
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
     dispatchDate: sub(new Date(), { days: 5 }).toISOString(),
+    wasteDap: "aa",
     weightValue: 1.4,
     weightIsEstimate: true,
     volume: 1.2,
@@ -37,6 +43,10 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
     initialEmitterMunicipalitiesNames: null,
+    parcelInseeCodes: undefined,
+    parcelNumbers: undefined,
+    parcelCoordinates: ["47.829864 1.937389", "48.894258 2.240027"],
+    sisIdentifier: undefined,
     destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
     destinationCompanyName: "Raison sociale de l'expéditeur",
@@ -49,6 +59,15 @@ function getCorrectLine(siret: string) {
     destinationDropSitePostalCode: "75012",
     destinationDropSiteCity: "Commune de prise en charge de l'expéditeur",
     destinationDropSiteCountryCode: "FR",
+    operationCode: "R 5",
+    operationMode: "RECYCLAGE",
+    isUpcycled: false,
+    destinationParcelInseeCodes: undefined,
+    destinationParcelNumbers: undefined,
+    destinationParcelCoordinates: undefined,
+    declarationNumber: null,
+    notificationNumber: null,
+    movementNumber: null,
     brokerCompanySiret: null,
     brokerCompanyName: null,
     brokerRecepisseNumber: null,
@@ -57,11 +76,6 @@ function getCorrectLine(siret: string) {
     traderRecepisseNumber: null,
     ecoOrganismeSiret: null,
     ecoOrganismeName: null,
-    operationCode: "R 5",
-    operationMode: "RECYCLAGE",
-    declarationNumber: null,
-    notificationNumber: null,
-    movementNumber: null,
     isDirectSupply: false,
     transporter1TransportMode: "ROAD",
     transporter1CompanyType: "ETABLISSEMENT_FR",
@@ -116,14 +130,14 @@ function getCorrectLine(siret: string) {
   };
 }
 
-describe("Registry - addToOutgoingWasteRegistry", () => {
+describe("Registry - addToOutgoingTexsRegistry", () => {
   afterAll(resetDatabase);
 
   it("should return an error if the user is not authenticated", async () => {
     const { mutate } = makeClient();
     const { errors } = await mutate<
-      Pick<Mutation, "addToOutgoingWasteRegistry">
-    >(ADD_TO_OUTGOING_WASTE_REGISTRY, { variables: { lines: [] } });
+      Pick<Mutation, "addToOutgoingTexsRegistry">
+    >(ADD_TO_OUTGOING_TEXS_REGISTRY, { variables: { lines: [] } });
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
@@ -140,8 +154,8 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       getCorrectLine(`0000000000000${i}`)
     );
     const { errors } = await mutate<
-      Pick<Mutation, "addToOutgoingWasteRegistry">
-    >(ADD_TO_OUTGOING_WASTE_REGISTRY, { variables: { lines } });
+      Pick<Mutation, "addToOutgoingTexsRegistry">
+    >(ADD_TO_OUTGOING_TEXS_REGISTRY, { variables: { lines } });
 
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
@@ -151,21 +165,21 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     );
   });
 
-  it("should create an outgoing waste item", async () => {
+  it("should create an outgoing texs item", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToOutgoingTexsRegistry">>(
+      ADD_TO_OUTGOING_TEXS_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry).toBe(true);
   });
 
-  it("should create several outgoing waste items", async () => {
+  it("should create several outgoing texs items", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -173,15 +187,15 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       getCorrectLine(company.siret!)
     );
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToOutgoingTexsRegistry">>(
+      ADD_TO_OUTGOING_TEXS_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry).toBe(true);
   });
 
-  it("should create and edit an outgoing waste item in one go", async () => {
+  it("should create and edit an outgoing texs item in one go", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -189,14 +203,14 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     const editedLine = { ...line, reason: "EDIT", wasteCodeBale: "A1070" };
     const lines = [line, editedLine];
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToOutgoingTexsRegistry">>(
+      ADD_TO_OUTGOING_TEXS_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry).toBe(true);
 
-    const result = await prisma.registryOutgoingWaste.findFirstOrThrow({
+    const result = await prisma.registryOutgoingTexs.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");

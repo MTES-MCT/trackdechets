@@ -1,15 +1,15 @@
 import type { Mutation } from "@td/codegen-back";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import makeClient from "../../../../__tests__/testClient";
+import gql from "graphql-tag";
+import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import { randomUUID } from "node:crypto";
 import { prisma } from "@td/prisma";
 import { sub } from "date-fns";
-import gql from "graphql-tag";
-import { randomUUID } from "node:crypto";
-import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import makeClient from "../../../../__tests__/testClient";
 
-const ADD_TO_OUTGOING_WASTE_REGISTRY = gql`
-  mutation AddToOutgoingWasteRegistry($lines: [OutgoingWasteLineInput!]!) {
-    addToOutgoingWasteRegistry(lines: $lines)
+const ADD_TO_MANAGED_REGISTRY = gql`
+  mutation AddToManagedRegistry($lines: [ManagedLineInput!]!) {
+    addToManagedRegistry(lines: $lines)
   }
 `;
 
@@ -24,7 +24,8 @@ function getCorrectLine(siret: string) {
     wasteCodeBale: "A1100",
     wastePop: false,
     wasteIsDangerous: true,
-    dispatchDate: sub(new Date(), { days: 5 }).toISOString(),
+    managingStartDate: sub(new Date(), { days: 6 }).toISOString(),
+    managingEndDate: sub(new Date(), { days: 5 }).toISOString(),
     weightValue: 1.4,
     weightIsEstimate: true,
     volume: 1.2,
@@ -35,8 +36,6 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyPostalCode: "75002",
     initialEmitterCompanyCity: "Commune du producteur",
     initialEmitterCompanyCountryCode: "FR",
-    initialEmitterMunicipalitiesInseeCodes: null,
-    initialEmitterMunicipalitiesNames: null,
     destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
     destinationCompanyName: "Raison sociale de l'expéditeur",
@@ -49,19 +48,27 @@ function getCorrectLine(siret: string) {
     destinationDropSitePostalCode: "75012",
     destinationDropSiteCity: "Commune de prise en charge de l'expéditeur",
     destinationDropSiteCountryCode: "FR",
-    brokerCompanySiret: null,
-    brokerCompanyName: null,
-    brokerRecepisseNumber: null,
-    traderCompanySiret: null,
-    traderCompanyName: null,
-    traderRecepisseNumber: null,
-    ecoOrganismeSiret: null,
-    ecoOrganismeName: null,
+    declarationNumber: undefined,
+    notificationNumber: undefined,
+    movementNumber: undefined,
     operationCode: "R 5",
     operationMode: "RECYCLAGE",
-    declarationNumber: null,
-    notificationNumber: null,
-    movementNumber: null,
+    emitterCompanyType: "ETABLISSEMENT_FR",
+    emitterCompanyOrgId: "78467169500103",
+    emitterCompanyName: "Raison sociale de l'expéditeur",
+    emitterCompanyAddress: "Adresse de l'expéditeur",
+    emitterCompanyPostalCode: "75003",
+    emitterCompanyCity: "Commune de l'expéditeur",
+    emitterCompanyCountryCode: "FR",
+    emitterPickupSiteName:
+      "Référence du chantier / lieu de collecte de l'expéditeur",
+    emitterPickupSiteAddress:
+      "Libellé de l'adresse de prise en charge de l'expéditeur",
+    emitterPickupSitePostalCode: "75012",
+    emitterPickupSiteCity: "Commune de prise en charge de l'expéditeur",
+    emitterPickupSiteCountryCode: "FR",
+    ecoOrganismeSiret: null,
+    ecoOrganismeName: null,
     isDirectSupply: false,
     transporter1TransportMode: "ROAD",
     transporter1CompanyType: "ETABLISSEMENT_FR",
@@ -116,14 +123,15 @@ function getCorrectLine(siret: string) {
   };
 }
 
-describe("Registry - addToOutgoingWasteRegistry", () => {
+describe("Registry - addToManagedRegistry", () => {
   afterAll(resetDatabase);
 
   it("should return an error if the user is not authenticated", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate<
-      Pick<Mutation, "addToOutgoingWasteRegistry">
-    >(ADD_TO_OUTGOING_WASTE_REGISTRY, { variables: { lines: [] } });
+    const { errors } = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
+      { variables: { lines: [] } }
+    );
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
@@ -139,9 +147,10 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     const lines = Array.from({ length: 1_001 }, (_, i) =>
       getCorrectLine(`0000000000000${i}`)
     );
-    const { errors } = await mutate<
-      Pick<Mutation, "addToOutgoingWasteRegistry">
-    >(ADD_TO_OUTGOING_WASTE_REGISTRY, { variables: { lines } });
+    const { errors } = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
+      { variables: { lines } }
+    );
 
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
@@ -151,52 +160,58 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     );
   });
 
-  it("should create an outgoing waste item", async () => {
-    const { user, company } = await userWithCompanyFactory();
+  it("should create a managed item", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const lines = [getCorrectLine(company.siret!)];
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToManagedRegistry).toBe(true);
   });
 
-  it("should create several outgoing waste items", async () => {
-    const { user, company } = await userWithCompanyFactory();
+  it("should create several managed items", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const lines = Array.from({ length: 100 }, () =>
       getCorrectLine(company.siret!)
     );
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToManagedRegistry).toBe(true);
   });
 
-  it("should create and edit an outgoing waste item in one go", async () => {
-    const { user, company } = await userWithCompanyFactory();
+  it("should create and edit a managed item in one go", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: { set: ["RECOVERY_FACILITY"] }
+    });
     const { mutate } = makeClient(user);
 
     const line = getCorrectLine(company.siret!);
     const editedLine = { ...line, reason: "EDIT", wasteCodeBale: "A1070" };
     const lines = [line, editedLine];
 
-    const { data } = await mutate<Pick<Mutation, "addToOutgoingWasteRegistry">>(
-      ADD_TO_OUTGOING_WASTE_REGISTRY,
+    const { data } = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToManagedRegistry).toBe(true);
 
-    const result = await prisma.registryOutgoingWaste.findFirstOrThrow({
+    const result = await prisma.registryManaged.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
