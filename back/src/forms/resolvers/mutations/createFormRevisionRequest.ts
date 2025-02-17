@@ -366,7 +366,6 @@ async function getFlatContent(
 
   const contentToValidate = getContentToValidate(bsdd, flatContent);
 
-  //
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
       strict: true
@@ -412,7 +411,7 @@ const getContentToValidate = (
   flatContent: ReturnType<typeof flattenBsddRevisionRequestInput>
 ) => {
   // quantityReceived & quantityRefused sont liées pour la validation, il faut donc
-  // passser les deux
+  // passer les deux
   const isReviewingQuantities =
     isDefined(flatContent.quantityReceived) ||
     isDefined(flatContent.quantityRefused);
