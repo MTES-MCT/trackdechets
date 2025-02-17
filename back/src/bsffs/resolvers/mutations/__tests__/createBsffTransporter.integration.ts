@@ -70,6 +70,51 @@ describe("Mutation.createBsffTransporter", () => {
     ]);
   });
 
+  it("should forbid invalid plates", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient(user);
+    const transporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      transporterReceipt: {
+        create: {
+          department: "13",
+          receiptNumber: "MON-RECEPISSE",
+          validityLimit: new Date("2024-01-01")
+        }
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsffTransporter">,
+      MutationCreateBsffTransporterArgs
+    >(CREATE_BSFF_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          transport: {
+            mode: "ROAD",
+            plates: ["XY"]
+          },
+          recepisse: {
+            number: "receipt", // should be ignored
+            department: "07", // should be ignored
+            validityLimit: new Date().toISOString() as any // should be ignored
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should create a BSFF transporter", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);

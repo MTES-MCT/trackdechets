@@ -877,6 +877,78 @@ describe("Mutation.createDasri validation scenarii", () => {
     ]);
   });
 
+  it("should fail creating the form if plate humbers are invalid", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporterCompany = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+
+      transporter: {
+        company: {
+          mail: "trans@test.fr",
+          name: "El transporter",
+          siret: transporterCompany.siret,
+          contact: "Jason Statham",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        },
+        transport: {
+          plates: ["AB"],
+          weight: { value: 22, isEstimate: false },
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo())
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("create a dasri without transport quantity and type", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory();

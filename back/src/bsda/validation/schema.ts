@@ -43,7 +43,10 @@ import {
   rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
-import { validateMultiTransporterPlates } from "../../common/validation/zod/refinement";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -337,6 +340,10 @@ export type ParsedZodBsdaTransporter = z.output<
   typeof rawBsdaTransporterSchema
 >;
 
-export const transformedBsdaTransporterSchema = rawBsdaTransporterSchema
+const refinedBsdaTransporter = rawBsdaTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsdaTransporterSchema = refinedBsdaTransporter
   .transform(updateTransporterRecepisse)
   .transform(sirenifyBsdaTransporter);

@@ -116,9 +116,7 @@ input AcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -162,9 +160,7 @@ input ReceivedFormInput {
   quantityReceived: Float
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -786,9 +782,7 @@ input TempStorerAcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -823,9 +817,7 @@ input TempStoredFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -985,11 +977,12 @@ input FormRevisionRequestContentInput {
   "Informations sur l'installation de destination ou d’entreposage ou de reconditionnement prévue (édition partielle uniquement)"
   recipient: FormRevisionRequestRecipientInput
 
-  "Statut d'acceptation du déchet (case 10)"
-  wasteAcceptationStatus: WasteAcceptationStatus
+  # Retirés jusqu'à nouvel ordre!
+  # "Statut d'acceptation du déchet (case 10)"
+  # wasteAcceptationStatus: WasteAcceptationStatus
 
-  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
-  wasteRefusalReason: String
+  # "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
+  # wasteRefusalReason: String
 
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float

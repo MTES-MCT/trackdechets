@@ -138,7 +138,8 @@ const receivedInfoInput = {
   receivedBy: "Antoine Derieux",
   receivedAt: "2020-04-05T11:18:00",
   signedAt: "2020-04-05T12:00:00",
-  quantityReceived: 1
+  quantityReceived: 1,
+  quantityRefused: 0
 };
 
 const processedInfoInput = {
@@ -168,6 +169,7 @@ const tempStoredInfosInput = {
   receivedAt: "2020-05-03T09:00:00",
   signedAt: "2020-05-03T09:00:00",
   quantityReceived: 1,
+  quantityRefused: 0,
   quantityType: "REAL"
 };
 

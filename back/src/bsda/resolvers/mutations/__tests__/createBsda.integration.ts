@@ -572,6 +572,93 @@ describe("Mutation.Bsda.create", () => {
     ]);
   });
 
+  it("should fail creating the form if plate numbers are invalid", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const worker = await companyFactory();
+
+    const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: worker.siret,
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: {
+          siret: transporterCompany.siret,
+          name: "The Transporter",
+          address: "Rue du bsda",
+          contact: "Un transporter",
+          phone: "0101010101",
+          mail: "transporter@mail.com"
+        },
+        transport: { plates: ["SD"] }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should fail creating the form if a required field like the waste code is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destinationCompany } = await userWithCompanyFactory(
