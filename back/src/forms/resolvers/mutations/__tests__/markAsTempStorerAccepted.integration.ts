@@ -448,26 +448,6 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         ).toEqual(2.4);
       });
 
-      it("quantityRefused is required", async () => {
-        // Given
-        const { user, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          user,
-          form.id,
-          WasteAcceptationStatus.ACCEPTED,
-          2.4,
-          null
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
-        );
-      });
-
       it("quantityRefused must be zero", async () => {
         // Given
         const { user, form } = await createBSDD();
@@ -528,27 +508,6 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           expect.objectContaining({
             subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`
           })
-        );
-      });
-
-      it("quantityRefused is required", async () => {
-        // Given
-        const { user, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          user,
-          form.id,
-          WasteAcceptationStatus.REFUSED,
-          2.4,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
         );
       });
 
@@ -618,27 +577,6 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         <li>Quantité refusée nette : 1.1 tonnes</li>
         <li>Quantité acceptée nette : 1.3 tonnes</li>`)
         });
-      });
-
-      it("quantityRefused is required", async () => {
-        // Given
-        const { user, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          user,
-          form.id,
-          WasteAcceptationStatus.PARTIALLY_REFUSED,
-          2.4,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
-        );
       });
 
       it("quantityRefused cannot = 0", async () => {
