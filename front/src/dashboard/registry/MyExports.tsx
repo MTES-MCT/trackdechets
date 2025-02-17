@@ -175,7 +175,9 @@ export function MyExports() {
                 "dd/MM/yyyy HH:mm"
               )}
             </div>
-            {badges[registryExport.node.status]("export")}
+            <div className={styles.badge}>
+              {badges[registryExport.node.status]("export")}
+            </div>
           </div>,
           <div>
             {(registryExport.node.status === RegistryV2ExportStatus.Started ||
@@ -227,18 +229,22 @@ export function MyExports() {
           registryExport.node.status === RegistryV2ExportStatus.Pending ||
           registryExport.node.status === RegistryV2ExportStatus.Started ||
           downloadLoadingExportId === registryExport.node.id ? (
-            <div style={{ width: "fit-content" }}>
+            <div className="tw-px-2" style={{ width: "fit-content" }}>
               <InlineLoader size={32} />
             </div>
           ) : registryExport.node.status ===
             RegistryV2ExportStatus.Successful ? (
-            <Button
-              title="Télécharger"
-              priority="secondary"
-              iconId="fr-icon-download-line"
-              onClick={() => downloadRegistryExportFile(registryExport.node.id)}
-              size="small"
-            />
+            <div className="tw-px-2">
+              <Button
+                title="Télécharger"
+                priority="secondary"
+                iconId="fr-icon-download-line"
+                onClick={() =>
+                  downloadRegistryExportFile(registryExport.node.id)
+                }
+                size="small"
+              />
+            </div>
           ) : (
             ""
           )

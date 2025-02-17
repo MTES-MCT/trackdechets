@@ -20,7 +20,7 @@ export const toIncomingWaste = (
     publicId: incomingWaste.publicId,
     bsdId: null,
     reportAsSiret: incomingWaste.reportAsCompanySiret,
-    createdAt: incomingWaste.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
     destinationReceptionDate: incomingWaste.receptionDate,

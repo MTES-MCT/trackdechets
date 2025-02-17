@@ -20,7 +20,7 @@ export const toOutgoingWaste = (
     publicId: outgoingTexs.publicId,
     bsdId: null,
     reportAsSiret: outgoingTexs.reportAsCompanySiret,
-    createdAt: outgoingTexs.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: outgoingTexs.dispatchDate,
     destinationOperationDate: null,
