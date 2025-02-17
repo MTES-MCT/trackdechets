@@ -1925,8 +1925,6 @@ describe("Mutation.createFormRevisionRequest", () => {
       // Then
       expect(errors).toBeUndefined();
 
-      expect(errors).toBeUndefined();
-
       const revisionRequest = await prisma.bsddRevisionRequest.findFirstOrThrow(
         {
           where: { bsddId: bsdd.id }
