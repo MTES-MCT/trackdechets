@@ -6,6 +6,7 @@ import { useFormContext } from "react-hook-form";
 type TagsInputWrapperProps = {
   readonly fieldName: string;
   readonly hintText?: string;
+  readonly disabled?: boolean;
 } & Pick<TagsInputProps, "label" | "maxTags">;
 
 /**
@@ -46,7 +47,8 @@ export const RhfTagsInputWrapper = ({
   fieldName,
   label,
   maxTags,
-  hintText
+  hintText,
+  disabled
 }: RhfTagsInputWrapperProps): React.JSX.Element => {
   const { setValue, watch, getFieldState } = useFormContext();
 
@@ -67,6 +69,7 @@ export const RhfTagsInputWrapper = ({
       }}
       errorMessage={error?.message}
       hintText={hintText}
+      disabled={disabled}
     />
   );
 };

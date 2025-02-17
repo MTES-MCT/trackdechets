@@ -78,6 +78,7 @@ const TagsInput = ({
               dismissible
               nativeButtonProps={{
                 type: "button",
+                disabled: disabled,
                 onClick: () => {
                   onDeleteTag(idx);
                 }
