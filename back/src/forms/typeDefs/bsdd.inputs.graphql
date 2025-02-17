@@ -121,7 +121,7 @@ input AcceptedFormInput {
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
-  quantityRefused: Float
+  quantityRefused: Float!
 
   "Charte citerne - Est-ce que la citerne a été rincée ou non?"
   hasCiterneBeenWashedOut: Boolean
@@ -787,7 +787,7 @@ input TempStorerAcceptedFormInput {
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
-  quantityRefused: Float
+  quantityRefused: Float!
 
   "Réelle ou estimée"
   quantityType: QuantityType!
