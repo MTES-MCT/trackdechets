@@ -5048,11 +5048,12 @@ describe("Mutation.updateForm", () => {
       companyTypes: [CompanyType.WASTEPROCESSOR],
       wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
-    // Create a form that has already been received
+    // Create a form that has already been sent
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
         status: Status.SENT,
+
         emittedAt: new Date(),
         takenOverAt: new Date(),
         emitterCompanySiret: emitter.company.siret,
@@ -5098,7 +5099,7 @@ describe("Mutation.updateForm", () => {
     const transporter1 = await userWithCompanyFactory("MEMBER");
     const transporter2 = await userWithCompanyFactory("MEMBER");
 
-    // Create a form that has already been received
+    // Create a form that has already been sent
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
@@ -5140,6 +5141,130 @@ describe("Mutation.updateForm", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters[0]"
+      })
+    ]);
+  });
+
+  it("Bugifx - It should be possible to add a tranporter on a SENT BSDD when first transporter has invalid plates", async () => {
+    // Adding a transporter to an older SENT bsd with invalid plates used to fail
+
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    // Create a form that has already been signed by the first transporter
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date(),
+            transporterTransportMode: "ROAD",
+            transporterNumberPlate: "X"
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    //  Transporter n°2 (not signed yet)
+    const bsddTransporter2 = await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret,
+        takenOverAt: null,
+        transporterNumberPlate: "XY-ZE-23"
+      }
+    });
+
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter1!.id, bsddTransporter2.id]
+    };
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("Should validate second transporter plate", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    // Create a form that has already been signed by the first transporter
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.siret,
+
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date(),
+            transporterTransportMode: "ROAD",
+            transporterNumberPlate: "XY-23-AZ"
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    //  Transporter n°2 (not signed yet)
+    const bsddTransporter2 = await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret,
+        takenOverAt: null,
+        transporterNumberPlate: "XY"
+      }
+    });
+
+    // Add second transporter
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter1!.id, bsddTransporter2.id]
+    };
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
       })
     ]);
   });
