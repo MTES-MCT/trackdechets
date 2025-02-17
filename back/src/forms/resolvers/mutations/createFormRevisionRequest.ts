@@ -48,7 +48,6 @@ import {
   canProcessNonDangerousWaste
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
-import { isDefined } from "../../../common/helpers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -364,8 +363,7 @@ async function getFlatContent(
 
   await validateWAsteAccordingToDestination(bsdd, flatContent);
 
-  const contentToValidate = getContentToValidate(bsdd, flatContent);
-
+  //
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
       strict: true
@@ -381,7 +379,7 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(contentToValidate, {
+    await bsddRevisionRequestSchema.validate(flatContent, {
       strict: true,
       abortEarly: false
     });
@@ -390,7 +388,7 @@ async function getFlatContent(
   // Double-check the waste quantities
   await bsddRevisionRequestWasteQuantitiesSchema.validate({
     ...bsdd,
-    ...contentToValidate
+    ...flatContent
   });
 
   if (
@@ -405,37 +403,6 @@ async function getFlatContent(
 
   return flatContent;
 }
-
-const getContentToValidate = (
-  bsdd: Form & { transporters: BsddTransporter[] },
-  flatContent: ReturnType<typeof flattenBsddRevisionRequestInput>
-) => {
-  // quantityReceived & quantityRefused sont liées pour la validation, il faut donc
-  // passer les deux
-  const isReviewingQuantities =
-    isDefined(flatContent.quantityReceived) ||
-    isDefined(flatContent.quantityRefused);
-
-  if (!isReviewingQuantities) return flatContent;
-
-  let quantityReceived: number | null = null;
-  if (isDefined(flatContent.quantityReceived))
-    quantityReceived = flatContent.quantityReceived;
-  else if (isDefined(bsdd.quantityReceived))
-    quantityReceived = Number(bsdd.quantityReceived);
-
-  let quantityRefused: number | null = null;
-  if (isDefined(flatContent.quantityRefused))
-    quantityRefused = flatContent.quantityRefused;
-  else if (isDefined(bsdd.quantityRefused))
-    quantityRefused = Number(bsdd.quantityRefused);
-
-  return {
-    ...flatContent,
-    quantityReceived,
-    quantityRefused
-  };
-};
 
 async function getApproversSirets(
   bsdd: Form,
