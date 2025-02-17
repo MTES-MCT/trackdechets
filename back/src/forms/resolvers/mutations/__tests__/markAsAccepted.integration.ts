@@ -664,6 +664,7 @@ describe("Test Form reception", () => {
         acceptedInfo: {
           wasteAcceptationStatus: "ACCEPTED",
           quantityReceived: 1,
+          quantityRefused: 0,
           signedAt: new Date("2022-01-01").toISOString() as any,
           signedBy: "John Snow"
         }
@@ -706,6 +707,7 @@ describe("Test Form reception", () => {
           acceptedInfo: {
             wasteAcceptationStatus: "ACCEPTED",
             quantityReceived: 1,
+            quantityRefused: 0,
             signedAt: new Date("2022-01-01").toISOString() as any,
             signedBy: "John Snow"
           }
@@ -1284,26 +1286,6 @@ describe("Test Form reception", () => {
         expect(acceptedForm.status).toBe("ACCEPTED");
       });
 
-      it("quantityRefused is required", async () => {
-        // Given
-        const { recipient, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "ACCEPTED",
-          11,
-          null
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
-        );
-      });
-
       it("quantityRefused cannot be > 0", async () => {
         // Given
         const { recipient, form } = await createBSDD();
@@ -1349,27 +1331,6 @@ describe("Test Form reception", () => {
         expect(acceptedForm.quantityRefused?.toNumber()).toEqual(11);
         expect(acceptedForm.wasteAcceptationStatus).toBe("REFUSED");
         expect(acceptedForm.status).toBe("REFUSED");
-      });
-
-      it("quantityRefused is required", async () => {
-        // Given
-        const { recipient, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "REFUSED",
-          11,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
-        );
       });
 
       it("quantityRefused cannot be != quantityReceived", async () => {
@@ -1418,27 +1379,6 @@ describe("Test Form reception", () => {
         expect(acceptedForm.quantityRefused?.toNumber()).toEqual(6);
         expect(acceptedForm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
         expect(acceptedForm.status).toBe("ACCEPTED");
-      });
-
-      it("quantityRefused is required", async () => {
-        // Given
-        const { recipient, form } = await createBSDD();
-
-        // When
-        const { errors } = await markBSDDAsAccepted(
-          recipient,
-          form.id,
-          "PARTIALLY_REFUSED",
-          11,
-          null,
-          "Pas bon"
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          "La quantité refusée (quantityRefused) est requise"
-        );
       });
 
       it("quantityRefused cannot be = quantityReceived", async () => {
