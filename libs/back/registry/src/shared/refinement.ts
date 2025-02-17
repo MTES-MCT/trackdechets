@@ -235,7 +235,7 @@ function refineActorDetails<T>({
       return;
     }
 
-    if (!item[nameKey]) {
+    if (!item[nameKey] && type !== "PERSONNE_PHYSIQUE") {
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "La raison sociale est obligatoire",
