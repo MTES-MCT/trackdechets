@@ -6,8 +6,7 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User,
-  WasteAcceptationStatus
+  User
 } from "@prisma/client";
 import * as yup from "yup";
 import {
