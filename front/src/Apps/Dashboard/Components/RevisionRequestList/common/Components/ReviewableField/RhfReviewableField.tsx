@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { isDefined } from "../../../../../../../common/helper";
 
 type Props = {
   readonly title: string;
@@ -33,7 +34,7 @@ const LabelContent = ({
   defaultValue?: string | number | React.ReactNode;
   suffix?: string;
 }) =>
-  !!value ? (
+  isDefined(value) ? (
     <span>
       {labelText} :{" "}
       <strong>
