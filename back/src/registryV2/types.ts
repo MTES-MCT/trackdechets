@@ -4,7 +4,7 @@ import type {
   SsdWasteV2
 } from "@td/codegen-back";
 import { Prisma } from "@prisma/client";
-export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2;
+export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2 | OutgoingWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
