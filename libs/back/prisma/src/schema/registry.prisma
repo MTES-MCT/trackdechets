@@ -518,7 +518,7 @@ model RegistryOutgoingWaste {
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
