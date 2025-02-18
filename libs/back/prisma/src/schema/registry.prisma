@@ -384,7 +384,7 @@ model RegistryOutgoingTexs {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?      @db.Timestamptz(6)
+    dispatchDate                           DateTime       @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
@@ -516,7 +516,7 @@ model RegistryOutgoingWaste {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?      @db.Timestamptz(6)
+    dispatchDate                           DateTime       @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?

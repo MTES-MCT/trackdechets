@@ -107,31 +107,6 @@ export async function generateRegistryV2Export(
       }
     }
   }
-  console.log({
-    createdById: user.id,
-    createdAt: { gte: subMinutes(new Date(), 5) },
-    isForAllCompanies,
-    sirets: isForAllCompanies ? undefined : { equals: sirets },
-    registryType: registryType === "ALL" ? null : registryType,
-    wasteTypes: where?.wasteType?._eq
-      ? { equals: [where.wasteType._eq] }
-      : where?.wasteType?._in?.length
-      ? { equals: where.wasteType._in }
-      : { isEmpty: true },
-    wasteCodes: where?.wasteCode?._eq
-      ? { equals: [where.wasteCode._eq] }
-      : where?.wasteCode?._in?.length
-      ? { equals: where.wasteCode._in }
-      : { isEmpty: true },
-    declarationType: where?.declarationType?._eq
-      ? where.declarationType._eq === "ALL"
-        ? null
-        : where.declarationType._eq
-      : null,
-    startDate: dateRange._gt ?? dateRange._gte ?? dateRange._eq ?? undefined,
-    endDate: dateRange._lt ?? dateRange._lte ?? dateRange._eq ?? undefined,
-    format
-  });
 
   const recentSameExport = await prisma.registryExport.findFirst({
     where: {
