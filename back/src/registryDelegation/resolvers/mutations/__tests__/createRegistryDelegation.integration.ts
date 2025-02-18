@@ -315,8 +315,9 @@ describe("mutation createRegistryDelegation", () => {
     );
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.stringContaining(`effective à partir du ${formattedStartDate}
-  <span>pour une durée illimitée.</span>`),
+        body: expect.stringContaining(`effective
+  <b
+    >à partir du ${formattedStartDate}     <span>pour une durée illimitée.</span>`),
         subject: `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`
       })
     );
@@ -353,8 +354,10 @@ describe("mutation createRegistryDelegation", () => {
     const formattedEndDate = toddMMYYYY(endDate).replace(/\//g, "&#x2F;");
     expect(sendMail as jest.Mock).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.stringContaining(`effective à partir du ${formattedStartDate}
-  <span>et jusqu'au ${formattedEndDate}.</span>`),
+        body: expect.stringContaining(`effective
+  <b
+    >à partir du ${formattedStartDate} 
+    <span>et jusqu'au ${formattedEndDate}.</span>`),
         subject: `Émission d'une demande de délégation de l'établissement ${delegator.name} (${delegator.siret})`
       })
     );
