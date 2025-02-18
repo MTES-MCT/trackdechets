@@ -47,7 +47,7 @@ const formData: Partial<Form> = {
   emitterCompanyAddress: "8 rue du Général de Gaulle",
   emitterCompanyMail: "e@e.fr",
   recipientCap: "1234",
-  recipientProcessingOperation: "D 6",
+  recipientProcessingOperation: "D 8",
   recipientCompanyName: "A company 3",
   recipientCompanySiret: siret2,
   recipientCompanyAddress: "8 rue du Général de Gaulle",
