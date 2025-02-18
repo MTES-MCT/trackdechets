@@ -4,6 +4,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   siretSchema,
+  dateSchema,
   actorAddressSchema,
   actorPostalCodeSchema,
   actorCitySchema,
@@ -26,8 +27,7 @@ import {
   operationModeSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema,
-  nullishDateSchema
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingWasteItem = z.output<
@@ -50,7 +50,7 @@ const inputOutgoingWasteSchema = z.object({
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: nullishDateSchema,
+  dispatchDate: dateSchema,
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,

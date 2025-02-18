@@ -222,7 +222,7 @@ const minimalRegistryForLookupSelect = {
   dispatchDate: true
 };
 
-type MinimalRegistryForLookup = Prisma.RegistryIncomingTexsGetPayload<{
+type MinimalRegistryForLookup = Prisma.RegistryOutgoingTexsGetPayload<{
   select: typeof minimalRegistryForLookupSelect;
 }>;
 

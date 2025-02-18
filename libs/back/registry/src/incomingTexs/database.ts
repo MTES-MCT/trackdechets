@@ -33,7 +33,6 @@ export async function saveIncomingTexsLine({
           await lookupUtils.delete(id, tx);
         }
       });
-
       return;
     case "IGNORER":
       return;
