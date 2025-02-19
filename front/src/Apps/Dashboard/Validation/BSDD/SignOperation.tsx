@@ -215,6 +215,10 @@ function SignOperationModal({
   );
 
   const [isForeignCompany, setIsForeignCompany] = useState(false);
+  const [isForeignCompanyNameDisabled, setIsForeignCompanyNameDisabled] =
+    useState(false);
+  const [isForeignCompanyAddressDisabled, setIsForeignCompanyAddressDisabled] =
+    useState(false);
 
   /**
    * Hack the API requirement for any value in nextDestination.company.extraEuropeanId
@@ -494,6 +498,9 @@ function SignOperationModal({
                           "nextDestination.company.country",
                           company.codePaysEtrangerEtablissement
                         );
+
+                        setIsForeignCompanyNameDisabled(!!company.name);
+                        setIsForeignCompanyAddressDisabled(!!company.address);
                       }
 
                       setIsForeignCompany(isForeignVat(company.vatNumber!));
@@ -513,7 +520,7 @@ function SignOperationModal({
                           (errors?.nextDestination?.company?.name
                             ?.message as string) ?? ""
                         }
-                        disabled={!!nextDestination?.company?.name}
+                        disabled={isForeignCompanyNameDisabled}
                         nativeInputProps={{
                           ...register("nextDestination.company.name")
                         }}
@@ -529,7 +536,7 @@ function SignOperationModal({
                           (errors?.nextDestination?.company?.address
                             ?.message as string) ?? ""
                         }
-                        disabled={!!nextDestination?.company?.address}
+                        disabled={isForeignCompanyAddressDisabled}
                         nativeInputProps={{
                           ...register("nextDestination.company.address")
                         }}
