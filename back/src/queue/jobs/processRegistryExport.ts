@@ -268,7 +268,6 @@ export async function processRegistryExportJob(
         gte: dateRange._gte ?? undefined
       }
     };
-    console.log(JSON.stringify(query, null, 2));
 
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
