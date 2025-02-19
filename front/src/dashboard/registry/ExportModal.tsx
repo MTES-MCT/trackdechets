@@ -262,12 +262,12 @@ const getSchema = () =>
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["startDate"],
-            message: `"La date de début doit être avant la date de fin.`
+            message: "La date de début doit être avant la date de fin."
           });
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["endDate"],
-            message: `"La date de début doit être avant la date de fin.`
+            message: "La date de début doit être avant la date de fin."
           });
         }
       }
