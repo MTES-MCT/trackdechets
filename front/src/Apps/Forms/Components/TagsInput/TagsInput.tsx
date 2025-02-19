@@ -47,6 +47,7 @@ const TagsInput = ({
         style={{ marginBottom: "10px" }}
         nativeInputProps={{
           value: tag,
+          ...{ "data-testid": "tagsInput" },
           onChange: e => setTag(e.target.value),
           onBlur: () => {
             saveTag();
@@ -78,9 +79,11 @@ const TagsInput = ({
               dismissible
               nativeButtonProps={{
                 type: "button",
+                disabled: disabled,
                 onClick: () => {
                   onDeleteTag(idx);
-                }
+                },
+                ...{ "data-testid": "tagsInputTags" }
               }}
             >
               {plate}
