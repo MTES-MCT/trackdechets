@@ -8,21 +8,43 @@ import {
   Form,
   RegistryIncomingTexs,
   RegistryIncomingWaste,
+  RegistryOutgoingTexs,
+  RegistryOutgoingWaste,
   RegistrySsd
 } from "@prisma/client";
 import type { RegistryV2ExportType } from "@td/codegen-back";
 import { GenericWasteV2 } from "./types";
-import { toIncomingWasteV2 as bsddToIncomingWasteV2 } from "../forms/registryV2";
-import { toIncomingWasteV2 as bsdaToIncomingWasteV2 } from "../bsda/registryV2";
-import { toIncomingWasteV2 as bsdasriToIncomingWasteV2 } from "../bsdasris/registryV2";
-import { toIncomingWasteV2 as bsffToIncomingWasteV2 } from "../bsffs/registryV2";
-import { toIncomingWasteV2 as bspaohToIncomingWasteV2 } from "../bspaoh/registryV2";
-import { toIncomingWasteV2 as bsvhuToIncomingWasteV2 } from "../bsvhu/registryV2";
+import {
+  toIncomingWasteV2 as bsddToIncomingWasteV2,
+  toOutgoingWasteV2 as bsddToOutgoingWasteV2
+} from "../forms/registryV2";
+import {
+  toIncomingWasteV2 as bsdaToIncomingWasteV2,
+  toOutgoingWasteV2 as bsdaToOutgoingWasteV2
+} from "../bsda/registryV2";
+import {
+  toIncomingWasteV2 as bsdasriToIncomingWasteV2,
+  toOutgoingWasteV2 as bsdasriToOutgoingWasteV2
+} from "../bsdasris/registryV2";
+import {
+  toIncomingWasteV2 as bsffToIncomingWasteV2,
+  toOutgoingWasteV2 as bsffToOutgoingWasteV2
+} from "../bsffs/registryV2";
+import {
+  toIncomingWasteV2 as bspaohToIncomingWasteV2,
+  toOutgoingWasteV2 as bspaohToOutgoingWasteV2
+} from "../bspaoh/registryV2";
+import {
+  toIncomingWasteV2 as bsvhuToIncomingWasteV2,
+  toOutgoingWasteV2 as bsvhuToOutgoingWasteV2
+} from "../bsvhu/registryV2";
 // add other types when other exports are added
 type InputMap = {
   SSD: RegistrySsd | null;
   INCOMING_WASTE: RegistryIncomingWaste | null;
   INCOMING_TEXS: RegistryIncomingTexs | null;
+  OUTGOING_WASTE: RegistryOutgoingWaste | null;
+  OUTGOING_TEXS: RegistryOutgoingTexs | null;
   BSDD: Form | null;
   BSDA: Bsda | null;
   BSDASRI: Bsdasri | null;
@@ -47,6 +69,17 @@ const inputToIncomingWaste: Partial<Record<keyof InputMap, any>> = {
   BSVHU: bsvhuToIncomingWasteV2
 };
 
+const inputToOutgoingWaste: Partial<Record<keyof InputMap, any>> = {
+  OUTGOING_WASTE: exportOptions.OUTGOING_WASTE?.toOutgoingWaste,
+  OUTGOING_TEXS: exportOptions.OUTGOING_TEXS?.toOutgoingWaste,
+  BSDD: bsddToOutgoingWasteV2,
+  BSDA: bsdaToOutgoingWasteV2,
+  BSDASRI: bsdasriToOutgoingWasteV2,
+  BSFF: bsffToOutgoingWasteV2,
+  BSPAOH: bspaohToOutgoingWasteV2,
+  BSVHU: bsvhuToOutgoingWasteV2
+};
+
 const registryToWaste: Partial<
   Record<
     Exclude<RegistryV2ExportType, "ALL">,
@@ -54,7 +87,8 @@ const registryToWaste: Partial<
   >
 > = {
   SSD: inputToSsdWaste,
-  INCOMING: inputToIncomingWaste
+  INCOMING: inputToIncomingWaste,
+  OUTGOING: inputToOutgoingWaste
 };
 
 export function toWaste<WasteType extends GenericWasteV2>(
@@ -67,6 +101,8 @@ export function toWaste<WasteType extends GenericWasteV2>(
     SSD,
     INCOMING_WASTE,
     INCOMING_TEXS,
+    OUTGOING_WASTE,
+    OUTGOING_TEXS,
     BSDD,
     BSDA,
     BSDASRI,
@@ -80,6 +116,10 @@ export function toWaste<WasteType extends GenericWasteV2>(
     return converter.INCOMING_WASTE?.(INCOMING_WASTE);
   } else if (INCOMING_TEXS) {
     return converter.INCOMING_TEXS?.(INCOMING_TEXS);
+  } else if (OUTGOING_WASTE) {
+    return converter.OUTGOING_WASTE?.(OUTGOING_WASTE);
+  } else if (OUTGOING_TEXS) {
+    return converter.OUTGOING_TEXS?.(OUTGOING_TEXS);
   } else if (BSDD) {
     return converter.BSDD?.(BSDD);
   } else if (BSDA) {

@@ -5,6 +5,12 @@
 .myRegistryExportsContainer {
   width: 100%;
 }
+.fullWidthTable {
+  > table {
+    display: table;
+    word-break: break-word;
+  }
+}
 
 .dateButtons {
   display: flex;
@@ -15,4 +21,8 @@
 
 .prewrap {
   white-space: pre-wrap;
+}
+
+.badge {
+  word-break: normal;
 }

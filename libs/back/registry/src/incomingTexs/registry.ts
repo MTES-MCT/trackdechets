@@ -20,7 +20,7 @@ export const toIncomingWaste = (
     publicId: incomingTexs.publicId,
     bsdId: null,
     reportAsSiret: incomingTexs.reportAsCompanySiret,
-    createdAt: incomingTexs.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
     destinationReceptionDate: incomingTexs.receptionDate,
@@ -163,8 +163,12 @@ export const toIncomingWaste = (
     destinationReceptionWeightIsEstimate: incomingTexs.weightIsEstimate,
     destinationReceptionVolume: incomingTexs.volume,
     destinationPlannedOperationCode: null,
-    destinationOperationMode: incomingTexs.operationMode,
-    destinationOperationCode: incomingTexs.operationCode,
+    destinationOperationModes: incomingTexs.operationMode
+      ? [incomingTexs.operationMode]
+      : null,
+    destinationOperationCodes: incomingTexs.operationCode
+      ? [incomingTexs.operationCode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingTexs.noTraceability,
     declarationNumber: incomingTexs.declarationNumber,
