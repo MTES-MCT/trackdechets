@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./companyRegistryDelegation.scss";
+import "./CompanyRegistry.scss";
 import { CompanyPrivate, UserRole } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CreateRegistryDelegationModal } from "./CreateRegistryDelegationModal";
