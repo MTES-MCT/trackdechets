@@ -7,6 +7,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.03.1] 11/03/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de l'export du registre sortant V2 [PR 3976](https://github.com/MTES-MCT/trackdechets/pull/3976)
+- Ajout d'un paramètre pour les établissements souhaitant pousser automatiquement leurs BSDND dans leurs déclarations [PR3988](https://github.com/MTES-MCT/trackdechets/pull/3988)
+
 #### :nail_care: Améliorations
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
