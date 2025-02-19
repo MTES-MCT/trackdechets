@@ -302,6 +302,7 @@ model Company {
   allowAppendix1SignatureAutomation    Boolean                   @default(false)
   featureFlags                         String[]                  @default([])
   isDormantSince                       DateTime?                 @db.Timestamptz(6)
+  hasEnabledRegistryDndFromBsdSince    DateTime?                 @db.Timestamptz(6)
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]

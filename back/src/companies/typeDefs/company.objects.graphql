@@ -140,10 +140,17 @@ type CompanyPrivate {
   featureFlags: [String]!
 
   """
-  Date depuis partir de laquelle l'entreprise est en sommeil sur Trackdéchets.
+  Date depuis laquelle l'entreprise est en sommeil sur Trackdéchets.
   Vide si l'entreprise n'est pas en sommeil.
   """
   isDormantSince: DateTime
+
+  """
+  Date à partir de laquelle l'entreprise a choisi de prendre en compte
+  ses BSD de déchet non dangereux dans les exports de registres
+  Vide si l'entreprise n'a pas fait ce choix.
+  """
+  hasEnabledRegistryDndFromBsdSince: DateTime
 
   """
   Liste des transferts administratifs initiés par l'établissement

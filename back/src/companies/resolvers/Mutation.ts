@@ -32,7 +32,7 @@ import toggleDormantCompany from "./mutations/toggleDormantCompany";
 import { createAdministrativeTransfer } from "./mutations/createAdministrativeTransfer";
 import { cancelAdministrativeTransfer } from "./mutations/cancelAdministrativeTransfer";
 import { submitAdministrativeTransferApproval } from "./mutations/submitAdministrativeTransferApproval";
-
+import enableRegistryDndFromBsd from "./mutations/enableRegistryDndFromBsd";
 const Mutation: MutationResolvers = {
   createCompany,
   renewSecurityCode,
@@ -66,7 +66,8 @@ const Mutation: MutationResolvers = {
   toggleDormantCompany,
   createAdministrativeTransfer,
   cancelAdministrativeTransfer,
-  submitAdministrativeTransferApproval
+  submitAdministrativeTransferApproval,
+  enableRegistryDndFromBsd
 };
 
 export default Mutation;
