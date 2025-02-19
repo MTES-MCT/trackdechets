@@ -25,7 +25,11 @@ import {
   actorSiretSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
-  dateSchema
+  dateSchema,
+  inseeCodesSchema,
+  municipalitiesNamesSchema,
+  parcelNumbersSchema,
+  parcelCoordinatesSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputManagedItem = z.output<typeof inputManagedSchema>;
@@ -36,7 +40,7 @@ const inputManagedSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  wasteCode: getWasteCodeSchema(),
+  wasteCode: getWasteCodeSchema().nullish(),
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
@@ -46,6 +50,11 @@ const inputManagedSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
+  wasteDap: z
+    .string()
+    .trim()
+    .max(50, "Le DAP ne doit pas excéder 50 caractères")
+    .nullish(),
   initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
@@ -53,6 +62,16 @@ const inputManagedSchema = z.object({
   initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
+  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
+  parcelInseeCodes: inseeCodesSchema,
+  parcelNumbers: parcelNumbersSchema,
+  parcelCoordinates: parcelCoordinatesSchema,
+  sisIdentifier: z
+    .string()
+    .trim()
+    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+    .nullish(),
   destinationCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   destinationCompanyOrgId: actorOrgIdSchema.nullish(),
   destinationCompanyName: actorNameSchema.nullish(),
@@ -92,6 +111,17 @@ const inputManagedSchema = z.object({
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   emitterPickupSiteCity: actorCitySchema.nullish(),
   emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
+  tempStorerCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
+  tempStorerCompanyOrgId: actorOrgIdSchema.nullish(),
+  tempStorerCompanyName: actorNameSchema.nullish(),
+  tempStorerCompanyAddress: actorAddressSchema.nullish(),
+  tempStorerCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  tempStorerCompanyCity: actorCitySchema.nullish(),
+  tempStorerCompanyCountryCode: actorCountryCodeSchema.nullish(),
+  isUpcycled: booleanSchema.nullish(),
+  destinationParcelInseeCodes: inseeCodesSchema,
+  destinationParcelNumbers: parcelNumbersSchema,
+  destinationParcelCoordinates: parcelCoordinatesSchema,
   ecoOrganismeSiret: actorSiretSchema.nullish(),
   ecoOrganismeName: actorNameSchema.nullish(),
   isDirectSupply: booleanSchema.nullish(),

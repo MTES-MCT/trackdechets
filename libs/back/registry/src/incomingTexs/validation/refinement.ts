@@ -116,3 +116,20 @@ export const refineReportForProfile: Refinement<
     });
   }
 };
+
+export const requiredParcelsRefinement: Refinement<
+  ParsedZodIncomingTexsItem
+> = async (incomingTexsItem, { addIssue }) => {
+  if (
+    !incomingTexsItem.parcelCoordinates.length &&
+    !incomingTexsItem.parcelNumbers.length &&
+    !incomingTexsItem.parcelInseeCodes.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
+      path: ["parcelCoordinates"]
+    });
+  }
+};

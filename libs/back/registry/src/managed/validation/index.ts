@@ -1,4 +1,4 @@
-import { refineTransportersConsistency } from "../../shared/refinement";
+import { refineOperationCodeWhenUpcycled, refineTransportersConsistency } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
@@ -6,12 +6,14 @@ import {
   refineEmitter,
   refineDestination,
   refineInitialEmitter,
+  refineTempStorer,
   transporter1Refinement,
   transporter2Refinement,
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineNotificationNumber
+  refineNotificationNumber,
+  refineManagedUpcycled
 } from "./refinement";
 import { managedSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
@@ -22,7 +24,10 @@ export function safeParseAsyncManaged(line: unknown) {
     .superRefine(refineInitialEmitter)
     .superRefine(refineEmitter)
     .superRefine(refineDestination)
+    .superRefine(refineTempStorer)
     .superRefine(refineNotificationNumber)
+    .superRefine(refineManagedUpcycled)
+    .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

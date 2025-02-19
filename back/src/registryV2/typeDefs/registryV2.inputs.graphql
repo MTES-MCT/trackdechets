@@ -869,7 +869,7 @@ input IncomingTexsLineInput {
   parcelCoordinates: [String!]
   """
   Identifiant SIS du terrain
-  Identifiant du terrain SIS lorsque les terres et sédiments ou déchets entrants ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
+  Identifiant du terrain SIS lorsque les déchets ou les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
   """
   sisIdentifier: String
   """
@@ -1051,7 +1051,7 @@ input IncomingTexsLineInput {
   nextOperationCode: String
   """
   Terre valorisée
-  Indique si les terres et sédiments ou déchets entrants sont valorisés en remblayage
+  Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
   Si la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination).
   """
@@ -1492,7 +1492,7 @@ input OutgoingTexsLineInput {
   parcelCoordinates: [String!]
   """
   Identifiant SIS du terrain
-  Identifiant du terrain SIS lorsque les terres et sédiments ou déchets sortants ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
+  Identifiant du terrain SIS lorsque les déchets ou les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
   """
   sisIdentifier: String
   """
@@ -1556,7 +1556,7 @@ input OutgoingTexsLineInput {
   operationMode: OperationMode
   """
   Terre valorisée
-  Indique si les terres et sédiments ou déchets entrants sont valorisés en remblayage
+  Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
   Si la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination).
   """
@@ -2677,7 +2677,7 @@ input ManagedLineInput {
 
   Le code déchet mentionné doit faire partie de la liste des codes déchets officielle
   """
-  wasteCode: String!
+  wasteCode: String
   """
   Code déchet Bâle
   Code Bâle du déchet géré
@@ -2700,12 +2700,12 @@ input ManagedLineInput {
   wasteIsDangerous: Boolean
   """
   Date d'acquisition ou de début de gestion
-  Date d'acquisition du déchet par le négociant, ou date de début de gestion du déchet par le courtier
+  Date d'acquisition du déchet ou des terres excavées et sédiments par le négociant, ou date de début de gestion du déchet ou des terres excavées et sédiments par le courtier
   """
   managingStartDate: DateTime!
   """
   Date de cession ou de fin de gestion
-  Date de cession du déchet par le négociant, ou date de fin de gestion du déchet par le courtier
+  Date de cession du déchet ou des terres excavées et sédiments par le négociant, ou date de fin de gestion du déchet ou des terres excavées et sédiments par le courtier 
   """
   managingEndDate: DateTime!
   """
@@ -2730,6 +2730,11 @@ input ManagedLineInput {
   Si au moins un mode de transport est "ROAD" alors le volume du déchet ne peut être supérieur à 40 M3.
   """
   volume: Float
+  """
+  DAP
+  Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP)
+  """
+  wasteDap: String
   """
   Type de producteur initial
   Type d'acteur correspondant au producteur des déchets gérés
@@ -2767,6 +2772,80 @@ input ManagedLineInput {
   Code pays du producteur initial des déchets gérés
   """
   initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  Le ou les codes INSEE de la ou des commune(s) de collecte des déchets entrants
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Commune(s)
+  Libellé de la ou des commune(s) de collecte des déchets entrants
+  """
+  initialEmitterMunicipalitiesNames: [String!]
+  """
+  Codes INSEE des parcelles
+  Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés
+
+  Chaque code INSEE doit faire 5 caractères, si plusieurs codes INSEE sont renseignés, ils doivent être séparés par virgules.
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  """
+  parcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles
+  Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
+
+  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+  Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  """
+  parcelNumbers: [String!]
+  """
+  Coordonnées des parcelles
+  Coordonnées de la ou des parcelles cadastrales du site de production par exemple : 48.894258 2.240027
+
+  Attention à bien séparer par des virgules des coordonnées de parcelles différentes, mais à bien utiliser le point comme séparateur décimal au sein même des coordonnées.
+  Concernant le format de chaque coordonnées :
+  - valeur attendue en degrés
+  - le séparateur de décimales utilisé doit être un point
+  - entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
+  - pour séparer plusieurs coordonnées, une virgule doit être utilisée
+  """
+  parcelCoordinates: [String!]
+  """
+  Identifiant SIS du terrain
+  Identifiant du terrain SIS lorsque les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
+  """
+  sisIdentifier: String
+  """
+  Type d'installation de Tri Transit Regroupement
+
+  Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
+  """
+  tempStorerCompanyType: String!
+  """
+  Numéro d'identification de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyOrgId: String
+  """
+  Raison sociale de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyName: String
+  """
+  Libellé de l'adresse de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyAddress: String
+  """
+  Commune de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyCity: String
+  """
+  Code postal de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyPostalCode: String
+  """
+  Code pays de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyCountryCode: String
   """
   Type de destinataire
 
@@ -2813,6 +2892,44 @@ input ManagedLineInput {
   Pays de l'adresse de dépôt du destinataire
   """
   destinationDropSiteCountryCode: String
+  """
+  Terre valorisée
+  Indique si les terres excavées et sédiments sont valorisés en remblayage.
+
+  Si la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination).
+  """
+  isUpcycled: Boolean
+  """
+  Codes INSEE des parcelles si valorisation
+  Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation, plusieurs numéros peuvent être renseignés
+
+  Chaque code INSEE doit faire 5 caractères, si plusieurs codes INSEE sont renseignés, ils doivent être séparés par virgules.
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  """
+  destinationParcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles si valorisation
+  Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
+
+  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+  Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  """
+  destinationParcelNumbers: [String!]
+  """
+  Coordonnées des parcelles si valorisation
+  Coordonnées de la ou des parcelles cadastrales du site de valorisation, par exemple : 48.894258 2.240027
+
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  Attention à bien séparer par des virgules des coordonnées de parcelles différentes, mais à bien utiliser le point comme séparateur décimal au sein même des coordonnées.
+
+  Concernant le format de chaque coordonnées :
+  - valeur attendue en degrés
+  - le séparateur de décimales utilisé doit être un point
+  - entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
+  - pour séparer plusieurs coordonnées, une virgule doit être utilisée
+  """
+  destinationParcelCoordinates: [String!]
   """
   Numéro de déclaration
   N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.

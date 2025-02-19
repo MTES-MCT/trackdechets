@@ -572,19 +572,6 @@ export const parcelRefinement: Refinement<{
   nextDestinationIsAbroad?: boolean | null;
 }> = (item, { addIssue }) => {
   if (
-    !item.parcelCoordinates.length &&
-    !item.parcelNumbers.length &&
-    !item.parcelInseeCodes.length
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
-      path: ["parcelCoordinates"]
-    });
-  }
-
-  if (
     item.parcelNumbers.length &&
     item.parcelInseeCodes.length &&
     item.parcelNumbers.length !== item.parcelInseeCodes.length

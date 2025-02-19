@@ -19,7 +19,8 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineReportForProfile
+  refineReportForProfile,
+  requiredParcelsRefinement
 } from "./refinement";
 import { incomingTexsSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
@@ -32,6 +33,7 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
+    .superRefine(requiredParcelsRefinement)
     .superRefine(parcelRefinement)
     .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)

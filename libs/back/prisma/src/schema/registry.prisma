@@ -387,7 +387,7 @@ model RegistryOutgoingTexs {
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
@@ -620,69 +620,69 @@ model RegistryTransported {
     createdById String
     createdBy   User   @relation(fields: [createdById], references: [id])
 
-    publicId                               String
-    reportForCompanySiret                  String
-    reportForCompanyName                   String
-    reportForCompanyAddress                String
-    reportForCompanyCity                   String
-    reportForCompanyPostalCode             String
-    reportForTransportMode                 TransportMode
-    reportForTransportIsWaste Boolean
-    reportForRecepisseIsExempted Boolean?
-    reportForRecepisseNumber String?
-    reportForTransportAdr String?
+    publicId                       String
+    reportForCompanySiret          String
+    reportForCompanyName           String
+    reportForCompanyAddress        String
+    reportForCompanyCity           String
+    reportForCompanyPostalCode     String
+    reportForTransportMode         TransportMode
+    reportForTransportIsWaste      Boolean
+    reportForRecepisseIsExempted   Boolean?
+    reportForRecepisseNumber       String?
+    reportForTransportAdr          String?
     reportForTransportOtherTmdCode String?
-    reportForTransportPlates String[]
-    reportAsCompanySiret                   String?
-    wasteDescription String
-    wasteCode String?
-    wasteCodeBale String?
-    wastePop Boolean?
-    wasteIsDangerous Boolean?
-    collectionDate DateTime?      @db.Timestamptz(6)
-    unloadingDate DateTime?      @db.Timestamptz(6)
-    weightValue Float
-    weightIsEstimate Boolean
-    volume Float?
-    emitterCompanyType String
-    emitterCompanyOrgId String?
-    emitterCompanyName String?
-    emitterCompanyAddress String?
-    emitterCompanyPostalCode String?
-    emitterCompanyCity String?
-    emitterCompanyCountryCode String?
-    emitterPickupSiteName String?
-    emitterPickupSiteAddress String?
-    emitterPickupSitePostalCode String?
-    emitterPickupSiteCity String?
-    emitterPickupSiteCountryCode String?
-    destinationCompanyType String
-    destinationCompanyOrgId String?
-    destinationCompanyName String?
-    destinationCompanyAddress String?
-    destinationCompanyPostalCode String?
-    destinationCompanyCity String?
-    destinationCompanyCountryCode String?
-    destinationDropSiteAddress String?
-    destinationDropSitePostalCode String?
-    destinationDropSiteCity String?
+    reportForTransportPlates       String[]
+    reportAsCompanySiret           String?
+    wasteDescription               String
+    wasteCode                      String?
+    wasteCodeBale                  String?
+    wastePop                       Boolean?
+    wasteIsDangerous               Boolean?
+    collectionDate                 DateTime?     @db.Timestamptz(6)
+    unloadingDate                  DateTime?     @db.Timestamptz(6)
+    weightValue                    Float
+    weightIsEstimate               Boolean
+    volume                         Float?
+    emitterCompanyType             String
+    emitterCompanyOrgId            String?
+    emitterCompanyName             String?
+    emitterCompanyAddress          String?
+    emitterCompanyPostalCode       String?
+    emitterCompanyCity             String?
+    emitterCompanyCountryCode      String?
+    emitterPickupSiteName          String?
+    emitterPickupSiteAddress       String?
+    emitterPickupSitePostalCode    String?
+    emitterPickupSiteCity          String?
+    emitterPickupSiteCountryCode   String?
+    destinationCompanyType         String
+    destinationCompanyOrgId        String?
+    destinationCompanyName         String?
+    destinationCompanyAddress      String?
+    destinationCompanyPostalCode   String?
+    destinationCompanyCity         String?
+    destinationCompanyCountryCode  String?
+    destinationDropSiteAddress     String?
+    destinationDropSitePostalCode  String?
+    destinationDropSiteCity        String?
     destinationDropSiteCountryCode String?
-    declarationNumber String?
-    notificationNumber String?
-    movementNumber String?
-    ecoOrganismeSiret String?
-    ecoOrganismeName String?
-    brokerCompanySiret String?
-    brokerCompanyName String?
-    brokerRecepisseNumber String?
-    traderCompanySiret String?
-    traderCompanyName String?
-    traderRecepisseNumber String?
-    
+    declarationNumber              String?
+    notificationNumber             String?
+    movementNumber                 String?
+    ecoOrganismeSiret              String?
+    ecoOrganismeName               String?
+    brokerCompanySiret             String?
+    brokerCompanyName              String?
+    brokerRecepisseNumber          String?
+    traderCompanySiret             String?
+    traderCompanyName              String?
+    traderRecepisseNumber          String?
+
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
-  }
-  
+}
+
 model RegistryManaged {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -701,16 +701,17 @@ model RegistryManaged {
     reportForCompanyCity                   String
     reportForCompanyPostalCode             String
     reportAsCompanySiret                   String?
-    wasteCode                              String
+    wasteCode                              String?
     wasteCodeBale                          String?
     wasteDescription                       String
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    managingStartDate                      DateTime   @db.Timestamptz(6)
-    managingEndDate                        DateTime   @db.Timestamptz(6)
+    managingStartDate                      DateTime       @db.Timestamptz(6)
+    managingEndDate                        DateTime       @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
+    wasteDap                               String?
     initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
@@ -718,6 +719,12 @@ model RegistryManaged {
     initialEmitterCompanyPostalCode        String?
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
+    initialEmitterMunicipalitiesInseeCodes String[]
+    initialEmitterMunicipalitiesNames      String[]
+    parcelInseeCodes                       String[]
+    parcelNumbers                          String[]
+    parcelCoordinates                      String[]
+    sisIdentifier                          String?
     destinationCompanyType                 String
     destinationCompanyOrgId                String?
     destinationCompanyName                 String?
@@ -729,6 +736,17 @@ model RegistryManaged {
     destinationDropSitePostalCode          String?
     destinationDropSiteCity                String?
     destinationDropSiteCountryCode         String?
+    tempStorerCompanyType                  String?
+    tempStorerCompanyOrgId                 String?
+    tempStorerCompanyName                  String?
+    tempStorerCompanyAddress               String?
+    tempStorerCompanyPostalCode            String?
+    tempStorerCompanyCity                  String?
+    tempStorerCompanyCountryCode           String?
+    isUpcycled                             Boolean?
+    destinationParcelInseeCodes            String[]
+    destinationParcelNumbers               String[]
+    destinationParcelCoordinates           String[]
     declarationNumber                      String?
     notificationNumber                     String?
     movementNumber                         String?
@@ -799,7 +817,7 @@ model RegistryManaged {
     transporter5CompanyPostalCode          String?
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
-    
+
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
 }

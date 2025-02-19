@@ -6,10 +6,10 @@ import {
 } from "../../shared/refinement";
 
 export const refineDates: Refinement<ParsedZodManagedItem> = (
-  transportedItem,
+  managedItem,
   { addIssue }
 ) => {
-  if (transportedItem.managingEndDate < transportedItem.managingStartDate) {
+  if (managedItem.managingEndDate < managedItem.managingStartDate) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
@@ -20,19 +20,19 @@ export const refineDates: Refinement<ParsedZodManagedItem> = (
 };
 
 export const refineNotificationNumber: Refinement<ParsedZodManagedItem> = (
-  transportedItem,
+  managedItem,
   { addIssue }
 ) => {
   const isDangerous =
-    transportedItem.wasteIsDangerous ||
-    transportedItem.wastePop ||
-    transportedItem.wasteCode?.includes("*");
+    managedItem.wasteIsDangerous ||
+    managedItem.wastePop ||
+    managedItem.wasteCode?.includes("*");
 
   const isAbroad = ["ENTREPRISE_HORS_UE", "ENTREPRISE_UE"].includes(
-    transportedItem.destinationCompanyType
+    managedItem.destinationCompanyType
   );
 
-  if (!transportedItem.notificationNumber && isDangerous && isAbroad) {
+  if (!managedItem.notificationNumber && isDangerous && isAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
@@ -40,11 +40,29 @@ export const refineNotificationNumber: Refinement<ParsedZodManagedItem> = (
     });
   }
 
-  if (!transportedItem.declarationNumber && !isDangerous && isAbroad) {
+  if (!managedItem.declarationNumber && !isDangerous && isAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
       path: ["declarationNumber"]
+    });
+  }
+};
+
+export const refineManagedUpcycled: Refinement<ParsedZodManagedItem> = (
+  managedItem,
+  { addIssue }
+) => {
+  if (
+    managedItem.isUpcycled &&
+    !managedItem.destinationParcelCoordinates.length &&
+    !managedItem.destinationParcelNumbers.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les numéros de parcelles de destination, soit les coordonnées de parcelles de destination lorsque les terres sont valorisées",
+      path: ["destinationParcelCoordinates"]
     });
   }
 };
@@ -77,6 +95,16 @@ export const refineEmitter = refineActorInfos<ParsedZodManagedItem>({
   postalCodeKey: "emitterCompanyPostalCode",
   cityKey: "emitterCompanyCity",
   countryKey: "emitterCompanyCountryCode"
+});
+
+export const refineTempStorer = refineActorInfos<ParsedZodManagedItem>({
+  typeKey: "tempStorerCompanyType",
+  orgIdKey: "tempStorerCompanyOrgId",
+  nameKey: "tempStorerCompanyName",
+  addressKey: "tempStorerCompanyAddress",
+  postalCodeKey: "tempStorerCompanyPostalCode",
+  cityKey: "tempStorerCompanyCity",
+  countryKey: "tempStorerCompanyCountryCode"
 });
 
 export const transporter1Refinement =
