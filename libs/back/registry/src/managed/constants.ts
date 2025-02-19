@@ -50,12 +50,18 @@ export const MANAGED_HEADERS: {
   emitterPickupSiteCountryCode:
     "Code pays du chantier ou du lieu de collecte de l'expéditeur ou du remettant",
   tempStorerCompanyType: "Type d'installation de Tri Transit Regroupement",
-  tempStorerCompanyOrgId: "Numéro d'identification de l'installation de Tri Transit Regroupement",
-  tempStorerCompanyName: "Raison sociale de l'installation de Tri Transit Regroupement",
-  tempStorerCompanyAddress: "Libellé de l'adresse de l'installation de Tri Transit Regroupement",
-  tempStorerCompanyPostalCode: "Code postal de l'installation de Tri Transit Regroupement",
-  tempStorerCompanyCity: "Commune de l'installation de Tri Transit Regroupement",
-  tempStorerCompanyCountryCode: "Code pays de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyOrgId:
+    "Numéro d'identification de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyName:
+    "Raison sociale de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyAddress:
+    "Libellé de l'adresse de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyPostalCode:
+    "Code postal de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyCity:
+    "Commune de l'installation de Tri Transit Regroupement",
+  tempStorerCompanyCountryCode:
+    "Code pays de l'installation de Tri Transit Regroupement",
   destinationCompanyType: "Type de destinataire",
   destinationCompanyOrgId: "Numéro d'identification du destinataire",
   destinationCompanyName: "Raison sociale du destinataire",

@@ -111,7 +111,7 @@ const inputManagedSchema = z.object({
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   emitterPickupSiteCity: actorCitySchema.nullish(),
   emitterPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
-  tempStorerCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
+  tempStorerCompanyType: actorTypeSchema.exclude(["COMMUNES"]).nullish(),
   tempStorerCompanyOrgId: actorOrgIdSchema.nullish(),
   tempStorerCompanyName: actorNameSchema.nullish(),
   tempStorerCompanyAddress: actorAddressSchema.nullish(),

@@ -172,7 +172,7 @@ describe("Registry - addToManagedRegistry", () => {
       ADD_TO_MANAGED_REGISTRY,
       { variables: { lines } }
     );
-
+    
     expect(data.addToManagedRegistry).toBe(true);
   });
 

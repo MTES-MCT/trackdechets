@@ -2705,7 +2705,7 @@ input ManagedLineInput {
   managingStartDate: DateTime!
   """
   Date de cession ou de fin de gestion
-  Date de cession du déchet ou des terres excavées et sédiments par le négociant, ou date de fin de gestion du déchet ou des terres excavées et sédiments par le courtier 
+  Date de cession du déchet ou des terres excavées et sédiments par le négociant, ou date de fin de gestion du déchet ou des terres excavées et sédiments par le courtier
   """
   managingEndDate: DateTime!
   """
@@ -2821,7 +2821,7 @@ input ManagedLineInput {
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  tempStorerCompanyType: String!
+  tempStorerCompanyType: String
   """
   Numéro d'identification de l'installation de Tri Transit Regroupement
   """
