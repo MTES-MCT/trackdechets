@@ -159,7 +159,7 @@ export default function CompanyInfo() {
                 ) : (
                   <div className="fr-alert fr-alert--error">
                     <h3 className="fr-alert__title">
-                      Cet établissement n'est pas encore inscrite sur
+                      Cet établissement n'est pas encore inscrit sur
                       Trackdéchets
                     </h3>
                     <p>
@@ -240,9 +240,9 @@ export default function CompanyInfo() {
                         Une information vous semble erronée,
                       </span>
                       <a
-                        href="#"
+                        href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                         target="_blank"
-                        rel="noopener external"
+                        rel="noopener noreferrer external"
                         className="fr-notice__link"
                       >
                         faites nous le savoir
@@ -263,14 +263,4 @@ export default function CompanyInfo() {
       </div>
     </div>
   );
-}
-
-{
-  /* 
-          <div className="columns">
-            {!nonDiffusible && <CompanyContact company={company} />}
-            {geoInfo && !nonDiffusible && (
-              <CompanyMap lng={geoInfo.longitude} lat={geoInfo.latitude} />
-            )}
-          </div> */
 }
