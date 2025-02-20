@@ -279,4 +279,33 @@ describe("splitAddress", () => {
     // Then
     expect(splitted).toMatchObject(expected);
   });
+
+  test("[bug - infinite loop] should not jam", () => {
+    // When
+    const splitted = splitAddress(
+      "DWF OFFICES, 5 GEORGE'S DOCK, IFSC, DUBLIN 12",
+      "IE4893017M"
+    );
+
+    // Then
+    expect(splitted).toMatchObject({
+      street: "DWF OFFICES, 5 GEORGE'S DOCK, IFSC, DUBLIN 12",
+      postalCode: "",
+      city: "",
+      country: "IE"
+    });
+  });
+
+  test("dealing with special chars", () => {
+    // When
+    const splitted = splitAddress("4 BOULEVARD PASTEUR\n44100 NANTES");
+
+    // Then
+    expect(splitted).toMatchObject({
+      street: "4 BOULEVARD PASTEUR",
+      postalCode: "44100",
+      city: "NANTES",
+      country: "FR"
+    });
+  });
 });
