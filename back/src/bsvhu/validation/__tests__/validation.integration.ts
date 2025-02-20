@@ -332,6 +332,20 @@ describe("BSVHU validation", () => {
       });
       expect(parsed).toBeDefined();
     });
+
+    test("when destination agrement number is missing", async () => {
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        destinationAgrementNumber: null
+      };
+
+      const parsed = parseBsvhu(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+
+      expect(parsed).toBeDefined();
+    });
   });
 
   describe("BSVHU should not be valid", () => {
@@ -639,26 +653,6 @@ describe("BSVHU validation", () => {
           expect.objectContaining({
             message:
               "La date de validité du récépissé du transporteur est un champ requis. L'établissement doit renseigner son récépissé dans Trackdéchets"
-          })
-        ]);
-      }
-    });
-
-    test("when destination agrement number is missing", async () => {
-      const data: ZodBsvhu = {
-        ...bsvhu,
-        destinationAgrementNumber: null
-      };
-      expect.assertions(1);
-      try {
-        parseBsvhu(data, {
-          ...context,
-          currentSignatureType: "EMISSION"
-        });
-      } catch (err) {
-        expect((err as ZodError).issues).toEqual([
-          expect.objectContaining({
-            message: "Le N° d'agrément du destinataire est un champ requis."
           })
         ]);
       }

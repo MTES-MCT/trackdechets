@@ -763,7 +763,7 @@ describe("Mutation.Vhu.create", () => {
     );
   });
 
-  it("should fail if a required field like the recipient agrement is missing", async () => {
+  it("should succeed if the recipient agrement is missing (field was required before v20250301", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTE_VEHICLES"],
@@ -816,12 +816,66 @@ describe("Mutation.Vhu.create", () => {
       }
     );
 
-    expect(errors[0].message).toBe(
-      "Le N° d'agrément du destinataire est un champ requis."
+    expect(errors).toBeUndefined();
+  });
+
+  it("should fail if a required field like the recipient plannedOperationCode is missing", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"],
+      wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+    });
+
+    const input = {
+      emitter: {
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Un centre VHU",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        },
+        agrementNumber: "1234"
+      },
+      wasteCode: "16 01 06",
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: "NUMERO_ORDRE_REGISTRE_POLICE"
+      },
+      quantity: 2,
+      weight: {
+        isEstimate: false,
+        value: 1.3
+      },
+      destination: {
+        type: "BROYEUR",
+        // plannedOperationCode missing,
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsvhu">>(
+      CREATE_VHU_FORM,
+      {
+        variables: {
+          input
+        }
+      }
     );
+
+    expect(errors[0].message).toBe("L'opération prévue est un champ requis.");
     expect(errors[0].extensions!.issues![0].path).toStrictEqual([
       "destination",
-      "agrementNumber"
+      "plannedOperationCode"
     ]);
   });
 
