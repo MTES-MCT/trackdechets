@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import "./CompanyMap.scss";
 
 type Props = {
   lng: number;
@@ -47,7 +46,7 @@ export default class CompanyMap extends React.Component<Props> {
 
   render() {
     if (this.mapboxglSupported()) {
-      return <div id="map"></div>;
+      return <div id="map" style={{ height: "300px" }}></div>;
     } else {
       return (
         <div className="box" style={{ flex: 1 }}>
