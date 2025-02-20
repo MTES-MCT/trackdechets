@@ -1,12 +1,5 @@
 import { prisma } from "@td/prisma";
-
-type ImportStats = {
-  errors: number;
-  insertions: number;
-  edits: number;
-  cancellations: number;
-  skipped: number;
-};
+import type { RegistryChanges } from "./changeAggregates";
 
 export async function startImport(importId: string) {
   const registryImport = await prisma.registryImport.update({
@@ -23,8 +16,8 @@ export async function endImport({
   sirets
 }: {
   importId: string;
-  stats: ImportStats;
   sirets: { for: string; as: string }[];
+  stats: RegistryChanges;
 }) {
   const status = getStatus(stats);
 
@@ -56,7 +49,7 @@ export function updateImportStats({
   stats
 }: {
   importId: string;
-  stats: ImportStats;
+  stats: RegistryChanges;
 }) {
   return prisma.registryImport.update({
     where: { id: importId },
@@ -70,7 +63,7 @@ export function updateImportStats({
   });
 }
 
-function getStatus(stats: ImportStats) {
+function getStatus(stats: RegistryChanges) {
   if (
     stats.cancellations + stats.edits + stats.insertions + stats.skipped ===
     0
