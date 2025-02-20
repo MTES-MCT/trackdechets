@@ -13,7 +13,11 @@ import {
   CANCELLABLE_BSDA_STATUSES,
   NON_CANCELLABLE_BSDA_STATUSES
 } from "../createRevisionRequest";
-import { BsdaStatus } from "@prisma/client";
+import {
+  BsdaRevisionRequestApproval,
+  BsdaStatus,
+  BsdaType
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
 
 const CREATE_BSDA_REVISION_REQUEST = `
@@ -1042,5 +1046,485 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       where: { id: data.createBsdaRevisionRequest.id }
     });
     expect(revision.initialDestinationCap).toBe("EXUTOIRE-CAP");
+  });
+
+  describe("tra-15364: si révision sur wasteSealNumbers ou packagings, approbations du worker et de la destination requises uniquement", () => {
+    const sortApprovals = (approvers: BsdaRevisionRequestApproval[]) =>
+      approvers.sort((a, b) => a.approverSiret.localeCompare(b.approverSiret));
+
+    const expectApprovalsAreEqual = (
+      expectedApprovals: BsdaRevisionRequestApproval[],
+      actualApprovals: BsdaRevisionRequestApproval[]
+    ) => {
+      expect(actualApprovals).toHaveLength(expectedApprovals.length);
+      expect(sortApprovals(actualApprovals)).toMatchObject(
+        sortApprovals(expectedApprovals)
+      );
+    };
+
+    const createCompaniesAndBsda = async opt => {
+      const { company: emitterCompany, user: emitter } =
+        await userWithCompanyFactory("ADMIN");
+      const { company: workerCompany, user: worker } =
+        await userWithCompanyFactory("ADMIN");
+      const { company: destinationCompany, user: destination } =
+        await userWithCompanyFactory("ADMIN");
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitterCompany.siret,
+          status: "SENT",
+          type: "OTHER_COLLECTIONS",
+          workerCompanySiret: workerCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          ...opt
+        }
+      });
+
+      return {
+        bsda,
+        emitter,
+        worker,
+        destination,
+        emitterCompany,
+        workerCompany,
+        destinationCompany
+      };
+    };
+
+    const createRevisionRequest = async (
+      bsdaId,
+      user,
+      authoringCompanySiret,
+      content
+    ) => {
+      const { mutate } = makeClient(user);
+      return await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId,
+            content,
+            comment: "A comment",
+            authoringCompanySiret
+          }
+        }
+      });
+    };
+
+    const getRevision = async id => {
+      return await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+        where: { id },
+        include: { approvals: true }
+      });
+    };
+
+    it("worker creating revision on wasteSealNumbers > only destination approval is required", async () => {
+      // Given
+      const { bsda, worker, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        worker,
+        workerCompany.siret,
+        { waste: { sealNumbers: ["SEAL-3"] } }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("destination creating revision on wasteSealNumbers > only worker approval is required", async () => {
+      // Given
+      const { bsda, destination, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        destination,
+        destinationCompany.siret,
+        { waste: { sealNumbers: ["SEAL-3"] } }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(destinationCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("emitter creating revision on wasteSealNumbers > worker & destination approvals are required", async () => {
+      // Given
+      const {
+        bsda,
+        emitter,
+        emitterCompany,
+        workerCompany,
+        destinationCompany
+      } = await createCompaniesAndBsda({
+        wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+      });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        emitter,
+        emitterCompany.siret,
+        { waste: { sealNumbers: ["SEAL-3"] } }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(emitterCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" },
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("worker creating revision on packagings > only destination approval is required", async () => {
+      // Given
+      const { bsda, worker, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        worker,
+        workerCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }]
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("destination creating revision on packagings > only worker approval is required", async () => {
+      // Given
+      const { bsda, destination, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        destination,
+        destinationCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }]
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.authoringCompanyId).toBe(destinationCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("emitter creating revision on packagings > worker & destination approvals are required", async () => {
+      // Given
+      const {
+        bsda,
+        emitter,
+        emitterCompany,
+        workerCompany,
+        destinationCompany
+      } = await createCompaniesAndBsda({
+        packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }]
+      });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        emitter,
+        emitterCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }]
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.authoringCompanyId).toBe(emitterCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" },
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("worker creating revision on packagings & wasteSealNumbers > only destination approval is required", async () => {
+      // Given
+      const { bsda, worker, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        worker,
+        workerCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }],
+          waste: { sealNumbers: ["SEAL-3"] }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("destination creating revision on packagings & wasteSealNumbers > only worker approval is required", async () => {
+      // Given
+      const { bsda, destination, workerCompany, destinationCompany } =
+        await createCompaniesAndBsda({
+          packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        destination,
+        destinationCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }],
+          waste: { sealNumbers: ["SEAL-3"] }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(destinationCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("emitter creating revision on packagings & wasteSealNumbers > worker & destination approvals are required", async () => {
+      // Given
+      const {
+        bsda,
+        emitter,
+        emitterCompany,
+        workerCompany,
+        destinationCompany
+      } = await createCompaniesAndBsda({
+        packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+        wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+      });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        emitter,
+        emitterCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }],
+          waste: { sealNumbers: ["SEAL-3"] }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.authoringCompanyId).toBe(emitterCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: workerCompany.siret, status: "PENDING" },
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("worker creating revision on packagings & wasteSealNumbers AND other field > emitter & destination approvals are required", async () => {
+      // Given
+      const {
+        bsda,
+        emitterCompany,
+        worker,
+        workerCompany,
+        destinationCompany
+      } = await createCompaniesAndBsda({
+        packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+        wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+        wasteMaterialName: "Matière 1"
+      });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        worker,
+        workerCompany.siret,
+        {
+          packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }],
+          waste: { sealNumbers: ["SEAL-3"], materialName: "Matière 2" }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.packagings).toMatchObject([
+        { type: "PALETTE_FILME", other: "", quantity: 1 }
+      ]);
+      expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+      expect(revision.wasteMaterialName).toBe("Matière 2");
+      expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: emitterCompany.siret, status: "PENDING" },
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it.each([
+      BsdaType.COLLECTION_2710,
+      BsdaType.RESHIPMENT,
+      BsdaType.GATHERING
+    ])(
+      "worker creating revision on packagings & wasteSealNumbers but BSDA type is %p > emitter & destination approvals are required",
+      async type => {
+        // Given
+        const {
+          bsda,
+          emitterCompany,
+          worker,
+          workerCompany,
+          destinationCompany
+        } = await createCompaniesAndBsda({
+          packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+          type
+        });
+
+        // When
+        const { data, errors } = await createRevisionRequest(
+          bsda.id,
+          worker,
+          workerCompany.siret,
+          {
+            packagings: [{ type: "PALETTE_FILME", other: "", quantity: 1 }],
+            waste: { sealNumbers: ["SEAL-3"] }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revision = await getRevision(data.createBsdaRevisionRequest.id);
+        expect(revision.packagings).toMatchObject([
+          { type: "PALETTE_FILME", other: "", quantity: 1 }
+        ]);
+        expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
+        expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+        const expectedApprovals = [
+          { approverSiret: emitterCompany.siret, status: "PENDING" },
+          { approverSiret: destinationCompany.siret, status: "PENDING" }
+        ] as BsdaRevisionRequestApproval[];
+
+        expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+      }
+    );
   });
 });
