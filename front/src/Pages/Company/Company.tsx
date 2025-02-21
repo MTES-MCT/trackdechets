@@ -165,7 +165,10 @@ export default function CompanyInfo() {
                     <p>
                       Il s'agit de votre établissement ? Mettez à jour vos
                       informations en{" "}
-                      <a className="fr-link" href={routes.signup.index}>
+                      <a
+                        className="fr-link force-underline-link"
+                        href={routes.signup.index}
+                      >
                         vous inscrivant
                       </a>
                       .
@@ -222,7 +225,7 @@ export default function CompanyInfo() {
                                 href={agreement}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="fr-link"
+                                className="fr-link force-underline-link force-external-link-content"
                               >
                                 {agreement}
                               </a>
@@ -237,15 +240,16 @@ export default function CompanyInfo() {
                   <div className="fr-container">
                     <p>
                       <span className="fr-notice__title">
-                        Une information vous semble erronée,
+                        Une information vous semble erronée ? Faites-le nous
+                        savoir via
                       </span>
                       <a
                         href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                         target="_blank"
                         rel="noopener noreferrer external"
-                        className="fr-notice__link"
+                        className="fr-notice__link force-external-link-content force-underline-link"
                       >
-                        faites nous le savoir
+                        le formulaire d'assistance Trackdéchets
                       </a>
                       .
                     </p>

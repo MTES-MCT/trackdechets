@@ -77,3 +77,15 @@ address {
   white-space: nowrap !important;
   border: 0 !important;
 }
+
+// Cette classe permet de forcer l'affichage du lien externe. L'utilisation de raw-link pour raison de compatibilités avec Tailwind rentrant en conflit avec le DSFR
+.force-external-link-content {
+  &::after {
+    content: "" !important;
+  }
+}
+
+// Cette classe permet de forcer le sous-lignage des liens. L'utilisation de raw-link pour raison de compatibilités avec Tailwind rentrant en conflit avec le DSFR
+.force-underline-link {
+  --underline-img: linear-gradient(0deg, currentColor, currentColor) !important;
+}
