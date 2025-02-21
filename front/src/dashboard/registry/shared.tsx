@@ -47,10 +47,12 @@ export const GET_REGISTRY_IMPORTS = gql`
 
 export const TYPES: { [key in RegistryImportType]: string } = {
   SSD: "SSD",
-  INCOMING_WASTE: "D(N)D entrants",
-  OUTGOING_WASTE: "D(N)D sortants",
+  INCOMING_WASTE: "D et ND entrants",
+  OUTGOING_WASTE: "D et ND sortants",
   INCOMING_TEXS: "TEXS entrants",
-  OUTGOING_TEXS: "TEXS sortants"
+  OUTGOING_TEXS: "TEXS sortants",
+  TRANSPORTED: "Transportés",
+  MANAGED: "Gérés"
 };
 
 export const badges = {

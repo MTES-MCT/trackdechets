@@ -5,6 +5,7 @@ import {
   refineMunicipalities,
   refineNotificationNumber,
   refineOperationMode,
+  refineTransportersConsistency,
   refineWeightAndVolume,
   refineWeightIsEstimate
 } from "../../shared/refinement";
@@ -43,6 +44,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(transporter3Refinement)
     .superRefine(transporter4Refinement)
     .superRefine(transporter5Refinement)
+    .superRefine(refineTransportersConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .safeParseAsync(line, { errorMap: registryErrorMap });

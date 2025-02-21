@@ -96,7 +96,6 @@ const inputIncomingWasteSchema = z.object({
   emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   emitterCompanyCity: actorCitySchema.nullish(),
   emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterNoTraceability: booleanSchema.nullish(),
   emitterPickupSiteName: z
     .string()
     .trim()

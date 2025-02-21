@@ -49,11 +49,12 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
       cancelledBy: null,
       startDate: { lte: new Date() },
       OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-    }
+    },
+    include: { delegator: { select: { orgId: true } } }
   });
   const delegateToDelegatorsMap = givenDelegations.reduce((map, delegation) => {
     const currentValue = map.get(delegation.delegateId) ?? [];
-    currentValue.push(delegation.delegatorId);
+    currentValue.push(delegation.delegator.orgId);
 
     map.set(delegation.delegateId, currentValue);
     return map;

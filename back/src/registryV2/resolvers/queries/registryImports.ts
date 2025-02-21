@@ -24,15 +24,41 @@ export async function registryImports(
   }
 
   if (siret) {
+    const filteredOnCompany = await prisma.company.findUnique({
+      where: { siret }
+    });
+
+    if (!filteredOnCompany) {
+      throw new UserInputError("Impossible de filtrer sur ce SIRET");
+    }
+
     const userCompanies = await getUserCompanies(user.id);
     const canReportForSirets = userCompanies.map(c => c.orgId);
     const isOwnReport = canReportForSirets.includes(siret);
 
-    const siretsThatHaveDelegationOnTarget: string[] = []; // TODO delegations where target siret = input
+    const delegations = await prisma.registryDelegation.findMany({
+      where: {
+        delegatorId: filteredOnCompany.id,
+        revokedBy: null,
+        cancelledBy: null,
+        startDate: { lte: new Date() },
+        OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+      },
+      include: { delegate: { select: { orgId: true } } }
+    });
+
+    const siretsThatHaveDelegationOnTarget = delegations.map(
+      delegation => delegation.delegate.orgId
+    );
+
+    const siretsThatCanAccessRegistry = [
+      siret,
+      ...siretsThatHaveDelegationOnTarget
+    ];
 
     await checkUserPermissions(
       user,
-      [siret, ...siretsThatHaveDelegationOnTarget],
+      siretsThatCanAccessRegistry,
       Permission.RegistryCanRead,
       `Vous n'êtes pas autorisé à lire les données de ce registre`
     );
@@ -41,7 +67,7 @@ export async function registryImports(
       some: {
         reportedFor: siret,
         ...(!isOwnReport && {
-          reportedAs: { in: siretsThatHaveDelegationOnTarget }
+          reportedAs: { in: siretsThatCanAccessRegistry }
         })
       }
     };

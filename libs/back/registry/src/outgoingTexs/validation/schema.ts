@@ -65,7 +65,7 @@ const inputOutgoingTexsSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
   initialEmitterCompanyAddress: actorAddressSchema.nullish(),
