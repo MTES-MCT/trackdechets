@@ -8,7 +8,7 @@ import {
 import { PROCESSING_AND_REUSE_OPERATIONS } from "@td/constants";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { removeEmptyKeys } from "../../../../../../common/helper";
+import { isDefined, removeEmptyKeys } from "../../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsddReviewsQuery";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
@@ -116,6 +116,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const areModificationsDisabled = formValues.isCanceled;
 
   const wasteDetailsCodeInput = register("wasteDetails.code");
+
+  const hasBeenProcessed = isDefined(bsdd.processedAt);
 
   return (
     <div className={styles.container}>
@@ -300,62 +302,67 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   </RhfReviewableField>
                 ) : null}
 
-                <RhfReviewableField
-                  title="Code de l'opération D/R"
-                  path="processingOperationDone"
-                  value={bsdd.processingOperationDone}
-                  defaultValue={initialBsddReview.processingOperationDone}
-                >
-                  <div className={styles.processingOperationTextQuote}>
-                    <p>
-                      Vous hésitez sur le type d'opération à choisir ? Vous
-                      pouvez consulter la liste de traitement des déchets sur{" "}
-                      <a
-                        href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174/"
-                        target="_blank"
-                        className="link"
-                        rel="noopener noreferrer"
+                {hasBeenProcessed && (
+                  <>
+                    <RhfReviewableField
+                      title="Code de l'opération D/R"
+                      path="processingOperationDone"
+                      value={bsdd.processingOperationDone}
+                      defaultValue={initialBsddReview.processingOperationDone}
+                    >
+                      <div className={styles.processingOperationTextQuote}>
+                        <p>
+                          Vous hésitez sur le type d'opération à choisir ? Vous
+                          pouvez consulter la liste de traitement des déchets
+                          sur{" "}
+                          <a
+                            href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174/"
+                            target="_blank"
+                            className="link"
+                            rel="noopener noreferrer"
+                          >
+                            le site legifrance.
+                          </a>
+                        </p>
+                      </div>
+                      <Select
+                        label="Code de l'opération"
+                        className="fr-col-8"
+                        nativeSelectProps={{
+                          ...register("processingOperationDone")
+                        }}
                       >
-                        le site legifrance.
-                      </a>
-                    </p>
-                  </div>
-                  <Select
-                    label="Code de l'opération"
-                    className="fr-col-8"
-                    nativeSelectProps={{
-                      ...register("processingOperationDone")
-                    }}
-                  >
-                    <option value="">Choisissez...</option>
-                    {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
-                      <option key={operation.code} value={operation.code}>
-                        {operation.code} - {operation.description}
-                      </option>
-                    ))}
-                  </Select>
-                  <RhfOperationModeSelect
-                    operationCode={formValues?.processingOperationDone}
-                    path={"destinationOperationMode"}
-                  />
-                </RhfReviewableField>
+                        <option value="">Choisissez...</option>
+                        {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                          <option key={operation.code} value={operation.code}>
+                            {operation.code} - {operation.description}
+                          </option>
+                        ))}
+                      </Select>
+                      <RhfOperationModeSelect
+                        operationCode={formValues?.processingOperationDone}
+                        path={"destinationOperationMode"}
+                      />
+                    </RhfReviewableField>
 
-                <RhfReviewableField
-                  title="Description de l'opération D/R"
-                  path="processingOperationDescription"
-                  value={bsdd.processingOperationDescription}
-                  defaultValue={
-                    initialBsddReview.processingOperationDescription
-                  }
-                >
-                  <Input
-                    label="Description de l'opération D/R"
-                    nativeInputProps={{
-                      ...register("processingOperationDescription")
-                    }}
-                    className="fr-col-8"
-                  />
-                </RhfReviewableField>
+                    <RhfReviewableField
+                      title="Description de l'opération D/R"
+                      path="processingOperationDescription"
+                      value={bsdd.processingOperationDescription}
+                      defaultValue={
+                        initialBsddReview.processingOperationDescription
+                      }
+                    >
+                      <Input
+                        label="Description de l'opération D/R"
+                        nativeInputProps={{
+                          ...register("processingOperationDescription")
+                        }}
+                        className="fr-col-8"
+                      />
+                    </RhfReviewableField>
+                  </>
+                )}
 
                 <RhfReviewableField
                   title={isTempStorage ? "CAP destination finale" : "CAP"}
