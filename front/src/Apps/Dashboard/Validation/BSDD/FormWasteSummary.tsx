@@ -127,10 +127,10 @@ export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
         </DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>
-        <DsfrDataListTerm>Poids estimé / réel</DsfrDataListTerm>
-        <DsfrDataListDescription>
-          {`${quantity}t${isEstimated ? " (estimé)" : ""}`}
-        </DsfrDataListDescription>
+        <DsfrDataListTerm>
+          {isEstimated ? "Poids estimé" : "Poids réel"}
+        </DsfrDataListTerm>
+        <DsfrDataListDescription>{`${quantity}t`}</DsfrDataListDescription>
       </DsfrDataListItem>
     </DsfrDataList>
   );
