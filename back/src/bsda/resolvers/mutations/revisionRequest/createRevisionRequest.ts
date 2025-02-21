@@ -160,7 +160,7 @@ async function checkIfUserCanRequestRevisionOnBsda(
   }
 }
 
-const isOnlyAboutFields = (
+export const isOnlyAboutFields = (
   revisionRequestContent: RevisionRequestContent,
   fields: string[]
 ) => {

@@ -3,6 +3,7 @@ import {
   BsdaRevisionRequest,
   BsdaRevisionRequestApproval,
   BsdaStatus,
+  BsdaType,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
 } from "@prisma/client";
@@ -14,11 +15,22 @@ import {
   RepositoryTransaction
 } from "../../../common/repository/types";
 import { PARTIAL_OPERATIONS } from "../../validation/constants";
-import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
+import {
+  isOnlyAboutFields,
+  NON_CANCELLABLE_BSDA_STATUSES
+} from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
 import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
+import {
+  bsdaWasteSealNumbersOrPackagingsRevision,
+  MessageVersion,
+  renderMail
+} from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
+import { PACKAGINGS_NAMES } from "../../pdf/components/BsdaPdf";
+import { isDefined } from "../../../common/helpers";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -260,7 +272,8 @@ export async function approveAndApplyRevisionRequest(
 
   const updatedRevisionRequest = await prisma.bsdaRevisionRequest.update({
     where: { id: revisionRequestId },
-    data: { status: RevisionRequestStatus.ACCEPTED }
+    data: { status: RevisionRequestStatus.ACCEPTED },
+    include: { approvals: true }
   });
 
   const bsdaBeforeRevision = await prisma.bsda.findUniqueOrThrow({
@@ -328,6 +341,108 @@ export async function approveAndApplyRevisionRequest(
         groupedInId: null
       }
     });
+  }
+
+  // Si la révision s'est jouée entre l'entreprise de travaux et la destination,
+  // pour les champs wasteSealNumbers et wasteMaterialName, on prévient
+  // l'émetteur par mail
+  if (
+    updatedBsda.type === BsdaType.OTHER_COLLECTIONS &&
+    isOnlyAboutFields(updateData, [
+      "status", // le status peut se glisser dans l'update, attention
+      "wasteSealNumbers",
+      "packagings"
+    ]) &&
+    !updatedRevisionRequest.approvals.some(
+      approval => approval.approverSiret === updatedBsda.emitterCompanySiret
+    )
+  ) {
+    // Send mail
+    const emitterCompany = await prisma.company.findFirstOrThrow({
+      where: {
+        orgId: updatedBsda.emitterCompanySiret ?? ""
+      },
+      select: {
+        id: true,
+        orgId: true
+      }
+    });
+
+    const companyAssociations = await prisma.companyAssociation.findMany({
+      where: {
+        companyId: emitterCompany.id,
+        notificationIsActiveBsdaFinalDestinationUpdate: true
+      },
+      include: {
+        user: true
+      }
+    });
+
+    if (companyAssociations?.length) {
+      const messageVersion: MessageVersion = {
+        to: companyAssociations
+          .filter(association => association.companyId === emitterCompany?.id)
+          .map(association => ({
+            name: association.user.name,
+            email: association.user.email
+          }))
+      };
+
+      const worker = {
+        name: updatedBsda.workerCompanyName,
+        siret: updatedBsda.workerCompanySiret
+      };
+      const destination = {
+        name: updatedBsda.destinationCompanyName,
+        siret: updatedBsda.destinationCompanySiret
+      };
+
+      const approverSiret = updatedRevisionRequest.approvals.find(
+        approval => approval.approverSiret
+      )?.approverSiret;
+      const approver = worker.siret === approverSiret ? worker : destination;
+      const author = worker.siret === approver.siret ? destination : worker;
+
+      const packagingsToString = packagings =>
+        packagings
+          ?.map(
+            p => `${p.quantity} x ${PACKAGINGS_NAMES[p.type]}${p.other ?? ""}`
+          )
+          ?.join(", ");
+
+      let wasteSealNumbersBeforeRevision, wasteSealNumbersAfterRevision;
+      if (updatedRevisionRequest.wasteSealNumbers?.length !== 0) {
+        wasteSealNumbersBeforeRevision =
+          bsdaBeforeRevision.wasteSealNumbers?.join(", ");
+        wasteSealNumbersAfterRevision =
+          updatedBsda.wasteSealNumbers?.join(", ");
+      }
+
+      let packagingsBeforeRevision, packagingsAfterRevision;
+      if (isDefined(updatedRevisionRequest.packagings)) {
+        packagingsBeforeRevision = packagingsToString(
+          bsdaBeforeRevision.packagings
+        );
+        packagingsAfterRevision = packagingsToString(updatedBsda.packagings);
+      }
+
+      const payload = renderMail(bsdaWasteSealNumbersOrPackagingsRevision, {
+        variables: {
+          bsdaId: updatedBsda.id,
+          author,
+          approver,
+          worker,
+          destination,
+          wasteSealNumbersBeforeRevision,
+          wasteSealNumbersAfterRevision,
+          packagingsBeforeRevision,
+          packagingsAfterRevision
+        },
+        messageVersions: [messageVersion]
+      });
+
+      await sendMail(payload);
+    }
   }
 
   prisma.addAfterCommitCallback?.(() =>

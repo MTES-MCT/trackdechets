@@ -1072,9 +1072,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
 
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: emitterCompany.siret,
           status: "SENT",
           type: "OTHER_COLLECTIONS",
+          emitterCompanySiret: emitterCompany.siret,
           workerCompanySiret: workerCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
           ...opt
