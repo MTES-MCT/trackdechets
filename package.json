@@ -41,7 +41,7 @@
     "@aws-sdk/s3-request-presigner": "3.677.0",
     "@bull-board/api": "^4.12.2",
     "@bull-board/express": "^4.12.2",
-    "@codegouvfr/react-dsfr": "^1.14.5",
+    "@codegouvfr/react-dsfr": "^1.20.0",
     "@docusaurus/core": "^3.7.0",
     "@docusaurus/preset-classic": "^3.7.0",
     "@elastic/elasticsearch": "7.13",
