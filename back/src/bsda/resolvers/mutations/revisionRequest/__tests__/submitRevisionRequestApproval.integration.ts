@@ -1501,5 +1501,67 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     });
+
+    it("emitter creates revision on wasteSealNumbers > mail should NOT be sent", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { name: "Emitter Inc." },
+        { email: "emitter@mail.com", name: "Emetteur" }
+      );
+      const { user: worker, company: workerCompany } =
+        await userWithCompanyFactory("ADMIN", {
+          name: "Worker Inc."
+        });
+      const { user: destination, company: destinationCompany } =
+        await userWithCompanyFactory("ADMIN", { name: "Destination Inc." });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          type: "OTHER_COLLECTIONS",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          workerCompanySiret: workerCompany.siret,
+          workerCompanyName: workerCompany.name,
+          destinationCompanySiret: destinationCompany.siret,
+          destinationCompanyName: destinationCompany.name,
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: emitterCompany.id,
+          approvals: {
+            createMany: {
+              data: [
+                { approverSiret: workerCompany.siret! },
+                { approverSiret: destinationCompany.siret! }
+              ]
+            }
+          },
+          comment: "It's reviewin' time!",
+          wasteSealNumbers: ["SEAL-3"]
+        }
+      });
+
+      // When
+      const { errors: destinationErrors } = await approveRevision(
+        destination,
+        revisionRequest.id
+      );
+      const { errors: workerErrors } = await approveRevision(
+        worker,
+        revisionRequest.id
+      );
+
+      // Then
+      expect(destinationErrors).toBeUndefined();
+      expect(workerErrors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
   });
 });

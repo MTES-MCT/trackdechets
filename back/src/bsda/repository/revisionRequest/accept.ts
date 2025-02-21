@@ -23,14 +23,14 @@ import { ForbiddenError } from "../../../common/errors";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
+import { sendMail } from "../../../mailer/mailing";
+import { PACKAGINGS_NAMES } from "../../pdf/components/BsdaPdf";
+import { isDefined } from "../../../common/helpers";
 import {
   bsdaWasteSealNumbersOrPackagingsRevision,
   MessageVersion,
   renderMail
 } from "@td/mail";
-import { sendMail } from "../../../mailer/mailing";
-import { PACKAGINGS_NAMES } from "../../pdf/components/BsdaPdf";
-import { isDefined } from "../../../common/helpers";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -343,6 +343,16 @@ export async function approveAndApplyRevisionRequest(
     });
   }
 
+  let emitterCompanyId;
+  if (bsdaBeforeRevision.emitterCompanySiret) {
+    const emitterCompany = await prisma.company.findFirstOrThrow({
+      where: { orgId: bsdaBeforeRevision.emitterCompanySiret },
+      select: { id: true }
+    });
+
+    emitterCompanyId = emitterCompany.id;
+  }
+
   // Si la révision s'est jouée entre l'entreprise de travaux et la destination,
   // pour les champs wasteSealNumbers et wasteMaterialName, on prévient
   // l'émetteur par mail
@@ -353,9 +363,7 @@ export async function approveAndApplyRevisionRequest(
       "wasteSealNumbers",
       "packagings"
     ]) &&
-    !updatedRevisionRequest.approvals.some(
-      approval => approval.approverSiret === updatedBsda.emitterCompanySiret
-    )
+    updatedRevisionRequest.authoringCompanyId !== emitterCompanyId
   ) {
     // Send mail
     const emitterCompany = await prisma.company.findFirstOrThrow({

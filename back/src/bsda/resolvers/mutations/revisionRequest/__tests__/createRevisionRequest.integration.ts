@@ -1106,7 +1106,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         variables: {
           input: {
             bsdaId,
-            content,
+            content: { isCanceled: false, ...content },
             comment: "A comment",
             authoringCompanySiret
           }

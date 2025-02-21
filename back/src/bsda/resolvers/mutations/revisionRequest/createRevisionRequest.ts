@@ -186,7 +186,8 @@ async function getApproversSirets(
     bsda.type === BsdaType.OTHER_COLLECTIONS &&
     isOnlyAboutFields(revisionRequestContent, [
       "wasteSealNumbers",
-      "packagings"
+      "packagings",
+      "isCanceled" // isCanceled est envoyé systématiquement par le front
     ]) &&
     (authoringCompanySiret === bsda.workerCompanySiret ||
       authoringCompanySiret === bsda.destinationCompanySiret)
