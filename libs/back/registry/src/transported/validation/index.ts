@@ -1,6 +1,11 @@
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
-import { refineDates, refineEmitter, refineDestination } from "./refinement";
+import {
+  refineDates,
+  refineEmitter,
+  refineDestination,
+  refineVolumeAndWeightIfWaste
+} from "./refinement";
 import { transportedSchema } from "./schema";
 import {
   transformAndRefineReason,
@@ -12,6 +17,7 @@ export function safeParseAsyncTransported(line: unknown) {
     .superRefine(refineDates)
     .superRefine(refineEmitter)
     .superRefine(refineDestination)
+    .superRefine(refineVolumeAndWeightIfWaste)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .transform(transformReportForRecepisseNumber)

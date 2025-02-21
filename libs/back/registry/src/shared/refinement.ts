@@ -323,7 +323,6 @@ export const refineWeightAndVolume: Refinement<{
   weightValue: number;
   volume?: number | null | undefined;
   weightIsEstimate: boolean;
-  operationCode: string;
 }> = (item, { addIssue }) => {
   const isUsingRoad = [
     item.transporter1TransportMode,
