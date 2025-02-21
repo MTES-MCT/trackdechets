@@ -17,7 +17,7 @@ import {
 import Transporter from "../../../common/pdf/components/Transporter";
 import { pluralize } from "@td/constants";
 
-const PACKAGINGS_NAMES = {
+export const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
   DEPOT_BAG: "Dépôt-bag",
   PALETTE_FILME: "Palette filmée",
