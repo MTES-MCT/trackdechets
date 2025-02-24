@@ -1297,7 +1297,6 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(errors).toBeUndefined();
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      console.log("body", (sendMail as jest.Mock).mock.calls[0][0]);
       const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
         .mock.calls[0][0];
 

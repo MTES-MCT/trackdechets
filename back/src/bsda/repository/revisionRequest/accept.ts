@@ -358,6 +358,9 @@ export async function approveAndApplyRevisionRequest(
   // l'émetteur par mail
   if (
     updatedBsda.type === BsdaType.OTHER_COLLECTIONS &&
+    isDefined(updatedBsda.emitterCompanySiret) &&
+    isDefined(updatedBsda.workerCompanySiret) &&
+    isDefined(updatedBsda.destinationCompanySiret) &&
     !updatedRevisionRequest.isCanceled &&
     isOnlyAboutFields(updateData, [
       "status", // le status peut se glisser dans l'update, attention
@@ -404,13 +407,13 @@ export async function approveAndApplyRevisionRequest(
     });
 
     const emitterCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === emitterCompany.id
+      association => association.companyId === emitterCompany?.id
     );
     const workerCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === workerCompany.id
+      association => association.companyId === workerCompany?.id
     );
     const destinationCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === destinationCompany.id
+      association => association.companyId === destinationCompany?.id
     );
 
     if (emitterCompanyAssociations?.length) {
