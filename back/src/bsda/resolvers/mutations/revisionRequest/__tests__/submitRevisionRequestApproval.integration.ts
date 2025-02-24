@@ -1471,6 +1471,20 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
     });
 
+    it("canceling BSDA > mail should NOT be sent to emitter", async () => {
+      // Given
+      const { revisionRequest, destination } =
+        await createBsdaRevisionAndApprove({}, { isCanceled: true });
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
+
     it("admin is not subscribed to email alerts > mail should NOT be sent", async () => {
       // Given
       const { emitter, revisionRequest, destination } =

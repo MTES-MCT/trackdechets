@@ -184,6 +184,7 @@ async function getApproversSirets(
   // l'approbation de l'émetteur n'est pas nécessaire
   if (
     bsda.type === BsdaType.OTHER_COLLECTIONS &&
+    !revisionRequestContent.isCanceled &&
     isOnlyAboutFields(revisionRequestContent, [
       "wasteSealNumbers",
       "packagings",

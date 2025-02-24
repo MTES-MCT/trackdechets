@@ -19,6 +19,7 @@ import {
   BsdaType
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
+import { isCancel } from "axios";
 
 const CREATE_BSDA_REVISION_REQUEST = `
   mutation CreateBsdaRevisionRequest($input: CreateBsdaRevisionRequestInput!) {
@@ -1467,6 +1468,45 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       ]);
       expect(revision.wasteSealNumbers).toMatchObject(["SEAL-3"]);
       expect(revision.wasteMaterialName).toBe("Matière 2");
+      expect(revision.authoringCompanyId).toBe(workerCompany.id);
+
+      const expectedApprovals = [
+        { approverSiret: emitterCompany.siret, status: "PENDING" },
+        { approverSiret: destinationCompany.siret, status: "PENDING" }
+      ] as BsdaRevisionRequestApproval[];
+
+      expectApprovalsAreEqual(expectedApprovals, revision.approvals);
+    });
+
+    it("worker creating revision to cancel BSDA > emitter & destination approvals are required", async () => {
+      // Given
+      const {
+        bsda,
+        emitterCompany,
+        worker,
+        workerCompany,
+        destinationCompany
+      } = await createCompaniesAndBsda({
+        packagings: [{ type: "DEPOT_BAG", other: "", quantity: 1 }],
+        wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+        wasteMaterialName: "Matière 1"
+      });
+
+      // When
+      const { data, errors } = await createRevisionRequest(
+        bsda.id,
+        worker,
+        workerCompany.siret,
+        {
+          isCanceled: true
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const revision = await getRevision(data.createBsdaRevisionRequest.id);
+      expect(revision.isCanceled).toBeTruthy();
       expect(revision.authoringCompanyId).toBe(workerCompany.id);
 
       const expectedApprovals = [

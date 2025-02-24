@@ -358,6 +358,7 @@ export async function approveAndApplyRevisionRequest(
   // l'émetteur par mail
   if (
     updatedBsda.type === BsdaType.OTHER_COLLECTIONS &&
+    !updatedRevisionRequest.isCanceled &&
     isOnlyAboutFields(updateData, [
       "status", // le status peut se glisser dans l'update, attention
       "wasteSealNumbers",
