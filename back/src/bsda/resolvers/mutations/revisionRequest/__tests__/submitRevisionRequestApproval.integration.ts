@@ -1205,11 +1205,19 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
           { email: "emitter@mail.com", name: "Emetteur" }
         );
       const { user: worker, company: workerCompany } =
-        await userWithCompanyFactory("ADMIN", {
-          name: "Worker Inc."
-        });
+        await userWithCompanyFactory(
+          "ADMIN",
+          {
+            name: "Worker Inc."
+          },
+          { email: "worker@mail.com", name: "Worker" }
+        );
       const { user: destination, company: destinationCompany } =
-        await userWithCompanyFactory("ADMIN", { name: "Destination Inc." });
+        await userWithCompanyFactory(
+          "ADMIN",
+          { name: "Destination Inc." },
+          { email: "destination@mail.com", name: "Destination" }
+        );
 
       const bsda = await bsdaFactory({
         opt: {
@@ -1289,11 +1297,16 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(errors).toBeUndefined();
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      const { body, messageVersions, subject } = (sendMail as jest.Mock).mock
-        .calls[0][0];
+      console.log("body", (sendMail as jest.Mock).mock.calls[0][0]);
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
 
-      expect(messageVersions).toMatchObject([
-        { to: [{ email: "emitter@mail.com", name: "Emetteur" }] }
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
       ]);
       expect(subject).toBe(
         `Scellés et conditionnement du bordereau amiante n° ${bsda.id} mis à jour`
@@ -1352,11 +1365,15 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(errors).toBeUndefined();
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      const { body, messageVersions, subject } = (sendMail as jest.Mock).mock
-        .calls[0][0];
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
 
-      expect(messageVersions).toMatchObject([
-        { to: [{ email: "emitter@mail.com", name: "Emetteur" }] }
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
       ]);
       expect(subject).toBe(
         `Scellés du bordereau amiante n° ${bsda.id} mis à jour`
@@ -1411,11 +1428,15 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(errors).toBeUndefined();
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
-      const { body, messageVersions, subject } = (sendMail as jest.Mock).mock
-        .calls[0][0];
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
 
-      expect(messageVersions).toMatchObject([
-        { to: [{ email: "emitter@mail.com", name: "Emetteur" }] }
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
       ]);
       expect(subject).toBe(
         `Conditionnement du bordereau amiante n° ${bsda.id} mis à jour`

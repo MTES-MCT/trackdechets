@@ -367,9 +367,15 @@ export async function approveAndApplyRevisionRequest(
     updatedRevisionRequest.authoringCompanyId !== emitterCompanyId
   ) {
     // Send mail
-    const emitterCompany = await prisma.company.findFirstOrThrow({
+    const companies = await prisma.company.findMany({
       where: {
-        orgId: updatedBsda.emitterCompanySiret ?? ""
+        orgId: {
+          in: [
+            updatedBsda.emitterCompanySiret ?? "",
+            updatedBsda.workerCompanySiret ?? "",
+            updatedBsda.destinationCompanySiret ?? ""
+          ]
+        }
       },
       select: {
         id: true,
@@ -377,9 +383,19 @@ export async function approveAndApplyRevisionRequest(
       }
     });
 
+    const emitterCompany = companies.find(
+      company => company.orgId === updatedBsda.emitterCompanySiret
+    );
+    const workerCompany = companies.find(
+      company => company.orgId === updatedBsda.workerCompanySiret
+    );
+    const destinationCompany = companies.find(
+      company => company.orgId === updatedBsda.destinationCompanySiret
+    );
+
     const companyAssociations = await prisma.companyAssociation.findMany({
       where: {
-        companyId: emitterCompany.id,
+        companyId: { in: companies.map(company => company.id) },
         notificationIsActiveBsdaFinalDestinationUpdate: true
       },
       include: {
@@ -387,9 +403,19 @@ export async function approveAndApplyRevisionRequest(
       }
     });
 
-    if (companyAssociations?.length) {
+    const emitterCompanyAssociations = companyAssociations.filter(
+      association => association.companyId === emitterCompany.id
+    );
+    const workerCompanyAssociations = companyAssociations.filter(
+      association => association.companyId === workerCompany.id
+    );
+    const destinationCompanyAssociations = companyAssociations.filter(
+      association => association.companyId === destinationCompany.id
+    );
+
+    if (emitterCompanyAssociations?.length) {
       const messageVersion: MessageVersion = {
-        to: companyAssociations
+        to: emitterCompanyAssociations
           .filter(association => association.companyId === emitterCompany?.id)
           .map(association => ({
             name: association.user.name,
@@ -447,7 +473,23 @@ export async function approveAndApplyRevisionRequest(
           packagingsBeforeRevision,
           packagingsAfterRevision
         },
-        messageVersions: [messageVersion]
+        messageVersions: [messageVersion],
+        cc: [
+          ...workerCompanyAssociations
+            .filter(association => association.companyId === workerCompany?.id)
+            .map(association => ({
+              name: association.user.name,
+              email: association.user.email
+            })),
+          ...destinationCompanyAssociations
+            .filter(
+              association => association.companyId === destinationCompany?.id
+            )
+            .map(association => ({
+              name: association.user.name,
+              email: association.user.email
+            }))
+        ]
       });
 
       await sendMail(payload);
