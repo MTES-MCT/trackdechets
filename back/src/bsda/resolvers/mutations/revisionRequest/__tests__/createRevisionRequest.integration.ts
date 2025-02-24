@@ -19,7 +19,6 @@ import {
   BsdaType
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { isCancel } from "axios";
 
 const CREATE_BSDA_REVISION_REQUEST = `
   mutation CreateBsdaRevisionRequest($input: CreateBsdaRevisionRequestInput!) {
