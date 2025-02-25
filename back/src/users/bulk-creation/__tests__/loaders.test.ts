@@ -6,7 +6,7 @@ describe("loaders", () => {
     expect(companies).toHaveLength(2);
     expect(companies).toEqual([
       {
-        siret: "85001946400013",
+        siret: "85001946400021",
         gerepId: "1234",
         companyTypes: ["PRODUCER"],
         collectorTypes: [],
@@ -39,7 +39,7 @@ describe("loaders", () => {
     expect(roles).toHaveLength(4);
     expect(roles).toEqual([
       {
-        siret: "85001946400013",
+        siret: "85001946400021",
         email: "john.snow@trackdechets.fr",
         role: "ADMIN"
       },
@@ -49,7 +49,7 @@ describe("loaders", () => {
         role: "ADMIN"
       },
       {
-        siret: "85001946400013",
+        siret: "85001946400021",
         email: "tyrion.lannister@trackdechets.fr",
         role: "MEMBER"
       },

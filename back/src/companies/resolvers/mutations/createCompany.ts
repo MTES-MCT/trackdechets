@@ -35,6 +35,7 @@ import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
 import { getDefaultNotifications } from "../../../users/notifications";
+import { getCompanyRepository } from "../../repository";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company
@@ -181,11 +182,15 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const notifications = getDefaultNotifications(UserRole.ADMIN);
-  const companyAssociation = await prisma.companyAssociation.create({
+
+  const { createCompany } = await getCompanyRepository(user);
+  let company = await createCompany(companyCreateInput);
+
+  await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
       company: {
-        create: companyCreateInput
+        connect: { id: company.id }
       },
       role: UserRole.ADMIN,
       ...notifications
@@ -193,7 +198,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     include: { company: true }
   });
   await deleteCachedUserRoles(user.id);
-  let company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
