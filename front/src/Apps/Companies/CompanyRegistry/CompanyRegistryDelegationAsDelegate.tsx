@@ -1,5 +1,5 @@
 import React from "react";
-import "./companyRegistryDelegation.scss";
+import "./CompanyRegistry.scss";
 import { CompanyPrivate } from "@td/codegen-ui";
 import { RegistryDelegationsTable } from "./RegistryDelegationsTable";
 
