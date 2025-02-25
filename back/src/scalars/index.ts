@@ -6,5 +6,5 @@ export default {
   URL: URLResolver,
   DateTime: DateTimeResolver,
   String: StringResolver,
-  JSONObject: JSONObjectResolver,
+  JSONObject: JSONObjectResolver
 };
