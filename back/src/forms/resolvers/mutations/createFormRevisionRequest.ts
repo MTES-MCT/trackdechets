@@ -6,8 +6,7 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User,
-  WasteAcceptationStatus
+  User
 } from "@prisma/client";
 import * as yup from "yup";
 import {
@@ -37,7 +36,7 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import {
   brokerSchemaFn,
   packagingInfoFn,
-  quantityRefused,
+  quantityRefusedNotRequired,
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
@@ -48,6 +47,7 @@ import {
   canProcessNonDangerousWaste
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
+import { isDefined } from "../../../common/helpers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -281,23 +281,24 @@ async function getFlatContent(
 
   const { isCanceled, ...revisionFields } = flatContent;
 
+  // Retiré jusqu'à nouvel ordre!
   // Trying to change the acceptation status
-  if (content.wasteAcceptationStatus) {
-    if (!bsdd.wasteAcceptationStatus) {
-      throw new UserInputError(
-        "Le statut d'acceptation des déchets n'est modifiable que s'il a déjà une valeur."
-      );
-    }
+  // if (content.wasteAcceptationStatus) {
+  //   if (!bsdd.wasteAcceptationStatus) {
+  //     throw new UserInputError(
+  //       "Le statut d'acceptation des déchets n'est modifiable que s'il a déjà une valeur."
+  //     );
+  //   }
 
-    if (
-      content.wasteAcceptationStatus !== bsdd.wasteAcceptationStatus &&
-      ![Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED].includes(bsdd.status)
-    ) {
-      throw new UserInputError(
-        "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
-      );
-    }
-  }
+  //   if (
+  //     content.wasteAcceptationStatus !== bsdd.wasteAcceptationStatus &&
+  //     ![Status.ACCEPTED, Status.TEMP_STORER_ACCEPTED].includes(bsdd.status)
+  //   ) {
+  //     throw new UserInputError(
+  //       "Le statut d'acceptation des déchets n'est modifiable que si le bordereau est au stade de la réception."
+  //     );
+  //   }
+  // }
 
   if (!isCanceled && Object.keys(revisionFields).length === 0) {
     throw new UserInputError(
@@ -363,7 +364,8 @@ async function getFlatContent(
 
   await validateWAsteAccordingToDestination(bsdd, flatContent);
 
-  //
+  const contentToValidate = getContentToValidate(bsdd, flatContent);
+
   if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
     await appendix1ProducerRevisionRequestSchema.validate(flatContent, {
       strict: true
@@ -379,7 +381,7 @@ async function getFlatContent(
       );
     }
   } else {
-    await bsddRevisionRequestSchema.validate(flatContent, {
+    await bsddRevisionRequestSchema.validate(contentToValidate, {
       strict: true,
       abortEarly: false
     });
@@ -388,7 +390,7 @@ async function getFlatContent(
   // Double-check the waste quantities
   await bsddRevisionRequestWasteQuantitiesSchema.validate({
     ...bsdd,
-    ...flatContent
+    ...contentToValidate
   });
 
   if (
@@ -403,6 +405,37 @@ async function getFlatContent(
 
   return flatContent;
 }
+
+const getContentToValidate = (
+  bsdd: Form & { transporters: BsddTransporter[] },
+  flatContent: ReturnType<typeof flattenBsddRevisionRequestInput>
+) => {
+  // quantityReceived & quantityRefused sont liées pour la validation, il faut donc
+  // passer les deux
+  const isReviewingQuantities =
+    isDefined(flatContent.quantityReceived) ||
+    isDefined(flatContent.quantityRefused);
+
+  if (!isReviewingQuantities) return flatContent;
+
+  let quantityReceived: number | null = null;
+  if (isDefined(flatContent.quantityReceived))
+    quantityReceived = flatContent.quantityReceived;
+  else if (isDefined(bsdd.quantityReceived))
+    quantityReceived = Number(bsdd.quantityReceived);
+
+  let quantityRefused: number | null = null;
+  if (isDefined(flatContent.quantityRefused))
+    quantityRefused = flatContent.quantityRefused;
+  else if (isDefined(bsdd.quantityRefused))
+    quantityRefused = Number(bsdd.quantityRefused);
+
+  return {
+    ...flatContent,
+    quantityReceived,
+    quantityRefused
+  };
+};
 
 async function getApproversSirets(
   bsdd: Form,
@@ -459,23 +492,24 @@ function hasTemporaryStorageUpdate(
 }
 
 const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
-  wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
-  wasteRefusalReason: yup
-    .string()
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.ensure().required("Vous devez saisir un motif de refus")
-        : schema
-            .notRequired()
-            .nullable()
-            .test(
-              "is-empty",
-              "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-              v => !v
-            )
-    ),
+  // Retirés jusqu'à nouvel ordre!
+  // wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+  // wasteRefusalReason: yup
+  //   .string()
+  //   .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+  //     ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
+  //       ? schema.ensure().required("Vous devez saisir un motif de refus")
+  //       : schema
+  //           .notRequired()
+  //           .nullable()
+  //           .test(
+  //             "is-empty",
+  //             "Le champ wasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
+  //             v => !v
+  //           )
+  //   ),
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused
+  quantityRefused: quantityRefusedNotRequired
 });
 
 async function recipify(

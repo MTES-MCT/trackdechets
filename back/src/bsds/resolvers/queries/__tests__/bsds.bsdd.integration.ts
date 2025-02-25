@@ -409,6 +409,7 @@ describe("Query.bsds workflow", () => {
             receivedAt: new Date().toISOString() as any,
             receivedBy: recipient.user.name,
             quantityReceived: 1,
+            quantityRefused: 0,
             signedAt: new Date().toISOString() as any,
             wasteAcceptationStatus: "ACCEPTED"
           }
@@ -859,7 +860,8 @@ describe("Query.bsds workflow", () => {
             receivedAt: new Date().toISOString() as any,
             signedAt: new Date().toISOString() as any,
             receivedBy: "Destination",
-            quantityReceived: 1
+            quantityReceived: 1,
+            quantityRefused: 0
           }
         }
       });
