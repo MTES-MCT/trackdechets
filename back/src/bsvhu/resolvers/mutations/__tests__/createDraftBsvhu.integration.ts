@@ -347,7 +347,7 @@ describe("Mutation.Vhu.createDraft", () => {
     expect(data.createDraftBsvhu.id).toBeTruthy();
   });
 
-  it("should fail when packaging is UNITE and identificationType is null", async () => {
+  it("should succeed when packaging is UNITE and identificationType is null", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTE_VEHICLES"],
@@ -392,7 +392,7 @@ describe("Mutation.Vhu.createDraft", () => {
       }
     };
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
+    const { data, errors } = await mutate<Pick<Mutation, "createDraftBsvhu">>(
       CREATE_VHU_FORM,
       {
         variables: {
@@ -401,15 +401,8 @@ describe("Mutation.Vhu.createDraft", () => {
       }
     );
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité",
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
-      })
-    ]);
+    expect(errors).toBeUndefined();
+    expect(data.createDraftBsvhu.id).toBeTruthy();
   });
 
   it.each([

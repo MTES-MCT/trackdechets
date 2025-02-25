@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
 - Rendre optionnel les agréments à la publication d'un VHU [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3984)
+- Rendre optionnel le type de conditionnement du Bsvhu en brouillon [PR 3996](https://github.com/MTES-MCT/trackdechets/pull/3996)
 
 # [2025.02.1] 11/02/2025
 

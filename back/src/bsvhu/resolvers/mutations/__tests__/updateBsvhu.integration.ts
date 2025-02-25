@@ -749,12 +749,12 @@ describe("Mutation.Vhu.update", () => {
     expect(data.updateBsvhu.identification?.type).toEqual(null);
   });
 
-  it("should fail when packaging is UNITE and identificationType is null", async () => {
+  it("should fail when packaging is UNITE and identificationType is null on a published bsvhu", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsvhu = await bsvhuFactory({
       userId: user.id,
       opt: {
-        isDraft: true,
+        isDraft: false,
         status: "INITIAL",
         emitterCompanySiret: company.siret
       }
@@ -784,6 +784,34 @@ describe("Mutation.Vhu.update", () => {
         })
       })
     ]);
+  });
+
+  it("should succeed when packaging is UNITE and identificationType is null on a draft bsvhu", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const input = {
+      packaging: "UNITE",
+      identification: {
+        numbers: ["123", "456"],
+        type: null
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: { id: bsvhu.id, input }
+      }
+    );
+
+    expect(errors).toBeUndefined();
   });
 
   it("should succeed when packaging is UNITE and identificationType is null on a bsvhu created before release date", async () => {

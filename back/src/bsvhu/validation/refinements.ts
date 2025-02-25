@@ -209,8 +209,12 @@ export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (
         "identificationType : Le type d'identification doit être null quand le conditionnement est en lot"
     });
   }
-
-  if (bsvhu.packaging === "UNITE" && !bsvhu.identificationType) {
+  // Must not apply on draft bsvhus
+  if (
+    !bsvhu.isDraft &&
+    bsvhu.packaging === "UNITE" &&
+    !bsvhu.identificationType
+  ) {
     addIssue({
       code: z.ZodIssueCode.custom,
       path: ["identification", "type"],
