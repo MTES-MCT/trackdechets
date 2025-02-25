@@ -14,9 +14,10 @@ import {
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -47,10 +48,8 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   ),
   packagingInfos: () => (
     <div className="form__row">
-      <label>
-        Conditionnement(s)
-        <Field name="packagingInfos" component={Packagings} />
-      </label>
+      <h6 className="fr-h6">Conditionnement</h6>
+      <FormikPackagingList fieldName="packagingInfos" />
     </div>
   ),
   transporterNumberPlate: () => (
@@ -66,7 +65,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteEmissionSummary({
   form
 }: FormWasteEmissionSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
 
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
@@ -109,12 +108,21 @@ export function FormWasteEmissionSummary({
           <DataListTerm>Contenant(s)</DataListTerm>
           <DataListDescription>
             {values.packagingInfos
-              ?.map(packaging => `${packaging.quantity} ${packaging.type}(s)`)
+              ?.map(packaging =>
+                packaging?.type
+                  ? `${packaging.quantity} ${packaging.type}(s)`
+                  : ""
+              )
               .join(", ")}
 
             <button
               type="button"
-              onClick={() => addField("packagingInfos")}
+              onClick={() => {
+                addField("packagingInfos");
+                if (!values.packagingInfos?.length) {
+                  setFieldValue("packagingInfos", [emptyPackaging]);
+                }
+              }}
               className="tw-ml-2"
             >
               <IconPaperWrite color="blue" />

@@ -688,7 +688,13 @@ export const packagingInfoFn = ({
               "Le nombre de benne ou de citerne ne peut être supérieur à 2."
             )
           : schema
-      )
+      ),
+    volume: yup
+      .number()
+      .optional()
+      .nullable()
+      .moreThan(0, "Le volume doit être un nombre positif"),
+    identificationNumbers: yup.array(yup.string()).optional().notRequired()
   });
 
 const parcelCommonInfos = yup

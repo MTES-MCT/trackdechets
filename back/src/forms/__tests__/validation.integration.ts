@@ -1702,6 +1702,20 @@ describe("draftFormSchema", () => {
     );
   });
 
+  it.each([-1, 0])(
+    "should not validate when packaging volume is %p (not strictly positive)",
+    async volume => {
+      const validateFn = () =>
+        draftFormSchema.validate({
+          wasteDetailsPackagingInfos: [{ type: "FUT", weight: 1, volume }]
+        });
+
+      await expect(validateFn()).rejects.toThrow(
+        "Le volume doit être un nombre positif"
+      );
+    }
+  );
+
   it("should not be valid when passing eco-organisme as emitter", async () => {
     const ecoOrganisme = await ecoOrganismeFactory({
       siret: siretify(),

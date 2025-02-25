@@ -19,9 +19,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
-import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
-import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import {
   BsddRevisionRequestValidationSchema,
   initialBsddReview,
@@ -31,10 +29,10 @@ import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCance
 import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision";
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
-import { disableAddPackagingCta } from "../../common/utils/rules";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
+import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 
 type Props = {
   bsdd: Bsdd;
@@ -83,6 +81,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
       // on le réinitialise à la valeur par défaut du formulaire
       data.wasteDetails.pop = null;
     }
+
     return data;
   };
 
@@ -214,13 +213,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   defaultValue={initialBsddReview.wasteDetails.packagingInfos}
                   initialValue={bsdd.wasteDetails?.packagingInfos}
                 >
-                  <BsdPackagings
-                    path="wasteDetails.packagingInfos"
-                    bsdType={BsdTypename.Bsdd}
-                    disabledAddCta={disableAddPackagingCta(
-                      formValues.wasteDetails?.packagingInfos
-                    )}
-                  />
+                  <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
                 </RhfReviewableField>
 
                 <RhfReviewableField

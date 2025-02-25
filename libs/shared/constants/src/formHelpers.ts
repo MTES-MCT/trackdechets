@@ -2,10 +2,16 @@ export const isBsddTransporterFieldEditable = status =>
   ["SEALED", "RESEALED", "SIGNED_BY_PRODUCER"].includes(status);
 
 export const objectsEqual = (o1, o2) => {
-  return isObject(o1) && isObject(o2)
-    ? Object.keys(o1).length === Object.keys(o2).length &&
-        Object.keys(o1).every(p => objectsEqual(o1[p], o2[p]))
-    : o1 === o2;
+  if (isObject(o1) && isObject(o2)) {
+    return (
+      Object.keys(o1).length === Object.keys(o2).length &&
+      Object.keys(o1).every(p => objectsEqual(o1[p], o2[p]))
+    );
+  }
+
+  if (Array.isArray(o1) && Array.isArray(o2)) return arraysEqual(o1, o2);
+
+  return o1 === o2;
 };
 
 const arraysEqual = (a1, a2) =>
