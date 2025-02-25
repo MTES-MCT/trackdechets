@@ -13,6 +13,7 @@ type FileDownload {
 type SignedUrlResponse {
   fileKey: String!
   signedUrl: String!
+  fields: JSONObject
 }
 
 type PageInfo {
