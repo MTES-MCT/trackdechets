@@ -301,9 +301,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
         </tr>
       </thead>
       <tbody>
-        {packagingsRows.map(({ quantity, conditionnement }, idx) => (
+        {packagingsRows.map(({ quantity, packagingsLabel }, idx) => (
           <tr key={idx}>
-            <td>{conditionnement}</td>
+            <td>{packagingsLabel}</td>
             <td>{quantity}</td>
           </tr>
         ))}

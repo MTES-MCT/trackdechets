@@ -2,7 +2,7 @@ import { PackagingInfo } from "@td/codegen-back";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
 
-const packagingsLabel = {
+const packagingsLabels = {
   FUT: "Fût",
   GRV: "GRV",
   CITERNE: "Citerne",
@@ -32,8 +32,8 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
       0
     );
 
-    let conditionnement: string = pluralize(
-      packagingsLabel[type],
+    let packagingsLabel: string = pluralize(
+      packagingsLabels[type],
       totalQuantity
     );
 
@@ -63,8 +63,8 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
           .filter(Boolean)
           .join("");
       });
-      conditionnement = [
-        conditionnement,
+      packagingsLabel = [
+        packagingsLabel,
         " (",
         packagingDetails.join(", "),
         ")"
@@ -75,8 +75,8 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
       // en faisant un cas particulier pour le type Benne qui s'exprime en m3
       // Exemple  GRV 30l ou Benne 20m3
       const volume = packagings[0].volume;
-      conditionnement = [
-        conditionnement,
+      packagingsLabel = [
+        packagingsLabel,
         packagings[0].other,
         ...(volume
           ? [
@@ -90,7 +90,7 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
         .join(" ");
     }
 
-    return { quantity: totalQuantity, conditionnement };
+    return { quantity: totalQuantity, packagingsLabel };
   });
 
   return packagingsRows;
