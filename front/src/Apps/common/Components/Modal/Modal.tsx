@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import FocusTrap from "focus-trap-react";
@@ -36,9 +36,44 @@ export function Modal({
   const ref = React.useRef(null);
   const { modalProps, underlayProps } = useModalOverlay(props, state, ref);
 
+  const [keyboardOffset, setKeyboardOffset] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.visualViewport) {
+        const viewportHeight = window.visualViewport.height;
+        const screenHeight = window.innerHeight;
+
+        if (viewportHeight < screenHeight) {
+          // Le clavier est ouvert, calcul de l'espace perdu
+          setKeyboardOffset(screenHeight - viewportHeight);
+        } else {
+          // Clavier fermé
+          setKeyboardOffset(0);
+        }
+      }
+    };
+
+    window.visualViewport?.addEventListener("resize", handleResize);
+    window.visualViewport?.addEventListener("scroll", handleResize);
+
+    return () => {
+      window.visualViewport?.removeEventListener("resize", handleResize);
+      window.visualViewport?.removeEventListener("scroll", handleResize);
+    };
+  }, []);
+
   return (
     <Overlay>
-      <div className="tdModalOverlay" {...underlayProps}>
+      <div
+        style={{
+          height: `calc(100vh - ${keyboardOffset}px)`,
+          overflow: "auto",
+          transition: "height 0.05s ease-out"
+        }}
+        className="tdModalOverlay"
+        {...underlayProps}
+      >
         <div className="tdModalInner">
           <div
             className="fr-container fr-container--fluid fr-container-md"
