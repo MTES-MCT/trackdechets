@@ -312,73 +312,44 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
           <div></div>
         </div>
         {/* End Emitter signature */}
-        {/* Trader informations or broker information if no trader */}
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                8.{bsvhu.trader && bsvhu.broker ? "1" : ""}{" "}
-                <input
-                  type="checkbox"
-                  checked={Boolean(bsvhu.trader)}
-                  readOnly
-                />{" "}
-                Négociant{" "}
-                <input
-                  type="checkbox"
-                  checked={!bsvhu.trader && Boolean(bsvhu.broker)}
-                  readOnly
-                />{" "}
-                Courtier
-              </strong>
-            </p>
-            <div className="Row">
-              <div className="Col">
-                <FormCompanyFields
-                  company={
-                    bsvhu.trader ? bsvhu.trader.company : bsvhu.broker?.company
-                  }
-                />
-              </div>
-              <div className="Col">
-                <Recepisse
-                  recepisse={{
-                    ...(bsvhu.trader?.recepisse ??
-                      bsvhu.broker?.recepisse ??
-                      {})
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* End Broker/Trader informations */}
-        {/* Broker information */}
-        {bsvhu.broker ? (
+        {/* Trader informations */}
+        {bsvhu.trader && (
           <div className="BoxRow">
             <div className="BoxCol">
               <p>
-                <strong>
-                  8.{bsvhu.trader ? "2" : ""}{" "}
-                  <input type="checkbox" checked={false} readOnly /> Négociant{" "}
-                  <input type="checkbox" checked={true} readOnly /> Courtier
-                </strong>
+                <strong>8.{bsvhu.broker ? "1" : ""} Négociant</strong>
               </p>
               <div className="Row">
                 <div className="Col">
-                  <FormCompanyFields company={bsvhu.broker?.company} />
+                  <FormCompanyFields company={bsvhu.trader.company} />
                 </div>
                 <div className="Col">
-                  <Recepisse
-                    recepisse={{
-                      ...(bsvhu.broker?.recepisse ?? {})
-                    }}
-                  />
+                  <Recepisse recepisse={bsvhu.trader.recepisse} />
                 </div>
               </div>
             </div>
           </div>
-        ) : null}
+        )}
+
+        {/* End Trader informations */}
+        {/* Broker informations */}
+        {bsvhu.broker && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>8.{bsvhu.trader ? "2" : ""} Courtier</strong>
+              </p>
+              <div className="Row">
+                <div className="Col">
+                  <FormCompanyFields company={bsvhu.broker.company} />
+                </div>
+                <div className="Col">
+                  <Recepisse recepisse={bsvhu.broker.recepisse} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         {/* End Broker informations */}
         {/* Transporter */}
         <div className="BoxRow">
