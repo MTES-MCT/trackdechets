@@ -9,7 +9,7 @@ describe("getPackagingsRows", () => {
     ];
 
     const result = getPackagingsRows(packagingInfos);
-    expect(result).toEqual([{ quantity: 5, conditionnement: "Fûts 30l" }]);
+    expect(result).toEqual([{ quantity: 5, packagingsLabel: "Fûts 30l" }]);
   });
 
   it("should return correct rows for single type of packaging with multiple volumes", () => {
@@ -20,7 +20,7 @@ describe("getPackagingsRows", () => {
 
     const result = getPackagingsRows(packagingInfos);
     expect(result).toEqual([
-      { quantity: 5, conditionnement: "Fûts (2 x 30l, 3 x 50l)" }
+      { quantity: 5, packagingsLabel: "Fûts (2 x 30l, 3 x 50l)" }
     ]);
   });
 
@@ -35,7 +35,7 @@ describe("getPackagingsRows", () => {
 
       const result = getPackagingsRows(packagingInfos);
       expect(result).toEqual([
-        { quantity: 5, conditionnement: "Fûts (2, 3 x 50l)" }
+        { quantity: 5, packagingsLabel: "Fûts (2, 3 x 50l)" }
       ]);
     }
   );
@@ -48,8 +48,8 @@ describe("getPackagingsRows", () => {
 
     const result = getPackagingsRows(packagingInfos);
     expect(result).toEqual([
-      { quantity: 2, conditionnement: "Fûts 30l" },
-      { quantity: 1, conditionnement: "GRV 1000l" }
+      { quantity: 2, packagingsLabel: "Fûts 30l" },
+      { quantity: 1, packagingsLabel: "GRV 1000l" }
     ]);
   });
 
@@ -68,7 +68,7 @@ describe("getPackagingsRows", () => {
     expect(result).toEqual([
       {
         quantity: 1,
-        conditionnement: "Autre (1 Caisse plastique)"
+        packagingsLabel: "Autre (1 Caisse plastique)"
       }
     ]);
   });
@@ -95,7 +95,7 @@ describe("getPackagingsRows", () => {
     expect(result).toEqual([
       {
         quantity: 5,
-        conditionnement: "Autres (2 Caisse plastique x 20l, 3 Tupperware)"
+        packagingsLabel: "Autres (2 Caisse plastique x 20l, 3 Tupperware)"
       }
     ]);
   });
@@ -106,7 +106,7 @@ describe("getPackagingsRows", () => {
     ];
 
     const result = getPackagingsRows(packagingInfos);
-    expect(result).toEqual([{ quantity: 1, conditionnement: "Benne 20m3" }]);
+    expect(result).toEqual([{ quantity: 1, packagingsLabel: "Benne 20m3" }]);
   });
 
   it("should handle empty packagingInfos array", () => {
