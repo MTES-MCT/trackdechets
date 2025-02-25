@@ -164,6 +164,9 @@ export async function processStream({
       sirets
     });
   }
+
+  const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
+  return stats;
 }
 
 function formatErrorMessage(message: string) {
