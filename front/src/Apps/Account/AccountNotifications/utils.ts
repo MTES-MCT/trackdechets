@@ -11,8 +11,9 @@ export const hintTexts: { [key in keyof UserNotifications]: string } = {
   bsdRefusal:
     "Un courriel sera envoyé à chaque refus total ou partiel d'un bordereau",
   bsdaFinalDestinationUpdate:
-    "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire différent ou que le CAP " +
-    "a fait l'objet d'une modification à la suite de la signature du producteur.",
+    "Un courriel sera envoyé lorsque le BSDA est envoyé à un exutoire différent, que le CAP " +
+    "a fait l'objet d'une modification à la suite de la signature du producteur ou qu'une révision " +
+    "a été approuvée par l'entreprise de travaux ou la destination sur les numéros de scellés et/ou conditionnement.",
   revisionRequest:
     "Un courriel sera envoyé à chaque fois qu'une révision sera restée sans réponse 14 jours après sa demande",
   registryDelegation:
