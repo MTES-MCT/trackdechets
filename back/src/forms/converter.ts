@@ -438,7 +438,11 @@ export function flattenFormInput(
 ): Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">> {
   return safeInput({
     customId: formInput.customId,
-    isDirectSupply: formInput.isDirectSupply ?? false,
+    // Si `isDirectSupply` est null ou undefined, on omet le champ
+    // et on laisse le soin à la DB de mettre une valeur par défaut
+    ...(typeof formInput.isDirectSupply === "boolean"
+      ? { isDirectSupply: formInput.isDirectSupply }
+      : {}),
     ...flattenEmitterInput(formInput),
     ...flattenRecipientInput(formInput),
     ...flattenWasteDetailsInput(formInput),

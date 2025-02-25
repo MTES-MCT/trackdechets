@@ -1774,6 +1774,20 @@ describe("draftFormSchema", () => {
     );
   });
 
+  it("isDirectSupply=true cannot be set with a transporter", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        wasteDetailsPackagingInfos: [
+          { type: "PIPELINE", numero: null, weight: null, volume: null }
+        ],
+        transporters: [{ transporterCompanySiret: siretify(1) }]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+    );
+  });
+
   it.each([-1, 0])(
     "should not validate when packaging volume is %p (not strictly positive)",
     async volume => {

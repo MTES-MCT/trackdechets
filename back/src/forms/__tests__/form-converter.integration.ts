@@ -36,6 +36,7 @@ describe("expandFormFromDb", () => {
       readableId: form.readableId,
       customId: null,
       isImportedFromPaper: false,
+      isDirectSupply: false,
       metadata: undefined,
       citerneNotWashedOutReason: null,
       hasCiterneBeenWashedOut: null,

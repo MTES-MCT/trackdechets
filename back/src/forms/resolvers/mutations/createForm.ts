@@ -3,6 +3,7 @@ import { isDangerous } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
   MutationCreateFormArgs,
+  PackagingInfo,
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
@@ -130,7 +131,9 @@ const createFormResolver = async (
   // Cela permet de ne pas faire de breaking change lors de l'implémentation
   // de tra-15674 - Sortir Conditionné pour pipeline de la liste des conditionnements
   if (hasPipelinePackaging(form)) {
-    form.wasteDetailsPackagingInfos = [];
+    form.wasteDetailsPackagingInfos = (
+      (form.wasteDetailsPackagingInfos ?? []) as PackagingInfo[]
+    ).filter(p => p.type !== "PIPELINE");
     form.isDirectSupply = true;
   }
 

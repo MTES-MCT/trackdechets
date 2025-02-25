@@ -788,21 +788,25 @@ const parcelInfos = yup.lazy(value => {
   return parcelCommonInfos.concat(parcelCoordinates);
 });
 
-function isValidPackagingInfos(infos: PackagingInfo[] | undefined) {
-  const hasCiterne = infos?.some(i => i.type === "CITERNE");
-  const hasPipeline = infos?.some(i => i.type === "PIPELINE");
-  const hasBenne = infos?.some(i => i.type === "BENNE");
+const isValidPackagingInfos: yup.TestFunction<PackagingInfo[] | undefined> = (
+  value,
+  { parent }
+) => {
+  const hasCiterne = value?.some(i => i.type === "CITERNE");
+  const hasPipeline =
+    value?.some(i => i.type === "PIPELINE") || !!parent.isDirectSupply;
+  const hasBenne = value?.some(i => i.type === "BENNE");
 
   if (
     // citerne and benne together are not allowed
     (hasCiterne && hasBenne) ||
     // pipeline and any other Packaging is forbidden
-    (infos?.some(i => i.type !== "PIPELINE") && hasPipeline)
+    (value?.some(i => i.type !== "PIPELINE") && hasPipeline)
   ) {
     return false;
   }
 
-  const hasOtherPackaging = infos?.find(
+  const hasOtherPackaging = value?.find(
     i => !["CITERNE", "BENNE"].includes(i.type)
   );
   if ((hasCiterne || hasBenne) && hasOtherPackaging) {
@@ -810,7 +814,7 @@ function isValidPackagingInfos(infos: PackagingInfo[] | undefined) {
   }
 
   return true;
-}
+};
 
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
@@ -1950,6 +1954,9 @@ const baseFormSchemaFn = (context: FormValidationContext) =>
 
     const transporterSchema = transporterSchemaFn(context);
 
+    const pipelineAndTransporterError =
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline";
+
     return yup
       .object()
       .concat(emitterSchemaFn(context))
@@ -1963,13 +1970,16 @@ const baseFormSchemaFn = (context: FormValidationContext) =>
           transporters: yup
             .array<Transporter>()
             .of(transporterSchema)
+            .when(
+              "wasteDetailsPackagingInfos",
+              (wasteDetailsPackagingInfos, schema) =>
+                hasPipelinePackaging({ wasteDetailsPackagingInfos })
+                  ? schema.length(0, pipelineAndTransporterError)
+                  : schema
+            )
             .when("isDirectSupply", {
               is: true,
-              then: schema =>
-                schema.length(
-                  0,
-                  "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
-                )
+              then: schema => schema.length(0, pipelineAndTransporterError)
             })
             .max(5, "Vous ne pouvez pas ajouter plus de ${max} transporteurs")
         })
