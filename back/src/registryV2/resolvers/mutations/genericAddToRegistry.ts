@@ -1,9 +1,13 @@
 import { pluralize } from "@td/constants";
 import { prisma } from "@td/prisma";
 import {
+  ImportType,
+  RegistryChanges,
   UNAUTHORIZED_ERROR,
-  type ImportOptions,
-  isAuthorized
+  importOptions,
+  incrementLocalChangesForCompany,
+  isAuthorized,
+  saveCompaniesChanges
 } from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -21,10 +25,12 @@ type UnparsedLine = {
 };
 
 export async function genericAddToRegistry<T extends UnparsedLine>(
-  importOptions: ImportOptions,
+  importType: ImportType,
   lines: T[],
   context: GraphQLContext
 ) {
+  const options = importOptions[importType];
+
   const user = checkIsAuthenticated(context);
   const userCompanies = await getUserCompanies(user.id);
   await checkUserPermissions(
@@ -60,8 +66,12 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     return map;
   }, new Map<string, string[]>());
 
-  const { safeParseAsync, saveLine } = importOptions;
+  const { safeParseAsync, saveLine } = options;
   const errors = new Map<string, string>();
+  const changesByCompany = new Map<
+    string,
+    { [reportAsSiret: string]: RegistryChanges }
+  >();
 
   for (const line of lines) {
     const result = await safeParseAsync(line);
@@ -81,6 +91,13 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         continue;
       }
 
+      incrementLocalChangesForCompany(changesByCompany, {
+        reason: result.data.reason,
+        reportForCompanySiret: result.data.reportForCompanySiret,
+        reportAsCompanySiret:
+          result.data.reportAsCompanySiret ?? result.data.reportForCompanySiret
+      });
+
       await saveLine({
         line: { ...result.data, createdById: user.id },
         importId: null
@@ -94,6 +111,12 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
       );
     }
   }
+
+  await saveCompaniesChanges(changesByCompany, {
+    type: importType,
+    source: "API",
+    createdById: user.id
+  });
 
   if (errors.size > 0) {
     throw new UserInputError(

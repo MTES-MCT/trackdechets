@@ -6,6 +6,7 @@ import { registryUploadSignedUrl } from "./queries/registryUploadSignedUrl";
 import { registryDownloadSignedUrl } from "./queries/registryDownloadSignedUrl";
 import { registryImports } from "./queries/registryImports";
 import { registryImport } from "./queries/registryImport";
+import { registryChangeAggregates } from "./queries/registryChangeAggregates";
 
 export const Query: QueryResolvers = {
   registryUploadSignedUrl,
@@ -14,5 +15,6 @@ export const Query: QueryResolvers = {
   registryImport: registryImport as any,
   registryV2ExportDownloadSignedUrl,
   registryV2Exports: registryV2Exports as any,
-  registryV2Export: registryV2Export as any
+  registryV2Export: registryV2Export as any,
+  registryChangeAggregates: registryChangeAggregates as any
 };

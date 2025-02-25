@@ -16,8 +16,8 @@ export async function registryImport(
   await checkUserPermissions(
     user,
     userCompanies.map(company => company.orgId),
-    Permission.RegistryCanImport,
-    `Vous n'êtes pas autorisé à importer des données dans le registre`
+    Permission.RegistryCanRead,
+    `Vous n'êtes pas autorisé à lire les données de cet import`
   );
 
   const registryImport = await prisma.registryImport.findUnique({

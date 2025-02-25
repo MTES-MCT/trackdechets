@@ -1,0 +1,24 @@
+type ChangeAggregate {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  type: RegistryImportType!
+  source: RegistryImportSource!
+  createdBy: ChangeAggregateCratedBy!
+  reportAs: ChangeAggregateReportAs!
+  numberOfAggregates: Int!
+  numberOfErrors: Int!
+  numberOfInsertions: Int!
+  numberOfEdits: Int!
+  numberOfCancellations: Int!
+  numberOfSkipped: Int!
+}
+
+type ChangeAggregateCratedBy {
+  name: String!
+}
+
+type ChangeAggregateReportAs {
+  name: String!
+  siret: String
+}
