@@ -10,9 +10,13 @@ export type RegistryChanges = {
   skipped: number;
 };
 
-export type RegistryChangesByCompany = Map<string, RegistryChanges>;
+export type RegistryChangesByCompany = Map<
+  string,
+  { [reportAsSiret: string]: RegistryChanges }
+>;
 
-const AGGREGATE_WINDOW = 3 * 60 * 1000;
+const SLIDING_AGGREGATE_WINDOW = 1 * 60 * 1000; // If you push update in that window, it will be added to the previous one
+const MAX_AGGREGATE_WINDOW = 5 * 60 * 1000; // Maximum window between the creation and an update
 
 export function getEmptyChanges(): RegistryChanges {
   return {
@@ -30,11 +34,13 @@ export function getSumOfChanges(
 ) {
   const globalChanges = getEmptyChanges();
 
-  for (const changes of changesByCompany.values()) {
-    globalChanges.insertions += changes.insertions;
-    globalChanges.edits += changes.edits;
-    globalChanges.cancellations += changes.cancellations;
-    globalChanges.skipped += changes.skipped;
+  for (const changesByReporter of changesByCompany.values()) {
+    for (const changes of Object.values(changesByReporter)) {
+      globalChanges.insertions += changes.insertions;
+      globalChanges.edits += changes.edits;
+      globalChanges.cancellations += changes.cancellations;
+      globalChanges.skipped += changes.skipped;
+    }
   }
 
   globalChanges.errors += globalErrorNumber;
@@ -46,19 +52,26 @@ export function incrementLocalChangesForCompany(
   changesByCompany: RegistryChangesByCompany,
   {
     reason,
-    reportForCompanySiret
+    reportForCompanySiret,
+    reportAsCompanySiret
   }: {
     reason: "MODIFIER" | "ANNULER" | "IGNORER" | null | undefined;
     reportForCompanySiret: string;
+    reportAsCompanySiret: string;
   }
 ) {
   if (!changesByCompany.has(reportForCompanySiret)) {
-    changesByCompany.set(reportForCompanySiret, getEmptyChanges());
+    changesByCompany.set(reportForCompanySiret, {
+      [reportAsCompanySiret]: getEmptyChanges()
+    });
   }
 
-  const companyStats = changesByCompany.get(
-    reportForCompanySiret
-  ) as RegistryChanges;
+  const changesByReporter = changesByCompany.get(reportForCompanySiret)!;
+  if (!changesByReporter[reportAsCompanySiret]) {
+    changesByReporter[reportAsCompanySiret] = getEmptyChanges();
+  }
+
+  const companyStats = changesByReporter[reportAsCompanySiret];
 
   switch (reason) {
     case "MODIFIER":
@@ -85,19 +98,30 @@ export async function saveCompaniesChanges(
   }: { type: RegistryImportType; source: RegistrySource; createdById: string }
 ) {
   const promises = Array.from(changesByCompany.entries()).map(
-    async ([siret, changes]) => {
+    async ([siret, changesByReporter]) => {
       const company = await getCachedCompany(siret);
 
       if (!company) {
         return;
       }
 
-      await saveRegistryChanges(changes, {
-        createdById,
-        companyId: company.id,
-        type,
-        source
-      });
+      for (const [reportAsSiret, changes] of Object.entries(
+        changesByReporter
+      )) {
+        const reportAsCompany = await getCachedCompany(reportAsSiret);
+
+        if (!reportAsCompany) {
+          continue;
+        }
+
+        await saveRegistryChanges(changes, {
+          createdById,
+          reportForId: company.id,
+          reportAsId: reportAsCompany.id,
+          type,
+          source
+        });
+      }
     }
   );
 
@@ -108,12 +132,14 @@ export async function saveRegistryChanges(
   registryChanges: RegistryChanges,
   {
     createdById,
-    companyId,
+    reportForId,
+    reportAsId,
     type,
     source
   }: {
     createdById: string;
-    companyId: string;
+    reportForId: string;
+    reportAsId?: string;
     type: RegistryImportType;
     source: RegistrySource;
   }
@@ -122,11 +148,15 @@ export async function saveRegistryChanges(
     await prisma.registryChangeAggregate.findFirst({
       where: {
         createdById,
-        companyId,
+        reportForId,
+        reportAsId,
         type,
         source,
         updatedAt: {
-          gte: new Date(Date.now() - AGGREGATE_WINDOW)
+          gte: new Date(Date.now() - SLIDING_AGGREGATE_WINDOW)
+        },
+        createdAt: {
+          gte: new Date(Date.now() - MAX_AGGREGATE_WINDOW)
         }
       }
     });
@@ -160,7 +190,8 @@ export async function saveRegistryChanges(
   return prisma.registryChangeAggregate.create({
     data: {
       createdById,
-      companyId,
+      reportForId,
+      reportAsId,
       type,
       source,
       numberOfErrors: registryChanges.errors,

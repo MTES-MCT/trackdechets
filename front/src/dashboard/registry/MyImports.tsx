@@ -19,11 +19,11 @@ import { ImportModal } from "./ImportModal";
 import {
   badges,
   downloadFromSignedUrl,
+  formatStats,
   GET_REGISTRY_IMPORTS,
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
 } from "./shared";
-import { pluralize } from "@td/constants";
 
 const HEADERS = [
   "Importé le",
@@ -92,57 +92,9 @@ export function MyImports() {
         0 &&
       ![RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
         importData.node.status
-      ) ? (
-        "Fichier d'import vide"
-      ) : (
-        <ul>
-          {importData.node.numberOfErrors > 0 && (
-            <li>
-              <strong>{importData.node.numberOfErrors} en erreur</strong>
-            </li>
-          )}
-          {importData.node.numberOfInsertions > 0 && (
-            <li>
-              {importData.node.numberOfInsertions}{" "}
-              {pluralize(
-                "ajoutée",
-                importData.node.numberOfInsertions,
-                "ajoutées"
-              )}
-            </li>
-          )}
-          {importData.node.numberOfEdits > 0 && (
-            <li>
-              {importData.node.numberOfEdits}{" "}
-              {pluralize(
-                "modifiée",
-                importData.node.numberOfEdits,
-                "modifiées"
-              )}
-            </li>
-          )}
-          {importData.node.numberOfCancellations > 0 && (
-            <li>
-              {importData.node.numberOfCancellations}{" "}
-              {pluralize(
-                "annulée",
-                importData.node.numberOfCancellations,
-                "annulées"
-              )}
-            </li>
-          )}
-          {importData.node.numberOfSkipped > 0 && (
-            <li>
-              {importData.node.numberOfSkipped}{" "}
-              {pluralize(
-                "ignorée",
-                importData.node.numberOfSkipped,
-                "ignorées"
-              )}
-            </li>
-          )}
-        </ul>
-      ),
+      )
+        ? "Fichier d'import vide"
+        : formatStats(importData.node),
       importData.node.associations
         .map(
           association =>

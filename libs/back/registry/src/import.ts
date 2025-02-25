@@ -42,7 +42,10 @@ export async function processStream({
     { importId, importType, inputStream, fileType }
   );
   const options = importOptions[importType];
-  const changesByCompany = new Map<string, RegistryChanges>();
+  const changesByCompany = new Map<
+    string,
+    { [reportAsSiret: string]: RegistryChanges }
+  >();
   let globalErrorNumber = 0;
 
   const errorStream =
@@ -119,7 +122,8 @@ export async function processStream({
 
       incrementLocalChangesForCompany(changesByCompany, {
         reason,
-        reportForCompanySiret
+        reportForCompanySiret,
+        reportAsCompanySiret: reportAsCompanySiret ?? reportForCompanySiret
       });
 
       const line = { ...result.data, createdById };

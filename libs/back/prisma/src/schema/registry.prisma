@@ -950,8 +950,8 @@ model RegistryLookup {
 }
 
 enum RegistrySource {
-  FILE
-  API
+    FILE
+    API
 }
 
 model RegistryChangeAggregate {
@@ -964,8 +964,11 @@ model RegistryChangeAggregate {
     createdById String
     createdBy   User   @relation(fields: [createdById], references: [id])
 
-    companyId String
-    company   Company @relation(fields: [companyId], references: [id])
+    reportForId String
+    reportFor   Company @relation("RegistryChangeAggregatesReportedFor", fields: [reportForId], references: [id])
+
+    reportAsId String?
+    reportAs   Company? @relation("RegistryChangeAggregatesReportedAs", fields: [reportAsId], references: [id])
 
     numberOfAggregates Int @default(1)
 
@@ -974,4 +977,7 @@ model RegistryChangeAggregate {
     numberOfEdits         Int @default(0)
     numberOfCancellations Int @default(0)
     numberOfSkipped       Int @default(0)
+
+    @@index([reportForId], map: "_RRegistryChangeAggregateReportForIdIdx")
+    @@index([updatedAt], map: "_RRegistryChangeAggregateUpdatedAtIdx")
 }

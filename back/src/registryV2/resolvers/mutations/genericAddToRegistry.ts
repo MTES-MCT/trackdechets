@@ -1,13 +1,13 @@
 import { pluralize } from "@td/constants";
 import { prisma } from "@td/prisma";
 import {
-  UNAUTHORIZED_ERROR,
-  isAuthorized,
-  RegistryChanges,
-  incrementLocalChangesForCompany,
-  saveCompaniesChanges,
   ImportType,
-  importOptions
+  RegistryChanges,
+  UNAUTHORIZED_ERROR,
+  importOptions,
+  incrementLocalChangesForCompany,
+  isAuthorized,
+  saveCompaniesChanges
 } from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -68,7 +68,10 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   const { safeParseAsync, saveLine } = options;
   const errors = new Map<string, string>();
-  const changesByCompany = new Map<string, RegistryChanges>();
+  const changesByCompany = new Map<
+    string,
+    { [reportAsSiret: string]: RegistryChanges }
+  >();
 
   for (const line of lines) {
     const result = await safeParseAsync(line);
@@ -90,7 +93,9 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
       incrementLocalChangesForCompany(changesByCompany, {
         reason: result.data.reason,
-        reportForCompanySiret: result.data.reportForCompanySiret
+        reportForCompanySiret: result.data.reportForCompanySiret,
+        reportAsCompanySiret:
+          result.data.reportAsCompanySiret ?? result.data.reportForCompanySiret
       });
 
       await saveLine({
