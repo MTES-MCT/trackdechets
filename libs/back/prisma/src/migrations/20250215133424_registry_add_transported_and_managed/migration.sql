@@ -1,0 +1,217 @@
+/*
+  Warnings:
+
+  - You are about to drop the column `emitterNoTraceability` on the `RegistryIncomingTexs` table. All the data in the column will be lost.
+  - You are about to drop the column `emitterNoTraceability` on the `RegistryIncomingWaste` table. All the data in the column will be lost.
+
+*/
+-- AlterTable
+ALTER TABLE "RegistryIncomingTexs" DROP COLUMN "emitterNoTraceability";
+
+-- AlterTable
+ALTER TABLE "RegistryIncomingWaste" DROP COLUMN "emitterNoTraceability";
+
+-- CreateTable
+CREATE TABLE "RegistryTransported" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "importId" TEXT,
+    "isLatest" BOOLEAN NOT NULL DEFAULT true,
+    "isCancelled" BOOLEAN NOT NULL DEFAULT false,
+    "createdById" TEXT NOT NULL,
+    "publicId" TEXT NOT NULL,
+    "reportForCompanySiret" TEXT NOT NULL,
+    "reportForCompanyName" TEXT NOT NULL,
+    "reportForCompanyAddress" TEXT NOT NULL,
+    "reportForCompanyCity" TEXT NOT NULL,
+    "reportForCompanyPostalCode" TEXT NOT NULL,
+    "reportForTransportMode" "TransportMode" NOT NULL,
+    "reportForTransportIsWaste" BOOLEAN NOT NULL,
+    "reportForRecepisseIsExempted" BOOLEAN,
+    "reportForRecepisseNumber" TEXT,
+    "reportForTransportAdr" TEXT,
+    "reportForTransportOtherTmdCode" TEXT,
+    "reportForTransportPlates" TEXT[],
+    "reportAsCompanySiret" TEXT,
+    "wasteDescription" TEXT NOT NULL,
+    "wasteCode" TEXT,
+    "wasteCodeBale" TEXT,
+    "wastePop" BOOLEAN,
+    "wasteIsDangerous" BOOLEAN,
+    "collectionDate" TIMESTAMPTZ(6),
+    "unloadingDate" TIMESTAMPTZ(6),
+    "weightValue" DOUBLE PRECISION NOT NULL,
+    "weightIsEstimate" BOOLEAN NOT NULL,
+    "volume" DOUBLE PRECISION,
+    "emitterCompanyType" TEXT NOT NULL,
+    "emitterCompanyOrgId" TEXT,
+    "emitterCompanyName" TEXT,
+    "emitterCompanyAddress" TEXT,
+    "emitterCompanyPostalCode" TEXT,
+    "emitterCompanyCity" TEXT,
+    "emitterCompanyCountryCode" TEXT,
+    "emitterPickupSiteName" TEXT,
+    "emitterPickupSiteAddress" TEXT,
+    "emitterPickupSitePostalCode" TEXT,
+    "emitterPickupSiteCity" TEXT,
+    "emitterPickupSiteCountryCode" TEXT,
+    "destinationCompanyType" TEXT NOT NULL,
+    "destinationCompanyOrgId" TEXT,
+    "destinationCompanyName" TEXT,
+    "destinationCompanyAddress" TEXT,
+    "destinationCompanyPostalCode" TEXT,
+    "destinationCompanyCity" TEXT,
+    "destinationCompanyCountryCode" TEXT,
+    "destinationDropSiteAddress" TEXT,
+    "destinationDropSitePostalCode" TEXT,
+    "destinationDropSiteCity" TEXT,
+    "destinationDropSiteCountryCode" TEXT,
+    "declarationNumber" TEXT,
+    "notificationNumber" TEXT,
+    "movementNumber" TEXT,
+    "ecoOrganismeSiret" TEXT,
+    "ecoOrganismeName" TEXT,
+    "brokerCompanySiret" TEXT,
+    "brokerCompanyName" TEXT,
+    "brokerRecepisseNumber" TEXT,
+    "traderCompanySiret" TEXT,
+    "traderCompanyName" TEXT,
+    "traderRecepisseNumber" TEXT,
+
+    CONSTRAINT "RegistryTransported_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RegistryManaged" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "importId" TEXT,
+    "isLatest" BOOLEAN NOT NULL DEFAULT true,
+    "isCancelled" BOOLEAN NOT NULL DEFAULT false,
+    "createdById" TEXT NOT NULL,
+    "publicId" TEXT NOT NULL,
+    "reportForCompanySiret" TEXT NOT NULL,
+    "reportForCompanyName" TEXT NOT NULL,
+    "reportForCompanyAddress" TEXT NOT NULL,
+    "reportForCompanyCity" TEXT NOT NULL,
+    "reportForCompanyPostalCode" TEXT NOT NULL,
+    "reportAsCompanySiret" TEXT,
+    "wasteCode" TEXT NOT NULL,
+    "wasteCodeBale" TEXT,
+    "wasteDescription" TEXT NOT NULL,
+    "wastePop" BOOLEAN NOT NULL,
+    "wasteIsDangerous" BOOLEAN,
+    "managingStartDate" TIMESTAMPTZ(6) NOT NULL,
+    "managingEndDate" TIMESTAMPTZ(6) NOT NULL,
+    "weightValue" DOUBLE PRECISION NOT NULL,
+    "weightIsEstimate" BOOLEAN NOT NULL,
+    "volume" DOUBLE PRECISION,
+    "initialEmitterCompanyType" TEXT,
+    "initialEmitterCompanyOrgId" TEXT,
+    "initialEmitterCompanyName" TEXT,
+    "initialEmitterCompanyAddress" TEXT,
+    "initialEmitterCompanyPostalCode" TEXT,
+    "initialEmitterCompanyCity" TEXT,
+    "initialEmitterCompanyCountryCode" TEXT,
+    "destinationCompanyType" TEXT NOT NULL,
+    "destinationCompanyOrgId" TEXT,
+    "destinationCompanyName" TEXT,
+    "destinationCompanyAddress" TEXT,
+    "destinationCompanyCity" TEXT,
+    "destinationCompanyPostalCode" TEXT,
+    "destinationCompanyCountryCode" TEXT,
+    "destinationDropSiteAddress" TEXT,
+    "destinationDropSitePostalCode" TEXT,
+    "destinationDropSiteCity" TEXT,
+    "destinationDropSiteCountryCode" TEXT,
+    "declarationNumber" TEXT,
+    "notificationNumber" TEXT,
+    "movementNumber" TEXT,
+    "operationCode" TEXT NOT NULL,
+    "operationMode" "OperationMode",
+    "emitterCompanyType" TEXT NOT NULL,
+    "emitterCompanyOrgId" TEXT,
+    "emitterCompanyName" TEXT,
+    "emitterCompanyAddress" TEXT,
+    "emitterCompanyPostalCode" TEXT,
+    "emitterCompanyCity" TEXT,
+    "emitterCompanyCountryCode" TEXT,
+    "emitterPickupSiteName" TEXT,
+    "emitterPickupSiteAddress" TEXT,
+    "emitterPickupSitePostalCode" TEXT,
+    "emitterPickupSiteCity" TEXT,
+    "emitterPickupSiteCountryCode" TEXT,
+    "ecoOrganismeSiret" TEXT,
+    "ecoOrganismeName" TEXT,
+    "isDirectSupply" BOOLEAN,
+    "transporter1TransportMode" "TransportMode",
+    "transporter1CompanyType" TEXT,
+    "transporter1CompanyOrgId" TEXT,
+    "transporter1RecepisseIsExempted" BOOLEAN,
+    "transporter1RecepisseNumber" TEXT,
+    "transporter1CompanyName" TEXT,
+    "transporter1CompanyAddress" TEXT,
+    "transporter1CompanyPostalCode" TEXT,
+    "transporter1CompanyCity" TEXT,
+    "transporter1CompanyCountryCode" TEXT,
+    "transporter2TransportMode" "TransportMode",
+    "transporter2CompanyType" TEXT,
+    "transporter2CompanyOrgId" TEXT,
+    "transporter2RecepisseIsExempted" BOOLEAN,
+    "transporter2RecepisseNumber" TEXT,
+    "transporter2CompanyName" TEXT,
+    "transporter2CompanyAddress" TEXT,
+    "transporter2CompanyPostalCode" TEXT,
+    "transporter2CompanyCity" TEXT,
+    "transporter2CompanyCountryCode" TEXT,
+    "transporter3TransportMode" "TransportMode",
+    "transporter3CompanyType" TEXT,
+    "transporter3CompanyOrgId" TEXT,
+    "transporter3RecepisseIsExempted" BOOLEAN,
+    "transporter3RecepisseNumber" TEXT,
+    "transporter3CompanyName" TEXT,
+    "transporter3CompanyAddress" TEXT,
+    "transporter3CompanyPostalCode" TEXT,
+    "transporter3CompanyCity" TEXT,
+    "transporter3CompanyCountryCode" TEXT,
+    "transporter4TransportMode" "TransportMode",
+    "transporter4CompanyType" TEXT,
+    "transporter4CompanyOrgId" TEXT,
+    "transporter4RecepisseIsExempted" BOOLEAN,
+    "transporter4RecepisseNumber" TEXT,
+    "transporter4CompanyName" TEXT,
+    "transporter4CompanyAddress" TEXT,
+    "transporter4CompanyPostalCode" TEXT,
+    "transporter4CompanyCity" TEXT,
+    "transporter4CompanyCountryCode" TEXT,
+    "transporter5TransportMode" "TransportMode",
+    "transporter5CompanyType" TEXT,
+    "transporter5CompanyOrgId" TEXT,
+    "transporter5RecepisseIsExempted" BOOLEAN,
+    "transporter5RecepisseNumber" TEXT,
+    "transporter5CompanyName" TEXT,
+    "transporter5CompanyAddress" TEXT,
+    "transporter5CompanyPostalCode" TEXT,
+    "transporter5CompanyCity" TEXT,
+    "transporter5CompanyCountryCode" TEXT,
+
+    CONSTRAINT "RegistryManaged_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "_RegistryTransportedImportIdIdx" ON "RegistryTransported"("importId");
+
+-- CreateIndex
+CREATE INDEX "_RegistryTransportedPublicIdReportForCompanySiretIdx" ON "RegistryTransported"("publicId", "reportForCompanySiret");
+
+-- CreateIndex
+CREATE INDEX "_RegistryManagedImportIdIdx" ON "RegistryManaged"("importId");
+
+-- CreateIndex
+CREATE INDEX "_RegistryManagedPublicIdReportForCompanySiretIdx" ON "RegistryManaged"("publicId", "reportForCompanySiret");
+
+-- AddForeignKey
+ALTER TABLE "RegistryTransported" ADD CONSTRAINT "RegistryTransported_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RegistryManaged" ADD CONSTRAINT "RegistryManaged_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -8,6 +8,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   siretSchema,
+  dateSchema,
   actorAddressSchema,
   actorPostalCodeSchema,
   actorCitySchema,
@@ -32,8 +33,7 @@ import {
   notificationNumberSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema,
-  nullishDateSchema
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -56,7 +56,7 @@ const inputOutgoingTexsSchema = z.object({
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: nullishDateSchema,
+  dispatchDate: dateSchema,
   wasteDap: z
     .string()
     .trim()
@@ -65,7 +65,7 @@ const inputOutgoingTexsSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
   initialEmitterCompanyAddress: actorAddressSchema.nullish(),

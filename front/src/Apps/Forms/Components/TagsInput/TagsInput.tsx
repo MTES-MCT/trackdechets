@@ -47,6 +47,7 @@ const TagsInput = ({
         className="fr-mb-2w"
         nativeInputProps={{
           value: tag,
+          ...{ "data-testid": "tagsInput" },
           onChange: e => setTag(e.target.value),
           onBlur: () => {
             saveTag();
@@ -82,7 +83,8 @@ const TagsInput = ({
                 disabled,
                 onClick: () => {
                   onDeleteTag(idx);
-                }
+                },
+                ...{ "data-testid": "tagsInputTags" }
               }}
             >
               {plate}

@@ -38,7 +38,6 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
     initialEmitterMunicipalitiesNames: null,
-    emitterNoTraceability: false,
     emitterCompanyType: "ETABLISSEMENT_FR",
     emitterCompanyOrgId: "78467169500103",
     emitterCompanyName: "Raison sociale de l'expéditeur",

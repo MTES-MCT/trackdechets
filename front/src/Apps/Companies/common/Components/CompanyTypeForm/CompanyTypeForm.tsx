@@ -73,14 +73,6 @@ export type CompanyTypeInputErrors = {
     validityLimit?: string;
     department?: string;
   };
-  vhuAgrementBroyeur?: {
-    agrementNumber?: string;
-    department?: string;
-  };
-  vhuAgrementDemolisseur?: {
-    agrementNumber?: string;
-    department?: string;
-  };
   workerCertification?: {
     certificationNumber?: string;
     validityLimit?: string;

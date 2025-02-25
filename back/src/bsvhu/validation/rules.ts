@@ -231,7 +231,6 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   destinationAgrementNumber: {
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION" },
     readableFieldName: "Le N° d'agrément du destinataire",
     path: ["destination", "agrementNumber"]
   },

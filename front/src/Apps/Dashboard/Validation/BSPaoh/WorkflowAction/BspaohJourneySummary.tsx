@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Bspaoh } from "@td/codegen-ui";
 import {
-  DsfrJourney,
-  DsfrJourneyStop,
-  DsfrJourneyStopName,
-  DsfrJourneyStopDescription
+  Journey,
+  JourneyStop,
+  JourneyStopName,
+  JourneyStopDescription
 } from "../../../../../common/components";
 
 interface BspaohJourneySummaryProps {
@@ -29,33 +29,33 @@ export function BspaohJourneySummary({
     return null;
   }
   return (
-    <DsfrJourney>
-      <DsfrJourneyStop variant={steps[status][0]}>
-        <DsfrJourneyStopName>Producteur</DsfrJourneyStopName>
-        <DsfrJourneyStopDescription>
+    <Journey>
+      <JourneyStop variant={steps[status][0]}>
+        <JourneyStopName>Producteur</JourneyStopName>
+        <JourneyStopDescription>
           {bspaoh.emitter?.company?.name} ({bspaoh.emitter?.company?.siret})
           <br />
           {bspaoh.emitter?.company?.address}
-        </DsfrJourneyStopDescription>
-      </DsfrJourneyStop>
-      <DsfrJourneyStop variant={steps[status][1]}>
-        <DsfrJourneyStopName>Transporteur</DsfrJourneyStopName>
-        <DsfrJourneyStopDescription>
+        </JourneyStopDescription>
+      </JourneyStop>
+      <JourneyStop variant={steps[status][1]}>
+        <JourneyStopName>Transporteur</JourneyStopName>
+        <JourneyStopDescription>
           {bspaoh.transporter?.company?.name} (
           {bspaoh.transporter?.company?.orgId})
           <br />
           {bspaoh.transporter?.company?.address}
-        </DsfrJourneyStopDescription>
-      </DsfrJourneyStop>
-      <DsfrJourneyStop variant={steps[status][2]}>
-        <DsfrJourneyStopName>Crématorium</DsfrJourneyStopName>
-        <DsfrJourneyStopDescription>
+        </JourneyStopDescription>
+      </JourneyStop>
+      <JourneyStop variant={steps[status][2]}>
+        <JourneyStopName>Crématorium</JourneyStopName>
+        <JourneyStopDescription>
           {bspaoh.destination?.company?.name} (
           {bspaoh.destination?.company?.siret})
           <br />
           {bspaoh.destination?.company?.address}
-        </DsfrJourneyStopDescription>
-      </DsfrJourneyStop>
-    </DsfrJourney>
+        </JourneyStopDescription>
+      </JourneyStop>
+    </Journey>
   );
 }

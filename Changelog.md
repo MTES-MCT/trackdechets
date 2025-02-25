@@ -14,6 +14,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
+- Rendre optionnel les agréments à la publication d'un VHU [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3984)
 
 # [2025.02.1] 11/02/2025
 

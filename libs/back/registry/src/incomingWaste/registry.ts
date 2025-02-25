@@ -20,7 +20,7 @@ export const toIncomingWaste = (
     publicId: incomingWaste.publicId,
     bsdId: null,
     reportAsSiret: incomingWaste.reportAsCompanySiret,
-    createdAt: incomingWaste.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
     destinationReceptionDate: incomingWaste.receptionDate,
@@ -162,8 +162,12 @@ export const toIncomingWaste = (
     destinationReceptionWeightIsEstimate: incomingWaste.weightIsEstimate,
     destinationReceptionVolume: incomingWaste.volume,
     destinationPlannedOperationCode: null,
-    destinationOperationMode: incomingWaste.operationMode,
-    destinationOperationCode: incomingWaste.operationCode,
+    destinationOperationModes: incomingWaste.operationMode
+      ? [incomingWaste.operationMode]
+      : null,
+    destinationOperationCodes: incomingWaste.operationCode
+      ? [incomingWaste.operationCode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingWaste.noTraceability,
     declarationNumber: incomingWaste.declarationNumber,
@@ -238,6 +242,9 @@ export const updateRegistryLookup = async (
         // the id changes because a new RegistrySsd entry is created on each update
         id: registryIncomingWaste.id,
         reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
+        wasteType: registryIncomingWaste.wasteIsDangerous
+          ? RegistryExportWasteType.DD
+          : RegistryExportWasteType.DND,
         wasteCode: registryIncomingWaste.wasteCode,
         ...generateDateInfos(registryIncomingWaste.receptionDate),
         registryIncomingWasteId: registryIncomingWaste.id

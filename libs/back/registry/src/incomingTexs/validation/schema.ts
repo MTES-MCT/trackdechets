@@ -77,17 +77,13 @@ const inputIncomingTexsSchema = z.object({
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNES"
-  ]),
+  emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),
   emitterCompanyAddress: actorAddressSchema.nullish(),
   emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   emitterCompanyCity: actorCitySchema.nullish(),
   emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterNoTraceability: booleanSchema.nullish(),
   emitterPickupSiteName: z.string().trim().nullish(),
   emitterPickupSiteAddress: actorAddressSchema.nullish(),
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),

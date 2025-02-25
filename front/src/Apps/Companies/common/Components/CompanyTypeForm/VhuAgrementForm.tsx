@@ -7,10 +7,6 @@ type VhuAgrementFormProps = {
     agrementNumber?: InputProps["nativeInputProps"];
     department?: InputProps["nativeInputProps"];
   };
-  inputErrors?: {
-    agrementNumber?: string;
-    department?: string;
-  };
 };
 
 const titleStyle: CSSProperties = {
@@ -19,8 +15,7 @@ const titleStyle: CSSProperties = {
 
 const VhuAgrementForm = ({
   title,
-  inputProps,
-  inputErrors
+  inputProps
 }: VhuAgrementFormProps): React.JSX.Element => {
   return (
     <div>
@@ -34,8 +29,6 @@ const VhuAgrementForm = ({
             nativeInputProps={{
               ...inputProps?.agrementNumber
             }}
-            state={inputErrors?.agrementNumber ? "error" : "default"}
-            stateRelatedMessage={inputErrors?.agrementNumber}
           ></Input>
         </div>
         <div className="fr-col-3">
@@ -45,8 +38,6 @@ const VhuAgrementForm = ({
               placeholder: "75",
               ...inputProps?.department
             }}
-            state={inputErrors?.department ? "error" : "default"}
-            stateRelatedMessage={inputErrors?.department}
           ></Input>
         </div>
       </div>
