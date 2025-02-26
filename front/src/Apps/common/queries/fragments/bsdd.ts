@@ -73,6 +73,8 @@ export const wasteDetailsFragment = gql`
       type
       other
       quantity
+      volume
+      identificationNumbers
     }
     quantity
     quantityType
@@ -143,6 +145,8 @@ export const temporaryStorageDetailFragment = gql`
         type
         other
         quantity
+        volume
+        identificationNumbers
       }
       quantity
       quantityType
@@ -167,6 +171,8 @@ export const staticFieldsFragment = gql`
         type
         other
         quantity
+        volume
+        identificationNumbers
       }
       isSubjectToADR
       onuCode
@@ -236,6 +242,8 @@ const mutableFieldsFragment = gql`
             type
             other
             quantity
+            volume
+            identificationNumbers
           }
         }
         emitter {
@@ -422,6 +430,8 @@ export const dashboardFormFragment = gql`
         type
         other
         quantity
+        volume
+        identificationNumbers
       }
       quantity
     }
@@ -526,6 +536,8 @@ export const dashboardFormFragment = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
         quantity
         quantityType
