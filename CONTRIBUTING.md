@@ -67,11 +67,26 @@
    127.0.0.1 es.trackdechets.local
    127.0.0.1 notifier.trackdechets.local
    127.0.0.1 storybook.trackdechets.local
+   127.0.0.1 s3.trackdechets.local # en cas d'utilisation d'un système de container S3 local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
    > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `STORYBOOK_HOST` et `ELASTIC_SEARCH_HOST`
+
+   Pour les utilisateurs de Mac/iOS, il faut aussi ajouter:
+
+   ```
+    ::1 api.trackdechets.local
+    ::1 trackdechets.local
+    ::1 developers.trackdechets.local
+    ::1 es.trackdechets.local
+    ::1 notifier.trackdechets.local
+    ::1 storybook.trackdechets.local
+    ::1 s3.trackdechets.local
+   ```
+
+   Celà permet de contourner la résolution par défaut qui considère les URLs .local comme des urls de service Bonjour, et va d'abord tenter une résolution via ce service, ce qui crée un délai important sur les réponses.
 
 4. Démarrer les containers de bases de données
 
