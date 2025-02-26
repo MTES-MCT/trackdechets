@@ -788,20 +788,16 @@ const parcelInfos = yup.lazy(value => {
   return parcelCommonInfos.concat(parcelCoordinates);
 });
 
-const isValidPackagingInfos: yup.TestFunction<PackagingInfo[] | undefined> = (
-  value,
-  { parent }
-) => {
+const isValidPackagingInfos: yup.TestFunction<
+  PackagingInfo[] | undefined
+> = value => {
   const hasCiterne = value?.some(i => i.type === "CITERNE");
-  const hasPipeline =
-    value?.some(i => i.type === "PIPELINE") || !!parent.isDirectSupply;
   const hasBenne = value?.some(i => i.type === "BENNE");
 
   if (
     // citerne and benne together are not allowed
-    (hasCiterne && hasBenne) ||
-    // pipeline and any other Packaging is forbidden
-    (value?.some(i => i.type !== "PIPELINE") && hasPipeline)
+    hasCiterne &&
+    hasBenne
   ) {
     return false;
   }
@@ -903,7 +899,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
       .of(packagingInfoFn({ isDraft }) as any)
       .test(
         "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+        "${path} ne peut pas à la fois contenir 1 citerne, 1 benne et un autre conditionnement.",
         isValidPackagingInfos
       )
   });
@@ -945,7 +941,7 @@ const wasteDetailsAppendix1ProducerSchemaFn: (
       .transform(value => (!value ? [] : value))
       .test(
         "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+        "${path} ne peut pas à la fois contenir 1 citerne, 1 benne et un autre conditionnement.",
         isValidPackagingInfos
       ) as any
   });
@@ -963,9 +959,18 @@ const wasteDetailsNormalSchemaFn: FactorySchemaOf<
         .of(packagingInfoFn({ isDraft }) as any)
         .test(
           "is-valid-packaging-infos",
-          "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+          "${path} ne peut pas à la fois contenir 1 citerne, 1 benne et un autre conditionnement.",
           isValidPackagingInfos
-        ),
+        )
+        .when("isDirectSupply", {
+          is: true,
+          then: schema =>
+            schema.max(
+              0,
+              "Aucun conditionnement ne doit être renseigné dans le cadre d'un acheminement direct " +
+                "par pipeline ou convoyeur"
+            )
+        }),
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .test(
           "is-not-zero",
@@ -1955,7 +1960,7 @@ const baseFormSchemaFn = (context: FormValidationContext) =>
     const transporterSchema = transporterSchemaFn(context);
 
     const pipelineAndTransporterError =
-      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline";
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur";
 
     return yup
       .object()
@@ -2000,10 +2005,11 @@ export const wasteDetailsSchema = wasteDetailsSchemaFn({
 export async function validateBeforeEmission(form: PrismaForm) {
   await wasteDetailsSchemaFn({ isDraft: false }).validate(form);
 
-  if (form.emitterType !== "APPENDIX1_PRODUCER") {
+  if (form.emitterType !== "APPENDIX1_PRODUCER" && !form.isDirectSupply) {
     // Vérifie qu'au moins un packaging a été défini sauf dans le cas
     // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
-    // de packaging
+    // de packaging et dans le cas d'un acheminement direct par pipeline ou
+    // convoyeur
     const wasteDetailsBeforeTransportSchema = yup.object({
       wasteDetailsPackagingInfos: yup
         .array()

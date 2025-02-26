@@ -110,7 +110,12 @@ const signatures: Partial<
       {
         status: transitionForm(existingForm, {
           type: EventType.SignedByProducer,
-          formUpdateInput
+          formUpdateInput: {
+            ...formUpdateInput,
+            // permet d'accéder à la variable `isDirectSupply` dans une
+            // condition du state machine pour passer directement au statut SENT
+            isDirectSupply: existingForm.isDirectSupply
+          }
         }),
         ...formUpdateInput
       }

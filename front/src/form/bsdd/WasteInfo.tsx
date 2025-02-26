@@ -19,9 +19,11 @@ import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityT
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { FormFormikValues } from "./utils/initial-state";
+import {
+  FormFormikValues,
+  initialFormTransporter
+} from "./utils/initial-state";
 import FormikPackagingList from "../../Apps/Forms/Components/PackagingList/FormikPackagingList";
-import { Packagings } from "@td/codegen-ui";
 import { emptyPackaging } from "../../Apps/Forms/Components/PackagingList/helpers";
 
 const SOIL_CODES = [
@@ -51,10 +53,6 @@ export default function WasteInfo({ disabled }) {
   }, [values.wasteDetails?.code, setFieldValue]);
 
   const showDuplicateWarning = !!values.isDuplicateOf && !disabled;
-
-  const isPipeline = (values.wasteDetails?.packagingInfos ?? []).some(
-    p => p.type === Packagings.Pipeline
-  );
 
   return (
     <>
@@ -188,22 +186,26 @@ export default function WasteInfo({ disabled }) {
           <Switch
             label="Le déchet est acheminé directement par pipeline ou convoyeur"
             disabled={disabled}
-            checked={isPipeline}
-            onChange={checked => {
-              const updatedPackagings = checked
-                ? [{ type: Packagings.Pipeline, quantity: 1 }]
-                : [emptyPackaging];
-              setFieldValue(
-                "wasteDetails.packagingInfos",
-                updatedPackagings,
-                false
-              );
+            checked={Boolean(values.isDirectSupply)}
+            onChange={(checked: boolean) => {
+              setFieldValue("isDirectSupply", checked);
+              if (checked) {
+                setFieldValue("wasteDetails.packagingInfos", []);
+                setFieldValue("transporters", []);
+              } else {
+                setFieldValue(
+                  "wasteDetails.packagingInfos",
+                  [emptyPackaging],
+                  false
+                );
+                setFieldValue("transporters", [initialFormTransporter], false);
+              }
             }}
           />
         </div>
       )}
 
-      {values.emitter?.type !== "APPENDIX1" && !isPipeline && (
+      {values.emitter?.type !== "APPENDIX1" && !values.isDirectSupply && (
         <>
           <h4 className="form__section-heading">Conditionnement</h4>
           <FormikPackagingList

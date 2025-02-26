@@ -139,14 +139,12 @@ export type FormFormikValues = Omit<FormInput, "transporters"> & {
  * @param f current BSD
  */
 export function getInitialState(f?: Form | null): FormFormikValues {
-  const initialTransporters =
-    f?.transporters && f?.transporters.length > 0
-      ? f.transporters
-      : [initialFormTransporter];
+  const initialTransporters = f?.id ? f.transporters : [initialFormTransporter];
 
   return {
     id: f?.id ?? null,
     customId: f?.customId ?? "",
+    isDirectSupply: f?.isDirectSupply ?? false,
     isDuplicateOf: f?.isDuplicateOf,
     emitter: {
       pickupSite: null, // deprecated

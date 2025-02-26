@@ -135,6 +135,8 @@ const createFormResolver = async (
       (form.wasteDetailsPackagingInfos ?? []) as PackagingInfo[]
     ).filter(p => p.type !== "PIPELINE");
     form.isDirectSupply = true;
+    transporters = {};
+    transportersForValidation = [];
   }
 
   const readableId = getReadableId();

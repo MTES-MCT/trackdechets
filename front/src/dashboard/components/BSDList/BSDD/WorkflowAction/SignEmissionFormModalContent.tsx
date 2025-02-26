@@ -37,7 +37,7 @@ interface SignEmissionFormModalProps {
 const validationSchema = (form: Form) => {
   let packagingInfosSchema = yup.array().of(packagingInfo);
 
-  if (form.emitter?.type !== "APPENDIX1_PRODUCER") {
+  if (form.emitter?.type !== "APPENDIX1_PRODUCER" && !form.isDirectSupply) {
     packagingInfosSchema = packagingInfosSchema
       .required()
       .min(1, "Vous devez préciser le conditionnement");

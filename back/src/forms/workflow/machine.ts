@@ -6,7 +6,6 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import { Event, EventType } from "./types";
-import { hasPipelinePackaging } from "../validation";
 
 /**
  * Workflow state machine
@@ -39,12 +38,11 @@ const machine = Machine<any, Event>(
           ],
           [EventType.SignedByProducer]: [
             {
-              target: Status.SIGNED_BY_PRODUCER,
-              cond: "notPipeline"
+              target: Status.SENT,
+              cond: "isDirectSupply"
             },
             {
-              target: Status.SENT,
-              cond: "hasPipeline"
+              target: Status.SIGNED_BY_PRODUCER
             }
           ]
         }
@@ -304,12 +302,9 @@ const machine = Machine<any, Event>(
           guard(event.formUpdateInput?.forwardedIn?.update)
         );
       },
-      hasPipeline: (_, event) =>
-        !!event.formUpdateInput?.wasteDetailsPackagingInfos &&
-        hasPipelinePackaging(event.formUpdateInput as any),
-      notPipeline: (_, event) =>
-        !event.formUpdateInput?.wasteDetailsPackagingInfos ||
-        !hasPipelinePackaging(event.formUpdateInput as any)
+      isDirectSupply: (_, event) => {
+        return !!event.formUpdateInput?.isDirectSupply;
+      }
     }
   }
 );

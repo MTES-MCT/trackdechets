@@ -1770,7 +1770,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
     );
   });
 
@@ -1784,7 +1784,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
     );
   });
 

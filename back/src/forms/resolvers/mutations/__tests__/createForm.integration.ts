@@ -47,6 +47,7 @@ const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
     createForm(createFormInput: $createFormInput) {
       id
+      isDirectSupply
       recipient {
         company {
           siret
@@ -1522,14 +1523,14 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+          "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
       })
     ]);
   });
 
   it(
-    "should throw validation error when packagings contain PIPELINE " +
-      "and transporters list is not empty (retro-compatibility)",
+    "[deprecated] should empty transporters list and packagings" +
+      " when packagings input contain PIPELINE",
     async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const transporter = await companyFactory();
@@ -1548,19 +1549,20 @@ describe("Mutation.createForm", () => {
         }
       };
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { data } = await mutate<
         Pick<Mutation, "createForm">,
         MutationCreateFormArgs
       >(CREATE_FORM, {
         variables: { createFormInput }
       });
 
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
-        })
-      ]);
+      expect(data.createForm).toMatchObject({
+        isDirectSupply: true,
+        wasteDetails: {
+          packagingInfos: []
+        },
+        transporter: null
+      });
     }
   );
 
@@ -1588,7 +1590,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+          "Aucun conditionnement ne doit être renseigné dans le cadre d'un acheminement direct par pipeline ou convoyeur",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

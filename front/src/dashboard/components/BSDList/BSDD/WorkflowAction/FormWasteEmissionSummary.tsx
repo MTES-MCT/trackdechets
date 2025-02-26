@@ -104,31 +104,34 @@ export function FormWasteEmissionSummary({
             </button>
           </DataListDescription>
         </DataListItem>
-        <DataListItem>
-          <DataListTerm>Contenant(s)</DataListTerm>
-          <DataListDescription>
-            {values.packagingInfos
-              ?.map(packaging =>
-                packaging?.type
-                  ? `${packaging.quantity} ${packaging.type}(s)`
-                  : ""
-              )
-              .join(", ")}
+        {!form.isDirectSupply && (
+          <DataListItem>
+            <DataListTerm>Contenant(s)</DataListTerm>
+            <DataListDescription>
+              {values.packagingInfos
+                ?.map(packaging =>
+                  packaging?.type
+                    ? `${packaging.quantity} ${packaging.type}(s)`
+                    : ""
+                )
+                .join(", ")}
 
-            <button
-              type="button"
-              onClick={() => {
-                addField("packagingInfos");
-                if (!values.packagingInfos?.length) {
-                  setFieldValue("packagingInfos", [emptyPackaging]);
-                }
-              }}
-              className="tw-ml-2"
-            >
-              <IconPaperWrite color="blue" />
-            </button>
-          </DataListDescription>
-        </DataListItem>
+              <button
+                type="button"
+                onClick={() => {
+                  addField("packagingInfos");
+                  if (!values.packagingInfos?.length) {
+                    setFieldValue("packagingInfos", [emptyPackaging]);
+                  }
+                }}
+                className="tw-ml-2"
+              >
+                <IconPaperWrite color="blue" />
+              </button>
+            </DataListDescription>
+          </DataListItem>
+        )}
+
         {form.emitter?.type !== EmitterType.Appendix1Producer && (
           <DataListItem>
             <DataListTerm>Mention ADR</DataListTerm>
