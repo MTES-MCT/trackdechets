@@ -10,7 +10,7 @@ import {
 import { isDefinedStrict } from "../../../common/helper";
 import { formatDateViewDisplay } from "../common/utils";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import "./companyRegistryDelegation.scss";
+import "./CompanyRegistry.scss";
 import { useQuery } from "@apollo/client";
 import { REGISTRY_DELEGATIONS } from "../../common/queries/registryDelegation/queries";
 import Button from "@codegouvfr/react-dsfr/Button";

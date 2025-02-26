@@ -183,6 +183,8 @@ registryLookup --> |includes|registrySsd[(RegistrySsd)]
 lookup --> |Returns|inputStream>Input Stream]
 subgraph Pipeline
   direction LR
+  companies[(Companies)] --> companyCachedFetcher[companyCachedFetcher]
+companyCachedFetcher --> transformStream
     inputStream2>Input Stream] --> transformStream>Transform Stream]
     transformStream --> uploadStream2>Upload Stream]
     uploadStream2 --> file@{ shape: doc, label: "Export file" }

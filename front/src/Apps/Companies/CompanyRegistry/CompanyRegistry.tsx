@@ -1,18 +1,20 @@
 import React from "react";
-import "./companyRegistryDelegation.scss";
+import "./CompanyRegistry.scss";
 import { CompanyPrivate } from "@td/codegen-ui";
 import { CompanyRegistryDelegationAsDelegator } from "./CompanyRegistryDelegationAsDelegator";
 import { CompanyRegistryDelegationAsDelegate } from "./CompanyRegistryDelegationAsDelegate";
+import { CompanyRegistryDndFromBsd } from "./CompanyRegistryDndFromBsd";
 
 interface Props {
   company: CompanyPrivate;
 }
 
-export const CompanyRegistryDelegation = ({ company }: Props) => {
+export const CompanyRegistry = ({ company }: Props) => {
   return (
     <>
       <CompanyRegistryDelegationAsDelegator company={company} />
       <CompanyRegistryDelegationAsDelegate company={company} />
+      <CompanyRegistryDndFromBsd company={company} />
     </>
   );
 };
