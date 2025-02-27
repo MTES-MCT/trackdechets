@@ -24,13 +24,14 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { operationHook } from "../../operationHook";
 import { isFinalOperationCode } from "../../../common/operationCodes";
 import { sendMail } from "../../../mailer/mailing";
-import { PACKAGINGS_NAMES } from "../../pdf/components/BsdaPdf";
 import { isDefined } from "../../../common/helpers";
 import {
   bsdaWasteSealNumbersOrPackagingsRevision,
   MessageVersion,
   renderMail
 } from "@td/mail";
+import { PACKAGINGS_NAMES } from "../../utils";
+import { prisma } from "@td/prisma";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -343,161 +344,12 @@ export async function approveAndApplyRevisionRequest(
     });
   }
 
-  let emitterCompanyId;
-  if (bsdaBeforeRevision.emitterCompanySiret) {
-    const emitterCompany = await prisma.company.findFirstOrThrow({
-      where: { orgId: bsdaBeforeRevision.emitterCompanySiret },
-      select: { id: true }
-    });
-
-    emitterCompanyId = emitterCompany.id;
-  }
-
-  // Si la révision s'est jouée entre l'entreprise de travaux et la destination,
-  // pour les champs wasteSealNumbers et wasteMaterialName, on prévient
-  // l'émetteur par mail
-  if (
-    updatedBsda.type === BsdaType.OTHER_COLLECTIONS &&
-    isDefined(updatedBsda.emitterCompanySiret) &&
-    isDefined(updatedBsda.workerCompanySiret) &&
-    isDefined(updatedBsda.destinationCompanySiret) &&
-    !updatedRevisionRequest.isCanceled &&
-    isOnlyAboutFields(updateData, [
-      "status", // le status peut se glisser dans l'update, attention
-      "wasteSealNumbers",
-      "packagings"
-    ]) &&
-    updatedRevisionRequest.authoringCompanyId !== emitterCompanyId
-  ) {
-    // Send mail
-    const companies = await prisma.company.findMany({
-      where: {
-        orgId: {
-          in: [
-            updatedBsda.emitterCompanySiret ?? "",
-            updatedBsda.workerCompanySiret ?? "",
-            updatedBsda.destinationCompanySiret ?? ""
-          ]
-        }
-      },
-      select: {
-        id: true,
-        orgId: true
-      }
-    });
-
-    const emitterCompany = companies.find(
-      company => company.orgId === updatedBsda.emitterCompanySiret
-    );
-    const workerCompany = companies.find(
-      company => company.orgId === updatedBsda.workerCompanySiret
-    );
-    const destinationCompany = companies.find(
-      company => company.orgId === updatedBsda.destinationCompanySiret
-    );
-
-    const companyAssociations = await prisma.companyAssociation.findMany({
-      where: {
-        companyId: { in: companies.map(company => company.id) },
-        notificationIsActiveBsdaFinalDestinationUpdate: true
-      },
-      include: {
-        user: true
-      }
-    });
-
-    const emitterCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === emitterCompany?.id
-    );
-    const workerCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === workerCompany?.id
-    );
-    const destinationCompanyAssociations = companyAssociations.filter(
-      association => association.companyId === destinationCompany?.id
-    );
-
-    if (emitterCompanyAssociations?.length) {
-      const messageVersion: MessageVersion = {
-        to: emitterCompanyAssociations
-          .filter(association => association.companyId === emitterCompany?.id)
-          .map(association => ({
-            name: association.user.name,
-            email: association.user.email
-          }))
-      };
-
-      const worker = {
-        name: updatedBsda.workerCompanyName,
-        siret: updatedBsda.workerCompanySiret
-      };
-      const destination = {
-        name: updatedBsda.destinationCompanyName,
-        siret: updatedBsda.destinationCompanySiret
-      };
-
-      const approverSiret = updatedRevisionRequest.approvals.find(
-        approval => approval.approverSiret
-      )?.approverSiret;
-      const approver = worker.siret === approverSiret ? worker : destination;
-      const author = worker.siret === approver.siret ? destination : worker;
-
-      const packagingsToString = packagings =>
-        packagings
-          ?.map(
-            p => `${p.quantity} x ${PACKAGINGS_NAMES[p.type]}${p.other ?? ""}`
-          )
-          ?.join(", ");
-
-      let wasteSealNumbersBeforeRevision, wasteSealNumbersAfterRevision;
-      if (updatedRevisionRequest.wasteSealNumbers?.length !== 0) {
-        wasteSealNumbersBeforeRevision =
-          bsdaBeforeRevision.wasteSealNumbers?.join(", ");
-        wasteSealNumbersAfterRevision =
-          updatedBsda.wasteSealNumbers?.join(", ");
-      }
-
-      let packagingsBeforeRevision, packagingsAfterRevision;
-      if (isDefined(updatedRevisionRequest.packagings)) {
-        packagingsBeforeRevision = packagingsToString(
-          bsdaBeforeRevision.packagings
-        );
-        packagingsAfterRevision = packagingsToString(updatedBsda.packagings);
-      }
-
-      const payload = renderMail(bsdaWasteSealNumbersOrPackagingsRevision, {
-        variables: {
-          bsdaId: updatedBsda.id,
-          author,
-          approver,
-          worker,
-          destination,
-          wasteSealNumbersBeforeRevision,
-          wasteSealNumbersAfterRevision,
-          packagingsBeforeRevision,
-          packagingsAfterRevision
-        },
-        messageVersions: [messageVersion],
-        cc: [
-          ...workerCompanyAssociations
-            .filter(association => association.companyId === workerCompany?.id)
-            .map(association => ({
-              name: association.user.name,
-              email: association.user.email
-            })),
-          ...destinationCompanyAssociations
-            .filter(
-              association => association.companyId === destinationCompany?.id
-            )
-            .map(association => ({
-              name: association.user.name,
-              email: association.user.email
-            }))
-        ]
-      });
-
-      await sendMail(payload);
-    }
-  }
+  // We might need to send an email to the emitter
+  await sendEmailWhenRevisionOnSealNumbersOrPackagings(
+    bsdaBeforeRevision,
+    updatedBsda,
+    updatedRevisionRequest
+  );
 
   prisma.addAfterCommitCallback?.(() =>
     enqueueUpdatedBsdToIndex(updatedRevisionRequest.bsdaId)
@@ -505,3 +357,173 @@ export async function approveAndApplyRevisionRequest(
 
   return updatedRevisionRequest;
 }
+
+const getEmitterCompanyId = async bsda => {
+  if (bsda.emitterCompanySiret) {
+    const emitterCompany = await prisma.company.findFirstOrThrow({
+      where: { orgId: bsda.emitterCompanySiret },
+      select: { id: true }
+    });
+
+    return emitterCompany.id;
+  }
+
+  return null;
+};
+
+/**
+ * Si la révision s'est jouée entre l'entreprise de travaux et la destination,
+ * pour les champs wasteSealNumbers et wasteMaterialName, on prévient
+ * l'émetteur par mail
+ */
+const sendEmailWhenRevisionOnSealNumbersOrPackagings = async (
+  bsdaBeforeRevision,
+  bsdaAfterRevision,
+  updatedRevisionRequest
+) => {
+  const shouldSendMail =
+    bsdaAfterRevision.type === BsdaType.OTHER_COLLECTIONS &&
+    isDefined(bsdaAfterRevision.emitterCompanySiret) &&
+    isDefined(bsdaAfterRevision.workerCompanySiret) &&
+    isDefined(bsdaAfterRevision.destinationCompanySiret) &&
+    !updatedRevisionRequest.isCanceled &&
+    isOnlyAboutFields(bsdaAfterRevision, [
+      "status", // le status peut se glisser dans l'update, attention
+      "wasteSealNumbers",
+      "packagings"
+    ]) &&
+    updatedRevisionRequest.authoringCompanyId !==
+      (await getEmitterCompanyId(bsdaBeforeRevision));
+
+  if (!shouldSendMail) return;
+
+  const companies = await prisma.company.findMany({
+    where: {
+      orgId: {
+        in: [
+          bsdaAfterRevision.emitterCompanySiret ?? "",
+          bsdaAfterRevision.workerCompanySiret ?? "",
+          bsdaAfterRevision.destinationCompanySiret ?? ""
+        ]
+      }
+    },
+    select: {
+      id: true,
+      orgId: true
+    }
+  });
+
+  const emitterCompany = companies.find(
+    company => company.orgId === bsdaAfterRevision.emitterCompanySiret
+  );
+  const workerCompany = companies.find(
+    company => company.orgId === bsdaAfterRevision.workerCompanySiret
+  );
+  const destinationCompany = companies.find(
+    company => company.orgId === bsdaAfterRevision.destinationCompanySiret
+  );
+
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: { in: companies.map(company => company.id) },
+      notificationIsActiveBsdaFinalDestinationUpdate: true
+    },
+    include: {
+      user: true
+    }
+  });
+
+  const emitterCompanyAssociations = companyAssociations.filter(
+    association => association.companyId === emitterCompany?.id
+  );
+  const workerCompanyAssociations = companyAssociations.filter(
+    association => association.companyId === workerCompany?.id
+  );
+  const destinationCompanyAssociations = companyAssociations.filter(
+    association => association.companyId === destinationCompany?.id
+  );
+
+  if (emitterCompanyAssociations?.length) {
+    const messageVersion: MessageVersion = {
+      to: emitterCompanyAssociations
+        .filter(association => association.companyId === emitterCompany?.id)
+        .map(association => ({
+          name: association.user.name,
+          email: association.user.email
+        }))
+    };
+
+    const worker = {
+      name: bsdaAfterRevision.workerCompanyName,
+      siret: bsdaAfterRevision.workerCompanySiret
+    };
+    const destination = {
+      name: bsdaAfterRevision.destinationCompanyName,
+      siret: bsdaAfterRevision.destinationCompanySiret
+    };
+
+    const approverSiret = updatedRevisionRequest.approvals.find(
+      approval => approval.approverSiret
+    )?.approverSiret;
+    const approver = worker.siret === approverSiret ? worker : destination;
+    const author = worker.siret === approver.siret ? destination : worker;
+
+    const packagingsToString = packagings =>
+      packagings
+        ?.map(
+          p => `${p.quantity} x ${PACKAGINGS_NAMES[p.type]}${p.other ?? ""}`
+        )
+        ?.join(", ");
+
+    let wasteSealNumbersBeforeRevision, wasteSealNumbersAfterRevision;
+    if (updatedRevisionRequest.wasteSealNumbers?.length !== 0) {
+      wasteSealNumbersBeforeRevision =
+        bsdaBeforeRevision.wasteSealNumbers?.join(", ");
+      wasteSealNumbersAfterRevision =
+        bsdaAfterRevision.wasteSealNumbers?.join(", ");
+    }
+
+    let packagingsBeforeRevision, packagingsAfterRevision;
+    if (isDefined(updatedRevisionRequest.packagings)) {
+      packagingsBeforeRevision = packagingsToString(
+        bsdaBeforeRevision.packagings
+      );
+      packagingsAfterRevision = packagingsToString(
+        bsdaAfterRevision.packagings
+      );
+    }
+
+    const payload = renderMail(bsdaWasteSealNumbersOrPackagingsRevision, {
+      variables: {
+        bsdaId: bsdaAfterRevision.id,
+        author,
+        approver,
+        worker,
+        destination,
+        wasteSealNumbersBeforeRevision,
+        wasteSealNumbersAfterRevision,
+        packagingsBeforeRevision,
+        packagingsAfterRevision
+      },
+      messageVersions: [messageVersion],
+      cc: [
+        ...workerCompanyAssociations
+          .filter(association => association.companyId === workerCompany?.id)
+          .map(association => ({
+            name: association.user.name,
+            email: association.user.email
+          })),
+        ...destinationCompanyAssociations
+          .filter(
+            association => association.companyId === destinationCompany?.id
+          )
+          .map(association => ({
+            name: association.user.name,
+            email: association.user.email
+          }))
+      ]
+    });
+
+    await sendMail(payload);
+  }
+};
