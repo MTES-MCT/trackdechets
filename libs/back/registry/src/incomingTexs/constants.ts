@@ -38,8 +38,6 @@ export const INCOMING_TEXS_HEADERS: {
   emitterCompanyPostalCode: "Code postal de l'expéditeur ou détenteur",
   emitterCompanyCity: "Commune de l'expéditeur ou détenteur",
   emitterCompanyCountryCode: "Code pays de l'expéditeur ou détenteur",
-  emitterNoTraceability:
-    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
     "Référence du chantier ou du lieu de collecte de l'expéditeur",
   emitterPickupSiteAddress:

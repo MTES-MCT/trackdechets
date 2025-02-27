@@ -118,14 +118,12 @@ export const fillWasteTab = async (page: Page) => {
 
   // Détail des identifications
   const fillIdentificationsInput = async (value: string) => {
-    const identificationsInput = await page.getByTestId(
-      "identificationNumberInput"
-    );
+    const identificationsInput = await page.getByTestId("tagsInput");
     await identificationsInput.fill(value);
     await identificationsInput.press("Enter");
   };
 
-  const nbrInput = await page.getByTestId("tagInputIdentificationNumber");
+  const nbrInput = await page.getByTestId("tagsInputTags");
 
   // Fill in a 1st value
   await fillIdentificationsInput("LOTVHU001");

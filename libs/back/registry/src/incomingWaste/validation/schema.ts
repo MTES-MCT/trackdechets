@@ -86,14 +86,16 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema,
-  emitterCompanyOrgId: actorOrgIdSchema,
-  emitterCompanyName: actorNameSchema,
-  emitterCompanyAddress: actorAddressSchema,
-  emitterCompanyPostalCode: actorPostalCodeSchema,
-  emitterCompanyCity: actorCitySchema,
-  emitterCompanyCountryCode: actorCountryCodeSchema,
-  emitterNoTraceability: booleanSchema.nullish(),
+  emitterCompanyType: actorTypeSchema.exclude([
+    "PERSONNE_PHYSIQUE",
+    "COMMUNES"
+  ]),
+  emitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  emitterCompanyName: actorNameSchema.nullish(),
+  emitterCompanyAddress: actorAddressSchema.nullish(),
+  emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  emitterCompanyCity: actorCitySchema.nullish(),
+  emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   emitterPickupSiteName: z
     .string()
     .trim()

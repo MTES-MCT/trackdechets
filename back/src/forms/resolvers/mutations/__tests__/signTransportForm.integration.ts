@@ -496,6 +496,111 @@ describe("signTransportForm", () => {
     );
   });
 
+  it("should sign transport from temporary storage when plates are valid", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+
+    const form = await formWithTempStorageFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: "SIGNED_BY_TEMP_STORER",
+        recipientCompanySiret: temporaryStorage.company.siret,
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name,
+          transporterNumberPlate: "XY-65-TR"
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.signTransportForm).toEqual(
+      expect.objectContaining({
+        status: "RESENT",
+        temporaryStorageDetail: expect.objectContaining({
+          signedAt: takenOverAt.toISOString(),
+          signedBy: temporaryStorage.user.name,
+
+          takenOverAt: takenOverAt.toISOString(),
+          takenOverBy: transporter.user.name
+        })
+      })
+    );
+  });
+
+  it("should throw an error when signing transport from temporary storage and plates are invalid", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+
+    const form = await formWithTempStorageFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: "SIGNED_BY_TEMP_STORER",
+        recipientCompanySiret: temporaryStorage.company.siret,
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name,
+          transporterNumberPlate: "XY"
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le numéro d'immatriculation doit faire entre 4 et 12 caractères"
+      })
+    ]);
+  });
+
   it("should sign transport from temporary storage with security code", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");

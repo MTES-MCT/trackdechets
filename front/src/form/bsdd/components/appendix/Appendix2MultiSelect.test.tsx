@@ -36,7 +36,9 @@ const appendixForms = [
           __typename: "PackagingInfo",
           type: "BENNE",
           other: "",
-          quantity: 1
+          quantity: 1,
+          volume: null,
+          identificationNumbers: []
         }
       ]
     },
@@ -73,7 +75,9 @@ const appendixForms = [
           __typename: "PackagingInfo",
           type: "GRV",
           other: "",
-          quantity: 1
+          quantity: 1,
+          volume: null,
+          identificationNumbers: []
         }
       ]
     },
@@ -110,7 +114,9 @@ const grouping = [
             __typename: "PackagingInfo",
             type: "BENNE",
             other: "",
-            quantity: 1
+            quantity: 1,
+            volume: null,
+            identificationNumbers: []
           }
         ]
       },
@@ -178,7 +184,10 @@ describe("<Appendix2MultiSelect />", () => {
 
   it("should render correctly with data from `grouping` and `appendixForms`", async () => {
     render(
-      component(appendixForms as Form[], grouping as InitialFormFraction[])
+      component(
+        appendixForms as any as Form[],
+        grouping as any as InitialFormFraction[]
+      )
     );
     // Vérifie la présence des headers
     const headers = screen.getAllByRole("columnheader");
@@ -269,7 +278,9 @@ describe("<Appendix2MultiSelect />", () => {
       {
         other: "",
         quantity: 2,
-        type: "BENNE"
+        type: "BENNE",
+        volume: null,
+        identificationNumbers: []
       }
     ]);
 
@@ -280,12 +291,16 @@ describe("<Appendix2MultiSelect />", () => {
       {
         other: "",
         quantity: 2,
-        type: "BENNE"
+        type: "BENNE",
+        volume: null,
+        identificationNumbers: []
       },
       {
         other: "",
         quantity: 1,
-        type: "GRV"
+        type: "GRV",
+        volume: null,
+        identificationNumbers: []
       }
     ]);
     expect(input3).not.toBeDisabled();
@@ -350,12 +365,16 @@ describe("<Appendix2MultiSelect />", () => {
       {
         other: "",
         quantity: 2,
-        type: "BENNE"
+        type: "BENNE",
+        volume: null,
+        identificationNumbers: []
       },
       {
         other: "",
         quantity: 1,
-        type: "GRV"
+        type: "GRV",
+        volume: null,
+        identificationNumbers: []
       }
     ]);
 

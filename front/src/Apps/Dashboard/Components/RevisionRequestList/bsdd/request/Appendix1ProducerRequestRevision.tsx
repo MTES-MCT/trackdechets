@@ -3,11 +3,9 @@ import { BSDD_SAMPLE_NUMBER_WASTE_CODES } from "@td/constants";
 import React from "react";
 import { useFormContext } from "react-hook-form";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
-import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
-import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
-import { disableAddPackagingCta } from "../../common/utils/rules";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 
 const Appendix1ProducerRequestRevision = ({
   bsdd,
@@ -16,7 +14,6 @@ const Appendix1ProducerRequestRevision = ({
 }) => {
   const { register, getValues } = useFormContext();
 
-  const packagingInfoValues = getValues("wasteDetails.packagingInfos");
   const wasteQuantityValue = getValues("wasteDetails.quantity");
   return (
     <div
@@ -37,11 +34,7 @@ const Appendix1ProducerRequestRevision = ({
         defaultValue={initialBsddReview.wasteDetails.packagingInfos}
         initialValue={bsdd.wasteDetails?.packagingInfos}
       >
-        <BsdPackagings
-          path="wasteDetails.packagingInfos"
-          bsdType={BsdTypename.Bsdd}
-          disabledAddCta={disableAddPackagingCta(packagingInfoValues)}
-        />
+        <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
       </RhfReviewableField>
 
       {bsdd.wasteDetails?.code &&

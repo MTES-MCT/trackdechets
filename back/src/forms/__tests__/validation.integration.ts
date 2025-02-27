@@ -47,7 +47,7 @@ const formData: Partial<Form> = {
   emitterCompanyAddress: "8 rue du Général de Gaulle",
   emitterCompanyMail: "e@e.fr",
   recipientCap: "1234",
-  recipientProcessingOperation: "D 6",
+  recipientProcessingOperation: "D 8",
   recipientCompanyName: "A company 3",
   recipientCompanySiret: siret2,
   recipientCompanyAddress: "8 rue du Général de Gaulle",
@@ -1773,6 +1773,20 @@ describe("draftFormSchema", () => {
       "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
     );
   });
+
+  it.each([-1, 0])(
+    "should not validate when packaging volume is %p (not strictly positive)",
+    async volume => {
+      const validateFn = () =>
+        draftFormSchema.validate({
+          wasteDetailsPackagingInfos: [{ type: "FUT", weight: 1, volume }]
+        });
+
+      await expect(validateFn()).rejects.toThrow(
+        "Le volume doit être un nombre positif"
+      );
+    }
+  );
 
   it("should not be valid when passing eco-organisme as emitter", async () => {
     const ecoOrganisme = await ecoOrganismeFactory({

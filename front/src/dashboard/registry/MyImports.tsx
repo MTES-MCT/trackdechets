@@ -13,6 +13,7 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 
+import styles from "./MyImports.module.scss";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { ImportModal } from "./ImportModal";
 import {
@@ -22,6 +23,7 @@ import {
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
 } from "./shared";
+import { pluralize } from "@td/constants";
 
 const HEADERS = [
   "Importé le",
@@ -53,13 +55,13 @@ export function MyImports() {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ErrorFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
   async function downloadImportFile(importId: string) {
     const link = await getDownloadLink({
       variables: { importId, target: RegistryDownloadTarget.ImportFile }
     });
-    await downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
+    downloadFromSignedUrl(link.data?.registryDownloadSignedUrl.signedUrl);
   }
 
   const totalCount = data?.registryImports.totalCount;
@@ -100,16 +102,44 @@ export function MyImports() {
             </li>
           )}
           {importData.node.numberOfInsertions > 0 && (
-            <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
+            <li>
+              {importData.node.numberOfInsertions}{" "}
+              {pluralize(
+                "ajoutée",
+                importData.node.numberOfInsertions,
+                "ajoutées"
+              )}
+            </li>
           )}
           {importData.node.numberOfEdits > 0 && (
-            <li>{importData.node.numberOfEdits} modifiée(s)</li>
+            <li>
+              {importData.node.numberOfEdits}{" "}
+              {pluralize(
+                "modifiée",
+                importData.node.numberOfEdits,
+                "modifiées"
+              )}
+            </li>
           )}
           {importData.node.numberOfCancellations > 0 && (
-            <li>{importData.node.numberOfCancellations} annulée(s)</li>
+            <li>
+              {importData.node.numberOfCancellations}{" "}
+              {pluralize(
+                "annulée",
+                importData.node.numberOfCancellations,
+                "annulées"
+              )}
+            </li>
           )}
           {importData.node.numberOfSkipped > 0 && (
-            <li>{importData.node.numberOfSkipped} ignorées(s)</li>
+            <li>
+              {importData.node.numberOfSkipped}{" "}
+              {pluralize(
+                "ignorée",
+                importData.node.numberOfSkipped,
+                "ignorées"
+              )}
+            </li>
           )}
         </ul>
       ),
@@ -172,9 +202,9 @@ export function MyImports() {
           </div>
           <div className="tw-flex tw-items-center">
             <a
-              href="https://faq.trackdechets.fr/"
+              href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noreferrer"
               className="fr-link fr-text--sm"
             >
               Retrouvez les modèles de registres dans la documentation
@@ -201,49 +231,50 @@ export function MyImports() {
           </div>
         )}
         {data && tableData.length > 0 && (
-          <div className="tw-mt-8">
-            <div className="tw-flex tw-justify-between">
-              <h2 className="tw-text-2xl tw-font-bold">
-                Historique de mes imports
-              </h2>
-              <div>
-                <Button
-                  priority="secondary"
-                  iconId="fr-icon-refresh-line"
-                  iconPosition="right"
-                  size="small"
-                  onClick={() => refetch()}
-                >
-                  Rafraîchir
-                </Button>
+          <div>
+            <div className="tw-mt-8">
+              <div className="tw-flex tw-justify-between">
+                <h2 className="tw-text-2xl tw-font-bold">
+                  Historique de mes imports
+                </h2>
+                <div>
+                  <Button
+                    priority="secondary"
+                    iconId="fr-icon-refresh-line"
+                    iconPosition="right"
+                    size="small"
+                    onClick={() => refetch()}
+                  >
+                    Rafraîchir
+                  </Button>
+                </div>
               </div>
+              <Table
+                bordered
+                className={styles.fullWidthTable}
+                noCaption
+                data={tableData}
+                headers={HEADERS}
+              />
             </div>
-            <Table
-              bordered
-              fixed
-              noCaption
-              data={tableData}
-              headers={HEADERS}
-            />
+            <div className="tw-flex tw-justify-center">
+              <Pagination
+                showFirstLast
+                count={pageCount}
+                defaultPage={pageIndex + 1}
+                getPageLinkProps={pageNumber => ({
+                  onClick: event => {
+                    event.preventDefault();
+                    gotoPage(pageNumber - 1);
+                  },
+                  href: "#",
+                  key: `pagination-link-${pageNumber}`
+                })}
+                className={"fr-mt-1w"}
+              />
+            </div>
           </div>
         )}
-
-        <div className="tw-flex tw-justify-center">
-          <Pagination
-            showFirstLast
-            count={pageCount}
-            defaultPage={pageIndex + 1}
-            getPageLinkProps={pageNumber => ({
-              onClick: event => {
-                event.preventDefault();
-                gotoPage(pageNumber - 1);
-              },
-              href: "#",
-              key: `pagination-link-${pageNumber}`
-            })}
-            className={"fr-mt-1w"}
-          />
-        </div>
       </div>
 
       <ImportModal

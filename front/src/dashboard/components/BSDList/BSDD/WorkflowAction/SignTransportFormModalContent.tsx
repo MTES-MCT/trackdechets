@@ -29,6 +29,8 @@ import {
   GET_FORM,
   UPDATE_FORM
 } from "../../../../../Apps/common/queries/bsdd/queries";
+import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
+import { packagingInfo } from "../../../../../form/bsdd/utils/schema";
 
 const validationSchema = yup.object({
   takenOverAt: yup.date().required("La date de prise en charge est requise"),
@@ -39,7 +41,8 @@ const validationSchema = yup.object({
   securityCode: yup
     .string()
     .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres")
+    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+  update: yup.object({ packagingInfos: yup.array().of(packagingInfo) })
 });
 interface SignTransportFormModalProps {
   title: string;
@@ -148,10 +151,11 @@ export default function SignTransportFormModalContent({
       onSubmit={async values => {
         try {
           const { update } = values;
+          const packagingsInfoUpdate = cleanPackagings(update.packagingInfos);
           if (
             update.sampleNumber ||
             (form.emitter?.type === EmitterType.Appendix1Producer &&
-              (update.quantity || update.packagingInfos.length > 0))
+              (update.quantity || packagingsInfoUpdate.length > 0))
           ) {
             await updateForm({
               variables: {
@@ -163,7 +167,7 @@ export default function SignTransportFormModalContent({
                       sampleNumber: update.sampleNumber
                     }),
                     ...(update.packagingInfos.length > 0 && {
-                      packagingInfos: update.packagingInfos
+                      packagingInfos: packagingsInfoUpdate
                     })
                   }
                 }

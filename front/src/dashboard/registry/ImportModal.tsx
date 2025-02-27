@@ -156,7 +156,14 @@ function Step1({ register }: StepProps) {
           description={
             <p>
               Vous trouverez de l'aide sur le format de fichier et des exemples
-              dans la <a href="#todo">documentation</a>
+              dans la{" "}
+              <a
+                href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
+                target="_blank"
+                rel="noreferrer"
+              >
+                documentation
+              </a>
             </p>
           }
           severity="info"
@@ -183,6 +190,8 @@ function Step1({ register }: StepProps) {
         <option value="OUTGOING_TEXS">
           Terres excavées et sédiments, dangereux et non dangereux sortants
         </option>
+        <option value="TRANSPORTED">Transportés</option>
+        <option value="MANAGED">Gérés</option>
       </Select>
 
       <Upload

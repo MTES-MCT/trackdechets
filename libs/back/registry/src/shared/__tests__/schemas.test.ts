@@ -21,7 +21,8 @@ import {
   booleanSchema,
   operationModeSchema,
   notificationNumberSchema,
-  parcelNumbersSchema
+  parcelNumbersSchema,
+  declarationNumberSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -60,6 +61,10 @@ describe("Schemas", () => {
 
   test("getWasteCodeSchema", () => {
     expect(() => getWasteCodeSchema().parse("17 02 01")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("170201")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01*")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("07 03 01 *")).not.toThrow();
+    expect(() => getWasteCodeSchema().parse("070301*")).not.toThrow();
     expect(() => getWasteCodeSchema().parse("invalid")).toThrow();
     expect(() =>
       getWasteCodeSchema().nullish().parse("17 02 01")
@@ -203,8 +208,20 @@ describe("Schemas", () => {
     expect(operationModeSchema.parse(null)).toBe(null);
   });
 
+  test("declarationNumberSchema", () => {
+    expect(() =>
+      declarationNumberSchema.parse("A7E 2024 063125")
+    ).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => declarationNumberSchema.parse("A7E 2024 06312")).toThrow();
+  });
+
   test("notificationNumberSchema", () => {
     expect(() => notificationNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() =>
+      notificationNumberSchema.parse("FR 2023 077002")
+    ).not.toThrow();
     expect(() =>
       notificationNumberSchema.parse("AA 1234 567890")
     ).not.toThrow();
@@ -214,6 +231,7 @@ describe("Schemas", () => {
 
   test("parcelNumbersSchema", () => {
     expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("1-A-1")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("123-AA-1234")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("12-AA-12")).not.toThrow();

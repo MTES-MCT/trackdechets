@@ -627,6 +627,12 @@ input PackagingInfoInput {
   le nombre de colis ne peut être supérieur à 2.
   """
   quantity: Int!
+
+  "Volume du conditionnement en litre(s)"
+  volume: Float
+
+  "Numéros des contenants"
+  identificationNumbers: [String!]
 }
 
 "Payload lié au détails du déchet (case 3 à 6)"

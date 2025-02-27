@@ -1,9 +1,10 @@
 import {
+  refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
   refineNotificationNumber,
-  refineOperationCodeWhenUpcycled,
   refineOperationMode,
+  refineTransportersConsistency,
   refineWeightAndVolume
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -28,13 +29,14 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
     .superRefine(refineNotificationNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
-    .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)
+    .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)
     .superRefine(transporter4Refinement)
     .superRefine(transporter5Refinement)
+    .superRefine(refineTransportersConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .safeParseAsync(line, { errorMap: registryErrorMap });

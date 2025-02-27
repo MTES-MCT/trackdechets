@@ -8,6 +8,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   siretSchema,
+  dateSchema,
   actorAddressSchema,
   actorPostalCodeSchema,
   actorCitySchema,
@@ -32,8 +33,7 @@ import {
   notificationNumberSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema,
-  nullishDateSchema
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -52,11 +52,11 @@ const inputOutgoingTexsSchema = z.object({
   reportForPickupSiteCity: actorCitySchema.nullish(),
   reportForPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
-  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES),
+  wasteCode: getWasteCodeSchema(INCOMING_TEXS_WASTE_CODES).nullish(),
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: nullishDateSchema,
+  dispatchDate: dateSchema,
   wasteDap: z
     .string()
     .trim()
@@ -65,13 +65,13 @@ const inputOutgoingTexsSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
-  initialEmitterCompanyOrgId: actorOrgIdSchema,
-  initialEmitterCompanyName: actorNameSchema,
-  initialEmitterCompanyAddress: actorAddressSchema,
-  initialEmitterCompanyPostalCode: actorPostalCodeSchema,
-  initialEmitterCompanyCity: actorCitySchema,
-  initialEmitterCompanyCountryCode: actorCountryCodeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
+  initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
+  initialEmitterCompanyName: actorNameSchema.nullish(),
+  initialEmitterCompanyAddress: actorAddressSchema.nullish(),
+  initialEmitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  initialEmitterCompanyCity: actorCitySchema.nullish(),
+  initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
   initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   parcelInseeCodes: inseeCodesSchema,
@@ -83,12 +83,12 @@ const inputOutgoingTexsSchema = z.object({
     .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
     .nullish(),
   destinationCompanyType: actorTypeSchema,
-  destinationCompanyOrgId: actorOrgIdSchema,
-  destinationCompanyName: actorNameSchema,
-  destinationCompanyAddress: actorAddressSchema,
-  destinationCompanyPostalCode: actorPostalCodeSchema,
-  destinationCompanyCity: actorCitySchema,
-  destinationCompanyCountryCode: actorCountryCodeSchema,
+  destinationCompanyOrgId: actorOrgIdSchema.nullish(),
+  destinationCompanyName: actorNameSchema.nullish(),
+  destinationCompanyAddress: actorAddressSchema.nullish(),
+  destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
+  destinationCompanyCity: actorCitySchema.nullish(),
+  destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   destinationDropSiteAddress: actorAddressSchema.nullish(),
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),

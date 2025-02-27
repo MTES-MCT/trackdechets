@@ -47,10 +47,12 @@ export const GET_REGISTRY_IMPORTS = gql`
 
 export const TYPES: { [key in RegistryImportType]: string } = {
   SSD: "SSD",
-  INCOMING_WASTE: "D(N)D entrants",
-  OUTGOING_WASTE: "D(N)D sortants",
+  INCOMING_WASTE: "D et ND entrants",
+  OUTGOING_WASTE: "D et ND sortants",
   INCOMING_TEXS: "TEXS entrants",
-  OUTGOING_TEXS: "TEXS sortants"
+  OUTGOING_TEXS: "TEXS sortants",
+  TRANSPORTED: "Transportés",
+  MANAGED: "Gérés"
 };
 
 export const badges = {
@@ -98,7 +100,7 @@ export const REGISTRY_DOWNLOAD_SIGNED_URL = gql`
   }
 `;
 
-export async function downloadFromSignedUrl(signedUrl: string | undefined) {
+export function downloadFromSignedUrl(signedUrl: string | undefined) {
   if (!signedUrl) {
     return;
   }
@@ -156,13 +158,14 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
 `;
 
 export const GET_REGISTRY_V2_EXPORTS = gql`
-  query RegistryV2Exports($first: Int = 5) {
-    registryV2Exports(first: $first) {
+  query RegistryV2Exports($first: Int = 20, $skip: Int = 0) {
+    registryV2Exports(first: $first, skip: $skip) {
       edges {
         node {
           ...RegistryV2ExportFragment
         }
       }
+      totalCount
     }
   }
   ${registryV2ExportFragment}

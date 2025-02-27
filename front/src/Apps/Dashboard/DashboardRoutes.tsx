@@ -39,6 +39,7 @@ import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
 import FormContainer from "./Creation/FormContainer";
 import { BsdTypename } from "../common/types/bsdTypes";
+import { getDefaultOrgId } from "../common/Components/CompanySwitcher/CompanySwitcher";
 
 export const GET_ME = gql`
   {
@@ -127,7 +128,7 @@ function DashboardRoutes() {
                   ? routes.dashboard.transport.toCollect
                   : routes.dashboard.bsds.index,
                 {
-                  siret: companies[0].orgId
+                  siret: getDefaultOrgId(companies)
                 }
               )
             : routes.companies.index

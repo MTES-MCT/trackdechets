@@ -151,7 +151,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     );
   });
 
-  it("should create an incoming waste item", async () => {
+  it("should create an outgoing waste item", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -165,7 +165,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     expect(data.addToOutgoingWasteRegistry).toBe(true);
   });
 
-  it("should create several incoming waste items", async () => {
+  it("should create several outgoing waste items", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -181,7 +181,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     expect(data.addToOutgoingWasteRegistry).toBe(true);
   });
 
-  it("should create and edit an incoming waste item in one go", async () => {
+  it("should create and edit an outgoing waste item in one go", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 

@@ -5,6 +5,7 @@ import * as Excel from "exceljs";
 import { PassThrough, Readable } from "node:stream";
 
 import { CSV_DELIMITER, ERROR_HEADER, ImportOptions } from "./options";
+import { format } from "date-fns";
 
 export function getTransformCsvStream(options: ImportOptions) {
   const parseStream = parse({
@@ -151,8 +152,10 @@ export function getTransformXlsxStream(options: ImportOptions) {
         let isEmptyLine = true;
         const rawLine = {};
         for (const [index, key] of indexToHeaderMapping.entries()) {
-          const { value } = row.getCell(index + 1);
+          const cell = row.getCell(index + 1);
+          const value = getCellValue(cell);
           rawLine[key] = value;
+
           if (value) {
             isEmptyLine = false;
           }
@@ -195,4 +198,36 @@ function normalizeHeader(header: string) {
 
 function isLiteralCellValue(value: unknown) {
   return typeof value !== "object";
+}
+
+function getCellValue(cell: Excel.Cell) {
+  if (!cell.value) {
+    return null;
+  }
+
+  if (cell.type === Excel.ValueType.Date && cell.style.numFmt) {
+    return applyDateFormat(cell.value as Date, cell.style.numFmt);
+  }
+
+  if (cell.type === Excel.ValueType.Number) {
+    return cell.text;
+  }
+
+  return cell.value;
+}
+
+function applyDateFormat(value: Date, formatStr: string) {
+  // Hours format
+  if (formatStr === "hh:mm") {
+    return format(value, "HH:mm");
+  }
+
+  // Could be a misinterpretation of the waste code
+  if (formatStr === "dd mm yy") {
+    return format(value, "dd MM yy");
+  }
+
+  // Excel passes MM as mm for dates (and minutes...)
+  // And this way if we receive dd/mm/yyyy its okay
+  return format(value, "yyyy-MM-dd");
 }

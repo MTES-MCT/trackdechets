@@ -521,8 +521,6 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
               vhuAgrementBroyeurId = newAgrementData.createVhuAgrement.id;
             }
           }
-        } else {
-          // do nothing, la validation ne le permet pas normalement
         }
       }
     } else if (company.vhuAgrementBroyeur) {

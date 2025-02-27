@@ -61,6 +61,8 @@ const streamLookup = (
             registrySsd: true,
             registryIncomingWaste: true,
             registryIncomingTexs: true,
+            registryOutgoingWaste: true,
+            registryOutgoingTexs: true,
             bsdd: {
               include: RegistryV2BsddInclude
             },
@@ -81,29 +83,14 @@ const streamLookup = (
             }
           }
         });
-        for (const item of items) {
-          const lookup = item as Prisma.RegistryLookupGetPayload<{
-            include: {
-              registrySsd: true;
-              registryIncomingWaste: true;
-              registryIncomingTexs: true;
-              bsdd: true;
-              bsda: true;
-              bsdasri: true;
-              bsff: true;
-              bspaoh: {
-                include: {
-                  transporters: true;
-                };
-              };
-              bsvhu: true;
-            };
-          }>;
+        for (const lookup of items) {
           addEncounteredSiret(lookup.siret);
           const mapped = toWaste(registryType, {
             SSD: lookup.registrySsd,
             INCOMING_WASTE: lookup.registryIncomingWaste,
             INCOMING_TEXS: lookup.registryIncomingTexs,
+            OUTGOING_WASTE: lookup.registryOutgoingWaste,
+            OUTGOING_TEXS: lookup.registryOutgoingTexs,
             BSDD: lookup.bsdd,
             BSDA: lookup.bsda,
             BSDASRI: lookup.bsdasri,
@@ -188,11 +175,78 @@ export async function processRegistryExportJob(
     });
     upload = streamInfos.upload;
     const outputStream = streamInfos.s3Stream;
+
+    let condition: Prisma.RegistryLookupWhereInput;
+    // if there is a chance that DND BSDs are in the export
+    if (
+      (!registryExport.wasteTypes?.length ||
+        registryExport.wasteTypes.some(wasteType => wasteType === "DND")) && // the user wants DNDs in the export
+      registryExport.declarationType !== "REGISTRY" && // the user only wants BSDs in the export
+      registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry
+    ) {
+      const companies = await prisma.company.findMany({
+        where: {
+          orgId: {
+            in: registryExport.sirets
+          }
+        },
+        select: {
+          orgId: true,
+          hasEnabledRegistryDndFromBsdSince: true
+        }
+      });
+      // create a pre-filter that hides DND BSDs pre-hasEnabledRegistryDndFromBsdSince if it's defined for a company
+      const orCondition = companies.map(company => {
+        if (company.hasEnabledRegistryDndFromBsdSince) {
+          return {
+            siret: company.orgId,
+            OR: [
+              {
+                declarationType: "REGISTRY"
+              },
+              {
+                wasteType: { in: ["DD", "TEXS"] },
+                declarationType: "BSD"
+              },
+              {
+                wasteType: "DND",
+                declarationType: "BSD",
+                date: {
+                  gte: company.hasEnabledRegistryDndFromBsdSince
+                }
+              }
+            ]
+          } as Prisma.RegistryLookupWhereInput;
+        } else {
+          // the company has not enabled DND BSDs, so we always hide them
+          return {
+            siret: company.orgId,
+            OR: [
+              {
+                declarationType: "REGISTRY"
+              },
+              {
+                wasteType: { in: ["DD", "TEXS"] },
+                declarationType: "BSD"
+              }
+            ]
+          } as Prisma.RegistryLookupWhereInput;
+        }
+      });
+      condition = {
+        OR: orCondition
+      };
+    } else {
+      // we know this export will not contain DND BSDs, so we don't need a pre-filter
+      condition = {
+        siret: {
+          in: registryExport.sirets
+        }
+      };
+    }
     //craft the query
-    const query: Prisma.RegistryLookupFindManyArgs["where"] = {
-      siret: {
-        in: registryExport.sirets
-      },
+    const query: Prisma.RegistryLookupWhereInput = {
+      ...condition,
       reportAsSiret: registryExport.delegateSiret ?? undefined,
       exportRegistryType: registryExport.registryType ?? undefined,
       wasteType: registryExport.wasteTypes?.length

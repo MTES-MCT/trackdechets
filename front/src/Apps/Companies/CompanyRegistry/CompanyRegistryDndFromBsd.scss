@@ -1,0 +1,25 @@
+.fr-list {
+  list-style-type: var(--ul-type);
+  padding-inline-start: var(--ul-start);
+}
+
+.dnd-from-bsd-confirmation-modal {
+  .fr-modal__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    .fr-icon-warning-line::before {
+      background-color: var(--text-default-error);
+    }
+  }
+}
+
+.custom-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.danger-button {
+  background-color: var(--text-default-error);
+}
