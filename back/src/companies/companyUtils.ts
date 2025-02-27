@@ -2,6 +2,7 @@ import { searchCompany } from "./search";
 import { splitAddress } from "../common/addresses";
 import { Company } from "@prisma/client";
 import { isDefinedStrict } from "../common/helpers";
+import type { CompanySearchResult } from "@td/codegen-back";
 
 /**
  * Retourne l'adresse splittée d'une entreprise ('street', 'postalCode', 'city', 'country').
@@ -15,7 +16,7 @@ import { isDefinedStrict } from "../common/helpers";
  * auquel cas on retourne "" pour la rue.
  */
 export const getCompanySplittedAddress = async (company: Company) => {
-  let searchedCompany;
+  let searchedCompany: CompanySearchResult | null = null;
   try {
     searchedCompany = await searchCompany(company.orgId);
   } catch (_) {
