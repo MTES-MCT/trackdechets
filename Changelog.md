@@ -13,6 +13,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de l'export du registre sortant V2 [PR 3976](https://github.com/MTES-MCT/trackdechets/pull/3976)
 - Ajout d'un paramètre pour les établissements souhaitant pousser automatiquement leurs BSDND dans leurs déclarations [PR3988](https://github.com/MTES-MCT/trackdechets/pull/3988)
 
+#### :nail_care: Breaking Change
+
+- BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
+
 #### :nail_care: Améliorations
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
