@@ -62,6 +62,7 @@ describe("simpleFormToBsdd", () => {
       isDeleted: form.isDeleted,
       isDraft: false,
       status: form.status,
+      isDirectSupply: false,
       wasteCode: form.wasteDetailsCode,
       wasteIsDangerous: true,
       wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
@@ -454,6 +455,7 @@ describe("simpleFormToBsdd", () => {
       nextDestinationNotificationNumber: null,
       nextDestinationProcessingOperation: null,
       status: fullForwardedInForm.status,
+      isDirectSupply: false,
       wasteCode: fullForwardedInForm.wasteDetailsCode,
       wasteIsDangerous: true,
       wasteDetailsLandIdentifiers:
@@ -653,6 +655,7 @@ describe("simpleFormToBsdd", () => {
         isDeleted: form.isDeleted,
         isDraft: form.status === "DRAFT",
         status: form.status,
+        isDirectSupply: false,
         wasteCode: form.wasteDetailsCode,
         wasteIsDangerous: true,
         wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
