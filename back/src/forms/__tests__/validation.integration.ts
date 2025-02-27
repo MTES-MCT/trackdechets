@@ -1739,39 +1739,35 @@ describe("draftFormSchema", () => {
     expect(isValid).toEqual(true);
   });
 
-  it("packaging PIPELINE can be set without any other details", async () => {
+  it("isDirectSupply=true can be set without any other details", async () => {
     const isValid = await draftFormSchema.isValid({
-      wasteDetailsPackagingInfos: [
-        { type: "PIPELINE", numero: null, weight: null, volume: null }
-      ]
+      isDirectSupply: true,
+      wasteDetailsPackagingInfos: []
     });
 
     expect(isValid).toEqual(true);
   });
 
-  it("packaging PIPELINE cannot be set with any other packaging", async () => {
-    const isValid = await draftFormSchema.isValid({
-      wasteDetailsPackagingInfos: [
-        { type: "PIPELINE", other: null, quantity: null },
-        { type: "FUT", other: null, quantity: 1 }
-      ]
-    });
-
-    expect(isValid).toEqual(false);
-  });
-
-  it("packaging PIPELINE cannot be set with a transporter", async () => {
+  it("packaging PIPELINE should not be valid", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         wasteDetailsPackagingInfos: [
           { type: "PIPELINE", numero: null, weight: null, volume: null }
-        ],
-        transporters: [{ transporterCompanySiret: siretify(1) }]
+        ]
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
+      "Le type de conditionnement PIPELINE n'est pas valide"
     );
+  });
+
+  it("isDirectSupply=true cannot be set with any packaging", async () => {
+    const isValid = await draftFormSchema.isValid({
+      isDirectSupply: true,
+      wasteDetailsPackagingInfos: [{ type: "FUT", other: null, quantity: 1 }]
+    });
+
+    expect(isValid).toEqual(false);
   });
 
   it("isDirectSupply=true cannot be set with a transporter", async () => {

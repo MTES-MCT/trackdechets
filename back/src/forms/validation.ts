@@ -671,6 +671,11 @@ export const packagingInfoFn = ({
   yup.object().shape({
     type: yup
       .mixed<Packagings>()
+      .test({
+        name: "is-not-pipeline",
+        test: value => value !== "PIPELINE",
+        message: "Le type de conditionnement PIPELINE n'est pas valide"
+      })
       .required("Le type de conditionnement doit être précisé."),
     other: yup
       .string()
