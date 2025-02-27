@@ -1060,6 +1060,7 @@ export function expandBsddRevisionRequestContent(
       cap: bsddRevisionRequest.recipientCap
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
+    quantityRefused: bsddRevisionRequest.quantityRefused,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
     destinationOperationMode: bsddRevisionRequest.destinationOperationMode,
     processingOperationDescription:

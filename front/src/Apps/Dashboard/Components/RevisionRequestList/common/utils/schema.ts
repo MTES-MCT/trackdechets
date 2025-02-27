@@ -135,6 +135,7 @@ export const initialBsddReview: BsddRevisionRequestValidationSchema = {
     cap: ""
   },
   quantityReceived: null,
+  quantityRefused: null,
   processingOperationDone: "",
   destinationOperationMode: null,
   processingOperationDescription: "",
@@ -229,6 +230,7 @@ export const validationBsddSchema = z.object({
     cap: z.string().nullish()
   }),
   quantityReceived: z.number().nullish(),
+  quantityRefused: z.number().nullish(),
   processingOperationDone: z.string().nullish(),
   destinationOperationMode: z.string().nullish(),
   processingOperationDescription: z.string().nullish(),

@@ -106,6 +106,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
     BsddRevisionRequestValidationSchema
   > = async data => {
     await onSubmitForm(data);
+
     resetAndClose();
   };
 
@@ -116,6 +117,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
 
   const wasteDetailsCodeInput = register("wasteDetails.code");
 
+  const hasBeenReceived = isDefined(bsdd.receivedAt);
   const hasBeenProcessed = isDefined(bsdd.processedAt);
 
   return (
@@ -133,7 +135,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
               areModificationsDisabled={areModificationsDisabled}
             />
           )}
-
           {!isAppendix1Producer && (
             <>
               <BsddRequestRevisionCancelationInput
@@ -216,36 +217,77 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
                 </RhfReviewableField>
 
-                <RhfReviewableField
-                  title={
-                    !isTempStorage
-                      ? "Quantité reçue"
-                      : "Quantité reçue sur l'installation de destination"
-                  }
-                  path="quantityReceived"
-                  value={bsdd.quantityReceived}
-                  defaultValue={initialBsddReview?.quantityReceived}
-                >
-                  <NonScrollableInput
-                    label="Poids en tonnes"
-                    className="fr-col-2"
-                    state={errors.quantityReceived && "error"}
-                    stateRelatedMessage={errors.quantityReceived?.message ?? ""}
-                    nativeInputProps={{
-                      ...register("quantityReceived", { valueAsNumber: true }),
-                      type: "number",
-                      inputMode: "decimal",
-                      step: "0.000001"
-                    }}
-                  />
-                  {formValues?.quantityReceived && (
-                    <p className="fr-info-text">
-                      Soit {Number(formValues.quantityReceived) * 1000} kg
-                    </p>
-                  )}
-                </RhfReviewableField>
+                {hasBeenReceived && (
+                  <>
+                    <RhfReviewableField
+                      title={
+                        !isTempStorage
+                          ? "Quantité reçue"
+                          : "Quantité reçue sur l'installation de destination"
+                      }
+                      path="quantityReceived"
+                      value={bsdd.quantityReceived}
+                      defaultValue={initialBsddReview?.quantityReceived}
+                    >
+                      <NonScrollableInput
+                        label="Poids en tonnes"
+                        className="fr-col-2"
+                        state={errors.quantityReceived && "error"}
+                        stateRelatedMessage={
+                          errors.quantityReceived?.message ?? ""
+                        }
+                        nativeInputProps={{
+                          ...register("quantityReceived", {
+                            valueAsNumber: true
+                          }),
+                          type: "number",
+                          inputMode: "decimal",
+                          step: "0.000001"
+                        }}
+                      />
+                      {formValues?.quantityReceived && (
+                        <p className="fr-info-text">
+                          Soit {Number(formValues.quantityReceived) * 1000} kg
+                        </p>
+                      )}
+                    </RhfReviewableField>
 
-                {isTempStorage ? (
+                    <RhfReviewableField
+                      title={
+                        !isTempStorage
+                          ? "Quantité refusée"
+                          : "Quantité refusée sur l'installation de destination"
+                      }
+                      path="quantityRefused"
+                      value={bsdd.quantityRefused}
+                      defaultValue={initialBsddReview?.quantityRefused}
+                    >
+                      <NonScrollableInput
+                        label="Poids en tonnes"
+                        className="fr-col-2"
+                        state={errors.quantityRefused && "error"}
+                        stateRelatedMessage={
+                          errors.quantityRefused?.message ?? ""
+                        }
+                        nativeInputProps={{
+                          ...register("quantityRefused", {
+                            valueAsNumber: true
+                          }),
+                          type: "number",
+                          inputMode: "decimal",
+                          step: "0.000001"
+                        }}
+                      />
+                      {formValues?.quantityRefused && (
+                        <p className="fr-info-text">
+                          Soit {Number(formValues.quantityRefused) * 1000} kg
+                        </p>
+                      )}
+                    </RhfReviewableField>
+                  </>
+                )}
+
+                {isTempStorage && hasBeenReceived ? (
                   <RhfReviewableField
                     title={
                       "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"

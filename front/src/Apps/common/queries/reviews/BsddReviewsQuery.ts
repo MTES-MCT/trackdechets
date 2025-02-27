@@ -73,6 +73,7 @@ const reviewFragment = gql`
         cap
       }
       quantityReceived
+      quantityRefused
       processingOperationDone
       destinationOperationMode
       processingOperationDescription
@@ -134,6 +135,7 @@ const reviewFragment = gql`
         cap
       }
       quantityReceived
+      quantityRefused
       processingOperationDone
       destinationOperationMode
       processingOperationDescription
