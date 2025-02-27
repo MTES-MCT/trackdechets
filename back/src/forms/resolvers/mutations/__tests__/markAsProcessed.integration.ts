@@ -2293,4 +2293,42 @@ describe("mutation.markAsProcessed", () => {
       })
     ]);
   });
+
+  it("should mark a form as processed even if quantityRefused is null (legacy BSDs)", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        quantityRefused: null,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const resultingForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { finalOperations: true }
+    });
+    expect(resultingForm.status).toBe("PROCESSED");
+  });
 });
