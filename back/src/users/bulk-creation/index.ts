@@ -23,7 +23,8 @@ import {
 } from "@prisma/client";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 import { UserInputError } from "../../common/errors";
-import { getCompanyRepository } from "../../companies/repository";
+import { getCompanySplittedAddress } from "../../companies/companyUtils";
+import { CompanySearchResult } from "../../generated/graphql/types";
 
 function printHelp() {
   console.log(`
@@ -151,10 +152,6 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     }
   }
 
-  const { createCompany } = getCompanyRepository({
-    id: "support_tech"
-  } as Express.User);
-
   // create companies in Trackdéchets
   for (const company of sirenifiedCompanies) {
     const existingCompany = await prisma.company.findUnique({
@@ -163,38 +160,48 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
 
-      await createCompany({
-        orgId: company.siret,
-        siret: company.siret,
-        verificationStatus: CompanyVerificationStatus.VERIFIED,
-        verificationMode: CompanyVerificationMode.MANUAL,
-        verifiedAt: new Date(),
-        verificationComment: "Import en masse",
-        codeNaf: company.codeNaf,
-        gerepId: company.gerepId,
-        name: company.name!,
-        companyTypes: {
-          set: company.companyTypes as CompanyType[]
-        },
-        collectorTypes: {
-          set: company.collectorTypes as CollectorType[]
-        },
-        wasteProcessorTypes: {
-          set: company.wasteProcessorTypes as WasteProcessorType[]
-        },
-        wasteVehiclesTypes: {
-          set: company.wasteVehiclesTypes as WasteVehiclesType[]
-        },
-        securityCode: randomNumber(4),
-        givenName: company.givenName,
-        contactEmail: company.contactEmail,
-        contactPhone: company.contactPhone,
-        contact: company.contact,
-        website: company.website,
-        verificationCode: randomNumber(5).toString(),
-        address: company.address,
-        latitude: company.latitude,
-        longitude: company.longitude
+      const { street, postalCode, city, country } = getCompanySplittedAddress(
+        company as unknown as CompanySearchResult
+      );
+
+      await prisma.company.create({
+        data: {
+          orgId: company.siret,
+          siret: company.siret,
+          verificationStatus: CompanyVerificationStatus.VERIFIED,
+          verificationMode: CompanyVerificationMode.MANUAL,
+          verifiedAt: new Date(),
+          verificationComment: "Import en masse",
+          codeNaf: company.codeNaf,
+          gerepId: company.gerepId,
+          name: company.name!,
+          companyTypes: {
+            set: company.companyTypes as CompanyType[]
+          },
+          collectorTypes: {
+            set: company.collectorTypes as CollectorType[]
+          },
+          wasteProcessorTypes: {
+            set: company.wasteProcessorTypes as WasteProcessorType[]
+          },
+          wasteVehiclesTypes: {
+            set: company.wasteVehiclesTypes as WasteVehiclesType[]
+          },
+          securityCode: randomNumber(4),
+          givenName: company.givenName,
+          contactEmail: company.contactEmail,
+          contactPhone: company.contactPhone,
+          contact: company.contact,
+          website: company.website,
+          verificationCode: randomNumber(5).toString(),
+          address: company.address,
+          street,
+          postalCode,
+          city,
+          country,
+          latitude: company.latitude,
+          longitude: company.longitude
+        }
       });
     }
   }

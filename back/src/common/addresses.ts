@@ -1,4 +1,5 @@
 import { checkVAT, countries } from "jsvat";
+import { isDefinedStrict } from "./helpers";
 
 // Source: https://github.com/unicode-org/cldr/blob/release-26-0-1/common/supplemental/postalCodeData.xml
 // SO: https://stackoverflow.com/questions/578406/what-is-the-ultimate-postal-code-and-zip-regex
@@ -230,7 +231,7 @@ export const splitAddress = (
   address: string | null | undefined,
   vatNumber?: string | null
 ) => {
-  if (!address) {
+  if (!isDefinedStrict(address)) {
     return {
       street: "",
       postalCode: "",
@@ -250,7 +251,7 @@ export const splitAddress = (
   if (!postalCode) {
     return {
       // Fallback: return the full address in 'street' field
-      street: address
+      street: address!
         .replace(/\r?\n|\r/g, " ") // remove line breaks
         .replace(/\s+/g, " "), // double spaces to single spaces
       postalCode: "",
@@ -259,7 +260,7 @@ export const splitAddress = (
     };
   }
 
-  const splitted = address
+  const splitted = address!
     .replace(/\r?\n|\r/g, " ") // remove line breaks
     .replace(/\s+/g, " ") // double spaces to single spaces
     .split(postalCode)

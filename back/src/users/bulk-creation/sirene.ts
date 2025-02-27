@@ -9,11 +9,23 @@ import { searchCompany } from "../../companies/search";
 export async function sirenify(
   company: CompanyRow
 ): Promise<CompanyRow & CompanyInfo> {
-  const { naf: codeNaf, name, address } = await searchCompany(company.siret);
+  const {
+    naf: codeNaf,
+    name,
+    address,
+    addressCity,
+    addressPostalCode,
+    addressVoie,
+    codePaysEtrangerEtablissement
+  } = await searchCompany(company.siret);
   const { latitude, longitude } = await geocode(address);
   return {
     ...company,
     address,
+    addressCity,
+    addressPostalCode,
+    addressVoie,
+    codePaysEtrangerEtablissement,
     latitude,
     longitude,
     codeNaf,

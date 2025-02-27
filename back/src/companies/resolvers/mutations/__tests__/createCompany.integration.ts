@@ -2169,7 +2169,7 @@ describe("Mutation.createCompany", () => {
       expect(company?.country).toBe("FR");
     });
 
-    it("should add splitted address to company (foreign)", async () => {
+    it("should add manually splitted address to company (foreign)", async () => {
       // Given
       const user = await userFactory();
       const orgId = "BE0894129667";

@@ -6,6 +6,7 @@ import {
   getUpdatedCompanyNameAndAddress,
   updateFavorites
 } from "../../database";
+
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 import { Prisma } from "@prisma/client";
@@ -14,8 +15,9 @@ import { safeInput } from "../../../common/converter";
 import { parseCompanyAsync } from "../../validation/index";
 import { SiretNotFoundError } from "../../sirene/errors";
 import { logger } from "@td/logger";
+import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../converters";
-import { getCompanyRepository } from "../../repository";
+import { CompanyToSplit, getCompanySplittedAddress } from "../../companyUtils";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -129,6 +131,19 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
       data.name = updateFromExternalService.name;
       data.address = updateFromExternalService.address;
 
+      const { street, city, country, postalCode } = getCompanySplittedAddress(
+        updateFromExternalService,
+        {
+          address: data.address,
+          vatNumber: existingCompany.vatNumber
+        } as CompanyToSplit
+      );
+
+      data.street = street;
+      data.city = city;
+      data.country = country;
+      data.postalCode = postalCode;
+
       if (updateFromExternalService.codeNaf) {
         data.codeNaf = updateFromExternalService.codeNaf;
       }
@@ -147,8 +162,7 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  const { updateCompany } = getCompanyRepository(user);
-  const updatedCompany = await updateCompany({
+  const updatedCompany = await prisma.company.update({
     where: { id: existingCompany.id },
     data
   });

@@ -1,47 +1,64 @@
-import { searchCompany } from "./search";
 import { splitAddress } from "../common/addresses";
 import { Company } from "@prisma/client";
 import { isDefinedStrict } from "../common/helpers";
 import type { CompanySearchResult } from "@td/codegen-back";
 
+export type AddressCompanySearchResult = Pick<
+  CompanySearchResult,
+  | "addressVoie"
+  | "addressPostalCode"
+  | "addressCity"
+  | "codePaysEtrangerEtablissement"
+>;
+
+interface SplittedAddress {
+  street: string | null;
+  postalCode: string | null;
+  city: string | null;
+  country: string | null;
+}
+
+export type CompanyToSplit = Pick<Company, "vatNumber" | "address">;
+
 /**
  * Retourne l'adresse splittée d'une entreprise ('street', 'postalCode', 'city', 'country').
  *
- * Essaie d'abord d'interroger les APIs / ES pour avoir l'adresse splittée,
- * et en cas de souci, essaie de splitter l'adresse manuellement.
+ * Pour éviter de multiplier les appels aux APIs externes, cette fonction fait pas d'appel
+ * elle-même et prend en entrée un companySearchResult (partiel).
+ *
+ * Si le companySearchResult est valide, retourne les champs splittés.
+ *
+ * Si le companySearchResult mais l'adresse complète de l'entreprise est exploitable, retourne
+ * un split manuel.
  *
  * Si le split n'a pas fonctionné, retourne tous les champs à null.
  *
  * Attention: certaines entreprises ont des addresses du genre "codePostal ville",
  * auquel cas on retourne "" pour la rue.
  */
-export const getCompanySplittedAddress = async (company: Company) => {
-  let searchedCompany: CompanySearchResult | null = null;
-  try {
-    searchedCompany = await searchCompany(company.orgId);
-  } catch (_) {
-    // Peut potentiellement soulever une ClosedCompanyError
-  }
-
+export const getCompanySplittedAddress = (
+  companySearchResult: AddressCompanySearchResult | null | undefined,
+  company?: CompanyToSplit | null | undefined
+): SplittedAddress => {
   let res;
 
   // Split manuel...
   if (
     // ...si pas de retour des APIs
-    !searchedCompany ||
+    !companySearchResult ||
     // ...si entreprise étrangère
-    isDefinedStrict(searchedCompany.codePaysEtrangerEtablissement) ||
+    isDefinedStrict(companySearchResult.codePaysEtrangerEtablissement) ||
     // ...si le retour des APIs ne comprend pas d'adresse fiable
-    !isDefinedStrict(searchedCompany?.addressPostalCode?.trim())
+    !isDefinedStrict(companySearchResult?.addressPostalCode?.trim())
   ) {
-    res = splitAddress(company.address, company.vatNumber);
+    res = splitAddress(company?.address, company?.vatNumber);
   }
   // Sinon, split avec les données retournées par les APIs
   else {
     res = {
-      street: searchedCompany.addressVoie,
-      postalCode: searchedCompany.addressPostalCode,
-      city: searchedCompany.addressCity,
+      street: companySearchResult.addressVoie,
+      postalCode: companySearchResult.addressPostalCode,
+      city: companySearchResult.addressCity,
       country: "FR"
     };
   }

@@ -35,7 +35,7 @@ import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
 import { getDefaultNotifications } from "../../../users/notifications";
-import { getCompanyRepository } from "../../repository";
+import { CompanyToSplit, getCompanySplittedAddress } from "../../companyUtils";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company
@@ -94,6 +94,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // check if orgId exists in public databases or in AnonymousCompany
   const companyInfo = await searchCompany(orgId);
 
+  const { street, city, country, postalCode } = getCompanySplittedAddress(
+    companyInfo,
+    { address, vatNumber } as CompanyToSplit
+  );
+
   if (isClosedCompany(companyInfo)) {
     throw new UserInputError(CLOSED_COMPANY_ERROR);
   }
@@ -107,6 +112,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     name: companyInfo?.name ?? name,
     givenName,
     address: companyInfo?.address ?? address,
+    street,
+    city,
+    country,
+    postalCode,
     companyTypes: { set: companyTypes as CompanyType[] },
     collectorTypes: collectorTypes
       ? { set: collectorTypes as CollectorType[] }
@@ -182,15 +191,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const notifications = getDefaultNotifications(UserRole.ADMIN);
-
-  const { createCompany } = getCompanyRepository(user);
-  let company = await createCompany(companyCreateInput);
-
-  await prisma.companyAssociation.create({
+  const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
       company: {
-        connect: { id: company.id }
+        create: companyCreateInput
       },
       role: UserRole.ADMIN,
       ...notifications
@@ -198,6 +203,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     include: { company: true }
   });
   await deleteCachedUserRoles(user.id);
+  let company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({

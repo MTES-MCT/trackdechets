@@ -1,6 +1,7 @@
 import { prisma } from "@td/prisma";
 import { getCompanySplittedAddress } from "../../companies/companyUtils";
 import { Company } from "@prisma/client";
+import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
 
 // TODO: important: comment out the ClosedCompanyError!!!
 // back/src/companies/sirene/insee/client.ts
@@ -64,7 +65,10 @@ import { Company } from "@prisma/client";
       }
 
       try {
-        const splittedAddress = await getCompanySplittedAddress(
+        const companySearch = await searchCompanyTD(company.orgId);
+
+        const splittedAddress = getCompanySplittedAddress(
+          companySearch,
           company as Company
         );
 

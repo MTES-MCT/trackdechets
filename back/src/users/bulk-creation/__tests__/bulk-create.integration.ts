@@ -20,6 +20,10 @@ jest.mock("../sirene");
       ...company,
       name: "NAME FROM SIRENE",
       address: "40 boulevard Voltaire 13001 Marseille",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      addressVoie: "40 boulevard Voltaire",
+      codePaysEtrangerEtablissement: "",
       codeNaf: "62.01Z",
       latitude: 1,
       longitude: 1
@@ -31,6 +35,10 @@ jest.mock("../sirene");
       ...company,
       name: "NAME FROM SIRENE",
       address: "4 boulevard Pasteur 44100 Nantes",
+      addressCity: "Nantes",
+      addressPostalCode: "44100",
+      addressVoie: "4 boulevard Pasteur",
+      codePaysEtrangerEtablissement: "",
       codeNaf: "62.01Z",
       latitude: 1,
       longitude: 1
