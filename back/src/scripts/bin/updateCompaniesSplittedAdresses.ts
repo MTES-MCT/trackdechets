@@ -2,13 +2,10 @@ import { prisma } from "@td/prisma";
 import { getCompanySplittedAddress } from "../../companies/companyUtils";
 import { Company } from "@prisma/client";
 import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
+import { SiretNotFoundError } from "../../companies/sirene/errors";
+import { SireneSearchResult } from "../../companies/sirene/types";
 
-// TODO: important: comment out the ClosedCompanyError!!!
-// back/src/companies/sirene/insee/client.ts
-// back/src/companies/sirene/trackdechets/client.ts
-
-// Résultat avec la DB de sandbox:
-// 30162 entreprises mises à jour, 0 erreurs (0%), 108 ignorées (0%) en 713504ms!
+// Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/updateCompaniesSplittedAdresses.ts
 
 (async function () {
   console.log(">> Lancement du script de mise à jour des adresses splittées");
@@ -16,6 +13,7 @@ import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
   let companiesTotal = 0;
   let errors = 0;
   let ignored = 0;
+  let addressTest = 0;
 
   const startDate = new Date();
 
@@ -60,12 +58,19 @@ import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
       companiesTotal += 1;
 
       if (company.address === "Adresse test") {
-        ignored++;
+        addressTest++;
         continue;
       }
 
       try {
-        const companySearch = await searchCompanyTD(company.orgId);
+        let companySearch: SireneSearchResult | null = null;
+        try {
+          companySearch = await searchCompanyTD(company.orgId);
+        } catch (e) {
+          if (!(e instanceof SiretNotFoundError)) {
+            throw e;
+          }
+        }
 
         const splittedAddress = getCompanySplittedAddress(
           companySearch,
@@ -107,6 +112,8 @@ import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
       (errors / companiesTotal) * 100
     )}%), ${ignored} ignorées (${Math.round(
       (ignored / companiesTotal) * 100
+    )}%), ${addressTest} addresses test (${Math.round(
+      (addressTest / companiesTotal) * 100
     )}%) en ${duration}ms!`
   );
 
