@@ -151,18 +151,17 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     }
   }
 
-  // create companies in Trackdéchets
+  const { createCompany } = getCompanyRepository({
+    id: "support_tech"
+  } as Express.User);
 
+  // create companies in Trackdéchets
   for (const company of sirenifiedCompanies) {
     const existingCompany = await prisma.company.findUnique({
       where: { siret: company.siret }
     });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
-
-      const { createCompany } = await getCompanyRepository({
-        id: "support_tech"
-      } as Express.User);
 
       await createCompany({
         orgId: company.siret,

@@ -147,7 +147,7 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     );
   }
 
-  const { updateCompany } = await getCompanyRepository(user);
+  const { updateCompany } = getCompanyRepository(user);
   const updatedCompany = await updateCompany({
     where: { id: existingCompany.id },
     data

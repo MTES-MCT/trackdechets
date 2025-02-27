@@ -183,7 +183,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const notifications = getDefaultNotifications(UserRole.ADMIN);
 
-  const { createCompany } = await getCompanyRepository(user);
+  const { createCompany } = getCompanyRepository(user);
   let company = await createCompany(companyCreateInput);
 
   await prisma.companyAssociation.create({
