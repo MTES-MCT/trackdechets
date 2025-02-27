@@ -379,6 +379,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         path={"destinationOperationMode"}
                       />
                     </RhfReviewableField>
+
                     <RhfReviewableField
                       title="Description de l'opération D/R"
                       path="processingOperationDescription"
@@ -395,46 +396,46 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         className="fr-col-8"
                       />
                     </RhfReviewableField>
-
-                    <RhfReviewableField
-                      title={isTempStorage ? "CAP destination finale" : "CAP"}
-                      path={
-                        isTempStorage
-                          ? "temporaryStorageDetail.destination.cap"
-                          : "recipient.cap"
-                      }
-                      value={
-                        isTempStorage
-                          ? bsdd.temporaryStorageDetail?.destination?.cap
-                          : bsdd.recipient?.cap
-                      }
-                      defaultValue={
-                        isTempStorage
-                          ? initialBsddReview.temporaryStorageDetail
-                              ?.destination?.cap
-                          : initialBsddReview.recipient.cap
-                      }
-                    >
-                      <Input
-                        label={`${
-                          isTempStorage
-                            ? "Numéro de CAP destination finale"
-                            : "Numéro de CAP (Optionnel pour les déchets non dangereux)"
-                        }`}
-                        className="fr-col-6"
-                        nativeInputProps={{
-                          ...register(
-                            `${
-                              isTempStorage
-                                ? "temporaryStorageDetail.destination.cap"
-                                : "recipient.cap"
-                            }`
-                          )
-                        }}
-                      />
-                    </RhfReviewableField>
                   </>
                 )}
+
+                <RhfReviewableField
+                  title={isTempStorage ? "CAP destination finale" : "CAP"}
+                  path={
+                    isTempStorage
+                      ? "temporaryStorageDetail.destination.cap"
+                      : "recipient.cap"
+                  }
+                  value={
+                    isTempStorage
+                      ? bsdd.temporaryStorageDetail?.destination?.cap
+                      : bsdd.recipient?.cap
+                  }
+                  defaultValue={
+                    isTempStorage
+                      ? initialBsddReview.temporaryStorageDetail?.destination
+                          ?.cap
+                      : initialBsddReview.recipient.cap
+                  }
+                >
+                  <Input
+                    label={`${
+                      isTempStorage
+                        ? "Numéro de CAP destination finale"
+                        : "Numéro de CAP (Optionnel pour les déchets non dangereux)"
+                    }`}
+                    className="fr-col-6"
+                    nativeInputProps={{
+                      ...register(
+                        `${
+                          isTempStorage
+                            ? "temporaryStorageDetail.destination.cap"
+                            : "recipient.cap"
+                        }`
+                      )
+                    }}
+                  />
+                </RhfReviewableField>
 
                 {isTempStorage && (
                   <RhfReviewableField
