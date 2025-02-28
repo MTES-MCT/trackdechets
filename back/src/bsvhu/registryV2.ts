@@ -74,6 +74,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: bsvhu.quantity,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
@@ -81,6 +83,7 @@ export const toIncomingWasteV2 = (
           .toNumber()
       : bsvhu.weightValue,
     emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
+    emitterCompanyType: null,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
@@ -199,6 +202,8 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: bsvhu.quantity,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
@@ -215,6 +220,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
+    emitterCompanyType: null,
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     emitterCompanyName: bsvhu.emitterCompanyName,
     emitterCompanyGivenName: null,

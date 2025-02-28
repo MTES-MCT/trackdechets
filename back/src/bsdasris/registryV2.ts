@@ -107,6 +107,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
@@ -121,6 +123,7 @@ export const toIncomingWasteV2 = (
     initialEmitterCompanyCountry: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -280,6 +283,8 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
@@ -296,6 +301,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanyGivenName: null,

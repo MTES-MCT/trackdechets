@@ -63,6 +63,7 @@ const streamLookup = (
             registryIncomingTexs: true,
             registryOutgoingWaste: true,
             registryOutgoingTexs: true,
+            registryTransported: true,
             bsdd: {
               include: RegistryV2BsddInclude
             },
@@ -91,6 +92,7 @@ const streamLookup = (
             INCOMING_TEXS: lookup.registryIncomingTexs,
             OUTGOING_WASTE: lookup.registryOutgoingWaste,
             OUTGOING_TEXS: lookup.registryOutgoingTexs,
+            TRANSPORTED: lookup.registryTransported,
             BSDD: lookup.bsdd,
             BSDA: lookup.bsda,
             BSDASRI: lookup.bsdasri,

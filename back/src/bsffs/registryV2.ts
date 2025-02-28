@@ -322,6 +322,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
@@ -333,6 +335,7 @@ export const toIncomingWasteV2 = (
     initialEmitterCompanyCountry,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -555,10 +558,11 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    weightIsEstimate: bsff.weightIsEstimate,
     volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -568,6 +572,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanyGivenName: null,
