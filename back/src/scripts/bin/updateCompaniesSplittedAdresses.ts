@@ -5,12 +5,24 @@ import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
 import { SiretNotFoundError } from "../../companies/sirene/errors";
 import { SireneSearchResult } from "../../companies/sirene/types";
 
+const formatTime = milliseconds => {
+  const seconds = Math.floor((milliseconds / 1000) % 60);
+  const minutes = Math.floor((milliseconds / 1000 / 60) % 60);
+  const hours = Math.floor((milliseconds / 1000 / 60 / 60) % 24);
+
+  return [
+    hours.toString().padStart(2, "0"),
+    minutes.toString().padStart(2, "0"),
+    seconds.toString().padStart(2, "0")
+  ].join(":");
+};
+
 // Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/updateCompaniesSplittedAdresses.ts
 
 (async function () {
   console.log(">> Lancement du script de mise à jour des adresses splittées");
 
-  let companiesTotal = 0;
+  let updatedCompanies = 0;
   let errors = 0;
   let ignored = 0;
   let addressTest = 0;
@@ -21,6 +33,8 @@ import { SireneSearchResult } from "../../companies/sirene/types";
   let lastId: string | null = null;
   let finished = false;
   let skip = 0;
+
+  const companiesTotal = await prisma.company.count();
 
   while (!finished) {
     const companies = await prisma.company.findMany({
@@ -55,7 +69,7 @@ import { SireneSearchResult } from "../../companies/sirene/types";
     skip = 1;
 
     for (const company of companies) {
-      companiesTotal += 1;
+      updatedCompanies += 1;
 
       if (company.address === "Adresse test") {
         addressTest++;
@@ -102,19 +116,26 @@ import { SireneSearchResult } from "../../companies/sirene/types";
       }
     }
 
-    console.log(`${companiesTotal} entreprises mises à jour`);
+    const loopDuration = new Date().getTime() - startDate.getTime();
+    console.log(
+      `${updatedCompanies} entreprises mises à jour (${Math.round(
+        (updatedCompanies / companiesTotal) * 100
+      )}%) en ${formatTime(loopDuration)} (temps total estimé: ${formatTime(
+        (loopDuration / updatedCompanies) * companiesTotal
+      )})`
+    );
   }
 
   const duration = new Date().getTime() - startDate.getTime();
 
   console.log(
-    `${companiesTotal} entreprises mises à jour, ${errors} erreurs (${Math.round(
-      (errors / companiesTotal) * 100
+    `${updatedCompanies} entreprises mises à jour, ${errors} erreurs (${Math.round(
+      (errors / updatedCompanies) * 100
     )}%), ${ignored} ignorées (${Math.round(
-      (ignored / companiesTotal) * 100
+      (ignored / updatedCompanies) * 100
     )}%), ${addressTest} addresses test (${Math.round(
-      (addressTest / companiesTotal) * 100
-    )}%) en ${duration}ms!`
+      (addressTest / updatedCompanies) * 100
+    )}%) en ${formatTime(duration)}!`
   );
 
   console.log("Terminé!");
