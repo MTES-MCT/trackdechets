@@ -1,4 +1,8 @@
-import { IncomingWasteV2, OutgoingWasteV2 } from "@td/codegen-back";
+import {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  TransportedWasteV2
+} from "@td/codegen-back";
 import {
   PrismaClient,
   RegistryExportType,
@@ -9,6 +13,7 @@ import {
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
+  emptyTransportedWasteV2,
   RegistryV2Bsdd
 } from "../registryV2/types";
 import { formToBsddV2, BsddV2 } from "./compat";
@@ -665,6 +670,265 @@ export const toOutgoingWasteV2 = (
   };
 };
 
+export const toTransportedWasteV2 = (
+  form: RegistryV2Bsdd
+): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
+  const bsdd = formToBsddV2(form);
+
+  // there should always be a transporter on this type of export, but since
+  // the type doesn't know it, and we could get a weird DB state, we check it
+  if (!bsdd.transporterCompanySiret && !bsdd.transporterCompanyVatNumber) {
+    return null;
+  }
+
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdd.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdd.emitterCompanyAddress);
+
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    bsdd.transporterCompanyAddress,
+    bsdd.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    bsdd.transporter2CompanyAddress,
+    bsdd.transporter2CompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    bsdd.transporter3CompanyAddress,
+    bsdd.transporter3CompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    bsdd.transporter4CompanyAddress,
+    bsdd.transporter4CompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    bsdd.transporter5CompanyAddress,
+    bsdd.transporter5CompanyVatNumber
+  );
+
+  return {
+    ...emptyTransportedWasteV2,
+    id: bsdd.id,
+    source: "BSD",
+    publicId: null,
+    bsdId: bsdd.id,
+    reportAsSiret: null,
+    createdAt: bsdd.createdAt,
+    updatedAt: bsdd.updatedAt,
+    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    unloadingDate: null,
+    destinationReceptionDate: bsdd.destinationReceptionDate,
+    bsdType: "BSDD",
+    bsdSubType: getBsddSubType(bsdd),
+    customId: bsdd.customId,
+    status: bsdd.status,
+    wasteDescription: bsdd.wasteDescription,
+    wasteCode: bsdd.wasteCode,
+    wasteCodeBale: null,
+    wastePop: bsdd.pop,
+    wasteIsDangerous: bsdd.wasteIsDangerous,
+    weight: bsdd.weightValue,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
+    weightIsEstimate: bsdd.weightIsEstimate,
+    volume: null,
+
+    emitterCompanyIrregularSituation: null,
+    emitterCompanyType: bsdd.emitterType,
+    emitterCompanySiret: bsdd.emitterCompanySiret,
+    emitterCompanyName: bsdd.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bsdd.emitterCompanyMail,
+
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdd.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdd.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdd.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdd.emitterPickupSiteAddress ? "FR" : null,
+
+    workerCompanySiret: null,
+    workerCompanyName: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+
+    ecoOrganismeSiret: bsdd.ecoOrganismeSiret,
+    ecoOrganismeName: bsdd.ecoOrganismeName,
+
+    brokerCompanyName: bsdd.brokerCompanyName,
+    brokerCompanySiret: bsdd.brokerCompanySiret,
+    brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
+    brokerCompanyMail: bsdd.brokerCompanyMail,
+
+    traderCompanyName: bsdd.traderCompanyName,
+    traderCompanySiret: bsdd.traderCompanySiret,
+    traderRecepisseNumber: bsdd.traderRecepisseNumber,
+    traderCompanyMail: bsdd.traderCompanyMail,
+
+    transporter1CompanySiret: bsdd.transporterCompanySiret?.length
+      ? bsdd.transporterCompanySiret
+      : bsdd.transporterCompanyVatNumber,
+    transporter1CompanyName: bsdd.transporterCompanyName,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted: bsdd.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporter1TransportMode: bsdd.transporterTransportMode,
+    transporter1CompanyMail: bsdd.transporterCompanyMail,
+    transporter1TransportPlates: bsdd.transporterNumberPlates,
+
+    transporter2CompanySiret:
+      (bsdd.transporter2CompanySiret?.length
+        ? bsdd.transporter2CompanySiret
+        : bsdd.transporter2CompanyVatNumber) ?? null,
+    transporter2CompanyName: bsdd.transporter2CompanyName ?? null,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      bsdd.transporter2RecepisseIsExempted ?? null,
+    transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber ?? null,
+    transporter2TransportMode: bsdd.transporter2TransportMode ?? null,
+    transporter2CompanyMail: bsdd.transporter2CompanyMail ?? null,
+    transporter2TransportPlates: bsdd.transporter2NumberPlates ?? null,
+
+    transporter3CompanySiret:
+      (bsdd.transporter3CompanySiret?.length
+        ? bsdd.transporter3CompanySiret
+        : bsdd.transporter3CompanyVatNumber) ?? null,
+    transporter3CompanyName: bsdd.transporter3CompanyName ?? null,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      bsdd.transporter3RecepisseIsExempted ?? null,
+    transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber ?? null,
+    transporter3TransportMode: bsdd.transporter3TransportMode ?? null,
+    transporter3CompanyMail: bsdd.transporter3CompanyMail ?? null,
+    transporter3TransportPlates: bsdd.transporter3NumberPlates ?? null,
+
+    transporter4CompanySiret:
+      (bsdd.transporter4CompanySiret?.length
+        ? bsdd.transporter4CompanySiret
+        : bsdd.transporter4CompanyVatNumber) ?? null,
+    transporter4CompanyName: bsdd.transporter4CompanyName ?? null,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      bsdd.transporter4RecepisseIsExempted ?? null,
+    transporter4RecepisseNumber: bsdd.transporter4RecepisseNumber ?? null,
+    transporter4TransportMode: bsdd.transporter4TransportMode ?? null,
+    transporter4CompanyMail: bsdd.transporter4CompanyMail ?? null,
+    transporter4TransportPlates: bsdd.transporter4NumberPlates ?? null,
+
+    transporter5CompanySiret:
+      (bsdd.transporter5CompanySiret?.length
+        ? bsdd.transporter5CompanySiret
+        : bsdd.transporter5CompanyVatNumber) ?? null,
+    transporter5CompanyName: bsdd.transporter5CompanyName ?? null,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      bsdd.transporter5RecepisseIsExempted ?? null,
+    transporter5RecepisseNumber: bsdd.transporter5RecepisseNumber ?? null,
+    transporter5TransportMode: bsdd.transporter5TransportMode ?? null,
+    transporter5CompanyMail: bsdd.transporter5CompanyMail ?? null,
+    transporter5TransportPlates: bsdd.transporter5NumberPlates ?? null,
+
+    wasteAdr: bsdd.wasteAdr,
+    nonRoadRegulationMention: null,
+    destinationCap: null,
+
+    destinationCompanySiret: bsdd.destinationCompanySiret,
+    destinationCompanyName: bsdd.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bsdd.destinationCompanyMail,
+
+    destinationDropSiteAddress: null,
+    destinationDropSitePostalCode: null,
+    destinationDropSiteCity: null,
+    destinationDropSiteCountryCode: null,
+
+    destinationReceptionAcceptationStatus:
+      bsdd.destinationReceptionAcceptationStatus,
+    destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
+    destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
+
+    declarationNumber:
+      !bsdd.wasteIsDangerous && !bsdd.pop
+        ? bsdd.nextDestinationNotificationNumber
+        : null,
+    notificationNumber:
+      bsdd.wasteIsDangerous || bsdd.pop
+        ? bsdd.nextDestinationNotificationNumber
+        : null,
+    movementNumber: null
+  };
+};
+
 const minimalBsddForLookupSelect = {
   id: true,
   readableId: true,
@@ -674,7 +938,16 @@ const minimalBsddForLookupSelect = {
   emitterCompanySiret: true,
   ecoOrganismeSiret: true,
   wasteDetailsIsDangerous: true,
-  wasteDetailsCode: true
+  wasteDetailsCode: true,
+  transporters: {
+    select: {
+      id: true,
+      number: true,
+      transporterCompanySiret: true,
+      transporterCompanyVatNumber: true,
+      takenOverAt: true
+    }
+  }
 };
 
 type MinimalBsddForLookup = Prisma.FormGetPayload<{
@@ -721,6 +994,27 @@ const bsddToLookupCreateInputs = (
       });
     });
   }
+  form.transporters?.forEach(transporter => {
+    const transporterSiret =
+      transporter.transporterCompanySiret ??
+      transporter.transporterCompanyVatNumber;
+    if (!transporterSiret || !transporter.takenOverAt) {
+      return;
+    }
+    res.push({
+      id: form.id,
+      readableId: form.readableId,
+      siret: transporterSiret,
+      exportRegistryType: RegistryExportType.TRANSPORTED,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: form.wasteDetailsIsDangerous
+        ? RegistryExportWasteType.DD
+        : RegistryExportWasteType.DND,
+      wasteCode: form.wasteDetailsCode,
+      ...generateDateInfos(transporter.takenOverAt),
+      bsddId: form.id
+    });
+  });
   return res;
 };
 

@@ -677,7 +677,7 @@ export const toTransportedWasteV2 = (
     transporters;
   // there should always be a transporter on this type of export, but since
   // the type doesn't know it, and we could get a weird DB state, we check it
-  if (!transporter) {
+  if (!getTransporterCompanyOrgId(transporter)) {
     return null;
   }
   const {
@@ -933,6 +933,7 @@ const minimalBsdaForLookupSelect = {
       number: true,
       transporterCompanySiret: true,
       transporterCompanyVatNumber: true,
+      transporterTransportTakenOverAt: true,
       transporterTransportSignatureDate: true
     }
   }
@@ -997,7 +998,10 @@ const bsdaToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsda.wasteCode,
-      ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+      ...generateDateInfos(
+        transporter.transporterTransportTakenOverAt ??
+          transporter.transporterTransportSignatureDate!
+      ),
       bsdaId: bsda.id
     });
   });
