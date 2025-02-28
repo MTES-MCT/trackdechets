@@ -349,7 +349,9 @@ export const quantityRefusedNotRequired = (
     );
 
 export const quantityRefused = (
-  quantityReceivedFieldName = "quantityReceived"
+  quantityReceivedFieldName:
+    | "temporaryStorageTemporaryStorerQuantityReceived"
+    | "quantityReceived" = "quantityReceived"
 ) =>
   quantityRefusedNotRequired(quantityReceivedFieldName).test(
     "quantity-is-required",
