@@ -72,6 +72,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bspaoh.emitterWasteWeightValue
       ? new Decimal(bspaoh.emitterWasteWeightValue)
           .dividedBy(1000)
@@ -84,9 +86,9 @@ export const toIncomingWasteV2 = (
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
     initialEmitterCompanyCountry: null,
-    initialEmitterMunicipalitiesNames: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: bspaoh.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bspaoh.emitterCompanySiret,
@@ -231,6 +233,8 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bspaoh.emitterWasteWeightValue
       ? new Decimal(bspaoh.emitterWasteWeightValue)
           .dividedBy(1000)
@@ -245,9 +249,9 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
     initialEmitterCompanyCountry: null,
-    initialEmitterMunicipalitiesNames: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanySiret: bspaoh.emitterCompanySiret,
     emitterCompanyName: bspaoh.emitterCompanyName,
     emitterCompanyGivenName: null,
