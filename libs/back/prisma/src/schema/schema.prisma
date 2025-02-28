@@ -683,6 +683,7 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
+  temporaryStorageTemporaryStorerQuantityRefused  Float?
 
   initialRecipientCap                                    String?
   initialWasteDetailsCode                                String?

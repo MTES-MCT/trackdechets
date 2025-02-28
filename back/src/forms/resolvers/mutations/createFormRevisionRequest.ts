@@ -416,24 +416,53 @@ const getContentToValidate = (
     isDefined(flatContent.quantityReceived) ||
     isDefined(flatContent.quantityRefused);
 
-  if (!isReviewingQuantities) return flatContent;
-
   let quantityReceived: number | null = null;
-  if (isDefined(flatContent.quantityReceived))
-    quantityReceived = flatContent.quantityReceived;
-  else if (isDefined(bsdd.quantityReceived))
-    quantityReceived = Number(bsdd.quantityReceived);
-
   let quantityRefused: number | null = null;
-  if (isDefined(flatContent.quantityRefused))
-    quantityRefused = flatContent.quantityRefused;
-  else if (isDefined(bsdd.quantityRefused))
-    quantityRefused = Number(bsdd.quantityRefused);
+
+  if (isReviewingQuantities) {
+    if (isDefined(flatContent.quantityReceived))
+      quantityReceived = flatContent.quantityReceived;
+    else if (isDefined(bsdd.quantityReceived))
+      quantityReceived = Number(bsdd.quantityReceived);
+
+    if (isDefined(flatContent.quantityRefused))
+      quantityRefused = flatContent.quantityRefused;
+    else if (isDefined(bsdd.quantityRefused))
+      quantityRefused = Number(bsdd.quantityRefused);
+  }
+
+  // Idem for temp storage
+  const isReviewingTempStorageQuantities =
+    isDefined(flatContent.temporaryStorageTemporaryStorerQuantityReceived) ||
+    isDefined(flatContent.temporaryStorageTemporaryStorerQuantityRefused);
+
+  let temporaryStorageTemporaryStorerQuantityReceived: number | null = null;
+  let temporaryStorageTemporaryStorerQuantityRefused: number | null = null;
+
+  if (isReviewingTempStorageQuantities) {
+    if (isDefined(flatContent.temporaryStorageTemporaryStorerQuantityReceived))
+      temporaryStorageTemporaryStorerQuantityReceived =
+        flatContent.temporaryStorageTemporaryStorerQuantityReceived;
+    else if (isDefined(bsdd.quantityReceived))
+      temporaryStorageTemporaryStorerQuantityReceived = Number(
+        bsdd.quantityRefused
+      );
+
+    if (isDefined(flatContent.temporaryStorageTemporaryStorerQuantityRefused))
+      temporaryStorageTemporaryStorerQuantityRefused =
+        flatContent.temporaryStorageTemporaryStorerQuantityRefused;
+    else if (isDefined(bsdd.quantityRefused))
+      temporaryStorageTemporaryStorerQuantityRefused = Number(
+        bsdd.quantityRefused
+      );
+  }
 
   return {
     ...flatContent,
     quantityReceived,
-    quantityRefused
+    quantityRefused,
+    temporaryStorageTemporaryStorerQuantityReceived,
+    temporaryStorageTemporaryStorerQuantityRefused
   };
 };
 
@@ -508,8 +537,15 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
   //             v => !v
   //           )
   //   ),
+  temporaryStorageTemporaryStorerQuantityReceived: yup
+    .number()
+    .min(0)
+    .nullable(),
+  temporaryStorageTemporaryStorerQuantityRefused: quantityRefusedNotRequired(
+    "temporaryStorageTemporaryStorerQuantityReceived"
+  ),
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused: quantityRefusedNotRequired
+  quantityRefused: quantityRefusedNotRequired()
 });
 
 async function recipify(
@@ -606,10 +642,6 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       ),
     processingOperationDescription: yup.string().nullable(),
     temporaryStorageDestinationCap: yup.string().nullable(),
-    temporaryStorageTemporaryStorerQuantityReceived: yup
-      .number()
-      .min(0)
-      .nullable(),
     temporaryStorageDestinationProcessingOperation: yup
       .string()
       .oneOf(

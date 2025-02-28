@@ -869,6 +869,9 @@ type FormRevisionRequestDestination {
 type FormRevisionRequestTemporaryStorer {
   "Quantité reçue sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
   quantityReceived: Float
+
+  "Quantité refusée par l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
+  quantityRefused: Float
 }
 
 type FormRevisionRequestConnection {
