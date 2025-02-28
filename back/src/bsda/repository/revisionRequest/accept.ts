@@ -348,7 +348,8 @@ export async function approveAndApplyRevisionRequest(
   await sendEmailWhenRevisionOnSealNumbersOrPackagings(
     bsdaBeforeRevision,
     updatedBsda,
-    updatedRevisionRequest
+    updatedRevisionRequest,
+    updateData
   );
 
   prisma.addAfterCommitCallback?.(() =>
@@ -379,7 +380,8 @@ const getEmitterCompanyId = async bsda => {
 const sendEmailWhenRevisionOnSealNumbersOrPackagings = async (
   bsdaBeforeRevision,
   bsdaAfterRevision,
-  updatedRevisionRequest
+  updatedRevisionRequest,
+  updateData
 ) => {
   const shouldSendMail =
     bsdaAfterRevision.type === BsdaType.OTHER_COLLECTIONS &&
@@ -387,7 +389,7 @@ const sendEmailWhenRevisionOnSealNumbersOrPackagings = async (
     isDefined(bsdaAfterRevision.workerCompanySiret) &&
     isDefined(bsdaAfterRevision.destinationCompanySiret) &&
     !updatedRevisionRequest.isCanceled &&
-    isOnlyAboutFields(bsdaAfterRevision, [
+    isOnlyAboutFields(updateData, [
       "status", // le status peut se glisser dans l'update, attention
       "wasteSealNumbers",
       "packagings"
