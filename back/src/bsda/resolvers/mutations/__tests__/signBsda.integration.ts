@@ -888,73 +888,85 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.id).toBeTruthy();
     });
 
-    it("should sign transport for transporter N", async () => {
-      const emitter = await userWithCompanyFactory("ADMIN");
-      const transporter1 = await userWithCompanyFactory("ADMIN");
-      const transporter2 = await userWithCompanyFactory("ADMIN");
-      await transporterReceiptFactory({ company: transporter1.company });
-      await transporterReceiptFactory({ company: transporter2.company });
+    it(
+      "should sign transport for transporter N and auto-complete recepisse" +
+        "with info from company N (correction bug tra-14706)",
+      async () => {
+        const emitter = await userWithCompanyFactory("ADMIN");
+        const transporter1 = await userWithCompanyFactory("ADMIN");
+        const transporter2 = await userWithCompanyFactory("ADMIN");
+        await transporterReceiptFactory({
+          company: transporter1.company,
+          number: "rec-1"
+        });
+        await transporterReceiptFactory({
+          company: transporter2.company,
+          number: "rec-2"
+        });
 
-      // Crée un BSDA avec la signature du premier transporteur
-      const bsda = await bsdaFactory({
-        opt: {
-          status: "SENT",
-          emitterCompanySiret: emitter.company.siret,
-          emitterCompanyName: emitter.company.name,
-          emitterEmissionSignatureDate: new Date("2018-12-11T00:00:00.000Z")
-        },
-        transporterOpt: {
-          transporterCompanySiret: transporter1.company.siret,
-          transporterTransportSignatureDate: new Date(
-            "2018-12-12T00:00:00.000Z"
-          )
-        }
-      });
-
-      // Ajoute un second transporteur qui n'a pas encore signé
-      const bsdaTransporter2 = await bsdaTransporterFactory({
-        bsdaId: bsda.id,
-        opts: {
-          transporterCompanySiret: transporter2.company.siret,
-          transporterTransportSignatureDate: null
-        }
-      });
-
-      const transporterTransportSignatureDate2 = new Date(
-        "2018-12-13T00:00:00.000Z"
-      );
-      const { mutate } = makeClient(transporter2.user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            type: "TRANSPORT",
-            date: transporterTransportSignatureDate2.toISOString() as any,
-            author: "Transporteur n°2"
+        // Crée un BSDA avec la signature du premier transporteur
+        const bsda = await bsdaFactory({
+          opt: {
+            status: "SENT",
+            emitterCompanySiret: emitter.company.siret,
+            emitterCompanyName: emitter.company.name,
+            emitterEmissionSignatureDate: new Date("2018-12-11T00:00:00.000Z")
+          },
+          transporterOpt: {
+            transporterCompanySiret: transporter1.company.siret,
+            transporterTransportSignatureDate: new Date(
+              "2018-12-12T00:00:00.000Z"
+            )
           }
-        }
-      });
+        });
 
-      expect(errors).toBeUndefined();
+        // Ajoute un second transporteur qui n'a pas encore signé
+        const bsdaTransporter2 = await bsdaTransporterFactory({
+          bsdaId: bsda.id,
+          opts: {
+            transporterCompanySiret: transporter2.company.siret,
+            transporterTransportSignatureDate: null
+          }
+        });
 
-      const updatedBsda = await prisma.bsda.findFirstOrThrow({
-        where: { id: bsda.id },
-        include: { transporters: true }
-      });
+        const transporterTransportSignatureDate2 = new Date(
+          "2018-12-13T00:00:00.000Z"
+        );
+        const { mutate } = makeClient(transporter2.user);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              type: "TRANSPORT",
+              date: transporterTransportSignatureDate2.toISOString() as any,
+              author: "Transporteur n°2"
+            }
+          }
+        });
 
-      // Le statut ne doit pas être modifié
-      expect(updatedBsda.status).toEqual("SENT");
+        expect(errors).toBeUndefined();
 
-      const transporters = getTransportersSync(updatedBsda);
+        const updatedBsda = await prisma.bsda.findFirstOrThrow({
+          where: { id: bsda.id },
+          include: { transporters: true }
+        });
 
-      expect(transporters[1].id).toEqual(bsdaTransporter2.id);
-      expect(transporters[1].transporterTransportSignatureDate).toEqual(
-        transporterTransportSignatureDate2
-      );
-    });
+        // Le statut ne doit pas être modifié
+        expect(updatedBsda.status).toEqual("SENT");
+
+        const transporters = getTransportersSync(updatedBsda);
+
+        expect(transporters[1].id).toEqual(bsdaTransporter2.id);
+        expect(transporters[1].transporterTransportSignatureDate).toEqual(
+          transporterTransportSignatureDate2
+        );
+
+        expect(transporters[1].transporterRecepisseNumber).toEqual("rec-2");
+      }
+    );
 
     it("should not be possible for transporter N+1 to sign if transporter N has not signed", async () => {
       const emitter = await userWithCompanyFactory("ADMIN");
