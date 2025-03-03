@@ -6,6 +6,7 @@ import type {
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -2293,6 +2294,503 @@ describe("Mutation.createFormRevisionRequest", () => {
 
       expect(revisionRequest.quantityRefused).toEqual(5);
       expect(revisionRequest.quantityReceived).toEqual(null);
+    });
+
+    describe("temp storage", () => {
+      const createUserAndTempStoredBSDD = async (
+        tmpStoredOpt,
+        destOpt = {}
+      ) => {
+        // Companies & users
+        const { user: emitter, company: emitterCompany } =
+          await userWithCompanyFactory("ADMIN");
+        const { company: recipientCompany } = await userWithCompanyFactory(
+          "ADMIN",
+          {
+            companyTypes: [CompanyType.WASTEPROCESSOR],
+            wasteProcessorTypes: [
+              WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+            ]
+          }
+        );
+        const { company: ttrCompany } = await userWithCompanyFactory("ADMIN", {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        });
+
+        // Bsdd
+        const bsdd = await formWithTempStorageFactory({
+          ownerId: emitter.id,
+          opt: {
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: ttrCompany.siret,
+            status: Status.ACCEPTED,
+            receivedAt: new Date(),
+            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+            quantityReceived: 10,
+            quantityRefused: 2,
+            wasteRefusalReason: "Pas bon",
+            ...tmpStoredOpt
+          },
+          forwardedInOpts: {
+            recipientCompanySiret: recipientCompany.siret,
+            wasteAcceptationStatus: null,
+            quantityReceived: null,
+            quantityRefused: null,
+            wasteRefusalReason: null,
+            ...destOpt
+          }
+        });
+
+        return {
+          bsdd,
+          emitterCompany,
+          emitter
+        };
+      };
+
+      it("should be able to review temp storage quantityReceived & quantityRefused", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD({
+            status: Status.ACCEPTED,
+            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+            quantityReceived: 10,
+            quantityRefused: 2,
+            wasteRefusalReason: "Pas bon"
+          });
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 11,
+                quantityRefused: 5
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        ).toEqual(11);
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+        ).toEqual(5);
+
+        expect(revisionRequest.initialQuantityReceived?.toNumber()).toEqual(10);
+        expect(revisionRequest.initialQuantityRefused?.toNumber()).toEqual(2);
+      });
+
+      it("temp storage checks on quantitites should throw if error", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD({
+            status: Status.ACCEPTED,
+            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+            quantityReceived: 10,
+            quantityRefused: 2,
+            wasteRefusalReason: "Pas bon"
+          });
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 10,
+                quantityRefused: 12
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)"
+        );
+      });
+
+      it("temp storage checks on quantitites & wasteAcceptationStatus should throw if error", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD({
+            status: Status.ACCEPTED,
+            wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+            quantityReceived: 10,
+            quantityRefused: 2,
+            wasteRefusalReason: "Pas bon"
+          });
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 10,
+                quantityRefused: 0
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
+
+      it("should be able to review destination quantityReceived & quantityRefused", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 7,
+              quantityRefused: 3,
+              wasteRefusalReason: "Pas bon"
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            quantityReceived: 10,
+            quantityRefused: 5
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(revisionRequest.quantityReceived).toEqual(10);
+        expect(revisionRequest.quantityRefused).toEqual(5);
+
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityReceived?.toNumber()
+        ).toEqual(7);
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
+        ).toEqual(3);
+      });
+
+      it("should throw if errors on destination quantities", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 7,
+              quantityRefused: 3,
+              wasteRefusalReason: "Pas bon"
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            quantityReceived: 10,
+            quantityRefused: 15
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)"
+        );
+      });
+
+      it("should throw if errors on destination quantities & wasteAcceptationStatus", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 7,
+              quantityRefused: 3,
+              wasteRefusalReason: "Pas bon"
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            quantityReceived: 10,
+            quantityRefused: 0
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
+
+      it("should be able to review quantities & wasteAcceptationStatus on both temp storage & destination (ACCEPTED then PARTIALLY_REFUSED)", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 15,
+              quantityRefused: 0
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 13,
+              quantityRefused: 3,
+              wasteRefusalReason: "Pas bon"
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 16,
+                quantityRefused: 0
+              }
+            },
+            quantityReceived: 16,
+            quantityRefused: 2
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        ).toEqual(16);
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+        ).toEqual(0);
+
+        expect(revisionRequest.initialQuantityReceived?.toNumber()).toEqual(15);
+        expect(revisionRequest.initialQuantityRefused?.toNumber()).toEqual(0);
+
+        expect(revisionRequest.quantityReceived).toEqual(16);
+        expect(revisionRequest.quantityRefused).toEqual(2);
+
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityReceived?.toNumber()
+        ).toEqual(13);
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
+        ).toEqual(3);
+      });
+
+      it("should be able to review quantities & wasteAcceptationStatus on both temp storage & destination (PARTIALLY_REFUSED then ACCEPTED)", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 15,
+              quantityRefused: 5,
+              wasteRefusalReason: "Pas bon"
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 10,
+              quantityRefused: 0
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 16,
+                quantityRefused: 3
+              }
+            },
+            quantityReceived: 13,
+            quantityRefused: 0
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        ).toEqual(16);
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+        ).toEqual(3);
+
+        expect(revisionRequest.initialQuantityReceived?.toNumber()).toEqual(15);
+        expect(revisionRequest.initialQuantityRefused?.toNumber()).toEqual(5);
+
+        expect(revisionRequest.quantityReceived).toEqual(13);
+        expect(revisionRequest.quantityRefused).toEqual(0);
+
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityReceived?.toNumber()
+        ).toEqual(10);
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
+        ).toEqual(0);
+      });
+
+      it("should throw if temp storage reviewed quantites are bad but destination is ok", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 15,
+              quantityRefused: 5,
+              wasteRefusalReason: "Pas bon"
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 10,
+              quantityRefused: 0
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 16,
+                quantityRefused: 0
+              }
+            },
+            quantityReceived: 13,
+            quantityRefused: 0
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+        );
+      });
+
+      it("should throw if destination storage reviewed quantites are bad but temp storage is ok", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 15,
+              quantityRefused: 5,
+              wasteRefusalReason: "Pas bon"
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 10,
+              quantityRefused: 0
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 16,
+                quantityRefused: 5
+              }
+            },
+            quantityReceived: 10,
+            quantityRefused: 1
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+        );
+      });
     });
   });
 

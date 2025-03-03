@@ -36,7 +36,8 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import {
   brokerSchemaFn,
   packagingInfoFn,
-  quantityRefusedNotRequired,
+  revisionRequestQuantityRefused,
+  revisionRequestTempStorageQuantityRefused,
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
@@ -541,11 +542,10 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
     .number()
     .min(0)
     .nullable(),
-  temporaryStorageTemporaryStorerQuantityRefused: quantityRefusedNotRequired(
-    "temporaryStorageTemporaryStorerQuantityReceived"
-  ),
+  temporaryStorageTemporaryStorerQuantityRefused:
+    revisionRequestTempStorageQuantityRefused,
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused: quantityRefusedNotRequired()
+  quantityRefused: revisionRequestQuantityRefused
 });
 
 async function recipify(
@@ -712,6 +712,8 @@ function getBsddHistory(bsdd: Form & { forwardedIn: Form | null }) {
     initialTemporaryStorageDestinationProcessingOperation:
       bsdd.forwardedIn?.processingOperationDone,
     initialTemporaryStorageTemporaryStorerQuantityReceived:
-      bsdd.forwardedIn?.quantityReceived
+      bsdd.forwardedIn?.quantityReceived,
+    initialTemporaryStorageTemporaryStorerQuantityRefused:
+      bsdd.forwardedIn?.quantityRefused
   };
 }

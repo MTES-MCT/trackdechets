@@ -265,18 +265,39 @@ export const hasPipeline = (value: {
 }): boolean =>
   value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
 
-export const quantityRefusedNotRequired = (
-  quantityReceivedFieldName:
-    | "temporaryStorageTemporaryStorerQuantityReceived"
-    | "quantityReceived" = "quantityReceived"
-) =>
+const getReceptionData = (context: any, isTempStorage = false) => {
+  if (isTempStorage) {
+    return {
+      wasteAcceptationStatus: context.wasteAcceptationStatus,
+      quantityReceived: context.temporaryStorageTemporaryStorerQuantityReceived,
+      quantityRefused: context.temporaryStorageTemporaryStorerQuantityRefused
+    };
+  }
+
+  return {
+    wasteAcceptationStatus:
+      context?.forwardedIn?.wasteAcceptationStatus ??
+      context?.wasteAcceptationStatus,
+    quantityReceived: isDefined(context?.forwardedIn?.quantityReceived)
+      ? context?.forwardedIn?.quantityReceived
+      : context.quantityReceived,
+    quantityRefused: isDefined(context?.forwardedIn?.quantityReceived)
+      ? context?.forwardedIn?.quantityRefused
+      : context.quantityRefused
+  };
+};
+
+export const quantityRefusedSchemaBuilder = (isTempStorage = false) =>
   weight(WeightUnits.Tonne)
     .min(0)
     .test(
       "not-defined-if-no-quantity-received",
       "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas",
       (value, context) => {
-        const quantityReceived = context.parent[quantityReceivedFieldName];
+        const { quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
         const quantityReceivedIsDefined = isDefined(quantityReceived);
         const quantityRefusedIsDefined = isDefined(value);
@@ -290,7 +311,10 @@ export const quantityRefusedNotRequired = (
       "waste-is-accepted",
       "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
       (value, context) => {
-        const { wasteAcceptationStatus } = context.parent;
+        const { wasteAcceptationStatus } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
         if (wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED)
           return true;
@@ -305,8 +329,10 @@ export const quantityRefusedNotRequired = (
       "waste-is-refused",
       "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
       (value, context) => {
-        const { wasteAcceptationStatus } = context.parent;
-        const quantityReceived = context.parent[quantityReceivedFieldName];
+        const { wasteAcceptationStatus, quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
         if (wasteAcceptationStatus !== WasteAcceptationStatus.REFUSED)
           return true;
@@ -321,8 +347,10 @@ export const quantityRefusedNotRequired = (
       "waste-is-partially-refused",
       "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
       (value, context) => {
-        const { wasteAcceptationStatus } = context.parent;
-        const quantityReceived = context.parent[quantityReceivedFieldName];
+        const { wasteAcceptationStatus, quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
         if (wasteAcceptationStatus !== WasteAcceptationStatus.PARTIALLY_REFUSED)
           return true;
@@ -337,7 +365,10 @@ export const quantityRefusedNotRequired = (
       "lower-than-quantity-received",
       "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)",
       (value, context) => {
-        const quantityReceived = context.parent[quantityReceivedFieldName];
+        const { quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
         if (!isDefined(quantityReceived)) return true;
 
@@ -348,26 +379,26 @@ export const quantityRefusedNotRequired = (
       }
     );
 
-export const quantityRefused = (
-  quantityReceivedFieldName:
-    | "temporaryStorageTemporaryStorerQuantityReceived"
-    | "quantityReceived" = "quantityReceived"
-) =>
-  quantityRefusedNotRequired(quantityReceivedFieldName).test(
-    "quantity-is-required",
-    "La quantité refusée (quantityRefused) est requise",
-    (value, context) => {
-      const { wasteAcceptationStatus } = context.parent;
+export const quantityRefusedRequired = quantityRefusedSchemaBuilder().test(
+  "quantity-is-required",
+  "La quantité refusée (quantityRefused) est requise",
+  (value, context) => {
+    const { wasteAcceptationStatus } = getReceptionData(context.parent);
 
-      // La quantity refusée est obligatoire à l'étape d'acceptation,
-      // donc si wasteAcceptationStatus est renseigné
-      if (isDefined(wasteAcceptationStatus) && !isDefined(value)) {
-        return false;
-      }
-
-      return true;
+    // La quantity refusée est obligatoire à l'étape d'acceptation,
+    // donc si wasteAcceptationStatus est renseigné
+    if (isDefined(wasteAcceptationStatus) && !isDefined(value)) {
+      return false;
     }
-  );
+
+    return true;
+  }
+);
+
+export const revisionRequestQuantityRefused =
+  quantityRefusedSchemaBuilder(false);
+export const revisionRequestTempStorageQuantityRefused =
+  quantityRefusedSchemaBuilder(true);
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -1437,7 +1468,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .label("Réception")
     .when("wasteAcceptationStatus", weightConditions.bsddWasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
-  quantityRefused: quantityRefused(),
+  quantityRefused: quantityRefusedRequired,
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(
@@ -1482,7 +1513,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
       "wasteAcceptationStatus",
       weightConditions.bsddWasteAcceptationStatus as any
     ),
-  quantityRefused: quantityRefused(),
+  quantityRefused: quantityRefusedRequired,
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()

@@ -720,6 +720,7 @@ model BsddRevisionRequest {
   initialTemporaryStorageDestinationCap                  String?
   initialTemporaryStorageDestinationProcessingOperation  String?
   initialTemporaryStorageTemporaryStorerQuantityReceived Decimal?
+  initialTemporaryStorageTemporaryStorerQuantityRefused  Decimal?
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
