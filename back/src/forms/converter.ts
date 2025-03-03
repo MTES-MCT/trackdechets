@@ -686,13 +686,12 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
-        p => ({
+      packagingInfos:
+        (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
           ...p,
           volume: p.volume ?? null,
           identificationNumbers: p.identificationNumbers ?? []
-        })
-      ),
+        })) ?? [],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -874,7 +873,13 @@ export function expandFormFromDb(
             nonRoadRegulationMention:
               forwardedIn.wasteDetailsNonRoadRegulationMention,
             packagingInfos:
-              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
+              (forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
+                p => ({
+                  ...p,
+                  volume: p.volume ?? null,
+                  identificationNumbers: p.identificationNumbers ?? []
+                })
+              ) ?? [],
             // DEPRECATED - To remove with old packaging fields
             ...getDeprecatedPackagingApiFields(
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]

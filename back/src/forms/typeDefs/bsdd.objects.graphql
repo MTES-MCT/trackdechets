@@ -524,7 +524,7 @@ type PackagingInfo {
   volume: Float
 
   "Numéros des contenants"
-  identificationNumbers: [String!]
+  identificationNumbers: [String!]!
 }
 
 "Détails du déchet (case 3, 4, 5, 6)"
