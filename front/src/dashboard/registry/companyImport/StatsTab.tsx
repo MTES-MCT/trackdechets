@@ -49,6 +49,14 @@ export function StatsTab({ source, siret }: Props) {
           aggregate.type === RegistryImportType.OutgoingTexs
             ? sum.outgoingTexs + aggregate.numberOfInsertions
             : sum.outgoingTexs,
+        transported:
+          aggregate.type === RegistryImportType.Transported
+            ? sum.transported + aggregate.numberOfInsertions
+            : sum.transported,
+        managed:
+          aggregate.type === RegistryImportType.Managed
+            ? sum.managed + aggregate.numberOfInsertions
+            : sum.managed,
         inserted: sum.inserted + aggregate.numberOfInsertions,
         edited: sum.edited + aggregate.numberOfEdits,
         cancelled: sum.cancelled + aggregate.numberOfCancellations
@@ -62,7 +70,9 @@ export function StatsTab({ source, siret }: Props) {
       incomingWaste: 0,
       outgoingWaste: 0,
       incomingTexs: 0,
-      outgoingTexs: 0
+      outgoingTexs: 0,
+      transported: 0,
+      managed: 0
     }
   );
 
@@ -123,6 +133,8 @@ export function StatsTab({ source, siret }: Props) {
             <Stat value={stats?.outgoingWaste} label="D(N)D sortants" />
             <Stat value={stats?.incomingTexs} label="TEXS entrants" />
             <Stat value={stats?.outgoingTexs} label="TEXS sortants" />
+            <Stat value={stats?.transported} label="Transportés" />
+            <Stat value={stats?.managed} label="Managés" />
           </div>
         </div>
       </CallOut>

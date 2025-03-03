@@ -1,5 +1,5 @@
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import { RegistryImportType } from "@td/codegen-ui";
+import { RegistryImportStatus, RegistryImportType } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
 import gql from "graphql-tag";
 import React from "react";
@@ -262,8 +262,10 @@ export function formatStats({
       )}
       {numberOfInsertions > 0 && (
         <li>
-          {numberOfInsertions}{" "}
-          {pluralize("ajoutée", numberOfInsertions, "ajoutées")}
+          <strong>
+            {numberOfInsertions}{" "}
+            {pluralize("ajoutée", numberOfInsertions, "ajoutées")}
+          </strong>
         </li>
       )}
       {numberOfEdits > 0 && (
@@ -284,4 +286,35 @@ export function formatStats({
       )}
     </ul>
   );
+}
+
+export function getStatusFromStats({
+  numberOfErrors,
+  numberOfInsertions,
+  numberOfEdits,
+  numberOfCancellations,
+  numberOfSkipped
+}: {
+  numberOfErrors: number;
+  numberOfInsertions: number;
+  numberOfEdits: number;
+  numberOfCancellations: number;
+  numberOfSkipped: number;
+}): RegistryImportStatus {
+  if (
+    numberOfCancellations +
+      numberOfEdits +
+      numberOfInsertions +
+      numberOfSkipped ===
+    0
+  ) {
+    // No data was processed. Mark the import as failed
+    return RegistryImportStatus.Failed;
+  }
+
+  if (numberOfErrors) {
+    return RegistryImportStatus.PartiallySuccessful;
+  }
+
+  return RegistryImportStatus.Successful;
 }

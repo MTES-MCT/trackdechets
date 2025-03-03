@@ -2,7 +2,7 @@ import { Table } from "@codegouvfr/react-dsfr/Table";
 import { ChangeAggregate } from "@td/codegen-ui";
 import { format } from "date-fns";
 import React from "react";
-import { TYPES, formatStats } from "../shared";
+import { TYPES, badges, formatStats, getStatusFromStats } from "../shared";
 
 type Props = { aggregates: ChangeAggregate[]; siret: string };
 
@@ -14,7 +14,10 @@ export function ChangeAggregatesTable({ aggregates, siret }: Props) {
   }
 
   const tableData = aggregates.map(aggregate => [
-    format(new Date(aggregate.createdAt), "dd/MM/yyyy HH'h'mm"),
+    <div>
+      <div>{format(new Date(aggregate.createdAt), "dd/MM/yyyy HH'h'mm")}</div>
+      {badges[getStatusFromStats(aggregate)]("import")}
+    </div>,
     TYPES[aggregate.type],
     formatStats(aggregate),
     <div>
