@@ -224,7 +224,13 @@ describe("expandFormFromDb", () => {
         onuCode: forwardedIn!.wasteDetailsOnuCode,
         nonRoadRegulationMention:
           forwardedIn!.wasteDetailsNonRoadRegulationMention,
-        packagingInfos: forwardedIn!.wasteDetailsPackagingInfos,
+        packagingInfos: (
+          form.wasteDetailsPackagingInfos as PackagingInfo[]
+        ).map(p => ({
+          ...p,
+          identificationNumbers: [],
+          volume: null
+        })),
         packagings: ["CITERNE"],
         otherPackaging: undefined,
         numberOfPackages: 1,
