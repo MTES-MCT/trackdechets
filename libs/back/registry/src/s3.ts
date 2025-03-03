@@ -2,11 +2,11 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
   NotFound,
-  PutObjectCommand,
   PutObjectTaggingCommand,
   S3Client
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
+import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { PassThrough, Readable } from "node:stream";
 import { envConfig } from "./config";
@@ -22,6 +22,7 @@ export const registryS3Client = new S3Client({
 });
 
 const SIGNED_URL_EXPIRES_IN = 60 * 10; // 10 minutes
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
 export function getUploadWithWritableStream({
   bucketName,
@@ -92,20 +93,34 @@ export async function getSignedUrlForUpload({
   metadata?: Record<string, string>;
   tags?: Record<string, string>;
 }) {
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: key,
-    Metadata: metadata,
-    Tagging: Object.entries({ ...tags, temp: true })
+  const metadataFields = metadata
+    ? Object.entries(metadata).map(([key, value]) => ({
+        [`x-amz-meta-${key}`]: value
+      }))
+    : [];
+  const taggingField = {
+    "x-amz-tagging": Object.entries({ ...tags, temp: true })
       .map(([key, value]) => `${key}=${value}`)
       .join("&")
-  });
+  };
 
-  const signedUrl = await getSignedUrl(registryS3Client, command, {
-    expiresIn: SIGNED_URL_EXPIRES_IN,
-    unhoistableHeaders: new Set(["x-amz-meta-filename"])
+  // We use a presigned post as it supports POST policy conditions
+  // that allow us to limit the file size
+  const { url, fields } = await createPresignedPost(registryS3Client, {
+    Bucket: bucketName,
+    Key: key,
+    Expires: SIGNED_URL_EXPIRES_IN,
+    Conditions: [
+      ["content-length-range", 0, MAX_FILE_SIZE],
+      ...metadataFields,
+      taggingField
+    ],
+    Fields: {
+      ...metadataFields.reduce((acc, field) => ({ ...acc, ...field }), {}),
+      ...taggingField
+    }
   });
-  return signedUrl;
+  return { url, fields };
 }
 
 export async function getSignedUrlForDownload({
