@@ -115,4 +115,36 @@ describe("Mutation.Vhu.publish", () => {
       })
     ]);
   });
+
+  it("should fail when packaging is UNITE and identificationType is nullshould pass the form as non draft", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        isDraft: true,
+        packaging: "UNITE",
+        identificationType: null
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "publishBsvhu">>(
+      PUBLISH_VHU_FORM,
+      {
+        variables: { id: form.id }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité\n" +
+          "Le type de numéro d'identification est un champ requis.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });
