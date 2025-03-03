@@ -686,7 +686,7 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: (form.wasteDetailsPackagingInfos as PackagingInfo[]).map(
+      packagingInfos: (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
         p => ({
           ...p,
           volume: p.volume ?? null,
