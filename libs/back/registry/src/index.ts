@@ -9,6 +9,7 @@ export {
   exportOptions
 } from "./options";
 export * from "./s3";
+export * from "./changeAggregates";
 
 export { SSD_HEADERS } from "./ssd/constants";
 

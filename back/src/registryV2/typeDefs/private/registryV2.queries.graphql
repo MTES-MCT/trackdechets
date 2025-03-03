@@ -1,0 +1,7 @@
+type Query {
+  registryChangeAggregates(
+    siret: String!
+    window: Int!
+    source: RegistryImportSource!
+  ): [ChangeAggregate!]
+}

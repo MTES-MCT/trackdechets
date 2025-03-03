@@ -1,8 +1,8 @@
-import type { Mutation } from "@td/codegen-back";
+import { Mutation, Query } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
+import { randomUUID } from "crypto";
 import { sub } from "date-fns";
 import gql from "graphql-tag";
-import { randomUUID } from "node:crypto";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -13,7 +13,20 @@ const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   }
 `;
 
-function getCorrectLine(siret: string) {
+const GET_REGISTRY_CHANGE_AGGREGATES = gql`
+  query RegistryChangeAggregates($siret: String!, $window: Int!) {
+    registryChangeAggregates(siret: $siret, window: $window, source: API) {
+      numberOfInsertions
+      numberOfSkipped
+      numberOfErrors
+      numberOfEdits
+      numberOfCancellations
+      numberOfAggregates
+    }
+  }
+`;
+
+function getIncomingTexsLine(siret: string) {
   return {
     reason: undefined,
     publicId: randomUUID(),
@@ -120,106 +133,21 @@ function getCorrectLine(siret: string) {
   };
 }
 
-describe("Registry - addToIncomingTexsRegistry", () => {
-  afterAll(resetDatabase);
-
-  it("should return an error if the user is not authenticated", async () => {
-    const { mutate } = makeClient();
-    const { errors } = await mutate<
-      Pick<Mutation, "addToIncomingTexsRegistry">
-    >(ADD_TO_INCOMING_TEXS_REGISTRY, { variables: { lines: [] } });
-    expect(errors).toHaveLength(1);
-    expect(errors[0]).toEqual(
-      expect.objectContaining({
-        message: "Vous n'êtes pas connecté."
-      })
-    );
-  });
-
-  it("should not be able to import more than 1_000 lines at once", async () => {
-    const { user } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
-
-    const lines = Array.from({ length: 1_001 }, (_, i) =>
-      getCorrectLine(`0000000000000${i}`)
-    );
-    const { errors } = await mutate<
-      Pick<Mutation, "addToIncomingTexsRegistry">
-    >(ADD_TO_INCOMING_TEXS_REGISTRY, { variables: { lines } });
-
-    expect(errors).toHaveLength(1);
-    expect(errors[0]).toEqual(
-      expect.objectContaining({
-        message: "Vous ne pouvez pas importer plus de 1000 lignes par appel"
-      })
-    );
-  });
-
-  it("should create an incoming texs item", async () => {
-    const { user, company } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
-
-    const lines = [getCorrectLine(company.siret!)];
-
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
-      ADD_TO_INCOMING_TEXS_REGISTRY,
-      { variables: { lines } }
-    );
-
-    expect(data.addToIncomingTexsRegistry).toBe(true);
-  });
-
-  it("should create several incoming texs items", async () => {
-    const { user, company } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
-
-    const lines = Array.from({ length: 100 }, () =>
-      getCorrectLine(company.siret!)
-    );
-
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
-      ADD_TO_INCOMING_TEXS_REGISTRY,
-      { variables: { lines } }
-    );
-
-    expect(data.addToIncomingTexsRegistry).toBe(true);
-  });
-
-  it("should create and edit an incoming texs item in one go", async () => {
-    const { user, company } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
-
-    const line = getCorrectLine(company.siret!);
-    const editedLine = { ...line, reason: "EDIT", wasteCodeBale: "A1070" };
-    const lines = [line, editedLine];
-
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
-      ADD_TO_INCOMING_TEXS_REGISTRY,
-      { variables: { lines } }
-    );
-
-    expect(data.addToIncomingTexsRegistry).toBe(true);
-
-    const result = await prisma.registryIncomingTexs.findFirstOrThrow({
-      where: { publicId: line.publicId, isLatest: true }
-    });
-    expect(result.wasteCodeBale).toBe("A1070");
-  });
+describe("Registry - registryChangeAggregates", () => {
+  afterEach(resetDatabase);
 
   it("should create a ChangeAggregate when creating several incoming texs items", async () => {
     const { user, company } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
+    const { mutate, query } = makeClient(user);
 
     const lines = Array.from({ length: 100 }, () =>
-      getCorrectLine(company.siret!)
+      getIncomingTexsLine(company.siret!)
     );
 
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+    await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
       ADD_TO_INCOMING_TEXS_REGISTRY,
       { variables: { lines } }
     );
-
-    expect(data.addToIncomingTexsRegistry).toBe(true);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -227,51 +155,157 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     expect(changeAggregates.length).toBe(1);
     expect(changeAggregates[0].numberOfInsertions).toBe(100);
+
+    const { data } = await query<Pick<Query, "registryChangeAggregates">>(
+      GET_REGISTRY_CHANGE_AGGREGATES,
+      { variables: { siret: company.siret, window: 1 } }
+    );
+
+    expect(data.registryChangeAggregates?.length).toBe(1);
+    expect(data.registryChangeAggregates?.[0].numberOfInsertions).toBe(100);
   });
 
-  it("should amend to previous ChangeAggregate when creating incoming texs items less than 1 min after previous creation", async () => {
+  it("should amend previous ChangeAggregate when creating incoming texs items less than 1 min after previous creation", async () => {
     const { user, company } = await userWithCompanyFactory();
-    const { mutate } = makeClient(user);
+    const { mutate, query } = makeClient(user);
+
+    // Existing aggregate that should be incremented
+    await prisma.registryChangeAggregate.create({
+      data: {
+        source: "API",
+        type: "INCOMING_TEXS",
+        createdById: user.id,
+        numberOfInsertions: 1,
+        numberOfSkipped: 1,
+        numberOfErrors: 1,
+        numberOfEdits: 1,
+        numberOfCancellations: 1,
+        numberOfAggregates: 1,
+        reportForId: company.id,
+        reportAsId: company.id
+      }
+    });
 
     const lines = Array.from({ length: 100 }, () =>
-      getCorrectLine(company.siret!)
+      getIncomingTexsLine(company.siret!)
     );
 
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+    await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
       ADD_TO_INCOMING_TEXS_REGISTRY,
       { variables: { lines } }
     );
-
-    expect(data.addToIncomingTexsRegistry).toBe(true);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
     });
 
     expect(changeAggregates.length).toBe(1);
-    expect(changeAggregates[0].numberOfInsertions).toBe(100);
+    expect(changeAggregates[0].numberOfInsertions).toBe(101);
+
+    expect(changeAggregates[0].numberOfSkipped).toBe(1);
+    expect(changeAggregates[0].numberOfErrors).toBe(1);
+    expect(changeAggregates[0].numberOfEdits).toBe(1);
+    expect(changeAggregates[0].numberOfCancellations).toBe(1);
+
+    expect(changeAggregates[0].numberOfAggregates).toBe(2);
+
+    const { data } = await query<Pick<Query, "registryChangeAggregates">>(
+      GET_REGISTRY_CHANGE_AGGREGATES,
+      { variables: { siret: company.siret, window: 1 } }
+    );
+    expect(data.registryChangeAggregates?.length).toBe(1);
+    expect(data.registryChangeAggregates?.[0].numberOfInsertions).toBe(101);
   });
 
   it("should create a ChangeAggregate when creating incoming texs items more than 1 min after previous creation", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
+    // Existing aggregate with more than 2 min since the last update
+    const date = sub(new Date(), { minutes: 2 });
+    await prisma.registryChangeAggregate.create({
+      data: {
+        createdAt: date,
+        updatedAt: date,
+        source: "API",
+        type: "INCOMING_TEXS",
+        createdById: user.id,
+        numberOfInsertions: 1,
+        numberOfSkipped: 1,
+        numberOfErrors: 1,
+        numberOfEdits: 1,
+        numberOfCancellations: 1,
+        numberOfAggregates: 1,
+        reportForId: company.id,
+        reportAsId: company.id
+      }
+    });
+
     const lines = Array.from({ length: 100 }, () =>
-      getCorrectLine(company.siret!)
+      getIncomingTexsLine(company.siret!)
     );
 
-    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+    await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
       ADD_TO_INCOMING_TEXS_REGISTRY,
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
-
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
-      where: { createdById: user.id }
+      where: { createdById: user.id },
+      orderBy: { createdAt: "desc" }
     });
 
-    expect(changeAggregates.length).toBe(1);
+    expect(changeAggregates.length).toBe(2);
     expect(changeAggregates[0].numberOfInsertions).toBe(100);
+    expect(changeAggregates[1].numberOfInsertions).toBe(1);
+  });
+
+  it("should create a ChangeAggregate when creating incoming texs items with updatedAt<1min & createdAt>5min", async () => {
+    const { user, company } = await userWithCompanyFactory();
+    const { mutate, query } = makeClient(user);
+
+    // Existing aggregate updated now but created 6min ago
+    await prisma.registryChangeAggregate.create({
+      data: {
+        createdAt: sub(new Date(), { minutes: 6 }),
+        updatedAt: new Date(),
+        source: "API",
+        type: "INCOMING_TEXS",
+        createdById: user.id,
+        numberOfInsertions: 1,
+        numberOfSkipped: 1,
+        numberOfErrors: 1,
+        numberOfEdits: 1,
+        numberOfCancellations: 1,
+        numberOfAggregates: 1,
+        reportForId: company.id,
+        reportAsId: company.id
+      }
+    });
+
+    const lines = Array.from({ length: 100 }, () =>
+      getIncomingTexsLine(company.siret!)
+    );
+
+    await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    const changeAggregates = await prisma.registryChangeAggregate.findMany({
+      where: { createdById: user.id },
+      orderBy: { createdAt: "desc" }
+    });
+
+    expect(changeAggregates.length).toBe(2);
+    expect(changeAggregates[0].numberOfInsertions).toBe(100);
+    expect(changeAggregates[1].numberOfInsertions).toBe(1);
+
+    const { data } = await query<Pick<Query, "registryChangeAggregates">>(
+      GET_REGISTRY_CHANGE_AGGREGATES,
+      { variables: { siret: company.siret, window: 1 } }
+    );
+    expect(data.registryChangeAggregates?.length).toBe(2);
+    expect(data.registryChangeAggregates?.[0].numberOfInsertions).toBe(100);
   });
 });

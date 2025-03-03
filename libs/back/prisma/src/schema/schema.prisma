@@ -317,6 +317,9 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  
+  registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
+  registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -938,6 +941,7 @@ model User {
   registryTransported        RegistryTransported[]
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
+  registryChangeAggregates   RegistryChangeAggregate[]
 }
 
 enum GovernmentPermission {
