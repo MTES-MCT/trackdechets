@@ -156,7 +156,8 @@ export const operationModeSchema = enumValueAsStringSchema
           "REUTILISATION",
           "RECYCLAGE",
           "VALORISATION_ENERGETIQUE",
-          "ELIMINATION"
+          "ELIMINATION",
+          "AUTRES VALORISATIONS"
         ],
         {
           required_error: "Le code de qualification est requis",

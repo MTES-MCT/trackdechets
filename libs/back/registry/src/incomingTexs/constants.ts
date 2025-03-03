@@ -30,7 +30,6 @@ export const INCOMING_TEXS_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   emitterCompanyType: "Type d'expéditeur ou détenteur",
   emitterCompanyOrgId: "Numéro d'identification de l'expéditeur ou détenteur",
   emitterCompanyName: "Raison sociale de l'expéditeur ou détenteur",
