@@ -213,7 +213,7 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
                 que les informations ci-dessus sont correctes. En signant ce
                 document, je déclare prendre en charge le déchet.
               </p>
-              <div className="fr-col-4 fr-mb-2w">
+              <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
                 <Input
                   label="Date de prise en charge"
                   nativeInputProps={{

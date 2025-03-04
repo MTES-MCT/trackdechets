@@ -420,9 +420,17 @@ export async function updateFavorites(orgIds: string[]) {
   }
 }
 
+interface UpdatedCompanyNameAndAddress
+  extends Pick<Company, "name" | "address" | "codeNaf"> {
+  addressVoie: string | null | undefined;
+  addressPostalCode: string | null | undefined;
+  addressCity: string | null | undefined;
+  codePaysEtrangerEtablissement: string | null | undefined;
+}
+
 export async function getUpdatedCompanyNameAndAddress(
   company: Pick<Company, "name" | "address" | "orgId">
-): Promise<Pick<Company, "name" | "address" | "codeNaf"> | null> {
+): Promise<UpdatedCompanyNameAndAddress | null> {
   let searchResult: null | SireneSearchResult | PartialCompanyVatSearchResult =
     null;
   if (isSiret(company.orgId)) {
@@ -440,6 +448,10 @@ export async function getUpdatedCompanyNameAndAddress(
         searchResult.address && searchResult.address !== company.address
           ? searchResult.address
           : company.address,
+      addressVoie: (searchResult as SireneSearchResult).addressVoie,
+      addressPostalCode: (searchResult as SireneSearchResult).addressPostalCode,
+      addressCity: (searchResult as SireneSearchResult).addressCity,
+      codePaysEtrangerEtablissement: searchResult.codePaysEtrangerEtablissement,
       codeNaf: (searchResult as SireneSearchResult).naf ?? null
     };
   }

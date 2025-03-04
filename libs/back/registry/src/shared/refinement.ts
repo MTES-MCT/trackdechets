@@ -4,6 +4,53 @@ import { Refinement, z } from "zod";
 import { transportModeSchema, getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@prisma/client";
 
+export function refineTransporterInfos<T>({
+  typeKey,
+  orgIdKey,
+  nameKey,
+  addressKey,
+  postalCodeKey,
+  cityKey,
+  countryKey,
+  recepisseIsExemptedKey,
+  recepisseNumberKey
+}: {
+  typeKey: string;
+  orgIdKey: string;
+  nameKey: string;
+  addressKey: string;
+  postalCodeKey: string;
+  cityKey: string;
+  countryKey: string;
+  recepisseIsExemptedKey: string;
+  recepisseNumberKey: string;
+}): Refinement<T> {
+  return (item, context) => {
+    if (!item[typeKey]) {
+      return;
+    }
+
+    if (!item[recepisseIsExemptedKey] && !item[recepisseNumberKey]) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le numéro de récépissé est obligatoire si le transporteur n'indique pas en être exempté",
+        path: [recepisseNumberKey]
+      });
+    }
+
+    refineActorInfos({
+      typeKey,
+      orgIdKey,
+      nameKey,
+      addressKey,
+      postalCodeKey,
+      cityKey,
+      countryKey
+    })(item, context);
+  };
+}
+
 export function refineActorInfos<T>({
   typeKey,
   orgIdKey,
@@ -21,7 +68,7 @@ export function refineActorInfos<T>({
   cityKey: string;
   countryKey: string;
 }): Refinement<T> {
-  return (item, { addIssue }) => {
+  return (item, context) => {
     // Refine orgId first
     const type:
       | "ETABLISSEMENT_FR"
@@ -43,13 +90,13 @@ export function refineActorInfos<T>({
     switch (type) {
       case "ETABLISSEMENT_FR": {
         if (!orgId) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le SIRET doit être saisi pour un établissement français",
             path: [orgIdKey]
           });
         } else if (!isSiret(orgId)) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le SIRET saisi n'est pas un SIRET valide",
             path: [orgIdKey]
@@ -57,7 +104,7 @@ export function refineActorInfos<T>({
         }
 
         if (countryKey && inputCountry && inputCountry !== "FR") {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une entreprise française",
             path: [countryKey]
@@ -67,7 +114,7 @@ export function refineActorInfos<T>({
         const postalCode = item[postalCodeKey];
         const isValidPostalCode = /^[0-9]{5,6}$/.test(postalCode);
         if (!isValidPostalCode) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le code postal doit être composé de 5 ou 6 chiffres pour une entreprise française",
@@ -79,7 +126,7 @@ export function refineActorInfos<T>({
       case "ENTREPRISE_UE": {
         const { isValid, country } = checkVAT(orgId, countries);
         if (!isValid) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro de TVA n'est pas valide. Il commence par 2 lettres majuscules, est suivi de chiffres et doit respecter les contraintes du pays concerné",
@@ -93,7 +140,7 @@ export function refineActorInfos<T>({
           inputCountry &&
           country.isoCode.short !== inputCountry
         ) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le code pays ne correspond pas au code pays de la TVA saisie",
@@ -105,7 +152,7 @@ export function refineActorInfos<T>({
       case "ENTREPRISE_HORS_UE": {
         const isOrgIdValidOutOfUe = orgId && /[A-Z0-9]{1,25}/.test(orgId);
         if (!isOrgIdValidOutOfUe) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit faire entre 1 et 25 caractères pour une entreprise hors UE. Il est composé de lettres majuscules et de chiffres.",
@@ -117,7 +164,7 @@ export function refineActorInfos<T>({
       case "ASSOCIATION": {
         const isOrgIdValidAssociation = orgId && /W[0-9]{9}/.test(orgId);
         if (!isOrgIdValidAssociation) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit faire 10 caractères pour une association. Il commence par un W suivi de 9 chiffres.",
@@ -126,7 +173,7 @@ export function refineActorInfos<T>({
         }
 
         if (countryKey && inputCountry && inputCountry !== "FR") {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une association française",
             path: [countryKey]
@@ -136,7 +183,7 @@ export function refineActorInfos<T>({
       }
       case "PERSONNE_PHYSIQUE": {
         if (!orgId) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit contenir le nom et prénom pour une personne physique"
@@ -158,7 +205,7 @@ export function refineActorInfos<T>({
       postalCodeKey,
       cityKey,
       countryKey
-    });
+    })(item, context);
   };
 }
 
@@ -188,7 +235,7 @@ function refineActorDetails<T>({
       return;
     }
 
-    if (!item[nameKey]) {
+    if (!item[nameKey] && type !== "PERSONNE_PHYSIQUE") {
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "La raison sociale est obligatoire",
@@ -276,7 +323,6 @@ export const refineWeightAndVolume: Refinement<{
   weightValue: number;
   volume?: number | null | undefined;
   weightIsEstimate: boolean;
-  operationCode: string;
 }> = (item, { addIssue }) => {
   const isUsingRoad = [
     item.transporter1TransportMode,
@@ -524,19 +570,6 @@ export const parcelRefinement: Refinement<{
   destinationParcelNumbers: string[];
   nextDestinationIsAbroad?: boolean | null;
 }> = (item, { addIssue }) => {
-  if (
-    !item.parcelCoordinates.length &&
-    !item.parcelNumbers.length &&
-    !item.parcelInseeCodes.length
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
-      path: ["parcelCoordinates"]
-    });
-  }
-
   if (
     item.parcelNumbers.length &&
     item.parcelInseeCodes.length &&

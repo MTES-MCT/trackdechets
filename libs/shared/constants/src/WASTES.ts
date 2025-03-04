@@ -5617,6 +5617,10 @@ export const BSDD_APPENDIX1_WASTE_CODES = [
     const prefixes = ["13 02", "13 05", "16 02", "16 07", "20 01"];
     return prefixes.some(prefix => waste.code.startsWith(prefix));
   }).map(waste => waste.code),
+  "13 01 10*",
+  "13 01 11*",
+  "13 01 12*",
+  "13 01 13*",
   "15 01 10*",
   "15 02 02*",
   "16 06 01*",

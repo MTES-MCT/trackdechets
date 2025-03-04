@@ -75,6 +75,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -168,6 +169,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -217,6 +219,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedBy: "John Doe",
           receivedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -260,7 +263,8 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedBy: "John Doe",
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 0,
+          quantityReceived: 5,
+          quantityRefused: 5,
           quantityType: "REAL"
         }
       }
@@ -321,6 +325,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -453,7 +458,8 @@ describe("{ mutation { markAsTempStored } }", () => {
               receivedAt: "2019-01-18" as any,
               receivedBy: "John",
               quantityType: "REAL",
-              quantityReceived: 0
+              quantityReceived: 2,
+              quantityRefused: 2
             }
           }
         }
@@ -516,6 +522,7 @@ describe("{ mutation { markAsTempStored } }", () => {
           receivedAt: "2018-12-11T00:00:00.000Z",
           signedAt: "2018-12-11T00:00:00.000Z",
           quantityReceived: 2.4,
+          quantityRefused: 0,
           quantityType: "REAL"
         }
       }
@@ -858,13 +865,14 @@ describe("{ mutation { markAsTempStored } }", () => {
     );
   });
 
-  test("[legacy] the temp storer of the BSD can mark it as PARTIALLY_REFUSED with quantityRefused = undefined", async () => {
+  test("can mark as TEMP_STORED without quantityRefused if no acceptation data", async () => {
     // Given
     const { user, company: tempStorerCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
 
     const emitterCompany = await companyFactory();
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -880,57 +888,62 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     // When
     const { mutate } = makeClient(user);
-    const { errors, data } = await mutate<Pick<Mutation, "markAsTempStored">>(
-      MARK_AS_TEMP_STORED,
-      {
-        variables: {
-          id: form.id,
-          tempStoredInfos: {
-            wasteAcceptationStatus: "PARTIALLY_REFUSED",
-            wasteRefusalReason: "Thats isn't what I was expecting man !",
-            receivedBy: "John Doe",
-            receivedAt: "2018-12-11T00:00:00.000Z",
-            signedAt: "2018-12-11T00:00:00.000Z",
-            quantityReceived: 10,
-            quantityType: "REAL"
-          }
+    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
         }
       }
-    );
+    });
 
     // Then
     expect(errors).toBeUndefined();
-    expect(
-      data.markAsTempStored?.temporaryStorageDetail?.wasteDetails?.quantity
-    ).toEqual(10);
+  });
 
-    const formAfterMutation = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
-    });
-
-    expect(formAfterMutation.status).toEqual("TEMP_STORER_ACCEPTED");
-    expect(formAfterMutation.wasteAcceptationStatus).toEqual(
-      "PARTIALLY_REFUSED"
+  test("can not mark as ACCEPTED without quantityRefused if acceptation data", async () => {
+    // Given
+    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+      "MEMBER"
     );
-    expect(formAfterMutation.quantityReceived?.toNumber()).toEqual(10);
-    expect(formAfterMutation.quantityRefused).toBeNull();
 
-    // check relevant statusLog is created
-    const statusLogs = await prisma.statusLog.findMany({
-      where: {
-        form: { id: form.id },
-        user: { id: user.id },
-        status: "TEMP_STORER_ACCEPTED"
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: tempStorerCompany.siret,
+        recipientIsTempStorage: true,
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
       }
     });
-    expect(statusLogs.length).toEqual(1);
-    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subject: `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
-        body: expect.stringContaining(`<li>Quantité réelle présentée nette : 10 tonnes</li>
-    <li>Quantité refusée nette : Non renseignée</li>
-    <li>Quantité acceptée nette : Non renseignée</li>`)
-      })
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "La quantité refusée (quantityRefused) est requise"
     );
   });
 });

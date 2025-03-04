@@ -13,11 +13,13 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 
+import styles from "./MyImports.module.scss";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { ImportModal } from "./ImportModal";
 import {
   badges,
   downloadFromSignedUrl,
+  formatStats,
   GET_REGISTRY_IMPORTS,
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
@@ -90,29 +92,9 @@ export function MyImports() {
         0 &&
       ![RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
         importData.node.status
-      ) ? (
-        "Fichier d'import vide"
-      ) : (
-        <ul>
-          {importData.node.numberOfErrors > 0 && (
-            <li>
-              <strong>{importData.node.numberOfErrors} en erreur</strong>
-            </li>
-          )}
-          {importData.node.numberOfInsertions > 0 && (
-            <li>{importData.node.numberOfInsertions} ajoutée(s)</li>
-          )}
-          {importData.node.numberOfEdits > 0 && (
-            <li>{importData.node.numberOfEdits} modifiée(s)</li>
-          )}
-          {importData.node.numberOfCancellations > 0 && (
-            <li>{importData.node.numberOfCancellations} annulée(s)</li>
-          )}
-          {importData.node.numberOfSkipped > 0 && (
-            <li>{importData.node.numberOfSkipped} ignorées(s)</li>
-          )}
-        </ul>
-      ),
+      )
+        ? "Fichier d'import vide"
+        : formatStats(importData.node),
       importData.node.associations
         .map(
           association =>
@@ -201,49 +183,50 @@ export function MyImports() {
           </div>
         )}
         {data && tableData.length > 0 && (
-          <div className="tw-mt-8">
-            <div className="tw-flex tw-justify-between">
-              <h2 className="tw-text-2xl tw-font-bold">
-                Historique de mes imports
-              </h2>
-              <div>
-                <Button
-                  priority="secondary"
-                  iconId="fr-icon-refresh-line"
-                  iconPosition="right"
-                  size="small"
-                  onClick={() => refetch()}
-                >
-                  Rafraîchir
-                </Button>
+          <div>
+            <div className="tw-mt-8">
+              <div className="tw-flex tw-justify-between">
+                <h2 className="tw-text-2xl tw-font-bold">
+                  Historique de mes imports
+                </h2>
+                <div>
+                  <Button
+                    priority="secondary"
+                    iconId="fr-icon-refresh-line"
+                    iconPosition="right"
+                    size="small"
+                    onClick={() => refetch()}
+                  >
+                    Rafraîchir
+                  </Button>
+                </div>
               </div>
+              <Table
+                bordered
+                className={styles.fullWidthTable}
+                noCaption
+                data={tableData}
+                headers={HEADERS}
+              />
             </div>
-            <Table
-              bordered
-              fixed
-              noCaption
-              data={tableData}
-              headers={HEADERS}
-            />
+            <div className="tw-flex tw-justify-center">
+              <Pagination
+                showFirstLast
+                count={pageCount}
+                defaultPage={pageIndex + 1}
+                getPageLinkProps={pageNumber => ({
+                  onClick: event => {
+                    event.preventDefault();
+                    gotoPage(pageNumber - 1);
+                  },
+                  href: "#",
+                  key: `pagination-link-${pageNumber}`
+                })}
+                className={"fr-mt-1w"}
+              />
+            </div>
           </div>
         )}
-
-        <div className="tw-flex tw-justify-center">
-          <Pagination
-            showFirstLast
-            count={pageCount}
-            defaultPage={pageIndex + 1}
-            getPageLinkProps={pageNumber => ({
-              onClick: event => {
-                event.preventDefault();
-                gotoPage(pageNumber - 1);
-              },
-              href: "#",
-              key: `pagination-link-${pageNumber}`
-            })}
-            className={"fr-mt-1w"}
-          />
-        </div>
       </div>
 
       <ImportModal

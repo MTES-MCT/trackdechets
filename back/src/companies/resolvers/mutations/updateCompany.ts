@@ -17,6 +17,7 @@ import { SiretNotFoundError } from "../../sirene/errors";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../converters";
+import { CompanyToSplit, getCompanySplittedAddress } from "../../companyUtils";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -129,6 +130,19 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     if (updateFromExternalService) {
       data.name = updateFromExternalService.name;
       data.address = updateFromExternalService.address;
+
+      const { street, city, country, postalCode } = getCompanySplittedAddress(
+        updateFromExternalService,
+        {
+          address: data.address,
+          vatNumber: existingCompany.vatNumber
+        } as CompanyToSplit
+      );
+
+      data.street = street;
+      data.city = city;
+      data.country = country;
+      data.postalCode = postalCode;
 
       if (updateFromExternalService.codeNaf) {
         data.codeNaf = updateFromExternalService.codeNaf;

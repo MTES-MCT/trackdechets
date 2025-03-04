@@ -7,6 +7,7 @@ import {
 import { prisma } from "@td/prisma";
 import { expandFormFromDb, expandableFormIncludes } from "../converter";
 import { getFirstTransporter } from "../database";
+import { PackagingInfo } from "@td/codegen-back";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
@@ -123,7 +124,13 @@ describe("expandFormFromDb", () => {
         isSubjectToADR: form.wasteDetailsIsSubjectToADR,
         onuCode: form.wasteDetailsOnuCode,
         nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-        packagingInfos: form.wasteDetailsPackagingInfos,
+        packagingInfos: (
+          form.wasteDetailsPackagingInfos as PackagingInfo[]
+        ).map(p => ({
+          ...p,
+          identificationNumbers: [],
+          volume: null
+        })),
         packagings: ["CITERNE"],
         otherPackaging: undefined,
         numberOfPackages: 1,
@@ -217,7 +224,13 @@ describe("expandFormFromDb", () => {
         onuCode: forwardedIn!.wasteDetailsOnuCode,
         nonRoadRegulationMention:
           forwardedIn!.wasteDetailsNonRoadRegulationMention,
-        packagingInfos: forwardedIn!.wasteDetailsPackagingInfos,
+        packagingInfos: (
+          form.wasteDetailsPackagingInfos as PackagingInfo[]
+        ).map(p => ({
+          ...p,
+          identificationNumbers: [],
+          volume: null
+        })),
         packagings: ["CITERNE"],
         otherPackaging: undefined,
         numberOfPackages: 1,
@@ -390,5 +403,21 @@ describe("expandFormFromDb", () => {
       takenOverAt: null,
       takenOverBy: null
     });
+  });
+
+  it("should set packagingInfos.numeros to empty array if not present", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: { wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }] }
+    });
+    const fullForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: expandableFormIncludes
+    });
+    const expanded = expandFormFromDb(fullForm);
+    expect(expanded.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({ volume: null, identificationNumbers: [] })
+    ]);
   });
 });

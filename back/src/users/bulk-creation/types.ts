@@ -14,4 +14,8 @@ export interface CompanyInfo {
   address: string | null | undefined;
   latitude: number | null | undefined;
   longitude: number | null | undefined;
+  addressCity: string | null | undefined;
+  addressPostalCode: string | null | undefined;
+  addressVoie: string | null | undefined;
+  codePaysEtrangerEtablissement: string | null | undefined;
 }

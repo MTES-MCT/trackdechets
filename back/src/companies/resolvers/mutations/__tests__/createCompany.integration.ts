@@ -2120,4 +2120,100 @@ describe("Mutation.createCompany", () => {
       ]
     });
   });
+
+  describe("splitted address", () => {
+    it("should add splitted address to company (FR)", async () => {
+      // Given
+      const user = await userFactory();
+      const orgId = siretify(7);
+      const companyInput = {
+        siret: orgId,
+        gerepId: "1234",
+        companyName: "Acme FR",
+        address: "4 Boulevard Pasteur 44100 Nantes",
+        companyTypes: [CompanyType.PRODUCER],
+        website: "https://testcompany.fr"
+      };
+
+      (searchCompany as jest.Mock).mockResolvedValue({
+        orgId,
+        siret: orgId,
+        etatAdministratif: "A",
+        addressVoie: "4 Boulevard Pasteur",
+        addressPostalCode: "44100",
+        addressCity: "Nantes",
+        codePaysEtrangerEtablissement: ""
+      });
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+        CREATE_COMPANY,
+        {
+          variables: {
+            companyInput
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const company = await prisma.company.findFirst({
+        where: { siret: companyInput.siret }
+      });
+
+      expect(company?.street).toBe("4 Boulevard Pasteur");
+      expect(company?.postalCode).toBe("44100");
+      expect(company?.city).toBe("Nantes");
+      expect(company?.country).toBe("FR");
+    });
+
+    it("should add manually splitted address to company (foreign)", async () => {
+      // Given
+      const user = await userFactory();
+      const orgId = "BE0894129667";
+      const companyInput = {
+        vatNumber: orgId,
+        gerepId: "1234",
+        companyName: "Acme BE",
+        address: "Rue Bois de Goesnes 3 4570 Marchin",
+        companyTypes: [CompanyType.TRANSPORTER],
+        website: "https://testcompany.be"
+      };
+
+      (searchCompany as jest.Mock).mockResolvedValue({
+        orgId,
+        vatNumber: orgId,
+        etatAdministratif: "A",
+        addressVoie: "",
+        addressPostalCode: "",
+        addressCity: "",
+        codePaysEtrangerEtablissement: "BE"
+      });
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "createCompany">>(
+        CREATE_COMPANY,
+        {
+          variables: {
+            companyInput
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const company = await prisma.company.findFirst({
+        where: { orgId: companyInput.vatNumber }
+      });
+
+      expect(company?.street).toBe("Rue Bois de Goesnes 3");
+      expect(company?.postalCode).toBe("4570");
+      expect(company?.city).toBe("Marchin");
+      expect(company?.country).toBe("BE");
+    });
+  });
 });

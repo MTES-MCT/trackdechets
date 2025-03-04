@@ -34,8 +34,6 @@ export const INCOMING_WASTE_HEADERS: {
   emitterCompanyPostalCode: "Code postal de l'expéditeur ou du détenteur",
   emitterCompanyCity: "Commune de l'expéditeur ou du détenteur",
   emitterCompanyCountryCode: "Code pays de l'expéditeur ou du détenteur",
-  emitterNoTraceability:
-    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
     "Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteAddress:

@@ -519,6 +519,12 @@ type PackagingInfo {
 
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
+
+  "Volume du conditionnement en litre"
+  volume: Float
+
+  "Numéros des contenants"
+  identificationNumbers: [String!]!
 }
 
 "Détails du déchet (case 3, 4, 5, 6)"
@@ -792,6 +798,9 @@ type FormRevisionRequestContent {
 
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
+
+  "Quantité refusée par l'installation de destination, en tonnes"
+  quantityRefused: Float
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String

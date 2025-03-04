@@ -7,9 +7,22 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.03.1] 11/03/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Permet l'ajout du volume et des numéros d'identification sur le BSDD partout où le formulaire de conditionnement apparait (création, modification, bordereau suite, signature émetteur/transporteur, révision) & Passage du formulaire conditionnement au DSFR [PR 3936](https://github.com/MTES-MCT/trackdechets/pull/3936).
+- Ajout de l'export du registre sortant V2 [PR 3976](https://github.com/MTES-MCT/trackdechets/pull/3976)
+- Ajout d'un paramètre pour les établissements souhaitant pousser automatiquement leurs BSDND dans leurs déclarations [PR3988](https://github.com/MTES-MCT/trackdechets/pull/3988)
+
 #### :nail_care: Améliorations
 
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
+- Rendre optionnel les agréments à la publication d'un VHU [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3984)
+- Rendre optionnel le type de conditionnement du Bsvhu en brouillon [PR 3996](https://github.com/MTES-MCT/trackdechets/pull/3996)
+
+#### :bug: Corrections de bugs
+
+- BSDD : Affiche sur le PDF les informations du courtier ET du négociant lorsque ces deux acteurs sont renseignés [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
+- BSVHU : Le courtier apparaît deux fois sur le récépissé PDF lorsqu'aucun négociant n'est sélectionné [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
 
 # [2025.02.1] 11/02/2025
 

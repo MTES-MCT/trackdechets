@@ -46,8 +46,8 @@ enum RegistryImportType {
     INCOMING_TEXS
     OUTGOING_WASTE
     OUTGOING_TEXS
-    TRANSPORTED_WASTE
-    MANAGED_WASTE
+    TRANSPORTED
+    MANAGED
 }
 
 model RegistrySsd {
@@ -136,7 +136,6 @@ model RegistryIncomingWaste {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -265,7 +264,6 @@ model RegistryIncomingTexs {
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
     initialEmitterMunicipalitiesNames      String[]
-    emitterNoTraceability                  Boolean?
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -384,12 +382,12 @@ model RegistryOutgoingTexs {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?      @db.Timestamptz(6)
+    dispatchDate                           DateTime       @db.Timestamptz(6)
     wasteDap                               String?
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
@@ -482,6 +480,8 @@ model RegistryOutgoingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
 }
@@ -514,11 +514,11 @@ model RegistryOutgoingWaste {
     wasteCodeBale                          String?
     wastePop                               Boolean
     wasteIsDangerous                       Boolean?
-    dispatchDate                           DateTime?      @db.Timestamptz(6)
+    dispatchDate                           DateTime       @db.Timestamptz(6)
     weightValue                            Float
     weightIsEstimate                       Boolean
     volume                                 Float?
-    initialEmitterCompanyType              String
+    initialEmitterCompanyType              String?
     initialEmitterCompanyOrgId             String?
     initialEmitterCompanyName              String?
     initialEmitterCompanyAddress           String?
@@ -603,8 +603,223 @@ model RegistryOutgoingWaste {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryOutgoingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIdx")
+}
+
+model RegistryTransported {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+    importId  String?
+
+    isLatest    Boolean @default(true)
+    isCancelled Boolean @default(false)
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
+
+    publicId                       String
+    reportForCompanySiret          String
+    reportForCompanyName           String
+    reportForCompanyAddress        String
+    reportForCompanyCity           String
+    reportForCompanyPostalCode     String
+    reportForTransportMode         TransportMode
+    reportForTransportIsWaste      Boolean
+    reportForRecepisseIsExempted   Boolean?
+    reportForRecepisseNumber       String?
+    reportForTransportAdr          String?
+    reportForTransportOtherTmdCode String?
+    reportForTransportPlates       String[]
+    reportAsCompanySiret           String?
+    wasteDescription               String
+    wasteCode                      String?
+    wasteCodeBale                  String?
+    wastePop                       Boolean?
+    wasteIsDangerous               Boolean?
+    collectionDate                 DateTime?     @db.Timestamptz(6)
+    unloadingDate                  DateTime?     @db.Timestamptz(6)
+    weightValue                    Float
+    weightIsEstimate               Boolean
+    volume                         Float?
+    emitterCompanyType             String
+    emitterCompanyOrgId            String?
+    emitterCompanyName             String?
+    emitterCompanyAddress          String?
+    emitterCompanyPostalCode       String?
+    emitterCompanyCity             String?
+    emitterCompanyCountryCode      String?
+    emitterPickupSiteName          String?
+    emitterPickupSiteAddress       String?
+    emitterPickupSitePostalCode    String?
+    emitterPickupSiteCity          String?
+    emitterPickupSiteCountryCode   String?
+    destinationCompanyType         String
+    destinationCompanyOrgId        String?
+    destinationCompanyName         String?
+    destinationCompanyAddress      String?
+    destinationCompanyPostalCode   String?
+    destinationCompanyCity         String?
+    destinationCompanyCountryCode  String?
+    destinationDropSiteAddress     String?
+    destinationDropSitePostalCode  String?
+    destinationDropSiteCity        String?
+    destinationDropSiteCountryCode String?
+    declarationNumber              String?
+    notificationNumber             String?
+    movementNumber                 String?
+    ecoOrganismeSiret              String?
+    ecoOrganismeName               String?
+    brokerCompanySiret             String?
+    brokerCompanyName              String?
+    brokerRecepisseNumber          String?
+    traderCompanySiret             String?
+    traderCompanyName              String?
+    traderRecepisseNumber          String?
+
+    @@index([importId], map: "_RegistryTransportedImportIdIdx")
+    @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
+}
+
+model RegistryManaged {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+    importId  String?
+
+    isLatest    Boolean @default(true)
+    isCancelled Boolean @default(false)
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
+
+    publicId                               String
+    reportForCompanySiret                  String
+    reportForCompanyName                   String
+    reportForCompanyAddress                String
+    reportForCompanyCity                   String
+    reportForCompanyPostalCode             String
+    reportAsCompanySiret                   String?
+    wasteCode                              String?
+    wasteCodeBale                          String?
+    wasteDescription                       String
+    wastePop                               Boolean
+    wasteIsDangerous                       Boolean?
+    managingStartDate                      DateTime       @db.Timestamptz(6)
+    managingEndDate                        DateTime       @db.Timestamptz(6)
+    weightValue                            Float
+    weightIsEstimate                       Boolean
+    volume                                 Float?
+    wasteDap                               String?
+    initialEmitterCompanyType              String?
+    initialEmitterCompanyOrgId             String?
+    initialEmitterCompanyName              String?
+    initialEmitterCompanyAddress           String?
+    initialEmitterCompanyPostalCode        String?
+    initialEmitterCompanyCity              String?
+    initialEmitterCompanyCountryCode       String?
+    initialEmitterMunicipalitiesInseeCodes String[]
+    initialEmitterMunicipalitiesNames      String[]
+    parcelInseeCodes                       String[]
+    parcelNumbers                          String[]
+    parcelCoordinates                      String[]
+    sisIdentifier                          String?
+    destinationCompanyType                 String
+    destinationCompanyOrgId                String?
+    destinationCompanyName                 String?
+    destinationCompanyAddress              String?
+    destinationCompanyCity                 String?
+    destinationCompanyPostalCode           String?
+    destinationCompanyCountryCode          String?
+    destinationDropSiteAddress             String?
+    destinationDropSitePostalCode          String?
+    destinationDropSiteCity                String?
+    destinationDropSiteCountryCode         String?
+    tempStorerCompanyType                  String?
+    tempStorerCompanyOrgId                 String?
+    tempStorerCompanyName                  String?
+    tempStorerCompanyAddress               String?
+    tempStorerCompanyPostalCode            String?
+    tempStorerCompanyCity                  String?
+    tempStorerCompanyCountryCode           String?
+    isUpcycled                             Boolean?
+    destinationParcelInseeCodes            String[]
+    destinationParcelNumbers               String[]
+    destinationParcelCoordinates           String[]
+    declarationNumber                      String?
+    notificationNumber                     String?
+    movementNumber                         String?
+    operationCode                          String
+    operationMode                          OperationMode?
+    emitterCompanyType                     String
+    emitterCompanyOrgId                    String?
+    emitterCompanyName                     String?
+    emitterCompanyAddress                  String?
+    emitterCompanyPostalCode               String?
+    emitterCompanyCity                     String?
+    emitterCompanyCountryCode              String?
+    emitterPickupSiteName                  String?
+    emitterPickupSiteAddress               String?
+    emitterPickupSitePostalCode            String?
+    emitterPickupSiteCity                  String?
+    emitterPickupSiteCountryCode           String?
+    ecoOrganismeSiret                      String?
+    ecoOrganismeName                       String?
+    isDirectSupply                         Boolean?
+    transporter1TransportMode              TransportMode?
+    transporter1CompanyType                String?
+    transporter1CompanyOrgId               String?
+    transporter1RecepisseIsExempted        Boolean?
+    transporter1RecepisseNumber            String?
+    transporter1CompanyName                String?
+    transporter1CompanyAddress             String?
+    transporter1CompanyPostalCode          String?
+    transporter1CompanyCity                String?
+    transporter1CompanyCountryCode         String?
+    transporter2TransportMode              TransportMode?
+    transporter2CompanyType                String?
+    transporter2CompanyOrgId               String?
+    transporter2RecepisseIsExempted        Boolean?
+    transporter2RecepisseNumber            String?
+    transporter2CompanyName                String?
+    transporter2CompanyAddress             String?
+    transporter2CompanyPostalCode          String?
+    transporter2CompanyCity                String?
+    transporter2CompanyCountryCode         String?
+    transporter3TransportMode              TransportMode?
+    transporter3CompanyType                String?
+    transporter3CompanyOrgId               String?
+    transporter3RecepisseIsExempted        Boolean?
+    transporter3RecepisseNumber            String?
+    transporter3CompanyName                String?
+    transporter3CompanyAddress             String?
+    transporter3CompanyPostalCode          String?
+    transporter3CompanyCity                String?
+    transporter3CompanyCountryCode         String?
+    transporter4TransportMode              TransportMode?
+    transporter4CompanyType                String?
+    transporter4CompanyOrgId               String?
+    transporter4RecepisseIsExempted        Boolean?
+    transporter4RecepisseNumber            String?
+    transporter4CompanyName                String?
+    transporter4CompanyAddress             String?
+    transporter4CompanyPostalCode          String?
+    transporter4CompanyCity                String?
+    transporter4CompanyCountryCode         String?
+    transporter5TransportMode              TransportMode?
+    transporter5CompanyType                String?
+    transporter5CompanyOrgId               String?
+    transporter5RecepisseIsExempted        Boolean?
+    transporter5RecepisseNumber            String?
+    transporter5CompanyName                String?
+    transporter5CompanyAddress             String?
+    transporter5CompanyPostalCode          String?
+    transporter5CompanyCity                String?
+    transporter5CompanyCountryCode         String?
+
+    @@index([importId], map: "_RegistryManagedImportIdIdx")
+    @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
 }
 
 enum RegistryExportType {
@@ -651,15 +866,16 @@ model RegistryExport {
     s3FileKey   String?
 
     // if this export is made as a delegate
-    delegateSiret   String?
-    sirets          String[]
-    registryType    RegistryExportType?
-    wasteTypes      RegistryExportWasteType[]      @default([])
-    wasteCodes      String[]                       @default([])
-    declarationType RegistryExportDeclarationType?
-    startDate       DateTime                       @db.Timestamptz(6)
-    endDate         DateTime?                      @db.Timestamptz(6)
-    format          RegistryExportFormat
+    delegateSiret     String?
+    sirets            String[]
+    isForAllCompanies Boolean                        @default(false)
+    registryType      RegistryExportType?
+    wasteTypes        RegistryExportWasteType[]      @default([])
+    wasteCodes        String[]                       @default([])
+    declarationType   RegistryExportDeclarationType?
+    startDate         DateTime                       @db.Timestamptz(6)
+    endDate           DateTime?                      @db.Timestamptz(6)
+    format            RegistryExportFormat
 
     createdBy User @relation(fields: [createdById], references: [id])
 
@@ -699,6 +915,12 @@ model RegistryLookup {
     registryIncomingTexsId String?
     registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id], onDelete: Cascade)
 
+    registryOutgoingWasteId String?
+    registryOutgoingWaste   RegistryOutgoingWaste? @relation(fields: [registryOutgoingWasteId], references: [id], onDelete: Cascade)
+
+    registryOutgoingTexsId String?
+    registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id], onDelete: Cascade)
+
     // foreign keys to BSD models
     bsddId    String?
     bsdd      Form?    @relation(fields: [bsddId], references: [id], onDelete: Cascade)
@@ -725,4 +947,37 @@ model RegistryLookup {
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
+}
+
+enum RegistrySource {
+    FILE
+    API
+}
+
+model RegistryChangeAggregate {
+    id        String             @id @default(cuid())
+    createdAt DateTime           @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime           @updatedAt @db.Timestamptz(6)
+    type      RegistryImportType
+    source    RegistrySource
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
+
+    reportForId String
+    reportFor   Company @relation("RegistryChangeAggregatesReportedFor", fields: [reportForId], references: [id])
+
+    reportAsId String?
+    reportAs   Company? @relation("RegistryChangeAggregatesReportedAs", fields: [reportAsId], references: [id])
+
+    numberOfAggregates Int @default(1)
+
+    numberOfErrors        Int @default(0)
+    numberOfInsertions    Int @default(0)
+    numberOfEdits         Int @default(0)
+    numberOfCancellations Int @default(0)
+    numberOfSkipped       Int @default(0)
+
+    @@index([reportForId], map: "_RRegistryChangeAggregateReportForIdIdx")
+    @@index([updatedAt], map: "_RRegistryChangeAggregateUpdatedAtIdx")
 }

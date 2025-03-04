@@ -14,6 +14,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../Apps/common/data/initialState";
+import { emptyPackaging } from "../../../Apps/Forms/Components/PackagingList/helpers";
 
 /**
  * Computes initial values for trader fields in Formik's form
@@ -187,7 +188,9 @@ export function getInitialState(f?: Form | null): FormFormikValues {
       onuCode: f?.wasteDetails?.onuCode ?? "",
       nonRoadRegulationMention:
         f?.wasteDetails?.nonRoadRegulationMention ?? null,
-      packagingInfos: f?.wasteDetails?.packagingInfos ?? [],
+      packagingInfos: f?.wasteDetails?.packagingInfos?.length
+        ? f.wasteDetails.packagingInfos
+        : [emptyPackaging],
       quantity: f?.wasteDetails?.quantity ?? null,
       quantityType: f?.wasteDetails?.quantityType ?? QuantityType.Estimated,
       consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,

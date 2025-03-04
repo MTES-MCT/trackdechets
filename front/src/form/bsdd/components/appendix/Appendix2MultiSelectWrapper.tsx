@@ -1,7 +1,12 @@
 import React, { useCallback } from "react";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/client";
-import { Form, Query, QueryAppendixFormsArgs } from "@td/codegen-ui";
+import {
+  Form,
+  PackagingInfo,
+  Query,
+  QueryAppendixFormsArgs
+} from "@td/codegen-ui";
 import { Loader } from "../../../../Apps/common/Components";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Appendix2MultiSelect from "./Appendix2MultiSelect";
@@ -26,6 +31,8 @@ const APPENDIX2_FORMS = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
       }
       signedAt
@@ -72,13 +79,8 @@ function Appendix2MultiSelectWrapper({
   // Cette fonction est ensuite utilisée dans un useEffect
   // On la wrap dans un `useCallaback` pour éviter un render infinie
   const updatePackagings = useCallback(
-    (
-      packagings: {
-        type: string;
-        other: string;
-        quantity: any;
-      }[]
-    ) => setFieldValue("wasteDetails.packagingInfos", packagings),
+    (packagings: PackagingInfo[]) =>
+      setFieldValue("wasteDetails.packagingInfos", packagings),
     [setFieldValue]
   );
 

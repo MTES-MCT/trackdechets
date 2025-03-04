@@ -382,8 +382,9 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(reviewContent, c => chain(c.wasteDetails, w => w.packagingInfos))
     ),
-    wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
-    wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
+    // Retirés jusqu'à nouvel ordre!
+    // wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
+    // wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
     wasteDetailsSampleNumber: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.sampleNumber)
     ),
@@ -685,7 +686,12 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos:
+        (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+          ...p,
+          volume: p.volume ?? null,
+          identificationNumbers: p.identificationNumbers ?? []
+        })) ?? [],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -867,7 +873,13 @@ export function expandFormFromDb(
             nonRoadRegulationMention:
               forwardedIn.wasteDetailsNonRoadRegulationMention,
             packagingInfos:
-              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
+              (forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
+                p => ({
+                  ...p,
+                  volume: p.volume ?? null,
+                  identificationNumbers: p.identificationNumbers ?? []
+                })
+              ) ?? [],
             // DEPRECATED - To remove with old packaging fields
             ...getDeprecatedPackagingApiFields(
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -1053,6 +1065,7 @@ export function expandBsddRevisionRequestContent(
       cap: bsddRevisionRequest.recipientCap
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
+    quantityRefused: bsddRevisionRequest.quantityRefused,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
     destinationOperationMode: bsddRevisionRequest.destinationOperationMode,
     processingOperationDescription:

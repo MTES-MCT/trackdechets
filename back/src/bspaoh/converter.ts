@@ -46,9 +46,9 @@ import { BspaohForElastic } from "./elastic";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { PrismaBspaohWithTransporters } from "./types";
 
-export function getFirstTransporterSync(bspaoh: {
-  transporters: PrismaBspaohTransporter[] | null;
-}): PrismaBspaohTransporter | null {
+export function getFirstTransporterSync<
+  T extends Pick<PrismaBspaohTransporter, "number">
+>(bspaoh: { transporters: T[] | null }): T | null {
   const { transporters } = bspaoh;
   if (!transporters) return null;
   const firstTransporter = transporters.find(t => t.number === 1);

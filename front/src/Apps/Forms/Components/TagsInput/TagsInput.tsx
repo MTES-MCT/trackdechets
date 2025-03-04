@@ -44,9 +44,10 @@ const TagsInput = ({
         label={label}
         hintText={hintText}
         disabled={disabled}
-        style={{ marginBottom: "10px" }}
+        className="fr-mb-2w"
         nativeInputProps={{
           value: tag,
+          ...{ "data-testid": "tagsInput" },
           onChange: e => setTag(e.target.value),
           onBlur: () => {
             saveTag();
@@ -71,16 +72,19 @@ const TagsInput = ({
           </Button>
         }
       />
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
         {tags?.map((plate, idx) => (
-          <div key={idx} style={{ padding: "0 2px" }}>
+          <div key={idx}>
             <Tag
-              dismissible
+              className="fr-mb-1v"
+              dismissible={!disabled}
               nativeButtonProps={{
                 type: "button",
+                disabled,
                 onClick: () => {
                   onDeleteTag(idx);
-                }
+                },
+                ...{ "data-testid": "tagsInputTags" }
               }}
             >
               {plate}

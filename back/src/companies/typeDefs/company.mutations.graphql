@@ -70,4 +70,10 @@ type Mutation {
   createAnonymousCompanyFromPDF(
     input: CreateAnonymousCompanyFromPDFInput!
   ): Boolean
+
+  """
+  Permet d'activer la prise en compte des BSDs de déchet non dangereux dans les exports de registre
+  ATTENTION: CETTE ACTION EST NON RÉVERSIBLE
+  """
+  enableRegistryDndFromBsd(id: String!): CompanyPrivate!
 }

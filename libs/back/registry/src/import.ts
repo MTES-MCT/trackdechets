@@ -11,6 +11,12 @@ import {
 } from "./options";
 import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
 import { getCsvErrorStream, getXlsxErrorStream } from "./errors";
+import {
+  RegistryChanges,
+  getSumOfChanges,
+  incrementLocalChangesForCompany,
+  saveCompaniesChanges
+} from "./changeAggregates";
 
 export async function processStream({
   importId,
@@ -36,13 +42,11 @@ export async function processStream({
     { importId, importType, inputStream, fileType }
   );
   const options = importOptions[importType];
-  const stats = {
-    errors: 0,
-    insertions: 0,
-    edits: 0,
-    cancellations: 0,
-    skipped: 0
-  };
+  const changesByCompany = new Map<
+    string,
+    { [reportAsSiret: string]: RegistryChanges }
+  >();
+  let globalErrorNumber = 0;
 
   const errorStream =
     fileType === "CSV"
@@ -65,7 +69,8 @@ export async function processStream({
       rawLine: Record<string, string>;
       result: SafeParseReturnType<unknown, ParsedLine>;
     }> = inputStream.pipe(transformStream).on("error", error => {
-      stats.errors++;
+      globalErrorNumber++;
+
       if (errorStream.writable) {
         errorStream.write({ errors: formatErrorMessage(error.message) });
       }
@@ -73,7 +78,7 @@ export async function processStream({
 
     for await (const { rawLine, result } of parsedLinesStream) {
       if (!result.success) {
-        stats.errors++;
+        globalErrorNumber++;
 
         // Build an ordering map that we rely on to sort the errors by the order of the columns
         const orderMap = Object.keys(options.headers).reduce(
@@ -107,22 +112,19 @@ export async function processStream({
           allowedSirets
         })
       ) {
-        stats.errors++;
+        // If someone wrongly tries to import data for a company they are not allowed on,
+        // dont increment their RegistryChangeAggregate
+        globalErrorNumber++;
 
         errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
         continue;
       }
 
-      if (reason === "MODIFIER") {
-        stats.edits++;
-      } else if (reason === "ANNULER") {
-        stats.cancellations++;
-      } else if (reason === "IGNORER") {
-        stats.skipped++;
-        continue;
-      } else {
-        stats.insertions++;
-      }
+      incrementLocalChangesForCompany(changesByCompany, {
+        reason,
+        reportForCompanySiret,
+        reportAsCompanySiret: reportAsCompanySiret ?? reportForCompanySiret
+      });
 
       const line = { ...result.data, createdById };
 
@@ -131,7 +133,16 @@ export async function processStream({
       const now = Date.now();
       if (now - lastStatsUpdate > 5 * 1000) {
         lastStatsUpdate = now;
-        updateImportStats({ importId, stats });
+        await saveCompaniesChanges(changesByCompany, {
+          type: importType,
+          source: "FILE",
+          createdById
+        });
+        const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
+        await updateImportStats({
+          importId,
+          stats
+        });
       }
     }
   } catch (err) {
@@ -139,10 +150,22 @@ export async function processStream({
   } finally {
     errorStream.end();
 
+    await saveCompaniesChanges(changesByCompany, {
+      type: importType,
+      source: "FILE",
+      createdById
+    });
+
     const sirets = await options.getImportSiretsAssociations(importId);
-    await endImport({ importId, stats, sirets });
+    const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
+    await endImport({
+      importId,
+      stats,
+      sirets
+    });
   }
 
+  const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
   return stats;
 }
 
