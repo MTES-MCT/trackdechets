@@ -5,10 +5,7 @@ import {
   Prisma,
   WasteAcceptationStatus
 } from "@prisma/client";
-import {
-  BsdTransporterReceiptPart,
-  getTransporterReceipt
-} from "../../../companies/recipify";
+import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -79,29 +76,18 @@ const signBsda: MutationResolvers["signBsda"] = async (
 
   checkSignatureTypeSpecificRules(bsda, input);
 
-  // TODO: should be replaced by code that get triggers when the
-  // transporter receipt is set on the profile
-  let transporterReceipt = {};
-  if (input.type === "TRANSPORT") {
-    transporterReceipt = await getTransporterReceipt(bsda.transporters[0]);
-  }
-
   const zodBsda = prismaToZodBsda(bsda);
 
   // Check that all necessary fields are filled
-  await parseBsdaAsync(
-    { ...zodBsda, ...transporterReceipt },
-    {
-      user,
-      enableCompletionTransformers: true,
-      currentSignatureType: signatureType
-    }
-  );
+  await parseBsdaAsync(zodBsda, {
+    user,
+    enableCompletionTransformers: true,
+    currentSignatureType: signatureType
+  });
 
   const sign = signatures[input.type];
   const signedBsda = await sign(user, bsda, {
     ...input,
-    ...transporterReceipt,
     date: new Date(input.date ?? Date.now())
   });
 
@@ -216,7 +202,7 @@ async function signWork(
 async function signTransport(
   user: Express.User,
   bsda: BsdaForSignature,
-  input: BsdaSignatureInput & BsdTransporterReceiptPart
+  input: BsdaSignatureInput
 ) {
   if (bsda.transporters.length === 0) {
     throw new UserInputError("Aucun transporteur n'est renseigné sur ce BSDA.");
@@ -227,6 +213,8 @@ async function signTransport(
   if (!transporter) {
     throw new AlreadySignedError();
   }
+
+  const transporterReceipt = await getTransporterReceipt(transporter);
 
   const nextStatus = await getNextStatus(bsda, input.type);
 
@@ -241,10 +229,12 @@ async function signTransport(
           transporterTransportSignatureAuthor: input.author,
           transporterTransportSignatureDate: signatureDate,
           // auto-complete transporter receipt
-          transporterRecepisseDepartment: input.transporterRecepisseDepartment,
-          transporterRecepisseNumber: input.transporterRecepisseNumber,
+          transporterRecepisseDepartment:
+            transporterReceipt.transporterRecepisseDepartment,
+          transporterRecepisseNumber:
+            transporterReceipt.transporterRecepisseNumber,
           transporterRecepisseValidityLimit:
-            input.transporterRecepisseValidityLimit
+            transporterReceipt.transporterRecepisseValidityLimit
         }
       }
     }
