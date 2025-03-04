@@ -1056,11 +1056,19 @@ const bsffToLookupCreateInputs = (
       });
     });
   }
+  const transporterSirets = {};
   bsff.transporters?.forEach(transporter => {
     const transporterSiret = getTransporterCompanyOrgId(transporter);
     if (!transporter.transporterTransportSignatureDate || !transporterSiret) {
       return;
     }
+    // we don't want to add the same transporter twice, the lookup index would have a conflict
+    // + it's not really supposed to happen on real use cases
+    // + the mapping would show the takenOver date of the first one anyways
+    if (transporterSirets[transporterSiret]) {
+      return;
+    }
+    transporterSirets[transporterSiret] = true;
     res.push({
       id: bsff.id,
       readableId: bsff.id,
