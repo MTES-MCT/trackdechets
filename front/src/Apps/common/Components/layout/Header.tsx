@@ -659,9 +659,9 @@ export default function Header() {
     company => company.orgId === currentSiret
   );
 
-  const canViewNewRegistry = companies?.some(company =>
-    company.featureFlags?.includes("REGISTRY_V2")
-  );
+  const canViewNewRegistry =
+    import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
+    companies?.some(company => company.featureFlags?.includes("REGISTRY_V2"));
 
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,

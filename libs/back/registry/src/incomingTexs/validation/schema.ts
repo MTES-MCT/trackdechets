@@ -28,7 +28,6 @@ import {
   siretSchema,
   parcelCoordinatesSchema,
   parcelNumbersSchema,
-  municipalitiesNamesSchema,
   operationModeSchema
 } from "../../shared/schemas";
 import {
@@ -76,7 +75,6 @@ const inputIncomingTexsSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),

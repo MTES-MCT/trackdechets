@@ -375,7 +375,6 @@ export const refineMunicipalities: Refinement<{
     | "COMMUNES"
     | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
-  initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
     item.initialEmitterCompanyType === "COMMUNES" &&
@@ -385,28 +384,6 @@ export const refineMunicipalities: Refinement<{
       code: z.ZodIssueCode.custom,
       message: `Le ou les codes INSEE des communes doivent être saisi`,
       path: ["initialEmitterMunicipalitiesInseeCodes"]
-    });
-  }
-
-  if (
-    item.initialEmitterCompanyType === "COMMUNES" &&
-    !item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le ou les libellés des communes doivent être saisi`,
-      path: ["initialEmitterMunicipalitiesNames"]
-    });
-  }
-
-  if (
-    item.initialEmitterMunicipalitiesInseeCodes?.length !==
-    item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
-      path: ["initialEmitterMunicipalitiesNames"]
     });
   }
 };

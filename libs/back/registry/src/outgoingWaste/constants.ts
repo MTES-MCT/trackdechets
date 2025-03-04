@@ -34,7 +34,6 @@ export const OUTGOING_WASTE_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   destinationCompanyType: "Type de destinataire",
   destinationCompanyOrgId: "Numéro d'identification du destinataire",
   destinationCompanyName: "Raison sociale du destinataire",

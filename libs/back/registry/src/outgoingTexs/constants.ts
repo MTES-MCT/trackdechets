@@ -35,7 +35,6 @@ export const OUTGOING_TEXS_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   parcelInseeCodes: "Codes INSEE des parcelles",
   parcelNumbers: "Numéro(s) des parcelles",
   parcelCoordinates: "Coordonnées des parcelles",

@@ -27,7 +27,6 @@ import {
   transportRecepisseNumberSchema,
   dateSchema,
   inseeCodesSchema,
-  municipalitiesNamesSchema,
   parcelNumbersSchema,
   parcelCoordinatesSchema
 } from "../../shared/schemas";
@@ -63,7 +62,6 @@ const inputManagedSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   parcelInseeCodes: inseeCodesSchema,
   parcelNumbers: parcelNumbersSchema,
   parcelCoordinates: parcelCoordinatesSchema,

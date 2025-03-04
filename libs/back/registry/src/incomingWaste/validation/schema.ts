@@ -26,7 +26,6 @@ import {
   declarationNumberSchema,
   notificationNumberSchema,
   siretSchema,
-  municipalitiesNamesSchema,
   operationModeSchema
 } from "../../shared/schemas";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
@@ -85,7 +84,6 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   emitterCompanyType: actorTypeSchema.exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNES"
