@@ -15,9 +15,14 @@ processors:
     limit_percentage: 80
     spike_limit_percentage: 15
       
-  batch/datadog:
-    send_batch_max_size: ${env:OTEL_DD_BATCH_MAX_SIZE:-100}
+  batch/datadog_metrics:
+    send_batch_max_size: 100
     send_batch_size: 10
+    timeout: 10s
+    
+  batch/datadog_generic:
+    send_batch_max_size: ${env:OTEL_DD_BATCH_MAX_SIZE:-1000}
+    send_batch_size: ${env:OTEL_DD_BATCH_SIZE:-100}
     timeout: 10s
 
 connectors:
@@ -33,13 +38,13 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, batch/datadog_generic]
       exporters: [datadog/connector, datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
-      processors: [memory_limiter, batch/datadog]
+      processors: [memory_limiter, batch/datadog_metrics]
       exporters: [datadog/exporter]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter, batch/datadog_generic]
       exporters: [datadog/exporter]
