@@ -23,6 +23,8 @@ import {
 } from "@prisma/client";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 import { UserInputError } from "../../common/errors";
+import { getCompanySplittedAddress } from "../../companies/companyUtils";
+import { CompanySearchResult } from "../../generated/graphql/types";
 
 function printHelp() {
   console.log(`
@@ -151,13 +153,17 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   }
 
   // create companies in Trackdéchets
-
   for (const company of sirenifiedCompanies) {
     const existingCompany = await prisma.company.findUnique({
       where: { siret: company.siret }
     });
     if (!existingCompany) {
       console.info(`Create company ${company.siret}`);
+
+      const { street, postalCode, city, country } = getCompanySplittedAddress(
+        company as unknown as CompanySearchResult
+      );
+
       await prisma.company.create({
         data: {
           orgId: company.siret,
@@ -189,6 +195,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           website: company.website,
           verificationCode: randomNumber(5).toString(),
           address: company.address,
+          street,
+          postalCode,
+          city,
+          country,
           latitude: company.latitude,
           longitude: company.longitude
         }
