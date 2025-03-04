@@ -16,15 +16,7 @@ import {
 } from "../../../common/pdf/components/Company";
 import Transporter from "../../../common/pdf/components/Transporter";
 import { pluralize } from "@td/constants";
-
-const PACKAGINGS_NAMES = {
-  BIG_BAG: "Big-bag / GRV",
-  DEPOT_BAG: "Dépôt-bag",
-  PALETTE_FILME: "Palette filmée",
-  SAC_RENFORCE: "Sac renforcé",
-  CONTENEUR_BAG: "Conteneur-bag",
-  OTHER: "Autre - "
-};
+import { PACKAGINGS_NAMES } from "../../utils";
 
 type Props = {
   bsda: Bsda;

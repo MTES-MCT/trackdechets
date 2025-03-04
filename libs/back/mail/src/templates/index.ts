@@ -338,3 +338,39 @@ export const bsdaDestinationCapModificationEmail: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+type CompanyNameAndSiret = {
+  name: string | undefined | null;
+  siret: string | undefined | null;
+};
+export const bsdaWasteSealNumbersOrPackagingsRevision: MailTemplate<{
+  bsdaId: string;
+  author: CompanyNameAndSiret;
+  approver: CompanyNameAndSiret;
+  worker: CompanyNameAndSiret;
+  destination: CompanyNameAndSiret;
+  wasteSealNumbersBeforeRevision: string;
+  wasteSealNumbersAfterRevision: string;
+  packagingsBeforeRevision: string;
+  packagingsAfterRevision: string;
+}> = {
+  subject: ({
+    bsdaId,
+    wasteSealNumbersBeforeRevision,
+    packagingsBeforeRevision
+  }) => {
+    if (wasteSealNumbersBeforeRevision && packagingsBeforeRevision) {
+      return `Scellés et conditionnement du bordereau amiante n° ${bsdaId} mis à jour`;
+    } else if (wasteSealNumbersBeforeRevision) {
+      return `Scellés du bordereau amiante n° ${bsdaId} mis à jour`;
+    } else {
+      return `Conditionnement du bordereau amiante n° ${bsdaId} mis à jour`;
+    }
+  },
+  body: mustacheRenderer("bsda-wasteSealNumbers-or-packagings-revision.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};
