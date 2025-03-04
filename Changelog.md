@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Exports registres V2 : Modale d'export et petites améliorations d'UX [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3953)
 - Rendre optionnel les agréments à la publication d'un VHU [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3984)
 - BSFF : Suppression temporaire de la limite de 60 jours au delà de laquelle il n'était pas possible de corriger les infos d'acceptation et de traitement des contenants BSFF [PR 4001](https://github.com/MTES-MCT/trackdechets/pull/4001)
+- Rendre optionnel le type de conditionnement du Bsvhu en brouillon [PR 3996](https://github.com/MTES-MCT/trackdechets/pull/3996)
 
 #### :bug: Corrections de bugs
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { Query, CompanyPrivate } from "@td/codegen-ui";
 import { CompanySwitcherProps } from "./companySwitcherTypes";
@@ -51,8 +51,14 @@ const saveOrgIdToLocalStorage = orgId => {
   window.localStorage.setItem(SIRET_STORAGE_KEY, JSON.stringify(orgId));
 };
 
-export const getDefaultOrgId = (companies: CompanyPrivate[]) =>
-  getLocalStorageOrgId() ?? (companies.length > 0 && companies[0].orgId) ?? "";
+export const getDefaultOrgId = (companies: CompanyPrivate[]) => {
+  const storedCompany = companies.find(
+    company => company.orgId === getLocalStorageOrgId()
+  );
+  const defaultOrgId = companies.length > 0 ? companies[0].orgId : "";
+
+  return storedCompany?.orgId ?? defaultOrgId;
+};
 
 const CompanySwitcher = ({
   currentOrgId,
@@ -63,6 +69,12 @@ const CompanySwitcher = ({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [displayPreloader, setDisplayPreloader] = useState(false);
+
+  useEffect(() => {
+    if (currentOrgId !== getLocalStorageOrgId()) {
+      saveOrgIdToLocalStorage(currentOrgId);
+    }
+  }, [currentOrgId]);
 
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setOpen(false)

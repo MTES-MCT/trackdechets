@@ -1,5 +1,6 @@
 import Badge from "@codegouvfr/react-dsfr/Badge";
-import { RegistryImportType } from "@td/codegen-ui";
+import { RegistryImportStatus, RegistryImportType } from "@td/codegen-ui";
+import { pluralize } from "@td/constants";
 import gql from "graphql-tag";
 import React from "react";
 
@@ -209,3 +210,111 @@ export const GET_MY_COMPANIES_WITH_DELEGATORS = gql`
     }
   }
 `;
+
+export const GET_CHANGE_AGGREGATES = gql`
+  query RegistryChangeAggregates(
+    $siret: String!
+    $window: Int!
+    $source: RegistryImportSource!
+  ) {
+    registryChangeAggregates(siret: $siret, window: $window, source: $source) {
+      id
+      createdAt
+      updatedAt
+      type
+      source
+      createdBy {
+        name
+      }
+      reportAs {
+        name
+        siret
+      }
+      numberOfAggregates
+      numberOfErrors
+      numberOfInsertions
+      numberOfEdits
+      numberOfCancellations
+      numberOfSkipped
+    }
+  }
+`;
+
+export function formatStats({
+  numberOfErrors,
+  numberOfInsertions,
+  numberOfEdits,
+  numberOfCancellations,
+  numberOfSkipped
+}: {
+  numberOfErrors: number;
+  numberOfInsertions: number;
+  numberOfEdits: number;
+  numberOfCancellations: number;
+  numberOfSkipped: number;
+}) {
+  return (
+    <ul>
+      {numberOfErrors > 0 && (
+        <li>
+          <strong>{numberOfErrors} en erreur</strong>
+        </li>
+      )}
+      {numberOfInsertions > 0 && (
+        <li>
+          <strong>
+            {numberOfInsertions}{" "}
+            {pluralize("ajoutée", numberOfInsertions, "ajoutées")}
+          </strong>
+        </li>
+      )}
+      {numberOfEdits > 0 && (
+        <li>
+          {numberOfEdits} {pluralize("modifiée", numberOfEdits, "modifiées")}
+        </li>
+      )}
+      {numberOfCancellations > 0 && (
+        <li>
+          {numberOfCancellations}{" "}
+          {pluralize("annulée", numberOfCancellations, "annulées")}
+        </li>
+      )}
+      {numberOfSkipped > 0 && (
+        <li>
+          {numberOfSkipped} {pluralize("ignorée", numberOfSkipped, "ignorées")}
+        </li>
+      )}
+    </ul>
+  );
+}
+
+export function getStatusFromStats({
+  numberOfErrors,
+  numberOfInsertions,
+  numberOfEdits,
+  numberOfCancellations,
+  numberOfSkipped
+}: {
+  numberOfErrors: number;
+  numberOfInsertions: number;
+  numberOfEdits: number;
+  numberOfCancellations: number;
+  numberOfSkipped: number;
+}): RegistryImportStatus {
+  if (
+    numberOfCancellations +
+      numberOfEdits +
+      numberOfInsertions +
+      numberOfSkipped ===
+    0
+  ) {
+    // No data was processed. Mark the import as failed
+    return RegistryImportStatus.Failed;
+  }
+
+  if (numberOfErrors) {
+    return RegistryImportStatus.PartiallySuccessful;
+  }
+
+  return RegistryImportStatus.Successful;
+}
