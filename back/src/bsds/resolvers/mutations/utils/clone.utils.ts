@@ -975,7 +975,7 @@ export const cloneBsdd = async (
     wasteDetailsQuantityType: bsdd.wasteDetailsQuantityType,
     wasteDetailsSampleNumber: bsdd.wasteDetailsSampleNumber,
     wasteRefusalReason: bsdd.wasteRefusalReason,
-    isDirectSupply: false
+    isDirectSupply: bsdd.isDirectSupply
   };
 
   const newBsdd = await create(newBsddCreateInput);
