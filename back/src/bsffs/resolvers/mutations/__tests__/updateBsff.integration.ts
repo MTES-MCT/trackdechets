@@ -129,10 +129,9 @@ describe("Mutation.updateBsff", () => {
       where: { id: bsff.id }
     });
 
-    expect(updatedBsff.canAccessDraftOrgIds).toEqual([
-      emitter.company.siret,
-      anotherCompany.siret
-    ]);
+    expect(updatedBsff.canAccessDraftOrgIds.sort()).toEqual(
+      [emitter.company.siret, anotherCompany.siret].sort()
+    );
   });
 
   it("should update a bsff transporter recepisse with data pulled from db", async () => {
