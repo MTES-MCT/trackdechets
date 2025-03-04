@@ -14,12 +14,12 @@ processors:
     check_interval: 1s
     limit_percentage: 80
     spike_limit_percentage: 15
-      
+
   batch/datadog_metrics:
     send_batch_max_size: 100
     send_batch_size: 10
     timeout: 10s
-    
+
   batch/datadog_generic:
     send_batch_max_size: ${env:OTEL_DD_BATCH_MAX_SIZE:-1000}
     send_batch_size: ${env:OTEL_DD_BATCH_SIZE:-100}
