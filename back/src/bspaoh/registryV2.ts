@@ -377,10 +377,10 @@ export const toTransportedWasteV2 = (
   bspaoh: RegistryV2Bspaoh
 ): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
   const transporter = getFirstTransporterSync(bspaoh);
-  if (
-    !getTransporterCompanyOrgId(transporter) ||
-    !transporter?.transporterTransportSignatureDate
-  ) {
+  const transporterTakenOverAt =
+    bspaoh.transporterTransportTakenOverAt ??
+    transporter?.transporterTransportSignatureDate;
+  if (!transporterTakenOverAt) {
     return null;
   }
 
@@ -417,9 +417,7 @@ export const toTransportedWasteV2 = (
     reportAsSiret: null,
     createdAt: bspaoh.createdAt,
     updatedAt: bspaoh.updatedAt,
-    transporterTakenOverAt:
-      bspaoh.transporterTransportTakenOverAt ??
-      transporter.transporterTransportSignatureDate!,
+    transporterTakenOverAt,
     unloadingDate: null,
     destinationReceptionDate: bspaoh.destinationReceptionDate,
     bsdType: "BSPAOH",
@@ -445,7 +443,6 @@ export const toTransportedWasteV2 = (
     volume: null,
 
     emitterCompanyIrregularSituation: null,
-    emitterCompanyType: null,
     emitterCompanySiret: bspaoh.emitterCompanySiret,
     emitterCompanyName: bspaoh.emitterCompanyName,
     emitterCompanyGivenName: null,
@@ -605,10 +602,7 @@ const bspaohToLookupCreateInputs = (
       bspaohId: bspaoh.id
     });
   }
-  if (
-    bspaoh.transporterTransportTakenOverAt &&
-    transporter?.transporterTransportSignatureDate
-  ) {
+  if (transporter?.transporterTransportSignatureDate) {
     const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
     if (transporterCompanyOrgId) {
       res.push({

@@ -896,10 +896,6 @@ export const EXPORT_COLUMNS: {
       label: "Expéditeur - Situation irrégulière",
       format: formatBoolean
     },
-    emitterCompanyType: {
-      label: "Expéditeur - Autre détenteur",
-      format: formatEmitterType
-    },
     emitterCompanySiret: { label: "Expéditeur - N° d'identification" },
     emitterCompanyName: { label: "Expéditeur - Raison sociale" },
     emitterCompanyGivenName: { label: "Expéditeur - Nom usuel" },
@@ -953,15 +949,15 @@ export const EXPORT_COLUMNS: {
     transporter1CompanyCity: { label: "Transporteur - Commune" },
     transporter1CompanyCountry: { label: "Transporteur - Code Pays" },
     transporter1CompanyMail: { label: "Transporteur - Contact" },
+    transporter1TransportPlates: {
+      label: "Transporteur - N° d'immatriculation(s)",
+      format: formatArray
+    },
     transporter1RecepisseIsExempted: {
       label: "Transporteur - Exemption de récépissé",
       format: formatBoolean
     },
     transporter1RecepisseNumber: { label: "Transporteur - N° de récépissé" },
-    transporter1TransportPlates: {
-      label: "Transporteur - N° d'immatriculation(s)",
-      format: formatArray
-    },
     wasteAdr: { label: "Mention ADR" },
     nonRoadRegulationMention: { label: "Mention RID, ADN, IMDG" },
     destinationCap: { label: "CAP" },

@@ -731,15 +731,24 @@ export const toOutgoingWasteV2 = (
 };
 
 export const toTransportedWasteV2 = (
-  bsff: RegistryV2Bsff
+  bsff: RegistryV2Bsff,
+  targetSiret: string
 ): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
   const transporters = getTransportersSync(bsff);
   const [transporter, transporter2, transporter3, transporter4, transporter5] =
     transporters;
+  const targetTransporter = transporters.find(
+    t => getTransporterCompanyOrgId(t) === targetSiret
+  );
+  const transporterTakenOverAt =
+    targetTransporter?.transporterTransportTakenOverAt ??
+    targetTransporter?.transporterTransportSignatureDate ?? // in case takenOverAt is null, failover to signature date
+    transporter?.transporterTransportTakenOverAt ?? // in case we don't find the target transporter, failover to the first transporter
+    transporter?.transporterTransportSignatureDate;
 
   // there should always be a transporter on this type of export, but since
-  // the type doesn't know it, and we could get a weird DB state, we check it
-  if (!getTransporterCompanyOrgId(transporter)) {
+  // the type doesn't know it, and we could get a weird DB state, we check that we have a date
+  if (!transporterTakenOverAt) {
     return null;
   }
 
@@ -823,9 +832,7 @@ export const toTransportedWasteV2 = (
     reportAsSiret: null,
     createdAt: bsff.createdAt,
     updatedAt: bsff.updatedAt,
-    transporterTakenOverAt:
-      transporter?.transporterTransportTakenOverAt ??
-      transporter?.transporterTransportSignatureDate,
+    transporterTakenOverAt,
     unloadingDate: null,
     destinationReceptionDate: bsff.destinationReceptionDate,
     bsdType: "BSFF",
@@ -846,7 +853,6 @@ export const toTransportedWasteV2 = (
     volume: null,
 
     emitterCompanyIrregularSituation: null,
-    emitterCompanyType: null,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanyGivenName: null,

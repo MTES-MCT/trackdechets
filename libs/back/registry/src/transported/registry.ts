@@ -41,7 +41,6 @@ export const toTransportedWaste = (
     volume: transportedWaste.volume,
 
     emitterCompanyIrregularSituation: null,
-    emitterCompanyType: null,
     emitterCompanySiret: transportedWaste.emitterCompanyOrgId,
     emitterCompanyName: transportedWaste.emitterCompanyName,
     emitterCompanyGivenName: null,
@@ -83,7 +82,7 @@ export const toTransportedWaste = (
     transporter1CompanyAddress: transportedWaste.reportForCompanyAddress,
     transporter1CompanyPostalCode: transportedWaste.reportForCompanyPostalCode,
     transporter1CompanyCity: transportedWaste.reportForCompanyCity,
-    transporter1CompanyCountry: null,
+    transporter1CompanyCountry: "FR",
     transporter1RecepisseIsExempted:
       transportedWaste.reportForRecepisseIsExempted,
     transporter1RecepisseNumber: transportedWaste.reportForRecepisseNumber,

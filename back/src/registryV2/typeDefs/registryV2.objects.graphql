@@ -853,8 +853,6 @@ type TransportedWasteV2 {
 
   "Indique si l'émetteur est en situation irrégulière"
   emitterCompanyIrregularSituation: Boolean
-  "Type d'émetteur"
-  emitterCompanyType: EmitterType
   "Le numéro SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "La raison sociale de l'établissement expéditeur des déchets"

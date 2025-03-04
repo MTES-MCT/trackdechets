@@ -86,7 +86,7 @@ const streamLookup = (
         });
         for (const lookup of items) {
           addEncounteredSiret(lookup.siret);
-          const mapped = toWaste(registryType, {
+          const mapped = toWaste(registryType, lookup.siret, {
             SSD: lookup.registrySsd,
             INCOMING_WASTE: lookup.registryIncomingWaste,
             INCOMING_TEXS: lookup.registryIncomingTexs,
