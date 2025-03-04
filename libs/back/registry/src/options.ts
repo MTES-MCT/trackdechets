@@ -1,53 +1,63 @@
 import type {
   IncomingWasteV2,
   OutgoingWasteV2,
-  SsdWasteV2
+  SsdWasteV2,
+  TransportedWasteV2
 } from "@td/codegen-back";
 import { SafeParseReturnType } from "zod";
+
+import { SSD_HEADERS } from "./ssd/constants";
+import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
+import { safeParseAsyncSsd } from "./ssd/validation";
+
 import { INCOMING_TEXS_HEADERS } from "./incomingTexs/constants";
 import {
   getIncomingTexsImportSiretsAssociations,
   saveIncomingTexsLine
 } from "./incomingTexs/database";
-import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingTexs/registry";
 import { safeParseAsyncIncomingTexs } from "./incomingTexs/validation";
+
 import { INCOMING_WASTE_HEADERS } from "./incomingWaste/constants";
 import {
   getIncomingWasteImportSiretsAssociations,
   saveIncomingWasteLine
 } from "./incomingWaste/database";
-import { toIncomingWaste as IncomingWasteToIncomingWaste } from "./incomingWaste/registry";
 import { safeParseAsyncIncomingWaste } from "./incomingWaste/validation";
-import { MANAGED_HEADERS } from "./managed/constants";
-import {
-  getManagedImportSiretsAssociations,
-  saveManagedLine
-} from "./managed/database";
-import { safeParseAsyncManaged } from "./managed/validation";
+
 import { OUTGOING_TEXS_HEADERS } from "./outgoingTexs/constants";
 import {
   getOutgoingTexsImportSiretsAssociations,
   saveOutgoingTexsLine
 } from "./outgoingTexs/database";
-import { toOutgoingWaste as OutgoingTexsToOutgoingWaste } from "./outgoingTexs/registry";
 import { safeParseAsyncOutgoingTexs } from "./outgoingTexs/validation";
+
 import { OUTGOING_WASTE_HEADERS } from "./outgoingWaste/constants";
 import {
   getOutgoingWasteImportSiretsAssociations,
   saveOutgoingWasteLine
 } from "./outgoingWaste/database";
-import { toOutgoingWaste as OutgoingWasteToOutgoingWaste } from "./outgoingWaste/registry";
 import { safeParseAsyncOutgoingWaste } from "./outgoingWaste/validation";
-import { SSD_HEADERS } from "./ssd/constants";
-import { getSsdImportSiretsAssociations, saveSsdLine } from "./ssd/database";
-import { toSsdWaste as SsdToSsdWaste } from "./ssd/registry";
-import { safeParseAsyncSsd } from "./ssd/validation";
+
 import { TRANSPORTED_HEADERS } from "./transported/constants";
 import {
   getTransportedImportSiretsAssociations,
   saveTransportedLine
 } from "./transported/database";
 import { safeParseAsyncTransported } from "./transported/validation";
+
+import { MANAGED_HEADERS } from "./managed/constants";
+import {
+  getManagedImportSiretsAssociations,
+  saveManagedLine
+} from "./managed/database";
+import { safeParseAsyncManaged } from "./managed/validation";
+
+import { toSsdWaste as SsdToSsdWaste } from "./ssd/registry";
+import { toIncomingWaste as IncomingWasteToIncomingWaste } from "./incomingWaste/registry";
+import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingTexs/registry";
+import { toOutgoingWaste as OutgoingWasteToOutgoingWaste } from "./outgoingWaste/registry";
+import { toOutgoingWaste as OutgoingTexsToOutgoingWaste } from "./outgoingTexs/registry";
+import { toTransportedWaste as TransportedToTransportedWaste } from "./transported/registry";
 
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
@@ -138,6 +148,7 @@ export type InputExportOptions = {
   toSsdWaste?: (registry: unknown) => SsdWasteV2;
   toIncomingWaste?: (registry: unknown) => IncomingWasteV2;
   toOutgoingWaste?: (registry: unknown) => OutgoingWasteV2;
+  toTransportedWaste?: (registry: unknown) => TransportedWasteV2;
 };
 
 export const INPUT_EXPORT_TYPES = [
@@ -146,6 +157,7 @@ export const INPUT_EXPORT_TYPES = [
   "INCOMING_TEXS",
   "OUTGOING_WASTE",
   "OUTGOING_TEXS",
+  "TRANSPORTED",
   "BSDD",
   "BSDA",
   "BSDASRI",
@@ -176,5 +188,8 @@ export const exportOptions: Partial<
   },
   OUTGOING_TEXS: {
     toOutgoingWaste: OutgoingTexsToOutgoingWaste
+  },
+  TRANSPORTED: {
+    toTransportedWaste: TransportedToTransportedWaste
   }
 };

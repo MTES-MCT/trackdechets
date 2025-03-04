@@ -33,6 +33,8 @@ export const toOutgoingWaste = (
     wasteCodeBale: outgoingTexs.wasteCodeBale,
     wastePop: outgoingTexs.wastePop,
     wasteIsDangerous: outgoingTexs.wasteIsDangerous,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: outgoingTexs.weightValue,
     weightIsEstimate: outgoingTexs.weightIsEstimate,
     volume: outgoingTexs.volume,
@@ -44,14 +46,11 @@ export const toOutgoingWaste = (
       outgoingTexs.initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity: outgoingTexs.initialEmitterCompanyCity,
     initialEmitterCompanyCountry: outgoingTexs.initialEmitterCompanyCountryCode,
-
-    initialEmitterMunicipalitiesNames:
-      outgoingTexs.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       outgoingTexs.initialEmitterMunicipalitiesInseeCodes,
 
     emitterCompanyIrregularSituation: null,
-
+    emitterCompanyType: null,
     emitterCompanySiret: outgoingTexs.reportForCompanySiret,
     emitterCompanyName: outgoingTexs.reportForCompanyName,
     emitterCompanyGivenName: null,

@@ -639,8 +639,8 @@ model RegistryTransported {
     wasteCodeBale                  String?
     wastePop                       Boolean?
     wasteIsDangerous               Boolean?
-    collectionDate                 DateTime?     @db.Timestamptz(6)
-    unloadingDate                  DateTime?     @db.Timestamptz(6)
+    collectionDate                 DateTime      @db.Timestamptz(6)
+    unloadingDate                  DateTime      @db.Timestamptz(6)
     weightValue                    Float
     weightIsEstimate               Boolean
     volume                         Float?
@@ -678,6 +678,8 @@ model RegistryTransported {
     traderCompanySiret             String?
     traderCompanyName              String?
     traderRecepisseNumber          String?
+
+    registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
@@ -920,6 +922,9 @@ model RegistryLookup {
 
     registryOutgoingTexsId String?
     registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id], onDelete: Cascade)
+
+    registryTransportedId String?
+    registryTransported   RegistryTransported? @relation(fields: [registryTransportedId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?

@@ -63,6 +63,7 @@ const streamLookup = (
             registryIncomingTexs: true,
             registryOutgoingWaste: true,
             registryOutgoingTexs: true,
+            registryTransported: true,
             bsdd: {
               include: RegistryV2BsddInclude
             },
@@ -85,12 +86,13 @@ const streamLookup = (
         });
         for (const lookup of items) {
           addEncounteredSiret(lookup.siret);
-          const mapped = toWaste(registryType, {
+          const mapped = toWaste(registryType, lookup.siret, {
             SSD: lookup.registrySsd,
             INCOMING_WASTE: lookup.registryIncomingWaste,
             INCOMING_TEXS: lookup.registryIncomingTexs,
             OUTGOING_WASTE: lookup.registryOutgoingWaste,
             OUTGOING_TEXS: lookup.registryOutgoingTexs,
+            TRANSPORTED: lookup.registryTransported,
             BSDD: lookup.bsdd,
             BSDA: lookup.bsda,
             BSDASRI: lookup.bsdasri,
