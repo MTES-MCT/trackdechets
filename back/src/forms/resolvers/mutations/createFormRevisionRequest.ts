@@ -36,7 +36,8 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import {
   brokerSchemaFn,
   packagingInfoFn,
-  quantityRefusedNotRequired,
+  revisionRequestQuantityRefused,
+  revisionRequestTempStorageQuantityRefused,
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
@@ -48,6 +49,7 @@ import {
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
 import { isDefined } from "../../../common/helpers";
+import { FormWithForwardedIn } from "../../types";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -275,7 +277,7 @@ async function validateWAsteAccordingToDestination(bsdd: Form, flatContent) {
 }
 async function getFlatContent(
   content: FormRevisionRequestContentInput,
-  bsdd: Form & { transporters: BsddTransporter[] }
+  bsdd: FormWithForwardedIn & { transporters: BsddTransporter[] }
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
 
@@ -407,7 +409,7 @@ async function getFlatContent(
 }
 
 const getContentToValidate = (
-  bsdd: Form & { transporters: BsddTransporter[] },
+  bsdd: FormWithForwardedIn & { transporters: BsddTransporter[] },
   flatContent: ReturnType<typeof flattenBsddRevisionRequestInput>
 ) => {
   // quantityReceived & quantityRefused sont liées pour la validation, il faut donc
@@ -416,24 +418,57 @@ const getContentToValidate = (
     isDefined(flatContent.quantityReceived) ||
     isDefined(flatContent.quantityRefused);
 
-  if (!isReviewingQuantities) return flatContent;
-
   let quantityReceived: number | null = null;
-  if (isDefined(flatContent.quantityReceived))
-    quantityReceived = flatContent.quantityReceived;
-  else if (isDefined(bsdd.quantityReceived))
-    quantityReceived = Number(bsdd.quantityReceived);
-
   let quantityRefused: number | null = null;
-  if (isDefined(flatContent.quantityRefused))
-    quantityRefused = flatContent.quantityRefused;
-  else if (isDefined(bsdd.quantityRefused))
-    quantityRefused = Number(bsdd.quantityRefused);
+
+  if (isReviewingQuantities) {
+    if (isDefined(flatContent.quantityReceived))
+      quantityReceived = flatContent.quantityReceived;
+    else if (isDefined(bsdd.forwardedIn?.quantityReceived))
+      quantityReceived = Number(bsdd.forwardedIn?.quantityReceived);
+    else if (isDefined(bsdd.quantityReceived))
+      quantityReceived = Number(bsdd.quantityReceived);
+
+    if (isDefined(flatContent.quantityRefused))
+      quantityRefused = flatContent.quantityRefused;
+    else if (isDefined(bsdd.forwardedIn?.quantityRefused))
+      quantityReceived = Number(bsdd.forwardedIn?.quantityRefused);
+    else if (isDefined(bsdd.quantityRefused))
+      quantityRefused = Number(bsdd.quantityRefused);
+  }
+
+  // Idem for temp storage
+  const isReviewingTempStorageQuantities =
+    isDefined(flatContent.temporaryStorageTemporaryStorerQuantityReceived) ||
+    isDefined(flatContent.temporaryStorageTemporaryStorerQuantityRefused);
+
+  let temporaryStorageTemporaryStorerQuantityReceived: number | null = null;
+  let temporaryStorageTemporaryStorerQuantityRefused: number | null = null;
+
+  if (isReviewingTempStorageQuantities) {
+    if (isDefined(flatContent.temporaryStorageTemporaryStorerQuantityReceived))
+      temporaryStorageTemporaryStorerQuantityReceived =
+        flatContent.temporaryStorageTemporaryStorerQuantityReceived;
+    else if (isDefined(bsdd.quantityReceived))
+      temporaryStorageTemporaryStorerQuantityReceived = Number(
+        bsdd.quantityRefused
+      );
+
+    if (isDefined(flatContent.temporaryStorageTemporaryStorerQuantityRefused))
+      temporaryStorageTemporaryStorerQuantityRefused =
+        flatContent.temporaryStorageTemporaryStorerQuantityRefused;
+    else if (isDefined(bsdd.quantityRefused))
+      temporaryStorageTemporaryStorerQuantityRefused = Number(
+        bsdd.quantityRefused
+      );
+  }
 
   return {
     ...flatContent,
     quantityReceived,
-    quantityRefused
+    quantityRefused,
+    temporaryStorageTemporaryStorerQuantityReceived,
+    temporaryStorageTemporaryStorerQuantityRefused
   };
 };
 
@@ -508,8 +543,14 @@ const bsddRevisionRequestWasteQuantitiesSchema = yup.object({
   //             v => !v
   //           )
   //   ),
+  temporaryStorageTemporaryStorerQuantityReceived: yup
+    .number()
+    .min(0)
+    .nullable(),
+  temporaryStorageTemporaryStorerQuantityRefused:
+    revisionRequestTempStorageQuantityRefused,
   quantityReceived: yup.number().min(0).nullable(),
-  quantityRefused: quantityRefusedNotRequired
+  quantityRefused: revisionRequestQuantityRefused
 });
 
 async function recipify(
@@ -606,10 +647,6 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
       ),
     processingOperationDescription: yup.string().nullable(),
     temporaryStorageDestinationCap: yup.string().nullable(),
-    temporaryStorageTemporaryStorerQuantityReceived: yup
-      .number()
-      .min(0)
-      .nullable(),
     temporaryStorageDestinationProcessingOperation: yup
       .string()
       .oneOf(
@@ -680,6 +717,8 @@ function getBsddHistory(bsdd: Form & { forwardedIn: Form | null }) {
     initialTemporaryStorageDestinationProcessingOperation:
       bsdd.forwardedIn?.processingOperationDone,
     initialTemporaryStorageTemporaryStorerQuantityReceived:
-      bsdd.forwardedIn?.quantityReceived
+      bsdd.forwardedIn?.quantityReceived,
+    initialTemporaryStorageTemporaryStorerQuantityRefused:
+      bsdd.forwardedIn?.quantityRefused
   };
 }

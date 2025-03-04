@@ -80,6 +80,7 @@ const reviewFragment = gql`
       temporaryStorageDetail {
         temporaryStorer {
           quantityReceived
+          quantityRefused
         }
         destination {
           cap
@@ -142,6 +143,7 @@ const reviewFragment = gql`
       temporaryStorageDetail {
         temporaryStorer {
           quantityReceived
+          quantityRefused
         }
         destination {
           cap

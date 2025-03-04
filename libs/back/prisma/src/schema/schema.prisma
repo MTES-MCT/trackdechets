@@ -691,6 +691,7 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
+  temporaryStorageTemporaryStorerQuantityRefused  Float?
 
   initialRecipientCap                                    String?
   initialWasteDetailsCode                                String?
@@ -727,6 +728,7 @@ model BsddRevisionRequest {
   initialTemporaryStorageDestinationCap                  String?
   initialTemporaryStorageDestinationProcessingOperation  String?
   initialTemporaryStorageTemporaryStorerQuantityReceived Decimal?
+  initialTemporaryStorageTemporaryStorerQuantityRefused  Decimal?
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")

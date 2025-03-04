@@ -185,7 +185,9 @@ async function getUpdateFromFormRevisionRequest(
     ...(hasTempStorage
       ? {
           quantityReceived:
-            revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+            revisionRequest.temporaryStorageTemporaryStorerQuantityReceived,
+          quantityRefused:
+            revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
         }
       : {
           quantityReceived: revisionRequest.quantityReceived,
@@ -223,6 +225,7 @@ async function getUpdateFromFormRevisionRequest(
         recipientProcessingOperation:
           revisionRequest.temporaryStorageDestinationProcessingOperation,
         quantityReceived: revisionRequest.quantityReceived,
+        quantityRefused: revisionRequest.quantityRefused,
         processingOperationDone: revisionRequest.processingOperationDone,
         processingOperationDescription:
           revisionRequest.processingOperationDescription,

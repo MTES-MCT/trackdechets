@@ -88,7 +88,9 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
             processingOperationDone:
               parent.initialTemporaryStorageDestinationProcessingOperation,
             quantityReceived:
-              parent.initialTemporaryStorageTemporaryStorerQuantityReceived
+              parent.initialTemporaryStorageTemporaryStorerQuantityReceived,
+            quantityRefused:
+              parent.initialTemporaryStorageTemporaryStorerQuantityRefused
           }
         : null,
       ...historicForm
