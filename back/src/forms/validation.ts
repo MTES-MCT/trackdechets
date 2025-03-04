@@ -278,12 +278,12 @@ const getReceptionData = (context: any, isTempStorage = false) => {
     wasteAcceptationStatus:
       context?.forwardedIn?.wasteAcceptationStatus ??
       context?.wasteAcceptationStatus,
-    quantityReceived: isDefined(context?.forwardedIn?.quantityReceived)
-      ? context?.forwardedIn?.quantityReceived
-      : context.quantityReceived,
-    quantityRefused: isDefined(context?.forwardedIn?.quantityReceived)
-      ? context?.forwardedIn?.quantityRefused
-      : context.quantityRefused
+    quantityReceived: isDefined(context?.quantityReceived)
+      ? context?.quantityReceived
+      : context?.forwardedIn?.quantityReceived,
+    quantityRefused: isDefined(context?.quantityReceived)
+      ? context?.quantityRefused
+      : context?.forwardedIn?.quantityRefused
   };
 };
 

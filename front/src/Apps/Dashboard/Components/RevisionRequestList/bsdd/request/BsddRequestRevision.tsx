@@ -34,6 +34,7 @@ import NonScrollableInput from "../../../../../common/Components/NonScrollableIn
 import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type Props = {
   bsdd: Bsdd;
@@ -119,8 +120,13 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const wasteDetailsCodeInput = register("wasteDetails.code");
 
   const hasBeenReceived = isDefined(bsdd.receivedAt);
+  const hasBeenAccepted = isDefined(bsdd.wasteAcceptationStatus);
+
   const hasBeenTempStoredReceived = isDefined(
     bsdd.temporaryStorageDetail?.temporaryStorer?.receivedAt
+  );
+  const hasBeenTempStoredAccepted = isDefined(
+    bsdd.temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
   );
   const hasBeenProcessed = isDefined(bsdd.processedAt);
 
@@ -222,41 +228,53 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 </RhfReviewableField>
 
                 {hasBeenReceived && (
-                  <>
-                    <RhfReviewableField
-                      title={
-                        !isTempStorage
-                          ? "Quantité reçue"
-                          : "Quantité reçue sur l'installation de destination"
-                      }
-                      path="quantityReceived"
-                      value={bsdd.quantityReceived}
-                      defaultValue={initialBsddReview?.quantityReceived}
-                    >
-                      <NonScrollableInput
-                        label="Poids en tonnes"
-                        className="fr-col-2"
-                        state={errors.quantityReceived && "error"}
-                        stateRelatedMessage={
-                          errors.quantityReceived?.message ?? ""
-                        }
-                        nativeInputProps={{
-                          ...register("quantityReceived", {
-                            valueAsNumber: true
-                          }),
-                          type: "number",
-                          inputMode: "decimal",
-                          step: "0.000001",
-                          min: 0
-                        }}
+                  <RhfReviewableField
+                    title={
+                      !isTempStorage
+                        ? "Quantité reçue"
+                        : "Quantité reçue sur l'installation de destination"
+                    }
+                    path="quantityReceived"
+                    value={bsdd.quantityReceived}
+                    defaultValue={initialBsddReview?.quantityReceived}
+                  >
+                    {bsdd.wasteAcceptationStatus ===
+                      WasteAcceptationStatus.PartiallyRefused && (
+                      <Alert
+                        className="fr-my-2w"
+                        small
+                        description="En cas de refus partiel, la quantité reçue et refusée peuvent être révisées, impactant la quantité traitée: quantité acceptée = quantité reçue - quantité refusée."
+                        severity="info"
                       />
-                      {isDefined(formValues?.quantityReceived) && (
-                        <p className="fr-info-text">
-                          Soit {Number(formValues.quantityReceived) * 1000} kg
-                        </p>
-                      )}
-                    </RhfReviewableField>
+                    )}
+                    <NonScrollableInput
+                      label="Poids en tonnes"
+                      className="fr-col-2"
+                      state={errors.quantityReceived && "error"}
+                      stateRelatedMessage={
+                        errors.quantityReceived?.message ?? ""
+                      }
+                      nativeInputProps={{
+                        ...register("quantityReceived", {
+                          valueAsNumber: true
+                        }),
+                        type: "number",
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        min: 0
+                      }}
+                    />
+                    {isDefined(formValues?.quantityReceived) && (
+                      <p className="fr-info-text">
+                        Soit {Number(formValues.quantityReceived) * 1000} kg
+                      </p>
+                    )}
+                  </RhfReviewableField>
+                )}
 
+                {hasBeenAccepted &&
+                  bsdd.wasteAcceptationStatus ===
+                    WasteAcceptationStatus.PartiallyRefused && (
                     <RhfReviewableField
                       title={
                         !isTempStorage
@@ -265,10 +283,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       }
                       path="quantityRefused"
                       value={bsdd.quantityRefused}
-                      disabled={
-                        bsdd.wasteAcceptationStatus ===
-                        WasteAcceptationStatus.Accepted
-                      }
                       defaultValue={initialBsddReview?.quantityRefused}
                     >
                       <NonScrollableInput
@@ -294,61 +308,76 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         </p>
                       )}
                     </RhfReviewableField>
-                  </>
+                  )}
+
+                {isTempStorage && hasBeenTempStoredReceived && (
+                  <RhfReviewableField
+                    title={
+                      "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                    }
+                    path="quantityReceived"
+                    value={
+                      bsdd.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    }
+                    defaultValue={
+                      initialBsddReview.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    }
+                  >
+                    {bsdd.temporaryStorageDetail?.temporaryStorer
+                      ?.wasteAcceptationStatus ===
+                      WasteAcceptationStatus.PartiallyRefused && (
+                      <Alert
+                        className="fr-my-2w"
+                        small
+                        description="En cas de refus partiel, la quantité reçue et refusée peuvent être révisées, impactant la quantité traitée: quantité acceptée = quantité reçue - quantité refusée."
+                        severity="info"
+                      />
+                    )}
+                    <NonScrollableInput
+                      label="Poids en tonnes"
+                      className="fr-col-2"
+                      state={
+                        errors.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived && "error"
+                      }
+                      stateRelatedMessage={
+                        errors.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived?.message ?? ""
+                      }
+                      nativeInputProps={{
+                        ...register(
+                          "temporaryStorageDetail.temporaryStorer.quantityReceived",
+                          { valueAsNumber: true }
+                        ),
+                        type: "number",
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        min: 0
+                      }}
+                    />
+                    {isDefined(
+                      formValues?.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    ) && (
+                      <p className="fr-info-text">
+                        Soit{" "}
+                        {Number(
+                          formValues.temporaryStorageDetail.temporaryStorer
+                            .quantityReceived
+                        ) * 1000}{" "}
+                        kg
+                      </p>
+                    )}
+                  </RhfReviewableField>
                 )}
 
-                {isTempStorage && hasBeenTempStoredReceived ? (
-                  <>
-                    <RhfReviewableField
-                      title={
-                        "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
-                      }
-                      path="quantityReceived"
-                      value={
-                        bsdd.temporaryStorageDetail?.temporaryStorer
-                          ?.quantityReceived
-                      }
-                      defaultValue={
-                        initialBsddReview.temporaryStorageDetail
-                          ?.temporaryStorer?.quantityReceived
-                      }
-                    >
-                      <NonScrollableInput
-                        label="Poids en tonnes"
-                        className="fr-col-2"
-                        state={
-                          errors.temporaryStorageDetail?.temporaryStorer
-                            ?.quantityReceived && "error"
-                        }
-                        stateRelatedMessage={
-                          errors.temporaryStorageDetail?.temporaryStorer
-                            ?.quantityReceived?.message ?? ""
-                        }
-                        nativeInputProps={{
-                          ...register(
-                            "temporaryStorageDetail.temporaryStorer.quantityReceived",
-                            { valueAsNumber: true }
-                          ),
-                          type: "number",
-                          inputMode: "decimal",
-                          step: "0.000001",
-                          min: 0
-                        }}
-                      />
-                      {isDefined(
-                        formValues?.temporaryStorageDetail?.temporaryStorer
-                          ?.quantityReceived
-                      ) && (
-                        <p className="fr-info-text">
-                          Soit{" "}
-                          {Number(
-                            formValues.temporaryStorageDetail.temporaryStorer
-                              .quantityReceived
-                          ) * 1000}{" "}
-                          kg
-                        </p>
-                      )}
-                    </RhfReviewableField>
+                {isTempStorage &&
+                  hasBeenTempStoredAccepted &&
+                  bsdd.temporaryStorageDetail?.temporaryStorer
+                    ?.wasteAcceptationStatus ===
+                    WasteAcceptationStatus.PartiallyRefused && (
                     <RhfReviewableField
                       title={
                         "Quantité refusée sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
@@ -358,11 +387,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         bsdd.temporaryStorageDetail?.temporaryStorer
                           ?.quantityRefused
                       }
-                      disabled={
-                        bsdd.temporaryStorageDetail?.temporaryStorer
-                          ?.wasteAcceptationStatus ===
-                        WasteAcceptationStatus.Accepted
-                      }
                       defaultValue={
                         initialBsddReview.temporaryStorageDetail
                           ?.temporaryStorer?.quantityRefused
@@ -371,11 +395,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       <NonScrollableInput
                         label="Poids en tonnes"
                         className="fr-col-2"
-                        disabled={
-                          bsdd.temporaryStorageDetail?.temporaryStorer
-                            ?.wasteAcceptationStatus ===
-                          WasteAcceptationStatus.Accepted
-                        }
                         state={
                           errors.temporaryStorageDetail?.temporaryStorer
                             ?.quantityRefused && "error"
@@ -409,8 +428,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         </p>
                       )}
                     </RhfReviewableField>
-                  </>
-                ) : null}
+                  )}
 
                 {hasBeenProcessed && (
                   <>

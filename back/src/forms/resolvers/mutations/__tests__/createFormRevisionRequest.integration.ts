@@ -2672,6 +2672,70 @@ describe("Mutation.createFormRevisionRequest", () => {
                 quantityRefused: 3
               }
             },
+            quantityReceived: 13
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        ).toEqual(16);
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+        ).toEqual(3);
+
+        expect(revisionRequest.initialQuantityReceived?.toNumber()).toEqual(15);
+        expect(revisionRequest.initialQuantityRefused?.toNumber()).toEqual(5);
+
+        expect(revisionRequest.quantityReceived).toEqual(13);
+        expect(revisionRequest.quantityRefused).toEqual(null);
+
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityReceived?.toNumber()
+        ).toEqual(10);
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
+        ).toEqual(0);
+      });
+
+      it("should be able to review quantities & wasteAcceptationStatus on both temp storage & destination (PARTIALLY_REFUSED then ACCEPTED + quantityRefused defined)", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 15,
+              quantityRefused: 5,
+              wasteRefusalReason: "Pas bon"
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 10,
+              quantityRefused: 0
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 16,
+                quantityRefused: 3
+              }
+            },
             quantityReceived: 13,
             quantityRefused: 0
           }
@@ -2704,6 +2768,70 @@ describe("Mutation.createFormRevisionRequest", () => {
         expect(
           revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
         ).toEqual(0);
+      });
+
+      it("should be able to review quantities & wasteAcceptationStatus on both temp storage & destination (PARTIALLY_REFUSED then ACCEPTED + quantityRefused defined)", async () => {
+        // Given
+        const { emitter, bsdd, emitterCompany } =
+          await createUserAndTempStoredBSDD(
+            {
+              status: Status.ACCEPTED,
+              wasteAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              quantityReceived: 15,
+              quantityRefused: 0
+            },
+            {
+              receivedAt: new Date(),
+              wasteAcceptationStatus: WasteAcceptationStatus.PARTIALLY_REFUSED,
+              quantityReceived: 7.8,
+              quantityRefused: 2.9,
+              wasteRefusalReason: "Pas bon"
+            }
+          );
+
+        // When
+        const { errors } = await createRevision(
+          emitter,
+          emitterCompany,
+          bsdd.id,
+          {
+            temporaryStorageDetail: {
+              temporaryStorer: {
+                quantityReceived: 14
+              }
+            },
+            quantityReceived: 18,
+            quantityRefused: 16
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+
+        const revisionRequest =
+          await prisma.bsddRevisionRequest.findFirstOrThrow({
+            where: { bsddId: bsdd.id }
+          });
+
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        ).toEqual(14);
+        expect(
+          revisionRequest.temporaryStorageTemporaryStorerQuantityRefused
+        ).toEqual(null);
+
+        expect(revisionRequest.initialQuantityReceived?.toNumber()).toEqual(15);
+        expect(revisionRequest.initialQuantityRefused?.toNumber()).toEqual(0);
+
+        expect(revisionRequest.quantityReceived).toEqual(18);
+        expect(revisionRequest.quantityRefused).toEqual(16);
+
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityReceived?.toNumber()
+        ).toEqual(7.8);
+        expect(
+          revisionRequest.initialTemporaryStorageTemporaryStorerQuantityRefused?.toNumber()
+        ).toEqual(2.9);
       });
 
       it("should throw if temp storage reviewed quantites are bad but destination is ok", async () => {

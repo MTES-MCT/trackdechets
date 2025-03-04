@@ -49,6 +49,7 @@ import {
 } from "../../../companies/companyProfilesRules";
 import { INVALID_DESTINATION_SUBPROFILE } from "../../errors";
 import { isDefined } from "../../../common/helpers";
+import { FormWithForwardedIn } from "../../types";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDD_STATUSES: Status[] = [
@@ -276,7 +277,7 @@ async function validateWAsteAccordingToDestination(bsdd: Form, flatContent) {
 }
 async function getFlatContent(
   content: FormRevisionRequestContentInput,
-  bsdd: Form & { transporters: BsddTransporter[] }
+  bsdd: FormWithForwardedIn & { transporters: BsddTransporter[] }
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
 
@@ -408,7 +409,7 @@ async function getFlatContent(
 }
 
 const getContentToValidate = (
-  bsdd: Form & { transporters: BsddTransporter[] },
+  bsdd: FormWithForwardedIn & { transporters: BsddTransporter[] },
   flatContent: ReturnType<typeof flattenBsddRevisionRequestInput>
 ) => {
   // quantityReceived & quantityRefused sont liées pour la validation, il faut donc
@@ -423,11 +424,15 @@ const getContentToValidate = (
   if (isReviewingQuantities) {
     if (isDefined(flatContent.quantityReceived))
       quantityReceived = flatContent.quantityReceived;
+    else if (isDefined(bsdd.forwardedIn?.quantityReceived))
+      quantityReceived = Number(bsdd.forwardedIn?.quantityReceived);
     else if (isDefined(bsdd.quantityReceived))
       quantityReceived = Number(bsdd.quantityReceived);
 
     if (isDefined(flatContent.quantityRefused))
       quantityRefused = flatContent.quantityRefused;
+    else if (isDefined(bsdd.forwardedIn?.quantityRefused))
+      quantityReceived = Number(bsdd.forwardedIn?.quantityRefused);
     else if (isDefined(bsdd.quantityRefused))
       quantityRefused = Number(bsdd.quantityRefused);
   }
