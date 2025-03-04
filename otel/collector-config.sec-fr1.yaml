@@ -10,8 +10,13 @@ receivers:
     password: ${env:SANDBOX_DB_PWD}
 
 processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 80
+    spike_limit_percentage: 15
+      
   batch/datadog:
-    send_batch_max_size: 100
+    send_batch_max_size: ${env:OTEL_DD_BATCH_MAX_SIZE:-100}
     send_batch_size: 10
     timeout: 10s
 
@@ -28,13 +33,13 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch, memory_limiter]
+      processors: [memory_limiter, batch]
       exporters: [datadog/connector, datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
-      processors: [batch/datadog, memory_limiter]
+      processors: [memory_limiter, batch/datadog]
       exporters: [datadog/exporter]
     logs:
       receivers: [otlp]
-      processors: [batch, memory_limiter]
+      processors: [memory_limiter, batch]
       exporters: [datadog/exporter]
