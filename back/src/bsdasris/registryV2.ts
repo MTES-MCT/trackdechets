@@ -495,7 +495,6 @@ export const toTransportedWasteV2 = (
     volume: null,
 
     emitterCompanyIrregularSituation: null,
-    emitterCompanyType: null,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanyGivenName: null,

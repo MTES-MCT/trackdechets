@@ -475,7 +475,6 @@ export const emptyTransportedWasteV2: Omit<
   weightIsEstimate: null,
   volume: null,
   emitterCompanyIrregularSituation: null,
-  emitterCompanyType: null,
   emitterCompanySiret: null,
   emitterCompanyName: null,
   emitterCompanyGivenName: null,

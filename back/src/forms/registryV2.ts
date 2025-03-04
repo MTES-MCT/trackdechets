@@ -23,6 +23,7 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { getTransporterCompanyOrgId } from "@td/constants";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -671,13 +672,22 @@ export const toOutgoingWasteV2 = (
 };
 
 export const toTransportedWasteV2 = (
-  form: RegistryV2Bsdd
+  form: RegistryV2Bsdd,
+  targetSiret: string
 ): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
   const bsdd = formToBsddV2(form);
+  const transporters = (form.transporters ?? []).sort(
+    (t1, t2) => t1.number - t2.number
+  );
+  const targetTransporter = transporters.find(
+    t => getTransporterCompanyOrgId(t) === targetSiret
+  );
+  const transporterTakenOverAt =
+    targetTransporter?.takenOverAt ?? bsdd.transporterTransportTakenOverAt; // in case we don't find the target transporter, failover to the first transporter
 
   // there should always be a transporter on this type of export, but since
-  // the type doesn't know it, and we could get a weird DB state, we check it
-  if (!bsdd.transporterCompanySiret && !bsdd.transporterCompanyVatNumber) {
+  // the type doesn't know it, and we could get a weird DB state, we check that we have a date
+  if (!transporterTakenOverAt) {
     return null;
   }
 
@@ -754,7 +764,7 @@ export const toTransportedWasteV2 = (
     reportAsSiret: null,
     createdAt: bsdd.createdAt,
     updatedAt: bsdd.updatedAt,
-    transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,
+    transporterTakenOverAt,
     unloadingDate: null,
     destinationReceptionDate: bsdd.destinationReceptionDate,
     bsdType: "BSDD",
@@ -773,7 +783,6 @@ export const toTransportedWasteV2 = (
     volume: null,
 
     emitterCompanyIrregularSituation: null,
-    emitterCompanyType: bsdd.emitterType,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanyGivenName: null,
@@ -995,9 +1004,7 @@ const bsddToLookupCreateInputs = (
     });
   }
   form.transporters?.forEach(transporter => {
-    const transporterSiret =
-      transporter.transporterCompanySiret ??
-      transporter.transporterCompanyVatNumber;
+    const transporterSiret = getTransporterCompanyOrgId(transporter);
     if (!transporterSiret || !transporter.takenOverAt) {
       return;
     }
