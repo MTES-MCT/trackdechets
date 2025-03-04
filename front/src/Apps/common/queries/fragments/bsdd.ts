@@ -199,6 +199,7 @@ const mutableFieldsFragment = gql`
   fragment MutableFieldsFragment on Form {
     id
     customId
+    isDirectSupply
     sentAt
     emittedAt
     emittedBy

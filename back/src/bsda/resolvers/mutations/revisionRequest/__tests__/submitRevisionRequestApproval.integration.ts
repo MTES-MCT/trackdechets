@@ -15,6 +15,22 @@ import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
 import { BsdaStatus, UserRole } from "@prisma/client";
 import { operationHook } from "../../../../operationHook";
 import { operationHooksQueue } from "../../../../../queue/producers/operationHook";
+import { sendMail } from "../../../../../mailer/mailing";
+
+// No mails
+jest.mock("../../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+// Jest's object matching is too goddam annoying, throwing failures
+// with hard-to-identify hidden spaces / tabs / line breaks
+// Cleanse the strings before asserting on them
+const cleanse = (input: string) => {
+  // Remove all kinds of hidden spaces (tabs, line breaks, etc.)
+  let cleaned = input.replace(/\s+/g, " ");
+  // Convert double spaces to single spaces
+  cleaned = cleaned.replace(/ {2,}/g, " ");
+  return cleaned.trim();
+};
 
 const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
   mutation SubmitBsdaRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -1176,5 +1192,410 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(updatedBsda.destinationOperationNextDestinationCap).toBe(
       "NEW-EXUTOIRE-CAP"
     );
+  });
+
+  describe("tra-15364: si révision sur wasteSealNumbers ou packagings, approbations du worker et de la destination requises uniquement", () => {
+    beforeEach(jest.resetAllMocks);
+
+    const createBsdaRevisionAndApprove = async (bsdaOpt, revisionOpt) => {
+      const { user: emitter, company: emitterCompany } =
+        await userWithCompanyFactory(
+          "ADMIN",
+          { name: "Emitter Inc." },
+          { email: "emitter@mail.com", name: "Emetteur" }
+        );
+      const { user: worker, company: workerCompany } =
+        await userWithCompanyFactory(
+          "ADMIN",
+          {
+            name: "Worker Inc."
+          },
+          { email: "worker@mail.com", name: "Worker" }
+        );
+      const { user: destination, company: destinationCompany } =
+        await userWithCompanyFactory(
+          "ADMIN",
+          { name: "Destination Inc." },
+          { email: "destination@mail.com", name: "Destination" }
+        );
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          type: "OTHER_COLLECTIONS",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          workerCompanySiret: workerCompany.siret,
+          workerCompanyName: workerCompany.name,
+          destinationCompanySiret: destinationCompany.siret,
+          destinationCompanyName: destinationCompany.name,
+          ...bsdaOpt
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: workerCompany.id,
+          approvals: { create: { approverSiret: destinationCompany.siret! } },
+          comment: "It's reviewin' time!",
+          ...revisionOpt
+        }
+      });
+
+      return {
+        revisionRequest,
+        bsda,
+        worker,
+        workerCompany,
+        destination,
+        destinationCompany,
+        emitter,
+        emitterCompany
+      };
+    };
+
+    const approveRevision = async (user, revisionRequestId) => {
+      // When
+      const { mutate } = makeClient(user);
+      return await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+        MutationSubmitBsdaRevisionRequestApprovalArgs
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequestId,
+          isApproved: true
+        }
+      });
+    };
+
+    it("updating wasteSealNumbers and packagings > mail should be sent to emitter", async () => {
+      // Given
+      const {
+        bsda,
+        revisionRequest,
+        workerCompany,
+        destination,
+        destinationCompany
+      } = await createBsdaRevisionAndApprove(
+        {
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+          packagings: [{ quantity: 1, type: "PALETTE_FILME" }]
+        },
+        {
+          wasteSealNumbers: ["SEAL-3"],
+          packagings: [
+            { type: "OTHER", quantity: 2, other: "Boîte à chaussure" }
+          ]
+        }
+      );
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
+
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
+      ]);
+      expect(subject).toBe(
+        `Scellés et conditionnement du bordereau amiante n° ${bsda.id} mis à jour`
+      );
+
+      const expectedBody = `<p>
+  Trackdéchets vous informe qu'une révision sur le bordereau amiante n° ${bsda.id} sur lequel votre établissement est identifié comme
+  producteur/émetteur a été demandée par l'entreprise ${workerCompany.name} (${workerCompany.siret}) et validée par l'entreprise ${destinationCompany.name} (${destinationCompany.siret}). Cette révision concerne les éléments suivants :
+</p>
+<ul>
+  <li>
+    Numéros de scellés avant révision : SEAL-1, SEAL-2
+  </li>
+  <li>
+    Numéros de scellés après révision : SEAL-3
+  </li>
+  <li>
+    Nombre et type de conditionnement avant révision : 1 x Palette filmée
+  </li>
+  <li>
+    Nombre et type de conditionnement après révision : 2 x Autre - Boîte à chaussure
+  </li>
+</ul> 
+<br /> 
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${workerCompany.name} (${workerCompany.siret})
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${destinationCompany.name} (${destinationCompany.siret}).
+</p>`;
+
+      expect(cleanse(body)).toBe(cleanse(expectedBody));
+    });
+
+    it("updating wasteSealNumbers only > mail should be sent to emitter", async () => {
+      // Given
+      const {
+        bsda,
+        revisionRequest,
+        workerCompany,
+        destination,
+        destinationCompany
+      } = await createBsdaRevisionAndApprove(
+        {
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        },
+        {
+          wasteSealNumbers: ["SEAL-3"]
+        }
+      );
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
+
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
+      ]);
+      expect(subject).toBe(
+        `Scellés du bordereau amiante n° ${bsda.id} mis à jour`
+      );
+
+      const expectedBody = `<p>
+  Trackdéchets vous informe qu'une révision sur le bordereau amiante n° ${bsda.id} sur lequel votre établissement est identifié comme
+  producteur/émetteur a été demandée par l'entreprise ${workerCompany.name} (${workerCompany.siret}) et validée par l'entreprise ${destinationCompany.name} (${destinationCompany.siret}). Cette révision concerne les éléments suivants :
+</p>
+<ul>
+  <li>
+    Numéros de scellés avant révision : SEAL-1, SEAL-2
+  </li>
+  <li>
+    Numéros de scellés après révision : SEAL-3
+  </li>
+</ul> 
+<br /> 
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${workerCompany.name} (${workerCompany.siret})
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${destinationCompany.name} (${destinationCompany.siret}).
+</p>`;
+
+      expect(cleanse(body)).toBe(cleanse(expectedBody));
+    });
+
+    it("updating packagings only > mail should be sent to emitter", async () => {
+      // Given
+      const {
+        bsda,
+        revisionRequest,
+        workerCompany,
+        destination,
+        destinationCompany
+      } = await createBsdaRevisionAndApprove(
+        {
+          packagings: [{ quantity: 1, type: "PALETTE_FILME" }]
+        },
+        {
+          packagings: [
+            { type: "OTHER", quantity: 2, other: "Boîte à chaussure" }
+          ]
+        }
+      );
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+      const { body, messageVersions, subject, cc } = (sendMail as jest.Mock)
+        .mock.calls[0][0];
+
+      expect(messageVersions[0].to).toMatchObject([
+        { email: "emitter@mail.com", name: "Emetteur" }
+      ]);
+      expect(cc).toMatchObject([
+        { email: "worker@mail.com", name: "Worker" },
+        { email: "destination@mail.com", name: "Destination" }
+      ]);
+      expect(subject).toBe(
+        `Conditionnement du bordereau amiante n° ${bsda.id} mis à jour`
+      );
+
+      const expectedBody = `<p>
+  Trackdéchets vous informe qu'une révision sur le bordereau amiante n° ${bsda.id} sur lequel votre établissement est identifié comme
+  producteur/émetteur a été demandée par l'entreprise ${workerCompany.name} (${workerCompany.siret}) et validée par l'entreprise ${destinationCompany.name} (${destinationCompany.siret}). Cette révision concerne les éléments suivants :
+</p>
+<ul>
+  <li>
+    Nombre et type de conditionnement avant révision : 1 x Palette filmée
+  </li>
+  <li>
+    Nombre et type de conditionnement après révision : 2 x Autre - Boîte à chaussure
+  </li>
+</ul> 
+<br /> 
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante ${workerCompany.name} (${workerCompany.siret})
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${destinationCompany.name} (${destinationCompany.siret}).
+</p>`;
+
+      expect(cleanse(body)).toBe(cleanse(expectedBody));
+    });
+
+    it("updating wasteSealNumbers and packagings AND something else > mail should NOT be sent to emitter", async () => {
+      // Given
+      const { revisionRequest, destination } =
+        await createBsdaRevisionAndApprove(
+          {
+            wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+            packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+            wasteMaterialName: "Some stuff"
+          },
+          {
+            wasteSealNumbers: ["SEAL-3"],
+            packagings: [
+              { type: "OTHER", quantity: 2, other: "Boîte à chaussure" }
+            ],
+            wasteMaterialName: "Some other stuff"
+          }
+        );
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
+
+    it("canceling BSDA > mail should NOT be sent to emitter", async () => {
+      // Given
+      const { revisionRequest, destination } =
+        await createBsdaRevisionAndApprove({}, { isCanceled: true });
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
+
+    it("admin is not subscribed to email alerts > mail should NOT be sent", async () => {
+      // Given
+      const { emitter, revisionRequest, destination } =
+        await createBsdaRevisionAndApprove(
+          {
+            wasteSealNumbers: ["SEAL-1", "SEAL-2"],
+            packagings: [{ quantity: 1, type: "PALETTE_FILME" }]
+          },
+          {
+            wasteSealNumbers: ["SEAL-3"],
+            packagings: [
+              { type: "OTHER", quantity: 2, other: "Boîte à chaussure" }
+            ]
+          }
+        );
+
+      // Unsubscribe admins from registry notification
+      await prisma.companyAssociation.updateMany({
+        where: { userId: { in: [emitter.id] } },
+        data: { notificationIsActiveBsdaFinalDestinationUpdate: false }
+      });
+
+      // When
+      const { errors } = await approveRevision(destination, revisionRequest.id);
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
+
+    it("emitter creates revision on wasteSealNumbers > mail should NOT be sent", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { name: "Emitter Inc." },
+        { email: "emitter@mail.com", name: "Emetteur" }
+      );
+      const { user: worker, company: workerCompany } =
+        await userWithCompanyFactory("ADMIN", {
+          name: "Worker Inc."
+        });
+      const { user: destination, company: destinationCompany } =
+        await userWithCompanyFactory("ADMIN", { name: "Destination Inc." });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          type: "OTHER_COLLECTIONS",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          workerCompanySiret: workerCompany.siret,
+          workerCompanyName: workerCompany.name,
+          destinationCompanySiret: destinationCompany.siret,
+          destinationCompanyName: destinationCompany.name,
+          wasteSealNumbers: ["SEAL-1", "SEAL-2"]
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: emitterCompany.id,
+          approvals: {
+            createMany: {
+              data: [
+                { approverSiret: workerCompany.siret! },
+                { approverSiret: destinationCompany.siret! }
+              ]
+            }
+          },
+          comment: "It's reviewin' time!",
+          wasteSealNumbers: ["SEAL-3"]
+        }
+      });
+
+      // When
+      const { errors: destinationErrors } = await approveRevision(
+        destination,
+        revisionRequest.id
+      );
+      const { errors: workerErrors } = await approveRevision(
+        worker,
+        revisionRequest.id
+      );
+
+      // Then
+      expect(destinationErrors).toBeUndefined();
+      expect(workerErrors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
   });
 });

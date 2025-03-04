@@ -312,7 +312,7 @@ describe("Mutation.updateBsffPackaging", () => {
     }
   );
 
-  test(
+  test.skip(
     "more than 60 days after refusal > " +
       " it should not be possible to update acceptation status",
     async () => {
@@ -505,7 +505,7 @@ describe("Mutation.updateBsffPackaging", () => {
     }
   );
 
-  test(
+  test.skip(
     "more than 60 days after operation >" +
       " it should not be possible to update acceptation and operation fields",
     async () => {

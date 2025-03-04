@@ -14,6 +14,7 @@ Eg. 2020-11-23T00:00:00 sera interprété comme 2020-11-22T23:00:00Z (CET) ou 20
 scalar DateTime
 
 scalar JSON
+scalar JSONObject
 
 """
 Chaîne de caractère au format URL, débutant par un protocole http(s).

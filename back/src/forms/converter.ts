@@ -63,6 +63,7 @@ import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
 import { extractPostalCode } from "../common/addresses";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
+import { isDefined } from "../common/helpers";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -432,6 +433,7 @@ export function flattenFormInput(
   formInput: Pick<
     FormInput,
     | "customId"
+    | "isDirectSupply"
     | "emitter"
     | "recipient"
     | "wasteDetails"
@@ -442,6 +444,11 @@ export function flattenFormInput(
 ): Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">> {
   return safeInput({
     customId: formInput.customId,
+    // Si `isDirectSupply` est null ou undefined, on omet le champ
+    // et on laisse le soin à la DB de mettre une valeur par défaut
+    ...(isDefined(formInput.isDirectSupply)
+      ? { isDirectSupply: formInput.isDirectSupply! }
+      : {}),
     ...flattenEmitterInput(formInput),
     ...flattenRecipientInput(formInput),
     ...flattenWasteDetailsInput(formInput),
@@ -672,6 +679,7 @@ export function expandFormFromDb(
       .map(segment => expandTransportSegmentFromDb(segment)),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
+    isDirectSupply: form.isDirectSupply,
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,
@@ -691,13 +699,12 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: (form.wasteDetailsPackagingInfos as PackagingInfo[]).map(
-        p => ({
+      packagingInfos:
+        (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
           ...p,
           volume: p.volume ?? null,
           identificationNumbers: p.identificationNumbers ?? []
-        })
-      ),
+        })) ?? [],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -879,7 +886,13 @@ export function expandFormFromDb(
             nonRoadRegulationMention:
               forwardedIn.wasteDetailsNonRoadRegulationMention,
             packagingInfos:
-              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
+              (forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
+                p => ({
+                  ...p,
+                  volume: p.volume ?? null,
+                  identificationNumbers: p.identificationNumbers ?? []
+                })
+              ) ?? [],
             // DEPRECATED - To remove with old packaging fields
             ...getDeprecatedPackagingApiFields(
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]

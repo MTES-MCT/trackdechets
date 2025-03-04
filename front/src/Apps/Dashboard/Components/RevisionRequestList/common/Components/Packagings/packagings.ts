@@ -26,7 +26,6 @@ export const PACKAGINGS_BSD_NAMES = {
     [Packagings.Citerne]: "Citerne(s)",
     [Packagings.Fut]: "Fût(s)",
     [Packagings.Grv]: "GRV(s)",
-    [Packagings.Pipeline]: "Conditionné pour Pipeline",
     [Packagings.Autre]: "Autre(s)"
   },
   [BsdTypename.Bsda]: {

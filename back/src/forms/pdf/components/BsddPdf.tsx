@@ -675,9 +675,13 @@ export function BsddPdf({
             <p>
               <strong>4. Conditionnement</strong>
             </p>
-            <PackagingInfosTable
-              packagingInfos={form.wasteDetails?.packagingInfos ?? []}
-            />
+            {form.isDirectSupply ? (
+              <p>Acheminement direct par pipeline ou convoyeur</p>
+            ) : (
+              <PackagingInfosTable
+                packagingInfos={form.wasteDetails?.packagingInfos ?? []}
+              />
+            )}
           </div>
 
           <div className="BoxCol">
@@ -792,7 +796,11 @@ export function BsddPdf({
             <p>
               <strong>8. Collecteur-Transporteur</strong>
             </p>
-            <TransporterFormCompanyFields {...form} />
+            {form.isDirectSupply ? (
+              <p>Acheminement direct par pipeline ou convoyeur</p>
+            ) : (
+              <TransporterFormCompanyFields {...form} />
+            )}
           </div>
         </div>
 

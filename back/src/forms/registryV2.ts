@@ -250,7 +250,7 @@ export const toIncomingWasteV2 = (
     brokerCompanySiret: bsdd.brokerCompanySiret,
     brokerCompanyMail: bsdd.brokerCompanyMail,
     brokerRecepisseNumber: bsdd.brokerRecepisseNumber,
-    isDirectSupply: false,
+    isDirectSupply: bsdd.isDirectSupply,
     transporter1CompanyName: bsdd.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanySiret: bsdd.transporterCompanySiret?.length
@@ -526,7 +526,7 @@ export const toOutgoingWasteV2 = (
     traderCompanyName: bsdd.traderCompanyName,
     traderCompanyMail: bsdd.traderCompanyMail,
     traderRecepisseNumber: bsdd.traderRecepisseNumber,
-    isDirectSupply: false,
+    isDirectSupply: bsdd.isDirectSupply,
     transporter1CompanySiret: bsdd.transporterCompanySiret?.length
       ? bsdd.transporterCompanySiret
       : bsdd.transporterCompanyVatNumber,

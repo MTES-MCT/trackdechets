@@ -1,4 +1,5 @@
 import { checkVAT, countries } from "jsvat";
+import { isDefinedStrict } from "./helpers";
 
 // Source: https://github.com/unicode-org/cldr/blob/release-26-0-1/common/supplemental/postalCodeData.xml
 // SO: https://stackoverflow.com/questions/578406/what-is-the-ultimate-postal-code-and-zip-regex
@@ -15,7 +16,7 @@ const POSTAL_CODE_REGEX_PER_COUNTRY = {
   AU: "[0-9]{4}",
   IT: "[0-9]{5}",
   CH: "[0-9]{4}",
-  AT: "[0-9]{4}",
+  AT: "(AT-)?[0-9]{4}",
   ES: "[0-9]{5}",
   NL: "[0-9]{4}[ ]?[A-Z]{2}",
   BE: "[0-9]{4}",
@@ -171,7 +172,10 @@ export function extractPostalCode(
   address: string | null | undefined,
   country: Country = "FR"
 ) {
-  const postalCodeRegex = POSTAL_CODE_REGEX_PER_COUNTRY[country];
+  const postalCodeRegex =
+    POSTAL_CODE_REGEX_PER_COUNTRY[country] ??
+    POSTAL_CODE_REGEX_PER_COUNTRY["FR"];
+
   const regex = new RegExp(
     new RegExp(/(^| |,)/).source + // There can be a space, a comma or beginning of string BEFORE
       new RegExp(postalCodeRegex).source + // The postalCode regex
@@ -179,7 +183,8 @@ export function extractPostalCode(
   );
 
   if (address) {
-    let addressUp = address.toUpperCase();
+    let addressUp = address.replace(/\n/g, " ").toUpperCase();
+
     // Kind of a complex machine here because matches might overlap and not be
     // detected by RegExp.matches()
     // ex: 134 AV DU GENERAL EISENHOWER CS 42326 31100 TOULOUSE
@@ -226,7 +231,7 @@ export const splitAddress = (
   address: string | null | undefined,
   vatNumber?: string | null
 ) => {
-  if (!address) {
+  if (!isDefinedStrict(address)) {
     return {
       street: "",
       postalCode: "",
@@ -246,7 +251,7 @@ export const splitAddress = (
   if (!postalCode) {
     return {
       // Fallback: return the full address in 'street' field
-      street: address
+      street: address!
         .replace(/\r?\n|\r/g, " ") // remove line breaks
         .replace(/\s+/g, " "), // double spaces to single spaces
       postalCode: "",
@@ -255,7 +260,7 @@ export const splitAddress = (
     };
   }
 
-  const splitted = address
+  const splitted = address!
     .replace(/\r?\n|\r/g, " ") // remove line breaks
     .replace(/\s+/g, " ") // double spaces to single spaces
     .split(postalCode)

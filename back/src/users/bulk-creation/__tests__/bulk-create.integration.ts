@@ -7,22 +7,48 @@ import { sendMail } from "../../../mailer/mailing";
 import { sirenify } from "../sirene";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { bulkCreate, Opts } from "../index";
+import { searchCompany } from "../../../companies/search";
 
 // No mails
 jest.mock("../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 jest.mock("../sirene");
-(sirenify as jest.Mock).mockImplementation(company =>
-  Promise.resolve({
-    ...company,
-    name: "NAME FROM SIRENE",
-    address: "40 boulevard Voltaire 13001 Marseille",
-    codeNaf: "62.01Z",
-    latitude: 1,
-    longitude: 1
-  })
-);
+(sirenify as jest.Mock).mockImplementation(company => {
+  if (company.siret === "85001946400021") {
+    return {
+      ...company,
+      name: "NAME FROM SIRENE",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      addressVoie: "40 boulevard Voltaire",
+      codePaysEtrangerEtablissement: "",
+      codeNaf: "62.01Z",
+      latitude: 1,
+      longitude: 1
+    };
+  }
+
+  if (company.siret === "81343950200028") {
+    return {
+      ...company,
+      name: "NAME FROM SIRENE",
+      address: "4 boulevard Pasteur 44100 Nantes",
+      addressCity: "Nantes",
+      addressPostalCode: "44100",
+      addressVoie: "4 boulevard Pasteur",
+      codePaysEtrangerEtablissement: "",
+      codeNaf: "62.01Z",
+      latitude: 1,
+      longitude: 1
+    };
+  }
+});
+
+jest.mock("../../../companies/search", () => ({
+  searchCompany: jest.fn().mockResolvedValue({ etatAdministratif: "A" })
+}));
 
 export interface CompanyInfo {
   etablissement: {
@@ -34,27 +60,48 @@ export interface CompanyInfo {
 }
 
 describe("bulk create users and companies from csv files", () => {
-  const { searchCompany } = require("../../../companies/search");
-  jest.mock("../../../companies/search");
-  (searchCompany as jest.Mock)
-    .mockResolvedValue({
-      siret: "85001946400013",
-      name: "Code en stock",
-      statutDiffusionEtablissement: "O",
-      etatAdministratif: "A"
-    })
-    .mockResolvedValue({
-      siret: "81343950200028",
-      name: "Frontier SAS",
-      statutDiffusionEtablissement: "O",
-      etatAdministratif: "A"
-    });
+  beforeAll(async () => {
+    await resetDatabase();
+  });
+
+  afterAll(async () => {
+    await resetDatabase();
+    jest.resetAllMocks();
+  });
+
+  (searchCompany as jest.Mock).mockImplementation((cue: string) => {
+    if (cue === "85001946400021") {
+      return {
+        siret: "85001946400021",
+        name: "Code en stock",
+        statutDiffusionEtablissement: "O",
+        etatAdministratif: "A",
+        addressVoie: "40 boulevard Voltaire",
+        addressPostalCode: "13001",
+        addressCity: "Marseille",
+        codePaysEtrangerEtablissement: ""
+      };
+    }
+    if (cue === "81343950200028") {
+      return {
+        siret: "81343950200028",
+        name: "Frontier SAS",
+        statutDiffusionEtablissement: "O",
+        etatAdministratif: "A",
+        addressVoie: "4 boulevard Pasteur",
+        addressPostalCode: "44100",
+        addressCity: "Nantes",
+        codePaysEtrangerEtablissement: ""
+      };
+    }
+  });
+
   // CSV files are read from __tests__/csv folder
   //
   // In the test data we have
   //
   // 2 companies:
-  // - Code en Stock 85001946400013
+  // - Code en Stock 85001946400021
   // - Frontier SAS 81343950200028
   //
   // and 3 users
@@ -115,7 +162,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // check fields are OK for first company
     const codeEnStock = await prisma.company.findUniqueOrThrow({
-      where: { siret: "85001946400013" }
+      where: { siret: "85001946400021" }
     });
     expect(codeEnStock.name).toEqual("NAME FROM SIRENE");
     expect(codeEnStock.givenName).toEqual("Code en Stock");
@@ -145,7 +192,7 @@ describe("bulk create users and companies from csv files", () => {
 
   test("already existing company", async () => {
     // assume Code en Stock was already created
-    const codeEnStock = await companyFactory({ siret: "85001946400013" });
+    const codeEnStock = await companyFactory({ siret: "85001946400021" });
 
     await bulkCreateIdempotent();
 
@@ -153,7 +200,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // Code en stock should be untouched
     expect(
-      await prisma.company.findUnique({ where: { siret: "85001946400013" } })
+      await prisma.company.findUnique({ where: { siret: "85001946400021" } })
     ).toEqual(codeEnStock);
   }, 10000);
 
@@ -181,7 +228,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // associations should exist between John Snow and Code en Stock
     const associations = await prisma.companyAssociation.findMany({
-      where: { user: { id: john.id }, company: { siret: "85001946400013" } }
+      where: { user: { id: john.id }, company: { siret: "85001946400021" } }
     });
     expect(associations).toHaveLength(1);
     expect(associations[0].role).toEqual("ADMIN");
@@ -190,7 +237,7 @@ describe("bulk create users and companies from csv files", () => {
   test("already existing user with existing role in company", async () => {
     // John Snow and Code en Stock already exist
     const john = await userFactory({ email: "john.snow@trackdechets.fr" });
-    const codeEnStock = await companyFactory({ siret: "85001946400013" });
+    const codeEnStock = await companyFactory({ siret: "85001946400021" });
     // and John Snow is member of Code en Stock
     const role = await prisma.companyAssociation.create({
       data: {
@@ -260,7 +307,7 @@ describe("bulk create users and companies from csv files", () => {
 
   test("role in csv already in pending invitation", async () => {
     // assume John Snow was already invited to Trackdéchets
-    const company = await companyFactory({ siret: "85001946400013" });
+    const company = await companyFactory({ siret: "85001946400021" });
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
@@ -291,5 +338,35 @@ describe("bulk create users and companies from csv files", () => {
       }
     });
     expect(updatedInvitation.acceptedAt).not.toBeNull();
+  }, 10000);
+
+  test("should fill company's splitted address", async () => {
+    // Given
+
+    // When
+    await bulkCreateIdempotent();
+
+    // Then
+    // Check fields are OK for first company
+    const codeEnStock = await prisma.company.findUniqueOrThrow({
+      where: { siret: "85001946400021" }
+    });
+    expect(codeEnStock.address).toEqual(
+      "40 boulevard Voltaire 13001 Marseille"
+    );
+    expect(codeEnStock.street).toEqual("40 boulevard Voltaire");
+    expect(codeEnStock.postalCode).toEqual("13001");
+    expect(codeEnStock.city).toEqual("Marseille");
+    expect(codeEnStock.country).toEqual("FR");
+
+    // Check fields are OK for second company
+    const frontierSAS = await prisma.company.findUniqueOrThrow({
+      where: { siret: "81343950200028" }
+    });
+    expect(frontierSAS.address).toEqual("4 boulevard Pasteur 44100 Nantes");
+    expect(frontierSAS.street).toEqual("4 boulevard Pasteur");
+    expect(frontierSAS.postalCode).toEqual("44100");
+    expect(frontierSAS.city).toEqual("Nantes");
+    expect(frontierSAS.country).toEqual("FR");
   }, 10000);
 });

@@ -1,6 +1,5 @@
 import { useFormikContext } from "formik";
 import React from "react";
-import { formTransportIsPipeline } from "../../Apps/common/utils/packagingsBsddSummary";
 import { TransporterList } from "../../Apps/Forms/Components/TransporterList/TransporterList";
 import { useParams } from "react-router-dom";
 import { FormFormikValues } from "./utils/initial-state";
@@ -15,8 +14,12 @@ export default function Transporter() {
   const { siret } = useParams<{ siret: string }>();
   const emitterType = values.emitter?.type;
 
-  if (formTransportIsPipeline(values)) {
-    return <h4 className="form__section-heading">Transport par pipeline</h4>;
+  if (values.isDirectSupply) {
+    return (
+      <h4 className="form__section-heading">
+        Acheminement direct par pipeline ou convoyeur
+      </h4>
+    );
   } else if (
     emitterType === EmitterType.Appendix1 ||
     emitterType === EmitterType.Appendix1Producer

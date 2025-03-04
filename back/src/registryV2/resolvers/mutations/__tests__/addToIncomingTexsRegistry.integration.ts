@@ -205,4 +205,73 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     });
     expect(result.wasteCodeBale).toBe("A1070");
   });
+
+  it("should create a ChangeAggregate when creating several incoming texs items", async () => {
+    const { user, company } = await userWithCompanyFactory();
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () =>
+      getCorrectLine(company.siret!)
+    );
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry).toBe(true);
+
+    const changeAggregates = await prisma.registryChangeAggregate.findMany({
+      where: { createdById: user.id }
+    });
+
+    expect(changeAggregates.length).toBe(1);
+    expect(changeAggregates[0].numberOfInsertions).toBe(100);
+  });
+
+  it("should amend to previous ChangeAggregate when creating incoming texs items less than 1 min after previous creation", async () => {
+    const { user, company } = await userWithCompanyFactory();
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () =>
+      getCorrectLine(company.siret!)
+    );
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry).toBe(true);
+
+    const changeAggregates = await prisma.registryChangeAggregate.findMany({
+      where: { createdById: user.id }
+    });
+
+    expect(changeAggregates.length).toBe(1);
+    expect(changeAggregates[0].numberOfInsertions).toBe(100);
+  });
+
+  it("should create a ChangeAggregate when creating incoming texs items more than 1 min after previous creation", async () => {
+    const { user, company } = await userWithCompanyFactory();
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () =>
+      getCorrectLine(company.siret!)
+    );
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry).toBe(true);
+
+    const changeAggregates = await prisma.registryChangeAggregate.findMany({
+      where: { createdById: user.id }
+    });
+
+    expect(changeAggregates.length).toBe(1);
+    expect(changeAggregates[0].numberOfInsertions).toBe(100);
+  });
 });

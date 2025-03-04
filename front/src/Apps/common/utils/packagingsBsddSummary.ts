@@ -1,4 +1,4 @@
-import { FormInput, PackagingInfo, Packagings } from "@td/codegen-ui";
+import { PackagingInfo, Packagings } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
 
@@ -7,7 +7,6 @@ export const PACKAGINGS_NAMES = {
   [Packagings.Citerne]: "Citerne",
   [Packagings.Fut]: "Fût",
   [Packagings.Grv]: "GRV",
-  [Packagings.Pipeline]: "Conditionné pour Pipeline",
   [Packagings.Autre]: "Autre"
 };
 
@@ -61,22 +60,5 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     })
     .join(", ");
 
-  const isPipeline = formTransportIsPipeline({
-    wasteDetails: {
-      packagingInfos
-    }
-  });
-
-  if (isPipeline) {
-    return packages;
-  }
-
   return `${total} colis : ${packages}`;
 }
-
-export const formTransportIsPipeline = (
-  form: Pick<FormInput, "wasteDetails">
-): boolean =>
-  form.wasteDetails?.packagingInfos?.some(
-    pkg => pkg.type === Packagings.Pipeline
-  )!;

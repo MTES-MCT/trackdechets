@@ -276,6 +276,10 @@ model Company {
   wasteProcessorTypes                  WasteProcessorType[]
   wasteVehiclesTypes                   WasteVehiclesType[]
   address                              String?
+  street                               String?
+  postalCode                           String?
+  city                                 String?
+  country                              String?
   latitude                             Float?
   longitude                            Float?
   verificationCode                     String
@@ -317,6 +321,9 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  
+  registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
+  registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -549,6 +556,7 @@ model Form {
   hasCiterneBeenWashedOut               Boolean?
   citerneNotWashedOutReason             CiterneNotWashedOutReason?
   emptyReturnADR                        EmptyReturnADR?
+  isDirectSupply                        Boolean                    @default(false)
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -940,6 +948,7 @@ model User {
   registryTransported        RegistryTransported[]
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
+  registryChangeAggregates   RegistryChangeAggregate[]
 }
 
 enum GovernmentPermission {
