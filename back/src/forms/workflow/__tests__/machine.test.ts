@@ -20,7 +20,7 @@ describe("Workflow machine", () => {
     const nextState = machine.transition(Status.SEALED, {
       type: EventType.SignedByProducer,
       formUpdateInput: {
-        wasteDetailsPackagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+        isDirectSupply: true
       }
     });
     expect(nextState.value).toEqual(Status.SENT);

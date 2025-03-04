@@ -9,6 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { SIGN_EMISSION_FORM } from "./mutations";
+import { prisma } from "@td/prisma";
 
 describe("signEmissionForm", () => {
   afterEach(resetDatabase);
@@ -713,5 +714,51 @@ describe("signEmissionForm", () => {
     expect(
       data.signEmissionForm.wasteDetails?.nonRoadRegulationMention
     ).toEqual("mention B");
+  });
+
+  test("BSDD should be SENT after emitter signature when isDirectSupply is true", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SEALED",
+        isDirectSupply: true,
+        signedByTransporter: null,
+        wasteDetailsPackagingInfos: [],
+        sentAt: null,
+        sentBy: null,
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name
+      }
+    });
+    await prisma.form.update({
+      where: { id: form.id },
+      data: { transporters: { deleteMany: {} } }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          nonRoadRegulationMention: "mention B",
+          emittedAt: new Date().toISOString() as unknown as Date,
+          emittedBy: emitter.user.name,
+          quantity: 1
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const signedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+
+    expect(signedForm.status).toEqual("SENT");
   });
 });

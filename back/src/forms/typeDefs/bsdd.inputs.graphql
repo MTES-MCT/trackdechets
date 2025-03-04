@@ -251,6 +251,13 @@ input CreateFormInput {
   """
   transporters: [ID!]
 
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -320,6 +327,13 @@ input UpdateFormInput {
   """
   transporters: [ID!]
 
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -373,6 +387,13 @@ input FormInput {
 
   "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
 
   """
   Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.

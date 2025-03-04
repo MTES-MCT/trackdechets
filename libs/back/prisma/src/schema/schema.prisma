@@ -556,6 +556,7 @@ model Form {
   hasCiterneBeenWashedOut               Boolean?
   citerneNotWashedOutReason             CiterneNotWashedOutReason?
   emptyReturnADR                        EmptyReturnADR?
+  isDirectSupply                        Boolean                    @default(false)
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")

@@ -152,6 +152,7 @@ export type Bsdd = {
   isDraft: boolean;
   status: FormStatus;
   forwardedInId: string | null;
+  isDirectSupply: boolean;
   pop: boolean | null;
   emitterType: EmitterType | null;
   ecoOrganismeName: string | null;

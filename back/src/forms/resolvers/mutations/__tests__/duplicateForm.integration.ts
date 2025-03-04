@@ -162,7 +162,7 @@ async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
 describe("Mutation.duplicateForm", () => {
   afterEach(() => resetDatabase());
 
-  it("should duplicate a form %s", async () => {
+  it("should duplicate a form", async () => {
     const { form, emitter } = await createForm({
       ecoOrganismeName: "COREPILE",
       ecoOrganismeSiret: siretify(1)
@@ -229,6 +229,7 @@ describe("Mutation.duplicateForm", () => {
       ecoOrganismeName,
       ecoOrganismeSiret,
       wasteDetailsIsSubjectToADR,
+      isDirectSupply,
       ...rest
     } = form;
 
@@ -414,7 +415,8 @@ describe("Mutation.duplicateForm", () => {
       brokerValidityLimit,
       ecoOrganismeName,
       ecoOrganismeSiret,
-      wasteDetailsIsSubjectToADR
+      wasteDetailsIsSubjectToADR,
+      isDirectSupply
     });
 
     expect(duplicatedTransporter).toMatchObject({
@@ -645,7 +647,8 @@ describe("Mutation.duplicateForm", () => {
       "citerneNotWashedOutReason",
       "hasCiterneBeenWashedOut",
       "emptyReturnADR",
-      "wasteDetailsOnuCode"
+      "wasteDetailsOnuCode",
+      "isDirectSupply"
     ];
 
     // make sure this test breaks when a new field is added to the Form model

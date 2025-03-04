@@ -48,6 +48,7 @@ export function simpleFormToBsdd(
     isDeleted: Boolean(form.isDeleted),
     isDraft: form.status == Status.DRAFT,
     status: form.status,
+    isDirectSupply: form.isDirectSupply,
     forwardedInId: form.forwardedInId,
     wasteCode: form.wasteDetailsCode,
     wasteDescription: form.wasteDetailsName,

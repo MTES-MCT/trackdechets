@@ -1739,28 +1739,38 @@ describe("draftFormSchema", () => {
     expect(isValid).toEqual(true);
   });
 
-  it("packaging PIPELINE can be set without any other details", async () => {
+  it("isDirectSupply=true can be set without any other details", async () => {
     const isValid = await draftFormSchema.isValid({
-      wasteDetailsPackagingInfos: [
-        { type: "PIPELINE", numero: null, weight: null, volume: null }
-      ]
+      isDirectSupply: true,
+      wasteDetailsPackagingInfos: []
     });
 
     expect(isValid).toEqual(true);
   });
 
-  it("packaging PIPELINE cannot be set with any other packaging", async () => {
+  it("packaging PIPELINE should not be valid", async () => {
+    const validateFn = () =>
+      draftFormSchema.validate({
+        wasteDetailsPackagingInfos: [
+          { type: "PIPELINE", numero: null, weight: null, volume: null }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Le type de conditionnement PIPELINE n'est pas valide"
+    );
+  });
+
+  it("isDirectSupply=true cannot be set with any packaging", async () => {
     const isValid = await draftFormSchema.isValid({
-      wasteDetailsPackagingInfos: [
-        { type: "PIPELINE", other: null, quantity: null },
-        { type: "FUT", other: null, quantity: 1 }
-      ]
+      isDirectSupply: true,
+      wasteDetailsPackagingInfos: [{ type: "FUT", other: null, quantity: 1 }]
     });
 
     expect(isValid).toEqual(false);
   });
 
-  it("packaging PIPELINE cannot be set with a transporter", async () => {
+  it("isDirectSupply=true cannot be set with a transporter", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         wasteDetailsPackagingInfos: [
@@ -1770,7 +1780,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
     );
   });
 

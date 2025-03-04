@@ -88,6 +88,9 @@ enum TransportMode {
   SEA
   "Autre (utilisé avec Packaging = PIPELINE par exemple)"
   OTHER
+    @deprecated(
+      reason: "Utiliser `isDirectSupply=true` sans transporteur en cas d'acheminement direct par pipeline ou convoyeur"
+    )
   "Non renseigné. Cas particulier pour des données importés"
   UNKNOWN
 }
