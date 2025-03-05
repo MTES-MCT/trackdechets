@@ -43,8 +43,6 @@ export const toIncomingWaste = (
       incomingTexs.initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity: incomingTexs.initialEmitterCompanyCity,
     initialEmitterCompanyCountry: incomingTexs.initialEmitterCompanyCountryCode,
-    initialEmitterMunicipalitiesNames:
-      incomingTexs.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       incomingTexs.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,

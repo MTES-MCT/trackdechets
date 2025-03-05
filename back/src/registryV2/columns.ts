@@ -230,10 +230,6 @@ export const EXPORT_COLUMNS: {
       label: "Producteur(s) - Code(s) INSEE de(s) commune(s)",
       format: formatArray
     },
-    initialEmitterMunicipalitiesNames: {
-      label: "Producteur(s) - Commune(s)",
-      format: formatArray
-    },
     emitterCompanyIrregularSituation: {
       label: "Expéditeur - Situation irrégulière",
       format: formatBoolean
@@ -526,10 +522,6 @@ export const EXPORT_COLUMNS: {
 
     initialEmitterMunicipalitiesInseeCodes: {
       label: "Producteur(s) - Code(s) INSEE de(s) commune(s)",
-      format: formatArray
-    },
-    initialEmitterMunicipalitiesNames: {
-      label: "Producteur(s) - Commune(s)",
       format: formatArray
     },
 

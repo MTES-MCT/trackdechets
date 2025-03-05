@@ -5,6 +5,7 @@ import { transportModeSchema, getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@prisma/client";
 
 export function refineTransporterInfos<T>({
+  modeKey,
   typeKey,
   orgIdKey,
   nameKey,
@@ -15,6 +16,7 @@ export function refineTransporterInfos<T>({
   recepisseIsExemptedKey,
   recepisseNumberKey
 }: {
+  modeKey: string;
   typeKey: string;
   orgIdKey: string;
   nameKey: string;
@@ -26,6 +28,15 @@ export function refineTransporterInfos<T>({
   recepisseNumberKey: string;
 }): Refinement<T> {
   return (item, context) => {
+    if (item[modeKey] && !item[typeKey]) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le mode de transport ne peut être renseigné que si les informations du transporteur le sont également",
+        path: [typeKey]
+      });
+    }
+
     if (!item[typeKey]) {
       return;
     }
@@ -79,6 +90,21 @@ export function refineActorInfos<T>({
       | "COMMUNES" = item[typeKey];
 
     if (!type) {
+      if (
+        item[orgIdKey] ||
+        item[nameKey] ||
+        item[addressKey] ||
+        item[postalCodeKey] ||
+        item[cityKey] ||
+        item[countryKey]
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Le type d'entreprise est obligatoire si des champs concernant l'entreprise sont renseignés",
+          path: [typeKey]
+        });
+      }
       return;
     }
 
@@ -375,7 +401,6 @@ export const refineMunicipalities: Refinement<{
     | "COMMUNES"
     | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
-  initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
     item.initialEmitterCompanyType === "COMMUNES" &&
@@ -385,28 +410,6 @@ export const refineMunicipalities: Refinement<{
       code: z.ZodIssueCode.custom,
       message: `Le ou les codes INSEE des communes doivent être saisi`,
       path: ["initialEmitterMunicipalitiesInseeCodes"]
-    });
-  }
-
-  if (
-    item.initialEmitterCompanyType === "COMMUNES" &&
-    !item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le ou les libellés des communes doivent être saisi`,
-      path: ["initialEmitterMunicipalitiesNames"]
-    });
-  }
-
-  if (
-    item.initialEmitterMunicipalitiesInseeCodes?.length !==
-    item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
-      path: ["initialEmitterMunicipalitiesNames"]
     });
   }
 };
@@ -602,6 +605,34 @@ export const parcelRefinement: Refinement<{
       message:
         "Vous devez renseigner soit les numéros de parcelles de destination, soit les coordonnées de parcelles de destination",
       path: ["destinationParcelCoordinates"]
+    });
+  }
+};
+
+export const requiredParcelsRefinement: Refinement<{
+  parcelCoordinates: string[];
+  parcelNumbers: string[];
+  parcelInseeCodes: string[];
+}> = async (item, { addIssue }) => {
+  if (
+    !item.parcelCoordinates.length &&
+    !item.parcelNumbers.length &&
+    !item.parcelInseeCodes.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
+      path: ["parcelCoordinates"]
+    });
+  }
+
+  if (item.parcelNumbers.length !== item.parcelInseeCodes.length) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner autant de codes INSEE de parcelles que de numéros des parcelles",
+      path: ["parcelCoordinates"]
     });
   }
 };

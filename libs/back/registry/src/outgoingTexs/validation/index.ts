@@ -5,7 +5,8 @@ import {
   refineMunicipalities,
   refineNotificationNumber,
   refineOperationCodeWhenUpcycled,
-  refineTransportersConsistency
+  refineTransportersConsistency,
+  requiredParcelsRefinement
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -29,6 +30,7 @@ export function safeParseAsyncOutgoingTexs(line: unknown) {
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
     .superRefine(parcelRefinement)
+    .superRefine(requiredParcelsRefinement)
     .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)

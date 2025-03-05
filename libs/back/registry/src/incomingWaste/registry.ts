@@ -44,8 +44,6 @@ export const toIncomingWaste = (
     initialEmitterCompanyCity: incomingWaste.initialEmitterCompanyCity,
     initialEmitterCompanyCountry:
       incomingWaste.initialEmitterCompanyCountryCode,
-    initialEmitterMunicipalitiesNames:
-      incomingWaste.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       incomingWaste.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,

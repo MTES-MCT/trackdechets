@@ -200,7 +200,7 @@ input SsdLineInput {
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   Si une Date d'utilisation a été renseignée, on considère que l'utilisation est effectuée sur site et donc le SIRET du destinataire attendu est celui de l'émetteur. Ainsi, si les champs en lien avec le destinataire ne sont pas complétés, ils le seront automatiquement avec les informations du SIRET émetteur.
   """
-  destinationCompanyType: String!
+  destinationCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du destinataire
   Numéro d'identification du destinataire du produit issu de la sortie de statut de déchet
@@ -346,7 +346,7 @@ input IncomingWasteLineInput {
 
   Selon le type de producteur initial renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du producteur initial.
   """
-  initialEmitterCompanyType: String!
+  initialEmitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur initial, selon son type de profil
@@ -383,15 +383,10 @@ input IncomingWasteLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets entrants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
-  """
   Type d'expéditeur ou détenteur
   Type d'acteur correspondant à l'expéditeur du déchet
   """
-  emitterCompanyType: String!
+  emitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification de l'expéditeur ou détenteur
   """
@@ -534,7 +529,7 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1CompanyType: String
+  transporter1CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°1
   """
@@ -574,7 +569,7 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2CompanyType: String
+  transporter2CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°2
   """
@@ -614,7 +609,7 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyType: String
+  transporter3CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°3
   """
@@ -654,7 +649,7 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4CompanyType: String
+  transporter4CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°4
   """
@@ -694,7 +689,7 @@ input IncomingWasteLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5CompanyType: String
+  transporter5CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°5
   """
@@ -875,7 +870,7 @@ input IncomingTexsLineInput {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: String!
+  initialEmitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur, à renseigner selon son type de profil
@@ -908,14 +903,9 @@ input IncomingTexsLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des terres et sédiments ou des déchets entrants séparées par des virgules (avec ou sans majuscules).
-  """
-  initialEmitterMunicipalitiesNames: [String!]
-  """
   Type d'expéditeur ou détenteur
   """
-  emitterCompanyType: String!
+  emitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification de l'expéditeur ou détenteur
   """
@@ -1101,7 +1091,7 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1CompanyType: String
+  transporter1CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°1
   """
@@ -1141,7 +1131,7 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2CompanyType: String
+  transporter2CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°2
   """
@@ -1181,7 +1171,7 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyType: String
+  transporter3CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°3
   """
@@ -1221,7 +1211,7 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4CompanyType: String
+  transporter4CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°4
   """
@@ -1261,7 +1251,7 @@ input IncomingTexsLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5CompanyType: String
+  transporter5CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°5
   """
@@ -1419,7 +1409,7 @@ input OutgoingTexsLineInput {
 
   Selon le type de producteur initial renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du producteur initial.
   """
-  initialEmitterCompanyType: String!
+  initialEmitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur initial, selon son type de profil
@@ -1455,11 +1445,6 @@ input OutgoingTexsLineInput {
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets sortants
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets sortants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
   """
   Codes INSEE des parcelles
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés
@@ -1500,7 +1485,7 @@ input OutgoingTexsLineInput {
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  destinationCompanyType: String!
+  destinationCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du destinataire
   """
@@ -1653,7 +1638,7 @@ input OutgoingTexsLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1CompanyType: String
+  transporter1CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°1
   """
@@ -1693,7 +1678,7 @@ input OutgoingTexsLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2CompanyType: String
+  transporter2CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°2
   """
@@ -1733,7 +1718,7 @@ input OutgoingTexsLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyType: String
+  transporter3CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°3
   """
@@ -1773,7 +1758,7 @@ input OutgoingTexsLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4CompanyType: String
+  transporter4CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°4
   """
@@ -1813,7 +1798,7 @@ input OutgoingTexsLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5CompanyType: String
+  transporter5CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°5
   """
@@ -1966,7 +1951,7 @@ input OutgoingWasteLineInput {
 
   Selon le type de producteur initial renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du producteur initial.
   """
-  initialEmitterCompanyType: String!
+  initialEmitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur initial, selon son type de profil
@@ -2003,16 +1988,11 @@ input OutgoingWasteLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets sortants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
-  """
   Type de destinataire
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  destinationCompanyType: String!
+  destinationCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du destinataire
   """
@@ -2127,7 +2107,7 @@ input OutgoingWasteLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1CompanyType: String
+  transporter1CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°1
   """
@@ -2167,7 +2147,7 @@ input OutgoingWasteLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2CompanyType: String
+  transporter2CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°2
   """
@@ -2207,7 +2187,7 @@ input OutgoingWasteLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyType: String
+  transporter3CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°3
   """
@@ -2247,7 +2227,7 @@ input OutgoingWasteLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4CompanyType: String
+  transporter4CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°4
   """
@@ -2287,7 +2267,7 @@ input OutgoingWasteLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5CompanyType: String
+  transporter5CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°5
   """
@@ -2471,7 +2451,7 @@ input TransportedLineInput {
   Type d'expéditeur ou détenteur
   Type d'acteur correspondant à l'expéditeur du déchet
   """
-  emitterCompanyType: String!
+  emitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification de l'expéditeur ou détenteur
   """
@@ -2535,7 +2515,7 @@ input TransportedLineInput {
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  destinationCompanyType: String!
+  destinationCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du destinataire
   """
@@ -2741,7 +2721,7 @@ input ManagedLineInput {
 
   Selon le type de producteur initial renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du producteur initial.
   """
-  initialEmitterCompanyType: String!
+  initialEmitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du producteur initial
   Numéro d'identification du producteur initial, selon son type de profil
@@ -2777,11 +2757,6 @@ input ManagedLineInput {
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets entrants
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets entrants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
   """
   Codes INSEE des parcelles
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés
@@ -2821,7 +2796,7 @@ input ManagedLineInput {
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  tempStorerCompanyType: String
+  tempStorerCompanyType: RegisryCompanyType
   """
   Numéro d'identification de l'installation de Tri Transit Regroupement
   """
@@ -2851,7 +2826,7 @@ input ManagedLineInput {
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   """
-  destinationCompanyType: String!
+  destinationCompanyType: RegisryCompanyType!
   """
   Numéro d'identification du destinataire
   """
@@ -2965,7 +2940,7 @@ input ManagedLineInput {
   Type d'expéditeur ou détenteur
   Type d'acteur correspondant à l'expéditeur du déchet
   """
-  emitterCompanyType: String!
+  emitterCompanyType: RegisryCompanyType!
   """
   Numéro d'identification de l'expéditeur ou détenteur
   """
@@ -3038,7 +3013,7 @@ input ManagedLineInput {
   """
   Type de transporteur n°1
   """
-  transporter1CompanyType: String
+  transporter1CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°1
   """
@@ -3078,7 +3053,7 @@ input ManagedLineInput {
   """
   Type de transporteur n°2
   """
-  transporter2CompanyType: String
+  transporter2CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°2
   """
@@ -3118,7 +3093,7 @@ input ManagedLineInput {
   """
   Type de transporteur n°3
   """
-  transporter3CompanyType: String
+  transporter3CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°3
   """
@@ -3158,7 +3133,7 @@ input ManagedLineInput {
   """
   Type de transporteur n°4
   """
-  transporter4CompanyType: String
+  transporter4CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°4
   """
@@ -3198,7 +3173,7 @@ input ManagedLineInput {
   """
   Type de transporteur n°5
   """
-  transporter5CompanyType: String
+  transporter5CompanyType: RegisryCompanyType
   """
   Numéro d'identification du transporteur n°5
   """

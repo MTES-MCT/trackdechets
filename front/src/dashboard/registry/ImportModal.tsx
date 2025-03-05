@@ -233,6 +233,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
 
       const form = new FormData();
       Object.keys(fields).forEach(key => form.append(key, fields[key]));
+      form.append("Content-Type", file.type);
       form.append("file", file);
 
       const uploadResponse = await fetch(signedUrl, {

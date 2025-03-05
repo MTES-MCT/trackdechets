@@ -135,7 +135,6 @@ model RegistryIncomingWaste {
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
-    initialEmitterMunicipalitiesNames      String[]
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -263,7 +262,6 @@ model RegistryIncomingTexs {
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
-    initialEmitterMunicipalitiesNames      String[]
     emitterCompanyType                     String
     emitterCompanyOrgId                    String?
     emitterCompanyName                     String?
@@ -395,7 +393,6 @@ model RegistryOutgoingTexs {
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
-    initialEmitterMunicipalitiesNames      String[]
     parcelInseeCodes                       String[]
     parcelNumbers                          String[]
     parcelCoordinates                      String[]
@@ -526,7 +523,6 @@ model RegistryOutgoingWaste {
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
-    initialEmitterMunicipalitiesNames      String[]
     destinationCompanyType                 String
     destinationCompanyOrgId                String?
     destinationCompanyName                 String?
@@ -720,7 +716,6 @@ model RegistryManaged {
     initialEmitterCompanyCity              String?
     initialEmitterCompanyCountryCode       String?
     initialEmitterMunicipalitiesInseeCodes String[]
-    initialEmitterMunicipalitiesNames      String[]
     parcelInseeCodes                       String[]
     parcelNumbers                          String[]
     parcelCoordinates                      String[]

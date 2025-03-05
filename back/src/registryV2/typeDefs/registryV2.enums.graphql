@@ -109,3 +109,18 @@ enum RegistryLineReason {
   "Spécifie que la ligne doit être supprimée du registre"
   CANCEL
 }
+
+enum RegisryCompanyType {
+  "Etablissement français"
+  ETABLISSEMENT_FR
+  "Entreprise de l'Union Européenne"
+  ENTREPRISE_UE
+  "Entreprise hors Union Européenne"
+  ENTREPRISE_HORS_UE
+  "Association"
+  ASSOCIATION
+  "Personne physique"
+  PERSONNE_PHYSIQUE
+  "Communes"
+  COMMUNES
+}
