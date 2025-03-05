@@ -1,8 +1,9 @@
-import React from "react";
-import SideBar from "../../Apps/common/Components/SideBar/SideBar";
-import { NavLink } from "react-router-dom";
-import routes from "../../Apps/routes";
 import { Accordion } from "@codegouvfr/react-dsfr/Accordion";
+import Button from "@codegouvfr/react-dsfr/Button";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import SideBar from "../../Apps/common/Components/SideBar/SideBar";
+import routes from "../../Apps/routes";
 
 export const RegistryMenuContent = () => (
   <div>
@@ -50,6 +51,20 @@ export const RegistryMenuContent = () => (
         </li>
       </ul>
     </Accordion>
+    <div className="fr-mt-4w tw-flex tw-justify-center">
+      <Button
+        iconId="fr-icon-draft-line"
+        iconPosition="right"
+        linkProps={{
+          href: "https://tally.so/r/mKWxXA",
+          target: "_blank",
+          rel: "noopener"
+        }}
+        priority="secondary"
+      >
+        Donnez votre avis
+      </Button>
+    </div>
   </div>
 );
 

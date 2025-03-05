@@ -30,6 +30,7 @@ export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
 
 export const transporter1Refinement =
   refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter1TransportMode",
     typeKey: "transporter1CompanyType",
     orgIdKey: "transporter1CompanyOrgId",
     nameKey: "transporter1CompanyName",
@@ -43,6 +44,7 @@ export const transporter1Refinement =
 
 export const transporter2Refinement =
   refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter2TransportMode",
     typeKey: "transporter2CompanyType",
     orgIdKey: "transporter2CompanyOrgId",
     nameKey: "transporter2CompanyName",
@@ -56,6 +58,7 @@ export const transporter2Refinement =
 
 export const transporter3Refinement =
   refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter3TransportMode",
     typeKey: "transporter3CompanyType",
     orgIdKey: "transporter3CompanyOrgId",
     nameKey: "transporter3CompanyName",
@@ -69,6 +72,7 @@ export const transporter3Refinement =
 
 export const transporter4Refinement =
   refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter4TransportMode",
     typeKey: "transporter4CompanyType",
     orgIdKey: "transporter4CompanyOrgId",
     nameKey: "transporter4CompanyName",
@@ -82,6 +86,7 @@ export const transporter4Refinement =
 
 export const transporter5Refinement =
   refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter5TransportMode",
     typeKey: "transporter5CompanyType",
     orgIdKey: "transporter5CompanyOrgId",
     nameKey: "transporter5CompanyName",
@@ -113,23 +118,6 @@ export const refineReportForProfile: Refinement<
       code: z.ZodIssueCode.custom,
       message: `L'établissement doit avoir le profil TTR et/ou Installation de traitement et/ou Installation de valorisation de terres et sédiments pour émettre une déclaration`,
       path: ["reportForCompanySiret"]
-    });
-  }
-};
-
-export const requiredParcelsRefinement: Refinement<
-  ParsedZodIncomingTexsItem
-> = async (incomingTexsItem, { addIssue }) => {
-  if (
-    !incomingTexsItem.parcelCoordinates.length &&
-    !incomingTexsItem.parcelNumbers.length &&
-    !incomingTexsItem.parcelInseeCodes.length
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
-      path: ["parcelCoordinates"]
     });
   }
 };

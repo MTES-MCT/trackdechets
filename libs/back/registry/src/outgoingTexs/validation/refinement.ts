@@ -6,6 +6,7 @@ import { ParsedZodOutgoingTexsItem } from "./schema";
 
 export const transporter1Refinement =
   refineTransporterInfos<ParsedZodOutgoingTexsItem>({
+    modeKey: "transporter1TransportMode",
     typeKey: "transporter1CompanyType",
     orgIdKey: "transporter1CompanyOrgId",
     nameKey: "transporter1CompanyName",
@@ -19,6 +20,7 @@ export const transporter1Refinement =
 
 export const transporter2Refinement =
   refineTransporterInfos<ParsedZodOutgoingTexsItem>({
+    modeKey: "transporter2TransportMode",
     typeKey: "transporter2CompanyType",
     orgIdKey: "transporter2CompanyOrgId",
     nameKey: "transporter2CompanyName",
@@ -32,6 +34,7 @@ export const transporter2Refinement =
 
 export const transporter3Refinement =
   refineTransporterInfos<ParsedZodOutgoingTexsItem>({
+    modeKey: "transporter3TransportMode",
     typeKey: "transporter3CompanyType",
     orgIdKey: "transporter3CompanyOrgId",
     nameKey: "transporter3CompanyName",
@@ -45,6 +48,7 @@ export const transporter3Refinement =
 
 export const transporter4Refinement =
   refineTransporterInfos<ParsedZodOutgoingTexsItem>({
+    modeKey: "transporter4TransportMode",
     typeKey: "transporter4CompanyType",
     orgIdKey: "transporter4CompanyOrgId",
     nameKey: "transporter4CompanyName",
@@ -58,6 +62,7 @@ export const transporter4Refinement =
 
 export const transporter5Refinement =
   refineTransporterInfos<ParsedZodOutgoingTexsItem>({
+    modeKey: "transporter5TransportMode",
     typeKey: "transporter5CompanyType",
     orgIdKey: "transporter5CompanyOrgId",
     nameKey: "transporter5CompanyName",
