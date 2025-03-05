@@ -178,6 +178,7 @@ export const staticFieldsFragment = gql`
       onuCode
       nonRoadRegulationMention
       quantity
+      quantityType
       transporterNumberPlate
       transporterCustomInfo
       transporter {
