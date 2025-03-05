@@ -80,7 +80,6 @@ type IncomingWasteV2 {
   "Le pays (isoCode) du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyCountry: String
 
-  initialEmitterMunicipalitiesNames: [String!]
   initialEmitterMunicipalitiesInseeCodes: [String!]
 
   "Indique si l'émetteur est en situation irrégulière"
@@ -441,7 +440,6 @@ type OutgoingWasteV2 {
   initialEmitterCompanyCountry: String
 
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  initialEmitterMunicipalitiesNames: [String!]
 
   "Indique si l'émetteur est en situation irrégulière"
   emitterCompanyIrregularSituation: Boolean

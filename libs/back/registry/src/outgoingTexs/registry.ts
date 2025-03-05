@@ -45,8 +45,6 @@ export const toOutgoingWaste = (
     initialEmitterCompanyCity: outgoingTexs.initialEmitterCompanyCity,
     initialEmitterCompanyCountry: outgoingTexs.initialEmitterCompanyCountryCode,
 
-    initialEmitterMunicipalitiesNames:
-      outgoingTexs.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       outgoingTexs.initialEmitterMunicipalitiesInseeCodes,
 

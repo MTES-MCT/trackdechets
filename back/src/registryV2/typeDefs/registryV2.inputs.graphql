@@ -383,11 +383,6 @@ input IncomingWasteLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets entrants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
-  """
   Type d'expéditeur ou détenteur
   Type d'acteur correspondant à l'expéditeur du déchet
   """
@@ -907,11 +902,6 @@ input IncomingTexsLineInput {
   Le ou les codes INSEE de la ou des commune(s) de collecte des terres et sédiments ou des déchets entrants doivent être séparés par des virgules.
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des terres et sédiments ou des déchets entrants séparées par des virgules (avec ou sans majuscules).
-  """
-  initialEmitterMunicipalitiesNames: [String!]
   """
   Type d'expéditeur ou détenteur
   """
@@ -1456,11 +1446,6 @@ input OutgoingTexsLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets sortants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
-  """
   Codes INSEE des parcelles
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés
 
@@ -2002,11 +1987,6 @@ input OutgoingWasteLineInput {
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets sortants
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets sortants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
   """
   Type de destinataire
 
@@ -2777,11 +2757,6 @@ input ManagedLineInput {
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets entrants
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
-  """
-  Commune(s)
-  Libellé de la ou des commune(s) de collecte des déchets entrants
-  """
-  initialEmitterMunicipalitiesNames: [String!]
   """
   Codes INSEE des parcelles
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés

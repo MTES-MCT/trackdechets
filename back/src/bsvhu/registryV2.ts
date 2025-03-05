@@ -213,7 +213,6 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyPostalCode: null,
     initialEmitterCompanyCity: null,
     initialEmitterCompanyCountry: null,
-    initialEmitterMunicipalitiesNames: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
     emitterCompanySiret: bsvhu.emitterCompanySiret,

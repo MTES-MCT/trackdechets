@@ -42,7 +42,6 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCity: "Commune du producteur",
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
-    initialEmitterMunicipalitiesNames: null,
     parcelInseeCodes: undefined,
     parcelNumbers: undefined,
     parcelCoordinates: ["47.829864 1.937389", "48.894258 2.240027"],

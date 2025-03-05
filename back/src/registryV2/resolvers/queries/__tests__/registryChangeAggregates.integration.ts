@@ -50,7 +50,6 @@ function getIncomingTexsLine(siret: string) {
     initialEmitterCompanyCity: "Commune du producteur",
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
-    initialEmitterMunicipalitiesNames: null,
     emitterCompanyType: "ETABLISSEMENT_FR",
     emitterCompanyOrgId: "78467169500103",
     emitterCompanyName: "Raison sociale de l'expéditeur",
