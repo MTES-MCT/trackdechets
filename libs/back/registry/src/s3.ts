@@ -112,6 +112,7 @@ export async function getSignedUrlForUpload({
     Expires: SIGNED_URL_EXPIRES_IN,
     Conditions: [
       ["content-length-range", 0, MAX_FILE_SIZE],
+      ["starts-with", "$Content-Type", ""],
       ...metadataFields,
       taggingField
     ],
