@@ -440,13 +440,11 @@ export const transportModeSchema = z
       "AÉRIEN",
       "FLUVIAL",
       "MARITIME",
-      "PIPELINE",
       "FERRÉ",
       "ROAD",
       "AIR",
       "RIVER",
       "SEA",
-      "OTHER",
       "RAIL"
     ],
     {
@@ -465,8 +463,6 @@ export const transportModeSchema = z
         return "RIVER";
       case "MARITIME":
         return "SEA";
-      case "PIPELINE":
-        return "OTHER";
       case "FERRÉ":
         return "RAIL";
       default:
