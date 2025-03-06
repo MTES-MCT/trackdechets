@@ -1069,19 +1069,6 @@ export const validatePlates = (transporterNumberPlate: string) => {
   return true;
 };
 
-// Schema dedicated to validate plates on signTransportForm SIGNED_BY_TEMP_STORER
-export const plateSchemaFn = () =>
-  yup.object({
-    transporterNumberPlate: yup
-      .string()
-      .nullable()
-      .test(transporterNumberPlate => {
-        return transporterNumberPlate
-          ? validatePlates(transporterNumberPlate)
-          : true;
-      })
-  });
-
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter

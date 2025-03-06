@@ -122,6 +122,14 @@ function SignEmissionFormModalContent({
     );
   }
   const form = data?.form;
+
+  const initialTransporterNumberPlate =
+    !!form.temporaryStorageDetail && !!form.emittedAt
+      ? // Il s'agit de la signature de l'émetteur après
+        // entreposage provisoire
+        form?.temporaryStorageDetail.transporter?.numberPlate
+      : form.transporter?.numberPlate;
+
   const initialValues = {
     emittedAt: TODAY.toISOString(),
     emittedBy: "",
@@ -131,7 +139,7 @@ function SignEmissionFormModalContent({
     packagingInfos: form.wasteDetails?.packagingInfos ?? [],
     quantity: form.wasteDetails?.quantity ?? 0,
     onuCode: form.wasteDetails?.onuCode ?? "",
-    transporterNumberPlate: form.transporter?.numberPlate ?? ""
+    transporterNumberPlate: initialTransporterNumberPlate ?? ""
   };
 
   const handlesubmit = async values => {
