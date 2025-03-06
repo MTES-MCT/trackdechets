@@ -71,9 +71,16 @@ function PackagingForm({
     packagingsLength > 1
       ? // Un conditionnement en citerne ou benne exclut le mélange avec
         // tout autre type de conditionnement
-        packagingTypeOptions.filter(
-          o => o.value !== Packagings.Citerne && o.value !== Packagings.Benne
-        )
+        packagingTypeOptions.filter(o => {
+          return (
+            // tra-16064 - cas particulier si les conditionnements ont été calculés
+            // automatiquement à partir de la liste des annexes 2, on peut se retrouver
+            // avec des conditionnements incohérents et on veut quand même pouvoir afficher
+            // Citerne ou Benne dans la liste des options disponibles.
+            o.value === packaging.type ||
+            (o.value !== Packagings.Citerne && o.value !== Packagings.Benne)
+          );
+        })
       : packagingTypeOptions;
 
   return (
