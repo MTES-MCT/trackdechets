@@ -197,7 +197,10 @@ export const validationBsddSchema = z.object({
             type: z.string().min(1, "Ce champ est requis"),
             volume: z
               .union([z.string(), z.number()])
-              .transform(val => (val === "" ? null : Number(val)))
+              .nullable()
+              .transform(val =>
+                val === "" || val === null ? null : Number(val)
+              )
               .refine(
                 v => v === null || v > 0,
                 "Le volume doit être supérieur à 0"
