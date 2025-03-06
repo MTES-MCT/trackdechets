@@ -376,9 +376,10 @@ type TemporaryStorer {
   quantityAccepted: Float
   wasteAcceptationStatus: WasteAcceptationStatus
   wasteRefusalReason: String
-
   receivedAt: DateTime
   receivedBy: String
+  "Date à laquelle le déchet a été accepté ou refusé (case 13)"
+  signedAt: DateTime
 }
 
 "Destination finale après entreposage provisoire ou reconditionement"
