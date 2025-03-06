@@ -343,11 +343,19 @@ const signatures: Partial<
     const transporterNumberPlate =
       args.input.transporterNumberPlate ?? transporter?.transporterNumberPlate;
 
+    const transporterTransportMode =
+      args.input.transporterTransportMode ??
+      transporter?.transporterTransportMode;
+
     const transporterSchema = transporterSchemaFn({ signingTransporterOrgId });
+
+    const receiptFields = await getFormReceiptField(transporter);
 
     await transporterSchema.validate({
       ...transporter,
-      transporterNumberPlate
+      transporterNumberPlate,
+      transporterTransportMode,
+      ...receiptFields
     });
 
     const formUpdateInput: Prisma.FormUpdateInput = {
@@ -359,7 +367,9 @@ const signatures: Partial<
           transporters: {
             updateMany: {
               data: {
-                transporterNumberPlate
+                transporterNumberPlate,
+                transporterTransportMode,
+                ...receiptFields
               },
               where: { number: 1 }
             }

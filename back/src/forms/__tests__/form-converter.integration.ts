@@ -203,7 +203,8 @@ describe("expandFormFromDb", () => {
         wasteAcceptationStatus: null,
         wasteRefusalReason: null,
         receivedAt: null,
-        receivedBy: null
+        receivedBy: null,
+        signedAt: null
       },
       destination: {
         cap: "CAP",

@@ -444,6 +444,7 @@ describe("signTransportForm", () => {
   it("should sign transport from temporary storage", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
 
@@ -499,6 +500,7 @@ describe("signTransportForm", () => {
   it("should sign transport from temporary storage when plates are valid", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
 
@@ -555,6 +557,7 @@ describe("signTransportForm", () => {
   it("should throw an error when signing transport from temporary storage and plates are invalid", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
 
@@ -604,6 +607,7 @@ describe("signTransportForm", () => {
   it("should sign transport from temporary storage with security code", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
 
