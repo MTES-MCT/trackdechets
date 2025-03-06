@@ -128,7 +128,8 @@ const routes = {
       foreign: "/companies/foreign"
     },
     join: "/companies/join",
-    orientation: "/companies/create"
+    orientation: "/companies/create",
+    manage: "companies/manage"
   },
   registry: "/registre",
   registry_new: {
@@ -245,6 +246,7 @@ export const titles = {
     "Ajouter un transporteur étranger, Non-French carrier — Trackdéchets",
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
+  "/companies/manage": "Gestion avancée — Trackdéchets",
   "/registre": "Mes registres — Trackdéchets",
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":

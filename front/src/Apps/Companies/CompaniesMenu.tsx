@@ -24,6 +24,18 @@ export const CompaniesMenuContent = () => (
           Établissements
         </NavLink>
       </li>
+      <li className="tw-mb-1">
+        <NavLink
+          to={routes.companies.manage}
+          className={({ isActive }) =>
+            isActive
+              ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+              : "sidebarv2__item sidebarv2__item--indented"
+          }
+        >
+          Gestion avancée
+        </NavLink>
+      </li>
     </ul>
   </Accordion>
 );
