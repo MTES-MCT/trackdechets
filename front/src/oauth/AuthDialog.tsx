@@ -85,7 +85,13 @@ function AuthDialog({
                       <br />
                       de la transition
                       <br />
-                      écologique
+                      écologique,
+                      <br />
+                      de la biodiversité,
+                      <br />
+                      de la forêt, de la mer
+                      <br />
+                      et de la pêche
                     </p>
                   </div>
                   <div className="fr-header__operator">
