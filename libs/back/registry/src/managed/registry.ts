@@ -224,21 +224,21 @@ type MinimalRegistryForLookup = Prisma.RegistryManagedGetPayload<{
 }>;
 
 const registryToLookupCreateInput = (
-  registryOutgoingWaste: MinimalRegistryForLookup
+  registryManaged: MinimalRegistryForLookup
 ): Prisma.RegistryLookupUncheckedCreateInput => {
   return {
-    id: registryOutgoingWaste.id,
-    readableId: registryOutgoingWaste.publicId,
-    siret: registryOutgoingWaste.reportForCompanySiret,
-    reportAsSiret: registryOutgoingWaste.reportAsCompanySiret,
+    id: registryManaged.id,
+    readableId: registryManaged.publicId,
+    siret: registryManaged.reportForCompanySiret,
+    reportAsSiret: registryManaged.reportAsCompanySiret,
     exportRegistryType: RegistryExportType.MANAGED,
     declarationType: RegistryExportDeclarationType.REGISTRY,
-    wasteType: registryOutgoingWaste.wasteIsDangerous
+    wasteType: registryManaged.wasteIsDangerous
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
-    wasteCode: registryOutgoingWaste.wasteCode,
-    ...generateDateInfos(registryOutgoingWaste.managingStartDate),
-    registryOutgoingWasteId: registryOutgoingWaste.id
+    wasteCode: registryManaged.wasteCode,
+    ...generateDateInfos(registryManaged.managingStartDate),
+    registryManagedId: registryManaged.id
   };
 };
 
