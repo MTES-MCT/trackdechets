@@ -26,3 +26,5 @@ export { lookupUtils as outgoingWasteLookupUtils } from "./outgoingWaste/registr
 export { lookupUtils as outgoingTexsLookupUtils } from "./outgoingTexs/registry";
 
 export { lookupUtils as transportedLookupUtils } from "./transported/registry";
+
+export { lookupUtils as managedLookupUtils } from "./managed/registry";

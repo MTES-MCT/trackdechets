@@ -815,6 +815,8 @@ model RegistryManaged {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
+    registryLookups RegistryLookup[]
+
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
 }
@@ -920,6 +922,9 @@ model RegistryLookup {
 
     registryTransportedId String?
     registryTransported   RegistryTransported? @relation(fields: [registryTransportedId], references: [id], onDelete: Cascade)
+
+    registryManagedId String?
+    registryManaged   RegistryManaged? @relation(fields: [registryManagedId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?

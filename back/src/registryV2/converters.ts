@@ -11,10 +11,12 @@ import {
   RegistryOutgoingTexs,
   RegistryOutgoingWaste,
   RegistryTransported,
-  RegistrySsd
+  RegistrySsd,
+  RegistryManaged
 } from "@prisma/client";
 import type {
   IncomingWasteV2,
+  ManagedWasteV2,
   OutgoingWasteV2,
   RegistryV2ExportType,
   SsdWasteV2,
@@ -24,12 +26,14 @@ import { GenericWasteV2 } from "./types";
 import {
   toIncomingWasteV2 as bsddToIncomingWasteV2,
   toOutgoingWasteV2 as bsddToOutgoingWasteV2,
-  toTransportedWasteV2 as bsddToTransportedWasteV2
+  toTransportedWasteV2 as bsddToTransportedWasteV2,
+  toManagedWasteV2 as bsddToManagedWasteV2
 } from "../forms/registryV2";
 import {
   toIncomingWasteV2 as bsdaToIncomingWasteV2,
   toOutgoingWasteV2 as bsdaToOutgoingWasteV2,
-  toTransportedWasteV2 as bsdaToTransportedWasteV2
+  toTransportedWasteV2 as bsdaToTransportedWasteV2,
+  toManagedWasteV2 as bsdaToManagedWasteV2
 } from "../bsda/registryV2";
 import {
   toIncomingWasteV2 as bsdasriToIncomingWasteV2,
@@ -49,7 +53,8 @@ import {
 import {
   toIncomingWasteV2 as bsvhuToIncomingWasteV2,
   toOutgoingWasteV2 as bsvhuToOutgoingWasteV2,
-  toTransportedWasteV2 as bsvhuToTransportedWasteV2
+  toTransportedWasteV2 as bsvhuToTransportedWasteV2,
+  toManagedWasteV2 as bsvhuToManagedWasteV2
 } from "../bsvhu/registryV2";
 // add other types when other exports are added
 type InputMap = {
@@ -59,6 +64,7 @@ type InputMap = {
   OUTGOING_WASTE: RegistryOutgoingWaste | null;
   OUTGOING_TEXS: RegistryOutgoingTexs | null;
   TRANSPORTED: RegistryTransported | null;
+  MANAGED: RegistryManaged | null;
   BSDD: Form | null;
   BSDA: Bsda | null;
   BSDASRI: Bsdasri | null;
@@ -118,6 +124,15 @@ const inputToTransportedWaste: ConverterMap<
   BSPAOH: bspaohToTransportedWasteV2,
   BSVHU: bsvhuToTransportedWasteV2
 };
+const inputToManagedWaste: ConverterMap<keyof InputMap, ManagedWasteV2> = {
+  MANAGED: exportOptions.MANAGED?.toManagedWaste,
+  BSDD: bsddToManagedWasteV2,
+  BSDA: bsdaToManagedWasteV2,
+  BSDASRI: () => null,
+  BSFF: () => null,
+  BSPAOH: () => null,
+  BSVHU: bsvhuToManagedWasteV2
+};
 
 const registryToWaste: Partial<
   Record<
@@ -128,7 +143,8 @@ const registryToWaste: Partial<
   SSD: inputToSsdWaste,
   INCOMING: inputToIncomingWaste,
   OUTGOING: inputToOutgoingWaste,
-  TRANSPORTED: inputToTransportedWaste
+  TRANSPORTED: inputToTransportedWaste,
+  MANAGED: inputToManagedWaste
 };
 
 export function toWaste<WasteType extends GenericWasteV2>(
@@ -145,6 +161,7 @@ export function toWaste<WasteType extends GenericWasteV2>(
     OUTGOING_WASTE,
     OUTGOING_TEXS,
     TRANSPORTED,
+    MANAGED,
     BSDD,
     BSDA,
     BSDASRI,
@@ -164,6 +181,8 @@ export function toWaste<WasteType extends GenericWasteV2>(
     return converter.OUTGOING_TEXS?.(OUTGOING_TEXS, targetSiret);
   } else if (TRANSPORTED) {
     return converter.TRANSPORTED?.(TRANSPORTED, targetSiret);
+  } else if (MANAGED) {
+    return converter.MANAGED?.(MANAGED, targetSiret);
   } else if (BSDD) {
     return converter.BSDD?.(BSDD, targetSiret);
   } else if (BSDA) {

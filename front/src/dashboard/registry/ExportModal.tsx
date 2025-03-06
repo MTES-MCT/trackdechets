@@ -479,10 +479,11 @@ export function ExportModal({ isOpen, onClose }: Props) {
       registryType !== RegistryV2ExportType.Ssd &&
       registryType !== RegistryV2ExportType.Incoming &&
       registryType !== RegistryV2ExportType.Outgoing &&
-      registryType !== RegistryV2ExportType.Transported
+      registryType !== RegistryV2ExportType.Transported &&
+      registryType !== RegistryV2ExportType.Managed
     ) {
       setError(
-        "Seuls les exports SSD, entrants, sortants et transportés sont supportés pour le moment"
+        "Seuls les exports SSD, entrants, sortants, transportés et gérés sont supportés pour le moment"
       );
       return;
     }

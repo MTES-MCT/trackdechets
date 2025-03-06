@@ -1,5 +1,6 @@
 import type {
   IncomingWasteV2,
+  ManagedWasteV2,
   OutgoingWasteV2,
   SsdWasteV2,
   TransportedWasteV2
@@ -58,7 +59,7 @@ import { toIncomingWaste as IncomingTexsToIncomingWaste } from "./incomingTexs/r
 import { toOutgoingWaste as OutgoingWasteToOutgoingWaste } from "./outgoingWaste/registry";
 import { toOutgoingWaste as OutgoingTexsToOutgoingWaste } from "./outgoingTexs/registry";
 import { toTransportedWaste as TransportedToTransportedWaste } from "./transported/registry";
-
+import { toManagedWaste as ManagedToManagedWaste } from "./managed/registry";
 export type ParsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
   publicId: string;
@@ -149,6 +150,7 @@ export type InputExportOptions = {
   toIncomingWaste?: (registry: unknown) => IncomingWasteV2;
   toOutgoingWaste?: (registry: unknown) => OutgoingWasteV2;
   toTransportedWaste?: (registry: unknown) => TransportedWasteV2;
+  toManagedWaste?: (registry: unknown) => ManagedWasteV2;
 };
 
 export const INPUT_EXPORT_TYPES = [
@@ -158,6 +160,7 @@ export const INPUT_EXPORT_TYPES = [
   "OUTGOING_WASTE",
   "OUTGOING_TEXS",
   "TRANSPORTED",
+  "MANAGED",
   "BSDD",
   "BSDA",
   "BSDASRI",
@@ -191,5 +194,8 @@ export const exportOptions: Partial<
   },
   TRANSPORTED: {
     toTransportedWaste: TransportedToTransportedWaste
+  },
+  MANAGED: {
+    toManagedWaste: ManagedToManagedWaste
   }
 };

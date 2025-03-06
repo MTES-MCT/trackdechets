@@ -4,7 +4,8 @@ import {
   incomingTexsLookupUtils,
   outgoingWasteLookupUtils,
   outgoingTexsLookupUtils,
-  transportedLookupUtils
+  transportedLookupUtils,
+  managedLookupUtils
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { lookupUtils as bsddLookupUtils } from "../../forms/registryV2";
@@ -33,6 +34,7 @@ const bsdOrRegistryTypes: (BsdType | RegistryImportType)[] = [
   "OUTGOING_TEXS",
   "OUTGOING_WASTE",
   "TRANSPORTED",
+  "MANAGED",
   "SSD"
 ];
 
@@ -145,6 +147,7 @@ const runIntegrityTest = async () => {
   await Promise.all([elasticRun("INCOMING"), lookupRun("INCOMING")]);
   await Promise.all([elasticRun("OUTGOING"), lookupRun("OUTGOING")]);
   await Promise.all([elasticRun("TRANSPORTED"), lookupRun("TRANSPORTED")]);
+  await Promise.all([elasticRun("MANAGED"), lookupRun("MANAGED")]);
   if (Object.keys(mem).length === 0) {
     console.log("LOOKUP & ELASTIC are in sync, no misses :)");
   } else {
@@ -211,6 +214,13 @@ const runIntegrityTest = async () => {
     ) {
       console.info("Rebuilding transported registry lookup");
       await transportedLookupUtils.rebuildLookup();
+    }
+    if (
+      bsdOrRegistryTypesToIndex.length === 0 ||
+      bsdOrRegistryTypesToIndex.includes("MANAGED")
+    ) {
+      console.info("Rebuilding managed registry lookup");
+      await managedLookupUtils.rebuildLookup();
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
