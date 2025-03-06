@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Breaking Change
 
 - BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
+- La quantité refusée est désormais obligatoire à l'étape d'acceptation du déchet sur le BSDD [PR 3823](https://github.com/MTES-MCT/trackdechets/pull/3823)
 
 #### :nail_care: Améliorations
 
@@ -23,11 +24,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Rendre optionnel les agréments à la publication d'un VHU [PR 3953](https://github.com/MTES-MCT/trackdechets/pull/3984)
 - BSFF : Suppression temporaire de la limite de 60 jours au delà de laquelle il n'était pas possible de corriger les infos d'acceptation et de traitement des contenants BSFF [PR 4001](https://github.com/MTES-MCT/trackdechets/pull/4001)
 - Rendre optionnel le type de conditionnement du Bsvhu en brouillon [PR 3996](https://github.com/MTES-MCT/trackdechets/pull/3996)
+- Il est désormais possible de réviser la quantité refusée sur le BSDD [PR 3961](https://github.com/MTES-MCT/trackdechets/pull/3961)
+- BSDA : Si une révision est proposée par l'entreprise de travaux ou la destination sur les champs wasteSealNumbers & packagings uniquement, alors l'approbation de l'émetteur n'est plus nécessaire (mais il est prévenu par mail) [PR 3991](https://favro.com/widget/ab14a4f0460a99a9d64d4945/ca60ff23d07a2274c78317e5?card=tra-15364)
 
 #### :bug: Corrections de bugs
 
 - BSDD : Affiche sur le PDF les informations du courtier ET du négociant lorsque ces deux acteurs sont renseignés [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
 - BSVHU : Le courtier apparaît deux fois sur le récépissé PDF lorsqu'aucun négociant n'est sélectionné [PR 3979](https://github.com/MTES-MCT/trackdechets/pull/3979).
+- Les codes d'opération D6 et D7 ne sont plus disponibles pour le BSDD [PR 3966](https://github.com/MTES-MCT/trackdechets/pull/3966)
 
 # [2025.02.1] 11/02/2025
 
