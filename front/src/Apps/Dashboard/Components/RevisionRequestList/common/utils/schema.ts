@@ -141,7 +141,8 @@ export const initialBsddReview: BsddRevisionRequestValidationSchema = {
   processingOperationDescription: "",
   temporaryStorageDetail: {
     temporaryStorer: {
-      quantityReceived: null
+      quantityReceived: null,
+      quantityRefused: null
     },
     destination: {
       cap: "",
@@ -232,14 +233,15 @@ export const validationBsddSchema = z.object({
   recipient: z.object({
     cap: z.string().nullish()
   }),
-  quantityReceived: z.number().nullish(),
-  quantityRefused: z.number().nullish(),
+  quantityReceived: z.number().min(0).nullish(),
+  quantityRefused: z.number().min(0).nullish(),
   processingOperationDone: z.string().nullish(),
   destinationOperationMode: z.string().nullish(),
   processingOperationDescription: z.string().nullish(),
   temporaryStorageDetail: z.object({
     temporaryStorer: z.object({
-      quantityReceived: z.number().nullish()
+      quantityReceived: z.number().min(0).nullish(),
+      quantityRefused: z.number().min(0).nullish()
     }),
     destination: z.object({
       cap: z.string().nullish(),

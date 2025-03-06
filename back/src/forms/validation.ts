@@ -265,86 +265,125 @@ export const hasPipelinePackaging = (
     i => i.type === "PIPELINE"
   );
 
-export const quantityRefusedNotRequired = weight(WeightUnits.Tonne)
-  .min(0)
-  .test(
-    "not-defined-if-no-quantity-received",
-    "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas",
-    (value, context) => {
-      const { quantityReceived } = context.parent;
+const getReceptionData = (context: any, isTempStorage = false) => {
+  if (isTempStorage) {
+    return {
+      wasteAcceptationStatus: context.wasteAcceptationStatus,
+      quantityReceived: context.temporaryStorageTemporaryStorerQuantityReceived,
+      quantityRefused: context.temporaryStorageTemporaryStorerQuantityRefused
+    };
+  }
 
-      const quantityReceivedIsDefined = isDefined(quantityReceived);
-      const quantityRefusedIsDefined = isDefined(value);
+  return {
+    wasteAcceptationStatus:
+      context?.forwardedIn?.wasteAcceptationStatus ??
+      context?.wasteAcceptationStatus,
+    quantityReceived: isDefined(context?.quantityReceived)
+      ? context?.quantityReceived
+      : context?.forwardedIn?.quantityReceived,
+    quantityRefused: isDefined(context?.quantityReceived)
+      ? context?.quantityRefused
+      : context?.forwardedIn?.quantityRefused
+  };
+};
 
-      if (!quantityReceivedIsDefined && quantityRefusedIsDefined) return false;
-      return true;
-    }
-  )
-  .test(
-    "waste-is-accepted",
-    "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
-    (value, context) => {
-      const { wasteAcceptationStatus } = context.parent;
+export const quantityRefusedSchemaBuilder = (isTempStorage = false) =>
+  weight(WeightUnits.Tonne)
+    .min(0)
+    .test(
+      "not-defined-if-no-quantity-received",
+      "La quantité refusée (quantityRefused) ne peut être définie si la quantité reçue (quantityReceived) ne l'est pas",
+      (value, context) => {
+        const { quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
-      if (wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED)
+        const quantityReceivedIsDefined = isDefined(quantityReceived);
+        const quantityRefusedIsDefined = isDefined(value);
+
+        if (!quantityReceivedIsDefined && quantityRefusedIsDefined)
+          return false;
         return true;
+      }
+    )
+    .test(
+      "waste-is-accepted",
+      "La quantité refusée (quantityRefused) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
+      (value, context) => {
+        const { wasteAcceptationStatus } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
-      // Legacy
-      if (value === null || value === undefined) return true;
+        if (wasteAcceptationStatus !== WasteAcceptationStatus.ACCEPTED)
+          return true;
 
-      return value === 0;
-    }
-  )
-  .test(
-    "waste-is-refused",
-    "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
-    (value, context) => {
-      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+        // Legacy
+        if (value === null || value === undefined) return true;
 
-      if (wasteAcceptationStatus !== WasteAcceptationStatus.REFUSED)
-        return true;
+        return value === 0;
+      }
+    )
+    .test(
+      "waste-is-refused",
+      "La quantité refusée (quantityRefused) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
+      (value, context) => {
+        const { wasteAcceptationStatus, quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
-      // Legacy
-      if (value === null || value === undefined) return true;
+        if (wasteAcceptationStatus !== WasteAcceptationStatus.REFUSED)
+          return true;
 
-      return value === quantityReceived;
-    }
-  )
-  .test(
-    "waste-is-partially-refused",
-    "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
-    (value, context) => {
-      const { wasteAcceptationStatus, quantityReceived } = context.parent;
+        // Legacy
+        if (value === null || value === undefined) return true;
 
-      if (wasteAcceptationStatus !== WasteAcceptationStatus.PARTIALLY_REFUSED)
-        return true;
+        return value === quantityReceived;
+      }
+    )
+    .test(
+      "waste-is-partially-refused",
+      "La quantité refusée (quantityRefused) doit être inférieure à la quantité reçue (quantityReceived) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
+      (value, context) => {
+        const { wasteAcceptationStatus, quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
-      // Legacy
-      if (value === null || value === undefined) return true;
+        if (wasteAcceptationStatus !== WasteAcceptationStatus.PARTIALLY_REFUSED)
+          return true;
 
-      return value > 0 && value < quantityReceived;
-    }
-  )
-  .test(
-    "lower-than-quantity-received",
-    "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)",
-    (value, context) => {
-      const { quantityReceived } = context.parent;
+        // Legacy
+        if (value === null || value === undefined) return true;
 
-      if (!isDefined(quantityReceived)) return true;
+        return value > 0 && value < quantityReceived;
+      }
+    )
+    .test(
+      "lower-than-quantity-received",
+      "La quantité refusée (quantityRefused) doit être inférieure ou égale à la quantité réceptionnée (quantityReceived)",
+      (value, context) => {
+        const { quantityReceived } = getReceptionData(
+          context.parent,
+          isTempStorage
+        );
 
-      // Legacy
-      if (value === null || value === undefined) return true;
+        if (!isDefined(quantityReceived)) return true;
 
-      return value <= quantityReceived;
-    }
-  );
+        // Legacy
+        if (value === null || value === undefined) return true;
 
-export const quantityRefused = quantityRefusedNotRequired.test(
+        return value <= quantityReceived;
+      }
+    );
+
+export const quantityRefusedRequired = quantityRefusedSchemaBuilder().test(
   "quantity-is-required",
   "La quantité refusée (quantityRefused) est requise",
   (value, context) => {
-    const { wasteAcceptationStatus } = context.parent;
+    const { wasteAcceptationStatus } = getReceptionData(context.parent);
 
     // La quantity refusée est obligatoire à l'étape d'acceptation,
     // donc si wasteAcceptationStatus est renseigné
@@ -355,6 +394,11 @@ export const quantityRefused = quantityRefusedNotRequired.test(
     return true;
   }
 );
+
+export const revisionRequestQuantityRefused =
+  quantityRefusedSchemaBuilder(false);
+export const revisionRequestTempStorageQuantityRefused =
+  quantityRefusedSchemaBuilder(true);
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -1438,7 +1482,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .label("Réception")
     .when("wasteAcceptationStatus", weightConditions.bsddWasteAcceptationStatus)
     .when("transporters", weightConditions.transporters(WeightUnits.Tonne)),
-  quantityRefused,
+  quantityRefused: quantityRefusedRequired,
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(
@@ -1483,7 +1527,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
       "wasteAcceptationStatus",
       weightConditions.bsddWasteAcceptationStatus as any
     ),
-  quantityRefused,
+  quantityRefused: quantityRefusedRequired,
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()

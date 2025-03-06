@@ -1081,6 +1081,9 @@ input FormRevisionRequestDestinationInput {
 input FormRevisionRequestTemporaryStorerInput {
   "Quantité reçue sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
   quantityReceived: Float
+
+  "Quantité refusée sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
+  quantityRefused: Float
 }
 
 input FormRevisionRequestWhere {
