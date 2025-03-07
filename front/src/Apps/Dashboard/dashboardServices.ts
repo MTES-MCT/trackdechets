@@ -933,7 +933,7 @@ export const getSignByProducerBtnLabel = (
     isSameSiretTransporter(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignTransport)
   ) {
-    if (isBsdd(bsd.type)) {
+    if (isBsdd(bsd.type) && isToCollectTab) {
       return SIGNER;
     }
     if (isBsdasri(bsd.type)) {

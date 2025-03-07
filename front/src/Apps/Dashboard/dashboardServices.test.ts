@@ -1029,7 +1029,7 @@ describe("dashboardServices", () => {
           }
         },
         permissions,
-        "actTab"
+        "toCollectTab"
       );
       expect(result).toEqual(SIGNER);
     });

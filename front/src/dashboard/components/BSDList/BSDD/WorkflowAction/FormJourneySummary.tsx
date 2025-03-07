@@ -94,7 +94,11 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             variant={
               form.temporaryStorageDetail.emittedAt
                 ? "complete"
-                : (form.transporters ?? []).every(t => Boolean(t.takenOverAt))
+                : (form.isDirectSupply && form.emittedAt) ||
+                  (!form.isDirectSupply &&
+                    (form.transporters ?? []).every(t =>
+                      Boolean(t.takenOverAt)
+                    ))
                 ? // Actif si tous les transporteurs ont signé, sinon en attente
                   "active"
                 : "incomplete"

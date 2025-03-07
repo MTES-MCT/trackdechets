@@ -910,14 +910,15 @@ export default function BSDDetailContent({
                 <span className={styles.detailTabCaption}>Courtier</span>
               </Tab>
             )}
-            {form.transporters?.map((_, idx) => (
-              <Tab className={styles.detailTab} key={idx}>
-                <IconWarehouseDelivery size="25px" />
-                <span className={styles.detailTabCaption}>
-                  {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
-                </span>
-              </Tab>
-            ))}
+            {!form.isDirectSupply &&
+              form.transporters?.map((_, idx) => (
+                <Tab className={styles.detailTab} key={idx}>
+                  <IconWarehouseDelivery size="25px" />
+                  <span className={styles.detailTabCaption}>
+                    {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
+                  </span>
+                </Tab>
+              ))}
             {hasTempStorage && (
               <Tab className={styles.detailTab}>
                 <IconWarehouseStorage size="25px" />
@@ -1019,7 +1020,7 @@ export default function BSDDetailContent({
               </TabPanel>
             )}
             {/* Transporter tab panel */}
-            {!form.isDirectSupply ? (
+            {!form.isDirectSupply &&
               (form.transporters ?? []).map((transporter, idx) => (
                 <TabPanel className={styles.detailTabPanel}>
                   <div className={`${styles.detailGrid} `}>
@@ -1078,17 +1079,7 @@ export default function BSDDetailContent({
                     />
                   </div>
                 </TabPanel>
-              ))
-            ) : (
-              <TabPanel className={styles.detailTabPanel}>
-                <div className={`${styles.detailGrid} `}>
-                  <DetailRow
-                    value="Acheminement direct par pipeline ou convoyeur"
-                    label="Transport"
-                  />
-                </div>
-              </TabPanel>
-            )}
+              ))}
 
             {/* Temp storage tab panel */}
             {hasTempStorage && (

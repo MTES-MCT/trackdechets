@@ -860,7 +860,8 @@ export function expandFormFromDb(
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
             receivedAt: processDate(form.receivedAt),
-            receivedBy: form.receivedBy
+            receivedBy: form.receivedBy,
+            signedAt: form.signedAt
           },
           transporter: forwardedInTransporter
             ? expandTransporterFromDb(forwardedInTransporter)
