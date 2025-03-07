@@ -1,25 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import { useFormContext } from "react-hook-form";
 
 export const CompanyCreateAdminRequestModalStep1 = () => {
+  const { register, setValue, watch } = useFormContext();
+
+  const companyOrgId = watch("companyOrgId");
+
+  useEffect(() => {
+    // register fields managed under the hood by company selector
+    register("companyOrgId");
+  }, [register]);
+
   return (
     <CompanySelectorWrapper
-      // orgId={company.orgId}
-      // disabled={isLoading}
-      // selectedCompanyOrgId={delegateOrgId}
-      selectedCompanyError={selectedCompany => {
-        // if (selectedCompany?.orgId === company.orgId) {
-        //   return "Le délégant et le délégataire doivent être différents";
-        // }
-        // if (!selectedCompany?.siret) {
-        //   return "L'entreprise doit avoir un n° de SIRET";
-        // }
-        return null;
-      }}
+      orgId={companyOrgId}
+      selectedCompanyOrgId={companyOrgId}
       onCompanySelected={company => {
-        // if (company) {
-        //   setValue("delegateOrgId", company.orgId);
-        // }
+        if (company) {
+          setValue("companyOrgId", company?.orgId);
+          setValue("companyName", company?.name);
+        } else {
+          setValue("companyOrgId", null);
+          setValue("companyName", null);
+        }
       }}
     />
   );

@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import TdModal from "../../../../common/Components/Modal/Modal";
 import { CompanyCreateAdminRequestModalStep1 } from "./CompanyCreateAdminRequestModalStep1";
-import { CompanyCreateAdminRequestModalStep2 } from "./CompanyCreateAdminRequestModalStep2";
+import {
+  AdminRequestValidationMethod,
+  CompanyCreateAdminRequestModalStep2
+} from "./CompanyCreateAdminRequestModalStep2";
 import { CompanyCreateAdminRequestModalStep3 } from "./CompanyCreateAdminRequestModalStep3";
 import Stepper from "@codegouvfr/react-dsfr/Stepper";
+import {
+  FormProvider,
+  SubmitHandler,
+  useForm
+} from "react-hook-form";
 
 const steps = [
   {
@@ -14,12 +22,12 @@ const steps = [
   {
     title: "Validation au sein de l'établissement",
     component: CompanyCreateAdminRequestModalStep2,
-    buttons: ["CANCEL", "NEXT"]
+    buttons: ["PREVIOUS", "NEXT"]
   },
   {
     title: "Confirmer la demande",
     component: CompanyCreateAdminRequestModalStep3,
-    buttons: ["CANCEL", "VALIDATE"]
+    buttons: ["PREVIOUS", "VALIDATE"]
   }
 ];
 
@@ -28,15 +36,47 @@ interface CompanyCreateAdminRequestModalProps {
   onClose: () => void;
 }
 
+interface CreateAdminRequestFormInputs {
+  companyName: string | null;
+  companyOrgId: string | null;
+  validationMethod: AdminRequestValidationMethod | null;
+  collaboratorEmail: string | null;
+}
+
 // TODO: reset form when closing modal
+// TODO: ajouter validation
 export const CompanyCreateAdminRequestModal = ({
   isOpen,
   onClose
 }: CompanyCreateAdminRequestModalProps) => {
   const [currentStepIdx, setCurrentStepIdx] = useState(0);
 
+  const methods = useForm<CreateAdminRequestFormInputs>({
+    defaultValues: {
+      companyName: null,
+      companyOrgId: null,
+      validationMethod: null
+    }
+  });
+
+  const companyName = methods.watch("companyName");
+  const companyOrgId = methods.watch("companyOrgId");
+  const validationMethod = methods.watch("validationMethod");
+  const collaboratorEmail = methods.watch("collaboratorEmail");
+
+  console.log("values", {
+    companyName,
+    companyOrgId,
+    validationMethod,
+    collaboratorEmail
+  });
+
+  const onSubmit: SubmitHandler<CreateAdminRequestFormInputs> = () =>
+    console.log("submit");
+
   const closeAndReset = () => {
     setCurrentStepIdx(0);
+    methods.reset();
     onClose();
   };
 
@@ -59,25 +99,37 @@ export const CompanyCreateAdminRequestModal = ({
         />
       </div>
 
-      <div className="fr-mb-4w">
+      <div className="fr-mb-2w">
         <ul className="fr-ml-2w" style={{ listStyleType: "disc" }}>
-          <li>
-            Établissement concerné: DREAL nouvelle aquitaine - 1300104570013
-          </li>
-          <li>
-            Collaborateur pouvant valider: Marc Cassin m.cassin@dreal.gouv.fr
-          </li>
+          {companyName && companyOrgId && (
+            <li>
+              Établissement concerné: {companyName} - {companyOrgId}
+            </li>
+          )}
+          {collaboratorEmail && (
+            <li>Collaborateur pouvant valider: {collaboratorEmail}</li>
+          )}
         </ul>
       </div>
 
       <div>
-        <StepComponent />
+        <FormProvider {...methods}>
+          <StepComponent />
+        </FormProvider>
       </div>
 
       <div className="td-modal-actions">
         {steps[currentStepIdx].buttons?.includes("CANCEL") && (
           <button className="fr-btn fr-btn--secondary" onClick={closeAndReset}>
             Annuler
+          </button>
+        )}
+        {steps[currentStepIdx].buttons?.includes("PREVIOUS") && (
+          <button
+            className="fr-btn"
+            onClick={() => setCurrentStepIdx(currentStepIdx - 1)}
+          >
+            Retour
           </button>
         )}
         {steps[currentStepIdx].buttons?.includes("NEXT") && (
@@ -89,7 +141,7 @@ export const CompanyCreateAdminRequestModal = ({
           </button>
         )}
         {steps[currentStepIdx].buttons?.includes("VALIDATE") && (
-          <button className="fr-btn" onClick={closeAndReset}>
+          <button className="fr-btn" onClick={onSubmit}>
             Envoyer la demande
           </button>
         )}
