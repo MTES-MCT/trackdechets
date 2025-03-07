@@ -599,6 +599,7 @@ export const emptyManagedWasteV2: Omit<
   publicId: null,
   bsdId: null,
   reportAsSiret: null,
+  reportForSiret: null,
   createdAt: null,
   updatedAt: null,
   transporterTakenOverAt: null,

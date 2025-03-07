@@ -340,6 +340,16 @@ export async function processRegistryExportJob(
       });
 
       transformer.on("end", () => {
+        if (worksheet.columns === null) {
+          // write headers if not present
+          worksheet.columns = Object.keys(columns)
+            .map(key => ({
+              key,
+              header: columns[key].label,
+              width: 20
+            }))
+            .filter(Boolean);
+        }
         worksheet.commit();
         workbook.commit();
       });

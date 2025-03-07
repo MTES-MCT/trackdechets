@@ -489,7 +489,8 @@ export const toTransportedWasteV2 = (
 };
 
 export const toManagedWasteV2 = (
-  bsvhu: RegistryV2Bsvhu
+  bsvhu: RegistryV2Bsvhu,
+  targetSiret: string
 ): Omit<Required<ManagedWasteV2>, "__typename"> => {
   const {
     street: emitterCompanyAddress,
@@ -529,6 +530,7 @@ export const toManagedWasteV2 = (
     publicId: null,
     bsdId: bsvhu.id,
     reportAsSiret: null,
+    reportForSiret: targetSiret,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.createdAt,
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,

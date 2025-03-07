@@ -1125,6 +1125,11 @@ type ManagedWasteV2 {
 
   reportAsSiret: String
 
+  """
+  Le numéro SIRET de l'établissement qui a géré le déchet
+  """
+  reportForSiret: String
+
   "Date de création du bordereau"
   createdAt: DateTime
 

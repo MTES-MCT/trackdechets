@@ -3,7 +3,8 @@ import "./CompanyRegistryDndFromBsd.scss";
 import {
   CompanyPrivate,
   Mutation,
-  MutationEnableRegistryDndFromBsdArgs
+  MutationEnableRegistryDndFromBsdArgs,
+  UserRole
 } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -117,7 +118,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
             Traçabilité des déchets non dangereux dans le registre activée
           </h4>
           <p className="fr-text--bold">
-            {`L’activation de la traçabilité est irréversible et a pris effet le
+            {`L'activation de la traçabilité est irréversible et a pris effet le
             ${format(
               new Date(company.hasEnabledRegistryDndFromBsdSince),
               "dd/MM/yyyy"
@@ -137,14 +138,14 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
               <li>
                 Les déchets non dangereux tracés avec Trackdéchets sont
-                consultables via l’ensemble des registres réglementaires et
+                consultables via l'ensemble des registres réglementaires et
                 exhaustif.
               </li>
             </ul>
           </div>
           <div className="fr-my-5v">
             <p>
-              Plus d’informations{" "}
+              Plus d'informations{" "}
               <a
                 className={`fr-link`}
                 href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
@@ -197,7 +198,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
               <li>
                 Les déchets non dangereux tracés avec Trackdéchets seront
-                consultables via l’ensemble des registres réglementaires et
+                consultables via l'ensemble des registres réglementaires et
                 exhaustif.
               </li>
             </ul>
@@ -210,7 +211,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
           </div>
           <div className="fr-my-5v">
             <p>
-              Plus d’informations{" "}
+              Plus d'informations{" "}
               <a
                 className={`fr-link`}
                 href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
@@ -227,9 +228,16 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               iconId="fr-icon-arrow-right-line"
               iconPosition="right"
               onClick={() => confirmationModal.open()}
+              disabled={company.userRole !== UserRole.Admin}
             >
               Activer la traçabilité
             </Button>
+            {company.userRole !== UserRole.Admin && (
+              <p className="fr-mt-2v fr-text--xs">
+                Vous n'avez pas les droits pour activer la traçabilité des
+                déchets non dangereux dans le registre.
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -273,7 +281,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
               <li>
                 Les déchets non dangereux tracés avec Trackdéchets seront
-                consultables via l’ensemble des registres réglementaires et
+                consultables via l'ensemble des registres réglementaires et
                 exhaustif.
               </li>
             </ul>

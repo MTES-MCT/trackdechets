@@ -941,7 +941,8 @@ export const toTransportedWasteV2 = (
 };
 
 export const toManagedWasteV2 = (
-  form: RegistryV2Bsdd
+  form: RegistryV2Bsdd,
+  targetSiret: string
 ): Omit<Required<ManagedWasteV2>, "__typename"> => {
   const bsdd = formToBsddV2(form);
   const {
@@ -1030,6 +1031,7 @@ export const toManagedWasteV2 = (
     publicId: null,
     bsdId: bsdd.id,
     reportAsSiret: null,
+    reportForSiret: targetSiret,
     createdAt: bsdd.createdAt,
     updatedAt: bsdd.updatedAt,
     transporterTakenOverAt: bsdd.transporterTransportTakenOverAt,

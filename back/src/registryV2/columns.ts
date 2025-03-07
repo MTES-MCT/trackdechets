@@ -1111,6 +1111,7 @@ export const EXPORT_COLUMNS: {
     publicId: { label: "identifiant unique" },
     bsdId: { label: "N° de bordereau" },
     reportAsSiret: { label: "SIRET du déclarant" },
+    reportForSiret: { label: "SIRET du négociant ou courtier" },
     createdAt: { label: "Date de création du bordereau", format: formatDate },
     updatedAt: {
       label: "Date de dernière modification du bordereau",

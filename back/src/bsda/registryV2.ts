@@ -929,7 +929,8 @@ export const toTransportedWasteV2 = (
 };
 
 export const toManagedWasteV2 = (
-  bsda: RegistryV2Bsda
+  bsda: RegistryV2Bsda,
+  targetSiret: string
 ): Omit<Required<ManagedWasteV2>, "__typename"> => {
   const transporters = getTransportersSync(bsda);
 
@@ -1026,6 +1027,7 @@ export const toManagedWasteV2 = (
     publicId: null,
     bsdId: bsda.id,
     reportAsSiret: null,
+    reportForSiret: targetSiret,
     createdAt: bsda.createdAt,
     updatedAt: bsda.updatedAt,
     transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,

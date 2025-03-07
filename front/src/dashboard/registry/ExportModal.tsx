@@ -132,8 +132,8 @@ const getFilterStateForRegistryType = (
 const getDefaultsForRegistryType = (
   registryType: RegistryV2ExportType
 ): {
-  wasteTypes: [RegistryV2ExportWasteType, ...RegistryV2ExportWasteType[]];
-  declarationType: DeclarationType;
+  wasteTypes?: [RegistryV2ExportWasteType, ...RegistryV2ExportWasteType[]];
+  declarationType?: DeclarationType;
 } => {
   if (registryType === RegistryV2ExportType.Ssd) {
     return {
@@ -146,38 +146,18 @@ const getDefaultsForRegistryType = (
     };
   } else if (registryType === RegistryV2ExportType.Incoming) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Managed) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Outgoing) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Transported) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.All) {
@@ -192,7 +172,7 @@ const getDefaultsForRegistryType = (
       RegistryV2ExportWasteType.Dd,
       RegistryV2ExportWasteType.Texs
     ],
-    declarationType: DeclarationType.All
+    declarationType: DeclarationType.Registry
   };
 };
 
@@ -443,9 +423,13 @@ export function ExportModal({ isOpen, onClose }: Props) {
   // set the default values for waste types and declaration type depending on the registry type
   useEffect(() => {
     const defaults = getDefaultsForRegistryType(registryType);
-    Object.keys(defaults).forEach((key: "wasteTypes" | "declarationType") =>
-      setValue(key, defaults[key])
-    );
+    if (defaults) {
+      Object.keys(defaults).forEach((key: "wasteTypes" | "declarationType") => {
+        if (defaults[key]) {
+          setValue(key, defaults[key]);
+        }
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registryType]);
 

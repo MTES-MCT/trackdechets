@@ -20,6 +20,7 @@ export const toManagedWaste = (
     publicId: managedWaste.publicId,
     bsdId: null,
     reportAsSiret: managedWaste.reportAsCompanySiret,
+    reportForSiret: managedWaste.reportForCompanySiret,
     createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
