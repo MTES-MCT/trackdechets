@@ -2104,6 +2104,40 @@ model AdministrativeTransfer {
   status     AdministrativeTransferStatus @default(PENDING)
 }
 
+model AdminRequest {
+  id         String                       @id @default(cuid())
+  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+
+  // The user initiating the request, wanting to be promoted to admin
+  userId    String  @db.VarChar(30)
+
+  // The orgId of the company the user wants to be admin of
+  companyId String @db.VarChar(30)
+
+  // The collaborator who has been asked to approve the request 
+  collaboratorId String?  @db.VarChar(30)
+
+  // The code sent by mail to self-validate the request
+  code  String? @db.VarChar(8)
+
+  status AdminRequestStatus @default(PENDING)
+
+  validationMethod AdminRequestValidationMethod
+}
+
+enum AdminRequestStatus {
+  PENDING
+  ACCEPTED 
+  REFUSED
+}
+
+enum AdminRequestValidationMethod {
+  REQUEST_ADMIN_APPROVAL
+  REQUEST_COLLABORATOR_APPROVAL
+  SEND_MAIL
+}
+
 enum AdministrativeTransferStatus {
   PENDING
   ACCEPTED

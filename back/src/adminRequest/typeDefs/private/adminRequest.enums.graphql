@@ -1,0 +1,13 @@
+"""
+La méthode de validation de la demande
+"""
+enum AdminRequestValidationMethod {
+  "Envoi d'un email aux administrateurs"
+  REQUEST_ADMIN_APPROVAL
+
+  "Envoi d'un email à un collaborateur (les admininstrateurs seront quand même prévenus)"
+  REQUEST_COLLABORATOR_APPROVAL
+
+  "Envoi d'un courrier avec un code au siège de l'entreprise (les admininstrateurs seront quand même prévenus)"
+  SEND_MAIL
+}

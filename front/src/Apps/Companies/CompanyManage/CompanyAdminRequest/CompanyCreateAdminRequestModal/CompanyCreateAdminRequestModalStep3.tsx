@@ -18,7 +18,8 @@ export const CompanyCreateAdminRequestModalStep3 = () => {
 
   return (
     <>
-      {validationMethod === AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL && (
+      {validationMethod ===
+        AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL && (
         <Alert
           className="fr-mb-3w"
           small
@@ -27,7 +28,8 @@ export const CompanyCreateAdminRequestModalStep3 = () => {
         />
       )}
 
-      {validationMethod === AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL && (
+      {validationMethod ===
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL && (
         <Alert
           className="fr-mb-3w"
           small

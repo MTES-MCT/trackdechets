@@ -49,7 +49,8 @@ export const CompanyCreateAdminRequestModalStep2 = () => {
         // }
       />
 
-      {validationMethod === AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL && (
+      {validationMethod ===
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL && (
         <Input
           label="Courriel du collaborateur"
           nativeInputProps={{

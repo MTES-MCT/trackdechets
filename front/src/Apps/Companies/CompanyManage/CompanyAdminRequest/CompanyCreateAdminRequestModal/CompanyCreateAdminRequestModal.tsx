@@ -7,11 +7,7 @@ import {
 } from "./CompanyCreateAdminRequestModalStep2";
 import { CompanyCreateAdminRequestModalStep3 } from "./CompanyCreateAdminRequestModalStep3";
 import Stepper from "@codegouvfr/react-dsfr/Stepper";
-import {
-  FormProvider,
-  SubmitHandler,
-  useForm
-} from "react-hook-form";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 const steps = [
   {
