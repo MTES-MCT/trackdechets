@@ -11,7 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Permet l'ajout du volume et des numéros d'identification sur le BSDD partout où le formulaire de conditionnement apparait (création, modification, bordereau suite, signature émetteur/transporteur, révision) & Passage du formulaire conditionnement au DSFR [PR 3936](https://github.com/MTES-MCT/trackdechets/pull/3936).
 - Ajout de l'export du registre sortant V2 [PR 3976](https://github.com/MTES-MCT/trackdechets/pull/3976)
-- Ajout de l'export du registre transporté V2 [PR 4011](https://github.com/MTES-MCT/trackdechets/pull/4011)
+- Ajout de l'export du registre transporté V2 [PR 4017](https://github.com/MTES-MCT/trackdechets/pull/4017)
+- Ajout de l'export du registre géré V2 [PR 4017](https://github.com/MTES-MCT/trackdechets/pull/4017)
 - Ajout d'un paramètre pour les établissements souhaitant pousser automatiquement leurs BSDND dans leurs déclarations [PR3988](https://github.com/MTES-MCT/trackdechets/pull/3988)
 
 #### :nail_care: Breaking Change
