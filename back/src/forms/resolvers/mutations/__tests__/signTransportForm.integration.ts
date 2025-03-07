@@ -705,6 +705,115 @@ describe("signTransportForm", () => {
     expect(errors).not.toBeUndefined();
   });
 
+  it("should throw an error when signing transport from temporary storage if plates are not provided and mode is ROAD", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formWithTempStorageFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: "SIGNED_BY_TEMP_STORER",
+        recipientCompanySiret: temporaryStorage.company.siret,
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterTransportMode: "ROAD",
+            transporterNumberPlate: null,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name,
+          transporterNumberPlate: null
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "La plaque d'immatriculation est requise"
+      })
+    ]);
+  });
+
+  it("should sign transport from temporary storage if plates are not provided and mode is not ROAD", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter.company });
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formWithTempStorageFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: "SIGNED_BY_TEMP_STORER",
+        recipientCompanySiret: temporaryStorage.company.siret,
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterTransportMode: "SEA",
+            transporterNumberPlate: null,
+            number: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name,
+          transporterNumberPlate: null
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.signTransportForm).toEqual(
+      expect.objectContaining({
+        status: "RESENT",
+        temporaryStorageDetail: expect.objectContaining({
+          signedAt: takenOverAt.toISOString(),
+          signedBy: temporaryStorage.user.name,
+
+          takenOverAt: takenOverAt.toISOString(),
+          takenOverBy: transporter.user.name
+        })
+      })
+    );
+  });
+
   it("should throw an error if signed by an intermediary", async () => {
     const intermediary = await userWithCompanyFactory("ADMIN");
     const emitter = await userWithCompanyFactory("ADMIN");
