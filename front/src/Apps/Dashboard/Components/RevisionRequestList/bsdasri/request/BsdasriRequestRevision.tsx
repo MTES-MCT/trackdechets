@@ -20,7 +20,10 @@ import { removeEmptyKeys } from "../../../../../../common/helper";
 import { CREATE_BSDASRI_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdasriReviewQuery";
 import styles from "./BsdasriRequestRevision.module.scss";
 
-import { BsdasriRequestRevisionCancelationInput } from "../BsdasriRequestRevisionCancelationInput";
+import {
+  BsdasriRequestRevisionCancelationInput,
+  CANCELLABLE_BSDASRI_STATUSES
+} from "../BsdasriRequestRevisionCancelationInput";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Select } from "@codegouvfr/react-dsfr/Select";
@@ -40,6 +43,7 @@ import {
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import { TITLE_REQUEST_LIST } from "../../../Revision/wordingsRevision";
 
 type Props = {
   readonly bsdasri: Bsdasri;
@@ -122,11 +126,14 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
 
   const status = bsdasri["bsdasriStatus"];
   const bsdasriType = bsdasri.type;
+  const canBeCancelled = CANCELLABLE_BSDASRI_STATUSES.includes(
+    bsdasri["bsdasriStatus"]
+  );
 
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
-        Demander une révision du bordereau {bsdasri.id}
+        {TITLE_REQUEST_LIST} {bsdasri.id}
       </h2>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -144,7 +151,7 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             >
               <Input
                 label="Nom du site d'enlèvement"
-                className="fr-col-9"
+                className="fr-col-10"
                 nativeInputProps={{
                   ...register("emitter.pickupSite.name"),
                   value: formValues?.emitter?.pickupSite?.name || ""
@@ -224,7 +231,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
               />
             </RhfReviewableField>
           )}
-
           <RhfReviewableField
             title="Quantité traitée"
             suffix="kg"
@@ -283,6 +289,8 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
             />
           </RhfReviewableField>
 
+          {!canBeCancelled && <hr />}
+
           <Input
             textArea
             label="Commentaire à propos de la révision"
@@ -299,7 +307,6 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
               title="Erreur"
             />
           )}
-
           <div className="transporterInfoEditForm__cta">
             <Button
               priority="secondary"

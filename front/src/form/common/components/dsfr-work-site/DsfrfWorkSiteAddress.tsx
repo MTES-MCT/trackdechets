@@ -180,7 +180,7 @@ export default function DsfrfWorkSiteAddress({
       <SearchInput
         id="eco-search"
         placeholder={placeholder}
-        className="fr-col-8 fr-mb-2w"
+        className="fr-col-10 fr-mb-2w"
         onChange={e =>
           dispatch({ type: "search_input", payload: e.target.value })
         }

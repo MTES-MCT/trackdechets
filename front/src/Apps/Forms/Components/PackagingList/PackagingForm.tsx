@@ -162,7 +162,7 @@ function PackagingForm({
         </div>
       )}
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-md-10 fr-col-12">
+        <div className="fr-col-md-12 fr-col-12">
           <TagsInput
             label="N° de contenant (optionnel)"
             tags={packaging.identificationNumbers ?? []}
