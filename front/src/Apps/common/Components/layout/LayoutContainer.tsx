@@ -50,10 +50,10 @@ const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
   <>
-    <strong>À compter du 5 mai 2025</strong>, toutes les déclarations qui
-    étaient auparavant effectuées sur le RNDTS devront être réalisées sur la
-    plateforme Trackdéchets. Consultez la FAQ pour le calendrier d'intégration
-    et les changements à venir.
+    <strong>À partir du 5 mai 2025</strong>, toutes les déclarations RNDTS
+    devront être réalisées directement sur Trackdéchets. Anticipez dès
+    maintenant cette évolution en testant les fonctionnalités de déclaration sur
+    notre plateforme de test.
   </>
 ];
 
@@ -100,10 +100,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Consulter la FAQ",
-                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/informations-generales"
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
                   }}
-                  persistedSurveyName="td-20250211"
+                  persistedSurveyName="td-20250303"
                 />
               }
             />

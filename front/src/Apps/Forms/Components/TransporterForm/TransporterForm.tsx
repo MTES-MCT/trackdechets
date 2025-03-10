@@ -127,7 +127,7 @@ export function TransporterForm<T extends AnyTransporterInput>({
           />
         )}
 
-      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
+      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mt-1w">
         <div className="fr-col-12 fr-col-md-3">
           <Field name={transportModeFieldName}>
             {({ field }) => (
@@ -141,7 +141,7 @@ export function TransporterForm<T extends AnyTransporterInput>({
             )}
           </Field>
         </div>
-        <div className="fr-col-12 fr-col-md-3">
+        <div className="fr-col-12 fr-col-md-4">
           <TransportPlates
             bsdType={bsdType}
             fieldName={transportPlatesFieldName}
