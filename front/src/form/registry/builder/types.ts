@@ -1,0 +1,33 @@
+import type { ComponentType } from "react";
+import type {
+  FrIconClassName,
+  RiIconClassName
+} from "@codegouvfr/react-dsfr/fr/generatedFromCss/classNames";
+import type { UseFormReturn } from "react-hook-form";
+
+type FieldStyle = { className?: string };
+
+export type FormShapeField =
+  | {
+      name: string;
+      shape: "generic";
+      style?: FieldStyle;
+      type: string;
+      label: string;
+      validation: { required: boolean };
+      choices?: { label: string; value: string | number }[];
+    }
+  | {
+      name?: string;
+      shape: "custom";
+      style?: FieldStyle;
+      Component: ComponentType<{ name?: string; methods: UseFormReturn<any> }>;
+    };
+
+type FormShapeItem = {
+  tabTitle: string;
+  iconId?: FrIconClassName | RiIconClassName;
+  fields: FormShapeField[];
+};
+
+export type FormShape = FormShapeItem[];
