@@ -58,6 +58,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
     <div className="form__row">
       <label>
         Plaque d'immatriculation{" "}
+        <span>(Max 2 plaques, séparées par une virgule)</span>{" "}
         <Field name="transporterNumberPlate" className="td-input" />
       </label>
       <RedErrorMessage name="transporterNumberPlate" />
