@@ -10,7 +10,8 @@ import {
 import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   PROCESSING_AND_REUSE_OPERATIONS,
-  isDangerous
+  isDangerous,
+  isForeignVat
 } from "@td/constants";
 import { useMutation, gql } from "@apollo/client";
 import { useForm, FormProvider } from "react-hook-form";
@@ -212,6 +213,12 @@ function SignOperationModal({
   const [extraEuropeanCompany, setExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId
   );
+
+  const [isForeignCompany, setIsForeignCompany] = useState(false);
+  const [isForeignCompanyNameDisabled, setIsForeignCompanyNameDisabled] =
+    useState(false);
+  const [isForeignCompanyAddressDisabled, setIsForeignCompanyAddressDisabled] =
+    useState(false);
 
   /**
    * Hack the API requirement for any value in nextDestination.company.extraEuropeanId
@@ -485,9 +492,74 @@ function SignOperationModal({
                         "nextDestination.company",
                         toCompanyInput(company)
                       );
+
+                      if (company.codePaysEtrangerEtablissement) {
+                        setValue(
+                          "nextDestination.company.country",
+                          company.codePaysEtrangerEtablissement
+                        );
+
+                        setIsForeignCompanyNameDisabled(!!company.name);
+                        setIsForeignCompanyAddressDisabled(!!company.address);
+                      }
+
+                      setIsForeignCompany(isForeignVat(company.vatNumber!));
                     }
                   }}
                 />
+
+                {isForeignCompany && (
+                  <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+                    <div className="fr-col-12 fr-col-md-6">
+                      <Input
+                        label="Nom de l'entreprise"
+                        state={
+                          errors?.nextDestination?.company?.name && "error"
+                        }
+                        stateRelatedMessage={
+                          (errors?.nextDestination?.company?.name
+                            ?.message as string) ?? ""
+                        }
+                        disabled={isForeignCompanyNameDisabled}
+                        nativeInputProps={{
+                          ...register("nextDestination.company.name")
+                        }}
+                      />
+                    </div>
+                    <div className="fr-col-12 fr-col-md-6">
+                      <Input
+                        label="Adresse de l'entreprise"
+                        state={
+                          errors?.nextDestination?.company?.address && "error"
+                        }
+                        stateRelatedMessage={
+                          (errors?.nextDestination?.company?.address
+                            ?.message as string) ?? ""
+                        }
+                        disabled={isForeignCompanyAddressDisabled}
+                        nativeInputProps={{
+                          ...register("nextDestination.company.address")
+                        }}
+                      />
+                    </div>
+                    <div className="fr-col-12 fr-col-md-6">
+                      <Input
+                        label="Pays de l'entreprise"
+                        state={
+                          errors?.nextDestination?.company?.country && "error"
+                        }
+                        stateRelatedMessage={
+                          (errors?.nextDestination?.company?.country
+                            ?.message as string) ?? ""
+                        }
+                        disabled={true}
+                        nativeInputProps={{
+                          ...register("nextDestination.company.country")
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <CompanyContactInfo
                   fieldName={"nextDestination.company"}
