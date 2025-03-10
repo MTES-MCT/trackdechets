@@ -672,6 +672,7 @@ export const toManagedWasteV2 = (
 const minimalBsvhuForLookupSelect = {
   id: true,
   destinationOperationSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   transporterTransportSignatureDate: true,
   transporterTransportTakenOverAt: true,
@@ -710,7 +711,10 @@ const bsvhuToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsvhu.wasteCode,
-      ...generateDateInfos(bsvhu.destinationOperationSignatureDate),
+      ...generateDateInfos(
+        bsvhu.destinationReceptionDate ??
+          bsvhu.destinationOperationSignatureDate
+      ),
       bsvhuId: bsvhu.id
     });
   }
@@ -731,7 +735,10 @@ const bsvhuToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsvhu.wasteCode,
-        ...generateDateInfos(bsvhu.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          bsvhu.transporterTransportTakenOverAt ??
+            bsvhu.transporterTransportSignatureDate!
+        ),
         bsvhuId: bsvhu.id
       });
     });
@@ -775,7 +782,10 @@ const bsvhuToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsvhu.wasteCode,
-        ...generateDateInfos(bsvhu.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          bsvhu.transporterTransportTakenOverAt ??
+            bsvhu.transporterTransportSignatureDate!
+        ),
         bsvhuId: bsvhu.id
       });
     });

@@ -1217,6 +1217,7 @@ export const toManagedWasteV2 = (
 const minimalBsdaForLookupSelect = {
   id: true,
   destinationOperationSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   emitterCompanySiret: true,
   ecoOrganismeSiret: true,
@@ -1261,7 +1262,9 @@ const bsdaToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsda.wasteCode,
-      ...generateDateInfos(bsda.destinationOperationSignatureDate),
+      ...generateDateInfos(
+        bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate
+      ),
       bsdaId: bsda.id
     });
   }
@@ -1283,7 +1286,10 @@ const bsdaToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsda.wasteCode,
-        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!
+        ),
         bsdaId: bsda.id
       });
     });
@@ -1306,7 +1312,10 @@ const bsdaToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsda.wasteCode,
-        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!
+        ),
         bsdaId: bsda.id
       });
     });

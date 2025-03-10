@@ -600,6 +600,7 @@ export const toTransportedWasteV2 = (
 const minimalBsdasriForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   transporterTransportSignatureDate: true,
   transporterTakenOverAt: true,
@@ -630,7 +631,10 @@ const bsdasriToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsdasri.wasteCode,
-      ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
+      ...generateDateInfos(
+        bsdasri.destinationReceptionDate ??
+          bsdasri.destinationReceptionSignatureDate
+      ),
       bsdasriId: bsdasri.id
     });
   }
@@ -651,7 +655,10 @@ const bsdasriToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsdasri.wasteCode,
-        ...generateDateInfos(bsdasri.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          bsdasri.transporterTakenOverAt ??
+            bsdasri.transporterTransportSignatureDate!
+        ),
         bsdasriId: bsdasri.id
       });
     });

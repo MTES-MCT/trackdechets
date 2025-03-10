@@ -1234,6 +1234,7 @@ const minimalBsddForLookupSelect = {
   readableId: true,
   receivedAt: true,
   sentAt: true,
+  takenOverAt: true,
   recipientCompanySiret: true,
   emitterCompanySiret: true,
   ecoOrganismeSiret: true,
@@ -1301,7 +1302,7 @@ const bsddToLookupCreateInputs = (
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: form.wasteDetailsCode,
-        ...generateDateInfos(form.sentAt!),
+        ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
         bsddId: form.id
       });
     });
@@ -1329,7 +1330,7 @@ const bsddToLookupCreateInputs = (
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: form.wasteDetailsCode,
-        ...generateDateInfos(form.sentAt!),
+        ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
         bsddId: form.id
       });
     });

@@ -996,6 +996,7 @@ export const toTransportedWasteV2 = (
 const minimalBsffForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   wasteCode: true,
   emitterCompanySiret: true,
@@ -1030,7 +1031,9 @@ const bsffToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsff.wasteCode,
-      ...generateDateInfos(bsff.destinationReceptionSignatureDate),
+      ...generateDateInfos(
+        bsff.destinationReceptionDate ?? bsff.destinationReceptionSignatureDate
+      ),
       bsffId: bsff.id
     });
   }
@@ -1051,7 +1054,10 @@ const bsffToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsff.wasteCode,
-        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!
+        ),
         bsffId: bsff.id
       });
     });

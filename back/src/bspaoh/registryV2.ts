@@ -546,6 +546,7 @@ export const toTransportedWasteV2 = (
 const minimalBspaohForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   emitterCompanySiret: true,
   wasteCode: true,
@@ -554,6 +555,7 @@ const minimalBspaohForLookupSelect = {
     select: {
       id: true,
       number: true,
+      transporterTakenOverAt: true,
       transporterTransportSignatureDate: true,
       transporterCompanySiret: true,
       transporterCompanyVatNumber: true
@@ -582,7 +584,10 @@ const bspaohToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bspaoh.wasteCode,
-      ...generateDateInfos(bspaoh.destinationReceptionSignatureDate),
+      ...generateDateInfos(
+        bspaoh.destinationReceptionDate ??
+          bspaoh.destinationReceptionSignatureDate
+      ),
       bspaohId: bspaoh.id
     });
   }
@@ -598,7 +603,10 @@ const bspaohToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bspaoh.wasteCode,
-      ...generateDateInfos(transporter.transporterTransportSignatureDate),
+      ...generateDateInfos(
+        transporter.transporterTakenOverAt ??
+          transporter.transporterTransportSignatureDate
+      ),
       bspaohId: bspaoh.id
     });
   }
@@ -614,7 +622,7 @@ const bspaohToLookupCreateInputs = (
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bspaoh.wasteCode,
         ...generateDateInfos(
-          bspaoh.transporterTransportTakenOverAt ??
+          transporter.transporterTakenOverAt ??
             transporter.transporterTransportSignatureDate
         ),
         bspaohId: bspaoh.id
