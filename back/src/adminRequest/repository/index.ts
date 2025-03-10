@@ -9,13 +9,15 @@ import { AdminRequestActions } from "./types";
 import buildFindFirstAdminRequest from "./adminRequest/findFirst";
 import { buildUpdateAdminRequest } from "./adminRequest/update";
 import { buildFindManyAdminRequest } from "./adminRequest/findMany";
+import { buildCountAdminRequests } from "./adminRequest/count";
 
 export type AdminRequestRepository = AdminRequestActions;
 
 export function getReadonlyAdminRequestRepository() {
   return {
     findFirst: buildFindFirstAdminRequest({ prisma }),
-    findMany: buildFindManyAdminRequest({ prisma })
+    findMany: buildFindManyAdminRequest({ prisma }),
+    count: buildCountAdminRequests({ prisma })
   };
 }
 

@@ -3,18 +3,26 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import {
+  companyFactory,
   siretify,
   userFactory,
   userInCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { AdminRequestValidationMethod } from "@prisma/client";
+import {
+  AdminRequestStatus,
+  AdminRequestValidationMethod
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
 
 const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
     createAdminRequest(input: $input) {
       id
+      companyOrgId
+      companyName
+      status
+      createdAt
     }
   }
 `;
@@ -148,7 +156,7 @@ describe("Mutation createAdminRequest", () => {
     );
   });
 
-  it("should throw if requesting validation by collaborator email but providing no collborator email", async () => {
+  it("should throw if requesting validation by collaborator email but providing no collaborator email", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -212,5 +220,101 @@ describe("Mutation createAdminRequest", () => {
     expect(companyAdminRequest.validationMethod).toEqual(
       AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL
     );
+  });
+
+  it("should throw if there is already a pending request for this company", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    await prisma.adminRequest.create({
+      data: {
+        userId: user.id,
+        status: AdminRequestStatus.PENDING,
+        companyId: company.id,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Une demande est déjà en attente pour cette entreprise."
+    );
+  });
+
+  it("should allow creating admin requests for different companies", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const company2 = await companyFactory();
+    await prisma.adminRequest.create({
+      data: {
+        userId: user.id,
+        status: AdminRequestStatus.PENDING,
+        companyId: company.id,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company2.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
+
+  it("API should return expected fields", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const collaborator = await userInCompany("MEMBER", company.id, {
+      email: "collaborator@mail.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: collaborator.email
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createAdminRequest.id).not.toBeUndefined();
+    expect(data.createAdminRequest.createdAt).not.toBeUndefined();
+    expect(data.createAdminRequest.companyOrgId).toBe(company.orgId);
+    expect(data.createAdminRequest.companyName).toBe(company.name);
+    expect(data.createAdminRequest.status).toBe(AdminRequestStatus.PENDING);
   });
 });

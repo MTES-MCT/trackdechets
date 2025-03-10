@@ -27,3 +27,8 @@ export const createAdminRequestInputSchema = z
       });
     }
   });
+
+export const queryAdminRequestsArgsSchema = z.object({
+  skip: z.number().nonnegative().nullish(),
+  first: z.number().min(1).max(50).nullish()
+});

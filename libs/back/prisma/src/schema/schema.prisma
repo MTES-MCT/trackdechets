@@ -325,6 +325,8 @@ model Company {
   registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
   registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
+  adminRequests AdminRequest[] @relation("AdminRequestCompany")
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
@@ -2114,6 +2116,7 @@ model AdminRequest {
 
   // The orgId of the company the user wants to be admin of
   companyId String @db.VarChar(30)
+  company Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
 
   // The collaborator who has been asked to approve the request 
   collaboratorId String?  @db.VarChar(30)

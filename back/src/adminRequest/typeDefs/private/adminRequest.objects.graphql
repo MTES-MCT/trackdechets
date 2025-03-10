@@ -1,3 +1,40 @@
 type AdminRequest {
+  """
+  L'identifiant unique de la demande
+  """
   id: ID!
+
+  """
+  Le siret ou n° de TVA de l'entreprise ciblée
+  """
+  companyOrgId: String!
+
+  """
+  Le nom de l'entreprise ciblée
+  """
+  companyName: String!
+
+  """
+  La date de création de la demande
+  """
+  createdAt: DateTime!
+
+  """
+  Le statut de la demande
+  """
+  status: AdminRequestStatus!
+}
+
+type AdminRequestEdge {
+  cursor: String!
+  node: AdminRequest!
+}
+
+"""
+List paginée de délégations
+"""
+type AdminRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AdminRequestEdge!]!
 }

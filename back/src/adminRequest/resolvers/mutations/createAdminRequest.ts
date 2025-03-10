@@ -1,15 +1,17 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
+  AdminRequest,
   MutationCreateAdminRequestArgs,
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { AdminRequest, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { parseCreateAdminRequestInput } from "../../validation";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
+import { toGQLAdminRequest } from "../adminRequestResolverUtils";
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -73,44 +75,30 @@ const createAdminRequest = async (
     }
   }
 
+  // Make sure there isn't already a PENDING request
+  const existingRequest = await prisma.adminRequest.findFirst({
+    where: { userId: user.id, companyId: company.id, status: "PENDING" }
+  });
+
+  if (existingRequest) {
+    throw new UserInputError(
+      "Une demande est déjà en attente pour cette entreprise."
+    );
+  }
+
   // Create admin request
   const { create } = await getAdminRequestRepository(user);
-  const adminRequest = create({
-    userId: user.id,
-    companyId: company.id,
-    collaboratorId: collaborator?.id,
-    validationMethod: adminRequestInput.validationMethod
-  });
-  //   // Fetch companies
-  //   const { delegator, delegate } = await findDelegateAndDelegatorOrThrow(
-  //     delegationInput.delegateOrgId,
-  //     delegationInput.delegatorOrgId
-  //   );
+  const adminRequest = await create(
+    {
+      userId: user.id,
+      company: { connect: { id: company.id } },
+      collaboratorId: collaborator?.id,
+      validationMethod: adminRequestInput.validationMethod
+    },
+    { include: { company: true } }
+  );
 
-  //   // Make sure user can create delegation
-  //   await checkCanCreate(user, delegator);
-
-  //   // Check there's not already an existing delegation
-  //   await checkNoExistingNotRevokedAndNotExpiredDelegation(
-  //     user,
-  //     delegator,
-  //     delegate
-  //   );
-
-  //   // Create delegation
-  //   const delegation = await createDelegation(
-  //     user,
-  //     delegationInput,
-  //     delegator,
-  //     delegate
-  //   );
-
-  //   // Send email
-  //   await sendRegistryDelegationCreationEmail(delegation, delegator, delegate);
-
-  //   return fixTyping(delegation);
-
-  return adminRequest;
+  return toGQLAdminRequest({ ...adminRequest, company });
 };
 
 export default createAdminRequest;

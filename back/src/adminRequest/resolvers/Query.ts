@@ -1,16 +1,10 @@
 import type { QueryResolvers } from "@td/codegen-back";
-// import AdminRequest from "./queries/AdminRequest";
-// import AdminRequests from "./queries/AdminRequests";
+import adminRequests from "./queries/private/adminRequests";
 
-export type AdminRequestQueryResolvers = QueryResolvers;
-// Pick<
-// QueryResolvers,
-// "AdminRequest" | "AdminRequests"
-// >;
+export type AdminRequestQueryResolvers = Pick<QueryResolvers, "adminRequests">;
 
 const Query: AdminRequestQueryResolvers = {
-  // AdminRequest,
-  // AdminRequests
+  adminRequests
 };
 
 export default Query;
