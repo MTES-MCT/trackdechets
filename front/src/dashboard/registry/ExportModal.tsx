@@ -424,11 +424,12 @@ export function ExportModal({ isOpen, onClose }: Props) {
   useEffect(() => {
     const defaults = getDefaultsForRegistryType(registryType);
     if (defaults) {
-      Object.keys(defaults).forEach((key: "wasteTypes" | "declarationType") => {
-        if (defaults[key]) {
-          setValue(key, defaults[key]);
-        }
-      });
+      if (defaults.wasteTypes) {
+        setValue("wasteTypes", defaults.wasteTypes);
+      }
+      if (defaults.declarationType) {
+        setValue("declarationType", defaults.declarationType);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registryType]);
