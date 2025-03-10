@@ -19,6 +19,7 @@ type Props = {
     key: string;
     name: string;
   };
+  label?: string;
 };
 
 const MY_COMPANIES = gql`
@@ -47,7 +48,8 @@ const MY_COMPANIES = gql`
 export function RegistryCompanySwitcher({
   onCompanySelect,
   wrapperClassName,
-  allOption
+  allOption,
+  label
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [debouncedClue, setDebouncedClue] = useState("");
@@ -137,7 +139,7 @@ export function RegistryCompanySwitcher({
       className={wrapperClassName ?? "tw-relative tw-w-1/2"}
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
-      <span className="fr-label">Établissement concerné</span>
+      <span className="fr-label">{label || "Établissement concerné"}</span>
       <div
         className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
         onClick={() => setIsOpen(!isOpen)}

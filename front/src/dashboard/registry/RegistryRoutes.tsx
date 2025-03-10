@@ -4,10 +4,12 @@ import React from "react";
 import RegistryMenu from "./RegistryMenu";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
-import { CompanyImports } from "./CompanyImports";
+import { CompanyImports } from "./companyImport/CompanyImports";
 import routes, { getRelativeRoute } from "../../Apps/routes";
 import { MyExports } from "./MyExports";
 import { MyImports } from "./MyImports";
+import { MyLines } from "./myLines/MyLines";
+import { FormContainer } from "./myLines/FormContainer";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -39,6 +41,16 @@ export default function RegistryRoutes() {
           <Route
             path={toRelative(routes.registry_new.export)}
             element={<MyExports />}
+          />
+
+          <Route
+            path={toRelative(routes.registry_new.lines)}
+            element={<MyLines />}
+          />
+
+          <Route
+            path={toRelative(routes.registry_new.form.ssd)}
+            element={<FormContainer />}
           />
 
           <Route
