@@ -19,6 +19,7 @@ const CONNECT_SRC = [
   "https://api-adresse.data.gouv.fr",
   "https://sentry.incubateur.net",
   "https://openmaptiles.geo.data.gouv.fr",
+  "https://openmaptiles.data.gouv.fr",
   "https://openmaptiles.github.io",
   "https://s3.fr-par.scw.cloud"
 ];
