@@ -1,29 +1,34 @@
 import React, { useState } from "react";
 import TdModal from "../../../../common/Components/Modal/Modal";
 import { CompanyCreateAdminRequestModalStep1 } from "./CompanyCreateAdminRequestModalStep1";
-import {
-  AdminRequestValidationMethod,
-  CompanyCreateAdminRequestModalStep2
-} from "./CompanyCreateAdminRequestModalStep2";
+import { CompanyCreateAdminRequestModalStep2 } from "./CompanyCreateAdminRequestModalStep2";
 import { CompanyCreateAdminRequestModalStep3 } from "./CompanyCreateAdminRequestModalStep3";
 import Stepper from "@codegouvfr/react-dsfr/Stepper";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import {
+  Mutation,
+  MutationCreateAdminRequestArgs,
+  AdminRequestValidationMethod
+} from "@td/codegen-ui";
+import { useMutation } from "@apollo/client";
+import {
+  ADMIN_REQUESTS,
+  CREATE_ADMIN_REQUEST
+} from "../../../../common/queries/adminRequest/adminRequest";
+import toast from "react-hot-toast";
 
 const steps = [
   {
     title: "Établissement concerné",
-    component: CompanyCreateAdminRequestModalStep1,
-    buttons: ["CANCEL", "NEXT"]
+    component: CompanyCreateAdminRequestModalStep1
   },
   {
     title: "Validation au sein de l'établissement",
-    component: CompanyCreateAdminRequestModalStep2,
-    buttons: ["PREVIOUS", "NEXT"]
+    component: CompanyCreateAdminRequestModalStep2
   },
   {
     title: "Confirmer la demande",
-    component: CompanyCreateAdminRequestModalStep3,
-    buttons: ["PREVIOUS", "VALIDATE"]
+    component: CompanyCreateAdminRequestModalStep3
   }
 ];
 
@@ -39,8 +44,6 @@ interface CreateAdminRequestFormInputs {
   collaboratorEmail: string | null;
 }
 
-// TODO: reset form when closing modal
-// TODO: ajouter validation
 export const CompanyCreateAdminRequestModal = ({
   isOpen,
   onClose
@@ -55,20 +58,40 @@ export const CompanyCreateAdminRequestModal = ({
     }
   });
 
+  const [createAdminRequest, { loading, error, reset }] = useMutation<
+    Pick<Mutation, "createAdminRequest">,
+    MutationCreateAdminRequestArgs
+  >(CREATE_ADMIN_REQUEST, {
+    refetchQueries: [ADMIN_REQUESTS]
+  });
+
   const companyName = methods.watch("companyName");
   const companyOrgId = methods.watch("companyOrgId");
   const validationMethod = methods.watch("validationMethod");
   const collaboratorEmail = methods.watch("collaboratorEmail");
 
-  console.log("values", {
-    companyName,
-    companyOrgId,
-    validationMethod,
-    collaboratorEmail
-  });
+  const onSubmit: SubmitHandler<CreateAdminRequestFormInputs> = async () => {
+    console.log("submit", {
+      companyName,
+      companyOrgId,
+      validationMethod,
+      collaboratorEmail
+    });
 
-  const onSubmit: SubmitHandler<CreateAdminRequestFormInputs> = () =>
-    console.log("submit");
+    await createAdminRequest({
+      variables: {
+        input: {
+          companyOrgId,
+          validationMethod,
+          collaboratorEmail
+        }
+      },
+      onCompleted: () => {
+        toast.success("Demande envoyée!");
+        closeAndReset();
+      }
+    });
+  };
 
   const closeAndReset = () => {
     setCurrentStepIdx(0);
@@ -95,53 +118,19 @@ export const CompanyCreateAdminRequestModal = ({
         />
       </div>
 
-      <div className="fr-mb-2w">
-        <ul className="fr-ml-2w" style={{ listStyleType: "disc" }}>
-          {companyName && companyOrgId && (
-            <li>
-              Établissement concerné: {companyName} - {companyOrgId}
-            </li>
-          )}
-          {collaboratorEmail && (
-            <li>Collaborateur pouvant valider: {collaboratorEmail}</li>
-          )}
-        </ul>
-      </div>
-
-      <div>
-        <FormProvider {...methods}>
-          <StepComponent />
-        </FormProvider>
-      </div>
-
-      <div className="td-modal-actions">
-        {steps[currentStepIdx].buttons?.includes("CANCEL") && (
-          <button className="fr-btn fr-btn--secondary" onClick={closeAndReset}>
-            Annuler
-          </button>
-        )}
-        {steps[currentStepIdx].buttons?.includes("PREVIOUS") && (
-          <button
-            className="fr-btn"
-            onClick={() => setCurrentStepIdx(currentStepIdx - 1)}
-          >
-            Retour
-          </button>
-        )}
-        {steps[currentStepIdx].buttons?.includes("NEXT") && (
-          <button
-            className="fr-btn"
-            onClick={() => setCurrentStepIdx(currentStepIdx + 1)}
-          >
-            Suivant
-          </button>
-        )}
-        {steps[currentStepIdx].buttons?.includes("VALIDATE") && (
-          <button className="fr-btn" onClick={onSubmit}>
-            Envoyer la demande
-          </button>
-        )}
-      </div>
+      <FormProvider {...methods}>
+        <StepComponent
+          onClickNext={() => setCurrentStepIdx(currentStepIdx + 1)}
+          onClickPrevious={() => {
+            setCurrentStepIdx(currentStepIdx - 1);
+            reset();
+          }}
+          onSubmit={onSubmit}
+          onCancel={closeAndReset}
+          loading={loading}
+          error={error?.message}
+        />
+      </FormProvider>
     </TdModal>
   );
 };

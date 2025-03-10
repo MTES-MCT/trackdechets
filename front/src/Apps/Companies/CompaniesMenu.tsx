@@ -14,6 +14,7 @@ export const CompaniesMenuContent = () => (
     <ul>
       <li className="tw-mb-1">
         <NavLink
+          end
           to={routes.companies.index}
           className={({ isActive }) =>
             isActive

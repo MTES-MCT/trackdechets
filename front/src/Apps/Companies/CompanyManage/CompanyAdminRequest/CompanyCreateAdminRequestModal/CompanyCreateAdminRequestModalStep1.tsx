@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import CompanySelectorWrapper from "../../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useFormContext } from "react-hook-form";
+import { isDefined } from "../../../../../common/helper";
 
-export const CompanyCreateAdminRequestModalStep1 = () => {
+export const CompanyCreateAdminRequestModalStep1 = ({
+  onClickNext,
+  onCancel
+}) => {
   const { register, setValue, watch } = useFormContext();
 
   const companyOrgId = watch("companyOrgId");
@@ -13,18 +17,36 @@ export const CompanyCreateAdminRequestModalStep1 = () => {
   }, [register]);
 
   return (
-    <CompanySelectorWrapper
-      orgId={companyOrgId}
-      selectedCompanyOrgId={companyOrgId}
-      onCompanySelected={company => {
-        if (company) {
-          setValue("companyOrgId", company?.orgId);
-          setValue("companyName", company?.name);
-        } else {
-          setValue("companyOrgId", null);
-          setValue("companyName", null);
-        }
-      }}
-    />
+    <>
+      <div>
+        <CompanySelectorWrapper
+          orgId={companyOrgId}
+          selectedCompanyOrgId={companyOrgId}
+          onCompanySelected={company => {
+            if (company) {
+              setValue("companyOrgId", company?.orgId);
+              setValue("companyName", company?.name);
+            } else {
+              setValue("companyOrgId", null);
+              setValue("companyName", null);
+            }
+          }}
+        />
+      </div>
+
+      <div className="td-modal-actions">
+        <button className="fr-btn fr-btn--secondary" onClick={onCancel}>
+          Annuler
+        </button>
+
+        <button
+          className="fr-btn"
+          disabled={!isDefined(companyOrgId)}
+          onClick={onClickNext}
+        >
+          Suivant
+        </button>
+      </div>
+    </>
   );
 };
