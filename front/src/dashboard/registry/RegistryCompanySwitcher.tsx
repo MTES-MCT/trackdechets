@@ -19,12 +19,18 @@ type Props = {
     key: string;
     name: string;
   };
+  label?: string;
+  defaultSiret?: string;
+  excludeDelegations?: boolean;
 };
 
 export function RegistryCompanySwitcher({
   onCompanySelect,
   wrapperClassName,
-  allOption
+  allOption,
+  label,
+  defaultSiret,
+  excludeDelegations = false
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [debouncedClue, setDebouncedClue] = useState("");
@@ -61,13 +67,13 @@ export function RegistryCompanySwitcher({
     variables: {
       search: debouncedClue,
       firstCompanies: 10,
-      firstDelegators: 10,
+      firstDelegators: excludeDelegations ? 0 : 10,
       userRoles: [UserRole.Admin, UserRole.Member, UserRole.Reader]
     },
     onCompleted: data => {
       if (!selectedItem && !allOption) {
-        const firstNode = data.registryCompanies.myCompanies.find(
-          node => node.siret
+        const firstNode = data.registryCompanies.myCompanies.find(node =>
+          defaultSiret ? node.siret === defaultSiret : node.siret
         );
 
         if (firstNode) {
@@ -99,7 +105,7 @@ export function RegistryCompanySwitcher({
       className={wrapperClassName ?? "tw-relative tw-w-1/2"}
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
-      <span className="fr-label">Établissement concerné</span>
+      <span className="fr-label">{label || "Établissement concerné"}</span>
       <div
         className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
         onClick={() => setIsOpen(!isOpen)}

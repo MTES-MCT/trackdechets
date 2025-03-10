@@ -279,7 +279,7 @@ export const nullishDateSchema = z
       .nullish()
   );
 
-const stringToArraySchema = z
+export const stringToArraySchema = z
   .string()
   .trim()
   .nullish()

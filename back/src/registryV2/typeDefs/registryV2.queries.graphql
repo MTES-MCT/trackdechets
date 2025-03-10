@@ -57,4 +57,22 @@ type Query {
   Permet de récupérer un export en particulier
   """
   registryV2Export(id: ID!): RegistryV2Export!
+
+  "Récupère les informations sur une déclaration de registre"
+  registryLookup(
+    "SIRET pour lequel la déclaration a été faite"
+    siret: String!
+    "Identifiant unique de la déclaration"
+    publicId: ID!
+    "Type de registre auquel appartient la déclaration"
+    type: RegistryImportType!
+  ): RegistryLookup!
+
+  "Récupère les déclarations de registre récentes"
+  registryLookups(
+    "SIRET pour lequel les déclarations ont été faites"
+    siret: String!
+    "Type de registre auquel appartient la déclaration"
+    type: RegistryImportType
+  ): [RegistryLookup!]
 }

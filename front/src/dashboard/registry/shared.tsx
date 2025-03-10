@@ -3,6 +3,7 @@ import { RegistryImportStatus, RegistryImportType } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
 import gql from "graphql-tag";
 import React from "react";
+import routes from "../../Apps/routes";
 
 export const GET_REGISTRY_IMPORTS = gql`
   query GetRegistryImports(
@@ -50,6 +51,38 @@ export const GET_REGISTRY_IMPORTS = gql`
   }
 `;
 
+export const GET_REGISTRY_LOOKUP = gql`
+  query GetRegistryLookup(
+    $siret: String!
+    $type: RegistryImportType!
+    $publicId: ID!
+  ) {
+    registryLookup(siret: $siret, type: $type, publicId: $publicId) {
+      createdAt
+      publicId
+      type
+      siret
+      reportAsSiret
+      date
+      wasteCode
+    }
+  }
+`;
+
+export const GET_REGISTRY_LOOKUPS = gql`
+  query GetRegistryLookups($siret: String!) {
+    registryLookups(siret: $siret) {
+      createdAt
+      publicId
+      type
+      siret
+      reportAsSiret
+      date
+      wasteCode
+    }
+  }
+`;
+
 export const TYPES: { [key in RegistryImportType]: string } = {
   SSD: "SSD",
   INCOMING_WASTE: "D et ND entrants",
@@ -58,6 +91,16 @@ export const TYPES: { [key in RegistryImportType]: string } = {
   OUTGOING_TEXS: "TEXS sortants",
   TRANSPORTED: "Transportés",
   MANAGED: "Gérés"
+};
+
+export const TYPES_ROUTES: { [key in RegistryImportType]: string } = {
+  SSD: routes.registry_new.form.ssd,
+  INCOMING_WASTE: routes.registry_new.form.incomingWaste,
+  OUTGOING_WASTE: routes.registry_new.form.incomingTexs,
+  INCOMING_TEXS: routes.registry_new.form.outgoingWaste,
+  OUTGOING_TEXS: routes.registry_new.form.outgoingTexs,
+  TRANSPORTED: routes.registry_new.form.transported,
+  MANAGED: routes.registry_new.form.managed
 };
 
 export const badges = {
