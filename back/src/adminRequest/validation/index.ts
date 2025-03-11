@@ -1,12 +1,14 @@
 import {
   CreateAdminRequestInput,
+  AcceptAdminRequestInput,
   QueryAdminRequestsArgs,
   MutationRefuseAdminRequestArgs
 } from "@td/codegen-back";
 import {
   createAdminRequestInputSchema,
   queryAdminRequestsArgsSchema,
-  adminRequestIdSchema
+  adminRequestIdSchema,
+  acceptAdminRequestInputSchema
 } from "./schema";
 
 export const parseCreateAdminRequestInput = (
@@ -27,4 +29,10 @@ export const parseMutationRefuseAdminRequestArgs = (
   args: MutationRefuseAdminRequestArgs
 ) => {
   return adminRequestIdSchema.parse(args);
+};
+
+export const parseAcceptAdminRequestInput = (
+  input: AcceptAdminRequestInput
+) => {
+  return acceptAdminRequestInputSchema.parse(input);
 };

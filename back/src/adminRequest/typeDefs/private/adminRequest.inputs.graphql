@@ -14,3 +14,10 @@ input CreateAdminRequestInput {
   """
   validationMethod: AdminRequestValidationMethod
 }
+
+input AcceptAdminRequestInput {
+  """
+  L'identifiant unique de la demande
+  """
+  adminRequestId: ID!
+}

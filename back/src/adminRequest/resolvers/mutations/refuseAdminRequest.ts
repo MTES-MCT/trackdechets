@@ -64,7 +64,7 @@ const refuseAdminRequest = async (
   const updatedAdminRequest = await update(
     { id: adminRequestId },
     {
-      status: "REFUSED"
+      status: AdminRequestStatus.REFUSED
     }
   );
 

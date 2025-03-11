@@ -38,3 +38,7 @@ export const queryAdminRequestsArgsSchema = z.object({
 export const adminRequestIdSchema = z.object({
   adminRequestId: idSchema
 });
+
+export const acceptAdminRequestInputSchema = z.object({
+  adminRequestId: idSchema
+});
