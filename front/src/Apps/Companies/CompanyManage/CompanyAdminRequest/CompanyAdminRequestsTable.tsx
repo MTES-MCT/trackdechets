@@ -81,16 +81,15 @@ export const CompanyAdminRequestsTable = () => {
               </thead>
               <tbody>
                 {requests.map(request => {
-                  const { id, companyName, companyOrgId, createdAt, status } =
-                    request;
+                  const { id, company, createdAt, status } = request;
 
                   return (
                     <tr key={id}>
                       <td
                         className="fr-py-4v"
-                        aria-describedby={`company-name-${companyOrgId}`}
+                        aria-describedby={`company-name-${company.orgId}`}
                       >
-                        {`${companyName} - ${companyOrgId}`}
+                        {`${company.name} - ${company.orgId}`}
                       </td>
                       <td>{formatDateViewDisplay(createdAt)}</td>
                       <td>{getStatusBadge(status)}</td>

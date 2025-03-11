@@ -4,8 +4,10 @@ export const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
     createAdminRequest(input: $input) {
       id
-      companyOrgId
-      companyName
+      company {
+        orgId
+        name
+      }
       status
       createdAt
     }
@@ -25,8 +27,10 @@ export const ADMIN_REQUESTS = gql`
       edges {
         node {
           id
-          companyOrgId
-          companyName
+          company {
+            orgId
+            name
+          }
           status
           createdAt
         }
