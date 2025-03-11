@@ -11,7 +11,7 @@ import { parseCreateAdminRequestInput } from "../../validation";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
-import { toGQLAdminRequest } from "../adminRequestResolverUtils";
+import { fixTyping } from "../typing";
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -75,9 +75,13 @@ const createAdminRequest = async (
     }
   }
 
+  const { create, findFirst } = getAdminRequestRepository(user);
+
   // Make sure there isn't already a PENDING request
-  const existingRequest = await prisma.adminRequest.findFirst({
-    where: { userId: user.id, companyId: company.id, status: "PENDING" }
+  const existingRequest = await findFirst({
+    userId: user.id,
+    companyId: company.id,
+    status: "PENDING"
   });
 
   if (existingRequest) {
@@ -87,7 +91,6 @@ const createAdminRequest = async (
   }
 
   // Create admin request
-  const { create } = await getAdminRequestRepository(user);
   const adminRequest = await create(
     {
       userId: user.id,
@@ -98,7 +101,7 @@ const createAdminRequest = async (
     { include: { company: true } }
   );
 
-  return toGQLAdminRequest({ ...adminRequest, company });
+  return fixTyping(adminRequest);
 };
 
 export default createAdminRequest;

@@ -3,6 +3,8 @@ import { siretSchema } from "../../common/validation/zod/schema";
 import { AdminRequestValidationMethod } from "@prisma/client";
 import { isDefined } from "../../common/helpers";
 
+const idSchema = z.coerce.string().length(25, "L'id doit faire 25 caractères.");
+
 export const createAdminRequestInputSchema = z
   .object({
     companyOrgId: siretSchema(),
@@ -31,4 +33,8 @@ export const createAdminRequestInputSchema = z
 export const queryAdminRequestsArgsSchema = z.object({
   skip: z.number().nonnegative().default(0).nullish(),
   first: z.number().min(1).max(50).default(10).nullish()
+});
+
+export const adminRequestIdSchema = z.object({
+  adminRequestId: idSchema
 });

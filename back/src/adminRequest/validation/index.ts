@@ -1,10 +1,12 @@
 import {
   CreateAdminRequestInput,
-  QueryAdminRequestsArgs
+  QueryAdminRequestsArgs,
+  MutationRefuseAdminRequestArgs
 } from "@td/codegen-back";
 import {
   createAdminRequestInputSchema,
-  queryAdminRequestsArgsSchema
+  queryAdminRequestsArgsSchema,
+  adminRequestIdSchema
 } from "./schema";
 
 export const parseCreateAdminRequestInput = (
@@ -20,3 +22,9 @@ export function parseQueryAdminRequestsArgs(args: QueryAdminRequestsArgs) {
 export type ParsedQueryAdminRequestsArgs = ReturnType<
   typeof parseQueryAdminRequestsArgs
 >;
+
+export const parseMutationRefuseAdminRequestArgs = (
+  args: MutationRefuseAdminRequestArgs
+) => {
+  return adminRequestIdSchema.parse(args);
+};

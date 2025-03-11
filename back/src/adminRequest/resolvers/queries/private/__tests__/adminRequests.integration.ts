@@ -25,8 +25,10 @@ const ADMIN_REQUESTS = gql`
       edges {
         node {
           id
-          companyOrgId
-          companyName
+          company {
+            orgId
+            name
+          }
           status
           createdAt
         }
@@ -98,14 +100,14 @@ describe("Query adminRequests", () => {
 
     expect(data.adminRequests.totalCount).toBe(2);
 
-    expect(data.adminRequests.edges[0].node.companyOrgId).toBe(company2.orgId);
-    expect(data.adminRequests.edges[0].node.companyName).toBe(company2.name);
+    expect(data.adminRequests.edges[0].node.company.orgId).toBe(company2.orgId);
+    expect(data.adminRequests.edges[0].node.company.name).toBe(company2.name);
     expect(data.adminRequests.edges[0].node.status).toBe(
       AdminRequestStatus.PENDING
     );
 
-    expect(data.adminRequests.edges[1].node.companyOrgId).toBe(company1.orgId);
-    expect(data.adminRequests.edges[1].node.companyName).toBe(company1.name);
+    expect(data.adminRequests.edges[1].node.company.orgId).toBe(company1.orgId);
+    expect(data.adminRequests.edges[1].node.company.name).toBe(company1.name);
     expect(data.adminRequests.edges[1].node.status).toBe(
       AdminRequestStatus.PENDING
     );

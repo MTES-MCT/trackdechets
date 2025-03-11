@@ -1,0 +1,24 @@
+import { AdminRequest } from "@prisma/client";
+import type { AdminRequestCompany } from "@td/codegen-back";
+
+// Revolvers don't provide some of the fields, because they are computed
+// by sub-resolvers (ie: company).
+// However, Apollo complains that the resolvers are missing said fields.
+// With this method we fake providing the sub-fields and Apollo shuts up.
+export const fixTyping = (adminRequest: AdminRequest) => {
+  return {
+    ...adminRequest,
+    company: null as unknown as AdminRequestCompany
+  };
+};
+
+// Same as above, but for a paginated output
+export const fixPaginatedTyping = paginatedAdminRequests => {
+  return {
+    ...paginatedAdminRequests,
+    edges: paginatedAdminRequests.edges.map(edge => ({
+      ...edge,
+      node: fixTyping(edge.node)
+    }))
+  };
+};

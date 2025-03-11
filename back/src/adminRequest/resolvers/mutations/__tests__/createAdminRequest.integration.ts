@@ -19,8 +19,10 @@ const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
     createAdminRequest(input: $input) {
       id
-      companyOrgId
-      companyName
+      company {
+        orgId
+        name
+      }
       status
       createdAt
     }
@@ -313,8 +315,8 @@ describe("Mutation createAdminRequest", () => {
     expect(errors).toBeUndefined();
     expect(data.createAdminRequest.id).not.toBeUndefined();
     expect(data.createAdminRequest.createdAt).not.toBeUndefined();
-    expect(data.createAdminRequest.companyOrgId).toBe(company.orgId);
-    expect(data.createAdminRequest.companyName).toBe(company.name);
+    expect(data.createAdminRequest.company.orgId).toBe(company.orgId);
+    expect(data.createAdminRequest.company.name).toBe(company.name);
     expect(data.createAdminRequest.status).toBe(AdminRequestStatus.PENDING);
   });
 });

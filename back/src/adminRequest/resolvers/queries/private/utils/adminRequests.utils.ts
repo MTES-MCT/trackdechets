@@ -3,7 +3,6 @@ import {
   getConnection,
   getPrismaPaginationArgs
 } from "../../../../../common/pagination";
-import { toGQLAdminRequest } from "../../../adminRequestResolverUtils";
 
 interface Args {
   skip?: number | null | undefined;
@@ -33,7 +32,7 @@ export const getPaginatedDelegations = async (
         orderBy: { updatedAt: "desc" },
         include: { company: true }
       }),
-    formatNode: node => toGQLAdminRequest(node)
+    formatNode: node => node
   });
 
   return result;

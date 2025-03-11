@@ -1,3 +1,5 @@
 type Mutation {
   createAdminRequest(input: CreateAdminRequestInput!): AdminRequest!
+
+  refuseAdminRequest(adminRequestId: ID!): AdminRequest!
 }

@@ -3,6 +3,7 @@ import { checkIsAuthenticated } from "../../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
 import { parseQueryAdminRequestsArgs } from "../../../validation";
 import { getPaginatedDelegations } from "./utils/adminRequests.utils";
+import { fixPaginatedTyping } from "../../typing";
 
 const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
   _,
@@ -24,7 +25,7 @@ const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
     first
   });
 
-  return paginatedDelegations;
+  return fixPaginatedTyping(paginatedDelegations);
 };
 
 export default adminRequestsResolver;
