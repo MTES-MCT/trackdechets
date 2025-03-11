@@ -36,6 +36,8 @@ export const toIncomingWaste = (
     wastePop: incomingWaste.wastePop,
     wasteIsDangerous: incomingWaste.wasteIsDangerous,
     weight: null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName: incomingWaste.initialEmitterCompanyName,
     initialEmitterCompanySiret: incomingWaste.initialEmitterCompanyOrgId,
     initialEmitterCompanyAddress: incomingWaste.initialEmitterCompanyAddress,
@@ -47,6 +49,7 @@ export const toIncomingWaste = (
     initialEmitterMunicipalitiesInseeCodes:
       incomingWaste.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: incomingWaste.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: incomingWaste.emitterCompanyOrgId,

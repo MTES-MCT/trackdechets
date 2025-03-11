@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { useMutation, useQuery } from "@apollo/client";
 import styles from "./MyExports.module.scss";
@@ -10,7 +10,8 @@ import {
   Query,
   RegistryV2ExportWasteType,
   UserRole,
-  RegistryV2ExportType
+  RegistryV2ExportType,
+  CompanyType
 } from "@td/codegen-ui";
 import {
   GENERATE_REGISTRY_V2_EXPORT,
@@ -47,6 +48,7 @@ type ExportCompany = {
   name: string | null | undefined;
   givenName: string | null | undefined;
   delegate: string | null;
+  companyTypes: CompanyType[];
 };
 
 const displayError = (error: FieldError | undefined) => {
@@ -130,8 +132,8 @@ const getFilterStateForRegistryType = (
 const getDefaultsForRegistryType = (
   registryType: RegistryV2ExportType
 ): {
-  wasteTypes: [RegistryV2ExportWasteType, ...RegistryV2ExportWasteType[]];
-  declarationType: DeclarationType;
+  wasteTypes?: [RegistryV2ExportWasteType, ...RegistryV2ExportWasteType[]];
+  declarationType?: DeclarationType;
 } => {
   if (registryType === RegistryV2ExportType.Ssd) {
     return {
@@ -144,38 +146,18 @@ const getDefaultsForRegistryType = (
     };
   } else if (registryType === RegistryV2ExportType.Incoming) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Managed) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Outgoing) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.Transported) {
     return {
-      wasteTypes: [
-        RegistryV2ExportWasteType.Dnd,
-        RegistryV2ExportWasteType.Dd,
-        RegistryV2ExportWasteType.Texs
-      ],
       declarationType: DeclarationType.All
     };
   } else if (registryType === RegistryV2ExportType.All) {
@@ -190,7 +172,7 @@ const getDefaultsForRegistryType = (
       RegistryV2ExportWasteType.Dd,
       RegistryV2ExportWasteType.Texs
     ],
-    declarationType: DeclarationType.All
+    declarationType: DeclarationType.Registry
   };
 };
 
@@ -345,7 +327,8 @@ export function ExportModal({ isOpen, onClose }: Props) {
         orgId: company.node.orgId,
         name: company.node.name,
         givenName: company.node.givenName,
-        delegate: null
+        delegate: null,
+        companyTypes: company.node.companyTypes
       });
       if (company.node.delegators) {
         company.node.delegators.forEach(delegator => {
@@ -353,7 +336,8 @@ export function ExportModal({ isOpen, onClose }: Props) {
             orgId: delegator.orgId,
             name: delegator.name,
             givenName: delegator.givenName,
-            delegate: company.node.orgId
+            delegate: company.node.orgId,
+            companyTypes: delegator.companyTypes
           });
         });
       }
@@ -362,13 +346,91 @@ export function ExportModal({ isOpen, onClose }: Props) {
   }, [companiesData]);
 
   const registryType = watch("registryType");
+  const companyOrgId = watch("companyOrgId");
   const startDate = watch("startDate");
 
+  // get a list of possible export types for the seleced company (or all companies) to grey out
+  // the export types that are impossible
+  const possibleExportTypes = useMemo(() => {
+    const selectedCompanies =
+      companyOrgId === "all"
+        ? companies
+        : companies.filter(c => c.orgId === companyOrgId);
+    if (selectedCompanies.length === 0) {
+      return [];
+    }
+    const companyTypes = selectedCompanies.reduce((acc, company) => {
+      company.companyTypes.forEach(t => {
+        if (!acc.includes(t)) {
+          acc.push(t);
+        }
+      });
+      return acc;
+    }, [] as CompanyType[]);
+
+    const exportTypes: RegistryV2ExportType[] = [];
+
+    if (
+      companyTypes.filter(t =>
+        [
+          CompanyType.Producer,
+          CompanyType.WasteVehicles,
+          CompanyType.WasteCenter,
+          CompanyType.Collector,
+          CompanyType.Worker,
+          CompanyType.EcoOrganisme
+        ].includes(t)
+      ).length > 0
+    ) {
+      exportTypes.push(RegistryV2ExportType.Outgoing);
+    }
+
+    if (
+      companyTypes.filter(t =>
+        [
+          CompanyType.Wasteprocessor,
+          CompanyType.WasteVehicles,
+          CompanyType.Collector
+        ].includes(t)
+      ).length > 0
+    ) {
+      exportTypes.push(RegistryV2ExportType.Incoming);
+    }
+
+    if (companyTypes.includes(CompanyType.Transporter)) {
+      exportTypes.push(RegistryV2ExportType.Transported);
+    }
+
+    if (
+      companyTypes.includes(CompanyType.Trader) ||
+      companyTypes.includes(CompanyType.Broker) ||
+      companyTypes.includes(CompanyType.Intermediary)
+    ) {
+      exportTypes.push(RegistryV2ExportType.Managed);
+    }
+    exportTypes.push(RegistryV2ExportType.Ssd);
+    return exportTypes;
+  }, [companyOrgId, companies]);
+
+  // if the registry type is not in the possible export types, set the first possible export type
+  useEffect(() => {
+    if (!possibleExportTypes.includes(registryType)) {
+      setValue("registryType", possibleExportTypes[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [possibleExportTypes, registryType]);
+
+  // set the default values for waste types and declaration type depending on the registry type
   useEffect(() => {
     const defaults = getDefaultsForRegistryType(registryType);
-    Object.keys(defaults).forEach((key: "wasteTypes" | "declarationType") =>
-      setValue(key, defaults[key])
-    );
+    if (defaults) {
+      if (defaults.wasteTypes) {
+        setValue("wasteTypes", defaults.wasteTypes);
+      }
+      if (defaults.declarationType) {
+        setValue("declarationType", defaults.declarationType);
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [registryType]);
 
@@ -401,10 +463,12 @@ export function ExportModal({ isOpen, onClose }: Props) {
     if (
       registryType !== RegistryV2ExportType.Ssd &&
       registryType !== RegistryV2ExportType.Incoming &&
-      registryType !== RegistryV2ExportType.Outgoing
+      registryType !== RegistryV2ExportType.Outgoing &&
+      registryType !== RegistryV2ExportType.Transported &&
+      registryType !== RegistryV2ExportType.Managed
     ) {
       setError(
-        "Seuls les exports SSD, entrants et sortants sont supportés pour le moment"
+        "Seuls les exports SSD, entrants, sortants, transportés et gérés sont supportés pour le moment"
       );
       return;
     }
@@ -454,31 +518,6 @@ export function ExportModal({ isOpen, onClose }: Props) {
                 name: "Tous les établissements"
               }}
             />
-            {/* <Select
-              label="Établissement concerné"
-              disabled={isLoading}
-              nativeSelectProps={{
-                ...register("companyOrgId")
-              }}
-            >
-              <option value="all" key="all">
-                Tous les établissements
-              </option>
-              {companies.map((company, key) => {
-                const name =
-                  company.givenName && company.givenName !== ""
-                    ? company.givenName
-                    : company.name;
-
-                return (
-                  <option value={company.orgId} key={key}>
-                    {`${name} - ${company.orgId}${
-                      company.delegate ? ` (délégataire)` : ""
-                    }`}
-                  </option>
-                );
-              })}
-            </Select> */}
           </div>
           <div className="fr-mb-8v">
             <Select
@@ -488,12 +527,19 @@ export function ExportModal({ isOpen, onClose }: Props) {
                 ...register("registryType")
               }}
             >
-              {Object.keys(RegistryV2ExportType).map(key => (
+              {[
+                RegistryV2ExportType.Incoming,
+                RegistryV2ExportType.Outgoing,
+                RegistryV2ExportType.Transported,
+                RegistryV2ExportType.Managed,
+                RegistryV2ExportType.Ssd
+              ].map(key => (
                 <option
-                  value={RegistryV2ExportType[key]}
-                  key={RegistryV2ExportType[key]}
+                  value={key}
+                  key={key}
+                  disabled={!possibleExportTypes.includes(key)}
                 >
-                  {getRegistryTypeWording(RegistryV2ExportType[key])}
+                  {getRegistryTypeWording(key)}
                 </option>
               ))}
             </Select>

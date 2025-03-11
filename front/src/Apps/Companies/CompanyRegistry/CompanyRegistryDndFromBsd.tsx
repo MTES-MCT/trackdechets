@@ -3,7 +3,8 @@ import "./CompanyRegistryDndFromBsd.scss";
 import {
   CompanyPrivate,
   Mutation,
-  MutationEnableRegistryDndFromBsdArgs
+  MutationEnableRegistryDndFromBsdArgs,
+  UserRole
 } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -16,7 +17,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { CompanyDetailsfragment } from "../common/fragments";
 import { useMutation } from "@apollo/client";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { format } from "date-fns";
+import { format, isFuture } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Props {
   company: CompanyPrivate;
@@ -108,7 +110,9 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
       onError: err => setError(err.message)
     });
   };
-
+  const isFutureDate =
+    company.hasEnabledRegistryDndFromBsdSince &&
+    isFuture(new Date(company.hasEnabledRegistryDndFromBsdSince));
   return (
     <>
       {company.hasEnabledRegistryDndFromBsdSince ? (
@@ -117,34 +121,45 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
             Traçabilité des déchets non dangereux dans le registre activée
           </h4>
           <p className="fr-text--bold">
-            {`L’activation de la traçabilité est irréversible et a pris effet le
-            ${format(
-              new Date(company.hasEnabledRegistryDndFromBsdSince),
-              "dd/MM/yyyy"
-            )}.`}
+            {`L'activation de la traçabilité est irréversible et ${
+              isFutureDate
+                ? `prendra effet à 23h59 (heure de Paris) le ${format(
+                    new Date(company.hasEnabledRegistryDndFromBsdSince),
+                    "d MMMM yyyy",
+                    { locale: fr }
+                  )}`
+                : `a pris effet le ${format(
+                    new Date(company.hasEnabledRegistryDndFromBsdSince),
+                    "d MMMM yyyy",
+                    { locale: fr }
+                  )} à 00h00 (heure de Paris)`
+            }.`}
           </p>
           <div className="fr-my-5v">
             <ul className="fr-list">
               <li>
-                Les déchets non dangereux tracés avec Trackdéchets sont pris en
-                compte dans les registres réglementaires, les registres d'export
-                et les données agrégées pour l'administration.
+                {`Les déchets non dangereux tracés avec Trackdéchets ${
+                  isFutureDate ? "seront" : "sont"
+                } pris en compte dans les registres réglementaires, les registres
+                d'export et les données agrégées pour l'administration.`}
               </li>
               <li>
-                Les déchets non dangereux tracés avec Trackdéchets valent
-                déclaration au registre, il ne faut donc plus les déclarer via
-                les imports de registres, au risque de créer un doublon.
+                {`Les déchets non dangereux tracés avec Trackdéchets ${
+                  isFutureDate ? "vaudront" : "valent"
+                } déclaration au registre, il ne faut donc plus les déclarer via
+                les imports de registres, au risque de créer un doublon.`}
               </li>
               <li>
-                Les déchets non dangereux tracés avec Trackdéchets sont
-                consultables via l’ensemble des registres réglementaires et
-                exhaustif.
+                {`Les déchets non dangereux tracés avec Trackdéchets ${
+                  isFutureDate ? "seront" : "sont"
+                } consultables via l'ensemble des registres réglementaires et
+                exhaustif.`}
               </li>
             </ul>
           </div>
           <div className="fr-my-5v">
             <p>
-              Plus d’informations{" "}
+              Plus d'informations{" "}
               <a
                 className={`fr-link`}
                 href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
@@ -197,20 +212,23 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
               <li>
                 Les déchets non dangereux tracés avec Trackdéchets seront
-                consultables via l’ensemble des registres réglementaires et
+                consultables via l'ensemble des registres réglementaires et
                 exhaustif.
               </li>
             </ul>
           </div>
           <div className="fr-my-5v">
             <p className="fr-text--bold">
-              L'activation est irréversible et prendra effet immédiatement à la
-              date de confirmation.
+              {`L'activation est irréversible et prendra effet à 23h59 (heure de Paris) le ${format(
+                new Date(),
+                "d MMMM yyyy",
+                { locale: fr }
+              )}.`}
             </p>
           </div>
           <div className="fr-my-5v">
             <p>
-              Plus d’informations{" "}
+              Plus d'informations{" "}
               <a
                 className={`fr-link`}
                 href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
@@ -227,9 +245,16 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               iconId="fr-icon-arrow-right-line"
               iconPosition="right"
               onClick={() => confirmationModal.open()}
+              disabled={company.userRole !== UserRole.Admin}
             >
               Activer la traçabilité
             </Button>
+            {company.userRole !== UserRole.Admin && (
+              <p className="fr-mt-2v fr-text--xs">
+                Vous n'avez pas les droits pour activer la traçabilité des
+                déchets non dangereux dans le registre.
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -273,7 +298,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
               <li>
                 Les déchets non dangereux tracés avec Trackdéchets seront
-                consultables via l’ensemble des registres réglementaires et
+                consultables via l'ensemble des registres réglementaires et
                 exhaustif.
               </li>
             </ul>

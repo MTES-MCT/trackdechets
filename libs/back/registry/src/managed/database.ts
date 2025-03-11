@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { ParsedZodManagedItem } from "./validation/schema";
-// import { lookupUtils } from "./registry";
+import { lookupUtils } from "./registry";
 
 export async function saveManagedLine({
   line,
@@ -17,10 +17,10 @@ export async function saveManagedLine({
           where: { id },
           data: { isLatest: false }
         });
-        await tx.registryManaged.create({
+        const registryManaged = await tx.registryManaged.create({
           data: { ...persistedData, importId }
         });
-        // await lookupUtils.update(registryManaged, id ?? null, tx);
+        await lookupUtils.update(registryManaged, id ?? null, tx);
       });
       return;
     case "ANNULER":
@@ -29,9 +29,9 @@ export async function saveManagedLine({
           where: { id },
           data: { isCancelled: true }
         });
-        // if (id) {
-        //   await lookupUtils.delete(id, tx);
-        // }
+        if (id) {
+          await lookupUtils.delete(id, tx);
+        }
       });
 
       return;
@@ -39,10 +39,10 @@ export async function saveManagedLine({
       return;
     default:
       await prisma.$transaction(async tx => {
-        await tx.registryManaged.create({
+        const registryManaged = await tx.registryManaged.create({
           data: { ...persistedData, importId }
         });
-        // await lookupUtils.update(registryManaged, null, tx);
+        await lookupUtils.update(registryManaged, null, tx);
       });
 
       return;
