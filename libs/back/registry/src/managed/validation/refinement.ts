@@ -19,7 +19,7 @@ export const refineDates: Refinement<ParsedZodManagedItem> = (
   }
 };
 
-export const refineNotificationNumber: Refinement<ParsedZodManagedItem> = (
+export const refineGistridNumber: Refinement<ParsedZodManagedItem> = (
   managedItem,
   { addIssue }
 ) => {
@@ -32,19 +32,11 @@ export const refineNotificationNumber: Refinement<ParsedZodManagedItem> = (
     managedItem.destinationCompanyType
   );
 
-  if (!managedItem.notificationNumber && isDangerous && isAbroad) {
+  if (!managedItem.gistridNumber && isDangerous && isAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["notificationNumber"]
-    });
-  }
-
-  if (!managedItem.declarationNumber && !isDangerous && isAbroad) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["declarationNumber"]
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistridNumber"]
     });
   }
 };

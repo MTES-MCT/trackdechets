@@ -36,38 +36,24 @@ export const refineDestination = refineActorInfos<ParsedZodTransportedItem>({
   countryKey: "destinationCompanyCountryCode"
 });
 
-export const refineVolumeAndWeightIfWaste: Refinement<
-  ParsedZodTransportedItem
-> = (transportedItem, context) => {
-  const uncheckedCodes = [
-    "17 05 03*",
-    "17 05 04",
-    "17 05 05*",
-    "17 05 06",
-    "20 02 02"
-  ];
+export const refineGistridNumber: Refinement<ParsedZodTransportedItem> = (
+  managedItem,
+  { addIssue }
+) => {
+  const isDangerous =
+    managedItem.wasteIsDangerous ||
+    managedItem.wastePop ||
+    managedItem.wasteCode?.includes("*");
 
-  const shouldCheckCode =
-    !transportedItem.wasteCode ||
-    !uncheckedCodes.includes(transportedItem.wasteCode);
+  const isAbroad = ["ENTREPRISE_HORS_UE", "ENTREPRISE_UE"].includes(
+    managedItem.destinationCompanyType
+  );
 
-  if (transportedItem.reportForTransportIsWaste && shouldCheckCode) {
-    const isUsingRoad = transportedItem.reportForTransportMode === "ROAD";
-
-    if (isUsingRoad && transportedItem.weightValue > 40) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
-        path: ["weightValue"]
-      });
-    }
-
-    if (isUsingRoad && transportedItem.volume && transportedItem.volume > 40) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
-        path: ["volume"]
-      });
-    }
+  if (!managedItem.gistridNumber && isDangerous && isAbroad) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistrifNumber"]
+    });
   }
 };

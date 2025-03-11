@@ -3,7 +3,7 @@ import {
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationMode,
   refineTransportersConsistency,
   refineWeightIsEstimate
@@ -33,7 +33,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineWeightAndVolume)
     .superRefine(refineWeightIsEstimate)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(refineOperationMode)

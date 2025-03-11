@@ -2,7 +2,7 @@ import {
   refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationMode,
   refineTransportersConsistency
 } from "../../shared/refinement";
@@ -24,7 +24,7 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
   return outgoingWasteSchema
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
     .superRefine(refineOperationMode)

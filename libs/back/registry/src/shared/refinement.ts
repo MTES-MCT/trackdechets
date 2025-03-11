@@ -364,30 +364,21 @@ export const refineMunicipalities: Refinement<{
   }
 };
 
-export const refineNotificationNumber: Refinement<{
+export const refineGistridNumber: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
   wasteCode?: z.infer<ReturnType<typeof getWasteCodeSchema>> | null;
-  declarationNumber?: string | null | undefined;
-  notificationNumber?: string | null | undefined;
+  gistridNumber?: string | null | undefined;
   nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {
   const isDangerous =
     item.wasteIsDangerous || item.wastePop || item.wasteCode?.includes("*");
 
-  if (!item.notificationNumber && isDangerous && item.nextDestinationIsAbroad) {
+  if (!item.gistridNumber && isDangerous && item.nextDestinationIsAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["notificationNumber"]
-    });
-  }
-
-  if (!item.declarationNumber && !isDangerous && item.nextDestinationIsAbroad) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["declarationNumber"]
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistridNumber"]
     });
   }
 };

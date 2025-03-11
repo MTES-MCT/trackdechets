@@ -327,22 +327,12 @@ export const municipalitiesNamesSchema = z.union([
   municipalitiesNamesArraySchema
 ]);
 
-export const declarationNumberSchema = z
+export const gistridNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
-    v => /^A7[EI][0-9]{10}$/.test(v),
-    "Le numéro de déclaration GISTRID ne respecte pas le format attendu"
-  )
-
-  .nullish();
-
-export const notificationNumberSchema = z
-  .string()
-  .transform(v => v.replace(/\s+/g, ""))
-  .refine(
-    v => /^[A-Z]{2}[0-9]{10}$/.test(v),
-    "Le numéro de notification GISTRID ne respecte pas le format attendu"
+    v => /^[A-Z]{2}[0-9]{10}$/.test(v) || /^A7[EI][0-9]{10}$/.test(v),
+    "Le numéro de notification ou de déclaration GISTRID ne respecte pas le format attendu"
   )
   .nullish();
 

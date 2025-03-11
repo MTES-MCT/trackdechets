@@ -301,14 +301,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    declarationNumber:
-      !bsdd.wasteIsDangerous && !bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
-    notificationNumber:
-      bsdd.wasteIsDangerous || bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
+    gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null,
     nextOperationCode: bsdd.nextDestinationProcessingOperation,
     isUpcycled: null,
@@ -657,14 +650,7 @@ export const toOutgoingWasteV2 = (
     destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber:
-      !bsdd.wasteIsDangerous && !bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
-    notificationNumber:
-      bsdd.wasteIsDangerous || bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
+    gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -928,14 +914,7 @@ export const toTransportedWasteV2 = (
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
 
-    declarationNumber:
-      !bsdd.wasteIsDangerous && !bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
-    notificationNumber:
-      bsdd.wasteIsDangerous || bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
+    gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null
   };
 };
@@ -1213,14 +1192,7 @@ export const toManagedWasteV2 = (
     destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber:
-      !bsdd.wasteIsDangerous && !bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
-    notificationNumber:
-      bsdd.wasteIsDangerous || bsdd.pop
-        ? bsdd.nextDestinationNotificationNumber
-        : null,
+    gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,

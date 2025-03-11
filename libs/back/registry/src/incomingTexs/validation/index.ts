@@ -4,7 +4,7 @@ import {
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationCodeWhenUpcycled,
   refineOperationMode,
   refineTransportersConsistency,
@@ -30,7 +30,7 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(refineReportForProfile)
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(parcelRefinement)

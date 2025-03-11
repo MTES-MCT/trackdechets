@@ -200,8 +200,7 @@ export const toManagedWaste = (
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
 
-    declarationNumber: managedWaste.declarationNumber,
-    notificationNumber: managedWaste.notificationNumber,
+    gistridNumber: managedWaste.gistridNumber,
     movementNumber: managedWaste.movementNumber,
     isUpcycled: null,
     destinationParcelInseeCodes: null,

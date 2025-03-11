@@ -359,10 +359,8 @@ type IncomingWasteV2 {
   "Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  declarationNumber: String
+  gistridNumber: String
   movementNumber: String
-  "N° de notification"
-  notificationNumber: String
   "Code d'opération ultérieure prévue"
   nextOperationCode: String
 
@@ -763,10 +761,8 @@ type OutgoingWasteV2 {
   "Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
   destinationFinalOperationWeights: [Float!]
 
-  declarationNumber: String
+  gistridNumber: String
   movementNumber: String
-  "N° de notification"
-  notificationNumber: String
 
   isUpcycled: Boolean
 
@@ -1103,10 +1099,8 @@ type TransportedWasteV2 {
   "Charte citerne - Est-ce que la citerne a été rincée ou non?"
   destinationHasCiterneBeenWashedOut: Boolean
 
-  declarationNumber: String
+  gistridNumber: String
   movementNumber: String
-  "N° de notification"
-  notificationNumber: String
 }
 
 """
@@ -1507,10 +1501,8 @@ type ManagedWasteV2 {
   "Quantité(s) correspondante(s) au traitement réalisé par le ou les exutoires finaux"
   destinationFinalOperationWeights: [Float!]
 
-  declarationNumber: String
+  gistridNumber: String
   movementNumber: String
-  "N° de notification"
-  notificationNumber: String
 
   isUpcycled: Boolean
 

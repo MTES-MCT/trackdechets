@@ -4,7 +4,7 @@ import {
   refineDates,
   refineEmitter,
   refineDestination,
-  refineVolumeAndWeightIfWaste
+  refineGistridNumber
 } from "./refinement";
 import { transportedSchema } from "./schema";
 import {
@@ -17,7 +17,7 @@ export function safeParseAsyncTransported(line: unknown) {
     .superRefine(refineDates)
     .superRefine(refineEmitter)
     .superRefine(refineDestination)
-    .superRefine(refineVolumeAndWeightIfWaste)
+    .superRefine(refineGistridNumber)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .transform(transformReportForRecepisseNumber)

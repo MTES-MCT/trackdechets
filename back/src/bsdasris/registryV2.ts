@@ -225,8 +225,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null
@@ -418,8 +417,7 @@ export const toOutgoingWasteV2 = (
     nextDestinationPlannedOperationCodes: null,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -591,9 +589,8 @@ export const toTransportedWasteV2 = (
         : null,
     destinationHasCiterneBeenWashedOut: null,
 
-    declarationNumber: null,
-    movementNumber: null,
-    notificationNumber: null
+    gistridNumber: null,
+    movementNumber: null
   };
 };
 
