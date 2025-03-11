@@ -8,7 +8,11 @@ import {
   OperationMode,
   EmitterType
 } from "@prisma/client";
-import type { CiterneNotWashedOutReason, FormStatus } from "@td/codegen-back";
+import type {
+  CiterneNotWashedOutReason,
+  FormStatus,
+  PackagingInfo
+} from "@td/codegen-back";
 
 export const FormWithTransportersInclude =
   Prisma.validator<Prisma.FormInclude>()({
@@ -171,7 +175,7 @@ export type Bsdd = {
   emitterPickupSiteInfos: string | null;
   emitterEmissionSignatureAuthor: string | null;
   emitterEmissionSignatureDate: Date | null;
-  packagings: Prisma.JsonValue;
+  packagings: PackagingInfo[];
   wasteCode: string | null;
   wasteDescription: string | null;
   wasteDetailsLandIdentifiers: string[] | null;

@@ -6,6 +6,7 @@ import {
 import type {
   AppendixFormInput,
   InitialFormFractionInput,
+  PackagingInfo,
   ParcelNumber
 } from "@td/codegen-back";
 import { Bsdd } from "./types";
@@ -90,7 +91,12 @@ export function simpleFormToBsdd(
     emitterPickupSiteInfos: form.emitterWorkSiteInfos,
     emitterEmissionSignatureAuthor: form.sentBy,
     emitterEmissionSignatureDate: form.sentAt,
-    packagings: form.wasteDetailsPackagingInfos,
+    packagings:
+      (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+        ...p,
+        volume: p.volume ?? null,
+        identificationNumbers: p.identificationNumbers ?? []
+      })) ?? [],
     weightValue: form.wasteDetailsQuantity
       ? form.wasteDetailsQuantity.toNumber()
       : null,

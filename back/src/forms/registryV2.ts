@@ -2,6 +2,7 @@ import {
   IncomingWasteV2,
   ManagedWasteV2,
   OutgoingWasteV2,
+  PackagingInfo,
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
@@ -116,6 +117,16 @@ const getFinalOperationsData = (bsdd: BsddV2) => {
   };
 };
 
+const getQuantity = (packagings: PackagingInfo[]) => {
+  if (!packagings) {
+    return null;
+  }
+  return packagings.reduce(
+    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
+    0
+  );
+};
+
 export const toIncomingWasteV2 = (
   form: RegistryV2Bsdd
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
@@ -214,7 +225,7 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: null,
+    quantity: getQuantity(bsdd.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     initialEmitterCompanyName,
@@ -490,7 +501,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: null,
+    quantity: getQuantity(bsdd.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
@@ -779,7 +790,7 @@ export const toTransportedWasteV2 = (
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
     weight: bsdd.weightValue,
-    quantity: null,
+    quantity: getQuantity(bsdd.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdd.weightIsEstimate,
     volume: null,
@@ -1045,7 +1056,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsdd.pop,
     wasteIsDangerous: bsdd.wasteIsDangerous,
-    quantity: null,
+    quantity: getQuantity(bsdd.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdd.weightValue,
     weightIsEstimate: bsdd.weightIsEstimate,
