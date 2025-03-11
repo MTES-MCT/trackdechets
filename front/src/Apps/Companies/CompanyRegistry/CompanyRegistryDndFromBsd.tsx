@@ -18,6 +18,7 @@ import { CompanyDetailsfragment } from "../common/fragments";
 import { useMutation } from "@apollo/client";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { format, isFuture } from "date-fns";
+import { fr } from "date-fns/locale";
 
 interface Props {
   company: CompanyPrivate;
@@ -121,12 +122,18 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
           </h4>
           <p className="fr-text--bold">
             {`L'activation de la traçabilité est irréversible et ${
-              isFutureDate ? "prendra" : "a pris"
-            } effet le
-            ${format(
-              new Date(company.hasEnabledRegistryDndFromBsdSince),
-              "dd/MM/yyyy"
-            )}.`}
+              isFutureDate
+                ? `prendra effet à 23h59 (heure de Paris) le ${format(
+                    new Date(company.hasEnabledRegistryDndFromBsdSince),
+                    "d MMMM yyyy",
+                    { locale: fr }
+                  )}`
+                : `a pris effet le ${format(
+                    new Date(company.hasEnabledRegistryDndFromBsdSince),
+                    "d MMMM yyyy",
+                    { locale: fr }
+                  )} à 00h00 (heure de Paris)`
+            }.`}
           </p>
           <div className="fr-my-5v">
             <ul className="fr-list">
@@ -212,8 +219,11 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
           </div>
           <div className="fr-my-5v">
             <p className="fr-text--bold">
-              L'activation est irréversible et prendra effet à minuit le jour de
-              la confirmation.
+              {`L'activation est irréversible et prendra effet à 23h59 (heure de Paris) le ${format(
+                new Date(),
+                "d MMMM yyyy",
+                { locale: fr }
+              )}.`}
             </p>
           </div>
           <div className="fr-my-5v">
