@@ -80,7 +80,9 @@ export function StatsTab({ source, siret }: Props) {
     <div>
       <CallOut title="">
         <SegmentedControl
-          legend="Statistiques des déclarations par API"
+          legend={`Statistiques des déclarations par ${
+            source === "API" ? "API" : "fichier"
+          }`}
           hintText={generatePeriodText(window)}
           segments={[
             {
@@ -129,12 +131,12 @@ export function StatsTab({ source, siret }: Props) {
           </div>
           <div className="tw-flex">
             <Stat value={stats?.ssd} label="SSD" />
-            <Stat value={stats?.incomingWaste} label="D(N)D entrants" />
-            <Stat value={stats?.outgoingWaste} label="D(N)D sortants" />
+            <Stat value={stats?.incomingWaste} label="D et ND entrants" />
+            <Stat value={stats?.outgoingWaste} label="D et ND sortants" />
             <Stat value={stats?.incomingTexs} label="TEXS entrants" />
             <Stat value={stats?.outgoingTexs} label="TEXS sortants" />
             <Stat value={stats?.transported} label="Transportés" />
-            <Stat value={stats?.managed} label="Managés" />
+            <Stat value={stats?.managed} label="Gérés" />
           </div>
         </div>
       </CallOut>

@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_OUTGOING_TEXS_REGISTRY = gql`
   mutation AddToOutgoingTexsRegistry($lines: [OutgoingTexsLineInput!]!) {
-    addToOutgoingTexsRegistry(lines: $lines)
+    addToOutgoingTexsRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -175,7 +187,7 @@ describe("Registry - addToOutgoingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingTexsRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several outgoing texs items", async () => {
@@ -191,7 +203,7 @@ describe("Registry - addToOutgoingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingTexsRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an outgoing texs item in one go", async () => {
@@ -207,7 +219,8 @@ describe("Registry - addToOutgoingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingTexsRegistry).toBe(true);
+    expect(data.addToOutgoingTexsRegistry.stats.insertions).toBe(1);
+    expect(data.addToOutgoingTexsRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryOutgoingTexs.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

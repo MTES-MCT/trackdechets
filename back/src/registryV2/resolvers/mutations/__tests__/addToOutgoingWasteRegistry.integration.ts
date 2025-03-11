@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_OUTGOING_WASTE_REGISTRY = gql`
   mutation AddToOutgoingWasteRegistry($lines: [OutgoingWasteLineInput!]!) {
-    addToOutgoingWasteRegistry(lines: $lines)
+    addToOutgoingWasteRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -161,7 +173,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several outgoing waste items", async () => {
@@ -177,7 +189,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an outgoing waste item in one go", async () => {
@@ -193,7 +205,8 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(1);
+    expect(data.addToOutgoingWasteRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryOutgoingWaste.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

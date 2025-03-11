@@ -133,11 +133,6 @@ export async function processStream({
       const now = Date.now();
       if (now - lastStatsUpdate > 5 * 1000) {
         lastStatsUpdate = now;
-        await saveCompaniesChanges(changesByCompany, {
-          type: importType,
-          source: "FILE",
-          createdById
-        });
         const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
         await updateImportStats({
           importId,

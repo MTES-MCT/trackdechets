@@ -1,9 +1,6 @@
 import { Refinement, z } from "zod";
 import { ParsedZodTransportedItem } from "./schema";
-import {
-  refineActorInfos,
-  refineWeightAndVolume
-} from "../../shared/refinement";
+import { refineActorInfos } from "../../shared/refinement";
 
 export const refineDates: Refinement<ParsedZodTransportedItem> = (
   transportedItem,
@@ -55,6 +52,22 @@ export const refineVolumeAndWeightIfWaste: Refinement<
     !uncheckedCodes.includes(transportedItem.wasteCode);
 
   if (transportedItem.reportForTransportIsWaste && shouldCheckCode) {
-    refineWeightAndVolume(transportedItem, context);
+    const isUsingRoad = transportedItem.reportForTransportMode === "ROAD";
+
+    if (isUsingRoad && transportedItem.weightValue > 40) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
+        path: ["weightValue"]
+      });
+    }
+
+    if (isUsingRoad && transportedItem.volume && transportedItem.volume > 40) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
+        path: ["volume"]
+      });
+    }
   }
 };

@@ -6,7 +6,6 @@ import {
   refineNotificationNumber,
   refineOperationMode,
   refineTransportersConsistency,
-  refineWeightAndVolume,
   refineWeightIsEstimate
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -20,7 +19,8 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineReportForProfile
+  refineReportForProfile,
+  refineWeightAndVolume
 } from "./refinement";
 import { incomingWasteSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";

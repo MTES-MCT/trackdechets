@@ -1,7 +1,7 @@
 import { TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
-import { transportModeSchema, getWasteCodeSchema } from "./schemas";
+import { getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@prisma/client";
 
 export function refineTransporterInfos<T>({
@@ -321,56 +321,6 @@ export const refineIsDangerous: Refinement<{
       code: z.ZodIssueCode.custom,
       message: `Le déchet contient des POP ou a un code déchet avec étoile, il ne peut pas être indiqué comme non dangereux`,
       path: ["wasteIsDangerous"]
-    });
-  }
-};
-
-export const refineWeightAndVolume: Refinement<{
-  transporter1TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter2TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter3TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter4TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter5TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  weightValue: number;
-  volume?: number | null | undefined;
-  weightIsEstimate: boolean;
-}> = (item, { addIssue }) => {
-  const isUsingRoad = [
-    item.transporter1TransportMode,
-    item.transporter2TransportMode,
-    item.transporter3TransportMode,
-    item.transporter4TransportMode,
-    item.transporter5TransportMode
-  ].some(transportMode => transportMode === "ROAD");
-
-  if (isUsingRoad && item.weightValue > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
-      path: ["weightValue"]
-    });
-  }
-
-  if (isUsingRoad && item.volume && item.volume > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
-      path: ["volume"]
     });
   }
 };

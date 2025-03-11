@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   mutation AddToIncomingTexsRegistry($lines: [IncomingTexsLineInput!]!) {
-    addToIncomingTexsRegistry(lines: $lines)
+    addToIncomingTexsRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -165,7 +177,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several incoming texs items", async () => {
@@ -181,7 +193,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an incoming texs item in one go", async () => {
@@ -197,7 +209,8 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
+    expect(data.addToIncomingTexsRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryIncomingTexs.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }
@@ -218,7 +231,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -241,7 +254,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -264,7 +277,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }

@@ -4,6 +4,7 @@ import {
   ImportType,
   RegistryChanges,
   UNAUTHORIZED_ERROR,
+  getSumOfChanges,
   importOptions,
   incrementLocalChangesForCompany,
   isAuthorized,
@@ -134,5 +135,13 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     );
   }
 
-  return true;
+  const stats = getSumOfChanges(changesByCompany, errors.size);
+
+  return {
+    stats,
+    errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
+      message: errors,
+      publicId
+    }))
+  };
 }

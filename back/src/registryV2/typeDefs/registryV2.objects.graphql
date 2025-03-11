@@ -1624,3 +1624,21 @@ type RegistryImportAssociation {
   reportedFor: RegistryCompany!
   reportedAs: RegistryCompany!
 }
+
+type RegistryLineError {
+  publicId: String!
+  message: String!
+}
+
+type AddRegistryLinesStats {
+  errors: Int!
+  insertions: Int!
+  edits: Int!
+  cancellations: Int!
+  skipped: Int!
+}
+
+type AddRegistryLinesResponse {
+  stats: AddRegistryLinesStats!
+  errors: [RegistryLineError!]
+}
