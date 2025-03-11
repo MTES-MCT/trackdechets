@@ -320,8 +320,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode:
       bsda.destinationOperationNextDestinationPlannedOperationCode,
@@ -660,8 +659,7 @@ export const toOutgoingWasteV2 = (
     destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -922,9 +920,8 @@ export const toTransportedWasteV2 = (
     destinationReceptionRefusedWeight: null,
     destinationHasCiterneBeenWashedOut: null,
 
-    declarationNumber: null,
-    movementNumber: null,
-    notificationNumber: null
+    gistridNumber: null,
+    movementNumber: null
   };
 };
 
@@ -1204,8 +1201,7 @@ export const toManagedWasteV2 = (
     destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,

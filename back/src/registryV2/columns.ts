@@ -396,8 +396,9 @@ export const EXPORT_COLUMNS: {
       label: "Rupture de traçabilité autorisée",
       format: formatBoolean
     },
-    declarationNumber: { label: "Numéro de déclaration GISTRID" },
-    notificationNumber: { label: "Numéro de notification GISTRID" },
+    gistridNumber: {
+      label: "Numéro de notification ou de déclaration GISTRID"
+    },
     movementNumber: { label: "N° de mouvement" },
     nextOperationCode: {
       label: "Code de traitement ultérieur prévu",
@@ -756,8 +757,7 @@ export const EXPORT_COLUMNS: {
           : ""
     },
 
-    declarationNumber: { label: "N° de déclaration GISTRID" },
-    notificationNumber: { label: "N° de notification GISTRID" },
+    gistridNumber: { label: "N° de notification ou de déclaration GISTRID" },
     movementNumber: { label: "N° de mouvement" },
     isUpcycled: { label: "Terres valorisées", format: formatBoolean },
     destinationParcelInseeCodes: {
@@ -1005,8 +1005,7 @@ export const EXPORT_COLUMNS: {
       label: "Rinçage citerne",
       format: formatHasCiterneBeenWashedOut
     },
-    declarationNumber: { label: "N° de déclaration GISTRID" },
-    notificationNumber: { label: "N° de notification GISTRID" },
+    gistridNumber: { label: "N° de notification ou de déclaration GISTRID" },
     movementNumber: { label: "N° de mouvement" },
     transporter2TransportMode: {
       label: "Transporteur n°2 - Mode de transport",
@@ -1360,8 +1359,7 @@ export const EXPORT_COLUMNS: {
           : ""
     },
 
-    declarationNumber: { label: "N° de déclaration GISTRID" },
-    notificationNumber: { label: "N° de notification GISTRID" },
+    gistridNumber: { label: "N° de notification ou de déclaration GISTRID" },
     movementNumber: { label: "N° de mouvement" },
     isUpcycled: { label: "Terres valorisées", format: formatBoolean },
     destinationParcelInseeCodes: {

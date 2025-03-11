@@ -15,7 +15,7 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineManagedUpcycled
 } from "./refinement";
 import { managedSchema } from "./schema";
@@ -28,7 +28,7 @@ export function safeParseAsyncManaged(line: unknown) {
     .superRefine(refineEmitter)
     .superRefine(refineDestination)
     .superRefine(refineTempStorer)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(refineManagedUpcycled)
     .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(transporter1Refinement)

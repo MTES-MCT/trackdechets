@@ -1,7 +1,7 @@
 import { TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
-import { transportModeSchema, getWasteCodeSchema } from "./schemas";
+import { getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@prisma/client";
 
 export function refineTransporterInfos<T>({
@@ -325,56 +325,6 @@ export const refineIsDangerous: Refinement<{
   }
 };
 
-export const refineWeightAndVolume: Refinement<{
-  transporter1TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter2TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter3TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter4TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter5TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  weightValue: number;
-  volume?: number | null | undefined;
-  weightIsEstimate: boolean;
-}> = (item, { addIssue }) => {
-  const isUsingRoad = [
-    item.transporter1TransportMode,
-    item.transporter2TransportMode,
-    item.transporter3TransportMode,
-    item.transporter4TransportMode,
-    item.transporter5TransportMode
-  ].some(transportMode => transportMode === "ROAD");
-
-  if (isUsingRoad && item.weightValue > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
-      path: ["weightValue"]
-    });
-  }
-
-  if (isUsingRoad && item.volume && item.volume > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
-      path: ["volume"]
-    });
-  }
-};
-
 export const refineWeightIsEstimate: Refinement<{
   weightIsEstimate: boolean;
   operationCode: string;
@@ -414,30 +364,21 @@ export const refineMunicipalities: Refinement<{
   }
 };
 
-export const refineNotificationNumber: Refinement<{
+export const refineGistridNumber: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
   wasteCode?: z.infer<ReturnType<typeof getWasteCodeSchema>> | null;
-  declarationNumber?: string | null | undefined;
-  notificationNumber?: string | null | undefined;
+  gistridNumber?: string | null | undefined;
   nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {
   const isDangerous =
     item.wasteIsDangerous || item.wastePop || item.wasteCode?.includes("*");
 
-  if (!item.notificationNumber && isDangerous && item.nextDestinationIsAbroad) {
+  if (!item.gistridNumber && isDangerous && item.nextDestinationIsAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["notificationNumber"]
-    });
-  }
-
-  if (!item.declarationNumber && !isDangerous && item.nextDestinationIsAbroad) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["declarationNumber"]
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistridNumber"]
     });
   }
 };

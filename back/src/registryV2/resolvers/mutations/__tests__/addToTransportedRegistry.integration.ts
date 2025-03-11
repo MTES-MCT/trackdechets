@@ -9,7 +9,19 @@ import { sub } from "date-fns";
 
 const ADD_TO_TRANSPORTED_REGISTRY = gql`
   mutation AddToTransportedRegistry($lines: [TransportedLineInput!]!) {
-    addToTransportedRegistry(lines: $lines)
+    addToTransportedRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -59,8 +71,7 @@ function getCorrectLine(siret: string) {
     destinationDropSitePostalCode: undefined,
     destinationDropSiteCity: undefined,
     destinationDropSiteCountryCode: undefined,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     brokerCompanySiret: null,
     brokerCompanyName: null,
@@ -123,7 +134,7 @@ describe("Registry - addToTransportedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToTransportedRegistry).toBe(true);
+    expect(data.addToTransportedRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several transported items", async () => {
@@ -141,7 +152,7 @@ describe("Registry - addToTransportedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToTransportedRegistry).toBe(true);
+    expect(data.addToTransportedRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit a transported item in one go", async () => {
@@ -159,7 +170,8 @@ describe("Registry - addToTransportedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToTransportedRegistry).toBe(true);
+    expect(data.addToTransportedRegistry.stats.insertions).toBe(1);
+    expect(data.addToTransportedRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryTransported.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

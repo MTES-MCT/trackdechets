@@ -117,9 +117,8 @@ export const toTransportedWaste = (
     destinationReceptionRefusedWeight: null,
     destinationHasCiterneBeenWashedOut: null,
 
-    declarationNumber: transportedWaste.declarationNumber,
-    movementNumber: transportedWaste.movementNumber,
-    notificationNumber: transportedWaste.notificationNumber
+    gistridNumber: transportedWaste.gistridNumber,
+    movementNumber: transportedWaste.movementNumber
   };
 };
 

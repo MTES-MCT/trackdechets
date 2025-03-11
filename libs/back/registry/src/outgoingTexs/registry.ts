@@ -202,9 +202,7 @@ export const toOutgoingWaste = (
     destinationFinalOperationCodes: null,
     destinationFinalOperationWeights: null,
 
-    declarationNumber: outgoingTexs.declarationNumber,
-    notificationNumber: outgoingTexs.notificationNumber,
-    movementNumber: outgoingTexs.movementNumber,
+    gistridNumber: outgoingTexs.gistridNumber,
     isUpcycled: outgoingTexs.isUpcycled,
     destinationParcelInseeCodes: outgoingTexs.destinationParcelInseeCodes,
     destinationParcelNumbers: outgoingTexs.destinationParcelNumbers,

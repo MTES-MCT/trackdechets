@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_WASTE_REGISTRY = gql`
   mutation AddToIncomingWasteRegistry($lines: [IncomingWasteLineInput!]!) {
-    addToIncomingWasteRegistry(lines: $lines)
+    addToIncomingWasteRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -63,8 +75,7 @@ function getCorrectLine(siret: string) {
     operationMode: "RECYCLAGE",
     noTraceability: false,
     nextDestinationIsAbroad: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     transporter1TransportMode: "ROAD",
@@ -166,7 +177,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingWasteRegistry).toBe(true);
+    expect(data.addToIncomingWasteRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several incoming waste items", async () => {
@@ -182,7 +193,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingWasteRegistry).toBe(true);
+    expect(data.addToIncomingWasteRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an incoming waste item in one go", async () => {
@@ -198,7 +209,8 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingWasteRegistry).toBe(true);
+    expect(data.addToIncomingWasteRegistry.stats.insertions).toBe(1);
+    expect(data.addToIncomingWasteRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryIncomingWaste.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

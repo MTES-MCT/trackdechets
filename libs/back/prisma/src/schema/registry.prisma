@@ -159,8 +159,7 @@ model RegistryIncomingWaste {
     operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     nextOperationCode                      String?
     isDirectSupply                         Boolean?
@@ -286,8 +285,7 @@ model RegistryIncomingTexs {
     operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     nextOperationCode                      String?
     isUpcycled                             Boolean?
@@ -414,8 +412,7 @@ model RegistryOutgoingTexs {
     destinationParcelInseeCodes            String[]
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     ecoOrganismeSiret                      String?
     ecoOrganismeName                       String?
@@ -534,8 +531,7 @@ model RegistryOutgoingWaste {
     destinationDropSitePostalCode          String?
     destinationDropSiteCity                String?
     destinationDropSiteCountryCode         String?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     operationCode                          String
     operationMode                          OperationMode?
@@ -663,8 +659,7 @@ model RegistryTransported {
     destinationDropSitePostalCode  String?
     destinationDropSiteCity        String?
     destinationDropSiteCountryCode String?
-    declarationNumber              String?
-    notificationNumber             String?
+    gistridNumber                  String?
     movementNumber                 String?
     ecoOrganismeSiret              String?
     ecoOrganismeName               String?
@@ -744,8 +739,7 @@ model RegistryManaged {
     destinationParcelInseeCodes            String[]
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     operationCode                          String
     operationMode                          OperationMode?

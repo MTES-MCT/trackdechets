@@ -18,8 +18,7 @@ import {
   actorPostalCodeSchema,
   actorCitySchema,
   actorCountryCodeSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   getOperationCodeSchema,
   operationModeSchema,
   actorSiretSchema,
@@ -81,8 +80,7 @@ const inputManagedSchema = z.object({
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
   destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

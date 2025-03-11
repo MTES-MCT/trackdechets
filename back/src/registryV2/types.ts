@@ -222,8 +222,7 @@ export const emptyIncomingWasteV2: Omit<
   destinationOperationModes: null,
   destinationHasCiterneBeenWashedOut: null,
   destinationOperationNoTraceability: null,
-  declarationNumber: null,
-  notificationNumber: null,
+  gistridNumber: null,
   movementNumber: null,
   nextOperationCode: null,
   isUpcycled: null,
@@ -438,9 +437,8 @@ export const emptyOutgoingWasteV2: Omit<
   destinationFinalOperationCompanySirets: null,
   destinationFinalOperationCodes: null,
   destinationFinalOperationWeights: null,
-  declarationNumber: null,
+  gistridNumber: null,
   movementNumber: null,
-  notificationNumber: null,
   isUpcycled: null,
   destinationParcelInseeCodes: null,
   destinationParcelNumbers: null,
@@ -585,9 +583,8 @@ export const emptyTransportedWasteV2: Omit<
   destinationReceptionAcceptedWeight: null,
   destinationReceptionRefusedWeight: null,
   destinationHasCiterneBeenWashedOut: null,
-  declarationNumber: null,
-  movementNumber: null,
-  notificationNumber: null
+  gistridNumber: null,
+  movementNumber: null
 };
 
 export const emptyManagedWasteV2: Omit<
@@ -755,9 +752,8 @@ export const emptyManagedWasteV2: Omit<
   destinationFinalOperationCompanySirets: null,
   destinationFinalOperationCodes: null,
   destinationFinalOperationWeights: null,
-  declarationNumber: null,
+  gistridNumber: null,
   movementNumber: null,
-  notificationNumber: null,
   isUpcycled: null,
   destinationParcelInseeCodes: null,
   destinationParcelNumbers: null,

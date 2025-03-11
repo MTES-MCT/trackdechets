@@ -9,7 +9,19 @@ import { subMonths, format, addDays } from "date-fns";
 
 const ADD_TO_SSD_REGISTRY = gql`
   mutation AddToSsdRegistry($lines: [SsdLineInput!]!) {
-    addToSsdRegistry(lines: $lines)
+    addToSsdRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -98,7 +110,7 @@ describe("Registry - addToSsdRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToSsdRegistry).toBe(true);
+    expect(data.addToSsdRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several ssd items", async () => {
@@ -116,7 +128,7 @@ describe("Registry - addToSsdRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToSsdRegistry).toBe(true);
+    expect(data.addToSsdRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an ssd item in one go", async () => {
@@ -134,7 +146,8 @@ describe("Registry - addToSsdRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToSsdRegistry).toBe(true);
+    expect(data.addToSsdRegistry.stats.insertions).toBe(1);
+    expect(data.addToSsdRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registrySsd.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }
