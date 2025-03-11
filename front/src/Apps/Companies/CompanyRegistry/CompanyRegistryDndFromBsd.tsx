@@ -17,7 +17,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { CompanyDetailsfragment } from "../common/fragments";
 import { useMutation } from "@apollo/client";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { format, isFuture } from "date-fns";
+import { format, isFuture, subDays } from "date-fns";
 import { fr } from "date-fns/locale";
 
 interface Props {
@@ -124,7 +124,10 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
             {`L'activation de la traçabilité est irréversible et ${
               isFutureDate
                 ? `prendra effet à 23h59 (heure de Paris) le ${format(
-                    new Date(company.hasEnabledRegistryDndFromBsdSince),
+                    subDays(
+                      new Date(company.hasEnabledRegistryDndFromBsdSince),
+                      1
+                    ),
                     "d MMMM yyyy",
                     { locale: fr }
                   )}`
