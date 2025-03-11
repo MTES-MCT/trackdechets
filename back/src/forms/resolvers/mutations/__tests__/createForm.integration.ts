@@ -17,6 +17,7 @@ import type {
   CreateFormInput,
   Mutation,
   MutationCreateFormArgs,
+  Packagings,
   ParcelNumber
 } from "@td/codegen-back";
 import {
@@ -46,6 +47,7 @@ const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
     createForm(createFormInput: $createFormInput) {
       id
+      isDirectSupply
       recipient {
         company {
           siret
@@ -107,6 +109,8 @@ const CREATE_FORM = `
           type
           other
           quantity
+          volume 
+          identificationNumbers
         }
         isDangerous
         onuCode
@@ -1493,8 +1497,9 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it("should erase transporter infos in a form with PIPELINE packaging", async () => {
+  it("should throw validation error when isDirectSypply=true and transporters list is not empty", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
 
     const createFormInput = {
       emitter: {
@@ -1502,59 +1507,64 @@ describe("Mutation.createForm", () => {
           siret: company.siret
         }
       },
-      wasteDetails: {
-        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
-      },
+      isDirectSupply: true,
       transporter: {
-        company: { siret: siretify(1) }
+        company: { siret: transporter.siret }
       }
     };
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
       variables: { createFormInput }
     });
 
-    expect(data.createForm.transporter).toMatchObject({
-      company: null,
-      mode: "OTHER"
-    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
+      })
+    ]);
   });
 
-  it("should force transporter mode to OTHER with PIPELINE packaging", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+  it(
+    "[deprecated] should empty transporters list and packagings" +
+      " when packagings input contain PIPELINE",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const transporter = await companyFactory();
 
-    const createFormInput = {
-      emitter: {
-        company: {
-          siret: company.siret
-        }
-      },
-      wasteDetails: {
-        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
-      },
-      transporter: {
-        mode: "ROAD"
-      }
-    };
-    const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-      variables: { createFormInput }
-    });
-    expect(data.createForm).toMatchObject({
-      transporter: {
-        mode: "OTHER"
-      },
-      wasteDetails: {
-        packagingInfos: [
-          {
-            type: "PIPELINE",
-            quantity: 1,
-            other: null
+      const createFormInput = {
+        emitter: {
+          company: {
+            siret: company.siret
           }
-        ]
-      }
-    });
-  });
+        },
+        wasteDetails: {
+          packagingInfos: [{ type: "PIPELINE" as Packagings, quantity: 1 }]
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        }
+      };
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: { createFormInput }
+      });
+
+      expect(data.createForm).toMatchObject({
+        isDirectSupply: true,
+        wasteDetails: {
+          packagingInfos: []
+        },
+        transporter: null
+      });
+    }
+  );
 
   it("should error if any other packaging type is sent with the PIPELINE type", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -1580,7 +1590,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
+          "Aucun conditionnement ne doit être renseigné dans le cadre d'un acheminement direct par pipeline ou convoyeur",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -2636,6 +2646,78 @@ describe("Mutation.createForm", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.createForm.wasteDetails?.nonRoadRegulationMention).toBeNull();
+  });
+
+  it("should create BSDD with volume and numeros on packagingsInfos and return it", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            packagingInfos: [
+              {
+                type: "FUT",
+                quantity: 1,
+                volume: 1,
+                identificationNumbers: ["numero", "numerobis"]
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({
+        volume: 1,
+        identificationNumbers: ["numero", "numerobis"]
+      })
+    ]);
+  });
+
+  it("should return BSDD with volume (resp. numeros) set to null (resp. empty array) if omitted", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          wasteDetails: {
+            packagingInfos: [
+              {
+                type: "FUT",
+                quantity: 1
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.createForm.wasteDetails?.packagingInfos).toEqual([
+      expect.objectContaining({
+        volume: null,
+        identificationNumbers: []
+      })
+    ]);
   });
 
   describe("Annexe 1", () => {

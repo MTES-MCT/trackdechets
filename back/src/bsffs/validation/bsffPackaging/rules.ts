@@ -9,7 +9,6 @@ import {
   BsffPackagingSignatureType,
   BsffPackagingValidationContext
 } from "./types";
-import { differenceInDays } from "date-fns";
 
 // Specs métier
 // https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit#gid=0
@@ -62,10 +61,7 @@ function isBsffPackagingFieldSealed(bsffPackaging: ZodBsffPackaging) {
     !!lastSignatureDate &&
     // cas particulier : on ne permet pas de modifier un contenant qui est
     // déjà réexpédié, regroupé ou reconditionné
-    !bsffPackaging.nextPackagingId &&
-    // tra-15501 Le destinataire peut modifier les informations du contenant
-    // (acceptation et opération) jusqu'à 60 jours après l'opération ou le refus
-    differenceInDays(new Date(), lastSignatureDate) <= 60
+    !bsffPackaging.nextPackagingId
   ) {
     return false;
   }

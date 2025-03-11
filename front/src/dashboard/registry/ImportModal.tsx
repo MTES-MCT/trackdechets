@@ -48,6 +48,7 @@ const REGISTRY_UPLOAD_SIGNED_URL = gql`
     registryUploadSignedUrl(fileName: $fileName) {
       fileKey
       signedUrl
+      fields
     }
   }
 `;
@@ -190,6 +191,8 @@ function Step1({ register }: StepProps) {
         <option value="OUTGOING_TEXS">
           Terres excavées et sédiments, dangereux et non dangereux sortants
         </option>
+        <option value="TRANSPORTED">Transportés</option>
+        <option value="MANAGED">Gérés</option>
       </Select>
 
       <Upload
@@ -226,13 +229,16 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
     variables: { fileName },
     fetchPolicy: "no-cache",
     onCompleted: async ({ registryUploadSignedUrl }) => {
-      const uploadResponse = await fetch(registryUploadSignedUrl.signedUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": file.type,
-          "x-amz-meta-filename": fileName
-        },
-        body: file
+      const { signedUrl, fields } = registryUploadSignedUrl;
+
+      const form = new FormData();
+      Object.keys(fields).forEach(key => form.append(key, fields[key]));
+      form.append("Content-Type", file.type);
+      form.append("file", file);
+
+      const uploadResponse = await fetch(signedUrl, {
+        method: "POST",
+        body: form
       });
 
       if (uploadResponse.ok) {

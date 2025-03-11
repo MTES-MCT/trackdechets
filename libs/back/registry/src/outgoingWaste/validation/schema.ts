@@ -4,6 +4,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   siretSchema,
+  dateSchema,
   actorAddressSchema,
   actorPostalCodeSchema,
   actorCitySchema,
@@ -19,15 +20,12 @@ import {
   actorOrgIdSchema,
   actorNameSchema,
   inseeCodesSchema,
-  municipalitiesNamesSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   getOperationCodeSchema,
   operationModeSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema,
-  nullishDateSchema
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingWasteItem = z.output<
@@ -50,11 +48,11 @@ const inputOutgoingWasteSchema = z.object({
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: nullishDateSchema,
+  dispatchDate: dateSchema,
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
   initialEmitterCompanyAddress: actorAddressSchema.nullish(),
@@ -62,7 +60,6 @@ const inputOutgoingWasteSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   destinationCompanyType: actorTypeSchema,
   destinationCompanyOrgId: actorOrgIdSchema.nullish(),
   destinationCompanyName: actorNameSchema.nullish(),
@@ -74,8 +71,7 @@ const inputOutgoingWasteSchema = z.object({
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
   destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

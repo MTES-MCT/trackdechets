@@ -25,7 +25,6 @@ export const INCOMING_WASTE_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   emitterCompanyType: "Type d'expéditeur ou de détenteur",
   emitterCompanyOrgId:
     "Numéro d'identification de l'expéditeur ou du détenteur",
@@ -34,8 +33,6 @@ export const INCOMING_WASTE_HEADERS: {
   emitterCompanyPostalCode: "Code postal de l'expéditeur ou du détenteur",
   emitterCompanyCity: "Commune de l'expéditeur ou du détenteur",
   emitterCompanyCountryCode: "Code pays de l'expéditeur ou du détenteur",
-  emitterNoTraceability:
-    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
     "Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteAddress:
@@ -58,8 +55,7 @@ export const INCOMING_WASTE_HEADERS: {
   operationMode: "Mode de traitement",
   noTraceability: "Rupture de traçabilité autorisée",
   nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
-  declarationNumber: "Numéro de déclaration GISTRID",
-  notificationNumber: "Numéro de notification GISTRID",
+  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
   movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code de traitement ultérieur prévu",
   isDirectSupply: "Approvisionnement direct",

@@ -276,6 +276,10 @@ model Company {
   wasteProcessorTypes                  WasteProcessorType[]
   wasteVehiclesTypes                   WasteVehiclesType[]
   address                              String?
+  street                               String?
+  postalCode                           String?
+  city                                 String?
+  country                              String?
   latitude                             Float?
   longitude                            Float?
   verificationCode                     String
@@ -302,6 +306,7 @@ model Company {
   allowAppendix1SignatureAutomation    Boolean                   @default(false)
   featureFlags                         String[]                  @default([])
   isDormantSince                       DateTime?                 @db.Timestamptz(6)
+  hasEnabledRegistryDndFromBsdSince    DateTime?                 @db.Timestamptz(6)
   MembershipRequest                    MembershipRequest[]
   // Révisions
   bsdaRevisionRequests                 BsdaRevisionRequest[]
@@ -316,6 +321,9 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
+  
+  registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
+  registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -548,6 +556,7 @@ model Form {
   hasCiterneBeenWashedOut               Boolean?
   citerneNotWashedOutReason             CiterneNotWashedOutReason?
   emptyReturnADR                        EmptyReturnADR?
+  isDirectSupply                        Boolean                    @default(false)
 
   transporters BsddTransporter[]
   groupedIn    FormGroupement[]  @relation("GroupedIn")
@@ -682,6 +691,7 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                  String?
   temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
+  temporaryStorageTemporaryStorerQuantityRefused  Float?
 
   initialRecipientCap                                    String?
   initialWasteDetailsCode                                String?
@@ -718,6 +728,7 @@ model BsddRevisionRequest {
   initialTemporaryStorageDestinationCap                  String?
   initialTemporaryStorageDestinationProcessingOperation  String?
   initialTemporaryStorageTemporaryStorerQuantityReceived Decimal?
+  initialTemporaryStorageTemporaryStorerQuantityRefused  Decimal?
 
   @@index([authoringCompanyId], map: "_BsddRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsddId], map: "_BsddRevisionRequestBsddIdIdx")
@@ -934,7 +945,10 @@ model User {
   registryIncomingTexs       RegistryIncomingTexs[]
   registryOutgoingTexs       RegistryOutgoingTexs[]
   registryOutgoingWaste      RegistryOutgoingWaste[]
+  registryTransported        RegistryTransported[]
+  registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
+  registryChangeAggregates   RegistryChangeAggregate[]
 }
 
 enum GovernmentPermission {

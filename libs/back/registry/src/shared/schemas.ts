@@ -156,7 +156,8 @@ export const operationModeSchema = enumValueAsStringSchema
           "REUTILISATION",
           "RECYCLAGE",
           "VALORISATION_ENERGETIQUE",
-          "ELIMINATION"
+          "ELIMINATION",
+          "AUTRES VALORISATIONS"
         ],
         {
           required_error: "Le code de qualification est requis",
@@ -326,22 +327,12 @@ export const municipalitiesNamesSchema = z.union([
   municipalitiesNamesArraySchema
 ]);
 
-export const declarationNumberSchema = z
+export const gistridNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
-    v => /^A7[EI][0-9]{10}$/.test(v),
-    "Le numéro de déclaration GISTRID ne respecte pas le format attendu"
-  )
-
-  .nullish();
-
-export const notificationNumberSchema = z
-  .string()
-  .transform(v => v.replace(/\s+/g, ""))
-  .refine(
-    v => /^[A-Z]{2}[0-9]{10}$/.test(v),
-    "Le numéro de notification GISTRID ne respecte pas le format attendu"
+    v => /^[A-Z]{2}[0-9]{10}$/.test(v) || /^A7[EI][0-9]{10}$/.test(v),
+    "Le numéro de notification ou de déclaration GISTRID ne respecte pas le format attendu"
   )
   .nullish();
 
@@ -350,7 +341,7 @@ const parcelNumbersArraySchema = z.array(
     .string()
     .transform(v => v.replace(/\s+/g, ""))
     .refine(
-      v => /^\d{1,3}-[A-Z]{2}-\d{1,4}$/.test(v),
+      v => /^\d{1,3}-[A-Z]{1,2}-\d{1,4}$/.test(v),
       "Le numéro de parcelle ne respecte pas le format attendu"
     )
 );
@@ -439,13 +430,11 @@ export const transportModeSchema = z
       "AÉRIEN",
       "FLUVIAL",
       "MARITIME",
-      "PIPELINE",
       "FERRÉ",
       "ROAD",
       "AIR",
       "RIVER",
       "SEA",
-      "OTHER",
       "RAIL"
     ],
     {
@@ -464,8 +453,6 @@ export const transportModeSchema = z
         return "RIVER";
       case "MARITIME":
         return "SEA";
-      case "PIPELINE":
-        return "OTHER";
       case "FERRÉ":
         return "RAIL";
       default:
@@ -484,3 +471,16 @@ export const transportRecepisseNumberSchema = z.coerce
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"
   );
+
+const transportPlatesArraySchema = z.array(
+  z
+    .string()
+    .trim()
+    .min(4, "Une plaque d'immatriculation doit faire au moins 4 cacatères")
+    .max(12, "Une plaque d'immatriculation ne peut pas dépasser 12 cacatères")
+);
+
+export const transportPlatesSchema = z.union([
+  stringToArraySchema.pipe(transportPlatesArraySchema),
+  transportPlatesArraySchema
+]);

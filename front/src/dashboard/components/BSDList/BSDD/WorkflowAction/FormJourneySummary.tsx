@@ -6,7 +6,6 @@ import {
   JourneyStopDescription,
   JourneyStopName
 } from "../../../../../common/components";
-import { formTransportIsPipeline } from "../../../../../Apps/common/utils/packagingsBsddSummary";
 
 interface FormJourneySummaryProps {
   form: Form;
@@ -31,7 +30,10 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
       }
     : {
         isComplete: Boolean(form.receivedAt),
-        isActive: (form.transporters ?? []).every(t => Boolean(t.takenOverAt)),
+        isActive:
+          (form.isDirectSupply && form.emittedAt) ||
+          (!form.isDirectSupply &&
+            (form.transporters ?? []).every(t => Boolean(t.takenOverAt))),
         company: form.recipient?.company
       };
 
@@ -46,6 +48,16 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
           </JourneyStopDescription>
         )}
       </JourneyStop>
+      {!!form.isDirectSupply && (
+        <JourneyStop variant={form.emittedAt ? "complete" : "incomplete"}>
+          <JourneyStopName>Transport</JourneyStopName>
+          {form.emitter?.company && (
+            <JourneyStopDescription>
+              Acheminement direct par pipeline ou convoyeur
+            </JourneyStopDescription>
+          )}
+        </JourneyStop>
+      )}
       {form.transporters.map((transporter, idx) => {
         return (
           <JourneyStop
@@ -65,16 +77,11 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             <JourneyStopName>
               Transporteur{form.transporters.length > 1 ? ` n° ${idx + 1}` : ""}
             </JourneyStopName>
-            {transporter.company && !formTransportIsPipeline(form) && (
+            {transporter.company && (
               <JourneyStopDescription>
                 {transporter.company.name} ({transporter.company.orgId})
                 <br />
                 {transporter.company.address}
-              </JourneyStopDescription>
-            )}
-            {formTransportIsPipeline(form) && (
-              <JourneyStopDescription>
-                Conditionné pour Pipeline
               </JourneyStopDescription>
             )}
           </JourneyStop>
@@ -87,7 +94,11 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             variant={
               form.temporaryStorageDetail.emittedAt
                 ? "complete"
-                : (form.transporters ?? []).every(t => Boolean(t.takenOverAt))
+                : (form.isDirectSupply && form.emittedAt) ||
+                  (!form.isDirectSupply &&
+                    (form.transporters ?? []).every(t =>
+                      Boolean(t.takenOverAt)
+                    ))
                 ? // Actif si tous les transporteurs ont signé, sinon en attente
                   "active"
                 : "incomplete"

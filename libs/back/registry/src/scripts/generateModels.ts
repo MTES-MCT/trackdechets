@@ -10,13 +10,17 @@ import { registryS3Client } from "../s3";
 import { SSD_HEADERS } from "../ssd/constants";
 import { OUTGOING_WASTE_HEADERS } from "../outgoingWaste/constants";
 import { OUTGOING_TEXS_HEADERS } from "../outgoingTexs/constants";
+import { MANAGED_HEADERS } from "../managed/constants";
+import { TRANSPORTED_HEADERS } from "../transported/constants";
 
 const MODEL_SOURCES = [
   { headers: SSD_HEADERS, name: "Modele SSD" },
   { headers: INCOMING_WASTE_HEADERS, name: "Modele DND entrant" },
   { headers: INCOMING_TEXS_HEADERS, name: "Modele TEXS entrant" },
   { headers: OUTGOING_WASTE_HEADERS, name: "Modele DND sortant" },
-  { headers: OUTGOING_TEXS_HEADERS, name: "Modele TEXS sortant" }
+  { headers: OUTGOING_TEXS_HEADERS, name: "Modele TEXS sortant" },
+  { headers: TRANSPORTED_HEADERS, name: "Modele transportés" },
+  { headers: MANAGED_HEADERS, name: "Modele gérés" }
 ];
 
 /**

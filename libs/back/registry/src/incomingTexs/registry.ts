@@ -20,7 +20,7 @@ export const toIncomingWaste = (
     publicId: incomingTexs.publicId,
     bsdId: null,
     reportAsSiret: incomingTexs.reportAsCompanySiret,
-    createdAt: incomingTexs.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
     destinationReceptionDate: incomingTexs.receptionDate,
@@ -36,6 +36,8 @@ export const toIncomingWaste = (
     wastePop: incomingTexs.wastePop,
     wasteCodeBale: incomingTexs.wasteCodeBale,
     weight: null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName: incomingTexs.initialEmitterCompanyName,
     initialEmitterCompanySiret: incomingTexs.initialEmitterCompanyOrgId,
     initialEmitterCompanyAddress: incomingTexs.initialEmitterCompanyAddress,
@@ -43,11 +45,10 @@ export const toIncomingWaste = (
       incomingTexs.initialEmitterCompanyPostalCode,
     initialEmitterCompanyCity: incomingTexs.initialEmitterCompanyCity,
     initialEmitterCompanyCountry: incomingTexs.initialEmitterCompanyCountryCode,
-    initialEmitterMunicipalitiesNames:
-      incomingTexs.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       incomingTexs.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: incomingTexs.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: incomingTexs.emitterCompanyOrgId,
@@ -163,13 +164,16 @@ export const toIncomingWaste = (
     destinationReceptionWeightIsEstimate: incomingTexs.weightIsEstimate,
     destinationReceptionVolume: incomingTexs.volume,
     destinationPlannedOperationCode: null,
-    destinationOperationMode: incomingTexs.operationMode,
-    destinationOperationCode: incomingTexs.operationCode,
+    destinationOperationModes: incomingTexs.operationMode
+      ? [incomingTexs.operationMode]
+      : null,
+    destinationOperationCodes: incomingTexs.operationCode
+      ? [incomingTexs.operationCode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingTexs.noTraceability,
-    declarationNumber: incomingTexs.declarationNumber,
+    gistridNumber: incomingTexs.gistridNumber,
     movementNumber: incomingTexs.movementNumber,
-    notificationNumber: incomingTexs.notificationNumber,
     nextOperationCode: incomingTexs.nextOperationCode,
     isUpcycled: incomingTexs.isUpcycled,
     destinationParcelInseeCodes: incomingTexs.destinationParcelInseeCodes,

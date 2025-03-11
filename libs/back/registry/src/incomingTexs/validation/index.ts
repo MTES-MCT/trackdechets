@@ -4,10 +4,11 @@ import {
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationCodeWhenUpcycled,
   refineOperationMode,
-  refineWeightAndVolume
+  refineTransportersConsistency,
+  requiredParcelsRefinement
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -28,12 +29,12 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
   return incomingTexsSchema
     .superRefine(refineReportForProfile)
     .superRefine(refineIsDangerous)
-    .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(parcelRefinement)
+    .superRefine(requiredParcelsRefinement)
     .superRefine(refineOperationCodeWhenUpcycled)
     .superRefine(refineOperationMode)
     .superRefine(refineFollowingTraceabilityInfos)
@@ -43,6 +44,7 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(transporter3Refinement)
     .superRefine(transporter4Refinement)
     .superRefine(transporter5Refinement)
+    .superRefine(refineTransportersConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .safeParseAsync(line, { errorMap: registryErrorMap });

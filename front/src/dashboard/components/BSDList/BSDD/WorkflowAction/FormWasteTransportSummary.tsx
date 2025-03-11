@@ -19,10 +19,11 @@ import {
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { useEffect } from "react";
 import { getTransportModeLabel } from "../../../../constants";
 import { getFormWasteDetailsADRMention } from "@td/constants";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -90,10 +91,8 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   ),
   packagingInfos: () => (
     <div className="form__row">
-      <label>
-        Conditionnement(s)
-        <Field name="update.packagingInfos" component={Packagings} />
-      </label>
+      <h6 className="fr-h6">Conditionnement</h6>
+      <FormikPackagingList fieldName="update.packagingInfos" />
     </div>
   ),
   sampleNumber: () => (
@@ -205,7 +204,15 @@ export function FormWasteTransportSummary({
               {form.emitter?.type === EmitterType.Appendix1Producer && (
                 <button
                   type="button"
-                  onClick={() => addField("packagingInfos")}
+                  onClick={() => {
+                    addField("packagingInfos");
+                    setFieldValue(
+                      "update.packagingInfos",
+                      form.wasteDetails?.packagingInfos?.length
+                        ? form.wasteDetails?.packagingInfos
+                        : [emptyPackaging]
+                    );
+                  }}
                   className="tw-ml-2"
                 >
                   <IconPaperWrite color="blue" />

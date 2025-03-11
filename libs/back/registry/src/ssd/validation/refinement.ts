@@ -13,7 +13,7 @@ export const refineDates: Refinement<ParsedZodSsdItem> = (
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez saisir soit une date d'utilisation soit une date d'expédition.",
+        "Vous devez saisir soit une date d'utilisation soit une date d'expédition",
       path: ["useDate"]
     });
   }

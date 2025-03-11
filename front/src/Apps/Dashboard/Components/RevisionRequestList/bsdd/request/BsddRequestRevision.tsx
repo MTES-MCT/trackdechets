@@ -3,12 +3,13 @@ import {
   Form as Bsdd,
   BsdType,
   Mutation,
-  MutationCreateFormRevisionRequestArgs
+  MutationCreateFormRevisionRequestArgs,
+  WasteAcceptationStatus
 } from "@td/codegen-ui";
 import { PROCESSING_AND_REUSE_OPERATIONS } from "@td/constants";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { removeEmptyKeys } from "../../../../../../common/helper";
+import { isDefined, removeEmptyKeys } from "../../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsddReviewsQuery";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
@@ -19,9 +20,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import WasteCodeSelector from "../../../../../common/Components/WasteCodeSelector/WasteCodeSelector";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
-import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
-import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import {
   BsddRevisionRequestValidationSchema,
   initialBsddReview,
@@ -31,10 +30,11 @@ import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCance
 import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision";
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
-import { disableAddPackagingCta } from "../../common/utils/rules";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
+import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type Props = {
   bsdd: Bsdd;
@@ -83,6 +83,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
       // on le réinitialise à la valeur par défaut du formulaire
       data.wasteDetails.pop = null;
     }
+
     return data;
   };
 
@@ -107,6 +108,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
     BsddRevisionRequestValidationSchema
   > = async data => {
     await onSubmitForm(data);
+
     resetAndClose();
   };
 
@@ -116,6 +118,17 @@ export function BsddRequestRevision({ bsdd }: Props) {
   const areModificationsDisabled = formValues.isCanceled;
 
   const wasteDetailsCodeInput = register("wasteDetails.code");
+
+  const hasBeenReceived = isDefined(bsdd.receivedAt);
+  const hasBeenAccepted = isDefined(bsdd.wasteAcceptationStatus);
+
+  const hasBeenTempStoredReceived = isDefined(
+    bsdd.temporaryStorageDetail?.temporaryStorer?.receivedAt
+  );
+  const hasBeenTempStoredAccepted = isDefined(
+    bsdd.temporaryStorageDetail?.temporaryStorer?.wasteAcceptationStatus
+  );
+  const hasBeenProcessed = isDefined(bsdd.processedAt);
 
   return (
     <div className={styles.container}>
@@ -132,7 +145,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
               areModificationsDisabled={areModificationsDisabled}
             />
           )}
-
           {!isAppendix1Producer && (
             <>
               <BsddRequestRevisionCancelationInput
@@ -212,45 +224,93 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   defaultValue={initialBsddReview.wasteDetails.packagingInfos}
                   initialValue={bsdd.wasteDetails?.packagingInfos}
                 >
-                  <BsdPackagings
-                    path="wasteDetails.packagingInfos"
-                    bsdType={BsdTypename.Bsdd}
-                    disabledAddCta={disableAddPackagingCta(
-                      formValues.wasteDetails?.packagingInfos
+                  <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
+                </RhfReviewableField>
+
+                {hasBeenReceived && (
+                  <RhfReviewableField
+                    title={
+                      !isTempStorage
+                        ? "Quantité reçue"
+                        : "Quantité reçue sur l'installation de destination"
+                    }
+                    path="quantityReceived"
+                    value={bsdd.quantityReceived}
+                    defaultValue={initialBsddReview?.quantityReceived}
+                  >
+                    {bsdd.wasteAcceptationStatus ===
+                      WasteAcceptationStatus.PartiallyRefused && (
+                      <Alert
+                        className="fr-my-2w"
+                        small
+                        description="En cas de refus partiel, la quantité reçue et refusée peuvent être révisées, impactant la quantité traitée: quantité acceptée = quantité reçue - quantité refusée."
+                        severity="info"
+                      />
                     )}
-                  />
-                </RhfReviewableField>
+                    <NonScrollableInput
+                      label="Poids en tonnes"
+                      className="fr-col-2"
+                      state={errors.quantityReceived && "error"}
+                      stateRelatedMessage={
+                        errors.quantityReceived?.message ?? ""
+                      }
+                      nativeInputProps={{
+                        ...register("quantityReceived", {
+                          valueAsNumber: true
+                        }),
+                        type: "number",
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        min: 0
+                      }}
+                    />
+                    {isDefined(formValues?.quantityReceived) && (
+                      <p className="fr-info-text">
+                        Soit {Number(formValues.quantityReceived) * 1000} kg
+                      </p>
+                    )}
+                  </RhfReviewableField>
+                )}
 
-                <RhfReviewableField
-                  title={
-                    !isTempStorage
-                      ? "Quantité reçue"
-                      : "Quantité reçue sur l'installation de destination"
-                  }
-                  path="quantityReceived"
-                  value={bsdd.quantityReceived}
-                  defaultValue={initialBsddReview?.quantityReceived}
-                >
-                  <NonScrollableInput
-                    label="Poids en tonnes"
-                    className="fr-col-2"
-                    state={errors.quantityReceived && "error"}
-                    stateRelatedMessage={errors.quantityReceived?.message ?? ""}
-                    nativeInputProps={{
-                      ...register("quantityReceived", { valueAsNumber: true }),
-                      type: "number",
-                      inputMode: "decimal",
-                      step: "0.000001"
-                    }}
-                  />
-                  {formValues?.quantityReceived && (
-                    <p className="fr-info-text">
-                      Soit {Number(formValues.quantityReceived) * 1000} kg
-                    </p>
+                {hasBeenAccepted &&
+                  bsdd.wasteAcceptationStatus ===
+                    WasteAcceptationStatus.PartiallyRefused && (
+                    <RhfReviewableField
+                      title={
+                        !isTempStorage
+                          ? "Quantité refusée"
+                          : "Quantité refusée sur l'installation de destination"
+                      }
+                      path="quantityRefused"
+                      value={bsdd.quantityRefused}
+                      defaultValue={initialBsddReview?.quantityRefused}
+                    >
+                      <NonScrollableInput
+                        label="Poids en tonnes"
+                        className="fr-col-2"
+                        state={errors.quantityRefused && "error"}
+                        stateRelatedMessage={
+                          errors.quantityRefused?.message ?? ""
+                        }
+                        nativeInputProps={{
+                          ...register("quantityRefused", {
+                            valueAsNumber: true
+                          }),
+                          type: "number",
+                          inputMode: "decimal",
+                          step: "0.000001",
+                          min: 0
+                        }}
+                      />
+                      {isDefined(formValues?.quantityRefused) && (
+                        <p className="fr-info-text">
+                          Soit {Number(formValues.quantityRefused) * 1000} kg
+                        </p>
+                      )}
+                    </RhfReviewableField>
                   )}
-                </RhfReviewableField>
 
-                {isTempStorage ? (
+                {isTempStorage && hasBeenTempStoredReceived && (
                   <RhfReviewableField
                     title={
                       "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
@@ -265,6 +325,16 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         ?.quantityReceived
                     }
                   >
+                    {bsdd.temporaryStorageDetail?.temporaryStorer
+                      ?.wasteAcceptationStatus ===
+                      WasteAcceptationStatus.PartiallyRefused && (
+                      <Alert
+                        className="fr-my-2w"
+                        small
+                        description="En cas de refus partiel, la quantité reçue et refusée peuvent être révisées, impactant la quantité traitée: quantité acceptée = quantité reçue - quantité refusée."
+                        severity="info"
+                      />
+                    )}
                     <NonScrollableInput
                       label="Poids en tonnes"
                       className="fr-col-2"
@@ -283,11 +353,14 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         ),
                         type: "number",
                         inputMode: "decimal",
-                        step: "0.000001"
+                        step: "0.000001",
+                        min: 0
                       }}
                     />
-                    {formValues?.temporaryStorageDetail?.temporaryStorer
-                      ?.quantityReceived && (
+                    {isDefined(
+                      formValues?.temporaryStorageDetail?.temporaryStorer
+                        ?.quantityReceived
+                    ) && (
                       <p className="fr-info-text">
                         Soit{" "}
                         {Number(
@@ -298,64 +371,126 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       </p>
                     )}
                   </RhfReviewableField>
-                ) : null}
+                )}
 
-                <RhfReviewableField
-                  title="Code de l'opération D/R"
-                  path="processingOperationDone"
-                  value={bsdd.processingOperationDone}
-                  defaultValue={initialBsddReview.processingOperationDone}
-                >
-                  <div className={styles.processingOperationTextQuote}>
-                    <p>
-                      Vous hésitez sur le type d'opération à choisir ? Vous
-                      pouvez consulter la liste de traitement des déchets sur{" "}
-                      <a
-                        href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174/"
-                        target="_blank"
-                        className="link"
-                        rel="noopener noreferrer"
+                {isTempStorage &&
+                  hasBeenTempStoredAccepted &&
+                  bsdd.temporaryStorageDetail?.temporaryStorer
+                    ?.wasteAcceptationStatus ===
+                    WasteAcceptationStatus.PartiallyRefused && (
+                    <RhfReviewableField
+                      title={
+                        "Quantité refusée sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                      }
+                      path="quantityRefused"
+                      value={
+                        bsdd.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityRefused
+                      }
+                      defaultValue={
+                        initialBsddReview.temporaryStorageDetail
+                          ?.temporaryStorer?.quantityRefused
+                      }
+                    >
+                      <NonScrollableInput
+                        label="Poids en tonnes"
+                        className="fr-col-2"
+                        state={
+                          errors.temporaryStorageDetail?.temporaryStorer
+                            ?.quantityRefused && "error"
+                        }
+                        stateRelatedMessage={
+                          errors.temporaryStorageDetail?.temporaryStorer
+                            ?.quantityRefused?.message ?? ""
+                        }
+                        nativeInputProps={{
+                          ...register(
+                            "temporaryStorageDetail.temporaryStorer.quantityRefused",
+                            { valueAsNumber: true }
+                          ),
+                          type: "number",
+                          inputMode: "decimal",
+                          step: "0.000001",
+                          min: 0
+                        }}
+                      />
+                      {isDefined(
+                        formValues?.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityRefused
+                      ) && (
+                        <p className="fr-info-text">
+                          Soit{" "}
+                          {Number(
+                            formValues.temporaryStorageDetail.temporaryStorer
+                              .quantityRefused
+                          ) * 1000}{" "}
+                          kg
+                        </p>
+                      )}
+                    </RhfReviewableField>
+                  )}
+
+                {hasBeenProcessed && (
+                  <>
+                    <RhfReviewableField
+                      title="Code de l'opération D/R"
+                      path="processingOperationDone"
+                      value={bsdd.processingOperationDone}
+                      defaultValue={initialBsddReview.processingOperationDone}
+                    >
+                      <div className={styles.processingOperationTextQuote}>
+                        <p>
+                          Vous hésitez sur le type d'opération à choisir ? Vous
+                          pouvez consulter la liste de traitement des déchets
+                          sur{" "}
+                          <a
+                            href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174/"
+                            target="_blank"
+                            className="link"
+                            rel="noopener noreferrer"
+                          >
+                            le site legifrance.
+                          </a>
+                        </p>
+                      </div>
+                      <Select
+                        label="Code de l'opération"
+                        className="fr-col-8"
+                        nativeSelectProps={{
+                          ...register("processingOperationDone")
+                        }}
                       >
-                        le site legifrance.
-                      </a>
-                    </p>
-                  </div>
-                  <Select
-                    label="Code de l'opération"
-                    className="fr-col-8"
-                    nativeSelectProps={{
-                      ...register("processingOperationDone")
-                    }}
-                  >
-                    <option value="">Choisissez...</option>
-                    {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
-                      <option key={operation.code} value={operation.code}>
-                        {operation.code} - {operation.description}
-                      </option>
-                    ))}
-                  </Select>
-                  <RhfOperationModeSelect
-                    operationCode={formValues?.processingOperationDone}
-                    path={"destinationOperationMode"}
-                  />
-                </RhfReviewableField>
+                        <option value="">Choisissez...</option>
+                        {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
+                          <option key={operation.code} value={operation.code}>
+                            {operation.code} - {operation.description}
+                          </option>
+                        ))}
+                      </Select>
+                      <RhfOperationModeSelect
+                        operationCode={formValues?.processingOperationDone}
+                        path={"destinationOperationMode"}
+                      />
+                    </RhfReviewableField>
 
-                <RhfReviewableField
-                  title="Description de l'opération D/R"
-                  path="processingOperationDescription"
-                  value={bsdd.processingOperationDescription}
-                  defaultValue={
-                    initialBsddReview.processingOperationDescription
-                  }
-                >
-                  <Input
-                    label="Description de l'opération D/R"
-                    nativeInputProps={{
-                      ...register("processingOperationDescription")
-                    }}
-                    className="fr-col-8"
-                  />
-                </RhfReviewableField>
+                    <RhfReviewableField
+                      title="Description de l'opération D/R"
+                      path="processingOperationDescription"
+                      value={bsdd.processingOperationDescription}
+                      defaultValue={
+                        initialBsddReview.processingOperationDescription
+                      }
+                    >
+                      <Input
+                        label="Description de l'opération D/R"
+                        nativeInputProps={{
+                          ...register("processingOperationDescription")
+                        }}
+                        className="fr-col-8"
+                      />
+                    </RhfReviewableField>
+                  </>
+                )}
 
                 <RhfReviewableField
                   title={isTempStorage ? "CAP destination finale" : "CAP"}

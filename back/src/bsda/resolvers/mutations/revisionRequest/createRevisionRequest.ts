@@ -1,6 +1,7 @@
 import {
   Bsda,
   BsdaStatus,
+  BsdaType,
   Prisma,
   RevisionRequestStatus
 } from "@prisma/client";
@@ -99,14 +100,14 @@ export async function createBsdaRevisionRequest(
       `Authoring company ${authoringCompany.id} has no siret. Cannot create BSDA revision request.`
     );
   }
+  const recipified = await recipify(content);
+  const flatContent = await getFlatContent(recipified, bsda);
+
   const approversSirets = await getApproversSirets(
+    flatContent,
     bsda,
     authoringCompany.siret
   );
-
-  const recipified = await recipify(content);
-
-  const flatContent = await getFlatContent(recipified, bsda);
 
   const history = getBsdaHistory(bsda);
 
@@ -159,11 +160,43 @@ async function checkIfUserCanRequestRevisionOnBsda(
   }
 }
 
-async function getApproversSirets(bsda: Bsda, authoringCompanySiret: string) {
+export const isOnlyAboutFields = (
+  revisionRequestContent: RevisionRequestContent,
+  fields: string[]
+) => {
+  return (
+    Object.keys(revisionRequestContent).filter(field => !fields.includes(field))
+      .length === 0
+  );
+};
+
+async function getApproversSirets(
+  revisionRequestContent: RevisionRequestContent,
+  bsda: Bsda,
+  authoringCompanySiret: string
+) {
   // Requesters and approvers are the same persona
-  const approversSirets = BSDA_REVISION_REQUESTER_FIELDS.map(
+  let approversSirets = BSDA_REVISION_REQUESTER_FIELDS.map(
     field => bsda[field]
   ).filter(siret => Boolean(siret) && siret !== authoringCompanySiret);
+
+  // Si la révision ne concerne QUE les champs wasteSealNumbers et/ou packagings,
+  // l'approbation de l'émetteur n'est pas nécessaire
+  if (
+    bsda.type === BsdaType.OTHER_COLLECTIONS &&
+    !revisionRequestContent.isCanceled &&
+    isOnlyAboutFields(revisionRequestContent, [
+      "wasteSealNumbers",
+      "packagings",
+      "isCanceled" // isCanceled est envoyé systématiquement par le front
+    ]) &&
+    (authoringCompanySiret === bsda.workerCompanySiret ||
+      authoringCompanySiret === bsda.destinationCompanySiret)
+  ) {
+    approversSirets = approversSirets.filter(
+      siret => siret !== bsda.emitterCompanySiret
+    );
+  }
 
   // Remove duplicates
   return [...new Set(approversSirets)];

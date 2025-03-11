@@ -48,9 +48,11 @@ export enum DataNameEnum {
   CAP_TEMP_STORAGE = "CAP (entreposage provisoire ou reconditionnement)",
   QTY_ESTIMATED = "Poids estimé (en tonnes)",
   QTY_RECEIVED = "Quantité reçue (tonnes)",
+  QTY_REFUSED = "Quantité refusée (tonnes)",
   QTY_PROCESSED = "Quantité traitée (en tonnes)",
   QTY_PROCESSED_KG = "Quantité traitée (en kg)",
   QTY_RECEIVED_TEMP_STORAGE = "Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)",
+  QTY_REFUSED_TEMP_STORAGE = "Quantité refusée par l'installation d'entreposage provisoire ou reconditionnement (tonnes)",
   OPERATION_CODE = "Code d'opération réalisée",
   OPERATION_DONE = "Opération réalisée",
   OPERATION_DONE_DESC = "Description de l'opération réalisée",
@@ -282,6 +284,11 @@ export const mapRevision = (
         dataNewValue: review?.content?.quantityReceived
       },
       {
+        dataName: DataNameEnum.QTY_REFUSED,
+        dataOldValue: review?.[bsdName]?.quantityRefused,
+        dataNewValue: review?.content?.quantityRefused
+      },
+      {
         dataName: DataNameEnum.QTY_PROCESSED,
         dataOldValue: review?.[bsdName]?.destination?.reception?.weight,
         dataNewValue: review?.content?.destination?.reception?.weight
@@ -299,6 +306,15 @@ export const mapRevision = (
         dataNewValue:
           review?.content?.temporaryStorageDetail?.temporaryStorer
             ?.quantityReceived
+      },
+      {
+        dataName: DataNameEnum.QTY_REFUSED_TEMP_STORAGE,
+        dataOldValue:
+          review?.[bsdName]?.temporaryStorageDetail?.temporaryStorer
+            ?.quantityRefused,
+        dataNewValue:
+          review?.content?.temporaryStorageDetail?.temporaryStorer
+            ?.quantityRefused
       },
       {
         dataName: DataNameEnum.OPERATION_CODE,

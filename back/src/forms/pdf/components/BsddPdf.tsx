@@ -14,7 +14,6 @@ import type {
   Transporter,
   TransportSegment
 } from "@td/codegen-back";
-
 import { buildAddress } from "../../../companies/sirene/utils";
 import {
   getFormWasteDetailsADRMention,
@@ -39,6 +38,7 @@ import {
 } from "@prisma/client";
 import { getEmptyReturnADRLabel } from "../../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../../helpers/citerneNotWashedOutReason";
+import { getPackagingsRows } from "../helpers";
 
 type GroupeInBsd = {
   readableId: string;
@@ -290,70 +290,33 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
   return `Autre (${otherPackagingsSummary})`;
 }
 
-const colisPackagings = ["GRV", "FUT", "AUTRE"];
 function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
+  const packagingsRows = getPackagingsRows(packagingInfos);
   return (
     <table>
       <thead>
         <tr>
-          <th>Nombre</th>
           <th>Conditionnement</th>
+          <th>Nombre</th>
         </tr>
       </thead>
       <tbody>
-        {[
-          { label: "Benne", value: "BENNE" },
-          { label: "Citerne", value: "CITERNE" },
-          { label: "Conditionnné pour Pipeline", value: "PIPELINE" },
-          { label: "GRV", value: "GRV" },
-          { label: "Fûts", value: "FUT" },
-          { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
-        ].map((packagingType, index) => (
-          <tr
-            key={index}
-            style={
-              packagingType.value === "PIPELINE"
-                ? { borderBottom: "2px solid black" }
-                : {}
-            }
-          >
-            <td>
-              {packagingInfos.reduce(
-                (total, packaging) =>
-                  packaging.type === packagingType.value
-                    ? total + (packaging.quantity ?? 0)
-                    : total,
-                0
-              ) ||
-                // leave the box empty if it's 0
-                null}
-            </td>
-
-            <td>
-              {colisPackagings.includes(packagingType.value) ? (
-                packagingType.label
-              ) : (
-                <b>{packagingType.label}</b>
-              )}
-            </td>
+        {packagingsRows.map(({ quantity, packagingsLabel }, idx) => (
+          <tr key={idx}>
+            <td>{packagingsLabel}</td>
+            <td>{quantity}</td>
           </tr>
         ))}
-        <tr>
-          <td>
-            <strong>
-              {packagingInfos.reduce((total, packaging) => {
-                return colisPackagings.includes(packaging.type)
-                  ? total + (packaging.quantity ?? 0)
-                  : total;
-              }, 0) ||
-                // leave the box empty if it's 0
-                null}
-            </strong>
-          </td>
-          <td>
-            <strong>Total conditionnement</strong>
-          </td>
-        </tr>
+        {packagingsRows.length > 1 && (
+          <tr key={packagingsRows.length}>
+            <td>
+              <b>TOTAL</b>
+            </td>
+            <td>
+              {packagingsRows.reduce((total, p) => total + p.quantity, 0)}
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );
@@ -712,9 +675,13 @@ export function BsddPdf({
             <p>
               <strong>4. Conditionnement</strong>
             </p>
-            <PackagingInfosTable
-              packagingInfos={form.wasteDetails?.packagingInfos ?? []}
-            />
+            {form.isDirectSupply ? (
+              <p>Acheminement direct par pipeline ou convoyeur</p>
+            ) : (
+              <PackagingInfosTable
+                packagingInfos={form.wasteDetails?.packagingInfos ?? []}
+              />
+            )}
           </div>
 
           <div className="BoxCol">
@@ -755,43 +722,54 @@ export function BsddPdf({
           </div>
         </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                7.{" "}
-                <input
-                  type="checkbox"
-                  checked={Boolean(form.trader) && renderCheckboxState}
-                  readOnly
-                />{" "}
-                Négociant{" "}
-                <input
-                  type="checkbox"
-                  checked={Boolean(form.broker) && renderCheckboxState}
-                  readOnly
-                />{" "}
-                Courtier
-              </strong>
-            </p>
-            {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
-              appendix1ProducerPlaceholder
-            ) : (
-              <>
-                <div className="Row">
-                  <div className="Col">
-                    <FormCompanyFields
-                      company={form.trader?.company ?? form.broker?.company}
-                    />
+        {form.trader && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>7.{form.broker ? "1" : ""} Négociant</strong>
+              </p>
+              {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+                appendix1ProducerPlaceholder
+              ) : (
+                <>
+                  <div className="Row">
+                    <div className="Col">
+                      <FormCompanyFields company={form.trader.company} />
+                    </div>
+                    <div className="Col">
+                      <ReceiptFields {...form.trader} />
+                    </div>
                   </div>
-                  <div className="Col">
-                    <ReceiptFields {...(form.trader ?? form.broker ?? {})} />
-                  </div>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
+        )}
+
+        {form.broker && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>7.{form.trader ? "2" : ""} Courtier</strong>
+              </p>
+              {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
+                appendix1ProducerPlaceholder
+              ) : (
+                <>
+                  <div className="Row">
+                    <div className="Col">
+                      <FormCompanyFields company={form.broker.company} />
+                    </div>
+                    <div className="Col">
+                      <ReceiptFields {...form.broker} />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         {form.intermediaries?.length ? (
           <div className="BoxRow">
             <div className="BoxCol">
@@ -818,7 +796,11 @@ export function BsddPdf({
             <p>
               <strong>8. Collecteur-Transporteur</strong>
             </p>
-            <TransporterFormCompanyFields {...form} />
+            {form.isDirectSupply ? (
+              <p>Acheminement direct par pipeline ou convoyeur</p>
+            ) : (
+              <TransporterFormCompanyFields {...form} />
+            )}
           </div>
         </div>
 
@@ -1001,7 +983,9 @@ export function BsddPdf({
                 </p>
                 <AcceptationFields
                   {...form.temporaryStorageDetail?.temporaryStorer}
-                  signedAt={form.signedAt} //check this
+                  signedAt={
+                    form.temporaryStorageDetail?.temporaryStorer?.signedAt
+                  }
                 />
                 <p>
                   Nom :{" "}

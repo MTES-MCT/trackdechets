@@ -23,7 +23,6 @@ import { BsdStatusCode, TBsdStatusCode } from "../../../common/types/bsdTypes";
 import SignBsffPackagingButton from "./SignBsffPackagingButton";
 import { GET_BSFF } from "./queries";
 import { pluralize } from "@td/constants";
-import { differenceInDays } from "date-fns";
 
 interface SignPackagingsModalProps {
   bsffId: string;
@@ -40,16 +39,10 @@ function getSignBtnLabel(packaging: BsffPackaging): string | null {
       packaging.operation?.signature?.date ??
       packaging.acceptation?.signature?.date;
 
-    if (signatureDate) {
-      // Calcule le nombre de jours depuis la signature du traitement ou du refus
-      const daysOld = differenceInDays(new Date(), new Date(signatureDate));
-
-      if (daysOld <= 60 && !packaging.nextBsff) {
-        // La correction est autorisée pendant un maximum de 60 jours
-        // après la signature de traitement du contenant et tant que le
-        // contenant n'a pas été groupé / réexpédié / reconditionné
-        return "Corriger";
-      }
+    if (signatureDate && !packaging.nextBsff) {
+      // La correction est autorisée tant que le
+      // contenant n'a pas été groupé / réexpédié / reconditionné
+      return "Corriger";
     }
 
     return null;

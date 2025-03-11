@@ -1,23 +1,13 @@
 import { Refinement, z } from "zod";
-import { refineActorInfos } from "../../shared/refinement";
+import {
+  refineActorInfos,
+  refineTransporterInfos
+} from "../../shared/refinement";
 import { ParsedZodIncomingTexsItem } from "./schema";
 import { $Enums } from "@prisma/client";
 import { getCachedCompany } from "../../shared/helpers";
 
-export const initialEmitterRefinement: Refinement<
-  ParsedZodIncomingTexsItem
-> = async (incomingTexsItem, ctx) => {
-  if (
-    !incomingTexsItem.emitterNoTraceability &&
-    !incomingTexsItem.initialEmitterCompanyType
-  ) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le producteur initial doit être renseigné lorsqu'il n'y a pas rupture de traçabilité pour l'expéditeur ou détenteur`,
-      path: ["initialEmitterCompanyType"]
-    });
-  }
-
+export const initialEmitterRefinement: Refinement<ParsedZodIncomingTexsItem> =
   refineActorInfos<ParsedZodIncomingTexsItem>({
     typeKey: "initialEmitterCompanyType",
     orgIdKey: "initialEmitterCompanyOrgId",
@@ -26,8 +16,7 @@ export const initialEmitterRefinement: Refinement<
     postalCodeKey: "initialEmitterCompanyPostalCode",
     cityKey: "initialEmitterCompanyCity",
     countryKey: "initialEmitterCompanyCountryCode"
-  })(incomingTexsItem, ctx);
-};
+  });
 
 export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
   typeKey: "emitterCompanyType",
@@ -40,58 +29,73 @@ export const emitterRefinement = refineActorInfos<ParsedZodIncomingTexsItem>({
 });
 
 export const transporter1Refinement =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter1TransportMode",
     typeKey: "transporter1CompanyType",
     orgIdKey: "transporter1CompanyOrgId",
     nameKey: "transporter1CompanyName",
     addressKey: "transporter1CompanyAddress",
     postalCodeKey: "transporter1CompanyPostalCode",
     cityKey: "transporter1CompanyCity",
-    countryKey: "transporter1CompanyCountryCode"
+    countryKey: "transporter1CompanyCountryCode",
+    recepisseIsExemptedKey: "transporter1RecepisseIsExempted",
+    recepisseNumberKey: "transporter1RecepisseNumber"
   });
 
 export const transporter2Refinement =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter2TransportMode",
     typeKey: "transporter2CompanyType",
     orgIdKey: "transporter2CompanyOrgId",
     nameKey: "transporter2CompanyName",
     addressKey: "transporter2CompanyAddress",
     postalCodeKey: "transporter2CompanyPostalCode",
     cityKey: "transporter2CompanyCity",
-    countryKey: "transporter2CompanyCountryCode"
+    countryKey: "transporter2CompanyCountryCode",
+    recepisseIsExemptedKey: "transporter2RecepisseIsExempted",
+    recepisseNumberKey: "transporter2RecepisseNumber"
   });
 
 export const transporter3Refinement =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter3TransportMode",
     typeKey: "transporter3CompanyType",
     orgIdKey: "transporter3CompanyOrgId",
     nameKey: "transporter3CompanyName",
     addressKey: "transporter3CompanyAddress",
     postalCodeKey: "transporter3CompanyPostalCode",
     cityKey: "transporter3CompanyCity",
-    countryKey: "transporter3CompanyCountryCode"
+    countryKey: "transporter3CompanyCountryCode",
+    recepisseIsExemptedKey: "transporter3RecepisseIsExempted",
+    recepisseNumberKey: "transporter3RecepisseNumber"
   });
 
 export const transporter4Refinement =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter4TransportMode",
     typeKey: "transporter4CompanyType",
     orgIdKey: "transporter4CompanyOrgId",
     nameKey: "transporter4CompanyName",
     addressKey: "transporter4CompanyAddress",
     postalCodeKey: "transporter4CompanyPostalCode",
     cityKey: "transporter4CompanyCity",
-    countryKey: "transporter4CompanyCountryCode"
+    countryKey: "transporter4CompanyCountryCode",
+    recepisseIsExemptedKey: "transporter4RecepisseIsExempted",
+    recepisseNumberKey: "transporter4RecepisseNumber"
   });
 
 export const transporter5Refinement =
-  refineActorInfos<ParsedZodIncomingTexsItem>({
+  refineTransporterInfos<ParsedZodIncomingTexsItem>({
+    modeKey: "transporter5TransportMode",
     typeKey: "transporter5CompanyType",
     orgIdKey: "transporter5CompanyOrgId",
     nameKey: "transporter5CompanyName",
     addressKey: "transporter5CompanyAddress",
     postalCodeKey: "transporter5CompanyPostalCode",
     cityKey: "transporter5CompanyCity",
-    countryKey: "transporter5CompanyCountryCode"
+    countryKey: "transporter5CompanyCountryCode",
+    recepisseIsExemptedKey: "transporter5RecepisseIsExempted",
+    recepisseNumberKey: "transporter5RecepisseNumber"
   });
 
 export const refineReportForProfile: Refinement<

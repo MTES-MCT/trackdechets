@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_OUTGOING_WASTE_REGISTRY = gql`
   mutation AddToOutgoingWasteRegistry($lines: [OutgoingWasteLineInput!]!) {
-    addToOutgoingWasteRegistry(lines: $lines)
+    addToOutgoingWasteRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -36,7 +48,6 @@ function getCorrectLine(siret: string) {
     initialEmitterCompanyCity: "Commune du producteur",
     initialEmitterCompanyCountryCode: "FR",
     initialEmitterMunicipalitiesInseeCodes: null,
-    initialEmitterMunicipalitiesNames: null,
     destinationCompanyType: "ETABLISSEMENT_FR",
     destinationCompanyOrgId: "78467169500103",
     destinationCompanyName: "Raison sociale de l'expéditeur",
@@ -59,8 +70,7 @@ function getCorrectLine(siret: string) {
     ecoOrganismeName: null,
     operationCode: "R 5",
     operationMode: "RECYCLAGE",
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isDirectSupply: false,
     transporter1TransportMode: "ROAD",
@@ -151,7 +161,7 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
     );
   });
 
-  it("should create an incoming waste item", async () => {
+  it("should create an outgoing waste item", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -162,10 +172,10 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(1);
   });
 
-  it("should create several incoming waste items", async () => {
+  it("should create several outgoing waste items", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -178,10 +188,10 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(100);
   });
 
-  it("should create and edit an incoming waste item in one go", async () => {
+  it("should create and edit an outgoing waste item in one go", async () => {
     const { user, company } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 
@@ -194,7 +204,8 @@ describe("Registry - addToOutgoingWasteRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToOutgoingWasteRegistry).toBe(true);
+    expect(data.addToOutgoingWasteRegistry.stats.insertions).toBe(1);
+    expect(data.addToOutgoingWasteRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryOutgoingWaste.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

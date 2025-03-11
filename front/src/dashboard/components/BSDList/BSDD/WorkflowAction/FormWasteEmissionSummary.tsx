@@ -14,9 +14,10 @@ import {
 } from "../../../../../common/components";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -47,10 +48,8 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   ),
   packagingInfos: () => (
     <div className="form__row">
-      <label>
-        Conditionnement(s)
-        <Field name="packagingInfos" component={Packagings} />
-      </label>
+      <h6 className="fr-h6">Conditionnement</h6>
+      <FormikPackagingList fieldName="packagingInfos" />
     </div>
   ),
   transporterNumberPlate: () => (
@@ -66,7 +65,7 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
 export function FormWasteEmissionSummary({
   form
 }: FormWasteEmissionSummaryProps) {
-  const { values } = useFormikContext<FormValues>();
+  const { values, setFieldValue } = useFormikContext<FormValues>();
 
   const [fields, setFields] = React.useState<FormKeys[]>([]);
   const addField = (name: FormKeys) =>
@@ -75,6 +74,12 @@ export function FormWasteEmissionSummary({
         .concat([name])
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
+
+  // On ne doit pas pouvoir éditer la liste des contenants ou la plaque immat
+  // lors d'un acheminement direct par pipeline ou convoyeur sauf s'il s'agit
+  // de la signature du TTR après entreposage provisoire
+  const isDirectSupply =
+    form.temporaryStorageDetail && form.emittedAt ? false : form.isDirectSupply;
 
   return (
     <>
@@ -105,22 +110,34 @@ export function FormWasteEmissionSummary({
             </button>
           </DataListDescription>
         </DataListItem>
-        <DataListItem>
-          <DataListTerm>Contenant(s)</DataListTerm>
-          <DataListDescription>
-            {values.packagingInfos
-              ?.map(packaging => `${packaging.quantity} ${packaging.type}(s)`)
-              .join(", ")}
+        {!isDirectSupply && (
+          <DataListItem>
+            <DataListTerm>Contenant(s)</DataListTerm>
+            <DataListDescription>
+              {values.packagingInfos
+                ?.map(packaging =>
+                  packaging?.type
+                    ? `${packaging.quantity} ${packaging.type}(s)`
+                    : ""
+                )
+                .join(", ")}
 
-            <button
-              type="button"
-              onClick={() => addField("packagingInfos")}
-              className="tw-ml-2"
-            >
-              <IconPaperWrite color="blue" />
-            </button>
-          </DataListDescription>
-        </DataListItem>
+              <button
+                type="button"
+                onClick={() => {
+                  addField("packagingInfos");
+                  if (!values.packagingInfos?.length) {
+                    setFieldValue("packagingInfos", [emptyPackaging]);
+                  }
+                }}
+                className="tw-ml-2"
+              >
+                <IconPaperWrite color="blue" />
+              </button>
+            </DataListDescription>
+          </DataListItem>
+        )}
+
         {form.emitter?.type !== EmitterType.Appendix1Producer && (
           <DataListItem>
             <DataListTerm>Mention ADR</DataListTerm>
@@ -146,22 +163,23 @@ export function FormWasteEmissionSummary({
             </DataListDescription>
           </DataListItem>
         )}
-        {form.emitter?.type !== EmitterType.Appendix1Producer && (
-          <DataListItem>
-            <DataListTerm>Plaque d'immatriculation</DataListTerm>
-            <DataListDescription>
-              {values.transporterNumberPlate}
+        {form.emitter?.type !== EmitterType.Appendix1Producer &&
+          !isDirectSupply && (
+            <DataListItem>
+              <DataListTerm>Plaque d'immatriculation</DataListTerm>
+              <DataListDescription>
+                {values.transporterNumberPlate}
 
-              <button
-                type="button"
-                onClick={() => addField("transporterNumberPlate")}
-                className="tw-ml-2"
-              >
-                <IconPaperWrite color="blue" />
-              </button>
-            </DataListDescription>
-          </DataListItem>
-        )}
+                <button
+                  type="button"
+                  onClick={() => addField("transporterNumberPlate")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              </DataListDescription>
+            </DataListItem>
+          )}
       </DataList>
       {fields.length > 0 && (
         <div className="tw-mb-4">

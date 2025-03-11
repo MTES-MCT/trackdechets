@@ -313,7 +313,7 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
               également une copie.
             </p>
 
-            <div className="fr-col-4 fr-mb-2w">
+            <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
               <Input
                 label="Date de prise en charge"
                 nativeInputProps={{

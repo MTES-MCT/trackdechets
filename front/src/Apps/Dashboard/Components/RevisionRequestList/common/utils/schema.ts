@@ -135,12 +135,14 @@ export const initialBsddReview: BsddRevisionRequestValidationSchema = {
     cap: ""
   },
   quantityReceived: null,
+  quantityRefused: null,
   processingOperationDone: "",
   destinationOperationMode: null,
   processingOperationDescription: "",
   temporaryStorageDetail: {
     temporaryStorer: {
-      quantityReceived: null
+      quantityReceived: null,
+      quantityRefused: null
     },
     destination: {
       cap: "",
@@ -193,24 +195,29 @@ export const validationBsddSchema = z.object({
       .array(
         z
           .object({
-            type: z.enum(
-              ["BENNE", "FUT", "CITERNE", "PIPELINE", "GRV", "AUTRE"],
-              {
-                required_error: "Ce champ est requis",
-                invalid_type_error: "Ce champ est requis"
-              }
-            ),
-            other: z.string(),
+            type: z.string().min(1, "Ce champ est requis"),
+            volume: z
+              .union([z.string(), z.number()])
+              .nullable()
+              .transform(val =>
+                val === "" || val === null ? null : Number(val)
+              )
+              .refine(
+                v => v === null || v > 0,
+                "Le volume doit être supérieur à 0"
+              ),
+            other: z.string().nullish(),
             quantity: z.coerce
               .number()
-              .positive("Ce champ est requis est doit être supérieur à 0")
+              .positive("Ce champ est requis est doit être supérieur à 0"),
+            identificationNumbers: z.array(z.string()).nullish()
           })
           .superRefine((values, context) => {
             if (values.type === "AUTRE" && !values.other) {
               context.addIssue({
                 code: z.ZodIssueCode.custom,
 
-                message: "Veuillez préciser le conditionnement",
+                message: "Veuillez préciser le type de conditionnement",
 
                 path: ["other"]
               });
@@ -226,13 +233,15 @@ export const validationBsddSchema = z.object({
   recipient: z.object({
     cap: z.string().nullish()
   }),
-  quantityReceived: z.number().nullish(),
+  quantityReceived: z.number().min(0).nullish(),
+  quantityRefused: z.number().min(0).nullish(),
   processingOperationDone: z.string().nullish(),
   destinationOperationMode: z.string().nullish(),
   processingOperationDescription: z.string().nullish(),
   temporaryStorageDetail: z.object({
     temporaryStorer: z.object({
-      quantityReceived: z.number().nullish()
+      quantityReceived: z.number().min(0).nullish(),
+      quantityRefused: z.number().min(0).nullish()
     }),
     destination: z.object({
       cap: z.string().nullish(),

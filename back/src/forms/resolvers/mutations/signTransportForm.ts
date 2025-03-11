@@ -21,7 +21,7 @@ import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
-import { validateBeforeTransport, plateSchemaFn } from "../../validation";
+import { validateBeforeTransport, transporterSchemaFn } from "../../validation";
 import { Permission } from "../../../permissions";
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { recipifyFormInput } from "../../recipify";
@@ -333,12 +333,30 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     const transporter = getFirstTransporterSync(existingFullForm.forwardedIn!);
+    const signingTransporterOrgId = getTransporterCompanyOrgId(transporter)!;
     await checkCanSignFor(
-      getTransporterCompanyOrgId(transporter)!,
+      signingTransporterOrgId,
       user,
       Permission.BsdCanSignTransport,
       args.securityCode
     );
+    const transporterNumberPlate =
+      args.input.transporterNumberPlate ?? transporter?.transporterNumberPlate;
+
+    const transporterTransportMode =
+      args.input.transporterTransportMode ??
+      transporter?.transporterTransportMode;
+
+    const transporterSchema = transporterSchemaFn({ signingTransporterOrgId });
+
+    const receiptFields = await getFormReceiptField(transporter);
+
+    await transporterSchema.validate({
+      ...transporter,
+      transporterNumberPlate,
+      transporterTransportMode,
+      ...receiptFields
+    });
 
     const formUpdateInput: Prisma.FormUpdateInput = {
       forwardedIn: {
@@ -349,9 +367,9 @@ const signatures: Partial<
           transporters: {
             updateMany: {
               data: {
-                transporterNumberPlate:
-                  args.input.transporterNumberPlate ??
-                  transporter?.transporterNumberPlate
+                transporterNumberPlate,
+                transporterTransportMode,
+                ...receiptFields
               },
               where: { number: 1 }
             }
@@ -364,17 +382,6 @@ const signatures: Partial<
         }
       }
     };
-
-    await plateSchemaFn().validate(
-      {
-        transporterNumberPlate:
-          args.input.transporterNumberPlate ??
-          transporter?.transporterNumberPlate
-      },
-      {
-        abortEarly: false
-      }
-    );
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingFullForm.id, status: existingFullForm.status },

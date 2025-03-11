@@ -3,9 +3,9 @@ import {
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationMode,
-  refineWeightAndVolume,
+  refineTransportersConsistency,
   refineWeightIsEstimate
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -19,7 +19,8 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineReportForProfile
+  refineReportForProfile,
+  refineWeightAndVolume
 } from "./refinement";
 import { incomingWasteSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
@@ -32,7 +33,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineWeightAndVolume)
     .superRefine(refineWeightIsEstimate)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(refineOperationMode)
@@ -43,6 +44,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(transporter3Refinement)
     .superRefine(transporter4Refinement)
     .superRefine(transporter5Refinement)
+    .superRefine(refineTransportersConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .safeParseAsync(line, { errorMap: registryErrorMap });

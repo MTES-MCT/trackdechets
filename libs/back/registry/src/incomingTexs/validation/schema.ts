@@ -23,12 +23,10 @@ import {
   getOperationCodeSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   siretSchema,
   parcelCoordinatesSchema,
   parcelNumbersSchema,
-  municipalitiesNamesSchema,
   operationModeSchema
 } from "../../shared/schemas";
 import {
@@ -76,18 +74,13 @@ const inputIncomingTexsSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
-  emitterCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNES"
-  ]),
+  emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),
   emitterCompanyAddress: actorAddressSchema.nullish(),
   emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   emitterCompanyCity: actorCitySchema.nullish(),
   emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterNoTraceability: booleanSchema.nullish(),
   emitterPickupSiteName: z.string().trim().nullish(),
   emitterPickupSiteAddress: actorAddressSchema.nullish(),
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
@@ -121,8 +114,7 @@ const inputIncomingTexsSchema = z.object({
   operationMode: operationModeSchema,
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

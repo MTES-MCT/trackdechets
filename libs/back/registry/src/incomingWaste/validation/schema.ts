@@ -23,10 +23,8 @@ import {
   booleanSchema,
   dateSchema,
   inseeCodesSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   siretSchema,
-  municipalitiesNamesSchema,
   operationModeSchema
 } from "../../shared/schemas";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
@@ -85,7 +83,6 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   emitterCompanyType: actorTypeSchema.exclude([
     "PERSONNE_PHYSIQUE",
     "COMMUNES"
@@ -96,7 +93,6 @@ const inputIncomingWasteSchema = z.object({
   emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   emitterCompanyCity: actorCitySchema.nullish(),
   emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterNoTraceability: booleanSchema.nullish(),
   emitterPickupSiteName: z
     .string()
     .trim()
@@ -137,8 +133,7 @@ const inputIncomingWasteSchema = z.object({
   operationMode: operationModeSchema,
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

@@ -5,7 +5,6 @@ import { NotificationError } from "../../../../../Apps/common/Components/Error/E
 import ProcessingOperationSelect from "../../../../../common/components/ProcessingOperationSelect";
 import { statusChangeFragment } from "../../../../../Apps/common/queries/fragments";
 import { mergeDefaults } from "../../../../../common/helper";
-import Packagings from "../../../../../form/bsdd/components/packagings/Packagings";
 import CompanySelector from "../../../../../form/common/components/company/CompanySelector";
 import NumberInput from "../../../../../form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../../../../../form/common/components/custom-inputs/RadioButton";
@@ -25,6 +24,7 @@ import { TransporterForm } from "../../../../../Apps/Forms/Components/Transporte
 import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { companySchema } from "../../../../../common/validation/schema";
+import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -176,10 +176,7 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
 
                 <h4>Conditionnement</h4>
 
-                <Field
-                  name="wasteDetails.packagingInfos"
-                  component={Packagings}
-                />
+                <FormikPackagingList fieldName="wasteDetails.packagingInfos" />
 
                 <h4>Quantité en tonnes</h4>
                 <div className="form__row">

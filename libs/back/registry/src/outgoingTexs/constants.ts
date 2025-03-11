@@ -35,7 +35,6 @@ export const OUTGOING_TEXS_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   parcelInseeCodes: "Codes INSEE des parcelles",
   parcelNumbers: "Numéro(s) des parcelles",
   parcelCoordinates: "Coordonnées des parcelles",
@@ -53,8 +52,7 @@ export const OUTGOING_TEXS_HEADERS: {
   destinationDropSiteCity: "Commune de l'adresse de dépôt du destinataire",
   destinationDropSiteCountryCode:
     "Code pays de l'adresse de dépôt du destinataire",
-  declarationNumber: "Numéro de déclaration GISTRID",
-  notificationNumber: "Numéro de notification GISTRID",
+  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
   movementNumber: "Numéro de mouvement",
   operationCode: "Code de traitement prévu",
   operationMode: "Mode de traitement prévu",

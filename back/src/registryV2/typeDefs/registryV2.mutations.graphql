@@ -14,7 +14,7 @@ type Mutation {
   addToSsdRegistry(
     "Lignes à ajouter, modifier, ou supprimer"
     lines: [SsdLineInput!]!
-  ): Boolean!
+  ): AddRegistryLinesResponse!
 
   """
   Ajoute, modifie, ou supprime des lignes au registre de déchets dangereux ou non dangereux entrants
@@ -23,7 +23,7 @@ type Mutation {
   addToIncomingWasteRegistry(
     "Lignes à ajouter, modifier, ou supprimer"
     lines: [IncomingWasteLineInput!]!
-  ): Boolean!
+  ): AddRegistryLinesResponse!
 
   """
   Ajoute, modifie, ou supprime des lignes au registre de terres excavées et sédiments entrants
@@ -32,7 +32,7 @@ type Mutation {
   addToIncomingTexsRegistry(
     "Lignes à ajouter, modifier, ou supprimer"
     lines: [IncomingTexsLineInput!]!
-  ): Boolean!
+  ): AddRegistryLinesResponse!
 
   """
   Ajoute, modifie, ou supprime des lignes au registre de terres excavées et sédiments sortants
@@ -41,7 +41,7 @@ type Mutation {
   addToOutgoingTexsRegistry(
     "Lignes à ajouter, modifier, ou supprimer"
     lines: [OutgoingTexsLineInput!]!
-  ): Boolean!
+  ): AddRegistryLinesResponse!
 
   """
   Ajoute, modifie, ou supprime des lignes au registre de déchets dangereux ou non dangereux sortants
@@ -50,7 +50,25 @@ type Mutation {
   addToOutgoingWasteRegistry(
     "Lignes à ajouter, modifier, ou supprimer"
     lines: [OutgoingWasteLineInput!]!
-  ): Boolean!
+  ): AddRegistryLinesResponse!
+
+  """
+  Ajoute, modifie, ou supprime des lignes au registre de déchets transportés
+  Il est possible de passer jusqu'à 1000 lignes par appel
+  """
+  addToTransportedRegistry(
+    "Lignes à ajouter, modifier, ou supprimer"
+    lines: [TransportedLineInput!]!
+  ): AddRegistryLinesResponse!
+
+  """
+  Ajoute, modifie, ou supprime des lignes au registre de déchets gérés
+  Il est possible de passer jusqu'à 1000 lignes par appel
+  """
+  addToManagedRegistry(
+    "Lignes à ajouter, modifier, ou supprimer"
+    lines: [ManagedLineInput!]!
+  ): AddRegistryLinesResponse!
 
   "Renvoie un lien permettant de télécharger un registre au format CSV"
   generateRegistryV2Export(

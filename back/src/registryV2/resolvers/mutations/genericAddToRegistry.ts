@@ -1,15 +1,19 @@
-import { pluralize } from "@td/constants";
-import { prisma } from "@td/prisma";
 import {
+  ImportType,
+  RegistryChanges,
   UNAUTHORIZED_ERROR,
-  type ImportOptions,
-  isAuthorized
+  getSumOfChanges,
+  importOptions,
+  incrementLocalChangesForCompany,
+  isAuthorized,
+  saveCompaniesChanges
 } from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { getDelegatorsByDelegateForEachCompanies } from "../../../registryDelegation/database";
 
 const LINES_LIMIT = 1_000;
 
@@ -21,10 +25,12 @@ type UnparsedLine = {
 };
 
 export async function genericAddToRegistry<T extends UnparsedLine>(
-  importOptions: ImportOptions,
+  importType: ImportType,
   lines: T[],
   context: GraphQLContext
 ) {
+  const options = importOptions[importType];
+
   const user = checkIsAuthenticated(context);
   const userCompanies = await getUserCompanies(user.id);
   await checkUserPermissions(
@@ -42,25 +48,16 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   const userSirets = userCompanies.map(company => company.orgId);
   const userCompanyIds = userCompanies.map(company => company.id);
-  const givenDelegations = await prisma.registryDelegation.findMany({
-    where: {
-      delegateId: { in: userCompanyIds },
-      revokedBy: null,
-      cancelledBy: null,
-      startDate: { lte: new Date() },
-      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-    }
-  });
-  const delegateToDelegatorsMap = givenDelegations.reduce((map, delegation) => {
-    const currentValue = map.get(delegation.delegateId) ?? [];
-    currentValue.push(delegation.delegatorId);
 
-    map.set(delegation.delegateId, currentValue);
-    return map;
-  }, new Map<string, string[]>());
+  const delegatorSiretsByDelegateSirets =
+    await getDelegatorsByDelegateForEachCompanies(userCompanyIds);
 
-  const { safeParseAsync, saveLine } = importOptions;
+  const { safeParseAsync, saveLine } = options;
   const errors = new Map<string, string>();
+  const changesByCompany = new Map<
+    string,
+    { [reportAsSiret: string]: RegistryChanges }
+  >();
 
   for (const line of lines) {
     const result = await safeParseAsync(line);
@@ -71,7 +68,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
       if (
         !isAuthorized({
           reportAsCompanySiret,
-          delegateToDelegatorsMap,
+          delegatorSiretsByDelegateSirets,
           reportForCompanySiret,
           allowedSirets: userSirets
         })
@@ -79,6 +76,13 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         errors.set(line.publicId, UNAUTHORIZED_ERROR);
         continue;
       }
+
+      incrementLocalChangesForCompany(changesByCompany, {
+        reason: result.data.reason,
+        reportForCompanySiret: result.data.reportForCompanySiret,
+        reportAsCompanySiret:
+          result.data.reportAsCompanySiret ?? result.data.reportForCompanySiret
+      });
 
       await saveLine({
         line: { ...result.data, createdById: user.id },
@@ -94,21 +98,19 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     }
   }
 
-  if (errors.size > 0) {
-    throw new UserInputError(
-      `${errors.size} ${pluralize(
-        "ligne en erreur n'a pas pu être importée",
-        errors.size,
-        "lignes en erreur n'ont pas pu être importées"
-      )}.`,
-      {
-        errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
-          message: errors,
-          publicId
-        }))
-      }
-    );
-  }
+  await saveCompaniesChanges(changesByCompany, {
+    type: importType,
+    source: "API",
+    createdById: user.id
+  });
 
-  return true;
+  const stats = getSumOfChanges(changesByCompany, errors.size);
+
+  return {
+    stats,
+    errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
+      message: errors,
+      publicId
+    }))
+  };
 }

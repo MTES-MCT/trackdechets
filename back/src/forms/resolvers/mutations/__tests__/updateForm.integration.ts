@@ -48,6 +48,7 @@ const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
     updateForm(updateFormInput: $updateFormInput) {
       id
+      isDirectSupply
       wasteDetails {
         name
         code
@@ -2139,47 +2140,55 @@ describe("Mutation.updateForm", () => {
     );
   });
 
-  it("should update a form with a PIPELINE packaging, erasing transporter infos and forcing transporter mode OTHER", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    // recipient needs appropriate profiles and subprofiles
-    const destination = await companyFactory({
-      companyTypes: [CompanyType.WASTEPROCESSOR],
-      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
-    });
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: company.siret,
-        recipientCompanySiret: destination.siret
-      }
-    });
-
-    const updateFormInput = {
-      id: form.id,
-      transporter: {
-        mode: "ROAD",
-        company: {
-          siret: siretify(1)
+  it(
+    "[deprecated] should empty transporter list and packagings when " +
+      "adding a PIPELINE packaging",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      // recipient needs appropriate profiles and subprofiles
+      const destination = await companyFactory({
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: destination.siret
         }
-      },
-      wasteDetails: {
-        name: "things",
-        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
-      }
-    };
-    const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
-      variables: { updateFormInput }
-    });
-    expect(data.updateForm.wasteDetails).toMatchObject(
-      updateFormInput.wasteDetails
-    );
-    expect(data.updateForm.transporter).toMatchObject({
-      mode: "OTHER",
-      company: null
-    });
-  });
+      });
+
+      const updateFormInput = {
+        id: form.id,
+        transporter: {
+          mode: "ROAD",
+          company: {
+            siret: siretify(1)
+          }
+        },
+        wasteDetails: {
+          name: "things",
+          packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+        }
+      };
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "updateForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toBeUndefined();
+      expect(data.updateForm).toMatchObject({
+        isDirectSupply: true,
+        wasteDetails: {
+          packagingInfos: []
+        },
+        transporter: null
+      });
+    }
+  );
 
   it("should error updating form with a PIPELINE packaging, and any other packaging", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -2216,8 +2225,102 @@ describe("Mutation.updateForm", () => {
       {
         extensions: { code: "BAD_USER_INPUT" },
         message:
-          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement."
+          "Aucun conditionnement ne doit être renseigné dans le cadre d'un acheminement direct par pipeline ou convoyeur"
       }
+    ]);
+  });
+
+  it("should be possible to set isDirectSupply=true", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          isDirectSupply: true,
+          wasteDetails: { packagingInfos: [] },
+          transporters: []
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    expect(data.updateForm).toMatchObject({
+      isDirectSupply: true,
+      wasteDetails: { packagingInfos: {} },
+      transporter: null
+    });
+  });
+
+  it("should throw error when trying to set isDirectSupply=true and transporters are present", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          isDirectSupply: true,
+          wasteDetails: { packagingInfos: [] }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne devez pas spécifier de transporteur dans le cas d'un acheminement direct par pipeline ou convoyeur"
+      })
+    ]);
+  });
+
+  it("should throw error when trying to set isDirectSupply=true and packagings are present", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          isDirectSupply: true,
+          transporters: []
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Aucun conditionnement ne doit être renseigné dans le cadre d'un acheminement direct par pipeline ou convoyeur"
+      })
     ]);
   });
 

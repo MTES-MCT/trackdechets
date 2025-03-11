@@ -9,6 +9,7 @@ import {
 } from "../../../../../Apps/common/Components/Error/Error";
 import { fullFormFragment } from "../../../../../Apps/common/queries/fragments";
 import {
+  Form,
   FormStatus,
   Mutation,
   MutationSignEmissionFormArgs,
@@ -23,6 +24,8 @@ import SignatureCodeInput from "../../../../../form/common/components/custom-inp
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 import { GET_FORM } from "../../../../../Apps/common/queries/bsdd/queries";
+import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
+import { packagingInfo } from "../../../../../form/bsdd/utils/schema";
 
 interface SignEmissionFormModalProps {
   title: string;
@@ -31,17 +34,28 @@ interface SignEmissionFormModalProps {
   onClose: () => void;
 }
 
-const validationSchema = yup.object({
-  emittedAt: yup.date().required("La date d'émission est requise"),
-  emittedBy: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  securityCode: yup
-    .string()
-    .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres")
-});
+const validationSchema = (form: Form) => {
+  let packagingInfosSchema = yup.array().of(packagingInfo);
+
+  if (form.emitter?.type !== "APPENDIX1_PRODUCER" && !form.isDirectSupply) {
+    packagingInfosSchema = packagingInfosSchema
+      .required()
+      .min(1, "Vous devez préciser le conditionnement");
+  }
+
+  return yup.object({
+    emittedAt: yup.date().required("La date d'émission est requise"),
+    emittedBy: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    securityCode: yup
+      .string()
+      .nullable()
+      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+    packagingInfos: packagingInfosSchema
+  });
+};
 
 enum EmitterType {
   Emitter = "Emitter",
@@ -108,27 +122,24 @@ function SignEmissionFormModalContent({
     );
   }
   const form = data?.form;
+
+  const initialTransporterNumberPlate =
+    !!form.temporaryStorageDetail && !!form.emittedAt
+      ? // Il s'agit de la signature de l'émetteur après
+        // entreposage provisoire
+        form?.temporaryStorageDetail.transporter?.numberPlate
+      : form.transporter?.numberPlate;
+
   const initialValues = {
     emittedAt: TODAY.toISOString(),
     emittedBy: "",
     emittedByType: EmitterType.Emitter,
     securityCode: "",
     emitter: { type: form?.emitter?.type },
-    ...(form.status === FormStatus.Resealed
-      ? {
-          packagingInfos:
-            form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
-          quantity: form.temporaryStorageDetail?.wasteDetails?.quantity ?? 0,
-          onuCode: form.temporaryStorageDetail?.wasteDetails?.onuCode ?? "",
-          transporterNumberPlate:
-            form.temporaryStorageDetail?.transporter?.numberPlate ?? ""
-        }
-      : {
-          packagingInfos: form.wasteDetails?.packagingInfos,
-          quantity: form.wasteDetails?.quantity ?? 0,
-          onuCode: form.wasteDetails?.onuCode ?? "",
-          transporterNumberPlate: form.transporter?.numberPlate ?? ""
-        })
+    packagingInfos: form.wasteDetails?.packagingInfos ?? [],
+    quantity: form.wasteDetails?.quantity ?? 0,
+    onuCode: form.wasteDetails?.onuCode ?? "",
+    transporterNumberPlate: initialTransporterNumberPlate ?? ""
   };
 
   const handlesubmit = async values => {
@@ -139,7 +150,7 @@ function SignEmissionFormModalContent({
           input: {
             quantity: values.quantity,
             onuCode: values.onuCode,
-            packagingInfos: values.packagingInfos,
+            packagingInfos: cleanPackagings(values.packagingInfos),
             transporterNumberPlate: values.transporterNumberPlate,
             emittedAt: values.emittedAt,
             emittedBy: values.emittedBy,
@@ -158,12 +169,12 @@ function SignEmissionFormModalContent({
   };
 
   return (
-    <Formik
+    <Formik<typeof initialValues>
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validationSchema={validationSchema(form)}
       onSubmit={handlesubmit}
     >
-      {({ values }) => {
+      {({ values, errors }) => {
         let signatureAuthorSiret: string | null | undefined = undefined;
 
         if (form.status === FormStatus.Resealed) {
@@ -188,6 +199,10 @@ function SignEmissionFormModalContent({
         return (
           <FormikForm>
             <FormWasteEmissionSummary form={form} />
+            {errors.packagingInfos &&
+              typeof errors.packagingInfos === "string" && (
+                <RedErrorMessage name="packagingInfos" />
+              )}
             <FormJourneySummary form={form} />
 
             {form.status === FormStatus.Sealed && form.ecoOrganisme && (

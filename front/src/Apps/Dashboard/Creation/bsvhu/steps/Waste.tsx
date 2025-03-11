@@ -2,13 +2,13 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import React, { useEffect, useContext } from "react";
 import { useFormContext } from "react-hook-form";
-import IdentificationNumber from "../../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import WasteRadioGroup from "../../../../Forms/Components/WasteRadioGoup/WasteRadioGroup";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { ZodBsvhu } from "../schema";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { setFieldError, TabError } from "../../utils";
 import NonScrollableInput from "../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import { RhfTagsInputWrapper } from "../../../../Forms/Components/TagsInput/TagsInputWrapper";
 
 const WasteBsvhu = ({
   errors,
@@ -23,8 +23,6 @@ const WasteBsvhu = ({
   const weight = watch("weight.value");
   const quantity = watch("quantity") ?? 0;
   const isEstimate = watch("weight.isEstimate");
-  const identificationNumbersDefaultValue =
-    formState.defaultValues?.identification?.numbers;
   const identificationNumbers = watch("identification.numbers");
   const packaging = watch("packaging");
 
@@ -174,12 +172,11 @@ const WasteBsvhu = ({
         </div>
       </fieldset>
 
-      <div className="fr-col-md-12 fr-mb-4w">
-        <IdentificationNumber
+      <div className="fr-col-md-12 fr-mt-4w fr-mb-4w">
+        <RhfTagsInputWrapper
           disabled={sealedFields.includes("identification.numbers")}
-          name="identification.numbers"
-          defaultValue={identificationNumbersDefaultValue}
-          error={formState.errors.identification?.numbers}
+          label="Détail des identifications"
+          fieldName="identification.numbers"
         />
         {formState.errors.identification?.numbers?.message && (
           <p className="fr-text fr-error-text">

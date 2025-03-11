@@ -9,6 +9,7 @@ import { prisma } from "@td/prisma";
 import { RegistryFormInclude } from "../../registry/elastic";
 import { formToBsdd } from "../compat";
 import { Decimal } from "@prisma/client/runtime/library";
+import { PackagingInfo } from "@td/codegen-back";
 
 describe("simpleFormToBsdd", () => {
   it("should convert a Form to a Bsdd", async () => {
@@ -62,6 +63,7 @@ describe("simpleFormToBsdd", () => {
       isDeleted: form.isDeleted,
       isDraft: false,
       status: form.status,
+      isDirectSupply: false,
       wasteCode: form.wasteDetailsCode,
       wasteIsDangerous: true,
       wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
@@ -102,7 +104,12 @@ describe("simpleFormToBsdd", () => {
       emitterPickupSiteInfos: form.emitterWorkSiteInfos,
       emitterEmissionSignatureAuthor: form.sentBy,
       emitterEmissionSignatureDate: form.sentAt,
-      packagings: form.wasteDetailsPackagingInfos,
+      packagings:
+        (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+          ...p,
+          volume: p.volume ?? null,
+          identificationNumbers: p.identificationNumbers ?? []
+        })) ?? [],
       weightValue: form.wasteDetailsQuantity?.toNumber(),
       wasteAdr: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
@@ -454,6 +461,7 @@ describe("simpleFormToBsdd", () => {
       nextDestinationNotificationNumber: null,
       nextDestinationProcessingOperation: null,
       status: fullForwardedInForm.status,
+      isDirectSupply: false,
       wasteCode: fullForwardedInForm.wasteDetailsCode,
       wasteIsDangerous: true,
       wasteDetailsLandIdentifiers:
@@ -496,7 +504,14 @@ describe("simpleFormToBsdd", () => {
       emitterPickupSiteInfos: fullForwardedInForm.emitterWorkSiteInfos,
       emitterEmissionSignatureAuthor: fullForwardedInForm.sentBy,
       emitterEmissionSignatureDate: fullForwardedInForm.sentAt,
-      packagings: fullForwardedInForm.wasteDetailsPackagingInfos,
+      packagings:
+        (
+          fullForwardedInForm.wasteDetailsPackagingInfos as PackagingInfo[]
+        )?.map(p => ({
+          ...p,
+          volume: p.volume ?? null,
+          identificationNumbers: p.identificationNumbers ?? []
+        })) ?? [],
       weightValue: fullForwardedInForm.wasteDetailsQuantity?.toNumber(),
       wasteAdr: fullForwardedInForm.wasteDetailsOnuCode,
       nonRoadRegulationMention:
@@ -653,6 +668,7 @@ describe("simpleFormToBsdd", () => {
         isDeleted: form.isDeleted,
         isDraft: form.status === "DRAFT",
         status: form.status,
+        isDirectSupply: false,
         wasteCode: form.wasteDetailsCode,
         wasteIsDangerous: true,
         wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
@@ -693,7 +709,12 @@ describe("simpleFormToBsdd", () => {
         emitterPickupSiteInfos: form.emitterWorkSiteInfos,
         emitterEmissionSignatureAuthor: form.sentBy,
         emitterEmissionSignatureDate: form.sentAt,
-        packagings: form.wasteDetailsPackagingInfos,
+        packagings:
+          (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+            ...p,
+            volume: p.volume ?? null,
+            identificationNumbers: p.identificationNumbers ?? []
+          })) ?? [],
         weightValue: form.wasteDetailsQuantity?.toNumber(),
         wasteAdr: form.wasteDetailsOnuCode,
         nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,

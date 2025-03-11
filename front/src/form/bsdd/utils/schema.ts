@@ -9,14 +9,13 @@ import {
   mixed,
   SchemaOf
 } from "yup";
-
 import {
-  PackagingInfo,
   Packagings,
   Consistence,
   WasteAcceptationStatus,
   CompanyType,
-  CompanyInput
+  CompanyInput,
+  PackagingInfoInput
 } from "@td/codegen-ui";
 import graphlClient from "../../../graphql-client";
 import { COMPANY_INFOS_REGISTERED_VALIDATION_SCHEMA } from "../../../Apps/common/queries/company/query";
@@ -72,7 +71,7 @@ export const transporterSchema = object().shape({
   company: transporterCompanySchema
 });
 
-const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
+export const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
   object().shape({
     type: mixed<Packagings>().required(
       "Le type de conditionnement doit être précisé."
@@ -104,7 +103,11 @@ const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
               "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
             )
           : schema
-      )
+      ),
+    volume: number()
+      .nullable()
+      .moreThan(0, "Le volume doit être supérieur à 0"),
+    identificationNumbers: array<String>().nullable()
   });
 
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
@@ -209,31 +212,7 @@ export const formSchema = object().shape({
     name: string().nullable(true),
     isSubjectToADR: boolean(),
     onuCode: string().nullable(),
-    packagingInfos: array()
-      .required()
-      .min(1)
-      .of(packagingInfo)
-      .test(
-        "is-valid-packaging-infos",
-        "Le conditionnement ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        infos => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE") != null;
-          const hasBenne = infos?.find(i => i.type === "BENNE") != null;
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => i.type && !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
+    packagingInfos: array().required().min(1).of(packagingInfo),
     quantity: number().min(0, "La quantité doit être supérieure à 0"),
     quantityType: string().matches(
       /(REAL|ESTIMATED)/,

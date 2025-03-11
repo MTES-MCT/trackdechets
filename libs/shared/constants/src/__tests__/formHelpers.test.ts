@@ -85,4 +85,27 @@ describe("packagingEquals", () => {
       )
     ).toEqual(false);
   });
+
+  test("same packagings with identification numbers", () => {
+    expect(
+      packagingsEqual(
+        [
+          {
+            type: "FUT",
+            quantity: 1,
+            volume: 1,
+            identificationNumbers: ["fut1", "fut2"]
+          }
+        ],
+        [
+          {
+            type: "FUT",
+            quantity: 1,
+            volume: 1,
+            identificationNumbers: ["fut1", "fut2"]
+          }
+        ]
+      )
+    ).toEqual(true);
+  });
 });

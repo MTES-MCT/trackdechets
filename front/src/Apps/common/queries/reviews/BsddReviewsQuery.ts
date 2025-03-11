@@ -47,6 +47,8 @@ const reviewFragment = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
         quantity
         sampleNumber
@@ -71,12 +73,14 @@ const reviewFragment = gql`
         cap
       }
       quantityReceived
+      quantityRefused
       processingOperationDone
       destinationOperationMode
       processingOperationDescription
       temporaryStorageDetail {
         temporaryStorer {
           quantityReceived
+          quantityRefused
         }
         destination {
           cap
@@ -106,6 +110,8 @@ const reviewFragment = gql`
           type
           other
           quantity
+          volume
+          identificationNumbers
         }
         quantity
         sampleNumber
@@ -130,12 +136,14 @@ const reviewFragment = gql`
         cap
       }
       quantityReceived
+      quantityRefused
       processingOperationDone
       destinationOperationMode
       processingOperationDescription
       temporaryStorageDetail {
         temporaryStorer {
           quantityReceived
+          quantityRefused
         }
         destination {
           cap

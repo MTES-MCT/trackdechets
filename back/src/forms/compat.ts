@@ -6,12 +6,14 @@ import {
 import type {
   AppendixFormInput,
   InitialFormFractionInput,
+  PackagingInfo,
   ParcelNumber
 } from "@td/codegen-back";
 import { Bsdd } from "./types";
 import { RegistryForm } from "../registry/elastic";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { getFormADRMention } from "@td/constants";
+import { RegistryV2Bsdd } from "../registryV2/types";
 
 /**
  * Convert a simple form (without temporary storage) to a BSDD v2
@@ -47,6 +49,7 @@ export function simpleFormToBsdd(
     isDeleted: Boolean(form.isDeleted),
     isDraft: form.status == Status.DRAFT,
     status: form.status,
+    isDirectSupply: form.isDirectSupply,
     forwardedInId: form.forwardedInId,
     wasteCode: form.wasteDetailsCode,
     wasteDescription: form.wasteDetailsName,
@@ -88,7 +91,12 @@ export function simpleFormToBsdd(
     emitterPickupSiteInfos: form.emitterWorkSiteInfos,
     emitterEmissionSignatureAuthor: form.sentBy,
     emitterEmissionSignatureDate: form.sentAt,
-    packagings: form.wasteDetailsPackagingInfos,
+    packagings:
+      (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+        ...p,
+        volume: p.volume ?? null,
+        identificationNumbers: p.identificationNumbers ?? []
+      })) ?? [],
     weightValue: form.wasteDetailsQuantity
       ? form.wasteDetailsQuantity.toNumber()
       : null,
@@ -274,6 +282,57 @@ export function formToBsdd(form: RegistryForm): Bsdd & {
 } & Pick<RegistryForm, "finalOperations"> & {
     intermediaries: IntermediaryFormAssociation[] | null;
   } {
+  let grouping: Bsdd[] = [];
+
+  if (form.grouping) {
+    grouping = form.grouping.map(({ initialForm }) =>
+      simpleFormToBsdd(initialForm)
+    );
+  }
+
+  return {
+    ...simpleFormToBsdd(form),
+    ...(form.forwardedIn
+      ? {
+          forwardedIn: {
+            ...simpleFormToBsdd(form.forwardedIn),
+            grouping: []
+          }
+        }
+      : { forwardedIn: null }),
+    ...(form.forwarding
+      ? {
+          forwarding: {
+            ...simpleFormToBsdd(form.forwarding),
+            grouping: []
+          }
+        }
+      : { forwarding: null }),
+    ...(form.finalOperations?.length
+      ? {
+          finalOperations: form.finalOperations
+        }
+      : { finalOperations: [] }),
+    ...(form.intermediaries
+      ? {
+          intermediaries: form.intermediaries
+        }
+      : { intermediaries: null }),
+    grouping
+  };
+}
+
+export type BsddV2 = Bsdd & {
+  grouping: Bsdd[];
+} & {
+  forwardedIn: (Bsdd & { grouping: Bsdd[] }) | null;
+} & {
+  forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
+} & Pick<RegistryV2Bsdd, "finalOperations"> & {
+    intermediaries: IntermediaryFormAssociation[] | null;
+  };
+
+export function formToBsddV2(form: RegistryV2Bsdd): BsddV2 {
   let grouping: Bsdd[] = [];
 
   if (form.grouping) {

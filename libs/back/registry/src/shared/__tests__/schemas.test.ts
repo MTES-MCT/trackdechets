@@ -20,9 +20,8 @@ import {
   transportRecepisseNumberSchema,
   booleanSchema,
   operationModeSchema,
-  notificationNumberSchema,
-  parcelNumbersSchema,
-  declarationNumberSchema
+  gistridNumberSchema,
+  parcelNumbersSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -208,29 +207,22 @@ describe("Schemas", () => {
     expect(operationModeSchema.parse(null)).toBe(null);
   });
 
-  test("declarationNumberSchema", () => {
-    expect(() =>
-      declarationNumberSchema.parse("A7E 2024 063125")
-    ).not.toThrow();
-    expect(() => declarationNumberSchema.parse("A7E2024063125")).not.toThrow();
-    expect(() => declarationNumberSchema.parse("A7E 2024 0631256")).toThrow();
-    expect(() => declarationNumberSchema.parse("A7E 2024 06312")).toThrow();
-  });
+  test("gistridNumberSchema", () => {
+    expect(() => gistridNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() => gistridNumberSchema.parse("FR 2023 077002")).not.toThrow();
+    expect(() => gistridNumberSchema.parse("AA 1234 567890")).not.toThrow();
+    expect(() => gistridNumberSchema.parse("AAA 1234567890")).toThrow();
+    expect(() => gistridNumberSchema.parse("AA 12345 678901")).toThrow();
 
-  test("notificationNumberSchema", () => {
-    expect(() => notificationNumberSchema.parse("AA1234567890")).not.toThrow();
-    expect(() =>
-      notificationNumberSchema.parse("FR 2023 077002")
-    ).not.toThrow();
-    expect(() =>
-      notificationNumberSchema.parse("AA 1234 567890")
-    ).not.toThrow();
-    expect(() => notificationNumberSchema.parse("AAA 1234567890")).toThrow();
-    expect(() => notificationNumberSchema.parse("AA 12345 678901")).toThrow();
+    expect(() => gistridNumberSchema.parse("A7E 2024 063125")).not.toThrow();
+    expect(() => gistridNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => gistridNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => gistridNumberSchema.parse("A7E 2024 06312")).toThrow();
   });
 
   test("parcelNumbersSchema", () => {
     expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("1-A-1")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("123-AA-1234")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("12-AA-12")).not.toThrow();

@@ -1,0 +1,35 @@
+<p>
+  Trackdéchets vous informe qu'une révision sur le bordereau amiante n° {{{
+  bsdaId }}} sur lequel votre établissement est identifié comme
+  producteur/émetteur a été demandée par l'entreprise {{{ author.name }}} ({{{
+  author.siret }}}) et validée par l'entreprise {{{ approver.name }}} ({{{
+  approver.siret }}}). Cette révision concerne les éléments suivants :
+</p>
+<ul>
+  {{#wasteSealNumbersBeforeRevision}}
+  <li>
+    Numéros de scellés avant révision : {{{ wasteSealNumbersBeforeRevision }}}
+  </li>
+  <li>
+    Numéros de scellés après révision : {{{ wasteSealNumbersAfterRevision }}}
+  </li>
+  {{/wasteSealNumbersBeforeRevision}} {{#packagingsBeforeRevision}}
+  <li>
+    Nombre et type de conditionnement avant révision : {{{
+    packagingsBeforeRevision }}}
+  </li>
+  <li>
+    Nombre et type de conditionnement après révision : {{{
+    packagingsAfterRevision }}}
+  </li>
+  {{/packagingsBeforeRevision}}
+</ul>
+
+<br />
+
+<p>
+  En cas de désaccord ou de question, il convient de vous rapprocher de
+  l'entreprise de travaux amiante {{{ worker.name }}} ({{{ worker.siret }}})
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale {{{ destination.name }}} ({{{ destination.siret }}}).
+</p>

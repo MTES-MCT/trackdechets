@@ -45,7 +45,7 @@ const PasswordResetRequest = lazy(
 );
 const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
 const Signup = lazy(() => import("../../../../login/Signup"));
-const Company = lazy(() => import("../../../../company/Company"));
+const Company = lazy(() => import("../../../../Pages/Company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [

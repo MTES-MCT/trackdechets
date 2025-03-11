@@ -75,7 +75,6 @@ import {
   COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
   SEARCH_COMPANIES
 } from "../../../Apps/common/queries/company/query";
-import { formTransportIsPipeline } from "../../../Apps/common/utils/packagingsBsddSummary";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { hasAppendix1Cta } from "../../../Apps/Dashboard/dashboardServices";
@@ -807,9 +806,16 @@ export default function BSDDetailContent({
               <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
-              <PackagingRow
-                packagingInfos={form.stateSummary?.packagingInfos}
-              />
+              {form.isDirectSupply ? (
+                <DetailRow
+                  label="Conditionnement"
+                  value="Acheminement direct par pipeline ou convoyeur"
+                />
+              ) : (
+                <PackagingRow
+                  packagingInfos={form.stateSummary?.packagingInfos}
+                />
+              )}
               <dt>Consistance</dt>{" "}
               <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
               <DetailRow
@@ -904,14 +910,15 @@ export default function BSDDetailContent({
                 <span className={styles.detailTabCaption}>Courtier</span>
               </Tab>
             )}
-            {form.transporters?.map((_, idx) => (
-              <Tab className={styles.detailTab} key={idx}>
-                <IconWarehouseDelivery size="25px" />
-                <span className={styles.detailTabCaption}>
-                  {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
-                </span>
-              </Tab>
-            ))}
+            {!form.isDirectSupply &&
+              form.transporters?.map((_, idx) => (
+                <Tab className={styles.detailTab} key={idx}>
+                  <IconWarehouseDelivery size="25px" />
+                  <span className={styles.detailTabCaption}>
+                    {isMultiModal ? `Transp. n° ${idx + 1}` : "Transporteur"}
+                  </span>
+                </Tab>
+              ))}
             {hasTempStorage && (
               <Tab className={styles.detailTab}>
                 <IconWarehouseStorage size="25px" />
@@ -1013,7 +1020,7 @@ export default function BSDDetailContent({
               </TabPanel>
             )}
             {/* Transporter tab panel */}
-            {!formTransportIsPipeline(form) ? (
+            {!form.isDirectSupply &&
               (form.transporters ?? []).map((transporter, idx) => (
                 <TabPanel className={styles.detailTabPanel}>
                   <div className={`${styles.detailGrid} `}>
@@ -1072,17 +1079,7 @@ export default function BSDDetailContent({
                     />
                   </div>
                 </TabPanel>
-              ))
-            ) : (
-              <TabPanel className={styles.detailTabPanel}>
-                <div className={`${styles.detailGrid} `}>
-                  <DetailRow
-                    value="Conditionné pour Pipeline"
-                    label="Transport"
-                  />
-                </div>
-              </TabPanel>
-            )}
+              ))}
 
             {/* Temp storage tab panel */}
             {hasTempStorage && (

@@ -1,8 +1,66 @@
 import { TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
-import { transportModeSchema, getWasteCodeSchema } from "./schemas";
+import { getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@prisma/client";
+
+export function refineTransporterInfos<T>({
+  modeKey,
+  typeKey,
+  orgIdKey,
+  nameKey,
+  addressKey,
+  postalCodeKey,
+  cityKey,
+  countryKey,
+  recepisseIsExemptedKey,
+  recepisseNumberKey
+}: {
+  modeKey: string;
+  typeKey: string;
+  orgIdKey: string;
+  nameKey: string;
+  addressKey: string;
+  postalCodeKey: string;
+  cityKey: string;
+  countryKey: string;
+  recepisseIsExemptedKey: string;
+  recepisseNumberKey: string;
+}): Refinement<T> {
+  return (item, context) => {
+    if (item[modeKey] && !item[typeKey]) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le mode de transport ne peut être renseigné que si les informations du transporteur le sont également",
+        path: [typeKey]
+      });
+    }
+
+    if (!item[typeKey]) {
+      return;
+    }
+
+    if (!item[recepisseIsExemptedKey] && !item[recepisseNumberKey]) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le numéro de récépissé est obligatoire si le transporteur n'indique pas en être exempté",
+        path: [recepisseNumberKey]
+      });
+    }
+
+    refineActorInfos({
+      typeKey,
+      orgIdKey,
+      nameKey,
+      addressKey,
+      postalCodeKey,
+      cityKey,
+      countryKey
+    })(item, context);
+  };
+}
 
 export function refineActorInfos<T>({
   typeKey,
@@ -21,7 +79,7 @@ export function refineActorInfos<T>({
   cityKey: string;
   countryKey: string;
 }): Refinement<T> {
-  return (item, { addIssue }) => {
+  return (item, context) => {
     // Refine orgId first
     const type:
       | "ETABLISSEMENT_FR"
@@ -32,6 +90,21 @@ export function refineActorInfos<T>({
       | "COMMUNES" = item[typeKey];
 
     if (!type) {
+      if (
+        item[orgIdKey] ||
+        item[nameKey] ||
+        item[addressKey] ||
+        item[postalCodeKey] ||
+        item[cityKey] ||
+        item[countryKey]
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Le type d'entreprise est obligatoire si des champs concernant l'entreprise sont renseignés",
+          path: [typeKey]
+        });
+      }
       return;
     }
 
@@ -43,13 +116,13 @@ export function refineActorInfos<T>({
     switch (type) {
       case "ETABLISSEMENT_FR": {
         if (!orgId) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le SIRET doit être saisi pour un établissement français",
             path: [orgIdKey]
           });
         } else if (!isSiret(orgId)) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le SIRET saisi n'est pas un SIRET valide",
             path: [orgIdKey]
@@ -57,7 +130,7 @@ export function refineActorInfos<T>({
         }
 
         if (countryKey && inputCountry && inputCountry !== "FR") {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une entreprise française",
             path: [countryKey]
@@ -67,7 +140,7 @@ export function refineActorInfos<T>({
         const postalCode = item[postalCodeKey];
         const isValidPostalCode = /^[0-9]{5,6}$/.test(postalCode);
         if (!isValidPostalCode) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le code postal doit être composé de 5 ou 6 chiffres pour une entreprise française",
@@ -79,7 +152,7 @@ export function refineActorInfos<T>({
       case "ENTREPRISE_UE": {
         const { isValid, country } = checkVAT(orgId, countries);
         if (!isValid) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro de TVA n'est pas valide. Il commence par 2 lettres majuscules, est suivi de chiffres et doit respecter les contraintes du pays concerné",
@@ -93,7 +166,7 @@ export function refineActorInfos<T>({
           inputCountry &&
           country.isoCode.short !== inputCountry
         ) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le code pays ne correspond pas au code pays de la TVA saisie",
@@ -105,7 +178,7 @@ export function refineActorInfos<T>({
       case "ENTREPRISE_HORS_UE": {
         const isOrgIdValidOutOfUe = orgId && /[A-Z0-9]{1,25}/.test(orgId);
         if (!isOrgIdValidOutOfUe) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit faire entre 1 et 25 caractères pour une entreprise hors UE. Il est composé de lettres majuscules et de chiffres.",
@@ -117,7 +190,7 @@ export function refineActorInfos<T>({
       case "ASSOCIATION": {
         const isOrgIdValidAssociation = orgId && /W[0-9]{9}/.test(orgId);
         if (!isOrgIdValidAssociation) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit faire 10 caractères pour une association. Il commence par un W suivi de 9 chiffres.",
@@ -126,7 +199,7 @@ export function refineActorInfos<T>({
         }
 
         if (countryKey && inputCountry && inputCountry !== "FR") {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message: "Le code pays doit être FR pour une association française",
             path: [countryKey]
@@ -136,7 +209,7 @@ export function refineActorInfos<T>({
       }
       case "PERSONNE_PHYSIQUE": {
         if (!orgId) {
-          addIssue({
+          context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
               "Le numéro d'identification doit contenir le nom et prénom pour une personne physique"
@@ -158,7 +231,7 @@ export function refineActorInfos<T>({
       postalCodeKey,
       cityKey,
       countryKey
-    });
+    })(item, context);
   };
 }
 
@@ -188,7 +261,7 @@ function refineActorDetails<T>({
       return;
     }
 
-    if (!item[nameKey]) {
+    if (!item[nameKey] && type !== "PERSONNE_PHYSIQUE") {
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "La raison sociale est obligatoire",
@@ -252,57 +325,6 @@ export const refineIsDangerous: Refinement<{
   }
 };
 
-export const refineWeightAndVolume: Refinement<{
-  transporter1TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter2TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter3TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter4TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  transporter5TransportMode?:
-    | z.infer<typeof transportModeSchema>
-    | null
-    | undefined;
-  weightValue: number;
-  volume?: number | null | undefined;
-  weightIsEstimate: boolean;
-  operationCode: string;
-}> = (item, { addIssue }) => {
-  const isUsingRoad = [
-    item.transporter1TransportMode,
-    item.transporter2TransportMode,
-    item.transporter3TransportMode,
-    item.transporter4TransportMode,
-    item.transporter5TransportMode
-  ].some(transportMode => transportMode === "ROAD");
-
-  if (isUsingRoad && item.weightValue > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
-      path: ["weightValue"]
-    });
-  }
-
-  if (isUsingRoad && item.volume && item.volume > 40) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
-      path: ["volume"]
-    });
-  }
-};
-
 export const refineWeightIsEstimate: Refinement<{
   weightIsEstimate: boolean;
   operationCode: string;
@@ -329,7 +351,6 @@ export const refineMunicipalities: Refinement<{
     | "COMMUNES"
     | null;
   initialEmitterMunicipalitiesInseeCodes: string[];
-  initialEmitterMunicipalitiesNames: string[];
 }> = (item, { addIssue }) => {
   if (
     item.initialEmitterCompanyType === "COMMUNES" &&
@@ -341,54 +362,23 @@ export const refineMunicipalities: Refinement<{
       path: ["initialEmitterMunicipalitiesInseeCodes"]
     });
   }
-
-  if (
-    item.initialEmitterCompanyType === "COMMUNES" &&
-    !item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le ou les libellés des communes doivent être saisi`,
-      path: ["initialEmitterMunicipalitiesNames"]
-    });
-  }
-
-  if (
-    item.initialEmitterMunicipalitiesInseeCodes?.length !==
-    item.initialEmitterMunicipalitiesNames?.length
-  ) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le nombre de codes INSEE et de noms de communes doit être identique`,
-      path: ["initialEmitterMunicipalitiesNames"]
-    });
-  }
 };
 
-export const refineNotificationNumber: Refinement<{
+export const refineGistridNumber: Refinement<{
   wasteIsDangerous?: boolean | null | undefined;
   wastePop: boolean;
   wasteCode?: z.infer<ReturnType<typeof getWasteCodeSchema>> | null;
-  declarationNumber?: string | null | undefined;
-  notificationNumber?: string | null | undefined;
+  gistridNumber?: string | null | undefined;
   nextDestinationIsAbroad?: boolean | null | undefined;
 }> = (item, { addIssue }) => {
   const isDangerous =
     item.wasteIsDangerous || item.wastePop || item.wasteCode?.includes("*");
 
-  if (!item.notificationNumber && isDangerous && item.nextDestinationIsAbroad) {
+  if (!item.gistridNumber && isDangerous && item.nextDestinationIsAbroad) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le numéro de notification est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["notificationNumber"]
-    });
-  }
-
-  if (!item.declarationNumber && !isDangerous && item.nextDestinationIsAbroad) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Le numéro de déclaration est obligatoire lorsque le déchet est non dangereux et que la destination ultérieure est à l'étranger`,
-      path: ["declarationNumber"]
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistridNumber"]
     });
   }
 };
@@ -525,19 +515,6 @@ export const parcelRefinement: Refinement<{
   nextDestinationIsAbroad?: boolean | null;
 }> = (item, { addIssue }) => {
   if (
-    !item.parcelCoordinates.length &&
-    !item.parcelNumbers.length &&
-    !item.parcelInseeCodes.length
-  ) {
-    addIssue({
-      code: "custom",
-      message:
-        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
-      path: ["parcelCoordinates"]
-    });
-  }
-
-  if (
     item.parcelNumbers.length &&
     item.parcelInseeCodes.length &&
     item.parcelNumbers.length !== item.parcelInseeCodes.length
@@ -569,6 +546,34 @@ export const parcelRefinement: Refinement<{
       message:
         "Vous devez renseigner soit les numéros de parcelles de destination, soit les coordonnées de parcelles de destination",
       path: ["destinationParcelCoordinates"]
+    });
+  }
+};
+
+export const requiredParcelsRefinement: Refinement<{
+  parcelCoordinates: string[];
+  parcelNumbers: string[];
+  parcelInseeCodes: string[];
+}> = async (item, { addIssue }) => {
+  if (
+    !item.parcelCoordinates.length &&
+    !item.parcelNumbers.length &&
+    !item.parcelInseeCodes.length
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner soit les codes INSEE et numéros des parcelles, soit les coordonnées de parcelles",
+      path: ["parcelCoordinates"]
+    });
+  }
+
+  if (item.parcelNumbers.length !== item.parcelInseeCodes.length) {
+    addIssue({
+      code: "custom",
+      message:
+        "Vous devez renseigner autant de codes INSEE de parcelles que de numéros des parcelles",
+      path: ["parcelCoordinates"]
     });
   }
 };

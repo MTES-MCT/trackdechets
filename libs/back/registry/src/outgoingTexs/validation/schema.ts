@@ -8,6 +8,7 @@ import {
   publicIdSchema,
   reportAsCompanySiretSchema,
   siretSchema,
+  dateSchema,
   actorAddressSchema,
   actorPostalCodeSchema,
   actorCitySchema,
@@ -23,17 +24,14 @@ import {
   actorOrgIdSchema,
   actorNameSchema,
   inseeCodesSchema,
-  municipalitiesNamesSchema,
   parcelNumbersSchema,
   parcelCoordinatesSchema,
   getOperationCodeSchema,
   operationModeSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema,
-  nullishDateSchema
+  transportRecepisseNumberSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -56,7 +54,7 @@ const inputOutgoingTexsSchema = z.object({
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
-  dispatchDate: nullishDateSchema,
+  dispatchDate: dateSchema,
   wasteDap: z
     .string()
     .trim()
@@ -65,7 +63,7 @@ const inputOutgoingTexsSchema = z.object({
   weightValue: weightValueSchema,
   weightIsEstimate: weightIsEstimateSchema,
   volume: volumeSchema,
-  initialEmitterCompanyType: actorTypeSchema,
+  initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
   initialEmitterCompanyName: actorNameSchema.nullish(),
   initialEmitterCompanyAddress: actorAddressSchema.nullish(),
@@ -73,7 +71,6 @@ const inputOutgoingTexsSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  initialEmitterMunicipalitiesNames: municipalitiesNamesSchema,
   parcelInseeCodes: inseeCodesSchema,
   parcelNumbers: parcelNumbersSchema,
   parcelCoordinates: parcelCoordinatesSchema,
@@ -101,8 +98,7 @@ const inputOutgoingTexsSchema = z.object({
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
   destinationParcelCoordinates: parcelCoordinatesSchema,
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

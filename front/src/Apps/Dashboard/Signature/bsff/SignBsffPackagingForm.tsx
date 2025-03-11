@@ -443,9 +443,14 @@ function SignBsffPackagingForm({
       ? "Date de l'acceptation"
       : "Date du refus";
 
-  const today = new Date();
-  const maxDate = datetimeToYYYYMMDD(today);
-  const minDate = datetimeToYYYYMMDD(subMonths(today, 2));
+  const signatureDate = packaging?.operation?.signature?.date
+    ? // Dans le cas d'une correction, on prend la date de signature
+      // de l'opération comme date de référence
+      new Date(packaging.operation.signature.date)
+    : // sinon on prend la date du jour
+      new Date();
+  const maxDate = datetimeToYYYYMMDD(signatureDate);
+  const minDate = datetimeToYYYYMMDD(subMonths(signatureDate, 2));
 
   return (
     <FormProvider {...methods}>

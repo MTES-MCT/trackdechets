@@ -20,7 +20,7 @@ export const toIncomingWaste = (
     publicId: incomingWaste.publicId,
     bsdId: null,
     reportAsSiret: incomingWaste.reportAsCompanySiret,
-    createdAt: incomingWaste.createdAt,
+    createdAt: null,
     updatedAt: null,
     transporterTakenOverAt: null,
     destinationReceptionDate: incomingWaste.receptionDate,
@@ -36,6 +36,8 @@ export const toIncomingWaste = (
     wastePop: incomingWaste.wastePop,
     wasteIsDangerous: incomingWaste.wasteIsDangerous,
     weight: null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName: incomingWaste.initialEmitterCompanyName,
     initialEmitterCompanySiret: incomingWaste.initialEmitterCompanyOrgId,
     initialEmitterCompanyAddress: incomingWaste.initialEmitterCompanyAddress,
@@ -44,11 +46,10 @@ export const toIncomingWaste = (
     initialEmitterCompanyCity: incomingWaste.initialEmitterCompanyCity,
     initialEmitterCompanyCountry:
       incomingWaste.initialEmitterCompanyCountryCode,
-    initialEmitterMunicipalitiesNames:
-      incomingWaste.initialEmitterMunicipalitiesNames,
     initialEmitterMunicipalitiesInseeCodes:
       incomingWaste.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: incomingWaste.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: incomingWaste.emitterCompanyOrgId,
@@ -162,13 +163,16 @@ export const toIncomingWaste = (
     destinationReceptionWeightIsEstimate: incomingWaste.weightIsEstimate,
     destinationReceptionVolume: incomingWaste.volume,
     destinationPlannedOperationCode: null,
-    destinationOperationMode: incomingWaste.operationMode,
-    destinationOperationCode: incomingWaste.operationCode,
+    destinationOperationModes: incomingWaste.operationMode
+      ? [incomingWaste.operationMode]
+      : null,
+    destinationOperationCodes: incomingWaste.operationCode
+      ? [incomingWaste.operationCode]
+      : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingWaste.noTraceability,
-    declarationNumber: incomingWaste.declarationNumber,
+    gistridNumber: incomingWaste.gistridNumber,
     movementNumber: incomingWaste.movementNumber,
-    notificationNumber: incomingWaste.notificationNumber,
     nextOperationCode: incomingWaste.nextOperationCode,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -238,6 +242,9 @@ export const updateRegistryLookup = async (
         // the id changes because a new RegistrySsd entry is created on each update
         id: registryIncomingWaste.id,
         reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
+        wasteType: registryIncomingWaste.wasteIsDangerous
+          ? RegistryExportWasteType.DD
+          : RegistryExportWasteType.DND,
         wasteCode: registryIncomingWaste.wasteCode,
         ...generateDateInfos(registryIncomingWaste.receptionDate),
         registryIncomingWasteId: registryIncomingWaste.id

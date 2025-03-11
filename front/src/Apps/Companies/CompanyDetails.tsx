@@ -22,7 +22,7 @@ import CompanyMembers from "./CompanyMembers/CompanyMembers";
 import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
-import { CompanyRegistryDelegation } from "./CompanyRegistryDelegation/CompanyRegistryDelegation";
+import { CompanyRegistry } from "./CompanyRegistry/CompanyRegistry";
 
 export type TabContentProps = {
   company: CompanyPrivate;
@@ -39,7 +39,9 @@ const buildTabs = (
   const isAdmin = company.userRole === UserRole.Admin;
 
   // RNDTS features protected by feature flag
-  const canViewRndtsFeatures = company.featureFlags.includes(REGISTRY_V2_FLAG);
+  const canViewRndtsFeatures =
+    import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
+    company.featureFlags.includes(REGISTRY_V2_FLAG);
 
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
@@ -78,11 +80,11 @@ const buildTabs = (
   };
   if (canViewRndtsFeatures) {
     tabs.push({
-      tabId: "delegations",
-      label: "Délégations",
+      tabId: "registry",
+      label: "Registre national",
       iconId
     });
-    tabsContent["delegations"] = CompanyRegistryDelegation;
+    tabsContent["registry"] = CompanyRegistry;
   }
   if (isAdmin) {
     tabs.push({
@@ -108,7 +110,7 @@ export default function CompanyDetails() {
       "membres",
       "contact",
       "fiche",
-      "delegations",
+      "registry",
       "avance"
     ].includes(location.hash.substring(1))
       ? location.hash.substring(1)

@@ -63,6 +63,7 @@ import { getFirstTransporterSync } from "./database";
 import { FormForElastic } from "./elastic";
 import { extractPostalCode } from "../common/addresses";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
+import { isDefined } from "../common/helpers";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -382,8 +383,9 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsPackagingInfos: prismaJsonNoNull(
       chain(reviewContent, c => chain(c.wasteDetails, w => w.packagingInfos))
     ),
-    wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
-    wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
+    // Retirés jusqu'à nouvel ordre!
+    // wasteAcceptationStatus: chain(reviewContent, c => c.wasteAcceptationStatus),
+    // wasteRefusalReason: chain(reviewContent, c => c.wasteRefusalReason),
     wasteDetailsSampleNumber: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.sampleNumber)
     ),
@@ -414,6 +416,11 @@ export function flattenBsddRevisionRequestInput(
         chain(t.temporaryStorer, s => s.quantityReceived)
       )
     ),
+    temporaryStorageTemporaryStorerQuantityRefused: chain(reviewContent, c =>
+      chain(c.temporaryStorageDetail, t =>
+        chain(t.temporaryStorer, s => s.quantityRefused)
+      )
+    ),
     temporaryStorageDestinationProcessingOperation: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t =>
         chain(t.destination, d => d.processingOperation)
@@ -426,6 +433,7 @@ export function flattenFormInput(
   formInput: Pick<
     FormInput,
     | "customId"
+    | "isDirectSupply"
     | "emitter"
     | "recipient"
     | "wasteDetails"
@@ -436,6 +444,11 @@ export function flattenFormInput(
 ): Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">> {
   return safeInput({
     customId: formInput.customId,
+    // Si `isDirectSupply` est null ou undefined, on omet le champ
+    // et on laisse le soin à la DB de mettre une valeur par défaut
+    ...(isDefined(formInput.isDirectSupply)
+      ? { isDirectSupply: formInput.isDirectSupply! }
+      : {}),
     ...flattenEmitterInput(formInput),
     ...flattenRecipientInput(formInput),
     ...flattenWasteDetailsInput(formInput),
@@ -666,6 +679,7 @@ export function expandFormFromDb(
       .map(segment => expandTransportSegmentFromDb(segment)),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
+    isDirectSupply: form.isDirectSupply,
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,
@@ -685,7 +699,12 @@ export function expandFormFromDb(
       isSubjectToADR: form.wasteDetailsIsSubjectToADR,
       onuCode: form.wasteDetailsOnuCode,
       nonRoadRegulationMention: form.wasteDetailsNonRoadRegulationMention,
-      packagingInfos: form.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos:
+        (form.wasteDetailsPackagingInfos as PackagingInfo[])?.map(p => ({
+          ...p,
+          volume: p.volume ?? null,
+          identificationNumbers: p.identificationNumbers ?? []
+        })) ?? [],
       // DEPRECATED - To remove with old packaging fields
       ...getDeprecatedPackagingApiFields(
         form.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -841,7 +860,8 @@ export function expandFormFromDb(
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
             receivedAt: processDate(form.receivedAt),
-            receivedBy: form.receivedBy
+            receivedBy: form.receivedBy,
+            signedAt: form.signedAt
           },
           transporter: forwardedInTransporter
             ? expandTransporterFromDb(forwardedInTransporter)
@@ -867,7 +887,13 @@ export function expandFormFromDb(
             nonRoadRegulationMention:
               forwardedIn.wasteDetailsNonRoadRegulationMention,
             packagingInfos:
-              forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[],
+              (forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[])?.map(
+                p => ({
+                  ...p,
+                  volume: p.volume ?? null,
+                  identificationNumbers: p.identificationNumbers ?? []
+                })
+              ) ?? [],
             // DEPRECATED - To remove with old packaging fields
             ...getDeprecatedPackagingApiFields(
               forwardedIn.wasteDetailsPackagingInfos as PackagingInfo[]
@@ -1053,6 +1079,7 @@ export function expandBsddRevisionRequestContent(
       cap: bsddRevisionRequest.recipientCap
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
+    quantityRefused: bsddRevisionRequest.quantityRefused,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
     destinationOperationMode: bsddRevisionRequest.destinationOperationMode,
     processingOperationDescription:
@@ -1061,7 +1088,9 @@ export function expandBsddRevisionRequestContent(
       nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
         temporaryStorer: nullIfNoValues<FormRevisionRequestTemporaryStorer>({
           quantityReceived:
-            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived,
+          quantityRefused:
+            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityRefused
         }),
         destination: nullIfNoValues<FormRevisionRequestDestination>({
           cap: bsddRevisionRequest.temporaryStorageDestinationCap,

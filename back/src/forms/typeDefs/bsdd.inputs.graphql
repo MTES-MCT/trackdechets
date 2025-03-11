@@ -116,14 +116,12 @@ input AcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
-  quantityRefused: Float
+  quantityRefused: Float!
 
   "Charte citerne - Est-ce que la citerne a été rincée ou non?"
   hasCiterneBeenWashedOut: Boolean
@@ -162,9 +160,7 @@ input ReceivedFormInput {
   quantityReceived: Float
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -255,6 +251,13 @@ input CreateFormInput {
   """
   transporters: [ID!]
 
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -324,6 +327,13 @@ input UpdateFormInput {
   """
   transporters: [ID!]
 
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -377,6 +387,13 @@ input FormInput {
 
   "Premier transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  """
+  Le déchet est acheminé directement par pipeline ou convoyeur.
+  Lorsque `isDirectSupply` est `true`, aucun transporteur
+  ni conditionnement (`wasteDetails.packagingInfos`) ne doivent être spécifiés.
+  """
+  isDirectSupply: Boolean
 
   """
   Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
@@ -631,6 +648,12 @@ input PackagingInfoInput {
   le nombre de colis ne peut être supérieur à 2.
   """
   quantity: Int!
+
+  "Volume du conditionnement en litre(s)"
+  volume: Float
+
+  "Numéros des contenants"
+  identificationNumbers: [String!]
 }
 
 "Payload lié au détails du déchet (case 3 à 6)"
@@ -786,14 +809,12 @@ input TempStorerAcceptedFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
   """
-  quantityRefused: Float
+  quantityRefused: Float!
 
   "Réelle ou estimée"
   quantityType: QuantityType!
@@ -823,9 +844,7 @@ input TempStoredFormInput {
   quantityReceived: Float!
 
   """
-  Quantité refusée nette (optionnelle)
-
-  Si définie:
+  Quantité refusée nette:
   - doit être supérieure à 0 et inférieure ou égale à quantityReceived si le déchet est partiellement refusé.
   - doit être égale à 0 si le déchet est totalement accepté.
   - doit être égale à quantityReceived si le déchet est totalement refusé.
@@ -985,11 +1004,12 @@ input FormRevisionRequestContentInput {
   "Informations sur l'installation de destination ou d’entreposage ou de reconditionnement prévue (édition partielle uniquement)"
   recipient: FormRevisionRequestRecipientInput
 
-  "Statut d'acceptation du déchet (case 10)"
-  wasteAcceptationStatus: WasteAcceptationStatus
+  # Retirés jusqu'à nouvel ordre!
+  # "Statut d'acceptation du déchet (case 10)"
+  # wasteAcceptationStatus: WasteAcceptationStatus
 
-  "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
-  wasteRefusalReason: String
+  # "Raison du refus (case 10). Obligatoire en cas de refus de déchet"
+  # wasteRefusalReason: String
 
   "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
@@ -1061,6 +1081,9 @@ input FormRevisionRequestDestinationInput {
 input FormRevisionRequestTemporaryStorerInput {
   "Quantité reçue sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
   quantityReceived: Float
+
+  "Quantité refusée sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
+  quantityRefused: Float
 }
 
 input FormRevisionRequestWhere {

@@ -30,7 +30,6 @@ export const INCOMING_TEXS_HEADERS: {
   initialEmitterCompanyCity: "Commune du producteur initial",
   initialEmitterCompanyCountryCode: "Code pays du producteur initial",
   initialEmitterMunicipalitiesInseeCodes: "Code(s) INSEE de(s) commune(s)",
-  initialEmitterMunicipalitiesNames: "Commune(s)",
   emitterCompanyType: "Type d'expéditeur ou détenteur",
   emitterCompanyOrgId: "Numéro d'identification de l'expéditeur ou détenteur",
   emitterCompanyName: "Raison sociale de l'expéditeur ou détenteur",
@@ -38,8 +37,6 @@ export const INCOMING_TEXS_HEADERS: {
   emitterCompanyPostalCode: "Code postal de l'expéditeur ou détenteur",
   emitterCompanyCity: "Commune de l'expéditeur ou détenteur",
   emitterCompanyCountryCode: "Code pays de l'expéditeur ou détenteur",
-  emitterNoTraceability:
-    "Rupture de traçabilité de l'expéditeur ou du détenteur",
   emitterPickupSiteName:
     "Référence du chantier ou du lieu de collecte de l'expéditeur",
   emitterPickupSiteAddress:
@@ -62,8 +59,7 @@ export const INCOMING_TEXS_HEADERS: {
   operationMode: "Mode de traitement",
   noTraceability: "Rupture de traçabilité autorisée",
   nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
-  declarationNumber: "Numéro de déclaration GISTRID",
-  notificationNumber: "Numéro de notification GISTRID",
+  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
   movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code de traitement ultérieur prévue",
   isUpcycled: "Terre valorisée",

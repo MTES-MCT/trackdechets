@@ -359,6 +359,7 @@ export const CompanyDetailsfragment = {
       userRole
       featureFlags
       isDormantSince
+      hasEnabledRegistryDndFromBsdSince
       givenAdministrativeTransfers {
         id
         status

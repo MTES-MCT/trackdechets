@@ -1,4 +1,4 @@
-import { FieldSwitch } from "../../common/components";
+import { FieldSwitch, Switch } from "../../common/components";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import Tooltip from "../../common/components/Tooltip";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
@@ -9,7 +9,6 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "@td/constants";
 import React, { useEffect } from "react";
-import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import {
   WasteCodeSelect,
@@ -20,7 +19,12 @@ import EstimatedQuantityTooltip from "../../common/components/EstimatedQuantityT
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Appendix2MultiSelectWrapper from "./components/appendix/Appendix2MultiSelectWrapper";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { FormFormikValues } from "./utils/initial-state";
+import {
+  FormFormikValues,
+  initialFormTransporter
+} from "./utils/initial-state";
+import FormikPackagingList from "../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { emptyPackaging } from "../../Apps/Forms/Components/PackagingList/helpers";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -177,14 +181,38 @@ export default function WasteInfo({ disabled }) {
         </>
       )}
 
-      <h4 className="form__section-heading">Conditionnement</h4>
-
       {values.emitter?.type !== "APPENDIX1" && (
-        <Field
-          name="wasteDetails.packagingInfos"
-          component={Packagings}
-          disabled={disabled}
-        />
+        <div className="form__row" style={{ flexDirection: "row" }}>
+          <Switch
+            label="Le déchet est acheminé directement par pipeline ou convoyeur"
+            disabled={disabled}
+            checked={Boolean(values.isDirectSupply)}
+            onChange={(checked: boolean) => {
+              setFieldValue("isDirectSupply", checked);
+              if (checked) {
+                setFieldValue("wasteDetails.packagingInfos", []);
+                setFieldValue("transporters", []);
+              } else {
+                setFieldValue(
+                  "wasteDetails.packagingInfos",
+                  [emptyPackaging],
+                  false
+                );
+                setFieldValue("transporters", [initialFormTransporter], false);
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {values.emitter?.type !== "APPENDIX1" && !values.isDirectSupply && (
+        <>
+          <h4 className="form__section-heading">Conditionnement</h4>
+          <FormikPackagingList
+            fieldName="wasteDetails.packagingInfos"
+            disabled={disabled}
+          />
+        </>
       )}
 
       <div className="form__row">

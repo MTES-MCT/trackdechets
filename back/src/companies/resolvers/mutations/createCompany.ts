@@ -35,6 +35,7 @@ import { parseCompanyAsync } from "../../validation/index";
 import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
 import { getDefaultNotifications } from "../../../users/notifications";
+import { CompanyToSplit, getCompanySplittedAddress } from "../../companyUtils";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company
@@ -93,6 +94,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // check if orgId exists in public databases or in AnonymousCompany
   const companyInfo = await searchCompany(orgId);
 
+  const { street, city, country, postalCode } = getCompanySplittedAddress(
+    companyInfo,
+    { address, vatNumber } as CompanyToSplit
+  );
+
   if (isClosedCompany(companyInfo)) {
     throw new UserInputError(CLOSED_COMPANY_ERROR);
   }
@@ -106,6 +112,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     name: companyInfo?.name ?? name,
     givenName,
     address: companyInfo?.address ?? address,
+    street,
+    city,
+    country,
+    postalCode,
     companyTypes: { set: companyTypes as CompanyType[] },
     collectorTypes: collectorTypes
       ? { set: collectorTypes as CollectorType[] }
