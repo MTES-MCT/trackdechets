@@ -986,7 +986,7 @@ export const toTransportedWasteV2 = (
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
-    notificationNumber: null
+    movementNumber: null
   };
 };
 
