@@ -135,7 +135,11 @@ const routes = {
     index: "/registry",
     myImports: "/registry/own",
     companyImports: "/registry/list",
-    export: "/registry/export"
+    export: "/registry/export",
+    lines: "/registry/lines",
+    form: {
+      ssd: "/registry/form/ssd"
+    }
   }
 };
 
