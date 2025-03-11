@@ -285,4 +285,51 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     expect(changeAggregates.length).toBe(1);
     expect(changeAggregates[0].numberOfInsertions).toBe(100);
   });
+
+  it("should work if the current user has delegation rights on the reportFor siret", async () => {
+    const { company } = await userWithCompanyFactory();
+    const { user, company: delegateCompany } = await userWithCompanyFactory();
+
+    await prisma.registryDelegation.create({
+      data: {
+        startDate: new Date(),
+        delegateId: delegateCompany.id,
+        delegatorId: company.id
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () => ({
+      ...getCorrectLine(company.siret!),
+      reportAsCompanySiret: delegateCompany.orgId
+    }));
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
+  });
+
+  it("should fail if the current user does not belong to or have delegation rights on the reportFor siret", async () => {
+    const { company } = await userWithCompanyFactory();
+    const { user } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () =>
+      getCorrectLine(company.siret!)
+    );
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry.stats.errors).toBe(100);
+    expect(data.addToIncomingTexsRegistry.errors![0].message).toBe(
+      "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours"
+    );
+  });
 });
