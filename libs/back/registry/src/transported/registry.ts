@@ -161,15 +161,19 @@ export const updateRegistryLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryTransportedId) {
-    await tx.registryLookup.update({
+    await tx.registryLookup.upsert({
       where: {
+        // we use this compound id to target a specific registry type for a specific registry id
+        // and a specific siret
         idExportTypeAndSiret: {
           id: oldRegistryTransportedId,
           exportRegistryType: RegistryExportType.TRANSPORTED,
           siret: registryTransported.reportForCompanySiret
         }
       },
-      data: {
+      update: {
+        // only those properties can change during an update
+        // the id changes because a new Registry entry is created on each update
         id: registryTransported.id,
         reportAsSiret: registryTransported.reportAsCompanySiret,
         wasteType: registryTransported.wasteIsDangerous
@@ -179,6 +183,7 @@ export const updateRegistryLookup = async (
         ...generateDateInfos(registryTransported.collectionDate),
         registryTransportedId: registryTransported.id
       },
+      create: registryToLookupCreateInput(registryTransported),
       select: {
         id: true
       }
