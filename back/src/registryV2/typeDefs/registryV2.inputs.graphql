@@ -741,7 +741,7 @@ input IncomingTexsLineInput {
 
   Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET de l'émetteur et mon SIRET.
   """
-  reportAsCompanySiret: String!
+  reportAsCompanySiret: String
   """
   SIRET du destinataire
   Établissement pour lequel la déclaration est effectuée, soit ici le destinataire des terres et sédiments ou des déchets entrants
@@ -765,7 +765,7 @@ input IncomingTexsLineInput {
   - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation).
   La raison sociale ainsi que l'adresse de ce SIRET seront récupérés depuis la base Trackdéchets.
   """
-  reportForCompanySiret: String
+  reportForCompanySiret: String!
   """
   Dénomination usuelle des terres et sédiments ou des déchets
   """
