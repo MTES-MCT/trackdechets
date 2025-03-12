@@ -10,6 +10,7 @@ import { prisma } from "@td/prisma";
 import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toIncomingWaste = (
   incomingWaste: RegistryIncomingWaste
@@ -34,7 +35,10 @@ export const toIncomingWaste = (
     wasteCode: incomingWaste.wasteCode,
     wasteCodeBale: incomingWaste.wasteCodeBale,
     wastePop: incomingWaste.wastePop,
-    wasteIsDangerous: incomingWaste.wasteIsDangerous,
+    wasteIsDangerous:
+      !!incomingWaste.wasteIsDangerous ||
+      !!incomingWaste.wastePop ||
+      isDangerous(incomingWaste.wasteCode),
     weight: null,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
@@ -220,26 +224,19 @@ export const updateRegistryLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryIncomingWasteId) {
-    // note for future implementations:
-    // if there is a possibility that the siret changes between updates (BSDs),
-    // you should use an upsert.
-    // This is because the index would point to an empty lookup in that case, so we need to create it.
-    // the cleanup method will remove the lookup with the old siret afterward
-    await tx.registryLookup.update({
+    await tx.registryLookup.upsert({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
-        // this is not strictly necessary on SSDs since they only appear in one export registry, for one siret
-        // but is necessary on other types of registries that appear for multiple actors/ export registries
         idExportTypeAndSiret: {
           id: oldRegistryIncomingWasteId,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: registryIncomingWaste.reportForCompanySiret
         }
       },
-      data: {
+      update: {
         // only those properties can change during an update
-        // the id changes because a new RegistrySsd entry is created on each update
+        // the id changes because a new Registry entry is created on each update
         id: registryIncomingWaste.id,
         reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
         wasteType: registryIncomingWaste.wasteIsDangerous
@@ -249,6 +246,7 @@ export const updateRegistryLookup = async (
         ...generateDateInfos(registryIncomingWaste.receptionDate),
         registryIncomingWasteId: registryIncomingWaste.id
       },
+      create: registryToLookupCreateInput(registryIncomingWaste),
       select: {
         // lean selection to improve performances
         id: true
