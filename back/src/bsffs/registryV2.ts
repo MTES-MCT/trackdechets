@@ -27,7 +27,11 @@ import {
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { splitAddress } from "../common/addresses";
 import { getBsffSubType } from "../common/subTypes";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "@td/registry";
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 
@@ -1116,21 +1120,32 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSFF");
   await prisma.registryLookup.deleteMany({
     where: {
       bsffId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.bsff.count({
+    where: {
+      isDeleted: false,
+      isDraft: false
+    }
+  });
+
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.bsff.findMany({
       where: {
         isDeleted: false,
         isDraft: false
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -1144,14 +1159,18 @@ export const rebuildRegistryLookup = async () => {
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { v7 as uuidv7 } from "uuid";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
+import { clearLine, cursorTo } from "readline";
+import { performance } from "perf_hooks";
 
 export const generateDateInfos = (date: Date) => ({
   date,
@@ -40,4 +42,59 @@ export const deleteRegistryLookup = async (
     }
   });
   return;
+};
+
+export class RegistryLogger {
+  private lastUpdate: number = Date.now();
+  private registryType: string;
+  private globalStart: number;
+
+  constructor(registryType: string) {
+    this.registryType = registryType;
+    this.globalStart = performance.now();
+    console.log(`⚙️  [${registryType}] rebuilding registry lookup...`);
+  }
+
+  logDelete(): void {
+    const deleteTime = performance.now() - this.globalStart;
+    console.log(
+      `🗑️  [${this.registryType}] Deleted existing lookups in ${Math.round(
+        deleteTime
+      )}ms`
+    );
+  }
+
+  logProgress(current: number, total: number): void {
+    const now = Date.now();
+    if (now - this.lastUpdate > 100) {
+      const percent = Math.round((current / total) * 100);
+      const progressBar =
+        "█".repeat(Math.floor(percent / 2)) +
+        "░".repeat(50 - Math.floor(percent / 2));
+      clearLine(process.stdout, 0);
+      cursorTo(process.stdout, 0);
+      process.stdout.write(
+        `⏳ [${this.registryType}] Processing: ${progressBar} ${percent}% (${current}/${total})`
+      );
+      this.lastUpdate = now;
+    }
+  }
+
+  logCompletion(processedCount): void {
+    const totalTimeSeconds = (performance.now() - this.globalStart) / 1000;
+    // Clear the progress bar line
+    clearLine(process.stdout, 0);
+    cursorTo(process.stdout, 0);
+    console.log(
+      `✅ [${
+        this.registryType
+      }] Completed! Processed ${processedCount} records in ${Math.round(
+        totalTimeSeconds
+      )}s`
+    );
+  }
+}
+
+export const createRegistryLogger = (registryType: string): RegistryLogger => {
+  return new RegistryLogger(registryType);
 };

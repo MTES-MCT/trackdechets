@@ -168,6 +168,10 @@ const runIntegrityTest = async () => {
   const bsdOrRegistryTypesToIndex = bsdOrRegistryTypes.filter(t =>
     args.map(a => a.toUpperCase()).includes(t)
   );
+  const pageSize = args.includes("--page-size")
+    ? parseInt(args[args.indexOf("--page-size") + 1])
+    : 500;
+  console.log("pageSize", pageSize);
   try {
     if (integrityTest) {
       await runIntegrityTest();
@@ -177,92 +181,79 @@ const runIntegrityTest = async () => {
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("SSD")
     ) {
-      console.info("Rebuilding SSD registry lookup");
-      await ssdLookupUtils.rebuildLookup();
+      await ssdLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_WASTE")
     ) {
-      console.info("Rebuilding incoming waste registry lookup");
-      await incomingWasteLookupUtils.rebuildLookup();
+      await incomingWasteLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_TEXS")
     ) {
-      console.info("Rebuilding incoming texs registry lookup");
-      await incomingTexsLookupUtils.rebuildLookup();
+      await incomingTexsLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("OUTGOING_WASTE")
     ) {
-      console.info("Rebuilding outgoing waste registry lookup");
-      await outgoingWasteLookupUtils.rebuildLookup();
+      await outgoingWasteLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("OUTGOING_TEXS")
     ) {
-      console.info("Rebuilding outgoing texs registry lookup");
-      await outgoingTexsLookupUtils.rebuildLookup();
+      await outgoingTexsLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("TRANSPORTED")
     ) {
-      console.info("Rebuilding transported registry lookup");
-      await transportedLookupUtils.rebuildLookup();
+      await transportedLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("MANAGED")
     ) {
-      console.info("Rebuilding managed registry lookup");
-      await managedLookupUtils.rebuildLookup();
+      await managedLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDD")
     ) {
-      console.info("Rebuilding BSDD lookup");
-      await bsddLookupUtils.rebuildLookup();
+      await bsddLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDA")
     ) {
-      console.info("Rebuilding BSDA lookup");
-      await bsdaLookupUtils.rebuildLookup();
+      await bsdaLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDASRI")
     ) {
-      console.info("Rebuilding BSDASRI lookup");
-      await bsdasriLookupUtils.rebuildLookup();
+      await bsdasriLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSFF")
     ) {
-      console.info("Rebuilding BSFF lookup");
-      await bsffLookupUtils.rebuildLookup();
+      await bsffLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSPAOH")
     ) {
-      console.info("Rebuilding BSPAOH lookup");
-      await bspaohLookupUtils.rebuildLookup();
+      await bspaohLookupUtils.rebuildLookup(pageSize);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSVHU")
     ) {
-      console.info("Rebuilding BSVHU lookup");
-      await bsvhuLookupUtils.rebuildLookup();
+      await bsvhuLookupUtils.rebuildLookup(pageSize);
     }
   } catch (error) {
     console.error("Error in rebuildRegistryLookup script, exiting", error);

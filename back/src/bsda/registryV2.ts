@@ -23,7 +23,11 @@ import {
 import { splitAddress } from "../common/addresses";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { getBsdaSubType } from "../common/subTypes";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  deleteRegistryLookup,
+  generateDateInfos,
+  createRegistryLogger
+} from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 
@@ -1373,21 +1377,33 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSDA");
   await prisma.registryLookup.deleteMany({
     where: {
       bsdaId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.bsda.count({
+    where: {
+      isDeleted: false,
+      isDraft: false
+    }
+  });
+
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
+
   while (!done) {
     const items = await prisma.bsda.findMany({
       where: {
         isDeleted: false,
         isDraft: false
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -1395,20 +1411,26 @@ export const rebuildRegistryLookup = async () => {
       },
       select: minimalBsdaForLookupSelect
     });
+
     let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
     for (const bsda of items) {
       const createInputs = bsdaToLookupCreateInputs(bsda);
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {
