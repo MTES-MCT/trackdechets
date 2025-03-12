@@ -125,17 +125,21 @@ export function MyImports() {
           }}
         />
       </div>,
-      <div className="tw-flex tw-justify-center">
-        {importData.node.numberOfErrors > 0 && (
-          <Button
-            title="Voir le rapport d'erreur"
-            priority="secondary"
-            iconId="fr-icon-download-line"
-            onClick={() => downloadErrorFile(importData.node.id)}
-            size="small"
-          />
-        )}
-      </div>
+      ![RegistryImportStatus.Pending, RegistryImportStatus.Started].includes(
+        importData.node.status
+      ) && (
+        <div className="tw-flex tw-justify-center">
+          {importData.node.numberOfErrors > 0 && (
+            <Button
+              title="Voir le rapport d'erreur"
+              priority="secondary"
+              iconId="fr-icon-download-line"
+              onClick={() => downloadErrorFile(importData.node.id)}
+              size="small"
+            />
+          )}
+        </div>
+      )
     ]) ?? [];
 
   return (
