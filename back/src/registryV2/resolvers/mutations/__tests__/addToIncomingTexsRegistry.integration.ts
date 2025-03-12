@@ -332,4 +332,33 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours"
     );
   });
+
+  it("should allow to edit a line that has been cancelled before", async () => {
+    const { user, company } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const line = getCorrectLine(company.orgId);
+
+    // First create
+    const res1 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [line] } }
+    );
+    expect(res1.data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
+
+    // Then cancel
+    const res2 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [{ ...line, reason: "CANCEL" }] } }
+    );
+    expect(res2.data.addToIncomingTexsRegistry.stats.cancellations).toBe(1);
+
+    // Then edit
+    const res3 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [{ ...line, reason: "EDIT" }] } }
+    );
+    expect(res3.data.addToIncomingTexsRegistry.stats.edits).toBe(1);
+  });
 });

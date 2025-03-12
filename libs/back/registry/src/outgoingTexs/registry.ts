@@ -10,6 +10,7 @@ import { prisma } from "@td/prisma";
 import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { OutgoingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toOutgoingWaste = (
   outgoingTexs: RegistryOutgoingTexs
@@ -32,7 +33,10 @@ export const toOutgoingWaste = (
     wasteCode: outgoingTexs.wasteCode,
     wasteCodeBale: outgoingTexs.wasteCodeBale,
     wastePop: outgoingTexs.wastePop,
-    wasteIsDangerous: outgoingTexs.wasteIsDangerous,
+    wasteIsDangerous:
+      !!outgoingTexs.wasteIsDangerous ||
+      !!outgoingTexs.wastePop ||
+      isDangerous(outgoingTexs.wasteCode),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weight: outgoingTexs.weightValue,
@@ -246,32 +250,26 @@ export const updateRegistryLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryOutgoingTexsId) {
-    // note for future implementations:
-    // if there is a possibility that the siret changes between updates (BSDs),
-    // you should use an upsert.
-    // This is because the index would point to an empty lookup in that case, so we need to create it.
-    // the cleanup method will remove the lookup with the old siret afterward
-    await tx.registryLookup.update({
+    await tx.registryLookup.upsert({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
-        // this is not strictly necessary on SSDs since they only appear in one export registry, for one siret
-        // but is necessary on other types of registries that appear for multiple actors/ export registries
         idExportTypeAndSiret: {
           id: oldRegistryOutgoingTexsId,
           exportRegistryType: RegistryExportType.OUTGOING,
           siret: registryOutgoingTexs.reportForCompanySiret
         }
       },
-      data: {
+      update: {
         // only those properties can change during an update
-        // the id changes because a new RegistrySsd entry is created on each update
+        // the id changes because a new Registry entry is created on each update
         id: registryOutgoingTexs.id,
         reportAsSiret: registryOutgoingTexs.reportAsCompanySiret,
         wasteCode: registryOutgoingTexs.wasteCode,
         ...generateDateInfos(registryOutgoingTexs.dispatchDate),
         registryOutgoingTexsId: registryOutgoingTexs.id
       },
+      create: registryToLookupCreateInput(registryOutgoingTexs),
       select: {
         // lean selection to improve performances
         id: true

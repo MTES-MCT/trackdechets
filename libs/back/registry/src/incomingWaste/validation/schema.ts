@@ -83,10 +83,7 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  emitterCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNES"
-  ]),
+  emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),
   emitterCompanyAddress: actorAddressSchema.nullish(),
