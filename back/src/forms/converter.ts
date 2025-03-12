@@ -1042,8 +1042,14 @@ export function expandBsddRevisionRequestContent(
       code: bsddRevisionRequest.wasteDetailsCode,
       name: bsddRevisionRequest.wasteDetailsName,
       pop: bsddRevisionRequest.wasteDetailsPop,
-      packagingInfos:
-        bsddRevisionRequest.wasteDetailsPackagingInfos as PackagingInfo[],
+      packagingInfos: (
+        (bsddRevisionRequest.wasteDetailsPackagingInfos ??
+          []) as PackagingInfo[]
+      ).map(p => ({
+        ...p,
+        volume: p.volume ?? null,
+        identificationNumbers: p.identificationNumbers ?? []
+      })),
       sampleNumber: bsddRevisionRequest.wasteDetailsSampleNumber,
       quantity: bsddRevisionRequest.wasteDetailsQuantity
         ? processDecimal(bsddRevisionRequest.wasteDetailsQuantity).toNumber()

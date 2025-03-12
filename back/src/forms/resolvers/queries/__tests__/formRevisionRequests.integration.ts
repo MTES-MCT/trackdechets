@@ -18,6 +18,14 @@ const FORM_REVISION_REQUESTS = `
       edges {
         node {
           id
+          content {
+            wasteDetails {
+              packagingInfos {
+                volume
+                identificationNumbers
+              }
+            }
+          }
           form {
             id
             intermediaries {
@@ -384,5 +392,39 @@ describe("Mutation.formRevisionRequests", () => {
     expect(data.formRevisionRequests.edges.map(_ => _.node)[0].id).toEqual(
       bsdd1RevisionRequest.id
     );
+  });
+
+  it("[2025.03.1 hotfix] should display legacy revision requests on packagings without identification numbers", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED",
+        // legacy packagingInfos payload
+        wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { errors } = await query<
+      Pick<Query, "formRevisionRequests">,
+      QueryFormRevisionRequestsArgs
+    >(FORM_REVISION_REQUESTS, {
+      variables: { siret: company.orgId, where: { bsddId: { _eq: bsdd.id } } }
+    });
+
+    expect(errors).toBeUndefined();
   });
 });
