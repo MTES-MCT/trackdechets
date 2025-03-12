@@ -10,6 +10,7 @@ import { prisma } from "@td/prisma";
 import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { OutgoingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toOutgoingWaste = (
   outgoingTexs: RegistryOutgoingTexs
@@ -32,7 +33,10 @@ export const toOutgoingWaste = (
     wasteCode: outgoingTexs.wasteCode,
     wasteCodeBale: outgoingTexs.wasteCodeBale,
     wastePop: outgoingTexs.wastePop,
-    wasteIsDangerous: outgoingTexs.wasteIsDangerous,
+    wasteIsDangerous:
+      !!outgoingTexs.wasteIsDangerous ||
+      !!outgoingTexs.wastePop ||
+      isDangerous(outgoingTexs.wasteCode),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weight: outgoingTexs.weightValue,

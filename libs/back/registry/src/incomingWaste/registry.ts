@@ -10,6 +10,7 @@ import { prisma } from "@td/prisma";
 import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toIncomingWaste = (
   incomingWaste: RegistryIncomingWaste
@@ -34,7 +35,10 @@ export const toIncomingWaste = (
     wasteCode: incomingWaste.wasteCode,
     wasteCodeBale: incomingWaste.wasteCodeBale,
     wastePop: incomingWaste.wastePop,
-    wasteIsDangerous: incomingWaste.wasteIsDangerous,
+    wasteIsDangerous:
+      !!incomingWaste.wasteIsDangerous ||
+      !!incomingWaste.wastePop ||
+      isDangerous(incomingWaste.wasteCode),
     weight: null,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
@@ -232,7 +236,7 @@ export const updateRegistryLookup = async (
       },
       update: {
         // only those properties can change during an update
-        // the id changes because a new RegistrySsd entry is created on each update
+        // the id changes because a new Registry entry is created on each update
         id: registryIncomingWaste.id,
         reportAsSiret: registryIncomingWaste.reportAsCompanySiret,
         wasteType: registryIncomingWaste.wasteIsDangerous

@@ -10,6 +10,7 @@ import { prisma } from "@td/prisma";
 import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toIncomingWaste = (
   incomingTexs: RegistryIncomingTexs
@@ -32,7 +33,10 @@ export const toIncomingWaste = (
     status: null,
     wasteDescription: incomingTexs.wasteDescription,
     wasteCode: incomingTexs.wasteCode,
-    wasteIsDangerous: incomingTexs.wasteIsDangerous,
+    wasteIsDangerous:
+      !!incomingTexs.wasteIsDangerous ||
+      !!incomingTexs.wastePop ||
+      isDangerous(incomingTexs.wasteCode),
     wastePop: incomingTexs.wastePop,
     wasteCodeBale: incomingTexs.wasteCodeBale,
     weight: null,
