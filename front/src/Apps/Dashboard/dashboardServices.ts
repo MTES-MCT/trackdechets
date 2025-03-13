@@ -1594,7 +1594,7 @@ export const canUpdateBsd = (bsd, siret) =>
   canUpdateBsvhu(bsd) ||
   canUpdateBspaoh(bsd);
 
-export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
+export const canGeneratePdf = bsd => !bsd.isDraft;
 
 export const canMakeCorrection = (bsd: BsdDisplay, siret: string) => {
   // On ne permet pas la correction des contenants qui sont
