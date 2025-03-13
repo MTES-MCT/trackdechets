@@ -1,0 +1,49 @@
+<p>
+  Nous vous informons qu’un utilisateur <b>{{ user.name }}</b> (email: {{
+  user.email }}) souhaite obtenir les droits d’administrateur pour
+  l’établissement <b>{{ company.name }}</b> - {{ company.orgId }}. En tant
+  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  <a href="{{UI_URL}}/companies/manage/adminRequest/{{ adminRequest.id }}"
+    >sur ce lien</a
+  >.
+</p>
+
+<br />
+
+{{#isValidationByCollaboratorApproval}}
+<p><b>En cas d'absence de réponse</b></p>
+
+<br />
+<p>
+  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Trackdéchets mettra en place une procédure de vérification alternative visant
+  à confirmer la légitimité de la demande. Nous solliciterons alors un
+  <b>collaborateur rattaché à votre établissement</b>, dont l’adresse e-mail a
+  été communiquée par le demandeur. Celui-ci pourra alors valider la demande et
+  permettre l’octroi des droits d’administrateur.
+</p>
+{{/isValidationByCollaboratorApproval}} {{#isValidationByMail}}
+<p><b>En cas d'absence de réponse</b></p>
+
+<br />
+<p>
+  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Trackdéchets mettra en place une procédure de vérification alternative visant
+  à confirmer la légitimité de la demande.
+  <b>Un courrier comprenant un code de vérification</b> sera alors expédié au
+  siège social de l’établissement.
+</p>
+
+<br />
+
+<p>
+  Ce code pourra alors être renseigné sur le compte Trackdéchets du demandeur,
+  ce qui lui permettra de devenir administrateur de cet établissement.
+</p>
+{{/isValidationByMail}}
+
+<p>
+  Nous restons à votre disposition pour toute information complémentaire et vous
+  remercions de votre coopération.
+</p>

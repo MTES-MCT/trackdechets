@@ -374,3 +374,20 @@ export const bsdaWasteSealNumbersOrPackagingsRevision: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+export const adminRequestInitialWarningToAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string; email: string };
+  isValidationByCollaboratorApproval: boolean;
+  isValidationByMail: boolean;
+  adminRequest: { id: string };
+}> = {
+  subject: ({ company }) =>
+    `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-initial-warning-to-admin.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};

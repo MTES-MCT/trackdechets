@@ -14,6 +14,12 @@ import {
   AdminRequestValidationMethod
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
+import { sendMail } from "../../../../mailer/mailing";
+import { cleanse } from "../../../../__tests__/utils";
+
+// No mails
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
@@ -33,7 +39,10 @@ const CREATE_ADMIN_REQUEST = gql`
 `;
 
 describe("Mutation createAdminRequest", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    jest.resetAllMocks();
+  });
 
   it("user must be logged in", async () => {
     // Given
@@ -336,5 +345,241 @@ describe("Mutation createAdminRequest", () => {
     expect(data.createAdminRequest.company.orgId).toBe(company.orgId);
     expect(data.createAdminRequest.company.name).toBe(company.name);
     expect(data.createAdminRequest.status).toBe(AdminRequestStatus.PENDING);
+  });
+
+  it("should send mail to warn admins - verification = SEND_MAIL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "Super company"
+    });
+    await userInCompany("ADMIN", company.id, {
+      email: "admin@mail.com",
+      name: "Company admin"
+    });
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
+    expect(subject).toBe(
+      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
+  souhaite obtenir les droits d’administrateur pour
+  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
+    >sur ce lien</a
+  >.
+</p>
+
+<br />
+
+<p><b>En cas d'absence de réponse</b></p>
+
+<br />
+
+<p>
+  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Trackdéchets mettra en place une procédure de vérification alternative visant
+  à confirmer la légitimité de la demande.
+  <b>Un courrier comprenant un code de vérification</b> sera alors expédié au
+  siège social de l’établissement.
+</p>
+
+<br />
+
+<p>
+  Ce code pourra alors être renseigné sur le compte Trackdéchets du demandeur,
+  ce qui lui permettra de devenir administrateur de cet établissement.
+</p>
+
+<p>
+  Nous restons à votre disposition pour toute information complémentaire et vous
+  remercions de votre coopération.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should send mail to warn admins - verification = REQUEST_COLLABORATOR_APPROVAL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "Super company"
+    });
+    await userInCompany("ADMIN", company.id, {
+      email: "admin@mail.com",
+      name: "Company admin"
+    });
+    const collaborator = await userInCompany("MEMBER", company.id, {
+      email: "collaborator@mail.com",
+      name: "Company collaborator"
+    });
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: collaborator.email
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
+    expect(subject).toBe(
+      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
+  souhaite obtenir les droits d’administrateur pour
+  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
+    >sur ce lien</a
+  >.
+</p>
+
+<br />
+
+<p><b>En cas d'absence de réponse</b></p>
+
+<br />
+
+<p>
+  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Trackdéchets mettra en place une procédure de vérification alternative visant
+  à confirmer la légitimité de la demande. Nous solliciterons alors un
+  <b>collaborateur rattaché à votre établissement</b>, dont l’adresse e-mail a
+  été communiquée par le demandeur. Celui-ci pourra alors valider la demande et
+  permettre l’octroi des droits d’administrateur.
+</p>
+
+<p>
+  Nous restons à votre disposition pour toute information complémentaire et vous
+  remercions de votre coopération.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should send mail to warn admins - verification = REQUEST_ADMIN_APPROVAL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "Super company"
+    });
+    await userInCompany("ADMIN", company.id, {
+      email: "admin@mail.com",
+      name: "Company admin"
+    });
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
+    expect(subject).toBe(
+      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
+  souhaite obtenir les droits d’administrateur pour
+  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
+    >sur ce lien</a
+  >.
+</p>
+
+<br />
+
+<p>
+  Nous restons à votre disposition pour toute information complémentaire et vous
+  remercions de votre coopération.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
   });
 });

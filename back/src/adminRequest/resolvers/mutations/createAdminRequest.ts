@@ -6,12 +6,14 @@ import type {
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { UserRole } from "@prisma/client";
+import { AdminRequestValidationMethod, UserRole } from "@prisma/client";
 import { parseCreateAdminRequestInput } from "../../validation";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
+import { adminRequestInitialWarningToAdminEmail, renderMail } from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -100,6 +102,39 @@ const createAdminRequest = async (
     },
     { include: { company: true } }
   );
+
+  // Immediately warn the admins by email
+  const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: company.id,
+      role: UserRole.ADMIN
+    },
+    include: {
+      user: true
+    }
+  });
+
+  if (adminsCompanyAssociations.length) {
+    const mail = renderMail(adminRequestInitialWarningToAdminEmail, {
+      to: adminsCompanyAssociations.map(association => ({
+        email: association.user.email,
+        name: association.user.name
+      })),
+      variables: {
+        company,
+        user,
+        adminRequest,
+        isValidationByCollaboratorApproval:
+          adminRequest.validationMethod ===
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        isValidationByMail:
+          adminRequest.validationMethod ===
+          AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    await sendMail(mail);
+  }
 
   return fixTyping(adminRequest);
 };
