@@ -88,7 +88,12 @@ export default function CompaniesRoutes() {
             />
 
             <Route
-              path={toRelative(routes.companies.manage)}
+              path={toRelative(routes.companies.manage.index)}
+              element={<CompanyManage />}
+            />
+
+            <Route
+              path={toRelative(routes.companies.manage.adminRequest)}
               element={<CompanyManage />}
             />
           </Routes>

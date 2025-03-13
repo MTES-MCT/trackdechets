@@ -83,8 +83,41 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  });
+
+  it("user cannot accept own request", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: { connect: { id: company.id } },
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -117,8 +150,8 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.REFUSED,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -151,8 +184,8 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.ACCEPTED,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -190,8 +223,8 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -224,8 +257,8 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -274,8 +307,8 @@ describe("Mutation acceptAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }

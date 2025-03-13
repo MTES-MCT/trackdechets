@@ -3,9 +3,13 @@ import styles from "../../../Account/AccountContentWrapper.module.scss";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CompanyCreateAdminRequestModal } from "./CompanyCreateAdminRequestModal/CompanyCreateAdminRequestModal";
 import { CompanyAdminRequestsTable } from "./CompanyAdminRequestsTable";
+import { useParams } from "react-router-dom";
+import { AcceptAdminRequestModal } from "./AcceptAdminRequestModal";
 
 export const CompanyAdminRequest = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  const { adminRequestId } = useParams<{ adminRequestId: string }>();
 
   return (
     <div className={`fr-container--fluid ${styles.content}`}>
@@ -48,7 +52,7 @@ export const CompanyAdminRequest = () => {
 
           <Button
             onClick={async () => {
-              setIsModalOpen(true);
+              setIsCreateModalOpen(true);
             }}
             iconId="fr-icon-arrow-right-line"
             iconPosition="right"
@@ -69,10 +73,14 @@ export const CompanyAdminRequest = () => {
 
       <CompanyCreateAdminRequestModal
         onClose={() => {
-          setIsModalOpen(false);
+          setIsCreateModalOpen(false);
         }}
-        isOpen={isModalOpen}
+        isOpen={isCreateModalOpen}
       />
+
+      {adminRequestId && (
+        <AcceptAdminRequestModal adminRequestId={adminRequestId} />
+      )}
     </div>
   );
 };

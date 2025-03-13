@@ -27,7 +27,7 @@ export const CompaniesMenuContent = () => (
       </li>
       <li className="tw-mb-1">
         <NavLink
-          to={routes.companies.manage}
+          to={routes.companies.manage.index}
           className={({ isActive }) =>
             isActive
               ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"

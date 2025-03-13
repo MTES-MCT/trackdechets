@@ -93,7 +93,7 @@ const createAdminRequest = async (
   // Create admin request
   const adminRequest = await create(
     {
-      userId: user.id,
+      user: { connect: { id: user.id } },
       company: { connect: { id: company.id } },
       collaboratorId: collaborator?.id,
       validationMethod: adminRequestInput.validationMethod

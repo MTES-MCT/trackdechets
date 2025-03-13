@@ -41,6 +41,13 @@ const acceptAdminRequest = async (
     throw new UserInputError("La demande n'existe pas.");
   }
 
+  // User cannot validate own request
+  if (user.id === adminRequest.userId) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  }
+
   // Only rule is user must belong to target company
   const association = await prisma.companyAssociation.findFirst({
     where: {

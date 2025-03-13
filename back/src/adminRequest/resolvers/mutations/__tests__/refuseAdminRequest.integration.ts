@@ -77,8 +77,8 @@ describe("Mutation refuseAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -109,8 +109,8 @@ describe("Mutation refuseAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.ACCEPTED,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -141,8 +141,8 @@ describe("Mutation refuseAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.PENDING,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
@@ -178,8 +178,8 @@ describe("Mutation refuseAdminRequest", () => {
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
-        userId: requestAuthor.id,
         status: AdminRequestStatus.REFUSED,
         validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }

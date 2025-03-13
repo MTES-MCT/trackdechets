@@ -129,7 +129,10 @@ const routes = {
     },
     join: "/companies/join",
     orientation: "/companies/create",
-    manage: "companies/manage"
+    manage: {
+      index: "/companies/manage",
+      adminRequest: "/companies/manage/adminRequest/:adminRequestId"
+    }
   },
   registry: "/registre",
   registry_new: {

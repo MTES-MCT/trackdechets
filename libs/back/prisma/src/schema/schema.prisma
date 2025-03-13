@@ -951,6 +951,7 @@ model User {
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
+  adminRequests              AdminRequest[] @relation("AdminRequestUser")
 }
 
 enum GovernmentPermission {
@@ -2113,6 +2114,7 @@ model AdminRequest {
 
   // The user initiating the request, wanting to be promoted to admin
   userId    String  @db.VarChar(30)
+  user User  @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
 
   // The orgId of the company the user wants to be admin of
   companyId String @db.VarChar(30)

@@ -25,6 +25,9 @@ const ADMIN_REQUESTS = gql`
       edges {
         node {
           id
+          user {
+            name
+          }
           company {
             orgId
             name
@@ -67,19 +70,19 @@ describe("Query adminRequests", () => {
 
     await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: user.id } },
         company: { connect: { id: company1.id } },
         status: AdminRequestStatus.PENDING,
-        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-        userId: user.id
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
     });
 
     await prisma.adminRequest.create({
       data: {
+        user: { connect: { id: user.id } },
         company: { connect: { id: company2.id } },
         status: AdminRequestStatus.PENDING,
-        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-        userId: user.id
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
       }
     });
 
@@ -102,12 +105,14 @@ describe("Query adminRequests", () => {
 
     expect(data.adminRequests.edges[0].node.company.orgId).toBe(company2.orgId);
     expect(data.adminRequests.edges[0].node.company.name).toBe(company2.name);
+    expect(data.adminRequests.edges[0].node.user.name).toBe(user.name);
     expect(data.adminRequests.edges[0].node.status).toBe(
       AdminRequestStatus.PENDING
     );
 
     expect(data.adminRequests.edges[1].node.company.orgId).toBe(company1.orgId);
     expect(data.adminRequests.edges[1].node.company.name).toBe(company1.name);
+    expect(data.adminRequests.edges[1].node.user.name).toBe(user.name);
     expect(data.adminRequests.edges[1].node.status).toBe(
       AdminRequestStatus.PENDING
     );

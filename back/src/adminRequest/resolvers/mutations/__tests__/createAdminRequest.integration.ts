@@ -19,6 +19,9 @@ const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
     createAdminRequest(input: $input) {
       id
+      user {
+        name
+      }
       company {
         orgId
         name
@@ -186,7 +189,16 @@ describe("Mutation createAdminRequest", () => {
 
   it("should create an admin request", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
     const collaborator = await userInCompany("MEMBER", company.id, {
       email: "collaborator@mail.com"
     });
@@ -210,6 +222,11 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
+    expect(data.createAdminRequest.user.name).toBe(user.name);
+    expect(data.createAdminRequest.company.name).toBe(company.name);
+    expect(data.createAdminRequest.company.orgId).toBe(company.orgId);
+    expect(data.createAdminRequest.status).toBe(AdminRequestStatus.PENDING);
+
     const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
       where: {
         id: data.createAdminRequest.id
@@ -219,6 +236,7 @@ describe("Mutation createAdminRequest", () => {
     expect(companyAdminRequest.userId).toEqual(user.id);
     expect(companyAdminRequest.companyId).toEqual(company.id);
     expect(companyAdminRequest.collaboratorId).toEqual(collaborator.id);
+    expect(companyAdminRequest.status).toEqual(AdminRequestStatus.PENDING);
     expect(companyAdminRequest.validationMethod).toEqual(
       AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL
     );

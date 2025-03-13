@@ -1,5 +1,5 @@
 import { AdminRequest } from "@prisma/client";
-import type { AdminRequestCompany } from "@td/codegen-back";
+import type { AdminRequestCompany, AdminRequestUser } from "@td/codegen-back";
 
 // Revolvers don't provide some of the fields, because they are computed
 // by sub-resolvers (ie: company).
@@ -8,7 +8,8 @@ import type { AdminRequestCompany } from "@td/codegen-back";
 export const fixTyping = (adminRequest: AdminRequest) => {
   return {
     ...adminRequest,
-    company: null as unknown as AdminRequestCompany
+    company: null as unknown as AdminRequestCompany,
+    user: null as unknown as AdminRequestUser
   };
 };
 
