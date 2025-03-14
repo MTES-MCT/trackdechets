@@ -1,7 +1,6 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
-  AdminRequest,
   MutationRefuseAdminRequestArgs,
   ResolversParentTypes
 } from "@td/codegen-back";
@@ -10,8 +9,10 @@ import { parseMutationRefuseAdminRequestArgs } from "../../validation";
 import { prisma } from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
-import { fixTyping } from "../typing";
-import { AdminRequestStatus } from "@prisma/client";
+import { AdminRequestWithUserAndCompany, fixTyping } from "../typing";
+import { AdminRequestStatus, AdminRequest } from "@prisma/client";
+import { adminRequestRefusedEmail, renderMail } from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
 
 const refuseAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -29,7 +30,15 @@ const refuseAdminRequest = async (
 
   const { findFirst, update } = getAdminRequestRepository(user);
 
-  const adminRequest = await findFirst({ id: adminRequestId });
+  const adminRequest: AdminRequestWithUserAndCompany | null = (await findFirst(
+    { id: adminRequestId },
+    {
+      include: {
+        company: true,
+        user: true
+      }
+    }
+  )) as unknown as AdminRequestWithUserAndCompany;
 
   if (!adminRequest) {
     throw new UserInputError("La demande n'existe pas.");
@@ -67,6 +76,17 @@ const refuseAdminRequest = async (
       status: AdminRequestStatus.REFUSED
     }
   );
+
+  // Warn the author by email
+  const { user: author, company } = adminRequest;
+  const mail = renderMail(adminRequestRefusedEmail, {
+    to: [{ email: author.email, name: author.name }],
+    variables: {
+      company
+    }
+  });
+
+  await sendMail(mail);
 
   return fixTyping(updatedAdminRequest);
 };

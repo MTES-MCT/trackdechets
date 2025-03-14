@@ -633,7 +633,7 @@ administrateurs actuels afin pour les informer de votre démarche. Ils pourront 
 refuser</b> votre demande.
 </p>
 
-<br/>
+<br />
 
 <p>
 Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
@@ -698,14 +698,14 @@ administrateurs actuels afin pour les informer de votre démarche. Ils pourront 
 refuser</b> votre demande.
 </p>
 
-<br/>
+<br />
 
 <p>
 Si les administrateurs ne répondent pas sous 24 heures, <b>le collaborateur</b> que vous avez renseigné 
 sera sollicité à son tour pour <b>valider ou refuser</b> la demande. 
 </p>
 
-<br/>
+<br />
 
 <p>
 Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
@@ -767,18 +767,18 @@ administrateurs actuels afin pour les informer de votre démarche. Ils pourront 
 refuser</b> votre demande.
 </p>
 
-<br/>
+<br />
 
 <p>
 Un <b>courrier contenant un code de vérification</b> a été envoyé au siège social de l’établissement concerné. 
 </p>
 
-<br/>
+<br />
 
 <p>
 Si aucune réponse n’est donnée de la part des administrateurs avant réception du courrier, vous pourrez alors 
 finaliser votre demande grâce au code de vérification, que vous pourrez renseigner dans 
-l'onglet <b>Mes établissements > Gestion avancée > Saisir un code reçu par courrier</b>. 
+l'onglet <b>Mes établissements > Gestion avancée > Saisir un code reçu par courrier</b >. 
 </p>
 
 <p>

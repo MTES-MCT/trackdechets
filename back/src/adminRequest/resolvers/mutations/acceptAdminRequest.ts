@@ -14,8 +14,10 @@ import {
 import { parseAcceptAdminRequestInput } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
-import { fixTyping } from "../typing";
+import { AdminRequestWithUserAndCompany, fixTyping } from "../typing";
 import { prisma } from "@td/prisma";
+import { adminRequestAcceptedEmail, renderMail } from "@td/mail";
+import { sendMail } from "../../../mailer/mailing";
 
 const acceptAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -35,7 +37,15 @@ const acceptAdminRequest = async (
 
   const { findFirst, update } = getAdminRequestRepository(user);
 
-  const adminRequest = await findFirst({ id: adminRequestId });
+  const adminRequest: AdminRequestWithUserAndCompany | null = (await findFirst(
+    { id: adminRequestId },
+    {
+      include: {
+        company: true,
+        user: true
+      }
+    }
+  )) as unknown as AdminRequestWithUserAndCompany;
 
   if (!adminRequest) {
     throw new UserInputError("La demande n'existe pas.");
@@ -128,6 +138,17 @@ const acceptAdminRequest = async (
       status: AdminRequestStatus.ACCEPTED
     }
   );
+
+  // Warn the author by email
+  const { user: author, company } = adminRequest;
+  const mail = renderMail(adminRequestAcceptedEmail, {
+    to: [{ email: author.email, name: author.name }],
+    variables: {
+      company
+    }
+  });
+
+  await sendMail(mail);
 
   return fixTyping(updatedAdminRequest);
 };

@@ -1,4 +1,4 @@
-import { AdminRequest } from "@prisma/client";
+import { AdminRequest, Company, User } from "@prisma/client";
 import type { AdminRequestCompany, AdminRequestUser } from "@td/codegen-back";
 
 // Revolvers don't provide some of the fields, because they are computed
@@ -23,3 +23,8 @@ export const fixPaginatedTyping = paginatedAdminRequests => {
     }))
   };
 };
+
+export interface AdminRequestWithUserAndCompany extends AdminRequest {
+  user: User;
+  company: Company;
+}
