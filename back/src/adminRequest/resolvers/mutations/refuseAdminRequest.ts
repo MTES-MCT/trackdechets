@@ -10,8 +10,12 @@ import { prisma } from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
 import { AdminRequestWithUserAndCompany, fixTyping } from "../typing";
-import { AdminRequestStatus, AdminRequest } from "@prisma/client";
-import { adminRequestRefusedEmail, renderMail } from "@td/mail";
+import { AdminRequestStatus, AdminRequest, UserRole } from "@prisma/client";
+import {
+  adminRequestRefusedAdminEmail,
+  adminRequestRefusedEmail,
+  renderMail
+} from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 
 const refuseAdminRequest = async (
@@ -77,8 +81,34 @@ const refuseAdminRequest = async (
     }
   );
 
-  // Warn the author by email
   const { user: author, company } = adminRequest;
+
+  // Warn the admins
+  const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: adminRequest.companyId,
+      role: UserRole.ADMIN,
+      userId: { not: adminRequest.userId }
+    },
+    include: { user: true }
+  });
+
+  if (adminsCompanyAssociations.length) {
+    const adminMail = renderMail(adminRequestRefusedAdminEmail, {
+      to: adminsCompanyAssociations.map(association => ({
+        email: association.user.email,
+        name: association.user.name
+      })),
+      variables: {
+        company,
+        user: author
+      }
+    });
+
+    await sendMail(adminMail);
+  }
+
+  // Inform the author by email
   const mail = renderMail(adminRequestRefusedEmail, {
     to: [{ email: author.email, name: author.name }],
     variables: {

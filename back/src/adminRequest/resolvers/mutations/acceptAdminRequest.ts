@@ -16,7 +16,11 @@ import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
 import { AdminRequestWithUserAndCompany, fixTyping } from "../typing";
 import { prisma } from "@td/prisma";
-import { adminRequestAcceptedEmail, renderMail } from "@td/mail";
+import {
+  adminRequestAcceptedAdminEmail,
+  adminRequestAcceptedEmail,
+  renderMail
+} from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 
 const acceptAdminRequest = async (
@@ -139,16 +143,42 @@ const acceptAdminRequest = async (
     }
   );
 
-  // Warn the author by email
   const { user: author, company } = adminRequest;
-  const mail = renderMail(adminRequestAcceptedEmail, {
+
+  // Warn the admins
+  const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
+    where: {
+      companyId: adminRequest.companyId,
+      role: UserRole.ADMIN,
+      userId: { not: adminRequest.userId }
+    },
+    include: { user: true }
+  });
+
+  if (adminsCompanyAssociations.length) {
+    const adminMail = renderMail(adminRequestAcceptedAdminEmail, {
+      to: adminsCompanyAssociations.map(association => ({
+        email: association.user.email,
+        name: association.user.name
+      })),
+      variables: {
+        company,
+        user: author
+      }
+    });
+
+    await sendMail(adminMail);
+  }
+
+  // Inform the author by email
+  const authorMail = renderMail(adminRequestAcceptedEmail, {
     to: [{ email: author.email, name: author.name }],
     variables: {
       company
     }
   });
 
-  await sendMail(mail);
+  await sendMail(authorMail);
 
   return fixTyping(updatedAdminRequest);
 };

@@ -430,3 +430,29 @@ export const adminRequestAcceptedEmail: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+export const adminRequestAcceptedAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+}> = {
+  subject: () => `Mise à jour concernant la demande d’accès administrateur`,
+  body: mustacheRenderer("admin-request-accepted-admin.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};
+
+export const adminRequestRefusedAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+}> = {
+  subject: () => `Mise à jour concernant la demande d’accès administrateur`,
+  body: mustacheRenderer("admin-request-refused-admin.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};

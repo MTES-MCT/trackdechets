@@ -359,9 +359,75 @@ describe("Mutation acceptAdminRequest", () => {
     expect(companyAssociation?.role).toBe(UserRole.ADMIN);
   });
 
-  // TODO
-  // TODO
-  // TODO
+  it("should send mail to admins", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      {
+        email: "admin@mail.com",
+        name: "Company Admin"
+      }
+    );
+    const requestAuthor = await userFactory({
+      email: "author@mail.com",
+      name: "Request Author"
+    });
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
+
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company Admin" }
+    ]);
+    expect(subject).toBe(
+      `Mise à jour concernant la demande d’accès administrateur`
+    );
+
+    const expectedBody = `<p>
+  Nous vous informons que la demande de l'utilisateur
+  <b>${requestAuthor.name}</b> pour devenir administrateur de l'établissement
+  <b>${company.name} - ${company.orgId}</b> a été validée.
+</p>
+
+<br />
+
+<p>Pour toute question, vous pouvez contacter l'assistance Trackdéchets.</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
 
   it("should send mail to author", async () => {
     // Given
@@ -401,9 +467,9 @@ describe("Mutation acceptAdminRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[1][0];
 
     expect(to).toMatchObject([
       { email: "author@mail.com", name: "Request Author" }
