@@ -38,5 +38,16 @@ type Query {
     clue: String!
   ): CompanySearchPrivate!
 
+  """
+  Renvoie les établissements de l'utilisateur authentifié ainsi que les établissements
+  de ses délégants, utilisé pour le champ de recherche des établissements dans les pages de registre V2
+  """
+  registryCompanies(
+    firstCompanies: Int
+    firstDelegators: Int
+    search: String
+    userRoles: [UserRole!]
+  ): CompanyRegistryConnection!
+
   companyExhaustive(siret: String!): CompanyExhaustive!
 }

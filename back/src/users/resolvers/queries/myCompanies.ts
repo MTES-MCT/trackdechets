@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
@@ -25,7 +25,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
       `Le paramètre de recherche "search" est réservé à usage interne et n'est pas disponible via l'api.`
     );
   }
-  let searchQuery = {};
+  let searchQuery: Prisma.CompanyAssociationWhereInput = {};
 
   if (search) {
     if (
