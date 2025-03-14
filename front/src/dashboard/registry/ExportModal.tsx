@@ -9,13 +9,12 @@ import {
   MutationGenerateRegistryV2ExportArgs,
   Query,
   RegistryV2ExportWasteType,
-  UserRole,
   RegistryV2ExportType,
   CompanyType
 } from "@td/codegen-ui";
 import {
   GENERATE_REGISTRY_V2_EXPORT,
-  GET_MY_COMPANIES_WITH_DELEGATORS,
+  GET_MY_COMPANIES,
   GET_REGISTRY_V2_EXPORTS
 } from "./shared";
 import { FieldError, useForm } from "react-hook-form";
@@ -33,6 +32,7 @@ import {
 import { Modal } from "../../common/components";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import classNames from "classnames";
@@ -40,16 +40,9 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import { WasteCodeSwitcher } from "./WasteCodeSwitcher";
 import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { REGISTRY_DELEGATIONS } from "../../Apps/common/queries/registryDelegation/queries";
 
 type Props = { isOpen: boolean; onClose: () => void };
-
-type ExportCompany = {
-  orgId: string;
-  name: string | null | undefined;
-  givenName: string | null | undefined;
-  delegate: string | null;
-  companyTypes: CompanyType[];
-};
 
 const displayError = (error: FieldError | undefined) => {
   return error ? error.message : null;
@@ -205,6 +198,8 @@ const getSchema = () =>
   z
     .object({
       companyOrgId: z.string({ required_error: "Ce champ est requis" }),
+      isDelegation: z.boolean(),
+      delegateSiret: z.string().nullable(),
       startDate: z.coerce
         .date({
           required_error: "La date de début est requise",
@@ -257,6 +252,8 @@ const getSchema = () =>
 
 const getDefaultValues = () => ({
   companyOrgId: "all",
+  isDelegation: false,
+  delegateSiret: null,
   startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
   registryType: RegistryV2ExportType.Incoming,
   format: FormsRegisterExportFormat.Csv,
@@ -270,13 +267,8 @@ const getDefaultValues = () => ({
 });
 
 export function ExportModal({ isOpen, onClose }: Props) {
-  const [companies, setCompanies] = useState<ExportCompany[]>([]);
+  // const [companies, setCompanies] = useState<ExportCompany[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const {
-    data: companiesData,
-    loading,
-    error: companiesError
-  } = useQuery<Pick<Query, "myCompanies">>(GET_MY_COMPANIES_WITH_DELEGATORS);
 
   const [generateExport, { loading: generateLoading }] = useMutation<
     Pick<Mutation, "generateRegistryV2Export">,
@@ -302,71 +294,116 @@ export function ExportModal({ isOpen, onClose }: Props) {
     resolver: zodResolver(validationSchema)
   });
 
+  const companyOrgId = watch("companyOrgId");
+  const isDelegation = watch("isDelegation");
+  const registryType = watch("registryType");
+  const startDate = watch("startDate");
+
+  // TODO indstead of getting myCOmpanies, get registryDelegations, either with
+  // delegateOrgId or delegatorIrgId
+  // then use the companies infos in the rest
+
+  const {
+    data: registryDelegationsData,
+    loading: registryDelegationsLoading,
+    error: registryDelegationsError
+  } = useQuery<Pick<Query, "registryDelegations">>(REGISTRY_DELEGATIONS, {
+    variables: {
+      where: {
+        delegatorOrgId: companyOrgId
+      }
+    },
+    skip: !isDelegation,
+    fetchPolicy: "network-only"
+  });
+
+  const { data: companiesData, error: companiesError } = useQuery<
+    Pick<Query, "myCompanies">
+  >(GET_MY_COMPANIES, {
+    variables: {
+      search: companyOrgId
+    },
+    skip: isDelegation,
+    fetchPolicy: "network-only"
+  });
+
   const closeAndReset = () => {
     setError(null);
     reset(getDefaultValues());
     onClose();
   };
 
-  useEffect(() => {
-    const rawCompanies = companiesData?.myCompanies?.edges;
-    if (!rawCompanies?.length) {
-      setCompanies([]);
-      return;
-    }
-    const tmpCompanies: ExportCompany[] = [];
-    rawCompanies.forEach(company => {
-      if (
-        company.node.userRole !== UserRole.Admin &&
-        company.node.userRole !== UserRole.Member &&
-        company.node.userRole !== UserRole.Reader
-      ) {
-        return;
-      }
-      tmpCompanies.push({
-        orgId: company.node.orgId,
-        name: company.node.name,
-        givenName: company.node.givenName,
-        delegate: null,
-        companyTypes: company.node.companyTypes
-      });
-      if (company.node.delegators) {
-        company.node.delegators.forEach(delegator => {
-          tmpCompanies.push({
-            orgId: delegator.orgId,
-            name: delegator.name,
-            givenName: delegator.givenName,
-            delegate: company.node.orgId,
-            companyTypes: delegator.companyTypes
-          });
-        });
-      }
-    });
-    setCompanies(tmpCompanies);
-  }, [companiesData]);
+  // useEffect(() => {
+  //   const rawCompanies = companiesData?.myCompanies?.edges;
+  //   if (!rawCompanies?.length) {
+  //     setCompanies([]);
+  //     return;
+  //   }
+  //   const tmpCompanies: ExportCompany[] = [];
+  //   rawCompanies.forEach(company => {
+  //     if (
+  //       company.node.userRole !== UserRole.Admin &&
+  //       company.node.userRole !== UserRole.Member &&
+  //       company.node.userRole !== UserRole.Reader
+  //     ) {
+  //       return;
+  //     }
+  //     tmpCompanies.push({
+  //       orgId: company.node.orgId,
+  //       name: company.node.name,
+  //       givenName: company.node.givenName,
+  //       delegate: null,
+  //       companyTypes: company.node.companyTypes
+  //     });
+  //     if (company.node.delegators) {
+  //       company.node.delegators.forEach(delegator => {
+  //         tmpCompanies.push({
+  //           orgId: delegator.orgId,
+  //           name: delegator.name,
+  //           givenName: delegator.givenName,
+  //           delegate: company.node.orgId,
+  //           companyTypes: delegator.companyTypes
+  //         });
+  //       });
+  //     }
+  //   });
+  //   setCompanies(tmpCompanies);
+  // }, [companiesData]);
 
-  const registryType = watch("registryType");
-  const companyOrgId = watch("companyOrgId");
-  const startDate = watch("startDate");
-
-  // get a list of possible export types for the seleced company (or all companies) to grey out
+  // get a list of possible export types for the selected company (or all companies) to grey out
   // the export types that are impossible
   const possibleExportTypes = useMemo(() => {
-    const selectedCompanies =
-      companyOrgId === "all"
-        ? companies
-        : companies.filter(c => c.orgId === companyOrgId);
-    if (selectedCompanies.length === 0) {
-      return [];
+    if (companyOrgId === "all") {
+      return [
+        RegistryV2ExportType.Outgoing,
+        RegistryV2ExportType.Incoming,
+        RegistryV2ExportType.Transported,
+        RegistryV2ExportType.Managed,
+        RegistryV2ExportType.Ssd
+      ];
     }
-    const companyTypes = selectedCompanies.reduce((acc, company) => {
-      company.companyTypes.forEach(t => {
-        if (!acc.includes(t)) {
-          acc.push(t);
-        }
-      });
-      return acc;
-    }, [] as CompanyType[]);
+    console.log("companiesData", companiesData);
+    console.log("registryDelegationsData", registryDelegationsData);
+    const companies = isDelegation
+      ? registryDelegationsData?.registryDelegations.edges.map(
+          d => d.node.delegator
+        )
+      : companiesData?.myCompanies.edges.map(c => c.node);
+    const selectedCompany = companies?.find(c => c.orgId === companyOrgId);
+    if (!selectedCompany) {
+      return [
+        RegistryV2ExportType.Outgoing,
+        RegistryV2ExportType.Incoming,
+        RegistryV2ExportType.Transported,
+        RegistryV2ExportType.Managed,
+        RegistryV2ExportType.Ssd
+      ];
+    }
+    console.log("selectedCompany", selectedCompany);
+    console.log("isDelegation", isDelegation);
+
+    const companyTypes = selectedCompany.companyTypes;
+    console.log("companyTypes", companyTypes);
 
     const exportTypes: RegistryV2ExportType[] = [];
 
@@ -410,7 +447,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
     }
     exportTypes.push(RegistryV2ExportType.Ssd);
     return exportTypes;
-  }, [companyOrgId, companies]);
+  }, [companyOrgId, isDelegation, companiesData, registryDelegationsData]);
 
   // if the registry type is not in the possible export types, set the first possible export type
   useEffect(() => {
@@ -438,6 +475,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
     setError(null);
     const {
       companyOrgId,
+      isDelegation,
       registryType,
       format,
       startDate,
@@ -446,20 +484,29 @@ export function ExportModal({ isOpen, onClose }: Props) {
       wasteTypes,
       wasteCodes
     } = input;
-
+    let delegateSiret = input.delegateSiret;
+    if (isDelegation) {
+      if (!delegateSiret) {
+        if (registryDelegationsData?.registryDelegations.edges.length === 1) {
+          const tmpSiret =
+            registryDelegationsData.registryDelegations.edges[0].node.delegate
+              .siret;
+          if (tmpSiret) {
+            delegateSiret = tmpSiret;
+          }
+        } else {
+          setError("Veuillez sélectionner un délégataire");
+          return;
+        }
+      }
+    }
     const siret = companyOrgId === "all" ? null : companyOrgId;
-    let delegateSiret: string | null = null;
     // push the dates to the extremities of days so we include the days entered in the inputs
     const startOfDayStartDate = startOfDay(new Date(startDate)).toISOString();
     const endOfDayEndDate = endDate
       ? endOfDay(new Date(endDate)).toISOString()
       : null;
-    if (siret) {
-      const company = companies.find(comp => comp.orgId === siret);
-      if (company?.delegate) {
-        delegateSiret = company.delegate;
-      }
-    }
+
     if (
       registryType !== RegistryV2ExportType.Ssd &&
       registryType !== RegistryV2ExportType.Incoming &&
@@ -493,7 +540,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
     });
   };
 
-  const isLoading = isSubmitting || loading || generateLoading;
+  const isLoading = isSubmitting || generateLoading;
   const dateButtons = getDateButtons();
 
   return (
@@ -505,19 +552,87 @@ export function ExportModal({ isOpen, onClose }: Props) {
       isOpen={isOpen}
       size="M"
     >
-      {companiesError ? (
-        <InlineError apolloError={companiesError} />
+      {companiesError || registryDelegationsError ? (
+        <InlineError
+          apolloError={(companiesError || registryDelegationsError)!}
+        />
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="fr-mb-8v">
             <RegistryCompanySwitcher
-              onCompanySelect={v => setValue("companyOrgId", v)}
+              onCompanySelect={(orgId, isDelegation) => {
+                setValue("companyOrgId", orgId);
+                setValue("isDelegation", isDelegation);
+                setValue("delegateSiret", null);
+              }}
               wrapperClassName={"tw-relative"}
               allOption={{
                 key: "all",
                 name: "Tous les établissements"
               }}
             />
+            {isDelegation ? (
+              registryDelegationsLoading ? (
+                <div className="fr-mt-2v">
+                  <InlineLoader size={32} />
+                </div>
+              ) : registryDelegationsData?.registryDelegations.edges.length ? (
+                <div className="fr-mt-2v">
+                  {registryDelegationsData.registryDelegations.edges.length ===
+                  1 ? (
+                    <p className={styles.delegationHint}>
+                      {`Cette déclaration sera faite en tant que délégataire par
+                    l'établissement\n`}
+                      <br />
+                      <b>
+                        {`${
+                          registryDelegationsData.registryDelegations.edges[0]
+                            .node.delegate.givenName ||
+                          registryDelegationsData.registryDelegations.edges[0]
+                            .node.delegate.name ||
+                          ""
+                        } ${
+                          registryDelegationsData.registryDelegations.edges[0]
+                            .node.delegate.orgId || ""
+                        }`}
+                      </b>
+                    </p>
+                  ) : (
+                    <>
+                      <p className={styles.delegationHint}>
+                        Cet établissement vous a désigné en tant que délégataire
+                        sur plusieurs de vos établissements. Veuillez
+                        sélectionner lequel utiliser pour cette déclaration.
+                      </p>
+                      <div className="fr-mt-4v">
+                        <Select
+                          label="Établissement délégataire"
+                          disabled={isLoading}
+                          nativeSelectProps={{
+                            ...register("delegateSiret")
+                          }}
+                        >
+                          {registryDelegationsData.registryDelegations.edges.map(
+                            edge => (
+                              <option
+                                value={edge.node.delegate.orgId}
+                                key={edge.node.delegate.orgId}
+                              >
+                                {`${
+                                  edge.node.delegate.givenName ||
+                                  edge.node.delegate.name ||
+                                  ""
+                                } ${edge.node.delegate.orgId || ""}`}
+                              </option>
+                            )
+                          )}
+                        </Select>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : null
+            ) : null}
           </div>
           <div className="fr-mb-8v">
             <Select

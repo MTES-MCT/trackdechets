@@ -41,11 +41,13 @@ export const REGISTRY_DELEGATIONS = gql`
             name
             givenName
             orgId
+            companyTypes
           }
           delegator {
             name
             givenName
             orgId
+            companyTypes
           }
           startDate
           endDate

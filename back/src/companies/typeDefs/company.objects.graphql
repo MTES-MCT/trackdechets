@@ -179,6 +179,17 @@ type CompanyPrivateConnection {
   edges: [CompanyPrivateEdge!]!
 }
 
+type CompanyPrivateEdge {
+  cursor: String!
+  node: CompanyPrivate!
+}
+
+type CompanyRegistryConnection {
+  totalCount: Int!
+  myCompanies: [CompanyPrivate!]!
+  delegators: [CompanyPublic!]!
+}
+
 "Information sur un établissement accessible publiquement en recherche"
 type CompanyPublic {
   "SIRET ou TVA de l'établissement"
