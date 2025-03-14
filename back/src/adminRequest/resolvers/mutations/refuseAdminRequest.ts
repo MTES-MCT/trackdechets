@@ -48,7 +48,6 @@ const refuseAdminRequest = async (
     throw new UserInputError("La demande n'existe pas.");
   }
 
-  // Only rule is user must belong to target company
   const association = await prisma.companyAssociation.findFirst({
     where: {
       userId: user.id,
@@ -56,7 +55,8 @@ const refuseAdminRequest = async (
     }
   });
 
-  if (!association) {
+  // To refuse a request, a user must belong to target company (or be a Trackdéchets admin)
+  if (!user.isAdmin && !association) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à effectuer cette action."
     );
@@ -83,7 +83,7 @@ const refuseAdminRequest = async (
 
   const { user: author, company } = adminRequest;
 
-  // Warn the admins
+  // Warn the company's admins
   const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
     where: {
       companyId: adminRequest.companyId,

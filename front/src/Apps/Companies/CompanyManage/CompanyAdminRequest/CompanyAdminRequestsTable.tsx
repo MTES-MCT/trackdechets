@@ -11,7 +11,7 @@ import Badge from "@codegouvfr/react-dsfr/Badge";
 import { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { ADMIN_REQUESTS } from "../../../common/queries/adminRequest/adminRequest";
 
-const getStatusLabel = (status: AdminRequestStatus) => {
+export const getStatusLabel = (status: AdminRequestStatus) => {
   switch (status) {
     case AdminRequestStatus.Pending:
       return "EN COURS";
@@ -22,7 +22,7 @@ const getStatusLabel = (status: AdminRequestStatus) => {
   }
 };
 
-const getStatusBadge = (status: AdminRequestStatus) => {
+export const getStatusBadge = (status: AdminRequestStatus) => {
   let severity: AlertProps.Severity = "error";
   if (status === AdminRequestStatus.Pending) severity = "info";
   else if (status === AdminRequestStatus.Accepted) severity = "success";

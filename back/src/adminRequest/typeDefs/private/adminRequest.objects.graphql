@@ -20,6 +20,14 @@ type AdminRequest {
   createdAt: DateTime!
 
   """
+  La méthode de validation:
+  - Demande à un admin
+  - Demande à un collaborateur
+  - Envoi d'un courrier
+  """
+  validationMethod: AdminRequestValidationMethod!
+
+  """
   Le statut de la demande
   """
   status: AdminRequestStatus!

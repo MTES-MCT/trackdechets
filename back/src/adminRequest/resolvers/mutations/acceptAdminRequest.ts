@@ -55,14 +55,14 @@ const acceptAdminRequest = async (
     throw new UserInputError("La demande n'existe pas.");
   }
 
-  // User cannot validate own request
-  if (user.id === adminRequest.userId) {
+  // User cannot validate own request (except it Trackdéchets admin)
+  if (!user.isAdmin && user.id === adminRequest.userId) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à effectuer cette action."
     );
   }
 
-  // Only rule is user must belong to target company
+  // TODO: not everyone from the company can accept. Admins first, then possible collaborators
   const association = await prisma.companyAssociation.findFirst({
     where: {
       userId: user.id,
@@ -70,7 +70,8 @@ const acceptAdminRequest = async (
     }
   });
 
-  if (!association) {
+  // Trackdéchets admins can also accept requests
+  if (!user.isAdmin && !association) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à effectuer cette action."
     );
@@ -98,7 +99,7 @@ const acceptAdminRequest = async (
     // TODO
   }
 
-  // If the user does not belong to target company, add him
+  // Check if user already belongs to company
   const companyAssociation = await prisma.companyAssociation.findFirst({
     where: {
       userId: adminRequest.userId,
@@ -145,7 +146,7 @@ const acceptAdminRequest = async (
 
   const { user: author, company } = adminRequest;
 
-  // Warn the admins
+  // Warn the company's admins
   const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
     where: {
       companyId: adminRequest.companyId,

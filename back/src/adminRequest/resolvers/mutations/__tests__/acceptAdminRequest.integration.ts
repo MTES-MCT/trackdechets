@@ -259,6 +259,107 @@ describe("Mutation acceptAdminRequest", () => {
     );
   });
 
+  it("Trackdéchets admins can accept a request", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory();
+    const requestAuthor = await userFactory();
+    const tdAdmin = await userFactory({ isAdmin: true });
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(tdAdmin);
+    const { errors, data } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+
+    const updatedAdminRequest = await prisma.adminRequest.findUniqueOrThrow({
+      where: { id: adminRequest.id }
+    });
+
+    expect(updatedAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+
+    // User should now be admin
+    const companyAssociation = await prisma.companyAssociation.findFirstOrThrow(
+      {
+        where: {
+          userId: requestAuthor.id,
+          companyId: company.id
+        }
+      }
+    );
+    expect(companyAssociation?.role).toBe(UserRole.ADMIN);
+  });
+
+  it("Trackdéchets admins can his own requests", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory();
+    const requestAuthor = await userFactory({ isAdmin: true });
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(requestAuthor);
+    const { errors, data } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+
+    const updatedAdminRequest = await prisma.adminRequest.findUniqueOrThrow({
+      where: { id: adminRequest.id }
+    });
+
+    expect(updatedAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+
+    // User should now be admin
+    const companyAssociation = await prisma.companyAssociation.findFirstOrThrow(
+      {
+        where: {
+          userId: requestAuthor.id,
+          companyId: company.id
+        }
+      }
+    );
+    expect(companyAssociation?.role).toBe(UserRole.ADMIN);
+  });
+
   it("if user does not belong to company, should be added and promoted to admin", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory();

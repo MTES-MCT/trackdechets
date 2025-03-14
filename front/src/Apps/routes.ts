@@ -14,7 +14,8 @@ const routes = {
     registry: "/admin/registry",
     membersAdmin: "/admin/members",
     bsdAdmin: "/admin/bsd",
-    massProfilesAdmin: "/admin/mass-profile"
+    massProfilesAdmin: "/admin/mass-profile",
+    adminRequests: "/admin/admin-requests"
   },
   login: "/login",
   invite: "/invite",
@@ -131,7 +132,7 @@ const routes = {
     orientation: "/companies/create",
     manage: {
       index: "/companies/manage",
-      adminRequest: "/companies/manage/adminRequest/:adminRequestId"
+      adminRequest: "/companies/manage/admin-request/:adminRequestId"
     }
   },
   registry: "/registre",

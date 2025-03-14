@@ -3,6 +3,7 @@ import {
   getConnection,
   getPrismaPaginationArgs
 } from "../../../../../common/pagination";
+import { Prisma } from "@prisma/client";
 
 interface Args {
   skip?: number | null | undefined;
@@ -11,11 +12,10 @@ interface Args {
 
 export const getPaginatedDelegations = async (
   user: Express.User,
+  where: Prisma.AdminRequestWhereInput,
   { skip, first }: Args
 ) => {
   const delegationRepository = getAdminRequestRepository(user);
-
-  const where = { userId: user.id };
 
   const totalCount = await delegationRepository.count(where);
 

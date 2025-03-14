@@ -4,8 +4,9 @@ import type { QueryResolvers } from "@td/codegen-back";
 import { parseQueryAdminRequestsArgs } from "../../../validation";
 import { getPaginatedDelegations } from "./utils/adminRequests.utils";
 import { fixPaginatedTyping } from "../../typing";
+import { ForbiddenError } from "../../../../common/errors";
 
-const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
+const adminRequestsAdminResolver: QueryResolvers["adminRequestsAdmin"] = async (
   _,
   args,
   context
@@ -16,13 +17,19 @@ const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
   // User must be authenticated
   const user = checkIsAuthenticated(context);
 
+  if (!user.isAdmin) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  }
+
   // Sync validation of args
   const { skip, first } = parseQueryAdminRequestsArgs(args);
 
   // Get paginated delegations
   const paginatedDelegations = await getPaginatedDelegations(
     user,
-    { userId: user.id },
+    {},
     {
       skip,
       first
@@ -32,4 +39,4 @@ const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
   return fixPaginatedTyping(paginatedDelegations);
 };
 
-export default adminRequestsResolver;
+export default adminRequestsAdminResolver;

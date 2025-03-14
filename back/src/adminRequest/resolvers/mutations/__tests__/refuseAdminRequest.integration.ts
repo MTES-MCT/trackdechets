@@ -180,6 +180,44 @@ describe("Mutation refuseAdminRequest", () => {
     expect(updatedAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
   });
 
+  it("Trackdéchets admin can refuse a pending request", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory();
+    const requestAuthor = await userFactory();
+    const tdAdmin = await userFactory({ isAdmin: true });
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(tdAdmin);
+    const { errors, data } = await mutate<Pick<Mutation, "refuseAdminRequest">>(
+      REFUSE_ADMIN_REQUEST,
+      {
+        variables: {
+          adminRequestId: adminRequest.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.refuseAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+
+    const updatedAdminRequest = await prisma.adminRequest.findUniqueOrThrow({
+      where: { id: adminRequest.id }
+    });
+
+    expect(updatedAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+  });
+
   it("should not throw if request has already been refused", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory();

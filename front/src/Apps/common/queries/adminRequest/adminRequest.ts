@@ -1,17 +1,29 @@
 import { gql } from "@apollo/client";
 
+const adminRequestFragment = gql`
+  fragment AdminRequestFragment on AdminRequest {
+    id
+    company {
+      orgId
+      name
+    }
+    user {
+      name
+    }
+    status
+    createdAt
+    validationMethod
+  }
+`;
+
 export const CREATE_ADMIN_REQUEST = gql`
   mutation createAdminRequest($input: CreateAdminRequestInput!) {
     createAdminRequest(input: $input) {
-      id
-      company {
-        orgId
-        name
-      }
-      status
-      createdAt
+      ...AdminRequestFragment
     }
   }
+
+  ${adminRequestFragment}
 `;
 
 export const ADMIN_REQUESTS = gql`
@@ -26,60 +38,62 @@ export const ADMIN_REQUESTS = gql`
       }
       edges {
         node {
-          id
-          company {
-            orgId
-            name
-          }
-          status
-          createdAt
+          ...AdminRequestFragment
         }
       }
     }
   }
+
+  ${adminRequestFragment}
+`;
+
+export const ADMIN_REQUESTS_ADMIN = gql`
+  query adminRequestsAdmin($skip: Int!, $first: Int!) {
+    adminRequestsAdmin(skip: $skip, first: $first) {
+      totalCount
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        node {
+          ...AdminRequestFragment
+        }
+      }
+    }
+  }
+
+  ${adminRequestFragment}
 `;
 
 export const ADMIN_REQUEST = gql`
-  query adminRequests($adminRequestId: ID!) {
+  query adminRequest($adminRequestId: ID!) {
     adminRequest(adminRequestId: $adminRequestId) {
-      id
-      user {
-        name
-      }
-      company {
-        orgId
-        name
-      }
-      status
-      createdAt
+      ...AdminRequestFragment
     }
   }
+
+  ${adminRequestFragment}
 `;
 
 export const ACCEPT_ADMIN_REQUEST = gql`
   mutation acceptAdminRequest($input: AcceptAdminRequestInput!) {
     acceptAdminRequest(input: $input) {
-      id
-      company {
-        orgId
-        name
-      }
-      status
-      createdAt
+      ...AdminRequestFragment
     }
   }
+
+  ${adminRequestFragment}
 `;
 
 export const REFUSE_ADMIN_REQUEST = gql`
   mutation refuseAdminRequest($adminRequestId: ID!) {
     refuseAdminRequest(adminRequestId: $adminRequestId) {
-      id
-      company {
-        orgId
-        name
-      }
-      status
-      createdAt
+      ...AdminRequestFragment
     }
   }
+
+  ${adminRequestFragment}
 `;
