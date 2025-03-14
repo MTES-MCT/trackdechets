@@ -12,7 +12,11 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
-import { adminRequestInitialWarningToAdminEmail, renderMail } from "@td/mail";
+import {
+  adminRequestInitialInfoToAuthorEmail,
+  adminRequestInitialWarningToAdminEmail,
+  renderMail
+} from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
 
 const createAdminRequest = async (
@@ -135,6 +139,21 @@ const createAdminRequest = async (
 
     await sendMail(mail);
   }
+
+  // Send confirmation email to author
+  const mail = renderMail(adminRequestInitialInfoToAuthorEmail, {
+    to: [{ email: user.email, name: user.name }],
+    variables: {
+      company,
+      isValidationByCollaboratorApproval:
+        adminRequest.validationMethod ===
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+      isValidationByMail:
+        adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL
+    }
+  });
+
+  await sendMail(mail);
 
   return fixTyping(adminRequest);
 };

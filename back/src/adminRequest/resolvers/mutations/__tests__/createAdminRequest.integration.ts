@@ -379,9 +379,8 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
     const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
 
     expect(to).toMatchObject([
@@ -394,7 +393,7 @@ describe("Mutation createAdminRequest", () => {
     const expectedBody = `<p>
   Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
   souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
@@ -469,9 +468,8 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
     const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
 
     expect(to).toMatchObject([
@@ -484,7 +482,7 @@ describe("Mutation createAdminRequest", () => {
     const expectedBody = `<p>
   Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
   souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
@@ -549,9 +547,8 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).toBeUndefined();
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
     const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
 
     expect(to).toMatchObject([
@@ -564,7 +561,7 @@ describe("Mutation createAdminRequest", () => {
     const expectedBody = `<p>
   Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
   souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name}</b> - ${company.orgId}. En tant
+  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/adminRequest/${data.createAdminRequest.id}"
@@ -577,6 +574,215 @@ describe("Mutation createAdminRequest", () => {
 <p>
   Nous restons à votre disposition pour toute information complémentaire et vous
   remercions de votre coopération.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should send confirmation mail to author - verification = REQUEST_ADMIN_APPROVAL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Super company"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    await userInCompany("ADMIN", company.id);
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
+
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[1][0];
+
+    expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
+    expect(subject).toBe(
+      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
+l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
+administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+refuser</b> votre demande.
+</p>
+
+<br/>
+
+<p>
+Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should send confirmation mail to author - verification = REQUEST_COLLABORATOR_APPROVAL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Super company"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    await userInCompany("ADMIN", company.id);
+    const collaborator = await userInCompany("MEMBER", company.id);
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: collaborator.email
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
+
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[1][0];
+
+    expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
+    expect(subject).toBe(
+      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
+l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
+administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+refuser</b> votre demande.
+</p>
+
+<br/>
+
+<p>
+Si les administrateurs ne répondent pas sous 24 heures, <b>le collaborateur</b> que vous avez renseigné 
+sera sollicité à son tour pour <b>valider ou refuser</b> la demande. 
+</p>
+
+<br/>
+
+<p>
+Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
+</p>
+`;
+
+    expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should send confirmation mail to author - verification = SEND_MAIL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Super company"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    await userInCompany("ADMIN", company.id);
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
+
+    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[1][0];
+
+    expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
+    expect(subject).toBe(
+      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+    );
+
+    const expectedBody = `<p>
+Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
+l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
+administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+refuser</b> votre demande.
+</p>
+
+<br/>
+
+<p>
+Un <b>courrier contenant un code de vérification</b> a été envoyé au siège social de l’établissement concerné. 
+</p>
+
+<br/>
+
+<p>
+Si aucune réponse n’est donnée de la part des administrateurs avant réception du courrier, vous pourrez alors 
+finaliser votre demande grâce au code de vérification, que vous pourrez renseigner dans 
+l'onglet <b>Mes établissements > Gestion avancée > Saisir un code reçu par courrier</b>. 
+</p>
+
+<p>
+Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
 </p>
 `;
 

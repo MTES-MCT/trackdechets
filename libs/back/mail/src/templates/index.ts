@@ -391,3 +391,18 @@ export const adminRequestInitialWarningToAdminEmail: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  isValidationByCollaboratorApproval: boolean;
+  isValidationByMail: boolean;
+}> = {
+  subject: ({ company }) =>
+    `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-initial-info-to-author.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};
