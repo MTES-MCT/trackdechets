@@ -15,14 +15,15 @@ interface Args {
   first?: number | null | undefined;
 }
 
-const getActiveDelegationFilter = (): Prisma.RegistryDelegationWhereInput => {
-  return {
-    revokedBy: null,
-    cancelledBy: null,
-    startDate: { lte: new Date() },
-    OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+export const getActiveDelegationFilter =
+  (): Prisma.RegistryDelegationWhereInput => {
+    return {
+      revokedBy: null,
+      cancelledBy: null,
+      startDate: { lte: new Date() },
+      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
+    };
   };
-};
 
 export const getPaginatedDelegations = async (
   user: Express.User,
@@ -96,6 +97,7 @@ export const getDelegatesOfCompany = async (
       include: { delegate: true }
     }
   );
+  console.log("delegations", delegations);
   return delegations.map(delegation => delegation.delegate);
 };
 

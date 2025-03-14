@@ -17,6 +17,8 @@ type Query {
     before: ID
     "USAGE INTERNE - Filtre par nom, siret ou numéro de TVA - chaîne comprise entre 3 et 30 caractères"
     search: String
+    "USAGE INTERNE - Filtre par rôle de l'utilisateur"
+    userRoles: [UserRole!]
   ): CompanyPrivateConnection!
 
   """

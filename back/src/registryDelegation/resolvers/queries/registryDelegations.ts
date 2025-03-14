@@ -28,12 +28,13 @@ const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
       delegatorOrgId
     );
 
-    // Check that user belongs to company
+    // Check that user belongs to the delegate company
     if (delegate) await checkBelongsTo(user, delegate);
-    if (delegator) await checkBelongsTo(user, delegator);
 
     const delegates = delegate ? [delegate] : [];
-    if (givenToMe) {
+    // this filter means that the delegations that will be returned
+    // will be the ones where the user is a member on the delegate company
+    if (givenToMe || delegator) {
       const userCompanies = await getUserCompanies(user.id);
       delegates.push(...userCompanies);
     }
