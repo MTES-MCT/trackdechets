@@ -220,6 +220,8 @@ enum OperationMode {
   RECYCLAGE
   // Valorisation énergétique
   VALORISATION_ENERGETIQUE
+  // Autres valorisations
+  AUTRES_VALORISATIONS
   // Incinération sans valorisation énergétique ou stockage en décharge
   ELIMINATION
   // Utilisé lors des migrations, lorsqu'on n'a pas de donnée
