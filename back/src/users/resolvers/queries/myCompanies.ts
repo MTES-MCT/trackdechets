@@ -19,7 +19,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
 ) => {
   const me = checkIsAuthenticated(context);
 
-  const { search, userRoles, ...paginationArgs } = args;
+  const { search, ...paginationArgs } = args;
   if (!!search && context.user?.auth !== AuthType.Session) {
     throw new UserInputError(
       `Le paramètre de recherche "search" est réservé à usage interne et n'est pas disponible via l'api.`
@@ -51,11 +51,6 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
           company: { vatNumber: { contains: search, mode: "insensitive" } }
         }
       ]
-    };
-  }
-  if (userRoles && userRoles.length > 0) {
-    searchQuery.role = {
-      in: userRoles
     };
   }
   const where = { userId: me.id, ...searchQuery };

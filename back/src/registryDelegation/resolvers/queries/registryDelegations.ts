@@ -7,6 +7,7 @@ import { parseQueryRegistryDelegationsArgs } from "../../validation";
 import { fixPaginatedTyping } from "../typing";
 import { findDelegateOrDelegatorOrThrow } from "../utils";
 import { getPaginatedDelegations } from "./utils/registryDelegations.utils";
+import { UserInputError } from "../../../common/errors";
 
 const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
   async (_, args, context) => {
@@ -21,7 +22,11 @@ const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
 
     const { delegateOrgId, delegatorOrgId, givenToMe, activeOnly, search } =
       paginationArgs.where;
-
+    if (delegateOrgId && givenToMe) {
+      throw new UserInputError(
+        "Les options delegateOrgId et givenToMe ne peuvent pas être utilisées en même temps"
+      );
+    }
     // Find targeted company
     const { delegate, delegator } = await findDelegateOrDelegatorOrThrow(
       delegateOrgId,
@@ -34,9 +39,13 @@ const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
     const delegates = delegate ? [delegate] : [];
     // this filter means that the delegations that will be returned
     // will be the ones where the user is a member on the delegate company
-    if (givenToMe || delegator) {
+    if (givenToMe) {
       const userCompanies = await getUserCompanies(user.id);
       delegates.push(...userCompanies);
+      // if we have delegator && givenToMe, we don't need to check if the user
+      // belongs to the delegator company since he will be a member of a delegate company
+    } else if (delegator) {
+      await checkBelongsTo(user, delegator);
     }
 
     // Get paginated delegations
