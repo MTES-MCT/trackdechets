@@ -179,11 +179,6 @@ type CompanyPrivateConnection {
   edges: [CompanyPrivateEdge!]!
 }
 
-type CompanyPrivateEdge {
-  cursor: String!
-  node: CompanyPrivate!
-}
-
 type CompanyRegistryConnection {
   totalCount: Int!
   myCompanies: [CompanyPrivate!]!

@@ -195,18 +195,8 @@ export const REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL = gql`
 `;
 
 export const GET_MY_COMPANIES = gql`
-  query MyCompaniesWithDelegators(
-    $first: Int
-    $after: ID
-    $search: String
-    $userRoles: [UserRole!]
-  ) {
-    myCompanies(
-      first: $first
-      after: $after
-      search: $search
-      userRoles: $userRoles
-    ) {
+  query MyCompaniesWithDelegators($first: Int, $after: ID, $search: String) {
+    myCompanies(first: $first, after: $after, search: $search) {
       edges {
         node {
           id
@@ -214,7 +204,6 @@ export const GET_MY_COMPANIES = gql`
           name
           orgId
           siret
-          userRole
           companyTypes
         }
       }

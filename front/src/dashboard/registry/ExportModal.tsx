@@ -310,7 +310,8 @@ export function ExportModal({ isOpen, onClose }: Props) {
   } = useQuery<Pick<Query, "registryDelegations">>(REGISTRY_DELEGATIONS, {
     variables: {
       where: {
-        delegatorOrgId: companyOrgId
+        delegatorOrgId: companyOrgId,
+        givenToMe: true
       }
     },
     skip: !isDelegation,
@@ -332,43 +333,6 @@ export function ExportModal({ isOpen, onClose }: Props) {
     reset(getDefaultValues());
     onClose();
   };
-
-  // useEffect(() => {
-  //   const rawCompanies = companiesData?.myCompanies?.edges;
-  //   if (!rawCompanies?.length) {
-  //     setCompanies([]);
-  //     return;
-  //   }
-  //   const tmpCompanies: ExportCompany[] = [];
-  //   rawCompanies.forEach(company => {
-  //     if (
-  //       company.node.userRole !== UserRole.Admin &&
-  //       company.node.userRole !== UserRole.Member &&
-  //       company.node.userRole !== UserRole.Reader
-  //     ) {
-  //       return;
-  //     }
-  //     tmpCompanies.push({
-  //       orgId: company.node.orgId,
-  //       name: company.node.name,
-  //       givenName: company.node.givenName,
-  //       delegate: null,
-  //       companyTypes: company.node.companyTypes
-  //     });
-  //     if (company.node.delegators) {
-  //       company.node.delegators.forEach(delegator => {
-  //         tmpCompanies.push({
-  //           orgId: delegator.orgId,
-  //           name: delegator.name,
-  //           givenName: delegator.givenName,
-  //           delegate: company.node.orgId,
-  //           companyTypes: delegator.companyTypes
-  //         });
-  //       });
-  //     }
-  //   });
-  //   setCompanies(tmpCompanies);
-  // }, [companiesData]);
 
   // get a list of possible export types for the selected company (or all companies) to grey out
   // the export types that are impossible
