@@ -1617,9 +1617,16 @@ type RegistryImportAssociation {
   reportedAs: RegistryCompany!
 }
 
+type RegistryIssue {
+  code: String!
+  message: String!
+  path: String!
+}
+
 type RegistryLineError {
   publicId: String!
   message: String!
+  issues: [RegistryIssue!]!
 }
 
 type AddRegistryLinesStats {
