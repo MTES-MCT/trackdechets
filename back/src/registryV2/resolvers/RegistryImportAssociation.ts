@@ -9,7 +9,7 @@ export const RegistryImportAssociation: RegistryImportAssociationResolvers = {
 
     return {
       siret: company.orgId,
-      name: company.givenName ?? company.name
+      name: company.givenName || company.name
     };
   },
   reportedAs: async parent => {
@@ -19,7 +19,7 @@ export const RegistryImportAssociation: RegistryImportAssociationResolvers = {
 
     return {
       siret: company.orgId,
-      name: company.givenName ?? company.name
+      name: company.givenName || company.name
     };
   }
 };
