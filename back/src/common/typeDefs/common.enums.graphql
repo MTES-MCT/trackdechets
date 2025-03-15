@@ -17,6 +17,8 @@ enum OperationMode {
   RECYCLAGE
   "Valorisation énergétique"
   VALORISATION_ENERGETIQUE
+  "Autres valorisations"
+  AUTRES_VALORISATIONS
   "Incinération sans valorisation énergétique ou stockage en décharge"
   ELIMINATION
   "Aucun mode renseigné. Cas particulier pour des données importées"

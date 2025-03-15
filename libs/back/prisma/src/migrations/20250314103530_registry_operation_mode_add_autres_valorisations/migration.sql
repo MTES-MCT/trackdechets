@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "OperationMode" ADD VALUE 'AUTRES_VALORISATIONS';

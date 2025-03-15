@@ -3,7 +3,6 @@ import {
   refineIsDangerous,
   refineMunicipalities,
   refineGistridNumber,
-  refineOperationMode,
   refineTransportersConsistency
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -27,7 +26,6 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
     .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
-    .superRefine(refineOperationMode)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)

@@ -39,6 +39,10 @@ export const GET_REGISTRY_IMPORTS = gql`
               siret
               name
             }
+            reportedAs {
+              siret
+              name
+            }
           }
         }
       }
