@@ -47,7 +47,3 @@ Vous pouvez également utiliser l'onglet "Variables" pour injecter les variables
 L'onglet de droite "Docs" vous permet de parcourir la référence de l'API. Vous y retrouverez les différentes Query et Mutation disponibles ainsi que les variables et les types de retours. La référence de l'API est également disponible dans la section [Référence API](../reference/api-reference/bsdd/queries.md)
 
 ![playground-docs](../../static/img/playground-docs.png)
-
-## Télécharger le schéma
-
-Vous pouvez télécharger le schéma GraphQL en cliquant sur le panneau latéral "Schema", puis "DOWNLOAD". Le schéma permet notamment de construire des clients grâce à des librairies dans le langage de votre choix. Voir la liste complète des librairies GraphQL sur le site [graphql.org](https://graphql.org/code/).
