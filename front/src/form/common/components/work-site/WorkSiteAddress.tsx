@@ -44,7 +44,8 @@ export default function WorkSiteAddress({
   postalCode,
   onAddressSelection,
   designation,
-  disabled = false
+  disabled = false,
+  titleForRevision = ""
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -102,12 +103,14 @@ export default function WorkSiteAddress({
 
   return (
     <div className="form__row">
-      <label>Adresse {designation}</label>
+      <label>
+        {!titleForRevision ? `Adresse ${designation}` : titleForRevision}
+      </label>
 
       <SearchInput
         id="eco-search"
         placeholder="Recherchez une adresse puis sélectionnez un des choix qui apparait..."
-        className={styles.worksiteSearchInput}
+        className={`${styles.worksiteSearchInput} fr-mb-2w`}
         onChange={e =>
           dispatch({ type: "search_input", payload: e.target.value })
         }
