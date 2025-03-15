@@ -39,8 +39,8 @@ const buildTabs = (
   const isAdmin = company.userRole === UserRole.Admin;
 
   // RNDTS features protected by feature flag
-  const canViewRndtsFeatures =
-    import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
+  const canViewRndtsFeatures = true;
+  import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
     company.featureFlags.includes(REGISTRY_V2_FLAG);
 
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;

@@ -16,21 +16,11 @@ import { BsdaStatus, UserRole } from "@prisma/client";
 import { operationHook } from "../../../../operationHook";
 import { operationHooksQueue } from "../../../../../queue/producers/operationHook";
 import { sendMail } from "../../../../../mailer/mailing";
+import { cleanse } from "../../../../../__tests__/utils";
 
 // No mails
 jest.mock("../../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
-
-// Jest's object matching is too goddam annoying, throwing failures
-// with hard-to-identify hidden spaces / tabs / line breaks
-// Cleanse the strings before asserting on them
-const cleanse = (input: string) => {
-  // Remove all kinds of hidden spaces (tabs, line breaks, etc.)
-  let cleaned = input.replace(/\s+/g, " ");
-  // Convert double spaces to single spaces
-  cleaned = cleaned.replace(/ {2,}/g, " ");
-  return cleaned.trim();
-};
 
 const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
   mutation SubmitBsdaRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
