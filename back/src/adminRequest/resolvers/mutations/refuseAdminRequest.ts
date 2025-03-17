@@ -7,16 +7,15 @@ import type {
 import { GraphQLContext } from "../../../types";
 import { parseMutationRefuseAdminRequestArgs } from "../../validation";
 import { prisma } from "@td/prisma";
-import { ForbiddenError, UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
-import { AdminRequestWithUserAndCompany, fixTyping } from "../typing";
-import { AdminRequestStatus, AdminRequest, UserRole } from "@prisma/client";
+import { fixTyping } from "../typing";
+import { AdminRequestStatus, AdminRequest } from "@prisma/client";
 import {
-  adminRequestRefusedAdminEmail,
-  adminRequestRefusedEmail,
-  renderMail
-} from "@td/mail";
-import { sendMail } from "../../../mailer/mailing";
+  checkCanRefuseAdminRequest,
+  getAdminRequestOrThrow,
+  sendEmailToAuthor,
+  sendEmailToCompanyAdmins
+} from "./utils/refuseAdminRequest.utils";
 
 const refuseAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -32,21 +31,7 @@ const refuseAdminRequest = async (
   // Sync validation of input
   const { adminRequestId } = parseMutationRefuseAdminRequestArgs(args);
 
-  const { findFirst, update } = getAdminRequestRepository(user);
-
-  const adminRequest: AdminRequestWithUserAndCompany | null = (await findFirst(
-    { id: adminRequestId },
-    {
-      include: {
-        company: true,
-        user: true
-      }
-    }
-  )) as unknown as AdminRequestWithUserAndCompany;
-
-  if (!adminRequest) {
-    throw new UserInputError("La demande n'existe pas.");
-  }
+  const adminRequest = await getAdminRequestOrThrow(user, adminRequestId);
 
   const association = await prisma.companyAssociation.findFirst({
     where: {
@@ -55,18 +40,7 @@ const refuseAdminRequest = async (
     }
   });
 
-  // To refuse a request, a user must belong to target company (or be a Trackdéchets admin)
-  if (!user.isAdmin && !association) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à effectuer cette action."
-    );
-  }
-
-  if (adminRequest.status === AdminRequestStatus.ACCEPTED) {
-    throw new UserInputError(
-      `La demande a déjà été acceptée et n'est plus modifiable.`
-    );
-  }
+  await checkCanRefuseAdminRequest(user, adminRequest, association);
 
   // Request has already been refused, exit early
   if (adminRequest.status === AdminRequestStatus.REFUSED) {
@@ -74,6 +48,7 @@ const refuseAdminRequest = async (
   }
 
   // Update the request
+  const { update } = getAdminRequestRepository(user);
   const updatedAdminRequest = await update(
     { id: adminRequestId },
     {
@@ -84,39 +59,10 @@ const refuseAdminRequest = async (
   const { user: author, company } = adminRequest;
 
   // Warn the company's admins
-  const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
-    where: {
-      companyId: adminRequest.companyId,
-      role: UserRole.ADMIN,
-      userId: { not: adminRequest.userId }
-    },
-    include: { user: true }
-  });
-
-  if (adminsCompanyAssociations.length) {
-    const adminMail = renderMail(adminRequestRefusedAdminEmail, {
-      to: adminsCompanyAssociations.map(association => ({
-        email: association.user.email,
-        name: association.user.name
-      })),
-      variables: {
-        company,
-        user: author
-      }
-    });
-
-    await sendMail(adminMail);
-  }
+  await sendEmailToCompanyAdmins(author, company, adminRequest);
 
   // Inform the author by email
-  const mail = renderMail(adminRequestRefusedEmail, {
-    to: [{ email: author.email, name: author.name }],
-    variables: {
-      company
-    }
-  });
-
-  await sendMail(mail);
+  await sendEmailToAuthor(author, company);
 
   return fixTyping(updatedAdminRequest);
 };

@@ -16,6 +16,10 @@ import {
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";
+import { sendAdminRequestVerificationCodeLetter } from "../../../../common/post";
+
+// Mock mail sending service
+jest.mock("../../../../common/post");
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -787,5 +791,105 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
 `;
 
     expect(cleanse(body)).toBe(cleanse(expectedBody));
+  });
+
+  it("should generate a mail code if validationMethod is SEND_MAIL", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(companyAdminRequest.userId).toEqual(user.id);
+    expect(companyAdminRequest.companyId).toEqual(company.id);
+    expect(companyAdminRequest.status).toEqual(AdminRequestStatus.PENDING);
+    expect(companyAdminRequest.validationMethod).toEqual(
+      AdminRequestValidationMethod.SEND_MAIL
+    );
+    expect(companyAdminRequest.code).not.toBeNull();
+    expect(companyAdminRequest.code?.length).toEqual(8);
+  });
+
+  it("should send verification code by mail", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+
+    jest.mock("../../../../common/post");
+    (sendAdminRequestVerificationCodeLetter as jest.Mock).mockImplementation(
+      () => Promise.resolve()
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(
+      sendAdminRequestVerificationCodeLetter as jest.Mock
+    ).toHaveBeenCalledTimes(1);
+
+    const [letterCompany, letterUser, letterCode] = (
+      sendAdminRequestVerificationCodeLetter as jest.Mock
+    ).mock.calls[0];
+
+    expect(letterCompany.orgId).toEqual(company.orgId);
+    expect(letterUser.name).toEqual(user.name);
+    expect(letterCode).toEqual(companyAdminRequest.code);
   });
 });

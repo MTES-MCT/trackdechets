@@ -2125,6 +2125,7 @@ model AdminRequest {
 
   // The code sent by mail to self-validate the request
   code  String? @db.VarChar(8)
+  codeAttempts Int @default(0)
 
   status AdminRequestStatus @default(PENDING)
 
@@ -2135,6 +2136,7 @@ enum AdminRequestStatus {
   PENDING
   ACCEPTED 
   REFUSED
+  BLOCKED
 }
 
 enum AdminRequestValidationMethod {

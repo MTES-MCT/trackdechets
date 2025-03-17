@@ -15,13 +15,13 @@ export const buildCreateAdminRequest = (
   return async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const delegation = await prisma.adminRequest.create({
+    const adminRequest = await prisma.adminRequest.create({
       data
     });
 
     await prisma.event.create({
       data: {
-        streamId: delegation.id,
+        streamId: adminRequest.id,
         actor: user.id,
         type: "AdminRequestCreated",
         data: { content: data } as Prisma.InputJsonObject,
@@ -29,6 +29,6 @@ export const buildCreateAdminRequest = (
       }
     });
 
-    return delegation;
+    return adminRequest;
   };
 };

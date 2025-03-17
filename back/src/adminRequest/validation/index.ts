@@ -45,3 +45,7 @@ export const parseAcceptAdminRequestInput = (
 ) => {
   return acceptAdminRequestInputSchema.parse(input);
 };
+
+export type ParsedAcceptAdminRequestInput = ReturnType<
+  typeof parseAcceptAdminRequestInput
+>;

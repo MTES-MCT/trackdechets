@@ -19,5 +19,15 @@ input AcceptAdminRequestInput {
   """
   L'identifiant unique de la demande
   """
-  adminRequestId: ID!
+  adminRequestId: ID
+
+  """
+  Si le mode de vérification est par courrier, l'utilisateur doit renseigner l'orgId de l'entreprise concernée
+  """
+  orgId: String
+
+  """
+  Si le mode de vérification est par courrier, l'utilisateur doit renseigner le code envoyé
+  """
+  code: String
 }

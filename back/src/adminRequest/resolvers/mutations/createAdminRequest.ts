@@ -18,6 +18,12 @@ import {
   renderMail
 } from "@td/mail";
 import { sendMail } from "../../../mailer/mailing";
+import { sendAdminRequestVerificationCodeLetter } from "../../../common/post";
+
+// Generates an 8 digit code, using only numbers. Can include and start with zeros
+const generateCode = () => {
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
+};
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -96,16 +102,31 @@ const createAdminRequest = async (
     );
   }
 
+  // If validation method is mail, generate a code
+  const code =
+    adminRequestInput.validationMethod ===
+    AdminRequestValidationMethod.SEND_MAIL
+      ? generateCode()
+      : null;
+
   // Create admin request
   const adminRequest = await create(
     {
       user: { connect: { id: user.id } },
       company: { connect: { id: company.id } },
       collaboratorId: collaborator?.id,
-      validationMethod: adminRequestInput.validationMethod
+      validationMethod: adminRequestInput.validationMethod,
+      code
     },
     { include: { company: true } }
   );
+
+  if (
+    adminRequestInput.validationMethod ===
+    AdminRequestValidationMethod.SEND_MAIL
+  ) {
+    await sendAdminRequestVerificationCodeLetter(company, user, code!);
+  }
 
   // Immediately warn the admins by email
   const adminsCompanyAssociations = await prisma.companyAssociation.findMany({

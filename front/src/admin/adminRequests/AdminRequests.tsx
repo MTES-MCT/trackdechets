@@ -21,7 +21,7 @@ import { getStatusBadge } from "../../Apps/Companies/CompanyManage/CompanyAdminR
 export const AdminRequests = () => {
   const [pageIndex, setPageIndex] = useState(0);
 
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 50;
 
   const { data, loading, refetch } = useQuery<
     Pick<Query, "adminRequestsAdmin">,

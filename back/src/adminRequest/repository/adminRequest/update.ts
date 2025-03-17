@@ -16,14 +16,14 @@ export const buildUpdateAdminRequest = (
   return async (where, data, logMetadata) => {
     const { prisma, user } = deps;
 
-    const delegation = await prisma.adminRequest.update({
+    const adminRequest = await prisma.adminRequest.update({
       where,
       data
     });
 
     await prisma.event.create({
       data: {
-        streamId: delegation.id,
+        streamId: adminRequest.id,
         actor: user.id,
         type: "AdminRequestUpdated",
         data: { content: data } as Prisma.InputJsonObject,
@@ -31,6 +31,6 @@ export const buildUpdateAdminRequest = (
       }
     });
 
-    return delegation;
+    return adminRequest;
   };
 };

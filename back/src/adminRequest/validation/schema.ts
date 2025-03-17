@@ -7,7 +7,7 @@ const idSchema = z.coerce.string().length(25, "L'id doit faire 25 caractères.")
 
 export const createAdminRequestInputSchema = z
   .object({
-    companyOrgId: siretSchema(),
+    companyOrgId: siretSchema(), // TODO: orgIdSchema?
     collaboratorEmail: z.string().email().optional(),
     validationMethod: z.enum([
       AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL,
@@ -39,6 +39,25 @@ export const adminRequestIdSchema = z.object({
   adminRequestId: idSchema
 });
 
-export const acceptAdminRequestInputSchema = z.object({
-  adminRequestId: idSchema
-});
+export const acceptAdminRequestInputSchema = z
+  .object({
+    adminRequestId: idSchema.optional(),
+    orgId: siretSchema().optional(), // TODO: orgIdSchema?
+    code: z.string().length(8).optional()
+  })
+  .superRefine(({ adminRequestId, orgId, code }, refinementContext) => {
+    const allParamsAreProvided =
+      isDefined(adminRequestId) && (isDefined(orgId) || isDefined(code));
+    const codeParamsAreIncomplete =
+      (isDefined(orgId) && !isDefined(code)) ||
+      (!isDefined(orgId) && isDefined(code));
+
+    if (allParamsAreProvided || codeParamsAreIncomplete) {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Vous devez soit fournir l'adminRequestId, soit le tuple orgId / code.",
+        path: ["adminRequestId"]
+      });
+    }
+  });

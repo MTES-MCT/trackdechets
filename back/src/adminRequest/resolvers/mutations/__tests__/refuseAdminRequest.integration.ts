@@ -143,6 +143,38 @@ describe("Mutation refuseAdminRequest", () => {
     );
   });
 
+  it("should throw if request has already been blocked", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory();
+    const requestAuthor = await userFactory();
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.BLOCKED,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "refuseAdminRequest">>(
+      REFUSE_ADMIN_REQUEST,
+      {
+        variables: {
+          adminRequestId: adminRequest.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(
+      `La demande a déjà été bloquée et n'est plus modifiable.`
+    );
+  });
+
   it("should refuse pending request", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory();
