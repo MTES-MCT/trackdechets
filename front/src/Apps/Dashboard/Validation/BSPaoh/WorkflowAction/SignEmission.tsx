@@ -105,7 +105,7 @@ function SignEmissionModal({
       <p>
         En tant qu’ <strong>établissement producteur du déchets</strong>, je
         certifie que les informations relatives aux déchets ci-dessus sont
-        exactes et que les déchets:{" "}
+        exactes et que les déchets :{" "}
       </p>
       <ul className="bullets--outside">
         <li>
