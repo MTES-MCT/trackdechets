@@ -346,4 +346,16 @@ describe("<TransporterList />", () => {
       expect(addButtons[1]).not.toBeDisabled();
     }
   );
+
+  test.each([BsdType.Bsdd, BsdType.Bsda, BsdType.Bsff])(
+    "Add button is available when transporters list is empty and bsdType is %p",
+    async bsdType => {
+      render(component([], bsdType));
+      const addButton = screen.getByTitle("Ajouter");
+      expect(addButton).toBeInTheDocument();
+      fireEvent.click(addButton);
+      const transporter1 = await screen.findByText("1 - Transporteur");
+      expect(transporter1).toBeInTheDocument();
+    }
+  );
 });
