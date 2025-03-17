@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.04.1] 08/04/2025
+
+#### :nail_care: Améliorations
+
+- Permettre aux intégrateurs API d'accéder aux délégations registre en lecture [PR 4039](https://github.com/MTES-MCT/trackdechets/pull/4039)
+
 # [2025.03.1] 11/03/2025
 
 #### :rocket: Nouvelles fonctionnalités
