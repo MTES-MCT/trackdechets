@@ -1,5 +1,4 @@
 import { getUserCompanies } from "../../../users/database";
-import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
 import { checkBelongsTo } from "../../permissions";
@@ -10,9 +9,6 @@ import { getPaginatedDelegations } from "./utils/registryDelegations.utils";
 
 const registryDelegationsResolver: QueryResolvers["registryDelegations"] =
   async (_, args, context) => {
-    // Browser only
-    applyAuthStrategies(context, [AuthType.Session]);
-
     // User must be authenticated
     const user = checkIsAuthenticated(context);
 

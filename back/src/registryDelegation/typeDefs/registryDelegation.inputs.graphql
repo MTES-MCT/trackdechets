@@ -1,0 +1,16 @@
+input RegistryDelegationWhere {
+  """
+  Delegate or delegator id. Specify exactly one of them
+  """
+  delegatorOrgId: ID
+  delegateOrgId: ID
+
+  "Permet de récupérer uniquement les délégations actives. Si vide, renvoie toutes les délégations"
+  activeOnly: Boolean
+
+  "Permet de récupérer les délégations données aux entreprises auxqelles j'appartiens"
+  givenToMe: Boolean
+
+  "Permet de filtrer sur les noms des entreprises délégantes"
+  search: String
+}
