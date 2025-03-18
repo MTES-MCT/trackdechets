@@ -30,7 +30,11 @@ import {
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import {
+  getTransporterCompanyOrgId,
+  INCOMING_TEXS_WASTE_CODES,
+  isDangerous
+} from "@td/constants";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -129,6 +133,20 @@ const getQuantity = (packagings: PackagingInfo[]) => {
     (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
     0
   );
+};
+
+const getWasteType = (bsdd: MinimalBsddForLookup): RegistryExportWasteType => {
+  if (!bsdd.wasteDetailsCode) {
+    return RegistryExportWasteType.DND;
+  }
+  if (INCOMING_TEXS_WASTE_CODES.includes(bsdd.wasteDetailsCode)) {
+    return RegistryExportWasteType.TEXS;
+  }
+  return isDangerous(bsdd.wasteDetailsCode) ||
+    bsdd.wasteDetailsPop ||
+    bsdd.wasteDetailsIsDangerous
+    ? RegistryExportWasteType.DD
+    : RegistryExportWasteType.DND;
 };
 
 export const toIncomingWasteV2 = (
@@ -1229,6 +1247,7 @@ const minimalBsddForLookupSelect = {
   traderCompanySiret: true,
   wasteDetailsIsDangerous: true,
   wasteDetailsCode: true,
+  wasteDetailsPop: true,
   transporters: {
     select: {
       id: true,
@@ -1262,9 +1281,7 @@ const bsddToLookupCreateInputs = (
       siret: form.recipientCompanySiret,
       exportRegistryType: RegistryExportType.INCOMING,
       declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: form.wasteDetailsIsDangerous
-        ? RegistryExportWasteType.DD
-        : RegistryExportWasteType.DND,
+      wasteType: getWasteType(form),
       wasteCode: form.wasteDetailsCode,
       ...generateDateInfos(form.receivedAt),
       bsddId: form.id
@@ -1285,9 +1302,7 @@ const bsddToLookupCreateInputs = (
         siret,
         exportRegistryType: RegistryExportType.OUTGOING,
         declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: form.wasteDetailsIsDangerous
-          ? RegistryExportWasteType.DD
-          : RegistryExportWasteType.DND,
+        wasteType: getWasteType(form),
         wasteCode: form.wasteDetailsCode,
         ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
         bsddId: form.id
@@ -1313,9 +1328,7 @@ const bsddToLookupCreateInputs = (
         siret,
         exportRegistryType: RegistryExportType.MANAGED,
         declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: form.wasteDetailsIsDangerous
-          ? RegistryExportWasteType.DD
-          : RegistryExportWasteType.DND,
+        wasteType: getWasteType(form),
         wasteCode: form.wasteDetailsCode,
         ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
         bsddId: form.id
@@ -1341,9 +1354,7 @@ const bsddToLookupCreateInputs = (
       siret: transporterSiret,
       exportRegistryType: RegistryExportType.TRANSPORTED,
       declarationType: RegistryExportDeclarationType.BSD,
-      wasteType: form.wasteDetailsIsDangerous
-        ? RegistryExportWasteType.DD
-        : RegistryExportWasteType.DND,
+      wasteType: getWasteType(form),
       wasteCode: form.wasteDetailsCode,
       ...generateDateInfos(transporter.takenOverAt),
       bsddId: form.id
