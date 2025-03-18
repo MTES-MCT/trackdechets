@@ -7,9 +7,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.04.1] 08/04/2025
 
+#### :nail_care: Améliorations
+
+- Permettre aux intégrateurs API d'accéder aux délégations registre en lecture [PR 4039](https://github.com/MTES-MCT/trackdechets/pull/4039)
+
 #### :memo: Documentation
 
 - Mettre à jour la doc "Utiliser le playground" de la documentation développeur [PR 4034](https://github.com/MTES-MCT/trackdechets/pull/4034)
+
 
 # [2025.03.1] 11/03/2025
 

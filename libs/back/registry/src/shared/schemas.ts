@@ -175,6 +175,8 @@ export const operationModeSchema = enumValueAsStringSchema
             return OperationMode.VALORISATION_ENERGETIQUE;
           case "ELIMINATION":
             return OperationMode.ELIMINATION;
+          case "AUTRES_VALORISATIONS":
+            return OperationMode.AUTRES_VALORISATIONS;
           default:
             throw Error(`Unhandled qualification code: ${val}`);
         }

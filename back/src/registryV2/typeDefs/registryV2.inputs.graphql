@@ -486,7 +486,7 @@ input IncomingWasteLineInput {
   Mode de traitement
   Qualification du traitement correspondant au code de traitement des déchets entrants
   """
-  operationMode: OperationMode!
+  operationMode: OperationMode
   """
   Rupture de traçabilité autorisée
   Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet
@@ -1518,20 +1518,20 @@ input OutgoingTexsLineInput {
   """
   destinationDropSiteCountryCode: String
   """
-  Code de traitement réalisé
-  Code de traitement appliqué aux terres et sédiments ou déchets entrants
+  Code de traitement prévu
+
+  Code de traitement prévu par le destinataire
   """
   operationCode: String!
   """
-  Mode de traitement
-  Qualification du traitement correspondant au code de traitement des terres et sédiments ou des déchets entrants
+  Mode de traitement prévu
 
-  Le mode de traitement est requis si un code de traitement final a été renseigné comme code de traitement.
-  La valeur doit correspondre au code de traitement réalisé ajouté."
+  Qualification du traitement correspondant au code de traitement prévu des terres excavées et sédiments ou déchets sortants
   """
   operationMode: OperationMode
   """
   Terre valorisée
+
   Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
   Si la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination).
@@ -2019,13 +2019,17 @@ input OutgoingWasteLineInput {
   """
   destinationDropSiteCountryCode: String
   """
-  Code de traitement réalisé
-  Code de traitement appliqué aux terres et sédiments ou déchets entrants
+  Code de traitement prévu
+
+  Code de traitement prévu qui va être opéré dans l'installation vers laquelle le déchet est expédié
+
+  Le code de traitement doit obligatoirement appartenir à la liste suivante : D1, D3, D4, D5, D8, D9, D10, D12, D13, D14, D15, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13
   """
   operationCode: String!
   """
-  Mode de traitement
-  Qualification du traitement correspondant au code de traitement des terres et sédiments ou des déchets entrants
+  Mode de traitement prévu
+
+  Qualification du traitement correspondant au code de traitement prévu des déchets sortants
 
   Le mode de traitement est requis si un code de traitement final a été renseigné comme code de traitement.
   La valeur doit correspondre au code de traitement réalisé ajouté."

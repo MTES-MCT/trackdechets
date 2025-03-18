@@ -8,12 +8,13 @@ import {
   isAuthorized,
   saveCompaniesChanges
 } from "@td/registry";
+import type { ZodIssue } from "zod";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
+import { getDelegatorsByDelegateForEachCompanies } from "../../../registryDelegation/database";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getDelegatorsByDelegateForEachCompanies } from "../../../registryDelegation/database";
 
 const LINES_LIMIT = 1_000;
 
@@ -53,7 +54,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     await getDelegatorsByDelegateForEachCompanies(userCompanyIds);
 
   const { safeParseAsync, saveLine } = options;
-  const errors = new Map<string, string>();
+  const errors = new Map<string, ZodIssue[]>();
   const changesByCompany = new Map<
     string,
     { [reportAsSiret: string]: RegistryChanges }
@@ -73,7 +74,9 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
           allowedSirets: userSirets
         })
       ) {
-        errors.set(line.publicId, UNAUTHORIZED_ERROR);
+        errors.set(line.publicId, [
+          { path: [], code: "unauthorized", message: UNAUTHORIZED_ERROR } as any
+        ]);
         continue;
       }
 
@@ -89,12 +92,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         importId: null
       });
     } else {
-      errors.set(
-        line.publicId,
-        result.error.issues
-          .map(issue => `${issue.path}: ${issue.message}`)
-          .join("\n")
-      );
+      errors.set(line.publicId, result.error.issues);
     }
   }
 
@@ -108,9 +106,18 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   return {
     stats,
-    errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
-      message: errors,
-      publicId
+    errors: Array.from(errors.entries()).map(([publicId, issues]) => ({
+      message: issues
+        .map(issue =>
+          [issue.path.join("."), issue.message].filter(Boolean).join(": ")
+        )
+        .join("\n"),
+      publicId,
+      issues: issues.map(({ path, message, code }) => ({
+        path: path.join("."),
+        message,
+        code
+      }))
     }))
   };
 }
