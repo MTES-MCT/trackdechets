@@ -6,6 +6,7 @@ import { endImport, startImport, updateImportStats } from "./database";
 import {
   importOptions,
   ImportType,
+  INTERNAL_ERROR,
   ParsedLine,
   UNAUTHORIZED_ERROR
 } from "./options";
@@ -141,6 +142,7 @@ export async function processStream({
     }
   } catch (err) {
     logger.error(`Error processing import ${importId}`, { importId, err });
+    errorStream.write({ errors: INTERNAL_ERROR });
   } finally {
     errorStream.end();
 
