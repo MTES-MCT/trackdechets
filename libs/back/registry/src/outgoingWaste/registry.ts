@@ -16,19 +16,6 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { OutgoingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
-const getWasteIsDangerous = (
-  outgoingWaste: Pick<
-    RegistryOutgoingWaste,
-    "wasteIsDangerous" | "wastePop" | "wasteCode"
-  >
-) => {
-  return (
-    !!outgoingWaste.wasteIsDangerous ||
-    !!outgoingWaste.wastePop ||
-    isDangerous(outgoingWaste.wasteCode)
-  );
-};
-
 export const toOutgoingWaste = (
   outgoingWaste: RegistryOutgoingWaste
 ): OutgoingWasteV2 => {
@@ -50,7 +37,10 @@ export const toOutgoingWaste = (
     wasteCode: outgoingWaste.wasteCode,
     wasteCodeBale: outgoingWaste.wasteCodeBale,
     wastePop: outgoingWaste.wastePop,
-    wasteIsDangerous: getWasteIsDangerous(outgoingWaste),
+    wasteIsDangerous:
+      !!outgoingWaste.wasteIsDangerous ||
+      !!outgoingWaste.wastePop ||
+      isDangerous(outgoingWaste.wasteCode),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weight: outgoingWaste.weightValue,
@@ -235,7 +225,6 @@ const minimalRegistryForLookupSelect = {
   reportAsCompanySiret: true,
   wasteIsDangerous: true,
   wasteCode: true,
-  wastePop: true,
   dispatchDate: true
 };
 
@@ -253,7 +242,7 @@ const registryToLookupCreateInput = (
     reportAsSiret: registryOutgoingWaste.reportAsCompanySiret,
     exportRegistryType: RegistryExportType.OUTGOING,
     declarationType: RegistryExportDeclarationType.REGISTRY,
-    wasteType: getWasteIsDangerous(registryOutgoingWaste)
+    wasteType: registryOutgoingWaste.wasteIsDangerous
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
     wasteCode: registryOutgoingWaste.wasteCode,
@@ -283,7 +272,7 @@ export const updateRegistryLookup = async (
         // the id changes because a new Registry entry is created on each update
         id: registryOutgoingWaste.id,
         reportAsSiret: registryOutgoingWaste.reportAsCompanySiret,
-        wasteType: getWasteIsDangerous(registryOutgoingWaste)
+        wasteType: registryOutgoingWaste.wasteIsDangerous
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: registryOutgoingWaste.wasteCode,
