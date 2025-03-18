@@ -120,15 +120,14 @@ export async function processStream({
         continue;
       }
 
+      const line = { ...result.data, createdById };
+      await options.saveLine({ line, importId });
+
       incrementLocalChangesForCompany(changesByCompany, {
         reason,
         reportForCompanySiret,
         reportAsCompanySiret: reportAsCompanySiret ?? reportForCompanySiret
       });
-
-      const line = { ...result.data, createdById };
-
-      await options.saveLine({ line, importId });
 
       const now = Date.now();
       if (now - lastStatsUpdate > 5 * 1000) {

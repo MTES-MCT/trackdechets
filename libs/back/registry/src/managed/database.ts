@@ -9,7 +9,7 @@ export async function saveManagedLine({
   line: ParsedZodManagedItem & { createdById: string };
   importId: string | null;
 }) {
-  const { reason, id, ...persistedData } = line;
+  const { reason, id, createdById, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
@@ -18,7 +18,11 @@ export async function saveManagedLine({
           data: { isLatest: false }
         });
         const registryManaged = await tx.registryManaged.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryManaged, id ?? null, tx);
       });
@@ -40,7 +44,11 @@ export async function saveManagedLine({
     default:
       await prisma.$transaction(async tx => {
         const registryManaged = await tx.registryManaged.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryManaged, null, tx);
       });

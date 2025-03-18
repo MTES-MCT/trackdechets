@@ -9,7 +9,7 @@ export async function saveIncomingWasteLine({
   line: ParsedZodIncomingWasteItem & { createdById: string };
   importId: string | null;
 }) {
-  const { reason, id, ...persistedData } = line;
+  const { reason, id, createdById, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
@@ -18,7 +18,11 @@ export async function saveIncomingWasteLine({
           data: { isLatest: false }
         });
         const registryIncomingWaste = await tx.registryIncomingWaste.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryIncomingWaste, id ?? null, tx);
       });
@@ -39,7 +43,11 @@ export async function saveIncomingWasteLine({
     default:
       await prisma.$transaction(async tx => {
         const registryIncomingWaste = await tx.registryIncomingWaste.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryIncomingWaste, null, tx);
       });

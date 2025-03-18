@@ -9,7 +9,7 @@ export async function saveOutgoingTexsLine({
   line: ParsedZodOutgoingTexsItem & { createdById: string };
   importId: string | null;
 }) {
-  const { reason, id, ...persistedData } = line;
+  const { reason, id, createdById, ...persistedData } = line;
   switch (line.reason) {
     case "MODIFIER":
       await prisma.$transaction(async tx => {
@@ -18,7 +18,11 @@ export async function saveOutgoingTexsLine({
           data: { isLatest: false }
         });
         const registryOutgoingTexs = await tx.registryOutgoingTexs.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryOutgoingTexs, id ?? null, tx);
       });
@@ -39,7 +43,11 @@ export async function saveOutgoingTexsLine({
     default:
       await prisma.$transaction(async tx => {
         const registryOutgoingTexs = await prisma.registryOutgoingTexs.create({
-          data: { ...persistedData, importId }
+          data: {
+            ...persistedData,
+            createdBy: { connect: { id: createdById } },
+            importId
+          }
         });
         await lookupUtils.update(registryOutgoingTexs, null, tx);
       });
