@@ -2129,6 +2129,9 @@ model AdminRequest {
   code  String? @db.VarChar(8)
   codeAttempts Int @default(0)
 
+  // End of the period during which only the admin can accept the request
+  adminOnlyEndDate DateTime?
+
   status AdminRequestStatus @default(PENDING)
 
   validationMethod AdminRequestValidationMethod

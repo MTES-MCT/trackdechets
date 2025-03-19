@@ -17,6 +17,7 @@ import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";
 import { sendAdminRequestVerificationCodeLetter } from "../../../../common/post";
+import { getAdminOnlyEndDate } from "../utils/createAdminRequest.utils";
 
 // Mock mail sending service
 jest.mock("../../../../common/post");
@@ -891,5 +892,134 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
     expect(letterCompany.orgId).toEqual(company.orgId);
     expect(letterUser.name).toEqual(user.name);
     expect(letterCode).toEqual(companyAdminRequest.code);
+  });
+
+  it("validation method = SEND_MAIL > should add adminOnlyEndDate", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(companyAdminRequest.adminOnlyEndDate).not.toBeNull();
+    expect(companyAdminRequest.adminOnlyEndDate?.toString()).toBe(
+      getAdminOnlyEndDate().toString()
+    );
+  });
+
+  it("validation method = REQUEST_COLLABORATOR_APPROVAL > should add adminOnlyEndDate", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    await userInCompany("MEMBER", company.id, {
+      email: "collaborator@mail.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: "collaborator@mail.com"
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(companyAdminRequest.adminOnlyEndDate).not.toBeNull();
+    expect(companyAdminRequest.adminOnlyEndDate?.toString()).toBe(
+      getAdminOnlyEndDate().toString()
+    );
+  });
+
+  it("validation method = REQUEST_ADMIN_APPROVAL > should *not* add adminOnlyEndDate", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(companyAdminRequest.adminOnlyEndDate).toBeNull();
   });
 });

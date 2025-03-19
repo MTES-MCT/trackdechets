@@ -12,18 +12,13 @@ import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
-import {
-  adminRequestInitialInfoToAuthorEmail,
-  adminRequestInitialWarningToAdminEmail,
-  renderMail
-} from "@td/mail";
-import { sendMail } from "../../../mailer/mailing";
 import { sendAdminRequestVerificationCodeLetter } from "../../../common/post";
-
-// Generates an 8 digit code, using only numbers. Can include and start with zeros
-const generateCode = () => {
-  return Math.floor(10000000 + Math.random() * 90000000).toString();
-};
+import {
+  generateCode,
+  getAdminOnlyEndDate,
+  sendEmailToAuthor,
+  sendEmailToCompanyAdmins
+} from "./utils/createAdminRequest.utils";
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -109,6 +104,13 @@ const createAdminRequest = async (
       ? generateCode()
       : null;
 
+  // Until this date, only admins can accept the request
+  const adminOnlyEndDate =
+    adminRequestInput.validationMethod !==
+    AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+      ? getAdminOnlyEndDate()
+      : null;
+
   // Create admin request
   const adminRequest = await create(
     {
@@ -116,6 +118,7 @@ const createAdminRequest = async (
       company: { connect: { id: company.id } },
       collaboratorId: collaborator?.id,
       validationMethod: adminRequestInput.validationMethod,
+      adminOnlyEndDate,
       code
     },
     { include: { company: true } }
@@ -129,52 +132,10 @@ const createAdminRequest = async (
   }
 
   // Immediately warn the admins by email
-  const adminsCompanyAssociations = await prisma.companyAssociation.findMany({
-    where: {
-      companyId: company.id,
-      role: UserRole.ADMIN
-    },
-    include: {
-      user: true
-    }
-  });
-
-  if (adminsCompanyAssociations.length) {
-    const mail = renderMail(adminRequestInitialWarningToAdminEmail, {
-      to: adminsCompanyAssociations.map(association => ({
-        email: association.user.email,
-        name: association.user.name
-      })),
-      variables: {
-        company,
-        user,
-        adminRequest,
-        isValidationByCollaboratorApproval:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
-        isValidationByMail:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.SEND_MAIL
-      }
-    });
-
-    await sendMail(mail);
-  }
+  await sendEmailToCompanyAdmins(user, company, adminRequest);
 
   // Send confirmation email to author
-  const mail = renderMail(adminRequestInitialInfoToAuthorEmail, {
-    to: [{ email: user.email, name: user.name }],
-    variables: {
-      company,
-      isValidationByCollaboratorApproval:
-        adminRequest.validationMethod ===
-        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
-      isValidationByMail:
-        adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL
-    }
-  });
-
-  await sendMail(mail);
+  await sendEmailToAuthor(user, company, adminRequest);
 
   return fixTyping(adminRequest);
 };

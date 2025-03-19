@@ -77,6 +77,17 @@ export const checkCanAcceptAdminRequest = async (
     return true;
   }
 
+  // Only admins can accept a request in the initial time period
+  if (
+    adminRequest.adminOnlyEndDate &&
+    new Date().getTime() < new Date(adminRequest.adminOnlyEndDate).getTime() &&
+    (!companyAssociation || companyAssociation?.role !== UserRole.ADMIN)
+  ) {
+    throw new ForbiddenError(
+      "Seuls les administrateurs de l'établissement peuvent approuver la demande à ce stade."
+    );
+  }
+
   // User can validate his own request only if verification mode = mail
   if (
     user.id === adminRequest.userId &&
@@ -99,7 +110,9 @@ export const checkCanAcceptAdminRequest = async (
   }
 
   // Acceptation by mail: code must be correct, 3 attempts max
+  // Company admins can validate with the code though
   if (
+    (!companyAssociation || companyAssociation.role !== UserRole.ADMIN) &&
     adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL &&
     adminRequestInput.code !== adminRequest.code
   ) {

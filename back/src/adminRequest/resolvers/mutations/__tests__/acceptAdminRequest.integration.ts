@@ -16,10 +16,13 @@ import {
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";
+import { getAdminOnlyEndDate } from "../utils/createAdminRequest.utils";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
 
 const ACCEPT_ADMIN_REQUEST = gql`
   mutation acceptAdminRequest($input: AcceptAdminRequestInput!) {
@@ -335,7 +338,8 @@ describe("Mutation acceptAdminRequest", () => {
         user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
         status: AdminRequestStatus.REFUSED,
-        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+        adminOnlyEndDate: yesterday
       }
     });
 
@@ -477,7 +481,8 @@ describe("Mutation acceptAdminRequest", () => {
         user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
         status: AdminRequestStatus.PENDING,
-        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+        adminOnlyEndDate: yesterday
       }
     });
 
@@ -527,7 +532,8 @@ describe("Mutation acceptAdminRequest", () => {
         user: { connect: { id: requestAuthor.id } },
         company: { connect: { id: company.id } },
         status: AdminRequestStatus.PENDING,
-        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+        adminOnlyEndDate: yesterday
       }
     });
 
@@ -819,7 +825,8 @@ describe("Mutation acceptAdminRequest", () => {
           company: { connect: { id: company.id } },
           status: AdminRequestStatus.PENDING,
           validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-          code: "12345678"
+          code: "12345678",
+          adminOnlyEndDate: yesterday
         }
       });
 
@@ -853,7 +860,8 @@ describe("Mutation acceptAdminRequest", () => {
           company: { connect: { id: company.id } },
           status: AdminRequestStatus.PENDING,
           validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-          code: "12345678"
+          code: "12345678",
+          adminOnlyEndDate: yesterday
         }
       });
 
@@ -895,7 +903,8 @@ describe("Mutation acceptAdminRequest", () => {
           company: { connect: { id: company.id } },
           status: AdminRequestStatus.PENDING,
           validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-          code: "12345678"
+          code: "12345678",
+          adminOnlyEndDate: yesterday
         }
       });
 
@@ -943,7 +952,8 @@ describe("Mutation acceptAdminRequest", () => {
           company: { connect: { id: company.id } },
           status: AdminRequestStatus.PENDING,
           validationMethod: AdminRequestValidationMethod.SEND_MAIL,
-          code: "12345678"
+          code: "12345678",
+          adminOnlyEndDate: yesterday
         }
       });
 
@@ -980,6 +990,259 @@ describe("Mutation acceptAdminRequest", () => {
           }
         });
       expect(companyAssociation?.role).toBe(UserRole.ADMIN);
+    });
+  });
+
+  describe("adminOnlyEndDate", () => {
+    it("Trackdéchets admins user can accept request during admin only period", async () => {
+      // Given
+      const { company } = await userWithCompanyFactory();
+      const tdAdmin = await userFactory({ isAdmin: true });
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      const adminRequest = await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+          code: "12345678",
+          adminOnlyEndDate: getAdminOnlyEndDate()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(tdAdmin);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "acceptAdminRequest">
+      >(ACCEPT_ADMIN_REQUEST, {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+    });
+
+    it("verification method = SEND_MAIL > user cannot enter code during admin only period", async () => {
+      // Given
+      const { company } = await userWithCompanyFactory();
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+          code: "12345678",
+          adminOnlyEndDate: getAdminOnlyEndDate()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(requestAuthor);
+      const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+        ACCEPT_ADMIN_REQUEST,
+        {
+          variables: {
+            input: {
+              orgId: company.orgId,
+              code: "12345678"
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Seuls les administrateurs de l'établissement peuvent approuver la demande à ce stade."
+      );
+    });
+
+    it("verification method = SEND_MAIL > admin can approve during admin only period", async () => {
+      // Given
+      const { company, user: admin } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      const adminRequest = await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+          code: "12345678",
+          adminOnlyEndDate: getAdminOnlyEndDate()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(admin);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "acceptAdminRequest">
+      >(ACCEPT_ADMIN_REQUEST, {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+    });
+
+    it("verification method = SEND_MAIL > user can enter code once admin only period is over", async () => {
+      // Given
+      const { company } = await userWithCompanyFactory();
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+          code: "12345678",
+          adminOnlyEndDate: yesterday
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(requestAuthor);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "acceptAdminRequest">
+      >(ACCEPT_ADMIN_REQUEST, {
+        variables: {
+          input: {
+            orgId: company.orgId,
+            code: "12345678"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+    });
+
+    it("verification method = REQUEST_COLLABORATOR_APPROVAL > collaborator cannot accept during admin only period", async () => {
+      // Given
+      const { user: collaborator, company } = await userWithCompanyFactory(
+        UserRole.MEMBER
+      );
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      const adminRequest = await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod:
+            AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+          collaboratorId: collaborator.id,
+          adminOnlyEndDate: getAdminOnlyEndDate()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(collaborator);
+      const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+        ACCEPT_ADMIN_REQUEST,
+        {
+          variables: {
+            input: {
+              adminRequestId: adminRequest.id
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Seuls les administrateurs de l'établissement peuvent approuver la demande à ce stade."
+      );
+    });
+
+    it("verification method = REQUEST_COLLABORATOR_APPROVAL > admins can accept during admin only period", async () => {
+      // Given
+      const { user: collaborator, company } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      const adminRequest = await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod:
+            AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+          collaboratorId: collaborator.id,
+          adminOnlyEndDate: getAdminOnlyEndDate()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(collaborator);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "acceptAdminRequest">
+      >(ACCEPT_ADMIN_REQUEST, {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
+    });
+
+    it("verification method = REQUEST_COLLABORATOR_APPROVAL > collaborator can accept once admin only period is over", async () => {
+      // Given
+      const { user: collaborator, company } = await userWithCompanyFactory(
+        UserRole.MEMBER
+      );
+      const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+      const adminRequest = await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: requestAuthor.id } },
+          company: { connect: { id: company.id } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod:
+            AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+          collaboratorId: collaborator.id,
+          adminOnlyEndDate: yesterday
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(collaborator);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "acceptAdminRequest">
+      >(ACCEPT_ADMIN_REQUEST, {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.acceptAdminRequest.status).toBe(AdminRequestStatus.ACCEPTED);
     });
   });
 });
