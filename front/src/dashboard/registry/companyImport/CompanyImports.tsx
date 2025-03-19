@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Tabs from "@codegouvfr/react-dsfr/Tabs";
 
-import { StatsTab } from "./companyImport/StatsTab";
-import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
+import { StatsTab } from "./StatsTab";
+import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
 
 export function CompanyImports() {
   const [siret, setSiret] = useState<string | undefined>();
