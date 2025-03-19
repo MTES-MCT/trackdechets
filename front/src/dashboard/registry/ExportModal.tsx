@@ -311,7 +311,8 @@ export function ExportModal({ isOpen, onClose }: Props) {
     variables: {
       where: {
         delegatorOrgId: companyOrgId,
-        givenToMe: true
+        givenToMe: true,
+        activeOnly: true
       }
     },
     skip: !isDelegation,
@@ -346,8 +347,6 @@ export function ExportModal({ isOpen, onClose }: Props) {
         RegistryV2ExportType.Ssd
       ];
     }
-    console.log("companiesData", companiesData);
-    console.log("registryDelegationsData", registryDelegationsData);
     const companies = isDelegation
       ? registryDelegationsData?.registryDelegations.edges.map(
           d => d.node.delegator
@@ -363,11 +362,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
         RegistryV2ExportType.Ssd
       ];
     }
-    console.log("selectedCompany", selectedCompany);
-    console.log("isDelegation", isDelegation);
-
     const companyTypes = selectedCompany.companyTypes;
-    console.log("companyTypes", companyTypes);
 
     const exportTypes: RegistryV2ExportType[] = [];
 
@@ -545,8 +540,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
                   {registryDelegationsData.registryDelegations.edges.length ===
                   1 ? (
                     <p className={styles.delegationHint}>
-                      {`Cette déclaration sera faite en tant que délégataire par
-                    l'établissement\n`}
+                      {`L'export ne comprendra que les données déclarées en tant que délégataire pour l'établissement :\n`}
                       <br />
                       <b>
                         {`${
@@ -564,9 +558,9 @@ export function ExportModal({ isOpen, onClose }: Props) {
                   ) : (
                     <>
                       <p className={styles.delegationHint}>
-                        Cet établissement vous a désigné en tant que délégataire
-                        sur plusieurs de vos établissements. Veuillez
-                        sélectionner lequel utiliser pour cette déclaration.
+                        L'export ne comprendra que les données déclarées en tant
+                        que délégataire pour l'établissement à choisir
+                        ci-dessous
                       </p>
                       <div className="fr-mt-4v">
                         <Select
