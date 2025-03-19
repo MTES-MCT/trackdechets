@@ -59,6 +59,22 @@ export function RegistryCompanySwitcher({
     onClickOutside: () => setIsOpen(false)
   });
 
+  const setSelectedCompany = (
+    key,
+    {
+      name,
+      givenName,
+      siret
+    }: {
+      name?: string | null;
+      givenName?: string | null;
+      siret?: string | null;
+    }
+  ) => {
+    setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
+    onCompanySelect(key);
+  };
+
   const { data: myCompaniesData, loading: myCompaniesLoading } = useQuery<
     Pick<Query, "myCompanies">
   >(MY_COMPANIES, {
@@ -69,8 +85,11 @@ export function RegistryCompanySwitcher({
         const firstNode = data.myCompanies.edges.find(({ node }) => node.siret);
 
         if (firstNode) {
-          setSelectedItem(`${firstNode.node.name} ${firstNode.node.siret}`);
-          onCompanySelect(firstNode.node.orgId);
+          setSelectedCompany(firstNode.node.orgId, {
+            name: firstNode.node.name,
+            givenName: firstNode.node.givenName,
+            siret: firstNode.node.siret
+          });
         }
       }
     }
@@ -164,14 +183,20 @@ export function RegistryCompanySwitcher({
           <div
             className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
             onClick={() => {
-              onCompanySelect(allOption.key);
-              setSelectedItem(allOption.name);
+              setSelectedCompany(allOption.key, {
+                name: allOption.name,
+                givenName: null,
+                siret: null
+              });
               setIsOpen(false);
             }}
             onKeyDown={e => {
               if (e.key === "Enter") {
-                onCompanySelect(allOption.key);
-                setSelectedItem(allOption.name);
+                setSelectedCompany(allOption.key, {
+                  name: allOption.name,
+                  givenName: null,
+                  siret: null
+                });
                 setIsOpen(false);
               }
             }}
@@ -184,20 +209,26 @@ export function RegistryCompanySwitcher({
           <div
             className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
             onClick={() => {
-              onCompanySelect(node.orgId);
-              setSelectedItem(`${node.name} ${node.siret}`);
+              setSelectedCompany(node.orgId, {
+                name: node.name,
+                givenName: node.givenName,
+                siret: node.siret
+              });
               setIsOpen(false);
             }}
             onKeyDown={e => {
               if (e.key === "Enter") {
-                onCompanySelect(node.orgId);
-                setSelectedItem(`${node.name} ${node.siret}`);
+                setSelectedCompany(node.orgId, {
+                  name: node.name,
+                  givenName: node.givenName,
+                  siret: node.siret
+                });
                 setIsOpen(false);
               }
             }}
             key={node.orgId}
           >
-            {node.givenName ?? node.name} {node.siret}
+            {node.givenName || node.name} {node.siret}
           </div>
         ))}
         {myCompaniesLoading || delegationsLoading ? (
@@ -214,21 +245,27 @@ export function RegistryCompanySwitcher({
             <div
               className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-flex tw-gap-4 tw-justify-between tw-items-center tw-cursor-pointer"
               onClick={() => {
-                onCompanySelect(delegator.orgId);
-                setSelectedItem(`${delegator.name} ${delegator.orgId}`);
+                setSelectedCompany(delegator.orgId, {
+                  name: delegator.name,
+                  givenName: delegator.givenName,
+                  siret: delegator.orgId
+                });
                 setIsOpen(false);
               }}
               onKeyDown={e => {
                 if (e.key === "Enter") {
-                  onCompanySelect(delegator.orgId);
-                  setSelectedItem(`${delegator.name} ${delegator.orgId}`);
+                  setSelectedCompany(delegator.orgId, {
+                    name: delegator.name,
+                    givenName: delegator.givenName,
+                    siret: delegator.orgId
+                  });
                   setIsOpen(false);
                 }
               }}
               key={delegator.orgId}
             >
               <div>
-                {delegator.name} {delegator.orgId}
+                {delegator.givenName || delegator.name} {delegator.orgId}
               </div>
               <Badge noIcon severity="info">
                 Délégation

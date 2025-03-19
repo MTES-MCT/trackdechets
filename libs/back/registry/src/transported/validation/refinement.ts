@@ -1,9 +1,6 @@
 import { Refinement, z } from "zod";
 import { ParsedZodTransportedItem } from "./schema";
-import {
-  refineActorInfos,
-  refineWeightAndVolume
-} from "../../shared/refinement";
+import { refineActorInfos } from "../../shared/refinement";
 
 export const refineDates: Refinement<ParsedZodTransportedItem> = (
   transportedItem,
@@ -39,22 +36,24 @@ export const refineDestination = refineActorInfos<ParsedZodTransportedItem>({
   countryKey: "destinationCompanyCountryCode"
 });
 
-export const refineVolumeAndWeightIfWaste: Refinement<
-  ParsedZodTransportedItem
-> = (transportedItem, context) => {
-  const uncheckedCodes = [
-    "17 05 03*",
-    "17 05 04",
-    "17 05 05*",
-    "17 05 06",
-    "20 02 02"
-  ];
+export const refineGistridNumber: Refinement<ParsedZodTransportedItem> = (
+  managedItem,
+  { addIssue }
+) => {
+  const isDangerous =
+    managedItem.wasteIsDangerous ||
+    managedItem.wastePop ||
+    managedItem.wasteCode?.includes("*");
 
-  const shouldCheckCode =
-    !transportedItem.wasteCode ||
-    !uncheckedCodes.includes(transportedItem.wasteCode);
+  const isAbroad = ["ENTREPRISE_HORS_UE", "ENTREPRISE_UE"].includes(
+    managedItem.destinationCompanyType
+  );
 
-  if (transportedItem.reportForTransportIsWaste && shouldCheckCode) {
-    refineWeightAndVolume(transportedItem, context);
+  if (!managedItem.gistridNumber && isDangerous && isAbroad) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le numéro de notification ou de déclaration est obligatoire lorsque le déchet est dangereux et que la destination ultérieure est à l'étranger`,
+      path: ["gistrifNumber"]
+    });
   }
 };

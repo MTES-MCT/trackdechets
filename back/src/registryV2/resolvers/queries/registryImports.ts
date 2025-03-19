@@ -52,7 +52,7 @@ export async function registryImports(
     );
 
     const siretsThatCanAccessRegistry = [
-      siret,
+      ...(canReportForSirets.includes(siret) ? [siret] : []),
       ...siretsThatHaveDelegationOnTarget
     ];
 

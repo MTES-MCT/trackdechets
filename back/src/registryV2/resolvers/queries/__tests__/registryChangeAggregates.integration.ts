@@ -9,7 +9,11 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   mutation AddToIncomingTexsRegistry($lines: [IncomingTexsLineInput!]!) {
-    addToIncomingTexsRegistry(lines: $lines)
+    addToIncomingTexsRegistry(lines: $lines) {
+      stats {
+        insertions
+      }
+    }
   }
 `;
 
@@ -75,8 +79,7 @@ function getIncomingTexsLine(siret: string) {
     noTraceability: false,
     nextDestinationIsAbroad: false,
     isUpcycled: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     transporter1TransportMode: "ROAD",

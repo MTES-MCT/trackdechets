@@ -1,17 +1,18 @@
-import { pluralize } from "@td/constants";
-import { prisma } from "@td/prisma";
 import {
   ImportType,
   RegistryChanges,
   UNAUTHORIZED_ERROR,
+  getSumOfChanges,
   importOptions,
   incrementLocalChangesForCompany,
   isAuthorized,
   saveCompaniesChanges
 } from "@td/registry";
+import type { ZodIssue } from "zod";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
+import { getDelegatorsByDelegateForEachCompanies } from "../../../registryDelegation/database";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 
@@ -48,26 +49,12 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   const userSirets = userCompanies.map(company => company.orgId);
   const userCompanyIds = userCompanies.map(company => company.id);
-  const givenDelegations = await prisma.registryDelegation.findMany({
-    where: {
-      delegateId: { in: userCompanyIds },
-      revokedBy: null,
-      cancelledBy: null,
-      startDate: { lte: new Date() },
-      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-    },
-    include: { delegator: { select: { orgId: true } } }
-  });
-  const delegateToDelegatorsMap = givenDelegations.reduce((map, delegation) => {
-    const currentValue = map.get(delegation.delegateId) ?? [];
-    currentValue.push(delegation.delegator.orgId);
 
-    map.set(delegation.delegateId, currentValue);
-    return map;
-  }, new Map<string, string[]>());
+  const delegatorSiretsByDelegateSirets =
+    await getDelegatorsByDelegateForEachCompanies(userCompanyIds);
 
   const { safeParseAsync, saveLine } = options;
-  const errors = new Map<string, string>();
+  const errors = new Map<string, ZodIssue[]>();
   const changesByCompany = new Map<
     string,
     { [reportAsSiret: string]: RegistryChanges }
@@ -82,12 +69,14 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
       if (
         !isAuthorized({
           reportAsCompanySiret,
-          delegateToDelegatorsMap,
+          delegatorSiretsByDelegateSirets,
           reportForCompanySiret,
           allowedSirets: userSirets
         })
       ) {
-        errors.set(line.publicId, UNAUTHORIZED_ERROR);
+        errors.set(line.publicId, [
+          { path: [], code: "unauthorized", message: UNAUTHORIZED_ERROR } as any
+        ]);
         continue;
       }
 
@@ -103,12 +92,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         importId: null
       });
     } else {
-      errors.set(
-        line.publicId,
-        result.error.issues
-          .map(issue => `${issue.path}: ${issue.message}`)
-          .join("\n")
-      );
+      errors.set(line.publicId, result.error.issues);
     }
   }
 
@@ -118,21 +102,22 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
     createdById: user.id
   });
 
-  if (errors.size > 0) {
-    throw new UserInputError(
-      `${errors.size} ${pluralize(
-        "ligne en erreur n'a pas pu être importée",
-        errors.size,
-        "lignes en erreur n'ont pas pu être importées"
-      )}.`,
-      {
-        errors: Array.from(errors.entries()).map(([publicId, errors]) => ({
-          message: errors,
-          publicId
-        }))
-      }
-    );
-  }
+  const stats = getSumOfChanges(changesByCompany, errors.size);
 
-  return true;
+  return {
+    stats,
+    errors: Array.from(errors.entries()).map(([publicId, issues]) => ({
+      message: issues
+        .map(issue =>
+          [issue.path.join("."), issue.message].filter(Boolean).join(": ")
+        )
+        .join("\n"),
+      publicId,
+      issues: issues.map(({ path, message, code }) => ({
+        path: path.join("."),
+        message,
+        code
+      }))
+    }))
+  };
 }

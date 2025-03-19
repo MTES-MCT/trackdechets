@@ -9,6 +9,7 @@ import {
   NotCompanyAdminErrorMsg
 } from "../../../common/errors";
 import { toGqlCompanyPrivate } from "../../converters";
+import { startOfDay, addDays } from "date-fns";
 
 const enableRegistryDndFromBsdResolver: MutationResolvers["enableRegistryDndFromBsd"] =
   async (parent, args, context) => {
@@ -30,7 +31,7 @@ const enableRegistryDndFromBsdResolver: MutationResolvers["enableRegistryDndFrom
     const updatedCompany = await prisma.company.update({
       where: { id: existingCompany.id },
       data: {
-        hasEnabledRegistryDndFromBsdSince: new Date()
+        hasEnabledRegistryDndFromBsdSince: addDays(startOfDay(new Date()), 1)
       }
     });
     return toGqlCompanyPrivate(updatedCompany);

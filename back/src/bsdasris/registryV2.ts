@@ -1,4 +1,8 @@
-import { IncomingWasteV2, OutgoingWasteV2 } from "@td/codegen-back";
+import {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  TransportedWasteV2
+} from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   Prisma,
@@ -11,12 +15,17 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
+  emptyTransportedWasteV2,
   RegistryV2Bsdasri
 } from "../registryV2/types";
 import { getBsdasriSubType } from "../common/subTypes";
 import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 
@@ -107,6 +116,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
@@ -121,6 +132,7 @@ export const toIncomingWasteV2 = (
     initialEmitterCompanyCountry: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
@@ -217,8 +229,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null
@@ -280,6 +291,8 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
@@ -296,6 +309,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry: null,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanyGivenName: null,
@@ -407,8 +421,7 @@ export const toOutgoingWasteV2 = (
     nextDestinationPlannedOperationCodes: null,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -417,11 +430,183 @@ export const toOutgoingWasteV2 = (
   };
 };
 
+export const toTransportedWasteV2 = (
+  bsdasri: RegistryV2Bsdasri
+): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
+  if (!getTransporterCompanyOrgId(bsdasri)) {
+    return null;
+  }
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsdasri.emitterCompanyAddress);
+
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsdasri.destinationCompanyAddress);
+
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    bsdasri.transporterCompanyAddress,
+    bsdasri.transporterCompanyVatNumber
+  );
+
+  return {
+    ...emptyTransportedWasteV2,
+    id: bsdasri.id,
+    source: "BSD",
+    publicId: null,
+    bsdId: bsdasri.id,
+    reportAsSiret: null,
+    createdAt: bsdasri.createdAt,
+    updatedAt: bsdasri.updatedAt,
+    transporterTakenOverAt:
+      bsdasri.transporterTakenOverAt ??
+      bsdasri.transporterTransportSignatureDate,
+    unloadingDate: null,
+    destinationReceptionDate: bsdasri.destinationReceptionDate,
+    bsdType: "BSDASRI",
+    bsdSubType: getBsdasriSubType(bsdasri),
+    customId: null,
+    status: bsdasri.status,
+    wasteDescription: bsdasri.wasteCode
+      ? getWasteDescription(bsdasri.wasteCode)
+      : "",
+    wasteCode: bsdasri.wasteCode,
+    wasteCodeBale: null,
+    wastePop: false,
+    wasteIsDangerous: true,
+    weight: bsdasri.emitterWasteWeightValue
+      ? bsdasri.emitterWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
+    weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
+    volume: null,
+
+    emitterCompanyIrregularSituation: null,
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
+    emitterCompanyName: bsdasri.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bsdasri.emitterCompanyMail,
+
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
+    emitterPickupsiteAddress: bsdasri.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bsdasri.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bsdasri.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bsdasri.emitterPickupSiteAddress ? "FR" : null,
+
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+
+    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret,
+    ecoOrganismeName: bsdasri.ecoOrganismeName,
+
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
+    brokerRecepisseNumber: null,
+    brokerCompanyMail: null,
+
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    traderRecepisseNumber: null,
+    traderCompanyMail: null,
+
+    transporter1CompanySiret: getTransporterCompanyOrgId(bsdasri),
+    transporter1CompanyName: bsdasri.transporterCompanyName,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted: bsdasri.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: bsdasri.transporterRecepisseNumber,
+    transporter1TransportMode: bsdasri.transporterTransportMode,
+    transporter1CompanyMail: bsdasri.transporterCompanyMail,
+    transporter1TransportPlates: bsdasri.transporterTransportPlates,
+
+    wasteAdr: bsdasri.wasteAdr,
+    nonRoadRegulationMention: null,
+    destinationCap: null,
+
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
+    destinationCompanyName: bsdasri.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bsdasri.destinationCompanyMail,
+
+    destinationDropSiteAddress: null,
+    destinationDropSitePostalCode: null,
+    destinationDropSiteCity: null,
+    destinationDropSiteCountryCode: null,
+
+    destinationReceptionAcceptationStatus:
+      bsdasri.destinationReceptionAcceptationStatus,
+    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
+      ? bsdasri.destinationReceptionWasteWeightValue
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
+    destinationReceptionAcceptedWeight:
+      bsdasri.destinationReceptionWasteWeightValue
+        ? bsdasri.destinationReceptionWasteRefusedWeightValue
+          ? bsdasri.destinationReceptionWasteWeightValue
+              .minus(bsdasri.destinationReceptionWasteRefusedWeightValue)
+              .dividedBy(1000)
+              .toDecimalPlaces(6)
+              .toNumber()
+          : bsdasri.destinationReceptionWasteWeightValue
+              .dividedBy(1000)
+              .toDecimalPlaces(6)
+              .toNumber()
+        : null,
+    destinationReceptionRefusedWeight:
+      bsdasri.destinationReceptionWasteRefusedWeightValue
+        ? bsdasri.destinationReceptionWasteRefusedWeightValue
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : null,
+    destinationHasCiterneBeenWashedOut: null,
+
+    gistridNumber: null,
+    movementNumber: null
+  };
+};
+
 const minimalBsdasriForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   transporterTransportSignatureDate: true,
+  transporterTakenOverAt: true,
+  transporterCompanySiret: true,
+  transporterCompanyVatNumber: true,
   emitterCompanySiret: true,
   ecoOrganismeSiret: true,
   wasteCode: true
@@ -447,7 +632,10 @@ const bsdasriToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsdasri.wasteCode,
-      ...generateDateInfos(bsdasri.destinationReceptionSignatureDate),
+      ...generateDateInfos(
+        bsdasri.destinationReceptionDate ??
+          bsdasri.destinationReceptionSignatureDate
+      ),
       bsdasriId: bsdasri.id
     });
   }
@@ -468,10 +656,30 @@ const bsdasriToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsdasri.wasteCode,
-        ...generateDateInfos(bsdasri.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          bsdasri.transporterTakenOverAt ??
+            bsdasri.transporterTransportSignatureDate!
+        ),
         bsdasriId: bsdasri.id
       });
     });
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
+    if (transporterCompanyOrgId) {
+      res.push({
+        id: bsdasri.id,
+        readableId: bsdasri.id,
+        siret: transporterCompanyOrgId,
+        exportRegistryType: RegistryExportType.TRANSPORTED,
+        declarationType: RegistryExportDeclarationType.BSD,
+        wasteType: RegistryExportWasteType.DD,
+        wasteCode: bsdasri.wasteCode,
+        ...generateDateInfos(
+          bsdasri.transporterTakenOverAt ??
+            bsdasri.transporterTransportSignatureDate!
+        ),
+        bsdasriId: bsdasri.id
+      });
+    }
   }
   return res;
 };
@@ -502,21 +710,32 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSDASRI");
   await prisma.registryLookup.deleteMany({
     where: {
       bsdasriId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.bsdasri.count({
+    where: {
+      isDeleted: false,
+      isDraft: false
+    }
+  });
+
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.bsdasri.findMany({
       where: {
         isDeleted: false,
         isDraft: false
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -530,14 +749,19 @@ export const rebuildRegistryLookup = async () => {
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

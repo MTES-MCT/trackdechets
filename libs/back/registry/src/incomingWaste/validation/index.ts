@@ -3,10 +3,9 @@ import {
   refineFollowingTraceabilityInfos,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationMode,
   refineTransportersConsistency,
-  refineWeightAndVolume,
   refineWeightIsEstimate
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -20,7 +19,8 @@ import {
   transporter3Refinement,
   transporter4Refinement,
   transporter5Refinement,
-  refineReportForProfile
+  refineReportForProfile,
+  refineWeightAndVolume
 } from "./refinement";
 import { incomingWasteSchema } from "./schema";
 import { transformAndRefineReason } from "./transform";
@@ -33,7 +33,7 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineWeightAndVolume)
     .superRefine(refineWeightIsEstimate)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
     .superRefine(refineOperationMode)

@@ -157,7 +157,7 @@ export const operationModeSchema = enumValueAsStringSchema
           "RECYCLAGE",
           "VALORISATION_ENERGETIQUE",
           "ELIMINATION",
-          "AUTRES VALORISATIONS"
+          "AUTRES_VALORISATIONS"
         ],
         {
           required_error: "Le code de qualification est requis",
@@ -175,6 +175,8 @@ export const operationModeSchema = enumValueAsStringSchema
             return OperationMode.VALORISATION_ENERGETIQUE;
           case "ELIMINATION":
             return OperationMode.ELIMINATION;
+          case "AUTRES_VALORISATIONS":
+            return OperationMode.AUTRES_VALORISATIONS;
           default:
             throw Error(`Unhandled qualification code: ${val}`);
         }
@@ -327,22 +329,12 @@ export const municipalitiesNamesSchema = z.union([
   municipalitiesNamesArraySchema
 ]);
 
-export const declarationNumberSchema = z
+export const gistridNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
-    v => /^A7[EI][0-9]{10}$/.test(v),
-    "Le numéro de déclaration GISTRID ne respecte pas le format attendu"
-  )
-
-  .nullish();
-
-export const notificationNumberSchema = z
-  .string()
-  .transform(v => v.replace(/\s+/g, ""))
-  .refine(
-    v => /^[A-Z]{2}[0-9]{10}$/.test(v),
-    "Le numéro de notification GISTRID ne respecte pas le format attendu"
+    v => /^[A-Z]{2}[0-9]{10}$/.test(v) || /^A7[EI][0-9]{10}$/.test(v),
+    "Le numéro de notification ou de déclaration GISTRID ne respecte pas le format attendu"
   )
   .nullish();
 

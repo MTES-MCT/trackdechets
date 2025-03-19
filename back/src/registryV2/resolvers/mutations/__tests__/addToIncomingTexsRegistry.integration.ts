@@ -9,7 +9,19 @@ import makeClient from "../../../../__tests__/testClient";
 
 const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
   mutation AddToIncomingTexsRegistry($lines: [IncomingTexsLineInput!]!) {
-    addToIncomingTexsRegistry(lines: $lines)
+    addToIncomingTexsRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -62,8 +74,7 @@ function getCorrectLine(siret: string) {
     noTraceability: false,
     nextDestinationIsAbroad: false,
     isUpcycled: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     transporter1TransportMode: "ROAD",
@@ -165,7 +176,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several incoming texs items", async () => {
@@ -181,7 +192,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit an incoming texs item in one go", async () => {
@@ -197,7 +208,8 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
+    expect(data.addToIncomingTexsRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryIncomingTexs.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }
@@ -218,7 +230,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -241,7 +253,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -264,7 +276,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToIncomingTexsRegistry).toBe(true);
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
 
     const changeAggregates = await prisma.registryChangeAggregate.findMany({
       where: { createdById: user.id }
@@ -272,5 +284,81 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     expect(changeAggregates.length).toBe(1);
     expect(changeAggregates[0].numberOfInsertions).toBe(100);
+  });
+
+  it("should work if the current user has delegation rights on the reportFor siret", async () => {
+    const { company } = await userWithCompanyFactory();
+    const { user, company: delegateCompany } = await userWithCompanyFactory();
+
+    await prisma.registryDelegation.create({
+      data: {
+        startDate: new Date(),
+        delegateId: delegateCompany.id,
+        delegatorId: company.id
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () => ({
+      ...getCorrectLine(company.siret!),
+      reportAsCompanySiret: delegateCompany.orgId
+    }));
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry.stats.insertions).toBe(100);
+  });
+
+  it("should fail if the current user does not belong to or have delegation rights on the reportFor siret", async () => {
+    const { company } = await userWithCompanyFactory();
+    const { user } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () =>
+      getCorrectLine(company.siret!)
+    );
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry.stats.errors).toBe(100);
+    expect(data.addToIncomingTexsRegistry.errors![0].message).toBe(
+      "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours"
+    );
+  });
+
+  it("should allow to edit a line that has been cancelled before", async () => {
+    const { user, company } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const line = getCorrectLine(company.orgId);
+
+    // First create
+    const res1 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [line] } }
+    );
+    expect(res1.data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
+
+    // Then cancel
+    const res2 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [{ ...line, reason: "CANCEL" }] } }
+    );
+    expect(res2.data.addToIncomingTexsRegistry.stats.cancellations).toBe(1);
+
+    // Then edit
+    const res3 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines: [{ ...line, reason: "EDIT" }] } }
+    );
+    expect(res3.data.addToIncomingTexsRegistry.stats.edits).toBe(1);
   });
 });

@@ -3,7 +3,7 @@ import {
   refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
+  refineGistridNumber,
   refineOperationCodeWhenUpcycled,
   refineTransportersConsistency,
   requiredParcelsRefinement
@@ -26,7 +26,7 @@ export function safeParseAsyncOutgoingTexs(line: unknown) {
   return outgoingTexsSchema
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
     .superRefine(parcelRefinement)

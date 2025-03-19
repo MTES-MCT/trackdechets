@@ -159,8 +159,7 @@ model RegistryIncomingWaste {
     operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     nextOperationCode                      String?
     isDirectSupply                         Boolean?
@@ -286,8 +285,7 @@ model RegistryIncomingTexs {
     operationMode                          OperationMode?
     noTraceability                         Boolean?
     nextDestinationIsAbroad                Boolean?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     nextOperationCode                      String?
     isUpcycled                             Boolean?
@@ -414,8 +412,7 @@ model RegistryOutgoingTexs {
     destinationParcelInseeCodes            String[]
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     ecoOrganismeSiret                      String?
     ecoOrganismeName                       String?
@@ -534,8 +531,7 @@ model RegistryOutgoingWaste {
     destinationDropSitePostalCode          String?
     destinationDropSiteCity                String?
     destinationDropSiteCountryCode         String?
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     operationCode                          String
     operationMode                          OperationMode?
@@ -635,8 +631,8 @@ model RegistryTransported {
     wasteCodeBale                  String?
     wastePop                       Boolean?
     wasteIsDangerous               Boolean?
-    collectionDate                 DateTime?     @db.Timestamptz(6)
-    unloadingDate                  DateTime?     @db.Timestamptz(6)
+    collectionDate                 DateTime      @db.Timestamptz(6)
+    unloadingDate                  DateTime      @db.Timestamptz(6)
     weightValue                    Float
     weightIsEstimate               Boolean
     volume                         Float?
@@ -663,8 +659,7 @@ model RegistryTransported {
     destinationDropSitePostalCode  String?
     destinationDropSiteCity        String?
     destinationDropSiteCountryCode String?
-    declarationNumber              String?
-    notificationNumber             String?
+    gistridNumber                  String?
     movementNumber                 String?
     ecoOrganismeSiret              String?
     ecoOrganismeName               String?
@@ -674,6 +669,8 @@ model RegistryTransported {
     traderCompanySiret             String?
     traderCompanyName              String?
     traderRecepisseNumber          String?
+
+    registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
@@ -742,8 +739,7 @@ model RegistryManaged {
     destinationParcelInseeCodes            String[]
     destinationParcelNumbers               String[]
     destinationParcelCoordinates           String[]
-    declarationNumber                      String?
-    notificationNumber                     String?
+    gistridNumber                          String?
     movementNumber                         String?
     operationCode                          String
     operationMode                          OperationMode?
@@ -812,6 +808,8 @@ model RegistryManaged {
     transporter5CompanyPostalCode          String?
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
+
+    registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
@@ -915,6 +913,12 @@ model RegistryLookup {
 
     registryOutgoingTexsId String?
     registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id], onDelete: Cascade)
+
+    registryTransportedId String?
+    registryTransported   RegistryTransported? @relation(fields: [registryTransportedId], references: [id], onDelete: Cascade)
+
+    registryManagedId String?
+    registryManaged   RegistryManaged? @relation(fields: [registryManagedId], references: [id], onDelete: Cascade)
 
     // foreign keys to BSD models
     bsddId    String?

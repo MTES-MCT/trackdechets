@@ -7,9 +7,14 @@ import {
   RegistryIncomingTexs
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "../lookup/utils";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
+import { isDangerous } from "@td/constants";
 
 export const toIncomingWaste = (
   incomingTexs: RegistryIncomingTexs
@@ -32,10 +37,15 @@ export const toIncomingWaste = (
     status: null,
     wasteDescription: incomingTexs.wasteDescription,
     wasteCode: incomingTexs.wasteCode,
-    wasteIsDangerous: incomingTexs.wasteIsDangerous,
+    wasteIsDangerous:
+      !!incomingTexs.wasteIsDangerous ||
+      !!incomingTexs.wastePop ||
+      isDangerous(incomingTexs.wasteCode),
     wastePop: incomingTexs.wastePop,
     wasteCodeBale: incomingTexs.wasteCodeBale,
     weight: null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName: incomingTexs.initialEmitterCompanyName,
     initialEmitterCompanySiret: incomingTexs.initialEmitterCompanyOrgId,
     initialEmitterCompanyAddress: incomingTexs.initialEmitterCompanyAddress,
@@ -46,6 +56,7 @@ export const toIncomingWaste = (
     initialEmitterMunicipalitiesInseeCodes:
       incomingTexs.initialEmitterMunicipalitiesInseeCodes,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: incomingTexs.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: incomingTexs.emitterCompanyOrgId,
@@ -169,9 +180,8 @@ export const toIncomingWaste = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingTexs.noTraceability,
-    declarationNumber: incomingTexs.declarationNumber,
+    gistridNumber: incomingTexs.gistridNumber,
     movementNumber: incomingTexs.movementNumber,
-    notificationNumber: incomingTexs.notificationNumber,
     nextOperationCode: incomingTexs.nextOperationCode,
     isUpcycled: incomingTexs.isUpcycled,
     destinationParcelInseeCodes: incomingTexs.destinationParcelInseeCodes,
@@ -216,34 +226,27 @@ export const updateRegistryLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryIncomingTexsId) {
-    // note for future implementations:
-    // if there is a possibility that the siret changes between updates (BSDs),
-    // you should use an upsert.
-    // This is because the index would point to an empty lookup in that case, so we need to create it.
-    // the cleanup method will remove the lookup with the old siret afterward
-    await tx.registryLookup.update({
+    await tx.registryLookup.upsert({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
-        // this is not strictly necessary on SSDs since they only appear in one export registry, for one siret
-        // but is necessary on other types of registries that appear for multiple actors/ export registries
         idExportTypeAndSiret: {
           id: oldRegistryIncomingTexsId,
           exportRegistryType: RegistryExportType.INCOMING,
           siret: registryIncomingTexs.reportForCompanySiret
         }
       },
-      data: {
+      update: {
         // only those properties can change during an update
-        // the id changes because a new RegistrySsd entry is created on each update
+        // the id changes because a new Registry entry is created on each update
         id: registryIncomingTexs.id,
         reportAsSiret: registryIncomingTexs.reportAsCompanySiret,
         wasteCode: registryIncomingTexs.wasteCode,
         ...generateDateInfos(registryIncomingTexs.receptionDate),
         registryIncomingTexsId: registryIncomingTexs.id
       },
+      create: registryToLookupCreateInput(registryIncomingTexs),
       select: {
-        // lean selection to improve performances
         id: true
       }
     });
@@ -251,29 +254,37 @@ export const updateRegistryLookup = async (
     await tx.registryLookup.create({
       data: registryToLookupCreateInput(registryIncomingTexs),
       select: {
-        // lean selection to improve performances
         id: true
       }
     });
   }
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("INCOMING_TEXS");
   await prisma.registryLookup.deleteMany({
     where: {
       registryIncomingTexsId: { not: null }
     }
   });
-  // reindex registrySSD
+  logger.logDelete();
+
+  const total = await prisma.registryIncomingTexs.count({
+    where: {
+      isCancelled: false,
+      isLatest: true
+    }
+  });
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.registryIncomingTexs.findMany({
       where: {
         isCancelled: false,
         isLatest: true
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -286,14 +297,18 @@ export const rebuildRegistryLookup = async () => {
         registryToLookupCreateInput(registryIncomingTexs)
     );
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

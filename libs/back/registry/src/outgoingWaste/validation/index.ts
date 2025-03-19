@@ -2,10 +2,8 @@ import {
   refineEcoOrgBrokerAndTrader,
   refineIsDangerous,
   refineMunicipalities,
-  refineNotificationNumber,
-  refineOperationMode,
-  refineTransportersConsistency,
-  refineWeightAndVolume
+  refineGistridNumber,
+  refineTransportersConsistency
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -24,12 +22,10 @@ import { transformAndRefineReason } from "./transform";
 export function safeParseAsyncOutgoingWaste(line: unknown) {
   return outgoingWasteSchema
     .superRefine(refineIsDangerous)
-    .superRefine(refineWeightAndVolume)
     .superRefine(refineMunicipalities)
-    .superRefine(refineNotificationNumber)
+    .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
-    .superRefine(refineOperationMode)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)

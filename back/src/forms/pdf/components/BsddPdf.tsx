@@ -983,7 +983,9 @@ export function BsddPdf({
                 </p>
                 <AcceptationFields
                   {...form.temporaryStorageDetail?.temporaryStorer}
-                  signedAt={form.signedAt} //check this
+                  signedAt={
+                    form.temporaryStorageDetail?.temporaryStorer?.signedAt
+                  }
                 />
                 <p>
                   Nom :{" "}

@@ -1113,19 +1113,6 @@ export const validatePlates = (transporterNumberPlate: string) => {
   return true;
 };
 
-// Schema dedicated to validate plates on signTransportForm SIGNED_BY_TEMP_STORER
-export const plateSchemaFn = () =>
-  yup.object({
-    transporterNumberPlate: yup
-      .string()
-      .nullable()
-      .test(transporterNumberPlate => {
-        return transporterNumberPlate
-          ? validatePlates(transporterNumberPlate)
-          : true;
-      })
-  });
-
 export const transporterSchemaFn: FactorySchemaOf<
   Pick<FormValidationContext, "signingTransporterOrgId">,
   Transporter
@@ -1139,7 +1126,8 @@ export const transporterSchemaFn: FactorySchemaOf<
         const {
           transporterTransportMode,
           transporterCompanySiret,
-          transporterCompanyVatNumber
+          transporterCompanyVatNumber,
+          takenOverAt
         } = ctx.parent;
 
         if (
@@ -1159,6 +1147,10 @@ export const transporterSchemaFn: FactorySchemaOf<
           return true;
         }
 
+        // Skip if already takenOver, useful for the multimodal because validation may be re-applied on already taken over transporters
+        if (takenOverAt) {
+          return true;
+        }
         return validatePlates(transporterNumberPlate);
       }),
     transporterCompanyName: yup

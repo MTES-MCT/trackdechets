@@ -389,17 +389,16 @@ describe("Process registry import job", () => {
     });
 
     it("should work if the current user has delegation rights on the reportFor siret", async () => {
-      const fileKey = "missing-colon.csv";
+      const fileKey = "delegation.csv";
       const { company } = await userWithCompanyFactory("ADMIN", {
         companyTypes: { set: ["RECOVERY_FACILITY"] }
       });
-      const { user, company: delegationCompany } =
-        await userWithCompanyFactory();
+      const { user, company: delegateCompany } = await userWithCompanyFactory();
 
       await prisma.registryDelegation.create({
         data: {
           startDate: new Date(),
-          delegateId: delegationCompany.id,
+          delegateId: delegateCompany.id,
           delegatorId: company.id
         }
       });
@@ -413,7 +412,7 @@ describe("Process registry import job", () => {
       s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
       s3Stream.end(
         Object.values(
-          getCorrectLine(company.orgId, delegationCompany.orgId)
+          getCorrectLine(company.orgId, delegateCompany.orgId)
         ).join(";") + "\n"
       );
 
@@ -422,7 +421,7 @@ describe("Process registry import job", () => {
       const registryImport = await prisma.registryImport.create({
         data: {
           s3FileKey: fileKey,
-          originalFileName: "missing-column.csv",
+          originalFileName: fileKey,
           type: "SSD",
           status: "PENDING",
           createdById: user.id
@@ -441,11 +440,11 @@ describe("Process registry import job", () => {
         where: { id: registryImport.id }
       });
 
-      expect(result.status).toBe("FAILED");
-      expect(result.numberOfInsertions).toBe(0);
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
       expect(result.numberOfCancellations).toBe(0);
       expect(result.numberOfEdits).toBe(0);
-      expect(result.numberOfErrors).toBe(1);
+      expect(result.numberOfErrors).toBe(0);
     });
 
     it("should fail if the uploaded file is not in a valid format", async () => {

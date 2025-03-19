@@ -13,6 +13,7 @@ import { format } from "date-fns";
 import { parse } from "node:path";
 
 import { getUserCompanies } from "../../users/database";
+import { getDelegatorsByDelegateForEachCompanies } from "../../registryDelegation/database";
 
 export type RegistryImportJobArgs = {
   importId: string;
@@ -77,23 +78,8 @@ export async function processRegistryImportJob(
   const allowedSirets = creatorCompanies.map(company => company.orgId);
   const allowedCompanyIds = creatorCompanies.map(company => company.id);
 
-  const givenDelegations = await prisma.registryDelegation.findMany({
-    where: {
-      delegateId: { in: allowedCompanyIds },
-      revokedBy: null,
-      cancelledBy: null,
-      startDate: { lte: new Date() },
-      OR: [{ endDate: null }, { endDate: { gt: new Date() } }]
-    },
-    include: { delegator: { select: { orgId: true } } }
-  });
-  const delegateToDelegatorsMap = givenDelegations.reduce((map, delegation) => {
-    const currentValue = map.get(delegation.delegateId) ?? [];
-    currentValue.push(delegation.delegator.orgId);
-
-    map.set(delegation.delegateId, currentValue);
-    return map;
-  }, new Map<string, string[]>());
+  const delegatorSiretsByDelegateSirets =
+    await getDelegatorsByDelegateForEachCompanies(allowedCompanyIds);
 
   const parsedOriginalFileName = parse(registryImport.originalFileName);
   const { s3Stream: outputErrorStream, upload } = getUploadWithWritableStream({
@@ -114,7 +100,7 @@ export async function processRegistryImportJob(
     outputErrorStream,
     createdById: registryImport.createdById,
     allowedSirets,
-    delegateToDelegatorsMap
+    delegatorSiretsByDelegateSirets
   });
 
   if (stats.errors > 0) {

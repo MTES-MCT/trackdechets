@@ -120,7 +120,7 @@ module.exports = {
       {
         id: "user-company",
         schema:
-          "../../back/src/{scalars,common,users,companies}/typeDefs/*.graphql",
+          "../../back/src/{scalars,common,users,companies,registryDelegation}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/user-company"
       }
     ],

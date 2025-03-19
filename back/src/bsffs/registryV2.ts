@@ -1,4 +1,8 @@
-import { IncomingWasteV2, OutgoingWasteV2 } from "@td/codegen-back";
+import {
+  IncomingWasteV2,
+  OutgoingWasteV2,
+  TransportedWasteV2
+} from "@td/codegen-back";
 import Decimal from "decimal.js";
 import {
   BsffPackaging,
@@ -17,12 +21,17 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
+  emptyTransportedWasteV2,
   RegistryV2Bsff
 } from "../registryV2/types";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { splitAddress } from "../common/addresses";
 import { getBsffSubType } from "../common/subTypes";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "@td/registry";
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 
@@ -322,6 +331,8 @@ export const toIncomingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
@@ -333,6 +344,7 @@ export const toIncomingWasteV2 = (
     initialEmitterCompanyCountry,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanyGivenName: null,
     emitterCompanySiret: bsff.emitterCompanySiret,
@@ -381,8 +393,7 @@ export const toIncomingWasteV2 = (
     destinationOperationModes,
     // >switch to array and destinationOperationModes?
     destinationOperationNoTraceability: false,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null,
@@ -555,10 +566,11 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
     weight: bsff.weightValue
       ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    weightIsEstimate: bsff.weightIsEstimate,
     volume: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -568,6 +580,7 @@ export const toOutgoingWasteV2 = (
     initialEmitterCompanyCountry,
     initialEmitterMunicipalitiesInseeCodes: null,
     emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
     emitterCompanySiret: bsff.emitterCompanySiret,
     emitterCompanyName: bsff.emitterCompanyName,
     emitterCompanyGivenName: null,
@@ -710,8 +723,7 @@ export const toOutgoingWasteV2 = (
     destinationFinalOperationCompanySirets,
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
-    declarationNumber: null,
-    notificationNumber: null,
+    gistridNumber: null,
     movementNumber: null,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
@@ -720,9 +732,272 @@ export const toOutgoingWasteV2 = (
   };
 };
 
+export const toTransportedWasteV2 = (
+  bsff: RegistryV2Bsff,
+  targetSiret: string
+): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
+  const transporters = getTransportersSync(bsff);
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+  const targetTransporter = transporters.find(
+    t => getTransporterCompanyOrgId(t) === targetSiret
+  );
+  const transporterTakenOverAt =
+    targetTransporter?.transporterTransportTakenOverAt ??
+    targetTransporter?.transporterTransportSignatureDate ?? // in case takenOverAt is null, failover to signature date
+    transporter?.transporterTransportTakenOverAt ?? // in case we don't find the target transporter, failover to the first transporter
+    transporter?.transporterTransportSignatureDate;
+
+  // there should always be a transporter on this type of export, but since
+  // the type doesn't know it, and we could get a weird DB state, we check that we have a date
+  if (!transporterTakenOverAt) {
+    return null;
+  }
+
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsff.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsff.emitterCompanyAddress);
+
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
+  const {
+    destinationReceptionAcceptationStatus,
+    destinationReceptionWeight,
+    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight
+  } = toBsffDestination(bsff.packagings);
+
+  return {
+    ...emptyTransportedWasteV2,
+    id: bsff.id,
+    source: "BSD",
+    publicId: null,
+    bsdId: bsff.id,
+    reportAsSiret: null,
+    createdAt: bsff.createdAt,
+    updatedAt: bsff.updatedAt,
+    transporterTakenOverAt,
+    unloadingDate: null,
+    destinationReceptionDate: bsff.destinationReceptionDate,
+    bsdType: "BSFF",
+    bsdSubType: getBsffSubType(bsff),
+    customId: null,
+    status: bsff.status,
+    wasteDescription: bsff.wasteDescription,
+    wasteCode: bsff.wasteCode,
+    wasteCodeBale: null,
+    wastePop: false,
+    wasteIsDangerous: true,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
+    weightIsEstimate: false,
+    volume: null,
+
+    emitterCompanyIrregularSituation: null,
+    emitterCompanySiret: bsff.emitterCompanySiret,
+    emitterCompanyName: bsff.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bsff.emitterCompanyMail,
+
+    emitterPickupsiteName: null,
+    emitterPickupsiteAddress: null,
+    emitterPickupsitePostalCode: null,
+    emitterPickupsiteCity: null,
+    emitterPickupsiteCountry: null,
+
+    workerCompanyName: null,
+    workerCompanySiret: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+
+    ecoOrganismeSiret: null,
+    ecoOrganismeName: null,
+
+    brokerCompanyName: null,
+    brokerCompanySiret: null,
+    brokerRecepisseNumber: null,
+    brokerCompanyMail: null,
+
+    traderCompanyName: null,
+    traderCompanySiret: null,
+    traderRecepisseNumber: null,
+    traderCompanyMail: null,
+
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
+    transporter1TransportPlates: transporter?.transporterTransportPlates,
+
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2TransportPlates: transporter2?.transporterTransportPlates,
+
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3TransportPlates: transporter3?.transporterTransportPlates,
+
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4TransportPlates: transporter4?.transporterTransportPlates,
+
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5TransportPlates: transporter5?.transporterTransportPlates,
+
+    wasteAdr: bsff.wasteAdr,
+    nonRoadRegulationMention: null,
+    destinationCap: null,
+
+    destinationCompanySiret: bsff.destinationCompanySiret,
+    destinationCompanyName: bsff.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bsff.destinationCompanyMail,
+
+    destinationDropSiteAddress: null,
+    destinationDropSitePostalCode: null,
+    destinationDropSiteCity: null,
+    destinationDropSiteCountryCode: null,
+
+    destinationReceptionAcceptationStatus,
+    destinationReceptionWeight: destinationReceptionWeight
+      ? new Decimal(destinationReceptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionWeight,
+    destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight,
+    destinationHasCiterneBeenWashedOut: null,
+
+    gistridNumber: null,
+    movementNumber: null
+  };
+};
+
 const minimalBsffForLookupSelect = {
   id: true,
   destinationReceptionSignatureDate: true,
+  destinationReceptionDate: true,
   destinationCompanySiret: true,
   wasteCode: true,
   emitterCompanySiret: true,
@@ -731,7 +1006,10 @@ const minimalBsffForLookupSelect = {
     select: {
       id: true,
       number: true,
-      transporterTransportSignatureDate: true
+      transporterTransportSignatureDate: true,
+      transporterTransportTakenOverAt: true,
+      transporterCompanySiret: true,
+      transporterCompanyVatNumber: true
     }
   }
 };
@@ -754,7 +1032,9 @@ const bsffToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsff.wasteCode,
-      ...generateDateInfos(bsff.destinationReceptionSignatureDate),
+      ...generateDateInfos(
+        bsff.destinationReceptionDate ?? bsff.destinationReceptionSignatureDate
+      ),
       bsffId: bsff.id
     });
   }
@@ -775,11 +1055,42 @@ const bsffToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsff.wasteCode,
-        ...generateDateInfos(transporter.transporterTransportSignatureDate!),
+        ...generateDateInfos(
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!
+        ),
         bsffId: bsff.id
       });
     });
   }
+  const transporterSirets = {};
+  bsff.transporters?.forEach(transporter => {
+    const transporterSiret = getTransporterCompanyOrgId(transporter);
+    if (!transporter.transporterTransportSignatureDate || !transporterSiret) {
+      return;
+    }
+    // we don't want to add the same transporter twice, the lookup index would have a conflict
+    // + it's not really supposed to happen on real use cases
+    // + the mapping would show the takenOver date of the first one anyways
+    if (transporterSirets[transporterSiret]) {
+      return;
+    }
+    transporterSirets[transporterSiret] = true;
+    res.push({
+      id: bsff.id,
+      readableId: bsff.id,
+      siret: transporterSiret,
+      exportRegistryType: RegistryExportType.TRANSPORTED,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: RegistryExportWasteType.DD,
+      wasteCode: bsff.wasteCode,
+      ...generateDateInfos(
+        transporter.transporterTransportTakenOverAt ??
+          transporter.transporterTransportSignatureDate
+      ),
+      bsffId: bsff.id
+    });
+  });
   return res;
 };
 
@@ -809,21 +1120,32 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSFF");
   await prisma.registryLookup.deleteMany({
     where: {
       bsffId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.bsff.count({
+    where: {
+      isDeleted: false,
+      isDraft: false
+    }
+  });
+
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.bsff.findMany({
       where: {
         isDeleted: false,
         isDraft: false
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -837,14 +1159,18 @@ export const rebuildRegistryLookup = async () => {
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

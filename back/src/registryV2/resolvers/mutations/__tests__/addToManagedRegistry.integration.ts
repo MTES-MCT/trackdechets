@@ -9,7 +9,19 @@ import { sub } from "date-fns";
 
 const ADD_TO_MANAGED_REGISTRY = gql`
   mutation AddToManagedRegistry($lines: [ManagedLineInput!]!) {
-    addToManagedRegistry(lines: $lines)
+    addToManagedRegistry(lines: $lines) {
+      stats {
+        errors
+        insertions
+        edits
+        cancellations
+        skipped
+      }
+      errors {
+        publicId
+        message
+      }
+    }
   }
 `;
 
@@ -48,8 +60,7 @@ function getCorrectLine(siret: string) {
     destinationDropSitePostalCode: "75012",
     destinationDropSiteCity: "Commune de prise en charge de l'expéditeur",
     destinationDropSiteCountryCode: "FR",
-    declarationNumber: undefined,
-    notificationNumber: undefined,
+    gistridNumber: undefined,
     movementNumber: undefined,
     operationCode: "R 5",
     operationMode: "RECYCLAGE",
@@ -173,7 +184,7 @@ describe("Registry - addToManagedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToManagedRegistry).toBe(true);
+    expect(data.addToManagedRegistry.stats.insertions).toBe(1);
   });
 
   it("should create several managed items", async () => {
@@ -191,7 +202,7 @@ describe("Registry - addToManagedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToManagedRegistry).toBe(true);
+    expect(data.addToManagedRegistry.stats.insertions).toBe(100);
   });
 
   it("should create and edit a managed item in one go", async () => {
@@ -209,7 +220,8 @@ describe("Registry - addToManagedRegistry", () => {
       { variables: { lines } }
     );
 
-    expect(data.addToManagedRegistry).toBe(true);
+    expect(data.addToManagedRegistry.stats.insertions).toBe(1);
+    expect(data.addToManagedRegistry.stats.edits).toBe(1);
 
     const result = await prisma.registryManaged.findFirstOrThrow({
       where: { publicId: line.publicId, isLatest: true }

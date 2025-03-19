@@ -155,3 +155,34 @@ export const refineReportForProfile: Refinement<
     });
   }
 };
+
+export const refineWeightAndVolume: Refinement<ParsedZodIncomingWasteItem> = (
+  item,
+  { addIssue }
+) => {
+  const isUsingRoad = [
+    item.transporter1TransportMode,
+    item.transporter2TransportMode,
+    item.transporter3TransportMode,
+    item.transporter4TransportMode,
+    item.transporter5TransportMode
+  ].some(transportMode => transportMode === "ROAD");
+
+  const hasWeightHour = item.weighingHour != null;
+
+  if (isUsingRoad && hasWeightHour && item.weightValue > 40) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le poids ne peut pas dépasser 40 tonnes lorsque le déchet est transporté par la route`,
+      path: ["weightValue"]
+    });
+  }
+
+  if (isUsingRoad && hasWeightHour && item.volume && item.volume > 40) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
+      path: ["volume"]
+    });
+  }
+};

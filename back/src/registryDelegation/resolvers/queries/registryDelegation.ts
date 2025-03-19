@@ -1,4 +1,3 @@
-import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers, RegistryDelegation } from "@td/codegen-back";
 import { checkCanAccess } from "../../permissions";
@@ -11,9 +10,6 @@ const registryDelegationResolver: QueryResolvers["registryDelegation"] = async (
   args,
   context
 ): Promise<RegistryDelegation> => {
-  // Browser only
-  applyAuthStrategies(context, [AuthType.Session]);
-
   // User must be authenticated
   const user = checkIsAuthenticated(context);
 

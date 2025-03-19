@@ -39,6 +39,10 @@ export const GET_REGISTRY_IMPORTS = gql`
               siret
               name
             }
+            reportedAs {
+              siret
+              name
+            }
           }
         }
       }
@@ -200,10 +204,12 @@ export const GET_MY_COMPANIES_WITH_DELEGATORS = gql`
           name
           orgId
           userRole
+          companyTypes
           delegators {
             orgId
             givenName
             name
+            companyTypes
           }
         }
       }

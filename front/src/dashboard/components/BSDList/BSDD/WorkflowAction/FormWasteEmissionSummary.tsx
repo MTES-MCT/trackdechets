@@ -75,6 +75,12 @@ export function FormWasteEmissionSummary({
         .filter((name, index, fields) => fields.indexOf(name) === index)
     );
 
+  // On ne doit pas pouvoir éditer la liste des contenants ou la plaque immat
+  // lors d'un acheminement direct par pipeline ou convoyeur sauf s'il s'agit
+  // de la signature du TTR après entreposage provisoire
+  const isDirectSupply =
+    form.temporaryStorageDetail && form.emittedAt ? false : form.isDirectSupply;
+
   return (
     <>
       <DataList>
@@ -104,7 +110,7 @@ export function FormWasteEmissionSummary({
             </button>
           </DataListDescription>
         </DataListItem>
-        {!form.isDirectSupply && (
+        {!isDirectSupply && (
           <DataListItem>
             <DataListTerm>Contenant(s)</DataListTerm>
             <DataListDescription>
@@ -157,22 +163,23 @@ export function FormWasteEmissionSummary({
             </DataListDescription>
           </DataListItem>
         )}
-        {form.emitter?.type !== EmitterType.Appendix1Producer && (
-          <DataListItem>
-            <DataListTerm>Plaque d'immatriculation</DataListTerm>
-            <DataListDescription>
-              {values.transporterNumberPlate}
+        {form.emitter?.type !== EmitterType.Appendix1Producer &&
+          !isDirectSupply && (
+            <DataListItem>
+              <DataListTerm>Plaque d'immatriculation</DataListTerm>
+              <DataListDescription>
+                {values.transporterNumberPlate}
 
-              <button
-                type="button"
-                onClick={() => addField("transporterNumberPlate")}
-                className="tw-ml-2"
-              >
-                <IconPaperWrite color="blue" />
-              </button>
-            </DataListDescription>
-          </DataListItem>
-        )}
+                <button
+                  type="button"
+                  onClick={() => addField("transporterNumberPlate")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              </DataListDescription>
+            </DataListItem>
+          )}
       </DataList>
       {fields.length > 0 && (
         <div className="tw-mb-4">

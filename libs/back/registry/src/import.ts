@@ -26,7 +26,7 @@ export async function processStream({
   fileType,
   createdById,
   allowedSirets,
-  delegateToDelegatorsMap
+  delegatorSiretsByDelegateSirets
 }: {
   importId: string;
   importType: ImportType;
@@ -35,7 +35,7 @@ export async function processStream({
   fileType: "CSV" | "XLSX";
   createdById: string;
   allowedSirets: string[];
-  delegateToDelegatorsMap: Map<string, string[]>;
+  delegatorSiretsByDelegateSirets: Map<string, string[]>;
 }) {
   logger.info(
     `Processing import ${importId}. File type ${fileType}, import ${importType}`,
@@ -107,7 +107,7 @@ export async function processStream({
       if (
         !isAuthorized({
           reportAsCompanySiret,
-          delegateToDelegatorsMap,
+          delegatorSiretsByDelegateSirets,
           reportForCompanySiret,
           allowedSirets
         })
@@ -133,11 +133,6 @@ export async function processStream({
       const now = Date.now();
       if (now - lastStatsUpdate > 5 * 1000) {
         lastStatsUpdate = now;
-        await saveCompaniesChanges(changesByCompany, {
-          type: importType,
-          source: "FILE",
-          createdById
-        });
         const stats = getSumOfChanges(changesByCompany, globalErrorNumber);
         await updateImportStats({
           importId,
@@ -180,18 +175,18 @@ function formatErrorMessage(message: string) {
 
 export function isAuthorized({
   reportAsCompanySiret,
-  delegateToDelegatorsMap,
+  delegatorSiretsByDelegateSirets,
   reportForCompanySiret,
   allowedSirets
 }: {
   reportAsCompanySiret: string | null | undefined;
-  delegateToDelegatorsMap: Map<string, string[]>;
+  delegatorSiretsByDelegateSirets: Map<string, string[]>;
   reportForCompanySiret: string;
   allowedSirets: string[];
 }) {
-  if (reportAsCompanySiret) {
+  if (reportAsCompanySiret && reportAsCompanySiret !== reportForCompanySiret) {
     return (
-      delegateToDelegatorsMap
+      delegatorSiretsByDelegateSirets
         .get(reportAsCompanySiret)
         ?.includes(reportForCompanySiret) ?? false
     );

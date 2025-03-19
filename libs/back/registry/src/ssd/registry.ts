@@ -9,8 +9,11 @@ import {
 import type { SsdWasteV2 } from "@td/codegen-back";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { prisma } from "@td/prisma";
-import { deleteRegistryLookup, generateDateInfos } from "../lookup/utils";
-import { performance } from "perf_hooks";
+import {
+  deleteRegistryLookup,
+  generateDateInfos,
+  createRegistryLogger
+} from "../lookup/utils";
 
 export const toSsdWaste = (ssd: RegistrySsd): SsdWasteV2 => {
   return {
@@ -85,24 +88,17 @@ export const updateRegistryLookup = async (
   tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistrySsdId) {
-    // note for future implementations:
-    // if there is a possibility that the siret changes between updates (BSDs),
-    // you should use an upsert.
-    // This is because the index would point to an empty lookup in that case, so we need to create it.
-    // the cleanup method will remove the lookup with the old siret afterward
-    await tx.registryLookup.update({
+    await tx.registryLookup.upsert({
       where: {
         // we use this compound id to target a specific registry type for a specific registry id
         // and a specific siret
-        // this is not strictly necessary on SSDs since they only appear in one export registry, for one siret
-        // but is necessary on other types of registries that appear for multiple actors/ export registries
         idExportTypeAndSiret: {
           id: oldRegistrySsdId,
           exportRegistryType: RegistryExportType.SSD,
           siret: registrySsd.reportForCompanySiret
         }
       },
-      data: {
+      update: {
         // only those properties can change during an update
         // the id changes because a new RegistrySsd entry is created on each update
         id: registrySsd.id,
@@ -113,6 +109,7 @@ export const updateRegistryLookup = async (
         ),
         registrySsdId: registrySsd.id
       },
+      create: registryToLookupCreateInput(registrySsd),
       select: {
         // lean selection to improve performances
         id: true
@@ -129,30 +126,35 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async () => {
-  const deleteStart = performance.now();
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("SSD");
+
   await prisma.registryLookup.deleteMany({
     where: {
       registrySsdId: { not: null }
     }
   });
-  const deleteEnd = performance.now();
-  console.log(`global delete: ${deleteEnd - deleteStart}ms`);
+  logger.logDelete();
 
-  // reindex registrySSD
+  // First, get total count for progress calculation
+  const total = await prisma.registrySsd.count({
+    where: {
+      isCancelled: false,
+      isLatest: true
+    }
+  });
+
   let done = false;
   let cursorId: string | null = null;
-  let accuFetch = 0;
-  let accuUpdate = 0;
-  let iters = 0;
+  let processedCount = 0;
+
   while (!done) {
-    const fetchStart = performance.now();
     const items = await prisma.registrySsd.findMany({
       where: {
         isCancelled: false,
         isLatest: true
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -160,33 +162,26 @@ export const rebuildRegistryLookup = async () => {
       },
       select: minimalRegistryForLookupSelect
     });
-    const fetchEnd = performance.now();
 
-    const updateStart = performance.now();
     const createArray = items.map((registrySsd: MinimalRegistryForLookup) =>
       registryToLookupCreateInput(registrySsd)
     );
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
 
-    const updateEnd = performance.now();
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+
+    if (items.length < pageSize) {
       done = true;
       break;
     }
     cursorId = items[items.length - 1].id;
-    accuFetch += fetchEnd - fetchStart;
-    accuUpdate += updateEnd - updateStart;
-    iters += 1;
   }
 
-  if (iters > 0) {
-    const meanFetch = accuFetch / iters;
-    const meanUpdate = accuUpdate / iters;
-    console.log(`mean fetch (100 rows): ${meanFetch}ms`);
-    console.log(`mean update (100 rows): ${meanUpdate}ms`);
-  }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

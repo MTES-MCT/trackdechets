@@ -23,8 +23,7 @@ import {
   booleanSchema,
   dateSchema,
   inseeCodesSchema,
-  declarationNumberSchema,
-  notificationNumberSchema,
+  gistridNumberSchema,
   siretSchema,
   operationModeSchema
 } from "../../shared/schemas";
@@ -84,10 +83,7 @@ const inputIncomingWasteSchema = z.object({
   initialEmitterCompanyCity: actorCitySchema.nullish(),
   initialEmitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
   initialEmitterMunicipalitiesInseeCodes: inseeCodesSchema,
-  emitterCompanyType: actorTypeSchema.exclude([
-    "PERSONNE_PHYSIQUE",
-    "COMMUNES"
-  ]),
+  emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),
   emitterCompanyAddress: actorAddressSchema.nullish(),
@@ -134,8 +130,7 @@ const inputIncomingWasteSchema = z.object({
   operationMode: operationModeSchema,
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
-  declarationNumber: declarationNumberSchema,
-  notificationNumber: notificationNumberSchema,
+  gistridNumber: gistridNumberSchema,
   movementNumber: z
     .string()
     .trim()

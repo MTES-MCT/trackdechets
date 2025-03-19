@@ -56,8 +56,7 @@ const errorLink = onError(({ response, graphQLErrors }) => {
         localAuthService.locallySignOut();
         window.location.href =
           "/login?session=expired&returnTo=" +
-          window.location.pathname +
-          window.location.search;
+          encodeURIComponent(window.location.pathname + window.location.search);
       }
     }
   }

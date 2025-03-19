@@ -17,7 +17,8 @@ export const OUTGOING_TEXS_HEADERS: {
     "Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   reportForPickupSiteCountryCode:
     "Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
-  wasteDescription: "Dénomination du déchet",
+  wasteDescription:
+    "Dénomination usuelle des terres excavées et sédiments ou des déchets",
   wasteCode: "Code déchet",
   wasteCodeBale: "Code déchet Bâle",
   wastePop: "POP",
@@ -52,8 +53,7 @@ export const OUTGOING_TEXS_HEADERS: {
   destinationDropSiteCity: "Commune de l'adresse de dépôt du destinataire",
   destinationDropSiteCountryCode:
     "Code pays de l'adresse de dépôt du destinataire",
-  declarationNumber: "Numéro de déclaration GISTRID",
-  notificationNumber: "Numéro de notification GISTRID",
+  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
   movementNumber: "Numéro de mouvement",
   operationCode: "Code de traitement prévu",
   operationMode: "Mode de traitement prévu",
