@@ -20,9 +20,9 @@ export async function transformReportForInfos<T extends ParsedLine>(
   return {
     ...line,
     reportForCompanyName: company.name,
-    reportForCompanyAddress: company.address,
-    reportForCompanyCity: "",
-    reportForCompanyPostalCode: ""
+    reportForCompanyAddress: company.address ?? "",
+    reportForCompanyCity: company.city ?? "",
+    reportForCompanyPostalCode: company.postalCode ?? ""
   };
 }
 
