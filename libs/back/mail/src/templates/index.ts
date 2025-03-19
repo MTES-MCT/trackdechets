@@ -456,3 +456,18 @@ export const adminRequestRefusedAdminEmail: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+export const adminRequestCollaboratorEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+  adminRequest: { id: string };
+}> = {
+  subject: ({ company }) =>
+    `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-collaborator.html"),
+  templateId: templateIds.LAYOUT,
+  params: {
+    // permet d'afficher le lien "Gérer mes préférences e-mails"
+    handlePreferencesUrl
+  }
+};

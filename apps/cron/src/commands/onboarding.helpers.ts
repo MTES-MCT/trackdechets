@@ -20,7 +20,9 @@ import {
   Company,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
-  User
+  User,
+  AdminRequestStatus,
+  AdminRequestValidationMethod
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import {
@@ -33,9 +35,12 @@ import {
   producersSecondOnboardingEmail,
   pendingRevisionRequestEmail,
   expiringRegistryDelegationWarning,
-  Mail
+  Mail,
+  adminRequestCollaboratorEmail
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
+import { getAdminRequestRepository } from "../../../../back/src/adminRequest/repository";
+import { addDays } from "date-fns";
 
 /**
  * Return recently "registered" profesionals. That means either:
@@ -617,6 +622,65 @@ export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
  */
 export const sendExpiringRegistryDelegationWarning = async () => {
   const payloads = await getExpiringRegistryDelegationWarningMailPayloads();
+
+  if (!payloads?.length) return;
+
+  await Promise.all(payloads?.map(async p => await sendMail(p)));
+
+  await prisma.$disconnect();
+};
+
+export const getAdminRequestEmailPayloads = async () => {
+  const now = new Date();
+  const yesterday = addDays(new Date(), -1);
+
+  const adminRequests = await prisma.adminRequest.findMany({
+    where: {
+      status: AdminRequestStatus.PENDING,
+      validationMethod:
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+      adminOnlyEndDate: { gte: yesterday, lt: now },
+      collaboratorId: { not: null }
+    },
+    include: {
+      user: true,
+      company: true
+    }
+  });
+
+  if (!adminRequests.length) {
+    return [];
+  }
+
+  // Send a mail to collaborators
+  const payloads: Mail[] = [];
+  for (const adminRequest of adminRequests) {
+    const collaborator = await prisma.user.findFirst({
+      where: { id: adminRequest.collaboratorId! }
+    });
+
+    if (collaborator) {
+      const payload = renderMail(adminRequestCollaboratorEmail, {
+        to: [{ email: collaborator.email, name: collaborator.name }],
+        variables: {
+          company: adminRequest.company,
+          user: adminRequest.user,
+          adminRequest
+        }
+      });
+
+      payloads.push(payload);
+    }
+  }
+
+  return payloads;
+};
+
+/**
+ * Once the 'admin-only' period has ran out, warn whoever is concerned next
+ */
+export const sendAdminRequestEmail = async () => {
+  const payloads = await getAdminRequestEmailPayloads();
 
   if (!payloads?.length) return;
 

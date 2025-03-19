@@ -1,4 +1,6 @@
 import {
+  AdminRequestStatus,
+  AdminRequestValidationMethod,
   BsdaRevisionRequest,
   BsdasriRevisionRequest,
   MembershipRequestStatus,
@@ -37,9 +39,11 @@ import {
   getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
-  getExpiringRegistryDelegationWarningMailPayloads
+  getExpiringRegistryDelegationWarningMailPayloads,
+  getAdminRequestEmailPayloads
 } from "../onboarding.helpers";
 import { xDaysAgo } from "../helpers";
+import { addDays } from "date-fns";
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
@@ -49,6 +53,7 @@ const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
 const NOW = todayAtMidnight();
 const YESTERDAY = xDaysAgo(NOW, 1);
+const TOMORROW = addDays(NOW, 1);
 const NOW_PLUS_SEVEN_DAYS = endOfDay(inXDays(NOW, 7));
 
 export const DELETE_COMPANY = `
@@ -2244,5 +2249,163 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
   >.
 </p>
 `);
+  });
+});
+
+describe("getAdminRequestEmailPayloads", () => {
+  it("should build payload with concerned collaborators", async () => {
+    // Given
+    const user1 = await userFactory();
+    const user2 = await userFactory();
+    const user3 = await userFactory();
+
+    const company1 = await companyFactory();
+    const company2 = await companyFactory();
+
+    // Should not be in results because validationMethod = SEND_MAIL
+    const a1 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+        code: "12345678",
+        adminOnlyEndDate: YESTERDAY
+      }
+    });
+
+    // Should not be in results because validationMethod = REQUEST_ADMIN_APPROVAL
+    const a2 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+      }
+    });
+
+    // Should not be in results because status = ACCEPTED
+    const a3 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.ACCEPTED,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: YESTERDAY
+      }
+    });
+
+    // Should not be in results because status = REFUSED
+    const a4 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.REFUSED,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: YESTERDAY
+      }
+    });
+
+    // Should not be in results because status = BLOCKED
+    const a5 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.REFUSED,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: YESTERDAY
+      }
+    });
+
+    // Should not be in results because admin-only period is not over
+    const a6 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: TOMORROW
+      }
+    });
+
+    // Should not be in results because admin-only period is too old
+    const a7 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: addDays(TODAY, -10)
+      }
+    });
+
+    // Should not be in results because admin-only period is in future
+    await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: addDays(TODAY, 10)
+      }
+    });
+
+    // Should be in results
+    const adminRequest1 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company1.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id,
+        adminOnlyEndDate: TODAY
+      }
+    });
+
+    // Should be in results
+    const adminRequest2 = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user2.id } },
+        company: { connect: { id: company2.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user3.id,
+        adminOnlyEndDate: TODAY
+      }
+    });
+
+    // When
+    const payloads = await getAdminRequestEmailPayloads();
+
+    // Then
+    expect(payloads.length).toBe(2);
+
+    expect(payloads[0].vars?.adminRequest.id).toEqual(adminRequest1.id);
+    expect(payloads[0].vars?.company.id).toEqual(company1.id);
+    expect(payloads[0].vars?.user.id).toEqual(user1.id);
+    expect(payloads[0].to).toMatchObject([
+      { email: user2.email, name: user2.name }
+    ]);
+
+    expect(payloads[1].vars?.adminRequest.id).toEqual(adminRequest2.id);
+    expect(payloads[1].vars?.company.id).toEqual(company2.id);
+    expect(payloads[1].vars?.user.id).toEqual(user2.id);
+    expect(payloads[1].to).toMatchObject([
+      { email: user3.email, name: user3.name }
+    ]);
   });
 });

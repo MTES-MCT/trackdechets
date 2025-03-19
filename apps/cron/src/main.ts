@@ -2,6 +2,7 @@ import * as cron from "cron";
 import cronValidator from "cron-validate";
 import { cleanUpIsReturnForTab, initSentry } from "back";
 import {
+  sendAdminRequestEmail,
   sendExpiringRegistryDelegationWarning,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
@@ -74,6 +75,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendExpiringRegistryDelegationWarning();
+      },
+      timeZone: TZ
+    }),
+    // admin requests: send mails to whoever is concerned
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendAdminRequestEmail();
       },
       timeZone: TZ
     })
