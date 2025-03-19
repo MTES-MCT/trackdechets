@@ -68,7 +68,10 @@ export const CompanyAdminRequestsTable = () => {
   };
 
   return (
-    <div className="fr-table--sm fr-table fr-table" id="table-sm-component">
+    <div
+      className="fr-table--sm fr-table fr-table fr-mb-2w"
+      id="table-sm-component"
+    >
       <div className="fr-table__wrapper">
         <div className="fr-table__container">
           <div className="fr-table__content">

@@ -65,19 +65,11 @@ export const CompanyCreateAdminRequestModal = ({
     refetchQueries: [ADMIN_REQUESTS]
   });
 
-  const companyName = methods.watch("companyName");
   const companyOrgId = methods.watch("companyOrgId");
   const validationMethod = methods.watch("validationMethod");
   const collaboratorEmail = methods.watch("collaboratorEmail");
 
   const onSubmit: SubmitHandler<CreateAdminRequestFormInputs> = async () => {
-    console.log("submit", {
-      companyName,
-      companyOrgId,
-      validationMethod,
-      collaboratorEmail
-    });
-
     await createAdminRequest({
       variables: {
         input: {
