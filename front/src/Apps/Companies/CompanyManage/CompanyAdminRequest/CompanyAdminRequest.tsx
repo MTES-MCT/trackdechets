@@ -81,6 +81,19 @@ export const CompanyAdminRequest = () => {
       {adminRequestId && (
         <AcceptAdminRequestModal adminRequestId={adminRequestId} />
       )}
+
+      <div>
+        <Button
+          priority="secondary"
+          onClick={async () => {
+            setIsCreateModalOpen(true);
+          }}
+          iconId="fr-icon-mail-open-line"
+          iconPosition="right"
+        >
+          Saisir un code reçu par courrier
+        </Button>
+      </div>
     </div>
   );
 };
