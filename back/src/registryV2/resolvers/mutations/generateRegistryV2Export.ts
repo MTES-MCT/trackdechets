@@ -48,8 +48,6 @@ export async function generateRegistryV2Export(
     ]);
     // bypass authorization if the user is authenticated from a service account or is admin
     if (!hasGovernmentPermission) {
-      console.log("siret", siret);
-      console.log("delegateSiret", delegateSiret);
       try {
         await checkUserPermissions(
           user,
@@ -57,14 +55,11 @@ export async function generateRegistryV2Export(
           Permission.RegistryCanRead,
           `Vous n'êtes pas autorisé à lire les données de ce registre`
         );
-        console.log("checkUserPermissions ok");
       } catch (error) {
-        console.log("checkUserPermissions error", error);
         if (!delegateSiret) {
           throw error;
         }
         if (!userCompanies.some(company => company.orgId === delegateSiret)) {
-          console.log("userCompanies", userCompanies);
           throw new ForbiddenError(
             `Vous n'êtes pas autorisé à lire les données de ce registre en tant que délégataire`
           );
@@ -77,7 +72,6 @@ export async function generateRegistryV2Export(
           user,
           delegatorCompany.id
         );
-        console.log("delegatesForCompany", delegatesForCompany);
         if (delegatesForCompany.length === 0) {
           throw new ForbiddenError(
             `Vous n'êtes pas autorisé à lire les données de ce registre en tant que délégataire`

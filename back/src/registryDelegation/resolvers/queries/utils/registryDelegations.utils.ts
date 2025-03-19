@@ -97,7 +97,6 @@ export const getDelegatesOfCompany = async (
       include: { delegate: true }
     }
   );
-  console.log("delegations", delegations);
   return delegations.map(delegation => delegation.delegate);
 };
 
