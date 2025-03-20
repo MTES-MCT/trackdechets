@@ -6,7 +6,7 @@ import type {
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { AdminRequestValidationMethod, UserRole } from "@prisma/client";
+import { AdminRequestValidationMethod } from "@prisma/client";
 import { parseCreateAdminRequestInput } from "../../validation";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
@@ -14,6 +14,7 @@ import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
 import { sendAdminRequestVerificationCodeLetter } from "../../../common/post";
 import {
+  checkCanCreateAdminRequest,
   generateCode,
   getAdminOnlyEndDate,
   sendEmailToAuthor,
@@ -51,51 +52,20 @@ const createAdminRequest = async (
     }
   });
 
-  if (companyAssociation?.role === UserRole.ADMIN) {
-    throw new UserInputError(
-      "Vous êtes déjà administrateur de cette entreprise."
-    );
-  }
-
   let collaborator;
   if (adminRequestInput.collaboratorEmail) {
     collaborator = await prisma.user.findFirst({
       where: { email: adminRequestInput.collaboratorEmail }
     });
-
-    if (!collaborator) {
-      throw new UserInputError("Le collaborateur ciblé n'existe pas.");
-    }
-
-    const collaboratorCompanyAssociation =
-      await prisma.companyAssociation.findFirst({
-        where: {
-          userId: collaborator.id,
-          companyId: company.id
-        }
-      });
-
-    if (!collaboratorCompanyAssociation) {
-      throw new UserInputError(
-        "Le collaborateur ne fait pas partie de l'entreprise ciblée."
-      );
-    }
   }
 
-  const { create, findFirst } = getAdminRequestRepository(user);
-
-  // Make sure there isn't already a PENDING request
-  const existingRequest = await findFirst({
-    userId: user.id,
-    companyId: company.id,
-    status: "PENDING"
-  });
-
-  if (existingRequest) {
-    throw new UserInputError(
-      "Une demande est déjà en attente pour cette entreprise."
-    );
-  }
+  await checkCanCreateAdminRequest(
+    user,
+    adminRequestInput,
+    company,
+    companyAssociation,
+    collaborator
+  );
 
   // If validation method is mail, generate a code
   const code =
@@ -110,6 +80,8 @@ const createAdminRequest = async (
     AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
       ? getAdminOnlyEndDate()
       : null;
+
+  const { create } = getAdminRequestRepository(user);
 
   // Create admin request
   const adminRequest = await create(

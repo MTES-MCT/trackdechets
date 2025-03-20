@@ -18,6 +18,10 @@ export const parseCreateAdminRequestInput = (
   return createAdminRequestInputSchema.parse(input);
 };
 
+export type ParsedCreateAdminRequestInput = ReturnType<
+  typeof parseCreateAdminRequestInput
+>;
+
 export function parseQueryAdminRequestsArgs(args: QueryAdminRequestsArgs) {
   return queryAdminRequestsArgsSchema.parse(args);
 }

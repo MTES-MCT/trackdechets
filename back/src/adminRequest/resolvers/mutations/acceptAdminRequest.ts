@@ -35,7 +35,6 @@ const acceptAdminRequest = async (
 
   const adminRequest = await getAdminRequestOrThrow(user, adminRequestInput);
 
-  // TODO: not everyone from the company can accept. Admins first, then possible collaborators
   const association = await prisma.companyAssociation.findFirst({
     where: {
       userId: user.id,

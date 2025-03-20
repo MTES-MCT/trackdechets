@@ -2135,6 +2135,10 @@ model AdminRequest {
   status AdminRequestStatus @default(PENDING)
 
   validationMethod AdminRequestValidationMethod
+
+  // Indexes
+  @@index([userId, companyId], map: "_AdminRequestUserIdCompanyIdIdx")
+  @@index([status], map: "_AdminRequestStatusIdx")
 }
 
 enum AdminRequestStatus {

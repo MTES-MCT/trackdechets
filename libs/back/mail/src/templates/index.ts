@@ -385,11 +385,7 @@ export const adminRequestInitialWarningToAdminEmail: MailTemplate<{
   subject: ({ company }) =>
     `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-initial-warning-to-admin.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
@@ -400,11 +396,7 @@ export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
   subject: ({ company }) =>
     `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-initial-info-to-author.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestRefusedEmail: MailTemplate<{
@@ -412,11 +404,7 @@ export const adminRequestRefusedEmail: MailTemplate<{
 }> = {
   subject: () => `Demande d’accès administrateur refusée`,
   body: mustacheRenderer("admin-request-refused.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestAcceptedEmail: MailTemplate<{
@@ -424,11 +412,7 @@ export const adminRequestAcceptedEmail: MailTemplate<{
 }> = {
   subject: () => `Demande d’accès administrateur acceptée`,
   body: mustacheRenderer("admin-request-accepted.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestAcceptedAdminEmail: MailTemplate<{
@@ -437,11 +421,7 @@ export const adminRequestAcceptedAdminEmail: MailTemplate<{
 }> = {
   subject: () => `Mise à jour concernant la demande d’accès administrateur`,
   body: mustacheRenderer("admin-request-accepted-admin.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestRefusedAdminEmail: MailTemplate<{
@@ -450,11 +430,7 @@ export const adminRequestRefusedAdminEmail: MailTemplate<{
 }> = {
   subject: () => `Mise à jour concernant la demande d’accès administrateur`,
   body: mustacheRenderer("admin-request-refused-admin.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };
 
 export const adminRequestCollaboratorEmail: MailTemplate<{
@@ -465,9 +441,5 @@ export const adminRequestCollaboratorEmail: MailTemplate<{
   subject: ({ company }) =>
     `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-collaborator.html"),
-  templateId: templateIds.LAYOUT,
-  params: {
-    // permet d'afficher le lien "Gérer mes préférences e-mails"
-    handlePreferencesUrl
-  }
+  templateId: templateIds.LAYOUT
 };

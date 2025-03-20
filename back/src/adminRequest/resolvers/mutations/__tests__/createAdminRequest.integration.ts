@@ -18,6 +18,7 @@ import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";
 import { sendAdminRequestVerificationCodeLetter } from "../../../../common/post";
 import { getAdminOnlyEndDate } from "../utils/createAdminRequest.utils";
+import { addDays } from "date-fns";
 
 // Mock mail sending service
 jest.mock("../../../../common/post");
@@ -1021,5 +1022,95 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
     });
 
     expect(companyAdminRequest.adminOnlyEndDate).toBeNull();
+  });
+
+  it("if too many SEND_MAIL requests, block & throw", async () => {
+    // Given
+    const OLD_ENV = process.env;
+    process.env.MAX_ADMIN_REQUESTS_MAILS_PER_WEEK = "1";
+
+    const { user: user1, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    const user2 = await userFactory();
+
+    // Already 1 request in the DB
+    await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company.id } },
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL,
+        code: "12345678",
+        adminOnlyEndDate: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user2);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "La vérification par courrier a été temporairement désactivée. Choisissez une autre méthode ou contactez le support."
+    );
+
+    // Finally
+    process.env = OLD_ENV;
+  });
+
+  it("user has a recently REFUSED request for same company > should throw", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    // Already 1 request in the DB
+    await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.REFUSED,
+        validationMethod: AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL,
+        createdAt: addDays(new Date(), -7),
+        updatedAt: addDays(new Date(), -6)
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous avez déjà effectué une demande pour cette entreprise, qui a été refusée récemment."
+    );
   });
 });
