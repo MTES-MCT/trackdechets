@@ -16,6 +16,19 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { ManagedWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
+const getWasteIsDangerous = (
+  managedWaste: Pick<
+    RegistryManaged,
+    "wasteIsDangerous" | "wastePop" | "wasteCode"
+  >
+) => {
+  return (
+    !!managedWaste.wasteIsDangerous ||
+    !!managedWaste.wastePop ||
+    isDangerous(managedWaste.wasteCode)
+  );
+};
+
 export const toManagedWaste = (
   managedWaste: RegistryManaged
 ): ManagedWasteV2 => {
@@ -38,10 +51,7 @@ export const toManagedWaste = (
     wasteCode: managedWaste.wasteCode,
     wasteCodeBale: managedWaste.wasteCodeBale,
     wastePop: managedWaste.wastePop,
-    wasteIsDangerous:
-      !!managedWaste.wasteIsDangerous ||
-      !!managedWaste.wastePop ||
-      isDangerous(managedWaste.wasteCode),
+    wasteIsDangerous: getWasteIsDangerous(managedWaste),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weight: managedWaste.weightValue,
@@ -224,6 +234,7 @@ const minimalRegistryForLookupSelect = {
   reportAsCompanySiret: true,
   wasteIsDangerous: true,
   wasteCode: true,
+  wastePop: true,
   managingStartDate: true
 };
 
@@ -241,7 +252,7 @@ const registryToLookupCreateInput = (
     reportAsSiret: registryManaged.reportAsCompanySiret,
     exportRegistryType: RegistryExportType.MANAGED,
     declarationType: RegistryExportDeclarationType.REGISTRY,
-    wasteType: registryManaged.wasteIsDangerous
+    wasteType: getWasteIsDangerous(registryManaged)
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
     wasteCode: registryManaged.wasteCode,
@@ -273,7 +284,7 @@ export const updateRegistryLookup = async (
         // the id changes because a new Registry entry is created on each update
         id: registryManagedWaste.id,
         reportAsSiret: registryManagedWaste.reportAsCompanySiret,
-        wasteType: registryManagedWaste.wasteIsDangerous
+        wasteType: getWasteIsDangerous(registryManagedWaste)
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: registryManagedWaste.wasteCode,

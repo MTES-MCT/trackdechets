@@ -18,6 +18,7 @@ import {
 import { getDelegatesOfCompany } from "../../../registryDelegation/resolvers/queries/utils/registryDelegations.utils";
 import { enqueueRegistryExportJob } from "../../../queue/producers/registryExport";
 import { subMinutes } from "date-fns";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 
 export async function generateRegistryV2Export(
   _,
@@ -46,7 +47,7 @@ export async function generateRegistryV2Export(
       siret
     ]);
     // bypass authorization if the user is authenticated from a service account or is admin
-    if (!hasGovernmentPermission && !user.isAdmin) {
+    if (!hasGovernmentPermission) {
       try {
         await checkUserPermissions(
           user,
@@ -63,8 +64,14 @@ export async function generateRegistryV2Export(
             `Vous n'êtes pas autorisé à lire les données de ce registre en tant que délégataire`
           );
         }
+        const delegatorCompany = await getCompanyOrCompanyNotFound({
+          siret
+        });
         // list the companies that have delegation for this siret
-        const delegatesForCompany = await getDelegatesOfCompany(user, siret);
+        const delegatesForCompany = await getDelegatesOfCompany(
+          user,
+          delegatorCompany.id
+        );
         if (delegatesForCompany.length === 0) {
           throw new ForbiddenError(
             `Vous n'êtes pas autorisé à lire les données de ce registre en tant que délégataire`
@@ -114,6 +121,7 @@ export async function generateRegistryV2Export(
       createdAt: { gte: subMinutes(new Date(), 5) },
       isForAllCompanies,
       sirets: isForAllCompanies ? undefined : { equals: sirets },
+      delegateSiret: delegate ?? undefined,
       registryType: registryType === "ALL" ? null : registryType,
       wasteTypes: where?.wasteType?._eq
         ? { equals: [where.wasteType._eq] }

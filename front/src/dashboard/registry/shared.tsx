@@ -194,24 +194,51 @@ export const REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL = gql`
   }
 `;
 
-export const GET_MY_COMPANIES_WITH_DELEGATORS = gql`
-  query MyCompaniesWithDelegators {
-    myCompanies {
+export const GET_MY_COMPANIES = gql`
+  query MyCompaniesWithDelegators($first: Int, $after: ID, $search: String) {
+    myCompanies(first: $first, after: $after, search: $search) {
       edges {
         node {
           id
           givenName
           name
           orgId
-          userRole
+          siret
           companyTypes
-          delegators {
-            orgId
-            givenName
-            name
-            companyTypes
-          }
         }
+      }
+    }
+  }
+`;
+
+export const GET_REGISTRY_COMPANIES = gql`
+  query RegistryCompanies(
+    $firstCompanies: Int
+    $firstDelegators: Int
+    $search: String
+    $userRoles: [UserRole!]
+  ) {
+    registryCompanies(
+      firstCompanies: $firstCompanies
+      firstDelegators: $firstDelegators
+      search: $search
+      userRoles: $userRoles
+    ) {
+      totalCount
+      myCompanies {
+        id
+        orgId
+        siret
+        name
+        givenName
+        companyTypes
+      }
+      delegators {
+        orgId
+        siret
+        name
+        givenName
+        companyTypes
       }
     }
   }

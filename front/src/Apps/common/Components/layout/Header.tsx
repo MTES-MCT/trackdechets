@@ -661,7 +661,14 @@ export default function Header() {
 
   const canViewNewRegistry =
     import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
-    companies?.some(company => company.featureFlags?.includes("REGISTRY_V2"));
+    companies?.some(
+      company =>
+        company.featureFlags?.includes("REGISTRY_V2") &&
+        company.userRole &&
+        [UserRole.Admin, UserRole.Member, UserRole.Reader].includes(
+          company.userRole
+        )
+    );
 
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,

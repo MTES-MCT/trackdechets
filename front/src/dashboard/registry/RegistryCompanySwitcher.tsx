@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
-import { useQuery, gql } from "@apollo/client";
-import { Query, QueryRegistryDelegationsArgs } from "@td/codegen-ui";
+import { useQuery } from "@apollo/client";
+import { Query, UserRole } from "@td/codegen-ui";
 import { debounce } from "../../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
@@ -9,40 +9,17 @@ import {
 import useOnClickOutsideRefTarget from "../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { Badge } from "@codegouvfr/react-dsfr/Badge";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { REGISTRY_DELEGATIONS } from "../../Apps/common/queries/registryDelegation/queries";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
+import { GET_REGISTRY_COMPANIES } from "./shared";
 
 type Props = {
-  onCompanySelect: (orgId: string) => void;
+  onCompanySelect: (orgId: string, isDelegation: boolean) => void;
   wrapperClassName?: string;
   allOption?: {
     key: string;
     name: string;
   };
 };
-
-const MY_COMPANIES = gql`
-  query MyCompanies($first: Int, $after: ID, $search: String) {
-    myCompanies(first: $first, after: $after, search: $search) {
-      totalCount
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      edges {
-        cursor
-        node {
-          id
-          name
-          orgId
-          siret
-          givenName
-          securityCode
-        }
-      }
-    }
-  }
-`;
 
 export function RegistryCompanySwitcher({
   onCompanySelect,
@@ -64,48 +41,43 @@ export function RegistryCompanySwitcher({
     {
       name,
       givenName,
-      siret
+      siret,
+      isDelegation
     }: {
       name?: string | null;
       givenName?: string | null;
       siret?: string | null;
+      isDelegation?: boolean;
     }
   ) => {
     setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
-    onCompanySelect(key);
+    onCompanySelect(key, !!isDelegation);
   };
 
-  const { data: myCompaniesData, loading: myCompaniesLoading } = useQuery<
-    Pick<Query, "myCompanies">
-  >(MY_COMPANIES, {
+  const { data: companiesData, loading: companiesLoading } = useQuery<
+    Pick<Query, "registryCompanies">
+  >(GET_REGISTRY_COMPANIES, {
     fetchPolicy: "network-only",
-    variables: { search: debouncedClue, first: 10 },
+    variables: {
+      search: debouncedClue,
+      firstCompanies: 10,
+      firstDelegators: 10,
+      userRoles: [UserRole.Admin, UserRole.Member, UserRole.Reader]
+    },
     onCompleted: data => {
       if (!selectedItem && !allOption) {
-        const firstNode = data.myCompanies.edges.find(({ node }) => node.siret);
+        const firstNode = data.registryCompanies.myCompanies.find(
+          node => node.siret
+        );
 
         if (firstNode) {
-          setSelectedCompany(firstNode.node.orgId, {
-            name: firstNode.node.name,
-            givenName: firstNode.node.givenName,
-            siret: firstNode.node.siret
+          setSelectedCompany(firstNode.orgId, {
+            name: firstNode.name,
+            givenName: firstNode.givenName,
+            siret: firstNode.siret
           });
         }
       }
-    }
-  });
-
-  const { data: delegationsData, loading: delegationsLoading } = useQuery<
-    Pick<Query, "registryDelegations">,
-    QueryRegistryDelegationsArgs
-  >(REGISTRY_DELEGATIONS, {
-    variables: {
-      where: {
-        activeOnly: true,
-        givenToMe: true,
-        search: debouncedClue
-      },
-      first: 10
     }
   });
 
@@ -117,20 +89,10 @@ export function RegistryCompanySwitcher({
     []
   );
 
-  const myCompanies =
-    myCompaniesData?.myCompanies.edges.filter(edge => edge.node.siret) ?? [];
-  const delegationsSirets = new Set();
-  const delegations =
-    delegationsData?.registryDelegations.edges.filter(item => {
-      return delegationsSirets.has(item.node.delegator.orgId)
-        ? false
-        : delegationsSirets.add(item.node.delegator.orgId);
-    }) ?? [];
-
-  const displayedCount = (myCompanies.length || 0) + (delegations.length || 0);
-  const totalCount =
-    (myCompaniesData?.myCompanies.totalCount || 0) +
-    (delegationsData?.registryDelegations.totalCount || 0);
+  const myCompanies = companiesData?.registryCompanies.myCompanies ?? [];
+  const delegators = companiesData?.registryCompanies.delegators ?? [];
+  const totalCount = companiesData?.registryCompanies.totalCount ?? 0;
+  const displayedCount = (myCompanies.length || 0) + (delegators.length || 0);
 
   return (
     <div
@@ -205,7 +167,7 @@ export function RegistryCompanySwitcher({
             {allOption.name}
           </div>
         ) : null}
-        {myCompanies.map(({ node }) => (
+        {myCompanies.map(node => (
           <div
             className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
             onClick={() => {
@@ -231,7 +193,7 @@ export function RegistryCompanySwitcher({
             {node.givenName || node.name} {node.siret}
           </div>
         ))}
-        {myCompaniesLoading || delegationsLoading ? (
+        {companiesLoading ? (
           <div
             className="tw-px-2 tw-py-2 tw-flex tw-gap-4 tw-justify-between tw-items-center"
             key={"loader"}
@@ -239,16 +201,16 @@ export function RegistryCompanySwitcher({
             <InlineLoader size={40} />
           </div>
         ) : null}
-        {delegations
-          .map(edge => edge.node.delegator)
-          .map(delegator => (
+        {delegators.map(delegator => {
+          return (
             <div
               className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-flex tw-gap-4 tw-justify-between tw-items-center tw-cursor-pointer"
               onClick={() => {
                 setSelectedCompany(delegator.orgId, {
                   name: delegator.name,
                   givenName: delegator.givenName,
-                  siret: delegator.orgId
+                  siret: delegator.orgId,
+                  isDelegation: true
                 });
                 setIsOpen(false);
               }}
@@ -257,7 +219,8 @@ export function RegistryCompanySwitcher({
                   setSelectedCompany(delegator.orgId, {
                     name: delegator.name,
                     givenName: delegator.givenName,
-                    siret: delegator.orgId
+                    siret: delegator.orgId,
+                    isDelegation: true
                   });
                   setIsOpen(false);
                 }
@@ -271,7 +234,8 @@ export function RegistryCompanySwitcher({
                 Délégation
               </Badge>
             </div>
-          ))}
+          );
+        })}
       </div>
     </div>
   );
