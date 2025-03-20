@@ -107,8 +107,6 @@ export const checkCanCreateAdminRequest = async (
     updatedAt: { gt: addDays(new Date(), -7) } // Past week
   });
 
-  console.log("existingRefusedRequest", existingRefusedRequest);
-
   if (existingRefusedRequest) {
     throw new UserInputError(
       "Vous avez déjà effectué une demande pour cette entreprise, qui a été refusée récemment."
