@@ -11,6 +11,7 @@ import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
 import bspaohResolvers from "./bspaoh/resolvers";
 import registryResolvers from "./registry/resolvers";
+import adminRequestResolvers from "./adminRequest/resolvers";
 import registryV2Resolvers from "./registryV2/resolvers";
 import applicationResolvers from "./applications/resolvers";
 import webhookResolvers from "./webhooks/resolvers";
@@ -36,7 +37,8 @@ const repositories = [
   "applications",
   "webhooks",
   "companydigest",
-  "registryDelegation"
+  "registryDelegation",
+  "adminRequest"
 ];
 
 const typeDefsPath = repositories.map(
@@ -63,7 +65,8 @@ const resolvers = [
   applicationResolvers,
   webhookResolvers,
   companyDigestResolvers,
-  registryDelegationResolvers
+  registryDelegationResolvers,
+  adminRequestResolvers
 ];
 
 export { typeDefs, resolvers };

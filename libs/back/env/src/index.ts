@@ -33,7 +33,7 @@ export const schema = z.object({
   API_URL_SCHEME: z.string().optional(),
   OIDC_PRIVATE_KEY: z.string(),
   // -------
-  // Various
+  // Misc
   USERS_BLACKLIST: z.string().optional(),
   MAX_REQUESTS_PER_WINDOW: z.string().optional().default("1000"),
   TRUST_PROXY_HOPS: z.string().optional().default("1").refine(isNumber),
@@ -45,6 +45,7 @@ export const schema = z.object({
     .default("false")
     .refine(isBoolean),
   JEST_WORKER_ID: z.string().optional(),
+  MAX_ADMIN_REQUESTS_MAILS_PER_WEEK: z.string().optional().default("100"),
   // -------
   // Bulk index
   BULK_INDEX_BATCH_SIZE: z.string().optional().default("100").refine(isNumber),
