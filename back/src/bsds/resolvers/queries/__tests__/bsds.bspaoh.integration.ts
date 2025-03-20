@@ -256,7 +256,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
       ]);
     });
 
-    it("draft bspaoh should be isDraftFor transporter", async () => {
+    it("draft bspaoh should not be isDraftFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -268,13 +268,10 @@ describe("Query.bsds.bspaohs base workflow", () => {
           }
         }
       );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bspaohId } })
-      ]);
+      expect(data.bsds.edges.length).toEqual(0);
     });
 
-    it("draft bspaoh should be isDraftFor destination", async () => {
+    it("draft bspaoh should not be isDraftFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -287,9 +284,7 @@ describe("Query.bsds.bspaohs base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bspaohId } })
-      ]);
+      expect(data.bsds.edges.length).toEqual(0);
     });
   });
 
