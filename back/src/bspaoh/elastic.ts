@@ -51,11 +51,22 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
     isCollectedFor: []
   };
 
-  const bsdSirets: Record<string, string | null | undefined> = {
+  let bsdSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bspaoh.emitterCompanySiret,
     destinationCompanySiret: bspaoh.destinationCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(transporter)
   };
+
+  // Drafts only appear in the dashboard for companies the bspaoh owner belongs to
+  if (bspaoh.status === BspaohStatus.DRAFT) {
+    const draftFormSiretsEntries = Object.entries(bsdSirets).filter(
+      ([, siret]) => siret && bspaoh.canAccessDraftSirets.includes(siret)
+    );
+    bsdSirets = Object.fromEntries(draftFormSiretsEntries) as Record<
+      string,
+      string | null | undefined
+    >;
+  }
 
   const siretsFilters = new Map<string, keyof typeof where>(
     Object.entries(bsdSirets)
