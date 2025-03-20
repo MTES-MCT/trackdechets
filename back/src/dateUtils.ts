@@ -14,17 +14,17 @@ export const getFrenchPublicHolidays = (year: number): string[] => {
   // Calcul du Lundi de Pâques
   const easter = calculateEaster(year);
   const easterMonday = new Date(easter);
-  easterMonday.setDate(easterMonday.getDate() + 1);
+  easterMonday.setUTCDate(easterMonday.getUTCDate() + 1);
   holidays.push(easterMonday.toISOString().split("T")[0]);
 
   // Calcul de l'Ascension (39 jours après Pâques)
   const ascensionDay = new Date(easter);
-  ascensionDay.setDate(ascensionDay.getDate() + 39);
+  ascensionDay.setUTCDate(ascensionDay.getUTCDate() + 39);
   holidays.push(ascensionDay.toISOString().split("T")[0]);
 
   // Calcul du Lundi de Pentecôte (50 après Pâques)
   const whitMonday = new Date(easter);
-  whitMonday.setDate(whitMonday.getDate() + 50);
+  whitMonday.setUTCDate(whitMonday.getUTCDate() + 50);
   holidays.push(whitMonday.toISOString().split("T")[0]);
 
   return holidays;
@@ -40,12 +40,11 @@ const calculateEaster = (year: number): Date => {
     L = I - J,
     month = 3 + f((L + 40) / 44),
     day = L + 28 - 31 * f(month / 4);
-
-  return new Date(year, month - 1, day + 1);
+  return new Date(Date.UTC(year, month - 1, day));
 };
 
 const isPublicHoliday = (date: Date): boolean => {
-  const year = date.getFullYear();
+  const year = date.getUTCFullYear();
   const publicHolidays = getFrenchPublicHolidays(year);
   const formattedDate = date.toISOString().split("T")[0];
   return publicHolidays.includes(formattedDate);
@@ -60,15 +59,15 @@ const isPublicHoliday = (date: Date): boolean => {
  */
 export const getNextWorkday = (inputDate: Date): Date => {
   const resultDate = new Date(inputDate);
-  resultDate.setDate(resultDate.getDate() + 1);
+  resultDate.setUTCDate(resultDate.getUTCDate() + 1);
 
   // Check if the next day is a weekend or a public holiday
   while (
-    resultDate.getDay() === 0 ||
-    resultDate.getDay() === 6 ||
+    resultDate.getUTCDay() === 0 ||
+    resultDate.getUTCDay() === 6 ||
     isPublicHoliday(resultDate)
   ) {
-    resultDate.setDate(resultDate.getDate() + 1);
+    resultDate.setUTCDate(resultDate.getUTCDate() + 1);
   }
 
   return resultDate;
