@@ -39,7 +39,6 @@ import {
   adminRequestCollaboratorEmail
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
-import { getAdminRequestRepository } from "../../../../back/src/adminRequest/repository";
 import { addDays } from "date-fns";
 
 /**

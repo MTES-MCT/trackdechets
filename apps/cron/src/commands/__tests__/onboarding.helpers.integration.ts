@@ -2263,7 +2263,7 @@ describe("getAdminRequestEmailPayloads", () => {
     const company2 = await companyFactory();
 
     // Should not be in results because validationMethod = SEND_MAIL
-    const a1 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2275,7 +2275,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because validationMethod = REQUEST_ADMIN_APPROVAL
-    const a2 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2285,7 +2285,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because status = ACCEPTED
-    const a3 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2298,7 +2298,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because status = REFUSED
-    const a4 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2311,7 +2311,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because status = BLOCKED
-    const a5 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2324,7 +2324,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because admin-only period is not over
-    const a6 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
@@ -2337,7 +2337,7 @@ describe("getAdminRequestEmailPayloads", () => {
     });
 
     // Should not be in results because admin-only period is too old
-    const a7 = await prisma.adminRequest.create({
+    await prisma.adminRequest.create({
       data: {
         user: { connect: { id: user1.id } },
         company: { connect: { id: company1.id } },
