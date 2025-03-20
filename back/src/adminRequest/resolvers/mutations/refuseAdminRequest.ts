@@ -1,6 +1,7 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
+  AdminRequest,
   MutationRefuseAdminRequestArgs,
   ResolversParentTypes
 } from "@td/codegen-back";
@@ -9,7 +10,7 @@ import { parseMutationRefuseAdminRequestArgs } from "../../validation";
 import { prisma } from "@td/prisma";
 import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
-import { AdminRequestStatus, AdminRequest } from "@prisma/client";
+import { AdminRequestStatus } from "@prisma/client";
 import {
   checkCanRefuseAdminRequest,
   getAdminRequestOrThrow,
