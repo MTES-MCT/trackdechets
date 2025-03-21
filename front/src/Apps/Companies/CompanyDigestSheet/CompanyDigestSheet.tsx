@@ -26,7 +26,7 @@ const Description = () => (
       fois par jour et par établissement mais reste consultable.
     </p>
     <br />
-    <p>Les sources des données sont multiples:</p>
+    <p>Les sources des données sont multiples : </p>
     <br />
     <ul className="fr-ml-2w">
       <li>

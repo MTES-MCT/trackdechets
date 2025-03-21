@@ -131,7 +131,7 @@ export function BsvhuDetailContent({ form }: Props) {
           {!form.isDraft && <span>{form.id}</span>}
 
           {!!form.customId && (
-            <span className="fr-ml-auto">Numéro libre: {form.customId}</span>
+            <span className="fr-ml-auto">Numéro libre : {form.customId}</span>
           )}
         </h4>
 

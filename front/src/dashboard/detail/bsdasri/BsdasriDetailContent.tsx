@@ -466,7 +466,7 @@ export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
 const DasriIdentificationNumbers = ({ identificationNumbers }) =>
   !!identificationNumbers ? (
     <div className={styles.BsdasriIdentificationNumbersRow}>
-      <dt>Identifiants de containers:</dt>
+      <dt>Identifiants de containers : </dt>
       <dd>{identificationNumbers ? identificationNumbers.join(", ") : null}</dd>
     </div>
   ) : null;

@@ -21,11 +21,11 @@ export default function Recepisse({
       severity="info"
       description={
         <>
-          Numéro: {numero}
+          Numéro : {numero}
           <br />
           Département : {departement}
           <br />
-          Date limite de validité: {formatDate(validityLimit ?? "")}
+          Date limite de validité : {formatDate(validityLimit ?? "")}
         </>
       }
       closable={false}

@@ -16,8 +16,8 @@ const TraderAndBrokerDetail = ({ detail }) => {
         {detail.company?.address}
       </div>
       <div>
-        Récepissé: {number} - Département: {department} - Date limite de
-        validité: {validityLimit ? formatDate(validityLimit) : ""}
+        Récepissé : {number} - Département : {department} - Date limite de
+        validité : {validityLimit ? formatDate(validityLimit) : ""}
       </div>
     </>
   );

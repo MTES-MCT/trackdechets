@@ -87,7 +87,7 @@ const WasteCodeSelector = forwardRef(function WasteCodeSelector(
       </label>
       {formValues.wasteDetails.code && waste?.description && (
         <div className="notification success tw-mt-2">
-          Vous avez sélectionné le code déchet suivant:{" "}
+          Vous avez sélectionné le code déchet suivant :{" "}
           <em>{waste?.description}</em>
         </div>
       )}

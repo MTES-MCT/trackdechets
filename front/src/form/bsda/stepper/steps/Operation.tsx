@@ -103,7 +103,7 @@ export default function Operation({ bsda }: Props) {
           </div>
           {bsda.weight?.value && (
             <p className="tw-text-sm">
-              <em>Quantité prévue: {bsda.weight?.value} tonnes</em>
+              <em>Quantité prévue : {bsda.weight?.value} tonnes</em>
             </p>
           )}
 
@@ -149,7 +149,7 @@ export default function Operation({ bsda }: Props) {
                 D 15 - Transit incluant le groupement sans transvasement
               </option>
             </Field>
-            <p>Opération prévue: {values.destination?.plannedOperationCode}</p>
+            <p>Opération prévue : {values.destination?.plannedOperationCode}</p>
           </div>
 
           <OperationModeSelect

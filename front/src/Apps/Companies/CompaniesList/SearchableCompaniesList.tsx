@@ -103,7 +103,7 @@ export default function SearchableCompaniesList({
       if (isFiltered) {
         return (
           <div className="tw-mb-3">
-            Aucun résultat pour la recherche: {searchClue}
+            Aucun résultat pour la recherche : {searchClue}
           </div>
         );
       }

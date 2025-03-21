@@ -34,7 +34,7 @@ export function Emitter({ disabled }) {
       {isBsdaSuite ? (
         <div className="notification">
           Vous effectuez un groupement ou une réexpédition. L'entreprise
-          émettrice est obligatoirement la vôtre:{" "}
+          émettrice est obligatoirement la vôtre :{" "}
           {values.emitter?.company?.name} - {values.emitter?.company?.siret}
         </div>
       ) : (

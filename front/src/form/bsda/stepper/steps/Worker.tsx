@@ -161,12 +161,12 @@ export function Worker({ disabled }) {
               <div className="form__row">
                 {worker?.workerCertification?.hasSubSectionThree && (
                   <p>
-                    SS3 <span aria-hidden> ✅</span> numéro:{" "}
+                    SS3 <span aria-hidden> ✅</span> numéro :{" "}
                     {worker?.workerCertification?.certificationNumber} date de
-                    validité:{" "}
+                    validité :{" "}
                     {formatDate(worker?.workerCertification?.validityLimit!)}
                     {" - "}
-                    organisme: {worker?.workerCertification?.organisation}
+                    organisme : {worker?.workerCertification?.organisation}
                   </p>
                 )}
               </div>

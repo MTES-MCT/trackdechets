@@ -22,8 +22,9 @@ export default function TransporterRecepisse(
         description={
           recepisse?.number ? (
             <p>
-              Numéro: {recepisse?.number}, département: {recepisse?.department},
-              date limite de validité: {formatDate(recepisse?.validityLimit!)}.
+              Numéro : {recepisse?.number}, département :{" "}
+              {recepisse?.department}, date limite de validité :{" "}
+              {formatDate(recepisse?.validityLimit!)}.
               <br />
               Informations complétées par le transporteur dans son profil
               Trackdéchets.

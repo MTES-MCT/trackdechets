@@ -78,7 +78,7 @@ function Reindex() {
                 return (
                   <Input
                     textArea
-                    label="ID du ou des BSD à réindexer:"
+                    label="ID du ou des BSD à réindexer : "
                     state={error ? "error" : "default"}
                     stateRelatedMessage={error?.message}
                     disabled={loading}
