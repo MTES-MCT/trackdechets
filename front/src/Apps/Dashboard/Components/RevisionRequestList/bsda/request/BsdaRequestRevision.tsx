@@ -6,7 +6,6 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bsda,
-  BsdType,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
@@ -32,7 +31,20 @@ import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCance
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
-import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
+import {
+  CODE_DECHET,
+  CODE_TRAITEMENT,
+  DENOMINATION_USUELLE,
+  DESCRIPTION_TRAITEMENT,
+  NOUVEAU_CODE_DECHET,
+  NOUVEAU_CODE_TRAITEMENT,
+  NOUVEAU_POIDS_EN_TONNES,
+  NOUVEAU_POP,
+  NOUVELLE_DENOMINATION_USUELLE,
+  NOUVELLE_DESC_TRAITEMENT,
+  POP,
+  TITLE_REQUEST_LIST
+} from "../../../Revision/wordingsRevision";
 type Props = {
   bsda: Bsda;
 };
@@ -125,7 +137,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
-        Demander une révision du bordereau {bsda.id}
+        {TITLE_REQUEST_LIST} {bsda.id}
       </h2>
 
       <FormProvider {...methods}>
@@ -141,15 +153,14 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 display: areModificationsDisabled ? "none" : "inline"
               }}
             >
-              <hr />
               <RhfReviewableField
-                title="Code déchet"
+                title={CODE_DECHET}
                 path="waste.code"
                 value={bsda.waste?.code}
                 defaultValue={initialBsdaReview.waste.code}
               >
                 <Select
-                  label="Code déchet"
+                  label={NOUVEAU_CODE_DECHET}
                   className="fr-col-8"
                   nativeSelectProps={{
                     ...register("waste.code")
@@ -165,13 +176,13 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="Nom usuel du déchet"
+                title={DENOMINATION_USUELLE}
                 path="waste.materialName"
                 value={bsda.waste?.materialName}
                 defaultValue={initialBsdaReview.waste.materialName}
               >
                 <Input
-                  label="Nom usuel du déchet"
+                  label={NOUVELLE_DENOMINATION_USUELLE}
                   className="fr-col-8"
                   nativeInputProps={{
                     ...register("waste.materialName")
@@ -187,7 +198,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
               >
                 <div className="fr-col-8">
                   <TagsInput
-                    label="Numéros de scellés"
+                    label="Nouveaux numéros de scellés"
                     onAddTag={handleAddSealNumbers}
                     onDeleteTag={dismissTag}
                     tags={sealNumbersTags}
@@ -196,14 +207,14 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="Contient des polluants organique persistant"
+                title={POP}
                 path="waste.pop"
                 value={Boolean(bsda.waste?.pop) ? "Oui" : "Non"}
                 defaultValue={initialBsdaReview.waste.pop}
                 initialValue={bsda?.waste?.pop}
               >
                 <ToggleSwitch
-                  label="Le déchet contient des polluants organiques persistants"
+                  label={NOUVEAU_POP}
                   checked={Boolean(formValues.waste?.pop)}
                   showCheckedHint={false}
                   onChange={checked => {
@@ -224,8 +235,8 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.destination.cap}
               >
                 <Input
-                  label="Numéro de CAP"
-                  className="fr-col-6"
+                  label="Nouveau CAP"
+                  className="fr-col-8"
                   nativeInputProps={{
                     ...register("destination.cap")
                   }}
@@ -246,6 +257,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.packagings}
                 initialValue={bsda.packagings}
               >
+                <p className="fr-text fr-mb-2w">Nouveaux conditionnements</p>
                 <BsdPackagings path="packagings" bsdType={BsdTypename.Bsda} />
               </RhfReviewableField>
 
@@ -256,8 +268,8 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.destination?.reception?.weight}
               >
                 <NonScrollableInput
-                  label="Poids en tonnes"
-                  className="fr-col-2"
+                  label={NOUVEAU_POIDS_EN_TONNES}
+                  className="fr-col-4"
                   state={errors.destination?.reception?.weight && "error"}
                   stateRelatedMessage={
                     errors.destination?.reception?.weight?.message ?? ""
@@ -281,13 +293,13 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="Code de l'opération D/R"
+                title={CODE_TRAITEMENT}
                 path="destination.operation.code"
                 value={bsda.destination?.operation?.code}
                 defaultValue={initialBsdaReview.destination?.operation?.code}
               >
                 <Select
-                  label="Code de l'opération"
+                  label={NOUVEAU_CODE_TRAITEMENT}
                   className="fr-col-8"
                   nativeSelectProps={{
                     ...register("destination.operation.code")
@@ -321,7 +333,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
-                title="Description de l'opération D/R"
+                title={DESCRIPTION_TRAITEMENT}
                 path="destination.operation.description"
                 value={bsda.destination?.operation?.description}
                 defaultValue={
@@ -329,30 +341,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 }
               >
                 <Input
-                  label="Description de l'opération D/R"
+                  label={NOUVELLE_DESC_TRAITEMENT}
                   nativeInputProps={{
                     ...register("destination.operation.description")
                   }}
                   className="fr-col-8"
-                />
-              </RhfReviewableField>
-
-              <RhfReviewableField
-                title="Courtier"
-                path="broker"
-                value={
-                  bsda.broker?.company?.name ? (
-                    <div>{bsda.broker.company.name}</div>
-                  ) : (
-                    "Aucun"
-                  )
-                }
-                defaultValue={initialBsdaReview.broker}
-              >
-                <RhfBroker
-                  bsdType={BsdType.Bsda}
-                  siret={siret}
-                  showSwitch={false}
                 />
               </RhfReviewableField>
 
@@ -383,6 +376,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                       );
                     }}
                     designation="du chantier ou lieu de collecte"
+                    titleForRevision="Nouvelle adresse du chantier ou lieu de collecte"
                   />
                 </div>
 
@@ -393,11 +387,12 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     placeholder: "Champ libre pour préciser...",
                     ...register("emitter.pickupSite.infos")
                   }}
+                  className="fr-mt-2w"
                 />
               </RhfReviewableField>
             </div>
           </div>
-          {areModificationsDisabled && <hr />}
+          {!areModificationsDisabled && <hr />}
           <Input
             textArea
             label="Commentaire à propos de la révision"

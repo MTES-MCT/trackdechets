@@ -72,7 +72,7 @@ const RhfReviewableField = ({
   }
 
   return (
-    <div>
+    <div className="fr-mb-4w">
       <ToggleSwitch
         label={<LabelContent labelText={title} value={value} suffix={suffix} />}
         inputTitle="terms" // todo: change
@@ -82,8 +82,7 @@ const RhfReviewableField = ({
         onChange={handleIsEditingChange}
         disabled={disabled}
       />
-      {isEditing && <div className="fr-ml-9w">{children} </div>}
-      <hr className="fr-mt-1w" />
+      {isEditing && <div className="fr-ml-9w fr-mt-2w">{children} </div>}
     </div>
   );
 };
