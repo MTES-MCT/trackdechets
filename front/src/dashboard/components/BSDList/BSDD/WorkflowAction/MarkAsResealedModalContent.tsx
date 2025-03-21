@@ -215,8 +215,8 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
                 </div>
                 <div className="form__row">
                   <label>
-                    Mentions au titre des règlements ADR, RID, ADNR, IMDG (le
-                    cas échéant)
+                    Mentions au titre des règlements ADR, RID, ADN, IMDG (le cas
+                    échéant)
                     <Field
                       type="text"
                       name="wasteDetails.onuCode"

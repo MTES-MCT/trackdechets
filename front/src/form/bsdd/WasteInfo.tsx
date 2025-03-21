@@ -342,7 +342,7 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row fr-ml-18v">
         <label>
-          Mention au titre des règlements RID, ADNR, IMDG (optionnel){" "}
+          Mention au titre des règlements RID, ADN, IMDG (optionnel){" "}
           <Field
             type="text"
             name="wasteDetails.nonRoadRegulationMention"
