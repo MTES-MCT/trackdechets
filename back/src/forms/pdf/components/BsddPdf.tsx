@@ -714,7 +714,7 @@ export function BsddPdf({
           <div className="BoxCol">
             <p>
               <strong>
-                6.2 Mentions au titre des règlements RID, ADNR, IMDG (le cas
+                6.2 Mentions au titre des règlements RID, ADN, IMDG (le cas
                 échéant) :
               </strong>
             </p>
@@ -1043,7 +1043,7 @@ export function BsddPdf({
               <div className="BoxCol">
                 <p>
                   <strong>
-                    17. Mentions au titre des règlements ADR, RID, ADNR, IMDG (à
+                    17. Mentions au titre des règlements ADR, RID, ADN, IMDG (à
                     remplir en cas de reconditionnement uniquement) (le cas
                     échéant) :
                   </strong>
