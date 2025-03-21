@@ -157,6 +157,11 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
       break;
     }
 
+    case BsvhuStatus.RECEIVED: {
+      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
+      break;
+    }
+
     case BsvhuStatus.REFUSED:
     case BsvhuStatus.PROCESSED: {
       for (const fieldName of siretsFilters.keys()) {
