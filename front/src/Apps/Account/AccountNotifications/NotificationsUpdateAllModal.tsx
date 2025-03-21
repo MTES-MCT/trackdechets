@@ -109,7 +109,7 @@ export default function AccountNotificationsUpdateAllModal({
       legend: "Demandes de rattachement",
       notification: "membershipRequest",
       activateHint:
-        "S'applique uniquement aux établissements sur lesquelles vous avez le rôle administrateur"
+        "S'applique uniquement aux établissements sur lesquels vous avez le rôle administrateur"
     },
     {
       legend: "Renouvellement du code signature",
@@ -127,7 +127,7 @@ export default function AccountNotificationsUpdateAllModal({
       legend: "Demandes de révision",
       notification: "revisionRequest",
       activateHint:
-        "Ne s'applique pas aux établissements sur lesquelles vous avez le rôle chauffeur"
+        "Ne s'applique pas aux établissements sur lesquels vous avez le rôle chauffeur"
     },
     {
       legend: "Délégations en lien avec le registre",
