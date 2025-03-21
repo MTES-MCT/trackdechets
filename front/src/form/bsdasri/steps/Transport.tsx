@@ -137,7 +137,7 @@ export default function Transport({ status, editionDisabled = false }) {
       )}
       <div className="form__row">
         <label htmlFor="identification.numbers">
-          Numéros de containers
+          Numéros de contenants
           <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
         </label>
         <TagsInput name="identification.numbers" disabled={disabled} />
