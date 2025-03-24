@@ -67,6 +67,18 @@ async function getFormCompanies(form: Form) {
   };
 }
 
+// postCode has been replaced by inseeCode since 08/04/2025
+const migrateParcelPostCodeToInseeCode = wasteDetailsParcelNumbers => {
+  const { postalCode, ...parcelNumber } = wasteDetailsParcelNumbers;
+  return { ...parcelNumber, ...(postalCode ? { inseeCode: postalCode } : {}) };
+};
+
+const migrateParcelsPostCodeToInseeCode = wasteDetailsParcelNumbers => {
+  return wasteDetailsParcelNumbers.map(pn =>
+    migrateParcelPostCodeToInseeCode(pn)
+  );
+};
+
 /**
  * Get duplicable form fields
  *
@@ -125,7 +137,9 @@ async function getDuplicateFormInput(
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
-    wasteDetailsParcelNumbers: prismaJsonNoNull(form.wasteDetailsParcelNumbers),
+    wasteDetailsParcelNumbers: prismaJsonNoNull(
+      migrateParcelsPostCodeToInseeCode(form.wasteDetailsParcelNumbers)
+    ),
     wasteDetailsAnalysisReferences: form.wasteDetailsAnalysisReferences,
     wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
     wasteDetailsName: form.wasteDetailsName,

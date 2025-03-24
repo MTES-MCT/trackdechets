@@ -437,6 +437,48 @@ describe("Mutation.duplicateForm", () => {
     });
   });
 
+  it("should migrate parcel numbers", async () => {
+    const { form, emitter } = await createForm({
+      wasteDetailsParcelNumbers: [
+        {
+          x: null,
+          y: null,
+          city: "Toulon",
+          number: "345",
+          prefix: "123",
+          section: "45",
+          postalCode: "83000"
+        }
+      ]
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    const duplicatedForm = await prisma.form.findUnique({
+      where: { id: data.duplicateForm.id }
+    });
+
+    expect(duplicatedForm?.wasteDetailsParcelNumbers).toMatchObject([
+      {
+        city: "Toulon",
+        number: "345",
+        inseeCode: "83000",
+        prefix: "123",
+        section: "45",
+        x: null,
+        y: null
+      }
+    ]);
+  });
+
   it("should duplicate the temporary storage detail", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ttr = await companyFactory();

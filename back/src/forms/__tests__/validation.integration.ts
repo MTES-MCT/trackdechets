@@ -38,7 +38,7 @@ const formData: Partial<Form> = {
   emitterWorkSiteName: "",
   emitterWorkSiteAddress: "",
   emitterWorkSiteCity: "",
-  emitterWorkSitePostalCode: "",
+  emitterWorkSiteinseeCode: "",
   emitterWorkSiteInfos: "",
   emitterCompanyName: "A company 2",
   emitterCompanySiret: siret1,
@@ -662,7 +662,7 @@ describe("sealedFormSchema", () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         wasteDetailsParcelNumbers: [
-          { city: "Paris", postalCode: "75018", x: 100, y: 0 }
+          { city: "Paris", inseeCode: "75018", x: 100, y: 0 }
         ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
@@ -675,7 +675,7 @@ describe("sealedFormSchema", () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         wasteDetailsParcelNumbers: [
-          { city: "Paris", postalCode: "75018", x: 5.1234567, y: 5 }
+          { city: "Paris", inseeCode: "75018", x: 5.1234567, y: 5 }
         ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
@@ -1543,7 +1543,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing a parcelNumber with no city and postal code", async () => {
+  it("should be invalid when passing a parcelNumber with no city and no insee code", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -1556,7 +1556,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Parcelle: le code postal est obligatoire"
+      "Parcelle: le code INSEE de la commune est obligatoire"
     );
   });
 
@@ -1567,7 +1567,7 @@ describe("draftFormSchema", () => {
         wasteDetailsParcelNumbers: [
           {
             city: "Paris",
-            postalCode: "750012",
+            inseeCode: "75056",
             prefix: "000",
             section: "AB",
             number: "25",
@@ -1588,7 +1588,7 @@ describe("draftFormSchema", () => {
       wasteDetailsParcelNumbers: [
         {
           city: "Paris",
-          postalCode: "750012",
+          inseeCode: "75056",
           prefix: "000",
           section: "AB",
           number: "25",
@@ -1607,7 +1607,7 @@ describe("draftFormSchema", () => {
       wasteDetailsParcelNumbers: [
         {
           city: "Paris",
-          postalCode: "750012",
+          inseeCode: "75056",
           prefix: null,
           section: null,
           number: null,
@@ -1626,7 +1626,7 @@ describe("draftFormSchema", () => {
       wasteDetailsParcelNumbers: [
         {
           city: "Paris",
-          postalCode: "750012",
+          inseeCode: "75056",
           prefix: "000",
           section: "AB",
           number: "25"
@@ -1643,7 +1643,7 @@ describe("draftFormSchema", () => {
       wasteDetailsParcelNumbers: [
         {
           city: "Paris",
-          postalCode: "750012",
+          inseeCode: "75056",
           x: 1.2,
           y: 1.3
         }
@@ -1659,7 +1659,7 @@ describe("draftFormSchema", () => {
       wasteDetailsParcelNumbers: [
         {
           city: "Paris",
-          postalCode: "750012",
+          inseeCode: "75056",
           x: -1.2,
           y: -1.3
         }
@@ -1676,7 +1676,7 @@ describe("draftFormSchema", () => {
         wasteDetailsParcelNumbers: [
           {
             city: "Paris",
-            postalCode: "750012",
+            inseeCode: "75056",
             prefix: "000",
             section: "AB"
           }
@@ -1695,7 +1695,7 @@ describe("draftFormSchema", () => {
         wasteDetailsParcelNumbers: [
           {
             city: "Paris",
-            postalCode: "750012",
+            inseeCode: "75056",
             x: 1.2
           }
         ]
@@ -1716,7 +1716,7 @@ describe("draftFormSchema", () => {
       emitterWorkSiteName: "",
       emitterWorkSiteAddress: "",
       emitterWorkSiteCity: "",
-      emitterWorkSitePostalCode: "",
+      emitterWorkSiteinseeCode: "",
       emitterWorkSiteInfos: "",
       emitterCompanyName: "A company 2",
       emitterCompanyContact: "Emetteur",
