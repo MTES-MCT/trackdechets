@@ -252,7 +252,10 @@ export function simpleFormToBsdd(
     nextDestinationProcessingOperation: form.nextDestinationProcessingOperation,
     parcelCities: parcels?.length ? parcels.map(parcel => parcel.city) : null,
     parcelPostalCodes: parcels?.length
-      ? parcels.map(parcel => parcel.postalCode)
+      ? parcels.map(parcel => parcel.postalCode).filter(Boolean)
+      : null,
+    parcelInseeCodes: parcels?.length
+      ? parcels.map(parcel => parcel.inseeCode).filter(Boolean)
       : null,
     parcelNumbers: parcels?.length
       ? parcels.map(parcel => {

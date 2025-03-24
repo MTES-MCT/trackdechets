@@ -83,6 +83,7 @@ export const wasteDetailsFragment = gql`
     isDangerous
     parcelNumbers {
       city
+      inseeCode
       postalCode
       prefix
       section
@@ -307,6 +308,7 @@ const mutableFieldsFragment = gql`
   ${recipientFragment}
   ${companyFragment}
 `;
+
 export const fullFormFragment = gql`
   fragment FullForm on Form {
     ...MutableFieldsFragment

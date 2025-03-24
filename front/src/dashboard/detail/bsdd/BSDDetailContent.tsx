@@ -822,7 +822,7 @@ export default function BSDDetailContent({
                 value={form.wasteDetails?.parcelNumbers
                   ?.map(
                     pn =>
-                      `${pn.city} - ${pn.postalCode} - ${[
+                      `${pn.city} - ${pn?.inseeCode ?? pn?.postalCode} - ${[
                         pn.prefix,
                         pn.section,
                         pn.number,
