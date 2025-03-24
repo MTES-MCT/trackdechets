@@ -9,7 +9,7 @@ import { toDDMMYYYY } from "./time";
 const getVHUCardDiv = async (page: Page, id: string) => {
   const div = page
     .locator(".bsd-card-list li")
-    .filter({ hasText: `N°: ${id}` })
+    .filter({ hasText: `${id}` })
     .first();
 
   await expect(div).toBeVisible();
@@ -315,7 +315,7 @@ export const createBsvhu = async (
   await page.getByRole("link", { name: "Tous les bordereaux" }).click();
 
   // Make sure VHU is visible
-  const vhuDiv = page.locator(".bsd-card-list li").getByText(`N°: ${id}`);
+  const vhuDiv = page.locator(".bsd-card-list li").getByTestId(`${id}`);
   await expect(vhuDiv).toBeVisible();
 
   return { id };
@@ -515,7 +515,7 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
   // Make sure VHU pops out in results list
   const duplicatedVhuDiv = page
     .locator(".bsd-card-list li")
-    .getByText(`N°: ${duplicatedId}`);
+    .getByTestId(`${duplicatedId}`);
   await expect(duplicatedVhuDiv).toBeVisible();
 
   return { id: duplicatedId };
