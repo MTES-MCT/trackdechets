@@ -184,7 +184,8 @@ describe("mutation.duplicateBsvhu", () => {
         traderCompanyMail: trader.contactEmail,
         traderRecepisseNumber: traderReceipt.receiptNumber,
         traderRecepisseDepartment: traderReceipt.department,
-        traderRecepisseValidityLimit: traderReceipt.validityLimit
+        traderRecepisseValidityLimit: traderReceipt.validityLimit,
+        containsElectricOrHybridVehicles: true
       }
     });
 
@@ -286,6 +287,7 @@ describe("mutation.duplicateBsvhu", () => {
       traderRecepisseNumber,
       traderRecepisseDepartment,
       traderRecepisseValidityLimit,
+      containsElectricOrHybridVehicles,
       ...rest
     } = bsvhu;
 
@@ -399,7 +401,8 @@ describe("mutation.duplicateBsvhu", () => {
       traderCompanyMail,
       traderRecepisseNumber,
       traderRecepisseDepartment,
-      traderRecepisseValidityLimit
+      traderRecepisseValidityLimit,
+      containsElectricOrHybridVehicles
     });
 
     // make sure this test breaks when a new field is added to the Bsvhu model
