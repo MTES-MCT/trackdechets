@@ -180,6 +180,7 @@ export function toGenericWaste(bsvhu: RegistryBsvhu): GenericWaste {
   return {
     wasteDescription: getWasteDescription(bsvhu.wasteCode),
     wasteCode: bsvhu.wasteCode,
+    containsElectricOrHybridVehicles: bsvhu.containsElectricOrHybridVehicles,
     wasteIsDangerous: true,
     pop: false,
     id: bsvhu.id,

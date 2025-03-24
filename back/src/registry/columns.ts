@@ -160,6 +160,10 @@ export const columns: Column[] = [
   { field: "wasteDescription", label: "Dénomination usuelle" },
   { field: "wasteCode", label: "Code du déchet" },
   {
+    field: "containsElectricOrHybridVehicles",
+    label: "VHU électrique ou hybride"
+  },
+  {
     field: "wasteIsDangerous",
     label: "Déchet dangereux",
     format: formatBoolean
