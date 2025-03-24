@@ -115,6 +115,9 @@ input BsvhuInput {
   "Poids des VHUs en tonnes"
   weight: BsvhuWeightInput
 
+  "Comprend des véhicules éléctriques ou hybrides"
+  containsElectricOrHybridVehicles: Boolean
+
   "Détails sur la destination"
   destination: BsvhuDestinationInput
   "Détails sur le transporteur"

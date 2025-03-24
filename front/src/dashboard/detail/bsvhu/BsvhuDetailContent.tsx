@@ -21,6 +21,7 @@ import styles from "../common/BSDDetailContent.module.scss";
 import { getVerboseAcceptationStatus } from "../common/utils";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { VHU_VERBOSE_STATUSES } from "@td/constants";
+import { isDefined } from "../../../common/helper";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -152,6 +153,13 @@ export function BsvhuDetailContent({ form }: Props) {
             <DetailRow value={form.quantity} label="Quantité" />
             <dt>Code déchet</dt>
             <dd>{form.wasteCode}</dd>
+
+            {isDefined(form.containsElectricOrHybridVehicles) && (
+              <>
+                <dt>Comprend des véhicules électriques ou hybrides</dt>
+                <dd>{form.containsElectricOrHybridVehicles ? "Oui" : "Non"}</dd>
+              </>
+            )}
           </div>
 
           {form?.ecoOrganisme && (

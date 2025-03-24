@@ -25,6 +25,9 @@ const WasteBsvhu = ({
   const isEstimate = watch("weight.isEstimate");
   const identificationNumbers = watch("identification.numbers");
   const packaging = watch("packaging");
+  const containsElectricOrHybridVehicles = watch(
+    "containsElectricOrHybridVehicles"
+  );
 
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -129,6 +132,45 @@ const WasteBsvhu = ({
           }
         ]}
       />
+
+      <div>
+        <p className="fr-mb-2w">
+          Comprend des véhicules électriques ou hybrides
+        </p>
+        <RadioButtons
+          disabled={sealedFields.includes("containsElectricOrHybridVehicles")}
+          orientation="horizontal"
+          options={[
+            {
+              label: "Oui",
+              nativeInputProps: {
+                onClick: () => {
+                  if (containsElectricOrHybridVehicles === true) {
+                    setValue("containsElectricOrHybridVehicles", null);
+                  } else {
+                    setValue("containsElectricOrHybridVehicles", true);
+                  }
+                },
+                checked: containsElectricOrHybridVehicles === true
+              }
+            },
+            {
+              label: "Non",
+              nativeInputProps: {
+                onClick: () => {
+                  if (containsElectricOrHybridVehicles === false) {
+                    setValue("containsElectricOrHybridVehicles", null);
+                  } else {
+                    setValue("containsElectricOrHybridVehicles", false);
+                  }
+                },
+                checked: containsElectricOrHybridVehicles === false
+              }
+            }
+          ]}
+        />
+      </div>
+
       <h4 className="fr-h4">Conditionnement</h4>
 
       <fieldset className="fr-fieldset">

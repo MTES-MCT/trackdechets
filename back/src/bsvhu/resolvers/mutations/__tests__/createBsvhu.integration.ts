@@ -12,12 +12,14 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import gql from "graphql-tag";
 import { BsvhuIdentificationType } from "@prisma/client";
+import { prisma } from "@td/prisma";
 
 const CREATE_VHU_FORM = gql`
   mutation CreateVhuForm($input: BsvhuInput!) {
     createBsvhu(input: $input) {
       id
       customId
+      containsElectricOrHybridVehicles
       destination {
         company {
           siret
@@ -1393,4 +1395,84 @@ describe("Mutation.Vhu.create", () => {
       expect(data.createBsvhu.id).toBeTruthy();
     }
   );
+
+  describe("containsElectricOrHybridVehicles", () => {
+    it.each([true, false, null])(
+      "should create a valid VHU with containsElectricOrHybridVehicles = %p",
+      async containsElectricOrHybridVehicles => {
+        // Given
+        const { user, company } = await userWithCompanyFactory("MEMBER");
+        const destinationCompany = await companyFactory({
+          companyTypes: ["WASTE_VEHICLES"],
+          wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+        });
+
+        const input = {
+          emitter: {
+            company: {
+              siret: company.siret,
+              name: "The crusher",
+              address: "Rue de la carcasse",
+              contact: "Un centre VHU",
+              phone: "0101010101",
+              mail: "emitter@mail.com"
+            },
+            agrementNumber: "1234"
+          },
+          wasteCode: "16 01 06",
+          packaging: "UNITE",
+          identification: {
+            numbers: ["123", "456"],
+            type: "NUMERO_ORDRE_REGISTRE_POLICE"
+          },
+          quantity: 2,
+          weight: {
+            isEstimate: false,
+            value: 1.3
+          },
+          destination: {
+            type: "BROYEUR",
+            plannedOperationCode: "R 12",
+            company: {
+              siret: destinationCompany.siret,
+              name: "destination",
+              address: "address",
+              contact: "contactEmail",
+              phone: "contactPhone",
+              mail: "contactEmail@mail.com"
+            },
+            agrementNumber: "9876"
+          },
+          containsElectricOrHybridVehicles
+        };
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors, data } = await mutate<Pick<Mutation, "createBsvhu">>(
+          CREATE_VHU_FORM,
+          {
+            variables: {
+              input
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.createBsvhu.containsElectricOrHybridVehicles).toBe(
+          containsElectricOrHybridVehicles
+        );
+
+        const vhu = await prisma.bsvhu.findFirstOrThrow({
+          where: {
+            id: data.createBsvhu.id
+          }
+        });
+
+        expect(vhu.containsElectricOrHybridVehicles).toBe(
+          containsElectricOrHybridVehicles
+        );
+      }
+    );
+  });
 });

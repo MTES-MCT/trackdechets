@@ -8,7 +8,7 @@ import {
 } from "../../../common/pdf";
 import type { Bsvhu, OperationMode } from "@td/codegen-back";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
 import { Recepisse } from "../../../common/pdf/components/Recepisse";
 
 const UNITE_IDENTIFICATION_TYPES_LABELS = {
@@ -253,6 +253,12 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
                 par un centre agréé)
               </label>
             </div>
+            {isDefined(bsvhu?.containsElectricOrHybridVehicles) && (
+              <div>
+                Comprend des véhicules électriques ou hybrides:{" "}
+                {bsvhu?.containsElectricOrHybridVehicles ? "Oui" : "Non"}
+              </div>
+            )}
           </div>
         </div>
         {/* End Waste */}

@@ -117,6 +117,7 @@ export const FullBsvhuFragment = gql`
     status
     createdAt
     updatedAt
+    containsElectricOrHybridVehicles
     emitter {
       company {
         ...CompanyFragment

@@ -83,6 +83,9 @@ type Bsvhu {
   trader: BsvhuTrader
 
   metadata: BsvhuMetadata!
+
+  "Comprend des véhicules éléctriques ou hybrides"
+  containsElectricOrHybridVehicles: Boolean
 }
 
 type BsvhuEmitter {

@@ -164,7 +164,8 @@ export const rawBsvhuSchema = z
         .nullish()
     }),
     hasIntermediaries: z.boolean().nullish(),
-    intermediaries: z.array(zodCompany).nullish()
+    intermediaries: z.array(zodCompany).nullish(),
+    containsElectricOrHybridVehicles: z.boolean().nullish()
   })
   .superRefine((val, ctx) => {
     if (val?.hasBroker && !val.broker.company.siret) {
