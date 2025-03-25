@@ -951,6 +951,7 @@ model User {
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
+  texsAnalysisFiles          TexsAnalysisFile[]
 }
 
 enum GovernmentPermission {
