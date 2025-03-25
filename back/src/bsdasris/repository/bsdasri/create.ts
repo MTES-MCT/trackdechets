@@ -39,10 +39,10 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
     }
 
     // For drafts, only the owner's sirets that appear on the bsd have access
-    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
-      bsdasri,
-      user.id
-    );
+    let canAccessDraftOrgIds: string[] = [];
+    if (bsdasri.isDraft) {
+      canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsdasri, user.id);
+    }
 
     const updatedBsdasri = await prisma.bsdasri.update({
       where: { id: bsdasri.id },
