@@ -23,7 +23,7 @@ export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
           control={methods.control}
           render={({ field }) => (
             <RegistryCompanySwitcher
-              wrapperClassName="fr-col-8 tw-relative"
+              wrapperClassName="fr-col-8"
               label={reportForLabel}
               defaultSiret={field.value}
               onCompanySelect={(siret, isDelegation) => {

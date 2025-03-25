@@ -63,8 +63,10 @@ export function Modal({
     };
   }, []);
 
+  const portal = document.querySelector("#portal-root")!;
+
   return (
-    <Overlay>
+    <Overlay portalContainer={portal}>
       <div
         style={{
           height: `calc(100vh - ${keyboardOffset}px)`,
@@ -81,7 +83,15 @@ export function Modal({
             {...modalProps}
             ref={ref}
           >
-            <FocusTrap active>
+            <FocusTrap
+              active
+              focusTrapOptions={{
+                // To allow other portals (eg combobox inside modal)
+                clickOutsideDeactivates: e => {
+                  return portal.contains(e.target as Node);
+                }
+              }}
+            >
               <div className="fr-grid-row fr-grid-row--center">
                 <div className={ModalSizesClass[size]}>
                   <div className="fr-modal__body">
