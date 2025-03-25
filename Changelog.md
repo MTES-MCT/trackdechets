@@ -15,6 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Mettre à jour la doc "Utiliser le playground" de la documentation développeur [PR 4034](https://github.com/MTES-MCT/trackdechets/pull/4034)
 
+#### :bug: Corrections de bugs
+
+- Impossibilité d'ajouter un transporteur via l'UI si la liste de transporteur est vide lors de l'édition d'un BSDD [PR 4042](https://github.com/MTES-MCT/trackdechets/pull/4042)
+
 # [2025.03.1] 11/03/2025
 
 #### :rocket: Nouvelles fonctionnalités

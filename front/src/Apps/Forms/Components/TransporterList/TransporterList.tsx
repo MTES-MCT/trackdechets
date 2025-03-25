@@ -10,6 +10,7 @@ import { AnyTransporterInput } from "../../types";
 import { useTransporters } from "../../hooks/useTransporters";
 import { useDeleteTransporter } from "../../hooks/useDeleteTransporter";
 import { initialTransporter } from "../../../common/data/initialState";
+import Button from "@codegouvfr/react-dsfr/Button";
 
 type TransporterListProps = {
   // SIRET ou VAT de l'établissement courant
@@ -54,6 +55,25 @@ export function TransporterList<TransporterInput extends AnyTransporterInput>({
         name={fieldName}
         render={arrayHelpers => (
           <>
+            {transporters.length === 0 && (
+              // Ce cas peut se produire lors de la modification d'un BSDD
+              // crée par API avec une liste de transporteurs vide (contrairement
+              // au front TD qui initialise un premier transporteur à la création du BSDD).
+              <Button
+                type="button"
+                className="transporter__header__button"
+                priority="secondary"
+                iconPosition="right"
+                iconId="ri-add-line"
+                title="Ajouter"
+                onClick={() => {
+                  arrayHelpers.insert(0, initialTransporterData);
+                  setExpandedIdx(0);
+                }}
+              >
+                Ajouter
+              </Button>
+            )}
             {transporters.map((t, idx) => {
               const onTransporterAdd = () => {
                 arrayHelpers.insert(idx + 1, initialTransporterData);
