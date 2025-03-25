@@ -233,6 +233,7 @@ export const INCOMING_WASTE_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
   "D 5",
   "D 8",
   "D 9",
+  "D 9 F",
   "D 10",
   "D 12",
   "D 13",
@@ -281,6 +282,7 @@ export const INCOMING_TEXS_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
 ];
 
 export const SSD_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
+  "R 1",
   "R 2",
   "R 3",
   "R 4",

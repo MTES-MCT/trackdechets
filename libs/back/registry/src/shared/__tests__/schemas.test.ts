@@ -91,6 +91,8 @@ describe("Schemas", () => {
 
   test("getOperationCodeSchema", () => {
     expect(getOperationCodeSchema().parse("D5")).toBe("D 5");
+    expect(getOperationCodeSchema().parse("D15")).toBe("D 15");
+    expect(getOperationCodeSchema().parse("D9F")).toBe("D 9 F");
     expect(() => getOperationCodeSchema().parse("invalid")).toThrow();
   });
 
