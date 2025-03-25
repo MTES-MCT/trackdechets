@@ -47,6 +47,11 @@ export default function CompaniesRoutes() {
             />
 
             <Route
+              path={toRelative(routes.companies.adminRequest)}
+              element={<CompanyDetails />}
+            />
+
+            <Route
               path={toRelative(routes.companies.orientation)}
               element={
                 <AccountContentWrapper title="">

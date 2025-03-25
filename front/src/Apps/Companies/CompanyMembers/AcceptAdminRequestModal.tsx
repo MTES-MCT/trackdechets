@@ -1,5 +1,5 @@
 import React from "react";
-import TdModal from "../../../common/Components/Modal/Modal";
+import TdModal from "../../common/Components/Modal/Modal";
 import {
   QueryAdminRequestArgs,
   Query,
@@ -13,12 +13,13 @@ import {
   ACCEPT_ADMIN_REQUEST,
   ADMIN_REQUEST,
   REFUSE_ADMIN_REQUEST
-} from "../../../common/queries/adminRequest/adminRequest";
+} from "../../common/queries/adminRequest/adminRequest";
 import { useNavigate } from "react-router-dom";
-import { InlineLoader } from "../../../common/Components/Loader/Loaders";
+import { InlineLoader } from "../../common/Components/Loader/Loaders";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import toast from "react-hot-toast";
+import { MY_COMPANIES } from "../common/queries";
 
 interface AcceptAdminRequestModalProps {
   adminRequestId: string;
@@ -40,6 +41,10 @@ export const AcceptAdminRequestModal = ({
     }
   );
 
+  const onClose = () => {
+    navigate(`/companies/${adminRequest?.company.orgId}#membres`);
+  };
+
   const [
     acceptAdminRequest,
     { loading: loadingAccept, error: errorAccept, reset: resetAccept }
@@ -57,12 +62,6 @@ export const AcceptAdminRequestModal = ({
   >(REFUSE_ADMIN_REQUEST);
 
   const adminRequest = data?.adminRequest;
-
-  const onClose = () => {
-    navigate("/companies/manage");
-  };
-
-  // TODO: si le statut n'est pas PENDING, afficher un message clair
 
   return (
     <TdModal
@@ -116,6 +115,7 @@ export const AcceptAdminRequestModal = ({
 
                   acceptAdminRequest({
                     variables: { input: { adminRequestId } },
+                    refetchQueries: [MY_COMPANIES], // Update the members list
                     onCompleted: () => {
                       toast.success("Demande accordée");
                       onClose();
@@ -160,6 +160,18 @@ export const AcceptAdminRequestModal = ({
         adminRequest &&
         adminRequest.status === AdminRequestStatus.Refused && (
           <p>Cette demande a déjà été refusée.</p>
+        )}
+
+      {!loadingGet &&
+        adminRequest &&
+        adminRequest.status === AdminRequestStatus.Blocked && (
+          <p>Cette demande a été bloquée et ne peut plus être modifiée.</p>
+        )}
+
+      {!loadingGet &&
+        adminRequest &&
+        adminRequest.status === AdminRequestStatus.Expired && (
+          <p>Cette demande a expiré et ne peut plus être modifiée.</p>
         )}
     </TdModal>
   );

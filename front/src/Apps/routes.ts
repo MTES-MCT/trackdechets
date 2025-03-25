@@ -123,6 +123,7 @@ const routes = {
   companies: {
     index: "/companies",
     details: "/companies/:siret",
+    adminRequest: "/companies/:siret/admin-request/:adminRequestId",
     create: {
       simple: "/companies/new",
       pro: "/companies/professional",

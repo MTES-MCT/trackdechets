@@ -402,7 +402,7 @@ describe("Mutation createAdminRequest", () => {
   l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
-  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/admin-request/${data.createAdminRequest.id}"
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
 </p>
@@ -491,7 +491,7 @@ describe("Mutation createAdminRequest", () => {
   l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
-  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/admin-request/${data.createAdminRequest.id}"
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
 </p>
@@ -570,7 +570,7 @@ describe("Mutation createAdminRequest", () => {
   l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
   qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
   demande et à <b>l’accepter ou la refuser</b> en cliquant
-  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/manage/admin-request/${data.createAdminRequest.id}"
+  <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
 </p>

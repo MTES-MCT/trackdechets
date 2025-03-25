@@ -22,7 +22,7 @@ export const CompanyCreateAdminRequestModalStep2 = ({
       validationMethod !==
       AdminRequestValidationMethod.RequestCollaboratorApproval
     ) {
-      setValue("collaboratorEmail", null);
+      setValue("collaboratorEmail", undefined);
     }
   }, [validationMethod, setValue]);
 

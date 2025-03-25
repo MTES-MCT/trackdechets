@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { format } from "date-fns";
 import consoleBackend from "./backends/console";
-import { Company, User, UserRole } from "@prisma/client";
+import { Company, UserRole } from "@prisma/client";
 import { searchCompany } from "../../companies/search";
 import { prisma } from "@td/prisma";
 

@@ -3,15 +3,11 @@ import styles from "../../../Account/AccountContentWrapper.module.scss";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CompanyCreateAdminRequestModal } from "./CompanyCreateAdminRequestModal/CompanyCreateAdminRequestModal";
 import { CompanyAdminRequestsTable } from "./CompanyAdminRequestsTable";
-import { useParams } from "react-router-dom";
-import { AcceptAdminRequestModal } from "./AcceptAdminRequestModal";
 import { AcceptMailAdminRequestModal } from "./AcceptMailAdminRequestModal";
 
 export const CompanyAdminRequest = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAcceptMailModalOpen, setIsAcceptMailModalOpen] = useState(false);
-
-  const { adminRequestId } = useParams<{ adminRequestId: string }>();
 
   return (
     <div className={`fr-container--fluid ${styles.content}`}>
@@ -79,10 +75,6 @@ export const CompanyAdminRequest = () => {
         }}
         isOpen={isCreateModalOpen}
       />
-
-      {adminRequestId && (
-        <AcceptAdminRequestModal adminRequestId={adminRequestId} />
-      )}
 
       <div>
         <Button
