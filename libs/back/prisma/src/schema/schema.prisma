@@ -323,7 +323,7 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
-  
+
   registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
   registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
@@ -934,10 +934,10 @@ model User {
   StatusLog             StatusLog[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[]               @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]               @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]               @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]               @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]                 @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]                 @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]                 @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]                 @relation("BsdasriOperationSignature")
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
@@ -1320,6 +1320,8 @@ model Bsdasri {
   finalOperations              BsdasriFinalOperation[] @relation("FinalOperationToInitialBsdasri")
   FinalOperationToFinalBsdasri BsdasriFinalOperation[] @relation("FinalOperationToFinalBsdasri")
 
+  canAccessDraftOrgIds String[] @default([])
+
   // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
@@ -1329,6 +1331,7 @@ model Bsdasri {
   @@index([ecoOrganismeSiret], map: "_BsdasriEcoOrganismeSiretIdx")
   @@index([synthesizedInId], map: "_BsdasriSynthesizedInIdIdx")
   @@index([groupedInId], map: "_BsdasriGroupedInIdIdx")
+  @@index([canAccessDraftOrgIds], map: "_BsdasriCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsdasriStatusIdx")
   @@index([type], map: "_BsdasriTypeIdx")
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")

@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { expandBsdasriFromDB } from "../../converter";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -8,7 +9,6 @@ import { getConnection } from "../../../common/pagination";
 import type { QueryResolvers } from "@td/codegen-back";
 import { getBsdasriRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
-
 const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
   _,
   args,
@@ -34,12 +34,26 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
     ]
   };
 
+  const draftMask: Prisma.BsdasriWhereInput = {
+    OR: [
+      {
+        isDraft: false,
+        ...mask
+      },
+      {
+        isDraft: true,
+        canAccessDraftOrgIds: { hasSome: orgIdsWithListPermission },
+        ...mask
+      }
+    ]
+  };
+
   const prismaWhere = {
     ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
     isDeleted: false
   };
 
-  const where = applyMask(prismaWhere, mask);
+  const where = applyMask<Prisma.BsdasriWhereInput>(prismaWhere, draftMask);
 
   const bsdasriRepository = getBsdasriRepository(user);
 

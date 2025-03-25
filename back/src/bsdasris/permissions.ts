@@ -7,15 +7,17 @@ import { ForbiddenError, UserInputError } from "../common/errors";
  * Retrieves organisations allowed to read a BSDASRI
  */
 function readers(bsdasri: Bsdasri): string[] {
-  return [
-    bsdasri.emitterCompanySiret,
-    bsdasri.transporterCompanySiret,
-    bsdasri.transporterCompanyVatNumber,
-    bsdasri.destinationCompanySiret,
-    bsdasri.ecoOrganismeSiret,
-    ...bsdasri.synthesisEmitterSirets,
-    ...bsdasri.groupingEmitterSirets
-  ].filter(Boolean);
+  return bsdasri.isDraft
+    ? [...bsdasri.canAccessDraftOrgIds]
+    : [
+        bsdasri.emitterCompanySiret,
+        bsdasri.transporterCompanySiret,
+        bsdasri.transporterCompanyVatNumber,
+        bsdasri.destinationCompanySiret,
+        bsdasri.ecoOrganismeSiret,
+        ...bsdasri.synthesisEmitterSirets,
+        ...bsdasri.groupingEmitterSirets
+      ].filter(Boolean);
 }
 
 /**
@@ -25,6 +27,9 @@ function readers(bsdasri: Bsdasri): string[] {
  * a user is not removing his own company from the BSDASRI
  */
 function contributors(bsdasri: Bsdasri, input?: BsdasriInput) {
+  if (bsdasri.isDraft) {
+    return [...bsdasri.canAccessDraftOrgIds];
+  }
   const updateEmitterCompanySiret = input?.emitter?.company?.siret;
   const updateTransporterCompanySiret = input?.transporter?.company?.siret;
   const updateTransporterCompanyVatNumber =
