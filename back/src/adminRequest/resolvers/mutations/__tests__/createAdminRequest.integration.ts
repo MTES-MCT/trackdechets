@@ -1113,4 +1113,52 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
       "Vous avez déjà effectué une demande pour cette entreprise, qui a été refusée récemment."
     );
   });
+
+  it("should throw if user already has lots of pending requests", async () => {
+    // Given
+    const { user, company: company1 } = await userWithCompanyFactory("MEMBER");
+    const company2 = await companyFactory();
+    const company3 = await companyFactory();
+    const company4 = await companyFactory();
+    const company5 = await companyFactory();
+    const company6 = await companyFactory();
+
+    const createRequest = async companyId => {
+      await prisma.adminRequest.create({
+        data: {
+          user: { connect: { id: user.id } },
+          company: { connect: { id: companyId } },
+          status: AdminRequestStatus.PENDING,
+          validationMethod: AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+        }
+      });
+    };
+
+    await createRequest(company1.id);
+    await createRequest(company2.id);
+    await createRequest(company3.id);
+    await createRequest(company4.id);
+    await createRequest(company5.id);
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company6.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez pas avoir plus de 5 demandes en cours."
+    );
+  });
 });
