@@ -136,8 +136,8 @@ export const sendEmailToCompanyAdmins = async (
         name: association.user.name
       })),
       variables: {
-        company,
-        user: author,
+        company: { orgId: company.orgId, name: company.name },
+        user: { name: author.name, email: author.email },
         adminRequest,
         isValidationByCollaboratorApproval:
           adminRequest.validationMethod ===
@@ -160,7 +160,7 @@ export const sendEmailToAuthor = async (
   const mail = renderMail(adminRequestInitialInfoToAuthorEmail, {
     to: [{ email: author.email, name: author.name }],
     variables: {
-      company,
+      company: { orgId: company.orgId, name: company.name },
       isValidationByCollaboratorApproval:
         adminRequest.validationMethod ===
         AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,

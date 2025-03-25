@@ -19,6 +19,8 @@ export const getStatusLabel = (status: AdminRequestStatus) => {
       return "ACCEPTÉE";
     case AdminRequestStatus.Refused:
       return "REFUSÉE";
+    case AdminRequestStatus.Expired:
+      return "EXPIRÉE";
     case AdminRequestStatus.Blocked:
       return "BLOQUÉE";
   }
@@ -29,6 +31,7 @@ export const getStatusBadge = (status: AdminRequestStatus) => {
   if (status === AdminRequestStatus.Pending) severity = "info";
   else if (status === AdminRequestStatus.Accepted) severity = "success";
   else if (status === AdminRequestStatus.Blocked) severity = "error";
+  else if (status === AdminRequestStatus.Expired) severity = "error";
 
   return (
     <Badge severity={severity} small>

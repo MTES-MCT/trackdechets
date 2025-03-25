@@ -34,7 +34,7 @@ function truncate(s: string) {
 export async function sendVerificationCodeLetter(company: Company) {
   if (!company.siret) {
     throw new Error(
-      `Cannot send verification code letter, company ${company.id} hyas no siret`
+      `Cannot send verification code letter, company ${company.id} has no siret`
     );
   }
   const sireneInfo = await searchCompany(company.siret);
@@ -82,13 +82,18 @@ export async function sendVerificationCodeLetter(company: Company) {
 }
 
 export async function sendAdminRequestVerificationCodeLetter(
-  company: Company,
-  user: User,
+  company: {
+    id: string;
+    orgId: string;
+    name: string;
+    siret: string | null;
+  },
+  user: { name: string },
   code: string
 ) {
   if (!company.siret) {
     throw new Error(
-      `Cannot send verification code letter, company ${company.id} hyas no siret`
+      `Cannot send verification code letter, company ${company.id} has no siret`
     );
   }
   const sireneInfo = await searchCompany(company.siret);

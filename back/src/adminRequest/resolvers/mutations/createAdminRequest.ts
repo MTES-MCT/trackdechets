@@ -100,7 +100,16 @@ const createAdminRequest = async (
     adminRequestInput.validationMethod ===
     AdminRequestValidationMethod.SEND_MAIL
   ) {
-    await sendAdminRequestVerificationCodeLetter(company, user, code!);
+    await sendAdminRequestVerificationCodeLetter(
+      {
+        id: company.id,
+        orgId: company.orgId,
+        name: company.name,
+        siret: company.siret
+      },
+      { name: user.name },
+      code!
+    );
   }
 
   // Immediately warn the admins by email

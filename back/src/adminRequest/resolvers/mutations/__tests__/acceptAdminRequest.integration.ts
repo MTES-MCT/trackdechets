@@ -397,6 +397,40 @@ describe("Mutation acceptAdminRequest", () => {
     );
   });
 
+  it("should throw if request has expired", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory();
+    const requestAuthor = await userFactory();
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.EXPIRED,
+        validationMethod: AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(
+      `La demande a expiré et n'est plus modifiable.`
+    );
+  });
+
   it("should not throw if request has already been accepted", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);

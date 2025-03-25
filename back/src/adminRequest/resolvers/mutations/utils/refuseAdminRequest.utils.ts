@@ -58,6 +58,10 @@ export const checkCanRefuseAdminRequest = async (
     );
   }
 
+  if (adminRequest.status === AdminRequestStatus.EXPIRED) {
+    throw new UserInputError(`La demande a expiré et n'est plus modifiable.`);
+  }
+
   // Trackdéchets admins can refuse anything
   if (user.isAdmin) {
     return true;
@@ -92,8 +96,8 @@ export const sendEmailToCompanyAdmins = async (
         name: association.user.name
       })),
       variables: {
-        company,
-        user: author
+        company: { orgId: company.orgId, name: company.name },
+        user: { name: author.name }
       }
     });
 
@@ -105,7 +109,7 @@ export const sendEmailToAuthor = async (author: User, company: Company) => {
   const mail = renderMail(adminRequestRefusedEmail, {
     to: [{ email: author.email, name: author.name }],
     variables: {
-      company
+      company: { orgId: company.orgId, name: company.name }
     }
   });
 

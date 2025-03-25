@@ -78,7 +78,7 @@ export const AcceptMailAdminRequestModal = ({
   return (
     <TdModal
       onClose={onClose}
-      title="Attribuer les droits administraeur"
+      title="Attribuer les droits administrateur"
       ariaLabel="Attribuer les droits administrateur"
       size="L"
       isOpen={isOpen}

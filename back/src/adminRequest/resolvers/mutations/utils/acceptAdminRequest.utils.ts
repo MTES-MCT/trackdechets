@@ -72,6 +72,10 @@ export const checkCanAcceptAdminRequest = async (
     );
   }
 
+  if (adminRequest.status === AdminRequestStatus.EXPIRED) {
+    throw new UserInputError(`La demande a expiré et n'est plus modifiable.`);
+  }
+
   // Admins can accept any request, but they must provide the request id
   if (user.isAdmin && isDefined(adminRequestInput.adminRequestId)) {
     return true;
@@ -172,8 +176,8 @@ export const sendEmailToCompanyAdmins = async (
         name: association.user.name
       })),
       variables: {
-        company,
-        user: author
+        company: { orgId: company.orgId, name: company.name },
+        user: { name: author.name }
       }
     });
 
@@ -186,7 +190,7 @@ export const sendEmailToAuthor = async (author: User, company: Company) => {
   const authorMail = renderMail(adminRequestAcceptedEmail, {
     to: [{ email: author.email, name: author.name }],
     variables: {
-      company
+      company: { orgId: company.orgId, name: company.name }
     }
   });
 
