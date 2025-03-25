@@ -24,6 +24,7 @@ import { splitAddress } from "../common/addresses";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { logger } from "@td/logger";
 
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   const destinationFinalOperationCodes: string[] = [];
@@ -687,9 +688,15 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bsdasri.id, tx);
   const lookupInputs = bsdasriToLookupCreateInputs(bsdasri);
   if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
+    try {
+      await tx.registryLookup.createMany({
+        data: lookupInputs
+      });
+    } catch (error) {
+      logger.error(`Error creating registry lookup for bsdasri ${bsdasri.id}`);
+      logger.error(lookupInputs);
+      throw error;
+    }
   }
 };
 

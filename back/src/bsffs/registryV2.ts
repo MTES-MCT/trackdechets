@@ -30,6 +30,7 @@ import { getBsffSubType } from "../common/subTypes";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1097,9 +1098,15 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bsff.id, tx);
   const lookupInputs = bsffToLookupCreateInputs(bsff);
   if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
+    try {
+      await tx.registryLookup.createMany({
+        data: lookupInputs
+      });
+    } catch (error) {
+      logger.error(`Error creating registry lookup for bsff ${bsff.id}`);
+      logger.error(lookupInputs);
+      throw error;
+    }
   }
 };
 

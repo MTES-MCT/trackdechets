@@ -26,6 +26,7 @@ import { getBsdaSubType } from "../common/subTypes";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1354,9 +1355,15 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bsda.id, tx);
   const lookupInputs = bsdaToLookupCreateInputs(bsda);
   if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
+    try {
+      await tx.registryLookup.createMany({
+        data: lookupInputs
+      });
+    } catch (error) {
+      logger.error(`Error creating registry lookup for bsda ${bsda.id}`);
+      logger.error(lookupInputs);
+      throw error;
+    }
   }
 };
 

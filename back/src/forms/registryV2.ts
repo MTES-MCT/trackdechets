@@ -31,6 +31,7 @@ import {
   INCOMING_TEXS_WASTE_CODES,
   isDangerous
 } from "@td/constants";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1366,9 +1367,15 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(form.id, tx);
   const lookupInputs = bsddToLookupCreateInputs(form);
   if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
+    try {
+      await tx.registryLookup.createMany({
+        data: lookupInputs
+      });
+    } catch (error) {
+      logger.error(`Error creating registry lookup for bsdd ${form.id}`);
+      logger.error(lookupInputs);
+      throw error;
+    }
   }
 };
 

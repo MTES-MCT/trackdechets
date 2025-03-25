@@ -25,6 +25,7 @@ import {
   emptyTransportedWasteV2
 } from "../registryV2/types";
 import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import { logger } from "@td/logger";
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
@@ -637,9 +638,15 @@ const performRegistryLookupUpdate = async (
   await deleteRegistryLookup(bspaoh.id, tx);
   const lookupInputs = bspaohToLookupCreateInputs(bspaoh);
   if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
+    try {
+      await tx.registryLookup.createMany({
+        data: lookupInputs
+      });
+    } catch (error) {
+      logger.error(`Error creating registry lookup for bspaoh ${bspaoh.id}`);
+      logger.error(lookupInputs);
+      throw error;
+    }
   }
 };
 
