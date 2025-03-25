@@ -633,6 +633,7 @@ export const getAdminRequestEmailPayloads = async () => {
   const now = new Date();
   const yesterday = addDays(new Date(), -1);
 
+  // TODO: use repository here?
   const adminRequests = await prisma.adminRequest.findMany({
     where: {
       status: AdminRequestStatus.PENDING,

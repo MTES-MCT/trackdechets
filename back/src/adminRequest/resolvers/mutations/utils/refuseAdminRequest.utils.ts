@@ -16,6 +16,7 @@ import {
   renderMail
 } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
+import { addDays } from "date-fns";
 
 export const getAdminRequestOrThrow = async (
   user: Express.User,
@@ -109,4 +110,20 @@ export const sendEmailToAuthor = async (author: User, company: Company) => {
   });
 
   await sendMail(mail);
+};
+
+/**
+ * Expire requests that are older than 14 days
+ */
+export const expireAdminRequests = async () => {
+  // TODO: use repository here?
+  await prisma.adminRequest.updateMany({
+    where: {
+      status: AdminRequestStatus.PENDING,
+      createdAt: { lt: addDays(new Date(), -14) }
+    },
+    data: {
+      status: AdminRequestStatus.EXPIRED
+    }
+  });
 };

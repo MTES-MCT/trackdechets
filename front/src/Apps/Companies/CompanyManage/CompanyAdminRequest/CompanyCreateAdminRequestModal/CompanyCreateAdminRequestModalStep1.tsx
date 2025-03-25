@@ -22,6 +22,12 @@ export const CompanyCreateAdminRequestModalStep1 = ({
         <CompanySelectorWrapper
           orgId={companyOrgId}
           selectedCompanyOrgId={companyOrgId}
+          selectedCompanyError={company => {
+            if (company && !company.isRegistered) {
+              return "Cet établissement n'est pas inscrit sur Trackdéchets.";
+            }
+            return null;
+          }}
           onCompanySelected={company => {
             if (company) {
               setValue("companyOrgId", company?.orgId);

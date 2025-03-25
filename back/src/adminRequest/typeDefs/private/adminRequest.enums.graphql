@@ -24,4 +24,7 @@ enum AdminRequestStatus {
 
   "La demande a été bloquée"
   BLOCKED
+
+  "La demande a expiré"
+  EXPIRED
 }

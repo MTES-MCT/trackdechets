@@ -2146,6 +2146,7 @@ enum AdminRequestStatus {
   ACCEPTED 
   REFUSED
   BLOCKED
+  EXPIRED
 }
 
 enum AdminRequestValidationMethod {

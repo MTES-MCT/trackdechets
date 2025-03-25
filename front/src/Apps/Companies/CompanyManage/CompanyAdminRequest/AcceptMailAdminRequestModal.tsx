@@ -54,9 +54,6 @@ export const AcceptMailAdminRequestModal = ({
   const orgId = watch("orgId");
   const code = watch("code");
 
-  console.log("orgId", orgId);
-  console.log("code", code);
-
   useEffect(() => {
     // register fields managed under the hood by company selector
     register(`orgId`);

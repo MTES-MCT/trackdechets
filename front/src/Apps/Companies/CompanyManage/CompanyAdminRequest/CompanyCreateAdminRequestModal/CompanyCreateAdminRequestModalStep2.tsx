@@ -1,6 +1,6 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { isDefined } from "../../../../../common/helper";
 import { isEmail } from "@td/constants";
@@ -10,12 +10,21 @@ export const CompanyCreateAdminRequestModalStep2 = ({
   onClickNext,
   onClickPrevious
 }) => {
-  const { register, watch } = useFormContext();
+  const { register, watch, setValue } = useFormContext();
 
   const validationMethod = watch("validationMethod");
   const collaboratorEmail = watch("collaboratorEmail");
   const companyName = watch("companyName");
   const companyOrgId = watch("companyOrgId");
+
+  useEffect(() => {
+    if (
+      validationMethod !==
+      AdminRequestValidationMethod.RequestCollaboratorApproval
+    ) {
+      setValue("collaboratorEmail", null);
+    }
+  }, [validationMethod, setValue]);
 
   return (
     <>
