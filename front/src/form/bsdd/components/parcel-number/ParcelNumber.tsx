@@ -16,7 +16,7 @@ const TagsInput = lazy(
 
 const newParcelNumber = {
   city: "",
-  postalCode: "",
+  inseeCode: "",
   prefix: "",
   number: "",
   section: ""
@@ -73,10 +73,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
                   </div>
                   <div className="form__row">
                     <label>
-                      Code postal
+                      Code INSEE de la commune
                       <Field
                         type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.postalCode`}
+                        name={`wasteDetails.parcelNumbers.${index}.inseeCode`}
                         className="td-input td-input--small"
                       />
                     </label>
@@ -138,14 +138,14 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
     if (showParcelNumber) {
       arrayHelpers.replace(index, {
         city: parcelNumber.city,
-        postalCode: parcelNumber.postalCode,
+        inseeCode: parcelNumber.inseeCode,
         x: 0,
         y: 0
       });
     } else {
       arrayHelpers.replace(index, {
         city: parcelNumber.city,
-        postalCode: parcelNumber.postalCode,
+        inseeCode: parcelNumber.inseeCode,
         prefix: "",
         number: "",
         section: ""
