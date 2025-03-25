@@ -87,6 +87,13 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
     OR: [
       // nextStep = markAsSealed
       { status: Status.DRAFT },
+      // Le bordereau est scellé, en attente de la signature émetteur
+      { status: Status.SEALED, emitterCompanySiret: siret },
+      // Le bordereau est signé par l'émetteur, en attente de la signature du 1er transporteur
+      {
+        status: Status.SIGNED_BY_PRODUCER,
+        transporters: { some: { transporterCompanySiret: siret, number: 1 } }
+      },
       {
         AND: [
           // BSD avec acheminement direct du producteur à l'installation de destination

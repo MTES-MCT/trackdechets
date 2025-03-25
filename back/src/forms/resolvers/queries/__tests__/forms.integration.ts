@@ -11,7 +11,8 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import type { Query } from "@td/codegen-back";
+import type { Query, QueryFormsArgs } from "@td/codegen-back";
+import gql from "graphql-tag";
 
 function createForms(
   userId: string,
@@ -50,53 +51,56 @@ async function createNSortedForms(
   return forms;
 }
 
-const FORMS = `
+const FORMS = gql`
   query Forms(
-    $siret: String,
-    $status: [FormStatus!],
-    $roles: [FormRole!],
-    $skip: Int,
-    $first: Int,
-    $last: Int,
-    $cursorBefore: ID,
-    $cursorAfter: ID) {
-      forms(
-        siret: $siret
-        status: $status
-        roles: $roles
-        skip: $skip
-        first: $first
-        last: $last
-        cursorBefore: $cursorBefore
-        cursorAfter: $cursorAfter
-        ) {
-          id
-          recipient {
-            company {
-              siret
-            }
-          }
-          emitter {
-            company {
-              siret
-            }
-          }
-          ecoOrganisme {
-            siret
-          }
-          wasteDetails {
-            packagingInfos {
-              type
-              quantity
-            }
-          }
-          stateSummary {
-            packagingInfos {
-              type
-              quantity
-            }
-          }
+    $siret: String
+    $status: [FormStatus!]
+    $roles: [FormRole!]
+    $hasNextStep: Boolean
+    $skip: Int
+    $first: Int
+    $last: Int
+    $cursorBefore: ID
+    $cursorAfter: ID
+  ) {
+    forms(
+      siret: $siret
+      status: $status
+      roles: $roles
+      hasNextStep: $hasNextStep
+      skip: $skip
+      first: $first
+      last: $last
+      cursorBefore: $cursorBefore
+      cursorAfter: $cursorAfter
+    ) {
+      id
+      recipient {
+        company {
+          siret
+        }
       }
+      emitter {
+        company {
+          siret
+        }
+      }
+      ecoOrganisme {
+        siret
+      }
+      wasteDetails {
+        packagingInfos {
+          type
+          quantity
+        }
+      }
+      stateSummary {
+        packagingInfos {
+          type
+          quantity
+        }
+      }
+    }
   }
 `;
 
@@ -809,6 +813,101 @@ describe("Query.forms", () => {
     expect(data.forms.length).toBe(1);
     expect(data.forms[0].emitter!.company!.siret).toBe(otherCompany.siret);
   });
+
+  it("should not return draft forms for which user is present but not the owner", async () => {
+    const { user: owner, company: ownerCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: {
+        set: ["WASTEPROCESSOR"]
+      }
+    });
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: ownerCompany.siret,
+        emitterCompanyName: ownerCompany.name,
+        recipientCompanySiret: company.name,
+        recipientCompanyName: company.siret
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
+
+    const forms = data.forms.filter(
+      f => f.recipient?.company?.siret === company.siret
+    );
+    expect(forms.length).toBe(0);
+  });
+
+  it("should return draft forms for which user is the owner", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
+
+    const forms = data.forms.filter(
+      f => f.emitter?.company?.siret === company.siret
+    );
+    expect(forms.length).toBe(1);
+  });
+
+  it("should return a form SEALED for emitter when hasNextStep=true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">, QueryFormsArgs>(FORMS, {
+      variables: { siret: company.siret, hasNextStep: true }
+    });
+
+    expect(data.forms).toHaveLength(1);
+  });
+
+  it("should return a form SIGNED_BY_PRODUCER for transporter when hasNextStep=true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emittedAt: new Date(),
+        transporters: {
+          create: { transporterCompanySiret: company.siret, number: 1 }
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">, QueryFormsArgs>(FORMS, {
+      variables: { siret: company.siret, hasNextStep: true }
+    });
+
+    expect(data.forms).toHaveLength(1);
+  });
 });
 
 describe("Integration / Forms query for transporters", () => {
@@ -935,58 +1034,5 @@ describe("Integration / Forms query for transporters", () => {
 
     expect(data.forms).toHaveLength(1);
     expect(data.forms[0].id).toEqual(form.id);
-  });
-
-  it("should not return draft forms for which user is present but not the owner", async () => {
-    const { user: owner, company: ownerCompany } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN", {
-      companyTypes: {
-        set: ["WASTEPROCESSOR"]
-      }
-    });
-
-    // Create form associated to the EO
-    await formFactory({
-      ownerId: owner.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: ownerCompany.siret,
-        emitterCompanyName: ownerCompany.name,
-        recipientCompanySiret: company.name,
-        recipientCompanyName: company.siret
-      }
-    });
-
-    const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "forms">>(FORMS);
-
-    const forms = data.forms.filter(
-      f => f.recipient?.company?.siret === company.siret
-    );
-    expect(forms.length).toBe(0);
-  });
-
-  it("should return draft forms for which user is the owner", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-
-    // Create form associated to the EO
-    await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: company.siret,
-        emitterCompanyName: company.name
-      }
-    });
-
-    const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "forms">>(FORMS);
-
-    const forms = data.forms.filter(
-      f => f.emitter?.company?.siret === company.siret
-    );
-    expect(forms.length).toBe(1);
   });
 });
