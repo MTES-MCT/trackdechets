@@ -11,6 +11,7 @@ import type { BsdasriPackagingsInput } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
 import { computeTotalVolume } from "../converter";
+import { getCanAccessDraftOrgIds } from "../utils";
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
   id: getReadableId(ReadableIdPrefix.DASRI),
@@ -18,8 +19,10 @@ const dasriData = () => ({
 });
 
 export const bsdasriFactory = async ({
+  userId,
   opt = {}
 }: {
+  userId?: string;
   opt?: Partial<Prisma.BsdasriCreateInput>;
 }) => {
   const dasriParams = {
@@ -59,6 +62,15 @@ export const bsdasriFactory = async ({
     return prisma.bsdasri.update({
       where: { id: created.id },
       data: { groupingEmitterSirets }
+    });
+  }
+
+  if (created.isDraft && userId) {
+    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(created, userId);
+
+    return prisma.bsdasri.update({
+      where: { id: created.id },
+      data: { canAccessDraftOrgIds }
     });
   }
 
