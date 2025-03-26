@@ -1313,6 +1313,8 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.GRP;
     case BsdaType.Reshipment:
       return WorkflowDisplayType.REEXPEDITION;
+    case BsdaType.Collection_2710:
+      return WorkflowDisplayType.Collection_2710;
 
     case BsdasriType.Grouping:
       return WorkflowDisplayType.GRP;
