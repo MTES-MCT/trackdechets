@@ -142,7 +142,9 @@ describe("getDelegationNotifiableUsers", () => {
     const users = await getDelegationNotifiableUsers(delegation);
 
     // Then
-    expect(users.map(user => user.id)).toMatchObject([
+    expect(
+      users.map(user => user.id).sort((a, b) => a.localeCompare(b))
+    ).toEqual([
       delegatorAdmin.id,
       delegatorAdmin3.id,
       delegateAdmin.id,
@@ -172,6 +174,6 @@ describe("getDelegationNotifiableUsers", () => {
     const users = await getDelegationNotifiableUsers(delegation);
 
     // Then
-    expect(users.map(user => user.id)).toMatchObject([]);
+    expect(users.map(user => user.id)).toHaveLength(0);
   });
 });
