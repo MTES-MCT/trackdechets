@@ -63,10 +63,10 @@ export function Modal({
     };
   }, []);
 
-  const portal = document.querySelector("#portal-root")!;
+  const portal = document.querySelector("#portal-root");
 
   return (
-    <Overlay portalContainer={portal}>
+    <Overlay portalContainer={portal || undefined}>
       <div
         style={{
           height: `calc(100vh - ${keyboardOffset}px)`,
@@ -88,7 +88,7 @@ export function Modal({
               focusTrapOptions={{
                 // To allow other portals (eg combobox inside modal)
                 clickOutsideDeactivates: e => {
-                  return portal.contains(e.target as Node);
+                  return portal != null && portal.contains(e.target as Node);
                 }
               }}
             >
