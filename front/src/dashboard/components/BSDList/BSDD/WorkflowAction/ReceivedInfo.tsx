@@ -275,7 +275,7 @@ export default function ReceivedInfo({
                   }
                 />
                 <span>
-                  Poids indicatif émis: {form.stateSummary?.quantity} tonnes
+                  Poids indicatif émis : {form.stateSummary?.quantity} tonnes
                 </span>
               </label>
               <RedErrorMessage name="quantityReceived" />

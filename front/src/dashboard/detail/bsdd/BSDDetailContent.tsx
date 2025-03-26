@@ -778,7 +778,7 @@ export default function BSDDetailContent({
             {form.status !== FormStatus.Draft && <span>{form.readableId}</span>}
 
             {!!form.customId && (
-              <span className="tw-ml-auto">Numéro libre: {form.customId}</span>
+              <span className="tw-ml-auto">Numéro libre : {form.customId}</span>
             )}
           </h4>
 

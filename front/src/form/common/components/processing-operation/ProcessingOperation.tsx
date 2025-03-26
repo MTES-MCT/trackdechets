@@ -42,7 +42,7 @@ export default function ProcessingOperation({
             styles.processingOperationNotification
           )}
         >
-          Vous avez sélectionné l'opération suivante:{" "}
+          Vous avez sélectionné l'opération suivante :{" "}
           <em>{operationDetail.description}</em>
         </div>
       )}
