@@ -56,7 +56,7 @@ const BSVHUPreviewContent = ({ bsdId }: BSVHUPreviewContentProps) => {
     },
     {
       tabId: "transport",
-      label: "Transport",
+      label: "Transporteur",
       iconId: "fr-icon-arrow-right-line" as FrIconClassName
     },
     {
