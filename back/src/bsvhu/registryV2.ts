@@ -1,12 +1,10 @@
 import {
   Prisma,
-  PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type {
   IncomingWasteV2,
   ManagedWasteV2,
@@ -791,36 +789,28 @@ const bsvhuToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  bsvhu: MinimalBsvhuForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsvhu.id, tx);
-  const lookupInputs = bsvhuToLookupCreateInputs(bsvhu);
-  if (lookupInputs.length > 0) {
-    try {
-      await tx.registryLookup.createMany({
-        data: lookupInputs
-      });
-    } catch (error) {
-      logger.error(`Error creating registry lookup for bsvhu ${bsvhu.id}`);
-      logger.error(lookupInputs);
-      throw error;
-    }
-  }
-};
-
 export const updateRegistryLookup = async (
-  bsvhu: MinimalBsvhuForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  bsvhu: MinimalBsvhuForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(bsvhu, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(bsvhu, tx);
-  }
+  await prisma.$transaction(async tx => {
+    // acquire an advisory lock on the bsvhu id
+    // see more explanation in bsda/registryV2.ts
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${bsvhu.id}, 0))`;
+
+    await deleteRegistryLookup(bsvhu.id, tx);
+    const lookupInputs = bsvhuToLookupCreateInputs(bsvhu);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(`Error creating registry lookup for bsvhu ${bsvhu.id}`);
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async () => {
