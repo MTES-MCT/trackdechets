@@ -3,7 +3,8 @@ import {
   refineIsDangerous,
   refineMunicipalities,
   refineGistridNumber,
-  refineTransportersConsistency
+  refineTransportersConsistency,
+  refineOperationModeConsistency
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -26,6 +27,7 @@ export function safeParseAsyncOutgoingWaste(line: unknown) {
     .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(destinationRefinement)
+    .superRefine(refineOperationModeConsistency)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)

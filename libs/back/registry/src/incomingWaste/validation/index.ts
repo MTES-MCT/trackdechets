@@ -4,7 +4,8 @@ import {
   refineIsDangerous,
   refineMunicipalities,
   refineGistridNumber,
-  refineOperationMode,
+  refineRequiredOperationMode,
+  refineOperationModeConsistency,
   refineTransportersConsistency,
   refineWeightIsEstimate
 } from "../../shared/refinement";
@@ -36,7 +37,8 @@ export function safeParseAsyncIncomingWaste(line: unknown) {
     .superRefine(refineGistridNumber)
     .superRefine(initialEmitterRefinement)
     .superRefine(emitterRefinement)
-    .superRefine(refineOperationMode)
+    .superRefine(refineRequiredOperationMode)
+    .superRefine(refineOperationModeConsistency)
     .superRefine(refineFollowingTraceabilityInfos)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)
