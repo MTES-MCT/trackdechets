@@ -31,7 +31,7 @@ export async function registryLookup(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const { siretsThatCanAccessLookup, reportAsIdsFilter } =
+  const { siretsThatCanAccessLookup, reportAsSiretsFilter } =
     await getLookupsFilterInfos({ siret, userId: user.id });
 
   await checkUserPermissions(
@@ -44,8 +44,8 @@ export async function registryLookup(
   const lookup = await prisma.registryLookup.findFirst({
     where: {
       siret,
-      ...(reportAsIdsFilter.length > 0 && {
-        reportAsId: { in: reportAsIdsFilter }
+      ...(reportAsSiretsFilter.length > 0 && {
+        reportAsSiret: { in: reportAsSiretsFilter }
       }),
       readableId: publicId,
       declarationType: "REGISTRY",

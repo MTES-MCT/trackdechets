@@ -99,7 +99,7 @@ export async function getLookupsFilterInfos({
   const userCompanyIds = userCompanies.map(company => company.id);
 
   const siretsThatCanAccessLookup = [siret];
-  const reportAsIdsFilter: string[] = [];
+  const reportAsSiretsFilter: string[] = [];
 
   if (!userCompanyIds.includes(filteredOnCompany.id)) {
     const delegatorSiretsByDelegateSirets =
@@ -115,7 +115,7 @@ export async function getLookupsFilterInfos({
           company => company.orgId === delegateSiret
         );
         if (delegate) {
-          reportAsIdsFilter.push(delegate.orgId);
+          reportAsSiretsFilter.push(delegate.orgId);
         }
       }
     }
@@ -123,6 +123,6 @@ export async function getLookupsFilterInfos({
 
   return {
     siretsThatCanAccessLookup,
-    reportAsIdsFilter
+    reportAsSiretsFilter
   };
 }
