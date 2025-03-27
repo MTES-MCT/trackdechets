@@ -496,7 +496,7 @@ function MobileSubNav({ currentCompany, canViewNewRegistry }) {
             </li>
             <li className="fr-nav__item">
               <a
-                className="fr-nav__link"
+                className="fr-nav__link force-external-link-content"
                 href="https://faq.trackdechets.fr/"
                 target="_blank"
                 rel="noreferrer"
@@ -730,7 +730,7 @@ export default function Header() {
                   <ul className="fr-menu__list">
                     <li>
                       <a
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                         href="https://faq.trackdechets.fr/"
                         target="_blank"
                         rel="noreferrer"
@@ -740,7 +740,7 @@ export default function Header() {
                     </li>
                     <li>
                       <a
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                         href="https://sandbox.trackdechets.beta.gouv.fr/"
                         target="_blank"
                         rel="noreferrer"
@@ -750,7 +750,7 @@ export default function Header() {
                     </li>
                     <li>
                       <a
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                         href="https://trackdechets.beta.gouv.fr/"
                         target="_blank"
                         rel="noreferrer"
@@ -972,7 +972,7 @@ export function UnauthenticatedHeader() {
                         href="https://faq.trackdechets.fr/"
                         target="_blank"
                         rel="noreferrer"
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                       >
                         Foire aux questions
                       </a>
@@ -982,7 +982,7 @@ export function UnauthenticatedHeader() {
                         href="https://sandbox.trackdechets.beta.gouv.fr/"
                         target="_blank"
                         rel="noreferrer"
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                       >
                         Site de démonstration
                       </a>
@@ -992,7 +992,7 @@ export function UnauthenticatedHeader() {
                         href="https://trackdechets.beta.gouv.fr/"
                         target="_blank"
                         rel="noreferrer"
-                        className="fr-nav__link"
+                        className="fr-nav__link force-external-link-content"
                       >
                         Page d'accueil / Formations
                       </a>

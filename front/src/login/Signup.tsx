@@ -166,7 +166,7 @@ export default function Signup() {
               href="https://trackdechets.beta.gouv.fr/cgu"
               target="_blank"
               rel="noopener noreferrer"
-              className="fr-link"
+              className="fr-link force-external-link-content force-underline-link"
             >
               Voir les conditions générales.
             </a>

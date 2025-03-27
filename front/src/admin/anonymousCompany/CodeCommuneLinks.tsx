@@ -15,7 +15,7 @@ const googleUrl = (postalCode: string): string => {
 const buildLink = (href: string, label: string): JSX.IntrinsicElements["a"] => {
   return (
     <a
-      className={styles.blueFrance}
+      className={`fr-link ${styles.blueFrance} force-external-link-content force-underline-link`}
       rel="noopener noreferrer"
       href={href}
       target="_blank"

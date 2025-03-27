@@ -68,7 +68,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                   erreur,{" "}
                   <a
                     href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-                    className="fr-link"
+                    className="fr-link force-external-link-content force-underline-link"
                     target="_blank"
                     rel="noreferrer"
                   >

@@ -161,7 +161,7 @@ export function MyImports() {
               href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
               target="_blank"
               rel="noreferrer"
-              className="fr-link fr-text--sm"
+              className="fr-link fr-text--sm force-external-link-content force-underline-link"
             >
               Retrouvez les modèles de registres dans la documentation
             </a>

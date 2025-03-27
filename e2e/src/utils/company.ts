@@ -176,13 +176,11 @@ export const generateSiretAndInitiateCompanyCreation = async (
 
   // For waste producers...
   if (isOnlyWasteProducter(roles)) {
-    // ...help message should be visible (and closable)
+    // ...help message should be visible
     const helpMessage = page.getByRole("heading", {
       name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
     });
     await expect(helpMessage).toBeVisible();
-    await page.getByRole("button", { name: "Masquer le message" }).click();
-    await expect(helpMessage).not.toBeVisible();
   }
 
   // Test submitting wihout a SIRET. Should display error message

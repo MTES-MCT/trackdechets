@@ -95,7 +95,7 @@ const CompanySelectorItem = ({
               onClick={e => e.stopPropagation()}
               target="_blank"
               rel="noopener noreferrer"
-              className="fr-link"
+              className="fr-link force-external-link-content force-underline-link"
             >
               Lien vers la page entreprise
             </a>

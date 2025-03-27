@@ -14,6 +14,7 @@ export const UploadYourSirenePDFInfo = () => {
           datant de moins de trois mois. Pour télécharger votre certificat, RDV
           sur{" "}
           <a
+            className="fr-link force-external-link-content force-underline-link"
             href="https://avis-situation-sirene.insee.fr/"
             target="_blank"
             rel="noreferrer"

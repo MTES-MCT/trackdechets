@@ -32,7 +32,6 @@ type IProps = {
 const individualInfo = (
   <div className={styles.alertWrapper}>
     <Alert
-      closable
       severity="info"
       title="Vous rencontrez des difficultés dans la création d'un établissement ?"
       description="Si vous êtes un particulier, vous n'avez pas à créer d'établissement, ni de compte Trackdéchets."
@@ -54,6 +53,7 @@ const closedCompanyError = (
           <p>
             Pour vérifier s'il existe encore, RDV sur{" "}
             <a
+              className="fr-link force-external-link-content force-underline-link"
               href="https://annuaire-entreprises.data.gouv.fr"
               target="_blank"
               rel="noreferrer"
@@ -64,6 +64,7 @@ const closedCompanyError = (
           <p>
             Pour déclarer un changement, RDV sur{" "}
             <a
+              className="fr-link force-external-link-content force-underline-link"
               href="https://entreprendre.service-public.fr/vosdroits/F31479"
               target="_blank"
               rel="noreferrer"
@@ -217,7 +218,7 @@ export default function AccountCompanyAddSiret({
                           href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                           target="_blank"
                           rel="noreferrer"
-                          className="fr-link--xs"
+                          className="fr-link--xs force-external-link-content force-underline-link"
                         >
                           la FAQ
                         </a>

@@ -110,7 +110,7 @@ function AddFicheInterventionModal({
           href="https://entreprendre.service-public.fr/vosdroits/R43122"
           target="_blank"
           rel="noopener noreferrer"
-          className="fr-link"
+          className="fr-link force-external-link-content force-underline-link"
           style={{ textDecoration: "none" }}
         >
           formulaire 15497*04

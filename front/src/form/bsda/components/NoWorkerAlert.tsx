@@ -26,7 +26,7 @@ const description = (
     <a
       target="_blank"
       rel="noopener noreferrer"
-      className="fr-link"
+      className="fr-link force-external-link-content force-underline-link"
       href={faqLink}
     >
       FAQ

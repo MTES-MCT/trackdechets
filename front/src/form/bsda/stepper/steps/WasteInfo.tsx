@@ -144,7 +144,7 @@ export function WasteInfoWorker({ disabled }) {
             <span>
               Le déchet contient des{" "}
               <a
-                className="tw-underline"
+                className="fr-link force-external-link-content force-underline-link"
                 href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
                 target="_blank"
                 rel="noopener noreferrer"

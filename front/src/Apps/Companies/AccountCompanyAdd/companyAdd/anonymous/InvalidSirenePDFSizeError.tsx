@@ -15,7 +15,7 @@ export const InvalidSirenePDFSizeError = () => {
             href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/questions-frequentes#lors-de-la-creation-de-mon-etablissement-non-diffusible-mon-fichier-na-pas-ete-valide.-que-faire"
             target="_blank"
             rel="noreferrer"
-            className="fr-link"
+            className="fr-link force-external-link-content force-underline-link"
           >
             cet article sur la foire aux questions Trackdéchets
           </a>

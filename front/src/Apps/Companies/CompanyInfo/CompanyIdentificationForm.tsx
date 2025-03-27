@@ -141,6 +141,7 @@ const CompanyIdentificationForm = ({
               <p className="companyFormWrapper__title-field">Fiche ICPE</p>
               <p className="companyFormWrapper__value-field">
                 <a
+                  className="fr-link force-external-link-content force-underline-link"
                   href={company.installation.urlFiche}
                   target="_blank"
                   rel="noopener noreferrer"

@@ -184,7 +184,7 @@ function ParcelCadastral({ index }) {
         <a
           href="https://cadastre.data.gouv.fr/map"
           target="_blank"
-          className="tw-underline"
+          className="fr-link force-external-link-content force-underline-link"
           rel="noreferrer"
         >
           le site du cadastre
@@ -193,7 +193,7 @@ function ParcelCadastral({ index }) {
         <a
           href="https://errial.georisques.gouv.fr/#/"
           target="_blank"
-          className="tw-underline"
+          className="fr-link force-external-link-content force-underline-link"
           rel="noreferrer"
         >
           le site Errial
