@@ -219,6 +219,7 @@ export const titles = {
   "/dashboard/:siret/transport/return": "Bordereaux en retour — Trackdéchets",
   "/account": "Mon compte — Trackdéchets",
   "/account/info": "Informations sur mon compte — Trackdéchets",
+  "/account/notifications": "Mes notifications — Trackdéchets",
   "/account/companies/new":
     "Ajouter un établissement producteur de déchets — Trackdéchets",
   "/account/companies/professional":
