@@ -84,7 +84,7 @@ describe("Mutation acceptAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("La demande n'existe pas.");
+    expect(errors[0].message).toEqual("Cette demande n'existe pas.");
   });
 
   it("should throw if user does not belong to company", async () => {
@@ -358,9 +358,7 @@ describe("Mutation acceptAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      `La demande a déjà été refusée et n'est plus modifiable.`
-    );
+    expect(errors[0].message).toEqual(`Cette demande a été refusée.`);
   });
 
   it("should throw if request has already been blocked", async () => {
@@ -393,7 +391,7 @@ describe("Mutation acceptAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      `La demande a été bloquée et n'est plus modifiable.`
+      `Cette demande a été bloquée en raison d'un trop grand nombre de codes erronés saisis.`
     );
   });
 
@@ -426,9 +424,7 @@ describe("Mutation acceptAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      `La demande a expiré et n'est plus modifiable.`
-    );
+    expect(errors[0].message).toEqual(`Cette demande a expiré.`);
   });
 
   it("should not throw if request has already been accepted", async () => {
@@ -500,7 +496,7 @@ describe("Mutation acceptAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      `L'utilisateur est déjà administrateur de l'entreprise.`
+      `L'utilisateur est déjà administrateur de l'établissement.`
     );
   });
 
@@ -760,7 +756,7 @@ describe("Mutation acceptAdminRequest", () => {
       { email: "admin@mail.com", name: "Company Admin" }
     ]);
     expect(subject).toBe(
-      `Mise à jour concernant la demande d’accès administrateur`
+      `Mise à jour concernant la demande de droits administrateur`
     );
 
     const expectedBody = `<p>
@@ -822,12 +818,11 @@ describe("Mutation acceptAdminRequest", () => {
     expect(to).toMatchObject([
       { email: "author@mail.com", name: "Request Author" }
     ]);
-    expect(subject).toBe(`Demande d’accès administrateur acceptée`);
+    expect(subject).toBe(`Demande de droits administrateur acceptée`);
 
     const expectedBody = `<p>
-  Votre demande pour rejoindre l’établissement
-  <b>${company.name} - ${company.orgId}</b> en tant qu’administrateur a
-  été <b>acceptée</b>.
+  Votre demande de droits administrateur pour l'établissement
+  <b>${company.name} - ${company.orgId}</b> a été <b>acceptée</b>.
 </p>
 
 <br />
@@ -835,14 +830,11 @@ describe("Mutation acceptAdminRequest", () => {
 <p>
   Vous pouvez dès à présent vous connecter à votre compte Trackdéchets et
   bénéficier de toutes les fonctionnalités de la plateforme en tant
-  qu’administrateur (gestion de l'établissement et des utilisateurs, création,
-  consultation et suivi des documents, etc.).
+  qu'administrateur (gestion de l'établissement et des utilisateurs, création,
+  consultation et suivi des bordereaux, des registres, etc.).
 </p>
 
-<br />
-
-<p>En cas de question, n’hésitez pas à contacter l'assistance Trackdéchets.</p>
-    `;
+<br />`;
 
     expect(cleanse(body)).toBe(cleanse(expectedBody));
   });
@@ -880,7 +872,7 @@ describe("Mutation acceptAdminRequest", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("La demande n'existe pas.");
+      expect(errors[0].message).toBe("Cette demande n'existe pas.");
     });
 
     it("should throw if code is not valid", async () => {

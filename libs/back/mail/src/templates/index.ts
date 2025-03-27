@@ -60,7 +60,7 @@ export const yourCompanyIsIdentifiedOnABsd: MailTemplate<{
 };
 
 export const onboardingFirstStep: MailTemplate = {
-  subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
+  subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd'hui !",
   templateId: templateIds.FIRST_ONBOARDING
 };
 
@@ -74,7 +74,7 @@ export const createPasswordResetRequest: MailTemplate<{
 
 export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
   subject: ({ form }) =>
-    `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`,
+    `Le déchet de l'entreprise ${form.emitterCompanyName} a été totalement refusé à réception`,
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -102,7 +102,7 @@ export const formPartiallyRefused: MailTemplate<{
   form: Form & BsddTransporter;
 }> = {
   subject: ({ form }) =>
-    `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
+    `Le déchet de l'entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -157,7 +157,7 @@ export const membershipRequestAccepted: MailTemplate<{
   companySiret: string;
 }> = {
   subject: ({ companyName, companySiret }) =>
-    `Vous êtes à présent membre de l’établissement ${companyName} (${companySiret}) 🔔`,
+    `Vous êtes à présent membre de l'établissement ${companyName} (${companySiret}) 🔔`,
   body: mustacheRenderer("demande-de-rattachement-acceptee.html"),
   templateId: templateIds.LAYOUT
 };
@@ -167,7 +167,7 @@ export const membershipRequestRefused: MailTemplate<{
   companySiret: string;
 }> = {
   subject:
-    "Votre demande de rattachement a été refusée par l'administrateur de l’établissement",
+    "Votre demande de rattachement a été refusée par l'administrateur de l'établissement",
   body: mustacheRenderer("demande-de-rattachement-refusee.html"),
   templateId: templateIds.LAYOUT
 };
@@ -383,7 +383,7 @@ export const adminRequestInitialWarningToAdminEmail: MailTemplate<{
   adminRequest: { id: string };
 }> = {
   subject: ({ company }) =>
-    `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+    `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-initial-warning-to-admin.html"),
   templateId: templateIds.LAYOUT
 };
@@ -394,7 +394,7 @@ export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
   isValidationByMail: boolean;
 }> = {
   subject: ({ company }) =>
-    `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+    `Votre demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-initial-info-to-author.html"),
   templateId: templateIds.LAYOUT
 };
@@ -402,7 +402,7 @@ export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
 export const adminRequestRefusedEmail: MailTemplate<{
   company: { name: string; orgId: string };
 }> = {
-  subject: () => `Demande d’accès administrateur refusée`,
+  subject: () => `Demande de droits administrateur refusée`,
   body: mustacheRenderer("admin-request-refused.html"),
   templateId: templateIds.LAYOUT
 };
@@ -410,7 +410,7 @@ export const adminRequestRefusedEmail: MailTemplate<{
 export const adminRequestAcceptedEmail: MailTemplate<{
   company: { name: string; orgId: string };
 }> = {
-  subject: () => `Demande d’accès administrateur acceptée`,
+  subject: () => `Demande de droits administrateur acceptée`,
   body: mustacheRenderer("admin-request-accepted.html"),
   templateId: templateIds.LAYOUT
 };
@@ -419,7 +419,7 @@ export const adminRequestAcceptedAdminEmail: MailTemplate<{
   company: { name: string; orgId: string };
   user: { name: string };
 }> = {
-  subject: () => `Mise à jour concernant la demande d’accès administrateur`,
+  subject: () => `Mise à jour concernant la demande de droits administrateur`,
   body: mustacheRenderer("admin-request-accepted-admin.html"),
   templateId: templateIds.LAYOUT
 };
@@ -428,7 +428,7 @@ export const adminRequestRefusedAdminEmail: MailTemplate<{
   company: { name: string; orgId: string };
   user: { name: string };
 }> = {
-  subject: () => `Mise à jour concernant la demande d’accès administrateur`,
+  subject: () => `Mise à jour concernant la demande de droits administrateur`,
   body: mustacheRenderer("admin-request-refused-admin.html"),
   templateId: templateIds.LAYOUT
 };
@@ -439,7 +439,7 @@ export const adminRequestCollaboratorEmail: MailTemplate<{
   adminRequest: { id: string };
 }> = {
   subject: ({ company }) =>
-    `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`,
+    `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
   body: mustacheRenderer("admin-request-collaborator.html"),
   templateId: templateIds.LAYOUT
 };

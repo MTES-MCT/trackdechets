@@ -153,25 +153,28 @@ export const AcceptAdminRequestModal = ({
       {!loadingGet &&
         adminRequest &&
         adminRequest.status === AdminRequestStatus.Accepted && (
-          <p>Cette demande a déjà été acceptée.</p>
+          <p>Cette demande a été acceptée.</p>
         )}
 
       {!loadingGet &&
         adminRequest &&
         adminRequest.status === AdminRequestStatus.Refused && (
-          <p>Cette demande a déjà été refusée.</p>
+          <p>Cette demande a été refusée.</p>
         )}
 
       {!loadingGet &&
         adminRequest &&
         adminRequest.status === AdminRequestStatus.Blocked && (
-          <p>Cette demande a été bloquée et ne peut plus être modifiée.</p>
+          <p>
+            Cette demande a été bloquée en raison d'un trop grand nombre de
+            codes erronés saisis.
+          </p>
         )}
 
       {!loadingGet &&
         adminRequest &&
         adminRequest.status === AdminRequestStatus.Expired && (
-          <p>Cette demande a expiré et ne peut plus être modifiée.</p>
+          <p>Cette demande a expiré.</p>
         )}
     </TdModal>
   );

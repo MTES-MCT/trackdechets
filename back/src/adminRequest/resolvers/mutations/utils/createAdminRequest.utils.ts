@@ -38,13 +38,15 @@ export const checkCanCreateAdminRequest = async (
 ) => {
   if (companyAssociation?.role === UserRole.ADMIN) {
     throw new UserInputError(
-      "Vous êtes déjà administrateur de cette entreprise."
+      "Vous êtes déjà administrateur de cet établissement."
     );
   }
 
   if (adminRequestInput.collaboratorEmail) {
     if (!collaborator) {
-      throw new UserInputError("Le collaborateur ciblé n'existe pas.");
+      throw new UserInputError(
+        "Ce collaborateur n'est pas inscrit sur Trackdéchets."
+      );
     }
 
     const collaboratorCompanyAssociation =
@@ -57,7 +59,7 @@ export const checkCanCreateAdminRequest = async (
 
     if (!collaboratorCompanyAssociation) {
       throw new UserInputError(
-        "Le collaborateur ne fait pas partie de l'entreprise ciblée."
+        "Ce collaborateur n'est pas rattaché à cet établissement."
       );
     }
   }
@@ -71,7 +73,7 @@ export const checkCanCreateAdminRequest = async (
   });
   if (pendingRequests >= MAX_SIMULTANEOUS_PENDING_REQUESTS) {
     throw new ForbiddenError(
-      `Vous ne pouvez pas avoir plus de ${MAX_SIMULTANEOUS_PENDING_REQUESTS} demandes en cours.`
+      `Il n'est pas possible d'avoir plus de ${MAX_SIMULTANEOUS_PENDING_REQUESTS} demandes en cours.`
     );
   }
 
@@ -94,7 +96,7 @@ export const checkCanCreateAdminRequest = async (
 
     if (mailRequestsCount >= MAX_ADMIN_REQUESTS_MAILS_PER_WEEK) {
       throw new UserInputError(
-        "La vérification par courrier a été temporairement désactivée. Choisissez une autre méthode ou contactez le support."
+        "La vérification par courrier a été temporairement désactivée. Veuillez choisir une autre méthode de vérification ou contacter le support."
       );
     }
   }
@@ -108,7 +110,7 @@ export const checkCanCreateAdminRequest = async (
 
   if (existingPendingRequest) {
     throw new UserInputError(
-      "Une demande est déjà en attente pour cette entreprise."
+      "Une demande est déjà en cours pour cet établissement."
     );
   }
 
@@ -122,7 +124,7 @@ export const checkCanCreateAdminRequest = async (
 
   if (existingRefusedRequest) {
     throw new UserInputError(
-      "Vous avez déjà effectué une demande pour cette entreprise, qui a été refusée récemment."
+      "Une demande a déjà été refusée pour cet établissement au cours des 7 derniers jours."
     );
   }
 };

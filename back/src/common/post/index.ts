@@ -99,7 +99,7 @@ export async function sendAdminRequestVerificationCodeLetter(
   const sireneInfo = await searchCompany(company.siret);
 
   return sendLetter({
-    description: "Code de vérification",
+    description: "Demande de droits administrateur",
     to: {
       address_line1: truncate(sireneInfo.addressVoie ?? ""),
       address_city: truncate(sireneInfo.addressCity ?? ""),

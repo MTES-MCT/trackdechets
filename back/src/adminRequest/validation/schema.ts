@@ -24,7 +24,7 @@ export const createAdminRequestInputSchema = z
       return refinementContext.addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "L'adresse email d'un collaborateur est requise pour cette méthode de validation.",
+          "L'ajout d'un courriel d'un collaborateur est requis pour cette méthode de validation.",
         path: ["collaboratorEmail"]
       });
     }

@@ -84,10 +84,9 @@ export const AcceptMailAdminRequestModal = ({
       isOpen={isOpen}
     >
       <div className="fr-mb-4w">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
+        Après avoir sélectionné l'établissement pour lequel vous demandez les
+        droits administrateur, veuillez saisir dans le champ ci-dessous le code
+        de vérification reçu par courrier.
       </div>
 
       <div>
@@ -106,7 +105,7 @@ export const AcceptMailAdminRequestModal = ({
 
       <div className="fr-mb-4w">
         <Input
-          label="Code d'activation"
+          label="Code de vérification"
           nativeInputProps={{
             required: true,
             minLength: 8,

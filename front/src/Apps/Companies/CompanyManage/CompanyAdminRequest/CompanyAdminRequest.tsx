@@ -23,8 +23,8 @@ export const CompanyAdminRequest = () => {
           <p className="fr-mb-4w">
             Vous vous retrouvez dans une situation dans laquelle,
             l'administrateur Trackdéchets de votre établissement n'est plus
-            actif pour diverses raisons (ex: départ sans accès à son compte, et
-            sans avoir nommé un autre admin).
+            actif pour diverses raisons (par exemple, départ sans avoir nommé de
+            nouvel administrateur).
           </p>
 
           <p className="fr-mb-4w">
@@ -33,15 +33,17 @@ export const CompanyAdminRequest = () => {
           </p>
 
           <p className="fr-mb-4w">
-            Cette nouvelle fonctionnalité va vous aider dans cette démarche,
-            tout en maintenant un niveau de sécurité et de confidentialité.
-            Selon les situations, cette demande peut être rapide, mais peut
-            aussi entrainer l'envoi d'un courrier au siège du SIRET concerné
-            pour nous assurer de la relation entre le demandeur et
-            l'établissement. Retrouvez les{" "}
+            Cette fonctionnalité va vous aider dans cette démarche, tout en
+            maintenant un niveau de sécurité et de confidentialité. Selon les
+            situations, cette demande peut être rapide, mais peut aussi
+            entraîner l'envoi d'un courrier au siège du SIRET concerné pour nous
+            assurer de la relation entre le demandeur et l'établissement.
+            Retrouvez les{" "}
             <a
               href="TODO"
-              className="force-external-link-content force-underline-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fr-link force-external-link-content force-underline-link"
             >
               détails de la procédure en FAQ
             </a>
@@ -62,7 +64,7 @@ export const CompanyAdminRequest = () => {
 
       <div className={`fr-mb-4w ${styles.panelTitle}`}>
         <div className={styles.titles}>
-          <h3 className="fr-h5 fr-mb-n0-5v">Suivi des demandes</h3>
+          <h3 className="fr-h5 fr-mb-n0-5v">Suivi de mes demandes</h3>
         </div>
       </div>
       <div>

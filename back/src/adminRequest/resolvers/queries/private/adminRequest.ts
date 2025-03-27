@@ -25,7 +25,7 @@ const adminRequestResolver: QueryResolvers["adminRequest"] = async (
   const adminRequest = await findFirst({ id: adminRequestId });
 
   if (!adminRequest) {
-    throw new UserInputError("La demande n'existe pas.");
+    throw new UserInputError("Cette demande n'existe pas.");
   }
 
   // In order to view a request, you must either be its author or

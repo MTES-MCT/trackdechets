@@ -65,7 +65,7 @@ const acceptAdminRequest = async (
   // We should never get to this, but just in case
   if (companyAssociation && companyAssociation.role === UserRole.ADMIN) {
     throw new UserInputError(
-      "L'utilisateur est déjà administrateur de l'entreprise."
+      "L'utilisateur est déjà administrateur de l'établissement."
     );
   }
 

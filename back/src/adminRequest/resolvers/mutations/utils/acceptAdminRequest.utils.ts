@@ -48,7 +48,7 @@ export const getAdminRequestOrThrow = async (
   )) as unknown as AdminRequestWithUserAndCompany;
 
   if (!adminRequest) {
-    throw new UserInputError("La demande n'existe pas.");
+    throw new UserInputError("Cette demande n'existe pas.");
   }
 
   return adminRequest;
@@ -61,19 +61,17 @@ export const checkCanAcceptAdminRequest = async (
   adminRequestInput: ParsedAcceptAdminRequestInput
 ) => {
   if (adminRequest.status === AdminRequestStatus.REFUSED) {
-    throw new UserInputError(
-      `La demande a déjà été refusée et n'est plus modifiable.`
-    );
+    throw new UserInputError(`Cette demande a été refusée.`);
   }
 
   if (adminRequest.status === AdminRequestStatus.BLOCKED) {
     throw new UserInputError(
-      `La demande a été bloquée et n'est plus modifiable.`
+      `Cette demande a été bloquée en raison d'un trop grand nombre de codes erronés saisis.`
     );
   }
 
   if (adminRequest.status === AdminRequestStatus.EXPIRED) {
-    throw new UserInputError(`La demande a expiré et n'est plus modifiable.`);
+    throw new UserInputError(`Cette demande a expiré.`);
   }
 
   // Admins can accept any request, but they must provide the request id

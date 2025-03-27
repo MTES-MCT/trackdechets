@@ -75,7 +75,7 @@ describe("Mutation refuseAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("La demande n'existe pas.");
+    expect(errors[0].message).toEqual("Cette demande n'existe pas.");
   });
 
   it("should throw if user does not belong to company", async () => {
@@ -138,9 +138,7 @@ describe("Mutation refuseAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      `La demande a déjà été acceptée et n'est plus modifiable.`
-    );
+    expect(errors[0].message).toEqual(`Cette demande a été acceptée.`);
   });
 
   it("should throw if request has already been blocked", async () => {
@@ -171,7 +169,7 @@ describe("Mutation refuseAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      `La demande a déjà été bloquée et n'est plus modifiable.`
+      `Cette demande a été bloquée en raison d'un trop grand nombre de codes erronés saisis.`
     );
   });
 
@@ -202,9 +200,7 @@ describe("Mutation refuseAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      `La demande a expiré et n'est plus modifiable.`
-    );
+    expect(errors[0].message).toEqual(`Cette demande a expiré.`);
   });
 
   it("should refuse pending request", async () => {
@@ -370,7 +366,7 @@ describe("Mutation refuseAdminRequest", () => {
       { email: "admin@mail.com", name: "Company Admin" }
     ]);
     expect(subject).toBe(
-      `Mise à jour concernant la demande d’accès administrateur`
+      `Mise à jour concernant la demande de droits administrateur`
     );
 
     const expectedBody = `<p>
@@ -430,24 +426,23 @@ describe("Mutation refuseAdminRequest", () => {
     expect(to).toMatchObject([
       { email: "author@mail.com", name: "Request Author" }
     ]);
-    expect(subject).toBe(`Demande d’accès administrateur refusée`);
+    expect(subject).toBe(`Demande de droits administrateur refusée`);
 
     const expectedBody = `<p>
-Votre demande pour rejoindre l’établissement <b>${company.name} - ${company.orgId}</b>
-en tant qu’administrateur a été <b>refusée</b>.
+Votre demande pour rejoindre l'établissement <b>${company.name} - ${company.orgId}</b>
+en tant qu'administrateur a été <b>refusée</b>.
 </p>
 
 <br />
 
 <p>
-Conformément à nos règles, vous ne pourrez pas effectuer de nouvelle demande pour accéder 
-à ces droits avant <b>1 semaine</b>. Passé ce délai, vous pourrez renouveler votre demande si 
-vous le jugez nécessaire.
+Conformément aux règles établies, vous ne pourrez pas effectuer de nouvelle demande
+avant <b>1 semaine</b>.
 </p>
 
 <br />
 
-<p>Pour toute question, vous pouvez contacter l'assistance  Trackdéchets.</p>
+<p>Pour toute question, vous pouvez contacter l'assistance Trackdéchets.</p>
   `;
 
     expect(cleanse(body)).toBe(cleanse(expectedBody));

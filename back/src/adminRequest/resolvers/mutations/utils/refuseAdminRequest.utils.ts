@@ -35,7 +35,7 @@ export const getAdminRequestOrThrow = async (
   )) as unknown as AdminRequestWithUserAndCompany;
 
   if (!adminRequest) {
-    throw new UserInputError("La demande n'existe pas.");
+    throw new UserInputError("Cette demande n'existe pas.");
   }
 
   return adminRequest;
@@ -47,19 +47,17 @@ export const checkCanRefuseAdminRequest = async (
   companyAssociation: CompanyAssociation | null
 ) => {
   if (adminRequest.status === AdminRequestStatus.ACCEPTED) {
-    throw new UserInputError(
-      `La demande a déjà été acceptée et n'est plus modifiable.`
-    );
+    throw new UserInputError(`Cette demande a été acceptée.`);
   }
 
   if (adminRequest.status === AdminRequestStatus.BLOCKED) {
     throw new UserInputError(
-      `La demande a déjà été bloquée et n'est plus modifiable.`
+      `Cette demande a été bloquée en raison d'un trop grand nombre de codes erronés saisis.`
     );
   }
 
   if (adminRequest.status === AdminRequestStatus.EXPIRED) {
-    throw new UserInputError(`La demande a expiré et n'est plus modifiable.`);
+    throw new UserInputError(`Cette demande a expiré.`);
   }
 
   // Trackdéchets admins can refuse anything

@@ -93,7 +93,7 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "L'entreprise ciblée n'existe pas dans Trackdéchets."
+      "Cet établissement n'est pas inscrit sur Trackdéchets."
     );
   });
 
@@ -119,7 +119,7 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "Vous êtes déjà administrateur de cette entreprise."
+      "Vous êtes déjà administrateur de cet établissement."
     );
   });
 
@@ -145,7 +145,9 @@ describe("Mutation createAdminRequest", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual("Le collaborateur ciblé n'existe pas.");
+    expect(errors[0].message).toEqual(
+      "Ce collaborateur n'est pas inscrit sur Trackdéchets."
+    );
   });
 
   it("should throw error if collaborator does not belong to target company", async () => {
@@ -172,7 +174,7 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "Le collaborateur ne fait pas partie de l'entreprise ciblée."
+      "Ce collaborateur n'est pas rattaché à cet établissement."
     );
   });
 
@@ -198,7 +200,7 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toEqual(
-      "L'adresse email d'un collaborateur est requise pour cette méthode de validation."
+      "L'ajout d'un courriel d'un collaborateur est requis pour cette méthode de validation."
     );
   });
 
@@ -286,7 +288,7 @@ describe("Mutation createAdminRequest", () => {
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Une demande est déjà en attente pour cette entreprise."
+      "Une demande est déjà en cours pour cet établissement."
     );
   });
 
@@ -393,15 +395,15 @@ describe("Mutation createAdminRequest", () => {
       { email: "admin@mail.com", name: "Company admin" }
     ]);
     expect(subject).toBe(
-      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
-  souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
-  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
-  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  Nous vous informons que l'utilisateur <b>${user.name}</b> (courriel: ${user.email}) 
+  souhaite obtenir les droits administrateur pour
+  l'établissement <b>${company.name} - ${company.orgId}</b>. En tant
+  qu'administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l'accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
@@ -414,11 +416,11 @@ describe("Mutation createAdminRequest", () => {
 <br />
 
 <p>
-  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Si aucune décision n'est prise de votre part <b>sous un jour ouvré</b>,
   Trackdéchets mettra en place une procédure de vérification alternative visant
   à confirmer la légitimité de la demande.
   <b>Un courrier comprenant un code de vérification</b> sera alors expédié au
-  siège social de l’établissement.
+  siège social de l'établissement.
 </p>
 
 <br />
@@ -482,15 +484,15 @@ describe("Mutation createAdminRequest", () => {
       { email: "admin@mail.com", name: "Company admin" }
     ]);
     expect(subject).toBe(
-      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
-  souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
-  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
-  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  Nous vous informons que l'utilisateur <b>${user.name}</b> (courriel: ${user.email}) 
+  souhaite obtenir les droits administrateur pour
+  l'établissement <b>${company.name} - ${company.orgId}</b>. En tant
+  qu'administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l'accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
@@ -503,12 +505,12 @@ describe("Mutation createAdminRequest", () => {
 <br />
 
 <p>
-  Si aucune décision n’est prise de votre part <b>sous 24 heures</b>,
+  Si aucune décision n'est prise de votre part <b>sous un jour ouvré</b>,
   Trackdéchets mettra en place une procédure de vérification alternative visant
   à confirmer la légitimité de la demande. Nous solliciterons alors un
-  <b>collaborateur rattaché à votre établissement</b>, dont l’adresse e-mail a
-  été communiquée par le demandeur. Celui-ci pourra alors valider la demande et
-  permettre l’octroi des droits d’administrateur.
+  <b>collaborateur rattaché à votre établissement</b>, dont le courriel a
+  été communiqué par le demandeur. Celui-ci pourra alors valider la demande et
+  accorder les droits administrateur.
 </p>
 
 <p>
@@ -561,15 +563,15 @@ describe("Mutation createAdminRequest", () => {
       { email: "admin@mail.com", name: "Company admin" }
     ]);
     expect(subject).toBe(
-      `Demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-  Nous vous informons qu’un utilisateur <b>${user.name}</b> (email: ${user.email}) 
-  souhaite obtenir les droits d’administrateur pour
-  l’établissement <b>${company.name} - ${company.orgId}</b>. En tant
-  qu’administrateur actuel, nous vous invitons à prendre connaissance de cette
-  demande et à <b>l’accepter ou la refuser</b> en cliquant
+  Nous vous informons que l'utilisateur <b>${user.name}</b> (courriel: ${user.email}) 
+  souhaite obtenir les droits administrateur pour
+  l'établissement <b>${company.name} - ${company.orgId}</b>. En tant
+  qu'administrateur actuel, nous vous invitons à prendre connaissance de cette
+  demande et à <b>l'accepter ou la refuser</b> en cliquant
   <a href="http:&#x2F;&#x2F;trackdechets.local/companies/${company.orgId}/admin-request/${data.createAdminRequest.id}#membres"
     >sur ce lien</a
   >.
@@ -629,20 +631,20 @@ describe("Mutation createAdminRequest", () => {
 
     expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
     expect(subject).toBe(
-      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Votre demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
-l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
-administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+Nous accusons réception de votre demande pour obtenir les droits administrateur pour 
+l'établissement <b>${company.name} - ${company.orgId}</b>. Un courriel vient d'être envoyé aux
+administrateurs actuels afin de les informer de votre démarche. Ils pourront <b>accepter ou
 refuser</b> votre demande.
 </p>
 
 <br />
 
 <p>
-Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
+Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
 </p>
 `;
 
@@ -694,27 +696,27 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
 
     expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
     expect(subject).toBe(
-      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Votre demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
-l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
-administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+Nous accusons réception de votre demande pour obtenir les droits administrateur pour 
+l'établissement <b>${company.name} - ${company.orgId}</b>. Un courriel vient d'être envoyé aux
+administrateurs actuels afin de les informer de votre démarche. Ils pourront <b>accepter ou
 refuser</b> votre demande.
 </p>
 
 <br />
 
 <p>
-Si les administrateurs ne répondent pas sous 24 heures, <b>le collaborateur</b> que vous avez renseigné 
+Si les administrateurs ne répondent pas sous un jour ouvré, <b>le collaborateur</b> que vous avez renseigné 
 sera sollicité à son tour pour <b>valider ou refuser</b> la demande. 
 </p>
 
 <br />
 
 <p>
-Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
+Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
 </p>
 `;
 
@@ -763,32 +765,32 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
 
     expect(to).toMatchObject([{ email: "user@mail.com", name: "User name" }]);
     expect(subject).toBe(
-      `Votre demande d’accès administrateur pour l’établissement ${company.name} - ${company.orgId}`
+      `Votre demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
 
     const expectedBody = `<p>
-Nous accusons réception de votre demande pour obtenir les droits d’administrateur de 
-l’établissement <b>${company.name} - ${company.orgId}</b>. Un email vient d’être envoyé aux
-administrateurs actuels afin pour les informer de votre démarche. Ils pourront <b>accepter ou
+Nous accusons réception de votre demande pour obtenir les droits administrateur pour 
+l'établissement <b>${company.name} - ${company.orgId}</b>. Un courriel vient d'être envoyé aux
+administrateurs actuels afin de les informer de votre démarche. Ils pourront <b>accepter ou
 refuser</b> votre demande.
 </p>
 
 <br />
 
 <p>
-Un <b>courrier contenant un code de vérification</b> a été envoyé au siège social de l’établissement concerné. 
+Un <b>courrier contenant un code de vérification</b> a été envoyé au siège social de l'établissement concerné. 
 </p>
 
 <br />
 
 <p>
-Si aucune réponse n’est donnée de la part des administrateurs avant réception du courrier, vous pourrez alors 
+Si aucune réponse n'est donnée de la part des administrateurs avant réception du courrier, vous pourrez alors 
 finaliser votre demande grâce au code de vérification, que vous pourrez renseigner dans 
 l'onglet <b>Mes établissements > Gestion avancée > Saisir un code reçu par courrier</b >. 
 </p>
 
 <p>
-Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
+Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
 </p>
 `;
 
@@ -1069,7 +1071,7 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "La vérification par courrier a été temporairement désactivée. Choisissez une autre méthode ou contactez le support."
+      "La vérification par courrier a été temporairement désactivée. Veuillez choisir une autre méthode de vérification ou contacter le support."
     );
 
     // Finally
@@ -1110,7 +1112,7 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Vous avez déjà effectué une demande pour cette entreprise, qui a été refusée récemment."
+      "Une demande a déjà été refusée pour cet établissement au cours des 7 derniers jours."
     );
   });
 
@@ -1158,7 +1160,7 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par email.
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Vous ne pouvez pas avoir plus de 5 demandes en cours."
+      "Il n'est pas possible d'avoir plus de 5 demandes en cours."
     );
   });
 });

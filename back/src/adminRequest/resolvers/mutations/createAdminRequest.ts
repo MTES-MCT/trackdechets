@@ -41,7 +41,7 @@ const createAdminRequest = async (
 
   if (!company) {
     throw new UserInputError(
-      "L'entreprise ciblée n'existe pas dans Trackdéchets."
+      "Cet établissement n'est pas inscrit sur Trackdéchets."
     );
   }
 

@@ -9,7 +9,7 @@ const ADMINS_WARNED_ALERT =
 const VALIDATOR_CONTACTED_AFTER_24H =
   "La personne pouvant valider sera prévenue au bout de 24h.";
 const MAIL_SENT =
-  "Un courrier postal sera envoyé à l'adresse du siège de votre établissement. Il contiendra un code d'activation que vous devrez saisir dans la gestion avancée.";
+  "Un courrier postal sera envoyé à l'adresse du siège de l'établissement. Il contiendra un code de vérification que vous devrez saisir dans la gestion avancée.";
 
 export const CompanyCreateAdminRequestModalStep3 = ({
   onSubmit,
