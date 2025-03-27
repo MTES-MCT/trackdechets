@@ -163,7 +163,7 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
-    currentCompany.siret
+    currentCompany.orgId
   );
 
   const showMyBsds =
