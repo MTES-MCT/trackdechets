@@ -271,7 +271,7 @@ async function checkEmitterIsNotEcoOrganisme(
   if (!siret) return null;
 
   const ecoOrganisme = await prisma.ecoOrganisme.findFirst({
-    where: { siret },
+    where: { siret, handleBsda: true },
     select: { id: true }
   });
 
