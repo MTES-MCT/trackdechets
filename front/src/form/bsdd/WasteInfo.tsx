@@ -105,7 +105,7 @@ export default function WasteInfo({ disabled }) {
             <span>
               Le déchet est{" "}
               <a
-                className="tw-underline"
+                className="fr-link force-external-link-content force-underline-link"
                 href="https://www.ecologie.gouv.fr/dechets-dangereux"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -130,7 +130,7 @@ export default function WasteInfo({ disabled }) {
             <span>
               Le déchet contient des{" "}
               <a
-                className="tw-underline"
+                className="fr-link force-external-link-content force-underline-link"
                 href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
                 target="_blank"
                 rel="noopener noreferrer"

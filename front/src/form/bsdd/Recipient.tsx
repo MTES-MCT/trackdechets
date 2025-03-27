@@ -82,7 +82,7 @@ export default function Recipient({ disabled }) {
           recevoir le déchet, vous pouvez consulter{" "}
           <a
             href="https://www.georisques.gouv.fr/risques/installations/donnees#/"
-            className="link"
+            className="fr-link force-external-link-content force-underline-link"
             target="_blank"
             rel="noopener noreferrer"
           >

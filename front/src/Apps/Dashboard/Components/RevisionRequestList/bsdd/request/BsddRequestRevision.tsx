@@ -455,7 +455,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                           <a
                             href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174/"
                             target="_blank"
-                            className="link"
+                            className="fr-link force-external-link-content force-underline-link"
                             rel="noopener noreferrer"
                           >
                             le site legifrance.

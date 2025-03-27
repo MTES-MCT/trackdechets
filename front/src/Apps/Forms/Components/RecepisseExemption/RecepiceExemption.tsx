@@ -14,7 +14,7 @@ const RecepisseExemption = ({ disabled, checked, onChange }) => {
             Le transporteur déclare être exempté de récépissé conformément aux
             dispositions de l'
             <a
-              className="fr-link"
+              className="fr-link force-external-link-content force-underline-link"
               target="_blank"
               rel="noreferrer"
               href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000046669839"

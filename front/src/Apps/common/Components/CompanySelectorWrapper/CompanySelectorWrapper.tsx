@@ -179,6 +179,7 @@ export default function CompanySelectorWrapper({
                 `Veuillez nous contacter via ` +
                 (
                   <a
+                    className="fr-link force-external-link-content force-underline-link"
                     href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                     target="_blank"
                     rel="noreferrer"

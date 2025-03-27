@@ -110,7 +110,7 @@ export function CompanyResult<T extends CompanyResultBase>({
             onClick={e => e.stopPropagation()}
             target="_blank"
             rel="noopener noreferrer"
-            className="link"
+            className="fr-link force-external-link-content force-underline-link"
           >
             Informations sur l'entreprise
           </a>

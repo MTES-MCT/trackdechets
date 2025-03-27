@@ -264,7 +264,9 @@ function CreateAlert() {
         autoriser votre application à utiliser leurs données Trackdéchets, nous
         utilisons le protocole OAuth2. Plus d'informations sur{" "}
         <a
-          className="fr-link"
+          className="fr-link force-external-link-content force-underline-link"
+          target="_blank"
+          rel="noopener noreferrer"
           href="https://developers.trackdechets.beta.gouv.fr/guides/oauth2"
         >
           https://developers.trackdechets.beta.gouv.fr/guides/oauth2
@@ -275,7 +277,7 @@ function CreateAlert() {
         Si vous développez une application pour le compte de clients, vous êtes
         soumis à la section 5.2.2 des{" "}
         <a
-          className="fr-link"
+          className="fr-link force-external-link-content force-underline-link"
           target="_blank"
           rel="noopener noreferrer"
           href="https://trackdechets.beta.gouv.fr/cgu/"
