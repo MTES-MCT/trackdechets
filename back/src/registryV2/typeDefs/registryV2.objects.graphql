@@ -1641,3 +1641,21 @@ type AddRegistryLinesResponse {
   stats: AddRegistryLinesStats!
   errors: [RegistryLineError!]
 }
+
+type RegistryLookup {
+  publicId: ID!
+  type: RegistryImportType!
+  siret: String!
+  reportAsSiret: String
+  date: DateTime!
+  createdAt: DateTime!
+  wasteCode: String
+
+  ssd: SsdWasteV2
+  incomingWaste: IncomingWasteV2
+  incomingTexs: IncomingWasteV2
+  outgoingWaste: OutgoingWasteV2
+  outgoingTexs: OutgoingWasteV2
+  managedWaste: ManagedWasteV2
+  transportedWaste: TransportedWasteV2
+}

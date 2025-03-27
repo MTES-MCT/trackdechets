@@ -20,6 +20,9 @@ siret
 vatNumber
 name
 address
+addressVoie
+addressPostalCode
+addressCity
 etatAdministratif
 codePaysEtrangerEtablissement
 isRegistered
