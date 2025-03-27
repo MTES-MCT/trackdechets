@@ -5,7 +5,7 @@ import BsdasriDetailContent from "../../dashboard/detail/bsdasri/BsdasriDetailCo
 import BSDDetailContent from "../../dashboard/detail/bsdd/BSDDetailContent";
 import { BsffDetailContent } from "../../dashboard/detail/bsff/BsffDetailContent";
 import BspaohDetailContent from "../../dashboard/detail/bspaoh/BspaohDetailContent";
-import { BsvhuDetailContent } from "../../dashboard/detail/bsvhu/BsvhuDetailContent";
+import BSVHUPreviewContent from "../../Apps/Dashboard/Preview/BSVHU/BSVHUPreviewContent";
 import {
   QueryFormArgs,
   Query,
@@ -118,7 +118,7 @@ export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
     return <BSDDetailContent form={bsddData.form} />;
   }
   if (isBsvhu && !!bsvhuData) {
-    return <BsvhuDetailContent form={bsvhuData.bsvhu} />;
+    return <BSVHUPreviewContent bsdId={bsvhuData.bsvhu.id} />;
   }
   if (isBsdasri && bsdasriData) {
     return <BsdasriDetailContent form={bsdasriData.bsdasri} />;
