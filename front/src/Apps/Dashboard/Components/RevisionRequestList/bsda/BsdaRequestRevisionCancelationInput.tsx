@@ -36,8 +36,11 @@ export function BsdaRequestRevisionCancelationInput({ bsda, onChange }: Props) {
         disabled={!canBeCancelled}
         onChange={onChange}
         showCheckedHint={false}
+        helperText={
+          canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG
+        }
       />
-      {canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG}
+      <hr className="fr-mt-2w" />
     </>
   );
 }

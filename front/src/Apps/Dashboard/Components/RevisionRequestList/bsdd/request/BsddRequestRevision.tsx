@@ -1,7 +1,6 @@
 import { useMutation } from "@apollo/client";
 import {
   Form as Bsdd,
-  BsdType,
   Mutation,
   MutationCreateFormRevisionRequestArgs,
   WasteAcceptationStatus
@@ -31,10 +30,21 @@ import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
-import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
-import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import {
+  CODE_DECHET,
+  CODE_TRAITEMENT,
+  DENOMINATION_USUELLE,
+  DESCRIPTION_TRAITEMENT,
+  NOUVEAU_CODE_TRAITEMENT,
+  NOUVEAU_POIDS_EN_TONNES,
+  NOUVEAU_POP,
+  NOUVELLE_DENOMINATION_USUELLE,
+  NOUVELLE_DESC_TRAITEMENT,
+  POP,
+  TITLE_REQUEST_LIST
+} from "../../../Revision/wordingsRevision";
 
 type Props = {
   bsdd: Bsdd;
@@ -133,7 +143,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
-        Demander une révision du bordereau {bsdd.readableId}
+        {TITLE_REQUEST_LIST} {bsdd.readableId}
       </h2>
 
       <FormProvider {...methods}>
@@ -156,10 +166,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   display: areModificationsDisabled ? "none" : "inline"
                 }}
               >
-                <hr />
-
                 <RhfReviewableField
-                  title="Code déchet"
+                  title={CODE_DECHET}
                   path="wasteDetails.code"
                   value={bsdd?.wasteDetails?.code}
                   defaultValue={initialBsddReview.wasteDetails.code}
@@ -179,13 +187,13 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 </RhfReviewableField>
 
                 <RhfReviewableField
-                  title="Nom usuel du déchet"
+                  title={DENOMINATION_USUELLE}
                   path="wasteDetails.name"
                   value={bsdd.wasteDetails?.name}
                   defaultValue={initialBsddReview.wasteDetails.name}
                 >
                   <Input
-                    label="Nom usuel du déchet"
+                    label={NOUVELLE_DENOMINATION_USUELLE}
                     nativeInputProps={{
                       ...register("wasteDetails.name")
                     }}
@@ -193,14 +201,14 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 </RhfReviewableField>
 
                 <RhfReviewableField
-                  title="Contient des polluants organique persistant"
+                  title={POP}
                   path="wasteDetails.pop"
                   value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
                   defaultValue={initialBsddReview.wasteDetails.pop}
                   initialValue={bsdd.wasteDetails?.pop}
                 >
                   <ToggleSwitch
-                    label="Le déchet contient des polluants organiques persistants"
+                    label={NOUVEAU_POP}
                     checked={Boolean(formValues.wasteDetails?.pop)}
                     showCheckedHint={false}
                     onChange={checked => {
@@ -224,6 +232,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   defaultValue={initialBsddReview.wasteDetails.packagingInfos}
                   initialValue={bsdd.wasteDetails?.packagingInfos}
                 >
+                  <p className="fr-text fr-mb-2w">Nouveaux conditionnements</p>
                   <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
                 </RhfReviewableField>
 
@@ -248,8 +257,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       />
                     )}
                     <NonScrollableInput
-                      label="Poids en tonnes"
-                      className="fr-col-2"
+                      label={NOUVEAU_POIDS_EN_TONNES}
+                      className="fr-col-4"
                       state={errors.quantityReceived && "error"}
                       stateRelatedMessage={
                         errors.quantityReceived?.message ?? ""
@@ -286,8 +295,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       defaultValue={initialBsddReview?.quantityRefused}
                     >
                       <NonScrollableInput
-                        label="Poids en tonnes"
-                        className="fr-col-2"
+                        label={NOUVEAU_POIDS_EN_TONNES}
+                        className="fr-col-4"
                         state={errors.quantityRefused && "error"}
                         stateRelatedMessage={
                           errors.quantityRefused?.message ?? ""
@@ -336,8 +345,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       />
                     )}
                     <NonScrollableInput
-                      label="Poids en tonnes"
-                      className="fr-col-2"
+                      label={NOUVEAU_POIDS_EN_TONNES}
+                      className="fr-col-4"
                       state={
                         errors.temporaryStorageDetail?.temporaryStorer
                           ?.quantityReceived && "error"
@@ -393,8 +402,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       }
                     >
                       <NonScrollableInput
-                        label="Poids en tonnes"
-                        className="fr-col-2"
+                        label={NOUVEAU_POIDS_EN_TONNES}
+                        className="fr-col-4"
                         state={
                           errors.temporaryStorageDetail?.temporaryStorer
                             ?.quantityRefused && "error"
@@ -433,7 +442,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 {hasBeenProcessed && (
                   <>
                     <RhfReviewableField
-                      title="Code de l'opération D/R"
+                      title={CODE_TRAITEMENT}
                       path="processingOperationDone"
                       value={bsdd.processingOperationDone}
                       defaultValue={initialBsddReview.processingOperationDone}
@@ -454,7 +463,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                         </p>
                       </div>
                       <Select
-                        label="Code de l'opération"
+                        label={NOUVEAU_CODE_TRAITEMENT}
                         className="fr-col-8"
                         nativeSelectProps={{
                           ...register("processingOperationDone")
@@ -474,7 +483,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     </RhfReviewableField>
 
                     <RhfReviewableField
-                      title="Description de l'opération D/R"
+                      title={DESCRIPTION_TRAITEMENT}
                       path="processingOperationDescription"
                       value={bsdd.processingOperationDescription}
                       defaultValue={
@@ -482,7 +491,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                       }
                     >
                       <Input
-                        label="Description de l'opération D/R"
+                        label={NOUVELLE_DESC_TRAITEMENT}
                         nativeInputProps={{
                           ...register("processingOperationDescription")
                         }}
@@ -514,10 +523,10 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   <Input
                     label={`${
                       isTempStorage
-                        ? "Numéro de CAP destination finale"
-                        : "Numéro de CAP (Optionnel pour les déchets non dangereux)"
+                        ? "Nouveau CAP destination finale"
+                        : "Nouveau CAP (optionnel pour les déchets non dangereux)"
                     }`}
-                    className="fr-col-6"
+                    className="fr-col-8"
                     nativeInputProps={{
                       ...register(
                         `${
@@ -538,49 +547,19 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     defaultValue={initialBsddReview.recipient.cap}
                   >
                     <Input
-                      label="Numéro de CAP entreposage provisoire ou reconditionnement"
-                      className="fr-col-3"
+                      label="Nouveau CAP entreposage provisoire ou reconditionnement"
+                      className="fr-col-8"
                       nativeInputProps={{
                         ...register("recipient.cap")
                       }}
                     />
                   </RhfReviewableField>
                 )}
-
-                <RhfReviewableField
-                  title="Courtier"
-                  path="broker"
-                  value={
-                    bsdd.broker?.company?.name
-                      ? bsdd.broker.company.name
-                      : "Aucun"
-                  }
-                  defaultValue={initialBsddReview.broker}
-                >
-                  <RhfBroker
-                    bsdType={BsdType.Bsdd}
-                    siret={siret}
-                    showSwitch={false}
-                  />
-                </RhfReviewableField>
-
-                <RhfReviewableField
-                  title="Négociant"
-                  path="trader"
-                  value={
-                    bsdd.trader?.company?.name
-                      ? bsdd.trader.company.name
-                      : "Aucun"
-                  }
-                  defaultValue={initialBsddReview.trader}
-                >
-                  <RhfTrader siret={siret} showSwitch={false} />
-                </RhfReviewableField>
               </div>
             </>
           )}
 
-          {areModificationsDisabled && <hr />}
+          {!areModificationsDisabled && <hr />}
           <Input
             textArea
             label="Commentaire à propos de la révision"
@@ -589,6 +568,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
             nativeTextAreaProps={{
               ...register("comment")
             }}
+            className="fr-mb-4w"
           />
 
           {error && (

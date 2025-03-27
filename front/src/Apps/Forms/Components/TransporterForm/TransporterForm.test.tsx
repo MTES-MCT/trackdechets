@@ -197,7 +197,7 @@ describe("TransporterForm", () => {
       expect(
         screen.getByText("Récépissé de déclaration de transport de déchets")
       ).toBeInTheDocument();
-      const expected = `Numéro: ${expectedRecepisseNumber}, département: ${expectedRecepisseDepartement}, date limite de validité: ${formatDate(
+      const expected = `Numéro : ${expectedRecepisseNumber}, département : ${expectedRecepisseDepartement}, date limite de validité : ${formatDate(
         expectedRecepisseValidityLimit!
       )}`;
       expect(screen.getByText(expected, { exact: false })).toBeInTheDocument();
@@ -358,7 +358,7 @@ describe("TransporterForm", () => {
           bsdType
         })
       );
-      const expected = `Numéro: NOUVEAU-RECEPISSE, département: NOUVEAU-DEPARTEMENT, date limite de validité: ${formatDate(
+      const expected = `Numéro : NOUVEAU-RECEPISSE, département : NOUVEAU-DEPARTEMENT, date limite de validité : ${formatDate(
         "2024-10-11"
       )}`;
 
@@ -487,7 +487,7 @@ describe("TransporterForm", () => {
       fireEvent.click(searchResult);
 
       const newRecepisse = await screen.findByText(
-        `Numéro: NOUVEAU-RECEPISSE, département: NOUVEAU-DEPARTEMENT, date limite de validité: ${formatDate(
+        `Numéro : NOUVEAU-RECEPISSE, département : NOUVEAU-DEPARTEMENT, date limite de validité : ${formatDate(
           "2024-10-11"
         )}`,
         { exact: false }

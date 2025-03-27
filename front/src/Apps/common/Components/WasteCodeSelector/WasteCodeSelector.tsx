@@ -7,6 +7,7 @@ import {
 import WasteTreeModal from "../search/WasteTreeModal";
 import styles from "./wasteCode.module.scss";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { NOUVEAU_CODE_DECHET } from "../../../../Apps/Dashboard/Components/Revision/wordingsRevision";
 
 function formatWasteCode(wasteCode: string) {
   if (!wasteCode) {
@@ -40,8 +41,10 @@ const WasteCodeSelector = forwardRef(function WasteCodeSelector(
       <div className={styles.textQuote}>
         <ul>
           <li>
-            Vous hésitez sur le type de code déchet à choisir ? Sélectionnez un
-            code via le bouton de liste des codes déchets
+            <span className="fr-text--sm">
+              Vous hésitez sur le type de code déchet à choisir ? Sélectionnez
+              un code via le bouton de liste des codes déchets
+            </span>
             <WasteTreeModal
               wasteTree={
                 formValues?.emitter?.type === "APPENDIX1"
@@ -57,12 +60,16 @@ const WasteCodeSelector = forwardRef(function WasteCodeSelector(
               }}
             />
           </li>
-          <li>Pour les codes déchets dangereux n'oubliez pas l'astérisque</li>
+          <li>
+            <span className="fr-text--sm">
+              Pour les codes déchets dangereux n'oubliez pas l'astérisque
+            </span>
+          </li>
         </ul>
       </div>
 
       <label>
-        Code déchet
+        {NOUVEAU_CODE_DECHET}
         <div className={styles.wasteCodeWidgets}>
           <input
             //@ts-ignore
@@ -87,7 +94,7 @@ const WasteCodeSelector = forwardRef(function WasteCodeSelector(
       </label>
       {formValues.wasteDetails.code && waste?.description && (
         <div className="notification success tw-mt-2">
-          Vous avez sélectionné le code déchet suivant:{" "}
+          Vous avez sélectionné le code déchet suivant :{" "}
           <em>{waste?.description}</em>
         </div>
       )}

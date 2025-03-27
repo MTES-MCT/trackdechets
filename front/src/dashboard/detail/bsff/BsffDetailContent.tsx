@@ -551,7 +551,7 @@ function Packagings({ form }: { form: Bsff }) {
                   )}
                   {p.operation?.nextDestination?.company?.siret && (
                     <div>
-                      Destination ultérieure prévue:{" "}
+                      Destination ultérieure prévue :{" "}
                       {p.operation?.nextDestination?.company?.name} (
                       {p.operation?.nextDestination?.company?.siret}) -{" "}
                       {p.operation?.nextDestination?.plannedOperationCode}

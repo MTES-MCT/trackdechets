@@ -29,7 +29,6 @@ import {
   RouteBSDasView,
   RouteBSDDsView,
   RouteBsffsView,
-  RouteBsvhusView,
   RouteBspaohsView
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
@@ -40,6 +39,7 @@ import { MEDIA_QUERIES } from "../../common/config";
 import FormContainer from "./Creation/FormContainer";
 import { BsdTypename } from "../common/types/bsdTypes";
 import { getDefaultOrgId } from "../common/Components/CompanySwitcher/CompanySwitcher";
+import BSDPreviewContainer from "./Preview/BSDPreviewContainer";
 
 export const GET_ME = gql`
   {
@@ -197,7 +197,7 @@ function DashboardRoutes() {
 
           <Route
             path={toRelative(routes.dashboard.bsvhus.view)}
-            element={<RouteBsvhusView />}
+            element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsvhu} />}
           />
 
           <Route
@@ -476,16 +476,7 @@ function DashboardRoutes() {
 
             <Route
               path={toRelative(routes.dashboard.bsvhus.view)}
-              element={
-                <Modal
-                  onClose={goBack}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  size={overviewModalSize}
-                >
-                  <RouteBsvhusView />
-                </Modal>
-              }
+              element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsvhu} />}
             />
 
             <Route
