@@ -60,7 +60,7 @@ export const yourCompanyIsIdentifiedOnABsd: MailTemplate<{
 };
 
 export const onboardingFirstStep: MailTemplate = {
-  subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd'hui !",
+  subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
   templateId: templateIds.FIRST_ONBOARDING
 };
 
@@ -74,7 +74,7 @@ export const createPasswordResetRequest: MailTemplate<{
 
 export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
   subject: ({ form }) =>
-    `Le déchet de l'entreprise ${form.emitterCompanyName} a été totalement refusé à réception`,
+    `Le déchet de l’entreprise ${form.emitterCompanyName} a été totalement refusé à réception`,
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -102,7 +102,7 @@ export const formPartiallyRefused: MailTemplate<{
   form: Form & BsddTransporter;
 }> = {
   subject: ({ form }) =>
-    `Le déchet de l'entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
+    `Le déchet de l’entreprise ${form.emitterCompanyName} a été partiellement refusé à réception`,
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ form }) => {
@@ -157,7 +157,7 @@ export const membershipRequestAccepted: MailTemplate<{
   companySiret: string;
 }> = {
   subject: ({ companyName, companySiret }) =>
-    `Vous êtes à présent membre de l'établissement ${companyName} (${companySiret}) 🔔`,
+    `Vous êtes à présent membre de l’établissement ${companyName} (${companySiret}) 🔔`,
   body: mustacheRenderer("demande-de-rattachement-acceptee.html"),
   templateId: templateIds.LAYOUT
 };
@@ -167,7 +167,7 @@ export const membershipRequestRefused: MailTemplate<{
   companySiret: string;
 }> = {
   subject:
-    "Votre demande de rattachement a été refusée par l'administrateur de l'établissement",
+    "Votre demande de rattachement a été refusée par l'administrateur de l’établissement",
   body: mustacheRenderer("demande-de-rattachement-refusee.html"),
   templateId: templateIds.LAYOUT
 };
