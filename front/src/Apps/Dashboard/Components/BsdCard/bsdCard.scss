@@ -77,11 +77,22 @@
       }
     }
 
-    .bsd-number,
-    .bsd-custom-id {
+    .fr-btn.btn-clicked {
+      &::after {
+        background-color: #18753c;
+      }
+    }
+    .fr-btn {
       font-size: 0.875rem; //14px
       color: #161616;
-      width: 240px;
+      padding: 0 10px 0 0;
+      &::after {
+        background-color: var(--background-action-high-blue-france);
+        margin-left: 0.2rem;
+      }
+
+      display: flex;
+      align-items: center;
     }
     .workflow-type {
       display: flex;

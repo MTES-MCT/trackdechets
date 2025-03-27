@@ -33,7 +33,7 @@ export const expectFilteredResults = async (
   for (const bsd of bsds) {
     const bsdCard = page
       .locator(".bsd-card-list__item")
-      .getByText(`N°: ${bsd.readableId ?? bsd.id}`);
+      .getByTestId(`${bsd.readableId ?? bsd.id}`);
     await expect(bsdCard).toBeVisible();
   }
 
