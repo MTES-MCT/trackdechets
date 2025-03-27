@@ -13,6 +13,7 @@ import {
   BsvhuBroker,
   BsvhuTrader
 } from "@td/codegen-ui";
+import { isDefined } from "../../../common/helper";
 
 export const PreviewContainer = ({ children }) => {
   return <div className="fr-container--fluid">{children}</div>;
@@ -104,7 +105,8 @@ export const PreviewDateTimeRow = ({ value, label }) => {
 };
 
 export const PreviewBooleanRow = ({ value, label }) => {
-  return <PreviewTextRow label={label} value={value ? "Oui" : "Non"} />;
+  const displayedValue = isDefined(value) ? (value ? "Oui" : "Non") : null;
+  return <PreviewTextRow label={label} value={displayedValue} />;
 };
 
 export const PreviewTransporterReceiptDetails = ({

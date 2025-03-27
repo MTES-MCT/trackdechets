@@ -15,7 +15,8 @@ import BSDPreviewHeader from "../BSDPreviewHeader";
 import {
   PreviewContainerCol,
   PreviewTextRow,
-  PreviewDateRow
+  PreviewDateRow,
+  PreviewBooleanRow
 } from "../BSDPreviewComponents";
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
@@ -112,6 +113,11 @@ const BSVHUPreviewContent = ({ bsdId }: BSVHUPreviewContentProps) => {
               </PreviewContainerCol>
 
               <PreviewContainerCol gridWidth={3}>
+                <PreviewBooleanRow
+                  label="Véhicule électrique ou hybride"
+                  value={bsd.containsElectricOrHybridVehicles}
+                />
+
                 <PreviewDateRow label="Dernière action" value={bsd.updatedAt} />
 
                 <PreviewTextRow
