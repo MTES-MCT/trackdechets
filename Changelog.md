@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Permettre aux intégrateurs API d'accéder aux délégations registre en lecture [PR 4039](https://github.com/MTES-MCT/trackdechets/pull/4039)
+- Ne pas permettre d'accéder aux brouillons des autres acteurs sur le PAOH [PR 4050](https://github.com/MTES-MCT/trackdechets/pull/4050)
 
 #### :bug: Corrections de bugs
 
