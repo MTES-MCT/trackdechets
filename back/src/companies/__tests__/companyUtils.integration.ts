@@ -179,7 +179,7 @@ describe("getCompanySplittedAddress", () => {
       addressVoie: "[ND][ND][ND][ND][ND]",
       addressPostalCode: "[ND]",
       addressCity: "Nantes",
-      codePaysEtrangerEtablissement: "FR"
+      codePaysEtrangerEtablissement: ""
     };
 
     // When
