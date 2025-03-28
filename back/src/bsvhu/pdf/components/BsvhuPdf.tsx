@@ -256,7 +256,24 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             {isDefined(bsvhu?.containsElectricOrHybridVehicles) && (
               <div>
                 Comprend des véhicules électriques ou hybrides:{" "}
-                {bsvhu?.containsElectricOrHybridVehicles ? "Oui" : "Non"}
+                <input
+                  type="checkbox"
+                  id="oui"
+                  name="containsElectricOrHybridVehicles"
+                  readOnly
+                  className="ml-12"
+                  checked={bsvhu?.containsElectricOrHybridVehicles === true}
+                />{" "}
+                <label htmlFor="oui">Oui</label>
+                <input
+                  type="checkbox"
+                  id="non"
+                  name="containsElectricOrHybridVehicles"
+                  readOnly
+                  className="ml-12"
+                  checked={bsvhu?.containsElectricOrHybridVehicles === false}
+                />{" "}
+                <label htmlFor="non">Non</label>
               </div>
             )}
           </div>
