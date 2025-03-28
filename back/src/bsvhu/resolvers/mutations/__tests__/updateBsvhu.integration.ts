@@ -9,7 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
-import { UserRole } from "@prisma/client";
+import { BsvhuStatus, UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import gql from "graphql-tag";
 import { BsvhuIdentificationType } from "@prisma/client";
@@ -20,6 +20,7 @@ const UPDATE_VHU_FORM = gql`
       id
       isDraft
       packaging
+      containsElectricOrHybridVehicles
       identification {
         type
       }
@@ -878,4 +879,76 @@ describe("Mutation.Vhu.update", () => {
       expect(data.updateBsvhu.identification?.type).toEqual(identificationType);
     }
   );
+
+  it("should allow user to update containsElectricOrHybridVehicles", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: "INITIAL",
+        emitterCompanySiret: company.siret,
+        containsElectricOrHybridVehicles: null
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: {
+            containsElectricOrHybridVehicles: true
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const updatedBsvhu = await prisma.bsvhu.findFirstOrThrow({
+      where: { id: bsvhu.id }
+    });
+
+    expect(updatedBsvhu.containsElectricOrHybridVehicles).toBeTruthy();
+  });
+
+  it("should not allow user to update containsElectricOrHybridVehicles if VHU is processed", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsvhu = await bsvhuFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        status: BsvhuStatus.PROCESSED,
+        emitterCompanySiret: company.siret,
+        containsElectricOrHybridVehicles: false,
+        destinationOperationSignatureDate: new Date()
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateBsvhu">>(
+      UPDATE_VHU_FORM,
+      {
+        variables: {
+          id: bsvhu.id,
+          input: {
+            containsElectricOrHybridVehicles: true
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Comprend des véhicules électriques ou hybrides"
+    );
+  });
 });

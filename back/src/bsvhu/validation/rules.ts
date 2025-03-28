@@ -778,6 +778,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "les intermédiaires",
     sealed: { from: "OPERATION" },
     path: ["intermediaries"]
+  },
+  containsElectricOrHybridVehicles: {
+    readableFieldName: "comprend des véhicules électriques ou hybrides",
+    sealed: { from: "OPERATION" },
+    path: ["containsElectricOrHybridVehicles"]
   }
 };
 

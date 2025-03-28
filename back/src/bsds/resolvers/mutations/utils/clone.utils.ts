@@ -671,7 +671,8 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
     destinationReceptionSignatureAuthor:
       bsvhu.destinationReceptionSignatureAuthor,
-    destinationReceptionSignatureDate: bsvhu.destinationReceptionSignatureDate
+    destinationReceptionSignatureDate: bsvhu.destinationReceptionSignatureDate,
+    containsElectricOrHybridVehicles: bsvhu.containsElectricOrHybridVehicles
   };
 
   const newBsvhu = await create(newBsvhuCreateInput);

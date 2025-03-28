@@ -60,6 +60,7 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
     isDraft: bsvhu.isDraft,
     status: bsvhu.status,
     isDuplicateOf: bsvhu.isDuplicateOf,
+    containsElectricOrHybridVehicles: bsvhu.containsElectricOrHybridVehicles,
     emitter: nullIfNoValues<BsvhuEmitter>({
       agrementNumber: bsvhu.emitterAgrementNumber,
       irregularSituation: bsvhu.emitterIrregularSituation ?? false,
@@ -225,7 +226,11 @@ export function flattenVhuInput(formInput: BsvhuInput) {
     ...flattenVhuIdentificationInput(formInput),
     ...flattenVhuWeightInput(formInput),
     intermediaries: formInput.intermediaries,
-    customId: chain(formInput, f => f.customId)
+    customId: chain(formInput, f => f.customId),
+    containsElectricOrHybridVehicles: chain(
+      formInput,
+      f => f.containsElectricOrHybridVehicles
+    )
   });
 }
 

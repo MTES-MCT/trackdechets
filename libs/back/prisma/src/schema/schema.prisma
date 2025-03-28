@@ -1110,6 +1110,7 @@ model Bsvhu {
   transporterTransportMode                            TransportMode?           @default(ROAD)
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
+  containsElectricOrHybridVehicles                    Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?

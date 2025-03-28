@@ -22,6 +22,10 @@ type IncomingWaste {
   """
   wasteCode: String
   """
+  VHU: Comprend des véhicules électriques ou hybrides
+  """
+  containsElectricOrHybridVehicles: Boolean
+  """
   S'il s'agit de déchets POP au sens de l'article R. 541-8 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006839071&dateTexte=&categorieLien=cid
   """
@@ -403,6 +407,8 @@ type OutgoingWaste {
   wasteDescription: String
   "Le code du déchet sortant au regard de l'article R. 541-7 du code de l'environnement"
   wasteCode: String
+  "VHU: Comprend des véhicules électriques ou hybrides"
+  containsElectricOrHybridVehicles: Boolean
   "S'il s'agit, de déchets POP au sens de l'article R. 541-8 du code de l'environnement"
   pop: Boolean
   """
@@ -807,6 +813,8 @@ type TransportedWaste {
   wasteDescription: String
   "Le code du déchet au regard de l'article R. 541-7 du code de l'environnement"
   wasteCode: String
+  "VHU: Comprend des véhicules électriques ou hybrides"
+  containsElectricOrHybridVehicles: Boolean
   "S'il s'agit, de déchets POP au sens de l'article R. 541-8 du code de l'environnement"
   pop: Boolean
   """
@@ -1175,6 +1183,10 @@ type ManagedWaste {
   """
   wasteCode: String
   """
+  VHU: Comprend des véhicules électriques ou hybrides
+  """
+  containsElectricOrHybridVehicles: Boolean
+  """
   S'il s'agit de déchets POP au sens de l'article R. 541-8 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006839071&dateTexte=&categorieLien=cid
   """
@@ -1530,6 +1542,10 @@ type AllWaste {
   https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000032191751/
   """
   wasteCode: String
+  """
+  VHU: Comprend des véhicules électriques ou hybrides
+  """
+  containsElectricOrHybridVehicles: Boolean
   """
   S'il s'agit de déchets POP au sens de l'article R. 541-8 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006839071&dateTexte=&categorieLien=cid
