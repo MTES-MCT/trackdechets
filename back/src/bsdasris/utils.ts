@@ -16,10 +16,7 @@ export const getCanAccessDraftOrgIds = async (
     const userOrgIds = userCompanies.map(company => company.orgId);
     const bsdasriOrgIds = [
       bsdasri.emitterCompanySiret,
-      ...[
-        bsdasri.transporterCompanySiret,
-        bsdasri.transporterCompanyVatNumber
-      ].filter(Boolean),
+      ...[bsdasri.transporterCompanySiret, bsdasri.transporterCompanyVatNumber],
       bsdasri.ecoOrganismeSiret,
       bsdasri.destinationCompanySiret
     ].filter(Boolean);
