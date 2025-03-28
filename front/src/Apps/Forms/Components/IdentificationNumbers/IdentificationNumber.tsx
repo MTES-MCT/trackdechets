@@ -2,7 +2,7 @@ import Tag from "@codegouvfr/react-dsfr/Tag";
 import React, { useEffect, useReducer, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import classNames from "classnames";
-import TdTooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../common/Components/Tooltip/Tooltip";
 import "./identificationNumber.scss";
 interface IdentificationNumberProps {
   title?: string;
@@ -105,7 +105,10 @@ const IdentificationNumber = ({
     <>
       <p className={classNames("multiTags-title", { error: !!error })}>
         {title}
-        <TdTooltip msg="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune" />
+        <Tooltip
+          className="fr-ml-1w"
+          title="Saisissez les identifications une par une. Appuyez sur la touche <Entrée> pour valider chacune"
+        />
       </p>
       <div
         className={classNames(

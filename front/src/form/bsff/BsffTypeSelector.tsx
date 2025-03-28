@@ -7,7 +7,7 @@ import {
   BsffWeightInput,
   BsffType
 } from "@td/codegen-ui";
-import Tooltip from "../../common/components/Tooltip";
+import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 import { getInitialState } from "./utils/initial-state";
 
 const options = [
@@ -222,7 +222,9 @@ export function BsffTypeSelector() {
                 }}
               />{" "}
               {option.label}
-              {option.tooltip && <Tooltip msg={option.tooltip} />}
+              {option.tooltip && (
+                <Tooltip className="fr-ml-1w" title={option.tooltip} />
+              )}
             </label>
           </React.Fragment>
         ))}
