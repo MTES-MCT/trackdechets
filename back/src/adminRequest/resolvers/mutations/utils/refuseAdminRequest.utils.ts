@@ -118,14 +118,17 @@ export const sendEmailToAuthor = async (author: User, company: Company) => {
  * Expire requests that are older than 14 days
  */
 export const expireAdminRequests = async () => {
-  // TODO: use repository here?
-  await prisma.adminRequest.updateMany({
-    where: {
+  const { updateMany } = getAdminRequestRepository({
+    id: "cron_job"
+  } as Express.User);
+
+  await updateMany(
+    {
       status: AdminRequestStatus.PENDING,
       createdAt: { lt: addDays(new Date(), -14) }
     },
-    data: {
+    {
       status: AdminRequestStatus.EXPIRED
     }
-  });
+  );
 };

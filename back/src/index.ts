@@ -91,3 +91,4 @@ export {
   getRegistryDelegationsExpiringInDays
 } from "./registryDelegation/resolvers/utils";
 export { expireAdminRequests } from "./adminRequest/resolvers/mutations/utils/refuseAdminRequest.utils";
+export { getAdminRequestRepository } from "./adminRequest/repository/index";

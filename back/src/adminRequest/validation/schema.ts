@@ -1,13 +1,40 @@
 import { z } from "zod";
-import { siretSchema } from "../../common/validation/zod/schema";
+import {
+  foreignVatNumberSchema,
+  siretSchema,
+  vatNumberSchema
+} from "../../common/validation/zod/schema";
 import { AdminRequestValidationMethod } from "@prisma/client";
 import { isDefined } from "../../common/helpers";
+import { isSiret } from "@td/constants";
 
 const idSchema = z.coerce.string().length(25, "L'id doit faire 25 caractères.");
 
+const orgIdSuperRefine = (orgId, path, refinementContext) => {
+  if (!isDefined(orgId)) return;
+
+  try {
+    siretSchema().parse(orgId);
+  } catch (_) {
+    try {
+      vatNumberSchema.parse(orgId);
+    } catch (_) {
+      try {
+        foreignVatNumberSchema().parse(orgId);
+      } catch (_) {
+        return refinementContext.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `L'identifiant de l'établissement ${path} doit être un SIRET ou un numéro de TVA valide.`,
+          path: [path]
+        });
+      }
+    }
+  }
+};
+
 export const createAdminRequestInputSchema = z
   .object({
-    companyOrgId: siretSchema(), // TODO: orgIdSchema?
+    companyOrgId: z.string(), // Actual check in superRefine
     collaboratorEmail: z.string().email().optional(),
     validationMethod: z.enum([
       AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL,
@@ -28,6 +55,22 @@ export const createAdminRequestInputSchema = z
         path: ["collaboratorEmail"]
       });
     }
+  })
+  .superRefine(({ companyOrgId }, refinementContext) =>
+    orgIdSuperRefine(companyOrgId, "companyOrgId", refinementContext)
+  )
+  .superRefine(({ companyOrgId, validationMethod }, refinementContext) => {
+    if (
+      !isSiret(companyOrgId) &&
+      validationMethod === AdminRequestValidationMethod.SEND_MAIL
+    ) {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le mode de vérification par courrier n'est pas autorisé pour les établissements étrangers.",
+        path: ["validationMethod"]
+      });
+    }
   });
 
 export const queryAdminRequestsArgsSchema = z.object({
@@ -42,7 +85,7 @@ export const adminRequestIdSchema = z.object({
 export const acceptAdminRequestInputSchema = z
   .object({
     adminRequestId: idSchema.optional(),
-    orgId: siretSchema().optional(), // TODO: orgIdSchema?
+    orgId: z.string().optional(), // Actual check in superRefine
     code: z.string().length(8).optional()
   })
   .superRefine(({ adminRequestId, orgId, code }, refinementContext) => {
@@ -60,4 +103,7 @@ export const acceptAdminRequestInputSchema = z
         path: ["adminRequestId"]
       });
     }
-  });
+  })
+  .superRefine(({ orgId }, refinementContext) =>
+    orgIdSuperRefine(orgId, "orgId", refinementContext)
+  );

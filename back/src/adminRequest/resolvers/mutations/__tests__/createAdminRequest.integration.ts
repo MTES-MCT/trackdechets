@@ -259,6 +259,99 @@ describe("Mutation createAdminRequest", () => {
     );
   });
 
+  it("should create an admin request with a VAT number", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name",
+        siret: null,
+        vatNumber: "ATU25700701"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+    const collaborator = await userInCompany("MEMBER", company.id, {
+      email: "collaborator@mail.com"
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: collaborator.email
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.createAdminRequest.user.name).toBe(user.name);
+    expect(data.createAdminRequest.company.name).toBe(company.name);
+    expect(data.createAdminRequest.company.orgId).toBe(company.orgId);
+    expect(data.createAdminRequest.status).toBe(AdminRequestStatus.PENDING);
+
+    const companyAdminRequest = await prisma.adminRequest.findFirstOrThrow({
+      where: {
+        id: data.createAdminRequest.id
+      }
+    });
+
+    expect(companyAdminRequest.userId).toEqual(user.id);
+    expect(companyAdminRequest.companyId).toEqual(company.id);
+    expect(companyAdminRequest.collaboratorId).toEqual(collaborator.id);
+    expect(companyAdminRequest.status).toEqual(AdminRequestStatus.PENDING);
+    expect(companyAdminRequest.validationMethod).toEqual(
+      AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL
+    );
+  });
+
+  it("should not allow validationMethod = SEND_MAIL for foreign companies", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        name: "Company name",
+        siret: null,
+        vatNumber: "ATU25700701"
+      },
+      {
+        name: "User name",
+        email: "user@mail.com"
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le mode de vérification par courrier n'est pas autorisé pour les établissements étrangers."
+    );
+  });
+
   it("should throw if there is already a pending request for this company", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");

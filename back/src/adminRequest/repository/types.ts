@@ -3,6 +3,7 @@ import { CreateAdminRequestFn } from "./adminRequest/create";
 import { FindFirstAdminRequestFn } from "./adminRequest/findFirst";
 import { FindManyAdminRequestFn } from "./adminRequest/findMany";
 import { UpdateAdminRequestFn } from "./adminRequest/update";
+import { UpdateManyAdminRequestFn } from "./adminRequest/updateMany";
 
 export type AdminRequestActions = {
   // Read
@@ -13,4 +14,5 @@ export type AdminRequestActions = {
   // Write
   create: CreateAdminRequestFn;
   update: UpdateAdminRequestFn;
+  updateMany: UpdateManyAdminRequestFn;
 };

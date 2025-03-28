@@ -40,6 +40,7 @@ import {
 } from "@td/mail";
 import { xDaysAgo } from "./helpers";
 import { addDays } from "date-fns";
+import { getAdminRequestRepository } from "back";
 
 /**
  * Return recently "registered" profesionals. That means either:
@@ -633,20 +634,24 @@ export const getAdminRequestEmailPayloads = async () => {
   const now = new Date();
   const yesterday = addDays(new Date(), -1);
 
-  // TODO: use repository here?
-  const adminRequests = await prisma.adminRequest.findMany({
-    where: {
+  const { findMany } = getAdminRequestRepository({
+    id: "cron_job"
+  } as Express.User);
+  const adminRequests = await findMany(
+    {
       status: AdminRequestStatus.PENDING,
       validationMethod:
         AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
       adminOnlyEndDate: { gte: yesterday, lt: now },
       collaboratorId: { not: null }
     },
-    include: {
-      user: true,
-      company: true
+    {
+      include: {
+        user: true,
+        company: true
+      }
     }
-  });
+  );
 
   if (!adminRequests.length) {
     return [];

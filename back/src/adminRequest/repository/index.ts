@@ -10,6 +10,7 @@ import buildFindFirstAdminRequest from "./adminRequest/findFirst";
 import { buildUpdateAdminRequest } from "./adminRequest/update";
 import { buildFindManyAdminRequest } from "./adminRequest/findMany";
 import { buildCountAdminRequests } from "./adminRequest/count";
+import { buildUpdateManyAdminRequest } from "./adminRequest/updateMany";
 
 export type AdminRequestRepository = AdminRequestActions;
 
@@ -32,6 +33,7 @@ export function getAdminRequestRepository(
   return {
     ...getReadonlyAdminRequestRepository(),
     create: useTransaction(buildCreateAdminRequest),
-    update: useTransaction(buildUpdateAdminRequest)
+    update: useTransaction(buildUpdateAdminRequest),
+    updateMany: useTransaction(buildUpdateManyAdminRequest)
   };
 }
