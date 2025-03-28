@@ -20,7 +20,7 @@ import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
 import BsdasriGroupingSelector from "../components/grouping/BsdasriGroupingSelector";
 import BsdasriSynthesisSelector from "../components/grouping/BsdasriSynthesisSelector";
 import { useParams } from "react-router-dom";
-import Tooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 
 export const customInfoToolTip =
   "Informations propres à l'entreprise. N'apparaît pas sur le bordereau.";
@@ -240,7 +240,7 @@ export function Emitter({ status, stepName, disabled = false }) {
 
       <div className="form__row">
         <label>
-          Champ libre (optionnel) <Tooltip msg={customInfoToolTip} />
+          Champ libre (optionnel) <Tooltip title={customInfoToolTip} />
           <Field
             disabled={editionDisabled}
             component="textarea"

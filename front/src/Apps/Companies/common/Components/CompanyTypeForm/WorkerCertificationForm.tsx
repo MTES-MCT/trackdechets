@@ -7,7 +7,7 @@ import {
   CompanyTypeInputProps,
   CompanyTypeInputValues
 } from "./CompanyTypeForm";
-import Tooltip from "../../../../../common/components/Tooltip";
+import Tooltip from "../../../../common/Components/Tooltip/Tooltip";
 import { WORKER_AGREMENT_ORGANISATION_OPTIONS } from "../../utils";
 
 type WorkerCategoryFormProps = {
@@ -45,7 +45,7 @@ const WorkerCertificationForm = ({
                 label: (
                   <>
                     Travaux relevant de la sous-section 3{" "}
-                    <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                    <Tooltip title="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
                   </>
                 ),
                 nativeInputProps: {

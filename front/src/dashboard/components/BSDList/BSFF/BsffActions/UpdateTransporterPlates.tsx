@@ -7,7 +7,7 @@ import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import { UPDATE_BSFF_FORM } from "../../../../../Apps/common/queries/bsff/queries";
 import { BsffFragment } from "../types";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
-import Tooltip from "../../../../../common/components/Tooltip";
+import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
 const TagsInput = lazy(
   () => import("../../../../../common/components/tags-input/TagsInput")
 );
@@ -89,7 +89,10 @@ function UpdateTransporterPlatesModal({
         <Form>
           <label htmlFor="plates">
             Immatriculations
-            <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+            <Tooltip
+              className="fr-ml-1w"
+              title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+            />
           </label>
           <TagsInput name="plates" limit={2} />
 

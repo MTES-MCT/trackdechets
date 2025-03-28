@@ -11,7 +11,7 @@ import {
 } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Tooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 
 type Props = { disabled: boolean };
 
@@ -140,8 +140,8 @@ export function Type({ disabled }: Props) {
               value={option.value}
               className="td-radio"
             />
-            {option.title}
-            <Tooltip msg={option.explanation} />
+            {option.title}{" "}
+            <Tooltip className="fr-ml-1w" title={option.explanation} />
           </label>
         ))}
       </div>

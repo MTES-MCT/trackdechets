@@ -9,7 +9,7 @@ import Operation from "./Operation";
 import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 
 import classNames from "classnames";
-import Tooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 import { customInfoToolTip } from "./Emitter";
 
 export default function Destination({ status, stepName, disabled = false }) {
@@ -37,7 +37,7 @@ export default function Destination({ status, stepName, disabled = false }) {
       </div>
       <div className="form__row">
         <label>
-          Champ libre (optionnel) <Tooltip msg={customInfoToolTip} />
+          Champ libre (optionnel) <Tooltip title={customInfoToolTip} />
           <Field
             component="textarea"
             name="destination.customInfo"

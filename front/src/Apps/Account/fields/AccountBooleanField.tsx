@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from "react";
 import styles from "./AccountField.module.scss";
 import classNames from "classnames";
-import Tooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../common/Components/Tooltip/Tooltip";
 
 type Props = {
   // the name of the field
@@ -45,7 +45,7 @@ export default function AccountBooleanField({
   return (
     <div className={classNames(styles.field, { [styles.editing]: editing })}>
       <span className={styles.label}>
-        {title} {tooltip && <Tooltip msg={tooltip} />}
+        {title} {tooltip && <Tooltip className="fr-ml-1w" title={tooltip} />}
       </span>
       <div className={styles.field__value}>{form}</div>
 

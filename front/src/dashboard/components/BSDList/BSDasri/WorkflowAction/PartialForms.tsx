@@ -20,7 +20,7 @@ import Transport from "../../../../../form/bsdasri/steps/Transport";
 import TransporterRecepisseWrapper from "../../../../../form/common/components/company/TransporterRecepisseWrapper";
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
-import Tooltip from "../../../../../common/components/Tooltip";
+import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
 const TagsInput = lazy(
   () => import("../../../../../common/components/tags-input/TagsInput")
 );
@@ -136,7 +136,7 @@ export function SynthesisTransportSignatureForm() {
         <div className="form__row">
           <label htmlFor="transporter.transport.plates">
             Immatriculations
-            <Tooltip msg={customInfoToolTip} />
+            <Tooltip className="fr-ml-1w" title={customInfoToolTip} />
           </label>
           <TagsInput name="transporter.transport.plates" />
         </div>

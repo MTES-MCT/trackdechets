@@ -14,7 +14,7 @@ import { isForeignVat } from "@td/constants";
 import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 import { isDefined } from "../../../common/helper";
 import { QUANTITY_NON_RENSEIGNE } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
-import TdTooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 import { transportModeLabels } from "../../constants";
 import { Company } from "../bsda/BsdaDetailContent";
 
@@ -216,7 +216,7 @@ export const QuantityRow = ({
           `${value} tonnes`
         ) : (
           <>
-            {QUANTITY_NON_RENSEIGNE} {tooltip && <TdTooltip msg={tooltip} />}
+            {QUANTITY_NON_RENSEIGNE} {tooltip && <Tooltip title={tooltip} />}
           </>
         )
       }

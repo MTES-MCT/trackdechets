@@ -8,7 +8,7 @@ import {
 import React, { useMemo, lazy } from "react";
 import TdSwitch from "../../../../common/components/Switch";
 import { Form, ParcelNumber } from "@td/codegen-ui";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
 const TagsInput = lazy(
   () => import("../../../../common/components/tags-input/TagsInput")
@@ -104,7 +104,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
           Identifiant(s) du terrain lorsque les terres ont été extraites d'un
           terrain placé en secteur d'information sur les sols au titre de
           l'article L. 125-6 (optionnel)
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <Tooltip
+            className="fr-ml-1w"
+            title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+          />
         </label>
         <TagsInput name="wasteDetails.landIdentifiers" />
       </div>
@@ -112,7 +115,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
       <div className="form__row">
         <label htmlFor="wasteDetails.analysisReferences">
           Références d'analyses (optionnel)
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <Tooltip
+            className="fr-ml-1w"
+            title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+          />
         </label>
         <TagsInput name="wasteDetails.analysisReferences" />
       </div>

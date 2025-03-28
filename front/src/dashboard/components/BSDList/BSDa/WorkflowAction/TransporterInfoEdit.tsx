@@ -4,7 +4,7 @@ import React, { useState, lazy } from "react";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
-import Tooltip from "../../../../../common/components/Tooltip";
+import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
 import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { Bsda, Mutation, MutationUpdateBsdaArgs } from "@td/codegen-ui";
 const TagsInput = lazy(
@@ -96,7 +96,10 @@ export function TransporterInfoEdit({
             <div className="form__row">
               <label htmlFor="transporter.transport.plates">
                 Immatriculations
-                <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+                <Tooltip
+                  className="fr-ml-1w"
+                  title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+                />
               </label>
               <TagsInput name="transporter.transport.plates" limit={2} />
             </div>

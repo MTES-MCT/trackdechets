@@ -7,7 +7,7 @@ import {
   getOperationModeLabel,
   getOperationModesFromOperationCode
 } from "../../Apps/common/operationModes";
-import Tooltip from "./Tooltip";
+import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 
 const OperationModeSelect = ({ operationCode, name }) => {
   const { setFieldValue, values } = useFormikContext();
@@ -40,7 +40,7 @@ const OperationModeSelect = ({ operationCode, name }) => {
       <fieldset>
         <legend>
           Mode de traitement{" "}
-          <Tooltip msg="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
+          <Tooltip title="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
         </legend>
         <div className="tw-flex">
           {modes.map(mode => (

@@ -14,8 +14,9 @@ import MyCompanySelector from "../common/components/company/MyCompanySelector";
 import { emitterTypeLabels } from "../../dashboard/constants";
 import { isForeignVat, isOmi } from "@td/constants";
 import { RedErrorMessage } from "../../common/components";
-import Tooltip from "../../common/components/Tooltip";
+// import Tooltip from "../../common/components/Tooltip";
 import { getInitialCompany } from "../../Apps/common/data/initialState";
+import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -134,7 +135,8 @@ export default function Emitter({ disabled }) {
               <div className="tw-flex tw-items-start">
                 <span>{emitterTypeLabels["APPENDIX1"]}</span>
                 <Tooltip
-                  msg={
+                  className="fr-ml-1w"
+                  title={
                     "La collecte de tournée dédiée permet une collecte plus facile (ancienne annexe 1)," +
                     " mais son usage est conditionné à certains déchets et certains acteurs.\n" +
                     (lockAppendix1

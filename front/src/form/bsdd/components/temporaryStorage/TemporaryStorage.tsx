@@ -4,7 +4,7 @@ import CompanySelector from "../../../common/components/company/CompanySelector"
 import styles from "./TemporaryStorage.module.scss";
 import classNames from "classnames";
 import ProcessingOperationSelect from "../../../../common/components/ProcessingOperationSelect";
-import TdTooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 
 export default function TemporaryStorage(props) {
   const tooltipMsg =
@@ -14,7 +14,7 @@ export default function TemporaryStorage(props) {
   return (
     <>
       <h4 className="form__section-heading">
-        Installation de destination prévue <TdTooltip msg={tooltipMsg} />
+        Installation de destination prévue <Tooltip title={tooltipMsg} />
       </h4>
       <CompanySelector
         name={
