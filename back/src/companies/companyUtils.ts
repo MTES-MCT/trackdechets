@@ -49,7 +49,10 @@ export const getCompanySplittedAddress = (
     // ...si entreprise étrangère
     isDefinedStrict(companySearchResult.codePaysEtrangerEtablissement) ||
     // ...si le retour des APIs ne comprend pas d'adresse fiable
-    !isDefinedStrict(companySearchResult?.addressPostalCode?.trim())
+    !isDefinedStrict(companySearchResult?.addressPostalCode?.trim()) ||
+    // ...si l'adresse n'est pas publique
+    companySearchResult.addressVoie?.includes("[ND]") ||
+    companySearchResult.addressPostalCode?.includes("[ND]")
   ) {
     res = splitAddress(company?.address, company?.vatNumber);
   }
