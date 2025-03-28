@@ -14,7 +14,8 @@ const routes = {
     registry: "/admin/registry",
     membersAdmin: "/admin/members",
     bsdAdmin: "/admin/bsd",
-    massProfilesAdmin: "/admin/mass-profile"
+    massProfilesAdmin: "/admin/mass-profile",
+    adminRequests: "/admin/admin-requests"
   },
   login: "/login",
   invite: "/invite",
@@ -122,13 +123,17 @@ const routes = {
   companies: {
     index: "/companies",
     details: "/companies/:siret",
+    adminRequest: "/companies/:siret/admin-request/:adminRequestId",
     create: {
       simple: "/companies/new",
       pro: "/companies/professional",
       foreign: "/companies/foreign"
     },
     join: "/companies/join",
-    orientation: "/companies/create"
+    orientation: "/companies/create",
+    manage: {
+      index: "/companies/manage"
+    }
   },
   registry: "/registre",
   registry_new: {
@@ -256,6 +261,7 @@ export const titles = {
     "Ajouter un transporteur étranger, Non-French carrier — Trackdéchets",
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
+  "/companies/manage": "Gestion avancée — Trackdéchets",
   "/registre": "Mes registres — Trackdéchets",
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":

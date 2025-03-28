@@ -1,0 +1,38 @@
+<p>
+  Nous accusons réception de votre demande pour obtenir les droits
+  administrateur pour l'établissement
+  <b>{{ company.name }} - {{ company.orgId }}</b>. Un courriel vient d'être
+  envoyé aux administrateurs actuels afin de les informer de votre démarche. Ils
+  pourront <b>accepter ou refuser</b> votre demande.
+</p>
+
+<br />
+
+{{#isValidationByCollaboratorApproval}}
+<p>
+  Si les administrateurs ne répondent pas sous un jour ouvré,
+  <b>le collaborateur</b> que vous avez renseigné sera sollicité à son tour pour
+  <b>valider ou refuser</b> la demande.
+</p>
+
+<br />
+{{/isValidationByCollaboratorApproval}} {{#isValidationByMail}}
+<p>
+  Un <b>courrier contenant un code de vérification</b> a été envoyé au siège
+  social de l'établissement concerné.
+</p>
+
+<br />
+
+<p>
+  Si aucune réponse n'est donnée de la part des administrateurs avant réception
+  du courrier, vous pourrez alors finaliser votre demande grâce au code de
+  vérification, que vous pourrez renseigner dans l'onglet
+  <b>Mes établissements > Gestion avancée > Saisir un code reçu par courrier</b
+  >.
+</p>
+{{/isValidationByMail}}
+
+<p>
+  Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
+</p>

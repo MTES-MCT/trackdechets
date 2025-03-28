@@ -14,6 +14,7 @@ import { MembersAdmin } from "./company/MembersAdmin";
 import { CompaniesDashboard } from "./companies/CompaniesDashboard";
 import { BsdAdmin } from "./bsd/BsdAdmin";
 import { BulkProfileUpdateAdmin } from "./bulkProfilesUpdate/BulkprofilesUpdateAdmin";
+import { AdminRequests } from "./adminRequests/AdminRequests";
 
 const toRelative = route => {
   return getRelativeRoute(routes.admin.index, route);
@@ -148,6 +149,18 @@ export default function Admin() {
                 Consultation BSD
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.adminRequests}
+                className={({ isActive }) =>
+                  isActive
+                    ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                    : "sidebarv2__item sidebarv2__item--indented"
+                }
+              >
+                Demandes admin
+              </NavLink>
+            </li>
           </ul>
         </Accordion>
       </SideBar>
@@ -207,6 +220,12 @@ export default function Admin() {
             path={toRelative(routes.admin.bsdAdmin)}
             element={<BsdAdmin />}
           />
+
+          <Route
+            path={toRelative(routes.admin.adminRequests)}
+            element={<AdminRequests />}
+          />
+
           <Route
             path={`${routes.admin.index}/*`}
             element={<Navigate to={routes.admin.verification} replace />}

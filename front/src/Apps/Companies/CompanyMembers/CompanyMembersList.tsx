@@ -25,6 +25,8 @@ import { TOAST_DURATION } from "../../../common/config";
 import "./companyMembers.scss";
 import { CompanyPrivateMembers } from "./CompanyMembers";
 import { userRoleLabel } from "../common/utils";
+import { useParams } from "react-router-dom";
+import { AcceptAdminRequestModal } from "./AcceptAdminRequestModal";
 
 interface CompanyMembersListProps {
   company: CompanyPrivateMembers;
@@ -52,6 +54,7 @@ const CompanyMembersList = ({
     null
   );
   const [filter, setFilter] = useState<string>("");
+  const { adminRequestId } = useParams<{ adminRequestId: string }>();
 
   const isAdmin = company.userRole === UserRole.Admin || isTDAdmin;
 
@@ -329,6 +332,10 @@ const CompanyMembersList = ({
           Êtes-vous sûr de vouloir révoquer{" "}
           {memberToDelete ? memberToDelete.name : ""} ?
         </deleteModal.Component>
+      )}
+
+      {adminRequestId && (
+        <AcceptAdminRequestModal adminRequestId={adminRequestId} />
       )}
     </div>
   );

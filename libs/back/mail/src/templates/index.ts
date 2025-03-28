@@ -374,3 +374,72 @@ export const bsdaWasteSealNumbersOrPackagingsRevision: MailTemplate<{
     handlePreferencesUrl
   }
 };
+
+export const adminRequestInitialWarningToAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string; email: string };
+  isValidationByCollaboratorApproval: boolean;
+  isValidationByMail: boolean;
+  adminRequest: { id: string };
+}> = {
+  subject: ({ company }) =>
+    `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-initial-warning-to-admin.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestInitialInfoToAuthorEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  isValidationByCollaboratorApproval: boolean;
+  isValidationByMail: boolean;
+}> = {
+  subject: ({ company }) =>
+    `Votre demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-initial-info-to-author.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestRefusedEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+}> = {
+  subject: () => `Demande de droits administrateur refusée`,
+  body: mustacheRenderer("admin-request-refused.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestAcceptedEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+}> = {
+  subject: () => `Demande de droits administrateur acceptée`,
+  body: mustacheRenderer("admin-request-accepted.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestAcceptedAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+}> = {
+  subject: () => `Mise à jour concernant la demande de droits administrateur`,
+  body: mustacheRenderer("admin-request-accepted-admin.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestRefusedAdminEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+}> = {
+  subject: () => `Mise à jour concernant la demande de droits administrateur`,
+  body: mustacheRenderer("admin-request-refused-admin.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const adminRequestCollaboratorEmail: MailTemplate<{
+  company: { name: string; orgId: string };
+  user: { name: string };
+  adminRequest: { id: string };
+}> = {
+  subject: ({ company }) =>
+    `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`,
+  body: mustacheRenderer("admin-request-collaborator.html"),
+  templateId: templateIds.LAYOUT
+};

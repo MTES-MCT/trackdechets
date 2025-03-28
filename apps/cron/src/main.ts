@@ -1,7 +1,8 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
-import { cleanUpIsReturnForTab, initSentry } from "back";
+import { cleanUpIsReturnForTab, expireAdminRequests, initSentry } from "back";
 import {
+  sendAdminRequestEmail,
   sendExpiringRegistryDelegationWarning,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
@@ -76,6 +77,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
         await sendExpiringRegistryDelegationWarning();
       },
       timeZone: TZ
+    }),
+    // admin requests: send mails to whoever is concerned
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendAdminRequestEmail();
+      },
+      timeZone: TZ
     })
   ];
 }
@@ -90,6 +99,13 @@ if (CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE) {
       cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
       onTick: async () => {
         await cleanUpIsReturnForTab();
+      },
+      timeZone: TZ
+    }),
+    new cron.CronJob({
+      cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
+      onTick: async () => {
+        await expireAdminRequests();
       },
       timeZone: TZ
     })
