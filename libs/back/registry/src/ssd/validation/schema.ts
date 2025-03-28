@@ -1,5 +1,6 @@
 import {
   BSDD_WASTE_CODES_ENUM,
+  SSD_OPERATION_MODES,
   SSD_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import { z } from "zod";
@@ -22,9 +23,9 @@ import {
   wasteDescriptionSchema,
   weightIsEstimateSchema,
   weightValueSchema,
-  operationModeSchema,
   nullishDateSchema,
-  dateSchema
+  dateSchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
@@ -108,7 +109,7 @@ const inputSsdSchema = z.object({
   destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
   destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   operationCode: getOperationCodeSchema(SSD_PROCESSING_OPERATIONS_CODES),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(SSD_OPERATION_MODES),
   administrativeActReference: z.enum([
     "Implicite",
     "Arrêté du 29 juillet 2014",

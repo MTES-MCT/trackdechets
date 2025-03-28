@@ -27,11 +27,11 @@ import {
   parcelNumbersSchema,
   parcelCoordinatesSchema,
   getOperationCodeSchema,
-  operationModeSchema,
   gistridNumberSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema
+  transportRecepisseNumberSchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingTexsItem = z.output<
@@ -93,7 +93,7 @@ const inputOutgoingTexsSchema = z.object({
   operationCode: getOperationCodeSchema(
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   isUpcycled: booleanSchema.nullish(),
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
