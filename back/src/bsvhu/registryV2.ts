@@ -86,7 +86,8 @@ export const toIncomingWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     quantity: bsvhu.quantity,
-    wasteContainsElectricOrHybridVehicles: null,
+    wasteContainsElectricOrHybridVehicles:
+      bsvhu.containsElectricOrHybridVehicles,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
@@ -214,7 +215,8 @@ export const toOutgoingWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     quantity: bsvhu.quantity,
-    wasteContainsElectricOrHybridVehicles: null,
+    wasteContainsElectricOrHybridVehicles:
+      bsvhu.containsElectricOrHybridVehicles,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
@@ -401,7 +403,8 @@ export const toTransportedWasteV2 = (
           .toNumber()
       : bsvhu.weightValue,
     quantity: bsvhu.quantity,
-    wasteContainsElectricOrHybridVehicles: null,
+    wasteContainsElectricOrHybridVehicles:
+      bsvhu.containsElectricOrHybridVehicles,
     weightIsEstimate: bsvhu.weightIsEstimate,
     volume: null,
 
@@ -547,7 +550,8 @@ export const toManagedWasteV2 = (
     wastePop: false,
     wasteIsDangerous: true,
     quantity: bsvhu.quantity,
-    wasteContainsElectricOrHybridVehicles: null,
+    wasteContainsElectricOrHybridVehicles:
+      bsvhu.containsElectricOrHybridVehicles,
     weight: bsvhu.weightValue
       ? new Decimal(bsvhu.weightValue)
           .dividedBy(1000)
