@@ -23,6 +23,7 @@ type EditableBsdasriFields = Required<
     | "synthesizedIn"
     | "synthesisEmitterSirets"
     | "groupingEmitterSirets"
+    | "canAccessDraftOrgIds"
     | "transportSignatory"
     | "emissionSignatory"
     | "emitterEmissionSignatureDate"

@@ -228,7 +228,7 @@ describe("Query.bsds.dasris base workflow", () => {
         expect.objectContaining({ node: { id: bsdasriId } })
       ]);
     });
-    it("draft bsdasri should be isDraftFor transporter", async () => {
+    it("draft bsdasri should be hidden for the transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -241,11 +241,9 @@ describe("Query.bsds.dasris base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
-    it("draft bsdasri should be isDraftFor destination", async () => {
+    it("draft bsdasri should be hidden for the destination destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -258,9 +256,7 @@ describe("Query.bsds.dasris base workflow", () => {
         }
       );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+      expect(data.bsds.edges).toEqual([]);
     });
   });
 

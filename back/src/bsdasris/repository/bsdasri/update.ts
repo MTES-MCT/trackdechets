@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
 import { objectDiff } from "../../../forms/workflow/diff";
+import { getCanAccessDraftOrgIds } from "../../utils";
 
 export type UpdateBsdasriFn = (
   where: Prisma.BsdasriWhereUniqueInput,
@@ -57,6 +58,22 @@ export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
       await prisma.bsdasri.update({
         where: { id: bsdasri.id },
         data: { groupingEmitterSirets }
+      });
+    }
+
+    if (bsdasri.isDraft) {
+      const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+        bsdasri,
+        user.id
+      );
+      await prisma.bsdasri.update({
+        where: { id: bsdasri.id },
+        data: {
+          canAccessDraftOrgIds
+        },
+        select: {
+          id: true
+        }
       });
     }
 

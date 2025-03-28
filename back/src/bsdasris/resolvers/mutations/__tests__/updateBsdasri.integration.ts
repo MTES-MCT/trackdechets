@@ -175,6 +175,7 @@ describe("Mutation.updateBsdasri", () => {
     async draftStatus => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const dasri = await bsdasriFactory({
+        userId: user.id,
         opt: {
           status: BsdasriStatus.INITIAL,
           isDraft: draftStatus === "draft",
@@ -197,7 +198,6 @@ describe("Mutation.updateBsdasri", () => {
           }
         }
       );
-
       expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
       expect(data.updateBsdasri.type).toBe("SIMPLE");
       // check input is sirenified
@@ -274,6 +274,7 @@ describe("Mutation.updateBsdasri", () => {
   it("should update transporter recepisse with data pulled from db", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
+      userId: user.id,
       opt: {
         status: BsdasriStatus.INITIAL,
         isDraft: true,
@@ -316,6 +317,7 @@ describe("Mutation.updateBsdasri", () => {
   it("should empty transporter recepisse if transporter has no receipt data", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
+      userId: user.id,
       opt: {
         status: BsdasriStatus.INITIAL,
         isDraft: true,
@@ -358,6 +360,7 @@ describe("Mutation.updateBsdasri", () => {
     });
 
     const dasri = await bsdasriFactory({
+      userId: user.id,
       opt: {
         status: BsdasriStatus.INITIAL,
         isDraft: true,

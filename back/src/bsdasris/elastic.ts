@@ -44,6 +44,32 @@ export async function getBsdasriForElastic(
   });
 }
 
+type ElasticSirets = {
+  emitterCompanySiret: string | null | undefined;
+  ecoOrganismeSiret: string | null | undefined;
+  destinationCompanySiret: string | null | undefined;
+  transporterCompanySiret: string | null | undefined;
+};
+
+const getBsdasriSirets = (bsdasri: BsdasriForElastic): ElasticSirets => {
+  const bsdasriSirets = {
+    emitterCompanySiret: bsdasri.emitterCompanySiret,
+    destinationCompanySiret: bsdasri.destinationCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
+    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
+  };
+
+  // Drafts only appear in the dashboard for companies the bsdasri owner belongs to
+  if (bsdasri.isDraft) {
+    const draftFormSiretsEntries = Object.entries(bsdasriSirets).filter(
+      ([, siret]) => siret && bsdasri.canAccessDraftOrgIds.includes(siret)
+    );
+    return Object.fromEntries(draftFormSiretsEntries) as ElasticSirets;
+  }
+
+  return bsdasriSirets;
+};
+
 type WhereKeys =
   | "isDraftFor"
   | "isForActionFor"
@@ -64,7 +90,7 @@ type WhereKeys =
 // | refused            | archive | archive     | archive   |
 // | awaiting_group     | follow  | follow      | follow    |
 
-function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
+function getWhere(bsdasri: BsdasriForElastic): Pick<BsdElastic, WhereKeys> {
   const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
@@ -74,12 +100,7 @@ function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
     isCollectedFor: []
   };
 
-  const formSirets: Record<string, string | null | undefined> = {
-    emitterCompanySiret: bsdasri.emitterCompanySiret,
-    destinationCompanySiret: bsdasri.destinationCompanySiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
-  };
+  const formSirets = getBsdasriSirets(bsdasri);
 
   const siretsFilters = new Map<string, keyof typeof where>(
     Object.entries(formSirets)
