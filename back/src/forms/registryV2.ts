@@ -6,7 +6,6 @@ import {
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
-  PrismaClient,
   RegistryExportType,
   RegistryExportDeclarationType,
   RegistryExportWasteType,
@@ -22,7 +21,6 @@ import {
 import { formToBsddV2, BsddV2 } from "./compat";
 import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import {
   createRegistryLogger,
   deleteRegistryLookup,
@@ -35,6 +33,7 @@ import {
   INCOMING_TEXS_WASTE_CODES,
   isDangerous
 } from "@td/constants";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1363,30 +1362,27 @@ const bsddToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  form: MinimalBsddForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(form.id, tx);
-  const lookupInputs = bsddToLookupCreateInputs(form);
-  if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
-  }
-};
-
 export const updateRegistryLookup = async (
-  form: MinimalBsddForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  form: MinimalBsddForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(form, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(form, tx);
-  }
+  await prisma.$transaction(async tx => {
+    // acquire an advisory lock on the bsdd id
+    // see more explanation in bsda/registryV2.ts
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${form.id}, 0))`;
+    await deleteRegistryLookup(form.id, tx);
+    const lookupInputs = bsddToLookupCreateInputs(form);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(`Error creating registry lookup for bsdd ${form.id}`);
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async (pageSize = 100) => {

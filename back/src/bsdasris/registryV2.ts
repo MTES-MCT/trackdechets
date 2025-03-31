@@ -6,12 +6,10 @@ import {
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   Prisma,
-  PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
 } from "@prisma/client";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
@@ -28,6 +26,7 @@ import {
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { logger } from "@td/logger";
 
 const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
   const destinationFinalOperationCodes: string[] = [];
@@ -684,30 +683,29 @@ const bsdasriToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  bsdasri: MinimalBsdasriForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsdasri.id, tx);
-  const lookupInputs = bsdasriToLookupCreateInputs(bsdasri);
-  if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
-  }
-};
-
 export const updateRegistryLookup = async (
-  bsdasri: MinimalBsdasriForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  bsdasri: MinimalBsdasriForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(bsdasri, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(bsdasri, tx);
-  }
+  await prisma.$transaction(async tx => {
+    // acquire an advisory lock on the bsdasri id
+    // see more explanation in bsda/registryV2.ts
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${bsdasri.id}, 0))`;
+    await deleteRegistryLookup(bsdasri.id, tx);
+    const lookupInputs = bsdasriToLookupCreateInputs(bsdasri);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(
+          `Error creating registry lookup for bsdasri ${bsdasri.id}`
+        );
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async (pageSize = 100) => {

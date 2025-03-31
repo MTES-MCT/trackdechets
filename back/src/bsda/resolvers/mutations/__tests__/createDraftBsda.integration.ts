@@ -537,6 +537,67 @@ describe("Mutation.Bsda.createDraft", () => {
       expect(errors).toBeUndefined();
       expect(data.createDraftBsda.status).toBe("INITIAL");
     });
+
+    it("should not allow to create a BSDA with an eco-organisme as emitter", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const ecoOrganisme = await ecoOrganismeFactory({
+        siret: company.siret!,
+        handle: { handleBsda: true }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateDraftBsdaArgs
+      >(CREATE_DRAFT_BSDA, {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: ecoOrganisme.siret
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "L'émetteur ne peut pas être un éco-organisme"
+          )
+        })
+      ]);
+    });
+
+    // tra-16203 - Permettre aux établissements identifiés comme systèmes d'individuels VHU d'être désignés
+    // comme producteurs sur un BSDD et BSDA
+    it("should allow to create a BSDA with an eco-organisme that do not handle BSDA as emitter", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const ecoOrganisme = await ecoOrganismeFactory({
+        siret: company.siret!,
+        // système individuel VHU
+        handle: { handleBsvhu: true }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateDraftBsdaArgs
+      >(CREATE_DRAFT_BSDA, {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: ecoOrganisme.siret
+              }
+            }
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+    });
   });
 
   describe("closed sirets", () => {

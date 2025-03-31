@@ -1,5 +1,6 @@
 import {
   refineOperationCodeWhenUpcycled,
+  refineOperationModeConsistency,
   refineTransportersConsistency
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
@@ -31,6 +32,7 @@ export function safeParseAsyncManaged(line: unknown) {
     .superRefine(refineGistridNumber)
     .superRefine(refineManagedUpcycled)
     .superRefine(refineOperationCodeWhenUpcycled)
+    .superRefine(refineOperationModeConsistency)
     .superRefine(transporter1Refinement)
     .superRefine(transporter2Refinement)
     .superRefine(transporter3Refinement)

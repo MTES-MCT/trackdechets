@@ -6,7 +6,8 @@ import {
   refineMunicipalities,
   refineGistridNumber,
   refineOperationCodeWhenUpcycled,
-  refineOperationMode,
+  refineRequiredOperationMode,
+  refineOperationModeConsistency,
   refineTransportersConsistency,
   requiredParcelsRefinement
 } from "../../shared/refinement";
@@ -36,7 +37,8 @@ export function safeParseAsyncIncomingTexs(line: unknown) {
     .superRefine(parcelRefinement)
     .superRefine(requiredParcelsRefinement)
     .superRefine(refineOperationCodeWhenUpcycled)
-    .superRefine(refineOperationMode)
+    .superRefine(refineRequiredOperationMode)
+    .superRefine(refineOperationModeConsistency)
     .superRefine(refineFollowingTraceabilityInfos)
     .superRefine(refineEcoOrgBrokerAndTrader)
     .superRefine(transporter1Refinement)

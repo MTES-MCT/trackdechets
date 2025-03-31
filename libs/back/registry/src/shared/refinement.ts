@@ -383,7 +383,7 @@ export const refineGistridNumber: Refinement<{
   }
 };
 
-export const refineOperationMode: Refinement<{
+export const refineRequiredOperationMode: Refinement<{
   operationCode: TdOperationCode;
   operationMode?: OperationMode | null;
 }> = (item, { addIssue }) => {
@@ -403,6 +403,23 @@ export const refineOperationMode: Refinement<{
     addIssue({
       code: z.ZodIssueCode.custom,
       message: `Le mode de traitement est requis lorsqu'un code de traitement final a été renseigné`,
+      path: ["operationMode"]
+    });
+  }
+};
+
+export const refineOperationModeConsistency: Refinement<{
+  operationCode: TdOperationCode;
+  operationMode?: OperationMode | null;
+}> = (item, { addIssue }) => {
+  if (
+    item.operationCode.startsWith("D") &&
+    item.operationMode &&
+    item.operationMode !== OperationMode.ELIMINATION
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Le mode de traitement doit obligatoirement être Élimination lorsque le code de traitement commence par D`,
       path: ["operationMode"]
     });
   }

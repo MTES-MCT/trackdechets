@@ -138,7 +138,11 @@ export const getOperationCodeSchema = (
   z
     .string()
     .trim()
-    .transform(val => val.replace(/([A-Z])(\d)/, "$1 $2")) // D5 becomes D 5
+    .transform(val =>
+      val.replace(/^([A-Z])(\d{1,2})([A-Z]?)$/, (_, p1, p2, p3) =>
+        [p1, p2, p3].filter(Boolean).join(" ")
+      )
+    ) // D5 becomes D 5, D9F becomes D 9 F
     .pipe(
       z.enum(operationCodes, {
         required_error: "Le code de traitement est requis",

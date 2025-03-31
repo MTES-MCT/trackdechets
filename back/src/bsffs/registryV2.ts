@@ -9,14 +9,12 @@ import {
   BsffType,
   OperationMode,
   Prisma,
-  PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   emptyIncomingWasteV2,
@@ -34,6 +32,7 @@ import {
 } from "@td/registry";
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1094,30 +1093,27 @@ const bsffToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  bsff: MinimalBsffForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsff.id, tx);
-  const lookupInputs = bsffToLookupCreateInputs(bsff);
-  if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
-  }
-};
-
 export const updateRegistryLookup = async (
-  bsff: MinimalBsffForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  bsff: MinimalBsffForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(bsff, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(bsff, tx);
-  }
+  await prisma.$transaction(async tx => {
+    // acquire an advisory lock on the bsff id
+    // see more explanation in bsda/registryV2.ts
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${bsff.id}, 0))`;
+    await deleteRegistryLookup(bsff.id, tx);
+    const lookupInputs = bsffToLookupCreateInputs(bsff);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(`Error creating registry lookup for bsff ${bsff.id}`);
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async (pageSize = 100) => {
