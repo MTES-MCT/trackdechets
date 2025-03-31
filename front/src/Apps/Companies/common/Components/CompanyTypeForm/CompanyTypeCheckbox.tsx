@@ -51,7 +51,8 @@ const CompanyTypeCheckbox = ({
 
   const labelWithHelp = (
     <>
-      {label} <Tooltip className="fr-ml-1w" title={helpText} />
+      <span data-testid="company-type-label">{label}</span>{" "}
+      <Tooltip className="fr-ml-1w" title={helpText} />
     </>
   );
 
