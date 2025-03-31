@@ -233,7 +233,12 @@ export const columns: Column[] = [
   },
   {
     field: "parcelPostalCodes",
-    label: "Parcelle code postal",
+    label: "Parcelle ancien code postal",
+    format: (v: string[]) => formatArray(v)
+  },
+  {
+    field: "parcelInseeCodes",
+    label: "Parcelle code commune INSEE",
     format: (v: string[]) => formatArray(v)
   },
   {

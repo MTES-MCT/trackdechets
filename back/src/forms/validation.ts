@@ -763,16 +763,18 @@ export const packagingInfoFn = ({
 const parcelCommonInfos = yup
   .object({
     city: yup.string().required("Parcelle: la ville est obligatoire"),
-    postalCode: yup
+    inseeCode: yup
       .string()
-      .required("Parcelle: le code postal est obligatoire")
+      .required("Parcelle: le code INSEE de la commune est obligatoire")
   })
   .test(
     "no-unknown",
     "Parcelle: impossible d'avoir à la fois des coordonnées GPS et un numéro de parcelle",
     (value, testContext) => {
       const { fields } = testContext.schema;
+
       const known = Object.keys(fields);
+
       const unknownKeys: string[] = Object.keys(value || {}).filter(
         key => known.indexOf(key) === -1
       );
@@ -797,7 +799,7 @@ const parcelNumber = yup.object({
     .max(5)
     .required("Parcelle: le numéro de parcelle est obligatoire")
 });
-const patternSixDigisAfterComma = /^[-+]?\d+(\.\d{0,6})?$/;
+const patternSixDigitsAfterComma = /^[-+]?\d+(\.\d{0,6})?$/;
 const parcelCoordinates = yup.object({
   x: yup
     .number()
@@ -806,7 +808,7 @@ const parcelCoordinates = yup.object({
       "La coordonnée ne peut pas avoir plus de 6 décimales",
       (val: any) => {
         if (val != undefined) {
-          return patternSixDigisAfterComma.test(val);
+          return patternSixDigitsAfterComma.test(val);
         }
         return true;
       }
@@ -821,7 +823,7 @@ const parcelCoordinates = yup.object({
       "La coordonnée ne peut pas avoir plus de 6 décimales",
       (val: any) => {
         if (val != undefined) {
-          return patternSixDigisAfterComma.test(val);
+          return patternSixDigitsAfterComma.test(val);
         }
         return true;
       }

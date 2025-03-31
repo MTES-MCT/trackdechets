@@ -17,6 +17,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Corriger le fonctionnement du filtre `hasNextStep` sur la query `forms`[PR 4051](https://github.com/MTES-MCT/trackdechets/pull/4051)
 
+#### :boom: Breaking Change
+
+-Demander les codes INSEE des communes lorsqu'une parcelle est renseignée plutôt que le(s) code(s) postaux [PR 4059](https://github.com/MTES-MCT/trackdechets/pull/4059)
+
 #### :memo: Documentation
 
 - Mettre à jour la doc "Utiliser le playground" de la documentation développeur [PR 4034](https://github.com/MTES-MCT/trackdechets/pull/4034)
@@ -35,7 +39,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de l'export du registre géré V2 [PR 4017](https://github.com/MTES-MCT/trackdechets/pull/4017)
 - Ajout d'un paramètre pour les établissements souhaitant pousser automatiquement leurs BSDND dans leurs déclarations [PR3988](https://github.com/MTES-MCT/trackdechets/pull/3988)
 
-#### :nail_care: Breaking Change
+#### :boom: Breaking Change
 
 - BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
 - La quantité refusée est désormais obligatoire à l'étape d'acceptation du déchet sur le BSDD [PR 3823](https://github.com/MTES-MCT/trackdechets/pull/3823)

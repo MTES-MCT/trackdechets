@@ -372,6 +372,7 @@ export function toGenericWaste(
     traderCompanyMail: bsdd.traderCompanyMail,
     parcelCities: bsdd.parcelCities,
     parcelPostalCodes: bsdd.parcelPostalCodes,
+    parcelInseeCodes: bsdd.parcelInseeCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
     destinationCompanyAddress,

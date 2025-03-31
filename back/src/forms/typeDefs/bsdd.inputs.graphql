@@ -751,7 +751,9 @@ input ParcelNumberInput {
   "Ville"
   city: String!
   "Code postal"
-  postalCode: String!
+  postalCode: String @deprecated(reason: "Ignoré - Remplacé par inseeCode")
+  "Code commune Insee"
+  inseeCode: String
   "Prefixe cadastral"
   prefix: String
   "Numéro de section cadastrale"

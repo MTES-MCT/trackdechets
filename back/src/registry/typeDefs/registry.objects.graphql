@@ -255,6 +255,8 @@ type IncomingWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
+  "Le code commune INSEE de la/des parcelles"
+  parcelInseeCodes: [String!]
   """
   Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
   Une parcelle peut être localisée par son numéro ou par ses coordonnées,
@@ -472,6 +474,8 @@ type OutgoingWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
+  "Le code commune INSEE de la/des parcelles"
+  parcelInseeCodes: [String!]
   """
   Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
   Une parcelle peut être localisée par son numéro ou par ses coordonnées,
@@ -1202,6 +1206,8 @@ type ManagedWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
+  "Le code commune INSEE de la/des parcelles"
+  parcelInseeCodes: [String!]
   """
   Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
   Une parcelle peut être localisée par son numéro ou par ses coordonnées,
@@ -1560,6 +1566,8 @@ type AllWaste {
   parcelCities: [String!]
   "Le code postal de la/des parcelles"
   parcelPostalCodes: [String!]
+  "Le code commune INSEE de la/des parcelles"
+  parcelInseeCodes: [String!]
   """
   Le numéro identifiant la/les parcelles, sous la forme 'préfixe-section-n° de parcelle'.
   Une parcelle peut être localisée par son numéro ou par ses coordonnées,
