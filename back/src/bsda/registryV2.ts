@@ -5,13 +5,11 @@ import {
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
-  PrismaClient,
   RegistryExportType,
   RegistryExportDeclarationType,
   RegistryExportWasteType,
   Prisma
 } from "@prisma/client";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   emptyIncomingWasteV2,
@@ -30,6 +28,7 @@ import {
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { logger } from "@td/logger";
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1351,30 +1350,50 @@ const bsdaToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  bsda: MinimalBsdaForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bsda.id, tx);
-  const lookupInputs = bsdaToLookupCreateInputs(bsda);
-  if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
-  }
-};
-
 export const updateRegistryLookup = async (
-  bsda: MinimalBsdaForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  bsda: MinimalBsdaForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(bsda, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(bsda, tx);
-  }
+  await prisma.$transaction(async tx => {
+    /*
+    Acquire an advisory lock on the bsda id
+    This ensures that only one transaction can proceed with the delete and create
+    operations at a time, preventing conflicts and inconsistencies.
+    Example of problems :
+    tx1: delete(id1) -------------------- create(id1, OUTGOING, siret1, wasteCode1) -> succeeds
+    tx2: ----------- delete(id1) -------------------- create(id1, OUTGOING, siret1, wasteCode2) -> fails
+    --> the second update would fail because of the unique constraint on (id, OUTGOING, siret1)
+    leading to an outdated lookup table
+    tx1: delete(id1) -------------------- create(id1, OUTGOING, siret1) -> succeeds
+    tx2: ----------- delete(id1) -------------------- create(id1, OUTGOING, siret2) -> succeeds
+    --> the second update would succeed, but without deleting the row created in the first tx,
+    leading to an inconsistency.
+    Without proper locking, the transaction doesn't prevent other transactions from
+    deleting and creating the same rows in parallel, it only prevents the deletion to happen if the subsequent creation fails.
+    Using a "select for update" lock would prevent most problems (if the lines already exist at the time the lock is acquired)
+    since it would wait for the lock to be released before proceeding with the delete and create.
+    But if the lines don't exist when the select for update is called, then nothing is locked
+    and we end up with the same problems.
+    Using an advisory lock allows us to define a lock that will prevent other transactions for operations
+    on the same id, even if there isn't any rows for this id yet.
+    They will have to wait for the lock to be released (at the end of the tx) before proceeding with the delete and create.
+  */
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${bsda.id}, 0))`;
+
+    // Now proceed with delete and create
+    await deleteRegistryLookup(bsda.id, tx);
+    const lookupInputs = bsdaToLookupCreateInputs(bsda);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(`Error creating registry lookup for bsda ${bsda.id}`);
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async (pageSize = 100) => {
