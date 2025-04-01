@@ -1256,4 +1256,37 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
       "Il n'est pas possible d'avoir plus de 5 demandes en cours."
     );
   });
+
+  it("should throw if user is picking himself for the collaborator", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(
+      "MEMBER",
+      {},
+      {
+        email: "author@mail.com"
+      }
+    );
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod:
+              AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+            collaboratorEmail: user.email
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez pas vous désigner vous-même pour le collaborateur."
+    );
+  });
 });

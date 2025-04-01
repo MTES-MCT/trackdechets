@@ -49,6 +49,12 @@ export const checkCanCreateAdminRequest = async (
       );
     }
 
+    if (collaborator && collaborator.id === user.id) {
+      throw new UserInputError(
+        "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
+      );
+    }
+
     const collaboratorCompanyAssociation =
       await prisma.companyAssociation.findFirst({
         where: {
