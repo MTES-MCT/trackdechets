@@ -163,4 +163,32 @@ describe("getCompanySplittedAddress", () => {
     expect(splittedAddress?.city).toBe("CHAUDEYRAC");
     expect(splittedAddress?.country).toBe("FR");
   });
+
+  it("companySearch contains [ND] > should do manual split", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory("ADMIN", {
+      name: "Acme FR",
+      vatNumber: null,
+      address: "4 boulevard pasteur 44100 Nantes"
+    });
+
+    const companySearch = {
+      orgId: company.orgId,
+      siret: company.orgId,
+      etatAdministratif: "A",
+      addressVoie: "[ND][ND][ND][ND][ND]",
+      addressPostalCode: "[ND]",
+      addressCity: "Nantes",
+      codePaysEtrangerEtablissement: ""
+    };
+
+    // When
+    const splittedAddress = getCompanySplittedAddress(companySearch, company);
+
+    // Then
+    expect(splittedAddress?.street).toBe("4 boulevard pasteur");
+    expect(splittedAddress?.postalCode).toBe("44100");
+    expect(splittedAddress?.city).toBe("Nantes");
+    expect(splittedAddress?.country).toBe("FR");
+  });
 });
