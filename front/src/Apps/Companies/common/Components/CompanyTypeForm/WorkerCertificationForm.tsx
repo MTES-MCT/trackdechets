@@ -45,7 +45,10 @@ const WorkerCertificationForm = ({
                 label: (
                   <>
                     Travaux relevant de la sous-section 3{" "}
-                    <Tooltip title="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                    <Tooltip
+                      className="fr-ml-1w"
+                      title="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)"
+                    />
                   </>
                 ),
                 nativeInputProps: {
