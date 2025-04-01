@@ -1640,6 +1640,14 @@ type AddRegistryLinesStats {
 type AddRegistryLinesResponse {
   stats: AddRegistryLinesStats!
   errors: [RegistryLineError!]
+  # Liste des identifiants (`publicId`) des déclarations qui ont été insérées
+  inserted: [ID!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été modifiées
+  edited: [ID!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été annulées
+  cancelled: [ID!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été ignorées
+  skipped: [ID!]!
 }
 
 type RegistryLookup {

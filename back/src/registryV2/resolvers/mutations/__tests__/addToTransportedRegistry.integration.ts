@@ -21,6 +21,10 @@ const ADD_TO_TRANSPORTED_REGISTRY = gql`
         publicId
         message
       }
+      inserted
+      edited
+      cancelled
+      skipped
     }
   }
 `;
@@ -177,5 +181,50 @@ describe("Registry - addToTransportedRegistry", () => {
       where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
+  });
+
+  it("should return public identifiers by status (inserted, edited, sipped, cancelled)", async () => {
+    const { user, company } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 3 }).map(_ =>
+      getCorrectLine(company.orgId)
+    );
+
+    // Insert lines
+    const res1 = await mutate<Pick<Mutation, "addToTransportedRegistry">>(
+      ADD_TO_TRANSPORTED_REGISTRY,
+      { variables: { lines } }
+    );
+    expect(res1.data.addToTransportedRegistry).toMatchObject({
+      inserted: lines.map(l => l.publicId),
+      edited: [],
+      cancelled: [],
+      skipped: []
+    });
+
+    // Edit, cancel and add already existing line that should be skipped
+    const res2 = await mutate<Pick<Mutation, "addToTransportedRegistry">>(
+      ADD_TO_TRANSPORTED_REGISTRY,
+      {
+        variables: {
+          lines: [
+            { ...lines[0], reason: "EDIT" },
+            { ...lines[1], reason: "CANCEL" },
+            lines[2]
+          ]
+        }
+      }
+    );
+
+    expect(res2.errors).toBeUndefined();
+
+    expect(res2.data.addToTransportedRegistry).toMatchObject({
+      inserted: [],
+      edited: [lines[0].publicId],
+      cancelled: [lines[1].publicId],
+      skipped: [lines[2].publicId]
+    });
   });
 });
