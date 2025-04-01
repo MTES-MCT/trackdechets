@@ -1,13 +1,11 @@
 import Decimal from "decimal.js";
 import {
   Prisma,
-  PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import {
   IncomingWasteV2,
   OutgoingWasteV2,
@@ -29,6 +27,7 @@ import {
   deleteRegistryLookup,
   generateDateInfos
 } from "@td/registry";
+import { logger } from "@td/logger";
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
@@ -634,30 +633,28 @@ const bspaohToLookupCreateInputs = (
   return res;
 };
 
-const performRegistryLookupUpdate = async (
-  bspaoh: MinimalBspaohForLookup,
-  tx: Omit<PrismaClient, ITXClientDenyList>
-): Promise<void> => {
-  await deleteRegistryLookup(bspaoh.id, tx);
-  const lookupInputs = bspaohToLookupCreateInputs(bspaoh);
-  if (lookupInputs.length > 0) {
-    await tx.registryLookup.createMany({
-      data: lookupInputs
-    });
-  }
-};
-
 export const updateRegistryLookup = async (
-  bspaoh: MinimalBspaohForLookup,
-  tx?: Omit<PrismaClient, ITXClientDenyList>
+  bspaoh: MinimalBspaohForLookup
 ): Promise<void> => {
-  if (!tx) {
-    await prisma.$transaction(async transaction => {
-      await performRegistryLookupUpdate(bspaoh, transaction);
-    });
-  } else {
-    await performRegistryLookupUpdate(bspaoh, tx);
-  }
+  await prisma.$transaction(async tx => {
+    // acquire an advisory lock on the bspaoh id
+    // see more explanation in bsda/registryV2.ts
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${bspaoh.id}, 0))`;
+
+    await deleteRegistryLookup(bspaoh.id, tx);
+    const lookupInputs = bspaohToLookupCreateInputs(bspaoh);
+    if (lookupInputs.length > 0) {
+      try {
+        await tx.registryLookup.createMany({
+          data: lookupInputs
+        });
+      } catch (error) {
+        logger.error(`Error creating registry lookup for bspaoh ${bspaoh.id}`);
+        logger.error(lookupInputs);
+        throw error;
+      }
+    }
+  });
 };
 
 export const rebuildRegistryLookup = async (pageSize = 100) => {

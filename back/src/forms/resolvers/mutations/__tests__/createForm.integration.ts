@@ -642,7 +642,10 @@ describe("Mutation.createForm", () => {
 
   it("should not allow to create a form with an eco-organisme as emitter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const ecoOrganisme = await ecoOrganismeFactory({ siret: siretify() });
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: siretify(),
+      handle: { handleBsdd: true }
+    });
 
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
@@ -669,6 +672,40 @@ describe("Mutation.createForm", () => {
     expect(errors[0].message).toContain(
       "L'émetteur ne peut pas être un éco-organisme."
     );
+  });
+
+  // tra-16203 - Permettre aux établissements identifiés comme systèmes d'individuels VHU d'être désignés
+  // comme producteurs sur un BSDD et BSDA
+  it("should allow to create a form with an eco-organisme that do not handle BSDD as emitter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: siretify(),
+      // système individuel VHU
+      handle: { handleBsvhu: true }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: {
+              siret: ecoOrganisme.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: company.siret
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it("should be possible to create a form and connect existing bsddTransporters", async () => {

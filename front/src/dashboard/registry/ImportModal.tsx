@@ -234,7 +234,7 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
 
       const form = new FormData();
       Object.keys(fields).forEach(key => form.append(key, fields[key]));
-      form.append("Content-Type", file.type);
+      form.append("Content-Type", getContentType(file));
       form.append("file", file);
 
       const uploadResponse = await fetch(signedUrl, {
@@ -455,4 +455,15 @@ function Step3({ registryImportId }) {
       )}
     </div>
   );
+}
+
+function getContentType(file: File): string {
+  // file.type is not reliable for CSV files
+  // Some browsers may detect CSV files as application/vnd.ms-excel instead of text/csv because of Windows file type mappings.
+  const extension = file.name.split(".").pop()?.toLowerCase();
+  if (extension === "csv") {
+    return "text/csv";
+  }
+
+  return file.type;
 }
