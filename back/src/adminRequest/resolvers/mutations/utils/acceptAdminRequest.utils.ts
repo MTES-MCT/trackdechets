@@ -84,6 +84,7 @@ export const checkCanAcceptAdminRequest = async (
     adminRequest.validationMethod ===
       AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL &&
     !user.isAdmin &&
+    companyAssociation?.role !== UserRole.ADMIN &&
     user.id !== adminRequest.collaboratorId
   ) {
     throw new ForbiddenError(

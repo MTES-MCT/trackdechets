@@ -1311,4 +1311,41 @@ describe("Mutation acceptAdminRequest", () => {
       "Vous n'êtes pas autorisé à effectuer cette action."
     );
   });
+
+  it("admin can still accept request after mail is sent to collaborator", async () => {
+    // Given
+    const { user: admin, company } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const collaborator = await userInCompany("MEMBER", company.id);
+    const requestAuthor = await userInCompany(UserRole.MEMBER, company.id);
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: collaborator.id,
+        adminOnlyEndDate: yesterday
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(admin);
+    const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
 });
