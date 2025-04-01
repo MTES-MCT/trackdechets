@@ -1,0 +1,67 @@
+type AdminRequest {
+  """
+  L'identifiant unique de la demande
+  """
+  id: ID!
+
+  """
+  L'entreprise ciblée par la demande
+  """
+  company: AdminRequestCompany!
+
+  """
+  L'utilisateur à l'origine de la demande
+  """
+  user: AdminRequestUser!
+
+  """
+  La date de création de la demande
+  """
+  createdAt: DateTime!
+
+  """
+  La méthode de validation:
+  - Demande à un admin
+  - Demande à un collaborateur
+  - Envoi d'un courrier
+  """
+  validationMethod: AdminRequestValidationMethod!
+
+  """
+  Le statut de la demande
+  """
+  status: AdminRequestStatus!
+}
+
+type AdminRequestCompany {
+  """
+  Le siret ou n° de TVA de l'entreprise ciblée
+  """
+  orgId: String!
+
+  """
+  Le nom de l'entreprise ciblée
+  """
+  name: String!
+}
+
+type AdminRequestUser {
+  """
+  Le nom de l'utilisateur
+  """
+  name: String!
+}
+
+type AdminRequestEdge {
+  cursor: String!
+  node: AdminRequest!
+}
+
+"""
+List paginée de délégations
+"""
+type AdminRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [AdminRequestEdge!]!
+}

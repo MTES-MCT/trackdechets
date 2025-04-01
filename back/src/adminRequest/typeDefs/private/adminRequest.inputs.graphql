@@ -1,0 +1,33 @@
+input CreateAdminRequestInput {
+  """
+  L'orgId de l'entreprise dont l'utilisateur souhaite devenir admin
+  """
+  companyOrgId: String
+
+  """
+  L'email d'un collaborateur déjà membre de l'entreprise ciblée, capable de valider la demande
+  """
+  collaboratorEmail: String
+
+  """
+  La méthode de validation de la demande
+  """
+  validationMethod: AdminRequestValidationMethod
+}
+
+input AcceptAdminRequestInput {
+  """
+  L'identifiant unique de la demande
+  """
+  adminRequestId: ID
+
+  """
+  Si le mode de vérification est par courrier, l'utilisateur doit renseigner l'orgId de l'entreprise concernée
+  """
+  orgId: String
+
+  """
+  Si le mode de vérification est par courrier, l'utilisateur doit renseigner le code envoyé
+  """
+  code: String
+}

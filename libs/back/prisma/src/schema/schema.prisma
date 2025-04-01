@@ -327,6 +327,8 @@ model Company {
   registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
   registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
 
+  adminRequests AdminRequest[] @relation("AdminRequestCompany")
+
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
   @@index([createdAt], map: "_CompanyCreatedAtIdx")
@@ -951,6 +953,7 @@ model User {
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
+  adminRequests              AdminRequest[] @relation("AdminRequestUser")
 }
 
 enum GovernmentPermission {
@@ -2108,6 +2111,52 @@ model AdministrativeTransfer {
   to         Company?                     @relation("AdministrativeTransferTo", fields: [toId], references: [id], onDelete: Cascade)
   approvedAt DateTime?                    @db.Timestamptz(6)
   status     AdministrativeTransferStatus @default(PENDING)
+}
+
+model AdminRequest {
+  id         String                       @id @default(cuid())
+  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+
+  // The user initiating the request, wanting to be promoted to admin
+  userId    String  @db.VarChar(30)
+  user User  @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  // The orgId of the company the user wants to be admin of
+  companyId String @db.VarChar(30)
+  company Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
+
+  // The collaborator who has been asked to approve the request 
+  collaboratorId String?  @db.VarChar(30)
+
+  // The code sent by mail to self-validate the request
+  code  String? @db.VarChar(8)
+  codeAttempts Int @default(0)
+
+  // End of the period during which only the admin can accept the request
+  adminOnlyEndDate DateTime?
+
+  status AdminRequestStatus @default(PENDING)
+
+  validationMethod AdminRequestValidationMethod
+
+  // Indexes
+  @@index([userId, companyId], map: "_AdminRequestUserIdCompanyIdIdx")
+  @@index([status], map: "_AdminRequestStatusIdx")
+}
+
+enum AdminRequestStatus {
+  PENDING
+  ACCEPTED 
+  REFUSED
+  BLOCKED
+  EXPIRED
+}
+
+enum AdminRequestValidationMethod {
+  REQUEST_ADMIN_APPROVAL
+  REQUEST_COLLABORATOR_APPROVAL
+  SEND_MAIL
 }
 
 enum AdministrativeTransferStatus {

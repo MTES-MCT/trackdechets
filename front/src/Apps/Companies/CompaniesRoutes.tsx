@@ -14,6 +14,7 @@ import { Query } from "@td/codegen-ui";
 import routes, { getRelativeRoute } from "../routes";
 import AccountCompanyOrientation from "./AccountCompanyOrientation";
 import "../Dashboard/dashboard.scss";
+import { CompanyManage } from "./CompanyManage/CompanyManage";
 
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
@@ -42,6 +43,11 @@ export default function CompaniesRoutes() {
 
             <Route
               path={toRelative(routes.companies.details)}
+              element={<CompanyDetails />}
+            />
+
+            <Route
+              path={toRelative(routes.companies.adminRequest)}
               element={<CompanyDetails />}
             />
 
@@ -84,6 +90,11 @@ export default function CompaniesRoutes() {
             <Route
               path={`${routes.companies.index}/*`}
               element={<Navigate to={routes.companies.index} replace />}
+            />
+
+            <Route
+              path={toRelative(routes.companies.manage.index)}
+              element={<CompanyManage />}
             />
           </Routes>
         </div>
