@@ -1286,7 +1286,7 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
     // Then
     expect(errors).not.toBeUndefined();
     expect(errors[0].message).toBe(
-      "Vous ne pouvez pas vous désigner vous-même pour le collaborateur."
+      "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
     );
   });
 });
