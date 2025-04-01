@@ -11,7 +11,7 @@ import {
   MutationUpdateBsvhuArgs,
   TransportMode
 } from "@td/codegen-ui";
-import { subMonths } from "date-fns";
+import { format, subMonths } from "date-fns";
 import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { generatePath, Link, useLocation, useParams } from "react-router-dom";
@@ -179,7 +179,11 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
                     id: bsvhuId,
                     input: {
                       transporter: {
-                        transport: { mode: mode as TransportMode, plates }
+                        transport: {
+                          mode: mode as TransportMode,
+                          plates,
+                          takenOverAt: date
+                        }
                       }
                     }
                   }
@@ -189,7 +193,7 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
                     id: bsvhu.id,
                     input: {
                       author,
-                      date,
+                      date: format(new Date(), "yyyy-MM-dd"),
                       type: SignatureTypeInput.Transport
                     }
                   }
