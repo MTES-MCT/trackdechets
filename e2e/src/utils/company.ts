@@ -224,8 +224,12 @@ export const fillInGenericCompanyInfo = async (
   }
 
   // Select the role
-  for (const role of company.roles)
-    await page.getByText(role, { exact: true }).click();
+  for (const role of company.roles) {
+    await page
+      .getByTestId("company-type-label")
+      .getByText(role, { exact: true })
+      .click();
+  }
 
   // Select the subRole
   if (company.subRoles) {
@@ -260,7 +264,7 @@ export const fillInAmianteCertification = async (
   // Certifications inputs should appear
   const certificationsDiv = page
     .getByText("Entreprise de travaux amiante")
-    .locator("../../../../../..");
+    .locator("../../../../../../..");
   await expect(certificationsDiv).toBeVisible();
 
   // Check amiante boxes

@@ -1,7 +1,7 @@
 import { Field, useFormikContext } from "formik";
 import React, { lazy } from "react";
 import classNames from "classnames";
-import Tooltip from "../../../common/components/Tooltip";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 import WeightWidget from "../components/Weight";
 import { FieldTransportModeSelect } from "../../../common/components";
 import Packagings from "../components/packagings/Packagings";
@@ -46,7 +46,7 @@ export default function Transport({ status, editionDisabled = false }) {
       <div className="form__row">
         <label>
           Champ libre (optionnel){" "}
-          <Tooltip msg="Informations internes. N'apparaît pas sur le bordereau." />
+          <Tooltip title="Informations internes. N'apparaît pas sur le bordereau." />
           <Field
             component="textarea"
             name="transporter.customInfo"
@@ -69,8 +69,7 @@ export default function Transport({ status, editionDisabled = false }) {
       {showTransportePlates && (
         <div className="form__row">
           <label htmlFor="transporter.transport.plates">
-            Immatriculations
-            <Tooltip msg={customInfoToolTip} />
+            Immatriculations <Tooltip title={customInfoToolTip} />
           </label>
           <TagsInput
             name="transporter.transport.plates"
@@ -137,8 +136,8 @@ export default function Transport({ status, editionDisabled = false }) {
       )}
       <div className="form__row">
         <label htmlFor="identification.numbers">
-          Numéros de contenants
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          Numéros de contenants{" "}
+          <Tooltip title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
         </label>
         <TagsInput name="identification.numbers" disabled={disabled} />
       </div>

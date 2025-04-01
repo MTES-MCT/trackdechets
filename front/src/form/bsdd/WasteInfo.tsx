@@ -1,6 +1,6 @@
 import { FieldSwitch, Switch } from "../../common/components";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
-import Tooltip from "../../common/components/Tooltip";
+import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 import NumberInput from "../common/components/custom-inputs/NumberInput";
 import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import { Field, useFormikContext } from "formik";
@@ -79,9 +79,9 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <label>
-          Votre appellation du déchet
+          Votre appellation du déchet{" "}
           <Tooltip
-            msg="L'appellation du déchet est propre à votre entreprise pour vous aider
+            title="L'appellation du déchet est propre à votre entreprise pour vous aider
           à retrouver facilement le déchet concerné."
           />
           <Field
@@ -116,7 +116,7 @@ export default function WasteInfo({ disabled }) {
           }
         />
         <div className="tw-ml-1">
-          <Tooltip msg="Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux." />
+          <Tooltip title="Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux." />
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export default function WasteInfo({ disabled }) {
         />
         <div className="tw-ml-1">
           <Tooltip
-            msg="Le terme POP recouvre un ensemble de substances organiques qui
+            title="Le terme POP recouvre un ensemble de substances organiques qui
         possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
           />
         </div>

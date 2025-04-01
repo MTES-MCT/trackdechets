@@ -1,7 +1,7 @@
 import React, { lazy } from "react";
 import { Field } from "formik";
 import { FieldTransportModeSelect } from "../../../../common/components";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import DateInput from "../../../common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
 
@@ -32,7 +32,10 @@ export function Transport({ disabled, required = false }: Props) {
       <div className="form__row">
         <label htmlFor="transport.plates">
           Immatriculations
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <Tooltip
+            className="fr-ml-1w"
+            title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+          />
         </label>
         <TagsInput name="transport.plates" disabled={disabled} limit={2} />
       </div>

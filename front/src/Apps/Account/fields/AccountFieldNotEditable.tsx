@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import styles from "./AccountField.module.scss";
-import ToolTip from "../../../common/components/Tooltip";
+import Tooltip from "../../common/Components/Tooltip/Tooltip";
 
 type Props = {
   name: string;
@@ -23,7 +23,7 @@ export default function AccountFieldNotEditable({
     <div className={classes.join(" ")}>
       <label htmlFor={name} className="text-right">
         {label}
-        {tooltip && <ToolTip msg={tooltip} />}
+        {tooltip && <Tooltip className="fr-ml-1w" title={tooltip} />}
       </label>
       <div id={name} className={styles.field__value}>
         {value}

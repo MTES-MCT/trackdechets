@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import TdTooltip from "../../../../../common/components/Tooltip";
+import Tooltip from "../../../../common/Components/Tooltip/Tooltip";
 import { AllCompanyType, CompanySubTypeOption } from "../../utils";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
 import CertificationForm from "./CertificationForm";
@@ -51,7 +51,8 @@ const CompanyTypeCheckbox = ({
 
   const labelWithHelp = (
     <>
-      {label} <TdTooltip msg={helpText} />
+      <span data-testid="company-type-label">{label}</span>{" "}
+      <Tooltip className="fr-ml-1w" title={helpText} />
     </>
   );
 
