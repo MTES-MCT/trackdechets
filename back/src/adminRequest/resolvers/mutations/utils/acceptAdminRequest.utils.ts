@@ -79,6 +79,19 @@ export const checkCanAcceptAdminRequest = async (
     return true;
   }
 
+  // Make sure user is designated collaborator
+  if (
+    adminRequest.validationMethod ===
+      AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL &&
+    !user.isAdmin &&
+    companyAssociation?.role !== UserRole.ADMIN &&
+    user.id !== adminRequest.collaboratorId
+  ) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  }
+
   // Only admins can accept a request in the initial time period
   if (
     adminRequest.adminOnlyEndDate &&
