@@ -44,6 +44,7 @@ import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings"
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import { TITLE_REQUEST_LIST } from "../../../Revision/wordingsRevision";
+import { resetPackagingIfUnchanged } from "../../common/Components/Packagings/packagings";
 
 type Props = {
   readonly bsdasri: Bsdasri;
@@ -87,9 +88,21 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
     navigate(-1);
   };
 
+  const checkIfInitialObjectValueChanged = data => {
+    const newData = resetPackagingIfUnchanged(
+      data,
+      bsdasri.destination?.reception?.packagings,
+      data.destination.reception.packagings,
+      () => delete data.destination.reception.packagings
+    );
+    return newData;
+  };
+
   const onSubmitForm = async data => {
     const { comment, ...content } = data;
-    const cleanedContent = removeEmptyKeys(content);
+    const cleanedContent = removeEmptyKeys(
+      checkIfInitialObjectValueChanged(content)
+    );
 
     await createBsdasriRevisionRequest({
       variables: {
