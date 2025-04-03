@@ -14,7 +14,7 @@ export function Transporter({ disabled }) {
   if (isDechetterie) {
     return (
       <div className="notification">
-        Vous effectuez une collecte en déchetterie. Il n'y a pas de transporteur
+        Vous effectuez une collecte en déchèterie. Il n'y a pas de transporteur
         à saisir.
       </div>
     );

@@ -155,7 +155,7 @@ export function Destination({ disabled }) {
       {isDechetterie && !hasNextDestination ? (
         <div className="form__row">
           <div className="notification">
-            Vous effectuez une collecte en déchetterie. Il n'y a pas de
+            Vous effectuez une collecte en déchèterie. Il n'y a pas de
             destination à saisir, votre entreprise a été automatiquement
             sélectionnée.
           </div>
