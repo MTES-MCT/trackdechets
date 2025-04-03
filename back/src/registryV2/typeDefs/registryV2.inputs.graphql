@@ -124,7 +124,7 @@ input SsdLineInput {
   Poids en tonnes
   Poids en tonnes du produit ou de la matière issue de l'opération de valorisation
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -190,7 +190,6 @@ input SsdLineInput {
   - Arrêté du 13 décembre 2021
   - Arrêté du 21 décembre 2021
   - Arrêté du 19 février 2024
-  - Implicite
   """
   administrativeActReference: String!
   """
@@ -322,7 +321,7 @@ input IncomingWasteLineInput {
   Poids en tonnes
   Poids en tonnes des déchets entrants
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
@@ -814,7 +813,7 @@ input IncomingTexsLineInput {
   Poids en tonnes
   Poids en tonnes des terres et sédiments ou des déchets entrants
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -1379,7 +1378,7 @@ input OutgoingTexsLineInput {
   Poids en tonnes
   Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -1915,7 +1914,7 @@ input OutgoingWasteLineInput {
   Poids en tonnes
   Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -2414,7 +2413,7 @@ input TransportedLineInput {
   Poids en tonnes
   Poids en tonnes des déchets transportés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
@@ -2673,7 +2672,7 @@ input ManagedLineInput {
   Poids en tonnes
   Poids en tonnes des déchets gérés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
