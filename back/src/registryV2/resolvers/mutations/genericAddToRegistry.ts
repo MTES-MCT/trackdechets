@@ -102,16 +102,16 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
       switch (result.data.reason) {
         case "MODIFIER":
-          identifiers.edited.push(result.data.publicId);
+          identifiers.edited.push({ publicId: result.data.publicId });
           break;
         case "ANNULER":
-          identifiers.cancelled.push(result.data.publicId);
+          identifiers.cancelled.push({ publicId: result.data.publicId });
           break;
         case "IGNORER":
-          identifiers.skipped.push(result.data.publicId);
+          identifiers.skipped.push({ publicId: result.data.publicId });
           break;
         default:
-          identifiers.inserted.push(result.data.publicId);
+          identifiers.inserted.push({ publicId: result.data.publicId });
           break;
       }
     } else {
