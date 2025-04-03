@@ -93,6 +93,13 @@ export function RegistryCompanySwitcher({
     []
   );
 
+  const setComboboxOpen = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) {
+      setDebouncedClue("");
+    }
+  };
+
   const myCompanies = companiesData?.registryCompanies.myCompanies ?? [];
   const delegators = companiesData?.registryCompanies.delegators ?? [];
   const totalCount = companiesData?.registryCompanies.totalCount ?? 0;
@@ -104,10 +111,10 @@ export function RegistryCompanySwitcher({
       <div
         ref={comboboxTriggerRef}
         className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setComboboxOpen(!isOpen)}
         onKeyDown={e => {
           if (e.key === "Enter") {
-            setIsOpen(!isOpen);
+            setComboboxOpen(!isOpen);
           }
         }}
       >
@@ -122,7 +129,7 @@ export function RegistryCompanySwitcher({
       <ComboBox
         parentRef={comboboxTriggerRef}
         isOpen={isOpen}
-        onOpenChange={setIsOpen}
+        onOpenChange={setComboboxOpen}
       >
         {({ close }) => (
           <div className="tw-bg-white tw-inset-x-0 tw-z-10 tw-p-2 tw-h-full tw-flex tw-flex-col">
