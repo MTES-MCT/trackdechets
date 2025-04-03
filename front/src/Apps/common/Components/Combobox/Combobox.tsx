@@ -1,30 +1,24 @@
-import React, { useState, useEffect, type ReactNode } from "react";
+import React, { useEffect, type ReactNode } from "react";
 import { Portal } from "../Portal/Portal";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 
 type Props = {
   parentRef: React.RefObject<HTMLElement>;
   children: ReactNode | ((props: { close: () => void }) => ReactNode);
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
 };
 
-export function ComboBox({ parentRef, children }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
-
+export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setIsOpen(false)
-  });
-
-  useEffect(() => {
-    function handleClick() {
-      setIsOpen(open => !open);
+    onClickOutside: (e: MouseEvent | TouchEvent) => {
+      if (parentRef.current?.contains(e.target as Node)) {
+        e.preventDefault();
+        return;
+      }
+      onOpenChange(false);
     }
-    const element = parentRef.current;
-    element?.addEventListener("click", handleClick);
-
-    return () => {
-      element?.removeEventListener("click", handleClick);
-    };
-  }, [parentRef]);
+  });
 
   useEffect(() => {
     if (!isOpen || !parentRef.current || !targetRef.current) {
@@ -34,19 +28,25 @@ export function ComboBox({ parentRef, children }: Props) {
     const parentRect = parentRef.current.getBoundingClientRect();
     const comboboxRect = targetRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - parentRect.bottom;
+    const spaceAbove = parentRect.top;
 
-    const dropdownTop = parentRect.bottom + window.scrollY;
     const dropdownLeft = parentRect.left + window.scrollX;
     const dropdownWidth = parentRect.width;
 
-    targetRef.current.style.top = `${dropdownTop}px`;
     targetRef.current.style.left = `${dropdownLeft}px`;
     targetRef.current.style.width = `${dropdownWidth}px`;
 
-    if (dropdownTop + comboboxRect.height > viewportHeight) {
+    // Calculate max height based on available space
+    const maxHeight = Math.max(spaceBelow, spaceAbove);
+    targetRef.current.style.maxHeight = `${maxHeight}px`;
+
+    if (comboboxRect.height > spaceBelow && comboboxRect.height <= spaceAbove) {
       targetRef.current.style.top = `${
         parentRect.top + window.scrollY - comboboxRect.height
       }px`;
+    } else {
+      targetRef.current.style.top = `${parentRect.bottom + window.scrollY}px`;
     }
   }, [isOpen, parentRef, targetRef]);
 
@@ -63,11 +63,17 @@ export function ComboBox({ parentRef, children }: Props) {
           backgroundColor: "white",
           border: "1px solid #ccc",
           zIndex: 1000,
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          overflow: "hidden",
+          height: `${Math.max(
+            window.innerHeight -
+              (parentRef.current?.getBoundingClientRect().bottom ?? 0),
+            parentRef.current?.getBoundingClientRect().top ?? 0
+          )}px`
         }}
       >
         {typeof children === "function"
-          ? children({ close: () => setIsOpen(false) })
+          ? children({ close: () => onOpenChange(false) })
           : children}
       </div>
     </Portal>
