@@ -27,7 +27,7 @@ import {
   siretSchema,
   parcelCoordinatesSchema,
   parcelNumbersSchema,
-  operationModeSchema
+  getOperationModeSchema
 } from "../../shared/schemas";
 import {
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
@@ -111,7 +111,7 @@ const inputIncomingTexsSchema = z.object({
   operationCode: getOperationCodeSchema(
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
   gistridNumber: gistridNumberSchema,

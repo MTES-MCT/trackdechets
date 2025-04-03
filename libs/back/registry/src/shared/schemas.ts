@@ -1,6 +1,7 @@
 import { OperationMode } from "@prisma/client";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
+  ALL_OPERATION_MODES,
   BSDD_WASTE_CODES_ENUM,
   isSiret,
   TdOperationCodeEnum,
@@ -151,42 +152,36 @@ export const getOperationCodeSchema = (
       })
     );
 
-export const operationModeSchema = enumValueAsStringSchema
-  .transform(val => val.replace(/ /g, "_"))
-  .pipe(
-    z
-      .enum(
-        [
-          "REUTILISATION",
-          "RECYCLAGE",
-          "VALORISATION_ENERGETIQUE",
-          "ELIMINATION",
-          "AUTRES_VALORISATIONS"
-        ],
-        {
+export const getOperationModeSchema = (
+  operationModes: [string, ...string[]] = ALL_OPERATION_MODES
+) =>
+  enumValueAsStringSchema
+    .transform(val => val.replace(/ /g, "_"))
+    .pipe(
+      z
+        .enum(operationModes, {
           required_error: "Le code de qualification est requis",
           invalid_type_error:
             "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
-        }
-      )
-      .transform(val => {
-        switch (val) {
-          case "REUTILISATION":
-            return OperationMode.REUTILISATION;
-          case "RECYCLAGE":
-            return OperationMode.RECYCLAGE;
-          case "VALORISATION_ENERGETIQUE":
-            return OperationMode.VALORISATION_ENERGETIQUE;
-          case "ELIMINATION":
-            return OperationMode.ELIMINATION;
-          case "AUTRES_VALORISATIONS":
-            return OperationMode.AUTRES_VALORISATIONS;
-          default:
-            throw Error(`Unhandled qualification code: ${val}`);
-        }
-      })
-  )
-  .nullish();
+        })
+        .transform(val => {
+          switch (val) {
+            case "REUTILISATION":
+              return OperationMode.REUTILISATION;
+            case "RECYCLAGE":
+              return OperationMode.RECYCLAGE;
+            case "VALORISATION_ENERGETIQUE":
+              return OperationMode.VALORISATION_ENERGETIQUE;
+            case "ELIMINATION":
+              return OperationMode.ELIMINATION;
+            case "AUTRES_VALORISATIONS":
+              return OperationMode.AUTRES_VALORISATIONS;
+            default:
+              throw Error(`Unhandled qualification code: ${val}`);
+          }
+        })
+    )
+    .nullish();
 
 const numberAsStringSchema = z
   .string()

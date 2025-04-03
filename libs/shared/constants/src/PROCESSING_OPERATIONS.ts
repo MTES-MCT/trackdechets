@@ -294,3 +294,18 @@ export const SSD_PROCESSING_OPERATIONS_CODES: TdOperationCodeEnum = [
   "R 12",
   "R 13"
 ];
+
+export const ALL_OPERATION_MODES: [string, ...string[]] = [
+  "REUTILISATION",
+  "RECYCLAGE",
+  "VALORISATION_ENERGETIQUE",
+  "ELIMINATION",
+  "AUTRES_VALORISATIONS"
+];
+
+export const SSD_OPERATION_MODES: [string, ...string[]] = [
+  "REUTILISATION",
+  "RECYCLAGE",
+  "VALORISATION_ENERGETIQUE",
+  "AUTRES_VALORISATIONS"
+];

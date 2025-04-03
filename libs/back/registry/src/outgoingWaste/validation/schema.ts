@@ -22,10 +22,10 @@ import {
   inseeCodesSchema,
   gistridNumberSchema,
   getOperationCodeSchema,
-  operationModeSchema,
   actorSiretSchema,
   transportModeSchema,
-  transportRecepisseNumberSchema
+  transportRecepisseNumberSchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputOutgoingWasteItem = z.output<
@@ -78,7 +78,7 @@ const inputOutgoingWasteSchema = z.object({
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   operationCode: getOperationCodeSchema(),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   ecoOrganismeSiret: actorSiretSchema.nullish(),
   ecoOrganismeName: actorNameSchema.nullish(),
   brokerCompanySiret: actorSiretSchema.nullish(),
