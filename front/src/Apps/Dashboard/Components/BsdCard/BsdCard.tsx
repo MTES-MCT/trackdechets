@@ -404,9 +404,7 @@ function BsdCard({
                   title="Cliquez pour copier dans le presse-papier"
                   aria-label={`${bsdDisplay.readableid}, copier dans le presse-papier`}
                   iconId={
-                    isBsdNumberClicked
-                      ? "fr-icon-success-line"
-                      : "fr-icon-draft-line"
+                    isBsdNumberClicked ? "ri-check-line" : "ri-file-copy-line"
                   }
                   onClick={handleBsdNumberClick}
                   nativeButtonProps={{
