@@ -8,6 +8,7 @@ import {
   ImportType,
   INTERNAL_ERROR,
   ParsedLine,
+  PERMISSION_ERROR,
   UNAUTHORIZED_ERROR
 } from "./options";
 import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
@@ -27,6 +28,7 @@ export async function processStream({
   fileType,
   createdById,
   allowedSirets,
+  allowedWithRolesSirets,
   delegatorSiretsByDelegateSirets
 }: {
   importId: string;
@@ -36,6 +38,7 @@ export async function processStream({
   fileType: "CSV" | "XLSX";
   createdById: string;
   allowedSirets: string[];
+  allowedWithRolesSirets: string[];
   delegatorSiretsByDelegateSirets: Map<string, string[]>;
 }) {
   logger.info(
@@ -118,6 +121,20 @@ export async function processStream({
         globalErrorNumber++;
 
         errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
+        continue;
+      }
+
+      if (
+        !isAuthorized({
+          reportAsCompanySiret,
+          delegatorSiretsByDelegateSirets,
+          reportForCompanySiret,
+          allowedSirets: allowedWithRolesSirets
+        })
+      ) {
+        globalErrorNumber++;
+
+        errorStream.write({ errors: PERMISSION_ERROR, ...rawLine });
         continue;
       }
 
