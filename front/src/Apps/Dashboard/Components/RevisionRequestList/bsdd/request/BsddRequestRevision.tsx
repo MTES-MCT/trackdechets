@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import {
   Form as Bsdd,
+  BsdType,
   Mutation,
   MutationCreateFormRevisionRequestArgs,
   WasteAcceptationStatus
@@ -30,6 +31,8 @@ import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
+import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import {
@@ -555,6 +558,36 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     />
                   </RhfReviewableField>
                 )}
+
+                <RhfReviewableField
+                  title="Courtier"
+                  path="broker"
+                  value={
+                    bsdd.broker?.company?.name
+                      ? bsdd.broker.company.name
+                      : "Aucun"
+                  }
+                  defaultValue={initialBsddReview.broker}
+                >
+                  <RhfBroker
+                    bsdType={BsdType.Bsdd}
+                    siret={siret}
+                    showSwitch={false}
+                  />
+                </RhfReviewableField>
+
+                <RhfReviewableField
+                  title="Négociant"
+                  path="trader"
+                  value={
+                    bsdd.trader?.company?.name
+                      ? bsdd.trader.company.name
+                      : "Aucun"
+                  }
+                  defaultValue={initialBsddReview.trader}
+                >
+                  <RhfTrader siret={siret} showSwitch={false} />
+                </RhfReviewableField>
               </div>
             </>
           )}
