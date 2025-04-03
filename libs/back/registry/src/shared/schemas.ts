@@ -198,7 +198,7 @@ export const weightValueSchema = z
         invalid_type_error: "Le poids doit être un nombre"
       })
       .gt(0, "Le poids ne peut pas être inférieur ou égal à 0 tonnes")
-      .lte(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
+      .lte(10_000, "Le poids ne peut pas dépasser 10 000 tonnes")
       .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales")
   );
 
@@ -466,10 +466,7 @@ export const transportModeSchema = enumValueAsStringSchema.pipe(
 export const transportRecepisseNumberSchema = z.coerce
   .string()
   .trim()
-  .min(
-    5,
-    "Le numéro de récépissé de transport doit faire au moins 5 caractères"
-  )
+  .min(1, "Le numéro de récépissé de transport doit faire au moins 1 caractère")
   .max(
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"

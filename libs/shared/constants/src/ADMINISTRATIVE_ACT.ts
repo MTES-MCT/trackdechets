@@ -1,5 +1,4 @@
 export const ADMINISTRATIVE_ACT_REFERENCES = [
-  "Implicite",
   "Arrêté du 29 juillet 2014",
   "Arrêté du 24 août 2016",
   "Arrêté du 10 juillet 2017",
