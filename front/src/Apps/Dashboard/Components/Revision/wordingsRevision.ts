@@ -38,6 +38,6 @@ export const DESCRIPTION_TRAITEMENT = "Description du traitement";
 export const NOUVELLE_DESC_TRAITEMENT = "Nouvelle description du traitement";
 export const CODE_DECHET = "Code déchet";
 export const NOUVEAU_CODE_DECHET = "Nouveau code déchet";
-export const POP = "Contient des polluants organique persistant";
+export const POP = "Contient des polluants organiques persistants";
 export const NOUVEAU_POP =
-  "Nouvelle valeur pour la présence de polluants organiques persistants";
+  "Le déchet contients des polluants organiques persistants";
