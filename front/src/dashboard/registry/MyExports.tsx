@@ -108,7 +108,8 @@ export function MyExports() {
     startPolling,
     stopPolling
   } = useQuery<Pick<Query, "registryV2Exports">>(GET_REGISTRY_V2_EXPORTS, {
-    variables: { first: PAGE_SIZE }
+    variables: { first: PAGE_SIZE },
+    fetchPolicy: "cache-and-network"
   });
   const registryExports = exportsData?.registryV2Exports?.edges;
   const totalCount = exportsData?.registryV2Exports?.totalCount;
