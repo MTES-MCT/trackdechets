@@ -19,9 +19,9 @@ import {
   transportModeSchema,
   transportRecepisseNumberSchema,
   booleanSchema,
-  operationModeSchema,
   gistridNumberSchema,
-  parcelNumbersSchema
+  parcelNumbersSchema,
+  getOperationModeSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -198,15 +198,21 @@ describe("Schemas", () => {
   });
 
   test("operationModeSchema", () => {
-    expect(operationModeSchema.parse("Recyclage")).toBe("RECYCLAGE");
-    expect(operationModeSchema.parse("Reutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("Réutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("réutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("Valorisation énergétique")).toBe(
+    expect(getOperationModeSchema().parse("Recyclage")).toBe("RECYCLAGE");
+    expect(getOperationModeSchema().parse("Reutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("Réutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("réutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("Valorisation énergétique")).toBe(
       "VALORISATION_ENERGETIQUE"
     );
-    expect(() => operationModeSchema.parse("Valo énergétique")).toThrow();
-    expect(operationModeSchema.parse(null)).toBe(null);
+    expect(() => getOperationModeSchema().parse("Valo énergétique")).toThrow();
+    expect(getOperationModeSchema().parse(null)).toBe(null);
   });
 
   test("gistridNumberSchema", () => {
