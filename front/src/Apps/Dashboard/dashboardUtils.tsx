@@ -194,35 +194,35 @@ export const quickFilterList: Filter[] = [
     label: filter_bsd_number,
     type: FilterType.input,
     isActive: true,
-    placeholder: `ex: "BSDA-202311.... " ou "B123"`
+    placeholder: `"BSDA-202311.... " ou "B123"`
   },
   {
     name: FilterName.waste,
     label: filter_waste_code,
     type: FilterType.input,
     isActive: true,
-    placeholder: `ex: "01 02 03*" ou "amiante"`
+    placeholder: `"01 02 03*" ou "amiante"`
   },
   {
     name: FilterName.givenName,
     label: filter_given_name,
     type: FilterType.input,
     isActive: true,
-    placeholder: `ex: "Track" ou "5323014000..."`
+    placeholder: `"Track" ou "5323014000..."`
   },
   {
     name: FilterName.cap,
     label: filter_cap,
     type: FilterType.input,
     isActive: true,
-    placeholder: `ex: "2023COL123"`
+    placeholder: `"2023COL123"`
   },
   {
     name: FilterName.pickupSiteName,
     label: filter_chantier_name,
     type: FilterType.input,
     isActive: true,
-    placeholder: `ex: "Chantier du Parc"`
+    placeholder: `"Chantier du Parc"`
   }
 ];
 
