@@ -424,42 +424,44 @@ export const actorCountryCodeSchema = z
     return /^[A-Z]{2}$/.test(val);
   }, `Le code du pays n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
-export const transportModeSchema = z
-  .enum(
-    [
-      "ROUTE",
-      "AÉRIEN",
-      "FLUVIAL",
-      "MARITIME",
-      "FERRÉ",
-      "ROAD",
-      "AIR",
-      "RIVER",
-      "SEA",
-      "RAIL"
-    ],
-    {
-      required_error: "Le mode de transport est requis",
-      invalid_type_error:
-        "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
-    }
-  )
-  .transform(val => {
-    switch (val) {
-      case "ROUTE":
-        return "ROAD";
-      case "AÉRIEN":
-        return "AIR";
-      case "FLUVIAL":
-        return "RIVER";
-      case "MARITIME":
-        return "SEA";
-      case "FERRÉ":
-        return "RAIL";
-      default:
-        return val;
-    }
-  });
+export const transportModeSchema = enumValueAsStringSchema.pipe(
+  z
+    .enum(
+      [
+        "ROUTE",
+        "AERIEN",
+        "FLUVIAL",
+        "MARITIME",
+        "FERRE",
+        "ROAD",
+        "AIR",
+        "RIVER",
+        "SEA",
+        "RAIL"
+      ],
+      {
+        required_error: "Le mode de transport est requis",
+        invalid_type_error:
+          "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
+      }
+    )
+    .transform(val => {
+      switch (val) {
+        case "ROUTE":
+          return "ROAD";
+        case "AERIEN":
+          return "AIR";
+        case "FLUVIAL":
+          return "RIVER";
+        case "MARITIME":
+          return "SEA";
+        case "FERRE":
+          return "RAIL";
+        default:
+          return val;
+      }
+    })
+);
 
 export const transportRecepisseNumberSchema = z.coerce
   .string()
