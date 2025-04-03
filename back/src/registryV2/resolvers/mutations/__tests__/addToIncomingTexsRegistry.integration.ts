@@ -21,10 +21,18 @@ const ADD_TO_INCOMING_TEXS_REGISTRY = gql`
         publicId
         message
       }
-      inserted
-      edited
-      skipped
-      cancelled
+      inserted {
+        publicId
+      }
+      edited {
+        publicId
+      }
+      skipped {
+        publicId
+      }
+      cancelled {
+        publicId
+      }
     }
   }
 `;
@@ -366,7 +374,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     expect(res3.data.addToIncomingTexsRegistry.stats.edits).toBe(1);
   });
 
-  it("should return public identifiers by status (inserted, edited, sipped, cancelled)", async () => {
+  it("should return public identifiers by status (inserted, edited, skipped, cancelled)", async () => {
     const { user, company } = await userWithCompanyFactory();
 
     const { mutate } = makeClient(user);
@@ -381,7 +389,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       { variables: { lines } }
     );
     expect(res1.data.addToIncomingTexsRegistry).toMatchObject({
-      inserted: lines.map(l => l.publicId),
+      inserted: lines.map(({ publicId }) => ({ publicId })),
       edited: [],
       cancelled: [],
       skipped: []
@@ -405,9 +413,9 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     expect(res2.data.addToIncomingTexsRegistry).toMatchObject({
       inserted: [],
-      edited: [lines[0].publicId],
-      cancelled: [lines[1].publicId],
-      skipped: [lines[2].publicId]
+      edited: [expect.objectContaining({ publicId: lines[0].publicId })],
+      cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
+      skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
     });
   });
 });

@@ -21,10 +21,18 @@ const ADD_TO_TRANSPORTED_REGISTRY = gql`
         publicId
         message
       }
-      inserted
-      edited
-      cancelled
-      skipped
+      inserted {
+        publicId
+      }
+      edited {
+        publicId
+      }
+      skipped {
+        publicId
+      }
+      cancelled {
+        publicId
+      }
     }
   }
 `;
@@ -198,7 +206,7 @@ describe("Registry - addToTransportedRegistry", () => {
       { variables: { lines } }
     );
     expect(res1.data.addToTransportedRegistry).toMatchObject({
-      inserted: lines.map(l => l.publicId),
+      inserted: lines.map(({ publicId }) => ({ publicId })),
       edited: [],
       cancelled: [],
       skipped: []
@@ -222,9 +230,9 @@ describe("Registry - addToTransportedRegistry", () => {
 
     expect(res2.data.addToTransportedRegistry).toMatchObject({
       inserted: [],
-      edited: [lines[0].publicId],
-      cancelled: [lines[1].publicId],
-      skipped: [lines[2].publicId]
+      edited: [expect.objectContaining({ publicId: lines[0].publicId })],
+      cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
+      skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
     });
   });
 });
