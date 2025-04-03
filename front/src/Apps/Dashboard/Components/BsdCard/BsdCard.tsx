@@ -62,6 +62,8 @@ import "./bsdCard.scss";
 import { getCurrentTransporterInfos } from "../../bsdMapper";
 import { isDefined } from "../../../../common/helper";
 import { useCloneBsd } from "../Clone/useCloneBsd";
+import copyTextToClipboard from "copy-text-to-clipboard";
+import Button from "@codegouvfr/react-dsfr/Button";
 
 const shouldDisplayTransporterNumberPlate = (
   currentTransporterInfos,
@@ -160,6 +162,8 @@ function BsdCard({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTransportEditModalOpen, setIsTransportEditModalOpen] =
     useState(false);
+
+  const [isBsdNumberClicked, setIsBsdNumberClicked] = useState(false);
 
   const isDuplicating =
     isDuplicatingBsdd ||
@@ -370,6 +374,14 @@ function BsdCard({
     bsd.packagings?.length &&
     bsd.packagings?.every(packaging => packaging.operation?.noTraceability);
 
+  const handleBsdNumberClick = () => {
+    setIsBsdNumberClicked(true);
+    copyTextToClipboard(bsdDisplay!.readableid);
+    setTimeout(() => {
+      setIsBsdNumberClicked(false);
+    }, 2000);
+  };
+
   return (
     <>
       <div
@@ -383,7 +395,24 @@ function BsdCard({
           <>
             <div className="bsd-card__header">
               <div>
-                <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
+                <Button
+                  type="button"
+                  className={`label-icon__copy label-icon__copy fr-btn--icon-right ${
+                    isBsdNumberClicked ? "btn-clicked" : ""
+                  }`}
+                  priority="tertiary no outline"
+                  title="Cliquez pour copier dans le presse-papier"
+                  aria-label={`${bsdDisplay.readableid}, copier dans le presse-papier`}
+                  iconId={
+                    isBsdNumberClicked ? "ri-check-line" : "ri-file-copy-line"
+                  }
+                  onClick={handleBsdNumberClick}
+                  nativeButtonProps={{
+                    ...{ "data-testid": bsdDisplay.readableid }
+                  }}
+                >
+                  {bsdDisplay.readableid}
+                </Button>
 
                 {isMobile && <div className="bsd-card-border" />}
                 <div className="bsd-card__header__infos">
