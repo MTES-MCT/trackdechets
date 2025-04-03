@@ -217,6 +217,7 @@ export const toOutgoingWaste = (
     destinationFinalOperationWeights: null,
 
     gistridNumber: outgoingWaste.gistridNumber,
+    movementNumber: outgoingWaste.movementNumber,
     isUpcycled: null,
     destinationParcelInseeCodes: null,
     destinationParcelNumbers: null,
