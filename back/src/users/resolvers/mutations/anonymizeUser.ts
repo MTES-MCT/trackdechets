@@ -36,7 +36,7 @@ async function anonymizeUserFn(userId: string): Promise<string> {
   ];
 
   if (errors.length > 0) {
-    throw new Error(errors.join("\n"));
+    throw new UserInputError(errors.join("\n"));
   }
 
   const uuid = getUid(16);
