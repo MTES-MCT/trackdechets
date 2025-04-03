@@ -8,6 +8,7 @@ import {
 } from "@td/codegen-ui";
 import { Decimal } from "decimal.js";
 import { BsdTypename } from "../../../../../../common/types/bsdTypes";
+import { isEqual } from "lodash";
 
 export const PACKAGINGS_BSD_NAMES = {
   [BsdTypename.Bsdasri]: {
@@ -112,3 +113,41 @@ export const formTransportIsPipeline = (
   form.wasteDetails?.packagingInfos?.some(
     pkg => pkg.type === Packagings.Pipeline
   )!;
+
+export const resetPackagingIfUnchanged = (
+  data,
+  packagingsInitalValue,
+  packagingsNewValue,
+  deleteObjCallback
+) => {
+  packagingsInitalValue = packagingsInitalValue.map(packaging => {
+    const { __typename, ...newData } = packaging;
+    return newData;
+  });
+
+  const sortedPackagingsInitalValue = Object.keys(packagingsInitalValue)
+    .sort((a, b) => {
+      const typeA = a[0]["type"];
+      const typeB = b[0]["type"];
+      return typeA.localeCompare(typeB);
+    })
+    .reduce((acc, key) => {
+      acc[key] = packagingsInitalValue[key]; // Ajoute chaque propriété triée à l'objet résultat
+      return acc;
+    }, {});
+
+  const sortedPackagingsNewValue = Object.keys(packagingsNewValue)
+    .sort((a, b) => {
+      const typeA = a[0]["type"];
+      const typeB = b[0]["type"];
+      return typeA.localeCompare(typeB);
+    })
+    .reduce((acc, key) => {
+      acc[key] = packagingsNewValue[key];
+      return acc;
+    }, {});
+  if (isEqual(sortedPackagingsInitalValue, sortedPackagingsNewValue)) {
+    deleteObjCallback();
+  }
+  return data;
+};
