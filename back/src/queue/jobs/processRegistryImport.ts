@@ -14,6 +14,7 @@ import { parse } from "node:path";
 
 import { getUserCompanies } from "../../users/database";
 import { getDelegatorsByDelegateForEachCompanies } from "../../registryDelegation/database";
+import { getUserRoles, Permission, can } from "../../permissions";
 
 export type RegistryImportJobArgs = {
   importId: string;
@@ -75,7 +76,13 @@ export async function processRegistryImportJob(
     where: { id: importId }
   });
   const creatorCompanies = await getUserCompanies(registryImport.createdById);
+  const userRoles = await getUserRoles(registryImport.createdById);
   const allowedSirets = creatorCompanies.map(company => company.orgId);
+  const allowedWithRolesSirets = creatorCompanies
+    .filter(company =>
+      can(userRoles[company.orgId], Permission.RegistryCanImport)
+    )
+    .map(company => company.orgId);
   const allowedCompanyIds = creatorCompanies.map(company => company.id);
 
   const delegatorSiretsByDelegateSirets =
@@ -100,6 +107,7 @@ export async function processRegistryImportJob(
     outputErrorStream,
     createdById: registryImport.createdById,
     allowedSirets,
+    allowedWithRolesSirets,
     delegatorSiretsByDelegateSirets
   });
 
