@@ -39,7 +39,7 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
 
     // Calculate max height based on available space
     const maxHeight = Math.max(spaceBelow, spaceAbove);
-    targetRef.current.style.maxHeight = `${maxHeight}px`;
+    targetRef.current.style.height = `${maxHeight}px`;
 
     if (comboboxRect.height > spaceBelow && comboboxRect.height <= spaceAbove) {
       targetRef.current.style.top = `${
@@ -64,12 +64,7 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
           border: "1px solid #ccc",
           zIndex: 1000,
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          overflow: "hidden",
-          height: `${Math.max(
-            window.innerHeight -
-              (parentRef.current?.getBoundingClientRect().bottom ?? 0),
-            parentRef.current?.getBoundingClientRect().top ?? 0
-          )}px`
+          overflow: "hidden"
         }}
       >
         {typeof children === "function"
