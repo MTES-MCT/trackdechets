@@ -37,9 +37,9 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
     targetRef.current.style.left = `${dropdownLeft}px`;
     targetRef.current.style.width = `${dropdownWidth}px`;
 
-    // Calculate max height based on available space
-    const maxHeight = Math.max(spaceBelow, spaceAbove);
-    targetRef.current.style.height = `${maxHeight}px`;
+    // Calculate max height based on available space and substract 20 for good measure
+    const maxHeight = Math.max(spaceBelow, spaceAbove) - 20;
+    targetRef.current.style.maxHeight = `${maxHeight}px`;
 
     if (comboboxRect.height > spaceBelow && comboboxRect.height <= spaceAbove) {
       targetRef.current.style.top = `${
@@ -64,7 +64,8 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
           border: "1px solid #ccc",
           zIndex: 1000,
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          overflow: "hidden"
+          overflow: "scroll",
+          height: "auto"
         }}
       >
         {typeof children === "function"
