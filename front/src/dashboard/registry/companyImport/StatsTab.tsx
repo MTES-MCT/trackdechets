@@ -23,7 +23,8 @@ export function StatsTab({ source, siret }: Props) {
       siret,
       window,
       source
-    }
+    },
+    skip: !siret
   });
 
   const stats = data?.registryChangeAggregates?.reduce(
