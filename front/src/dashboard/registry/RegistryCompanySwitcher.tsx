@@ -132,8 +132,8 @@ export function RegistryCompanySwitcher({
         onOpenChange={setComboboxOpen}
       >
         {({ close }) => (
-          <div className="tw-bg-white tw-inset-x-0 tw-z-10 tw-p-2 tw-h-full tw-flex tw-flex-col">
-            <div className="tw-sticky tw-top-0 tw-bg-white tw-z-10 tw-pb-2">
+          <div className="tw-bg-white tw-inset-x-0 tw-z-10 tw-px-2 tw-h-full tw-flex tw-flex-col">
+            <div className="tw-sticky tw-top-0 tw-bg-white tw-z-10 tw-py-2">
               <p className="tw-text-sm tw-text-center">
                 {displayedCount} sur {totalCount} établissements
               </p>
