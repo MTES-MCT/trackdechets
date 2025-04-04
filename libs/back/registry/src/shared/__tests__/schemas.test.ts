@@ -187,6 +187,7 @@ describe("Schemas", () => {
     expect(transportModeSchema.parse("ROUTE")).toBe("ROAD");
     expect(transportModeSchema.parse("AÉRIEN")).toBe("AIR");
     expect(transportModeSchema.parse("AERIEN")).toBe("AIR");
+    expect(transportModeSchema.parse("aérien")).toBe("AIR");
     expect(() => transportModeSchema.parse("INVALID")).toThrow();
   });
 
