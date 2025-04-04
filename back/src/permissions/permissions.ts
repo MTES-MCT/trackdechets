@@ -84,7 +84,9 @@ const readerPermissions = [
 ];
 
 const driverPermissions = [
-  ...readerPermissions,
+  Permission.BsdCanRead,
+  Permission.BsdCanList,
+  Permission.CompanyCanRead,
   Permission.BsdCanUpdate, // the driver must be able to update immat
   Permission.BsdCanSignTransport,
   Permission.BsdCanSignDelivery
