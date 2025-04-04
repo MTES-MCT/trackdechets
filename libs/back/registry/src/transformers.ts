@@ -218,7 +218,11 @@ function getCellValue(cell: Excel.Cell) {
 
 function applyDateFormat(value: Date, formatStr: string) {
   // Hours format
-  if (formatStr === "hh:mm") {
+  if (
+    formatStr === "hh:mm" ||
+    formatStr === "hh:mm:ss" ||
+    formatStr.includes("h:mm:ss")
+  ) {
     return format(value, "HH:mm");
   }
 

@@ -1,6 +1,7 @@
 import { OperationMode } from "@prisma/client";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
+  ALL_OPERATION_MODES,
   BSDD_WASTE_CODES_ENUM,
   isSiret,
   TdOperationCodeEnum,
@@ -151,42 +152,36 @@ export const getOperationCodeSchema = (
       })
     );
 
-export const operationModeSchema = enumValueAsStringSchema
-  .transform(val => val.replace(/ /g, "_"))
-  .pipe(
-    z
-      .enum(
-        [
-          "REUTILISATION",
-          "RECYCLAGE",
-          "VALORISATION_ENERGETIQUE",
-          "ELIMINATION",
-          "AUTRES_VALORISATIONS"
-        ],
-        {
+export const getOperationModeSchema = (
+  operationModes: [string, ...string[]] = ALL_OPERATION_MODES
+) =>
+  enumValueAsStringSchema
+    .transform(val => val.replace(/ /g, "_"))
+    .pipe(
+      z
+        .enum(operationModes, {
           required_error: "Le code de qualification est requis",
           invalid_type_error:
             "Le code de qualification n'est pas une valeur autorisée. Valeurs possibles: Réutilisation, Recyclage, Valorisation énergétique ou Élimination"
-        }
-      )
-      .transform(val => {
-        switch (val) {
-          case "REUTILISATION":
-            return OperationMode.REUTILISATION;
-          case "RECYCLAGE":
-            return OperationMode.RECYCLAGE;
-          case "VALORISATION_ENERGETIQUE":
-            return OperationMode.VALORISATION_ENERGETIQUE;
-          case "ELIMINATION":
-            return OperationMode.ELIMINATION;
-          case "AUTRES_VALORISATIONS":
-            return OperationMode.AUTRES_VALORISATIONS;
-          default:
-            throw Error(`Unhandled qualification code: ${val}`);
-        }
-      })
-  )
-  .nullish();
+        })
+        .transform(val => {
+          switch (val) {
+            case "REUTILISATION":
+              return OperationMode.REUTILISATION;
+            case "RECYCLAGE":
+              return OperationMode.RECYCLAGE;
+            case "VALORISATION_ENERGETIQUE":
+              return OperationMode.VALORISATION_ENERGETIQUE;
+            case "ELIMINATION":
+              return OperationMode.ELIMINATION;
+            case "AUTRES_VALORISATIONS":
+              return OperationMode.AUTRES_VALORISATIONS;
+            default:
+              throw Error(`Unhandled qualification code: ${val}`);
+          }
+        })
+    )
+    .nullish();
 
 const numberAsStringSchema = z
   .string()
@@ -203,7 +198,7 @@ export const weightValueSchema = z
         invalid_type_error: "Le poids doit être un nombre"
       })
       .gt(0, "Le poids ne peut pas être inférieur ou égal à 0 tonnes")
-      .lte(1_000, "Le poids ne peut pas dépasser 1 000 tonnes")
+      .lte(10_000, "Le poids ne peut pas dépasser 10 000 tonnes")
       .multipleOf(0.001, "Le poids ne doit pas avoir plus de 3 décimales")
   );
 
@@ -232,7 +227,7 @@ export const volumeSchema = z
         invalid_type_error: "Le volume doit être un nombre"
       })
       .gt(0, "Le volume ne peut pas être inférieur ou égal à 0")
-      .lte(1_000, "Le volume ne peut pas dépasser 1 000 M3")
+      .lte(10_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .nullish()
   );
@@ -429,50 +424,49 @@ export const actorCountryCodeSchema = z
     return /^[A-Z]{2}$/.test(val);
   }, `Le code du pays n'est pas valide. Il doit être composé de 2 lettres majuscules`);
 
-export const transportModeSchema = z
-  .enum(
-    [
-      "ROUTE",
-      "AÉRIEN",
-      "FLUVIAL",
-      "MARITIME",
-      "FERRÉ",
-      "ROAD",
-      "AIR",
-      "RIVER",
-      "SEA",
-      "RAIL"
-    ],
-    {
-      required_error: "Le mode de transport est requis",
-      invalid_type_error:
-        "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
-    }
-  )
-  .transform(val => {
-    switch (val) {
-      case "ROUTE":
-        return "ROAD";
-      case "AÉRIEN":
-        return "AIR";
-      case "FLUVIAL":
-        return "RIVER";
-      case "MARITIME":
-        return "SEA";
-      case "FERRÉ":
-        return "RAIL";
-      default:
-        return val;
-    }
-  });
+export const transportModeSchema = enumValueAsStringSchema.pipe(
+  z
+    .enum(
+      [
+        "ROUTE",
+        "AERIEN",
+        "FLUVIAL",
+        "MARITIME",
+        "FERRE",
+        "ROAD",
+        "AIR",
+        "RIVER",
+        "SEA",
+        "RAIL"
+      ],
+      {
+        required_error: "Le mode de transport est requis",
+        invalid_type_error:
+          "Le mode de transport n'est pas valide. Consultez la documentation pour la liste des valeurs possibles"
+      }
+    )
+    .transform(val => {
+      switch (val) {
+        case "ROUTE":
+          return "ROAD";
+        case "AERIEN":
+          return "AIR";
+        case "FLUVIAL":
+          return "RIVER";
+        case "MARITIME":
+          return "SEA";
+        case "FERRE":
+          return "RAIL";
+        default:
+          return val;
+      }
+    })
+);
 
 export const transportRecepisseNumberSchema = z.coerce
   .string()
   .trim()
-  .min(
-    5,
-    "Le numéro de récépissé de transport doit faire au moins 5 caractères"
-  )
+  .min(1, "Le numéro de récépissé de transport doit faire au moins 1 caractère")
   .max(
     50,
     "Le numéro de récépissé de transport ne peut pas dépasser 50 caractères"

@@ -124,7 +124,7 @@ input SsdLineInput {
   Poids en tonnes
   Poids en tonnes du produit ou de la matière issue de l'opération de valorisation
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -136,7 +136,7 @@ input SsdLineInput {
   Volume en M3
   Volume en M3 du produit ou de la matière issue de l'opération de valorisation
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """
@@ -190,7 +190,10 @@ input SsdLineInput {
   - Arrêté du 13 décembre 2021
   - Arrêté du 21 décembre 2021
   - Arrêté du 19 février 2024
-  - Implicite
+  - Règlement du 5 juin 2019
+  - Règlement du 31 mars 2011
+  - Règlement du 10 décembre 2012
+  - Règlement du 25 juillet 2013
   """
   administrativeActReference: String!
   """
@@ -322,7 +325,7 @@ input IncomingWasteLineInput {
   Poids en tonnes
   Poids en tonnes des déchets entrants
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
@@ -336,7 +339,7 @@ input IncomingWasteLineInput {
   Volume en M3
   Volume en M3 des déchets entrants
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le volume du déchet ne peut être supérieur à 40 M3.
   """
   volume: Float
@@ -413,13 +416,6 @@ input IncomingWasteLineInput {
   Code pays de l'expéditeur ou détenteur
   """
   emitterCompanyCountryCode: String
-  """
-  Rupture de traçabilité de l'expéditeur ou du détenteur
-  Indiquer ici si l'expediteur ou le détenteur était autorisé à une perte d'identification du ou des producteur(s) initial(aux) pour ces déchets entrants. Dans ce cas uniquement, les information du producteur initial ne sont pas requises.
-
-  Si aucune valeur n'a été renseignée, il sera considéré qu'il n'y pas de rupture de traçabilité entre le collecteur ou détenteur et le producteur initial du déchet. Le producteur initial est alors attendu.
-  """
-  emitterNoTraceability: Boolean
   """
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
@@ -814,7 +810,7 @@ input IncomingTexsLineInput {
   Poids en tonnes
   Poids en tonnes des terres et sédiments ou des déchets entrants
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -826,7 +822,7 @@ input IncomingTexsLineInput {
   """
   Volume en M3
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """
@@ -927,13 +923,6 @@ input IncomingTexsLineInput {
   Pays de l'expéditeur ou du détenteur
   """
   emitterCompanyCountryCode: String
-  """
-  Rupture de traçabilité de l'expéditeur ou du détenteur
-  Indiquer si l'expediteur ou le détenteur était autorisé à une perte d'identification du ou des producteur(s) initial(aux) pour ces terres et sédiments ou déchets entrants. Dans ce cas uniquement, les information du producteur initial ne sont pas requises.
-
-  Si aucune valeur n'a été renseignée, il sera considéré qu'il n'y pas de rupture de traçabilité entre le collecteur ou détenteur et le producteur initial des terres et sédiments ou des déchets entrants. Le producteur initial est alors attendu.
-  """
-  emitterNoTraceability: Boolean
   """
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
@@ -1379,7 +1368,7 @@ input OutgoingTexsLineInput {
   Poids en tonnes
   Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -1391,7 +1380,7 @@ input OutgoingTexsLineInput {
   Volume en M3
   Volume en M3 du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """
@@ -1915,7 +1904,7 @@ input OutgoingWasteLineInput {
   Poids en tonnes
   Poids en tonnes du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   """
   weightValue: Float!
   """
@@ -1927,7 +1916,7 @@ input OutgoingWasteLineInput {
   Volume en M3
   Volume en M3 du déchet faisant l'objet de la sortie de statut de déchet
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """
@@ -2414,7 +2403,7 @@ input TransportedLineInput {
   Poids en tonnes
   Poids en tonnes des déchets transportés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
@@ -2428,8 +2417,7 @@ input TransportedLineInput {
   Volume en M3
   Volume en M3 des déchets transportés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
-  Si au moins un mode de transport est "ROAD" alors le volume du déchet ne peut être supérieur à 40 M3.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """
@@ -2463,13 +2451,6 @@ input TransportedLineInput {
   Code pays de l'expéditeur ou détenteur
   """
   emitterCompanyCountryCode: String
-  """
-  Rupture de traçabilité de l'expéditeur ou du détenteur
-  Indiquer ici si l'expediteur ou le détenteur était autorisé à une perte d'identification du ou des producteur(s) initial(aux) pour ces déchets entrants. Dans ce cas uniquement, les information du producteur initial ne sont pas requises.
-
-  Si aucune valeur n'a été renseignée, il sera considéré qu'il n'y pas de rupture de traçabilité entre le collecteur ou détenteur et le producteur initial du déchet. Le producteur initial est alors attendu.
-  """
-  emitterNoTraceability: Boolean
   """
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
@@ -2673,7 +2654,7 @@ input ManagedLineInput {
   Poids en tonnes
   Poids en tonnes des déchets gérés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
   Si au moins un mode de transport est "ROAD" alors le poids du déchet ne peut être supérieur à 40 T.
   """
   weightValue: Float!
@@ -2687,8 +2668,7 @@ input ManagedLineInput {
   Volume en M3
   Volume en M3 des déchets gérés
 
-  La valeur doit être strictement comprise entre 0 et 1000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
-  Si au moins un mode de transport est "ROAD" alors le volume du déchet ne peut être supérieur à 40 M3.
+  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
   """
   volume: Float
   """

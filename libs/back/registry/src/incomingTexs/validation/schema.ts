@@ -27,7 +27,7 @@ import {
   siretSchema,
   parcelCoordinatesSchema,
   parcelNumbersSchema,
-  operationModeSchema
+  getOperationModeSchema
 } from "../../shared/schemas";
 import {
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
@@ -64,7 +64,8 @@ const inputIncomingTexsSchema = z.object({
   sisIdentifier: z
     .string()
     .trim()
-    .max(13, "Un identifiant SIS ne doit pas excéder 13 caractères")
+    .min(10, "Un identifiant SIS doit faire au moins 10 caractères")
+    .max(15, "Un identifiant SIS ne doit pas excéder 15 caractères")
     .nullish(),
   initialEmitterCompanyType: actorTypeSchema.nullish(),
   initialEmitterCompanyOrgId: actorOrgIdSchema.nullish(),
@@ -111,7 +112,7 @@ const inputIncomingTexsSchema = z.object({
   operationCode: getOperationCodeSchema(
     INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
   ),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
   gistridNumber: gistridNumberSchema,

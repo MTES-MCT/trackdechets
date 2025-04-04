@@ -1,6 +1,7 @@
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
-  SSD_PROCESSING_OPERATIONS_CODES
+  SSD_PROCESSING_OPERATIONS_CODES,
+  SSD_OPERATION_MODES
 } from "@td/constants";
 import { z } from "zod";
 import {
@@ -22,10 +23,10 @@ import {
   wasteDescriptionSchema,
   weightIsEstimateSchema,
   weightValueSchema,
-  operationModeSchema,
   nullishDateSchema,
   dateSchema,
-  stringToArraySchema
+  stringToArraySchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
@@ -69,7 +70,7 @@ const inputSsdSchema = z.object({
   destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
   destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   operationCode: getOperationCodeSchema(SSD_PROCESSING_OPERATIONS_CODES),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(SSD_OPERATION_MODES),
   administrativeActReference: z.enum(ADMINISTRATIVE_ACT_REFERENCES)
 });
 
