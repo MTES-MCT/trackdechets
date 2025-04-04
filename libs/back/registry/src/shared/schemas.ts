@@ -227,7 +227,7 @@ export const volumeSchema = z
         invalid_type_error: "Le volume doit être un nombre"
       })
       .gt(0, "Le volume ne peut pas être inférieur ou égal à 0")
-      .lte(1_000, "Le volume ne peut pas dépasser 1 000 M3")
+      .lte(10_000, "Le volume ne peut pas dépasser 1 000 M3")
       .multipleOf(0.001, "Le volume ne doit pas avoir plus de 3 décimales")
       .nullish()
   );
