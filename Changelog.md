@@ -13,10 +13,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ne pas permettre d'accéder aux brouillons des autres acteurs sur le PAOH [PR 4050](https://github.com/MTES-MCT/trackdechets/pull/4050)
 - Ne pas afficher les brouillons DASRI aux acteurs tiers [PR 4061](https://github.com/MTES-MCT/trackdechets/pull/4061)
 
-#### :bug: Corrections de bugs
-
-- Corriger le fonctionnement du filtre `hasNextStep` sur la query `forms`[PR 4051](https://github.com/MTES-MCT/trackdechets/pull/4051)
-
 #### :boom: Breaking Change
 
 -Demander les codes INSEE des communes lorsqu'une parcelle est renseignée plutôt que le(s) code(s) postaux [PR 4059](https://github.com/MTES-MCT/trackdechets/pull/4059)
@@ -27,7 +23,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Corriger le fonctionnement du filtre `hasNextStep` sur la query `forms`[PR 4051](https://github.com/MTES-MCT/trackdechets/pull/4051)
 - Impossibilité d'ajouter un transporteur via l'UI si la liste de transporteur est vide lors de l'édition d'un BSDD [PR 4042](https://github.com/MTES-MCT/trackdechets/pull/4042)
+- Résolution de nombreux points liés aux Registres (imports RNDTS et exports) [PR 4091](https://github.com/MTES-MCT/trackdechets/pull/4091)
 
 # [2025.03.1] 11/03/2025
 
