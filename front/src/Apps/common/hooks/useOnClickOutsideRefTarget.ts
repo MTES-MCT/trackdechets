@@ -1,6 +1,10 @@
 import { useEffect, useRef } from "react";
 
-const useOnClickOutsideRefTarget = ({ onClickOutside }) => {
+const useOnClickOutsideRefTarget = ({
+  onClickOutside
+}: {
+  onClickOutside: (e: MouseEvent | TouchEvent) => void;
+}) => {
   const targetRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -9,7 +13,7 @@ const useOnClickOutsideRefTarget = ({ onClickOutside }) => {
       "mousedown",
       (e: MouseEvent) => {
         if (targetRef && !targetRef?.current?.contains(e.target as Node)) {
-          onClickOutside();
+          onClickOutside(e);
         }
       }
     );
@@ -17,7 +21,7 @@ const useOnClickOutsideRefTarget = ({ onClickOutside }) => {
       "touchend",
       (e: TouchEvent) => {
         if (targetRef && !targetRef?.current?.contains(e.target as Node)) {
-          onClickOutside();
+          onClickOutside(e);
         }
       }
     );

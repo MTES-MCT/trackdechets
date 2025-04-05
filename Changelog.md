@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corriger le fonctionnement du filtre `hasNextStep` sur la query `forms`[PR 4051](https://github.com/MTES-MCT/trackdechets/pull/4051)
+- Corriger l'affichage de les listes déroulantes des établissements dans l'onglet Registres [PR 4088](https://github.com/MTES-MCT/trackdechets/pull/4088)
 
 #### :boom: Breaking Change
 
