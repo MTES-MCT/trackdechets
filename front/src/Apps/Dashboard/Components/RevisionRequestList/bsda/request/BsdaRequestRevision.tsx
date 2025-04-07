@@ -22,7 +22,10 @@ import RhfOperationModeSelect from "../../../../../common/Components/OperationMo
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
-import { PACKAGINGS_BSD_NAMES } from "../../common/Components/Packagings/packagings";
+import {
+  PACKAGINGS_BSD_NAMES,
+  resetPackagingIfUnchanged
+} from "../../common/Components/Packagings/packagings";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import {
   initialBsdaReview,
@@ -95,10 +98,22 @@ export function BsdaRequestRevision({ bsda }: Props) {
     return data;
   };
 
+  const checkIfInitialObjectValueChanged = data => {
+    let newData = resetPopIfUnchanged(data);
+    newData = resetPackagingIfUnchanged(
+      data,
+      bsda.packagings,
+      data.packagings,
+      () => delete data.packagings
+    );
+    return newData;
+  };
+
   const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
-    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
-
+    const cleanedContent = removeEmptyKeys(
+      checkIfInitialObjectValueChanged(content)
+    );
     await createBsdaRevisionRequest({
       variables: {
         input: {

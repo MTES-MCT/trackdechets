@@ -48,6 +48,7 @@ import {
   POP,
   TITLE_REQUEST_LIST
 } from "../../../Revision/wordingsRevision";
+import { resetPackagingIfUnchanged } from "../../common/Components/Packagings/packagings";
 
 type Props = {
   bsdd: Bsdd;
@@ -100,10 +101,23 @@ export function BsddRequestRevision({ bsdd }: Props) {
     return data;
   };
 
+  const checkIfInitialObjectValueChanged = data => {
+    let newData = resetPopIfUnchanged(data);
+    newData = resetPackagingIfUnchanged(
+      data,
+      bsdd.wasteDetails?.packagingInfos,
+      data.wasteDetails.packagingInfos,
+      () => delete data.wasteDetails.packagingInfos
+    );
+    return newData;
+  };
+
   const onSubmitForm = async (data: BsddRevisionRequestValidationSchema) => {
     const { comment, ...content } = data;
 
-    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
+    const cleanedContent = removeEmptyKeys(
+      checkIfInitialObjectValueChanged(content)
+    );
 
     await createFormRevisionRequest({
       variables: {
