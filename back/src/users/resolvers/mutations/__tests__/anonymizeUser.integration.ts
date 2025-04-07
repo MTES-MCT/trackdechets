@@ -125,7 +125,7 @@ describe("disconnectDeletedUser Middleware", () => {
     expect(errors.length).toBe(1);
     expect(errors[0]).toMatchObject({
       extensions: {
-        code: "INTERNAL_SERVER_ERROR"
+        code: "BAD_USER_INPUT"
       }
     });
     expect(errors[0].message).toMatch(

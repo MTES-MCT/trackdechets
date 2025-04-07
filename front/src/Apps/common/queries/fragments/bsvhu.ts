@@ -149,6 +149,10 @@ export const FullBsvhuFragment = gql`
           numbers
           type
         }
+        signature {
+          date
+          author
+        }
       }
       operation {
         code

@@ -153,7 +153,7 @@ export const COMPANY_TYPE_OPTIONS: CompanyTypeOption[] = [
     label:
       "Installation de collecte de déchets apportés par le producteur initial (Rubrique 2710)",
     helpText:
-      "Déchetteries et installations relevant de la rubrique 2710 de la nomenclature ICPE"
+      "Déchèteries et installations relevant de la rubrique 2710 de la nomenclature ICPE"
   },
   {
     value: CompanyType.WasteVehicles,

@@ -6,6 +6,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bsda,
+  BsdType,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
@@ -21,7 +22,10 @@ import RhfOperationModeSelect from "../../../../../common/Components/OperationMo
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
 import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
-import { PACKAGINGS_BSD_NAMES } from "../../common/Components/Packagings/packagings";
+import {
+  PACKAGINGS_BSD_NAMES,
+  resetPackagingIfUnchanged
+} from "../../common/Components/Packagings/packagings";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import {
   initialBsdaReview,
@@ -31,6 +35,7 @@ import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCance
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 import {
   CODE_DECHET,
   CODE_TRAITEMENT,
@@ -93,10 +98,22 @@ export function BsdaRequestRevision({ bsda }: Props) {
     return data;
   };
 
+  const checkIfInitialObjectValueChanged = data => {
+    let newData = resetPopIfUnchanged(data);
+    newData = resetPackagingIfUnchanged(
+      data,
+      bsda.packagings,
+      data.packagings,
+      () => delete data.packagings
+    );
+    return newData;
+  };
+
   const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
-    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
-
+    const cleanedContent = removeEmptyKeys(
+      checkIfInitialObjectValueChanged(content)
+    );
     await createBsdaRevisionRequest({
       variables: {
         input: {
@@ -346,6 +363,25 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     ...register("destination.operation.description")
                   }}
                   className="fr-col-8"
+                />
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Courtier"
+                path="broker"
+                value={
+                  bsda.broker?.company?.name ? (
+                    <div>{bsda.broker.company.name}</div>
+                  ) : (
+                    "Aucun"
+                  )
+                }
+                defaultValue={initialBsdaReview.broker}
+              >
+                <RhfBroker
+                  bsdType={BsdType.Bsda}
+                  siret={siret}
+                  showSwitch={false}
                 />
               </RhfReviewableField>
 

@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Impossibilité d'ajouter un transporteur via l'UI si la liste de transporteur est vide lors de l'édition d'un BSDD [PR 4042](https://github.com/MTES-MCT/trackdechets/pull/4042)
 - La date de prise en charge par le transporteur apparaît sur le PDF du BSVHU [PR 4052](https://github.com/MTES-MCT/trackdechets/pull/4052)
 - Après signature de la réception, un VHU reste dans l'onglet "Pour action" du destinataire [PR 4053](https://github.com/MTES-MCT/trackdechets/pull/4053)
+- Corriger l'affichage de les listes déroulantes des établissements dans l'onglet Registres [PR 4088](https://github.com/MTES-MCT/trackdechets/pull/4088)
 
 #### :boom: Breaking Change
 

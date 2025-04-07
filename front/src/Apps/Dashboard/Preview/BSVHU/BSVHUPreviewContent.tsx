@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { BsdType, Query, QueryBsvhuArgs } from "@td/codegen-ui";
 import { GET_VHU_FORM } from "../../../common/queries/bsvhu/queries";
 import { Loader } from "../../../common/Components";
-import { FrIconClassName } from "@codegouvfr/react-dsfr";
+import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
 import BSDPreviewTabs from "../BSDPreviewTabs";
 import BSVHUPreviewWaste from "./BSVHUPreviewWaste";
 import BSVHUPreviewEmitter from "./BSVHUPreviewEmitter";
@@ -53,12 +53,12 @@ const BSVHUPreviewContent = ({ bsdId }: BSVHUPreviewContentProps) => {
     {
       tabId: "emetteur",
       label: "Émetteur",
-      iconId: "fr-icon-arrow-right-line" as FrIconClassName
+      iconId: "fr-icon-map-pin-2-fill" as FrIconClassName
     },
     {
       tabId: "transport",
       label: "Transporteur",
-      iconId: "fr-icon-arrow-right-line" as FrIconClassName
+      iconId: "ri-truck-fill" as RiIconClassName
     },
     {
       tabId: "destination",
