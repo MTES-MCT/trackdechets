@@ -17,6 +17,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Permettre aux intégrateurs API d'accéder aux délégations registre en lecture [PR 4039](https://github.com/MTES-MCT/trackdechets/pull/4039)
 - Ne pas permettre d'accéder aux brouillons des autres acteurs sur le PAOH [PR 4050](https://github.com/MTES-MCT/trackdechets/pull/4050)
 - Ne pas afficher les brouillons DASRI aux acteurs tiers [PR 4061](https://github.com/MTES-MCT/trackdechets/pull/4061)
+- Nouvel aperçu mis au DSFR pour les BSVHU [PR 4036](https://github.com/MTES-MCT/trackdechets/pull/4036)
+- Mise au DSFR des infobulles [PR 4076](https://github.com/MTES-MCT/trackdechets/pull/4076)
+- Mise au DSFR des liens externes [PR 4072](https://github.com/MTES-MCT/trackdechets/pull/4072)
 
 #### :bug: Corrections de bugs
 
@@ -25,6 +28,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - La date de prise en charge par le transporteur apparaît sur le PDF du BSVHU [PR 4052](https://github.com/MTES-MCT/trackdechets/pull/4052)
 - Après signature de la réception, un VHU reste dans l'onglet "Pour action" du destinataire [PR 4053](https://github.com/MTES-MCT/trackdechets/pull/4053)
 - Corriger l'affichage de les listes déroulantes des établissements dans l'onglet Registres [PR 4088](https://github.com/MTES-MCT/trackdechets/pull/4088)
+- Corriger l'affichage de l'onglet Transport en mobile [PR 4070](https://github.com/MTES-MCT/trackdechets/pull/4070)
 
 #### :boom: Breaking Change
 
