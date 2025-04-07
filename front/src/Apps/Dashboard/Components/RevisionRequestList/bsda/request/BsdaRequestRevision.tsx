@@ -6,6 +6,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bsda,
+  BsdType,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
@@ -31,6 +32,7 @@ import { BsdaRequestRevisionCancelationInput } from "../BsdaRequestRevisionCance
 import TagsInput from "../../../../../Forms/Components/TagsInput/TagsInput";
 import styles from "./BsdaRequestRevision.module.scss";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
 import {
   CODE_DECHET,
   CODE_TRAITEMENT,
@@ -346,6 +348,25 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     ...register("destination.operation.description")
                   }}
                   className="fr-col-8"
+                />
+              </RhfReviewableField>
+
+              <RhfReviewableField
+                title="Courtier"
+                path="broker"
+                value={
+                  bsda.broker?.company?.name ? (
+                    <div>{bsda.broker.company.name}</div>
+                  ) : (
+                    "Aucun"
+                  )
+                }
+                defaultValue={initialBsdaReview.broker}
+              >
+                <RhfBroker
+                  bsdType={BsdType.Bsda}
+                  siret={siret}
+                  showSwitch={false}
                 />
               </RhfReviewableField>
 
