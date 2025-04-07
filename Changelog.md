@@ -7,6 +7,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.04.1] 08/04/2025
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Les utilisateurs sont maitenant autonomes pour devenir administrateurs d'une entreprise [PR 4015](https://github.com/MTES-MCT/trackdechets/pull/4015)
+- Je peux renseigner l'option "Comprend des véhicules électriques ou hybrides" pour un VHU [PR 4057](https://github.com/MTES-MCT/trackdechets/pull/4057)
+
 #### :nail_care: Améliorations
 
 - Permettre aux intégrateurs API d'accéder aux délégations registre en lecture [PR 4039](https://github.com/MTES-MCT/trackdechets/pull/4039)
@@ -16,19 +21,18 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corriger le fonctionnement du filtre `hasNextStep` sur la query `forms`[PR 4051](https://github.com/MTES-MCT/trackdechets/pull/4051)
+- Impossibilité d'ajouter un transporteur via l'UI si la liste de transporteur est vide lors de l'édition d'un BSDD [PR 4042](https://github.com/MTES-MCT/trackdechets/pull/4042)
+- La date de prise en charge par le transporteur apparaît sur le PDF du BSVHU [PR 4052](https://github.com/MTES-MCT/trackdechets/pull/4052)
+- Après signature de la réception, un VHU reste dans l'onglet "Pour action" du destinataire [PR 4053](https://github.com/MTES-MCT/trackdechets/pull/4053)
 - Corriger l'affichage de les listes déroulantes des établissements dans l'onglet Registres [PR 4088](https://github.com/MTES-MCT/trackdechets/pull/4088)
 
 #### :boom: Breaking Change
 
--Demander les codes INSEE des communes lorsqu'une parcelle est renseignée plutôt que le(s) code(s) postaux [PR 4059](https://github.com/MTES-MCT/trackdechets/pull/4059)
+- Demander les codes INSEE des communes lorsqu'une parcelle est renseignée plutôt que le(s) code(s) postaux [PR 4059](https://github.com/MTES-MCT/trackdechets/pull/4059)
 
 #### :memo: Documentation
 
 - Mettre à jour la doc "Utiliser le playground" de la documentation développeur [PR 4034](https://github.com/MTES-MCT/trackdechets/pull/4034)
-
-#### :bug: Corrections de bugs
-
-- Impossibilité d'ajouter un transporteur via l'UI si la liste de transporteur est vide lors de l'édition d'un BSDD [PR 4042](https://github.com/MTES-MCT/trackdechets/pull/4042)
 
 # [2025.03.1] 11/03/2025
 
