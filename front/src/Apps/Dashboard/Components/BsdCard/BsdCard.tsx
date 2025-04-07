@@ -62,7 +62,7 @@ import "./bsdCard.scss";
 import { getCurrentTransporterInfos } from "../../bsdMapper";
 import { isDefined } from "../../../../common/helper";
 import { useCloneBsd } from "../Clone/useCloneBsd";
-import copyTextToClipboard from "copy-text-to-clipboard";
+import { copyToClipboard } from "../../../utils/utils";
 import Button from "@codegouvfr/react-dsfr/Button";
 
 const shouldDisplayTransporterNumberPlate = (
@@ -376,7 +376,7 @@ function BsdCard({
 
   const handleBsdNumberClick = () => {
     setIsBsdNumberClicked(true);
-    copyTextToClipboard(bsdDisplay!.readableid);
+    copyToClipboard(bsdDisplay!.readableid);
     setTimeout(() => {
       setIsBsdNumberClicked(false);
     }, 2000);
