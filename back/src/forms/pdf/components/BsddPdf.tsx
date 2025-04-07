@@ -345,6 +345,8 @@ export function BsddPdf({
       form.wasteDetails?.packagingInfos
     );
 
+  console.log("form.emitter?.type", form.emitter?.type);
+
   return (
     <Document title={form.readableId}>
       <div className="Page">
@@ -504,6 +506,12 @@ export function BsddPdf({
               isPrivateIndividual={Boolean(form.emitter?.isPrivateIndividual)}
               isForeignShip={Boolean(form.emitter?.isForeignShip)}
             />
+
+            {form.emitter?.type === EmitterType.APPENDIX1 && (
+              <p>
+                <i>Liste des producteurs initiaux en annexe</i>
+              </p>
+            )}
 
             <p>
               <strong>1.2 Point de collecte/chantier</strong> (si adresse
