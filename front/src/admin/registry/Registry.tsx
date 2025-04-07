@@ -134,7 +134,7 @@ export function Registry() {
         <Input
           label="Siret"
           className="fr-col-3  fr-mb-5v"
-          hintText="Format: 14 chiffres 123 456 789 00099"
+          hintText="Format : 14 chiffres 123 456 789 00099"
           state={formState.errors.siret ? "error" : "default"}
           nativeInputProps={{
             ...register("siret", { required: true })
