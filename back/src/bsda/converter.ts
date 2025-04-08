@@ -92,7 +92,11 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
       name: bsda.ecoOrganismeName,
       siret: bsda.ecoOrganismeSiret
     }),
-    packagings: bsda.packagings as BsdaPackaging[],
+    packagings: ((bsda.packagings ?? []) as BsdaPackaging[]).map(p => ({
+      ...p,
+      volume: p.volume ?? null,
+      identificationNumbers: p.identificationNumbers ?? []
+    })),
     waste: nullIfNoValues<BsdaWaste>({
       code: bsda.wasteCode,
       name: bsda.wasteMaterialName, // TODO To remove - keeps support for `name` for now
