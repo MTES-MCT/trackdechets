@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import TdSwitch from "../../common/components/Switch";
-import Tooltip from "../../common/components/Tooltip";
+import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 import ProcessingOperation from "../common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
 import { isDangerous } from "@td/constants";
@@ -82,7 +82,7 @@ export default function Recipient({ disabled }) {
           recevoir le déchet, vous pouvez consulter{" "}
           <a
             href="https://www.georisques.gouv.fr/risques/installations/donnees#/"
-            className="link"
+            className="fr-link force-external-link-content force-underline-link"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -112,7 +112,8 @@ export default function Recipient({ disabled }) {
           Numéro de CAP
           {isDangerousWaste ? (
             <Tooltip
-              msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+              className="fr-ml-1"
+              title={`Le champ CAP est obligatoire pour les déchets dangereux.
 Il est important car il qualifie les conditions de gestion et de traitement du déchet entre le producteur et l'entreprise de destination.`}
             />
           ) : (

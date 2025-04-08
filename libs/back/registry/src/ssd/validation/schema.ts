@@ -1,6 +1,7 @@
 import {
-  BSDD_WASTE_CODES_ENUM,
-  SSD_PROCESSING_OPERATIONS_CODES
+  ADMINISTRATIVE_ACT_REFERENCES,
+  SSD_PROCESSING_OPERATIONS_CODES,
+  SSD_OPERATION_MODES
 } from "@td/constants";
 import { z } from "zod";
 import {
@@ -22,9 +23,10 @@ import {
   wasteDescriptionSchema,
   weightIsEstimateSchema,
   weightValueSchema,
-  operationModeSchema,
   nullishDateSchema,
-  dateSchema
+  dateSchema,
+  stringToArraySchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputSsdItem = z.output<typeof inputSsdSchema>;
@@ -40,54 +42,14 @@ const inputSsdSchema = z.object({
   wasteCode: getWasteCodeSchema(),
   wasteDescription: wasteDescriptionSchema,
   wasteCodeBale: wasteCodeBaleSchema,
-  secondaryWasteCodes: z.coerce
-    .string()
-    .trim()
-    .nullish()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(
-      z
-        .array(
-          z.enum(BSDD_WASTE_CODES_ENUM, {
-            required_error: "Le code déchet secondaire est requis",
-            invalid_type_error:
-              "Le code déchet secondaire n'a pas une valeur autorisée. Il doit faire partie de la liste officielle des codes déchets. Ex: 17 02 01, 10 01 18*. Attention à bien respecter les espaces"
-          })
-        )
-        .optional()
-    ),
-  secondaryWasteDescriptions: z
-    .string()
-    .trim()
-    .nullish()
-    .transform(val =>
-      val
-        ? String(val)
-            .split(",")
-            .map(val => val.trim())
-        : []
-    )
-    .pipe(
-      z.array(
-        z
-          .string()
-          .trim()
-          .min(
-            2,
-            "Les dénominations usuelles du déchet doivent faire au moins 2 caractères"
-          )
-          .max(
-            300,
-            "Les dénominations usuelles du déchet ne peuvent pas dépasser 300 caractères"
-          )
-      )
-    ),
+  secondaryWasteCodes: z.union([
+    stringToArraySchema.pipe(z.array(getWasteCodeSchema())),
+    z.array(getWasteCodeSchema())
+  ]),
+  secondaryWasteDescriptions: z.union([
+    stringToArraySchema.pipe(z.array(wasteDescriptionSchema)),
+    z.array(wasteDescriptionSchema)
+  ]),
   product: z
     .string()
     .trim()
@@ -108,20 +70,8 @@ const inputSsdSchema = z.object({
   destinationCompanyPostalCode: actorPostalCodeSchema.nullish(),
   destinationCompanyCountryCode: actorCountryCodeSchema.nullish(),
   operationCode: getOperationCodeSchema(SSD_PROCESSING_OPERATIONS_CODES),
-  operationMode: operationModeSchema,
-  administrativeActReference: z.enum([
-    "Implicite",
-    "Arrêté du 29 juillet 2014",
-    "Arrêté du 24 août 2016",
-    "Arrêté du 10 juillet 2017",
-    "Arrêté du 11 décembre 2018",
-    "Arrêté du 22 février 2019",
-    "Arrêté du 25 février 2019",
-    "Arrêté du 4 juin 2021",
-    "Arrêté du 13 décembre 2021",
-    "Arrêté du 21 décembre 2021",
-    "Arrêté du 19 février 2024"
-  ])
+  operationMode: getOperationModeSchema(SSD_OPERATION_MODES),
+  administrativeActReference: z.enum(ADMINISTRATIVE_ACT_REFERENCES)
 });
 
 // Props added through transform

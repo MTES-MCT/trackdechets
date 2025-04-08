@@ -5,7 +5,7 @@ import {
   getOperationModeLabel,
   getOperationModesFromOperationCode
 } from "../../operationModes";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../Tooltip/Tooltip";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 
 const RhfOperationModeSelect = ({
@@ -41,7 +41,7 @@ const RhfOperationModeSelect = ({
       <fieldset>
         <legend className={`fr-pb-1w fr-grid-row ${addedDsfrClass}`}>
           Mode de traitement{" "}
-          <Tooltip msg="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
+          <Tooltip title="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
         </legend>
 
         <RadioButtons

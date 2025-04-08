@@ -75,6 +75,13 @@
     white-space: nowrap;
     vertical-align: middle;
   }
+  &__copy {
+    &:before {
+      content: "";
+      width: 17px;
+      height: 17px;
+    }
+  }
   &__CustomInfo {
     &:before {
       background-image: url("/icons/dashboard/custom-info-icon.svg");

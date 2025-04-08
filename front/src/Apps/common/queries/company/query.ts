@@ -76,9 +76,16 @@ workerCertification {
   organisation
 }`;
 
+const companyAddressSearchString = `
+addressVoie
+addressPostalCode
+addressCity
+`;
+
 const companySearchResultFragment = gql`
   fragment CompanySearchResultFragment on CompanySearchResult {
     ${commonCompanySearchString}
+    ${companyAddressSearchString}
     ${commonCompanyTypesSearchString}
     ${transporterReceiptCompanySearchString}
     ${traderReceiptCompanySearchString}

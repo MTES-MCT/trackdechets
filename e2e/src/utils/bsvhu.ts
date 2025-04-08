@@ -9,7 +9,7 @@ import { toDDMMYYYY } from "./time";
 const getVHUCardDiv = async (page: Page, id: string) => {
   const div = page
     .locator(".bsd-card-list li")
-    .filter({ hasText: `N°: ${id}` })
+    .filter({ hasText: `${id}` })
     .first();
 
   await expect(div).toBeVisible();
@@ -315,7 +315,7 @@ export const createBsvhu = async (
   await page.getByRole("link", { name: "Tous les bordereaux" }).click();
 
   // Make sure VHU is visible
-  const vhuDiv = page.locator(".bsd-card-list li").getByText(`N°: ${id}`);
+  const vhuDiv = page.locator(".bsd-card-list li").getByTestId(`${id}`);
   await expect(vhuDiv).toBeVisible();
 
   return { id };
@@ -385,25 +385,28 @@ export const verifyOverviewData = async (
   };
 
   // Producteur
-  await page.getByRole("tab", { name: "Producteur" }).click();
+  await page.getByRole("tab", { name: "Émetteur" }).click();
   await expectValue("siret", emitter.orgId);
   await expectValue("contact", emitter.contact);
-  await expectValue("tel", emitter.contactPhone);
-  await expectValue("mel", emitter.contactEmail);
+  await expectValue("telephone", emitter.contactPhone);
+  await expectValue("courriel", emitter.contactEmail);
 
   // Transporter
   await page.getByRole("tab", { name: "Transporteur" }).click();
   await expectValue("siret", transporter.orgId);
   await expectValue("contact", transporter.contact);
-  await expectValue("tel", transporter.contactPhone);
-  await expectValue("mel", transporter.contactEmail);
+  await expectValue("telephone", transporter.contactPhone);
+  await expectValue("courriel", transporter.contactEmail);
   await expectValue(
-    "numero_de_recepisse",
+    "recepisse_n",
     transporter.transporterReceipt.receiptNumber
   );
-  await expectValue("departement", transporter.transporterReceipt.department);
   await expectValue(
-    "date_de_validite_de_recepisse",
+    "recepisse_departement",
+    transporter.transporterReceipt.department
+  );
+  await expectValue(
+    "recepisse_valable_jusquau",
     toDDMMYYYY(transporter.transporterReceipt.validityLimit)
   );
 
@@ -411,10 +414,10 @@ export const verifyOverviewData = async (
   await page.getByRole("tab", { name: "Destinataire" }).click();
   await expectValue("siret", destination.orgId);
   await expectValue("contact", destination.contact);
-  await expectValue("tel", destination.contactPhone);
-  await expectValue("mel", destination.contactEmail);
+  await expectValue("telephone", destination.contactPhone);
+  await expectValue("courriel", destination.contactEmail);
   await expectValue(
-    "agrement",
+    "numero_dagrement",
     destination.vhuAgrementDemolisseur.agrementNumber
   );
 
@@ -515,7 +518,7 @@ export const duplicateBsvhu = async (page: Page, { id }) => {
   // Make sure VHU pops out in results list
   const duplicatedVhuDiv = page
     .locator(".bsd-card-list li")
-    .getByText(`N°: ${duplicatedId}`);
+    .getByTestId(`${duplicatedId}`);
   await expect(duplicatedVhuDiv).toBeVisible();
 
   return { id: duplicatedId };

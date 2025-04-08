@@ -197,11 +197,11 @@ describe("<Appendix2MultiSelect />", () => {
     expect(headers[1]).toHaveTextContent("Numéro");
     expect(headers[2]).toHaveTextContent("Code déchet");
     expect(headers[3]).toHaveTextContent("Émetteur initial");
-    expect(headers[4]).toHaveTextContent("Date de l'acceptation");
-    expect(headers[5]).toHaveTextContent("Opération réalisée");
-    expect(headers[6]).toHaveTextContent("Qté acceptée (en T)");
-    expect(headers[7]).toHaveTextContent("Qté restante (en T)");
-    expect(headers[8]).toHaveTextContent("Qté à regrouper (en T)");
+    //expect(headers[4]).toHaveTextContent("Date de l'acceptation");
+    expect(headers[4]).toHaveTextContent("Opération réalisée");
+    expect(headers[5]).toHaveTextContent("Qté acceptée (en T)");
+    expect(headers[6]).toHaveTextContent("Qté restante (en T)");
+    expect(headers[7]).toHaveTextContent("Qté à regrouper (en T)");
 
     const rows = screen.getAllByRole("row");
 
@@ -222,13 +222,13 @@ describe("<Appendix2MultiSelect />", () => {
     expect(row1[2]).toHaveTextContent(grouping[0].form.wasteDetails?.code);
     expect(row1[3]).toHaveTextContent(grouping[0].form.emitter?.company?.name);
     expect(row1[3]).toHaveTextContent(grouping[0].form.emitter?.company?.orgId);
-    expect(row1[4]).toHaveTextContent("14/11/2024");
-    expect(row1[5]).toHaveTextContent(grouping[0].form.processingOperationDone);
-    expect(row1[6]).toHaveTextContent("1");
+    //expect(row1[4]).toHaveTextContent("14/11/2024");
+    expect(row1[4]).toHaveTextContent(grouping[0].form.processingOperationDone);
+    expect(row1[5]).toHaveTextContent("1");
     // La quantité déjà regroupée reste disponible puisque c'est groupé
     // sur le bordereau de groupement qui fait l'objet de ce formulaire
-    expect(row1[7]).toHaveTextContent("1");
-    const input1 = within(row1[8]).getByDisplayValue(
+    expect(row1[6]).toHaveTextContent("1");
+    const input1 = within(row1[7]).getByDisplayValue(
       String(grouping[0].quantity)
     );
     expect(input1).toBeInTheDocument();
@@ -244,13 +244,13 @@ describe("<Appendix2MultiSelect />", () => {
     expect(row2[2]).toHaveTextContent(appendixForms[0].wasteDetails?.code);
     expect(row2[3]).toHaveTextContent(appendixForms[0].emitter?.company?.name);
     expect(row2[3]).toHaveTextContent(appendixForms[0].emitter?.company?.orgId);
-    expect(row2[4]).toHaveTextContent("14/11/2024");
-    expect(row2[5]).toHaveTextContent(appendixForms[0].processingOperationDone);
-    expect(row2[6]).toHaveTextContent("1");
+    // expect(row2[4]).toHaveTextContent("14/11/2024");
+    expect(row2[4]).toHaveTextContent(appendixForms[0].processingOperationDone);
+    expect(row2[5]).toHaveTextContent("1");
     // La quantité restante est de 1 - 0.6
-    expect(row2[7]).toHaveTextContent("0.4");
+    expect(row2[6]).toHaveTextContent("0.4");
     // La valeur de l'input correspond par défaut à la quantité restante
-    const input2 = within(row2[8]).getByDisplayValue("0.4");
+    const input2 = within(row2[7]).getByDisplayValue("0.4");
     expect(input2).toBeInTheDocument();
     // L'input est disabled tant que le bordereau n'est pas sélectionné
     expect(input2).toBeDisabled();
@@ -262,11 +262,11 @@ describe("<Appendix2MultiSelect />", () => {
     expect(row3[2]).toHaveTextContent(appendixForms[1].wasteDetails?.code);
     expect(row3[3]).toHaveTextContent(appendixForms[1].emitter?.company?.name);
     expect(row3[3]).toHaveTextContent(appendixForms[1].emitter?.company?.orgId);
-    expect(row3[4]).toHaveTextContent("14/11/2024");
-    expect(row3[5]).toHaveTextContent(appendixForms[1].processingOperationDone);
+    //expect(row3[4]).toHaveTextContent("14/11/2024");
+    expect(row3[4]).toHaveTextContent(appendixForms[1].processingOperationDone);
+    expect(row3[5]).toHaveTextContent("1");
     expect(row3[6]).toHaveTextContent("1");
-    expect(row3[7]).toHaveTextContent("1");
-    const input3 = within(row3[8]).getByDisplayValue("1");
+    const input3 = within(row3[7]).getByDisplayValue("1");
     expect(input3).toBeInTheDocument();
     expect(input3).toBeDisabled();
 
@@ -318,7 +318,7 @@ describe("<Appendix2MultiSelect />", () => {
     user.type(input2, "2");
     await waitFor(() => expect(input2).toHaveValue(2));
     expect(
-      within(row2[8]).getByText(
+      within(row2[7]).getByText(
         "Vous ne pouvez pas regrouper une quantité supérieure à la quantité restante"
       )
     ).toBeInTheDocument();
@@ -327,7 +327,7 @@ describe("<Appendix2MultiSelect />", () => {
     user.type(input2, "-1");
     await waitFor(() => expect(input2).toHaveValue(-1));
     expect(
-      within(row2[8]).getByText("La quantité doit être un nombre supérieur à 0")
+      within(row2[7]).getByText("La quantité doit être un nombre supérieur à 0")
     ).toBeInTheDocument();
 
     // La checkbox du header permet de tout déselectionner

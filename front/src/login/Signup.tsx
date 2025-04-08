@@ -130,7 +130,7 @@ export default function Signup() {
             {Boolean(emailValue) && isGenericEmail(emailValue) && (
               <Alert
                 className="fr-mb-3w"
-                description="Dans le cas où vous posséderiez une adresse e-mail professionnelle avec un nom de domaine d'entreprise (ex: nom@votre-entreprise.fr), nous vous recommandons de l'utiliser pour la création de votre compte, afin de faciliter le processus de vérification de rattachement à votre établissement."
+                description="Dans le cas où vous posséderiez une adresse e-mail professionnelle avec un nom de domaine d'entreprise (ex : nom@votre-entreprise.fr), nous vous recommandons de l'utiliser pour la création de votre compte, afin de faciliter le processus de vérification de rattachement à votre établissement."
                 severity="info"
                 closable={false}
                 small
@@ -166,7 +166,7 @@ export default function Signup() {
               href="https://trackdechets.beta.gouv.fr/cgu"
               target="_blank"
               rel="noopener noreferrer"
-              className="fr-link"
+              className="fr-link force-external-link-content force-underline-link"
             >
               Voir les conditions générales.
             </a>

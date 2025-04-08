@@ -61,8 +61,8 @@ export default function AccountCompanyOrientation() {
           >
             Vous exploitez une entreprise de collecte et/ou tri et/ou transit
             et/ou regroupement et/ou traitement de déchets. Vous êtes négociant
-            et/ou courtier de déchets et/ou eco-organisme. Exemples:
-            Déchetterie, collecteur de déchets, casse automobile, entreprise de
+            et/ou courtier de déchets et/ou eco-organisme. Exemples :
+            Déchèterie, collecteur de déchets, casse automobile, entreprise de
             travaux amiante, transporteur, centre d'enfouissement, installation
             de traitement de déchets, incinérateur, crématorium.
           </CallOut>

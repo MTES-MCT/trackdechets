@@ -12,7 +12,6 @@ import {
   useFormikContext
 } from "formik";
 import Table from "@codegouvfr/react-dsfr/Table";
-import { formatDate } from "../../../../common/datetime";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
@@ -252,9 +251,27 @@ export default function Appendix2MultiSelect({
           <div style={{ wordBreak: "break-word", wordWrap: "break-word" }}>
             {form.readableId}
           </div>,
-          form.wasteDetails?.code,
+          <div>
+            <p>{form.wasteDetails?.code}</p>
+            <p
+              style={{
+                maxHeight: "25px",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+              }}
+              aria-describedby={form.readableId}
+            >
+              {form.wasteDetails?.name}
+            </p>
+            <span
+              className="fr-tooltip fr-placement"
+              id={form.readableId}
+              role="tooltip"
+            >
+              {form.wasteDetails?.name}
+            </span>
+          </div>,
           `${form.emitter?.company?.name} (${form.emitter?.company?.orgId})`,
-          form.signedAt && formatDate(form.signedAt),
           form.processingOperationDone,
           quantityAccepted.toNumber(),
           quantityLeft.toNumber(),
@@ -334,7 +351,6 @@ export default function Appendix2MultiSelect({
       "Numéro",
       "Code déchet",
       "Émetteur initial",
-      "Date de l'acceptation",
       "Opération réalisée",
       "Qté acceptée (en T)",
       "Qté restante (en T)",

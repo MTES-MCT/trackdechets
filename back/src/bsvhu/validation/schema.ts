@@ -224,7 +224,8 @@ const rawBsvhuSchema = z.object({
     .array(intermediarySchema)
     .nullish()
     .superRefine(intermediariesRefinement),
-  intermediariesOrgIds: z.array(z.string()).optional()
+  intermediariesOrgIds: z.array(z.string()).optional(),
+  containsElectricOrHybridVehicles: z.boolean().nullish()
 });
 
 // Type inféré par Zod - avant parsing

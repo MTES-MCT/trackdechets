@@ -323,9 +323,11 @@ model Company {
 
   delegatorRegistryDelegations RegistryDelegation[] @relation("RegistryDelegationDelegator")
   delegateRegistryDelegations  RegistryDelegation[] @relation("RegistryDelegationDelegate")
-  
+
   registryReportedForChangeAggregates RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedFor")
   registryReportedAsChangeAggregates  RegistryChangeAggregate[] @relation("RegistryChangeAggregatesReportedAs")
+
+  adminRequests AdminRequest[] @relation("AdminRequestCompany")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -934,10 +936,10 @@ model User {
   StatusLog             StatusLog[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[]               @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]               @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]               @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]               @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]                 @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]                 @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]                 @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]                 @relation("BsdasriOperationSignature")
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
@@ -951,6 +953,7 @@ model User {
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
+  adminRequests              AdminRequest[] @relation("AdminRequestUser")
 }
 
 enum GovernmentPermission {
@@ -1110,6 +1113,7 @@ model Bsvhu {
   transporterTransportMode                            TransportMode?           @default(ROAD)
   transporterTransportPlates                          String[]
   transporterRecepisseIsExempted                      Boolean?
+  containsElectricOrHybridVehicles                    Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
@@ -1319,6 +1323,8 @@ model Bsdasri {
   finalOperations              BsdasriFinalOperation[] @relation("FinalOperationToInitialBsdasri")
   FinalOperationToFinalBsdasri BsdasriFinalOperation[] @relation("FinalOperationToFinalBsdasri")
 
+  canAccessDraftOrgIds String[] @default([])
+
   // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
@@ -1328,6 +1334,7 @@ model Bsdasri {
   @@index([ecoOrganismeSiret], map: "_BsdasriEcoOrganismeSiretIdx")
   @@index([synthesizedInId], map: "_BsdasriSynthesizedInIdIdx")
   @@index([groupedInId], map: "_BsdasriGroupedInIdIdx")
+  @@index([canAccessDraftOrgIds], map: "_BsdasriCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsdasriStatusIdx")
   @@index([type], map: "_BsdasriTypeIdx")
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
@@ -2104,6 +2111,52 @@ model AdministrativeTransfer {
   to         Company?                     @relation("AdministrativeTransferTo", fields: [toId], references: [id], onDelete: Cascade)
   approvedAt DateTime?                    @db.Timestamptz(6)
   status     AdministrativeTransferStatus @default(PENDING)
+}
+
+model AdminRequest {
+  id         String                       @id @default(cuid())
+  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+
+  // The user initiating the request, wanting to be promoted to admin
+  userId    String  @db.VarChar(30)
+  user User  @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  // The orgId of the company the user wants to be admin of
+  companyId String @db.VarChar(30)
+  company Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
+
+  // The collaborator who has been asked to approve the request 
+  collaboratorId String?  @db.VarChar(30)
+
+  // The code sent by mail to self-validate the request
+  code  String? @db.VarChar(8)
+  codeAttempts Int @default(0)
+
+  // End of the period during which only the admin can accept the request
+  adminOnlyEndDate DateTime?
+
+  status AdminRequestStatus @default(PENDING)
+
+  validationMethod AdminRequestValidationMethod
+
+  // Indexes
+  @@index([userId, companyId], map: "_AdminRequestUserIdCompanyIdIdx")
+  @@index([status], map: "_AdminRequestStatusIdx")
+}
+
+enum AdminRequestStatus {
+  PENDING
+  ACCEPTED 
+  REFUSED
+  BLOCKED
+  EXPIRED
+}
+
+enum AdminRequestValidationMethod {
+  REQUEST_ADMIN_APPROVAL
+  REQUEST_COLLABORATOR_APPROVAL
+  SEND_MAIL
 }
 
 enum AdministrativeTransferStatus {

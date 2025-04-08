@@ -122,7 +122,7 @@ export default function AccountApplicationsAccessTokens() {
           href={DEVELOPERS_DOCUMENTATION_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="fr-link"
+          className="fr-link force-external-link-content force-underline-link"
         >
           Découvrir l'utilisation des jetons d'accès à l'API Trackdéchets
         </a>

@@ -21,6 +21,18 @@ const ADD_TO_MANAGED_REGISTRY = gql`
         publicId
         message
       }
+      inserted {
+        publicId
+      }
+      edited {
+        publicId
+      }
+      skipped {
+        publicId
+      }
+      cancelled {
+        publicId
+      }
     }
   }
 `;
@@ -227,5 +239,50 @@ describe("Registry - addToManagedRegistry", () => {
       where: { publicId: line.publicId, isLatest: true }
     });
     expect(result.wasteCodeBale).toBe("A1070");
+  });
+
+  it("should return public identifiers by status (inserted, edited, skipped, cancelled)", async () => {
+    const { user, company } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 3 }).map(_ =>
+      getCorrectLine(company.orgId)
+    );
+
+    // Insert lines
+    const res1 = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
+      { variables: { lines } }
+    );
+    expect(res1.data.addToManagedRegistry).toMatchObject({
+      inserted: lines.map(({ publicId }) => ({ publicId })),
+      edited: [],
+      cancelled: [],
+      skipped: []
+    });
+
+    // Edit, cancel and add already existing line that should be skipped
+    const res2 = await mutate<Pick<Mutation, "addToManagedRegistry">>(
+      ADD_TO_MANAGED_REGISTRY,
+      {
+        variables: {
+          lines: [
+            { ...lines[0], reason: "EDIT" },
+            { ...lines[1], reason: "CANCEL" },
+            lines[2]
+          ]
+        }
+      }
+    );
+
+    expect(res2.errors).toBeUndefined();
+
+    expect(res2.data.addToManagedRegistry).toMatchObject({
+      inserted: [],
+      edited: [expect.objectContaining({ publicId: lines[0].publicId })],
+      cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
+      skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
+    });
   });
 });

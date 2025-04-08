@@ -25,6 +25,9 @@ const WasteBsvhu = ({
   const isEstimate = watch("weight.isEstimate");
   const identificationNumbers = watch("identification.numbers");
   const packaging = watch("packaging");
+  const containsElectricOrHybridVehicles = watch(
+    "containsElectricOrHybridVehicles"
+  );
 
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -129,10 +132,49 @@ const WasteBsvhu = ({
           }
         ]}
       />
+
+      <div>
+        <p className="fr-mb-2w">
+          Comprend des véhicules électriques ou hybrides
+        </p>
+        <RadioButtons
+          disabled={sealedFields.includes("containsElectricOrHybridVehicles")}
+          orientation="horizontal"
+          options={[
+            {
+              label: "Oui",
+              nativeInputProps: {
+                onClick: () => {
+                  if (containsElectricOrHybridVehicles === true) {
+                    setValue("containsElectricOrHybridVehicles", null);
+                  } else {
+                    setValue("containsElectricOrHybridVehicles", true);
+                  }
+                },
+                checked: containsElectricOrHybridVehicles === true
+              }
+            },
+            {
+              label: "Non",
+              nativeInputProps: {
+                onClick: () => {
+                  if (containsElectricOrHybridVehicles === false) {
+                    setValue("containsElectricOrHybridVehicles", null);
+                  } else {
+                    setValue("containsElectricOrHybridVehicles", false);
+                  }
+                },
+                checked: containsElectricOrHybridVehicles === false
+              }
+            }
+          ]}
+        />
+      </div>
+
       <h4 className="fr-h4">Conditionnement</h4>
 
       <fieldset className="fr-fieldset">
-        <div className="fr_fieldset__content">
+        <div className="fr-fieldset__content">
           <div className="fr-radio-group">
             <input
               type="radio"
@@ -149,7 +191,7 @@ const WasteBsvhu = ({
       {packaging === "UNITE" && (
         <RadioButtons
           disabled={sealedFields.includes("identification.type")}
-          className="fr-col-sm-10 fr-ml-3w"
+          className="fr-col-sm-10 fr-pl-3w"
           options={identificationTypeOptions}
           state={formState.errors?.identification?.type && "error"}
           stateRelatedMessage={
@@ -158,17 +200,18 @@ const WasteBsvhu = ({
         />
       )}
       <fieldset className="fr-fieldset">
-        <div className="fr_fieldset__content"></div>
-        <div className="fr-radio-group">
-          <input
-            type="radio"
-            id="fr-fieldset-radio-lot"
-            value="LOT"
-            {...register("packaging")}
-          />
-          <label className="fr-label" htmlFor="fr-fieldset-radio-lot">
-            En lots (identification par numéro de lot)
-          </label>
+        <div className="fr-fieldset__content">
+          <div className="fr-radio-group">
+            <input
+              type="radio"
+              id="fr-fieldset-radio-lot"
+              value="LOT"
+              {...register("packaging")}
+            />
+            <label className="fr-label" htmlFor="fr-fieldset-radio-lot">
+              En lots (identification par numéro de lot)
+            </label>
+          </div>
         </div>
       </fieldset>
 

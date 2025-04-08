@@ -159,6 +159,7 @@ function Step1({ register }: StepProps) {
               Vous trouverez de l'aide sur le format de fichier et des exemples
               dans la{" "}
               <a
+                className="fr-link force-external-link-content force-underline-link"
                 href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
                 target="_blank"
                 rel="noreferrer"

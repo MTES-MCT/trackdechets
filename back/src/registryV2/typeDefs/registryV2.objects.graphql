@@ -1637,7 +1637,37 @@ type AddRegistryLinesStats {
   skipped: Int!
 }
 
+type AddRegistryLine {
+  publicId: ID!
+}
+
 type AddRegistryLinesResponse {
   stats: AddRegistryLinesStats!
   errors: [RegistryLineError!]
+  # Liste des identifiants (`publicId`) des déclarations qui ont été insérées
+  inserted: [AddRegistryLine!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été modifiées
+  edited: [AddRegistryLine!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été annulées
+  cancelled: [AddRegistryLine!]!
+  # Liste des identifiants (`publicId`) des déclarations qui ont été ignorées
+  skipped: [AddRegistryLine!]!
+}
+
+type RegistryLookup {
+  publicId: ID!
+  type: RegistryImportType!
+  siret: String!
+  reportAsSiret: String
+  date: DateTime!
+  createdAt: DateTime!
+  wasteCode: String
+
+  ssd: SsdWasteV2
+  incomingWaste: IncomingWasteV2
+  incomingTexs: IncomingWasteV2
+  outgoingWaste: OutgoingWasteV2
+  outgoingTexs: OutgoingWasteV2
+  managedWaste: ManagedWasteV2
+  transportedWaste: TransportedWasteV2
 }

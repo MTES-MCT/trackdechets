@@ -164,8 +164,8 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
             <p>
               Plus d'informations{" "}
               <a
-                className={`fr-link`}
-                href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
+                className={`fr-link force-external-link-content force-underline-link`}
+                href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#activer-la-tracabilite-des-dechets-non-dangereux-dans-le-registre"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -233,8 +233,8 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
             <p>
               Plus d'informations{" "}
               <a
-                className={`fr-link`}
-                href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte"
+                className={`fr-link force-external-link-content force-underline-link`}
+                href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#activer-la-tracabilite-des-dechets-non-dangereux-dans-le-registre"
                 target="_blank"
                 rel="noreferrer"
               >

@@ -205,7 +205,7 @@ export default function AccountCompanyAddProducer() {
                             href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044266537/"
                             target="_blank"
                             rel="noreferrer"
-                            className="fr-link"
+                            className="fr-link force-external-link-content force-underline-link"
                           >
                             l'article R.541-50 du code de l'environnement
                           </a>
@@ -241,7 +241,7 @@ export default function AccountCompanyAddProducer() {
                           En tant qu'administrateur de l'établissement, j'ai
                           pris connaissance des{" "}
                           <a
-                            className="fr-link"
+                            className="fr-link force-external-link-content force-underline-link"
                             href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement"
                             target="_blank"
                             rel="noreferrer"

@@ -176,13 +176,11 @@ export const generateSiretAndInitiateCompanyCreation = async (
 
   // For waste producers...
   if (isOnlyWasteProducter(roles)) {
-    // ...help message should be visible (and closable)
+    // ...help message should be visible
     const helpMessage = page.getByRole("heading", {
       name: "Vous rencontrez des difficultés dans la création d'un établissement ?"
     });
     await expect(helpMessage).toBeVisible();
-    await page.getByRole("button", { name: "Masquer le message" }).click();
-    await expect(helpMessage).not.toBeVisible();
   }
 
   // Test submitting wihout a SIRET. Should display error message
@@ -226,8 +224,12 @@ export const fillInGenericCompanyInfo = async (
   }
 
   // Select the role
-  for (const role of company.roles)
-    await page.getByText(role, { exact: true }).click();
+  for (const role of company.roles) {
+    await page
+      .getByTestId("company-type-label")
+      .getByText(role, { exact: true })
+      .click();
+  }
 
   // Select the subRole
   if (company.subRoles) {
@@ -262,7 +264,7 @@ export const fillInAmianteCertification = async (
   // Certifications inputs should appear
   const certificationsDiv = page
     .getByText("Entreprise de travaux amiante")
-    .locator("../../../../../..");
+    .locator("../../../../../../..");
   await expect(certificationsDiv).toBeVisible();
 
   // Check amiante boxes

@@ -14,6 +14,7 @@ export const CompaniesMenuContent = () => (
     <ul>
       <li className="tw-mb-1">
         <NavLink
+          end
           to={routes.companies.index}
           className={({ isActive }) =>
             isActive
@@ -22,6 +23,18 @@ export const CompaniesMenuContent = () => (
           }
         >
           Établissements
+        </NavLink>
+      </li>
+      <li className="tw-mb-1">
+        <NavLink
+          to={routes.companies.manage.index}
+          className={({ isActive }) =>
+            isActive
+              ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+              : "sidebarv2__item sidebarv2__item--indented"
+          }
+        >
+          Gestion avancée
         </NavLink>
       </li>
     </ul>

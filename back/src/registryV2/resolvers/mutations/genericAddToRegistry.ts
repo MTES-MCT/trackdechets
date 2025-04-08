@@ -15,6 +15,7 @@ import { Permission, checkUserPermissions } from "../../../permissions";
 import { getDelegatorsByDelegateForEachCompanies } from "../../../registryDelegation/database";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { AddRegistryLinesResponse } from "@td/codegen-back";
 
 const LINES_LIMIT = 1_000;
 
@@ -29,7 +30,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
   importType: ImportType,
   lines: T[],
   context: GraphQLContext
-) {
+): Promise<AddRegistryLinesResponse> {
   const options = importOptions[importType];
 
   const user = checkIsAuthenticated(context);
@@ -55,6 +56,13 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
   const { safeParseAsync, saveLine } = options;
   const errors = new Map<string, ZodIssue[]>();
+
+  // Payload permettant de renvoyer les identifiants des enregistrements
+  // par statut (insertion, modification, annulation, etc)
+  const identifiers: Pick<
+    AddRegistryLinesResponse,
+    "inserted" | "cancelled" | "edited" | "skipped"
+  > = { inserted: [], cancelled: [], edited: [], skipped: [] };
   const changesByCompany = new Map<
     string,
     { [reportAsSiret: string]: RegistryChanges }
@@ -91,6 +99,21 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         line: { ...result.data, createdById: user.id },
         importId: null
       });
+
+      switch (result.data.reason) {
+        case "MODIFIER":
+          identifiers.edited.push({ publicId: result.data.publicId });
+          break;
+        case "ANNULER":
+          identifiers.cancelled.push({ publicId: result.data.publicId });
+          break;
+        case "IGNORER":
+          identifiers.skipped.push({ publicId: result.data.publicId });
+          break;
+        default:
+          identifiers.inserted.push({ publicId: result.data.publicId });
+          break;
+      }
     } else {
       errors.set(line.publicId, result.error.issues);
     }
@@ -118,6 +141,7 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
         message,
         code
       }))
-    }))
+    })),
+    ...identifiers
   };
 }

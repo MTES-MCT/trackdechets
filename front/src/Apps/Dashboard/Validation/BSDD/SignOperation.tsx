@@ -335,7 +335,7 @@ function SignOperationModal({
             Vous hésitez sur le type d'opération à choisir ? Vous pouvez
             consulter la liste de traitement des déchets sur{" "}
             <a
-              className="fr-link"
+              className="fr-link force-external-link-content force-underline-link"
               target="_blank"
               rel="noopener noreferrer"
               href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"
@@ -424,7 +424,7 @@ function SignOperationModal({
                 Vous hésitez sur le type d'opération à choisir ? Vous pouvez
                 consulter la liste de traitement des déchets sur{" "}
                 <a
-                  className="fr-link"
+                  className="fr-link force-external-link-content force-underline-link"
                   target="_blank"
                   rel="noopener noreferrer"
                   href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"

@@ -119,6 +119,9 @@ export function FileImportsTable({ siret }: Props) {
         <div>{reportedBy}</div>,
         <div className="tw-flex">
           <Download
+            style={{
+              width: "100%"
+            }}
             details={(
               importData.node.originalFileName.split(".").pop() ?? ""
             ).toUpperCase()}

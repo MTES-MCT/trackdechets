@@ -4,7 +4,7 @@ import { Formik, FormikProps, Form, Field } from "formik";
 import { NotificationError } from "../../../common/Components/Error/Error";
 import { CompanyPrivate } from "@td/codegen-ui";
 import DateInput from "../../../../form/common/components/custom-inputs/DateInput";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../common/Components/Tooltip/Tooltip";
 
 type Props = {
   company: Pick<CompanyPrivate, "id" | "siret" | "workerCertification">;
@@ -174,7 +174,10 @@ export default function AccountFormCompanyAddWorkerCertification({
                 <tr>
                   <td>
                     Travaux relevant de la sous-section 3{" "}
-                    <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                    <Tooltip
+                      className="fr-ml-1w"
+                      title="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)"
+                    />
                   </td>
                   <td>
                     <Field

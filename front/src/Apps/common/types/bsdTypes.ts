@@ -157,7 +157,7 @@ export enum WorkflowDisplayType {
   ANNEXE_2 = "Annexe 2",
   RECONDITIONNEMENT = "Reconditionnement",
   REEXPEDITION = "Réexpédition",
-
+  Collection_2710 = "Collecte en déchèterie",
   DEFAULT = ""
 }
 

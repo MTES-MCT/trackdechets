@@ -14,7 +14,8 @@ const routes = {
     registry: "/admin/registry",
     membersAdmin: "/admin/members",
     bsdAdmin: "/admin/bsd",
-    massProfilesAdmin: "/admin/mass-profile"
+    massProfilesAdmin: "/admin/mass-profile",
+    adminRequests: "/admin/admin-requests"
   },
   login: "/login",
   invite: "/invite",
@@ -122,20 +123,34 @@ const routes = {
   companies: {
     index: "/companies",
     details: "/companies/:siret",
+    adminRequest: "/companies/:siret/admin-request/:adminRequestId",
     create: {
       simple: "/companies/new",
       pro: "/companies/professional",
       foreign: "/companies/foreign"
     },
     join: "/companies/join",
-    orientation: "/companies/create"
+    orientation: "/companies/create",
+    manage: {
+      index: "/companies/manage"
+    }
   },
   registry: "/registre",
   registry_new: {
     index: "/registry",
     myImports: "/registry/own",
     companyImports: "/registry/list",
-    export: "/registry/export"
+    export: "/registry/export",
+    lines: "/registry/lines",
+    form: {
+      ssd: "/registry/form/ssd",
+      incomingWaste: "/registry/form/incomingWaste",
+      incomingTexs: "/registry/form/incomingTexs",
+      outgoingWaste: "/registry/form/outgoingWaste",
+      outgoingTexs: "/registry/form/outgoingTexs",
+      transported: "/registry/form/transported",
+      managed: "/registry/form/managed"
+    }
   }
 };
 
@@ -219,6 +234,7 @@ export const titles = {
   "/dashboard/:siret/transport/return": "Bordereaux en retour — Trackdéchets",
   "/account": "Mon compte — Trackdéchets",
   "/account/info": "Informations sur mon compte — Trackdéchets",
+  "/account/notifications": "Mes notifications — Trackdéchets",
   "/account/companies/new":
     "Ajouter un établissement producteur de déchets — Trackdéchets",
   "/account/companies/professional":
@@ -245,6 +261,7 @@ export const titles = {
     "Ajouter un transporteur étranger, Non-French carrier — Trackdéchets",
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
+  "/companies/manage": "Gestion avancée — Trackdéchets",
   "/registre": "Mes registres — Trackdéchets",
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":

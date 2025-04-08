@@ -109,7 +109,7 @@ const CREATE_FORM = `
           type
           other
           quantity
-          volume 
+          volume
           identificationNumbers
         }
         isDangerous
@@ -118,6 +118,7 @@ const CREATE_FORM = `
         parcelNumbers {
           city
           postalCode
+          inseeCode
           prefix
           section
           number
@@ -1141,13 +1142,13 @@ describe("Mutation.createForm", () => {
     const parcelNumbers: ParcelNumber[] = [
       {
         city: "Paris",
-        postalCode: "75001",
+        inseeCode: "75001",
         x: 50.45612,
         y: 168.12546
       },
       {
         city: "Paris",
-        postalCode: "75001",
+        inseeCode: "75001",
         number: "0039",
         prefix: "000",
         section: "OS"

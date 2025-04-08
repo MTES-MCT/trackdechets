@@ -21,7 +21,11 @@ import {
 import { formToBsddV2, BsddV2 } from "./compat";
 import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import {
@@ -274,7 +278,7 @@ export const toIncomingWasteV2 = (
     workerCompanyCity: null,
     workerCompanyCountry: null,
     parcelCities: bsdd.parcelCities,
-    parcelInseeCodes: bsdd.parcelPostalCodes,
+    parcelInseeCodes: bsdd.parcelInseeCodes || bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
     sisIdentifiers: bsdd.wasteDetailsLandIdentifiers,
@@ -545,7 +549,7 @@ export const toOutgoingWasteV2 = (
     workerCompanyCity: null,
     workerCompanyCountry: null,
     parcelCities: bsdd.parcelCities,
-    parcelInseeCodes: bsdd.parcelPostalCodes,
+    parcelInseeCodes: bsdd.parcelInseeCodes || bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
     sisIdentifiers: bsdd.wasteDetailsLandIdentifiers,
@@ -1094,7 +1098,7 @@ export const toManagedWasteV2 = (
     workerCompanyCity: null,
     workerCompanyCountry: null,
     parcelCities: bsdd.parcelCities,
-    parcelInseeCodes: bsdd.parcelPostalCodes,
+    parcelInseeCodes: bsdd.parcelInseeCodes || bsdd.parcelPostalCodes,
     parcelNumbers: bsdd.parcelNumbers,
     parcelCoordinates: bsdd.parcelCoordinates,
     sisIdentifiers: bsdd.wasteDetailsLandIdentifiers,
@@ -1381,15 +1385,27 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSDD");
   await prisma.registryLookup.deleteMany({
     where: {
       bsddId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.form.count({
+    where: {
+      isDeleted: false,
+      NOT: {
+        status: "DRAFT"
+      }
+    }
+  });
 
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.form.findMany({
       where: {
@@ -1398,7 +1414,7 @@ export const rebuildRegistryLookup = async () => {
           status: "DRAFT"
         }
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -1412,14 +1428,18 @@ export const rebuildRegistryLookup = async () => {
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

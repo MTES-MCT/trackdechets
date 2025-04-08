@@ -22,7 +22,11 @@ import {
   RegistryV2Bspaoh,
   emptyTransportedWasteV2
 } from "../registryV2/types";
-import { deleteRegistryLookup, generateDateInfos } from "@td/registry";
+import {
+  createRegistryLogger,
+  deleteRegistryLookup,
+  generateDateInfos
+} from "@td/registry";
 import { logger } from "@td/logger";
 
 export const toIncomingWasteV2 = (
@@ -653,14 +657,26 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async () => {
+export const rebuildRegistryLookup = async (pageSize = 100) => {
+  const logger = createRegistryLogger("BSPAOH");
   await prisma.registryLookup.deleteMany({
     where: {
       bspaohId: { not: null }
     }
   });
+  logger.logDelete();
+
+  const total = await prisma.bspaoh.count({
+    where: {
+      isDeleted: false,
+      NOT: {
+        status: "DRAFT"
+      }
+    }
+  });
   let done = false;
   let cursorId: string | null = null;
+  let processedCount = 0;
   while (!done) {
     const items = await prisma.bspaoh.findMany({
       where: {
@@ -669,7 +685,7 @@ export const rebuildRegistryLookup = async () => {
           status: "DRAFT"
         }
       },
-      take: 100,
+      take: pageSize,
       skip: cursorId ? 1 : 0,
       cursor: cursorId ? { id: cursorId } : undefined,
       orderBy: {
@@ -683,14 +699,18 @@ export const rebuildRegistryLookup = async () => {
       createArray = createArray.concat(createInputs);
     }
     await prisma.registryLookup.createMany({
-      data: createArray
+      data: createArray,
+      skipDuplicates: true
     });
-    if (items.length < 100) {
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+    if (items.length < pageSize) {
       done = true;
-      return;
+      break;
     }
     cursorId = items[items.length - 1].id;
   }
+  logger.logCompletion(processedCount);
 };
 
 export const lookupUtils = {

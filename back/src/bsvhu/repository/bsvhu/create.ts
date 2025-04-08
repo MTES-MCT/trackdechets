@@ -31,24 +31,26 @@ export function buildCreateBsvhu(deps: RepositoryFnDeps): CreateBsvhuFn {
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+    if (bsvhu.isDraft) {
+      // For drafts, only the owner's sirets that appear on the bsd have access
+      const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+        bsvhu,
+        user.id
+      );
 
-    // For drafts, only the owner's sirets that appear on the bsd have access
-    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsvhu, user.id);
+      await prisma.bsvhu.update({
+        where: { id: bsvhu.id },
+        data: {
+          ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
+        },
+        select: {
+          id: true
+        }
+      });
+    }
 
-    const updatedBsvhu = await prisma.bsvhu.update({
-      where: { id: bsvhu.id },
-      data: {
-        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
-      },
-      include: {
-        intermediaries: true
-      }
-    });
+    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsvhu.id));
 
-    prisma.addAfterCommitCallback(() =>
-      enqueueCreatedBsdToIndex(updatedBsvhu.id)
-    );
-
-    return updatedBsvhu;
+    return bsvhu;
   };
 }

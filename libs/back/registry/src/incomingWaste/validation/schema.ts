@@ -25,7 +25,7 @@ import {
   inseeCodesSchema,
   gistridNumberSchema,
   siretSchema,
-  operationModeSchema
+  getOperationModeSchema
 } from "../../shared/schemas";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 
@@ -127,7 +127,7 @@ const inputIncomingWasteSchema = z.object({
   operationCode: getOperationCodeSchema(
     INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
   ),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   noTraceability: booleanSchema.nullish(),
   nextDestinationIsAbroad: booleanSchema.nullish(),
   gistridNumber: gistridNumberSchema,

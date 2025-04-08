@@ -52,6 +52,7 @@ describe("Mutation.publishBsdasri", () => {
     const { company: destination } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
+      userId: user.id,
       opt: {
         isDraft: true,
         ...initialData(company),
@@ -110,6 +111,7 @@ describe("Mutation.publishBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
+      userId: user.id,
       opt: {
         isDraft: true,
         ...initialData(company),

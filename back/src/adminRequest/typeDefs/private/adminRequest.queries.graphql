@@ -1,0 +1,13 @@
+type Query {
+  """
+  Renvoie la liste de demandes de l'utilisateur à l'origine de la requête (triée par updatedAt)
+  """
+  adminRequests(skip: Int, first: Int): AdminRequestConnection!
+
+  """
+  Endpoint à destination des administrateurs Trackdéchets, pour récupérer toutes les adminRequests (paginées)
+  """
+  adminRequestsAdmin(skip: Int, first: Int): AdminRequestConnection!
+
+  adminRequest(adminRequestId: ID!): AdminRequest!
+}

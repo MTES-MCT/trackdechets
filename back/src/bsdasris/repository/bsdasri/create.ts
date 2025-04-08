@@ -5,6 +5,7 @@ import {
 } from "../../../common/repository/types";
 import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
+import { getCanAccessDraftOrgIds } from "../../utils";
 
 export type CreateBsdasriFn = (
   data: Prisma.BsdasriCreateInput,
@@ -20,30 +21,41 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
       include: { synthesizing: true, grouping: true }
     });
     // denormalize synthesis emitter sirets
+    let synthesisEmitterSirets: string[] = [];
     if (bsdasri.type === BsdasriType.SYNTHESIS) {
-      const synthesisEmitterSirets = [
+      synthesisEmitterSirets = [
         ...new Set(
           bsdasri.synthesizing.map(associated => associated.emitterCompanySiret)
         )
       ].filter(Boolean);
-
-      await prisma.bsdasri.update({
-        where: { id: bsdasri.id },
-        data: { synthesisEmitterSirets }
-      });
     }
 
     // denormalize grouped emitter sirets
+    let groupingEmitterSirets: string[] = [];
     if (bsdasri.type === BsdasriType.GROUPING) {
-      const groupingEmitterSirets = [
+      groupingEmitterSirets = [
         ...new Set(bsdasri.grouping.map(grouped => grouped.emitterCompanySiret))
       ].filter(Boolean);
-
-      await prisma.bsdasri.update({
-        where: { id: bsdasri.id },
-        data: { groupingEmitterSirets }
-      });
     }
+
+    // For drafts, only the owner's sirets that appear on the bsd have access
+    let canAccessDraftOrgIds: string[] = [];
+    if (bsdasri.isDraft) {
+      canAccessDraftOrgIds = await getCanAccessDraftOrgIds(bsdasri, user.id);
+    }
+
+    const updatedBsdasri = await prisma.bsdasri.update({
+      where: { id: bsdasri.id },
+      data: {
+        ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
+        ...(bsdasri.type === BsdasriType.SYNTHESIS
+          ? { synthesisEmitterSirets }
+          : {}),
+        ...(bsdasri.type === BsdasriType.GROUPING
+          ? { groupingEmitterSirets }
+          : {})
+      }
+    });
 
     await prisma.event.create({
       data: {
@@ -56,6 +68,6 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
     });
     prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsdasri.id));
 
-    return bsdasri;
+    return updatedBsdasri;
   };
 }

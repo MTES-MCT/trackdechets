@@ -1,0 +1,339 @@
+<html>
+  <head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.11/semantic.min.css"
+    />
+
+    <style>
+      /* PAPER-CSS */
+      @page {
+        margin: 0;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      .sheet {
+        margin: 0;
+        overflow: hidden;
+        position: relative;
+        box-sizing: border-box;
+        page-break-after: always;
+      }
+
+      /** Paper sizes **/
+      body.A3 .sheet {
+        width: 297mm;
+        height: 419mm;
+      }
+
+      body.A3.landscape .sheet {
+        width: 420mm;
+        height: 296mm;
+      }
+
+      body.A4 .sheet {
+        width: 210mm;
+        height: 296mm;
+      }
+
+      body.A4.landscape .sheet {
+        width: 297mm;
+        height: 209mm;
+      }
+
+      body.A5 .sheet {
+        width: 148mm;
+        height: 209mm;
+      }
+
+      body.A5.landscape .sheet {
+        width: 210mm;
+        height: 147mm;
+      }
+
+      /** Padding area **/
+      .sheet > .padding-10mm {
+        padding: 10mm;
+      }
+
+      .sheet > .padding-15mm {
+        padding: 15mm;
+      }
+
+      .sheet > .padding-20mm {
+        padding: 20mm;
+      }
+
+      .sheet > .padding-25mm {
+        padding: 25mm;
+      }
+
+      /** For screen preview **/
+      @media screen {
+        body {
+          background: #e0e0e0;
+        }
+
+        .sheet {
+          background: white;
+          box-shadow: 0 0.5mm 2mm rgba(0, 0, 0, 0.3);
+          margin: 5mm;
+        }
+      }
+
+      /** Fix for Chrome issue #273306 **/
+      @media print {
+        body.A3.landscape {
+          width: 420mm;
+        }
+
+        body.A3,
+        body.A4.landscape {
+          width: 297mm;
+        }
+
+        body.A4,
+        body.A5.landscape {
+          width: 210mm;
+        }
+
+        body.A5 {
+          width: 148mm;
+        }
+
+        /* HIDE ON PRINT */
+        .address,
+        .pli-1,
+        .pli-2 {
+          display: none !important;
+        }
+      }
+
+      /* PAPER-CSS */
+
+      /* Helper Classes */
+      .m-no-bottom {
+        margin-bottom: 0 !important;
+      }
+
+      .m-no-top {
+        margin-top: 0 !important;
+      }
+
+      .m-no-left {
+        margin-left: 0 !important;
+      }
+
+      .m-no-right {
+        margin-right: 0 !important;
+      }
+
+      /* Helper Classes */
+
+      .address {
+        border: 2px dashed rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: calc(297mm - 214mm - 45mm);
+        left: calc(104mm);
+        height: 45mm;
+        width: 106mm;
+        float: left;
+        display: table;
+      }
+
+      .address p {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+        font-size: 20px;
+      }
+
+      .pli-1 {
+        position: absolute;
+        top: 33%;
+        border: 1px dashed rgba(0, 0, 0, 0.2);
+        width: 100%;
+      }
+
+      .pli-2 {
+        position: absolute;
+        top: 66%;
+        border: 1px dashed rgba(0, 0, 0, 0.2);
+        width: 100%;
+      }
+    </style>
+    <style>
+      body {
+        font-family: "Marianne-td", Arial, Helvetica, sans-serif;
+      }
+
+      @font-face {
+        font-family: "Marianne-td";
+        src: url("https://github.com/MTES-MCT/trackdechets-website/raw/master/src/components/assets/Marianne-Regular.woff2")
+            format("woff2"),
+          url("https://github.com/MTES-MCT/trackdechets-website/raw/master/src/components/assets/Marianne-Regular.woff")
+            format("woff");
+      }
+
+      .content {
+        margin-top: 40px;
+        font-size: 14px;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 40px;
+        width: 700px;
+      }
+
+      .footer p {
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .m-no-bottom {
+        margin-bottom: 0 !important;
+      }
+
+      .m-no-top {
+        margin-top: 0 !important;
+      }
+
+      .m-no-left {
+        margin-left: 0 !important;
+      }
+
+      .m-no-right {
+        margin-right: 0 !important;
+      }
+
+      .marianne {
+        margin-right: 20px;
+      }
+
+      .code-verification {
+        border: 1px solid black;
+        margin: auto;
+        width: 120px;
+        text-align: center;
+        font-size: x-large;
+        padding: 3px;
+      }
+
+      .steps {
+        list-style-type: decimal;
+      }
+    </style>
+  </head>
+
+  <body class="A4">
+    <!-- Each sheet element should have the class "sheet" -->
+    <!-- "padding-**mm" is optional: you can set 10, 15, 20 or 25 -->
+    <section class="sheet">
+      <div class="pli-1"></div>
+      <div class="pli-2"></div>
+
+      <div class="padding-10mm">
+        <p
+          style="
+            display: none;
+            background-color: #21314d;
+            height: 20px;
+            margin-left: -20px;
+            margin-right: -20px;
+            margin-top: 0;
+          "
+        ></p>
+
+        <div style="margin: 10px">
+          <img
+            class="marianne"
+            width="150px"
+            alt="Ministère de la Transition Écologique"
+            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/mte.svg"
+          />
+          <img
+            width="100px"
+            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/trackdechets.png"
+            alt="Trackdéchets logo"
+          />
+          <h3 class="ui header m-no-bottom">{{ expediteur.nom }}</h3>
+          <p>
+            {{ expediteur.numero }} {{ expediteur.rue }}
+            <br />
+            {{ expediteur.code_postal }} {{ expediteur.ville }}
+          </p>
+          <!-- Write HTML just like a web page -->
+          <article class="content">
+            <p>
+              <b
+                >Objet : Demande de vérification pour l’accès administrateur de
+                l’établissement {{ company.name}} - {{ company.siret }}</b
+              >
+            </p>
+            <br />
+
+            <p>À l’attention de {{ user.name }},</p>
+            <br />
+
+            <p>Madame, Monsieur,</p>
+            <p>
+              À la suite de votre demande pour obtenir les droits administrateur
+              au sein de l’établissement {{ company.name}} - {{ company.siret
+              }}, nous vous adressons ce courrier à titre de vérification. Les
+              administrateurs actuels de l'établissement concerné étant inactifs
+              ou indisponibles, nous souhaitons nous assurer de la légitimité de
+              votre démarche.
+            </p>
+            <br />
+
+            <p><b>Code de vérification</b></p>
+            <p class="code-verification">{{ code }}</p>
+
+            <p><b>Procédure de validation</b></p>
+            <p>Pour finaliser l’accès administrateur, vous devez :</p>
+            <ol>
+              <li>Vous connecter à votre compte Trackdéchets,</li>
+              <li>
+                Accéder à la rubrique <b><i>Mes établissements</i></b
+                >,
+              </li>
+              <li>
+                Cliquer sur <b><i>Gestion avancée</i></b
+                >,
+              </li>
+              <li>
+                Cliquer sur <b><i>Saisir un code reçu par courrier</i></b
+                >,
+              </li>
+              <li>
+                Saisir <b><i>le SIRET de l'établissement</i></b> et
+                <b><i>le code mentionné ci-dessus.</i></b>
+              </li>
+            </ol>
+            <br />
+
+            <p>
+              Vous êtes le seul utilisateur à être habilité à saisir ce code.
+              Dès validation, et si votre demande n'a pas été refusée par un
+              administrateur entre-temps, vos droits administrateur seront
+              activés.
+            </p>
+            <p>
+              Si vous n'êtes pas à l'origine de cette demande, veuillez
+              contacter l'assistance Trackdéchets.
+            </p>
+            <br />
+
+            <p>Bien cordialement,</p>
+            <p>L'équipe Trackdéchets</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

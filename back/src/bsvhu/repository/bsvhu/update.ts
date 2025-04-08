@@ -6,6 +6,7 @@ import {
 import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
 import { objectDiff } from "../../../forms/workflow/diff";
+import { getCanAccessDraftOrgIds } from "../../utils";
 
 export type UpdateBsvhuFn = (
   where: Prisma.BsvhuWhereUniqueInput,
@@ -18,8 +19,30 @@ export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
     const { prisma, user } = deps;
 
     const previousBsvhu = await prisma.bsvhu.findUniqueOrThrow({ where });
-    const bsvhu = await prisma.bsvhu.update({ where, data });
+    const bsvhu = await prisma.bsvhu.update({
+      where,
+      data,
+      include: {
+        intermediaries: true
+      }
+    });
+    if (bsvhu.isDraft) {
+      // For drafts, only the owner's sirets that appear on the bsd have access
+      const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
+        bsvhu,
+        user.id
+      );
 
+      await prisma.bsvhu.update({
+        where: { id: bsvhu.id },
+        data: {
+          ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {})
+        },
+        select: {
+          id: true
+        }
+      });
+    }
     const { updatedAt, ...updateDiff } = objectDiff(previousBsvhu, bsvhu);
     await prisma.event.create({
       data: {

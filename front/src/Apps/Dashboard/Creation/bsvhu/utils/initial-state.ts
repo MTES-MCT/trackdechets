@@ -93,5 +93,6 @@ export default {
   trader: {
     company: getInitialCompany()
   },
-  intermediaries: [getInitialCompany()]
+  intermediaries: [getInitialCompany()],
+  containsElectricOrHybridVehicles: null
 };

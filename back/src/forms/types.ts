@@ -323,6 +323,7 @@ export type Bsdd = {
   nextDestinationProcessingOperation: string | null;
   parcelCities: string[] | null;
   parcelPostalCodes: string[] | null;
+  parcelInseeCodes: string[] | null;
   parcelNumbers: (string | null)[] | null;
   parcelCoordinates: (string | null)[] | null;
 };

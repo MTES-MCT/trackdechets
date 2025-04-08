@@ -4,7 +4,7 @@ import { Field, useFormikContext } from "formik";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
 import Packagings from "../../components/packagings/Packagings";
 import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledSteps";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "@td/codegen-ui";
 import { FieldSwitch } from "../../../../common/components";
 import { BSDA_WASTES } from "@td/constants";
@@ -144,7 +144,7 @@ export function WasteInfoWorker({ disabled }) {
             <span>
               Le déchet contient des{" "}
               <a
-                className="tw-underline"
+                className="fr-link force-external-link-content force-underline-link"
                 href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -156,7 +156,7 @@ export function WasteInfoWorker({ disabled }) {
         />
         <div className="tw-ml-1">
           <Tooltip
-            msg="Le terme POP recouvre un ensemble de substances organiques qui
+            title="Le terme POP recouvre un ensemble de substances organiques qui
         possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles."
           />
         </div>
@@ -213,12 +213,12 @@ export function WasteInfoWorker({ disabled }) {
         <>
           <h4 className="form__section-heading">
             Numéros de scellés{" "}
-            <Tooltip msg="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
+            <Tooltip title="Ils peuvent être remplis au moment de la signature. Vous n'êtes pas obligé de les compléter à la création du bordereau." />
           </h4>
           <div className="form__row">
             <label htmlFor="waste.sealNumbers">
-              Numéros de scellés
-              <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+              Numéros de scellés{" "}
+              <Tooltip title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
             </label>
             <TagsInput name="waste.sealNumbers" disabled={disabled} />
           </div>

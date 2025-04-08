@@ -8,7 +8,7 @@ import {
 import React, { useMemo, lazy } from "react";
 import TdSwitch from "../../../../common/components/Switch";
 import { Form, ParcelNumber } from "@td/codegen-ui";
-import Tooltip from "../../../../common/components/Tooltip";
+import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
 const TagsInput = lazy(
   () => import("../../../../common/components/tags-input/TagsInput")
@@ -16,7 +16,7 @@ const TagsInput = lazy(
 
 const newParcelNumber = {
   city: "",
-  postalCode: "",
+  inseeCode: "",
   prefix: "",
   number: "",
   section: ""
@@ -73,10 +73,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
                   </div>
                   <div className="form__row">
                     <label>
-                      Code postal
+                      Code INSEE de la commune
                       <Field
                         type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.postalCode`}
+                        name={`wasteDetails.parcelNumbers.${index}.inseeCode`}
                         className="td-input td-input--small"
                       />
                     </label>
@@ -104,7 +104,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
           Identifiant(s) du terrain lorsque les terres ont été extraites d'un
           terrain placé en secteur d'information sur les sols au titre de
           l'article L. 125-6 (optionnel)
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <Tooltip
+            className="fr-ml-1w"
+            title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+          />
         </label>
         <TagsInput name="wasteDetails.landIdentifiers" />
       </div>
@@ -112,7 +115,10 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
       <div className="form__row">
         <label htmlFor="wasteDetails.analysisReferences">
           Références d'analyses (optionnel)
-          <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <Tooltip
+            className="fr-ml-1w"
+            title="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun"
+          />
         </label>
         <TagsInput name="wasteDetails.analysisReferences" />
       </div>
@@ -138,14 +144,14 @@ function ParcelDetails({ index, parcelNumber, arrayHelpers }) {
     if (showParcelNumber) {
       arrayHelpers.replace(index, {
         city: parcelNumber.city,
-        postalCode: parcelNumber.postalCode,
+        inseeCode: parcelNumber.inseeCode,
         x: 0,
         y: 0
       });
     } else {
       arrayHelpers.replace(index, {
         city: parcelNumber.city,
-        postalCode: parcelNumber.postalCode,
+        inseeCode: parcelNumber.inseeCode,
         prefix: "",
         number: "",
         section: ""
@@ -184,7 +190,7 @@ function ParcelCadastral({ index }) {
         <a
           href="https://cadastre.data.gouv.fr/map"
           target="_blank"
-          className="tw-underline"
+          className="fr-link force-external-link-content force-underline-link"
           rel="noreferrer"
         >
           le site du cadastre
@@ -193,7 +199,7 @@ function ParcelCadastral({ index }) {
         <a
           href="https://errial.georisques.gouv.fr/#/"
           target="_blank"
-          className="tw-underline"
+          className="fr-link force-external-link-content force-underline-link"
           rel="noreferrer"
         >
           le site Errial

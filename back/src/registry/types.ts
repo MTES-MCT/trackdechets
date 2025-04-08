@@ -142,6 +142,7 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   traderCompanyMail: null,
   parcelCities: null,
   parcelPostalCodes: null,
+  parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
   destinationCompanyGivenName: null,
@@ -182,7 +183,8 @@ export const emptyIncomingWaste: Required<IncomingWaste> = {
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
   destinationHasCiterneBeenWashedOut: null,
-  nonRoadRegulationMention: null
+  nonRoadRegulationMention: null,
+  containsElectricOrHybridVehicles: null
 };
 
 export const emptyOutgoingWaste: Required<OutgoingWaste> = {
@@ -286,6 +288,7 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   postTempStorageDestinationCountry: null,
   parcelCities: null,
   parcelPostalCodes: null,
+  parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
   destinationCompanyGivenName: null,
@@ -326,7 +329,8 @@ export const emptyOutgoingWaste: Required<OutgoingWaste> = {
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
   destinationHasCiterneBeenWashedOut: null,
-  nonRoadRegulationMention: null
+  nonRoadRegulationMention: null,
+  containsElectricOrHybridVehicles: null
 };
 
 export const emptyTransportedWaste: Required<TransportedWaste> = {
@@ -455,7 +459,8 @@ export const emptyTransportedWaste: Required<TransportedWaste> = {
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
   destinationHasCiterneBeenWashedOut: null,
-  nonRoadRegulationMention: null
+  nonRoadRegulationMention: null,
+  containsElectricOrHybridVehicles: null
 };
 
 export const emptyManagedWaste: Required<ManagedWaste> = {
@@ -538,6 +543,7 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   nextDestinationProcessingOperation: null,
   parcelCities: null,
   parcelPostalCodes: null,
+  parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
   brokerCompanyMail: null,
@@ -580,7 +586,8 @@ export const emptyManagedWaste: Required<ManagedWaste> = {
   destinationReceptionRefusedWeight: null,
   weight: null,
   destinationHasCiterneBeenWashedOut: null,
-  nonRoadRegulationMention: null
+  nonRoadRegulationMention: null,
+  containsElectricOrHybridVehicles: null
 };
 
 export const emptyAllWaste: Required<AllWaste> = {
@@ -702,6 +709,7 @@ export const emptyAllWaste: Required<AllWaste> = {
   traderCompanyMail: null,
   parcelCities: null,
   parcelPostalCodes: null,
+  parcelInseeCodes: null,
   parcelNumbers: null,
   parcelCoordinates: null,
   destinationCompanyGivenName: null,
@@ -742,5 +750,6 @@ export const emptyAllWaste: Required<AllWaste> = {
   emitterCompanyCountry: null,
   emitterCompanyPostalCode: null,
   destinationHasCiterneBeenWashedOut: null,
-  nonRoadRegulationMention: null
+  nonRoadRegulationMention: null,
+  containsElectricOrHybridVehicles: null
 };

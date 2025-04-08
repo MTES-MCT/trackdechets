@@ -13,6 +13,7 @@ export const SirenePDFUploadDisabledFallbackError = () => (
             Nous n'avons pas pu récupérer les informations de cet établissement
             car il n'est pas diffusible. Veuillez nous contacter via{" "}
             <a
+              className="fr-link force-external-link-content force-underline-link"
               href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
               target="_blank"
               rel="noreferrer"
@@ -25,6 +26,7 @@ export const SirenePDFUploadDisabledFallbackError = () => (
             RDV sur{" "}
           </span>
           <a
+            className="fr-link force-external-link-content force-underline-link"
             href="https://avis-situation-sirene.insee.fr/"
             target="_blank"
             rel="noreferrer"

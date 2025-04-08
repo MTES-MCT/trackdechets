@@ -67,6 +67,7 @@ export default function AccountApplicationsAccessTokenCreate({
             <p>
               Ce jeton est confidentiel, ne le diffusez pas et consultez nos{" "}
               <a
+                className="fr-link force-external-link-content force-underline-link"
                 href={`${DEVELOPERS_DOCUMENTATION_URL}/tutoriels/quickstart/access-token`}
                 target="_blank"
                 rel="noreferrer"

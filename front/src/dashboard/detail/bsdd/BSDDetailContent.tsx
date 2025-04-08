@@ -148,7 +148,7 @@ const TempStorage = ({ form }) => {
             value={
               temporaryStorageDetail?.wasteDetails?.nonRoadRegulationMention
             }
-            label="Mention RID, ADNR, IMDG"
+            label="Mention RID, ADN, IMDG"
           />
 
           <PackagingRow packagingInfos={form.stateSummary?.packagingInfos} />
@@ -778,7 +778,7 @@ export default function BSDDetailContent({
             {form.status !== FormStatus.Draft && <span>{form.readableId}</span>}
 
             {!!form.customId && (
-              <span className="tw-ml-auto">Numéro libre: {form.customId}</span>
+              <span className="tw-ml-auto">Numéro libre : {form.customId}</span>
             )}
           </h4>
 
@@ -822,7 +822,7 @@ export default function BSDDetailContent({
                 value={form.wasteDetails?.parcelNumbers
                   ?.map(
                     pn =>
-                      `${pn.city} - ${pn.postalCode} - ${[
+                      `${pn.city} - ${pn?.inseeCode ?? pn?.postalCode} - ${[
                         pn.prefix,
                         pn.section,
                         pn.number,
@@ -844,7 +844,7 @@ export default function BSDDetailContent({
             <div className={styles.detailGrid}>
               <dt>Mention ADR</dt>
               <dd>{getFormStateSummaryADRMention(form?.stateSummary)}</dd>
-              <dt>Mention RID, ADNR, IMDG</dt>
+              <dt>Mention RID, ADN, IMDG</dt>
               <dd>{form?.stateSummary?.nonRoadRegulationMention}</dd>
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
               {form?.wasteDetails?.sampleNumber && (

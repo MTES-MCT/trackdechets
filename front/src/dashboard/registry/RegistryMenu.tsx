@@ -5,7 +5,11 @@ import { NavLink } from "react-router-dom";
 import SideBar from "../../Apps/common/Components/SideBar/SideBar";
 import routes from "../../Apps/routes";
 
-export const RegistryMenuContent = () => (
+export const RegistryMenuContent = ({
+  canViewRegistryIHM
+}: {
+  canViewRegistryIHM: boolean;
+}) => (
   <div>
     <Accordion defaultExpanded label="Registre national" className="fr-mt-4w">
       <ul>
@@ -33,6 +37,20 @@ export const RegistryMenuContent = () => (
             Imports par établissement
           </NavLink>
         </li>
+        {canViewRegistryIHM && (
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.lines}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Déclarations
+            </NavLink>
+          </li>
+        )}
       </ul>
     </Accordion>
     <Accordion defaultExpanded label="Exports">
@@ -69,9 +87,12 @@ export const RegistryMenuContent = () => (
 );
 
 export default function RegistryMenu() {
+  const canViewRegistryIHM =
+    import.meta.env.VITE_FLAG_REGISTRY_V2_IHM === "true";
+
   return (
     <SideBar>
-      <RegistryMenuContent />
+      <RegistryMenuContent canViewRegistryIHM={canViewRegistryIHM} />
     </SideBar>
   );
 }

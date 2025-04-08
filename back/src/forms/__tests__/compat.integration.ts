@@ -303,6 +303,7 @@ describe("simpleFormToBsdd", () => {
       parcelCoordinates: null,
       parcelNumbers: null,
       parcelPostalCodes: null,
+      parcelInseeCodes: null,
       destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
       destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason
     });
@@ -659,6 +660,7 @@ describe("simpleFormToBsdd", () => {
       parcelCoordinates: null,
       parcelNumbers: null,
       parcelPostalCodes: null,
+      parcelInseeCodes: null,
       forwardedInId: null,
       forwarding: {
         id: form.readableId,
@@ -850,6 +852,7 @@ describe("simpleFormToBsdd", () => {
         parcelCoordinates: null,
         parcelNumbers: null,
         parcelPostalCodes: null,
+        parcelInseeCodes: null,
         forwardedInId: fullForwardedInForm.id,
         nextDestinationNotificationNumber: null,
         nextDestinationProcessingOperation: null,

@@ -807,7 +807,7 @@ export default function AccountCompanyAdd() {
                             En tant qu'administrateur de l'établissement, j'ai
                             pris connaissance des{" "}
                             <a
-                              className="fr-link"
+                              className="fr-link force-external-link-content force-underline-link"
                               href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement"
                               target="_blank"
                               rel="noreferrer"
