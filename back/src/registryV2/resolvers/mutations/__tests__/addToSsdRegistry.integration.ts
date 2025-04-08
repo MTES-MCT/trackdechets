@@ -21,10 +21,18 @@ const ADD_TO_SSD_REGISTRY = gql`
         publicId
         message
       }
-      inserted
-      edited
-      cancelled
-      skipped
+      inserted {
+        publicId
+      }
+      edited {
+        publicId
+      }
+      skipped {
+        publicId
+      }
+      cancelled {
+        publicId
+      }
     }
   }
 `;
@@ -176,7 +184,7 @@ describe("Registry - addToSsdRegistry", () => {
       { variables: { lines } }
     );
     expect(res1.data.addToSsdRegistry).toMatchObject({
-      inserted: lines.map(l => l.publicId),
+      inserted: lines.map(({ publicId }) => ({ publicId })),
       edited: [],
       cancelled: [],
       skipped: []
@@ -200,9 +208,9 @@ describe("Registry - addToSsdRegistry", () => {
 
     expect(res2.data.addToSsdRegistry).toMatchObject({
       inserted: [],
-      edited: [lines[0].publicId],
-      cancelled: [lines[1].publicId],
-      skipped: [lines[2].publicId]
+      edited: [expect.objectContaining({ publicId: lines[0].publicId })],
+      cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
+      skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
     });
   });
 });
