@@ -29,6 +29,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Après signature de la réception, un VHU reste dans l'onglet "Pour action" du destinataire [PR 4053](https://github.com/MTES-MCT/trackdechets/pull/4053)
 - Corriger l'affichage de les listes déroulantes des établissements dans l'onglet Registres [PR 4088](https://github.com/MTES-MCT/trackdechets/pull/4088)
 - Corriger l'affichage de l'onglet Transport en mobile [PR 4070](https://github.com/MTES-MCT/trackdechets/pull/4070)
+- Résolution de nombreux points liés aux Registres (imports RNDTS et exports) [PR 4091](https://github.com/MTES-MCT/trackdechets/pull/4091)
 
 #### :boom: Breaking Change
 

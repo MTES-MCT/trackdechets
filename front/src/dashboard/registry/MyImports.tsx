@@ -43,7 +43,8 @@ export function MyImports() {
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "registryImports">
   >(GET_REGISTRY_IMPORTS, {
-    variables: { ownImportsOnly: true, first: PAGE_SIZE }
+    variables: { ownImportsOnly: true, first: PAGE_SIZE },
+    fetchPolicy: "cache-and-network"
   });
 
   const [getDownloadLink] = useLazyQuery<
