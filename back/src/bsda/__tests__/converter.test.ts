@@ -36,6 +36,21 @@ describe("expandBsdaFromDb", () => {
       destination: { reception: { weight: 4.06 } }
     });
   });
+
+  it("should set packagings.identificationNumbers to an empty array if not present", () => {
+    const dbInput = {
+      packagings: [{ type: "BIG_BAG", quantity: 1 }]
+    };
+    const expanded = expandBsdaFromDb(dbInput as any);
+    expect(expanded.packagings).toEqual([
+      expect.objectContaining({
+        type: "BIG_BAG",
+        quantity: 1,
+        volume: null,
+        identificationNumbers: []
+      })
+    ]);
+  });
 });
 
 describe("flattenBsdaRevisionRequestInput", () => {
