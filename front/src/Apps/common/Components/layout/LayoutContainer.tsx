@@ -10,7 +10,6 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
@@ -272,15 +271,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth>
                 <CompaniesRoutes />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.registry}
-            element={
-              <RequireAuth>
-                <Exports />
               </RequireAuth>
             }
           />

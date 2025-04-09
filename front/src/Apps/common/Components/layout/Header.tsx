@@ -347,17 +347,6 @@ function DashboardSubNav({
           </div>
         </li>
       )}
-      {showRegistryTab && (
-        <li className="fr-nav__item">
-          <MenuLink
-            entry={{
-              navlink: true,
-              caption: "Mes registres",
-              href: routes.registry
-            }}
-          />
-        </li>
-      )}
       {showRegistryTab && canViewNewRegistry && (
         <li className="fr-nav__item">
           <button
@@ -570,11 +559,6 @@ const getDesktopMenuEntries = (
   ];
 
   const registry = [
-    {
-      caption: "Mes registres",
-      href: routes.registry,
-      navlink: true
-    },
     ...(canViewNewRegistry
       ? [
           {

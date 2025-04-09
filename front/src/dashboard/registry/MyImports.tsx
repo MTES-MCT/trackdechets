@@ -149,6 +149,7 @@ export function MyImports() {
         <div className="tw-flex tw-gap-6">
           <div>
             <Button
+              id="import-registry-btn"
               priority="primary"
               iconId="fr-icon-upload-line"
               iconPosition="right"

@@ -10,7 +10,7 @@ export const RegistryMenuContent = ({
 }: {
   canViewRegistryIHM: boolean;
 }) => (
-  <div>
+  <>
     <Accordion defaultExpanded label="Registre national" className="fr-mt-4w">
       <ul>
         <li className="tw-mb-1">
@@ -64,7 +64,19 @@ export const RegistryMenuContent = ({
                 : "sidebarv2__item sidebarv2__item--indented"
             }
           >
-            Mes exports
+            Règlementaires
+          </NavLink>
+        </li>
+        <li className="tw-mb-1">
+          <NavLink
+            to={routes.registry_new.exhaustive}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Exhaustif
           </NavLink>
         </li>
       </ul>
@@ -83,7 +95,7 @@ export const RegistryMenuContent = ({
         Donnez votre avis
       </Button>
     </div>
-  </div>
+  </>
 );
 
 export default function RegistryMenu() {

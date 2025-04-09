@@ -135,13 +135,13 @@ const routes = {
       index: "/companies/manage"
     }
   },
-  registry: "/registre",
   registry_new: {
     index: "/registry",
     myImports: "/registry/own",
     companyImports: "/registry/list",
     export: "/registry/export",
     lines: "/registry/lines",
+    exhaustive: "/registry/exhaustive",
     form: {
       ssd: "/registry/form/ssd",
       incomingWaste: "/registry/form/incomingWaste",
@@ -262,11 +262,11 @@ export const titles = {
   "/companies/join": "",
   "/companies/create": "Ajouter un établissement — Trackdéchets",
   "/companies/manage": "Gestion avancée — Trackdéchets",
-  "/registre": "Mes registres — Trackdéchets",
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":
     "Imports au registre national par établissement — Trackdéchets",
-  "/registry/export": "Mes exports de registres — Trackdéchets",
+  "/registry/export": "Exports règlementaires— Trackdéchets",
+  "/registry/exhaustive": "Export exhaustif — Trackdéchets",
   "/registry/lines":
     "Déclarations par ligne au registre national — Trackdéchets"
 };
