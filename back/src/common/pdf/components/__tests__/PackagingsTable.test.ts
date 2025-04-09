@@ -49,7 +49,7 @@ describe("getPackagingsRows", () => {
     const result = getPackagingsRows(packagingInfos);
     expect(result).toEqual([
       { quantity: 2, packagingsLabel: "Fûts 30l" },
-      { quantity: 1, packagingsLabel: "GRV 1000l" }
+      { quantity: 1, packagingsLabel: "Grand Récipient Vrac (GRV) 1000l" }
     ]);
   });
 
