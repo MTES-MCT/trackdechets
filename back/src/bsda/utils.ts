@@ -1,6 +1,15 @@
 import { getUserCompanies } from "../users/database";
 import { BsdaWithIntermediaries, BsdaWithTransporters } from "./types";
 
+export const PACKAGINGS_NAMES = {
+  BIG_BAG: "Big-bag / GRV",
+  DEPOT_BAG: "Dépôt-bag",
+  PALETTE_FILME: "Palette filmée",
+  SAC_RENFORCE: "Sac renforcé",
+  CONTENEUR_BAG: "Conteneur-bag",
+  OTHER: "Autre - "
+};
+
 export const getCanAccessDraftOrgIds = async (
   bsda: BsdaWithIntermediaries & BsdaWithTransporters,
   userId: string
