@@ -2,7 +2,6 @@ import React, { lazy, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
-import Packagings from "../../components/packagings/Packagings";
 import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledSteps";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "@td/codegen-ui";
@@ -11,10 +10,7 @@ import { BSDA_WASTES } from "@td/constants";
 import { BsdaContext } from "../../FormContainer";
 import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
 import FormikPackagingList from "../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
-import {
-  bsdaPackagingTypes,
-  bsddPackagingTypes
-} from "../../../../Apps/Forms/Components/PackagingList/helpers";
+import { bsdaPackagingTypes } from "../../../../Apps/Forms/Components/PackagingList/helpers";
 const TagsInput = lazy(
   () => import("../../../../common/components/tags-input/TagsInput")
 );
