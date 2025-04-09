@@ -19,7 +19,6 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { totalPackagings } from "./helpers";
 import { mergePackagings } from "../../../../common/packagings";
 
 type Appendix2MultiSelectProps = {
