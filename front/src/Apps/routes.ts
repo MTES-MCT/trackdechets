@@ -266,7 +266,9 @@ export const titles = {
   "/registry/own": "Mes imports au registre national — Trackdéchets",
   "/registry/list":
     "Imports au registre national par établissement — Trackdéchets",
-  "/registry/export": "Mes exports de registres — Trackdéchets"
+  "/registry/export": "Mes exports de registres — Trackdéchets",
+  "/registry/lines":
+    "Déclarations par ligne au registre national — Trackdéchets"
 };
 
 export default routes;
