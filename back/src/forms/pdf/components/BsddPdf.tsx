@@ -38,7 +38,7 @@ import {
 } from "@prisma/client";
 import { getEmptyReturnADRLabel } from "../../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../../helpers/citerneNotWashedOutReason";
-import { getPackagingsRows } from "../helpers";
+import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
 
 type GroupeInBsd = {
   readableId: string;
@@ -233,10 +233,6 @@ function RecipientFormCompanyFields({
   );
 }
 
-type PackagingInfosTableProps = {
-  packagingInfos: PackagingInfo[];
-};
-
 type TransporterFormCompanyFieldsProps = {
   transporter?: Omit<Transporter, "id"> | null;
   takenOverAt?: Date | null;
@@ -288,38 +284,6 @@ export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
           .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
           .join(", ");
   return `Autre (${otherPackagingsSummary})`;
-}
-
-function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
-  const packagingsRows = getPackagingsRows(packagingInfos);
-  return (
-    <table>
-      <thead>
-        <tr>
-          <th>Conditionnement</th>
-          <th>Nombre</th>
-        </tr>
-      </thead>
-      <tbody>
-        {packagingsRows.map(({ quantity, packagingsLabel }, idx) => (
-          <tr key={idx}>
-            <td>{packagingsLabel}</td>
-            <td>{quantity}</td>
-          </tr>
-        ))}
-        {packagingsRows.length > 1 && (
-          <tr key={packagingsRows.length}>
-            <td>
-              <b>TOTAL</b>
-            </td>
-            <td>
-              {packagingsRows.reduce((total, p) => total + p.quantity, 0)}
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  );
 }
 
 export function BsddPdf({
@@ -684,8 +648,8 @@ export function BsddPdf({
             {form.isDirectSupply ? (
               <p>Acheminement direct par pipeline ou convoyeur</p>
             ) : (
-              <PackagingInfosTable
-                packagingInfos={form.wasteDetails?.packagingInfos ?? []}
+              <PackagingsTable
+                packagings={form.wasteDetails?.packagingInfos ?? []}
               />
             )}
           </div>
