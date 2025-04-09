@@ -10,7 +10,6 @@ import type {
   Form as GraphQLForm,
   FormCompany,
   InitialFormFraction,
-  PackagingInfo,
   Transporter,
   TransportSegment
 } from "@td/codegen-back";
@@ -273,17 +272,6 @@ function TransporterFormCompanyFields({
       </div>
     </div>
   );
-}
-
-export function getOtherPackagingLabel(packagingInfos: PackagingInfo[]) {
-  const otherPackagings = packagingInfos.filter(p => p.type === "AUTRE");
-  const otherPackagingsSummary =
-    otherPackagings.length === 0
-      ? "à préciser"
-      : otherPackagings
-          .map(({ quantity, other }) => `${quantity} ${other ?? "?"}`)
-          .join(", ");
-  return `Autre (${otherPackagingsSummary})`;
 }
 
 export function BsddPdf({
@@ -985,8 +973,8 @@ export function BsddPdf({
                     uniquement)
                   </strong>
                 </p>
-                <PackagingInfosTable
-                  packagingInfos={
+                <PackagingsTable
+                  packagings={
                     isRepackaging
                       ? form.temporaryStorageDetail?.wasteDetails
                           ?.packagingInfos ?? []
