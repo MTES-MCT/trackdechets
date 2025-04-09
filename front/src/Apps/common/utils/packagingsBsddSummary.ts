@@ -1,18 +1,13 @@
-import { PackagingInfo, Packagings } from "@td/codegen-ui";
+import { BsdaPackaging, PackagingInfo, Packagings } from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
-
-export const PACKAGINGS_NAMES = {
-  [Packagings.Benne]: "Benne",
-  [Packagings.Citerne]: "Citerne",
-  [Packagings.Fut]: "Fût",
-  [Packagings.Grv]: "GRV",
-  [Packagings.Autre]: "Autre"
-};
+import { packagingTypeLabels } from "../../Forms/Components/PackagingList/helpers";
 
 // Renvoie un résumé des conditionnements de la forme suivante :
 // 7 colis : 2 Fûts de 50 litres (n° cont1, cont2), 5 GRVs de 1 litre (n° GRV1, GRV2, GRV3)
-export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
+export function getPackagingInfosSummary<
+  P extends PackagingInfo | BsdaPackaging
+>(packagingInfos: P[]) {
   const total = packagingInfos.reduce(
     (acc, packagingInfo) => acc + packagingInfo.quantity,
     0
@@ -28,12 +23,12 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
       const name =
         packagingInfo.type === Packagings.Autre
           ? [
-              PACKAGINGS_NAMES[Packagings.Autre],
+              packagingTypeLabels[Packagings.Autre],
               packagingInfo.other ? `(${packagingInfo.other})` : null
             ]
               .filter(Boolean)
               .join(" ")
-          : PACKAGINGS_NAMES[packagingInfo.type];
+          : packagingTypeLabels[packagingInfo.type];
 
       let summary = `${packagingInfo.quantity} ${pluralize(
         name,
