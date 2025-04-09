@@ -21,7 +21,6 @@ import { Loader } from "../../../../../common/Components";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
 import { BsdTypename } from "../../../../../common/types/bsdTypes";
-import { BsdPackagings } from "../../common/Components/Packagings/RhfPackagings";
 import {
   PACKAGINGS_BSD_NAMES,
   resetPackagingIfUnchanged
