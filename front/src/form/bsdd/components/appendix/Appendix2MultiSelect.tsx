@@ -20,6 +20,7 @@ import NonScrollableInput from "../../../../Apps/common/Components/NonScrollable
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { totalPackagings } from "./helpers";
+import { mergePackagings } from "../../../../common/packagings";
 
 type Appendix2MultiSelectProps = {
   // Résultat de la query `appendixForms` executé
@@ -181,7 +182,13 @@ export default function Appendix2MultiSelect({
       .toNumber();
 
     updateTotalQuantity(totalQuantity);
-    updatePackagings(totalPackagings(currentlyAnnexedForms));
+    updatePackagings(
+      mergePackagings(
+        currentlyAnnexedForms.flatMap(({ form, quantity }) => {
+          return quantity ? form.wasteDetails?.packagingInfos ?? [] : [];
+        })
+      )
+    );
   }, [currentlyAnnexedForms, updateTotalQuantity, updatePackagings]);
 
   // Auto-complète la quantité totale à partir des annexes 2 sélectionnées
