@@ -12,6 +12,7 @@ function FormikPackagingForm({
   fieldName,
   packaging,
   packagingsLength,
+  packagingTypes,
   idx,
   disabled = false
 }: RenderPackagingFormProps) {
@@ -78,6 +79,7 @@ function FormikPackagingForm({
         <PackagingForm
           packaging={packaging}
           packagingsLength={packagingsLength}
+          packagingTypes={packagingTypes}
           disabled={disabled}
           errors={errors}
           touched={touched}

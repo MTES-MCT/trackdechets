@@ -17,7 +17,10 @@ import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icon
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { isDefined } from "../../../../../common/helper";
 import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
-import { emptyPackaging } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
+import {
+  bsddPackagingTypes,
+  emptyBsddPackaging
+} from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 interface FormWasteEmissionSummaryProps {
   form: Form;
@@ -49,7 +52,10 @@ const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   packagingInfos: () => (
     <div className="form__row">
       <h6 className="fr-h6">Conditionnement</h6>
-      <FormikPackagingList fieldName="packagingInfos" />
+      <FormikPackagingList
+        fieldName="packagingInfos"
+        packagingTypes={bsddPackagingTypes}
+      />
     </div>
   ),
   transporterNumberPlate: () => (
@@ -127,7 +133,7 @@ export function FormWasteEmissionSummary({
                 onClick={() => {
                   addField("packagingInfos");
                   if (!values.packagingInfos?.length) {
-                    setFieldValue("packagingInfos", [emptyPackaging]);
+                    setFieldValue("packagingInfos", [emptyBsddPackaging]);
                   }
                 }}
                 className="tw-ml-2"

@@ -24,6 +24,12 @@ const CREATE_DRAFT_BSDA = gql`
     createDraftBsda(input: $input) {
       id
       status
+      packagings {
+        type
+        quantity
+        volume
+        identificationNumbers
+      }
       destination {
         company {
           siret
@@ -582,7 +588,7 @@ describe("Mutation.Bsda.createDraft", () => {
 
       const { mutate } = makeClient(user);
       const { errors } = await mutate<
-        Pick<Mutation, "createForm">,
+        Pick<Mutation, "createDraftBsda">,
         MutationCreateDraftBsdaArgs
       >(CREATE_DRAFT_BSDA, {
         variables: {
@@ -598,6 +604,76 @@ describe("Mutation.Bsda.createDraft", () => {
 
       expect(errors).toBeUndefined();
     });
+
+    it("should create BSDA with volume and identificationNumbers on packagings and return it", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsda">,
+        MutationCreateDraftBsdaArgs
+      >(CREATE_DRAFT_BSDA, {
+        variables: {
+          input: {
+            packagings: [
+              {
+                type: "BIG_BAG",
+                quantity: 1,
+                volume: 1,
+                identificationNumbers: ["big-bag-1"]
+              }
+            ],
+            emitter: {
+              company: {
+                siret: company.siret
+              }
+            }
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+      expect(data.createDraftBsda.packagings).toEqual([
+        expect.objectContaining({
+          volume: 1,
+          identificationNumbers: ["big-bag-1"]
+        })
+      ]);
+    });
+
+    it(
+      "should return BSDA packagings with volume (resp. identificationNumbers)" +
+        " set to null (resp. empty array) if omitted",
+      async () => {
+        const { user, company } = await userWithCompanyFactory("MEMBER");
+        const { mutate } = makeClient(user);
+        const { data, errors } = await mutate<
+          Pick<Mutation, "createDraftBsda">,
+          MutationCreateDraftBsdaArgs
+        >(CREATE_DRAFT_BSDA, {
+          variables: {
+            input: {
+              packagings: [
+                {
+                  type: "BIG_BAG",
+                  quantity: 1
+                }
+              ],
+              emitter: {
+                company: {
+                  siret: company.siret
+                }
+              }
+            }
+          }
+        });
+        expect(errors).toBeUndefined();
+        expect(data.createDraftBsda.packagings).toEqual([
+          expect.objectContaining({
+            volume: null,
+            identificationNumbers: []
+          })
+        ]);
+      }
+    );
   });
 
   describe("closed sirets", () => {

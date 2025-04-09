@@ -12,6 +12,7 @@ function RhfPackagingForm({
   fieldName,
   packaging,
   packagingsLength,
+  packagingTypes,
   idx,
   disabled = false
 }: RenderPackagingFormProps) {
@@ -106,6 +107,7 @@ function RhfPackagingForm({
     <PackagingForm
       packaging={packaging}
       packagingsLength={packagingsLength}
+      packagingTypes={packagingTypes}
       disabled={disabled}
       errors={errors}
       touched={touched}

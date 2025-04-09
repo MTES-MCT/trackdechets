@@ -1,18 +1,27 @@
 import Select, { SelectProps } from "@codegouvfr/react-dsfr/Select";
-import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
-import React from "react";
+import {
+  BsdaPackagingInput,
+  BsdaPackagingType,
+  PackagingInfoInput,
+  Packagings
+} from "@td/codegen-ui";
+import React, { useMemo } from "react";
 import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
 import Input, { InputProps } from "@codegouvfr/react-dsfr/Input";
 import { numberToString } from "../../../Dashboard/Creation/bspaoh/utils/numbers";
 import TagsInput from "../TagsInput/TagsInput";
 import { pluralize } from "@td/constants";
+import { packagingTypeLabels } from "./helpers";
 
 export type PackagingFormProps = {
   // Valeur de `packaging` provenant du store Formik ou RHF
-  packaging: PackagingInfoInput;
+  packaging: PackagingInfoInput | BsdaPackagingInput;
   // Nombre total de conditionnement qui permet de contrôler
   // l'affichage des types de conditionnements que l'on peut ajouter.
   packagingsLength: number;
+  // Liste des types de conditionnement possible
+  // À ajuster en fonction du type de bordereau
+  packagingTypes: (Packagings | BsdaPackagingType)[];
   // Props que l'on passe aux différents champs du formulaire
   // pour qu'ils soient contrôlés via Formik (`getFieldProps(fieldName)`)
   // ou RHF (`register(fieldName)`)
@@ -34,14 +43,6 @@ export type PackagingFormProps = {
   touched?: Partial<Record<keyof PackagingInfoInput, boolean>>;
 };
 
-const packagingTypeOptions = [
-  { value: Packagings.Benne, label: "Benne" },
-  { value: Packagings.Citerne, label: "Citerne" },
-  { value: Packagings.Fut, label: "Fût" },
-  { value: Packagings.Grv, label: "Grand Récipient Vrac (GRV)" },
-  { value: Packagings.Autre, label: "Autre" }
-];
-
 /**
  * Formulaire permettant de renseigner un conditionnement (type, volume, nombre, N°).
  * Ce composant est indépendant de la librairie Formik ou RHF utilisée.
@@ -50,6 +51,7 @@ const packagingTypeOptions = [
 function PackagingForm({
   packaging,
   packagingsLength,
+  packagingTypes,
   inputProps,
   disabled = false,
   errors,
@@ -66,6 +68,15 @@ function PackagingForm({
 
   const identificationNumbersLength =
     packaging.identificationNumbers?.length ?? 0;
+
+  const packagingTypeOptions = useMemo(
+    () =>
+      packagingTypes.map(t => ({
+        value: t,
+        label: packagingTypeLabels[t]
+      })),
+    [packagingTypes]
+  );
 
   const options =
     packagingsLength > 1
