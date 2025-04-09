@@ -50,6 +50,8 @@ import {
   POP,
   TITLE_REQUEST_LIST
 } from "../../../Revision/wordingsRevision";
+import { bsdaPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
+import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 type Props = {
   bsda: Bsda;
 };
@@ -282,7 +284,10 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 initialValue={bsda.packagings}
               >
                 <p className="fr-text fr-mb-2w">Nouveaux conditionnements</p>
-                <BsdPackagings path="packagings" bsdType={BsdTypename.Bsda} />
+                <RhfPackagingList
+                  fieldName="packagings"
+                  packagingTypes={bsdaPackagingTypes}
+                />
               </RhfReviewableField>
 
               <RhfReviewableField

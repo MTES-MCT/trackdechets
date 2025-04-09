@@ -18,7 +18,6 @@ import {
   Transporter
 } from "../common/Components";
 import { getVerboseAcceptationStatus } from "../common/utils";
-import { PACKAGINGS_NAMES } from "../../../form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
