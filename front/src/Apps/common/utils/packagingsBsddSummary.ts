@@ -1,4 +1,9 @@
-import { BsdaPackaging, PackagingInfo, Packagings } from "@td/codegen-ui";
+import {
+  BsdaPackaging,
+  BsdaPackagingType,
+  PackagingInfo,
+  Packagings
+} from "@td/codegen-ui";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
 import { packagingTypeLabels } from "../../Forms/Components/PackagingList/helpers";
@@ -21,9 +26,10 @@ export function getPackagingInfosSummary<
     .sort((p1, p2) => p1.type.localeCompare(p2.type))
     .map(packagingInfo => {
       const name =
-        packagingInfo.type === Packagings.Autre
+        packagingInfo.type === Packagings.Autre ||
+        packagingInfo.type === BsdaPackagingType.Other
           ? [
-              packagingTypeLabels[Packagings.Autre],
+              packagingTypeLabels[packagingInfo.type],
               packagingInfo.other ? `(${packagingInfo.other})` : null
             ]
               .filter(Boolean)

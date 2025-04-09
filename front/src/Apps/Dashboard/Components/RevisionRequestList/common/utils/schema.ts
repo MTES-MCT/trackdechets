@@ -330,7 +330,15 @@ export const validationBsdaSchema = z.object({
               invalid_type_error: "Ce champ est requis"
             }
           ),
-          other: z.string(),
+          volume: z
+            .union([z.string(), z.number()])
+            .nullable()
+            .transform(val => (val === "" || val === null ? null : Number(val)))
+            .refine(
+              v => v === null || v > 0,
+              "Le volume doit être supérieur à 0"
+            ),
+          other: z.string().nullish(),
           quantity: z.coerce
             .number()
             .positive("Ce champ est requis est doit être supérieur à 0")

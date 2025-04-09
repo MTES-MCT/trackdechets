@@ -2,7 +2,7 @@ import React from "react";
 import { RenderPackagingFormProps } from "./PackagingList";
 import { useFormContext, useFieldArray, useController } from "react-hook-form";
 import PackagingForm from "./PackagingForm";
-import { Packagings } from "@td/codegen-ui";
+import { BsdaPackagingType, Packagings } from "@td/codegen-ui";
 import Decimal from "decimal.js";
 
 /**
@@ -114,7 +114,10 @@ function RhfPackagingForm({
       inputProps={{
         type: register(fieldPath("type"), {
           onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            if (event.target.value === Packagings.Autre) {
+            if (
+              event.target.value === Packagings.Autre ||
+              event.target.value === BsdaPackagingType.Other
+            ) {
               setValue(fieldPath("other"), "", {
                 shouldTouch: true,
                 shouldDirty: true
