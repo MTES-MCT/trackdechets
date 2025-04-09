@@ -9,8 +9,9 @@ import FormikPackagingForm from "./FormikPackagingForm";
  */
 function FormikPackagingList({
   fieldName,
+  packagingTypes,
   disabled = false
-}: Pick<PackagingListProps, "fieldName" | "disabled">) {
+}: Pick<PackagingListProps, "fieldName" | "packagingTypes" | "disabled">) {
   const [field] = useField<PackagingInfoInput[]>(fieldName);
 
   const packagings = field.value;
@@ -22,6 +23,7 @@ function FormikPackagingList({
         <PackagingList
           packagingInfos={packagings}
           fieldName={fieldName}
+          packagingTypes={packagingTypes}
           push={push}
           remove={remove}
           disabled={disabled}

@@ -25,6 +25,7 @@ import { useParams } from "react-router-dom";
 import * as yup from "yup";
 import { companySchema } from "../../../../../common/validation/schema";
 import FormikPackagingList from "../../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { bsddPackagingTypes } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 const MARK_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -176,7 +177,10 @@ const MarkAsResealedModalContent = ({ bsd, onClose }) => {
 
                 <h4>Conditionnement</h4>
 
-                <FormikPackagingList fieldName="wasteDetails.packagingInfos" />
+                <FormikPackagingList
+                  fieldName="wasteDetails.packagingInfos"
+                  packagingTypes={bsddPackagingTypes}
+                />
 
                 <h4>Quantité en tonnes</h4>
                 <div className="form__row">

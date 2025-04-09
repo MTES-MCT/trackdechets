@@ -35,6 +35,7 @@ import {
   UPDATE_BSDA_TRANSPORTER
 } from "../../../Apps/Forms/Components/query";
 import { isForeignVat } from "@td/constants";
+import { cleanPackagings } from "../../../Apps/Forms/Components/PackagingList/helpers";
 
 const GenericStepList = lazy(
   () => import("../../common/stepper/GenericStepList")
@@ -180,7 +181,7 @@ export default function BsdaStepsList(props: Props) {
   }
 
   async function onSubmit(values: BsdaFormikValues) {
-    const { id, transporters, ...input } = values;
+    const { id, transporters, packagings, ...input } = values;
 
     let transporterIds: string[] = [];
 
@@ -196,7 +197,8 @@ export default function BsdaStepsList(props: Props) {
 
     const bsdaInput: BsdaInput = {
       ...input,
-      transporters: transporterIds
+      transporters: transporterIds,
+      packagings: cleanPackagings(packagings ?? [])
     };
 
     saveBsda(bsdaInput)
