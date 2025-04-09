@@ -23,6 +23,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { getInitialState } from "../../stepper/initial-state";
 import { getInitialCompany } from "../../../../Apps/common/data/initialState";
+import { mergePackagings } from "../../../../common/packagings";
 
 type Props = { name: string; bsdaId: string };
 
@@ -73,21 +74,12 @@ export function BsdaPicker({ name, bsdaId }: Props) {
         [] as string[]
       ) ?? initialState!.waste!.sealNumbers
     );
+
     setFieldValue(
       "packagings",
-      groupedBsdas?.reduce((prev, cur) => {
-        for (const packaging of cur.packagings ?? []) {
-          const found = prev.find(
-            pp => pp.type === packaging.type && pp.other === packaging.other
-          );
-          if (found) {
-            found.quantity += packaging.quantity;
-          } else {
-            prev.push(packaging);
-          }
-        }
-        return prev;
-      }, [] as BsdaPackaging[]) ?? initialState.packagings
+      groupedBsdas.length
+        ? mergePackagings(groupedBsdas.flatMap(bsda => bsda.packagings ?? []))
+        : initialState.packagings
     );
 
     const emitterCompany =
