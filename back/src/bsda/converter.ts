@@ -687,7 +687,13 @@ export function expandBsdaRevisionRequestContent(
         postalCode: bsdaRevisionRequest.emitterPickupSitePostalCode
       })
     }),
-    packagings: bsdaRevisionRequest.packagings as BsdaPackaging[],
+    packagings: ((bsdaRevisionRequest.packagings ?? []) as BsdaPackaging[]).map(
+      p => ({
+        ...p,
+        volume: p.volume ?? null,
+        identificationNumbers: p.identificationNumbers ?? []
+      })
+    ),
     waste: nullIfNoValues<BsdaRevisionRequestWaste>({
       code: bsdaRevisionRequest.wasteCode,
       materialName: bsdaRevisionRequest.wasteMaterialName,

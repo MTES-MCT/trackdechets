@@ -20,11 +20,7 @@ import WorkSiteAddress from "../../../../../../form/common/components/work-site/
 import { Loader } from "../../../../../common/Components";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
-import { BsdTypename } from "../../../../../common/types/bsdTypes";
-import {
-  PACKAGINGS_BSD_NAMES,
-  resetPackagingIfUnchanged
-} from "../../common/Components/Packagings/packagings";
+import { resetPackagingIfUnchanged } from "../../common/Components/Packagings/packagings";
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import {
   initialBsdaReview,
@@ -51,6 +47,7 @@ import {
 } from "../../../Revision/wordingsRevision";
 import { bsdaPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
+import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
 type Props = {
   bsda: Bsda;
 };
@@ -79,6 +76,8 @@ export function BsdaRequestRevision({ bsda }: Props) {
     reset,
     formState: { errors, isSubmitting, isDirty }
   } = methods;
+
+  console.log(errors);
 
   const resetAndClose = () => {
     reset();
@@ -271,14 +270,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
               <RhfReviewableField
                 title="Conditionnement"
                 path="packagings"
-                value={bsda.packagings
-                  ?.map(
-                    p =>
-                      `${p.quantity} ${
-                        PACKAGINGS_BSD_NAMES[BsdTypename.Bsda][p.type]
-                      }`
-                  )
-                  .join(", ")}
+                value={
+                  bsda.packagings
+                    ? getPackagingInfosSummary(bsda.packagings)
+                    : ""
+                }
                 defaultValue={initialBsdaReview.packagings}
                 initialValue={bsda.packagings}
               >
