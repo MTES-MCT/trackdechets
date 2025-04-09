@@ -1,5 +1,5 @@
-import { getPackagingsRows } from "../helpers";
 import { PackagingInfo } from "@td/codegen-back";
+import { getPackagingsRows } from "../PackagingsTable";
 
 describe("getPackagingsRows", () => {
   it("should return correct rows for single type of packaging with single volume", () => {
