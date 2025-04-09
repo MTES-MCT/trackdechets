@@ -1,45 +1,62 @@
 import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react";
 import { Formik } from "formik";
-import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
+import {
+  BsdaPackagingInput,
+  BsdaPackagingType,
+  PackagingInfoInput,
+  Packagings
+} from "@td/codegen-ui";
 import FormikPackagingList from "./FormikPackagingList";
 import RhfPackagingList from "./RhfPackagingList";
 import { useForm, FormProvider } from "react-hook-form";
+import { bsdaPackagingTypes, bsddPackagingTypes } from "./helpers";
+
+type AnyPackagingInput = PackagingInfoInput | BsdaPackagingInput;
 
 describe("<PackagingList />", () => {
-  const defaulValues: { packagings: PackagingInfoInput[] } = {
+  const defaulValues: {
+    packagings: AnyPackagingInput[];
+  } = {
     packagings: [{ type: Packagings.Fut, quantity: 2 }]
   };
 
-  const renderFormikPackagingList = (initialValues?: {
-    packagings: PackagingInfoInput[];
-  }) =>
+  function renderFormikPackagingList<
+    P extends AnyPackagingInput
+  >(initialValues?: { packagings: P[] }) {
     render(
       <Formik
         initialValues={initialValues ?? defaulValues}
         onSubmit={jest.fn()}
       >
-        <FormikPackagingList fieldName="packagings" />
+        <FormikPackagingList
+          fieldName="packagings"
+          packagingTypes={[...bsddPackagingTypes, ...bsdaPackagingTypes]}
+        />
       </Formik>
     );
+  }
 
-  const renderRhfPackagingList = (initialValues?: {
-    packagings: PackagingInfoInput[];
-  }) => {
+  function renderRhfPackagingList<P extends AnyPackagingInput>(initialValues?: {
+    packagings: P[];
+  }) {
     function Component() {
       const methods = useForm({ defaultValues: initialValues ?? defaulValues });
 
       return (
         <FormProvider {...methods}>
           <form onSubmit={methods.handleSubmit(jest.fn())}>
-            <RhfPackagingList fieldName="packagings" />
+            <RhfPackagingList
+              fieldName="packagings"
+              packagingTypes={[...bsddPackagingTypes, ...bsdaPackagingTypes]}
+            />
           </form>
         </FormProvider>
       );
     }
 
     render(<Component />);
-  };
+  }
 
   type Component = "FormikPackagingList" | "RhfPackagingList";
   const components: Component[] = ["FormikPackagingList", "RhfPackagingList"];
@@ -47,7 +64,7 @@ describe("<PackagingList />", () => {
   const renderComponent = (
     component: Component,
     initialValues?: {
-      packagings: PackagingInfoInput[];
+      packagings: AnyPackagingInput[];
     }
   ) => {
     return component === "FormikPackagingList"
@@ -142,7 +159,13 @@ describe("<PackagingList />", () => {
     Packagings.Grv,
     Packagings.Fut,
     Packagings.Citerne,
-    Packagings.Autre
+    Packagings.Autre,
+    BsdaPackagingType.BigBag,
+    BsdaPackagingType.ConteneurBag,
+    BsdaPackagingType.DepotBag,
+    BsdaPackagingType.Other,
+    BsdaPackagingType.PaletteFilme,
+    BsdaPackagingType.SacRenforce
   ])(
     "[FormikPackagingList] should display unit in litres when packaging type is %p",
     async packagingType => {
@@ -160,7 +183,13 @@ describe("<PackagingList />", () => {
     Packagings.Grv,
     Packagings.Fut,
     Packagings.Citerne,
-    Packagings.Autre
+    Packagings.Autre,
+    BsdaPackagingType.BigBag,
+    BsdaPackagingType.ConteneurBag,
+    BsdaPackagingType.DepotBag,
+    BsdaPackagingType.Other,
+    BsdaPackagingType.PaletteFilme,
+    BsdaPackagingType.SacRenforce
   ])(
     "[RhfPackagingList] should display unit in litres when packaging type is %p",
     async packagingType => {
@@ -221,10 +250,22 @@ describe("<PackagingList />", () => {
   );
 
   it.each<Component>(components)(
-    "[%p] should display input 'Nom du type de conditionnement' when Type 'Autre' is selected",
+    "[%p] should display input 'Nom du type de conditionnement' when Type 'Autre' (BSDD) is selected",
     async component => {
       renderComponent(component, {
         packagings: [{ type: Packagings.Autre, quantity: 1 }]
+      });
+      expect(
+        screen.getByLabelText("Nom du type de conditionnement")
+      ).toBeInTheDocument();
+    }
+  );
+
+  it.each<Component>(components)(
+    "[%p] should display input 'Nom du type de conditionnement' when Type 'Other' (BSDA) is selected",
+    async component => {
+      renderComponent(component, {
+        packagings: [{ type: BsdaPackagingType.Other, quantity: 1 }]
       });
       expect(
         screen.getByLabelText("Nom du type de conditionnement")

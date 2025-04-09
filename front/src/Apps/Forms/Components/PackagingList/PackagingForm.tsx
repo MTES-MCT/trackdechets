@@ -38,9 +38,13 @@ export type PackagingFormProps = {
   // Permet de griser les champs pour les rendre non éditable
   disabled?: boolean;
   // Erreurs sur chacun des champs
-  errors?: Partial<Record<keyof PackagingInfoInput, string>>;
+  errors?: Partial<
+    Record<keyof (PackagingInfoInput | BsdaPackagingInput), string>
+  >;
   // Permet de savoir si les différents champs ont été visité
-  touched?: Partial<Record<keyof PackagingInfoInput, boolean>>;
+  touched?: Partial<
+    Record<keyof (PackagingInfoInput | BsdaPackagingInput), boolean>
+  >;
 };
 
 /**
@@ -159,7 +163,8 @@ function PackagingForm({
           />
         </div>
       </div>
-      {packaging.type === Packagings.Autre && (
+      {(packaging.type === Packagings.Autre ||
+        packaging.type === BsdaPackagingType.Other) && (
         <div className="fr-grid-row fr-grid-row--gutters">
           <div className="fr-col-12">
             <Input
