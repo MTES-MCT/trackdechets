@@ -8,7 +8,7 @@ import {
 } from "@td/codegen-ui";
 import { Decimal } from "decimal.js";
 import { BsdTypename } from "../../../../../../common/types/bsdTypes";
-import { isEqual } from "lodash";
+import { packagingsEqual } from "@td/constants";
 
 export const PACKAGINGS_BSD_NAMES = {
   [BsdTypename.Bsdasri]: {
@@ -120,33 +120,16 @@ export const resetPackagingIfUnchanged = (
   packagingsNewValue,
   deleteObjCallback
 ) => {
+  if (!packagingsNewValue?.length) {
+    return data;
+  }
+
   packagingsInitalValue = packagingsInitalValue.map(packaging => {
     const { __typename, ...newData } = packaging;
     return newData;
   });
 
-  const sortedPackagingsInitalValue = Object.keys(packagingsInitalValue)
-    .sort((a, b) => {
-      const typeA = a[0]["type"];
-      const typeB = b[0]["type"];
-      return typeA.localeCompare(typeB);
-    })
-    .reduce((acc, key) => {
-      acc[key] = packagingsInitalValue[key]; // Ajoute chaque propriété triée à l'objet résultat
-      return acc;
-    }, {});
-
-  const sortedPackagingsNewValue = Object.keys(packagingsNewValue)
-    .sort((a, b) => {
-      const typeA = a[0]["type"];
-      const typeB = b[0]["type"];
-      return typeA.localeCompare(typeB);
-    })
-    .reduce((acc, key) => {
-      acc[key] = packagingsNewValue[key];
-      return acc;
-    }, {});
-  if (isEqual(sortedPackagingsInitalValue, sortedPackagingsNewValue)) {
+  if (packagingsEqual(packagingsInitalValue, packagingsNewValue)) {
     deleteObjCallback();
   }
   return data;
