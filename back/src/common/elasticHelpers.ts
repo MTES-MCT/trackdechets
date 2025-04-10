@@ -1,9 +1,15 @@
 import { ApiResponse } from "@elastic/elasticsearch";
-import { UpdateByQueryResponse } from "@elastic/elasticsearch/api/types";
+import {
+  SearchResponse,
+  UpdateByQueryResponse
+} from "@elastic/elasticsearch/api/types";
 import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
+import { addMonths } from "date-fns";
+import { prisma } from "@td/prisma";
+import { toHHmmss } from "./helpers";
 
 type RevisionRequest = {
   status: RevisionRequestStatus;
@@ -13,6 +19,8 @@ type RevisionRequest = {
   authoringCompany: {
     orgId: string;
   };
+  updatedAt: Date;
+  isCanceled: boolean;
 };
 
 /**
@@ -35,23 +43,35 @@ export function getRevisionOrgIds(
         revisionRequest.authoringCompany.orgId,
         ...revisionRequest.approvals.map(a => a.approverSiret)
       ];
+
       // En fonction du statut de la demande de révision, on affecte les identifiants
       // d'établissements soit à `isInRevisionFor`, soit à `isRevisedFor`. L'utilisation
       // de `new Set(...)` permet de s'assurer que les identifiants sont uniques dans la liste.
-
-      return revisionRequest.status === "PENDING"
-        ? {
-            isInRevisionFor: [
-              ...new Set([...isInRevisionFor, ...revisionRequestOrgIds])
-            ],
+      if (revisionRequest.status === "PENDING" && !revisionRequest.isCanceled) {
+        return {
+          isInRevisionFor: [
+            ...new Set([...isInRevisionFor, ...revisionRequestOrgIds])
+          ],
+          isRevisedFor
+        };
+      }
+      // La révision a été acceptée ou refusée. On n'affiche pas celles dont l'acceptation
+      // ou le refus a plus de 6 mois.
+      else {
+        if (revisionRequest.updatedAt < addMonths(new Date(), -6)) {
+          return {
+            isInRevisionFor,
             isRevisedFor
-          }
-        : {
+          };
+        } else {
+          return {
             isInRevisionFor,
             isRevisedFor: [
               ...new Set([...isRevisedFor, ...revisionRequestOrgIds])
             ]
           };
+        }
+      }
     },
     { isInRevisionFor: [], isRevisedFor: [] }
   );
@@ -106,4 +126,134 @@ export const cleanUpIsReturnForTab = async (alias = index.alias) => {
   );
 
   return body;
+};
+
+/**
+ * Dans l'onget "Révisés", on retire les révisions acceptées / refusées / annulées
+ * de plus de 6 mois
+ */
+export const cleanUpIsRevisedForTab = async (alias = index.alias) => {
+  const size = 100;
+  const sort = { id: "ASC" };
+  const search_after = undefined;
+
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: alias,
+      body: {
+        size:
+          size +
+          // Take one more result to know if there's a next page
+          // it's removed from the actual results though
+          1,
+        query: {
+          bool: {
+            filter: [
+              {
+                exists: {
+                  field: "isReturnFor"
+                }
+              }
+            ]
+          }
+        },
+        sort,
+        search_after
+      }
+    }
+  );
+
+  console.log("body.hits", body.hits);
+  // const hits = body.hits.hits.slice(0, size);
+
+  //   logger.info(
+  //     `[cleanUpIsRevisedForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
+  //   );
+
+  // const bsddWhere = {
+  //     updatedAt: { lt: addMonths(new Date(), -6) },
+  //     OR: [
+  //       { status: { not: RevisionRequestStatus.PENDING } },
+  //       { isCanceled: true }
+  //     ]
+  //   };
+
+  //   const bsddRevisionRequestsCount = await prisma.bsddRevisionRequest.count({
+  //     where: bsddWhere,
+  //   });
+
+  //   logger.info(`${bsddRevisionRequestsCount} révisions BSDD à réindexer`);
+
+  //   const BATCH_SIZE = 100;
+  //   let lastId: string | null = null;
+  //   let finished = false;
+  //   let skip = 0;
+  //   let updatedBsdds = 0;
+  //   const startDate = new Date();
+  //   let errors = 0;
+  //   while (!finished) {
+  //     const bsddRevisionRequests = await prisma.bsddRevisionRequest.findMany({
+  //       take: BATCH_SIZE,
+  //       where: bsddWhere,
+  //       skip, // Skip the cursor
+  //       ...(lastId
+  //         ? {
+  //             cursor: {
+  //               id: lastId
+  //             }
+  //           }
+  //         : {}),
+  //       orderBy: {
+  //         createdAt: "asc"
+  //       },
+  //       select: {
+  //         id: true,
+  //         bsddId: true,
+  //       }
+  //     });
+
+  //     if (bsddRevisionRequests.length < 10) {
+  //       finished = true;
+  //     }
+  //     if (bsddRevisionRequests.length === 0) {
+  //       break;
+  //     }
+
+  //     lastId = bsddRevisionRequests[bsddRevisionRequests.length - 1].id;
+  //     skip = 1;
+
+  //     // Reindex each BSDD
+  //     for (const bsddRevisionRequest of bsddRevisionRequests) {
+  //       updatedBsdds += 1;
+
+  //       try {
+  //         // TODO: Do something here
+  //         logger.info(`Réindexation du BSDD ${bsddRevisionRequest.bsddId}`);
+  //       } catch (e) {
+  //         errors++;
+
+  //         logger.error(
+  //           `/!\\ Erreur pour le BSDD ${bsddRevisionRequest.bsddId}: ${e.message}`
+  //         );
+  //       }
+  //     }
+
+  //     // Info debug
+  //     const loopDuration = new Date().getTime() - startDate.getTime();
+  //     logger.info(
+  //       `${updatedBsdds} BSDDs réindexés en ${toHHmmss(
+  //         loopDuration
+  //       )} (temps total estimé: ${toHHmmss(
+  //         (loopDuration / updatedBsdds) * bsddRevisionRequestsCount
+  //       )})`
+  //     );
+  //   }
+
+  //   // Info debug
+  //   const duration = new Date().getTime() - startDate.getTime();
+  //   logger.info(
+  //     `${updatedBsdds} BSDDs réindexés, ${errors} erreurs (${Math.round(
+  //       (errors / bsddRevisionRequestsCount) * 100
+  //     )}%) en ${toHHmmss(duration)}!`
+  //   );
 };
