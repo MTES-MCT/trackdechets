@@ -26,7 +26,7 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
               label={[
                 field.label,
-                !field.validation.required ? "(Optionnel)" : ""
+                !field.validation.required ? "(optionnel)" : ""
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -47,7 +47,7 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
               label={[
                 field.label,
-                !field.validation.required ? "(Optionnel)" : ""
+                !field.validation.required ? "(optionnel)" : ""
               ]
                 .filter(Boolean)
                 .join(" ")}

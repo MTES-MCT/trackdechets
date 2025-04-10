@@ -9,11 +9,13 @@ import "./dropdownMenu.scss";
 
 const DropdownMenu = ({
   menuTitle,
+  ButtonElement,
   links,
   isDisabled,
   iconId,
   iconAlone,
-  primary
+  primary,
+  alignRight
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -35,26 +37,37 @@ const DropdownMenu = ({
           "dropdown-menu--primary": primary
         })}
       >
-        <button
-          id="create-bsd-btn"
-          className={classNames(
-            `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
-            {
-              isOpen: isOpen,
-              "menu-btn__iconAlone": iconAlone
-            },
-            ...(iconId ? ["fr-btn--icon-left", iconId] : [])
-          )}
-          disabled={isDisabled}
-          onClick={toggleMenu}
-          aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
-        >
-          {menuTitle}
-        </button>
+        {ButtonElement ? (
+          <ButtonElement
+            id="create-bsd-btn"
+            disabled={isDisabled}
+            onClick={toggleMenu}
+            isOpen={isOpen}
+            menuTitle={menuTitle}
+          />
+        ) : (
+          <button
+            id="create-bsd-btn"
+            className={classNames(
+              `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
+              {
+                isOpen: isOpen,
+                "menu-btn__iconAlone": iconAlone
+              },
+              ...(iconId ? ["fr-btn--icon-left", iconId] : [])
+            )}
+            disabled={isDisabled}
+            onClick={toggleMenu}
+            aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
+          >
+            {menuTitle}
+          </button>
+        )}
         {isOpen && (
           <ul
             className={classNames("dropdown-menu__content", {
-              "dropdown-menu__content__iconAlone": iconAlone
+              "dropdown-menu__content__iconAlone": iconAlone,
+              "align-right": alignRight
             })}
           >
             {links.map(link => {
@@ -80,7 +93,7 @@ const DropdownMenu = ({
                           {link.icon}
                         </span>
                       )}
-                      <span className="sr-only">{menuTitle}</span>
+                      <span className="sr-only">{link.title}</span>
                       {link.title}
                     </button>
                   ) : (
@@ -107,7 +120,7 @@ const DropdownMenu = ({
                           className={classNames([iconId, "fr-btn--icon-left"])}
                         ></span>
                       )}
-                      <span className="fr-sr-only">{menuTitle}</span>
+                      <span className="fr-sr-only">{link.title}</span>
                       {link.title}
                     </Link>
                   )}

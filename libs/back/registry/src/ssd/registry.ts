@@ -56,7 +56,8 @@ const minimalRegistryForLookupSelect = {
   reportAsCompanySiret: true,
   wasteCode: true,
   useDate: true,
-  dispatchDate: true
+  dispatchDate: true,
+  createdAt: true
 };
 
 type MinimalRegistryForLookup = Prisma.RegistrySsdGetPayload<{
@@ -78,6 +79,7 @@ const registryToLookupCreateInput = (
     ...generateDateInfos(
       (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
     ),
+    declaredAt: registrySsd.createdAt,
     registrySsdId: registrySsd.id
   };
 };
@@ -107,6 +109,7 @@ export const updateRegistryLookup = async (
         ...generateDateInfos(
           (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
         ),
+        declaredAt: registrySsd.createdAt,
         registrySsdId: registrySsd.id
       },
       create: registryToLookupCreateInput(registrySsd),

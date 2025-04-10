@@ -58,7 +58,7 @@ export function SecondaryWasteCodes({ methods }: Props) {
             methods={methods}
             key={code.id}
             name={`secondaryWasteCodes.${index}`}
-            label="Code déchet secondaire (Optionnel)"
+            label="Code déchet secondaire (optionnel)"
           />
           <div className="fr-col-4">
             <Input

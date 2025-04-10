@@ -9,8 +9,8 @@ export function FormContainer() {
   return (
     <TdModal
       onClose={() => navigate(-1)}
-      ariaLabel="Annuler"
-      closeLabel="Annuler"
+      ariaLabel="Fermer"
+      closeLabel="Fermer"
       isOpen
       size="TD_SIZE"
     >
