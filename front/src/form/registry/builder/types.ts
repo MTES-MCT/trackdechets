@@ -16,6 +16,7 @@ export type FormShapeField =
       label: string;
       validation: { required: boolean };
       choices?: { label: string; value: string | number }[];
+      noDefaultOption?: boolean;
     }
   | {
       props?: Record<string, any>;
@@ -34,6 +35,7 @@ export type FormShapeField =
     };
 
 type FormShapeItem = {
+  tabId: string;
   tabTitle: string;
   iconId?: FrIconClassName | RiIconClassName;
   fields: FormShapeField[];

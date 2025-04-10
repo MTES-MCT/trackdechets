@@ -60,7 +60,9 @@ export function FormTab({ fields, methods }: Props) {
               state={errors?.[field.name] && "error"}
               stateRelatedMessage={formatError(errors?.[field.name])}
             >
-              <option value="">Selectionnez une option</option>
+              {field.noDefaultOption ? null : (
+                <option value="">Selectionnez une option</option>
+              )}
               {field.choices?.map(choice => (
                 <option key={choice.value} value={choice.value}>
                   {choice.label}
@@ -78,7 +80,7 @@ export function FormTab({ fields, methods }: Props) {
   }
 
   return (
-    <div className="tw-overflow-y-auto tw-overflow-x-hidden">
+    <div>
       {fields.map((field, index) => {
         return (
           <div className="fr-mb-2w" key={index}>
