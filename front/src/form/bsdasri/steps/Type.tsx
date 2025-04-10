@@ -12,6 +12,7 @@ import {
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
+import { isForeignVat } from "../../../../../libs/shared/constants/src";
 
 type Props = { disabled: boolean };
 
@@ -63,13 +64,16 @@ const TRANSPORTER_OPTIONS = [
 const ALL_OPTIONS = [...COMMON_OPTIONS, ...TRANSPORTER_OPTIONS];
 
 const getTypeOptions = (data, isUpdating) => {
-  // Only tranporters can create synthesis dasris
   if (isUpdating) {
     return ALL_OPTIONS;
   }
-  return data?.companyInfos?.companyTypes?.includes(CompanyType.Transporter)
-    ? ALL_OPTIONS
-    : COMMON_OPTIONS;
+
+  // Only FR tranporters can create synthesis dasris
+  const isFrenchTransporter =
+    data?.companyInfos?.companyTypes?.includes(CompanyType.Transporter) &&
+    !isForeignVat(data?.companyInfos?.vatNumber);
+
+  return isFrenchTransporter ? ALL_OPTIONS : COMMON_OPTIONS;
 };
 
 export function Type({ disabled }: Props) {
