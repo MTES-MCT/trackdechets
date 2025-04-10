@@ -16,16 +16,17 @@ type Props = { source: "API" | "FILE"; siret: string | undefined };
 export function StatsTab({ source, siret }: Props) {
   const [window, setWindow] = useState(1);
 
-  const { loading, error, data } = useQuery<
-    Pick<Query, "registryChangeAggregates">
-  >(GET_CHANGE_AGGREGATES, {
-    variables: {
-      siret,
-      window,
-      source
-    },
-    skip: !siret
-  });
+  const { error, data } = useQuery<Pick<Query, "registryChangeAggregates">>(
+    GET_CHANGE_AGGREGATES,
+    {
+      variables: {
+        siret,
+        window,
+        source
+      },
+      skip: !siret
+    }
+  );
 
   const stats = data?.registryChangeAggregates?.reduce(
     (sum, aggregate) => {
@@ -115,7 +116,6 @@ export function StatsTab({ source, siret }: Props) {
         />
 
         <div className="fr-mt-3w">
-          {loading && <InlineLoader />}
           {error && (
             <Alert
               closable
