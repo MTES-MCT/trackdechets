@@ -4,7 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Query, WasteRegistryType } from "@td/codegen-ui";

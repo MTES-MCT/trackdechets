@@ -2,7 +2,7 @@ import { useLazyQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import React from "react";
 import { Query } from "@td/codegen-ui";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Button from "@codegouvfr/react-dsfr/Button";

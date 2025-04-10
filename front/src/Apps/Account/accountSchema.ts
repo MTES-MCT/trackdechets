@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 import { SSTI_CHARS } from "@td/constants";
 import { validatePhoneNumber } from "../../common/helper";
 

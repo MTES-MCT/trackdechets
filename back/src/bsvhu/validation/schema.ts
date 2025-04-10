@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 
 import {

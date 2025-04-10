@@ -13,7 +13,7 @@ import { BSDA_WASTES } from "@td/constants";
 import React, { useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { removeEmptyKeys } from "../../../../../../common/helper";
 import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
 import { Loader } from "../../../../../common/Components";

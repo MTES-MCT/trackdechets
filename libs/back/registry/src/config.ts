@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 
 export const envConfig = z
   .object({

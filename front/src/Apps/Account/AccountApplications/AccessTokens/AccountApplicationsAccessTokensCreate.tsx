@@ -9,7 +9,7 @@ import {
   SimpleNotificationError
 } from "../../../common/Components/Error/Error";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@codegouvfr/react-dsfr/Input";
 

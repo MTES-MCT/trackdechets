@@ -20,7 +20,7 @@ import {
   NotificationError,
   SimpleNotificationError
 } from "../../../common/Components/Error/Error";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";

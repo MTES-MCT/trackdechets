@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 
 import { BSVHU_WASTE_CODES } from "@td/constants";
 

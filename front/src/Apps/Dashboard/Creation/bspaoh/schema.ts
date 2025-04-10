@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";
 

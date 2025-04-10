@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 import { MAX_WEIGHT_TONNES, WeightUnits } from "../validation";
 
 export const weightSchema = (unit = WeightUnits.Kilogramme) => {

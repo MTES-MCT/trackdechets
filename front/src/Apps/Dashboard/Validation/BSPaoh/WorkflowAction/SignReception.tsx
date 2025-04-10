@@ -22,7 +22,7 @@ import {
 import React, { useEffect } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths } from "date-fns";
 import { useForm } from "react-hook-form";

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 import { WasteAcceptationStatus } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { isCrematoriumRefinement } from "./dynamicRefinements";

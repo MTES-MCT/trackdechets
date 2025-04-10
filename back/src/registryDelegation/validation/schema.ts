@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@td/validation";
 import { siretSchema } from "../../common/validation/zod/schema";
 import { endOfDay, startOfDay, todayAtMidnight } from "../../utils";
 

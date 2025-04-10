@@ -10,7 +10,7 @@ import CompanySelectorWrapper from "../../common/Components/CompanySelectorWrapp
 import Input from "@codegouvfr/react-dsfr/Input";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { isSiret } from "@td/constants";
 import { datetimeToYYYYMMDD } from "../../Dashboard/Validation/BSPaoh/paohUtils";
 import { startOfDay } from "date-fns";

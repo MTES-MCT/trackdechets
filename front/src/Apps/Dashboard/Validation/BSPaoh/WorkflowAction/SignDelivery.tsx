@@ -13,7 +13,7 @@ import React from "react";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { SignBspaoh } from "./SignBspaoh";
 
 import { useForm } from "react-hook-form";
