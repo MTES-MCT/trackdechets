@@ -12,7 +12,7 @@ import {
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
-import { isForeignVat } from "../../../../../libs/shared/constants/src";
+import { isForeignVat } from "@td/constants";
 
 type Props = { disabled: boolean };
 
