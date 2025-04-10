@@ -132,15 +132,15 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
                     type="button"
                     onClick={() => navigate(-1)}
                   >
-                    Annuler
+                    Fermer
                   </Button>
 
                   <Button type="submit" disabled={loading}>
                     {reason === RegistryLineReason.Edit
-                      ? "Modifier"
+                      ? "Modifier la déclaration"
                       : reason === RegistryLineReason.Cancel
-                      ? "Annuler"
-                      : "Créer"}
+                      ? "Annuler la déclaration"
+                      : "Créer la déclaration"}
                   </Button>
                 </div>
               </div>
