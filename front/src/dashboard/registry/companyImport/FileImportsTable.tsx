@@ -2,7 +2,6 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Download from "@codegouvfr/react-dsfr/Download";
-import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
@@ -19,7 +18,7 @@ import {
   badges,
   downloadFromSignedUrl
 } from "../shared";
-
+import RegistryTable from "../RegistryTable";
 type Props = { siret: string };
 
 const HEADERS = [
@@ -168,15 +167,12 @@ export function FileImportsTable({ siret }: Props) {
         </p>
       )}
       {data && tableData.length > 0 && (
-        <div>
-          <Table
-            bordered
-            fixed
-            caption="Déclarations par fichiers"
-            data={tableData}
-            headers={HEADERS}
-          />
-        </div>
+        <RegistryTable
+          data={tableData}
+          headers={HEADERS}
+          caption="Déclarations par fichiers"
+          fixed
+        />
       )}
     </div>
   );

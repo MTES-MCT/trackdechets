@@ -51,28 +51,14 @@ export const GET_REGISTRY_IMPORTS = gql`
   }
 `;
 
-export const GET_REGISTRY_LOOKUP = gql`
-  query GetRegistryLookup(
-    $siret: String!
-    $type: RegistryImportType!
-    $publicId: ID!
-  ) {
-    registryLookup(siret: $siret, type: $type, publicId: $publicId) {
-      createdAt
-      publicId
-      type
-      siret
-      reportAsSiret
-      date
-      wasteCode
-    }
-  }
-`;
-
 export const GET_REGISTRY_LOOKUPS = gql`
-  query GetRegistryLookups($siret: String!) {
-    registryLookups(siret: $siret) {
-      createdAt
+  query GetRegistryLookups(
+    $siret: String!
+    $type: RegistryImportType
+    $publicId: String
+  ) {
+    registryLookups(siret: $siret, type: $type, publicId: $publicId) {
+      declaredAt
       publicId
       type
       siret

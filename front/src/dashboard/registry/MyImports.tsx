@@ -3,7 +3,6 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Download } from "@codegouvfr/react-dsfr/Download";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
@@ -13,7 +12,6 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 
-import styles from "./MyImports.module.scss";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { ImportModal } from "./ImportModal";
 import {
@@ -24,6 +22,8 @@ import {
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
 } from "./shared";
+import RegistryTable from "./RegistryTable";
+import Container from "../../Apps/common/Components/Container/Container";
 
 const HEADERS = [
   "Importé le",
@@ -145,7 +145,7 @@ export function MyImports() {
 
   return (
     <>
-      <div className="tw-px-6 tw-py-4">
+      <Container>
         <div className="tw-flex tw-gap-6">
           <div>
             <Button
@@ -207,13 +207,7 @@ export function MyImports() {
                   </Button>
                 </div>
               </div>
-              <Table
-                bordered
-                className={styles.fullWidthTable}
-                noCaption
-                data={tableData}
-                headers={HEADERS}
-              />
+              <RegistryTable data={tableData} headers={HEADERS} />
             </div>
             <div className="tw-flex tw-justify-center">
               <Pagination
@@ -233,7 +227,7 @@ export function MyImports() {
             </div>
           </div>
         )}
-      </div>
+      </Container>
 
       <ImportModal
         isOpen={isImportModalOpen}

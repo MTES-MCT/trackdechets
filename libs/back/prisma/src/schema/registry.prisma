@@ -893,6 +893,7 @@ model RegistryLookup {
     wasteType          RegistryExportWasteType
     wasteCode          String?
     date               DateTime
+    declaredAt         DateTime                      @default(now()) @db.Timestamptz(6)
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
@@ -946,7 +947,8 @@ model RegistryLookup {
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
-    @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+    @@index([readableId], map: "_RegistryLookupReadableIdIdx")
+    @@index([siret, declaredAt(sort: Desc), declarationType], map: "_RegistryLookupLinesReadIdx")
 }
 
 enum RegistrySource {

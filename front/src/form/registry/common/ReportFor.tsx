@@ -1,9 +1,14 @@
 import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
+import { Query } from "@td/codegen-ui";
 import { type UseFormReturn, Controller } from "react-hook-form";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-
+import styles from "./ReportFor.module.scss";
 import { RegistryCompanySwitcher } from "../../../dashboard/registry/RegistryCompanySwitcher";
 import { formatError } from "../builder/error";
+import { REGISTRY_DELEGATIONS } from "../../../Apps/common/queries/registryDelegation/queries";
+import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
+import Select from "@codegouvfr/react-dsfr/Select";
 
 type Props = {
   methods: UseFormReturn<any>;
@@ -12,8 +17,21 @@ type Props = {
 };
 
 export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
-  const [showReportAs, setShowReportAs] = useState(false);
+  const [isDelegation, setIsDelegation] = useState(false);
   const { errors } = methods.formState;
+  const reportForCompanySiret = methods.watch("reportForCompanySiret");
+  const { data: registryDelegationsData, loading: registryDelegationsLoading } =
+    useQuery<Pick<Query, "registryDelegations">>(REGISTRY_DELEGATIONS, {
+      variables: {
+        where: {
+          delegatorOrgId: reportForCompanySiret,
+          givenToMe: true,
+          activeOnly: true
+        }
+      },
+      skip: !isDelegation,
+      fetchPolicy: "network-only"
+    });
 
   return (
     <div className="fr-col">
@@ -28,20 +46,73 @@ export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
               defaultSiret={field.value}
               onCompanySelect={(siret, isDelegation) => {
                 field.onChange(siret);
-                setShowReportAs(isDelegation);
+                setIsDelegation(isDelegation);
               }}
             />
           )}
         />
         {errors?.reportForCompanySiret && (
-          <Alert
-            description={formatError(errors.reportForCompanySiret)}
-            severity="error"
-            small
-          />
+          <div className="fr-col-12">
+            <Alert
+              description={formatError(errors.reportForCompanySiret)}
+              severity="error"
+              small
+            />
+          </div>
         )}
-
-        {showReportAs && (
+        {isDelegation ? (
+          registryDelegationsLoading ? (
+            <div className="fr-col-8">
+              <InlineLoader size={32} />
+            </div>
+          ) : registryDelegationsData?.registryDelegations.edges.length ? (
+            <div className="fr-col-8">
+              {registryDelegationsData.registryDelegations.edges.length ===
+              1 ? (
+                <p className={styles.delegationHint}>
+                  {`Cette déclaration sera faite en tant que :\n`}
+                  <br />
+                  <b>
+                    {`${
+                      registryDelegationsData.registryDelegations.edges[0].node
+                        .delegate.givenName ||
+                      registryDelegationsData.registryDelegations.edges[0].node
+                        .delegate.name ||
+                      ""
+                    } ${
+                      registryDelegationsData.registryDelegations.edges[0].node
+                        .delegate.orgId || ""
+                    }`}
+                  </b>
+                </p>
+              ) : (
+                <Select
+                  label={reportAsLabel}
+                  style={{ width: "100%" }}
+                  nativeSelectProps={{
+                    ...methods.register("reportAsCompanySiret")
+                  }}
+                >
+                  {registryDelegationsData.registryDelegations.edges.map(
+                    edge => (
+                      <option
+                        value={edge.node.delegate.orgId}
+                        key={edge.node.delegate.orgId}
+                      >
+                        {`${
+                          edge.node.delegate.givenName ||
+                          edge.node.delegate.name ||
+                          ""
+                        } ${edge.node.delegate.orgId || ""}`}
+                      </option>
+                    )
+                  )}
+                </Select>
+              )}
+            </div>
+          ) : null
+        ) : null}
+        {/* {isDelegation && (
           <Controller
             name="reportAsCompanySiret"
             control={methods.control}
@@ -57,7 +128,7 @@ export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
               />
             )}
           />
-        )}
+        )} */}
       </div>
     </div>
   );

@@ -1215,6 +1215,7 @@ export const toManagedWasteV2 = (
 
 const minimalBsdaForLookupSelect = {
   id: true,
+  createdAt: true,
   destinationOperationSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
@@ -1264,6 +1265,7 @@ const bsdaToLookupCreateInputs = (
       ...generateDateInfos(
         bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate
       ),
+      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   }
@@ -1289,6 +1291,7 @@ const bsdaToLookupCreateInputs = (
           transporter.transporterTransportTakenOverAt ??
             transporter.transporterTransportSignatureDate!
         ),
+        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1315,6 +1318,7 @@ const bsdaToLookupCreateInputs = (
           transporter.transporterTransportTakenOverAt ??
             transporter.transporterTransportSignatureDate!
         ),
+        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1344,6 +1348,7 @@ const bsdaToLookupCreateInputs = (
         transporter.transporterTransportTakenOverAt ??
           transporter.transporterTransportSignatureDate!
       ),
+      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   });
