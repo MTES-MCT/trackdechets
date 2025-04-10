@@ -267,6 +267,7 @@ export function MyExports() {
           <div className="tw-flex">
             <div>
               <Button
+                id="export-reglementaire-btn"
                 priority="primary"
                 iconId="fr-icon-download-line"
                 iconPosition="right"

@@ -10,6 +10,7 @@ import { MyExports } from "./MyExports";
 import { MyImports } from "./MyImports";
 import { MyLines } from "./myLines/MyLines";
 import { FormContainer } from "./myLines/FormContainer";
+import Exports from "../exports/Registry";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -48,6 +49,11 @@ export default function RegistryRoutes() {
           <Route
             path={toRelative(routes.registry_new.lines)}
             element={<MyLines />}
+          />
+
+          <Route
+            path={toRelative(routes.registry_new.exhaustive)}
+            element={<Exports />}
           />
 
           <Route
