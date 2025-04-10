@@ -8,9 +8,11 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
+import { RegistryLineReason } from "@td/codegen-ui";
 
 export const ssdFormShape: FormShape = [
   {
+    tabId: "declaration",
     tabTitle: "Déclaration",
     fields: [
       {
@@ -21,9 +23,11 @@ export const ssdFormShape: FormShape = [
         validation: { required: false },
         style: { className: "fr-col-8" },
         choices: [
-          { label: "Modifier", value: "EDIT" },
-          { label: "Annuler", value: "CANCEL" }
-        ]
+          { label: "Créer", value: "" },
+          { label: "Modifier", value: RegistryLineReason.Edit },
+          { label: "Annuler", value: RegistryLineReason.Cancel }
+        ],
+        noDefaultOption: true
       },
       {
         name: "publicId",
@@ -36,10 +40,10 @@ export const ssdFormShape: FormShape = [
       {
         Component: ReportFor,
         props: {
-          reportForLabel: "SIRET du déclarant",
-          reportAsLabel: "SIRET de l'émetteur de la déclaration"
+          reportForLabel: "SIRET de l'émetteur",
+          reportAsLabel: "SIRET du déclarant"
         },
-        names: ["reportAsCompanySiret", "reportForCompanySiret"],
+        names: ["reportForCompanySiret", "reportAsCompanySiret"],
         shape: "custom"
       },
       {
@@ -66,6 +70,7 @@ export const ssdFormShape: FormShape = [
     ]
   },
   {
+    tabId: "waste",
     tabTitle: "Déchet",
     fields: [
       {
@@ -112,6 +117,7 @@ export const ssdFormShape: FormShape = [
     ]
   },
   {
+    tabId: "processing",
     tabTitle: "Traitement",
     fields: [
       {
@@ -162,10 +168,10 @@ export const ssdFormShape: FormShape = [
               { value: "RECYCLAGE", label: "Recyclage" },
               {
                 value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisatio énergétique"
+                label: "Valorisation énergétique"
               },
-              { value: "ELIMINATION", label: "Elimination" },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" }
+              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
+              { value: "ELIMINATION", label: "Elimination" }
             ]
           }
         ]
@@ -185,6 +191,7 @@ export const ssdFormShape: FormShape = [
     ]
   },
   {
+    tabId: "destination",
     tabTitle: "Destinataire",
     fields: [
       {

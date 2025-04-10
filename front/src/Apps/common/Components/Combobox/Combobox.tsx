@@ -26,7 +26,6 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
     }
 
     const parentRect = parentRef.current.getBoundingClientRect();
-    const comboboxRect = targetRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const spaceBelow = viewportHeight - parentRect.bottom;
     const spaceAbove = parentRect.top;
@@ -41,9 +40,10 @@ export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
     const maxHeight = Math.max(spaceBelow, spaceAbove) - 20;
     targetRef.current.style.maxHeight = `${maxHeight}px`;
 
-    if (comboboxRect.height > spaceBelow && comboboxRect.height <= spaceAbove) {
-      targetRef.current.style.top = `${
-        parentRect.top + window.scrollY - comboboxRect.height
+    if (maxHeight > spaceBelow && maxHeight <= spaceAbove) {
+      // Calculate bottom position as viewport height minus parent's top position
+      targetRef.current.style.bottom = `${
+        viewportHeight - parentRect.top + window.scrollY
       }px`;
     } else {
       targetRef.current.style.top = `${parentRect.bottom + window.scrollY}px`;
