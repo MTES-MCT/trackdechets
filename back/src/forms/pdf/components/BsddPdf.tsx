@@ -345,8 +345,6 @@ export function BsddPdf({
       form.wasteDetails?.packagingInfos
     );
 
-  console.log("form.emitter?.type", form.emitter?.type);
-
   return (
     <Document title={form.readableId}>
       <div className="Page">
