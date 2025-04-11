@@ -5,7 +5,6 @@ import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import { Query, RegistryImportType } from "@td/codegen-ui";
 import { format, subDays } from "date-fns";
 import React, { useState } from "react";
-import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_CHANGE_AGGREGATES } from "../shared";
 import { Stat } from "./Stat";
 import { FileImportsTable } from "./FileImportsTable";

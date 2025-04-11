@@ -13,6 +13,7 @@ export function FormContainer() {
       closeLabel="Fermer"
       isOpen
       size="TD_SIZE"
+      hasFooter={true}
     >
       <RegistrySsdForm onClose={() => navigate(-1)} />
     </TdModal>

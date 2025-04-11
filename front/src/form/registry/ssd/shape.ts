@@ -8,28 +8,28 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
-import { RegistryLineReason } from "@td/codegen-ui";
 
 export const ssdFormShape: FormShape = [
   {
     tabId: "declaration",
     tabTitle: "Déclaration",
     fields: [
+      // {
+      //   name: "reason",
+      //   shape: "generic",
+      //   type: "select",
+      //   label: "Motif",
+      //   validation: { required: false },
+      //   style: { className: "fr-col-8" },
+      //   choices: [
+      //     { label: "Créer", value: "" },
+      //     { label: "Modifier", value: RegistryLineReason.Edit },
+      //     { label: "Annuler", value: RegistryLineReason.Cancel }
+      //   ],
+      //   noDefaultOption: true
+      // },
       {
-        name: "reason",
-        shape: "generic",
-        type: "select",
-        label: "Motif",
-        validation: { required: false },
-        style: { className: "fr-col-8" },
-        choices: [
-          { label: "Créer", value: "" },
-          { label: "Modifier", value: RegistryLineReason.Edit },
-          { label: "Annuler", value: RegistryLineReason.Cancel }
-        ],
-        noDefaultOption: true
-      },
-      {
+        disableOnModify: true,
         name: "publicId",
         shape: "generic",
         type: "text",

@@ -103,7 +103,7 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
               className="fr-my-2w"
             />
           )}
-          <div className="fr-modal__footer">
+          <div className="fr-modal__footer fr-py-3w fr-mt-0">
             <div className="fr-btns-group fr-btns-group--inline">
               <div>
                 <div>

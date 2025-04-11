@@ -3,6 +3,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { clsx } from "clsx";
+import { RegistryLineReason } from "@td/codegen-ui";
 
 import type { FormShapeField } from "./types";
 import { formatError } from "./error";
@@ -11,7 +12,7 @@ type Props = { fields: FormShapeField[]; methods: UseFormReturn<any> };
 
 export function FormTab({ fields, methods }: Props) {
   const { errors } = methods.formState;
-
+  const reason = methods.getValues("reason");
   function renderField(field: FormShapeField, idx?: number) {
     if (field.shape === "custom") {
       const { Component, props } = field;
@@ -37,6 +38,9 @@ export function FormTab({ fields, methods }: Props) {
                   required: field.validation.required
                 })
               }}
+              disabled={
+                field.disableOnModify && reason === RegistryLineReason.Edit
+              }
               state={errors?.[field.name] && "error"}
               stateRelatedMessage={formatError(errors?.[field.name])}
             />
@@ -57,6 +61,9 @@ export function FormTab({ fields, methods }: Props) {
                   required: field.validation.required
                 })
               }}
+              disabled={
+                field.disableOnModify && reason === RegistryLineReason.Edit
+              }
               state={errors?.[field.name] && "error"}
               stateRelatedMessage={formatError(errors?.[field.name])}
             >

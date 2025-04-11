@@ -17,6 +17,7 @@ export type FormShapeField =
       validation: { required: boolean };
       choices?: { label: string; value: string | number }[];
       noDefaultOption?: boolean;
+      disableOnModify?: boolean;
     }
   | {
       props?: Record<string, any>;

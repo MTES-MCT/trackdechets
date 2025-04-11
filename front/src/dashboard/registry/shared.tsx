@@ -69,6 +69,24 @@ export const GET_REGISTRY_LOOKUPS = gql`
   }
 `;
 
+export const DELETE_REGISTRY_V2_LINE = gql`
+  mutation DeleteRegistryV2Line(
+    $publicId: String!
+    $siret: String!
+    $delegateSiret: String
+    $type: RegistryImportType!
+  ) {
+    deleteRegistryV2Line(
+      publicId: $publicId
+      siret: $siret
+      delegateSiret: $delegateSiret
+      type: $type
+    ) {
+      publicId
+    }
+  }
+`;
+
 export const TYPES: { [key in RegistryImportType]: string } = {
   SSD: "SSD",
   INCOMING_WASTE: "D et ND entrants",

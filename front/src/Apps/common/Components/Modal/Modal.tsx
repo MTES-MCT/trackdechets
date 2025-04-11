@@ -3,7 +3,7 @@ import { Overlay, useModalOverlay, useOverlayTrigger } from "react-aria";
 import { useOverlayTriggerState, OverlayTriggerState } from "react-stately";
 import FocusTrap from "focus-trap-react";
 import "./modal.scss";
-
+import cn from "classnames";
 const ModalSizesClass = {
   M: "fr-col-12 fr-col-md-6 fr-col-lg-6",
   L: "fr-col-12 fr-col-md-8 fr-col-lg-8",
@@ -22,6 +22,7 @@ type ModalProps = {
   isDismissable: boolean;
   isKeyboardDismissDisabled: boolean;
   size?: ModalSizes;
+  hasFooter?: boolean;
 };
 
 export function Modal({
@@ -31,6 +32,7 @@ export function Modal({
   title,
   ariaLabel,
   size = "M",
+  hasFooter = false,
   ...props
 }: ModalProps) {
   const ref = React.useRef(null);
@@ -110,7 +112,13 @@ export function Modal({
                         {title}
                       </h1>
                     )}
-                    <div className="fr-modal__content">{children}</div>
+                    <div
+                      className={cn("fr-modal__content", {
+                        "fr-mb-0": hasFooter
+                      })}
+                    >
+                      {children}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -129,6 +137,7 @@ type TdModalProps = {
   title?: string;
   closeLabel?: string;
   size?: ModalSizes;
+  hasFooter?: boolean;
 };
 
 export default function TdModal({
@@ -140,6 +149,7 @@ export default function TdModal({
   closeLabel = "Fermer",
   title,
   size,
+  hasFooter = false,
   ...props
 }: Pick<ModalProps, "padding" | "ariaLabel"> & TdModalProps) {
   const state = useOverlayTriggerState({
@@ -160,6 +170,7 @@ export default function TdModal({
       closeLabel={closeLabel}
       title={title}
       size={size}
+      hasFooter={hasFooter}
     >
       {children}
     </Modal>

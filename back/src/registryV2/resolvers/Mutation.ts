@@ -8,7 +8,7 @@ import { addToOutgoingTexsRegistry } from "./mutations/addToOutgoingTexsRegistry
 import { addToOutgoingWasteRegistry } from "./mutations/addToOutgoingWasteRegistry";
 import { addToTransportedRegistry } from "./mutations/addToTransportedRegistry";
 import { addToManagedRegistry } from "./mutations/addToManagedRegistry";
-
+import { deleteRegistryV2Line } from "./mutations/deleteRegistryV2Line";
 export const Mutation: MutationResolvers = {
   importFile: importFile as any,
   addToSsdRegistry,
@@ -18,5 +18,6 @@ export const Mutation: MutationResolvers = {
   addToOutgoingWasteRegistry,
   addToTransportedRegistry,
   addToManagedRegistry,
+  deleteRegistryV2Line,
   generateRegistryV2Export: generateRegistryV2Export as any
 };
