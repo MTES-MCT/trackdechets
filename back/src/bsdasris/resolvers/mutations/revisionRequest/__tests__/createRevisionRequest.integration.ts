@@ -238,7 +238,7 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Invalid enum value. Expected '18 01 03*' | '18 02 02*', received 'Made up code'"
+      "La valeur « Made up code » n'existe pas dans les options : '18 01 03*' | '18 02 02*'"
     );
   });
 

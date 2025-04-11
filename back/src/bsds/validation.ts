@@ -1,7 +1,7 @@
 import * as yup from "yup";
 import type { BsdWhere } from "@td/codegen-back";
 import { GET_BSDS_ACTOR_MAX_LENGTH } from "@td/constants";
-import { z } from "zod";
+import { z } from "@td/validation";
 
 const maxLengthString = (maxLength: number) =>
   yup

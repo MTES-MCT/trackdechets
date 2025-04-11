@@ -1,6 +1,6 @@
 import type { MutationResolvers } from "@td/codegen-back";
 import { applyAuthStrategies, AuthType } from "../../../auth";
-import { z } from "zod";
+import { z } from "@td/validation";
 import {
   cloneBsda,
   cloneBsdasri,

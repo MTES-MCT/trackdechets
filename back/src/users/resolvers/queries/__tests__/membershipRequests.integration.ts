@@ -194,7 +194,7 @@ describe("membershipRequests", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe("Required");
+    expect(errors[0].message).toBe("Obligatoire");
   });
 
   it("should return an error if using both ID and orgId", async () => {

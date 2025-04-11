@@ -14,7 +14,7 @@ import {
   QuantityType,
   TransportMode
 } from "@td/codegen-ui";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignForm } from "./SignForm";

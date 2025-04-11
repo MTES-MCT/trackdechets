@@ -16,7 +16,7 @@ import {
 import { useMutation, gql } from "@apollo/client";
 import { useForm, FormProvider } from "react-hook-form";
 import { useParams } from "react-router-dom";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { statusChangeFragment } from "../../../../Apps/common/queries/fragments";
 import { SignForm } from "./SignForm";

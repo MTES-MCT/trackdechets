@@ -16,7 +16,7 @@ import {
 import { subMonths } from "date-fns";
 import React, { useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { z } from "zod";
+import { z } from "@td/validation";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";

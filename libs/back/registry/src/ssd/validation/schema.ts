@@ -3,7 +3,7 @@ import {
   SSD_PROCESSING_OPERATIONS_CODES,
   SSD_OPERATION_MODES
 } from "@td/constants";
-import { z } from "zod";
+import { z } from "@td/validation";
 import {
   actorAddressSchema,
   actorCitySchema,

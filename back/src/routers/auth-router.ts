@@ -2,7 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import querystring from "querystring";
 import { prisma } from "@td/prisma";
-import { z } from "zod";
+import { z } from "@td/validation";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
 import { storeUserSessionsId } from "../common/redis/users";

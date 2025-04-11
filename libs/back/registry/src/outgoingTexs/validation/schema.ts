@@ -2,7 +2,7 @@ import {
   INCOMING_TEXS_WASTE_CODES,
   INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
-import { z } from "zod";
+import { z } from "@td/validation";
 import {
   reasonSchema,
   publicIdSchema,

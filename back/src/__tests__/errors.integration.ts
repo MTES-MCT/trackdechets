@@ -71,7 +71,9 @@ describe("Error handling", () => {
       const errors = body.singleResult.errors;
       const error = errors[0];
       expect(error.extensions.code).toEqual("BAD_USER_INPUT");
-      expect(error.message).toEqual("Expected string, received number");
+      expect(error.message).toEqual(
+        "Le type « chaîne de caractères » est attendu mais « nombre » a été reçu"
+      );
     });
   });
 
