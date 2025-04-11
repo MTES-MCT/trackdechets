@@ -505,6 +505,12 @@ export function BsddPdf({
               isForeignShip={Boolean(form.emitter?.isForeignShip)}
             />
 
+            {form.emitter?.type === EmitterType.APPENDIX1 && (
+              <p>
+                <i>Liste des producteurs initiaux en annexe</i>
+              </p>
+            )}
+
             <p>
               <strong>1.2 Point de collecte/chantier</strong> (si adresse
               différente de 1.1)
