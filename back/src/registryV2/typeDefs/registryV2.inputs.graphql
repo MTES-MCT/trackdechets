@@ -841,7 +841,12 @@ input IncomingTexsLineInput {
   Numéro(s) des parcelles
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
@@ -1051,7 +1056,12 @@ input IncomingTexsLineInput {
   Numéro(s) des parcelles si valorisation
   Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
@@ -1448,7 +1458,12 @@ input OutgoingTexsLineInput {
   Numéro(s) des parcelles
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+    Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
@@ -1549,7 +1564,12 @@ input OutgoingTexsLineInput {
   Numéro(s) des parcelles si valorisation
   Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+    Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
@@ -2750,7 +2770,12 @@ input ManagedLineInput {
   Numéro(s) des parcelles
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+    Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
@@ -2867,7 +2892,12 @@ input ManagedLineInput {
   Numéro(s) des parcelles si valorisation
   Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle avec préfixe : 3 chiffres, section : deux lettres et préfixe : 2 chiffres
+    Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
+  - Le préfixe peut faire de 1 à 3 chiffres
+  - La section peut faire de 1 à 2 lettres majuscules
+  - Le numéro de parcelle peut faire de 1 à 4 chiffres
+  Exemples: "123-A-4567" ou "1-AB-1234"
+
   Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
   """
