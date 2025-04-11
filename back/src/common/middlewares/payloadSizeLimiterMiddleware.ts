@@ -59,9 +59,9 @@ export function payloadSizeLimiter(
               limit
             )}.`
           });
+        } else {
+          return next();
         }
-
-        next();
       }
     }
   } catch (_err) {
@@ -77,5 +77,5 @@ export function payloadSizeLimiter(
     });
   }
 
-  next();
+  return next();
 }
