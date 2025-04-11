@@ -54,6 +54,7 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import configureYup from "./common/yup/configureYup";
+import { payloadSizeLimiter } from "./common/middlewares/payloadSizeLimiterMiddleware";
 
 const {
   SESSION_SECRET,
@@ -255,7 +256,7 @@ app.use(
  */
 app.use(urlencoded({ extended: false }));
 
-app.use(json({ limit: "1mb" }));
+app.use(json());
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
@@ -264,6 +265,7 @@ app.use(graphQLPath, graphqlBatchLimiterMiddleware());
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
 
+app.use(graphQLPath, payloadSizeLimiter);
 app.use(graphQLPath, timeoutMiddleware());
 
 // configure session for passport local strategy
