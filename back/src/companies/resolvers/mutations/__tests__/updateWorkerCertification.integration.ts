@@ -4,6 +4,7 @@ import { AuthType } from "../../../../auth";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
+import { addDays } from "date-fns";
 
 describe("{ mutation { updateworkerCertification } }", () => {
   afterEach(() => resetDatabase());
@@ -152,5 +153,52 @@ describe("{ mutation { updateworkerCertification } }", () => {
     expect(updated.hasSubSectionThree).toEqual(true);
     expect(updated.certificationNumber).toEqual("AAA");
     expect(updated.organisation).toEqual("QUALIBAT");
+  });
+
+  it("should throw if validityLimit is in the past", async () => {
+    // Given
+    const certification = {
+      hasSubSectionFour: true,
+      hasSubSectionThree: true,
+      certificationNumber: "AAA",
+      validityLimit: new Date().toISOString(),
+      organisation: "AFNOR Certification"
+    };
+
+    const createdCertification = await prisma.workerCertification.create({
+      data: certification
+    });
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    await prisma.company.update({
+      data: {
+        workerCertification: { connect: { id: createdCertification.id } }
+      },
+      where: { id: company.id }
+    });
+
+    const update = {
+      certificationNumber: "BBB",
+      validityLimit: addDays(new Date(), -1).toISOString()
+    };
+
+    const mutation = `
+      mutation {
+        updateWorkerCertification(
+          input: {
+            id: "${createdCertification.id}"
+            certificationNumber: "${update.certificationNumber}"
+            validityLimit: "${update.validityLimit}"
+          }
+          ) { certificationNumber }
+        }`;
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<
+      Pick<Mutation, "updateWorkerCertification">
+    >(mutation);
+
+    // Then
+    expect(errors).not.toBeUndefined();
   });
 });

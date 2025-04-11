@@ -4,6 +4,7 @@ import { AuthType } from "../../../../auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
+import { addDays } from "date-fns";
 
 describe("{ mutation { createWorkerCertification } }", () => {
   afterEach(() => resetDatabase());
@@ -131,5 +132,40 @@ describe("{ mutation { createWorkerCertification } }", () => {
     expect(errors[0].message).toContain(
       "L'organisme doit prendre l'une des valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT"
     );
+  });
+
+  it("should throw if validityDate is in the past", async () => {
+    // Given
+    const certification = {
+      hasSubSectionFour: true,
+      hasSubSectionThree: true,
+      certificationNumber: "AAA",
+      validityLimit: addDays(new Date(), -1).toISOString(),
+      organisation: "AFNOR Certification"
+    };
+
+    const user = await userFactory();
+
+    const mutation = `
+      mutation {
+        createWorkerCertification(
+          input: {
+            hasSubSectionFour: ${certification.hasSubSectionFour}
+            hasSubSectionThree: ${certification.hasSubSectionThree}
+            certificationNumber: "${certification.certificationNumber}"
+            validityLimit: "${certification.validityLimit}"
+            organisation: "${certification.organisation}"
+          }
+          ) { hasSubSectionFour hasSubSectionThree certificationNumber validityLimit organisation }
+        }`;
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<
+      Pick<Mutation, "createWorkerCertification">
+    >(mutation);
+
+    // Then
+    expect(errors).not.toBeUndefined();
   });
 });

@@ -15,9 +15,10 @@ import {
 import { checkVAT } from "jsvat";
 import type { FormCompany } from "@td/codegen-back";
 import countries, { Country } from "world-countries";
+import { todayAtMidnight } from "../utils";
 
 export const receiptSchema = yup.object().shape({
-  validityLimit: yup.date().required()
+  validityLimit: yup.date().min(todayAtMidnight()).required()
 });
 
 export function isCollector(company: Company) {
