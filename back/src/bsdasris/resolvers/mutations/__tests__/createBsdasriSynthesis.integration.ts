@@ -214,4 +214,135 @@ describe("Mutation.createDasri", () => {
       })
     ]);
   });
+
+  it("should allow a french transporter to create a synthesis DASRI", async () => {
+    // Given
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: {
+          set: ["TRANSPORTER"]
+        }
+      }
+    );
+
+    const toAssociate1 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SENT,
+        emitterCompanySiret: siretify(1),
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: siretify(2),
+        destinationOperationCode: "D9",
+        transporterWastePackagings: [
+          { type: "BOITE_CARTON", volume: 10, quantity: 3 }
+        ],
+        transporterWasteVolume: 100
+      }
+    });
+
+    const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
+      transporter: {
+        company: {
+          name: "le transporteur",
+          siret: transporter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          mail: "transporteur@test.fr",
+          address: "avenue de la mer"
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      synthesizing: [toAssociate1.id]
+    };
+
+    console.log("Before GQL request");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    console.log("GQL request gone");
+    console.log("errors", errors);
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(1).toEqual(1);
+  });
+
+  it("should not allow a foreign transporter to create a synthesis DASRI", async () => {
+    // Given
+    const { user, company: transporter } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: {
+          set: ["TRANSPORTER"]
+        },
+        siret: null,
+        vatNumber: "BE0406750197",
+        orgId: "BE0406750197"
+      }
+    );
+
+    const toAssociate1 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SENT,
+        emitterCompanySiret: siretify(1),
+        transporterCompanyVatNumber: transporter.vatNumber,
+        destinationCompanySiret: siretify(2),
+        destinationOperationCode: "D9",
+        transporterWastePackagings: [
+          { type: "BOITE_CARTON", volume: 10, quantity: 3 }
+        ],
+        transporterWasteVolume: 100
+      }
+    });
+
+    const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
+      transporter: {
+        company: {
+          name: "le transporteur",
+          siret: null, // Foreign transporter!
+          vatNumber: transporter.vatNumber, // Foreign transporter!
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          mail: "transporteur@test.fr",
+          address: "avenue de la mer"
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      synthesizing: [toAssociate1.id]
+    };
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Un transporteur étranger ne peut pas créer de BSDASRI de synthèse"
+    );
+  });
 });
