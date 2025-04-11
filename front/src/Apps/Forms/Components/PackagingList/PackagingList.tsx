@@ -1,6 +1,10 @@
-import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
+import {
+  BsdaPackagingType,
+  PackagingInfoInput,
+  Packagings
+} from "@td/codegen-ui";
 import React from "react";
-import { emptyPackaging } from "./helpers";
+import { emptyBsddPackaging } from "./helpers";
 import { PackagingFormProps } from "./PackagingForm";
 
 // Props passé à l'implémentation concrète (Formik ou RHF)
@@ -18,6 +22,9 @@ export type RenderPackagingFormProps = Omit<
 export type PackagingListProps = {
   // Nom du champ de liste des conditionnements
   fieldName: string;
+  // Liste des types de conditionnement possible
+  // À ajuster en fonction du type de bordereau
+  packagingTypes: (Packagings | BsdaPackagingType)[];
   // Valeur de `packagingInfos` provenant du store Formik ou RHF
   packagingInfos: PackagingInfoInput[];
   // Permet de griser les champs
@@ -32,6 +39,7 @@ export type PackagingListProps = {
 
 function PackagingList({
   fieldName,
+  packagingTypes,
   packagingInfos,
   push,
   remove,
@@ -53,6 +61,7 @@ function PackagingList({
           <div key={idx}>
             {children({
               fieldName,
+              packagingTypes,
               packagingsLength: packagingInfos.length,
               idx,
               packaging: p,
@@ -82,7 +91,7 @@ function PackagingList({
             disabled={disabled}
             className="fr-btn fr-btn--secondary"
             onClick={() => {
-              push(emptyPackaging);
+              push(emptyBsddPackaging);
             }}
           >
             Ajouter un conditionnement

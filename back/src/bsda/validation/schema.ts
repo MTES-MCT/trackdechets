@@ -79,7 +79,12 @@ export const bsdaPackagingSchema = z
   .object({
     type: ZodBsdaPackagingEnum.nullish(),
     other: z.string().nullish(),
-    quantity: z.number().nullish()
+    quantity: z.number().nullish(),
+    volume: z
+      .number()
+      .positive("Le volume doit être un nombre positif")
+      .nullish(),
+    identificationNumbers: z.array(z.string()).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
     message:

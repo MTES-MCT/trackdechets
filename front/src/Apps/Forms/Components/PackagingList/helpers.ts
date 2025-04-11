@@ -1,6 +1,11 @@
-import { PackagingInfoInput, Packagings } from "@td/codegen-ui";
+import {
+  BsdaPackagingInput,
+  BsdaPackagingType,
+  PackagingInfoInput,
+  Packagings
+} from "@td/codegen-ui";
 
-export const emptyPackaging: PackagingInfoInput = {
+export const emptyBsddPackaging: PackagingInfoInput = {
   // On force le typage ici pour pouvoir afficher un champ
   // de formulaire vide tout en étant compatible avec l'input
   // PackagingInfoInput sur lequel `type` et `quantity` sont des champs requis.
@@ -11,10 +16,16 @@ export const emptyPackaging: PackagingInfoInput = {
   quantity: "" as any as number
 };
 
+export const emptyBsdaPackaging: BsdaPackagingInput = {
+  type: "" as BsdaPackagingType,
+  quantity: "" as any as number
+};
+
 /**
  * On souhaite que le formulaire de conditionnement s'affiche par défaut
  * avec un seul conditionnement dont tous les inputs sont vides. Pour ce faire
- * il suffit d'initialiser l'état du formulaire avec la valeur `[emptyPackaging]`.
+ * il suffit d'initialiser l'état du formulaire avec la valeur `[emptyBsddPackaging]`
+ * ou `[emptyBsdaPackaging]`.
  * Le problème est que si l'utilisateur essaye d'enregistrer le formulaire sans
  * avoir modifier les conditionnements on prend les erreurs suivantes :
  *
@@ -29,7 +40,9 @@ export const emptyPackaging: PackagingInfoInput = {
  *
  * Il est donc nécessaire de nettoyer les données avant de les envoyer au serveur
  */
-export function cleanPackagings(packagings: PackagingInfoInput[]) {
+export function cleanPackagings<
+  P extends PackagingInfoInput | BsdaPackagingInput
+>(packagings: P[]) {
   return packagings
     .filter(
       // Supprime le conditionnement vide par défaut ajouté dans l'état initial
@@ -45,3 +58,38 @@ export function cleanPackagings(packagings: PackagingInfoInput[]) {
       volume: (p.volume as any) === "" ? null : p.volume
     }));
 }
+
+export const bsddPackagingTypes = [
+  Packagings.Benne,
+  Packagings.Citerne,
+  Packagings.Fut,
+  Packagings.Grv,
+  Packagings.Autre
+];
+
+export const bsdaPackagingTypes = [
+  BsdaPackagingType.BigBag,
+  BsdaPackagingType.ConteneurBag,
+  BsdaPackagingType.DepotBag,
+  BsdaPackagingType.PaletteFilme,
+  BsdaPackagingType.SacRenforce,
+  BsdaPackagingType.Other
+];
+
+export const packagingTypeLabels: Record<
+  Packagings | BsdaPackagingType,
+  string
+> = {
+  [Packagings.Benne]: "Benne",
+  [Packagings.Citerne]: "Citerne",
+  [Packagings.Fut]: "Fût",
+  [Packagings.Grv]: "Grand Récipient Vrac (GRV)",
+  [Packagings.Autre]: "Autre",
+  [Packagings.Pipeline]: "Pipeline",
+  [BsdaPackagingType.BigBag]: "Big Bag / GRV",
+  [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
+  [BsdaPackagingType.DepotBag]: "Dépôt-bag",
+  [BsdaPackagingType.PaletteFilme]: "Palette filmée",
+  [BsdaPackagingType.SacRenforce]: "Sac renforcé",
+  [BsdaPackagingType.Other]: "Autre"
+};

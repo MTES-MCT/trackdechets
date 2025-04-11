@@ -198,9 +198,11 @@ export const validationBsddSchema = z.object({
             type: z.string().min(1, "Ce champ est requis"),
             volume: z
               .union([z.string(), z.number()])
-              .nullable()
+              .nullish()
               .transform(val =>
-                val === "" || val === null ? null : Number(val)
+                val === "" || val === null || val === undefined
+                  ? null
+                  : Number(val)
               )
               .refine(
                 v => v === null || v > 0,
@@ -330,10 +332,23 @@ export const validationBsdaSchema = z.object({
               invalid_type_error: "Ce champ est requis"
             }
           ),
-          other: z.string(),
+          volume: z
+            .union([z.string(), z.number(), z.null()])
+            .nullish()
+            .transform(val =>
+              val === "" || val === null || val === undefined
+                ? null
+                : Number(val)
+            )
+            .refine(
+              v => v === null || v > 0,
+              "Le volume doit être supérieur à 0"
+            ),
+          other: z.string().nullish(),
           quantity: z.coerce
             .number()
-            .positive("Ce champ est requis est doit être supérieur à 0")
+            .positive("Ce champ est requis est doit être supérieur à 0"),
+          identificationNumbers: z.array(z.string()).nullish()
         })
         .superRefine((values, context) => {
           if (values.type === "OTHER" && !values.other) {

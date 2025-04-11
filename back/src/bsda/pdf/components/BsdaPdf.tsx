@@ -16,7 +16,7 @@ import {
 } from "../../../common/pdf/components/Company";
 import Transporter from "../../../common/pdf/components/Transporter";
 import { pluralize } from "@td/constants";
-import { PACKAGINGS_NAMES } from "../../utils";
+import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
 
 type Props = {
   bsda: Bsda;
@@ -157,24 +157,7 @@ export function BsdaPdf({
             {bsda?.waste?.adr}
           </div>
           <div className="BoxCol">
-            <p>
-              Total type de conditionnements : {bsda?.packagings?.length ?? 0}
-              <br />
-              Total colis :{" "}
-              {bsda?.packagings?.reduce((cur, p) => cur + p.quantity, 0)}
-              <br />
-              Détail Conditionnement/nombre :
-            </p>
-            <p>
-              {bsda?.packagings
-                ?.map(
-                  p =>
-                    `${p.quantity} x ${PACKAGINGS_NAMES[p.type]} ${
-                      p.other ?? ""
-                    }`
-                )
-                .join(", ")}
-            </p>
+            <PackagingsTable packagings={bsda?.packagings ?? []} />
           </div>
           <div className="BoxCol">
             <p>

@@ -179,6 +179,11 @@ type BsdaPackaging {
 
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
+
+  "Volume du conditionnement en litre(s)"
+  volume: Float
+  "Numéros des contenants"
+  identificationNumbers: [String!]!
 }
 
 type BsdaWeight {

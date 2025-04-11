@@ -225,6 +225,8 @@ export const FullBsdaFragment = gql`
       other
       quantity
       type
+      volume
+      identificationNumbers
     }
     waste {
       code

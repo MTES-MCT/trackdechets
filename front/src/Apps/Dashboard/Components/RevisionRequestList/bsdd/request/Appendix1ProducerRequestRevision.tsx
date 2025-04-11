@@ -6,6 +6,7 @@ import { getPackagingInfosSummary } from "../../../../../common/utils/packagings
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
+import { bsddPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 
 const Appendix1ProducerRequestRevision = ({
   bsdd,
@@ -34,7 +35,10 @@ const Appendix1ProducerRequestRevision = ({
         defaultValue={initialBsddReview.wasteDetails.packagingInfos}
         initialValue={bsdd.wasteDetails?.packagingInfos}
       >
-        <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
+        <RhfPackagingList
+          fieldName="wasteDetails.packagingInfos"
+          packagingTypes={bsddPackagingTypes}
+        />
       </RhfReviewableField>
 
       {bsdd.wasteDetails?.code &&

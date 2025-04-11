@@ -1,20 +1,70 @@
-import { PackagingInfo } from "@td/codegen-back";
+import React from "react";
+import {
+  BsdaPackaging,
+  BsdaPackagingType,
+  PackagingInfo,
+  Packagings
+} from "@td/codegen-back";
 import { pluralize } from "@td/constants";
 import Decimal from "decimal.js";
 
-const packagingsLabels = {
-  FUT: "Fût",
-  GRV: "GRV",
-  CITERNE: "Citerne",
+type PackagingsTableProps = {
+  packagings: PackagingInfo[] | BsdaPackaging[];
+};
+
+function PackagingsTable({ packagings }: PackagingsTableProps) {
+  const packagingsRows = getPackagingsRows(packagings);
+  return (
+    <table>
+      <thead>
+        <tr>
+          <th>Conditionnement</th>
+          <th>Nombre</th>
+        </tr>
+      </thead>
+      <tbody>
+        {packagingsRows.map(({ quantity, packagingsLabel }, idx) => (
+          <tr key={idx}>
+            <td>{packagingsLabel}</td>
+            <td>{quantity}</td>
+          </tr>
+        ))}
+        {packagingsRows.length > 1 && (
+          <tr key={packagingsRows.length}>
+            <td>
+              <b>TOTAL</b>
+            </td>
+            <td>
+              {packagingsRows.reduce((total, p) => total + p.quantity, 0)}
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  );
+}
+
+const packagingTypeLabels: Record<Packagings | BsdaPackagingType, string> = {
   BENNE: "Benne",
-  PIPELINE: "Conditionné pour pipeline",
-  AUTRE: "Autre"
+  CITERNE: "Citerne",
+  FUT: "Fût",
+  GRV: "Grand Récipient Vrac (GRV)",
+  AUTRE: "Autre",
+  PIPELINE: "Pipeline",
+  BIG_BAG: "Big Bag / GRV",
+  CONTENEUR_BAG: "Conteneur-bag",
+  DEPOT_BAG: "Dépôt-bag",
+  PALETTE_FILME: "Palette filmée",
+  SAC_RENFORCE: "Sac renforcé",
+  OTHER: "Autre"
 };
 
 /**
  * Permet de calculer les lignes du tableau de conditionnement <PackagingInfosTable />
  */
-export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
+export function getPackagingsRows(
+  packagingInfos: PackagingInfo[] | BsdaPackaging[]
+) {
   const packagingsByType: { [key: string]: PackagingInfo[] } =
     packagingInfos.reduce((acc, packaging) => {
       return {
@@ -33,7 +83,7 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
     );
 
     let packagingsLabel: string = pluralize(
-      packagingsLabels[type],
+      packagingTypeLabels[type],
       totalQuantity
     );
 
@@ -95,3 +145,5 @@ export function getPackagingsRows(packagingInfos: PackagingInfo[]) {
 
   return packagingsRows;
 }
+
+export default PackagingsTable;

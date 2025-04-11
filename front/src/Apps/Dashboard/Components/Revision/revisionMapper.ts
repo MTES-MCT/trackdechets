@@ -1,7 +1,6 @@
 import {
   Broker,
   Bsda,
-  BsdaPackagingType,
   BsdasriPackagingType,
   BsdaRevisionRequest,
   BsdasriRevisionRequest,
@@ -18,14 +17,9 @@ import {
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsddSummary";
 import {
-  BIGBAG,
   BOOLEAN_FALSE_LABEL,
   BOOLEAN_TRUE_LABEL,
-  CONTENEUR_BAG,
-  DEPOT_BAG,
   OTHER,
-  PALETTE_FILME,
-  SAC_RENFORCE,
   BOITE_CARTON,
   BOITE_PERFORANTS,
   GRAND_EMBALLAGE,
@@ -92,15 +86,6 @@ export interface ReviewInterface {
   details: ReviewDetailInterface[];
 }
 
-const BSDA_PACKAGINGS_NAMES = {
-  [BsdaPackagingType.BigBag]: BIGBAG,
-  [BsdaPackagingType.DepotBag]: DEPOT_BAG,
-  [BsdaPackagingType.PaletteFilme]: PALETTE_FILME,
-  [BsdaPackagingType.SacRenforce]: SAC_RENFORCE,
-  [BsdaPackagingType.ConteneurBag]: CONTENEUR_BAG,
-  [BsdaPackagingType.Other]: OTHER
-};
-
 const BSDASRI_PACKAGINGS_NAMES = {
   [BsdasriPackagingType.BoiteCarton]: BOITE_CARTON,
   [BsdasriPackagingType.Fut]: FUT,
@@ -108,17 +93,6 @@ const BSDASRI_PACKAGINGS_NAMES = {
   [BsdasriPackagingType.GrandEmballage]: GRAND_EMBALLAGE,
   [BsdasriPackagingType.Grv]: GRV,
   [BsdasriPackagingType.Autre]: OTHER
-};
-
-const formatPackagingName = packaging => {
-  const formattedName =
-    packaging.type === BsdaPackagingType.Other
-      ? `${packaging.quantity} ${BSDA_PACKAGINGS_NAMES[packaging.type]} ${
-          packaging.other ? `(${packaging.other})` : ""
-        }`
-      : `${packaging.quantity} ${BSDA_PACKAGINGS_NAMES[packaging.type]}`;
-
-  return formattedName;
 };
 
 const formatBsdasriPackagingName = packaging => {
@@ -221,11 +195,11 @@ export const mapRevision = (
       {
         dataName: DataNameEnum.PACKAGING,
         dataOldValue: review?.[bsdName]?.packagings
-          ?.map(p => formatPackagingName(p))
-          .join(", "),
+          ? getPackagingInfosSummary(review[bsdName].packagings)
+          : "",
         dataNewValue: review?.content?.packagings
-          ?.map(p => formatPackagingName(p))
-          .join(", ")
+          ? getPackagingInfosSummary(review.content.packagings)
+          : ""
       },
       {
         dataName: DataNameEnum.PACKAGING,

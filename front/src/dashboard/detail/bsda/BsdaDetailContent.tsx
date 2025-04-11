@@ -18,7 +18,6 @@ import {
   Transporter
 } from "../common/Components";
 import { getVerboseAcceptationStatus } from "../common/utils";
-import { PACKAGINGS_NAMES } from "../../../form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
@@ -27,7 +26,7 @@ import {
   OperationMode,
   UserPermission
 } from "@td/codegen-ui";
-import React from "react";
+import React, { useMemo } from "react";
 import QRCodeIcon from "react-qr-code";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -37,6 +36,7 @@ import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuanti
 import { BSDA_VERBOSE_STATUSES } from "@td/constants";
 import ExpandableList from "./ExpandableList";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
+import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -403,6 +403,11 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const initialBsdas = form.forwarding ? [form.forwarding] : form.grouping;
   const isMultiModal = form?.transporters.length > 1;
 
+  const conditionnement = useMemo(
+    () => (form.packagings ? getPackagingInfosSummary(form.packagings) : ""),
+    [form.packagings]
+  );
+
   return (
     <div className={styles.detail}>
       <div className={styles.detailSummary}>
@@ -468,11 +473,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dd>{form?.waste?.adr}</dd>
 
             <dt>Conditionnement</dt>
-            <dd>
-              {form?.packagings
-                ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
-                .join(", ")}
-            </dd>
+            <dd>{conditionnement}</dd>
 
             <dt>Scellés</dt>
             <dd>
