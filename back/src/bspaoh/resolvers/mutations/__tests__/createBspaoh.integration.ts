@@ -484,7 +484,7 @@ describe("Mutation.Bspaoh.create", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Invalid enum value. Expected '18 01 02', received '18 01 06*'",
+          "La valeur « 18 01 06* » n'existe pas dans les options : '18 01 02'",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
