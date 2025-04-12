@@ -4,15 +4,27 @@ import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 
 type Props = {
   parentRef: React.RefObject<HTMLElement>;
+  triggerRef?: React.RefObject<HTMLElement>;
   children: ReactNode | ((props: { close: () => void }) => ReactNode);
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 };
 
-export function ComboBox({ parentRef, children, isOpen, onOpenChange }: Props) {
+export function ComboBox({
+  parentRef,
+  triggerRef,
+  children,
+  isOpen,
+  onOpenChange
+}: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: (e: MouseEvent | TouchEvent) => {
-      if (parentRef.current?.contains(e.target as Node)) {
+      if (triggerRef) {
+        if (triggerRef.current?.contains(e.target as Node)) {
+          e.preventDefault();
+          return;
+        }
+      } else if (parentRef.current?.contains(e.target as Node)) {
         e.preventDefault();
         return;
       }

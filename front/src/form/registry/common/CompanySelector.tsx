@@ -12,6 +12,7 @@ type Props = {
   label: string;
   methods: UseFormReturn<any>;
   required?: boolean;
+  excludeTypes?: string[];
 };
 
 const TYPES = {
@@ -22,7 +23,13 @@ const TYPES = {
   PERSONNE_PHYSIQUE: "Personne physique"
 };
 
-export function CompanySelector({ prefix, label, required, methods }: Props) {
+export function CompanySelector({
+  prefix,
+  label,
+  required,
+  excludeTypes,
+  methods
+}: Props) {
   const companyType = methods.watch(`${prefix}CompanyType`, "ETABLISSEMENT_FR");
   const selectedCompanyOrgId = methods.watch(`${prefix}CompanyOrgId`);
 
@@ -40,11 +47,13 @@ export function CompanySelector({ prefix, label, required, methods }: Props) {
               })
             }}
           >
-            {Object.entries(TYPES).map(([key, value]) => (
-              <option value={key} key={key}>
-                {value}
-              </option>
-            ))}
+            {Object.entries(TYPES)
+              .filter(([key]) => !excludeTypes?.includes(key))
+              .map(([key, value]) => (
+                <option value={key} key={key}>
+                  {value}
+                </option>
+              ))}
           </Select>
         </div>
       </div>

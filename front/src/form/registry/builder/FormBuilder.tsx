@@ -37,7 +37,9 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
   const [selectedTabId, setSelectedTabId] = useState<string>(shape[0].tabId);
   const navigate = useNavigate();
   const { errors } = methods.formState;
+  console.log(errors);
   const shapeWithErrors = getTabsWithErrorClass(shape, errors);
+  console.log(shapeWithErrors);
   const tabIds = shape.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -146,22 +148,6 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
               </div>
             </div>
           </div>
-          {/* <div className="td-modal-actions">
-            <Button
-              priority="secondary"
-              nativeButtonProps={{ type: "button" }}
-              onClick={() => navigate(-1)}
-            >
-              Annuler
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {reason === RegistryLineReason.Edit
-                ? "Modifier"
-                : reason === RegistryLineReason.Cancel
-                ? "Annuler"
-                : "Créer"}
-            </Button>
-          </div> */}
         </form>
       </FormProvider>
     </div>

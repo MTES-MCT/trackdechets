@@ -196,7 +196,12 @@ export const ssdFormShape: FormShape = [
     fields: [
       {
         Component: CompanySelector,
-        props: { prefix: "destination", label: "destination", required: true },
+        props: {
+          prefix: "destination",
+          label: "destination",
+          required: true,
+          excludeTypes: ["PERSONNE_PHYSIQUE"]
+        },
         shape: "custom",
         names: [
           "destinationCompanyType",
