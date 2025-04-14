@@ -6,6 +6,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 // import useOnClickOutsideRefTarget from "../../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { formatError } from "../builder/error";
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import clsx from "clsx";
 
 type WasteCode = {
   code: string;
@@ -124,14 +125,16 @@ export function WasteCodeSelector({
         />
       </div>
       <div className="fr-col-2">
-        <Button
-          onClick={() => setShowSearch(!showSearch)}
-          priority="secondary"
-          type="button"
-          ref={triggerRef}
-        >
-          Recherche
-        </Button>
+        <div className={clsx({ "fr-mb-9v": !!errors?.[name] })}>
+          <Button
+            onClick={() => setShowSearch(!showSearch)}
+            priority="secondary"
+            type="button"
+            ref={triggerRef}
+          >
+            Recherche
+          </Button>
+        </div>
       </div>
     </>
   );

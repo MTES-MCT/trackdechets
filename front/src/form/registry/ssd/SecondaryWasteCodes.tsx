@@ -79,17 +79,16 @@ export function SecondaryWasteCodes({ methods }: Props) {
             />
           </div>
 
-          <div className="fr-mb-1w fr-mr-1w">
+          <div className="fr-col-2">
             <Button
+              className="fr-mr-1w"
               nativeButtonProps={{ type: "button" }}
               iconId="fr-icon-add-line"
               onClick={addLine}
               title="Label button"
             />
-          </div>
-
-          <div className="fr-mb-1w">
             <Button
+              className="fr-mt-1w"
               nativeButtonProps={{ type: "button" }}
               iconId="fr-icon-delete-line"
               onClick={() => removeLine(index)}

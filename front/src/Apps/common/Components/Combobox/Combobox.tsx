@@ -10,6 +10,16 @@ type Props = {
   onOpenChange: (isOpen: boolean) => void;
 };
 
+/*
+  If you want the dropdown to be the same width as the parent element (select, input,...)
+  you only need to pass the parent ref to the Combobox.
+  If you need the dropdown to be the width of another element,
+  you can separate the trigger element and the parent element.
+  The trigger element will be used to align the bottom of the dropdown (it can be the button that opens it for example),
+  and the parent element will be used to set the width and horizontal position (it can be a div that takes the whole width of the page for example).
+  In this case, you need to pass both the parent and the trigger refs to the Combobox.
+*/
+
 export function ComboBox({
   parentRef,
   triggerRef,
@@ -38,9 +48,10 @@ export function ComboBox({
     }
 
     const parentRect = parentRef.current.getBoundingClientRect();
+    const triggerRect = triggerRef?.current?.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const spaceBelow = viewportHeight - parentRect.bottom;
-    const spaceAbove = parentRect.top;
+    const spaceBelow = viewportHeight - (triggerRect ?? parentRect).bottom;
+    const spaceAbove = (triggerRect ?? parentRect).top;
 
     const dropdownLeft = parentRect.left + window.scrollX;
     const dropdownWidth = parentRect.width;
@@ -55,12 +66,14 @@ export function ComboBox({
     if (maxHeight > spaceBelow && maxHeight <= spaceAbove) {
       // Calculate bottom position as viewport height minus parent's top position
       targetRef.current.style.bottom = `${
-        viewportHeight - parentRect.top + window.scrollY
+        viewportHeight - (triggerRect ?? parentRect).top + window.scrollY
       }px`;
     } else {
-      targetRef.current.style.top = `${parentRect.bottom + window.scrollY}px`;
+      targetRef.current.style.top = `${
+        (triggerRect ?? parentRect).bottom + window.scrollY
+      }px`;
     }
-  }, [isOpen, parentRef, targetRef]);
+  }, [isOpen, parentRef, targetRef, triggerRef]);
 
   if (!isOpen) {
     return null;
