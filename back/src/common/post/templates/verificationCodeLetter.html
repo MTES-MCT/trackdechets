@@ -227,6 +227,18 @@
       .steps {
         list-style-type: decimal;
       }
+
+      .footer {
+        text-align: center;
+        width: 100%;
+        position: absolute;
+        bottom: 12px;
+      }
+
+      .footer-img {
+        display: inline-block;
+        vertical-align: middle;
+      }
     </style>
   </head>
 
@@ -253,13 +265,8 @@
           <img
             class="marianne"
             width="150px"
-            alt="Ministère de la Transition Écologique"
-            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/mte.svg"
-          />
-          <img
-            width="100px"
-            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/trackdechets.png"
-            alt="Trackdéchets logo"
+            alt="Ministère de la transition écologique, de la biodiversité, de la forêt, de la mer et de la pêche"
+            src="https://medias.trackdechets.beta.gouv.fr/mte_large.png"
           />
           <h3 class="ui header m-no-bottom">{{ expediteur.nom }}</h3>
           <p>
@@ -307,14 +314,22 @@
             <p>L'équipe Trackdéchets</p>
           </article>
         </div>
-
-        <div class="footer">
-          <p>
-            Trackdéchets est un service numérique de l'Etat incubé à la Fabrique
-            Numérique du Ministère de la Transition écologique.
-          </p>
-        </div>
       </div>
+
+      <section class="footer">
+        <img
+          class="footer-img"
+          width="200px"
+          src="https://medias.trackdechets.beta.gouv.fr/brgm_large.png"
+          alt="BRGM, géosciences pour une Terre durable"
+        />
+        <img
+          class="footer-img"
+          width="100px"
+          src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/trackdechets.png"
+          alt="Trackdéchets logo"
+        />
+      </section>
     </section>
   </body>
 </html>
