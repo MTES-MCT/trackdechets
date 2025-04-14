@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, ObjectCannedACL } from "@aws-sdk/client-s3";
 import { format } from "@fast-csv/format";
 import * as Excel from "exceljs";
 import { Writable } from "node:stream";
@@ -114,7 +114,8 @@ async function writeToS3({
     Key: name,
     Body: buffer,
     ContentType: contentType,
-    ContentEncoding: "utf-8"
+    ContentEncoding: "utf-8",
+    ACL: ObjectCannedACL.public_read
   };
 
   const command = new PutObjectCommand(params);
