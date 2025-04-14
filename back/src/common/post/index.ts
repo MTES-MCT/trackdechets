@@ -121,8 +121,9 @@ export async function sendAdminRequestVerificationCodeLetter(
     source_file_type: "html",
     variables: {
       code,
-      company,
-      user
+      company_name: company.name,
+      company_siret: company.siret,
+      user_name: user.name
     }
   });
 }
