@@ -81,7 +81,7 @@ async function generateCsvModel({
     }
   });
 
-  const csvStream = format({ headers: false, writeBOM: true }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
+  const csvStream = format({ headers: false, writeBOM: true, delimiter: ";" }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
   csvStream.pipe(writableStream);
 
   csvStream.write(headers);
