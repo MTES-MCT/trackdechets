@@ -413,9 +413,6 @@ input BsdaRevisionRequestContentInput {
 
   "Courtier"
   broker: BsdaBrokerInput
-    @deprecated(
-      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
-    )
 
   "Installation de destination"
   destination: BsdaRevisionRequestDestinationInput
