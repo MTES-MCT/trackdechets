@@ -58,9 +58,6 @@ export function FormTab({ fields, methods }: Props) {
                 state={errors?.[field.name] && "error"}
                 stateRelatedMessage={formatError(errors?.[field.name])}
               >
-                {field.noDefaultOption ? null : (
-                  <option value="">Selectionnez une option</option>
-                )}
                 {field.choices?.map(choice => (
                   <option key={choice.value} value={choice.value}>
                     {choice.label}
