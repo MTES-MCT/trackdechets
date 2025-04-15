@@ -29,7 +29,7 @@ export function WeightSelector({ methods }: Props) {
             nativeInputProps={{
               type: "number",
               step: "any",
-              ...methods.register("weightValue", { required: true })
+              ...methods.register("weightValue")
             }}
           />
         </div>

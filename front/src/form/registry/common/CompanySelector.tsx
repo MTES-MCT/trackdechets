@@ -11,7 +11,6 @@ type Props = {
   prefix: string;
   label: string;
   methods: UseFormReturn<any>;
-  required?: boolean;
   excludeTypes?: string[];
 };
 
@@ -26,7 +25,6 @@ const TYPES = {
 export function CompanySelector({
   prefix,
   label,
-  required,
   excludeTypes,
   methods
 }: Props) {
@@ -42,9 +40,7 @@ export function CompanySelector({
           <Select
             label={`Type de ${label}`}
             nativeSelectProps={{
-              ...methods.register(`${prefix}CompanyType`, {
-                required: true
-              })
+              ...methods.register(`${prefix}CompanyType`)
             }}
           >
             {Object.entries(TYPES)
@@ -61,7 +57,6 @@ export function CompanySelector({
       {companyType === "ETABLISSEMENT_FR" ? (
         <Controller
           name={`${prefix}CompanyOrgId`}
-          rules={{ required }}
           control={methods.control}
           render={({ field }) => (
             <>

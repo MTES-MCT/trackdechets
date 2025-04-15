@@ -16,7 +16,6 @@ type WasteCode = {
 
 type Props = {
   name: string;
-  required?: boolean;
   label?: string;
   methods: UseFormReturn<any>;
   containerRef?: React.RefObject<HTMLDivElement>;
@@ -24,7 +23,6 @@ type Props = {
 
 export function WasteCodeSelector({
   name,
-  required,
   methods,
   label,
   containerRef
@@ -118,7 +116,7 @@ export function WasteCodeSelector({
           label={label ?? "Code déchet"}
           nativeInputProps={{
             type: "text",
-            ...methods.register(name!, { required })
+            ...methods.register(name!)
           }}
           state={errors?.[name] && "error"}
           stateRelatedMessage={formatError(errors?.[name])}

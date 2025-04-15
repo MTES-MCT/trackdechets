@@ -17,6 +17,9 @@ import { handleMutationResponse } from "../builder/handler";
 import { isoDateToHtmlDate } from "../builder/utils";
 import { GET_SSD_REGISTRY_LOOKUP } from "./query";
 import { ssdFormShape } from "./shape";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { FormShape, FormShapeField } from "../builder/types";
 
 type Props = { onClose: () => void };
 
@@ -40,6 +43,40 @@ const ADD_TO_SSD_REGISTRY = gql`
   }
 `;
 
+const getFieldValidations = (
+  field: FormShapeField
+): Record<string, z.ZodType> => {
+  switch (field.shape) {
+    case "generic":
+    case "custom":
+      return field.validation;
+    case "layout":
+      return field.fields.reduce(
+        (acc, childField) => ({ ...acc, ...getFieldValidations(childField) }),
+        {}
+      );
+    default:
+      return {};
+  }
+};
+
+const schemaFromShape = (shape: FormShape) => {
+  const validations = shape.reduce(
+    (acc, tab) => {
+      const tabValidations = tab.fields.reduce(
+        (fieldAcc, field) => ({ ...fieldAcc, ...getFieldValidations(field) }),
+        {}
+      );
+      return { ...acc, ...tabValidations };
+    },
+    {
+      reason: z.enum([RegistryLineReason.Edit]).nullish()
+    }
+  );
+
+  return z.object(validations);
+};
+
 export function RegistrySsdForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -49,6 +86,16 @@ export function RegistrySsdForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       secondaryWasteCodes: [],
       secondaryWasteDescriptions: []
+    },
+    resolver: async (data, context, options) => {
+      console.log(data);
+      const res = await zodResolver(schemaFromShape(ssdFormShape))(
+        data,
+        context,
+        options
+      );
+      console.log(res);
+      return res;
     }
   });
 

@@ -4,7 +4,7 @@ import type {
   RiIconClassName
 } from "@codegouvfr/react-dsfr/fr/generatedFromCss/classNames";
 import type { UseFormReturn } from "react-hook-form";
-
+import { z } from "zod";
 type FieldStyle = { className?: string; parentClassName?: string };
 
 export type FormShapeField =
@@ -14,9 +14,9 @@ export type FormShapeField =
       style?: FieldStyle;
       type: string;
       label: string;
-      validation: { required: boolean };
+      required?: boolean;
+      validation: Record<string, z.ZodType>;
       choices?: { label: string; value: string | number }[];
-      noDefaultOption?: boolean;
       disableOnModify?: boolean;
     }
   | {
@@ -24,6 +24,8 @@ export type FormShapeField =
       shape: "custom";
       style?: FieldStyle;
       names: string[];
+      required?: boolean;
+      validation: Record<string, z.ZodType>;
       Component: ComponentType<{
         props?: Record<string, any>;
         methods: UseFormReturn<any>;

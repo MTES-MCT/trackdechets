@@ -8,33 +8,31 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
+import { z } from "zod";
+
+const nonEmptyString = z
+  .string({
+    required_error: "Champ requis"
+  })
+  .min(1, {
+    message: "Champ requis"
+  });
 
 export const ssdFormShape: FormShape = [
   {
     tabId: "declaration",
     tabTitle: "Déclaration",
     fields: [
-      // {
-      //   name: "reason",
-      //   shape: "generic",
-      //   type: "select",
-      //   label: "Motif",
-      //   validation: { required: false },
-      //   style: { className: "fr-col-8" },
-      //   choices: [
-      //     { label: "Créer", value: "" },
-      //     { label: "Modifier", value: RegistryLineReason.Edit },
-      //     { label: "Annuler", value: RegistryLineReason.Cancel }
-      //   ],
-      //   noDefaultOption: true
-      // },
       {
         disableOnModify: true,
         name: "publicId",
         shape: "generic",
         type: "text",
         label: "Identifiant unique",
-        validation: { required: true },
+        required: true,
+        validation: {
+          publicId: nonEmptyString
+        },
         style: { className: "fr-col-8" }
       },
       {
@@ -44,6 +42,10 @@ export const ssdFormShape: FormShape = [
           reportAsLabel: "SIRET du déclarant"
         },
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
+        validation: {
+          reportForCompanySiret: nonEmptyString,
+          reportAsCompanySiret: z.string().nullish()
+        },
         shape: "custom"
       },
       {
@@ -53,7 +55,9 @@ export const ssdFormShape: FormShape = [
             name: "useDate",
             shape: "generic",
             label: "Date d'utilisation",
-            validation: { required: false },
+            validation: {
+              useDate: z.string().nullish()
+            },
             type: "date",
             style: { className: "fr-col-4" }
           },
@@ -61,7 +65,9 @@ export const ssdFormShape: FormShape = [
             name: "dispatchDate",
             shape: "generic",
             label: "Date d'expédition",
-            validation: { required: false },
+            validation: {
+              dispatchDate: z.string().nullish()
+            },
             type: "date",
             style: { className: "fr-col-4" }
           }
@@ -75,16 +81,23 @@ export const ssdFormShape: FormShape = [
     fields: [
       {
         Component: WasteCodeSelector,
-        props: { name: "wasteCode", required: true },
+        props: { name: "wasteCode" },
         shape: "custom",
         names: ["wasteCode"],
+        required: true,
+        validation: {
+          wasteCode: nonEmptyString
+        },
         style: { parentClassName: "fr-grid-row--bottom tw-relative" }
       },
       {
         name: "wasteDescription",
         shape: "generic",
         label: "Dénomination du déchet",
-        validation: { required: true },
+        required: true,
+        validation: {
+          wasteDescription: nonEmptyString
+        },
         type: "text",
         style: { className: "fr-col-10" }
       },
@@ -92,27 +105,41 @@ export const ssdFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: "Code déchet Bâle",
-        validation: { required: false },
+        validation: {
+          wasteCodeBale: z.string().nullish()
+        },
         type: "text",
         style: { className: "fr-col-4" }
       },
       {
         Component: SecondaryWasteCodes,
         shape: "custom",
-        names: ["secondaryWasteCodes", "secondaryWasteDescriptions"]
+        names: ["secondaryWasteCodes", "secondaryWasteDescriptions"],
+        validation: {
+          secondaryWasteCodes: z.array(z.string()),
+          secondaryWasteDescriptions: z.array(z.string())
+        }
       },
       {
         name: "product",
         shape: "generic",
         label: "Produit",
-        validation: { required: true },
+        required: true,
+        validation: {
+          product: nonEmptyString
+        },
         type: "text",
         style: { className: "fr-col-10" }
       },
       {
         Component: WeightSelector,
         shape: "custom",
-        names: ["weightValue", "weightIsEstimate", "weightIsEstimate"]
+        names: ["weightValue", "weightIsEstimate", "volume"],
+        validation: {
+          weightValue: nonEmptyString,
+          volume: z.string().nullish(),
+          weightIsEstimate: z.enum(["true", "false"])
+        }
       }
     ]
   },
@@ -127,7 +154,10 @@ export const ssdFormShape: FormShape = [
             name: "processingDate",
             shape: "generic",
             label: "Date de traitement",
-            validation: { required: true },
+            required: true,
+            validation: {
+              processingDate: nonEmptyString
+            },
             type: "date",
             style: { className: "fr-col-4" }
           },
@@ -135,7 +165,9 @@ export const ssdFormShape: FormShape = [
             name: "processingEndDate",
             shape: "generic",
             label: "Date de fin de traitement",
-            validation: { required: false },
+            validation: {
+              processingEndDate: z.string().nullish()
+            },
             type: "date",
             style: { className: "fr-col-4" }
           }
@@ -149,7 +181,10 @@ export const ssdFormShape: FormShape = [
             shape: "generic",
             type: "select",
             label: "Code de traitement réalisé",
-            validation: { required: true },
+            required: true,
+            validation: {
+              operationCode: nonEmptyString
+            },
             style: { className: "fr-col-4" },
             choices: SSD_PROCESSING_OPERATIONS_CODES.map(code => ({
               label: code,
@@ -161,7 +196,10 @@ export const ssdFormShape: FormShape = [
             shape: "generic",
             type: "select",
             label: "Mode de traitement",
-            validation: { required: true },
+            required: true,
+            validation: {
+              operationMode: nonEmptyString
+            },
             style: { className: "fr-col-4" },
             choices: [
               { value: "REUTILISATION", label: "Réutilisation" },
@@ -181,7 +219,10 @@ export const ssdFormShape: FormShape = [
         shape: "generic",
         type: "select",
         label: "Référence de l'acte administratif",
-        validation: { required: true },
+        required: true,
+        validation: {
+          administrativeActReference: nonEmptyString
+        },
         style: { className: "fr-col-4" },
         choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
           label: reference,
@@ -199,8 +240,16 @@ export const ssdFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          required: true,
           excludeTypes: ["PERSONNE_PHYSIQUE"]
+        },
+        validation: {
+          destinationCompanyType: nonEmptyString,
+          destinationCompanyOrgId: nonEmptyString,
+          destinationCompanyName: z.string().nullish(),
+          destinationCompanyAddress: z.string().nullish(),
+          destinationCompanyPostalCode: z.string().nullish(),
+          destinationCompanyCity: z.string().nullish(),
+          destinationCompanyCountryCode: z.string().nullish()
         },
         shape: "custom",
         names: [

@@ -60,9 +60,10 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
     setSelectedTabId(getNextTab(tabIds, selectedTabId));
     scrollToTop();
   };
+
   const currentTab = shape.find(tab => tab.tabId === selectedTabId);
   return (
-    <div id="formBuilder">
+    <div id="formBuilder" className="registryFormBuilder">
       <h3 className="fr-h3">
         {reason === RegistryLineReason.Edit
           ? "Modifier "

@@ -23,59 +23,51 @@ export function FormTab({ fields, methods }: Props) {
       return (
         <>
           {["text", "number", "date"].includes(field.type) && (
-            <Input
-              key={field.name}
-              label={[
-                field.label,
-                !field.validation.required ? "(optionnel)" : ""
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              className={field.style?.className}
-              nativeInputProps={{
-                type: field.type,
-                ...methods.register(field.name, {
-                  required: field.validation.required
-                })
-              }}
-              disabled={
-                field.disableOnModify && reason === RegistryLineReason.Edit
-              }
-              state={errors?.[field.name] && "error"}
-              stateRelatedMessage={formatError(errors?.[field.name])}
-            />
+            <div className={field.style?.className ?? "fr-col-12"}>
+              <Input
+                key={field.name}
+                label={[field.label, !field.required ? "(optionnel)" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                nativeInputProps={{
+                  type: field.type,
+                  ...methods.register(field.name)
+                }}
+                disabled={
+                  field.disableOnModify && reason === RegistryLineReason.Edit
+                }
+                state={errors?.[field.name] && "error"}
+                stateRelatedMessage={formatError(errors?.[field.name])}
+              />
+            </div>
           )}
 
           {field.type === "select" && (
-            <Select
-              key={field.name}
-              label={[
-                field.label,
-                !field.validation.required ? "(optionnel)" : ""
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              className={field.style?.className}
-              nativeSelectProps={{
-                ...methods.register(field.name, {
-                  required: field.validation.required
-                })
-              }}
-              disabled={
-                field.disableOnModify && reason === RegistryLineReason.Edit
-              }
-              state={errors?.[field.name] && "error"}
-              stateRelatedMessage={formatError(errors?.[field.name])}
-            >
-              {field.noDefaultOption ? null : (
-                <option value="">Selectionnez une option</option>
-              )}
-              {field.choices?.map(choice => (
-                <option key={choice.value} value={choice.value}>
-                  {choice.label}
-                </option>
-              ))}
-            </Select>
+            <div className={field.style?.className ?? "fr-col-12"}>
+              <Select
+                key={field.name}
+                label={[field.label, !field.required ? "(optionnel)" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                nativeSelectProps={{
+                  ...methods.register(field.name)
+                }}
+                disabled={
+                  field.disableOnModify && reason === RegistryLineReason.Edit
+                }
+                state={errors?.[field.name] && "error"}
+                stateRelatedMessage={formatError(errors?.[field.name])}
+              >
+                {field.noDefaultOption ? null : (
+                  <option value="">Selectionnez une option</option>
+                )}
+                {field.choices?.map(choice => (
+                  <option key={choice.value} value={choice.value}>
+                    {choice.label}
+                  </option>
+                ))}
+              </Select>
+            </div>
           )}
         </>
       );
