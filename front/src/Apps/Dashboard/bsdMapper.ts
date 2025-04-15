@@ -345,7 +345,7 @@ export const mapBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   return bsdasriFormatted;
 };
 
-const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
+export const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
   const wasteCode = bsvhu?.wasteCode;
   const wasteName =
