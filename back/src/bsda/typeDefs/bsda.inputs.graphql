@@ -358,10 +358,19 @@ input BsdaBrokerRecepisseInput {
   isExempted: Boolean
   "Numéro de récépissé"
   number: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
   "Département"
   department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
   "Date limite de validité"
   validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
 }
 
 input BsdaTransportInput {
@@ -378,9 +387,6 @@ input BsdaBrokerInput {
   company: CompanyInput
   "Récépissé courtier"
   recepisse: BsdaBrokerRecepisseInput
-    @deprecated(
-      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
-    )
 }
 
 input BsdaSignatureInput {
