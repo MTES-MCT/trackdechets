@@ -216,7 +216,7 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     );
   });
 
-  it("should fail if fields validation fails", async () => {
+  it("should fail if fields validation2 fails", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const bsdasri = await bsdasriFactory({
       opt: { emitterCompanySiret: company.siret, status: "SENT" }
