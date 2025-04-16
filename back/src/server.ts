@@ -54,7 +54,7 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import configureYup from "./common/yup/configureYup";
-import { payloadSizeLimiter } from "./common/middlewares/payloadSizeLimiterMiddleware";
+import { gqlPayloadSizeLimiterPlugin } from "./common/plugins/gqlPayloadSizeLimiterPlugin";
 
 const {
   SESSION_SECRET,
@@ -128,6 +128,7 @@ export const server = new ApolloServer<GraphQLContext>({
   },
   plugins: [
     gqlInfosPlugin(),
+    gqlPayloadSizeLimiterPlugin(),
     gqlRateLimitPlugin({
       createPasswordResetRequest: {
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
@@ -264,8 +265,6 @@ app.use(graphQLPath, graphqlBatchLimiterMiddleware());
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
-
-app.use(graphQLPath, payloadSizeLimiter);
 app.use(graphQLPath, timeoutMiddleware());
 
 // configure session for passport local strategy
