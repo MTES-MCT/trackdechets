@@ -19,7 +19,7 @@ export async function transformAndRefineReason(
 
   return transformAndRefineItemReason<ParsedZodTransportedItem>(
     transportedItem,
-    transportedItemInDb?.id,
+    transportedItemInDb,
     ctx
   );
 }

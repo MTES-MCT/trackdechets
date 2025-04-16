@@ -17,7 +17,7 @@ export async function transformAndRefineReason(
 
   return transformAndRefineItemReason<ParsedZodIncomingWasteItem>(
     incomingWasteItem,
-    incomingWasteItemInDb?.id,
+    incomingWasteItemInDb,
     ctx
   );
 }
