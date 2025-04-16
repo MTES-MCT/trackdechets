@@ -257,7 +257,7 @@ app.use(
  */
 app.use(urlencoded({ extended: false }));
 
-app.use(json());
+app.use(json({ limit: "21mb" }));
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
