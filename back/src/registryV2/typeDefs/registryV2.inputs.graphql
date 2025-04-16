@@ -203,7 +203,7 @@ input SsdLineInput {
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
   Si une Date d'utilisation a été renseignée, on considère que l'utilisation est effectuée sur site et donc le SIRET du destinataire attendu est celui de l'émetteur. Ainsi, si les champs en lien avec le destinataire ne sont pas complétés, ils le seront automatiquement avec les informations du SIRET émetteur.
   """
-  destinationCompanyType: RegistryCompanyType!
+  destinationCompanyType: RegistryCompanyType
   """
   Numéro d'identification du destinataire
   Numéro d'identification du destinataire du produit issu de la sortie de statut de déchet

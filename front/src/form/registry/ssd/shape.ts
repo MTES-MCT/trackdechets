@@ -136,8 +136,8 @@ export const ssdFormShape: FormShape = [
         shape: "custom",
         names: ["weightValue", "weightIsEstimate", "volume"],
         validation: {
-          weightValue: nonEmptyString,
-          volume: z.string().nullish(),
+          weightValue: nonEmptyString.or(z.number()),
+          volume: z.string().nullish().or(z.number()),
           weightIsEstimate: z.enum(["true", "false"])
         }
       }
@@ -240,16 +240,38 @@ export const ssdFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["PERSONNE_PHYSIQUE"]
+          excludeTypes: ["PERSONNE_PHYSIQUE"],
+          showNullOption: true
         },
         validation: {
-          destinationCompanyType: nonEmptyString,
-          destinationCompanyOrgId: nonEmptyString,
-          destinationCompanyName: z.string().nullish(),
-          destinationCompanyAddress: z.string().nullish(),
-          destinationCompanyPostalCode: z.string().nullish(),
-          destinationCompanyCity: z.string().nullish(),
-          destinationCompanyCountryCode: z.string().nullish()
+          destinationCompanyType: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyOrgId: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyName: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyAddress: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyPostalCode: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyCity: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          destinationCompanyCountryCode: z
+            .string()
+            .nullish()
+            .transform(val => val || null)
         },
         shape: "custom",
         names: [
