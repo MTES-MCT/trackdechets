@@ -29,7 +29,7 @@ export function gqlPayloadSizeLimiterPlugin(): ApolloServerPlugin<GraphQLContext
 
           // Calculate the payload size
           const payloadSize = Buffer.byteLength(
-            JSON.stringify(req.body),
+            JSON.stringify(req.body || {}),
             "utf8"
           );
 
