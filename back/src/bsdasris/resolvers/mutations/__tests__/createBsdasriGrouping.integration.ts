@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
+  companyFactory,
   getDestinationCompanyInfo,
   siretify,
   userWithCompanyFactory
@@ -65,7 +66,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-
+      ...(await getDestinationCompanyInfo()),
       grouping: [toRegroup1.id]
     };
 
@@ -130,7 +131,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-
+      ...(await getDestinationCompanyInfo()),
       grouping: [toRegroup1.id]
     };
 
@@ -152,6 +153,99 @@ describe("Mutation.createDasri", () => {
       })
     ]);
   });
+
+  it("should forbid grouping operation code", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+
+    const destinationCompany = await companyFactory({
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+
+    const toRegroup1 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.AWAITING_GROUP,
+        emitterCompanySiret: siretify(1),
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "D13"
+      }
+    });
+
+    const toRegroup2 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.AWAITING_GROUP,
+        emitterCompanySiret: siretify(1),
+        destinationCompanySiret: company.siret,
+        destinationOperationCode: "R12"
+      }
+    });
+
+    const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          mail: "emitter@test.fr",
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      destination: {
+        company: {
+          name: destinationCompany.name,
+          address: destinationCompany.address,
+          phone: destinationCompany.contactPhone,
+          siret: destinationCompany.siret,
+          contact: destinationCompany.contact
+        },
+        operation: { code: "R12" }
+      },
+
+      grouping: [toRegroup1.id, toRegroup2.id]
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should build a groupment dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {

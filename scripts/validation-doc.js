@@ -25,6 +25,10 @@ const rules = {
   BSVHU: {
     ruleObjName: "bsvhuEditionRules",
     path: "../back/src/bsvhu/validation/rules.ts"
+  },
+  BSDASRI: {
+    ruleObjName: "bsdasriEditionRules",
+    path: "../back/src/bsdasris/validation/rules.ts"
   }
 };
 

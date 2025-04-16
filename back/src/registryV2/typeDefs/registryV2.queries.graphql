@@ -4,7 +4,7 @@ type Query {
   "Renvoie un lien permettant de téléverser un registre au format CSV ou Excel"
   registryUploadSignedUrl(fileName: String!): SignedUrlResponse!
 
-  "Renvoie un lien permettant de témécharger un fichier du registre"
+  "Renvoie un lien permettant de télécharger un fichier du registre"
   registryDownloadSignedUrl(
     importId: String!
     target: RegistryDownloadTarget!

@@ -129,7 +129,42 @@ describe("Mutation.signBsdasri emission", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le détail du conditionnement émis est obligatoire",
+        message: "Le conditionnement de l'émetteur est un champ requis."
+      })
+    ]);
+  });
+
+  it("should fail if data does not validate", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        emitterWasteWeightIsEstimate: true,
+        emitterWasteWeightValue: null, // required because of emitterWasteWeightIsEstimate
+        status: BsdasriStatus.INITIAL
+      }
+    });
+    const { mutate } = makeClient(user); // emitter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "EMISSION", author: "Marcel" }
+      }
+    });
+
+    const signedByEmitterDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id }
+    });
+    expect(signedByEmitterDasri.status).toEqual("INITIAL");
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée.",
+
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

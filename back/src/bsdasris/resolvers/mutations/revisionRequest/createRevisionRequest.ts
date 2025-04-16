@@ -19,7 +19,10 @@ import { getBsdasriOrNotFound } from "../../../database";
 import { checkCanRequestRevision } from "../../../permissions";
 import { getBsdasriRepository } from "../../../repository";
 
-import { revisionSchema, checkRevisionRules } from "../../../zodSchema";
+import {
+  revisionSchema,
+  checkRevisionRules
+} from "../../../validation/revisionSchema";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDASRI_STATUSES: BsdasriStatus[] = [

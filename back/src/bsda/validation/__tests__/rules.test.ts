@@ -89,7 +89,7 @@ describe("rules", () => {
       plannedOperationCode: "",
       reception,
       operation,
-      customInfo: "OPEATION"
+      customInfo: "OPERATION"
     };
 
     const waste: Required<BsdaWasteInput> = {
