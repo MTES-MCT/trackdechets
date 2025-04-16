@@ -86,8 +86,8 @@ type Mutation {
     where: RegistryV2ExportWhere
   ): RegistryV2Export!
 
-  "Supprime une déclaration du registre"
-  deleteRegistryV2Line(
+  "Annule une déclaration du registre"
+  cancelRegistryV2Line(
     "Identifiant unique de la déclaration"
     publicId: String!
     "SIRET de l'établissement pour lequel on veut supprimer la déclaration"
@@ -96,5 +96,5 @@ type Mutation {
     delegateSiret: String
     "Type de registre auquel appartient la déclaration"
     type: RegistryImportType!
-  ): DeleteRegistryV2LineResponse!
+  ): CancelRegistryV2LineResponse!
 }

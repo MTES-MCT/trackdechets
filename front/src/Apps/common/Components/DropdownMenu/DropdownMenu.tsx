@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import FocusTrap from "focus-trap-react";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
-import classNames from "classnames";
+import cn from "classnames";
 
 import "./dropdownMenu.scss";
 
 const DropdownMenu = ({
   menuTitle,
+  className,
   ButtonElement,
   links,
   isDisabled,
@@ -33,7 +34,7 @@ const DropdownMenu = ({
     <FocusTrap active={isOpen}>
       <div
         ref={targetRef as React.RefObject<HTMLDivElement>}
-        className={classNames("dropdown-menu", {
+        className={cn("dropdown-menu", className, {
           "dropdown-menu--primary": primary
         })}
       >
@@ -48,7 +49,7 @@ const DropdownMenu = ({
         ) : (
           <button
             id="create-bsd-btn"
-            className={classNames(
+            className={cn(
               `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
               {
                 isOpen: isOpen,
@@ -65,7 +66,7 @@ const DropdownMenu = ({
         )}
         {isOpen && (
           <ul
-            className={classNames("dropdown-menu__content", {
+            className={cn("dropdown-menu__content", {
               "dropdown-menu__content__iconAlone": iconAlone,
               "align-right": alignRight
             })}
@@ -76,10 +77,9 @@ const DropdownMenu = ({
                   {link.isButton ? (
                     <button
                       type="button"
-                      className={classNames(
-                        "fr-btn fr-btn--tertiary-no-outline",
-                        [...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])]
-                      )}
+                      className={cn("fr-btn fr-btn--tertiary-no-outline", [
+                        ...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])
+                      ])}
                       onClick={e => {
                         closeMenu();
                         !!link.handleClick && link.handleClick(e);
@@ -117,7 +117,7 @@ const DropdownMenu = ({
                       {link.iconId && (
                         <span
                           aria-hidden
-                          className={classNames([iconId, "fr-btn--icon-left"])}
+                          className={cn([iconId, "fr-btn--icon-left"])}
                         ></span>
                       )}
                       <span className="fr-sr-only">{link.title}</span>

@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import {
-  MutationDeleteRegistryV2LineArgs,
-  DeleteRegistryV2LineResponse
+  MutationCancelRegistryV2LineArgs,
+  CancelRegistryV2LineResponse
 } from "@td/codegen-back";
 import {
   incrementLocalChangesForCompany,
@@ -21,11 +21,11 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { getDelegatesOfCompany } from "../../../registryDelegation/resolvers/queries/utils/registryDelegations.utils";
 import { getTypeFilter } from "../queries/utils/registryLookup.util";
 
-export async function deleteRegistryV2Line(
+export async function cancelRegistryV2Line(
   _,
-  { publicId, siret, delegateSiret, type }: MutationDeleteRegistryV2LineArgs,
+  { publicId, siret, delegateSiret, type }: MutationCancelRegistryV2LineArgs,
   context: GraphQLContext
-): Promise<DeleteRegistryV2LineResponse> {
+): Promise<CancelRegistryV2LineResponse> {
   const user = checkIsAuthenticated(context);
   const userCompanies = await getUserCompanies(user.id);
   const hasGovernmentPermission = await hasGovernmentRegistryPerm(user, [
@@ -86,7 +86,7 @@ export async function deleteRegistryV2Line(
   });
   if (!lineInDb) {
     throw new UserInputError(
-      `Impossible de supprimer la ligne ${publicId} car elle n'existe pas`
+      `Impossible d'annuler la ligne ${publicId} car elle n'existe pas`
     );
   }
   const { saveLine } = importOptions[type];

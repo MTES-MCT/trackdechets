@@ -26,4 +26,5 @@ export interface DropdownMenuProps {
   primary?: boolean;
   iconId?: string;
   alignRight?: boolean;
+  className?: string;
 }

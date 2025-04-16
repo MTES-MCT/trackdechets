@@ -69,14 +69,14 @@ export const GET_REGISTRY_LOOKUPS = gql`
   }
 `;
 
-export const DELETE_REGISTRY_V2_LINE = gql`
-  mutation DeleteRegistryV2Line(
+export const CANCEL_REGISTRY_V2_LINE = gql`
+  mutation CancelRegistryV2Line(
     $publicId: String!
     $siret: String!
     $delegateSiret: String
     $type: RegistryImportType!
   ) {
-    deleteRegistryV2Line(
+    cancelRegistryV2Line(
       publicId: $publicId
       siret: $siret
       delegateSiret: $delegateSiret

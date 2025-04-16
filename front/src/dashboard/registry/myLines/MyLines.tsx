@@ -10,7 +10,7 @@ import DropdownMenu from "../../../Apps/common/Components/DropdownMenu/DropdownM
 import routes from "../../../Apps/routes";
 import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
 import {
-  DELETE_REGISTRY_V2_LINE,
+  CANCEL_REGISTRY_V2_LINE,
   GET_REGISTRY_LOOKUPS,
   TYPES,
   TYPES_ROUTES
@@ -22,6 +22,8 @@ import RegistryTable from "../RegistryTable";
 import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
+import "./MyLines.scss";
+
 const HEADERS = [
   "Importé le",
   "Type",
@@ -62,9 +64,9 @@ export function MyLines() {
     skip: !siret
   });
 
-  const [deleteRegistryLine] = useMutation<
-    Pick<Mutation, "deleteRegistryV2Line">
-  >(DELETE_REGISTRY_V2_LINE, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
+  const [cancelRegistryLine] = useMutation<
+    Pick<Mutation, "cancelRegistryV2Line">
+  >(CANCEL_REGISTRY_V2_LINE, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
   const debouncedOnApplyFilters = useMemo(() => {
     return debounce(
@@ -73,14 +75,14 @@ export function MyLines() {
     );
   }, []);
 
-  const deleteLine = () => {
+  const cancelLine = () => {
     const line = recentLookups?.registryLookups?.find(
       lookup => lookup.publicId === publicIdToDelete
     );
     if (!line) {
       return;
     }
-    deleteRegistryLine({
+    cancelRegistryLine({
       variables: {
         publicId: line.publicId,
         siret: line.siret,
@@ -101,8 +103,9 @@ export function MyLines() {
     lookup.reportAsSiret ?? lookup.siret,
     format(new Date(lookup.date), "dd/MM/yyyy"),
     lookup.wasteCode ?? "",
-    <div className="tw-px-2">
+    <div className="tw-px-2 line-actions-dropdown-container">
       <DropdownMenu
+        className="line-actions-dropdown"
         menuTitle={`Menu d'action de la déclaration ${lookup.publicId}`}
         ButtonElement={ActionButton}
         alignRight
@@ -122,7 +125,7 @@ export function MyLines() {
             }
           },
           {
-            title: "Supprimer",
+            title: "Annuler",
             isButton: true,
             handleClick: () => {
               setPublicIdToDelete(lookup.publicId);
@@ -226,27 +229,27 @@ export function MyLines() {
         )}
       </Container>
       <deleteConfirmationModal.Component
-        title={`Supprimer la déclaration ?`}
+        title={`Annuler la déclaration ?`}
         className="dnd-from-bsd-confirmation-modal"
         size="medium"
         buttons={[
           {
             priority: "secondary",
             doClosesModal: true,
-            children: "Annuler"
+            children: "Fermer"
           },
           {
-            onClick: deleteLine,
+            onClick: cancelLine,
             doClosesModal: true,
             priority: "primary",
             className: "danger-button",
-            children: "Supprimer la déclaration"
+            children: "Annuler la déclaration"
           }
         ]}
       >
         <div className="fr-mt-5v">
           <p>
-            Vous êtes sur le point de supprimer la déclaration{" "}
+            Vous êtes sur le point d'annuler la déclaration{" "}
             <span className="fr-text--bold">{publicIdToDelete}</span>.
           </p>
         </div>

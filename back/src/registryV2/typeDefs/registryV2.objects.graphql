@@ -1654,7 +1654,7 @@ type AddRegistryLinesResponse {
   skipped: [AddRegistryLine!]!
 }
 
-type DeleteRegistryV2LineResponse {
+type CancelRegistryV2LineResponse {
   publicId: ID!
 }
 
