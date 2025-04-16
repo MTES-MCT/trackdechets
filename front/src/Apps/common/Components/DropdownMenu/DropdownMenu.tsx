@@ -93,7 +93,7 @@ const DropdownMenu = ({
                           {link.icon}
                         </span>
                       )}
-                      <span className="sr-only">{link.title}</span>
+                      <span className="sr-only">{menuTitle}</span>
                       {link.title}
                     </button>
                   ) : (
@@ -120,7 +120,7 @@ const DropdownMenu = ({
                           className={cn([iconId, "fr-btn--icon-left"])}
                         ></span>
                       )}
-                      <span className="fr-sr-only">{link.title}</span>
+                      <span className="fr-sr-only">{menuTitle}</span>
                       {link.title}
                     </Link>
                   )}
