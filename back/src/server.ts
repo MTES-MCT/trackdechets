@@ -4,7 +4,6 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ROAD_CONTROL_SLUG } from "@td/constants";
-import { runWithCorrelationId } from "@td/logger";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
@@ -24,11 +23,13 @@ import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ErrorCode, UserInputError } from "./common/errors";
+import { correlationIdMiddleware } from "./common/middlewares/correlationId";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { impersonateMiddleware } from "./common/middlewares/impersonate";
 import { loggingMiddleware } from "./common/middlewares/loggingMiddleware";
+import { namedMiddleware } from "./common/middlewares/namedMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
 import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
@@ -189,11 +190,7 @@ if (Sentry) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
-app.use((_req, _res, next) => {
-  runWithCorrelationId(() => {
-    next();
-  });
-});
+app.use(correlationIdMiddleware);
 
 /**
  * Set the following headers for cross-domain cookie
@@ -396,23 +393,18 @@ export async function startApolloServer() {
 
   app.use(
     graphQLPath,
-    cors({
-      origin: [UI_BASE_URL],
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-      credentials: true
-    }),
-    json(),
-    expressMiddleware(server, {
-      context: async ctx => {
-        return {
-          ...ctx,
-          // req.user is made available by passport
-          user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
-          dataloaders: getServerDataloaders()
-        };
-      }
-    })
+    namedMiddleware(
+      "apolloExpress",
+      expressMiddleware(server, {
+        context: async ctx => {
+          return {
+            ...ctx,
+            // req.user is made available by passport
+            user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
+            dataloaders: getServerDataloaders()
+          };
+        }
+      })
+    )
   );
 }
