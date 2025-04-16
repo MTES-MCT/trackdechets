@@ -6,7 +6,7 @@ import { UserInputError } from "../errors";
 type GqlQueryKey = keyof QueryResolvers | keyof MutationResolvers;
 
 const MB = 1024 * 1024;
-const DEFAULT_LIMIT = 2 * MB;
+const DEFAULT_LIMIT = 1 * MB;
 // If you want a limit higher than 21mb, you'll also have to modify
 // app.use(json({ limit: "21mb" })); in server.ts
 const OPERATIONS_LIMIT: Partial<Record<GqlQueryKey, number>> = {
