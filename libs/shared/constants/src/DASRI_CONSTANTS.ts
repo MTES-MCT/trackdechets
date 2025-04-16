@@ -17,6 +17,8 @@ export const DASRI_WASTE_CODES = [
   }
 ];
 
+export const DASRI_WASTE_CODES_VALUES = ["18 01 03*", "18 02 02*"] as const;
+
 export const DASRI_WASTE_CODES_MAPPING = DASRI_WASTE_CODES.reduce(
   (acc, item) => ({ ...acc, ...{ [item.code]: item.description } }),
   {}

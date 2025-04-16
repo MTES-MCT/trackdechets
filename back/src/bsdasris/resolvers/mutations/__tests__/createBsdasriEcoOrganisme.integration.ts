@@ -11,6 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
+
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
   mutation DasriCreate($input: BsdasriInput!) {
@@ -68,15 +69,14 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
+
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'éco-organisme avec le siret \"${ecoOrgCompany.siret}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
+        message: `L'éco-organisme avec le SIRET ${ecoOrgCompany.siret} n'est pas référencé sur Trackdéchets`
       })
     ]);
   });
+
   it("should fail to create a bsdasri with an ecoorganisme not allowed to handle dasri", async () => {
     const ecoOrg = await ecoOrganismeFactory({});
     const { user } = await userWithCompanyFactory("MEMBER", {
@@ -119,15 +119,14 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
+
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'éco-organisme avec le siret \"${ecoOrg.siret}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
-        })
+        message: `L'éco-organisme avec le SIRET ${ecoOrg.siret} n'est pas autorisé à apparaitre sur un BSDASRI`
       })
     ]);
   });
+
   it("create a dasri with an eco-organisme (eco-org user)", async () => {
     const ecoOrg = await ecoOrganismeFactory({
       handle: { handleBsdasri: true }

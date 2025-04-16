@@ -6,10 +6,10 @@ import {
   Bsdasri
 } from "@prisma/client";
 
-import { getOperationModesFromOperationCode } from "../common/operationModes";
-import { capitalize } from "../common/strings";
+import { getOperationModesFromOperationCode } from "../../common/operationModes";
+import { capitalize } from "../../common/strings";
 
-// Dasri still uses yup for main validation but migration to zod is on its way
+// Dasri still uses yup for main validation2 but migration to zod is on its way
 const ZodWasteCodeEnum = z.enum(["18 01 03*", "18 02 02*"]).nullish();
 const ZodOperationEnum = z.enum(["D9", "D10", "R1"]).nullish();
 
