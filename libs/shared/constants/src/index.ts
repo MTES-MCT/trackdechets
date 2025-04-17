@@ -17,4 +17,3 @@ export * from "./adrHelpers";
 export * from "./BALE";
 export * from "./pluralize";
 export * from "./ADMINISTRATIVE_ACT";
-export * from "./belgium";
