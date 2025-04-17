@@ -5,7 +5,7 @@ import {
   checkVAT,
   andorra,
   austria,
-  belgium,
+  // Do not import belgium from jsvat as it is not up-to-date
   bulgaria,
   croatia,
   cyprus,
@@ -36,6 +36,7 @@ import {
   switzerland,
   unitedKingdom
 } from "jsvat";
+import { belgium } from "./belgium";
 
 export const countries = [
   andorra,
