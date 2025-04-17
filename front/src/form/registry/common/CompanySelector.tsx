@@ -12,7 +12,7 @@ type Props = {
   label: string;
   methods: UseFormReturn<any>;
   excludeTypes?: string[];
-  showNullOption?: boolean;
+  disabled?: boolean;
 };
 
 const TYPES = {
@@ -27,8 +27,8 @@ export function CompanySelector({
   prefix,
   label,
   excludeTypes,
-  showNullOption = true,
-  methods
+  methods,
+  disabled
 }: Props) {
   const companyType = methods.watch(`${prefix}CompanyType`, "ETABLISSEMENT_FR");
   const selectedCompanyOrgId = methods.watch(`${prefix}CompanyOrgId`);
@@ -55,6 +55,7 @@ export function CompanySelector({
             nativeSelectProps={{
               ...methods.register(`${prefix}CompanyType`)
             }}
+            disabled={disabled}
           >
             {Object.entries(TYPES)
               .filter(([key]) => !excludeTypes?.includes(key))
@@ -63,9 +64,6 @@ export function CompanySelector({
                   {value}
                 </option>
               ))}
-            {showNullOption && (
-              <option value={""}>{"Aucune destination"}</option>
-            )}
           </Select>
         </div>
       </div>
@@ -84,6 +82,7 @@ export function CompanySelector({
             <>
               <CompanySelectorWrapper
                 selectedCompanyOrgId={selectedCompanyOrgId}
+                disabled={disabled}
                 onCompanySelected={company => {
                   if (company) {
                     field.onChange(company.orgId);
@@ -109,6 +108,13 @@ export function CompanySelector({
               {errors?.[`${prefix}CompanyOrgId`] && (
                 <Alert
                   description={formatError(errors[`${prefix}CompanyOrgId`])}
+                  severity="error"
+                  small
+                />
+              )}
+              {errors?.[`${prefix}CompanyAddress`] && (
+                <Alert
+                  description={formatError(errors[`${prefix}CompanyAddress`])}
                   severity="error"
                   small
                 />

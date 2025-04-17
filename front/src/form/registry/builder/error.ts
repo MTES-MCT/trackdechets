@@ -1,6 +1,6 @@
 import type { Merge, FieldError, FieldErrorsImpl } from "react-hook-form";
 import { type FieldErrors } from "react-hook-form";
-import { FormShape, FormShapeField } from "./types";
+import { FormShape, FormShapeField, FormShapeWithState } from "./types";
 
 export function formatError(
   error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
@@ -20,19 +20,70 @@ export function formatError(
   return "Erreur";
 }
 
-export function getTabsWithErrorClass(
+const getFieldsWithState = (
+  fields: FormShapeField[],
+  errors: FieldErrors<any>,
+  disabledFieldNames?: string[]
+) => {
+  return fields.map(field => {
+    if (field.shape === "generic") {
+      return {
+        ...field,
+        ...(disabledFieldNames?.includes(field.name) && { disabled: true })
+      };
+    } else if (field.shape === "custom") {
+      return {
+        ...field,
+        props: {
+          ...field.props,
+          ...(disabledFieldNames?.some(disabledFieldName =>
+            field.names.includes(disabledFieldName)
+          ) && { disabled: true })
+        }
+      };
+    } else if (field.shape === "layout") {
+      return {
+        ...field,
+        fields: getFieldsWithState(field.fields, errors, disabledFieldNames)
+      };
+    }
+    return field;
+  });
+};
+
+export function getTabsWithState(
   formShape: FormShape,
-  errors: FieldErrors<any>
-) {
+  errors: FieldErrors<any>,
+  disabledFieldNames?: string[]
+): FormShapeWithState {
   return formShape.map(item => {
     const tabHasError = hasError(item.fields, errors);
-
+    const fieldsWithState = getFieldsWithState(
+      item.fields,
+      errors,
+      disabledFieldNames
+    );
     return {
       ...item,
-      ...(tabHasError && { iconId: "tabError fr-icon-warning-line" })
+      fields: fieldsWithState,
+      ...(tabHasError && { error: true })
     };
   });
 }
+
+// export function getTabsWithErrorClass(
+//   formShape: FormShape,
+//   errors: FieldErrors<any>
+// ) {
+//   return formShape.map(item => {
+//     const tabHasError = hasError(item.fields, errors);
+
+//     return {
+//       ...item,
+//       ...(tabHasError && { iconId: "tabError fr-icon-warning-line" })
+//     };
+//   });
+// }
 
 function hasError(fields: FormShapeField[], errors: FieldErrors<any>) {
   return fields.some(field => {

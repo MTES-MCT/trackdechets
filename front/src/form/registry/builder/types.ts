@@ -1,8 +1,4 @@
 import type { ComponentType } from "react";
-import type {
-  FrIconClassName,
-  RiIconClassName
-} from "@codegouvfr/react-dsfr/fr/generatedFromCss/classNames";
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 type FieldStyle = { className?: string; parentClassName?: string };
@@ -17,7 +13,7 @@ export type FormShapeField =
       required?: boolean;
       validation: Record<string, z.ZodType>;
       choices?: { label: string; value: string | number }[];
-      disableOnModify?: boolean;
+      infoText?: string;
     }
   | {
       props?: Record<string, any>;
@@ -30,18 +26,30 @@ export type FormShapeField =
         props?: Record<string, any>;
         methods: UseFormReturn<any>;
       }>;
+      infoText?: string;
     }
   | {
       shape: "layout";
       style?: FieldStyle;
       fields: FormShapeField[];
+      infoText?: string;
     };
 
 type FormShapeItem = {
   tabId: string;
   tabTitle: string;
-  iconId?: FrIconClassName | RiIconClassName;
   fields: FormShapeField[];
 };
 
-export type FormShape = FormShapeItem[];
+export type FormShapeFieldWithState = FormShapeField & {
+  disabled?: boolean;
+};
+
+type FormShapeItemWithState = FormShapeItem & {
+  error?: boolean;
+  fields: FormShapeFieldWithState[];
+};
+
+export type FormShape = FormShapeItemWithState[];
+
+export type FormShapeWithState = FormShapeItemWithState[];

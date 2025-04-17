@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from "react";
 import { useQuery } from "@apollo/client";
-import { Query, UserRole } from "@td/codegen-ui";
+import { CompanyPrivate, CompanyPublic, Query, UserRole } from "@td/codegen-ui";
 import { debounce } from "../../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
@@ -38,7 +38,6 @@ export function RegistryCompanySwitcher({
   const [selectedItem, setSelectedItem] = useState<string>(
     allOption ? allOption.name : ""
   );
-
   const comboboxTriggerRef = useRef<HTMLDivElement | null>(null);
 
   const setSelectedCompany = (
@@ -71,10 +70,15 @@ export function RegistryCompanySwitcher({
     },
     onCompleted: data => {
       if (!selectedItem && !allOption) {
-        const firstNode = data.registryCompanies.myCompanies.find(node =>
-          defaultSiret ? node.siret === defaultSiret : node.siret
-        );
-
+        let firstNode: CompanyPrivate | CompanyPublic | undefined =
+          data.registryCompanies.myCompanies.find(node =>
+            defaultSiret ? node.siret === defaultSiret : node.siret
+          );
+        if (!firstNode && data.registryCompanies.delegators.length) {
+          firstNode = data.registryCompanies.delegators.find(node =>
+            defaultSiret ? node.siret === defaultSiret : node.siret
+          );
+        }
         if (firstNode) {
           setSelectedCompany(firstNode.orgId, {
             name: firstNode.name,

@@ -69,20 +69,20 @@ export const GET_REGISTRY_LOOKUPS = gql`
   }
 `;
 
-export const CANCEL_REGISTRY_V2_LINE = gql`
-  mutation CancelRegistryV2Line(
-    $publicId: String!
+export const CANCEL_REGISTRY_V2_LINES = gql`
+  mutation CancelRegistryV2Lines(
+    $publicIds: [String!]!
     $siret: String!
     $delegateSiret: String
     $type: RegistryImportType!
   ) {
-    cancelRegistryV2Line(
-      publicId: $publicId
+    cancelRegistryV2Lines(
+      publicIds: $publicIds
       siret: $siret
       delegateSiret: $delegateSiret
       type: $type
     ) {
-      publicId
+      publicIds
     }
   }
 `;
@@ -398,3 +398,26 @@ export function getStatusFromStats({
 
   return RegistryImportStatus.Successful;
 }
+
+export const getRegistryNameFromImportType = (
+  importType: RegistryImportType
+): string => {
+  switch (importType) {
+    case RegistryImportType.Ssd:
+      return "Registre sortie de statut de déchet";
+    case RegistryImportType.IncomingWaste:
+      return "Registre déchets dangereux et non dangereux entrants";
+    case RegistryImportType.IncomingTexs:
+      return "Registre terres excavées et sédiments, dangereux et non dangereux entrants";
+    case RegistryImportType.OutgoingWaste:
+      return "Registre déchets dangereux et non dangereux sortants";
+    case RegistryImportType.OutgoingTexs:
+      return "Registre terres excavées et sédiments, dangereux et non dangereux sortants";
+    case RegistryImportType.Transported:
+      return "Registre de transport";
+    case RegistryImportType.Managed:
+      return "Registre de gestion";
+    default:
+      return "";
+  }
+};

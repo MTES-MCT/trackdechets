@@ -24,7 +24,6 @@ export const ssdFormShape: FormShape = [
     tabTitle: "Déclaration",
     fields: [
       {
-        disableOnModify: true,
         name: "publicId",
         shape: "generic",
         type: "text",
@@ -55,6 +54,7 @@ export const ssdFormShape: FormShape = [
             name: "useDate",
             shape: "generic",
             label: "Date d'utilisation",
+            required: true,
             validation: {
               useDate: z.string().nullish()
             },
@@ -65,13 +65,16 @@ export const ssdFormShape: FormShape = [
             name: "dispatchDate",
             shape: "generic",
             label: "Date d'expédition",
+            required: true,
             validation: {
               dispatchDate: z.string().nullish()
             },
             type: "date",
             style: { className: "fr-col-4" }
           }
-        ]
+        ],
+        infoText:
+          "Merci de renseigner une date d'utilisation ou une date d'expédition"
       }
     ]
   },
@@ -138,7 +141,7 @@ export const ssdFormShape: FormShape = [
         validation: {
           weightValue: nonEmptyString.or(z.number()),
           volume: z.string().nullish().or(z.number()),
-          weightIsEstimate: z.enum(["true", "false"])
+          weightIsEstimate: z.enum(["true", "false"]).or(z.boolean())
         }
       }
     ]
@@ -208,8 +211,7 @@ export const ssdFormShape: FormShape = [
                 value: "VALORISATION_ENERGETIQUE",
                 label: "Valorisation énergétique"
               },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
-              { value: "ELIMINATION", label: "Elimination" }
+              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" }
             ]
           }
         ]
@@ -240,8 +242,7 @@ export const ssdFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["PERSONNE_PHYSIQUE"],
-          showNullOption: true
+          excludeTypes: ["PERSONNE_PHYSIQUE"]
         },
         validation: {
           destinationCompanyType: z

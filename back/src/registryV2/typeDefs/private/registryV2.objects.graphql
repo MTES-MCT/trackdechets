@@ -22,7 +22,3 @@ type ChangeAggregateReportAs {
   name: String!
   siret: String
 }
-
-type CancelRegistryV2LineResponse {
-  publicId: ID!
-}

@@ -18,13 +18,15 @@ type Props = {
   label?: string;
   methods: UseFormReturn<any>;
   containerRef?: React.RefObject<HTMLDivElement>;
+  disabled?: boolean;
 };
 
 export function WasteCodeSelector({
   name,
   methods,
   label,
-  containerRef
+  containerRef,
+  disabled
 }: Props) {
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
@@ -109,6 +111,7 @@ export function WasteCodeSelector({
             type: "text",
             ...methods.register(name!)
           }}
+          disabled={disabled}
           state={errors?.[name] && "error"}
           stateRelatedMessage={formatError(errors?.[name])}
         />
@@ -120,6 +123,7 @@ export function WasteCodeSelector({
             priority="secondary"
             type="button"
             ref={triggerRef}
+            disabled={disabled}
           >
             Recherche
           </Button>

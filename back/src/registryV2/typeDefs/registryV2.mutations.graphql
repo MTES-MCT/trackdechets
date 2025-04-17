@@ -85,4 +85,18 @@ type Mutation {
     "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
     where: RegistryV2ExportWhere
   ): RegistryV2Export!
+
+  """
+  Annule des déclarations au registre
+  """
+  cancelRegistryV2Lines(
+    "Identifiants uniques des déclarations"
+    publicIds: [String!]!
+    "SIRET de l'établissement pour lequel on veut supprimer la déclaration"
+    siret: String!
+    "SIRET de l'établissement délégataire via lequel on veut supprimer la déclaration"
+    delegateSiret: String
+    "Type de registre auquel appartient la déclaration"
+    type: RegistryImportType!
+  ): CancelRegistryV2LineResponse!
 }

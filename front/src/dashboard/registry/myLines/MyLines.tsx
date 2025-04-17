@@ -10,7 +10,7 @@ import DropdownMenu from "../../../Apps/common/Components/DropdownMenu/DropdownM
 import routes from "../../../Apps/routes";
 import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
 import {
-  CANCEL_REGISTRY_V2_LINE,
+  CANCEL_REGISTRY_V2_LINES,
   GET_REGISTRY_LOOKUPS,
   TYPES,
   TYPES_ROUTES
@@ -65,8 +65,8 @@ export function MyLines() {
   });
 
   const [cancelRegistryLine] = useMutation<
-    Pick<Mutation, "cancelRegistryV2Line">
-  >(CANCEL_REGISTRY_V2_LINE, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
+    Pick<Mutation, "cancelRegistryV2Lines">
+  >(CANCEL_REGISTRY_V2_LINES, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
   const debouncedOnApplyFilters = useMemo(() => {
     return debounce(
@@ -84,7 +84,7 @@ export function MyLines() {
     }
     cancelRegistryLine({
       variables: {
-        publicId: line.publicId,
+        publicIds: [line.publicId],
         siret: line.siret,
         delegateSiret: line.reportAsSiret,
         type: line.type

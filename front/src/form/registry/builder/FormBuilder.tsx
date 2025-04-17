@@ -5,16 +5,19 @@ import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import type { FormShape } from "./types";
 import { FormTab } from "./FormTab";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { getTabsWithErrorClass } from "./error";
+import { getTabsWithState } from "./error";
 import "./FormBuilder.scss";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { RegistryLineReason } from "@td/codegen-ui";
+import { RegistryLineReason, RegistryImportType } from "@td/codegen-ui";
+import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
 
 type Props = {
+  registryType: RegistryImportType;
   shape: FormShape;
   methods: UseFormReturn<any>;
   onSubmit: (data: any) => void;
   loading?: boolean;
+  disabledFieldNames?: string[];
 };
 
 export const getNextTab = (tabIds: string[], currentTabId: string) => {
@@ -33,11 +36,18 @@ export const getPrevTab = (tabIds: string[], currentTabId: string) => {
   return tabIds[idx - 1];
 };
 
-export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
+export function FormBuilder({
+  registryType,
+  shape,
+  methods,
+  onSubmit,
+  loading,
+  disabledFieldNames
+}: Props) {
   const [selectedTabId, setSelectedTabId] = useState<string>(shape[0].tabId);
   const navigate = useNavigate();
   const { errors } = methods.formState;
-  const shapeWithErrors = getTabsWithErrorClass(shape, errors);
+  const shapeWithState = getTabsWithState(shape, errors, disabledFieldNames);
   const tabIds = shape.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -61,10 +71,10 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
     scrollToTop();
   };
 
-  const currentTab = shape.find(tab => tab.tabId === selectedTabId);
+  const currentTab = shapeWithState.find(tab => tab.tabId === selectedTabId);
   return (
     <div id="formBuilder" className="registryFormBuilder">
-      <h3 className="fr-h3">
+      <h3 className="fr-h3 fr-mb-1v">
         {reason === RegistryLineReason.Edit
           ? "Modifier "
           : reason === RegistryLineReason.Cancel
@@ -72,15 +82,20 @@ export function FormBuilder({ shape, methods, onSubmit, loading }: Props) {
           : "Créer "}
         une déclaration
       </h3>
+      <div className="fr-hint-text fr-mb-2w fr-text--md">
+        {getRegistryNameFromImportType(registryType)}
+      </div>
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <Tabs
             selectedTabId={selectedTabId}
             onTabChange={onTabChange}
-            tabs={shapeWithErrors.map(item => ({
+            tabs={shapeWithState.map(item => ({
               tabId: item.tabId,
               label: item.tabTitle,
-              ...(item.iconId && { iconId: item.iconId })
+              ...(item.error && {
+                iconId: "tabError fr-icon-warning-line" as any
+              })
             }))}
           >
             {currentTab && (

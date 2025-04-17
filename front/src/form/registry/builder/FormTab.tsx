@@ -1,19 +1,18 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
+import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import { clsx } from "clsx";
-import { RegistryLineReason } from "@td/codegen-ui";
 
-import type { FormShapeField } from "./types";
+import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
-type Props = { fields: FormShapeField[]; methods: UseFormReturn<any> };
+type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
 export function FormTab({ fields, methods }: Props) {
   const { errors } = methods.formState;
-  const reason = methods.getValues("reason");
-  function renderField(field: FormShapeField, idx?: number) {
+  function renderField(field: FormShapeFieldWithState, idx?: number) {
     if (field.shape === "custom") {
       const { Component, props } = field;
       return <Component key={idx} {...props} methods={methods} />;
@@ -23,9 +22,11 @@ export function FormTab({ fields, methods }: Props) {
       return (
         <>
           {["text", "number", "date"].includes(field.type) && (
-            <div className={field.style?.className ?? "fr-col-12"}>
-              <Input
-                key={field.name}
+            <div
+              className={field.style?.className ?? "fr-col-12"}
+              key={field.name}
+            >
+              <NonScrollableInput
                 label={[field.label, !field.required ? "(optionnel)" : ""]
                   .filter(Boolean)
                   .join(" ")}
@@ -33,9 +34,7 @@ export function FormTab({ fields, methods }: Props) {
                   type: field.type,
                   ...methods.register(field.name)
                 }}
-                disabled={
-                  field.disableOnModify && reason === RegistryLineReason.Edit
-                }
+                disabled={field.disabled}
                 state={errors?.[field.name] && "error"}
                 stateRelatedMessage={formatError(errors?.[field.name])}
               />
@@ -43,18 +42,18 @@ export function FormTab({ fields, methods }: Props) {
           )}
 
           {field.type === "select" && (
-            <div className={field.style?.className ?? "fr-col-12"}>
+            <div
+              className={field.style?.className ?? "fr-col-12"}
+              key={field.name}
+            >
               <Select
-                key={field.name}
                 label={[field.label, !field.required ? "(optionnel)" : ""]
                   .filter(Boolean)
                   .join(" ")}
                 nativeSelectProps={{
                   ...methods.register(field.name)
                 }}
-                disabled={
-                  field.disableOnModify && reason === RegistryLineReason.Edit
-                }
+                disabled={field.disabled}
                 state={errors?.[field.name] && "error"}
                 stateRelatedMessage={formatError(errors?.[field.name])}
               >
@@ -86,8 +85,13 @@ export function FormTab({ fields, methods }: Props) {
                 field.style?.parentClassName
               )}
             >
-              {renderField(field)}
+              {renderField(field, index)}
             </div>
+            {field.infoText && (
+              <div className="fr-mt-5v">
+                <Alert description={field.infoText} severity="info" small />
+              </div>
+            )}
           </div>
         );
       })}
