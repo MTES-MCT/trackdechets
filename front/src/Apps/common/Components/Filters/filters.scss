@@ -1,6 +1,8 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .filters {
+  margin: 0 8px 15px 0px;
+
   &__line {
     display: flex;
     flex-direction: column;

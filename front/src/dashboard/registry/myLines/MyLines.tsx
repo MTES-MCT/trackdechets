@@ -17,7 +17,6 @@ import {
 } from "../shared";
 import { format } from "date-fns";
 import { ActionButton } from "./ActionButton";
-import Container from "../../../Apps/common/Components/Container/Container";
 import RegistryTable from "../RegistryTable";
 import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
@@ -140,7 +139,7 @@ export function MyLines() {
 
   return (
     <>
-      <Container>
+      <>
         <div className="fr-mb-4w">
           <DropdownMenu
             links={[
@@ -227,7 +226,7 @@ export function MyLines() {
             )}
           </div>
         )}
-      </Container>
+      </>
       <deleteConfirmationModal.Component
         title={`Annuler la déclaration ?`}
         className="dnd-from-bsd-confirmation-modal"

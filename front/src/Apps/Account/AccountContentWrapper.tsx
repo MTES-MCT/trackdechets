@@ -3,6 +3,7 @@ import styles from "./AccountContentWrapper.module.scss";
 
 type Props = {
   title: string;
+  showTitle?: boolean;
   subtitle?: string;
   additional?: ReactNode;
   children: ReactNode;
@@ -15,22 +16,30 @@ export default function AccountContentWrapper({
   title,
   subtitle,
   additional,
-  children
+  children,
+  showTitle = false
 }: Props) {
   return (
-    <div className={`fr-container--fluid ${styles.content}`}>
-      <div className={`fr-mb-4w ${styles.panelTitle}`}>
+    <div className={`${styles.content}`}>
+      <div className={`${styles.panelTitle}`}>
+        {!showTitle && (
+          <div className={styles.additional}>{additional || null}</div>
+        )}
         <div className={styles.titles}>
-          <h1 className="fr-h3 fr-mb-n0-5v">{title}</h1>
+          <h1 className={showTitle ? "fr-h3 fr-mb-n0-5v" : "fr-sr-only"}>
+            {title}
+          </h1>
           {subtitle && (
             <p data-testid="page-subtitle" className="fr-text">
               {subtitle}
             </p>
           )}
         </div>
-        <div className={styles.additional}>{additional || null}</div>{" "}
+        {showTitle && (
+          <div className={styles.additional}>{additional || null}</div>
+        )}
       </div>
-      <div>{children}</div>
+      <div className={showTitle ? "fr-mt-4w" : ""}>{children}</div>
     </div>
   );
 }

@@ -79,7 +79,7 @@ export function StatsTab({ source, siret }: Props) {
 
   return (
     <div>
-      <CallOut title="">
+      <CallOut title="" className="fr-col-lg-11">
         <SegmentedControl
           legend={`Statistiques des déclarations par ${
             source === "API" ? "API" : "fichier"

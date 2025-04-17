@@ -86,16 +86,17 @@ export const CompaniesDashboard = () => {
 
   return (
     <div>
-      <h3 className="fr-h3 fr-mt-2w">Entreprises</h3>
+      <h3 className="fr-sr-only">Entreprises</h3>
 
       <div className="fr-mb-4v">
         <form onSubmit={handleSubmit(onSubmit)}>
           <Input
-            label="Siret"
-            className="fr-col-3 fr-mb-5v"
+            label="Recherche par SIRET ou n° de TVA"
+            className="fr-col-6 fr-mb-5v"
             hintText="Format: 14 chiffres 123 456 789 00099"
             state={formState.errors.siret ? "error" : "default"}
             nativeInputProps={{
+              type: "search",
               ...register("siret", { required: true })
             }}
             stateRelatedMessage={

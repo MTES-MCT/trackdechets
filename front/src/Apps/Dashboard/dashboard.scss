@@ -6,6 +6,7 @@
   overflow-x: scroll;
   width: 100%;
   max-width: 100%;
+  margin: 20px 24px 0 24px;
   @include lg-desktop {
     width: calc(100vw - 210px);
     max-width: calc(100vw - 210px);
