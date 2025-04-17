@@ -6,5 +6,11 @@
     "types": ["node"]
   },
   "exclude": ["src/**/__tests__/*", "prisma/seed*.ts"],
-  "include": ["src/**/*.ts", "src/**/*.tsx", "prisma/**/*.ts", "src/**/*.d.ts"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "prisma/**/*.ts",
+    "src/**/*.d.ts",
+    "../libs/shared/constants/src/belgium.ts"
+  ]
 }
