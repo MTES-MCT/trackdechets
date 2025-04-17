@@ -953,6 +953,7 @@ model User {
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
+  registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[] @relation("AdminRequestUser")
 }
 
