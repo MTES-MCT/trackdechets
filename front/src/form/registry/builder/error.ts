@@ -71,20 +71,6 @@ export function getTabsWithState(
   });
 }
 
-// export function getTabsWithErrorClass(
-//   formShape: FormShape,
-//   errors: FieldErrors<any>
-// ) {
-//   return formShape.map(item => {
-//     const tabHasError = hasError(item.fields, errors);
-
-//     return {
-//       ...item,
-//       ...(tabHasError && { iconId: "tabError fr-icon-warning-line" })
-//     };
-//   });
-// }
-
 function hasError(fields: FormShapeField[], errors: FieldErrors<any>) {
   return fields.some(field => {
     if (field.shape === "layout") {
