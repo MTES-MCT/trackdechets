@@ -68,15 +68,6 @@ const FormStepsTabs = ({
         {children}
       </Tabs>
       <br />
-      {/* {!!genericErrorMessage?.[0]?.message && (
-        <div ref={ref as React.RefObject<HTMLDivElement>} tabIndex={-1}>
-          <Alert
-            description={genericErrorMessage?.[0]?.message}
-            severity="error"
-            title=""
-          />
-        </div>
-      )} */}
       <div className="fr-modal__footer">
         <div className="error-container">
           {!!genericErrorMessage?.[0]?.message && (

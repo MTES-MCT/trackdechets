@@ -16,3 +16,10 @@
   background: #000091;
   margin: 2px 0;
 }
+
+.icon {
+  &:before {
+    margin-left: -9px;
+    transform: rotate(90deg);
+  }
+}

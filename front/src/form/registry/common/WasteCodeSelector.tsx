@@ -3,7 +3,6 @@ import { ALL_WASTES_TREE } from "@td/constants";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-// import useOnClickOutsideRefTarget from "../../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { formatError } from "../builder/error";
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 import clsx from "clsx";
@@ -38,14 +37,6 @@ export function WasteCodeSelector({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const { errors } = methods.formState;
-
-  // const { targetRef } = useOnClickOutsideRefTarget({
-  //   onClickOutside: () => {
-  //     if (showSearch) {
-  //       setShowSearch(false);
-  //     }
-  //   }
-  // });
 
   const setComboboxOpen = (open: boolean) => {
     setShowSearch(open);
@@ -176,27 +167,6 @@ export function WasteCodeSelector({
           </div>
         )}
       </ComboBox>
-      {/* <div
-        className={`${
-          showSearch ? "tw-block" : "tw-hidden"
-        } tw-absolute tw-bg-white tw-inset-x-0 tw-z-10 tw-p-2 tw-shadow-md tw-overflow-scroll fr-mt-1w`}
-        style={{ maxHeight: "500px", top: "100%" }}
-        ref={targetRef as React.RefObject<HTMLDivElement>}
-      >
-        <div className="tw-sticky tw-top-0 tw-z-20">
-          <Input
-            label=""
-            iconId="fr-icon-search-line"
-            className="tw-sticky tw-top-0 tw-z-20"
-            nativeInputProps={{
-              type: "text",
-              placeholder: "Recherche d'un code déchet...",
-              onChange: e => setSearch(e.target.value)
-            }}
-          />
-        </div>
-        <div>{renderTree(recursiveFilterTree(ALL_WASTES_TREE, search))}</div>
-      </div> */}
     </>
   );
 }

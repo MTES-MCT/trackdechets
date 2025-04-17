@@ -25,9 +25,10 @@ export const ActionButton: React.FC<ButtonElementProps> = ({
       <span className="fr-sr-only">
         {isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
       </span>
-      <figure aria-hidden={true} className={styles.dots}></figure>
-      <figure aria-hidden={true} className={styles.dots}></figure>
-      <figure aria-hidden={true} className={styles.dots}></figure>
+      <span
+        className={classNames(styles.icon, "fr-icon-more-fill")}
+        aria-hidden="true"
+      ></span>
     </button>
   );
 };

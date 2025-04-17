@@ -1654,10 +1654,6 @@ type AddRegistryLinesResponse {
   skipped: [AddRegistryLine!]!
 }
 
-type CancelRegistryV2LineResponse {
-  publicId: ID!
-}
-
 type RegistryLookup {
   publicId: ID!
   type: RegistryImportType!

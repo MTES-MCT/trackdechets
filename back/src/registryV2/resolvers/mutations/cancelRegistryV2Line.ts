@@ -6,8 +6,10 @@ import {
 import {
   incrementLocalChangesForCompany,
   RegistryChanges,
-  importOptions
+  importOptions,
+  saveCompaniesChanges
 } from "@td/registry";
+import { applyAuthStrategies, AuthType } from "../../../auth";
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
@@ -26,6 +28,8 @@ export async function cancelRegistryV2Line(
   { publicId, siret, delegateSiret, type }: MutationCancelRegistryV2LineArgs,
   context: GraphQLContext
 ): Promise<CancelRegistryV2LineResponse> {
+  // Browser only
+  applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const userCompanies = await getUserCompanies(user.id);
   const hasGovernmentPermission = await hasGovernmentRegistryPerm(user, [
@@ -98,6 +102,12 @@ export async function cancelRegistryV2Line(
     reason: "ANNULER",
     reportForCompanySiret: siret,
     reportAsCompanySiret: delegateSiret ?? siret
+  });
+
+  await saveCompaniesChanges(changesByCompany, {
+    type: type,
+    source: "API",
+    createdById: user.id
   });
 
   await saveLine({

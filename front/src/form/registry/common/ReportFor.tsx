@@ -112,23 +112,6 @@ export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
             </div>
           ) : null
         ) : null}
-        {/* {isDelegation && (
-          <Controller
-            name="reportAsCompanySiret"
-            control={methods.control}
-            render={({ field }) => (
-              <RegistryCompanySwitcher
-                wrapperClassName="fr-col-8"
-                label={reportAsLabel}
-                defaultSiret={field.value}
-                onCompanySelect={siret => {
-                  field.onChange(siret);
-                }}
-                excludeDelegations={true}
-              />
-            )}
-          />
-        )} */}
       </div>
     </div>
   );
