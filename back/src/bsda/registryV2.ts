@@ -323,7 +323,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode:
       bsda.destinationOperationNextDestinationPlannedOperationCode,

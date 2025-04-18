@@ -392,7 +392,7 @@ export const toIncomingWasteV2 = (
     destinationOperationModes,
     // >switch to array and destinationOperationModes?
     destinationOperationNoTraceability: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null,

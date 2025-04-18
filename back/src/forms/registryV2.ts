@@ -333,7 +333,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
     destinationOperationNoTraceability: bsdd.destinationOperationNoTraceability,
-    gistridNumber: bsdd.nextDestinationNotificationNumber,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: bsdd.nextDestinationProcessingOperation,
     isUpcycled: null,

@@ -222,7 +222,7 @@ export const emptyIncomingWasteV2: Omit<
   destinationOperationModes: null,
   destinationHasCiterneBeenWashedOut: null,
   destinationOperationNoTraceability: null,
-  gistridNumber: null,
+  ttdImportNumber: null,
   movementNumber: null,
   nextOperationCode: null,
   isUpcycled: null,
