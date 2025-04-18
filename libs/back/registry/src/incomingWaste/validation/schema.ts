@@ -23,7 +23,7 @@ import {
   booleanSchema,
   dateSchema,
   inseeCodesSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   siretSchema,
   getOperationModeSchema
 } from "../../shared/schemas";
@@ -129,8 +129,7 @@ const inputIncomingWasteSchema = z.object({
   ),
   operationMode: getOperationModeSchema(),
   noTraceability: booleanSchema.nullish(),
-  nextDestinationIsAbroad: booleanSchema.nullish(),
-  gistridNumber: gistridNumberSchema,
+  ttdImportNumber: ttdNumberSchema,
   movementNumber: z
     .string()
     .trim()
