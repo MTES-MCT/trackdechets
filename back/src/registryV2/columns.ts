@@ -396,8 +396,8 @@ export const EXPORT_COLUMNS: {
       label: "Rupture de traçabilité autorisée",
       format: formatBoolean
     },
-    gistridNumber: {
-      label: "Numéro de notification ou de déclaration GISTRID"
+    ttdImportNumber: {
+      label: "Numéro de notification ou de déclaration d'import"
     },
     movementNumber: { label: "N° de mouvement" },
     nextOperationCode: {
