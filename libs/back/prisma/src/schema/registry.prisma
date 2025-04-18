@@ -344,7 +344,8 @@ model RegistryIncomingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
-    registryLookups RegistryLookup[]
+    registryLookups   RegistryLookup[]
+    texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
@@ -474,7 +475,8 @@ model RegistryOutgoingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
-    registryLookups RegistryLookup[]
+    registryLookups   RegistryLookup[]
+    texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
@@ -982,4 +984,20 @@ model RegistryChangeAggregate {
 
     @@index([reportForId], map: "_RRegistryChangeAggregateReportForIdIdx")
     @@index([updatedAt], map: "_RRegistryChangeAggregateUpdatedAtIdx")
+}
+
+model RegistryTexsAnalysisFile {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+    
+    s3FileKey        String
+    originalFileName String
+
+    registryIncomingTexsId String?
+    registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id])
+    registryOutgoingTexsId String?
+    registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id])
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
 }
