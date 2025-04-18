@@ -440,7 +440,6 @@ export const refineOperationModeConsistency: Refinement<{
 export const refineFollowingTraceabilityInfos: Refinement<{
   operationCode: TdOperationCode;
   noTraceability?: boolean | null;
-  nextDestinationIsAbroad?: boolean | null;
   nextOperationCode?: TdOperationCode | null;
 }> = (item, { addIssue }) => {
   const nonFinalOperationCodes = [
@@ -468,14 +467,6 @@ export const refineFollowingTraceabilityInfos: Refinement<{
       code: z.ZodIssueCode.custom,
       message: `Le code de traitement ultérieur prévue est requis pour les codes de traitement non finaux`,
       path: ["nextOperationCode"]
-    });
-  }
-
-  if (item.noTraceability === false && item.nextDestinationIsAbroad == null) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Lorsque la rupture de traçabilité n'est pas autorisée, il faut indiquer si la destination ultérieure est à l'étranger ou pas`,
-      path: ["nextDestinationIsAbroad"]
     });
   }
 };
