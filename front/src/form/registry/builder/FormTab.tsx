@@ -1,12 +1,13 @@
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn, Controller } from "react-hook-form";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import { clsx } from "clsx";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
@@ -19,6 +20,9 @@ export function FormTab({ fields, methods }: Props) {
     }
 
     if (field.shape === "generic") {
+      const label = [field.label, !field.required ? "(optionnel)" : ""]
+        .filter(Boolean)
+        .join(" ");
       return (
         <>
           {["text", "number", "date"].includes(field.type) && (
@@ -27,9 +31,7 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
             >
               <NonScrollableInput
-                label={[field.label, !field.required ? "(optionnel)" : ""]
-                  .filter(Boolean)
-                  .join(" ")}
+                label={label}
                 nativeInputProps={{
                   type: field.type,
                   ...methods.register(field.name)
@@ -47,9 +49,7 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
             >
               <Select
-                label={[field.label, !field.required ? "(optionnel)" : ""]
-                  .filter(Boolean)
-                  .join(" ")}
+                label={label}
                 nativeSelectProps={{
                   ...methods.register(field.name)
                 }}
@@ -63,6 +63,26 @@ export function FormTab({ fields, methods }: Props) {
                   </option>
                 ))}
               </Select>
+            </div>
+          )}
+
+          {field.type === "checkbox" && (
+            <div
+              className={field.style?.className ?? "fr-col-12"}
+              key={field.name}
+            >
+              <Controller
+                name={field.name}
+                control={methods.control}
+                render={({ field: controllerField }) => (
+                  <ToggleSwitch
+                    label={label}
+                    inputTitle={field.name}
+                    checked={controllerField.value}
+                    onChange={checked => controllerField.onChange(checked)}
+                  />
+                )}
+              />
             </div>
           )}
         </>

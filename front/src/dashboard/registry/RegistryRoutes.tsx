@@ -18,6 +18,7 @@ import { MyLines } from "./myLines/MyLines";
 import { FormContainer } from "./myLines/FormContainer";
 import Exports from "../exports/Registry";
 import "../../Apps/Dashboard/dashboard.scss";
+import { RegistryImportType } from "@td/codegen-ui";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -97,7 +98,21 @@ export default function RegistryRoutes() {
           <Routes location={location}>
             <Route
               path={toRelative(routes.registry_new.form.ssd)}
-              element={<FormContainer onClose={handleClose} />}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.Ssd}
+                />
+              }
+            />
+            <Route
+              path={toRelative(routes.registry_new.form.incomingTexs)}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.IncomingTexs}
+                />
+              }
             />
           </Routes>
         )}

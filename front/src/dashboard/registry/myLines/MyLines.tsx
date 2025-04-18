@@ -147,6 +147,11 @@ export function MyLines() {
                 title: "Sortie de statut de déchet",
                 route: generatePath(routes.registry_new.form.ssd),
                 state: { background: location }
+              },
+              {
+                title: "TEXS entrants",
+                route: generatePath(routes.registry_new.form.incomingTexs),
+                state: { background: location }
               }
             ]}
             isDisabled={false}
