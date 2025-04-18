@@ -48,6 +48,7 @@ export function EcoOrganismes({ methods, disabled }: Props) {
         methods={methods}
         disabled={disabled}
         shortMode={true}
+        title="Éco-organisme (optionnel)"
       />
 
       {selectedSiret && !isKnownEcoOrganisme && (

@@ -60,7 +60,8 @@ export const incomingTexsFormShape: FormShape = [
         Component: FrenchCompanySelector,
         props: {
           prefix: "broker",
-          shortMode: true
+          shortMode: true,
+          title: "Courtier (optionnel)"
         },
         names: ["brokerSiret"],
         validation: {
@@ -76,8 +77,7 @@ export const incomingTexsFormShape: FormShape = [
           ecoOrganismeSiret: z.string().nullable()
         },
         shape: "custom"
-      }
-      ,
+      },
       {
         Component: Parcels,
         props: {

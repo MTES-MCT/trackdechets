@@ -10,16 +10,20 @@ type Props = {
   methods: UseFormReturn<any>;
   disabled?: boolean;
   shortMode?: boolean; // For company on which we only need the SIRET & name. No address, post code...
+  title?: string;
 };
 
 export function FrenchCompanySelector({
   prefix,
   methods,
   disabled,
-  shortMode
+  shortMode,
+  title
 }: Props) {
   return (
     <div className="fr-col">
+      {title && <h4 className="fr-h4">{title}</h4>}
+
       <InlineFrenchCompanySelector
         prefix={prefix}
         methods={methods}
