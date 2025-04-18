@@ -22,7 +22,7 @@ import {
   actorPostalCodeSchema,
   actorCitySchema,
   actorCountryCodeSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   actorSiretSchema
 } from "../../shared/schemas";
 
@@ -83,7 +83,7 @@ const inputTransportedSchema = z.object({
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
   destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
-  gistridNumber: gistridNumberSchema,
+  gistridNumber: ttdNumberSchema,
   movementNumber: z
     .string()
     .trim()

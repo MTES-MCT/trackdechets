@@ -14,7 +14,8 @@ export function refineTransporterInfos<T>({
   cityKey,
   countryKey,
   recepisseIsExemptedKey,
-  recepisseNumberKey
+  recepisseNumberKey,
+  ttdImportNumberKey
 }: {
   modeKey: string;
   typeKey: string;
@@ -26,6 +27,7 @@ export function refineTransporterInfos<T>({
   countryKey: string;
   recepisseIsExemptedKey: string;
   recepisseNumberKey: string;
+  ttdImportNumberKey?: string;
 }): Refinement<T> {
   return (item, context) => {
     if (item[modeKey] && !item[typeKey]) {
@@ -48,6 +50,16 @@ export function refineTransporterInfos<T>({
           "Le numéro de récépissé est obligatoire si le transporteur n'indique pas en être exempté",
         path: [recepisseNumberKey]
       });
+    }
+
+    // When the declaration comes from abroad and the transporter is not french,
+    // we often have partial or no information about the transporter. So we just skip the actor infos check.
+    if (
+      ["ENTREPRISE_UE", "ENTREPRISE_HORS_UE"].includes(item[typeKey]) &&
+      ttdImportNumberKey &&
+      item[ttdImportNumberKey]
+    ) {
+      return;
     }
 
     refineActorInfos({

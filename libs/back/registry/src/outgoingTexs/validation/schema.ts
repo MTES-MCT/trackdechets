@@ -27,7 +27,7 @@ import {
   parcelNumbersSchema,
   parcelCoordinatesSchema,
   getOperationCodeSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   actorSiretSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
@@ -99,7 +99,7 @@ const inputOutgoingTexsSchema = z.object({
   destinationParcelInseeCodes: inseeCodesSchema,
   destinationParcelNumbers: parcelNumbersSchema,
   destinationParcelCoordinates: parcelCoordinatesSchema,
-  gistridNumber: gistridNumberSchema,
+  gistridNumber: ttdNumberSchema,
   movementNumber: z
     .string()
     .trim()

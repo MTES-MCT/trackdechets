@@ -158,8 +158,7 @@ model RegistryIncomingWaste {
     operationCode                          String
     operationMode                          OperationMode?
     noTraceability                         Boolean?
-    nextDestinationIsAbroad                Boolean?
-    gistridNumber                          String?
+    ttdImportNumber                        String?
     movementNumber                         String?
     nextOperationCode                      String?
     isDirectSupply                         Boolean?
@@ -284,8 +283,7 @@ model RegistryIncomingTexs {
     operationCode                          String
     operationMode                          OperationMode?
     noTraceability                         Boolean?
-    nextDestinationIsAbroad                Boolean?
-    gistridNumber                          String?
+    ttdImportNumber                        String?
     movementNumber                         String?
     nextOperationCode                      String?
     isUpcycled                             Boolean?
