@@ -3,17 +3,20 @@ import { Link } from "react-router-dom";
 import FocusTrap from "focus-trap-react";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
-import classNames from "classnames";
+import cn from "classnames";
 
 import "./dropdownMenu.scss";
 
 const DropdownMenu = ({
   menuTitle,
+  className,
+  ButtonElement,
   links,
   isDisabled,
   iconId,
   iconAlone,
-  primary
+  primary,
+  alignRight
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -31,30 +34,41 @@ const DropdownMenu = ({
     <FocusTrap active={isOpen}>
       <div
         ref={targetRef as React.RefObject<HTMLDivElement>}
-        className={classNames("dropdown-menu", {
+        className={cn("dropdown-menu", className, {
           "dropdown-menu--primary": primary
         })}
       >
-        <button
-          id="create-bsd-btn"
-          className={classNames(
-            `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
-            {
-              isOpen: isOpen,
-              "menu-btn__iconAlone": iconAlone
-            },
-            ...(iconId ? ["fr-btn--icon-left", iconId] : [])
-          )}
-          disabled={isDisabled}
-          onClick={toggleMenu}
-          aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
-        >
-          {menuTitle}
-        </button>
+        {ButtonElement ? (
+          <ButtonElement
+            id="create-bsd-btn"
+            disabled={isDisabled}
+            onClick={toggleMenu}
+            isOpen={isOpen}
+            menuTitle={menuTitle}
+          />
+        ) : (
+          <button
+            id="create-bsd-btn"
+            className={cn(
+              `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
+              {
+                isOpen: isOpen,
+                "menu-btn__iconAlone": iconAlone
+              },
+              ...(iconId ? ["fr-btn--icon-left", iconId] : [])
+            )}
+            disabled={isDisabled}
+            onClick={toggleMenu}
+            aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
+          >
+            {menuTitle}
+          </button>
+        )}
         {isOpen && (
           <ul
-            className={classNames("dropdown-menu__content", {
-              "dropdown-menu__content__iconAlone": iconAlone
+            className={cn("dropdown-menu__content", {
+              "dropdown-menu__content__iconAlone": iconAlone,
+              "align-right": alignRight
             })}
           >
             {links.map(link => {
@@ -63,10 +77,9 @@ const DropdownMenu = ({
                   {link.isButton ? (
                     <button
                       type="button"
-                      className={classNames(
-                        "fr-btn fr-btn--tertiary-no-outline",
-                        [...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])]
-                      )}
+                      className={cn("fr-btn fr-btn--tertiary-no-outline", [
+                        ...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])
+                      ])}
                       onClick={e => {
                         closeMenu();
                         !!link.handleClick && link.handleClick(e);
@@ -104,7 +117,7 @@ const DropdownMenu = ({
                       {link.iconId && (
                         <span
                           aria-hidden
-                          className={classNames([iconId, "fr-btn--icon-left"])}
+                          className={cn([iconId, "fr-btn--icon-left"])}
                         ></span>
                       )}
                       <span className="fr-sr-only">{menuTitle}</span>

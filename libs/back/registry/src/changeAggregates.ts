@@ -53,11 +53,13 @@ export function incrementLocalChangesForCompany(
   {
     reason,
     reportForCompanySiret,
-    reportAsCompanySiret
+    reportAsCompanySiret,
+    increments = 1
   }: {
     reason: "MODIFIER" | "ANNULER" | "IGNORER" | null | undefined;
     reportForCompanySiret: string;
     reportAsCompanySiret: string;
+    increments?: number;
   }
 ) {
   if (!changesByCompany.has(reportForCompanySiret)) {
@@ -75,16 +77,16 @@ export function incrementLocalChangesForCompany(
 
   switch (reason) {
     case "MODIFIER":
-      companyStats.edits++;
+      companyStats.edits += increments;
       break;
     case "ANNULER":
-      companyStats.cancellations++;
+      companyStats.cancellations += increments;
       break;
     case "IGNORER":
-      companyStats.skipped++;
+      companyStats.skipped += increments;
       break;
     default:
-      companyStats.insertions++;
+      companyStats.insertions += increments;
       break;
   }
 }

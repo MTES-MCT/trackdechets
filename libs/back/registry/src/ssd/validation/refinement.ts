@@ -93,6 +93,16 @@ export const refineDestination: Refinement<ParsedZodSsdItem> = (item, ctx) => {
       path: ["destinationCompanyType"]
     });
   }
+  // skip destination validation if the destination is pre-filled with the emitter company
+  // it will be completed in the transformDestination refinement if informations are missing
+  if (
+    !item.dispatchDate &&
+    item.useDate &&
+    item.destinationCompanyType === "ETABLISSEMENT_FR" &&
+    item.destinationCompanyOrgId === item.reportForCompanySiret
+  ) {
+    return;
+  }
 
   refineActorInfos<ParsedZodSsdItem>({
     typeKey: "destinationCompanyType",

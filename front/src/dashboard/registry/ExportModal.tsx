@@ -299,10 +299,6 @@ export function ExportModal({ isOpen, onClose }: Props) {
   const registryType = watch("registryType");
   const startDate = watch("startDate");
 
-  // TODO indstead of getting myCOmpanies, get registryDelegations, either with
-  // delegateOrgId or delegatorIrgId
-  // then use the companies infos in the rest
-
   const {
     data: registryDelegationsData,
     loading: registryDelegationsLoading,

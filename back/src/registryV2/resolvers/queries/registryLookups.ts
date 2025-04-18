@@ -12,7 +12,7 @@ import { exportOptions } from "@td/registry";
 
 export async function registryLookups(
   _,
-  { siret, type }: QueryRegistryLookupArgs,
+  { siret, type, publicId }: QueryRegistryLookupArgs,
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
@@ -34,9 +34,15 @@ export async function registryLookups(
         reportAsSiret: { in: reportAsSiretsFilter }
       }),
       declarationType: "REGISTRY",
-      ...getTypeFilter(type)
+      ...getTypeFilter(type),
+      ...(publicId && {
+        readableId: {
+          contains: publicId,
+          mode: "insensitive"
+        }
+      })
     },
-    orderBy: { dateId: "desc" },
+    orderBy: { declaredAt: "desc" },
     take: 10,
     include: {
       registrySsd: true,

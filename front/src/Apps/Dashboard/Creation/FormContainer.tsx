@@ -28,6 +28,7 @@ const FormContainer = ({ bsdTypeName }: FormContainerProps) => {
       closeLabel="Annuler"
       isOpen
       size="TD_SIZE"
+      hasFooter={true}
     >
       {formContent[bsdTypeName]}
     </TdModal>

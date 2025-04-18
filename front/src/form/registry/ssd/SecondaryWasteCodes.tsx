@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { type UseFormReturn, useFieldArray } from "react-hook-form";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -29,6 +29,8 @@ export function SecondaryWasteCodes({ methods }: Props) {
     name: "secondaryWasteDescriptions"
   });
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const addLine = useCallback(() => {
     appendCode("");
     appendDescription("");
@@ -52,13 +54,15 @@ export function SecondaryWasteCodes({ methods }: Props) {
       {codeFields.map((code, index) => (
         <div
           className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          ref={containerRef}
           key={index}
         >
           <WasteCodeSelector
             methods={methods}
             key={code.id}
             name={`secondaryWasteCodes.${index}`}
-            label="Code déchet secondaire (Optionnel)"
+            label="Code déchet secondaire (optionnel)"
+            containerRef={containerRef}
           />
           <div className="fr-col-4">
             <Input
@@ -75,17 +79,16 @@ export function SecondaryWasteCodes({ methods }: Props) {
             />
           </div>
 
-          <div className="fr-mb-2w fr-mr-1w">
+          <div className="fr-col-2">
             <Button
+              className="fr-mr-1w"
               nativeButtonProps={{ type: "button" }}
               iconId="fr-icon-add-line"
               onClick={addLine}
               title="Label button"
             />
-          </div>
-
-          <div className="fr-mb-2w">
             <Button
+              className="fr-mt-1w"
               nativeButtonProps={{ type: "button" }}
               iconId="fr-icon-delete-line"
               onClick={() => removeLine(index)}

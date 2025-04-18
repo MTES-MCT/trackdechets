@@ -1,3 +1,11 @@
+export interface ButtonElementProps {
+  id: string;
+  disabled?: boolean;
+  onClick: () => void;
+  isOpen: boolean;
+  menuTitle: string;
+}
+
 export interface DropdownMenuProps {
   links: {
     title: string;
@@ -12,8 +20,11 @@ export interface DropdownMenuProps {
     ) => void;
   }[];
   menuTitle: string;
+  ButtonElement?: React.ComponentType<ButtonElementProps>;
   isDisabled?: boolean;
   iconAlone?: boolean;
   primary?: boolean;
   iconId?: string;
+  alignRight?: boolean;
+  className?: string;
 }

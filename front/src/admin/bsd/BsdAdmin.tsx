@@ -233,6 +233,7 @@ export function BsdAdmin() {
             isOpen={isPreviewOpen}
             onClose={() => setIsPreviewOpen(false)}
             size="XL"
+            hasFooter={true}
           >
             <BsdDetailContent bsd={data.bsd} />
           </Modal>

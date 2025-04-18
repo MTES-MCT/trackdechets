@@ -71,8 +71,7 @@ const BSDPreviewTabs = ({
         className="fr-modal__footer"
         style={{
           padding: "2rem 0",
-          marginTop: "0",
-          paddingBottom: "0"
+          marginTop: "0"
         }}
       >
         <div className="fr-btns-group fr-btns-group--inline">

@@ -18,13 +18,13 @@ import {
 } from "./shared";
 
 import { format, getYear, startOfYear, endOfYear, subHours } from "date-fns";
-import classNames from "classnames";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Table from "@codegouvfr/react-dsfr/Table";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import RegistryTable from "./RegistryTable";
+import Container from "../../Apps/common/Components/Container/Container";
 
 const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
@@ -255,14 +255,7 @@ export function MyExports() {
 
   return (
     <>
-      <div
-        className={classNames([
-          "tw-flex-grow",
-          "tw-px-6",
-          "tw-py-4",
-          styles.myRegistryExportsContainer
-        ])}
-      >
+      <Container>
         <div>
           <div className="tw-flex">
             <div>
@@ -312,11 +305,7 @@ export function MyExports() {
             </div>
           </div>
           {!exportsLoading ? (
-            <Table
-              bordered
-              noCaption
-              // caption="Exports récents"
-              className={styles.fullWidthTable}
+            <RegistryTable
               data={tableData}
               headers={[
                 "Date",
@@ -366,7 +355,7 @@ export function MyExports() {
             className={"fr-mt-1w"}
           />
         </div>
-      </div>
+      </Container>
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => {

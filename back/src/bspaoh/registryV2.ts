@@ -546,6 +546,7 @@ export const toTransportedWasteV2 = (
 
 const minimalBspaohForLookupSelect = {
   id: true,
+  createdAt: true,
   destinationReceptionSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
@@ -589,6 +590,7 @@ const bspaohToLookupCreateInputs = (
         bspaoh.destinationReceptionDate ??
           bspaoh.destinationReceptionSignatureDate
       ),
+      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -608,6 +610,7 @@ const bspaohToLookupCreateInputs = (
         transporter.transporterTakenOverAt ??
           transporter.transporterTransportSignatureDate
       ),
+      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -626,6 +629,7 @@ const bspaohToLookupCreateInputs = (
           transporter.transporterTakenOverAt ??
             transporter.transporterTransportSignatureDate
         ),
+        declaredAt: bspaoh.createdAt,
         bspaohId: bspaoh.id
       });
     }

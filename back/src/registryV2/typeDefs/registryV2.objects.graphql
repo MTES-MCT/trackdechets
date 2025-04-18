@@ -1654,13 +1654,17 @@ type AddRegistryLinesResponse {
   skipped: [AddRegistryLine!]!
 }
 
+type CancelRegistryV2LineResponse {
+  publicIds: [ID!]!
+}
+
 type RegistryLookup {
   publicId: ID!
   type: RegistryImportType!
   siret: String!
   reportAsSiret: String
   date: DateTime!
-  createdAt: DateTime!
+  declaredAt: DateTime!
   wasteCode: String
 
   ssd: SsdWasteV2
