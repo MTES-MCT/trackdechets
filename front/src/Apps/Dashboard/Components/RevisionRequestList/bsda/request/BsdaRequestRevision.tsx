@@ -11,7 +11,7 @@ import {
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-ui";
 import { BSDA_WASTES } from "@td/constants";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -83,6 +83,13 @@ export function BsdaRequestRevision({ bsda }: Props) {
     reset();
     navigate(-1);
   };
+
+  useEffect(() => {
+    if (bsda?.waste?.sealNumbers) {
+      setSealNumbersTags([...bsda.waste.sealNumbers]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Hacky fonction implémentée en hotfix dans tra-15573
   // La bonne solution à mon sens (benoît) serait d'initialiser
