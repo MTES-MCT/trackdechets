@@ -17,6 +17,7 @@ import { MyImports } from "./MyImports";
 import { MyLines } from "./myLines/MyLines";
 import { FormContainer } from "./myLines/FormContainer";
 import Exports from "../exports/Registry";
+import "../../Apps/Dashboard/dashboard.scss";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -54,7 +55,7 @@ export default function RegistryRoutes() {
   return (
     <div className="dashboard">
       {!isMobile && <RegistryMenu />}
-      <div className="tw-flex-grow">
+      <div className="dashboard-content">
         <Routes location={backgroundLocation ?? location}>
           <Route
             index

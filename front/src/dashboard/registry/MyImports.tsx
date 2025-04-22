@@ -23,7 +23,6 @@ import {
   TYPES
 } from "./shared";
 import RegistryTable from "./RegistryTable";
-import Container from "../../Apps/common/Components/Container/Container";
 
 const HEADERS = [
   "Importé le",
@@ -145,7 +144,7 @@ export function MyImports() {
 
   return (
     <>
-      <Container>
+      <>
         <div className="tw-flex tw-gap-6">
           <div>
             <Button
@@ -227,7 +226,7 @@ export function MyImports() {
             </div>
           </div>
         )}
-      </Container>
+      </>
 
       <ImportModal
         isOpen={isImportModalOpen}

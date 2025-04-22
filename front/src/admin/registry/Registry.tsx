@@ -119,7 +119,7 @@ export function Registry() {
 
   return (
     <div>
-      <h3 className="fr-h3">Registre</h3>
+      <h3 className="fr-sr-only">Registre</h3>
 
       <Alert
         className="fr-mb-5v"

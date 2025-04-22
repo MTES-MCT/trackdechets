@@ -165,7 +165,7 @@ export function BsdAdmin() {
 
   return (
     <div>
-      <h3 className="fr-h3 fr-mt-4w">Recherche par numéro de bordereau</h3>
+      <h3 className="fr-sr-only">Recherche par numéro de bordereau</h3>
       <form
         onSubmit={e => {
           e.preventDefault();

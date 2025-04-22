@@ -157,6 +157,7 @@ export default function CompanyDetails() {
       title={`${company.name}${
         company.givenName ? " - " + company.givenName : ""
       }`}
+      showTitle
       subtitle={company.orgId}
       additional={
         <>
