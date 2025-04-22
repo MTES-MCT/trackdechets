@@ -1544,286 +1544,617 @@ input IncomingWasteLineInput {
 input IncomingTexsLineInput {
   """
   Motif
+
   Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
+
+  Si aucune valeur n'est renseignée et que la ligne n'a jamais été déclarée (vérification via l'identifiant unique), alors celle-ci est ajoutée comme nouvelle déclaration.
+
+  Si aucune valeur n'est renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors la ligne sera ignorée.
+
+  Si la valeur CANCEL a été renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors celle-ci sera supprimée.
+
+  Si la valeur EDIT a été renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors celle-ci sera modifiée par les nouvelles valeurs.
+
+  Si la valeur CANCEL ou EDIT a été renseignée et que la ligne n'a jamais été déclarée (vérification via l'identifiant unique), alors une erreur remontera.
+
+  Valeurs :
+  - CANCEL
+  - EDIT
   """
   reason: RegistryLineReason
   """
   Identifiant unique
-  Identifiant unique donné à chaque déclaration pour un établissement donné
+
+  Identifiant unique donné à chaque déclaration pour un établissement donné.
 
   Si un import comporte plusieurs mêmes identifiants uniques sans motif, seule la première ligne sera déclarée, les suivantes seront ignorées.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 36 caractères
+  - Caractères autorisés : alphanumériques, point (.), tiret (-), slash (/), underscore (_)
   """
   publicId: ID!
   """
   SIRET du déclarant
+
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
-  Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET de l'émetteur et mon SIRET.
+  Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET du destinataire et mon SIRET.
+
+  Valeurs :
+  - 14 caractères numériques uniquement
   """
   reportAsCompanySiret: String
   """
   SIRET du destinataire
-  Établissement pour lequel la déclaration est effectuée, soit ici le destinataire des terres et sédiments ou des déchets entrants
+
+  Établissement pour lequel la déclaration est effectuée, soit ici le destinataire des terres excavées et sédiments ou des déchets entrants.
 
   Le SIRET renseigné doit :
-  - être inscrit sur Trackdéchets,
-  - être rattaché à mon compte Trackdéchets (sauf délégation),
-  - avoir au moins un des profils ou sous-profils suivants : Installation de valorisation de terres et sédiments et/ou Installation dans laquelle les déchets perdent leur statut de déchet et/ou :
-  Installation de valorisation de terres et sédiments :
-  Installation de Tri, transit regroupement de déchets y compris non classée
-  Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)
-  Déchets Dangereux (Rubrique 2718)
-  Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)
-  Installation de traitement :
-  Incinération de déchets dangereux (Rubrique 2770)
-  Incinération de déchets non dangereux (Rubriques 2771, 2740) stallation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)
-  Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)
-  Installation de stockage de déchets inertes (Rubrique 2760-3)
-  Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780, 2795)
-  Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)
-  - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation).
+  - être inscrit sur Trackdéchets
+  - être rattaché à mon compte Trackdéchets (sauf délégation) avec un rôle administrateur ou collaborateur
+  - avoir au moins un des profils ou sous-profils suivants :
+    - Installation de valorisation de terres et sédiments
+    - Installation dans laquelle les déchets perdent leur statut de déchet
+    - Installation de Tri, transit regroupement de déchets y compris non classée
+      - Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)
+      - Déchets Dangereux (Rubrique 2718)
+      - Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)
+    - Installation de traitement
+      - Incinération de déchets dangereux (Rubrique 2770)
+      - Incinération de déchets non dangereux (Rubriques 2771, 2740)
+      - Installation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)
+      - Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)
+      - Installation de stockage de déchets inertes (Rubrique 2760-3)
+      - Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780, 2795)
+      - Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)
+  - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation)
+
   La raison sociale ainsi que l'adresse de ce SIRET seront récupérés depuis la base Trackdéchets.
+
+  Valeurs :
+  - 14 caractères numériques uniquement
   """
   reportForCompanySiret: String!
   """
-  Dénomination usuelle des terres et sédiments ou des déchets
+  Dénomination usuelle des terres excavées et sédiments ou des déchets
+
+  Dénomination usuelle des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format libre sans contrainte
+  - De 2 à 300 caractères (espaces compris)
   """
   wasteDescription: String!
   """
   Code déchet
 
+  Code du déchet entrant.
+
   Si un code déchet est mentionné, il doit faire partie de la liste des codes déchets suivante :
-  17 05 03*, 17 05 04, 17 05 05*, 17 05 06, 20 02 02
+  - 17 05 03*
+  - 17 05 04
+  - 17 05 05*
+  - 17 05 06
+  - 20 02 02
+
+  Valeurs :
+  - De 8 à 9 caractères (espaces compris)
+  - Format code déchet avec espace : XX XX XX ou XX XX XX*
   """
   wasteCode: String
   """
   Code déchet Bâle
 
-  Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle
+  Code Bâle du déchet entrant.
+
+  Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle.
+
+  Valeurs :
+  - 5 caractères uniquement
+  - Format code déchet Bâle : [A]XXXX ou [B]XXXX
   """
   wasteCodeBale: String
   """
   POP
-  Ce champ permet d'indiquer si les terres et sédiments ou les déchets entrants contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
+
+  Ce champ permet d'indiquer si les terres excavées et sédiments ou les déchets entrants contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
+
+  Valeurs :
+  - OUI
+  - NON
+  (avec ou sans majuscules)
   """
   wastePop: Boolean!
   """
   Dangereux
-  Indique si le déchet avec un code sans * est qualifié de dangereux
+
+  Indique si le déchet avec un code sans * est qualifié de dangereux.
 
   Si le code déchet est non dangereux et ne dispose pas de code miroir dangereux, il est possible de le forcer comme dangereux.
   Si aucune valeur n'est ajoutée, c'est les valeurs du code déchet et POP qui permettent d'autocompléter le caractère dangereux ou non dangereux du déchet entrant.
+
+  Valeurs :
+  - OUI
+  - NON
+  (avec ou sans majuscules)
   """
   wasteIsDangerous: Boolean
   """
   DAP
-  Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP)
+
+  Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP).
+  Numéro de bordereau d'analyse chimique des terres excavées et sédiments lorsque cette analyse est necessaire pour valoriser ou éliminer les terres exacvées et sédiments, lorsque ces données sont disponibles.
+
+  Valeurs :
+  - Format libre sans contrainte
   """
   wasteDap: String
   """
   Date de réception
-  Date de réception des terres et sédiments ou des déchets entrants
+
+  Date de réception des terres excavées et sédiments ou des déchets entrants.
 
   La date de réception ne peut pas :
-  - être dans le futur,
-  - être antérieure à J-1 an.
+  - être dans le futur
+  - être antérieure à J-1 an
+
+  Valeurs :
+  Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
+  - 2000-01-01T00:00:00.000Z
+  - 2000-01-01T00:00:00.000
+  - 2000-01-01
   """
   receptionDate: DateTime!
   """
   Poids en tonnes
-  Poids en tonnes des terres et sédiments ou des déchets entrants
+
+  Poids en tonnes des terres excavées et sédiments ou des déchets entrants.
 
   La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+
+  Valeurs :
+  - De 1 à 7 caractères
+  - Chiffres uniquement avec séparateur décimal point (.) ou virgule (,)
   """
   weightValue: Float!
   """
   Type de poids
+
   Indique si le poids est estimé ou réel.
+
   Si le code d'opération est R1 ou D10 ou D5, le poids doit obligatoirement être réel.
+
+  Valeurs acceptées (avec ou sans accent, avec ou sans majuscule) :
+  - ESTIMÉ
+  - RÉEL
   """
   weightIsEstimate: Boolean!
   """
   Volume en M3
 
+  Volume en M3 des terres excavées et sédiments ou des déchets entrants.
+
   La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+
+  Valeurs :
+  - De 1 à 7 caractères
+  - Chiffres uniquement avec séparateur décimal point (.) ou virgule (,)
   """
   volume: Float
   """
   Codes INSEE des parcelles
-  Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés
 
-  Chaque code INSEE doit faire 5 caractères, si plusieurs codes INSEE sont renseignés, ils doivent être séparés par virgules.
+  Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés.
+
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+
+  Valeurs :
+  - Chaque code INSEE doit faire 5 caractères
+  - Si plusieurs codes INSEE sont renseignés, ils doivent être séparés par virgules
   """
   parcelInseeCodes: [String!]
   """
   Numéro(s) des parcelles
-  Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
-  - Le préfixe peut faire de 1 à 3 chiffres
-  - La section peut faire de 1 à 2 lettres majuscules
-  - Le numéro de parcelle peut faire de 1 à 4 chiffres
-  Exemples: "123-A-4567" ou "1-AB-1234"
+  Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
-  Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+
+  Valeurs :
+  - Format : [préfixe]-[section]-[numéro]
+  - Préfixe : 1 à 3 chiffres
+  - Section : 1 à 2 lettres majuscules
+  - Numéro de parcelle : 1 à 4 chiffres
+  - Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
+  Exemples : "123-A-4567" ou "1-AB-1234"
   """
   parcelNumbers: [String!]
   """
   Coordonnées des parcelles
-  Coordonnées de la ou des parcelles cadastrales du site de production par exemple : 48.894258 2.240027
+
+  Coordonnées de la ou des parcelles cadastrales du site de production, par exemple : 48.894258 2.240027
 
   Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
-  Attention à bien séparer par des virgules des coordonnées de parcelles différentes, mais à bien utiliser le point comme séparateur décimal au sein même des coordonnées.
-  Concernant le format de chaque coordonnées :
-  - valeur attendue en degrés
-  - le séparateur de décimales utilisé doit être un point
-  - entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
-  - pour séparer plusieurs coordonnées, une virgule doit être utilisée
+
+  Format des coordonnées :
+  - Valeur attendue en degrés
+  - Le séparateur de décimales utilisé doit être un point
+  - Entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
+  - Pour séparer plusieurs coordonnées, une virgule doit être utilisée
   """
   parcelCoordinates: [String!]
   """
   Identifiant SIS du terrain
+
   Identifiant du terrain SIS lorsque les déchets ou les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
+
+  Valeurs :
+  - Format : SIS suivi de chiffres
+  - De 10 à 15 caractères
   """
   sisIdentifier: String
   """
   Type de producteur initial
+
+  Type d'acteur correspondant au producteur des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs acceptées :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
+  - PERSONNE_PHYSIQUE
+  - COMMUNES
   """
   initialEmitterCompanyType: RegistryCompanyType!
   """
   Numéro d'identification du producteur initial
-  Numéro d'identification du producteur, à renseigner selon son type de profil
+
+  Numéro d'identification du producteur initial, à renseigner selon son type de profil.
+  Des contrôles différents seront effectués sur le format selon le type de producteur renseigné.
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
+  - PERSONNE_PHYSIQUE : Format libre
+  - COMMUNES : Non applicable
   """
   initialEmitterCompanyOrgId: String
   """
   Raison sociale du producteur initial
+
+  Raison sociale du producteur initial des terres excavées et sédiments ou des déchets entrants.
+
+  Obligatoire si le type de producteur n'est pas COMMUNES ou PERSONNE_PHYSIQUE.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   initialEmitterCompanyName: String
   """
   Adresse du producteur initial
-  Libellé de l'adresse du producteur (n° de voie et voie, complément, lieu-dit etc) du déchet
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   initialEmitterCompanyAddress: String
   """
   Code postal du producteur initial
+
+  Code postal du producteur initial des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   initialEmitterCompanyPostalCode: String
   """
   Commune du producteur initial
+
+  Commune du producteur initial des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   initialEmitterCompanyCity: String
   """
   Pays du producteur initial
+
+  Code pays du producteur initial des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   initialEmitterCompanyCountryCode: String
   """
   Code(s) INSEE de(s) commune(s)
-  Le ou les codes INSEE de la ou des commune(s) de collecte des terres et sédiments ou des déchets entrants doivent être séparés par des virgules.
+
+  Le ou les codes INSEE de la ou des commune(s) de collecte des terres excavées et sédiments ou des déchets entrants.
+
+  Obligatoire si le type de producteur est COMMUNES.
+
+  Valeurs :
+  - Format : 5 caractères par code INSEE
+  - Si plusieurs codes INSEE sont renseignés, ils doivent être séparés par des virgules
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
   Type d'expéditeur ou détenteur
+
+  Type d'acteur correspondant à l'expéditeur ou au détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Dans le cas où le producteur initial et l'expéditeur sont la même personne, alors il conviendra de renseigner le même type et numéro d'identification.
+
+  Valeurs acceptées :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
+  - PERSONNE_PHYSIQUE
   """
   emitterCompanyType: RegistryCompanyType!
   """
   Numéro d'identification de l'expéditeur ou détenteur
+
+  Numéro d'identification de l'expéditeur ou du détenteur, selon son type de profil.
+  Des contrôles différents seront effectués sur le format selon le type d'expéditeur renseigné.
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
+  - PERSONNE_PHYSIQUE : Format libre
   """
   emitterCompanyOrgId: String
   """
-  Raison sociale de l'expéditeur ou  du détenteur
+  Raison sociale de l'expéditeur ou du détenteur
+
+  Raison sociale de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Obligatoire si le type d'expéditeur n'est pas PERSONNE_PHYSIQUE.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   emitterCompanyName: String
   """
-  Libellé de l'adresse de l'expéditeur ou  du détenteur
+  Libellé de l'adresse de l'expéditeur ou du détenteur
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   emitterCompanyAddress: String
   """
   Code postal de l'expéditeur ou du détenteur
+
+  Code postal de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   emitterCompanyPostalCode: String
   """
   Commune de l'expéditeur ou du détenteur
+
+  Commune de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   emitterCompanyCity: String
   """
   Code pays de l'expéditeur ou du détenteur
+
+  Code pays de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   emitterCompanyCountryCode: String
   """
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur.
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
+
+  Valeurs :
+  - Format libre
+  - Jusqu'à 300 caractères
   """
   emitterPickupSiteName: String
   """
   Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   emitterPickupSiteAddress: String
   """
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   emitterPickupSitePostalCode: String
   """
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   emitterPickupSiteCity: String
   """
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   emitterPickupSiteCountryCode: String
   """
   SIRET de l'éco-organisme
+
+  SIRET de l'éco-organisme.
+
+  Le SIRET renseigné est désormais vérifié par l'algorithme de Luhn.
+
+  Valeurs :
+  - Format SIRET
+  - 14 caractères numériques uniquement
   """
   ecoOrganismeSiret: String
   """
   Raison sociale de l'éco-organisme
+
+  Raison sociale de l'éco-organisme.
+
+  Obligatoire si un SIRET de l'éco-organisme a été renseigné.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   ecoOrganismeName: String
   """
   SIRET du courtier
+
+  SIRET du courtier.
+
+  Le SIRET renseigné est désormais vérifié par l'algorithme de Luhn.
+
+  Valeurs :
+  - Format SIRET
+  - 14 caractères numériques uniquement
   """
   brokerCompanySiret: String
   """
   Raison sociale du courtier
+
+  Raison sociale du courtier.
+
+  Obligatoire si un SIRET du courtier a été renseigné.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   brokerCompanyName: String
   """
-  Numéro de recépissé du courtier
+  Numéro de récépissé du courtier
+
+  Numéro de récépissé du courtier.
+
+  Obligatoire si un SIRET du courtier a été renseigné.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - Jusqu'à 50 caractères
   """
   brokerRecepisseNumber: String
   """
   SIRET du négociant
+
+  SIRET du négociant.
+
+  Le SIRET renseigné est désormais vérifié par l'algorithme de Luhn.
+
+  Valeurs :
+  - Format SIRET
+  - 14 caractères numériques uniquement
   """
   traderCompanySiret: String
   """
   Raison sociale du négociant
+
+  Raison sociale du négociant.
+
+  Obligatoire si un SIRET du négociant a été renseigné.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   traderCompanyName: String
   """
   Numéro de récépissé du négociant
+
+  Numéro de récépissé du négociant.
+
+  Obligatoire si un SIRET du négociant a été renseigné.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - Jusqu'à 50 caractères
   """
   traderRecepisseNumber: String
   """
   Code de traitement réalisé
-  Code de traitement appliqué aux terres et sédiments ou déchets entrants
 
-  Le code de traitement doit obligatoirement appartenir à la liste suivante : D1, D3, D4, D5, D8, D9, D10, D12, D13, D14, D15, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13
+  Code de traitement appliqué aux terres excavées et sédiments ou déchets entrants.
+
+  Le code de traitement doit obligatoirement appartenir à la liste suivante : D1, D3, D4, D5, D8, D9, D10, D12, D13, D14, D15, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13.
+
+  Valeurs :
+  - Format Code de traitement avec ou sans espace
+  - Exemple : R12 ou R 12
   """
   operationCode: String!
   """
   Mode de traitement
-  Qualification du traitement correspondant au code de traitement des terres et sédiments ou des déchets entrants
+
+  Qualification du traitement correspondant au code de traitement des terres excavées et sédiments ou déchets entrants.
 
   Le mode de traitement est requis si un code de traitement final a été renseigné comme code de traitement.
-  La valeur doit correspondre au code de traitement réalisé ajouté. "
+  La valeur doit correspondre au code de traitement réalisé ajouté.
+  Si un code DXX a été renseigné, le seul mode de traitement possible est "ELIMINATION".
+
+  Valeurs :
+  - REUTILISATION
+  - RECYCLAGE
+  - VALORISATION_ENERGETIQUE
+  - AUTRES_VALORISATIONS
+  - ELIMINATION
   """
   operationMode: OperationMode
   """
   Rupture de traçabilité autorisée
-  Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet
+
+  Indiquer ici si le destinataire est autorisé à une rupture de traçabilité pour ce déchet.
+
+  Obligatoire si le code de traitement réalisé est non final, à savoir : R12, R13, D9, D13, D14, D15.
+
+  Valeurs :
+  - true
+  - false
   """
   noTraceability: Boolean
   """
@@ -1839,259 +2170,718 @@ input IncomingTexsLineInput {
   movementNumber: String
   """
   Code de traitement ultérieur prévu
-  Indique le code opération ultérieure prévue
 
-  Le code de traitement doit obligatoirement appartenir à la liste suivante : D1, D3, D4, D5, D8, D9, D10, D12, D13, D14, D15, R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11, R12, R13
+  Code de traitement ultérieur prévu.
+
+  Obligatoire si un code de traitement réalisé non final a été renseigné, à savoir : R12, R13, D9, D13, D14, D15.
+
+  Valeurs :
+  - Format Code de traitement avec ou sans espace
+  - Exemple : R12 ou R 12
   """
   nextOperationCode: String
   """
   Terre valorisée
+
   Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
   Si la terre est valorisée, le code de traitement réalisé doit obligatoirement commencer par un "R" (pas de code de traitement d'élimination).
+
+  Valeurs :
+  - true
+  - false
   """
   isUpcycled: Boolean
   """
   Codes INSEE des parcelles si valorisation
-  Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation, plusieurs numéros peuvent être renseignés
 
-  Chaque code INSEE doit faire 5 caractères, si plusieurs codes INSEE sont renseignés, ils doivent être séparés par virgules.
-  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation, plusieurs numéros peuvent être renseignés.
+
+  Obligatoire si "true" à Terre valorisée, et si aucune Coordonnées des parcelles n'a été renseignée.
+
+  Valeurs :
+  - Format Code INSEE Commune
+  - 5 caractères par code INSEE
+  - Si plusieurs codes INSEE sont renseignés, ils doivent être séparés par des virgules
   """
   destinationParcelInseeCodes: [String!]
   """
   Numéro(s) des parcelles si valorisation
-  Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle
 
-  Chaque numéro de parcelle doit être composé d'un préfixe, d'une section et d'un numéro de parcelle, séparés par des tirets:
-  - Le préfixe peut faire de 1 à 3 chiffres
-  - La section peut faire de 1 à 2 lettres majuscules
-  - Le numéro de parcelle peut faire de 1 à 4 chiffres
-  Exemples: "123-A-4567" ou "1-AB-1234"
+  Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
-  Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
-  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  Obligatoire si "true" à Terre valorisée, et si aucune Coordonnées des parcelles n'a été renseignée.
+
+  Valeurs :
+  - Format : [préfixe]-[section]-[numéro]
+  - Préfixe : 1 à 3 chiffres
+  - Section : 1 à 2 lettres majuscules
+  - Numéro de parcelle : 1 à 4 chiffres
+  - Plusieurs numéros peuvent être renseignés et doivent être séparés par des virgules
   """
   destinationParcelNumbers: [String!]
   """
   Coordonnées des parcelles si valorisation
-  Coordonnées de la ou des parcelles cadastrales du site de valorisation, par exemple : 48.894258 2.240027
 
-  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
-  Attention à bien séparer par des virgules des coordonnées de parcelles différentes, mais à bien utiliser le point comme séparateur décimal au sein même des coordonnées.
+  Coordonnées de la ou des parcelles cadastrales du site de valorisation, par exemple : 48.894258 2.240027.
 
-  Concernant le format de chaque coordonnées :
-  - valeur attendue en degrés
-  - le séparateur de décimales utilisé doit être un point
-  - entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
-  - pour séparer plusieurs coordonnées, une virgule doit être utilisée
+  Obligatoire si "true" à Terre valorisée, et si aucun Codes INSEE des parcelles n'a été renseigné.
+
+  Valeurs :
+  - Format WGS 84
+  - Valeur attendue en degrés
+  - Le séparateur de décimales utilisé doit être un point
+  - Entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
+  - Pour séparer plusieurs coordonnées, une virgule doit être utilisée
   """
   destinationParcelCoordinates: [String!]
   """
   Approvisionnement direct (pipeline, convoyeur)
-  Indique si les terres et sédiments ou déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
-  Si aucune valeur n'a été renseignée, il sera considéré que les terres et sédiments ou déchets entrants ne sont pas directement transportés et que donc la valeur est NON et qu'au moins un transporteur est attendu.
+  Indiquer ici si les terres excavées et sédiments ou déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
+
+  Si aucune valeur n'a été renseignée, il sera considéré que les terres excavées et sédiments ou déchets entrants ne sont pas directement transportés et que donc la valeur est false et qu'au moins un transporteur est attendu.
+
+  Valeurs :
+  - true
+  - false
   """
   isDirectSupply: Boolean
   """
   Mode de transport du transporteur n°1
+
+  Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°1.
+
+  Obligatoire si la colonne Transport direct (pipeline, convoyeur) est vide ou a la valeur false.
+
+  Valeurs :
+  - ROUTE
+  - AERIEN
+  - FLUVIAL
+  - MARITIME
+  - FERRE
   """
   transporter1TransportMode: TransportMode
   """
   Type de transporteur n°1
+
+  Type d'acteur correspondant au transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
+  - PERSONNE_PHYSIQUE
   """
   transporter1CompanyType: RegistryCompanyType
   """
   Numéro d'identification du transporteur n°1
+
+  Numéro d'identification du transporteur selon le type de transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée et si pas de "Numéro de notification ou de déclaration d'Import".
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
+  - PERSONNE_PHYSIQUE : Format libre
   """
   transporter1CompanyOrgId: String
   """
   Exemption de récépissé du transporteur n°1
+
+  Exemption de récépissé du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - true
+  - false
   """
   transporter1RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°1
+
+  Numéro de récépissé du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée et si Exemption de récépissé du transporteur est false.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - De 1 à 50 caractères maximum
   """
   transporter1RecepisseNumber: String
   """
   Raison sociale du transporteur n°1
+
+  Raison sociale du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée, sauf "PERSONNE_PHYSIQUE".
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter1CompanyName: String
   """
   Adresse du transporteur n°1
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter1CompanyAddress: String
   """
   Code postal du transporteur n°1
+
+  Code postal du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   transporter1CompanyPostalCode: String
   """
   Commune du transporteur n°1
+
+  Libellé de la commune du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   transporter1CompanyCity: String
   """
-  Pays du transporteur n°1
+  Code pays du transporteur n°1
+
+  Code pays du transporteur n°1.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°1 a été complétée.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   transporter1CompanyCountryCode: String
   """
   Mode de transport du transporteur n°2
+
+  Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°2.
+
+  Obligatoire si la colonne Transport par pipeline est false.
+
+  Valeurs :
+  - ROUTE
+  - AERIEN
+  - FLUVIAL
+  - MARITIME
+  - FERRE
   """
   transporter2TransportMode: TransportMode
   """
   Type de transporteur n°2
+
+  Type d'acteur correspondant au transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
   """
   transporter2CompanyType: RegistryCompanyType
   """
   Numéro d'identification du transporteur n°2
+
+  Numéro d'identification du transporteur selon le type de transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée et si pas de "Numéro de notification ou de déclaration d'Import".
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
   """
   transporter2CompanyOrgId: String
   """
   Exemption de récépissé du transporteur n°2
+
+  Exemption de récépissé du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - true
+  - false
   """
   transporter2RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°2
+
+  Numéro de récépissé du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée et si Exemption de récépissé du transporteur est false.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - De 1 à 50 caractères maximum
   """
   transporter2RecepisseNumber: String
   """
   Raison sociale du transporteur n°2
+
+  Raison sociale du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter2CompanyName: String
   """
   Adresse du transporteur n°2
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter2CompanyAddress: String
   """
   Code postal du transporteur n°2
+
+  Code postal du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   transporter2CompanyPostalCode: String
   """
   Commune du transporteur n°2
+
+  Libellé de la commune du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   transporter2CompanyCity: String
   """
-  Pays du transporteur n°2
+  Code pays du transporteur n°2
+
+  Code pays du transporteur n°2.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°2 a été complétée.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   transporter2CompanyCountryCode: String
   """
   Mode de transport du transporteur n°3
+
+  Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°3.
+
+  Obligatoire si la colonne Transport par pipeline est false.
+
+  Valeurs :
+  - ROUTE
+  - AERIEN
+  - FLUVIAL
+  - MARITIME
+  - FERRE
   """
   transporter3TransportMode: TransportMode
   """
   Type de transporteur n°3
+
+  Type d'acteur correspondant au transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
   """
   transporter3CompanyType: RegistryCompanyType
   """
   Numéro d'identification du transporteur n°3
+
+  Numéro d'identification du transporteur selon le type de transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée et si pas de "Numéro de notification ou de déclaration d'Import".
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
   """
   transporter3CompanyOrgId: String
   """
   Exemption de récépissé du transporteur n°3
+
+  Exemption de récépissé du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - true
+  - false
   """
   transporter3RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°3
+
+  Numéro de récépissé du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée et si Exemption de récépissé du transporteur est false.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - De 1 à 50 caractères maximum
   """
   transporter3RecepisseNumber: String
   """
   Raison sociale du transporteur n°3
+
+  Raison sociale du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter3CompanyName: String
   """
   Adresse du transporteur n°3
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter3CompanyAddress: String
   """
   Code postal du transporteur n°3
+
+  Code postal du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   transporter3CompanyPostalCode: String
   """
   Commune du transporteur n°3
+
+  Libellé de la commune du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   transporter3CompanyCity: String
   """
-  Pays du transporteur n°3
+  Code pays du transporteur n°3
+
+  Code pays du transporteur n°3.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°3 a été complétée.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   transporter3CompanyCountryCode: String
   """
   Mode de transport du transporteur n°4
+
+  Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°4.
+
+  Obligatoire si la colonne Transport par pipeline est false.
+
+  Valeurs :
+  - ROUTE
+  - AERIEN
+  - FLUVIAL
+  - MARITIME
+  - FERRE
   """
   transporter4TransportMode: TransportMode
   """
   Type de transporteur n°4
+
+  Type d'acteur correspondant au transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
   """
   transporter4CompanyType: RegistryCompanyType
   """
   Numéro d'identification du transporteur n°4
+
+  Numéro d'identification du transporteur selon le type de transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée et si pas de "Numéro de notification ou de déclaration d'Import".
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
   """
   transporter4CompanyOrgId: String
   """
   Exemption de récépissé du transporteur n°4
+
+  Exemption de récépissé du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - true
+  - false
   """
   transporter4RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°4
+
+  Numéro de récépissé du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée et si Exemption de récépissé du transporteur est false.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - De 1 à 50 caractères maximum
   """
   transporter4RecepisseNumber: String
   """
   Raison sociale du transporteur n°4
+
+  Raison sociale du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter4CompanyName: String
   """
   Adresse du transporteur n°4
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter4CompanyAddress: String
   """
   Code postal du transporteur n°4
+
+  Code postal du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   transporter4CompanyPostalCode: String
   """
   Commune du transporteur n°4
+
+  Libellé de la commune du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   transporter4CompanyCity: String
   """
-  Pays du transporteur n°4
+  Code pays du transporteur n°4
+
+  Code pays du transporteur n°4.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°4 a été complétée.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   transporter4CompanyCountryCode: String
   """
   Mode de transport du transporteur n°5
+
+  Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°5.
+
+  Obligatoire si la colonne Transport par pipeline est false.
+
+  Valeurs :
+  - ROUTE
+  - AERIEN
+  - FLUVIAL
+  - MARITIME
+  - FERRE
   """
   transporter5TransportMode: TransportMode
   """
   Type de transporteur n°5
+
+  Type d'acteur correspondant au transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
   """
   transporter5CompanyType: RegistryCompanyType
   """
   Numéro d'identification du transporteur n°5
+
+  Numéro d'identification du transporteur selon le type de transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée et si pas de "Numéro de notification ou de déclaration d'Import".
+
+  Valeurs selon le type :
+  - ETABLISSEMENT_FR : SIRET (14 caractères numériques)
+  - ENTREPRISE_UE : Numéro de TVA intracommunautaire (format selon pays)
+  - ENTREPRISE_HORS_UE : Format libre (lettres majuscules et chiffres)
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
   """
   transporter5CompanyOrgId: String
   """
   Exemption de récépissé du transporteur n°5
+
+  Exemption de récépissé du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - true
+  - false
   """
   transporter5RecepisseIsExempted: Boolean
   """
   Numéro de récépissé du transporteur n°5
+
+  Numéro de récépissé du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée et si Exemption de récépissé du transporteur est false.
+
+  Valeurs :
+  - Format libre sans contraintes
+  - De 1 à 50 caractères maximum
   """
   transporter5RecepisseNumber: String
   """
   Raison sociale du transporteur n°5
+
+  Raison sociale du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter5CompanyName: String
   """
   Adresse du transporteur n°5
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 150 caractères
   """
   transporter5CompanyAddress: String
   """
   Code postal du transporteur n°5
+
+  Code postal du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - Si ETABLISSEMENT_FR : 5 caractères numériques
+  - Autres types : Format alphanumérique accepté (lettres, chiffres et tirets)
   """
   transporter5CompanyPostalCode: String
   """
   Commune du transporteur n°5
+
+  Libellé de la commune du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - Format libre
+  - De 1 à 45 caractères
   """
   transporter5CompanyCity: String
   """
-  Pays du transporteur n°5
+  Code pays du transporteur n°5
+
+  Code pays du transporteur n°5.
+
+  Obligatoire si la colonne Mode de transport du transporteur n°5 a été complétée.
+
+  Valeurs :
+  - Format code pays : 2 lettres en majuscules
+  - Exemple : FR, BE, DE, etc.
   """
   transporter5CompanyCountryCode: String
 }
