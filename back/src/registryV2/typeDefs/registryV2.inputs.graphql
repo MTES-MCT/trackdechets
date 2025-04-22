@@ -17,169 +17,292 @@ input DeclarationTypeFilter {
 input SsdLineInput {
   """
   Motif
-  Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
+
+  Action à effectuer en rapport avec une ligne qui aurait déjà été déclarée.
 
   Si aucune valeur n'est renseignée et que la ligne n'a jamais été déclarée (vérification via l'identifiant unique), alors celle-ci est ajoutée comme nouvelle déclaration.
+
   Si aucune valeur n'est renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors la ligne sera ignorée.
+
   Si la valeur CANCEL a été renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors celle-ci sera supprimée.
+
   Si la valeur EDIT a été renseignée et que la ligne a déjà été déclarée (vérification via l'identifiant unique), alors celle-ci sera modifiée par les nouvelles valeurs.
+
   Si la valeur CANCEL ou EDIT a été renseignée et que la ligne n'a jamais été déclarée (vérification via l'identifiant unique), alors une erreur remontera.
+
+  Valeurs acceptées :
+  - EDIT
+  - CANCEL
   """
   reason: RegistryLineReason
+
   """
   Identifiant unique
-  Identifiant unique donné à chaque déclaration pour un établissement donné
+
+  Identifiant unique donné à chaque déclaration pour un établissement donné et type de registre.
 
   Si un import comporte plusieurs mêmes identifiants uniques sans motif, seule la première ligne sera déclarée, les suivantes seront ignorées.
+
+  Valeurs acceptées :
+  - Format libre
+  - Caractères alphanumériques [.] [-] [/] [_]
+  - De 1 à 36 caractères
   """
   publicId: ID!
+
   """
   SIRET du déclarant
+
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
   Le SIRET renseigné doit être rattaché à mon compte Trackdéchets (faire partie de mes établissements) et doit faire l'objet d'une délégation active entre le SIRET de l'émetteur et mon SIRET.
+
+  Valeurs acceptées :
+  - Format SIRET
+  - 14 caractères uniquement
+  - Chiffres uniquement
   """
   reportAsCompanySiret: String
+
   """
   SIRET de l'émetteur
+
   Établissement pour lequel la déclaration est effectuée, soit ici l'établissement pour lequel la déclaration de sortie de statut de déchet est effectuée.
 
   Le SIRET renseigné doit :
-  - être inscrit sur Trackdéchets,
-  - être rattaché à mon compte Trackdéchets (sauf délégation),
-  - avoir un profil ""Installation dans laquelle les déchets perdent leur statut de déchet"",
-  - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation).
+  - être inscrit sur Trackdéchets
+  - être rattaché à mon compte Trackdéchets (sauf délégation) avec un rôle administrateur ou collaborateur
+  - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation)
 
   La raison sociale ainsi que l'adresse de ce SIRET seront récupérés depuis la base Trackdéchets.
+
+  Valeurs acceptées :
+  - Format SIRET
+  - 14 caractères uniquement
+  - Chiffres uniquement
   """
   reportForCompanySiret: String!
+
   """
   Date d'utilisation
-  Date correspondant à l'utilisation sur site du produit faisant l'objet d'une sortie de statut de déchet.
+
+  Date correspondant à l'utilisation sur site du produit faisant l'objet de la sortie de statut de déchet.
 
   La date d'utilisation ne peut pas :
-  - être dans le futur,
-  - être antérieure à J-1 an,
-  - être antérieure à la date de traitement.
+  - être dans le futur
+  - être antérieure à J-1 an
+  - être antérieure ou égale à la date de traitement
 
   Une seule date d'utilisation ou d'expédition doit obligatoirement être renseignée.
+
+  Valeurs acceptées :
+  - Format ISO-8601 : YYYY-MM-DD
   """
   useDate: DateTime
+
   """
   Date d'expédition
-  Date correspondant à l'expédition du produit faisant l'objet d'une sortie de statut de déchet, si le produit n'est pas utilisé sur site.
+
+  Date correspondant à l'expédition du produit faisant l'objet de la sortie de statut de déchet, si le produit n'est pas utilisé sur site.
 
   La date d'expédition ne peut pas :
-  - être dans le futur,
-  - être antérieure à J-1 an,
-  - être antérieure à la date de traitement.
+  - être dans le futur
+  - être antérieure à J-1 an
+  - être antérieure ou égale à la date de traitement
 
   Une seule date d'utilisation ou d'expédition doit obligatoirement être renseignée.
+
+  Valeurs acceptées :
+  - Format ISO-8601 : YYYY-MM-DD
   """
   dispatchDate: DateTime
-  """
-  Dénomination du déchet
-  Dénomination usuelle du déchet faisant l'objet de la sortie de statut de déchet
 
-  La description renseignée ici peut ne pas correspondre à la définition du code déchet renseigné dans la colonne Code déchet.
-  """
-  wasteDescription: String!
-  """
-  Code déchet
-  Code du déchet traité, faisant l'objet d'une sortie de statut de déchet. Si plusieurs codes déchets sont traités, renseigner ici le code déchet principal.
-
-  Le code déchet mentionné doit faire partie de la liste des codes déchets officielle
-  """
-  wasteCode: String!
-  """
-  Code déchet Bâle
-  Code Bâle du déchet faisant l'objet de la sortie de statut de déchet
-
-  Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle
-  """
-  wasteCodeBale: String
-  """
-  Dénominations des déchets secondaires
-  Dénominations usuelles des codes déchets secondaires renseignés dans la colonne Codes déchets secondaires séparés par des virgules
-
-  Lorsque plusieurs codes déchets sont traités, renseigner ici l'ensemble des dénominations usuelles des codes déchets secondaires séparés par une virgule, la dénomination usuele du code déchet principal doit être renseigné dans la colonne Dénomination usuelle.
-  Le nombre de dénominations des déchets secondaires séparés par des virgules doit correspondre au nombre de codes déchets secondaires.
-  """
-  secondaryWasteDescriptions: [String!]
-  """
-  Codes déchets secondaires
-  Codes déchets secondaires traités faisant l'objet d'une sortie de statut de déchet. Lorsque plusieurs codes déchets sont traités, renseigner ici l'ensemble des codes déchets secondaires séparés par une virgule, le code déchet principal doit être renseigné dans la colonne Code déchet.
-
-  Lorsque plusieurs codes déchets sont traités, renseigner ici l'ensemble des codes déchets secondaires séparés par une virgule, le code déchet principal doit être renseigné dans la colonne Code déchet.
-  Le nombre de codes déchets secondaires séparés par des virgules doit correspondre au nombre de dénominations usuelles des déchets secondaires.
-  Les codes déchets mentionnés doivent faire partie de la liste des codes déchets officielle
-  """
-  secondaryWasteCodes: [String!]
   """
   Produit
-  Nature du produit ou de la matière issue de l'opération de valorisation
+
+  Nature du produit ou de la matière issue de l'opération de valorisation.
+
+  Valeurs acceptées :
+  - Format libre sans contrainte
+  - De 2 à 300 caractères (espaces compris)
   """
   product: String!
+
   """
   Poids en tonnes
-  Poids en tonnes du produit ou de la matière issue de l'opération de valorisation
 
-  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le poids ne peut avoir plus de 3 décimales.
+  Poids en tonnes du produit ou de la matière issue de l'opération de valorisation.
+
+  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
+
+  Valeurs acceptées :
+  - Nombre décimal
+  - De 1 à 7 caractères
   """
   weightValue: Float!
+
   """
   Type de poids
-  Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel
+
+  Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel.
+
+  La valeur doit obligatoirement être true (ESTIMÉ) ou false (RÉEL).
+
+  Valeurs acceptées :
+  - true (estimé)
+  - false (réel)
   """
   weightIsEstimate: Boolean!
+
   """
   Volume en M3
-  Volume en M3 du produit ou de la matière issue de l'opération de valorisation
 
-  La valeur doit être strictement comprise entre 0 et 10000, le séparateur de décimales peut être le point ou la virgule et le volume ne peut avoir plus de 3 décimales.
+  Volume en M3 du produit ou de la matière issue de l'opération de valorisation.
+
+  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
+
+  Valeurs acceptées :
+  - Nombre décimal
+  - De 1 à 7 caractères
   """
   volume: Float
+
+  """
+  Dénomination du déchet
+
+  Dénomination usuelle du déchet faisant l'objet de la sortie de statut de déchet.
+
+  La description renseignée ici peut ne pas correspondre à la définition du code déchet renseigné dans la colonne Code déchet.
+
+  Valeurs acceptées :
+  - Format libre
+  - De 2 à 300 caractères (espaces compris)
+  """
+  wasteDescription: String!
+
+  """
+  Code déchet
+
+  Code du déchet traité faisant l'objet de la sortie de statut de déchet. Si plusieurs codes déchets sont traités, renseigner ici le code déchet principal.
+
+  Le code déchet mentionné doit faire partie de la liste des codes déchets officielle.
+
+  Valeurs acceptées :
+  - Format code déchet avec espace : XX XX XX ou XX XX XX*
+  - De 8 à 9 caractères (espaces compris)
+  """
+  wasteCode: String!
+
+  """
+  Code déchet Bâle
+
+  Code Bâle du déchet faisant l'objet de la sortie de statut de déchet.
+
+  Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle.
+
+  Valeurs acceptées :
+  - Format code déchet Bâle : [A]XXXX ou [B]XXXX
+  - 5 caractères uniquement
+  """
+  wasteCodeBale: String
+
+  """
+  Dénominations des déchets secondaires
+
+  Dénominations usuelles des codes déchets secondaires faisant l'objet de la sortie de statut de déchet, séparés par des virgules.
+
+  Lorsque plusieurs codes déchets sont traités, renseigner ici l'ensemble des dénominations usuelles des codes déchets secondaires séparés par une virgule, la dénomination usuelle du code déchet principal doit être renseignée dans la colonne Dénomination usuelle.
+
+  Le nombre de dénominations des déchets secondaires séparés par des virgules doit correspondre au nombre de codes déchets secondaires.
+
+  Valeurs acceptées :
+  - Format libre
+  - Chaque dénomination ne doit pas excéder 300 caractères
+  """
+  secondaryWasteDescriptions: [String!]
+
+  """
+  Codes déchets secondaires
+
+  Codes déchets secondaires faisant l'objet de la sortie de statut de déchet.
+
+  Lorsque plusieurs codes déchets sont traités, renseigner ici l'ensemble des codes déchets secondaires séparés par une virgule, le code déchet principal doit être renseigné dans la colonne Code déchet.
+
+  Le nombre de codes déchets secondaires séparés par des virgules doit correspondre au nombre de dénominations usuelles des déchets secondaires.
+
+  Les codes déchets mentionnés doivent faire partie de la liste des codes déchets officielle.
+
+  Valeurs acceptées :
+  - Formats codes déchets avec espace séparés par des virgules : XX XX XX, XX XX XX*, XX XX XX*
+  """
+  secondaryWasteCodes: [String!]
+
   """
   Date de traitement
+
   Date correspondant au traitement du déchet faisant l'objet de la sortie de statut de déchet.
 
   La date de traitement ne peut pas :
-  - être dans le futur,
-  - être antérieure à J-1 an,
-  - être postérieure à la date d'utilisation ou d'expédition.
+  - être dans le futur
+  - être antérieure à J-1 an
+  - être postérieure à la date d'utilisation ou d'expédition
+
+  Valeurs acceptées :
+  - Format ISO-8601 : YYYY-MM-DD
   """
   processingDate: DateTime!
+
   """
   Date de fin de traitement
-  Date de fin de traitement du déchet faisant l'objet de la sortie de statut de déchet
+
+  Date de fin de traitement du déchet faisant l'objet de la sortie de statut de déchet.
 
   La date de fin de traitement ne peut pas :
-  - être dans le futur,
-  - être antérieure à J-1 an,
-  - être antérieure à la date de traitement.
+  - être dans le futur
+  - être antérieure à J-1 an
+  - être antérieure à la date de traitement
+
+  Valeurs acceptées :
+  - Format ISO-8601 : YYYY-MM-DD
   """
   processingEndDate: DateTime
+
   """
   Code de traitement réalisé
-  Code de traitement appliqué au déchet faisant l'objet de la sortie de statut de déchet
 
-  Le code de traitement doit obligatoirement être un code d'opération de valorisation, à savoir : R2, R3, R4, R5, R6, R7, R8, R12 ou R13
+  Code de traitement appliqué au déchet faisant l'objet de la sortie de statut de déchet.
+
+  Le code de traitement doit obligatoirement être un code d'opération de valorisation, à savoir : R1, R2, R3, R4, R5, R6, R7, R8, R9, R12 ou R13.
+
+  Valeurs acceptées :
+  - Format Code de traitement avec ou sans espace
+  - De 2 à 4 caractères (espaces compris)
   """
   operationCode: String!
+
   """
   Mode de traitement
-  Qualification du traitement correspondant au code de traitement du déchet faisant l'objet d'une sortie de statut de déchet
+
+  Qualification du traitement correspondant au code de traitement du déchet faisant l'objet d'une sortie de statut de déchet.
 
   Le mode de traitement Élimination n'est pas possible dans le cadre d'une sortie de statut de déchet.
   Le mode de traitement est requis si un code de traitement final a été renseigné comme code de traitement.
-  La valeur doit obligatoirement être Réutilisation ou Recyclage (avec ou sans accent, avec ou sans majuscule) et doit correspondre au code de traitement réalisé ajouté.
+  La valeur doit correspondre au code de traitement réalisé ajouté.
+
+  Valeurs acceptées :
+  - REUTILISATION
+  - RECYCLAGE
+  - VALORISATION_ENERGETIQUE
+  - AUTRES_VALORISATIONS
   """
   operationMode: OperationMode!
+
   """
   Référence de l'acte administratif
-  Référence de l'acte administratif ayant fixé les critères de sortie de statut de déchet
 
-  Référence de l'acte administratif qui doit strictement faire partie de la liste. Les espaces, les accents et les majuscules doivent être respectés:
+  Référence de l'acte administratif ayant fixé les critères de sortie de statut de déchet.
+
+  Valeurs strictement acceptées :
   - Arrêté du 29 juillet 2014
   - Arrêté du 24 août 2016
   - Arrêté du 10 juillet 2017
@@ -190,48 +313,97 @@ input SsdLineInput {
   - Arrêté du 13 décembre 2021
   - Arrêté du 21 décembre 2021
   - Arrêté du 19 février 2024
-  - Règlement du 5 juin 2019
   - Règlement du 31 mars 2011
   - Règlement du 10 décembre 2012
   - Règlement du 25 juillet 2013
+  - Règlement du 5 juin 2019
   """
   administrativeActReference: String!
+
   """
   Type de destinataire
-  Type d'acteur correspondant au destinataire du déchet faisant l'objet de la sortie de statut de déchet
+
+  Type d'acteur correspondant au destinataire du produit issu de la sortie de statut de déchet.
 
   Selon le type de destinataire renseigné, des contrôles différents seront effectués sur le format du numéro d'identification du destinataire.
+
   Si une Date d'utilisation a été renseignée, on considère que l'utilisation est effectuée sur site et donc le SIRET du destinataire attendu est celui de l'émetteur. Ainsi, si les champs en lien avec le destinataire ne sont pas complétés, ils le seront automatiquement avec les informations du SIRET émetteur.
+
+  Valeurs acceptées :
+  - ETABLISSEMENT_FR
+  - ENTREPRISE_UE
+  - ENTREPRISE_HORS_UE
+  - ASSOCIATION
   """
   destinationCompanyType: RegistryCompanyType
+
   """
   Numéro d'identification du destinataire
-  Numéro d'identification du destinataire du produit issu de la sortie de statut de déchet
+
+  Numéro d'identification du destinataire du produit issu de la sortie de statut de déchet.
+
+  Si une Date d'utilisation a été renseignée, on considère que l'utilisation est effectuée sur site et donc le SIRET du destinataire attendu est celui de l'émetteur. Ainsi, si les champs en lien avec le destinataire ne sont pas complétés, ils le seront automatiquement avec les informations du SIRET émetteur.
+
+  Valeurs acceptées selon le type de destinataire :
+  - ETABLISSEMENT_FR : SIRET (14 caractères)
+  - ENTREPRISE_UE : N° de TVA intracommunautaire
+  - ENTREPRISE_HORS_UE : Format libre
+  - ASSOCIATION : Format RNA (W + 9 chiffres)
   """
   destinationCompanyOrgId: String
+
   """
   Raison sociale du destinataire
-  Raison sociale du destinataire du produit issu de la sortie de statut de déchet
+
+  Raison sociale du destinataire du produit issu de la sortie de statut de déchet.
+
+  Valeurs acceptées :
+  - Format libre
+  - De 1 à 150 caractères
   """
   destinationCompanyName: String
+
   """
   Libellé de l'adresse du destinataire
-  Libellé de l'adresse du destinataire (n° de voie et voie, complément, lieu-dit etc) du produit issu de la sortie de statut de déchet
+
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire du produit issu de la sortie de statut de déchet.
+
+  Valeurs acceptées :
+  - Format libre
+  - De 1 à 150 caractères
   """
   destinationCompanyAddress: String
-  """
-  Commune du destinataire
-  Commune du destinataire du produit issu de la sortie de statut de déchet
-  """
-  destinationCompanyCity: String
+
   """
   Code postal du destinataire
-  Code postal du destinataire du produit issu de la sortie de statut de déchet
+
+  Code postal du destinataire du produit issu de la sortie de statut de déchet.
+
+  Valeurs acceptées :
+  - Si ETABLISSEMENT_FR : 5 caractères (chiffres uniquement)
+  - Autres cas : alphanumériques acceptés (lettres, chiffres et [-])
   """
   destinationCompanyPostalCode: String
+
+  """
+  Commune du destinataire
+
+  Commune du destinataire du produit issu de la sortie de statut de déchet.
+
+  Valeurs acceptées :
+  - Format libre
+  - De 1 à 45 caractères
+  """
+  destinationCompanyCity: String
+
   """
   Code pays du destinataire
-  Code pays du destinataire du produit issu de la sortie de statut de déchet, composé de 2 lettres majuscules
+
+  Code pays du destinataire du produit issu de la sortie de statut de déchet.
+
+  Valeurs acceptées :
+  - Format code pays
+  - 2 lettres en majuscules
   """
   destinationCompanyCountryCode: String
 }
@@ -396,12 +568,12 @@ input IncomingWasteLineInput {
   emitterCompanyOrgId: String
   """
   Raison sociale de l'expéditeur ou détenteur
-  Raison sociale de l’expéditeur ou du détenteur des déchets entrants
+  Raison sociale de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyName: String
   """
   Adresse de l'expéditeur ou détenteur
-  Libellé de l’adresse (n° de voie et voie, complément, lieu-dit etc) de l’expéditeur ou du détenteur des déchets entrants
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyAddress: String
   """
@@ -446,7 +618,7 @@ input IncomingWasteLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
@@ -921,7 +1093,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyCity: String
   """
-  Pays de l'expéditeur ou du détenteur
+  Code pays de l'expéditeur ou du détenteur
   """
   emitterCompanyCountryCode: String
   """
@@ -952,7 +1124,7 @@ input IncomingTexsLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
@@ -1584,7 +1756,7 @@ input OutgoingTexsLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
@@ -2051,7 +2223,7 @@ input OutgoingWasteLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
@@ -2355,7 +2527,7 @@ input TransportedLineInput {
   reportForTransportOtherTmdCode: String
   """
   Numéro(s) d'immatriculation(s)
-  Numéros d’immatriculations du ou des véhicules
+  Numéros d'immatriculations du ou des véhicules
   """
   reportForTransportPlates: [String!]
   """
@@ -2442,12 +2614,12 @@ input TransportedLineInput {
   emitterCompanyOrgId: String
   """
   Raison sociale de l'expéditeur ou détenteur
-  Raison sociale de l’expéditeur ou du détenteur des déchets entrants
+  Raison sociale de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyName: String
   """
   Adresse de l'expéditeur ou détenteur
-  Libellé de l’adresse (n° de voie et voie, complément, lieu-dit etc) de l’expéditeur ou du détenteur des déchets entrants
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyAddress: String
   """
@@ -2549,7 +2721,7 @@ input TransportedLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
@@ -2895,7 +3067,7 @@ input ManagedLineInput {
   gistridNumber: String
   """
   Numéro de mouvement
-  Numéro de saisie du document déclaré sur GISTRID.
+  Numéro de saisie du document déclaré sur GISTRID
   """
   movementNumber: String
   """
@@ -2925,12 +3097,12 @@ input ManagedLineInput {
   emitterCompanyOrgId: String
   """
   Raison sociale de l'expéditeur ou détenteur
-  Raison sociale de l’expéditeur ou du détenteur des déchets entrants
+  Raison sociale de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyName: String
   """
   Adresse de l'expéditeur ou détenteur
-  Libellé de l’adresse (n° de voie et voie, complément, lieu-dit etc) de l’expéditeur ou du détenteur des déchets entrants
+  Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets entrants
   """
   emitterCompanyAddress: String
   """
@@ -2975,7 +3147,7 @@ input ManagedLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l’éco-organisme
+  Raison sociale de l'éco-organisme
   """
   ecoOrganismeName: String
   """
