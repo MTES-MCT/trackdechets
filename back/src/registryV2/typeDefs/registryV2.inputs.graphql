@@ -118,56 +118,6 @@ input SsdLineInput {
   dispatchDate: DateTime
 
   """
-  Produit
-
-  Nature du produit ou de la matière issue de l'opération de valorisation.
-
-  Valeurs acceptées :
-  - Format libre sans contrainte
-  - De 2 à 300 caractères (espaces compris)
-  """
-  product: String!
-
-  """
-  Poids en tonnes
-
-  Poids en tonnes du produit ou de la matière issue de l'opération de valorisation.
-
-  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
-
-  Valeurs acceptées :
-  - Nombre décimal
-  - De 1 à 7 caractères
-  """
-  weightValue: Float!
-
-  """
-  Type de poids
-
-  Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel.
-
-  La valeur doit obligatoirement être true (ESTIMÉ) ou false (RÉEL).
-
-  Valeurs acceptées :
-  - true (estimé)
-  - false (réel)
-  """
-  weightIsEstimate: Boolean!
-
-  """
-  Volume en M3
-
-  Volume en M3 du produit ou de la matière issue de l'opération de valorisation.
-
-  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
-
-  Valeurs acceptées :
-  - Nombre décimal
-  - De 1 à 7 caractères
-  """
-  volume: Float
-
-  """
   Dénomination du déchet
 
   Dénomination usuelle du déchet faisant l'objet de la sortie de statut de déchet.
@@ -236,6 +186,56 @@ input SsdLineInput {
   - Formats codes déchets avec espace séparés par des virgules : XX XX XX, XX XX XX*, XX XX XX*
   """
   secondaryWasteCodes: [String!]
+
+  """
+  Produit
+
+  Nature du produit ou de la matière issue de l'opération de valorisation.
+
+  Valeurs acceptées :
+  - Format libre sans contrainte
+  - De 2 à 300 caractères (espaces compris)
+  """
+  product: String!
+
+  """
+  Poids en tonnes
+
+  Poids en tonnes du produit ou de la matière issue de l'opération de valorisation.
+
+  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
+
+  Valeurs acceptées :
+  - Nombre décimal
+  - De 1 à 7 caractères
+  """
+  weightValue: Float!
+
+  """
+  Type de poids
+
+  Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel.
+
+  La valeur doit obligatoirement être true (ESTIMÉ) ou false (RÉEL).
+
+  Valeurs acceptées :
+  - true (estimé)
+  - false (réel)
+  """
+  weightIsEstimate: Boolean!
+
+  """
+  Volume en M3
+
+  Volume en M3 du produit ou de la matière issue de l'opération de valorisation.
+
+  La valeur doit être strictement comprise entre 0 et 1000, et ne peut avoir plus de 3 décimales.
+
+  Valeurs acceptées :
+  - Nombre décimal
+  - De 1 à 7 caractères
+  """
+  volume: Float
 
   """
   Date de traitement
