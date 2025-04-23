@@ -266,6 +266,19 @@ const getDefaultValues = () => ({
   wasteCodes: []
 });
 
+const getDateDescription = (registryType: RegistryV2ExportType) => {
+  switch (registryType) {
+    case RegistryV2ExportType.Ssd:
+      return "La date d'utilisation ou d'expédition est prise en compte.";
+    case RegistryV2ExportType.Incoming:
+      return "La date de réception est prise en compte.";
+    case RegistryV2ExportType.Outgoing:
+    case RegistryV2ExportType.Transported:
+    case RegistryV2ExportType.Managed:
+      return "La date d'expédition est prise en compte. ";
+  }
+};
+
 export function ExportModal({ isOpen, onClose }: Props) {
   // const [companies, setCompanies] = useState<ExportCompany[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -706,7 +719,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
               </Button>
             ))}
           </div>
-          <div className="fr-container--fluid fr-mb-8v">
+          <div className="fr-container--fluid fr-mb-2v">
             <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
               <div className="fr-col-6">
                 <Input
@@ -738,6 +751,13 @@ export function ExportModal({ isOpen, onClose }: Props) {
                 />
               </div>
             </div>
+          </div>
+          <div className="fr-mb-8v">
+            <Alert
+              description={getDateDescription(registryType)}
+              severity="info"
+              small
+            />
           </div>
           <div className="fr-container--fluid fr-mb-8v">
             <Select
