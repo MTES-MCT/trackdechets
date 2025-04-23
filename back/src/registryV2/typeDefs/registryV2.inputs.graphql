@@ -16,7 +16,7 @@ input DeclarationTypeFilter {
 "Contenu d'une ligne pour l'import de sortie de statut de déchet"
 input SsdLineInput {
   """
-  Motif
+  **Motif**
 
   Action à effectuer en rapport avec une ligne qui aurait déjà été déclarée.
 
@@ -37,7 +37,7 @@ input SsdLineInput {
   reason: RegistryLineReason
 
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné et type de registre.
 
@@ -51,7 +51,7 @@ input SsdLineInput {
   publicId: ID!
 
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -65,7 +65,7 @@ input SsdLineInput {
   reportAsCompanySiret: String
 
   """
-  SIRET de l'émetteur
+  **SIRET de l'émetteur**
 
   Établissement pour lequel la déclaration est effectuée, soit ici l'établissement pour lequel la déclaration de sortie de statut de déchet est effectuée.
 
@@ -84,7 +84,7 @@ input SsdLineInput {
   reportForCompanySiret: String!
 
   """
-  Date d'utilisation
+  **Date d'utilisation**
 
   Date correspondant à l'utilisation sur site du produit faisant l'objet de la sortie de statut de déchet.
 
@@ -101,7 +101,7 @@ input SsdLineInput {
   useDate: DateTime
 
   """
-  Date d'expédition
+  **Date d'expédition**
 
   Date correspondant à l'expédition du produit faisant l'objet de la sortie de statut de déchet, si le produit n'est pas utilisé sur site.
 
@@ -118,7 +118,7 @@ input SsdLineInput {
   dispatchDate: DateTime
 
   """
-  Dénomination du déchet
+  **Dénomination du déchet**
 
   Dénomination usuelle du déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -131,7 +131,7 @@ input SsdLineInput {
   wasteDescription: String!
 
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet traité faisant l'objet de la sortie de statut de déchet. Si plusieurs codes déchets sont traités, renseigner ici le code déchet principal.
 
@@ -144,7 +144,7 @@ input SsdLineInput {
   wasteCode: String!
 
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -157,7 +157,7 @@ input SsdLineInput {
   wasteCodeBale: String
 
   """
-  Dénominations des déchets secondaires
+  **Dénominations des déchets secondaires**
 
   Dénominations usuelles des codes déchets secondaires faisant l'objet de la sortie de statut de déchet, séparés par des virgules.
 
@@ -172,7 +172,7 @@ input SsdLineInput {
   secondaryWasteDescriptions: [String!]
 
   """
-  Codes déchets secondaires
+  **Codes déchets secondaires**
 
   Codes déchets secondaires faisant l'objet de la sortie de statut de déchet.
 
@@ -188,7 +188,7 @@ input SsdLineInput {
   secondaryWasteCodes: [String!]
 
   """
-  Produit
+  **Produit**
 
   Nature du produit ou de la matière issue de l'opération de valorisation.
 
@@ -199,7 +199,7 @@ input SsdLineInput {
   product: String!
 
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes du produit ou de la matière issue de l'opération de valorisation.
 
@@ -212,7 +212,7 @@ input SsdLineInput {
   weightValue: Float!
 
   """
-  Type de poids
+  **Type de poids**
 
   Indiquer ici si le poids du produit ou de la matière issue de l'opération de valorisation est estimé ou réel.
 
@@ -225,7 +225,7 @@ input SsdLineInput {
   weightIsEstimate: Boolean!
 
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 du produit ou de la matière issue de l'opération de valorisation.
 
@@ -238,7 +238,7 @@ input SsdLineInput {
   volume: Float
 
   """
-  Date de traitement
+  **Date de traitement**
 
   Date correspondant au traitement du déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -253,7 +253,7 @@ input SsdLineInput {
   processingDate: DateTime!
 
   """
-  Date de fin de traitement
+  **Date de fin de traitement**
 
   Date de fin de traitement du déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -268,7 +268,7 @@ input SsdLineInput {
   processingEndDate: DateTime
 
   """
-  Code de traitement réalisé
+  **Code de traitement réalisé**
 
   Code de traitement appliqué au déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -281,7 +281,7 @@ input SsdLineInput {
   operationCode: String!
 
   """
-  Mode de traitement
+  **Mode de traitement**
 
   Qualification du traitement correspondant au code de traitement du déchet faisant l'objet d'une sortie de statut de déchet.
 
@@ -298,7 +298,7 @@ input SsdLineInput {
   operationMode: OperationMode!
 
   """
-  Référence de l'acte administratif
+  **Référence de l'acte administratif**
 
   Référence de l'acte administratif ayant fixé les critères de sortie de statut de déchet.
 
@@ -321,7 +321,7 @@ input SsdLineInput {
   administrativeActReference: String!
 
   """
-  Type de destinataire
+  **Type de destinataire**
 
   Type d'acteur correspondant au destinataire du produit issu de la sortie de statut de déchet.
 
@@ -338,7 +338,7 @@ input SsdLineInput {
   destinationCompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du destinataire
+  **Numéro d'identification du destinataire**
 
   Numéro d'identification du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -353,7 +353,7 @@ input SsdLineInput {
   destinationCompanyOrgId: String
 
   """
-  Raison sociale du destinataire
+  **Raison sociale du destinataire**
 
   Raison sociale du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -364,7 +364,7 @@ input SsdLineInput {
   destinationCompanyName: String
 
   """
-  Libellé de l'adresse du destinataire
+  **Libellé de l'adresse du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -375,7 +375,7 @@ input SsdLineInput {
   destinationCompanyAddress: String
 
   """
-  Code postal du destinataire
+  **Code postal du destinataire**
 
   Code postal du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -386,7 +386,7 @@ input SsdLineInput {
   destinationCompanyPostalCode: String
 
   """
-  Commune du destinataire
+  **Commune du destinataire**
 
   Commune du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -397,7 +397,7 @@ input SsdLineInput {
   destinationCompanyCity: String
 
   """
-  Code pays du destinataire
+  **Code pays du destinataire**
 
   Code pays du destinataire du produit issu de la sortie de statut de déchet.
 
@@ -411,7 +411,7 @@ input SsdLineInput {
 "Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux entrants"
 input IncomingWasteLineInput {
   """
-  Motif
+  **Motif**
 
   Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
 
@@ -431,7 +431,7 @@ input IncomingWasteLineInput {
   """
   reason: RegistryLineReason
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné.
 
@@ -444,7 +444,7 @@ input IncomingWasteLineInput {
   """
   publicId: ID!
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -455,7 +455,7 @@ input IncomingWasteLineInput {
   """
   reportAsCompanySiret: String
   """
-  SIRET du destinataire
+  **SIRET du destinataire**
 
   Établissement pour lequel la déclaration est effectuée, soit ici le destinataire des déchets entrants.
 
@@ -472,7 +472,7 @@ input IncomingWasteLineInput {
   """
   reportForCompanySiret: String!
   """
-  Dénomination du déchet
+  **Dénomination du déchet**
 
   Dénomination usuelle des déchets entrants.
 
@@ -484,7 +484,7 @@ input IncomingWasteLineInput {
   """
   wasteDescription: String!
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet entrant.
 
@@ -501,7 +501,7 @@ input IncomingWasteLineInput {
   """
   wasteCode: String!
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet entrant.
 
@@ -513,7 +513,7 @@ input IncomingWasteLineInput {
   """
   wasteCodeBale: String
   """
-  POP
+  **POP**
 
   La colonne POP permet d'indiquer si les déchets entrants contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
@@ -523,7 +523,7 @@ input IncomingWasteLineInput {
   """
   wastePop: Boolean!
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -536,7 +536,7 @@ input IncomingWasteLineInput {
   """
   wasteIsDangerous: Boolean
   """
-  Date de réception
+  **Date de réception**
 
   Date de réception des déchets entrants.
 
@@ -549,7 +549,7 @@ input IncomingWasteLineInput {
   """
   receptionDate: DateTime!
   """
-  Heure de pesée
+  **Heure de pesée**
 
   Heure de pesée du déchet entrant pour les installations soumises à contrôle vidéo.
 
@@ -562,7 +562,7 @@ input IncomingWasteLineInput {
   """
   weighingHour: String
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des déchets entrants.
 
@@ -576,7 +576,7 @@ input IncomingWasteLineInput {
   """
   weightValue: Float!
   """
-  Type de poids
+  **Type de poids**
 
   Indique si le poids des déchets entrants est estimé ou réel.
   Si le code d'opération est R1 ou D10 ou D5, le poids doit obligatoirement être réel.
@@ -587,7 +587,7 @@ input IncomingWasteLineInput {
   """
   weightIsEstimate: Boolean!
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des déchets entrants.
 
@@ -601,7 +601,7 @@ input IncomingWasteLineInput {
   """
   volume: Float
   """
-  Type de producteur initial
+  **Type de producteur initial**
 
   Type d'acteur correspondant au producteur des déchets entrants.
 
@@ -617,7 +617,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du producteur initial
+  **Numéro d'identification du producteur initial**
 
   Numéro d'identification du producteur initial, selon son type de profil.
 
@@ -630,7 +630,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyOrgId: String
   """
-  Raison sociale du producteur initial
+  **Raison sociale du producteur initial**
 
   Raison sociale du producteur initial des déchets entrants.
 
@@ -640,7 +640,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyName: String
   """
-  Adresse du producteur initial
+  **Adresse du producteur initial**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des déchets entrants.
 
@@ -650,7 +650,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyAddress: String
   """
-  Code postal du producteur initial
+  **Code postal du producteur initial**
 
   Code postal du producteur initial des déchets entrants.
 
@@ -660,7 +660,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyPostalCode: String
   """
-  Commune du producteur initial
+  **Commune du producteur initial**
 
   Commune du producteur initial des déchets entrants.
 
@@ -670,7 +670,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyCity: String
   """
-  Code pays du producteur initial
+  **Code pays du producteur initial**
 
   Code pays du producteur initial des déchets entrants.
 
@@ -680,7 +680,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterCompanyCountryCode: String
   """
-  Code(s) INSEE de(s) commune(s)
+  **Code(s) INSEE de(s) commune(s)**
 
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets entrants.
 
@@ -692,7 +692,7 @@ input IncomingWasteLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Type d'expéditeur ou détenteur
+  **Type d'expéditeur ou détenteur**
 
   Type d'acteur correspondant à l'expéditeur du déchet.
 
@@ -709,7 +709,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification de l'expéditeur ou détenteur
+  **Numéro d'identification de l'expéditeur ou détenteur**
 
   Numéro d'identification de l'expéditeur ou du détenteur, selon son type de profil.
 
@@ -722,7 +722,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyOrgId: String
   """
-  Raison sociale de l'expéditeur ou détenteur
+  **Raison sociale de l'expéditeur ou détenteur**
 
   Raison sociale de l'expéditeur ou du détenteur des déchets entrants.
 
@@ -732,7 +732,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyName: String
   """
-  Adresse de l'expéditeur ou détenteur
+  **Adresse de l'expéditeur ou détenteur**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets entrants.
 
@@ -742,7 +742,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyAddress: String
   """
-  Code postal de l'expéditeur ou détenteur
+  **Code postal de l'expéditeur ou détenteur**
 
   Code postal de l'expéditeur ou du détenteur des déchets entrants.
 
@@ -752,7 +752,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyPostalCode: String
   """
-  Commune de l'expéditeur ou détenteur
+  **Commune de l'expéditeur ou détenteur**
 
   Commune de l'expéditeur ou du détenteur des déchets entrants.
 
@@ -762,7 +762,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyCity: String
   """
-  Code pays de l'expéditeur ou détenteur
+  **Code pays de l'expéditeur ou détenteur**
 
   Code pays de l'expéditeur ou du détenteur des déchets entrants.
 
@@ -772,7 +772,7 @@ input IncomingWasteLineInput {
   """
   emitterCompanyCountryCode: String
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
 
@@ -782,7 +782,7 @@ input IncomingWasteLineInput {
   """
   emitterPickupSiteName: String
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -792,7 +792,7 @@ input IncomingWasteLineInput {
   """
   emitterPickupSiteAddress: String
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -802,7 +802,7 @@ input IncomingWasteLineInput {
   """
   emitterPickupSitePostalCode: String
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -812,7 +812,7 @@ input IncomingWasteLineInput {
   """
   emitterPickupSiteCity: String
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -822,7 +822,7 @@ input IncomingWasteLineInput {
   """
   emitterPickupSiteCountryCode: String
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -831,7 +831,7 @@ input IncomingWasteLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -841,7 +841,7 @@ input IncomingWasteLineInput {
   """
   ecoOrganismeName: String
   """
-  SIRET du courtier
+  **SIRET du courtier**
 
   SIRET du courtier.
 
@@ -850,7 +850,7 @@ input IncomingWasteLineInput {
   """
   brokerCompanySiret: String
   """
-  Raison sociale du courtier
+  **Raison sociale du courtier**
 
   Raison sociale du courtier.
 
@@ -860,7 +860,7 @@ input IncomingWasteLineInput {
   """
   brokerCompanyName: String
   """
-  Numéro de récépissé du courtier
+  **Numéro de récépissé du courtier**
 
   Numéro de récépissé du courtier.
 
@@ -870,7 +870,7 @@ input IncomingWasteLineInput {
   """
   brokerRecepisseNumber: String
   """
-  SIRET du négociant
+  **SIRET du négociant**
 
   SIRET du négociant.
 
@@ -879,7 +879,7 @@ input IncomingWasteLineInput {
   """
   traderCompanySiret: String
   """
-  Raison sociale du négociant
+  **Raison sociale du négociant**
 
   Raison sociale du négociant.
 
@@ -889,7 +889,7 @@ input IncomingWasteLineInput {
   """
   traderCompanyName: String
   """
-  Numéro de récépissé du négociant
+  **Numéro de récépissé du négociant**
 
   Numéro de récépissé du négociant.
 
@@ -899,7 +899,7 @@ input IncomingWasteLineInput {
   """
   traderRecepisseNumber: String
   """
-  Code de traitement réalisé
+  **Code de traitement réalisé**
 
   Code de traitement appliqué aux déchets entrants.
 
@@ -911,7 +911,7 @@ input IncomingWasteLineInput {
   """
   operationCode: String!
   """
-  Mode de traitement
+  **Mode de traitement**
 
   Qualification du traitement correspondant au code de traitement des déchets entrants.
 
@@ -929,7 +929,7 @@ input IncomingWasteLineInput {
   """
   operationMode: OperationMode
   """
-  Rupture de traçabilité autorisée
+  **Rupture de traçabilité autorisée**
 
   Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet.
 
@@ -947,12 +947,12 @@ input IncomingWasteLineInput {
   ttdImportNumber: String
 
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
   Numéro de saisie du document déclaré.
   """
   movementNumber: String
   """
-  Code de traitement ultérieur prévu
+  **Code de traitement ultérieur prévu**
 
   Code de traitement ultérieur prévu.
 
@@ -964,7 +964,7 @@ input IncomingWasteLineInput {
   """
   nextOperationCode: String
   """
-  Approvisionnement direct (pipeline, convoyeur)
+  **Approvisionnement direct (pipeline, convoyeur)**
 
   Indique si les déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
@@ -976,7 +976,7 @@ input IncomingWasteLineInput {
   """
   isDirectSupply: Boolean
   """
-  Mode de transport du transporteur n°1
+  **Mode de transport du transporteur n°1**
 
   Mode de transport des déchets entrants du transporteur n°1.
 
@@ -989,7 +989,7 @@ input IncomingWasteLineInput {
   """
   transporter1TransportMode: TransportMode
   """
-  Type de transporteur n°1
+  **Type de transporteur n°1**
 
   Type d'acteur correspondant au transporteur n°1.
 
@@ -1004,7 +1004,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°1
+  **Numéro d'identification du transporteur n°1**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -1017,7 +1017,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°1
+  **Exemption de récépissé du transporteur n°1**
 
   Exemption de récépissé du transporteur n°1.
 
@@ -1027,7 +1027,7 @@ input IncomingWasteLineInput {
   """
   transporter1RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°1
+  **Numéro de récépissé du transporteur n°1**
 
   Numéro de récépissé du transporteur n°1.
 
@@ -1037,7 +1037,7 @@ input IncomingWasteLineInput {
   """
   transporter1RecepisseNumber: String
   """
-  Raison sociale du transporteur n°1
+  **Raison sociale du transporteur n°1**
 
   Raison sociale du transporteur n°1.
 
@@ -1047,7 +1047,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyName: String
   """
-  Adresse du transporteur n°1
+  **Adresse du transporteur n°1**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
 
@@ -1057,7 +1057,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyAddress: String
   """
-  Code postal du transporteur n°1
+  **Code postal du transporteur n°1**
 
   Code postal du transporteur n°1.
 
@@ -1067,7 +1067,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyPostalCode: String
   """
-  Commune du transporteur n°1
+  **Commune du transporteur n°1**
 
   Commune du transporteur n°1.
 
@@ -1077,7 +1077,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyCity: String
   """
-  Pays du transporteur n°1
+  **Pays du transporteur n°1**
 
   Code pays du transporteur n°1.
 
@@ -1087,7 +1087,7 @@ input IncomingWasteLineInput {
   """
   transporter1CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°2
+  **Mode de transport du transporteur n°2**
 
   Mode de transport des déchets entrants du transporteur n°2.
 
@@ -1102,7 +1102,7 @@ input IncomingWasteLineInput {
   """
   transporter2TransportMode: TransportMode
   """
-  Type de transporteur n°2
+  **Type de transporteur n°2**
 
   Type d'acteur correspondant au transporteur n°2.
 
@@ -1118,7 +1118,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°2
+  **Numéro d'identification du transporteur n°2**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -1130,7 +1130,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°2
+  **Exemption de récépissé du transporteur n°2**
 
   Exemption de récépissé du transporteur n°2.
 
@@ -1140,7 +1140,7 @@ input IncomingWasteLineInput {
   """
   transporter2RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°2
+  **Numéro de récépissé du transporteur n°2**
 
   Numéro de récépissé du transporteur n°2.
 
@@ -1150,7 +1150,7 @@ input IncomingWasteLineInput {
   """
   transporter2RecepisseNumber: String
   """
-  Raison sociale du transporteur n°2
+  **Raison sociale du transporteur n°2**
 
   Raison sociale du transporteur n°2.
 
@@ -1160,7 +1160,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyName: String
   """
-  Adresse du transporteur n°2
+  **Adresse du transporteur n°2**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
 
@@ -1170,7 +1170,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyAddress: String
   """
-  Code postal du transporteur n°2
+  **Code postal du transporteur n°2**
 
   Code postal du transporteur n°2.
 
@@ -1180,7 +1180,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyPostalCode: String
   """
-  Commune du transporteur n°2
+  **Commune du transporteur n°2**
 
   Commune du transporteur n°2.
 
@@ -1190,7 +1190,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyCity: String
   """
-  Pays du transporteur n°2
+  **Pays du transporteur n°2**
 
   Code pays du transporteur n°2.
 
@@ -1200,7 +1200,7 @@ input IncomingWasteLineInput {
   """
   transporter2CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°3
+  **Mode de transport du transporteur n°3**
 
   Mode de transport des déchets entrants du transporteur n°3.
 
@@ -1215,7 +1215,7 @@ input IncomingWasteLineInput {
   """
   transporter3TransportMode: TransportMode
   """
-  Type de transporteur n°3
+  **Type de transporteur n°3**
 
   Type d'acteur correspondant au transporteur n°3.
 
@@ -1231,7 +1231,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°3
+  **Numéro d'identification du transporteur n°3**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -1243,7 +1243,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°3
+  **Exemption de récépissé du transporteur n°3**
 
   Exemption de récépissé du transporteur n°3.
 
@@ -1253,7 +1253,7 @@ input IncomingWasteLineInput {
   """
   transporter3RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°3
+  **Numéro de récépissé du transporteur n°3**
 
   Numéro de récépissé du transporteur n°3.
 
@@ -1263,7 +1263,7 @@ input IncomingWasteLineInput {
   """
   transporter3RecepisseNumber: String
   """
-  Raison sociale du transporteur n°3
+  **Raison sociale du transporteur n°3**
 
   Raison sociale du transporteur n°3.
 
@@ -1273,7 +1273,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyName: String
   """
-  Adresse du transporteur n°3
+  **Adresse du transporteur n°3**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
 
@@ -1283,7 +1283,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyAddress: String
   """
-  Code postal du transporteur n°3
+  **Code postal du transporteur n°3**
 
   Code postal du transporteur n°3.
 
@@ -1293,7 +1293,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyPostalCode: String
   """
-  Commune du transporteur n°3
+  **Commune du transporteur n°3**
 
   Commune du transporteur n°3.
 
@@ -1303,7 +1303,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyCity: String
   """
-  Pays du transporteur n°3
+  **Pays du transporteur n°3**
 
   Code pays du transporteur n°3.
 
@@ -1313,7 +1313,7 @@ input IncomingWasteLineInput {
   """
   transporter3CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°4
+  **Mode de transport du transporteur n°4**
 
   Mode de transport des déchets entrants du transporteur n°4.
 
@@ -1328,7 +1328,7 @@ input IncomingWasteLineInput {
   """
   transporter4TransportMode: TransportMode
   """
-  Type de transporteur n°4
+  **Type de transporteur n°4**
 
   Type d'acteur correspondant au transporteur n°4.
 
@@ -1344,7 +1344,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°4
+  **Numéro d'identification du transporteur n°4**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -1356,7 +1356,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°4
+  **Exemption de récépissé du transporteur n°4**
 
   Exemption de récépissé du transporteur n°4.
 
@@ -1366,7 +1366,7 @@ input IncomingWasteLineInput {
   """
   transporter4RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°4
+  **Numéro de récépissé du transporteur n°4**
 
   Numéro de récépissé du transporteur n°4.
 
@@ -1376,7 +1376,7 @@ input IncomingWasteLineInput {
   """
   transporter4RecepisseNumber: String
   """
-  Raison sociale du transporteur n°4
+  **Raison sociale du transporteur n°4**
 
   Raison sociale du transporteur n°4.
 
@@ -1386,7 +1386,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyName: String
   """
-  Adresse du transporteur n°4
+  **Adresse du transporteur n°4**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
 
@@ -1396,7 +1396,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyAddress: String
   """
-  Code postal du transporteur n°4
+  **Code postal du transporteur n°4**
 
   Code postal du transporteur n°4.
 
@@ -1406,7 +1406,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyPostalCode: String
   """
-  Commune du transporteur n°4
+  **Commune du transporteur n°4**
 
   Commune du transporteur n°4.
 
@@ -1416,7 +1416,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyCity: String
   """
-  Pays du transporteur n°4
+  **Pays du transporteur n°4**
 
   Code pays du transporteur n°4.
 
@@ -1426,7 +1426,7 @@ input IncomingWasteLineInput {
   """
   transporter4CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°5
+  **Mode de transport du transporteur n°5**
 
   Mode de transport des déchets entrants du transporteur n°5.
 
@@ -1441,7 +1441,7 @@ input IncomingWasteLineInput {
   """
   transporter5TransportMode: TransportMode
   """
-  Type de transporteur n°5
+  **Type de transporteur n°5**
 
   Type d'acteur correspondant au transporteur n°5.
 
@@ -1457,7 +1457,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°5
+  **Numéro d'identification du transporteur n°5**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -1469,7 +1469,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°5
+  **Exemption de récépissé du transporteur n°5**
 
   Exemption de récépissé du transporteur n°5.
 
@@ -1479,7 +1479,7 @@ input IncomingWasteLineInput {
   """
   transporter5RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°5
+  **Numéro de récépissé du transporteur n°5**
 
   Numéro de récépissé du transporteur n°5.
 
@@ -1489,7 +1489,7 @@ input IncomingWasteLineInput {
   """
   transporter5RecepisseNumber: String
   """
-  Raison sociale du transporteur n°5
+  **Raison sociale du transporteur n°5**
 
   Raison sociale du transporteur n°5.
 
@@ -1499,7 +1499,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyName: String
   """
-  Adresse du transporteur n°5
+  **Adresse du transporteur n°5**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
 
@@ -1509,7 +1509,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyAddress: String
   """
-  Code postal du transporteur n°5
+  **Code postal du transporteur n°5**
 
   Code postal du transporteur n°5.
 
@@ -1519,7 +1519,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyPostalCode: String
   """
-  Commune du transporteur n°5
+  **Commune du transporteur n°5**
 
   Commune du transporteur n°5.
 
@@ -1529,7 +1529,7 @@ input IncomingWasteLineInput {
   """
   transporter5CompanyCity: String
   """
-  Pays du transporteur n°5
+  **Pays du transporteur n°5**
 
   Code pays du transporteur n°5.
 
@@ -1543,7 +1543,7 @@ input IncomingWasteLineInput {
 "Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux entrants"
 input IncomingTexsLineInput {
   """
-  Motif
+  **Motif**
 
   Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
 
@@ -1563,7 +1563,7 @@ input IncomingTexsLineInput {
   """
   reason: RegistryLineReason
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné.
 
@@ -1576,7 +1576,7 @@ input IncomingTexsLineInput {
   """
   publicId: ID!
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -1587,29 +1587,47 @@ input IncomingTexsLineInput {
   """
   reportAsCompanySiret: String
   """
-  SIRET du destinataire
+  **SIRET du destinataire**
 
   Établissement pour lequel la déclaration est effectuée, soit ici le destinataire des terres excavées et sédiments ou des déchets entrants.
 
   Le SIRET renseigné doit :
-  - être inscrit sur Trackdéchets
-  - être rattaché à mon compte Trackdéchets (sauf délégation) avec un rôle administrateur ou collaborateur
-  - avoir au moins un des profils ou sous-profils suivants :
-    - Installation de valorisation de terres et sédiments
-    - Installation dans laquelle les déchets perdent leur statut de déchet
-    - Installation de Tri, transit regroupement de déchets y compris non classée
-      - Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)
-      - Déchets Dangereux (Rubrique 2718)
-      - Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)
-    - Installation de traitement
-      - Incinération de déchets dangereux (Rubrique 2770)
-      - Incinération de déchets non dangereux (Rubriques 2771, 2740)
-      - Installation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)
-      - Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)
-      - Installation de stockage de déchets inertes (Rubrique 2760-3)
-      - Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780, 2795)
-      - Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)
-  - faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation)
+
+  ‣ être inscrit sur Trackdéchets
+
+  ‣ être rattaché à mon compte Trackdéchets (sauf délégation) avec un rôle administrateur ou collaborateur
+
+  ‣ avoir au moins un des profils ou sous-profils suivants :
+
+    ○ Installation de valorisation de terres et sédiments
+
+    ○ Installation dans laquelle les déchets perdent leur statut de déchet
+
+    ○ Installation de Tri, transit regroupement de déchets y compris non classée
+
+    ◦ Déchets non Dangereux (Rubriques 2713, 2714, 2715, 2716)
+
+    ◦ Déchets Dangereux (Rubrique 2718)
+
+    ◦ Autres cas déchets dangereux (Rubriques 2719, 2792-1, 2793-1, 2793-2, 2797-1, 2798)
+
+    ○ Installation de traitement
+
+    ◦ Incinération de déchets dangereux (Rubrique 2770)
+
+    ◦ Incinération de déchets non dangereux (Rubriques 2771, 2740)
+
+    ◦ Installation de stockage de déchets dangereux (Rubriques 2720-1, 2760-1, 2760-4, 2797-2)
+
+    ◦ Installation de stockage de déchets non dangereux, y compris casiers dédiés amiante, plâtre (Rubriques 2720-2, 2760-2-a, 2760-2-b)
+
+    ◦ Installation de stockage de déchets inertes (Rubrique 2760-3)
+
+    ◦ Autres traitements de déchets non dangereux (Rubriques 2791, 2781, 2782, 2780, 2795)
+
+    ◦ Autres traitements de déchets dangereux (Rubriques 2790, 2792-2, 2793-3)
+
+  ‣ faire l'objet d'une délégation active avec le SIRET du déclarant (dans le cas d'une délégation)
 
   La raison sociale ainsi que l'adresse de ce SIRET seront récupérés depuis la base Trackdéchets.
 
@@ -1618,7 +1636,7 @@ input IncomingTexsLineInput {
   """
   reportForCompanySiret: String!
   """
-  Dénomination usuelle des terres excavées et sédiments ou des déchets
+  **Dénomination usuelle des terres excavées et sédiments ou des déchets**
 
   Dénomination usuelle des terres excavées et sédiments ou des déchets entrants.
 
@@ -1628,7 +1646,7 @@ input IncomingTexsLineInput {
   """
   wasteDescription: String!
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet entrant.
 
@@ -1645,7 +1663,7 @@ input IncomingTexsLineInput {
   """
   wasteCode: String
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet entrant.
 
@@ -1657,18 +1675,17 @@ input IncomingTexsLineInput {
   """
   wasteCodeBale: String
   """
-  POP
+  **POP**
 
   Ce champ permet d'indiquer si les terres excavées et sédiments ou les déchets entrants contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
   Valeurs :
-  - OUI
-  - NON
-  (avec ou sans majuscules)
+  - true : OUI
+  - false : NON
   """
   wastePop: Boolean!
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -1676,13 +1693,12 @@ input IncomingTexsLineInput {
   Si aucune valeur n'est ajoutée, c'est les valeurs du code déchet et POP qui permettent d'autocompléter le caractère dangereux ou non dangereux du déchet entrant.
 
   Valeurs :
-  - OUI
-  - NON
-  (avec ou sans majuscules)
+  - true : OUI
+  - false : NON
   """
   wasteIsDangerous: Boolean
   """
-  DAP
+  **DAP**
 
   Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP).
   Numéro de bordereau d'analyse chimique des terres excavées et sédiments lorsque cette analyse est necessaire pour valoriser ou éliminer les terres exacvées et sédiments, lorsque ces données sont disponibles.
@@ -1692,7 +1708,7 @@ input IncomingTexsLineInput {
   """
   wasteDap: String
   """
-  Date de réception
+  **Date de réception**
 
   Date de réception des terres excavées et sédiments ou des déchets entrants.
 
@@ -1708,7 +1724,7 @@ input IncomingTexsLineInput {
   """
   receptionDate: DateTime!
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des terres excavées et sédiments ou des déchets entrants.
 
@@ -1720,7 +1736,7 @@ input IncomingTexsLineInput {
   """
   weightValue: Float!
   """
-  Type de poids
+  **Type de poids**
 
   Indique si le poids est estimé ou réel.
 
@@ -1732,7 +1748,7 @@ input IncomingTexsLineInput {
   """
   weightIsEstimate: Boolean!
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des terres excavées et sédiments ou des déchets entrants.
 
@@ -1744,7 +1760,7 @@ input IncomingTexsLineInput {
   """
   volume: Float
   """
-  Codes INSEE des parcelles
+  **Codes INSEE des parcelles**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés.
 
@@ -1756,7 +1772,7 @@ input IncomingTexsLineInput {
   """
   parcelInseeCodes: [String!]
   """
-  Numéro(s) des parcelles
+  **Numéro(s) des parcelles**
 
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -1772,7 +1788,7 @@ input IncomingTexsLineInput {
   """
   parcelNumbers: [String!]
   """
-  Coordonnées des parcelles
+  **Coordonnées des parcelles**
 
   Coordonnées de la ou des parcelles cadastrales du site de production, par exemple : 48.894258 2.240027
 
@@ -1786,7 +1802,7 @@ input IncomingTexsLineInput {
   """
   parcelCoordinates: [String!]
   """
-  Identifiant SIS du terrain
+  **Identifiant SIS du terrain**
 
   Identifiant du terrain SIS lorsque les déchets ou les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
 
@@ -1796,7 +1812,7 @@ input IncomingTexsLineInput {
   """
   sisIdentifier: String
   """
-  Type de producteur initial
+  **Type de producteur initial**
 
   Type d'acteur correspondant au producteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1810,7 +1826,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du producteur initial
+  **Numéro d'identification du producteur initial**
 
   Numéro d'identification du producteur initial, à renseigner selon son type de profil.
   Des contrôles différents seront effectués sur le format selon le type de producteur renseigné.
@@ -1825,7 +1841,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyOrgId: String
   """
-  Raison sociale du producteur initial
+  **Raison sociale du producteur initial**
 
   Raison sociale du producteur initial des terres excavées et sédiments ou des déchets entrants.
 
@@ -1837,7 +1853,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyName: String
   """
-  Adresse du producteur initial
+  **Adresse du producteur initial**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des terres excavées et sédiments ou des déchets entrants.
 
@@ -1847,7 +1863,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyAddress: String
   """
-  Code postal du producteur initial
+  **Code postal du producteur initial**
 
   Code postal du producteur initial des terres excavées et sédiments ou des déchets entrants.
 
@@ -1857,7 +1873,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyPostalCode: String
   """
-  Commune du producteur initial
+  **Commune du producteur initial**
 
   Commune du producteur initial des terres excavées et sédiments ou des déchets entrants.
 
@@ -1867,7 +1883,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyCity: String
   """
-  Pays du producteur initial
+  **Pays du producteur initial**
 
   Code pays du producteur initial des terres excavées et sédiments ou des déchets entrants.
 
@@ -1877,7 +1893,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterCompanyCountryCode: String
   """
-  Code(s) INSEE de(s) commune(s)
+  **Code(s) INSEE de(s) commune(s)**
 
   Le ou les codes INSEE de la ou des commune(s) de collecte des terres excavées et sédiments ou des déchets entrants.
 
@@ -1889,7 +1905,7 @@ input IncomingTexsLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Type d'expéditeur ou détenteur
+  **Type d'expéditeur ou détenteur**
 
   Type d'acteur correspondant à l'expéditeur ou au détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1904,7 +1920,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification de l'expéditeur ou détenteur
+  **Numéro d'identification de l'expéditeur ou détenteur**
 
   Numéro d'identification de l'expéditeur ou du détenteur, selon son type de profil.
   Des contrôles différents seront effectués sur le format selon le type d'expéditeur renseigné.
@@ -1918,7 +1934,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyOrgId: String
   """
-  Raison sociale de l'expéditeur ou du détenteur
+  **Raison sociale de l'expéditeur ou du détenteur**
 
   Raison sociale de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1930,7 +1946,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyName: String
   """
-  Libellé de l'adresse de l'expéditeur ou du détenteur
+  **Libellé de l'adresse de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1940,7 +1956,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyAddress: String
   """
-  Code postal de l'expéditeur ou du détenteur
+  **Code postal de l'expéditeur ou du détenteur**
 
   Code postal de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1950,7 +1966,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyPostalCode: String
   """
-  Commune de l'expéditeur ou du détenteur
+  **Commune de l'expéditeur ou du détenteur**
 
   Commune de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1960,7 +1976,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyCity: String
   """
-  Code pays de l'expéditeur ou du détenteur
+  **Code pays de l'expéditeur ou du détenteur**
 
   Code pays de l'expéditeur ou du détenteur des terres excavées et sédiments ou des déchets entrants.
 
@@ -1970,7 +1986,7 @@ input IncomingTexsLineInput {
   """
   emitterCompanyCountryCode: String
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur.
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
@@ -1981,7 +1997,7 @@ input IncomingTexsLineInput {
   """
   emitterPickupSiteName: String
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -1991,7 +2007,7 @@ input IncomingTexsLineInput {
   """
   emitterPickupSiteAddress: String
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -2001,7 +2017,7 @@ input IncomingTexsLineInput {
   """
   emitterPickupSitePostalCode: String
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -2011,7 +2027,7 @@ input IncomingTexsLineInput {
   """
   emitterPickupSiteCity: String
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -2021,7 +2037,7 @@ input IncomingTexsLineInput {
   """
   emitterPickupSiteCountryCode: String
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -2033,7 +2049,7 @@ input IncomingTexsLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -2045,7 +2061,7 @@ input IncomingTexsLineInput {
   """
   ecoOrganismeName: String
   """
-  SIRET du courtier
+  **SIRET du courtier**
 
   SIRET du courtier.
 
@@ -2057,7 +2073,7 @@ input IncomingTexsLineInput {
   """
   brokerCompanySiret: String
   """
-  Raison sociale du courtier
+  **Raison sociale du courtier**
 
   Raison sociale du courtier.
 
@@ -2069,7 +2085,7 @@ input IncomingTexsLineInput {
   """
   brokerCompanyName: String
   """
-  Numéro de récépissé du courtier
+  **Numéro de récépissé du courtier**
 
   Numéro de récépissé du courtier.
 
@@ -2081,7 +2097,7 @@ input IncomingTexsLineInput {
   """
   brokerRecepisseNumber: String
   """
-  SIRET du négociant
+  **SIRET du négociant**
 
   SIRET du négociant.
 
@@ -2093,7 +2109,7 @@ input IncomingTexsLineInput {
   """
   traderCompanySiret: String
   """
-  Raison sociale du négociant
+  **Raison sociale du négociant**
 
   Raison sociale du négociant.
 
@@ -2105,7 +2121,7 @@ input IncomingTexsLineInput {
   """
   traderCompanyName: String
   """
-  Numéro de récépissé du négociant
+  **Numéro de récépissé du négociant**
 
   Numéro de récépissé du négociant.
 
@@ -2117,7 +2133,7 @@ input IncomingTexsLineInput {
   """
   traderRecepisseNumber: String
   """
-  Code de traitement réalisé
+  **Code de traitement réalisé**
 
   Code de traitement appliqué aux terres excavées et sédiments ou déchets entrants.
 
@@ -2129,7 +2145,7 @@ input IncomingTexsLineInput {
   """
   operationCode: String!
   """
-  Mode de traitement
+  **Mode de traitement**
 
   Qualification du traitement correspondant au code de traitement des terres excavées et sédiments ou déchets entrants.
 
@@ -2146,7 +2162,7 @@ input IncomingTexsLineInput {
   """
   operationMode: OperationMode
   """
-  Rupture de traçabilité autorisée
+  **Rupture de traçabilité autorisée**
 
   Indiquer ici si le destinataire est autorisé à une rupture de traçabilité pour ce déchet.
 
@@ -2158,18 +2174,18 @@ input IncomingTexsLineInput {
   """
   noTraceability: Boolean
   """
-  Numéro de notification ou de déclaration GISTRID
+  **Numéro de notification ou de déclaration GISTRID**
 
   Le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
   """
   ttdImportNumber: String
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
   Numéro de saisie du document déclaré
   """
   movementNumber: String
   """
-  Code de traitement ultérieur prévu
+  **Code de traitement ultérieur prévu**
 
   Code de traitement ultérieur prévu.
 
@@ -2181,7 +2197,7 @@ input IncomingTexsLineInput {
   """
   nextOperationCode: String
   """
-  Terre valorisée
+  **Terre valorisée**
 
   Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
@@ -2193,7 +2209,7 @@ input IncomingTexsLineInput {
   """
   isUpcycled: Boolean
   """
-  Codes INSEE des parcelles si valorisation
+  **Codes INSEE des parcelles si valorisation**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation, plusieurs numéros peuvent être renseignés.
 
@@ -2206,7 +2222,7 @@ input IncomingTexsLineInput {
   """
   destinationParcelInseeCodes: [String!]
   """
-  Numéro(s) des parcelles si valorisation
+  **Numéro(s) des parcelles si valorisation**
 
   Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -2221,7 +2237,7 @@ input IncomingTexsLineInput {
   """
   destinationParcelNumbers: [String!]
   """
-  Coordonnées des parcelles si valorisation
+  **Coordonnées des parcelles si valorisation**
 
   Coordonnées de la ou des parcelles cadastrales du site de valorisation, par exemple : 48.894258 2.240027.
 
@@ -2236,7 +2252,7 @@ input IncomingTexsLineInput {
   """
   destinationParcelCoordinates: [String!]
   """
-  Approvisionnement direct (pipeline, convoyeur)
+  **Approvisionnement direct (pipeline, convoyeur)**
 
   Indiquer ici si les terres excavées et sédiments ou déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
@@ -2248,7 +2264,7 @@ input IncomingTexsLineInput {
   """
   isDirectSupply: Boolean
   """
-  Mode de transport du transporteur n°1
+  **Mode de transport du transporteur n°1**
 
   Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°1.
 
@@ -2263,7 +2279,7 @@ input IncomingTexsLineInput {
   """
   transporter1TransportMode: TransportMode
   """
-  Type de transporteur n°1
+  **Type de transporteur n°1**
 
   Type d'acteur correspondant au transporteur n°1.
 
@@ -2278,7 +2294,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°1
+  **Numéro d'identification du transporteur n°1**
 
   Numéro d'identification du transporteur selon le type de transporteur n°1.
 
@@ -2293,7 +2309,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°1
+  **Exemption de récépissé du transporteur n°1**
 
   Exemption de récépissé du transporteur n°1.
 
@@ -2305,7 +2321,7 @@ input IncomingTexsLineInput {
   """
   transporter1RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°1
+  **Numéro de récépissé du transporteur n°1**
 
   Numéro de récépissé du transporteur n°1.
 
@@ -2317,7 +2333,7 @@ input IncomingTexsLineInput {
   """
   transporter1RecepisseNumber: String
   """
-  Raison sociale du transporteur n°1
+  **Raison sociale du transporteur n°1**
 
   Raison sociale du transporteur n°1.
 
@@ -2329,7 +2345,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyName: String
   """
-  Adresse du transporteur n°1
+  **Adresse du transporteur n°1**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
 
@@ -2341,7 +2357,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyAddress: String
   """
-  Code postal du transporteur n°1
+  **Code postal du transporteur n°1**
 
   Code postal du transporteur n°1.
 
@@ -2353,7 +2369,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyPostalCode: String
   """
-  Commune du transporteur n°1
+  **Commune du transporteur n°1**
 
   Libellé de la commune du transporteur n°1.
 
@@ -2365,7 +2381,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyCity: String
   """
-  Code pays du transporteur n°1
+  **Code pays du transporteur n°1**
 
   Code pays du transporteur n°1.
 
@@ -2377,7 +2393,7 @@ input IncomingTexsLineInput {
   """
   transporter1CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°2
+  **Mode de transport du transporteur n°2**
 
   Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°2.
 
@@ -2392,7 +2408,7 @@ input IncomingTexsLineInput {
   """
   transporter2TransportMode: TransportMode
   """
-  Type de transporteur n°2
+  **Type de transporteur n°2**
 
   Type d'acteur correspondant au transporteur n°2.
 
@@ -2406,7 +2422,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°2
+  **Numéro d'identification du transporteur n°2**
 
   Numéro d'identification du transporteur selon le type de transporteur n°2.
 
@@ -2420,7 +2436,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°2
+  **Exemption de récépissé du transporteur n°2**
 
   Exemption de récépissé du transporteur n°2.
 
@@ -2432,7 +2448,7 @@ input IncomingTexsLineInput {
   """
   transporter2RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°2
+  **Numéro de récépissé du transporteur n°2**
 
   Numéro de récépissé du transporteur n°2.
 
@@ -2444,7 +2460,7 @@ input IncomingTexsLineInput {
   """
   transporter2RecepisseNumber: String
   """
-  Raison sociale du transporteur n°2
+  **Raison sociale du transporteur n°2**
 
   Raison sociale du transporteur n°2.
 
@@ -2456,7 +2472,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyName: String
   """
-  Adresse du transporteur n°2
+  **Adresse du transporteur n°2**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
 
@@ -2468,7 +2484,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyAddress: String
   """
-  Code postal du transporteur n°2
+  **Code postal du transporteur n°2**
 
   Code postal du transporteur n°2.
 
@@ -2480,7 +2496,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyPostalCode: String
   """
-  Commune du transporteur n°2
+  **Commune du transporteur n°2**
 
   Libellé de la commune du transporteur n°2.
 
@@ -2492,7 +2508,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyCity: String
   """
-  Code pays du transporteur n°2
+  **Code pays du transporteur n°2**
 
   Code pays du transporteur n°2.
 
@@ -2504,7 +2520,7 @@ input IncomingTexsLineInput {
   """
   transporter2CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°3
+  **Mode de transport du transporteur n°3**
 
   Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°3.
 
@@ -2519,7 +2535,7 @@ input IncomingTexsLineInput {
   """
   transporter3TransportMode: TransportMode
   """
-  Type de transporteur n°3
+  **Type de transporteur n°3**
 
   Type d'acteur correspondant au transporteur n°3.
 
@@ -2533,7 +2549,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°3
+  **Numéro d'identification du transporteur n°3**
 
   Numéro d'identification du transporteur selon le type de transporteur n°3.
 
@@ -2547,7 +2563,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°3
+  **Exemption de récépissé du transporteur n°3**
 
   Exemption de récépissé du transporteur n°3.
 
@@ -2559,7 +2575,7 @@ input IncomingTexsLineInput {
   """
   transporter3RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°3
+  **Numéro de récépissé du transporteur n°3**
 
   Numéro de récépissé du transporteur n°3.
 
@@ -2571,7 +2587,7 @@ input IncomingTexsLineInput {
   """
   transporter3RecepisseNumber: String
   """
-  Raison sociale du transporteur n°3
+  **Raison sociale du transporteur n°3**
 
   Raison sociale du transporteur n°3.
 
@@ -2583,7 +2599,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyName: String
   """
-  Adresse du transporteur n°3
+  **Adresse du transporteur n°3**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
 
@@ -2595,7 +2611,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyAddress: String
   """
-  Code postal du transporteur n°3
+  **Code postal du transporteur n°3**
 
   Code postal du transporteur n°3.
 
@@ -2607,7 +2623,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyPostalCode: String
   """
-  Commune du transporteur n°3
+  **Commune du transporteur n°3**
 
   Libellé de la commune du transporteur n°3.
 
@@ -2619,7 +2635,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyCity: String
   """
-  Code pays du transporteur n°3
+  **Code pays du transporteur n°3**
 
   Code pays du transporteur n°3.
 
@@ -2631,7 +2647,7 @@ input IncomingTexsLineInput {
   """
   transporter3CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°4
+  **Mode de transport du transporteur n°4**
 
   Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°4.
 
@@ -2646,7 +2662,7 @@ input IncomingTexsLineInput {
   """
   transporter4TransportMode: TransportMode
   """
-  Type de transporteur n°4
+  **Type de transporteur n°4**
 
   Type d'acteur correspondant au transporteur n°4.
 
@@ -2660,7 +2676,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°4
+  **Numéro d'identification du transporteur n°4**
 
   Numéro d'identification du transporteur selon le type de transporteur n°4.
 
@@ -2674,7 +2690,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°4
+  **Exemption de récépissé du transporteur n°4**
 
   Exemption de récépissé du transporteur n°4.
 
@@ -2686,7 +2702,7 @@ input IncomingTexsLineInput {
   """
   transporter4RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°4
+  **Numéro de récépissé du transporteur n°4**
 
   Numéro de récépissé du transporteur n°4.
 
@@ -2698,7 +2714,7 @@ input IncomingTexsLineInput {
   """
   transporter4RecepisseNumber: String
   """
-  Raison sociale du transporteur n°4
+  **Raison sociale du transporteur n°4**
 
   Raison sociale du transporteur n°4.
 
@@ -2710,7 +2726,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyName: String
   """
-  Adresse du transporteur n°4
+  **Adresse du transporteur n°4**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
 
@@ -2722,7 +2738,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyAddress: String
   """
-  Code postal du transporteur n°4
+  **Code postal du transporteur n°4**
 
   Code postal du transporteur n°4.
 
@@ -2734,7 +2750,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyPostalCode: String
   """
-  Commune du transporteur n°4
+  **Commune du transporteur n°4**
 
   Libellé de la commune du transporteur n°4.
 
@@ -2746,7 +2762,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyCity: String
   """
-  Code pays du transporteur n°4
+  **Code pays du transporteur n°4**
 
   Code pays du transporteur n°4.
 
@@ -2758,7 +2774,7 @@ input IncomingTexsLineInput {
   """
   transporter4CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°5
+  **Mode de transport du transporteur n°5**
 
   Mode de transport des terres excavées et sédiments ou déchets entrants du transporteur n°5.
 
@@ -2773,7 +2789,7 @@ input IncomingTexsLineInput {
   """
   transporter5TransportMode: TransportMode
   """
-  Type de transporteur n°5
+  **Type de transporteur n°5**
 
   Type d'acteur correspondant au transporteur n°5.
 
@@ -2787,7 +2803,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°5
+  **Numéro d'identification du transporteur n°5**
 
   Numéro d'identification du transporteur selon le type de transporteur n°5.
 
@@ -2801,7 +2817,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°5
+  **Exemption de récépissé du transporteur n°5**
 
   Exemption de récépissé du transporteur n°5.
 
@@ -2813,7 +2829,7 @@ input IncomingTexsLineInput {
   """
   transporter5RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°5
+  **Numéro de récépissé du transporteur n°5**
 
   Numéro de récépissé du transporteur n°5.
 
@@ -2825,7 +2841,7 @@ input IncomingTexsLineInput {
   """
   transporter5RecepisseNumber: String
   """
-  Raison sociale du transporteur n°5
+  **Raison sociale du transporteur n°5**
 
   Raison sociale du transporteur n°5.
 
@@ -2837,7 +2853,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyName: String
   """
-  Adresse du transporteur n°5
+  **Adresse du transporteur n°5**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
 
@@ -2849,7 +2865,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyAddress: String
   """
-  Code postal du transporteur n°5
+  **Code postal du transporteur n°5**
 
   Code postal du transporteur n°5.
 
@@ -2861,7 +2877,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyPostalCode: String
   """
-  Commune du transporteur n°5
+  **Commune du transporteur n°5**
 
   Libellé de la commune du transporteur n°5.
 
@@ -2873,7 +2889,7 @@ input IncomingTexsLineInput {
   """
   transporter5CompanyCity: String
   """
-  Code pays du transporteur n°5
+  **Code pays du transporteur n°5**
 
   Code pays du transporteur n°5.
 
@@ -2889,7 +2905,7 @@ input IncomingTexsLineInput {
 "Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux sortants"
 input OutgoingTexsLineInput {
   """
-  Motif
+  **Motif**
 
   Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
 
@@ -2909,7 +2925,7 @@ input OutgoingTexsLineInput {
   """
   reason: RegistryLineReason
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné et type de registre.
 
@@ -2922,7 +2938,7 @@ input OutgoingTexsLineInput {
   """
   publicId: ID!
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -2934,7 +2950,7 @@ input OutgoingTexsLineInput {
   """
   reportAsCompanySiret: String
   """
-  SIRET de l'expéditeur ou du détenteur
+  **SIRET de l'expéditeur ou du détenteur**
 
   Établissement pour lequel la déclaration est effectuée.
 
@@ -2951,7 +2967,7 @@ input OutgoingTexsLineInput {
   """
   reportForCompanySiret: String!
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur.
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
@@ -2962,7 +2978,7 @@ input OutgoingTexsLineInput {
   """
   reportForPickupSiteName: String
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -2972,7 +2988,7 @@ input OutgoingTexsLineInput {
   """
   reportForPickupSiteAddress: String
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -2982,7 +2998,7 @@ input OutgoingTexsLineInput {
   """
   reportForPickupSitePostalCode: String
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -2992,7 +3008,7 @@ input OutgoingTexsLineInput {
   """
   reportForPickupSiteCity: String
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -3002,7 +3018,7 @@ input OutgoingTexsLineInput {
   """
   reportForPickupSiteCountryCode: String
   """
-  Dénomination usuelle des terres excavées et sédiments ou des déchets
+  **Dénomination usuelle des terres excavées et sédiments ou des déchets**
 
   Dénomination usuelle des déchets entrants.
   La description renseignée ici peut ne pas correspondre à la définition du code déchet renseigné dans la colonne Code déchet.
@@ -3013,7 +3029,7 @@ input OutgoingTexsLineInput {
   """
   wasteDescription: String!
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet sortant.
   Le code déchet mentionné doit faire partie de la liste des codes déchets officielle.
@@ -3031,7 +3047,7 @@ input OutgoingTexsLineInput {
   """
   wasteCode: String!
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet sortant.
   Le code déchet mentionné doit faire partie de la liste des codes déchets définis dans la Convention de Bâle.
@@ -3042,7 +3058,7 @@ input OutgoingTexsLineInput {
   """
   wasteCodeBale: String
   """
-  POP
+  **POP**
 
   Indique si le déchet contient des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
@@ -3052,7 +3068,7 @@ input OutgoingTexsLineInput {
   """
   wastePop: Boolean!
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -3065,7 +3081,7 @@ input OutgoingTexsLineInput {
   """
   wasteIsDangerous: Boolean
   """
-  Date de réception des terres et sédiments ou des déchets sortants
+  **Date de réception des terres et sédiments ou des déchets sortants**
 
   La date d'expédition ne peut pas :
   - être dans le futur
@@ -3078,7 +3094,7 @@ input OutgoingTexsLineInput {
   """
   dispatchDate: DateTime!
   """
-  DAP
+  **DAP**
 
   Numéro de bordereau d'analyse chimique des terres excavées et sédiments lorsque cette analyse est necessaire pour valoriser ou éliminer les terres exacvées et sédiments, lorsque ces données sont disponibles.
 
@@ -3087,7 +3103,7 @@ input OutgoingTexsLineInput {
   """
   wasteDap: String
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des terres excavées et sédiments ou des déchets sortants.
 
@@ -3098,7 +3114,7 @@ input OutgoingTexsLineInput {
   """
   weightValue: Float!
   """
-  Type de poids
+  **Type de poids**
 
   Indiquer ici si le poids des terres excavées et sédiments ou des déchets sortants est estimé ou réel.
 
@@ -3108,7 +3124,7 @@ input OutgoingTexsLineInput {
   """
   weightIsEstimate: Boolean!
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des terres excavées et sédiments ou des déchets sortants.
 
@@ -3119,7 +3135,7 @@ input OutgoingTexsLineInput {
   """
   volume: Float
   """
-  Type de producteur initial
+  **Type de producteur initial**
 
   Type d'acteur correspondant au producteur des terres excavées et sédiments ou des déchets sortants.
 
@@ -3133,7 +3149,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du producteur initial
+  **Numéro d'identification du producteur initial**
 
   Numéro d'identification du producteur initial, à renseigner selon son type de profil.
   Des contrôles différents seront effectués sur le format selon le type de producteur renseigné.
@@ -3148,7 +3164,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyOrgId: String
   """
-  Raison sociale du producteur initial
+  **Raison sociale du producteur initial**
 
   Raison sociale du producteur initial des terres excavées et sédiments ou des déchets sortants.
 
@@ -3160,7 +3176,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyName: String
   """
-  Adresse du producteur initial
+  **Adresse du producteur initial**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des terres excavées et sédiments ou des déchets sortants.
 
@@ -3170,7 +3186,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyAddress: String
   """
-  Code postal du producteur initial
+  **Code postal du producteur initial**
 
   Code postal du producteur initial des terres excavées et sédiments ou des déchets sortants.
 
@@ -3180,7 +3196,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyPostalCode: String
   """
-  Commune du producteur initial
+  **Commune du producteur initial**
 
   Commune du producteur initial des terres excavées et sédiments ou des déchets sortants.
 
@@ -3190,7 +3206,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyCity: String
   """
-  Code pays du producteur initial
+  **Code pays du producteur initial**
 
   Code pays du producteur initial des terres excavées et sédiments ou des déchets sortants.
 
@@ -3200,7 +3216,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterCompanyCountryCode: String
   """
-  Code(s) INSEE de(s) commune(s)
+  **Code(s) INSEE de(s) commune(s)**
 
   Le ou les codes INSEE de la ou des commune(s) de collecte des terres excavées et sédiments ou des déchets sortants.
 
@@ -3212,7 +3228,7 @@ input OutgoingTexsLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Codes INSEE des parcelles
+  **Codes INSEE des parcelles**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés.
 
@@ -3224,7 +3240,7 @@ input OutgoingTexsLineInput {
   """
   parcelInseeCodes: [String!]
   """
-  Numéro(s) des parcelles
+  **Numéro(s) des parcelles**
 
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -3241,7 +3257,7 @@ input OutgoingTexsLineInput {
   """
   parcelNumbers: [String!]
   """
-  Coordonnées des parcelles
+  **Coordonnées des parcelles**
 
   Coordonnées de la ou des parcelles cadastrales du site de production, par exemple : 48.894258 2.240027
 
@@ -3255,7 +3271,7 @@ input OutgoingTexsLineInput {
   """
   parcelCoordinates: [String!]
   """
-  Identifiant SIS du terrain
+  **Identifiant SIS du terrain**
 
   Identifiant du terrain SIS lorsque les déchets ou les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
 
@@ -3265,7 +3281,7 @@ input OutgoingTexsLineInput {
   """
   sisIdentifier: String
   """
-  Type de destinataire
+  **Type de destinataire**
 
   Type d'acteur correspondant au destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3280,7 +3296,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du destinataire
+  **Numéro d'identification du destinataire**
 
   Numéro d'identification du destinataire, selon son type de profil.
 
@@ -3295,7 +3311,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyOrgId: String
   """
-  Raison sociale du destinataire
+  **Raison sociale du destinataire**
 
   Raison sociale du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3305,7 +3321,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyName: String
   """
-  Adresse du destinataire
+  **Adresse du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3313,7 +3329,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyAddress: String
   """
-  Commune du destinataire
+  **Commune du destinataire**
 
   Commune du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3321,7 +3337,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyCity: String
   """
-  Code postal du destinataire
+  **Code postal du destinataire**
 
   Code postal du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3331,7 +3347,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyPostalCode: String
   """
-  Code pays du destinataire
+  **Code pays du destinataire**
 
   Code pays du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3341,7 +3357,7 @@ input OutgoingTexsLineInput {
   """
   destinationCompanyCountryCode: String
   """
-  Libellé de l'adresse de dépôt du destinataire
+  **Libellé de l'adresse de dépôt du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de dépôt du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3349,7 +3365,7 @@ input OutgoingTexsLineInput {
   """
   destinationDropSiteAddress: String
   """
-  Code postal de l'adresse de dépôt du destinataire
+  **Code postal de l'adresse de dépôt du destinataire**
 
   Code postal de l'adresse de dépôt du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3359,7 +3375,7 @@ input OutgoingTexsLineInput {
   """
   destinationDropSitePostalCode: String
   """
-  Commune de l'adresse de dépôt du destinataire
+  **Commune de l'adresse de dépôt du destinataire**
 
   Commune de l'adresse de dépôt du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3367,7 +3383,7 @@ input OutgoingTexsLineInput {
   """
   destinationDropSiteCity: String
   """
-  Pays de l'adresse de dépôt du destinataire
+  **Pays de l'adresse de dépôt du destinataire**
 
   Code pays de l'adresse de dépôt du destinataire des terres excavées et sédiments ou des déchets sortants.
 
@@ -3377,7 +3393,7 @@ input OutgoingTexsLineInput {
   """
   destinationDropSiteCountryCode: String
   """
-  Code de traitement prévu
+  **Code de traitement prévu**
 
   Code de traitement prévu par le destinataire.
 
@@ -3389,7 +3405,7 @@ input OutgoingTexsLineInput {
   """
   operationCode: String!
   """
-  Mode de traitement prévu
+  **Mode de traitement prévu**
 
   Qualification du traitement correspondant au code de traitement prévu des terres excavées et sédiments ou déchets sortants.
 
@@ -3405,7 +3421,7 @@ input OutgoingTexsLineInput {
   """
   operationMode: OperationMode
   """
-  Terre valorisée
+  **Terre valorisée**
 
   Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
@@ -3415,7 +3431,7 @@ input OutgoingTexsLineInput {
   """
   isUpcycled: Boolean
   """
-  Codes INSEE des parcelles si valorisation
+  **Codes INSEE des parcelles si valorisation**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation, plusieurs numéros peuvent être renseignés.
 
@@ -3425,7 +3441,7 @@ input OutgoingTexsLineInput {
   """
   destinationParcelInseeCodes: [String!]
   """
-  Numéro(s) des parcelles si valorisation
+  **Numéro(s) des parcelles si valorisation**
 
   Le ou les numéros des parcelles cadastrales du site de valorisation, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -3438,7 +3454,7 @@ input OutgoingTexsLineInput {
   """
   destinationParcelNumbers: [String!]
   """
-  Coordonnées des parcelles si valorisation
+  **Coordonnées des parcelles si valorisation**
 
   Coordonnées de la ou des parcelles cadastrales du site de valorisation.
 
@@ -3448,7 +3464,7 @@ input OutgoingTexsLineInput {
   """
   destinationParcelCoordinates: [String!]
   """
-  Numéro de notification ou de déclaration GISTRID
+  **Numéro de notification ou de déclaration GISTRID**
 
   Le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 ou le numéro de déclaration Annexe 7 prévu à l'annexe 1-B du règlement N°1013/2006.
 
@@ -3458,7 +3474,7 @@ input OutgoingTexsLineInput {
   """
   gistridNumber: String
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
 
   Numéro de saisie du document déclaré sur GISTRID.
 
@@ -3466,7 +3482,7 @@ input OutgoingTexsLineInput {
   """
   movementNumber: String
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -3474,7 +3490,7 @@ input OutgoingTexsLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -3482,7 +3498,7 @@ input OutgoingTexsLineInput {
   """
   ecoOrganismeName: String
   """
-  SIRET du courtier
+  **SIRET du courtier**
 
   SIRET du courtier.
 
@@ -3490,7 +3506,7 @@ input OutgoingTexsLineInput {
   """
   brokerCompanySiret: String
   """
-  Raison sociale du courtier
+  **Raison sociale du courtier**
 
   Raison sociale du courtier.
 
@@ -3498,7 +3514,7 @@ input OutgoingTexsLineInput {
   """
   brokerCompanyName: String
   """
-  Numéro de recépissé du courtier
+  **Numéro de recépissé du courtier**
 
   Numéro de recépissé du courtier.
 
@@ -3506,7 +3522,7 @@ input OutgoingTexsLineInput {
   """
   brokerRecepisseNumber: String
   """
-  SIRET du négociant
+  **SIRET du négociant**
 
   SIRET du négociant.
 
@@ -3514,7 +3530,7 @@ input OutgoingTexsLineInput {
   """
   traderCompanySiret: String
   """
-  Raison sociale du négociant
+  **Raison sociale du négociant**
 
   Raison sociale du négociant.
 
@@ -3522,7 +3538,7 @@ input OutgoingTexsLineInput {
   """
   traderCompanyName: String
   """
-  Numéro de récépissé du négociant
+  **Numéro de récépissé du négociant**
 
   Numéro de récépissé du négociant.
 
@@ -3530,7 +3546,7 @@ input OutgoingTexsLineInput {
   """
   traderRecepisseNumber: String
   """
-  Approvisionnement direct (pipeline, convoyeur)
+  **Approvisionnement direct (pipeline, convoyeur)**
 
   Indique si les terres et sédiments ou déchets sortants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
@@ -3540,7 +3556,7 @@ input OutgoingTexsLineInput {
   """
   isDirectSupply: Boolean
   """
-  Mode de transport du transporteur n°1
+  **Mode de transport du transporteur n°1**
 
   Mode de transport des terres excavées et sédiments ou déchets sortants du transporteur n°1.
 
@@ -3553,7 +3569,7 @@ input OutgoingTexsLineInput {
   """
   transporter1TransportMode: TransportMode
   """
-  Type de transporteur n°1
+  **Type de transporteur n°1**
 
   Type d'acteur correspondant au transporteur n°1.
 
@@ -3568,7 +3584,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°1
+  **Numéro d'identification du transporteur n°1**
 
   Numéro d'identification du transporteur selon le type de transporteur n°1.
 
@@ -3581,7 +3597,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°1
+  **Exemption de récépissé du transporteur n°1**
 
   Cette colonne a été ajoutée afin d'appliquer des vérifications cohérentes sur l'obligation de renseigner un numéro de récépissé de transport.
 
@@ -3589,7 +3605,7 @@ input OutgoingTexsLineInput {
   """
   transporter1RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°1
+  **Numéro de récépissé du transporteur n°1**
 
   Numéro de récépissé du transporteur n°1.
 
@@ -3597,7 +3613,7 @@ input OutgoingTexsLineInput {
   """
   transporter1RecepisseNumber: String
   """
-  Raison sociale du transporteur n°1
+  **Raison sociale du transporteur n°1**
 
   Raison sociale du transporteur n°1.
 
@@ -3605,7 +3621,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyName: String
   """
-  Adresse du transporteur n°1
+  **Adresse du transporteur n°1**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
 
@@ -3613,7 +3629,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyAddress: String
   """
-  Code postal du transporteur n°1
+  **Code postal du transporteur n°1**
 
   Code postal du transporteur n°1.
 
@@ -3623,7 +3639,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyPostalCode: String
   """
-  Commune du transporteur n°1
+  **Commune du transporteur n°1**
 
   Commune du transporteur n°1.
 
@@ -3631,7 +3647,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyCity: String
   """
-  Pays du transporteur n°1
+  **Pays du transporteur n°1**
 
   Code pays du transporteur n°1.
 
@@ -3639,7 +3655,7 @@ input OutgoingTexsLineInput {
   """
   transporter1CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°2
+  **Mode de transport du transporteur n°2**
 
   Mode de transport des terres excavées et sédiments ou déchets sortants du transporteur n°2.
 
@@ -3652,7 +3668,7 @@ input OutgoingTexsLineInput {
   """
   transporter2TransportMode: TransportMode
   """
-  Type de transporteur n°2
+  **Type de transporteur n°2**
 
   Type d'acteur correspondant au transporteur n°2.
 
@@ -3666,7 +3682,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°2
+  **Numéro d'identification du transporteur n°2**
 
   Numéro d'identification du transporteur selon le type de transporteur n°2.
 
@@ -3678,7 +3694,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°2
+  **Exemption de récépissé du transporteur n°2**
 
   Cette colonne a été ajoutée afin d'appliquer des vérifications cohérentes sur l'obligation de renseigner un numéro de récépissé de transport.
 
@@ -3686,7 +3702,7 @@ input OutgoingTexsLineInput {
   """
   transporter2RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°2
+  **Numéro de récépissé du transporteur n°2**
 
   Numéro de récépissé du transporteur n°2.
 
@@ -3694,7 +3710,7 @@ input OutgoingTexsLineInput {
   """
   transporter2RecepisseNumber: String
   """
-  Raison sociale du transporteur n°2
+  **Raison sociale du transporteur n°2**
 
   Raison sociale du transporteur n°2.
 
@@ -3702,7 +3718,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyName: String
   """
-  Adresse du transporteur n°2
+  **Adresse du transporteur n°2**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
 
@@ -3710,7 +3726,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyAddress: String
   """
-  Code postal du transporteur n°2
+  **Code postal du transporteur n°2**
 
   Code postal du transporteur n°2.
 
@@ -3720,7 +3736,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyPostalCode: String
   """
-  Commune du transporteur n°2
+  **Commune du transporteur n°2**
 
   Commune du transporteur n°2.
 
@@ -3728,7 +3744,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyCity: String
   """
-  Pays du transporteur n°2
+  **Pays du transporteur n°2**
 
   Code pays du transporteur n°2.
 
@@ -3736,7 +3752,7 @@ input OutgoingTexsLineInput {
   """
   transporter2CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°3
+  **Mode de transport du transporteur n°3**
 
   Mode de transport des terres excavées et sédiments ou déchets sortants du transporteur n°3.
 
@@ -3749,7 +3765,7 @@ input OutgoingTexsLineInput {
   """
   transporter3TransportMode: TransportMode
   """
-  Type de transporteur n°3
+  **Type de transporteur n°3**
 
   Type d'acteur correspondant au transporteur n°3.
 
@@ -3763,7 +3779,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°3
+  **Numéro d'identification du transporteur n°3**
 
   Numéro d'identification du transporteur selon le type de transporteur n°3.
 
@@ -3775,7 +3791,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°3
+  **Exemption de récépissé du transporteur n°3**
 
   Cette colonne a été ajoutée afin d'appliquer des vérifications cohérentes sur l'obligation de renseigner un numéro de récépissé de transport.
 
@@ -3783,7 +3799,7 @@ input OutgoingTexsLineInput {
   """
   transporter3RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°3
+  **Numéro de récépissé du transporteur n°3**
 
   Numéro de récépissé du transporteur n°3.
 
@@ -3791,7 +3807,7 @@ input OutgoingTexsLineInput {
   """
   transporter3RecepisseNumber: String
   """
-  Raison sociale du transporteur n°3
+  **Raison sociale du transporteur n°3**
 
   Raison sociale du transporteur n°3.
 
@@ -3799,7 +3815,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyName: String
   """
-  Adresse du transporteur n°3
+  **Adresse du transporteur n°3**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
 
@@ -3807,7 +3823,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyAddress: String
   """
-  Code postal du transporteur n°3
+  **Code postal du transporteur n°3**
 
   Code postal du transporteur n°3.
 
@@ -3817,7 +3833,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyPostalCode: String
   """
-  Commune du transporteur n°3
+  **Commune du transporteur n°3**
 
   Commune du transporteur n°3.
 
@@ -3825,7 +3841,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyCity: String
   """
-  Pays du transporteur n°3
+  **Pays du transporteur n°3**
 
   Code pays du transporteur n°3.
 
@@ -3833,7 +3849,7 @@ input OutgoingTexsLineInput {
   """
   transporter3CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°4
+  **Mode de transport du transporteur n°4**
 
   Mode de transport des terres excavées et sédiments ou déchets sortants du transporteur n°4.
 
@@ -3846,7 +3862,7 @@ input OutgoingTexsLineInput {
   """
   transporter4TransportMode: TransportMode
   """
-  Type de transporteur n°4
+  **Type de transporteur n°4**
 
   Type d'acteur correspondant au transporteur n°4.
 
@@ -3860,7 +3876,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°4
+  **Numéro d'identification du transporteur n°4**
 
   Numéro d'identification du transporteur selon le type de transporteur n°4.
 
@@ -3872,7 +3888,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°4
+  **Exemption de récépissé du transporteur n°4**
 
   Cette colonne a été ajoutée afin d'appliquer des vérifications cohérentes sur l'obligation de renseigner un numéro de récépissé de transport.
 
@@ -3880,7 +3896,7 @@ input OutgoingTexsLineInput {
   """
   transporter4RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°4
+  **Numéro de récépissé du transporteur n°4**
 
   Numéro de récépissé du transporteur n°4.
 
@@ -3888,7 +3904,7 @@ input OutgoingTexsLineInput {
   """
   transporter4RecepisseNumber: String
   """
-  Raison sociale du transporteur n°4
+  **Raison sociale du transporteur n°4**
 
   Raison sociale du transporteur n°4.
 
@@ -3896,7 +3912,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyName: String
   """
-  Adresse du transporteur n°4
+  **Adresse du transporteur n°4**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
 
@@ -3904,7 +3920,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyAddress: String
   """
-  Code postal du transporteur n°4
+  **Code postal du transporteur n°4**
 
   Code postal du transporteur n°4.
 
@@ -3914,7 +3930,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyPostalCode: String
   """
-  Commune du transporteur n°4
+  **Commune du transporteur n°4**
 
   Commune du transporteur n°4.
 
@@ -3922,7 +3938,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyCity: String
   """
-  Pays du transporteur n°4
+  **Pays du transporteur n°4**
 
   Code pays du transporteur n°4.
 
@@ -3930,7 +3946,7 @@ input OutgoingTexsLineInput {
   """
   transporter4CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°5
+  **Mode de transport du transporteur n°5**
 
   Mode de transport des terres excavées et sédiments ou déchets sortants du transporteur n°5.
 
@@ -3943,7 +3959,7 @@ input OutgoingTexsLineInput {
   """
   transporter5TransportMode: TransportMode
   """
-  Type de transporteur n°5
+  **Type de transporteur n°5**
 
   Type d'acteur correspondant au transporteur n°5.
 
@@ -3957,7 +3973,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°5
+  **Numéro d'identification du transporteur n°5**
 
   Numéro d'identification du transporteur selon le type de transporteur n°5.
 
@@ -3969,7 +3985,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°5
+  **Exemption de récépissé du transporteur n°5**
 
   Cette colonne a été ajoutée afin d'appliquer des vérifications cohérentes sur l'obligation de renseigner un numéro de récépissé de transport.
 
@@ -3977,7 +3993,7 @@ input OutgoingTexsLineInput {
   """
   transporter5RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°5
+  **Numéro de récépissé du transporteur n°5**
 
   Numéro de récépissé du transporteur n°5.
 
@@ -3985,7 +4001,7 @@ input OutgoingTexsLineInput {
   """
   transporter5RecepisseNumber: String
   """
-  Raison sociale du transporteur n°5
+  **Raison sociale du transporteur n°5**
 
   Raison sociale du transporteur n°5.
 
@@ -3993,7 +4009,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyName: String
   """
-  Adresse du transporteur n°5
+  **Adresse du transporteur n°5**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
 
@@ -4001,7 +4017,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyAddress: String
   """
-  Code postal du transporteur n°5
+  **Code postal du transporteur n°5**
 
   Code postal du transporteur n°5.
 
@@ -4011,7 +4027,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyPostalCode: String
   """
-  Commune du transporteur n°5
+  **Commune du transporteur n°5**
 
   Commune du transporteur n°5.
 
@@ -4019,7 +4035,7 @@ input OutgoingTexsLineInput {
   """
   transporter5CompanyCity: String
   """
-  Pays du transporteur n°5
+  **Pays du transporteur n°5**
 
   Code pays du transporteur n°5.
 
@@ -4031,7 +4047,7 @@ input OutgoingTexsLineInput {
 "Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux sortants"
 input OutgoingWasteLineInput {
   """
-  Motif
+  **Motif**
 
   Action à effectuer en rapport avec une ligne qui aurait déjà été déclarée.
 
@@ -4051,7 +4067,7 @@ input OutgoingWasteLineInput {
   """
   reason: RegistryLineReason
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné.
 
@@ -4064,7 +4080,7 @@ input OutgoingWasteLineInput {
   """
   publicId: ID!
   """
-  SIRET de l'expéditeur ou du détenteur
+  **SIRET de l'expéditeur ou du détenteur**
 
   Établissement pour lequel la déclaration est effectuée, soit ici l'expéditeur ou détenteur des déchets sortants.
 
@@ -4080,7 +4096,7 @@ input OutgoingWasteLineInput {
   """
   reportForCompanySiret: String!
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
 
@@ -4090,7 +4106,7 @@ input OutgoingWasteLineInput {
   """
   reportForPickupSiteName: String
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -4100,7 +4116,7 @@ input OutgoingWasteLineInput {
   """
   reportForPickupSiteAddress: String
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -4110,7 +4126,7 @@ input OutgoingWasteLineInput {
   """
   reportForPickupSitePostalCode: String
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -4120,7 +4136,7 @@ input OutgoingWasteLineInput {
   """
   reportForPickupSiteCity: String
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -4130,7 +4146,7 @@ input OutgoingWasteLineInput {
   """
   reportForPickupSiteCountryCode: String
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -4143,7 +4159,7 @@ input OutgoingWasteLineInput {
   """
   reportAsCompanySiret: String
   """
-  Dénomination du déchet
+  **Dénomination du déchet**
 
   Dénomination usuelle des déchets sortants.
 
@@ -4155,7 +4171,7 @@ input OutgoingWasteLineInput {
   """
   wasteDescription: String!
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet sortant.
 
@@ -4167,7 +4183,7 @@ input OutgoingWasteLineInput {
   """
   wasteCode: String!
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet sortant.
 
@@ -4179,7 +4195,7 @@ input OutgoingWasteLineInput {
   """
   wasteCodeBale: String
   """
-  POP
+  **POP**
 
   Ce champ permet d'indiquer si les déchets sortants contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
@@ -4189,7 +4205,7 @@ input OutgoingWasteLineInput {
   """
   wastePop: Boolean!
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -4202,7 +4218,7 @@ input OutgoingWasteLineInput {
   """
   wasteIsDangerous: Boolean
   """
-  Date d'expédition
+  **Date d'expédition**
 
   Date d'expédition des déchets sortants.
 
@@ -4218,7 +4234,7 @@ input OutgoingWasteLineInput {
   """
   dispatchDate: DateTime!
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des déchets sortants.
 
@@ -4230,7 +4246,7 @@ input OutgoingWasteLineInput {
   """
   weightValue: Float!
   """
-  Type de poids
+  **Type de poids**
 
   Indique si le poids est estimé ou réel.
 
@@ -4242,7 +4258,7 @@ input OutgoingWasteLineInput {
   """
   weightIsEstimate: Boolean!
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des déchets sortants.
 
@@ -4254,7 +4270,7 @@ input OutgoingWasteLineInput {
   """
   volume: Float
   """
-  Type de producteur initial
+  **Type de producteur initial**
 
   Type d'acteur correspondant au producteur des déchets sortants.
 
@@ -4270,7 +4286,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du producteur initial
+  **Numéro d'identification du producteur initial**
 
   Numéro d'identification du producteur initial, selon son type de profil.
 
@@ -4285,7 +4301,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyOrgId: String
   """
-  Raison sociale du producteur initial
+  **Raison sociale du producteur initial**
 
   Raison sociale du producteur initial des déchets sortants.
 
@@ -4297,7 +4313,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyName: String
   """
-  Adresse du producteur initial
+  **Adresse du producteur initial**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des déchets sortants.
 
@@ -4309,7 +4325,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyAddress: String
   """
-  Code postal du producteur initial
+  **Code postal du producteur initial**
 
   Code postal du producteur initial des déchets sortants.
 
@@ -4321,7 +4337,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyPostalCode: String
   """
-  Commune du producteur initial
+  **Commune du producteur initial**
 
   Commune du producteur initial des déchets sortants.
 
@@ -4333,7 +4349,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyCity: String
   """
-  Code pays du producteur initial
+  **Code pays du producteur initial**
 
   Code pays du producteur initial des déchets sortants.
 
@@ -4345,7 +4361,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterCompanyCountryCode: String
   """
-  Code(s) INSEE de(s) commune(s)
+  **Code(s) INSEE de(s) commune(s)**
 
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets sortants.
 
@@ -4358,7 +4374,7 @@ input OutgoingWasteLineInput {
   """
   initialEmitterMunicipalitiesInseeCodes: [String!]
   """
-  Type de destinataire
+  **Type de destinataire**
 
   Type d'acteur correspondant au destinataire des déchets sortants.
 
@@ -4372,7 +4388,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyType: RegistryCompanyType!
   """
-  Numéro d'identification du destinataire
+  **Numéro d'identification du destinataire**
 
   Numéro d'identification du destinataire, selon son type de profil.
 
@@ -4384,7 +4400,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyOrgId: String
   """
-  Raison sociale du destinataire
+  **Raison sociale du destinataire**
 
   Raison sociale du destinataire des déchets sortants.
 
@@ -4394,7 +4410,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyName: String
   """
-  Libellé de l'adresse du destinataire
+  **Libellé de l'adresse du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire des déchets sortants.
 
@@ -4404,7 +4420,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyAddress: String
   """
-  Commune du destinataire
+  **Commune du destinataire**
 
   Commune du destinataire des déchets sortants.
 
@@ -4414,7 +4430,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyCity: String
   """
-  Code postal du destinataire
+  **Code postal du destinataire**
 
   Code postal du destinataire des déchets sortants.
 
@@ -4424,7 +4440,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyPostalCode: String
   """
-  Code pays du destinataire
+  **Code pays du destinataire**
 
   Code pays du destinataire des déchets sortants.
 
@@ -4434,7 +4450,7 @@ input OutgoingWasteLineInput {
   """
   destinationCompanyCountryCode: String
   """
-  Libellé de l'adresse de dépôt du destinataire
+  **Libellé de l'adresse de dépôt du destinataire**
 
   Libellé de l'adresse de dépôt (n° de voie et voie, complément, lieu-dit etc) du destinataire des déchets sortants.
 
@@ -4444,7 +4460,7 @@ input OutgoingWasteLineInput {
   """
   destinationDropSiteAddress: String
   """
-  Code postal de l'adresse de dépôt du destinataire
+  **Code postal de l'adresse de dépôt du destinataire**
 
   Code postal de l'adresse de dépôt du destinataire des déchets sortants.
 
@@ -4454,7 +4470,7 @@ input OutgoingWasteLineInput {
   """
   destinationDropSitePostalCode: String
   """
-  Commune de l'adresse de dépôt du destinataire
+  **Commune de l'adresse de dépôt du destinataire**
 
   Commune de l'adresse de dépôt du destinataire des déchets sortants.
 
@@ -4464,7 +4480,7 @@ input OutgoingWasteLineInput {
   """
   destinationDropSiteCity: String
   """
-  Pays de l'adresse de dépôt du destinataire
+  **Pays de l'adresse de dépôt du destinataire**
 
   Code pays de l'adresse de dépôt du destinataire des déchets sortants.
 
@@ -4474,7 +4490,7 @@ input OutgoingWasteLineInput {
   """
   destinationDropSiteCountryCode: String
   """
-  Code de traitement prévu
+  **Code de traitement prévu**
 
   Code de traitement prévu qui va être opéré dans l'installation vers laquelle le déchet est expédié.
 
@@ -4486,7 +4502,7 @@ input OutgoingWasteLineInput {
   """
   operationCode: String!
   """
-  Mode de traitement prévu
+  **Mode de traitement prévu**
 
   Qualification du traitement correspondant au code de traitement prévu des déchets sortants.
 
@@ -4503,7 +4519,7 @@ input OutgoingWasteLineInput {
   """
   operationMode: OperationMode
   """
-  Numéro de notification ou de déclaration GISTRID
+  **Numéro de notification ou de déclaration GISTRID**
 
   Renseigner ici le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
 
@@ -4516,7 +4532,7 @@ input OutgoingWasteLineInput {
   """
   gistridNumber: String
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
 
   Renseigner ici le numéro de saisie du document déclaré sur GISTRID.
 
@@ -4526,7 +4542,7 @@ input OutgoingWasteLineInput {
   """
   movementNumber: String
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -4538,7 +4554,7 @@ input OutgoingWasteLineInput {
   """
   ecoOrganismeSiret: String
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -4550,7 +4566,7 @@ input OutgoingWasteLineInput {
   """
   ecoOrganismeName: String
   """
-  SIRET du courtier
+  **SIRET du courtier**
 
   SIRET du courtier.
 
@@ -4562,7 +4578,7 @@ input OutgoingWasteLineInput {
   """
   brokerCompanySiret: String
   """
-  Raison sociale du courtier
+  **Raison sociale du courtier**
 
   Raison sociale du courtier.
 
@@ -4574,7 +4590,7 @@ input OutgoingWasteLineInput {
   """
   brokerCompanyName: String
   """
-  Numéro de récépissé du courtier
+  **Numéro de récépissé du courtier**
 
   Numéro de récépissé du courtier.
 
@@ -4586,7 +4602,7 @@ input OutgoingWasteLineInput {
   """
   brokerRecepisseNumber: String
   """
-  SIRET du négociant
+  **SIRET du négociant**
 
   SIRET du négociant.
 
@@ -4598,7 +4614,7 @@ input OutgoingWasteLineInput {
   """
   traderCompanySiret: String
   """
-  Raison sociale du négociant
+  **Raison sociale du négociant**
 
   Raison sociale du négociant.
 
@@ -4610,7 +4626,7 @@ input OutgoingWasteLineInput {
   """
   traderCompanyName: String
   """
-  Numéro de récépissé du négociant
+  **Numéro de récépissé du négociant**
 
   Numéro de récépissé du négociant.
 
@@ -4622,7 +4638,7 @@ input OutgoingWasteLineInput {
   """
   traderRecepisseNumber: String
   """
-  Approvisionnement direct (pipeline, convoyeur)
+  **Approvisionnement direct (pipeline, convoyeur)**
 
   Indiquer ici si les déchets sortants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
@@ -4634,7 +4650,7 @@ input OutgoingWasteLineInput {
   """
   isDirectSupply: Boolean
   """
-  Mode de transport du transporteur n°1
+  **Mode de transport du transporteur n°1**
 
   Mode de transport des déchets sortants du transporteur n°1.
 
@@ -4649,7 +4665,7 @@ input OutgoingWasteLineInput {
   """
   transporter1TransportMode: TransportMode
   """
-  Type de transporteur n°1
+  **Type de transporteur n°1**
 
   Type d'acteur correspondant au transporteur n°1.
 
@@ -4664,7 +4680,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°1
+  **Numéro d'identification du transporteur n°1**
 
   Numéro d'identification du transporteur selon le type de transporteur n°1.
 
@@ -4679,7 +4695,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°1
+  **Exemption de récépissé du transporteur n°1**
 
   Exemption de récépissé du transporteur n°1.
 
@@ -4691,7 +4707,7 @@ input OutgoingWasteLineInput {
   """
   transporter1RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°1
+  **Numéro de récépissé du transporteur n°1**
 
   Numéro de récépissé du transporteur n°1.
 
@@ -4703,7 +4719,7 @@ input OutgoingWasteLineInput {
   """
   transporter1RecepisseNumber: String
   """
-  Raison sociale du transporteur n°1
+  **Raison sociale du transporteur n°1**
 
   Raison sociale du transporteur n°1.
 
@@ -4715,7 +4731,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyName: String
   """
-  Adresse du transporteur n°1
+  **Adresse du transporteur n°1**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
 
@@ -4727,7 +4743,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyAddress: String
   """
-  Code postal du transporteur n°1
+  **Code postal du transporteur n°1**
 
   Code postal du transporteur n°1.
 
@@ -4739,7 +4755,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyPostalCode: String
   """
-  Commune du transporteur n°1
+  **Commune du transporteur n°1**
 
   Libellé de la commune du transporteur n°1.
 
@@ -4751,7 +4767,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyCity: String
   """
-  Pays du transporteur n°1
+  **Pays du transporteur n°1**
 
   Code pays du transporteur n°1.
 
@@ -4763,7 +4779,7 @@ input OutgoingWasteLineInput {
   """
   transporter1CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°2
+  **Mode de transport du transporteur n°2**
 
   Mode de transport des déchets sortants du transporteur n°2.
 
@@ -4778,7 +4794,7 @@ input OutgoingWasteLineInput {
   """
   transporter2TransportMode: TransportMode
   """
-  Type de transporteur n°2
+  **Type de transporteur n°2**
 
   Type d'acteur correspondant au transporteur n°2.
 
@@ -4792,7 +4808,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°2
+  **Numéro d'identification du transporteur n°2**
 
   Numéro d'identification du transporteur selon le type de transporteur n°2.
 
@@ -4806,7 +4822,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°2
+  **Exemption de récépissé du transporteur n°2**
 
   Exemption de récépissé du transporteur n°2.
 
@@ -4818,7 +4834,7 @@ input OutgoingWasteLineInput {
   """
   transporter2RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°2
+  **Numéro de récépissé du transporteur n°2**
 
   Numéro de récépissé du transporteur n°2.
 
@@ -4830,7 +4846,7 @@ input OutgoingWasteLineInput {
   """
   transporter2RecepisseNumber: String
   """
-  Raison sociale du transporteur n°2
+  **Raison sociale du transporteur n°2**
 
   Raison sociale du transporteur n°2.
 
@@ -4842,7 +4858,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyName: String
   """
-  Adresse du transporteur n°2
+  **Adresse du transporteur n°2**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
 
@@ -4854,7 +4870,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyAddress: String
   """
-  Code postal du transporteur n°2
+  **Code postal du transporteur n°2**
 
   Code postal du transporteur n°2.
 
@@ -4866,7 +4882,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyPostalCode: String
   """
-  Commune du transporteur n°2
+  **Commune du transporteur n°2**
 
   Libellé de la commune du transporteur n°2.
 
@@ -4878,7 +4894,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyCity: String
   """
-  Pays du transporteur n°2
+  **Pays du transporteur n°2**
 
   Code pays du transporteur n°2.
 
@@ -4890,7 +4906,7 @@ input OutgoingWasteLineInput {
   """
   transporter2CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°3
+  **Mode de transport du transporteur n°3**
 
   Mode de transport des déchets sortants du transporteur n°3.
 
@@ -4905,7 +4921,7 @@ input OutgoingWasteLineInput {
   """
   transporter3TransportMode: TransportMode
   """
-  Type de transporteur n°3
+  **Type de transporteur n°3**
 
   Type d'acteur correspondant au transporteur n°3.
 
@@ -4919,7 +4935,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°3
+  **Numéro d'identification du transporteur n°3**
 
   Numéro d'identification du transporteur selon le type de transporteur n°3.
 
@@ -4933,7 +4949,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°3
+  **Exemption de récépissé du transporteur n°3**
 
   Exemption de récépissé du transporteur n°3.
 
@@ -4945,7 +4961,7 @@ input OutgoingWasteLineInput {
   """
   transporter3RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°3
+  **Numéro de récépissé du transporteur n°3**
 
   Numéro de récépissé du transporteur n°3.
 
@@ -4957,7 +4973,7 @@ input OutgoingWasteLineInput {
   """
   transporter3RecepisseNumber: String
   """
-  Raison sociale du transporteur n°3
+  **Raison sociale du transporteur n°3**
 
   Raison sociale du transporteur n°3.
 
@@ -4969,7 +4985,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyName: String
   """
-  Adresse du transporteur n°3
+  **Adresse du transporteur n°3**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
 
@@ -4981,7 +4997,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyAddress: String
   """
-  Code postal du transporteur n°3
+  **Code postal du transporteur n°3**
 
   Code postal du transporteur n°3.
 
@@ -4993,7 +5009,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyPostalCode: String
   """
-  Commune du transporteur n°3
+  **Commune du transporteur n°3**
 
   Libellé de la commune du transporteur n°3.
 
@@ -5005,7 +5021,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyCity: String
   """
-  Pays du transporteur n°3
+  **Pays du transporteur n°3**
 
   Code pays du transporteur n°3.
 
@@ -5017,7 +5033,7 @@ input OutgoingWasteLineInput {
   """
   transporter3CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°4
+  **Mode de transport du transporteur n°4**
 
   Mode de transport des déchets sortants du transporteur n°4.
 
@@ -5032,7 +5048,7 @@ input OutgoingWasteLineInput {
   """
   transporter4TransportMode: TransportMode
   """
-  Type de transporteur n°4
+  **Type de transporteur n°4**
 
   Type d'acteur correspondant au transporteur n°4.
 
@@ -5046,7 +5062,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°4
+  **Numéro d'identification du transporteur n°4**
 
   Numéro d'identification du transporteur selon le type de transporteur n°4.
 
@@ -5060,7 +5076,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°4
+  **Exemption de récépissé du transporteur n°4**
 
   Exemption de récépissé du transporteur n°4.
 
@@ -5072,7 +5088,7 @@ input OutgoingWasteLineInput {
   """
   transporter4RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°4
+  **Numéro de récépissé du transporteur n°4**
 
   Numéro de récépissé du transporteur n°4.
 
@@ -5084,7 +5100,7 @@ input OutgoingWasteLineInput {
   """
   transporter4RecepisseNumber: String
   """
-  Raison sociale du transporteur n°4
+  **Raison sociale du transporteur n°4**
 
   Raison sociale du transporteur n°4.
 
@@ -5096,7 +5112,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyName: String
   """
-  Adresse du transporteur n°4
+  **Adresse du transporteur n°4**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
 
@@ -5108,7 +5124,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyAddress: String
   """
-  Code postal du transporteur n°4
+  **Code postal du transporteur n°4**
 
   Code postal du transporteur n°4.
 
@@ -5120,7 +5136,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyPostalCode: String
   """
-  Commune du transporteur n°4
+  **Commune du transporteur n°4**
 
   Libellé de la commune du transporteur n°4.
 
@@ -5132,7 +5148,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyCity: String
   """
-  Pays du transporteur n°4
+  **Pays du transporteur n°4**
 
   Code pays du transporteur n°4.
 
@@ -5144,7 +5160,7 @@ input OutgoingWasteLineInput {
   """
   transporter4CompanyCountryCode: String
   """
-  Mode de transport du transporteur n°5
+  **Mode de transport du transporteur n°5**
 
   Mode de transport des déchets sortants du transporteur n°5.
 
@@ -5159,7 +5175,7 @@ input OutgoingWasteLineInput {
   """
   transporter5TransportMode: TransportMode
   """
-  Type de transporteur n°5
+  **Type de transporteur n°5**
 
   Type d'acteur correspondant au transporteur n°5.
 
@@ -5173,7 +5189,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyType: RegistryCompanyType
   """
-  Numéro d'identification du transporteur n°5
+  **Numéro d'identification du transporteur n°5**
 
   Numéro d'identification du transporteur selon le type de transporteur n°5.
 
@@ -5187,7 +5203,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyOrgId: String
   """
-  Exemption de récépissé du transporteur n°5
+  **Exemption de récépissé du transporteur n°5**
 
   Exemption de récépissé du transporteur n°5.
 
@@ -5199,7 +5215,7 @@ input OutgoingWasteLineInput {
   """
   transporter5RecepisseIsExempted: Boolean
   """
-  Numéro de récépissé du transporteur n°5
+  **Numéro de récépissé du transporteur n°5**
 
   Numéro de récépissé du transporteur n°5.
 
@@ -5211,7 +5227,7 @@ input OutgoingWasteLineInput {
   """
   transporter5RecepisseNumber: String
   """
-  Raison sociale du transporteur n°5
+  **Raison sociale du transporteur n°5**
 
   Raison sociale du transporteur n°5.
 
@@ -5223,7 +5239,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyName: String
   """
-  Adresse du transporteur n°5
+  **Adresse du transporteur n°5**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
 
@@ -5235,7 +5251,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyAddress: String
   """
-  Code postal du transporteur n°5
+  **Code postal du transporteur n°5**
 
   Code postal du transporteur n°5.
 
@@ -5247,7 +5263,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyPostalCode: String
   """
-  Commune du transporteur n°5
+  **Commune du transporteur n°5**
 
   Libellé de la commune du transporteur n°5.
 
@@ -5259,7 +5275,7 @@ input OutgoingWasteLineInput {
   """
   transporter5CompanyCity: String
   """
-  Pays du transporteur n°5
+  **Pays du transporteur n°5**
 
   Code pays du transporteur n°5.
 
@@ -5274,7 +5290,7 @@ input OutgoingWasteLineInput {
 
 input TransportedLineInput {
   """
-  Motif
+  **Motif**
 
   Action à effectuer en rapport avec une ligne qui aurait déjà été déclarée.
 
@@ -5295,7 +5311,7 @@ input TransportedLineInput {
   reason: RegistryLineReason
 
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné.
 
@@ -5309,7 +5325,7 @@ input TransportedLineInput {
   publicId: ID!
 
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -5323,7 +5339,7 @@ input TransportedLineInput {
   reportAsCompanySiret: String
 
   """
-  SIRET du transporteur
+  **SIRET du transporteur**
 
   Établissement pour lequel la déclaration est effectuée, soit ici le transporteur des déchets transportés.
 
@@ -5340,7 +5356,7 @@ input TransportedLineInput {
   reportForCompanySiret: String!
 
   """
-  Mode de transport du transporteur
+  **Mode de transport du transporteur**
 
   Mode de transport des déchets transportés.
 
@@ -5354,7 +5370,7 @@ input TransportedLineInput {
   reportForTransportMode: TransportMode!
 
   """
-  Transport de déchet
+  **Transport de déchet**
 
   Le transport concerne un déchet.
 
@@ -5365,7 +5381,7 @@ input TransportedLineInput {
   reportForTransportIsWaste: Boolean!
 
   """
-  Exemption de récépissé du transporteur
+  **Exemption de récépissé du transporteur**
 
   Exemption de récépissé du transporteur.
 
@@ -5378,7 +5394,7 @@ input TransportedLineInput {
   reportForRecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur
+  **Numéro de récépissé du transporteur**
 
   Numéro de récépissé du transporteur - mention exigée si transport de déchets et absence d'exemption, mais sous la responsabilité du déclarant.
   En cas d'absence de valeur, la valeur sera complétée par celle du profil sur Trackdéchets, si elle est remplie.
@@ -5392,7 +5408,7 @@ input TransportedLineInput {
   reportForRecepisseNumber: String
 
   """
-  Mention ADR
+  **Mention ADR**
 
   Code de transport lié aux réglementations internationales relatives au transport international des marchandises dangereuses.
 
@@ -5402,7 +5418,7 @@ input TransportedLineInput {
   reportForTransportAdr: String
 
   """
-  Mention RID, ADNR, IMDG
+  **Mention RID, ADNR, IMDG**
 
   Autres mentions relatives aux transports de matières dangereuses.
 
@@ -5412,7 +5428,7 @@ input TransportedLineInput {
   reportForTransportOtherTmdCode: String
 
   """
-  Numéro(s) d'immatriculation(s)
+  **Numéro(s) d'immatriculation(s)**
 
   Numéros d'immatriculation du ou des véhicules.
 
@@ -5426,7 +5442,7 @@ input TransportedLineInput {
   reportForTransportPlates: [String!]
 
   """
-  Dénomination du déchet
+  **Dénomination du déchet**
 
   Dénomination usuelle des déchets transportés.
 
@@ -5439,7 +5455,7 @@ input TransportedLineInput {
   wasteDescription: String!
 
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet transporté.
 
@@ -5454,7 +5470,7 @@ input TransportedLineInput {
   wasteCode: String!
 
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet transporté.
 
@@ -5467,7 +5483,7 @@ input TransportedLineInput {
   wasteCodeBale: String
 
   """
-  POP
+  **POP**
 
   Ce champ permet d'indiquer si les déchets transportés contiennent des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
@@ -5480,7 +5496,7 @@ input TransportedLineInput {
   wastePop: Boolean!
 
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -5494,7 +5510,7 @@ input TransportedLineInput {
   wasteIsDangerous: Boolean
 
   """
-  Date d'enlèvement
+  **Date d'enlèvement**
 
   Date d'enlèvement ou de prise en charge des déchets transportés.
 
@@ -5511,7 +5527,7 @@ input TransportedLineInput {
   collectionDate: DateTime!
 
   """
-  Date de déchargement
+  **Date de déchargement**
 
   Date de déchargement des déchets transportés.
 
@@ -5528,7 +5544,7 @@ input TransportedLineInput {
   unloadingDate: DateTime!
 
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des déchets transportés.
 
@@ -5542,7 +5558,7 @@ input TransportedLineInput {
   weightValue: Float!
 
   """
-  Type de poids
+  **Type de poids**
 
   Indique si le poids des déchets transportés est estimé ou réel.
 
@@ -5555,7 +5571,7 @@ input TransportedLineInput {
   weightIsEstimate: Boolean!
 
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des déchets transportés.
 
@@ -5568,7 +5584,7 @@ input TransportedLineInput {
   volume: Float
 
   """
-  Type d'expéditeur ou détenteur
+  **Type d'expéditeur ou détenteur**
 
   Type d'acteur correspondant à l'expéditeur du déchet.
 
@@ -5586,7 +5602,7 @@ input TransportedLineInput {
   emitterCompanyType: RegistryCompanyType!
 
   """
-  Numéro d'identification de l'expéditeur ou détenteur
+  **Numéro d'identification de l'expéditeur ou détenteur**
 
   Numéro d'identification de l'expéditeur ou du détenteur, selon son type de profil.
 
@@ -5602,7 +5618,7 @@ input TransportedLineInput {
   emitterCompanyOrgId: String
 
   """
-  Raison sociale de l'expéditeur ou détenteur
+  **Raison sociale de l'expéditeur ou détenteur**
 
   Raison sociale de l'expéditeur ou du détenteur des déchets transportés.
 
@@ -5615,7 +5631,7 @@ input TransportedLineInput {
   emitterCompanyName: String
 
   """
-  Adresse de l'expéditeur ou détenteur
+  **Adresse de l'expéditeur ou détenteur**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets transportés.
 
@@ -5626,7 +5642,7 @@ input TransportedLineInput {
   emitterCompanyAddress: String
 
   """
-  Code postal de l'expéditeur ou détenteur
+  **Code postal de l'expéditeur ou détenteur**
 
   Code postal de l'expéditeur ou du détenteur des déchets transportés.
 
@@ -5637,7 +5653,7 @@ input TransportedLineInput {
   emitterCompanyPostalCode: String
 
   """
-  Commune de l'expéditeur ou détenteur
+  **Commune de l'expéditeur ou détenteur**
 
   Commune de l'expéditeur ou du détenteur des déchets transportés.
 
@@ -5648,7 +5664,7 @@ input TransportedLineInput {
   emitterCompanyCity: String
 
   """
-  Code pays de l'expéditeur ou détenteur
+  **Code pays de l'expéditeur ou détenteur**
 
   Code pays de l'expéditeur ou du détenteur des déchets transportés.
 
@@ -5659,7 +5675,7 @@ input TransportedLineInput {
   emitterCompanyCountryCode: String
 
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
 
@@ -5670,7 +5686,7 @@ input TransportedLineInput {
   emitterPickupSiteName: String
 
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -5681,7 +5697,7 @@ input TransportedLineInput {
   emitterPickupSiteAddress: String
 
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -5692,7 +5708,7 @@ input TransportedLineInput {
   emitterPickupSitePostalCode: String
 
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -5703,7 +5719,7 @@ input TransportedLineInput {
   emitterPickupSiteCity: String
 
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -5714,7 +5730,7 @@ input TransportedLineInput {
   emitterPickupSiteCountryCode: String
 
   """
-  Type de destinataire
+  **Type de destinataire**
 
   Type d'acteur correspondant au destinataire des déchets transportés.
 
@@ -5730,7 +5746,7 @@ input TransportedLineInput {
   destinationCompanyType: RegistryCompanyType!
 
   """
-  Numéro d'identification du destinataire
+  **Numéro d'identification du destinataire**
 
   Numéro d'identification du destinataire, selon son type de profil.
 
@@ -5746,7 +5762,7 @@ input TransportedLineInput {
   destinationCompanyOrgId: String
 
   """
-  Raison sociale du destinataire
+  **Raison sociale du destinataire**
 
   Raison sociale du destinataire des déchets transportés.
 
@@ -5759,7 +5775,7 @@ input TransportedLineInput {
   destinationCompanyName: String
 
   """
-  Libellé de l'adresse du destinataire
+  **Libellé de l'adresse du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire des déchets transportés.
 
@@ -5770,7 +5786,7 @@ input TransportedLineInput {
   destinationCompanyAddress: String
 
   """
-  Commune du destinataire
+  **Commune du destinataire**
 
   Commune du destinataire des déchets transportés.
 
@@ -5781,7 +5797,7 @@ input TransportedLineInput {
   destinationCompanyCity: String
 
   """
-  Code postal du destinataire
+  **Code postal du destinataire**
 
   Code postal du destinataire des déchets transportés.
 
@@ -5792,7 +5808,7 @@ input TransportedLineInput {
   destinationCompanyPostalCode: String
 
   """
-  Code pays du destinataire
+  **Code pays du destinataire**
 
   Code pays du destinataire des déchets transportés.
 
@@ -5803,7 +5819,7 @@ input TransportedLineInput {
   destinationCompanyCountryCode: String
 
   """
-  Libellé de l'adresse de dépôt du destinataire
+  **Libellé de l'adresse de dépôt du destinataire**
 
   Libellé de l'adresse de dépôt (n° de voie et voie, complément, lieu-dit etc) du destinataire des déchets transportés si adresse de dépôt différente de celle du destinataire.
 
@@ -5814,7 +5830,7 @@ input TransportedLineInput {
   destinationDropSiteAddress: String
 
   """
-  Code postal de l'adresse de dépôt du destinataire
+  **Code postal de l'adresse de dépôt du destinataire**
 
   Code postal de l'adresse de dépôt du destinataire des déchets transportés si adresse de dépôt différente de celle du destinataire.
 
@@ -5825,7 +5841,7 @@ input TransportedLineInput {
   destinationDropSitePostalCode: String
 
   """
-  Commune de l'adresse de dépôt du destinataire
+  **Commune de l'adresse de dépôt du destinataire**
 
   Commune de l'adresse de dépôt du destinataire des déchets transportés si adresse de dépôt différente de celle du destinataire.
 
@@ -5836,7 +5852,7 @@ input TransportedLineInput {
   destinationDropSiteCity: String
 
   """
-  Pays de l'adresse de dépôt du destinataire
+  **Pays de l'adresse de dépôt du destinataire**
 
   Code pays de l'adresse de dépôt du destinataire des déchets transportés si adresse de dépôt différente de celle du destinataire.
 
@@ -5847,7 +5863,7 @@ input TransportedLineInput {
   destinationDropSiteCountryCode: String
 
   """
-  Numéro de notification ou de déclaration GISTRID
+  **Numéro de notification ou de déclaration GISTRID**
 
   Renseigner ici le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
 
@@ -5861,7 +5877,7 @@ input TransportedLineInput {
   gistridNumber: String
 
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
 
   Renseigner ici le numéro de saisie du document déclaré sur GISTRID.
 
@@ -5872,7 +5888,7 @@ input TransportedLineInput {
   movementNumber: String
 
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -5885,7 +5901,7 @@ input TransportedLineInput {
   ecoOrganismeSiret: String
 
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -5898,7 +5914,7 @@ input TransportedLineInput {
   ecoOrganismeName: String
 
   """
-  SIRET du courtier
+  **SIRET du courtier**
 
   SIRET du courtier.
 
@@ -5911,7 +5927,7 @@ input TransportedLineInput {
   brokerCompanySiret: String
 
   """
-  Raison sociale du courtier
+  **Raison sociale du courtier**
 
   Raison sociale du courtier.
 
@@ -5924,7 +5940,7 @@ input TransportedLineInput {
   brokerCompanyName: String
 
   """
-  Numéro de récépissé du courtier
+  **Numéro de récépissé du courtier**
 
   Numéro de récépissé du courtier.
 
@@ -5937,7 +5953,7 @@ input TransportedLineInput {
   brokerRecepisseNumber: String
 
   """
-  SIRET du négociant
+  **SIRET du négociant**
 
   SIRET du négociant.
 
@@ -5950,7 +5966,7 @@ input TransportedLineInput {
   traderCompanySiret: String
 
   """
-  Raison sociale du négociant
+  **Raison sociale du négociant**
 
   Raison sociale du négociant.
 
@@ -5963,7 +5979,7 @@ input TransportedLineInput {
   traderCompanyName: String
 
   """
-  Numéro de récépissé du négociant
+  **Numéro de récépissé du négociant**
 
   Numéro de récépissé du négociant.
 
@@ -5978,7 +5994,7 @@ input TransportedLineInput {
 
 input ManagedLineInput {
   """
-  Motif
+  **Motif**
 
   Indique si la ligne doit être modifiée ou supprimée. A laisser vide si c'est une création.
 
@@ -5999,7 +6015,7 @@ input ManagedLineInput {
   reason: RegistryLineReason
 
   """
-  Identifiant unique
+  **Identifiant unique**
 
   Identifiant unique donné à chaque déclaration pour un établissement donné.
 
@@ -6013,7 +6029,7 @@ input ManagedLineInput {
   publicId: ID!
 
   """
-  SIRET du déclarant
+  **SIRET du déclarant**
 
   À compléter dans le cadre d'une délégation, SIRET de l'établissement qui fait la déclaration qui n'est pas celui pour qui la déclaration est faite.
 
@@ -6026,7 +6042,7 @@ input ManagedLineInput {
   reportAsCompanySiret: String
 
   """
-  SIRET du courtier ou négociant
+  **SIRET du courtier ou négociant**
 
   Établissement pour lequel la déclaration est effectuée.
 
@@ -6044,7 +6060,7 @@ input ManagedLineInput {
   reportForCompanySiret: String!
 
   """
-  Dénomination du déchet
+  **Dénomination du déchet**
 
   Dénomination usuelle des déchets gérés.
 
@@ -6057,7 +6073,7 @@ input ManagedLineInput {
   wasteDescription: String!
 
   """
-  Code déchet
+  **Code déchet**
 
   Code du déchet géré.
 
@@ -6071,7 +6087,7 @@ input ManagedLineInput {
   wasteCode: String
 
   """
-  Code déchet Bâle
+  **Code déchet Bâle**
 
   Code Bâle du déchet géré.
 
@@ -6085,7 +6101,7 @@ input ManagedLineInput {
   wasteCodeBale: String
 
   """
-  POP
+  **POP**
 
   Indique si le déchet contient des polluants organiques persistants au regard de la définition de l'article R. 541-8 du code de l'environnement.
 
@@ -6096,7 +6112,7 @@ input ManagedLineInput {
   wastePop: Boolean!
 
   """
-  Dangereux
+  **Dangereux**
 
   Indique si le déchet avec un code sans * est qualifié de dangereux.
 
@@ -6110,7 +6126,7 @@ input ManagedLineInput {
   wasteIsDangerous: Boolean
 
   """
-  Date d'acquisition ou de début de gestion
+  **Date d'acquisition ou de début de gestion**
 
   Date d'acquisition du déchet ou des terres excavées et sédiments par le négociant, ou date de début de gestion du déchet ou des terres excavées et sédiments par le courtier.
 
@@ -6127,7 +6143,7 @@ input ManagedLineInput {
   managingStartDate: DateTime!
 
   """
-  Date de cession ou de fin de gestion
+  **Date de cession ou de fin de gestion**
 
   Date de cession du déchet ou des terres excavées et sédiments par le négociant, ou date de fin de gestion du déchet ou des terres excavées et sédiments par le courtier.
 
@@ -6144,7 +6160,7 @@ input ManagedLineInput {
   managingEndDate: DateTime!
 
   """
-  Poids en tonnes
+  **Poids en tonnes**
 
   Poids en tonnes des déchets gérés.
 
@@ -6158,7 +6174,7 @@ input ManagedLineInput {
   weightValue: Float!
 
   """
-  Type de poids
+  **Type de poids**
 
   Indiquer ici si le poids des déchets gérés est estimé ou réel.
 
@@ -6171,7 +6187,7 @@ input ManagedLineInput {
   weightIsEstimate: Boolean!
 
   """
-  Volume en M3
+  **Volume en M3**
 
   Volume en M3 des déchets gérés.
 
@@ -6185,7 +6201,7 @@ input ManagedLineInput {
   volume: Float
 
   """
-  DAP
+  **DAP**
 
   Numéro de bordereau d'analyse chimique ou Demande d'Acceptation Préalable (DAP).
 
@@ -6196,7 +6212,7 @@ input ManagedLineInput {
   wasteDap: String
 
   """
-  Type de producteur initial
+  **Type de producteur initial**
 
   Type d'acteur correspondant au producteur des déchets gérés.
 
@@ -6215,7 +6231,7 @@ input ManagedLineInput {
   initialEmitterCompanyType: RegistryCompanyType!
 
   """
-  Numéro d'identification du producteur initial
+  **Numéro d'identification du producteur initial**
 
   Numéro d'identification du producteur initial, selon son type de profil.
 
@@ -6231,7 +6247,7 @@ input ManagedLineInput {
   initialEmitterCompanyOrgId: String
 
   """
-  Raison sociale du producteur initial
+  **Raison sociale du producteur initial**
 
   Raison sociale du producteur initial des déchets gérés.
 
@@ -6244,7 +6260,7 @@ input ManagedLineInput {
   initialEmitterCompanyName: String
 
   """
-  Adresse du producteur initial
+  **Adresse du producteur initial**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du producteur initial des déchets gérés.
 
@@ -6257,7 +6273,7 @@ input ManagedLineInput {
   initialEmitterCompanyAddress: String
 
   """
-  Code postal du producteur initial
+  **Code postal du producteur initial**
 
   Code postal du producteur initial des déchets gérés.
 
@@ -6270,7 +6286,7 @@ input ManagedLineInput {
   initialEmitterCompanyPostalCode: String
 
   """
-  Commune du producteur initial
+  **Commune du producteur initial**
 
   Commune du producteur initial des déchets gérés.
 
@@ -6283,7 +6299,7 @@ input ManagedLineInput {
   initialEmitterCompanyCity: String
 
   """
-  Code pays du producteur initial
+  **Code pays du producteur initial**
 
   Code pays du producteur initial des déchets gérés.
 
@@ -6296,7 +6312,7 @@ input ManagedLineInput {
   initialEmitterCompanyCountryCode: String
 
   """
-  Code(s) INSEE de(s) commune(s)
+  **Code(s) INSEE de(s) commune(s)**
 
   Le ou les codes INSEE de la ou des commune(s) de collecte des déchets.
 
@@ -6310,7 +6326,7 @@ input ManagedLineInput {
   initialEmitterMunicipalitiesInseeCodes: [String!]
 
   """
-  Codes INSEE des parcelles
+  **Codes INSEE des parcelles**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de production, plusieurs numéros peuvent être renseignés.
 
@@ -6324,7 +6340,7 @@ input ManagedLineInput {
   parcelInseeCodes: [String!]
 
   """
-  Numéro(s) des parcelles
+  **Numéro(s) des parcelles**
 
   Le ou les numéros des parcelles cadastrales du site de production, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -6341,7 +6357,7 @@ input ManagedLineInput {
   parcelNumbers: [String!]
 
   """
-  Coordonnées des parcelles
+  **Coordonnées des parcelles**
 
   Coordonnées de la ou des parcelles cadastrales du site de production par exemple : 48.894258 2.240027.
 
@@ -6356,7 +6372,7 @@ input ManagedLineInput {
   parcelCoordinates: [String!]
 
   """
-  Identifiant SIS du terrain
+  **Identifiant SIS du terrain**
 
   Identifiant du terrain SIS lorsque les terres excavées et sédiments ont été extraits d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
 
@@ -6367,7 +6383,7 @@ input ManagedLineInput {
   sisIdentifier: String
 
   """
-  Type d'installation de Tri Transit Regroupement
+  **Type d'installation de Tri Transit Regroupement**
 
   Type d'acteur correspondant à l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6382,7 +6398,7 @@ input ManagedLineInput {
   tempStorerCompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification de l'installation de Tri Transit Regroupement
+  **Numéro d'identification de l'installation de Tri Transit Regroupement**
 
   Numéro d'identification de l'installation de Tri Transit Regroupement, selon son type de profil.
 
@@ -6397,7 +6413,7 @@ input ManagedLineInput {
   tempStorerCompanyOrgId: String
 
   """
-  Raison sociale de l'installation de Tri Transit Regroupement
+  **Raison sociale de l'installation de Tri Transit Regroupement**
 
   Raison sociale de l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6410,7 +6426,7 @@ input ManagedLineInput {
   tempStorerCompanyName: String
 
   """
-  Libellé de l'adresse de l'installation de Tri Transit Regroupement
+  **Libellé de l'adresse de l'installation de Tri Transit Regroupement**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6423,7 +6439,7 @@ input ManagedLineInput {
   tempStorerCompanyAddress: String
 
   """
-  Commune de l'installation de Tri Transit Regroupement
+  **Commune de l'installation de Tri Transit Regroupement**
 
   Commune de l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6436,7 +6452,7 @@ input ManagedLineInput {
   tempStorerCompanyCity: String
 
   """
-  Code postal de l'installation de Tri Transit Regroupement
+  **Code postal de l'installation de Tri Transit Regroupement**
 
   Code postal de l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6449,7 +6465,7 @@ input ManagedLineInput {
   tempStorerCompanyPostalCode: String
 
   """
-  Code pays de l'installation de Tri Transit Regroupement
+  **Code pays de l'installation de Tri Transit Regroupement**
 
   Code pays de l'installation de Tri Transit Regroupement des déchets gérés.
 
@@ -6462,7 +6478,7 @@ input ManagedLineInput {
   tempStorerCompanyCountryCode: String
 
   """
-  Type de destinataire
+  **Type de destinataire**
 
   Type d'acteur correspondant au destinataire des déchets gérés.
 
@@ -6477,7 +6493,7 @@ input ManagedLineInput {
   destinationCompanyType: RegistryCompanyType!
 
   """
-  Numéro d'identification du destinataire
+  **Numéro d'identification du destinataire**
 
   Numéro d'identification du destinataire, selon son type de profil.
 
@@ -6490,7 +6506,7 @@ input ManagedLineInput {
   destinationCompanyOrgId: String
 
   """
-  Raison sociale du destinataire
+  **Raison sociale du destinataire**
 
   Raison sociale du destinataire des déchets gérés.
 
@@ -6501,7 +6517,7 @@ input ManagedLineInput {
   destinationCompanyName: String
 
   """
-  Libellé de l'adresse du destinataire
+  **Libellé de l'adresse du destinataire**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du destinataire des déchets gérés.
 
@@ -6512,7 +6528,7 @@ input ManagedLineInput {
   destinationCompanyAddress: String
 
   """
-  Commune du destinataire
+  **Commune du destinataire**
 
   Commune du destinataire des déchets gérés.
 
@@ -6523,7 +6539,7 @@ input ManagedLineInput {
   destinationCompanyCity: String
 
   """
-  Code postal du destinataire
+  **Code postal du destinataire**
 
   Code postal du destinataire des déchets gérés.
 
@@ -6534,7 +6550,7 @@ input ManagedLineInput {
   destinationCompanyPostalCode: String
 
   """
-  Code pays du destinataire
+  **Code pays du destinataire**
 
   Code pays du destinataire des déchets gérés.
 
@@ -6545,7 +6561,7 @@ input ManagedLineInput {
   destinationCompanyCountryCode: String
 
   """
-  Libellé de l'adresse de dépôt du destinataire
+  **Libellé de l'adresse de dépôt du destinataire**
 
   Libellé de l'adresse de dépôt (n° de voie et voie, complément, lieu-dit etc) des déchets gérés.
 
@@ -6556,7 +6572,7 @@ input ManagedLineInput {
   destinationDropSiteAddress: String
 
   """
-  Code postal de l'adresse de dépôt du destinataire
+  **Code postal de l'adresse de dépôt du destinataire**
 
   Code postal de l'adresse de dépôt du destinataire des déchets gérés.
 
@@ -6567,7 +6583,7 @@ input ManagedLineInput {
   destinationDropSitePostalCode: String
 
   """
-  Commune de l'adresse de dépôt du destinataire
+  **Commune de l'adresse de dépôt du destinataire**
 
   Commune de l'adresse de dépôt du destinataire des déchets gérés.
 
@@ -6578,7 +6594,7 @@ input ManagedLineInput {
   destinationDropSiteCity: String
 
   """
-  Pays de l'adresse de dépôt du destinataire
+  **Pays de l'adresse de dépôt du destinataire**
 
   Code pays de l'adresse de dépôt du destinataire des déchets gérés.
 
@@ -6589,7 +6605,7 @@ input ManagedLineInput {
   destinationDropSiteCountryCode: String
 
   """
-  Terre valorisée
+  **Terre valorisée**
 
   Indique si les terres excavées et sédiments sont valorisés en remblayage.
 
@@ -6602,7 +6618,7 @@ input ManagedLineInput {
   isUpcycled: Boolean
 
   """
-  Codes INSEE des parcelles si valorisation
+  **Codes INSEE des parcelles si valorisation**
 
   Le ou les codes INSEE des communes des parcelles cadastrales du site de valorisation des terres excavées et sédiments, plusieurs numéros peuvent être renseignés.
 
@@ -6616,7 +6632,7 @@ input ManagedLineInput {
   destinationParcelInseeCodes: [String!]
 
   """
-  Numéro(s) des parcelles si valorisation
+  **Numéro(s) des parcelles si valorisation**
 
   Le ou les numéros des parcelles cadastrales du site de valorisation des terres excavées et sédiments, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
 
@@ -6633,7 +6649,7 @@ input ManagedLineInput {
   destinationParcelNumbers: [String!]
 
   """
-  Coordonnées des parcelles si valorisation
+  **Coordonnées des parcelles si valorisation**
 
   Coordonnées de la ou des parcelles cadastrales du site de valorisation des terres excavées et sédiments, par exemple : 48.894258 2.240027.
 
@@ -6648,7 +6664,7 @@ input ManagedLineInput {
   destinationParcelCoordinates: [String!]
 
   """
-  Numéro de notification ou de déclaration GISTRID
+  **Numéro de notification ou de déclaration GISTRID**
 
   Renseigner ici le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
 
@@ -6662,7 +6678,7 @@ input ManagedLineInput {
   gistridNumber: String
 
   """
-  Numéro de mouvement
+  **Numéro de mouvement**
 
   Numéro de saisie du document déclaré sur GISTRID.
 
@@ -6673,7 +6689,7 @@ input ManagedLineInput {
   movementNumber: String
 
   """
-  Code de traitement réalisé
+  **Code de traitement réalisé**
 
   Code de traitement appliqué au déchet faisant l'objet de la sortie de statut de déchet.
 
@@ -6687,7 +6703,7 @@ input ManagedLineInput {
   operationCode: String!
 
   """
-  Mode de traitement
+  **Mode de traitement**
 
   Qualification du traitement correspondant au code de traitement des déchets gérés.
 
@@ -6707,7 +6723,7 @@ input ManagedLineInput {
   operationMode: OperationMode
 
   """
-  Type d'expéditeur ou détenteur
+  **Type d'expéditeur ou détenteur**
 
   Type d'acteur correspondant à l'expéditeur des déchets gérés.
 
@@ -6725,7 +6741,7 @@ input ManagedLineInput {
   emitterCompanyType: RegistryCompanyType!
 
   """
-  Numéro d'identification de l'expéditeur ou détenteur
+  **Numéro d'identification de l'expéditeur ou détenteur**
 
   Numéro d'identification de l'expéditeur ou du détenteur, selon son type de profil.
 
@@ -6741,7 +6757,7 @@ input ManagedLineInput {
   emitterCompanyOrgId: String
 
   """
-  Raison sociale de l'expéditeur ou détenteur
+  **Raison sociale de l'expéditeur ou détenteur**
 
   Raison sociale de l'expéditeur ou du détenteur des déchets gérés.
 
@@ -6754,7 +6770,7 @@ input ManagedLineInput {
   emitterCompanyName: String
 
   """
-  Adresse de l'expéditeur ou détenteur
+  **Adresse de l'expéditeur ou détenteur**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) de l'expéditeur ou du détenteur des déchets gérés.
 
@@ -6765,7 +6781,7 @@ input ManagedLineInput {
   emitterCompanyAddress: String
 
   """
-  Code postal de l'expéditeur ou détenteur
+  **Code postal de l'expéditeur ou détenteur**
 
   Code postal de l'expéditeur ou du détenteur des déchets gérés.
 
@@ -6776,7 +6792,7 @@ input ManagedLineInput {
   emitterCompanyPostalCode: String
 
   """
-  Commune de l'expéditeur ou détenteur
+  **Commune de l'expéditeur ou détenteur**
 
   Commune de l'expéditeur ou détenteur des déchets gérés.
 
@@ -6787,7 +6803,7 @@ input ManagedLineInput {
   emitterCompanyCity: String
 
   """
-  Code pays de l'expéditeur ou détenteur
+  **Code pays de l'expéditeur ou détenteur**
 
   Code pays de l'expéditeur ou détenteur des déchets gérés.
 
@@ -6798,7 +6814,7 @@ input ManagedLineInput {
   emitterCompanyCountryCode: String
 
   """
-  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Cette référence chantier pourra être utilisée pour permettre un lien avec les déclarations sur la plateforme PEMD.
 
@@ -6809,7 +6825,7 @@ input ManagedLineInput {
   emitterPickupSiteName: String
 
   """
-  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Libellé de l'adresse du chantier ou du lieu de collecte (n° de voie et voie, complément, lieu-dit, etc) de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -6820,7 +6836,7 @@ input ManagedLineInput {
   emitterPickupSiteAddress: String
 
   """
-  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code postal de prise en charge de l'expéditeur si différente de l'adresse de l'établissement de l'expéditeur du déchet.
 
@@ -6831,7 +6847,7 @@ input ManagedLineInput {
   emitterPickupSitePostalCode: String
 
   """
-  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différente de celle de son établissement.
 
@@ -6842,7 +6858,7 @@ input ManagedLineInput {
   emitterPickupSiteCity: String
 
   """
-  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  **Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur**
 
   Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur, si différent de celui de son établissement.
 
@@ -6853,7 +6869,7 @@ input ManagedLineInput {
   emitterPickupSiteCountryCode: String
 
   """
-  SIRET de l'éco-organisme
+  **SIRET de l'éco-organisme**
 
   SIRET de l'éco-organisme.
 
@@ -6866,7 +6882,7 @@ input ManagedLineInput {
   ecoOrganismeSiret: String
 
   """
-  Raison sociale de l'éco-organisme
+  **Raison sociale de l'éco-organisme**
 
   Raison sociale de l'éco-organisme.
 
@@ -6879,7 +6895,7 @@ input ManagedLineInput {
   ecoOrganismeName: String
 
   """
-  Approvisionnement direct (pipeline, convoyeur)
+  **Approvisionnement direct (pipeline, convoyeur)**
 
   Indique si les déchets entrants ont été transportés par pipeline ou convoyeur et que donc aucun transporteur n'est attendu.
 
@@ -6892,7 +6908,7 @@ input ManagedLineInput {
   isDirectSupply: Boolean
 
   """
-  Mode de transport du transporteur n°1
+  **Mode de transport du transporteur n°1**
 
   Mode de transport des déchets entrants du transporteur n°1.
 
@@ -6908,7 +6924,7 @@ input ManagedLineInput {
   transporter1TransportMode: TransportMode
 
   """
-  Type de transporteur n°1
+  **Type de transporteur n°1**
 
   Type d'acteur correspondant au transporteur n°1.
 
@@ -6924,7 +6940,7 @@ input ManagedLineInput {
   transporter1CompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du transporteur n°1
+  **Numéro d'identification du transporteur n°1**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -6940,7 +6956,7 @@ input ManagedLineInput {
   transporter1CompanyOrgId: String
 
   """
-  Exemption de récépissé du transporteur n°1
+  **Exemption de récépissé du transporteur n°1**
 
   Indique si le transporteur n°1 est exempté de récépissé.
 
@@ -6953,7 +6969,7 @@ input ManagedLineInput {
   transporter1RecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur n°1
+  **Numéro de récépissé du transporteur n°1**
 
   Numéro de récépissé du transporteur n°1.
 
@@ -6966,7 +6982,7 @@ input ManagedLineInput {
   transporter1RecepisseNumber: String
 
   """
-  Raison sociale du transporteur n°1
+  **Raison sociale du transporteur n°1**
 
   Raison sociale du transporteur n°1.
 
@@ -6979,7 +6995,7 @@ input ManagedLineInput {
   transporter1CompanyName: String
 
   """
-  Adresse du transporteur n°1
+  **Adresse du transporteur n°1**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°1.
 
@@ -6992,7 +7008,7 @@ input ManagedLineInput {
   transporter1CompanyAddress: String
 
   """
-  Code postal du transporteur n°1
+  **Code postal du transporteur n°1**
 
   Code postal du transporteur n°1.
 
@@ -7005,7 +7021,7 @@ input ManagedLineInput {
   transporter1CompanyPostalCode: String
 
   """
-  Commune du transporteur n°1
+  **Commune du transporteur n°1**
 
   Commune du transporteur n°1.
 
@@ -7018,7 +7034,7 @@ input ManagedLineInput {
   transporter1CompanyCity: String
 
   """
-  Pays du transporteur n°1
+  **Pays du transporteur n°1**
 
   Code pays du transporteur n°1.
 
@@ -7031,7 +7047,7 @@ input ManagedLineInput {
   transporter1CompanyCountryCode: String
 
   """
-  Mode de transport du transporteur n°2
+  **Mode de transport du transporteur n°2**
 
   Mode de transport des déchets entrants du transporteur n°2.
 
@@ -7047,7 +7063,7 @@ input ManagedLineInput {
   transporter2TransportMode: TransportMode
 
   """
-  Type de transporteur n°2
+  **Type de transporteur n°2**
 
   Type d'acteur correspondant au transporteur n°2.
 
@@ -7062,7 +7078,7 @@ input ManagedLineInput {
   transporter2CompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du transporteur n°2
+  **Numéro d'identification du transporteur n°2**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -7077,7 +7093,7 @@ input ManagedLineInput {
   transporter2CompanyOrgId: String
 
   """
-  Exemption de récépissé du transporteur n°2
+  **Exemption de récépissé du transporteur n°2**
 
   Indique si le transporteur n°2 est exempté de récépissé.
 
@@ -7090,7 +7106,7 @@ input ManagedLineInput {
   transporter2RecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur n°2
+  **Numéro de récépissé du transporteur n°2**
 
   Numéro de récépissé du transporteur n°2.
 
@@ -7103,7 +7119,7 @@ input ManagedLineInput {
   transporter2RecepisseNumber: String
 
   """
-  Raison sociale du transporteur n°2
+  **Raison sociale du transporteur n°2**
 
   Raison sociale du transporteur n°2.
 
@@ -7116,7 +7132,7 @@ input ManagedLineInput {
   transporter2CompanyName: String
 
   """
-  Adresse du transporteur n°2
+  **Adresse du transporteur n°2**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°2.
 
@@ -7129,7 +7145,7 @@ input ManagedLineInput {
   transporter2CompanyAddress: String
 
   """
-  Code postal du transporteur n°2
+  **Code postal du transporteur n°2**
 
   Code postal du transporteur n°2.
 
@@ -7142,7 +7158,7 @@ input ManagedLineInput {
   transporter2CompanyPostalCode: String
 
   """
-  Commune du transporteur n°2
+  **Commune du transporteur n°2**
 
   Commune du transporteur n°2.
 
@@ -7155,7 +7171,7 @@ input ManagedLineInput {
   transporter2CompanyCity: String
 
   """
-  Pays du transporteur n°2
+  **Pays du transporteur n°2**
 
   Code pays du transporteur n°2.
 
@@ -7168,7 +7184,7 @@ input ManagedLineInput {
   transporter2CompanyCountryCode: String
 
   """
-  Mode de transport du transporteur n°3
+  **Mode de transport du transporteur n°3**
 
   Mode de transport des déchets entrants du transporteur n°3.
 
@@ -7184,7 +7200,7 @@ input ManagedLineInput {
   transporter3TransportMode: TransportMode
 
   """
-  Type de transporteur n°3
+  **Type de transporteur n°3**
 
   Type d'acteur correspondant au transporteur n°3.
 
@@ -7199,7 +7215,7 @@ input ManagedLineInput {
   transporter3CompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du transporteur n°3
+  **Numéro d'identification du transporteur n°3**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -7214,7 +7230,7 @@ input ManagedLineInput {
   transporter3CompanyOrgId: String
 
   """
-  Exemption de récépissé du transporteur n°3
+  **Exemption de récépissé du transporteur n°3**
 
   Indique si le transporteur n°3 est exempté de récépissé.
 
@@ -7227,7 +7243,7 @@ input ManagedLineInput {
   transporter3RecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur n°3
+  **Numéro de récépissé du transporteur n°3**
 
   Numéro de récépissé du transporteur n°3.
 
@@ -7240,7 +7256,7 @@ input ManagedLineInput {
   transporter3RecepisseNumber: String
 
   """
-  Raison sociale du transporteur n°3
+  **Raison sociale du transporteur n°3**
 
   Raison sociale du transporteur n°3.
 
@@ -7253,7 +7269,7 @@ input ManagedLineInput {
   transporter3CompanyName: String
 
   """
-  Adresse du transporteur n°3
+  **Adresse du transporteur n°3**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°3.
 
@@ -7266,7 +7282,7 @@ input ManagedLineInput {
   transporter3CompanyAddress: String
 
   """
-  Code postal du transporteur n°3
+  **Code postal du transporteur n°3**
 
   Code postal du transporteur n°3.
 
@@ -7279,7 +7295,7 @@ input ManagedLineInput {
   transporter3CompanyPostalCode: String
 
   """
-  Commune du transporteur n°3
+  **Commune du transporteur n°3**
 
   Commune du transporteur n°3.
 
@@ -7292,7 +7308,7 @@ input ManagedLineInput {
   transporter3CompanyCity: String
 
   """
-  Pays du transporteur n°3
+  **Pays du transporteur n°3**
 
   Code pays du transporteur n°3.
 
@@ -7305,7 +7321,7 @@ input ManagedLineInput {
   transporter3CompanyCountryCode: String
 
   """
-  Mode de transport du transporteur n°4
+  **Mode de transport du transporteur n°4**
 
   Mode de transport des déchets entrants du transporteur n°4.
 
@@ -7321,7 +7337,7 @@ input ManagedLineInput {
   transporter4TransportMode: TransportMode
 
   """
-  Type de transporteur n°4
+  **Type de transporteur n°4**
 
   Type d'acteur correspondant au transporteur n°4.
 
@@ -7336,7 +7352,7 @@ input ManagedLineInput {
   transporter4CompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du transporteur n°4
+  **Numéro d'identification du transporteur n°4**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -7351,7 +7367,7 @@ input ManagedLineInput {
   transporter4CompanyOrgId: String
 
   """
-  Exemption de récépissé du transporteur n°4
+  **Exemption de récépissé du transporteur n°4**
 
   Indique si le transporteur n°4 est exempté de récépissé.
 
@@ -7364,7 +7380,7 @@ input ManagedLineInput {
   transporter4RecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur n°4
+  **Numéro de récépissé du transporteur n°4**
 
   Numéro de récépissé du transporteur n°4.
 
@@ -7377,7 +7393,7 @@ input ManagedLineInput {
   transporter4RecepisseNumber: String
 
   """
-  Raison sociale du transporteur n°4
+  **Raison sociale du transporteur n°4**
 
   Raison sociale du transporteur n°4.
 
@@ -7390,7 +7406,7 @@ input ManagedLineInput {
   transporter4CompanyName: String
 
   """
-  Adresse du transporteur n°4
+  **Adresse du transporteur n°4**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°4.
 
@@ -7403,7 +7419,7 @@ input ManagedLineInput {
   transporter4CompanyAddress: String
 
   """
-  Code postal du transporteur n°4
+  **Code postal du transporteur n°4**
 
   Code postal du transporteur n°4.
 
@@ -7416,7 +7432,7 @@ input ManagedLineInput {
   transporter4CompanyPostalCode: String
 
   """
-  Commune du transporteur n°4
+  **Commune du transporteur n°4**
 
   Commune du transporteur n°4.
 
@@ -7429,7 +7445,7 @@ input ManagedLineInput {
   transporter4CompanyCity: String
 
   """
-  Pays du transporteur n°4
+  **Pays du transporteur n°4**
 
   Code pays du transporteur n°4.
 
@@ -7442,7 +7458,7 @@ input ManagedLineInput {
   transporter4CompanyCountryCode: String
 
   """
-  Mode de transport du transporteur n°5
+  **Mode de transport du transporteur n°5**
 
   Mode de transport des déchets entrants du transporteur n°5.
 
@@ -7458,7 +7474,7 @@ input ManagedLineInput {
   transporter5TransportMode: TransportMode
 
   """
-  Type de transporteur n°5
+  **Type de transporteur n°5**
 
   Type d'acteur correspondant au transporteur n°5.
 
@@ -7473,7 +7489,7 @@ input ManagedLineInput {
   transporter5CompanyType: RegistryCompanyType
 
   """
-  Numéro d'identification du transporteur n°5
+  **Numéro d'identification du transporteur n°5**
 
   Numéro d'identification du transporteur selon son type de profil.
 
@@ -7488,7 +7504,7 @@ input ManagedLineInput {
   transporter5CompanyOrgId: String
 
   """
-  Exemption de récépissé du transporteur n°5
+  **Exemption de récépissé du transporteur n°5**
 
   Indique si le transporteur n°5 est exempté de récépissé.
 
@@ -7501,7 +7517,7 @@ input ManagedLineInput {
   transporter5RecepisseIsExempted: Boolean
 
   """
-  Numéro de récépissé du transporteur n°5
+  **Numéro de récépissé du transporteur n°5**
 
   Numéro de récépissé du transporteur n°5.
 
@@ -7514,7 +7530,7 @@ input ManagedLineInput {
   transporter5RecepisseNumber: String
 
   """
-  Raison sociale du transporteur n°5
+  **Raison sociale du transporteur n°5**
 
   Raison sociale du transporteur n°5.
 
@@ -7527,7 +7543,7 @@ input ManagedLineInput {
   transporter5CompanyName: String
 
   """
-  Adresse du transporteur n°5
+  **Adresse du transporteur n°5**
 
   Libellé de l'adresse (n° de voie et voie, complément, lieu-dit etc) du transporteur n°5.
 
@@ -7540,7 +7556,7 @@ input ManagedLineInput {
   transporter5CompanyAddress: String
 
   """
-  Code postal du transporteur n°5
+  **Code postal du transporteur n°5**
 
   Code postal du transporteur n°5.
 
@@ -7553,7 +7569,7 @@ input ManagedLineInput {
   transporter5CompanyPostalCode: String
 
   """
-  Commune du transporteur n°5
+  **Commune du transporteur n°5**
 
   Commune du transporteur n°5.
 
@@ -7566,7 +7582,7 @@ input ManagedLineInput {
   transporter5CompanyCity: String
 
   """
-  Pays du transporteur n°5
+  **Pays du transporteur n°5**
 
   Code pays du transporteur n°5.
 
