@@ -359,7 +359,7 @@ type IncomingWasteV2 {
   "Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  gistridNumber: String
+  ttdImportNumber: String
   movementNumber: String
   "Code d'opération ultérieure prévue"
   nextOperationCode: String

@@ -180,7 +180,7 @@ export const toIncomingWaste = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingTexs.noTraceability,
-    gistridNumber: incomingTexs.gistridNumber,
+    ttdImportNumber: incomingTexs.ttdImportNumber,
     movementNumber: incomingTexs.movementNumber,
     nextOperationCode: incomingTexs.nextOperationCode,
     isUpcycled: incomingTexs.isUpcycled,

@@ -23,7 +23,7 @@ import {
   getOperationCodeSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   siretSchema,
   parcelCoordinatesSchema,
   parcelNumbersSchema,
@@ -114,8 +114,7 @@ const inputIncomingTexsSchema = z.object({
   ),
   operationMode: getOperationModeSchema(),
   noTraceability: booleanSchema.nullish(),
-  nextDestinationIsAbroad: booleanSchema.nullish(),
-  gistridNumber: gistridNumberSchema,
+  ttdImportNumber: ttdNumberSchema,
   movementNumber: z
     .string()
     .trim()

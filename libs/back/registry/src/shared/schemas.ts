@@ -328,12 +328,12 @@ export const municipalitiesNamesSchema = z.union([
   municipalitiesNamesArraySchema
 ]);
 
-export const gistridNumberSchema = z
+export const ttdNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
     v => /^[A-Z]{2}[0-9]{10}$/.test(v) || /^A7[EI][0-9]{10}$/.test(v),
-    "Le numéro de notification ou de déclaration GISTRID ne respecte pas le format attendu"
+    "Le numéro de notification ou de déclaration de transfert transfrontalier de déchet ne respecte pas le format attendu"
   )
   .nullish();
 
