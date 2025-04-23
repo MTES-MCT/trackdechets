@@ -488,21 +488,17 @@ input IncomingWasteLineInput {
   Indique si une rupture de traçabilité est autorisée ou pas pour ce déchet
   """
   noTraceability: Boolean
-  """
-  Destination ultérieure étranger
-  Permet de préciser si la destination ultérieure des déchets est à l'étranger
-  """
-  nextDestinationIsAbroad: Boolean
-  """
-  Numéro de notification ou de déclaration GISTRID
 
-  Le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
   """
-  gistridNumber: String
+  Numéro de notification ou de déclaration d'import
+
+  Le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
+  """
+  ttdImportNumber: String
 
   """
   Numéro de mouvement
-  Numéro de saisie du document déclaré sur GISTRID.
+  Numéro de saisie du document déclaré.
   """
   movementNumber: String
   """
@@ -1004,19 +1000,14 @@ input IncomingTexsLineInput {
   """
   noTraceability: Boolean
   """
-  Destination ultérieure étranger
-  Permet de préciser si la destination ultérieure des déchets est à l'étranger
-  """
-  nextDestinationIsAbroad: Boolean
-  """
   Numéro de notification ou de déclaration GISTRID
 
-  Le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
+  Le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
   """
-  gistridNumber: String
+  ttdImportNumber: String
   """
   Numéro de mouvement
-  Numéro de saisie du document déclaré sur GISTRID
+  Numéro de saisie du document déclaré
   """
   movementNumber: String
   """
