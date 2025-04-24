@@ -10,11 +10,15 @@ import {
   PreviewCompanyContact
 } from "../BSDPreviewComponents";
 import { getTransportModeLabel } from "../../../../dashboard/constants";
+import { isForeignVat } from "@td/constants";
 
 interface BSVHUPreviewTransportProps {
   bsd: Bsvhu;
 }
 const BSVHUPreviewTransport = ({ bsd }: BSVHUPreviewTransportProps) => {
+  const isForeignCompany =
+    bsd.transporter?.company?.vatNumber &&
+    isForeignVat(bsd.transporter?.company?.vatNumber);
   return (
     <PreviewContainer>
       <PreviewContainerRow title={bsd.transporter?.company?.name}>
@@ -25,8 +29,12 @@ const BSVHUPreviewTransport = ({ bsd }: BSVHUPreviewTransportProps) => {
           />
 
           <PreviewTextRow
-            label="Siret"
-            value={bsd.transporter?.company?.siret}
+            label={!isForeignCompany ? "Siret" : "TVA intracommunautaire"}
+            value={
+              !isForeignCompany
+                ? bsd.transporter?.company?.siret
+                : bsd.transporter?.company?.vatNumber
+            }
           />
 
           <PreviewTextRow
