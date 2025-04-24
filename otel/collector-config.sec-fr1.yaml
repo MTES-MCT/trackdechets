@@ -43,7 +43,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch/datadog_generic]
+      processors: [memory_limiter, attributes, batch/datadog_generic]
       exporters: [datadog/connector, datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
