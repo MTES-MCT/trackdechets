@@ -29,6 +29,8 @@ processors:
     actions:
       - key: graphql.source
         action: delete
+      - key: db.statement
+        action: delete
 
 connectors:
   datadog/connector:
