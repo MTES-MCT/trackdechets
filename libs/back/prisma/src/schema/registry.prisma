@@ -53,6 +53,7 @@ enum RegistryImportType {
 model RegistrySsd {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -101,6 +102,7 @@ model RegistrySsd {
 model RegistryIncomingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -222,6 +224,7 @@ model RegistryIncomingWaste {
 model RegistryIncomingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -352,6 +355,7 @@ model RegistryIncomingTexs {
 model RegistryOutgoingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -483,6 +487,7 @@ model RegistryOutgoingTexs {
 model RegistryOutgoingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -604,6 +609,7 @@ model RegistryOutgoingWaste {
 model RegistryTransported {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -679,6 +685,7 @@ model RegistryTransported {
 model RegistryManaged {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -987,7 +994,7 @@ model RegistryChangeAggregate {
 model RegistryTexsAnalysisFile {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
-    
+
     s3FileKey        String
     originalFileName String
 
