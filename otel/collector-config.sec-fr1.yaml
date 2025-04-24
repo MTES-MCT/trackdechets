@@ -25,6 +25,11 @@ processors:
     send_batch_size: ${env:OTEL_DD_BATCH_SIZE:-100}
     timeout: 10s
 
+  attributes:
+    actions:
+      - key: graphql.source
+        action: delete
+
 connectors:
   datadog/connector:
 
