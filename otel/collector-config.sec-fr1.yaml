@@ -33,13 +33,17 @@ exporters:
     api:
       site: datadoghq.eu
       key: ${env:DD_API_KEY}
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch/datadog_generic]
-      exporters: [datadog/connector, datadog/exporter]
+      exporters: [datadog/connector, datadog/exporter, debug]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
       processors: [memory_limiter, batch/datadog_metrics]
