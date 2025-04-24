@@ -80,10 +80,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
     formState: { errors, isSubmitting, isDirty }
   } = methods;
 
-  console.log(errors);
-
-  console.log(watch("wasteDetails.packagingInfos"));
-
   const resetAndClose = () => {
     reset();
     navigate(-1);

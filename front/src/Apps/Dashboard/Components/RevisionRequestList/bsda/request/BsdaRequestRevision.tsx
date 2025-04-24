@@ -77,8 +77,6 @@ export function BsdaRequestRevision({ bsda }: Props) {
     formState: { errors, isSubmitting, isDirty }
   } = methods;
 
-  console.log(errors);
-
   const resetAndClose = () => {
     reset();
     navigate(-1);
