@@ -52,8 +52,14 @@ const elasticKey: { [key in WasteRegistryType]?: keyof BsdElastic } = {
 };
 const getKey = (id: string, siret: string) => `${id}_${siret}`;
 const runIntegrityTest = async () => {
-  const mem = {};
+  const mem = {
+    INCOMING: {},
+    OUTGOING: {},
+    TRANSPORTED: {},
+    MANAGED: {}
+  };
   const elasticRun = async (registryType: WasteRegistryType) => {
+    console.log("elasticRun", registryType);
     let done = false;
     const size = 100;
     let after: any | null = null;
@@ -97,11 +103,14 @@ const runIntegrityTest = async () => {
       const hits = body.hits.hits;
       for (const element of hits) {
         const source = element._source;
-        for (const siret of source.isIncomingWasteFor) {
-          if (mem[getKey(source.readableId, siret)]) {
-            delete mem[getKey(source.readableId, siret)];
+        const sirets = [
+          ...new Set(source[elasticKey[registryType] as string])
+        ] as string[];
+        for (const siret of sirets) {
+          if (mem[registryType][getKey(source.readableId, siret)]) {
+            delete mem[registryType][getKey(source.readableId, siret)];
           } else {
-            mem[getKey(source.readableId, siret)] = "elastic";
+            mem[registryType][getKey(source.readableId, siret)] = "elastic";
           }
         }
       }
@@ -135,10 +144,10 @@ const runIntegrityTest = async () => {
         cursorId = items[items.length - 1].dateId;
       }
       for (const element of items) {
-        if (mem[getKey(element.readableId, element.siret)]) {
-          delete mem[getKey(element.readableId, element.siret)];
+        if (mem[exportType][getKey(element.readableId, element.siret)]) {
+          delete mem[exportType][getKey(element.readableId, element.siret)];
         } else {
-          mem[getKey(element.readableId, element.siret)] = "lookup";
+          mem[exportType][getKey(element.readableId, element.siret)] = "lookup";
         }
       }
     }
@@ -148,16 +157,20 @@ const runIntegrityTest = async () => {
   await Promise.all([elasticRun("OUTGOING"), lookupRun("OUTGOING")]);
   await Promise.all([elasticRun("TRANSPORTED"), lookupRun("TRANSPORTED")]);
   await Promise.all([elasticRun("MANAGED"), lookupRun("MANAGED")]);
-  if (Object.keys(mem).length === 0) {
-    console.log("LOOKUP & ELASTIC are in sync, no misses :)");
-  } else {
-    console.log(`There are ${Object.keys(mem).length} misses :(`);
-    for (const miss of Object.keys(mem)) {
+  for (const registryType of Object.keys(mem)) {
+    if (Object.keys(mem[registryType]).length === 0) {
+      console.log("LOOKUP & ELASTIC are in sync, no misses :)");
+    } else {
       console.log(
-        `Registry: INCOMING, BSD id: ${miss.split("_")[0]}, siret: ${
-          miss.split("_")[1]
-        }, found in: ${mem[miss]}`
+        `There are ${Object.keys(mem[registryType]).length} misses :(`
       );
+      for (const miss of Object.keys(mem[registryType])) {
+        console.log(
+          `Registry: ${registryType}, BSD id: ${miss.split("_")[0]}, siret: ${
+            miss.split("_")[1]
+          }, found in: ${mem[registryType][miss]}`
+        );
+      }
     }
   }
 };
