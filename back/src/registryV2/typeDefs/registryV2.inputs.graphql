@@ -940,9 +940,16 @@ input IncomingWasteLineInput {
   noTraceability: Boolean
 
   """
-  Numéro de notification ou de déclaration d'import
+  **Numéro de notification ou de déclaration d'import**
 
-  Le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
+  Renseigner ici le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP NNNN NNNNNN avec PP pour le code pays, N (chiffres); ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E NNNN NNNNNN avec A7E pour Annexe 7 Export, et la série de chiffres qui dépend du format du pays d'origine.
+
+  Il est attendu un numéro de notification ou de déclaration si l'expéditeur du déchet est une entreprise UE ou hors UE puisqu'il s'aagit d'un import.
+
+  Valeurs :
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - De 12 à 15 caractères
   """
   ttdImportNumber: String
 
@@ -2174,9 +2181,16 @@ input IncomingTexsLineInput {
   """
   noTraceability: Boolean
   """
-  **Numéro de notification ou de déclaration GISTRID**
+  **Numéro de notification ou de déclaration d'import**
 
-  Le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP AAAA DDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre; ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre.
+  Renseigner ici le numéro de notification prévue à l'annexe I-B du règlement (CE) 1013/2006 pour un registre entrant au format PP NNNN NNNNNN avec PP pour le code pays, N (chiffres); ou renseigner ici le numéro de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E NNNN NNNNNN avec A7E pour Annexe 7 Export, et la série de chiffres qui dépend du format du pays d'origine.
+
+  Il est attendu un numéro de notification ou de déclaration si l'expéditeur du déchet est une entreprise UE ou hors UE puisqu'il s'aagit d'un import.
+
+  Valeurs :
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - De 12 à 15 caractères
   """
   ttdImportNumber: String
   """
@@ -3468,9 +3482,10 @@ input OutgoingTexsLineInput {
 
   Le numéro de notification (GISTRID) prévue à l'annexe I-B du règlement (CE) 1013/2006 ou le numéro de déclaration Annexe 7 prévu à l'annexe 1-B du règlement N°1013/2006.
 
-  Format :
-  - Notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
-  - Déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  Valeurs :
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - De 12 à 15 caractères
   """
   gistridNumber: String
   """
@@ -4526,8 +4541,8 @@ input OutgoingWasteLineInput {
   Obligatoire si réponse le Type de destinataire est ENTREPRISE_UE ou ENTREPRISE_HORS_UE.
 
   Valeurs :
-  - Format n° de notification : PP AAAA DDDRRR
-  - Format n° de déclaration : A7E AAAA DDDRRR
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
   - De 12 à 15 caractères
   """
   gistridNumber: String
@@ -5870,8 +5885,8 @@ input TransportedLineInput {
   À utiliser lors d'un transport TTD.
 
   Valeurs :
-  - Format n° de notification : PP AAAA DDDRRR
-  - Format n° de déclaration : A7E AAAA DDDRRR
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
   - De 12 à 15 caractères
   """
   gistridNumber: String
@@ -6671,8 +6686,8 @@ input ManagedLineInput {
   Obligatoire si le Type de destinataire est ENTREPRISE_UE ou ENTREPRISE_HORS_UE.
 
   Valeurs :
-  - Format n° de notification : PP AAAA DDDRRR
-  - Format n° de déclaration : A7E AAAA DDDRRR
+  - Format n° de notification : PP AAAA DDDRRR (PP: code pays, AAAA: année, DDD: département, RRR: numéro d'ordre)
+  - Format n° de déclaration : A7E AAAA DDDRRR (A7E: Annexe 7 Export, AAAA: année, DDD: département, RRR: numéro d'ordre)
   - De 12 à 15 caractères
   """
   gistridNumber: String
