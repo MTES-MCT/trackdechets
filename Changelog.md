@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Améliorations et rework de la liste de déclarations + IHM [PR 4113](https://github.com/MTES-MCT/trackdechets/pull/4113)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Permet l'ajout du volume et des numéros d'identification sur le BSDA partout où le formulaire de conditionnement apparait (création, modification, bordereau suite, bordereau regroupement,révision) & Passage du formulaire conditionnement au DSFR [PR 4104](https://github.com/MTES-MCT/trackdechets/pull/4104).
+
 # [2025.04.1] 08/04/2025
 
 #### :rocket: Nouvelles fonctionnalités

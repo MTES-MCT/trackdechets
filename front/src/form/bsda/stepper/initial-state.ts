@@ -11,6 +11,7 @@ import {
   getInitialCompany,
   initialTransporter
 } from "../../../Apps/common/data/initialState";
+import { emptyBsdaPackaging } from "../../../Apps/Forms/Components/PackagingList/helpers";
 
 // Les données transporteurs du formulaire représente soit un transporteur BSDA
 // déjà crée en base de données qui dispose d'un identifiant, soit un transporteur
@@ -71,7 +72,9 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
       adr: bsda?.waste?.adr ?? "",
       pop: bsda?.waste?.pop ?? false
     },
-    packagings: bsda?.packagings ?? [],
+    packagings: bsda?.packagings?.length
+      ? bsda.packagings
+      : [emptyBsdaPackaging],
     weight: {
       isEstimate: bsda?.weight?.isEstimate,
       value: bsda?.weight?.value

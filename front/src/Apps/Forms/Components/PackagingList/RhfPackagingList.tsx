@@ -8,8 +8,9 @@ import RhfPackagingForm from "./RhfPackagingForm";
  */
 function RhfPackagingList({
   fieldName,
+  packagingTypes,
   disabled = false
-}: Pick<PackagingListProps, "fieldName" | "disabled">) {
+}: Pick<PackagingListProps, "fieldName" | "packagingTypes" | "disabled">) {
   const { control, watch } = useFormContext();
   const { append, remove } = useFieldArray({
     control,
@@ -21,6 +22,7 @@ function RhfPackagingList({
   return (
     <PackagingList
       packagingInfos={packagings}
+      packagingTypes={packagingTypes}
       fieldName={fieldName}
       push={append}
       remove={remove}
