@@ -266,7 +266,7 @@ const getDefaultValues = () => ({
   wasteCodes: []
 });
 
-const getDateDescription = (registryType: RegistryV2ExportType) => {
+const getDateDescription = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
     case RegistryV2ExportType.Ssd:
       return "La date d'utilisation ou d'expédition est prise en compte.";
@@ -277,6 +277,7 @@ const getDateDescription = (registryType: RegistryV2ExportType) => {
     case RegistryV2ExportType.Managed:
       return "La date d'expédition est prise en compte. ";
   }
+  return "";
 };
 
 export function ExportModal({ isOpen, onClose }: Props) {
