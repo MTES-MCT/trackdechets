@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Améliorations et rework de la liste de déclarations + IHM [PR 4113](https://github.com/MTES-MCT/trackdechets/pull/4113)
+- Le champ emitterWastePackagings (détail du conditionnement émis) n'est plus obligatoire à la publication d'un dasri [PR 4140](https://github.com/MTES-MCT/trackdechets/pull/4140)
 
 #### :rocket: Nouvelles fonctionnalités
 
