@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@codegouvfr/react-dsfr/Button";

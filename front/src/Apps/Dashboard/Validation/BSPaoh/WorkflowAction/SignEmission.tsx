@@ -13,7 +13,7 @@ import React from "react";
 
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths } from "date-fns";
 import { SIGN_BSPAOH } from "../../../../../Apps/common/queries/bspaoh/queries";

@@ -1,5 +1,5 @@
 import { OperationMode, WasteAcceptationStatus } from "@prisma/client";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";
 import { ZodOperationEnum, ZodWasteCodeEnum } from "../bsff/schema";

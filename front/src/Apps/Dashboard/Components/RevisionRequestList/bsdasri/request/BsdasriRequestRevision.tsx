@@ -30,7 +30,7 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import RhfReviewableField from "../../common/Components/ReviewableField/RhfReviewableField";

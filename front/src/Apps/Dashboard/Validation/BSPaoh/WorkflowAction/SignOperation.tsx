@@ -19,7 +19,7 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import React from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths, addMinutes } from "date-fns";
 import { useForm } from "react-hook-form";

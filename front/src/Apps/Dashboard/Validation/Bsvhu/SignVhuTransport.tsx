@@ -15,7 +15,7 @@ import { format, subMonths } from "date-fns";
 import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { generatePath, Link, useLocation, useParams } from "react-router-dom";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";

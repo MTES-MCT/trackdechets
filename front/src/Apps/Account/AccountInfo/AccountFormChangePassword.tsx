@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Mutation, MutationChangePasswordArgs } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { DsfrNotificationError } from "../../common/Components/Error/Error";
 import { validationAccountPasswordSchema } from "../accountSchema";
 import AccountInfoActionBar from "./AccountInfoActionBar";

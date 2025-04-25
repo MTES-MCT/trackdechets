@@ -1,7 +1,7 @@
 import "@total-typescript/ts-reset";
 import "@td/tracer";
 import { envVariables } from "@td/env";
-import { z } from "@td/validation";
+import { z } from "zod";
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

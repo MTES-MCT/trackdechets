@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 import type { QueryResolvers } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { z } from "@td/validation";
+import { z } from "zod";
 import {
   getConnection,
   getPrismaPaginationArgs

@@ -4,7 +4,7 @@ import {
   OperationMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { BSDA_WASTE_CODES } from "@td/constants";
 import {
   intermediariesRefinement,

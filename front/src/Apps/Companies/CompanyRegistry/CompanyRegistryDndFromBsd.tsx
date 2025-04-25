@@ -10,7 +10,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { z } from "@td/validation";
+import { z } from "zod";
 import gql from "graphql-tag";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";

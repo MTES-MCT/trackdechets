@@ -8,7 +8,7 @@ import {
   WasteCodeEnum
 } from "@td/constants";
 import { sub } from "date-fns";
-import { z } from "@td/validation";
+import { z } from "zod";
 
 const enumValueAsStringSchema = z
   .string()

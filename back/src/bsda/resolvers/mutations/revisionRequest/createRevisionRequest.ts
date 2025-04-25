@@ -5,7 +5,7 @@ import {
   Prisma,
   RevisionRequestStatus
 } from "@prisma/client";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";

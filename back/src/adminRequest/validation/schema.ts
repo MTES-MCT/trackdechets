@@ -1,4 +1,4 @@
-import { z } from "@td/validation";
+import { z } from "zod";
 import {
   foreignVatNumberSchema,
   siretSchema,

@@ -5,7 +5,7 @@ import express, { json } from "express";
 import * as Sentry from "@sentry/node";
 import supertest from "supertest";
 import * as yup from "yup";
-import { z } from "@td/validation";
+import { z } from "zod";
 import sentryReporter from "../sentryReporter";
 import {
   AuthenticationError,

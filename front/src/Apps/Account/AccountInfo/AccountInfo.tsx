@@ -3,7 +3,7 @@ import { gql, useMutation } from "@apollo/client";
 import { User } from "@td/codegen-ui";
 import { useForm, SubmitHandler } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { validationAccountParametersSchema } from "../accountSchema";
 import AccountInfoActionBar from "./AccountInfoActionBar";

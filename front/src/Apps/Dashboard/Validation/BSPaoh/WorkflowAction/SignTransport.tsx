@@ -16,7 +16,7 @@ import {
 } from "@td/codegen-ui";
 import React, { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { SignBspaoh } from "./SignBspaoh";
 import { subMonths } from "date-fns";
 import { useForm, FormProvider } from "react-hook-form";

@@ -1,4 +1,4 @@
-import { z } from "@td/validation";
+import { z } from "zod";
 
 export const registryErrorMap: z.ZodErrorMap = (issue, ctx) => {
   if (issue.code === z.ZodIssueCode.invalid_type) {

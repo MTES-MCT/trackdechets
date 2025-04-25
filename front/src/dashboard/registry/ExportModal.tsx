@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { useMutation, useQuery } from "@apollo/client";
 import styles from "./MyExports.module.scss";
 import {

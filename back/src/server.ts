@@ -54,6 +54,10 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import configureYup from "./common/yup/configureYup";
+import i18next from "i18next";
+import { z } from "zod";
+import { zodI18nMap } from "zod-i18n-map";
+import translation from "zod-i18n-map/locales/fr/zod.json";
 
 const {
   SESSION_SECRET,
@@ -66,6 +70,15 @@ const {
   TRUST_PROXY_HOPS,
   GERICO_WEBHOOK_SLUG
 } = process.env;
+
+// Zod in FR
+i18next.init({
+  lng: "fr",
+  resources: {
+    fr: { zod: translation }
+  }
+});
+z.setErrorMap(zodI18nMap);
 
 const Sentry = initSentry();
 configureYup();

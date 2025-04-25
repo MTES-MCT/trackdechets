@@ -16,7 +16,7 @@ import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import { subMonths } from "date-fns";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { z } from "@td/validation";
+import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
