@@ -10,8 +10,8 @@ export const GET_SSD_REGISTRY_LOOKUP = gql`
       publicId
       ssd {
         publicId
-        reportForCompanySiret: reportForSiret
-        reportAsCompanySiret: reportAsSiret
+        reportForCompanySiret
+        reportAsCompanySiret
         weightValue
         weightIsEstimate
         volume
@@ -25,13 +25,13 @@ export const GET_SSD_REGISTRY_LOOKUP = gql`
         product
         processingDate
         processingEndDate
-        destinationCompanyType: destinationType
-        destinationCompanyOrgId: destinationOrgId
-        destinationCompanyName: destinationName
-        destinationCompanyAddress: destinationAddress
-        destinationCompanyPostalCode: destinationPostalCode
-        destinationCompanyCity: destinationCity
-        destinationCompanyCountryCode: destinationCountryCode
+        destinationCompanyType
+        destinationCompanyOrgId
+        destinationCompanyName
+        destinationCompanyAddress
+        destinationCompanyPostalCode
+        destinationCompanyCity
+        destinationCompanyCountryCode
         operationCode
         operationMode
         administrativeActReference

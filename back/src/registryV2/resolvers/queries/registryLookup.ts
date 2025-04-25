@@ -9,7 +9,6 @@ import {
   getLookupsFilterInfos,
   getTypeFilter
 } from "./utils/registryLookup.util";
-import { exportOptions } from "@td/registry";
 
 const TYPES_NAMES = {
   [RegistryImportType.INCOMING_TEXS]:
@@ -72,48 +71,12 @@ export async function registryLookup(
     ...lookup,
     publicId: lookup.readableId,
     type,
-    ssd:
-      lookup.registrySsd && exportOptions.SSD?.toSsdWaste
-        ? exportOptions.SSD.toSsdWaste(lookup.registrySsd)
-        : null,
-    incomingWaste:
-      lookup.registryIncomingWaste &&
-      exportOptions.INCOMING_WASTE?.toIncomingWaste
-        ? exportOptions.INCOMING_WASTE.toIncomingWaste(
-            lookup.registryIncomingWaste
-          )
-        : null,
-    incomingTexs:
-      lookup.registryIncomingTexs &&
-      exportOptions.INCOMING_TEXS?.toIncomingWaste
-        ? exportOptions.INCOMING_TEXS.toIncomingWaste(
-            lookup.registryIncomingTexs
-          )
-        : null,
-    outgoingWaste:
-      lookup.registryOutgoingWaste &&
-      exportOptions.OUTGOING_WASTE?.toOutgoingWaste
-        ? exportOptions.OUTGOING_WASTE.toOutgoingWaste(
-            lookup.registryOutgoingWaste
-          )
-        : null,
-    outgoingTexs:
-      lookup.registryOutgoingTexs &&
-      exportOptions.OUTGOING_TEXS?.toOutgoingWaste
-        ? exportOptions.OUTGOING_TEXS.toOutgoingWaste(
-            lookup.registryOutgoingTexs
-          )
-        : null,
-    managedWaste:
-      lookup.registryManaged && exportOptions.MANAGED?.toManagedWaste
-        ? exportOptions.MANAGED.toManagedWaste(lookup.registryManaged)
-        : null,
-    transportedWaste:
-      lookup.registryTransported &&
-      exportOptions.TRANSPORTED?.toTransportedWaste
-        ? exportOptions.TRANSPORTED.toTransportedWaste(
-            lookup.registryTransported
-          )
-        : null
+    ssd: lookup.registrySsd ?? null,
+    incomingWaste: lookup.registryIncomingWaste ?? null,
+    incomingTexs: lookup.registryIncomingTexs ?? null,
+    outgoingWaste: lookup.registryOutgoingWaste ?? null,
+    outgoingTexs: lookup.registryOutgoingTexs ?? null,
+    managedWaste: lookup.registryManaged ?? null,
+    transportedWaste: lookup.registryTransported ?? null
   };
 }
