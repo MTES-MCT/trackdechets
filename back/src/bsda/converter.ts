@@ -129,7 +129,11 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
           ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : null
+          : null,
+        signature: nullIfNoValues<Signature>({
+          date: processDate(bsda.destinationReceptionSignatureDate),
+          author: bsda.destinationReceptionSignatureAuthor
+        })
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: bsda.destinationOperationCode,
