@@ -14,6 +14,7 @@ import Select from "@codegouvfr/react-dsfr/Select";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { format } from "date-fns";
 import Button from "@codegouvfr/react-dsfr/Button";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 interface IProps {
   companies: CompanyPrivate[];
@@ -188,19 +189,11 @@ export default function ExportsForm({ companies }: IProps) {
           <Form className={styles.exportForm}>
             <div className="fr-grid-row fr-grid-row--gutters">
               <div className="fr-col-10">
-                <Field name="exportType">
-                  {({ field }) => {
-                    return (
-                      <Select
-                        label="Type de registre"
-                        nativeSelectProps={field}
-                        disabled
-                      >
-                        <option value={WasteRegistryType.All}>Exhaustif</option>
-                      </Select>
-                    );
-                  }}
-                </Field>
+                <Alert
+                  title=""
+                  description="Le registre exhaustif concerne uniquement les déchets tracés avec un bordereau"
+                  severity="info"
+                />
               </div>
               <div className="fr-col-10">
                 <Field name="startDate">
