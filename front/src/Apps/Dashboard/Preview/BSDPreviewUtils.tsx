@@ -9,7 +9,7 @@ export const getVerboseAcceptationStatus = (
   const verbose = {
     ACCEPTED: "Acceptation totale",
     REFUSED: "Refus total",
-    "PARTIALLY REFUSED": "Refus partiel"
+    PARTIALLY_REFUSED: "Refus partiel"
   };
 
   return verbose[acceptationStatus];
