@@ -31,6 +31,12 @@ processors:
         action: delete
       - key: db.statement
         action: delete
+  
+  filter:
+    error_mode: ignore
+    traces:
+      span:
+        - 'name == "middleware - query"'
 
 connectors:
   datadog/connector:
