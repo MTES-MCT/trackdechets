@@ -114,6 +114,15 @@ export default function RegistryRoutes() {
                 />
               }
             />
+            <Route
+              path={toRelative(routes.registry_new.form.incomingWaste)}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.IncomingWaste}
+                />
+              }
+            />
           </Routes>
         )}
       </div>

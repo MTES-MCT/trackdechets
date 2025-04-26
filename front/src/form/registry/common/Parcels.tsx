@@ -121,6 +121,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
                 </div>
                 <div className="fr-col-3">
                   <Button
+                    type="button"
                     className="fr-mt-2v"
                     priority="secondary"
                     onClick={() => deleteParcel(index)}
@@ -150,6 +151,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
                 </div>
                 <div className="fr-col-4">
                   <Button
+                    type="button"
                     className="fr-mt-2v"
                     priority="secondary"
                     onClick={() => deleteParcel(index)}
@@ -163,6 +165,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
           ))}
 
       <Button
+        type="button"
         className="fr-mt-2v"
         priority="secondary"
         onClick={addParcel}

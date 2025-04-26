@@ -32,6 +32,21 @@ const HEADERS = [
   "Code déchet",
   "Actions"
 ];
+
+const REGISTRY_NAMES = {
+  [RegistryImportType.Ssd]: "Sortie de statut de déchet",
+  [RegistryImportType.IncomingWaste]:
+    "Déchets dangereux et non dangereux entrants",
+  [RegistryImportType.IncomingTexs]:
+    "Terres excavées et sédiments, dangereux et non dangereux entrants",
+  [RegistryImportType.OutgoingWaste]:
+    "Déchets dangereux et non dangereux sortants",
+  [RegistryImportType.OutgoingTexs]:
+    "Terres excavées et sédiments, dangereux et non dangereux sortants",
+  [RegistryImportType.Transported]: "Transportés",
+  [RegistryImportType.Managed]: "Gérés"
+};
+
 const DEBOUNCE_DELAY = 500;
 
 const deleteConfirmationModal = createModal({
@@ -144,15 +159,40 @@ export function MyLines() {
           <DropdownMenu
             links={[
               {
-                title: "Sortie de statut de déchet",
+                title: REGISTRY_NAMES[RegistryImportType.Ssd],
                 route: generatePath(routes.registry_new.form.ssd),
                 state: { background: location }
               },
               {
-                title: "TEXS entrants",
+                title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
+                route: generatePath(routes.registry_new.form.incomingWaste),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
                 route: generatePath(routes.registry_new.form.incomingTexs),
                 state: { background: location }
               }
+              // {
+              //   title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
+              //   route: generatePath(routes.registry_new.form.outgoingWaste),
+              //   state: { background: location }
+              // },
+              // {
+              //   title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
+              //   route: generatePath(routes.registry_new.form.outgoingTexs),
+              //   state: { background: location }
+              // },
+              // {
+              //   title: REGISTRY_NAMES[RegistryImportType.Transported],
+              //   route: generatePath(routes.registry_new.form.transported),
+              //   state: { background: location }
+              // },
+              // {
+              //   title: REGISTRY_NAMES[RegistryImportType.Managed],
+              //   route: generatePath(routes.registry_new.form.managed),
+              //   state: { background: location }
+              // }
             ]}
             isDisabled={false}
             menuTitle={"Créer une déclaration"}
@@ -181,26 +221,26 @@ export function MyLines() {
             >
               <option value="">Déclarations récentes</option>
               <option value={RegistryImportType.Ssd}>
-                Sortie de statut de déchet
+                {REGISTRY_NAMES[RegistryImportType.Ssd]}
               </option>
               <option value={RegistryImportType.IncomingWaste}>
-                Déchets dangereux et non dangereux entrants
+                {REGISTRY_NAMES[RegistryImportType.IncomingWaste]}
               </option>
               <option value={RegistryImportType.IncomingTexs}>
-                Terres excavées et sédiments, dangereux et non dangereux
-                entrants
+                {REGISTRY_NAMES[RegistryImportType.IncomingTexs]}
               </option>
               <option value={RegistryImportType.OutgoingWaste}>
-                Déchets dangereux et non dangereux sortants
+                {REGISTRY_NAMES[RegistryImportType.OutgoingWaste]}
               </option>
               <option value={RegistryImportType.OutgoingTexs}>
-                Terres excavées et sédiments, dangereux et non dangereux
-                sortants
+                {REGISTRY_NAMES[RegistryImportType.OutgoingTexs]}
               </option>
               <option value={RegistryImportType.Transported}>
-                Transportés
+                {REGISTRY_NAMES[RegistryImportType.Transported]}
               </option>
-              <option value={RegistryImportType.Managed}>Gérés</option>
+              <option value={RegistryImportType.Managed}>
+                {REGISTRY_NAMES[RegistryImportType.Managed]}
+              </option>
             </Select>
           </div>
           <div className="fr-col-3">

@@ -78,6 +78,7 @@ export function FormTab({ fields, methods }: Props) {
                   <ToggleSwitch
                     label={label}
                     inputTitle={field.name}
+                    showCheckedHint={false}
                     checked={controllerField.value}
                     onChange={checked => controllerField.onChange(checked)}
                   />

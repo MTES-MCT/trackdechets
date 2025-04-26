@@ -53,7 +53,6 @@ export async function registryLookups(
       registryManaged: true
     }
   });
-  console.log(lookups);
   return lookups.map(lookup => ({
     ...lookup,
     publicId: lookup.readableId,

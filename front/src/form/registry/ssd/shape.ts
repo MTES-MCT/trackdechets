@@ -9,14 +9,14 @@ import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
 import { z } from "zod";
-
-const nonEmptyString = z
-  .string({
-    required_error: "Champ requis"
-  })
-  .min(1, {
-    message: "Champ requis"
-  });
+import {
+  nonEmptyString,
+  optionalString,
+  filteredArray,
+  nonEmptyNumber,
+  optionalNumber,
+  booleanString
+} from "../builder/validation";
 
 export const ssdFormShape: FormShape = [
   {
@@ -43,7 +43,7 @@ export const ssdFormShape: FormShape = [
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
         validation: {
           reportForCompanySiret: nonEmptyString,
-          reportAsCompanySiret: z.string().nullish()
+          reportAsCompanySiret: optionalString
         },
         shape: "custom"
       },
@@ -56,7 +56,7 @@ export const ssdFormShape: FormShape = [
             label: "Date d'utilisation",
             required: true,
             validation: {
-              useDate: z.string().nullish()
+              useDate: optionalString
             },
             type: "date",
             style: { className: "fr-col-4" }
@@ -67,7 +67,7 @@ export const ssdFormShape: FormShape = [
             label: "Date d'expédition",
             required: true,
             validation: {
-              dispatchDate: z.string().nullish()
+              dispatchDate: optionalString
             },
             type: "date",
             style: { className: "fr-col-4" }
@@ -109,7 +109,7 @@ export const ssdFormShape: FormShape = [
         shape: "generic",
         label: "Code déchet Bâle",
         validation: {
-          wasteCodeBale: z.string().nullish()
+          wasteCodeBale: optionalString
         },
         type: "text",
         style: { className: "fr-col-4" }
@@ -119,8 +119,8 @@ export const ssdFormShape: FormShape = [
         shape: "custom",
         names: ["secondaryWasteCodes", "secondaryWasteDescriptions"],
         validation: {
-          secondaryWasteCodes: z.array(z.string()),
-          secondaryWasteDescriptions: z.array(z.string())
+          secondaryWasteCodes: filteredArray,
+          secondaryWasteDescriptions: filteredArray
         }
       },
       {
@@ -129,7 +129,7 @@ export const ssdFormShape: FormShape = [
         label: "Produit",
         required: true,
         validation: {
-          product: nonEmptyString
+          product: optionalString
         },
         type: "text",
         style: { className: "fr-col-10" }
@@ -139,9 +139,9 @@ export const ssdFormShape: FormShape = [
         shape: "custom",
         names: ["weightValue", "weightIsEstimate", "volume"],
         validation: {
-          weightValue: nonEmptyString.or(z.number()),
-          volume: z.string().nullish().or(z.number()),
-          weightIsEstimate: z.enum(["true", "false"]).or(z.boolean())
+          weightValue: nonEmptyNumber,
+          volume: optionalNumber,
+          weightIsEstimate: booleanString
         }
       }
     ]
@@ -169,7 +169,7 @@ export const ssdFormShape: FormShape = [
             shape: "generic",
             label: "Date de fin de traitement",
             validation: {
-              processingEndDate: z.string().nullish()
+              processingEndDate: optionalString
             },
             type: "date",
             style: { className: "fr-col-4" }

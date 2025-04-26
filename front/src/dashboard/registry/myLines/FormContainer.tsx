@@ -3,7 +3,7 @@ import React from "react";
 import TdModal from "../../../Apps/common/Components/Modal/Modal";
 import { RegistrySsdForm } from "../../../form/registry/ssd/RegistrySsdForm";
 import { RegistryIncomingTexsForm } from "../../../form/registry/incomingTexs/RegistryIncomingTexsForm";
-
+import { RegistryIncomingWasteForm } from "../../../form/registry/incomingWaste/RegistryIncomingWasteForm";
 export function FormContainer({
   onClose,
   type
@@ -33,6 +33,8 @@ function getFormComponent(type: RegistryImportType) {
       return RegistrySsdForm;
     case RegistryImportType.IncomingTexs:
       return RegistryIncomingTexsForm;
+    case RegistryImportType.IncomingWaste:
+      return RegistryIncomingWasteForm;
     default:
       throw new Error("Unknown form type");
   }
