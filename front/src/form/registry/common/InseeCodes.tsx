@@ -7,10 +7,10 @@ type Props = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
-  label?: string;
+  title?: string;
 };
 
-export function InseeCodes({ methods, disabled, prefix, label }: Props) {
+export function InseeCodes({ methods, disabled, prefix, title }: Props) {
   const {
     fields: inseeCodeFields,
     append: appendInseeCode,
@@ -22,7 +22,7 @@ export function InseeCodes({ methods, disabled, prefix, label }: Props) {
 
   return (
     <div className="fr-col">
-      <h4 className="fr-h4">{label ?? "Code(s) INSEE de(s) commune(s)"}</h4>
+      {title && <h4 className="fr-h4">{title}</h4>}
       {inseeCodeFields.map((field, index) => (
         <div key={field.id} className="fr-mb-2w">
           <p className="fr-mb-2v tw-text-lg tw-font-bold">

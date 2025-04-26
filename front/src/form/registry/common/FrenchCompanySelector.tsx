@@ -4,8 +4,9 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 
 import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { formatError } from "../builder/error";
-
-type Props = {
+import cn from "classnames";
+import "./FrenchCompanySelector.scss";
+type InlineProps = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
@@ -13,17 +14,25 @@ type Props = {
   title?: string;
 };
 
+type BlockProps = InlineProps & {
+  reducedMargin?: boolean;
+};
+
 export function FrenchCompanySelector({
   prefix,
   methods,
   disabled,
   shortMode,
+  reducedMargin,
   title
-}: Props) {
+}: BlockProps) {
   return (
-    <div className="fr-col">
+    <div
+      className={cn("fr-col", {
+        "company-selector-reduced-margin": reducedMargin
+      })}
+    >
       {title && <h4 className="fr-h4">{title}</h4>}
-
       <InlineFrenchCompanySelector
         prefix={prefix}
         methods={methods}
@@ -39,7 +48,7 @@ export function InlineFrenchCompanySelector({
   methods,
   disabled,
   shortMode
-}: Props) {
+}: InlineProps) {
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
 
   const selectedCompanyOrgId = methods.watch(fieldName);

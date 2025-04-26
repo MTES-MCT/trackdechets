@@ -4,27 +4,63 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { formatError } from "../builder/error";
 
-type Props = {
+type InlineProps = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
+  nameEnabled?: boolean;
 };
 
-export function Address({ prefix, methods, disabled }: Props) {
+type BlockProps = InlineProps & {
+  title?: string;
+};
+
+export function Address({
+  prefix,
+  methods,
+  title,
+  disabled,
+  nameEnabled
+}: BlockProps) {
   return (
     <div className="fr-col">
+      {title && <h4 className="fr-h4">{title}</h4>}
       <div className="fr-grid-row fr-grid-row--gutters">
-        <InlineAddress prefix={prefix} methods={methods} disabled={disabled} />
+        <InlineAddress
+          prefix={prefix}
+          methods={methods}
+          disabled={disabled}
+          nameEnabled={nameEnabled}
+        />
       </div>
     </div>
   );
 }
 
-export function InlineAddress({ prefix, methods, disabled }: Props) {
+export function InlineAddress({
+  prefix,
+  methods,
+  disabled,
+  nameEnabled
+}: InlineProps) {
   const { errors } = methods.formState;
 
   return (
     <>
+      {nameEnabled && (
+        <div className="fr-col-8">
+          <Input
+            label="Nom"
+            nativeInputProps={{
+              type: "text",
+              disabled,
+              ...methods.register(`${prefix}Name`)
+            }}
+            state={errors?.[`${prefix}Name`] && "error"}
+            stateRelatedMessage={formatError(errors?.[`${prefix}Name`])}
+          />
+        </div>
+      )}
       <div className="fr-col-8">
         <Input
           label="Adresse (n° de voie et voie, complément, lieu-dit etc.)"
