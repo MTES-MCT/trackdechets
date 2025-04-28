@@ -93,8 +93,7 @@ export const GET_INCOMING_WASTE_REGISTRY_LOOKUP = gql`
         operationCode
         operationMode
         noTraceability
-        nextDestinationIsAbroad
-        gistridNumber
+        ttdImportNumber
         movementNumber
         nextOperationCode
         isDirectSupply

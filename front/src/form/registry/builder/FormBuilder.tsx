@@ -99,7 +99,11 @@ export function FormBuilder({
             }))}
           >
             {currentTab && (
-              <FormTab fields={currentTab.fields} methods={methods} />
+              <FormTab
+                key={currentTab.tabId}
+                fields={currentTab.fields}
+                methods={methods}
+              />
             )}
           </Tabs>
 

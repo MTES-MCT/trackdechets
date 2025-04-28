@@ -16,6 +16,9 @@ import { InseeCodes } from "../common/InseeCodes";
 import { Address } from "../common/Address";
 import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
+import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
+import { RegistryCompanyType } from "@td/codegen-ui";
+import { TransportMode } from "@td/codegen-ui";
 /*
 
 transporters
@@ -40,7 +43,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         Component: ReportFor,
         props: {
-          reportForLabel: "SIRET de l'émetteur",
+          reportForLabel: "SIRET du destinataire",
           reportAsLabel: "SIRET du déclarant"
         },
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
@@ -95,7 +98,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "POP - Contient des polluants organiques persistants",
         required: true,
         validation: {
-          wastePop: z.boolean()
+          wastePop: booleanString
         }
       },
       {
@@ -105,7 +108,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Déchet dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: z.boolean().optional()
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -423,7 +426,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Rupture de traçabilité autorisée",
         required: false,
         validation: {
-          noTraceability: z.boolean().optional()
+          noTraceability: booleanString
         }
       },
       {
@@ -470,8 +473,36 @@ export const incomingWasteFormShape: FormShape = [
         label: "Approvisionnement direct (pipeline, convoyeur)",
         required: false,
         validation: {
-          isDirectSupply: z.boolean().optional()
+          isDirectSupply: booleanString
         }
+      }
+    ]
+  },
+  {
+    tabId: "transporter",
+    tabTitle: "Transport",
+    fields: [
+      {
+        Component: TransporterSelector,
+        props: {},
+        validation: {
+          transporter: z.array(
+            z.object({
+              TransportMode: z.nativeEnum(TransportMode),
+              CompanyType: z.nativeEnum(RegistryCompanyType),
+              CompanyOrgId: optionalString,
+              RecepisseIsExempted: z.boolean().optional(),
+              RecepisseNumber: optionalString,
+              CompanyName: optionalString,
+              CompanyAddress: optionalString,
+              CompanyPostalCode: optionalString,
+              CompanyCity: optionalString,
+              CompanyCountryCode: optionalString
+            })
+          )
+        },
+        shape: "custom",
+        names: ["transporter"]
       }
     ]
   }

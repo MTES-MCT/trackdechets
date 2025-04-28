@@ -16,7 +16,7 @@ type Props = {
   disabled?: boolean;
 };
 
-const TYPES = {
+export const COMPANY_TYPES = {
   ETABLISSEMENT_FR: "Etablissement français",
   ENTREPRISE_UE: "Entreprise UE",
   ENTREPRISE_HORS_UE: "Entreprise hors UE",
@@ -57,7 +57,7 @@ export function CompanySelector({
             }}
             disabled={disabled}
           >
-            {Object.entries(TYPES)
+            {Object.entries(COMPANY_TYPES)
               .filter(([key]) => !excludeTypes?.includes(key))
               .map(([key, value]) => (
                 <option value={key} key={key}>

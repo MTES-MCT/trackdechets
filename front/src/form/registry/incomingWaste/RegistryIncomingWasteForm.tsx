@@ -6,7 +6,9 @@ import {
   // RegistryCompanyType,
   RegistryImportType,
   RegistryLineReason,
-  IncomingWasteLineInput
+  IncomingWasteLineInput,
+  TransportMode,
+  RegistryCompanyType
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,15 +29,33 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = { onClose: () => void };
 
+type FormTransporter = {
+  TransportMode: TransportMode;
+  CompanyType: RegistryCompanyType;
+  CompanyOrgId?: string;
+  RecepisseIsExempted?: boolean;
+  RecepisseNumber?: string;
+  CompanyName?: string;
+  CompanyAddress?: string;
+  CompanyPostalCode?: string;
+  CompanyCity?: string;
+  CompanyCountryCode?: string;
+};
+
+type FormValues = IncomingWasteLineInput & {
+  transporter: FormTransporter[];
+};
+
 export function RegistryIncomingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
 
-  const methods = useForm<IncomingWasteLineInput>({
+  const methods = useForm<FormValues>({
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      initialEmitterMunicipalitiesInseeCodes: []
+      initialEmitterMunicipalitiesInseeCodes: [],
+      transporter: []
     },
     resolver: zodResolver(schemaFromShape(incomingWasteFormShape))
   });
@@ -51,19 +71,117 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       skip: !queryParams.get("publicId") || !queryParams.get("siret"),
       fetchPolicy: "network-only",
       onCompleted: data => {
-        if (data.registryLookup.incomingWaste) {
+        if (data?.registryLookup?.incomingWaste) {
           const definedIncomingWasteProps = Object.fromEntries(
             Object.entries(data.registryLookup.incomingWaste).filter(
               ([_, v]) => v != null
             )
-          );
+          ) as IncomingWasteLineInput;
+          const transporters: FormTransporter[] = [];
 
+          // Transform flat transporter fields into array format
+          for (let i = 1; i <= 5; i++) {
+            const transportMode =
+              definedIncomingWasteProps[`transporter${i}TransportMode`];
+
+            // Only add transporter if at least one field is present
+            if (transportMode) {
+              const companyType =
+                definedIncomingWasteProps[`transporter${i}CompanyType`];
+              const companyOrgId =
+                definedIncomingWasteProps[`transporter${i}CompanyOrgId`];
+              const recepisseIsExempted =
+                definedIncomingWasteProps[`transporter${i}RecepisseIsExempted`];
+              const recepisseNumber =
+                definedIncomingWasteProps[`transporter${i}RecepisseNumber`];
+              const companyName =
+                definedIncomingWasteProps[`transporter${i}CompanyName`];
+              const companyAddress =
+                definedIncomingWasteProps[`transporter${i}CompanyAddress`];
+              const companyPostalCode =
+                definedIncomingWasteProps[`transporter${i}CompanyPostalCode`];
+              const companyCity =
+                definedIncomingWasteProps[`transporter${i}CompanyCity`];
+              const companyCountryCode =
+                definedIncomingWasteProps[`transporter${i}CompanyCountryCode`];
+              transporters.push({
+                TransportMode: transportMode,
+                CompanyType: companyType,
+                CompanyOrgId: companyOrgId ?? "",
+                RecepisseIsExempted: recepisseIsExempted ?? false,
+                RecepisseNumber: recepisseNumber ?? "",
+                CompanyName: companyName ?? "",
+                CompanyAddress: companyAddress ?? "",
+                CompanyPostalCode: companyPostalCode ?? "",
+                CompanyCity: companyCity ?? "",
+                CompanyCountryCode: companyCountryCode ?? ""
+              });
+            }
+          }
+
+          // Create a new object without the flat transporter fields
+          const {
+            transporter1TransportMode,
+            transporter1CompanyType,
+            transporter1CompanyOrgId,
+            transporter1RecepisseIsExempted,
+            transporter1RecepisseNumber,
+            transporter1CompanyName,
+            transporter1CompanyAddress,
+            transporter1CompanyPostalCode,
+            transporter1CompanyCity,
+            transporter1CompanyCountryCode,
+            transporter2TransportMode,
+            transporter2CompanyType,
+            transporter2CompanyOrgId,
+            transporter2RecepisseIsExempted,
+            transporter2RecepisseNumber,
+            transporter2CompanyName,
+            transporter2CompanyAddress,
+            transporter2CompanyPostalCode,
+            transporter2CompanyCity,
+            transporter2CompanyCountryCode,
+            transporter3TransportMode,
+            transporter3CompanyType,
+            transporter3CompanyOrgId,
+            transporter3RecepisseIsExempted,
+            transporter3RecepisseNumber,
+            transporter3CompanyName,
+            transporter3CompanyAddress,
+            transporter3CompanyPostalCode,
+            transporter3CompanyCity,
+            transporter3CompanyCountryCode,
+            transporter4TransportMode,
+            transporter4CompanyType,
+            transporter4CompanyOrgId,
+            transporter4RecepisseIsExempted,
+            transporter4RecepisseNumber,
+            transporter4CompanyName,
+            transporter4CompanyAddress,
+            transporter4CompanyPostalCode,
+            transporter4CompanyCity,
+            transporter4CompanyCountryCode,
+            transporter5TransportMode,
+            transporter5CompanyType,
+            transporter5CompanyOrgId,
+            transporter5RecepisseIsExempted,
+            transporter5RecepisseNumber,
+            transporter5CompanyName,
+            transporter5CompanyAddress,
+            transporter5CompanyPostalCode,
+            transporter5CompanyCity,
+            transporter5CompanyCountryCode,
+            ...rest
+          } = definedIncomingWasteProps;
+
+          // Set the form values with the transformed data
           methods.reset({
-            ...definedIncomingWasteProps,
+            ...rest,
             receptionDate: isoDateToHtmlDate(
               definedIncomingWasteProps.receptionDate
             ),
-            reason: RegistryLineReason.Edit
+            reason: RegistryLineReason.Edit,
+            transporter: transporters
           });
           setDisabledFieldNames(["publicId"]);
         }
@@ -75,59 +193,33 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
     Pick<Mutation, "addToIncomingWasteRegistry">
   >(ADD_TO_INCOMING_WASTE_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
-  // const [searchCompaniesFromCompanyOrgId] = useLazyQuery<
-  //   Pick<Query, "searchCompanies">,
-  //   QuerySearchCompaniesArgs
-  // >(SEARCH_COMPANIES);
-  // const useDate = methods.watch("useDate");
-  // const reportForCompanySiret = methods.watch("reportForCompanySiret");
-  // const destinationCompanyOrgId = methods.watch("destinationCompanyOrgId");
-  // useEffect(() => {
-  //   if (useDate && reportForCompanySiret) {
-  //     setDisabledFieldNames(prev =>
-  //       prev.includes("destinationCompanyOrgId")
-  //         ? prev
-  //         : [...prev, "destinationCompanyOrgId"]
-  //     );
+  async function onSubmit(data: FormValues) {
+    const { transporter, ...rest } = data;
+    console.log(data);
+    // Flatten transporter array back into individual fields
+    const flattenedData = {
+      ...rest,
+      ...transporter.reduce(
+        (acc, t, index) => ({
+          ...acc,
+          [`transporter${index + 1}TransportMode`]: t.TransportMode,
+          [`transporter${index + 1}CompanyType`]: t.CompanyType,
+          [`transporter${index + 1}CompanyOrgId`]: t.CompanyOrgId,
+          [`transporter${index + 1}RecepisseIsExempted`]: t.RecepisseIsExempted,
+          [`transporter${index + 1}RecepisseNumber`]: t.RecepisseNumber,
+          [`transporter${index + 1}CompanyName`]: t.CompanyName,
+          [`transporter${index + 1}CompanyAddress`]: t.CompanyAddress,
+          [`transporter${index + 1}CompanyPostalCode`]: t.CompanyPostalCode,
+          [`transporter${index + 1}CompanyCity`]: t.CompanyCity,
+          [`transporter${index + 1}CompanyCountryCode`]: t.CompanyCountryCode
+        }),
+        {}
+      )
+    };
 
-  //     if (reportForCompanySiret !== destinationCompanyOrgId) {
-  //       searchCompaniesFromCompanyOrgId({
-  //         variables: { clue: reportForCompanySiret },
-  //         onCompleted: result => {
-  //           if (result.searchCompanies?.length > 0) {
-  //             const company = result.searchCompanies[0];
-  //             methods.setValue(
-  //               `destinationCompanyType`,
-  //               RegistryCompanyType.EtablissementFr
-  //             );
-  //             methods.setValue(`destinationCompanyOrgId`, company.orgId);
-  //             methods.setValue(`destinationCompanyName`, company.name);
-  //             methods.setValue(
-  //               `destinationCompanyAddress`,
-  //               company.addressVoie
-  //             );
-  //             methods.setValue(`destinationCompanyCity`, company.addressCity);
-  //             methods.setValue(
-  //               `destinationCompanyPostalCode`,
-  //               company.addressPostalCode
-  //             );
-  //             methods.setValue(`destinationCompanyCountryCode`, "FR");
-  //           }
-  //         }
-  //       });
-  //     }
-  //   } else {
-  //     setDisabledFieldNames(prev =>
-  //       prev.filter(field => field !== "destinationCompanyOrgId")
-  //     );
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [useDate, reportForCompanySiret, methods]);
-
-  async function onSubmit(data: any) {
     const result = await addToIncomingWasteRegistry({
       variables: {
-        lines: [data]
+        lines: [flattenedData]
       }
     });
 
