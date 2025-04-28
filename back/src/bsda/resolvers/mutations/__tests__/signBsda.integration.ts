@@ -2,12 +2,14 @@ import {
   BsdaStatus,
   Prisma,
   TransportMode,
+  User,
   UserRole,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import type {
+  BsdaInput,
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaArgs
@@ -27,11 +29,13 @@ import {
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
+import { AllBsdaSignatureType } from "../../../types";
+import gql from "graphql-tag";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
 
-export const UPDATE_BSDA = `
+export const UPDATE_BSDA = gql`
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
     updateBsda(id: $id, input: $input) {
       id
@@ -70,9 +74,9 @@ export const UPDATE_BSDA = `
   }
 `;
 
-const SIGN_BSDA = `
-mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
-  signBsda(id: $id, input: $input) {
+const SIGN_BSDA = gql`
+  mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
+    signBsda(id: $id, input: $input) {
       id
       status
       transporter {
@@ -83,8 +87,16 @@ mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
           isExempted
         }
       }
+      destination {
+        reception {
+          signature {
+            date
+            author
+          }
+        }
+      }
+    }
   }
-}
 `;
 
 describe("Mutation.Bsda.sign", () => {
@@ -2126,6 +2138,341 @@ describe("Mutation.Bsda.sign", () => {
 
       // Then
       expect(errors).toBeUndefined();
+    });
+  });
+
+  // New signature step "RECEPTION".
+  // As it is a non-breaking change, it is optional and can be skipped.
+  describe("RECEPTION", () => {
+    const SIGNATURE_DATE = new Date().toISOString();
+
+    let emitterUser;
+    let emitterCompany;
+    let destinationUser;
+    let destinationCompany;
+    let transporterCompany;
+
+    beforeAll(async () => {
+      await resetDatabase();
+
+      // Emitter
+      const emitter = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["PRODUCER"]
+      });
+      emitterUser = emitter.user;
+      emitterCompany = emitter.company;
+
+      // Destination
+      const destination = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["WASTE_VEHICLES"],
+        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+      });
+      destinationUser = destination.user;
+      destinationCompany = destination.company;
+
+      // Transporter
+      const transporter = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["TRANSPORTER"]
+      });
+      transporterCompany = transporter.company;
+    });
+
+    afterAll(resetDatabase);
+
+    const createBsda = async (opt: Partial<Prisma.BsdaCreateInput> = {}) => {
+      return await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          // Reception
+          destinationReceptionAcceptationStatus: null,
+          destinationReceptionWeight: null,
+          destinationReceptionDate: null,
+          destinationReceptionSignatureDate: null,
+          destinationReceptionSignatureAuthor: null,
+          // Operation
+          destinationOperationCode: null,
+          destinationOperationMode: null,
+          destinationOperationDate: null,
+          ...opt
+        },
+        transporterOpt: {
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterTransportPlates: ["XY-23-TR"],
+          transporterCompanySiret: transporterCompany.siret
+        }
+      });
+    };
+
+    const signBsda = async (
+      user: User,
+      bsdaId: string,
+      signatureType: AllBsdaSignatureType
+    ) => {
+      const { mutate } = makeClient(user);
+      return mutate<Pick<Mutation, "signBsda">>(SIGN_BSDA, {
+        variables: {
+          id: bsdaId,
+          input: {
+            type: signatureType,
+            author: user.name,
+            date: SIGNATURE_DATE
+          }
+        }
+      });
+    };
+
+    const updateBsda = async (user: User, bsdaId: string, input: BsdaInput) => {
+      const { mutate } = makeClient(user);
+      return mutate<Pick<Mutation, "updateBsda">>(UPDATE_BSDA, {
+        variables: {
+          id: bsdaId,
+          input
+        }
+      });
+    };
+
+    it("should be able to sign reception after transport", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              weight: 20,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors, data } = await signBsda(
+        destinationUser,
+        bsda.id,
+        "RECEPTION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.destination?.reception?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsda.destination?.reception?.signature?.date).toBe(
+        SIGNATURE_DATE
+      );
+      expect(data.signBsda.status).toBe("RECEIVED");
+    });
+
+    it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La date de réception est obligatoire.\n" +
+          "Le poids du déchet est obligatoire.\n" +
+          "L'acceptation du déchet est obligatoire."
+      );
+    });
+
+    it("should be able to sign operation after transport, skipping reception", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+
+      // Step 1: update with required reception data & operation data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              weight: 20
+              // date: null, // Not required!
+            },
+            operation: {
+              code: "R 5",
+              date: new Date().toISOString() as any,
+              mode: "REUTILISATION"
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign operation
+      const { errors, data } = await signBsda(
+        destinationUser,
+        bsda.id,
+        "OPERATION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.destination?.reception?.signature?.author).toBe(
+        undefined
+      );
+      expect(data.signBsda.destination?.reception?.signature?.date).toBe(
+        undefined
+      );
+      expect(data.signBsda.status).toBe("PROCESSED");
+    });
+
+    it("should not be able to sign operation after transport, skipping reception, if missing reception params", async () => {
+      // Given
+      const bsda = await createBsda({
+        // Missing reception data!
+        destinationReceptionAcceptationStatus: null, // Missing param
+        destinationReceptionWeight: null, // Missing param
+        destinationReceptionDate: null, // Not required!
+        // Operation data
+        destinationOperationCode: "R 5",
+        destinationOperationDate: new Date(),
+        destinationOperationMode: "REUTILISATION"
+      });
+
+      // When
+      const { errors } = await signBsda(destinationUser, bsda.id, "OPERATION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le poids du déchet est obligatoire.\n" +
+          "L'acceptation du déchet est obligatoire."
+      );
+    });
+
+    it("should fail if BSDA has already been received", async () => {
+      // Given
+      const bsda = await createBsda({
+        status: "RECEIVED",
+        // Reception data
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 20,
+        destinationReceptionDate: new Date(),
+        destinationReceptionSignatureAuthor: destinationUser.name,
+        destinationReceptionSignatureDate: new Date()
+      });
+
+      // When
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Cette signature a déjà été apposée.");
+    });
+
+    it("should fail if BSDA has already been processed", async () => {
+      // Given
+      const bsda = await createBsda({
+        status: "PROCESSED",
+        // Reception data
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 20,
+        destinationReceptionDate: new Date(),
+        // Operation data
+        destinationOperationCode: "R 5",
+        destinationOperationDate: new Date(),
+        destinationOperationMode: "REUTILISATION"
+      });
+
+      // When
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+      );
+    });
+
+    it("should fail if BSDA hasn't been sent yet", async () => {
+      // Given
+      const bsda = await createBsda({
+        status: "INITIAL",
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        // Reception data
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 20,
+        destinationReceptionDate: new Date()
+      });
+
+      // When
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
+      );
+    });
+
+    it("should return an error if not signed by destination", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+      const { errors } = await signBsda(emitterUser, bsda.id, "RECEPTION"); // Signed by emitter!
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Vous ne pouvez pas signer ce bordereau");
+    });
+
+    it("can NOT override reception data once reception has been signed", async () => {
+      // Given
+      const bsda = await createBsda({
+        status: "RECEIVED", // Reception is signed!
+        // Reception data
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 20,
+        destinationReceptionDate: null, // Not required!
+        destinationReceptionSignatureAuthor: destinationUser.name,
+        destinationReceptionSignatureDate: new Date()
+      });
+
+      // When: try to update reception data, but it's too late!
+      // Reception has been signed already!
+      const { errors } = await updateBsda(destinationUser, bsda.id, {
+        destination: {
+          reception: {
+            acceptationStatus: "PARTIALLY_REFUSED",
+            refusalReason: "Not enough weight",
+            weight: 20,
+            date: new Date().toISOString() as any
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " La date de réception a été verrouillé via signature et ne peut pas être modifié., " +
+          "Le poids du déchet a été verrouillé via signature et ne peut pas être modifié., " +
+          "L'acceptation du déchet a été verrouillé via signature et ne peut pas être modifié., " +
+          "La raison du refus du déchet a été verrouillé via signature et ne peut pas être modifié."
+      );
     });
   });
 });
