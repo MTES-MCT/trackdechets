@@ -15,7 +15,11 @@ const sanitizeObject = (obj: any) => {
     if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
       obj[key] = "[REDACTED]";
     } else if (typeof obj[key] === "object") {
-      sanitizeObject(obj[key]);
+      if (obj[key] !== null && !Array.isArray(obj[key])) {
+        obj[key] = sanitizeObject({
+          ...obj[key]
+        });
+      }
     }
   }
   return obj;
