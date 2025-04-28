@@ -459,7 +459,7 @@ export function BsddPdf({
 
             {form.emitter?.type === EmitterType.APPENDIX1 && (
               <p>
-                <i>Liste des producteurs initiaux en annexe</i>
+                <i>LISTE DES PRODUCTEURS INITIAUX EN ANNEXE</i>
               </p>
             )}
 
