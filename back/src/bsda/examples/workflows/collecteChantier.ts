@@ -13,7 +13,7 @@ const workflow: Workflow = {
   L’entreprise de travaux finalise les conditionnement et peut ajuster les quantités. Elle peut ajouter les scellés si ce n’est pas déjà fait.
   Quand elle signe en cadre 5.2, elle fige les informations jusqu’à ce cadre.
   Le transporteur identifié sur le BSDA peut alors venir sur le chantier, vérifier les conditionnements et scellés, compléter la partie le concernant si besoin (nom, date, immatriculation etc) et signer l'enlèvement pour acheminer le déchets vers l’installation de destination prévue.
-  L’installation de destination accepte le lot, effectue une pesée qu’elle renseigne.
+  L’installation de destination réceptionne puis accepte le lot, effectue une pesée qu’elle renseigne.
   Elle indique en cadre 8 l’opération réalisée, ajoute la date et signe sur Trackdéchets.
   Le BSDA est disponible sur la plateforme pour tous les acteurs.
   `,
@@ -30,7 +30,9 @@ const workflow: Workflow = {
     signBsda("worker", "WORK"),
     updateBsda("transporteur", fixtures.transporterSignatureUpdateInput),
     signBsda("transporteur", "TRANSPORT"),
-    updateBsda("traiteur", fixtures.destinationSignatureUpdateInput),
+    updateBsda("traiteur", fixtures.destinationReceptionSignatureUpdateInput),
+    signBsda("traiteur", "RECEPTION"),
+    updateBsda("traiteur", fixtures.destinationOperationSignatureUpdateInput),
     signBsda("traiteur", "OPERATION")
   ],
   docContext: {
@@ -46,7 +48,8 @@ const workflow: Workflow = {
     A(INITIAL) -->|signBsda| B(SIGNED_BY_PRODUCER)
     B -->|signBsda| C(SIGNED_BY_WORKER)
     C --> |signBsda| D(SENT)
-    D --> |signBsda| E(PROCESSED)
+    D --> |signBsda| D(RECEIVED)
+    E --> |signBsda| E(PROCESSED)
     `
 };
 
