@@ -5,7 +5,8 @@ import { addMetadata } from "./format";
 const LOG_PATH = `${appRoot}/logs/app.log`;
 // Avoid using undefined console.log() in jest context
 const LOG_TO_CONSOLE =
-  process.env.FORCE_LOGGER_CONSOLE && process.env.JEST_WORKER_ID === undefined;
+  process.env.FORCE_LOGGER_CONSOLE === "true" &&
+  process.env.JEST_WORKER_ID === undefined;
 const sensitiveFields = ["password", "token", "secret", "key"];
 const sanitizeObject = (obj: any) => {
   if (!obj || typeof obj !== "object") return obj;
