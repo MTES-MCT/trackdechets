@@ -18,16 +18,16 @@ import {
   actorPostalCodeSchema,
   actorCitySchema,
   actorCountryCodeSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   getOperationCodeSchema,
-  operationModeSchema,
   actorSiretSchema,
   transportModeSchema,
   transportRecepisseNumberSchema,
   dateSchema,
   inseeCodesSchema,
   parcelNumbersSchema,
-  parcelCoordinatesSchema
+  parcelCoordinatesSchema,
+  getOperationModeSchema
 } from "../../shared/schemas";
 
 export type ParsedZodInputManagedItem = z.output<typeof inputManagedSchema>;
@@ -80,14 +80,14 @@ const inputManagedSchema = z.object({
   destinationDropSitePostalCode: actorPostalCodeSchema.nullish(),
   destinationDropSiteCity: actorCitySchema.nullish(),
   destinationDropSiteCountryCode: actorCountryCodeSchema.nullish(),
-  gistridNumber: gistridNumberSchema,
+  gistridNumber: ttdNumberSchema,
   movementNumber: z
     .string()
     .trim()
     .max(75, "Le numéro de mouvement ne peut pas excéder 75 caractères")
     .nullish(),
   operationCode: getOperationCodeSchema(),
-  operationMode: operationModeSchema,
+  operationMode: getOperationModeSchema(),
   emitterCompanyType: actorTypeSchema.exclude(["COMMUNES"]),
   emitterCompanyOrgId: actorOrgIdSchema.nullish(),
   emitterCompanyName: actorNameSchema.nullish(),

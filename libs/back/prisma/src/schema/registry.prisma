@@ -53,6 +53,7 @@ enum RegistryImportType {
 model RegistrySsd {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -101,6 +102,7 @@ model RegistrySsd {
 model RegistryIncomingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -158,8 +160,7 @@ model RegistryIncomingWaste {
     operationCode                          String
     operationMode                          OperationMode?
     noTraceability                         Boolean?
-    nextDestinationIsAbroad                Boolean?
-    gistridNumber                          String?
+    ttdImportNumber                        String?
     movementNumber                         String?
     nextOperationCode                      String?
     isDirectSupply                         Boolean?
@@ -223,6 +224,7 @@ model RegistryIncomingWaste {
 model RegistryIncomingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -284,8 +286,7 @@ model RegistryIncomingTexs {
     operationCode                          String
     operationMode                          OperationMode?
     noTraceability                         Boolean?
-    nextDestinationIsAbroad                Boolean?
-    gistridNumber                          String?
+    ttdImportNumber                        String?
     movementNumber                         String?
     nextOperationCode                      String?
     isUpcycled                             Boolean?
@@ -344,7 +345,8 @@ model RegistryIncomingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
-    registryLookups RegistryLookup[]
+    registryLookups   RegistryLookup[]
+    texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
@@ -353,6 +355,7 @@ model RegistryIncomingTexs {
 model RegistryOutgoingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -474,7 +477,8 @@ model RegistryOutgoingTexs {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
-    registryLookups RegistryLookup[]
+    registryLookups   RegistryLookup[]
+    texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
@@ -483,6 +487,7 @@ model RegistryOutgoingTexs {
 model RegistryOutgoingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -604,6 +609,7 @@ model RegistryOutgoingWaste {
 model RegistryTransported {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -679,6 +685,7 @@ model RegistryTransported {
 model RegistryManaged {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -893,6 +900,7 @@ model RegistryLookup {
     wasteType          RegistryExportWasteType
     wasteCode          String?
     date               DateTime
+    declaredAt         DateTime                      @default(now()) @db.Timestamptz(6)
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
@@ -946,7 +954,8 @@ model RegistryLookup {
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
-    @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+    @@index([readableId], map: "_RegistryLookupReadableIdIdx")
+    @@index([siret, declaredAt(sort: Desc), declarationType], map: "_RegistryLookupLinesReadIdx")
 }
 
 enum RegistrySource {
@@ -980,4 +989,20 @@ model RegistryChangeAggregate {
 
     @@index([reportForId], map: "_RRegistryChangeAggregateReportForIdIdx")
     @@index([updatedAt], map: "_RRegistryChangeAggregateUpdatedAtIdx")
+}
+
+model RegistryTexsAnalysisFile {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+    s3FileKey        String
+    originalFileName String
+
+    registryIncomingTexsId String?
+    registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id])
+    registryOutgoingTexsId String?
+    registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id])
+
+    createdById String
+    createdBy   User   @relation(fields: [createdById], references: [id])
 }

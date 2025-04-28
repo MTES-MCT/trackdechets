@@ -19,9 +19,9 @@ import {
   transportModeSchema,
   transportRecepisseNumberSchema,
   booleanSchema,
-  operationModeSchema,
-  gistridNumberSchema,
-  parcelNumbersSchema
+  ttdNumberSchema,
+  parcelNumbersSchema,
+  getOperationModeSchema
 } from "../schemas";
 import { registryErrorMap } from "../../zodErrors";
 
@@ -101,7 +101,7 @@ describe("Schemas", () => {
     expect(weightValueSchema.parse("500,1")).toBe(500.1);
     expect(weightValueSchema.parse("500.1")).toBe(500.1);
     expect(() => weightValueSchema.parse("-1")).toThrow();
-    expect(() => weightValueSchema.parse("1001")).toThrow();
+    expect(() => weightValueSchema.parse("10001")).toThrow();
     expect(() => weightValueSchema.parse("1.0001")).toThrow();
   });
 
@@ -120,7 +120,7 @@ describe("Schemas", () => {
     expect(volumeSchema.parse("500")).toBe(500);
     expect(volumeSchema.parse(undefined)).toBeUndefined();
     expect(() => volumeSchema.parse("-1")).toThrow();
-    expect(() => volumeSchema.parse("1001")).toThrow();
+    expect(() => volumeSchema.parse("10001")).toThrow();
   });
 
   test("booleanSchema", () => {
@@ -186,40 +186,48 @@ describe("Schemas", () => {
   test("transportModeSchema", () => {
     expect(transportModeSchema.parse("ROUTE")).toBe("ROAD");
     expect(transportModeSchema.parse("AÉRIEN")).toBe("AIR");
+    expect(transportModeSchema.parse("AERIEN")).toBe("AIR");
+    expect(transportModeSchema.parse("aérien")).toBe("AIR");
     expect(() => transportModeSchema.parse("INVALID")).toThrow();
   });
 
   test("transportRecepisseNumberSchema", () => {
     expect(transportRecepisseNumberSchema.parse("12345")).toBe("12345");
-    expect(() => transportRecepisseNumberSchema.parse("1234")).toThrow();
+    expect(() => transportRecepisseNumberSchema.parse("")).toThrow();
     expect(() =>
       transportRecepisseNumberSchema.parse("a".repeat(51))
     ).toThrow();
   });
 
   test("operationModeSchema", () => {
-    expect(operationModeSchema.parse("Recyclage")).toBe("RECYCLAGE");
-    expect(operationModeSchema.parse("Reutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("Réutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("réutilisation")).toBe("REUTILISATION");
-    expect(operationModeSchema.parse("Valorisation énergétique")).toBe(
+    expect(getOperationModeSchema().parse("Recyclage")).toBe("RECYCLAGE");
+    expect(getOperationModeSchema().parse("Reutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("Réutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("réutilisation")).toBe(
+      "REUTILISATION"
+    );
+    expect(getOperationModeSchema().parse("Valorisation énergétique")).toBe(
       "VALORISATION_ENERGETIQUE"
     );
-    expect(() => operationModeSchema.parse("Valo énergétique")).toThrow();
-    expect(operationModeSchema.parse(null)).toBe(null);
+    expect(() => getOperationModeSchema().parse("Valo énergétique")).toThrow();
+    expect(getOperationModeSchema().parse(null)).toBe(null);
   });
 
-  test("gistridNumberSchema", () => {
-    expect(() => gistridNumberSchema.parse("AA1234567890")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("FR 2023 077002")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("AA 1234 567890")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("AAA 1234567890")).toThrow();
-    expect(() => gistridNumberSchema.parse("AA 12345 678901")).toThrow();
+  test("ttdNumberSchema", () => {
+    expect(() => ttdNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 2023 077002")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("AA 1234 567890")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("AAA 1234567890")).toThrow();
+    expect(() => ttdNumberSchema.parse("AA 12345 678901")).toThrow();
 
-    expect(() => gistridNumberSchema.parse("A7E 2024 063125")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("A7E2024063125")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("A7E 2024 0631256")).toThrow();
-    expect(() => gistridNumberSchema.parse("A7E 2024 06312")).toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 063125")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 06312")).toThrow();
   });
 
   test("parcelNumbersSchema", () => {

@@ -392,7 +392,7 @@ export const toIncomingWasteV2 = (
     destinationOperationModes,
     // >switch to array and destinationOperationModes?
     destinationOperationNoTraceability: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null,
@@ -995,6 +995,7 @@ export const toTransportedWasteV2 = (
 
 const minimalBsffForLookupSelect = {
   id: true,
+  createdAt: true,
   destinationReceptionSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
@@ -1034,6 +1035,7 @@ const bsffToLookupCreateInputs = (
       ...generateDateInfos(
         bsff.destinationReceptionDate ?? bsff.destinationReceptionSignatureDate
       ),
+      declaredAt: bsff.createdAt,
       bsffId: bsff.id
     });
   }
@@ -1058,6 +1060,7 @@ const bsffToLookupCreateInputs = (
           transporter.transporterTransportTakenOverAt ??
             transporter.transporterTransportSignatureDate!
         ),
+        declaredAt: bsff.createdAt,
         bsffId: bsff.id
       });
     });
@@ -1087,6 +1090,7 @@ const bsffToLookupCreateInputs = (
         transporter.transporterTransportTakenOverAt ??
           transporter.transporterTransportSignatureDate
       ),
+      declaredAt: bsff.createdAt,
       bsffId: bsff.id
     });
   });

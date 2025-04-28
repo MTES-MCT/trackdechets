@@ -113,9 +113,6 @@ input BsdaInput {
 
   "Courtier"
   broker: BsdaBrokerInput
-    @deprecated(
-      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
-    )
 
   "Dénomination du déchet"
   waste: BsdaWasteInput
@@ -212,6 +209,10 @@ input BsdaPackagingInput {
   other: String
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
+  "Volume du conditionnement en litre(s)"
+  volume: Float
+  "Numéros des contenants"
+  identificationNumbers: [String!]
 }
 
 input BsdaWeightInput {
@@ -361,10 +362,19 @@ input BsdaBrokerRecepisseInput {
   isExempted: Boolean
   "Numéro de récépissé"
   number: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
   "Département"
   department: String
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
   "Date limite de validité"
   validityLimit: DateTime
+    @deprecated(
+      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier"
+    )
 }
 
 input BsdaTransportInput {
@@ -413,9 +423,6 @@ input BsdaRevisionRequestContentInput {
 
   "Courtier"
   broker: BsdaBrokerInput
-    @deprecated(
-      reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par le courtier sur son profil Trackdéchets"
-    )
 
   "Installation de destination"
   destination: BsdaRevisionRequestDestinationInput

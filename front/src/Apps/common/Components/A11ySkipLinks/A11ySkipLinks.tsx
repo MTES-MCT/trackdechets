@@ -34,9 +34,41 @@ const A11ySkipLinks = () => {
     },
     location.pathname
   );
-  const matchRegistry = matchPath(
+  const matchRegistryOwn = matchPath(
     {
-      path: routes.registry,
+      path: routes.registry_new.myImports,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+  const matchRegistryList = matchPath(
+    {
+      path: routes.registry_new.companyImports,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+  const matchRegistryLines = matchPath(
+    {
+      path: routes.registry_new.lines,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+  const matchRegistryExports = matchPath(
+    {
+      path: routes.registry_new.export,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+  const matchRegistryExhaustive = matchPath(
+    {
+      path: routes.registry_new.exhaustive,
       caseSensitive: false,
       end: false
     },
@@ -136,8 +168,20 @@ const A11ySkipLinks = () => {
           if (matchCompanyDetails) {
             document.getElementById("company-tab-content")?.focus();
           }
-          if (matchRegistry) {
-            document.getElementsByName("exportType")?.[0]?.focus();
+          if (matchRegistryOwn) {
+            document.getElementById("import-registry-btn")?.focus();
+          }
+          if (matchRegistryList) {
+            document.getElementById("registry-company-combobox")?.focus();
+          }
+          if (matchRegistryLines) {
+            document.getElementById("create-bsd-btn")?.focus();
+          }
+          if (matchRegistryExports) {
+            document.getElementById("export-reglementaire-btn")?.focus();
+          }
+          if (matchRegistryExhaustive) {
+            document.getElementsByName("startDate")?.[0]?.focus();
           }
           if (matchAccount) {
             document.getElementById("account-info")?.focus();

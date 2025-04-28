@@ -47,6 +47,8 @@ export const INCOMING_TEXS_HEADERS: {
     "Commune de prise en charge de l'expéditeur ou détenteur",
   emitterPickupSiteCountryCode:
     "Code pays de prise en charge de l'expéditeur ou détenteur",
+  ttdImportNumber: "Numéro de notification ou de déclaration d'import",
+  movementNumber: "Numéro de mouvement",
   ecoOrganismeSiret: "SIRET de l'éco-organisme",
   ecoOrganismeName: "Raison sociale de l'éco-organisme",
   brokerCompanySiret: "SIRET du courtier",
@@ -58,9 +60,6 @@ export const INCOMING_TEXS_HEADERS: {
   operationCode: "Code de traitement réalisé",
   operationMode: "Mode de traitement",
   noTraceability: "Rupture de traçabilité autorisée",
-  nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
-  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
-  movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code de traitement ultérieur prévue",
   isUpcycled: "Terre valorisée",
   destinationParcelInseeCodes: "Codes INSEE des parcelles si valorisation",

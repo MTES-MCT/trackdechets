@@ -46,6 +46,12 @@ export async function indexBsdJob(
     const rawForm = await getFormForElastic({ readableId: bsdId });
     const elasticBsdd = await indexForm(rawForm);
     await bsddLookupUtils.update(rawForm);
+    if (rawForm.forwardedIn) {
+      await bsddLookupUtils.update({
+        ...rawForm.forwardedIn,
+        intermediaries: []
+      });
+    }
     return { ...elasticBsdd, siretsBeforeUpdate };
   }
 

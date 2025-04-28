@@ -215,14 +215,16 @@ export function BsffDetailContent({ form: bsff }: Props) {
           </div>
         </Tabs>
         <div className={styles.detailActions}>
-          <button
-            type="button"
-            className="btn btn--outline-primary"
-            onClick={() => downloadPdf()}
-          >
-            <IconPdf size="24px" color="blueLight" />
-            <span>Pdf</span>
-          </button>
+          {!bsff.isDraft && (
+            <button
+              type="button"
+              className="btn btn--outline-primary"
+              onClick={() => downloadPdf()}
+            >
+              <IconPdf size="24px" color="blueLight" />
+              <span>Pdf</span>
+            </button>
+          )}
           {[BsffStatus.Initial].includes(bsff.status) && isBsffContributor && (
             <>
               {permissions.includes(UserPermission.BsdCanDelete) && (

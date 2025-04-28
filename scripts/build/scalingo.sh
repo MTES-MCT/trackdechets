@@ -8,8 +8,8 @@ ROOT_DIR="$(dirname "$(dirname "$SCRIPT_DIR")")"
 echo "Building apps for $APP"
 
 if echo "$APP" | grep -o 'api'; then
+    npx patch-package
     npx nx run-many -t build --projects=api,cron,tag:backend:queues
-
     echo "Running migrate for $APP"
     npx prisma migrate deploy
 

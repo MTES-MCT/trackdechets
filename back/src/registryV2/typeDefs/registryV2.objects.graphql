@@ -359,7 +359,7 @@ type IncomingWasteV2 {
   "Autorisation par arrêté préfectoral, à la perte d'identification de la provenance à l'origine"
   destinationOperationNoTraceability: Boolean
 
-  gistridNumber: String
+  ttdImportNumber: String
   movementNumber: String
   "Code d'opération ultérieure prévue"
   nextOperationCode: String
@@ -1637,17 +1637,25 @@ type AddRegistryLinesStats {
   skipped: Int!
 }
 
+type AddRegistryLine {
+  publicId: ID!
+}
+
 type AddRegistryLinesResponse {
   stats: AddRegistryLinesStats!
   errors: [RegistryLineError!]
   # Liste des identifiants (`publicId`) des déclarations qui ont été insérées
-  inserted: [ID!]!
+  inserted: [AddRegistryLine!]!
   # Liste des identifiants (`publicId`) des déclarations qui ont été modifiées
-  edited: [ID!]!
+  edited: [AddRegistryLine!]!
   # Liste des identifiants (`publicId`) des déclarations qui ont été annulées
-  cancelled: [ID!]!
+  cancelled: [AddRegistryLine!]!
   # Liste des identifiants (`publicId`) des déclarations qui ont été ignorées
-  skipped: [ID!]!
+  skipped: [AddRegistryLine!]!
+}
+
+type CancelRegistryV2LineResponse {
+  publicIds: [ID!]!
 }
 
 type RegistryLookup {
@@ -1656,7 +1664,7 @@ type RegistryLookup {
   siret: String!
   reportAsSiret: String
   date: DateTime!
-  createdAt: DateTime!
+  declaredAt: DateTime!
   wasteCode: String
 
   ssd: SsdWasteV2

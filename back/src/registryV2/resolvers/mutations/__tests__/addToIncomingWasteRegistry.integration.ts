@@ -21,10 +21,18 @@ const ADD_TO_INCOMING_WASTE_REGISTRY = gql`
         publicId
         message
       }
-      inserted
-      edited
-      cancelled
-      skipped
+      inserted {
+        publicId
+      }
+      edited {
+        publicId
+      }
+      skipped {
+        publicId
+      }
+      cancelled {
+        publicId
+      }
     }
   }
 `;
@@ -78,8 +86,7 @@ function getCorrectLine(siret: string) {
     operationCode: "R 5",
     operationMode: "RECYCLAGE",
     noTraceability: false,
-    nextDestinationIsAbroad: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     transporter1TransportMode: "ROAD",
@@ -222,7 +229,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
     expect(result.wasteCodeBale).toBe("A1070");
   });
 
-  it("should return public identifiers by status (inserted, edited, sipped, cancelled)", async () => {
+  it("should return public identifiers by status (inserted, edited, skipped, cancelled)", async () => {
     const { user, company } = await userWithCompanyFactory();
 
     const { mutate } = makeClient(user);
@@ -237,7 +244,7 @@ describe("Registry - addToIncomingWasteRegistry", () => {
       { variables: { lines } }
     );
     expect(res1.data.addToIncomingWasteRegistry).toMatchObject({
-      inserted: lines.map(l => l.publicId),
+      inserted: lines.map(({ publicId }) => ({ publicId })),
       edited: [],
       cancelled: [],
       skipped: []
@@ -261,9 +268,9 @@ describe("Registry - addToIncomingWasteRegistry", () => {
 
     expect(res2.data.addToIncomingWasteRegistry).toMatchObject({
       inserted: [],
-      edited: [lines[0].publicId],
-      cancelled: [lines[1].publicId],
-      skipped: [lines[2].publicId]
+      edited: [expect.objectContaining({ publicId: lines[0].publicId })],
+      cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
+      skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
     });
   });
 });

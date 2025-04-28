@@ -122,29 +122,34 @@ export default function CompaniesList() {
       title="Établissements"
       subtitle={subtitle}
       additional={
-        <>
-          <Link className="fr-btn fr-mr-1w" to={routes.companies.orientation}>
-            <span id="create-company-link">Créer un établissement</span>
-          </Link>
-          <DropdownMenu
-            menuTitle="Exporter la liste"
-            links={[
-              {
-                title: "Format .XLS",
-                isButton: true,
-                iconId: "fr-icon-download-line",
-                handleClick: () => downloadMyCompaniesXls()
-              },
-              {
-                title: "Format .CSV",
-                isButton: true,
-                iconId: "fr-icon-download-line",
-                handleClick: () => downloadMyCompaniesCsv()
-              }
-            ]}
-            iconId="fr-icon-download-line"
-          />
-        </>
+        <div className="fr-mb-2w">
+          <div className="fr-grid-row">
+            <Link
+              className="fr-btn fr-mr-1w fr-mb-1w"
+              to={routes.companies.orientation}
+            >
+              <span id="create-company-link">Créer un établissement</span>
+            </Link>
+            <DropdownMenu
+              menuTitle="Exporter la liste"
+              links={[
+                {
+                  title: "Format .XLS",
+                  isButton: true,
+                  iconId: "fr-icon-download-line",
+                  handleClick: () => downloadMyCompaniesXls()
+                },
+                {
+                  title: "Format .CSV",
+                  isButton: true,
+                  iconId: "fr-icon-download-line",
+                  handleClick: () => downloadMyCompaniesCsv()
+                }
+              ]}
+              iconId="fr-icon-download-line"
+            />
+          </div>
+        </div>
       }
     >
       <SearchableCompaniesList

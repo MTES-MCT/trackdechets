@@ -180,7 +180,7 @@ export const toIncomingWaste = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: incomingTexs.noTraceability,
-    gistridNumber: incomingTexs.gistridNumber,
+    ttdImportNumber: incomingTexs.ttdImportNumber,
     movementNumber: incomingTexs.movementNumber,
     nextOperationCode: incomingTexs.nextOperationCode,
     isUpcycled: incomingTexs.isUpcycled,
@@ -192,6 +192,7 @@ export const toIncomingWaste = (
 
 const minimalRegistryForLookupSelect = {
   id: true,
+  createdAt: true,
   publicId: true,
   reportForCompanySiret: true,
   reportAsCompanySiret: true,
@@ -216,6 +217,7 @@ const registryToLookupCreateInput = (
     wasteType: RegistryExportWasteType.TEXS,
     wasteCode: registryIncomingTexs.wasteCode,
     ...generateDateInfos(registryIncomingTexs.receptionDate),
+    declaredAt: registryIncomingTexs.createdAt,
     registryIncomingTexsId: registryIncomingTexs.id
   };
 };
@@ -243,6 +245,7 @@ export const updateRegistryLookup = async (
         reportAsSiret: registryIncomingTexs.reportAsCompanySiret,
         wasteCode: registryIncomingTexs.wasteCode,
         ...generateDateInfos(registryIncomingTexs.receptionDate),
+        declaredAt: registryIncomingTexs.createdAt,
         registryIncomingTexsId: registryIncomingTexs.id
       },
       create: registryToLookupCreateInput(registryIncomingTexs),

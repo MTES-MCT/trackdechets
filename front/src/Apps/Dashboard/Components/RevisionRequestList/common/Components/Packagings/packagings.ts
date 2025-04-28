@@ -2,12 +2,12 @@ import {
   BsdasriPackaging,
   BsdasriPackagingType,
   Packagings,
-  PackagingInfo,
   FormInput,
   BsdaPackagingType
 } from "@td/codegen-ui";
 import { Decimal } from "decimal.js";
 import { BsdTypename } from "../../../../../../common/types/bsdTypes";
+import { packagingsEqual } from "@td/constants";
 
 export const PACKAGINGS_BSD_NAMES = {
   [BsdTypename.Bsdasri]: {
@@ -75,40 +75,30 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
   return `${total} colis : ${packages} -  Volume Total: ${totalVolume} l`;
 }
 
-export function getBsddPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
-  const total = packagingInfos.reduce(
-    (acc, packagingInfo) => acc + packagingInfo.quantity,
-    0
-  );
-
-  const packages = [...packagingInfos]
-    .sort((p1, p2) => p1.type.localeCompare(p2.type))
-    .map(packagingInfo => {
-      const name =
-        packagingInfo.type === Packagings.Autre
-          ? [
-              PACKAGINGS_BSD_NAMES[BsdTypename.Bsdd][Packagings.Autre],
-              packagingInfo.other ? `(${packagingInfo.other})` : null
-            ]
-              .filter(Boolean)
-              .join(" ")
-          : PACKAGINGS_BSD_NAMES[BsdTypename.Bsdd][packagingInfo.type];
-      return `${packagingInfo.quantity} ${name}`;
-    })
-    .join(", ");
-
-  return formTransportIsPipeline({
-    wasteDetails: {
-      packagingInfos
-    }
-  })
-    ? `${packages}`
-    : `${total} colis : ${packages}`;
-}
-
 export const formTransportIsPipeline = (
   form: Pick<FormInput, "wasteDetails">
 ): boolean =>
   form.wasteDetails?.packagingInfos?.some(
     pkg => pkg.type === Packagings.Pipeline
   )!;
+
+export const resetPackagingIfUnchanged = (
+  data,
+  packagingsInitalValue,
+  packagingsNewValue,
+  deleteObjCallback
+) => {
+  if (!packagingsNewValue?.length) {
+    return data;
+  }
+
+  packagingsInitalValue = packagingsInitalValue.map(packaging => {
+    const { __typename, ...newData } = packaging;
+    return newData;
+  });
+
+  if (packagingsEqual(packagingsInitalValue, packagingsNewValue)) {
+    deleteObjCallback();
+  }
+  return data;
+};

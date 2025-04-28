@@ -72,7 +72,8 @@ export const transporter1Refinement =
     cityKey: "transporter1CompanyCity",
     countryKey: "transporter1CompanyCountryCode",
     recepisseIsExemptedKey: "transporter1RecepisseIsExempted",
-    recepisseNumberKey: "transporter1RecepisseNumber"
+    recepisseNumberKey: "transporter1RecepisseNumber",
+    ttdImportNumberKey: "ttdImportNumber"
   });
 
 export const transporter2Refinement =
@@ -86,7 +87,8 @@ export const transporter2Refinement =
     cityKey: "transporter2CompanyCity",
     countryKey: "transporter2CompanyCountryCode",
     recepisseIsExemptedKey: "transporter2RecepisseIsExempted",
-    recepisseNumberKey: "transporter2RecepisseNumber"
+    recepisseNumberKey: "transporter2RecepisseNumber",
+    ttdImportNumberKey: "ttdImportNumber"
   });
 
 export const transporter3Refinement =
@@ -100,7 +102,8 @@ export const transporter3Refinement =
     cityKey: "transporter3CompanyCity",
     countryKey: "transporter3CompanyCountryCode",
     recepisseIsExemptedKey: "transporter3RecepisseIsExempted",
-    recepisseNumberKey: "transporter3RecepisseNumber"
+    recepisseNumberKey: "transporter3RecepisseNumber",
+    ttdImportNumberKey: "ttdImportNumber"
   });
 
 export const transporter4Refinement =
@@ -114,7 +117,8 @@ export const transporter4Refinement =
     cityKey: "transporter4CompanyCity",
     countryKey: "transporter4CompanyCountryCode",
     recepisseIsExemptedKey: "transporter4RecepisseIsExempted",
-    recepisseNumberKey: "transporter4RecepisseNumber"
+    recepisseNumberKey: "transporter4RecepisseNumber",
+    ttdImportNumberKey: "ttdImportNumber"
   });
 
 export const transporter5Refinement =
@@ -128,7 +132,8 @@ export const transporter5Refinement =
     cityKey: "transporter5CompanyCity",
     countryKey: "transporter5CompanyCountryCode",
     recepisseIsExemptedKey: "transporter5RecepisseIsExempted",
-    recepisseNumberKey: "transporter5RecepisseNumber"
+    recepisseNumberKey: "transporter5RecepisseNumber",
+    ttdImportNumberKey: "ttdImportNumber"
   });
 
 export const refineReportForProfile: Refinement<

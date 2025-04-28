@@ -5,7 +5,6 @@ import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import { Query, RegistryImportType } from "@td/codegen-ui";
 import { format, subDays } from "date-fns";
 import React, { useState } from "react";
-import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_CHANGE_AGGREGATES } from "../shared";
 import { Stat } from "./Stat";
 import { FileImportsTable } from "./FileImportsTable";
@@ -16,15 +15,17 @@ type Props = { source: "API" | "FILE"; siret: string | undefined };
 export function StatsTab({ source, siret }: Props) {
   const [window, setWindow] = useState(1);
 
-  const { loading, error, data } = useQuery<
-    Pick<Query, "registryChangeAggregates">
-  >(GET_CHANGE_AGGREGATES, {
-    variables: {
-      siret,
-      window,
-      source
+  const { error, data } = useQuery<Pick<Query, "registryChangeAggregates">>(
+    GET_CHANGE_AGGREGATES,
+    {
+      variables: {
+        siret,
+        window,
+        source
+      },
+      skip: !siret
     }
-  });
+  );
 
   const stats = data?.registryChangeAggregates?.reduce(
     (sum, aggregate) => {
@@ -78,7 +79,7 @@ export function StatsTab({ source, siret }: Props) {
 
   return (
     <div>
-      <CallOut title="">
+      <CallOut title="" className="fr-col-lg-11">
         <SegmentedControl
           legend={`Statistiques des déclarations par ${
             source === "API" ? "API" : "fichier"
@@ -114,7 +115,6 @@ export function StatsTab({ source, siret }: Props) {
         />
 
         <div className="fr-mt-3w">
-          {loading && <InlineLoader />}
           {error && (
             <Alert
               closable

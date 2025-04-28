@@ -5,6 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import type { MutationCreateWorkerCertificationArgs } from "@td/codegen-back";
 import configureYup from "../../../common/yup/configureYup";
+import { todayAtMidnight } from "../../../utils";
 
 configureYup();
 
@@ -27,11 +28,14 @@ export const workerCertificationSchema = yup.object({
     then: schema => schema.required(),
     otherwise: schema => schema.nullable()
   }),
-  validityLimit: yup.date().when("hasSubSectionThree", {
-    is: true,
-    then: schema => schema.required(),
-    otherwise: schema => schema.nullable()
-  }),
+  validityLimit: yup
+    .date()
+    .min(todayAtMidnight())
+    .when("hasSubSectionThree", {
+      is: true,
+      then: schema => schema.required(),
+      otherwise: schema => schema.nullable()
+    }),
   organisation: yup
     .string()
     .label("L'organisme")

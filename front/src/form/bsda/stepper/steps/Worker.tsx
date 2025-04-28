@@ -69,7 +69,7 @@ export function Worker({ disabled }) {
     return (
       <div className="notification">
         Vous effectuez un groupement, une réexpédition ou une collecte en
-        déchetterie. Il n'y a pas d'entreprise de travaux à saisir.
+        déchèterie. Il n'y a pas d'entreprise de travaux à saisir.
       </div>
     );
   }

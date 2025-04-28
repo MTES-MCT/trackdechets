@@ -73,7 +73,11 @@ const MenuLink = ({ entry }) => {
   );
 };
 
-function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
+function DashboardSubNav({
+  currentCompany,
+  canViewNewRegistry,
+  canViewRegistryIHM
+}) {
   const { permissions, role } = usePermissions();
 
   const location = useLocation();
@@ -150,6 +154,15 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
     location.pathname
   );
 
+  const matchRegistryLines = matchPath(
+    {
+      path: routes.registry_new.lines,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
   const matchReviewsTab = !!matchReviewsReviewed || !!matchReviewsToReview;
   const matchTransportTab =
     !!matchTransportCollected || !!matchTransportToCollect;
@@ -159,7 +172,8 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
   const matchRegistryV2Tab =
     !!matchRegistryImport ||
     !!matchRegistryCompanyImports ||
-    !!matchRegistryExport;
+    !!matchRegistryExport ||
+    !!matchRegistryLines;
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -333,17 +347,6 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
           </div>
         </li>
       )}
-      {showRegistryTab && (
-        <li className="fr-nav__item">
-          <MenuLink
-            entry={{
-              navlink: true,
-              caption: "Mes registres",
-              href: routes.registry
-            }}
-          />
-        </li>
-      )}
       {showRegistryTab && canViewNewRegistry && (
         <li className="fr-nav__item">
           <button
@@ -383,6 +386,17 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
                   }}
                 />
               </li>
+              {canViewRegistryIHM && (
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: "Déclarations",
+                      href: routes.registry_new.lines
+                    }}
+                  />
+                </li>
+              )}
             </ul>
           </div>
         </li>
@@ -396,7 +410,11 @@ function DashboardSubNav({ currentCompany, canViewNewRegistry }) {
  * Navigation subset to be included in the moble slidning panel nav
  * Contains main navigation items from the desktop top level nav (Dashboard, Account etc.)
  */
-function MobileSubNav({ currentCompany, canViewNewRegistry }) {
+function MobileSubNav({
+  currentCompany,
+  canViewNewRegistry,
+  canViewRegistryIHM
+}) {
   const location = useLocation();
 
   const matchAccount = matchPath(
@@ -417,6 +435,7 @@ function MobileSubNav({ currentCompany, canViewNewRegistry }) {
       <DashboardSubNav
         currentCompany={currentCompany}
         canViewNewRegistry={canViewNewRegistry}
+        canViewRegistryIHM={canViewRegistryIHM}
       />
     );
   }
@@ -540,11 +559,6 @@ const getDesktopMenuEntries = (
   ];
 
   const registry = [
-    {
-      caption: "Mes registres",
-      href: routes.registry,
-      navlink: true
-    },
     ...(canViewNewRegistry
       ? [
           {
@@ -669,6 +683,9 @@ export default function Header() {
           company.userRole
         )
     );
+
+  const canViewRegistryIHM =
+    import.meta.env.VITE_FLAG_REGISTRY_V2_IHM === "true";
 
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
@@ -799,6 +816,7 @@ export default function Header() {
         <MobileSubNav
           currentCompany={currentCompany}
           canViewNewRegistry={canViewNewRegistry}
+          canViewRegistryIHM={canViewRegistryIHM}
         />
       </div>
 

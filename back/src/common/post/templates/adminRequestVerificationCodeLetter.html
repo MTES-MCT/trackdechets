@@ -180,7 +180,7 @@
       }
 
       .content {
-        margin-top: 40px;
+        margin-top: 100px;
         font-size: 14px;
       }
 
@@ -227,6 +227,23 @@
       .steps {
         list-style-type: decimal;
       }
+
+      .footer {
+        text-align: center;
+        width: 100%;
+        position: absolute;
+        bottom: 12px;
+        height: 70px;
+      }
+
+      .footer-img {
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 120px;
+        max-height: 70px;
+        height: auto;
+        width: auto;
+      }
     </style>
   </head>
 
@@ -253,13 +270,8 @@
           <img
             class="marianne"
             width="150px"
-            alt="Ministère de la Transition Écologique"
-            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/mte.svg"
-          />
-          <img
-            width="100px"
-            src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/trackdechets.png"
-            alt="Trackdéchets logo"
+            alt="Ministère de la transition écologique, de la biodiversité, de la forêt, de la mer et de la pêche"
+            src="https://medias.trackdechets.beta.gouv.fr/mte_large.png"
           />
           <h3 class="ui header m-no-bottom">{{ expediteur.nom }}</h3>
           <p>
@@ -272,18 +284,18 @@
             <p>
               <b
                 >Objet : Demande de vérification pour l’accès administrateur de
-                l’établissement {{ company.name}} - {{ company.siret }}</b
+                l’établissement {{ company_name}} - {{ company_siret }}</b
               >
             </p>
             <br />
 
-            <p>À l’attention de {{ user.name }},</p>
+            <p>À l’attention de {{ user_name }},</p>
             <br />
 
             <p>Madame, Monsieur,</p>
             <p>
               À la suite de votre demande pour obtenir les droits administrateur
-              au sein de l’établissement {{ company.name}} - {{ company.siret
+              au sein de l’établissement {{ company_name}} - {{ company_siret
               }}, nous vous adressons ce courrier à titre de vérification. Les
               administrateurs actuels de l'établissement concerné étant inactifs
               ou indisponibles, nous souhaitons nous assurer de la légitimité de
@@ -334,6 +346,20 @@
           </article>
         </div>
       </div>
+      <section class="footer">
+        <img
+          class="footer-img"
+          width="200px"
+          src="https://medias.trackdechets.beta.gouv.fr/brgm_large.png"
+          alt="BRGM, géosciences pour une Terre durable"
+        />
+        <img
+          class="footer-img"
+          width="100px"
+          src="https://raw.githubusercontent.com/MTES-MCT/trackdechets-website/master/src/components/assets/trackdechets.png"
+          alt="Trackdéchets logo"
+        />
+      </section>
     </section>
   </body>
 </html>

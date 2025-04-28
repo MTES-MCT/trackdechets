@@ -43,6 +43,8 @@ export const INCOMING_WASTE_HEADERS: {
     "Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
   emitterPickupSiteCountryCode:
     "Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur",
+  ttdImportNumber: "Numéro de notification ou de déclaration d'import",
+  movementNumber: "Numéro de mouvement",
   ecoOrganismeSiret: "SIRET de l'éco-organisme",
   ecoOrganismeName: "Raison sociale de l'éco-organisme",
   brokerCompanySiret: "SIRET du courtier",
@@ -54,9 +56,6 @@ export const INCOMING_WASTE_HEADERS: {
   operationCode: "Code de traitement réalisé",
   operationMode: "Mode de traitement",
   noTraceability: "Rupture de traçabilité autorisée",
-  nextDestinationIsAbroad: "Destination ultérieure à l'étranger",
-  gistridNumber: "Numéro de notification ou de déclaration GISTRID",
-  movementNumber: "Numéro de mouvement",
   nextOperationCode: "Code de traitement ultérieur prévu",
   isDirectSupply: "Approvisionnement direct",
   transporter1TransportMode: "Mode de transport du transporteur n°1",

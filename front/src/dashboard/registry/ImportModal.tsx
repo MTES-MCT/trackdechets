@@ -179,21 +179,23 @@ function Step1({ register }: StepProps) {
         <option disabled hidden value="">
           Selectionnez un type d'import
         </option>
-        <option value="SSD">Sortie de statut de déchet</option>
-        <option value="INCOMING_WASTE">
+        <option value={RegistryImportType.Ssd}>
+          Sortie de statut de déchet
+        </option>
+        <option value={RegistryImportType.IncomingWaste}>
           Déchets dangereux et non dangereux entrants
         </option>
-        <option value="INCOMING_TEXS">
+        <option value={RegistryImportType.IncomingTexs}>
           Terres excavées et sédiments, dangereux et non dangereux entrants
         </option>
-        <option value="OUTGOING_WASTE">
+        <option value={RegistryImportType.OutgoingWaste}>
           Déchets dangereux et non dangereux sortants
         </option>
-        <option value="OUTGOING_TEXS">
+        <option value={RegistryImportType.OutgoingTexs}>
           Terres excavées et sédiments, dangereux et non dangereux sortants
         </option>
-        <option value="TRANSPORTED">Transportés</option>
-        <option value="MANAGED">Gérés</option>
+        <option value={RegistryImportType.Transported}>Transportés</option>
+        <option value={RegistryImportType.Managed}>Gérés</option>
       </Select>
 
       <Upload

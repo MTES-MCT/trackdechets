@@ -18,13 +18,12 @@ import {
 } from "./shared";
 
 import { format, getYear, startOfYear, endOfYear, subHours } from "date-fns";
-import classNames from "classnames";
 import Button from "@codegouvfr/react-dsfr/Button";
-import Table from "@codegouvfr/react-dsfr/Table";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import RegistryTable from "./RegistryTable";
 
 const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
@@ -108,7 +107,8 @@ export function MyExports() {
     startPolling,
     stopPolling
   } = useQuery<Pick<Query, "registryV2Exports">>(GET_REGISTRY_V2_EXPORTS, {
-    variables: { first: PAGE_SIZE }
+    variables: { first: PAGE_SIZE },
+    fetchPolicy: "cache-and-network"
   });
   const registryExports = exportsData?.registryV2Exports?.edges;
   const totalCount = exportsData?.registryV2Exports?.totalCount;
@@ -254,18 +254,12 @@ export function MyExports() {
 
   return (
     <>
-      <div
-        className={classNames([
-          "tw-flex-grow",
-          "tw-px-6",
-          "tw-py-4",
-          styles.myRegistryExportsContainer
-        ])}
-      >
+      <>
         <div>
           <div className="tw-flex">
             <div>
               <Button
+                id="export-reglementaire-btn"
                 priority="primary"
                 iconId="fr-icon-download-line"
                 iconPosition="right"
@@ -310,11 +304,7 @@ export function MyExports() {
             </div>
           </div>
           {!exportsLoading ? (
-            <Table
-              bordered
-              noCaption
-              // caption="Exports récents"
-              className={styles.fullWidthTable}
+            <RegistryTable
               data={tableData}
               headers={[
                 "Date",
@@ -364,7 +354,7 @@ export function MyExports() {
             className={"fr-mt-1w"}
           />
         </div>
-      </div>
+      </>
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => {

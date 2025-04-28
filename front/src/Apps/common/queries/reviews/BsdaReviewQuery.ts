@@ -54,6 +54,8 @@ const reviewFragment = gql`
         other
         quantity
         type
+        volume
+        identificationNumbers
       }
       broker {
         company {
@@ -111,6 +113,8 @@ const reviewFragment = gql`
         other
         quantity
         type
+        volume
+        identificationNumbers
       }
       broker {
         company {

@@ -10,7 +10,6 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import Exports from "../../../../dashboard/exports/Registry";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
@@ -50,10 +49,9 @@ const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
   <>
-    <strong>À partir du 5 mai 2025</strong>, toutes les déclarations RNDTS
-    devront être réalisées directement sur Trackdéchets. Anticipez dès
-    maintenant cette évolution en testant les fonctionnalités de déclaration sur
-    notre plateforme de test.
+    <strong>IMPORTANT : </strong> À compter du 5 mai, toutes les déclarations au
+    RNDTS doivent être effectuées directement sur Trackdéchets depuis l'onglet
+    Mes registres.
   </>
 ];
 
@@ -101,9 +99,9 @@ export default function LayoutContainer() {
                   messages={BANNER_MESSAGES}
                   button={{
                     title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"
+                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/informations-generales-and-impacts-utilisateurs"
                   }}
-                  persistedSurveyName="td-20250303"
+                  persistedSurveyName="td-20250505"
                 />
               }
             />
@@ -272,15 +270,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth>
                 <CompaniesRoutes />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.registry}
-            element={
-              <RequireAuth>
-                <Exports />
               </RequireAuth>
             }
           />

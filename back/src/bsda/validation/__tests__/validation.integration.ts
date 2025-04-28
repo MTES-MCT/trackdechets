@@ -755,6 +755,25 @@ describe("BSDA parsing", () => {
         ]);
       }
     });
+
+    test.each([-1, 0])(
+      "when packagings volume is %p (not strictly positive)",
+      async volume => {
+        const data: ZodBsda = {
+          ...bsda,
+          packagings: [{ type: "BIG_BAG", quantity: 1, volume }]
+        };
+        try {
+          await parseBsdaAsync(data, context);
+        } catch (err) {
+          expect((err as ZodError).issues).toEqual([
+            expect.objectContaining({
+              message: "Le volume doit être un nombre positif"
+            })
+          ]);
+        }
+      }
+    );
   });
 
   describe("Operation modes", () => {

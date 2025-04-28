@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, ObjectCannedACL } from "@aws-sdk/client-s3";
 import { format } from "@fast-csv/format";
 import * as Excel from "exceljs";
 import { Writable } from "node:stream";
@@ -81,7 +81,7 @@ async function generateCsvModel({
     }
   });
 
-  const csvStream = format({ headers: false, writeBOM: true }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
+  const csvStream = format({ headers: false, writeBOM: true, delimiter: ";" }); // UTF-8 BOM to help tools like Excel recognize UTF-8 encoding
   csvStream.pipe(writableStream);
 
   csvStream.write(headers);
@@ -114,7 +114,8 @@ async function writeToS3({
     Key: name,
     Body: buffer,
     ContentType: contentType,
-    ContentEncoding: "utf-8"
+    ContentEncoding: "utf-8",
+    ACL: ObjectCannedACL.public_read
   };
 
   const command = new PutObjectCommand(params);

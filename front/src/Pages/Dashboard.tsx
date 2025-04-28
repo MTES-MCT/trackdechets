@@ -212,7 +212,7 @@ const DashboardPage = () => {
   const isLoadingBsds = loading;
 
   return (
-    <div className="dashboard-page" role="feed" aria-busy={isLoadingBsds}>
+    <div role="feed" aria-busy={isLoadingBsds}>
       <div className="dashboard-page__actions">
         {permissions.includes(UserPermission.BsdCanCreate) && (
           <div className="create-btn">

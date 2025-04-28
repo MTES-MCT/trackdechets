@@ -228,7 +228,7 @@ export const toIncomingWasteV2 = (
       : null,
     destinationHasCiterneBeenWashedOut: null,
     destinationOperationNoTraceability: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     isUpcycled: null
@@ -599,6 +599,7 @@ export const toTransportedWasteV2 = (
 
 const minimalBsdasriForLookupSelect = {
   id: true,
+  createdAt: true,
   destinationReceptionSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
@@ -635,6 +636,7 @@ const bsdasriToLookupCreateInputs = (
         bsdasri.destinationReceptionDate ??
           bsdasri.destinationReceptionSignatureDate
       ),
+      declaredAt: bsdasri.createdAt,
       bsdasriId: bsdasri.id
     });
   }
@@ -659,6 +661,7 @@ const bsdasriToLookupCreateInputs = (
           bsdasri.transporterTakenOverAt ??
             bsdasri.transporterTransportSignatureDate!
         ),
+        declaredAt: bsdasri.createdAt,
         bsdasriId: bsdasri.id
       });
     });
@@ -676,6 +679,7 @@ const bsdasriToLookupCreateInputs = (
           bsdasri.transporterTakenOverAt ??
             bsdasri.transporterTransportSignatureDate!
         ),
+        declaredAt: bsdasri.createdAt,
         bsdasriId: bsdasri.id
       });
     }

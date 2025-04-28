@@ -3,7 +3,6 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { Download } from "@codegouvfr/react-dsfr/Download";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
-import Table from "@codegouvfr/react-dsfr/Table";
 import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
@@ -13,7 +12,6 @@ import {
 import { format } from "date-fns";
 import React, { useState } from "react";
 
-import styles from "./MyImports.module.scss";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { ImportModal } from "./ImportModal";
 import {
@@ -24,6 +22,7 @@ import {
   REGISTRY_DOWNLOAD_SIGNED_URL,
   TYPES
 } from "./shared";
+import RegistryTable from "./RegistryTable";
 
 const HEADERS = [
   "Importé le",
@@ -43,7 +42,8 @@ export function MyImports() {
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "registryImports">
   >(GET_REGISTRY_IMPORTS, {
-    variables: { ownImportsOnly: true, first: PAGE_SIZE }
+    variables: { ownImportsOnly: true, first: PAGE_SIZE },
+    fetchPolicy: "cache-and-network"
   });
 
   const [getDownloadLink] = useLazyQuery<
@@ -144,10 +144,11 @@ export function MyImports() {
 
   return (
     <>
-      <div className="tw-px-6 tw-py-4">
+      <>
         <div className="tw-flex tw-gap-6">
           <div>
             <Button
+              id="import-registry-btn"
               priority="primary"
               iconId="fr-icon-upload-line"
               iconPosition="right"
@@ -205,13 +206,7 @@ export function MyImports() {
                   </Button>
                 </div>
               </div>
-              <Table
-                bordered
-                className={styles.fullWidthTable}
-                noCaption
-                data={tableData}
-                headers={HEADERS}
-              />
+              <RegistryTable data={tableData} headers={HEADERS} />
             </div>
             <div className="tw-flex tw-justify-center">
               <Pagination
@@ -231,7 +226,7 @@ export function MyImports() {
             </div>
           </div>
         )}
-      </div>
+      </>
 
       <ImportModal
         isOpen={isImportModalOpen}

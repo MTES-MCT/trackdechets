@@ -11,6 +11,7 @@ import {
   deleteUserAccountHash
 } from "../../users/database";
 import { clearUserSessions } from "../../users/clearUserSessions";
+import { UserInputError } from "../../common/errors";
 
 /**
  * WARNING : this is irreversible
@@ -24,7 +25,7 @@ export default async function deleteUser(user: User) {
   ];
 
   if (errors.length > 0) {
-    throw new Error(errors.join("\n"));
+    throw new UserInputError(errors.join("\n"));
   }
 
   await deleteUserCompanyAssociations(user, prisma);

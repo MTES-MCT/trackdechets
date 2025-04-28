@@ -1,5 +1,11 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import React from "react";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate
+} from "react-router-dom";
+import React, { useCallback } from "react";
 
 import RegistryMenu from "./RegistryMenu";
 import { useMedia } from "../../common/use-media";
@@ -10,6 +16,8 @@ import { MyExports } from "./MyExports";
 import { MyImports } from "./MyImports";
 import { MyLines } from "./myLines/MyLines";
 import { FormContainer } from "./myLines/FormContainer";
+import Exports from "../exports/Registry";
+import "../../Apps/Dashboard/dashboard.scss";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -18,12 +26,36 @@ const toRelative = route => {
 export default function RegistryRoutes() {
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
   const location = useLocation();
-  const backgroundLocation = location.state?.background;
+  const navigate = useNavigate();
+  // Check if we're on the form route directly
+  const isDirectFormAccess = location.pathname.includes(
+    routes.registry_new.form.ssd
+  );
+
+  // If accessing form directly, create a synthetic background location for the lines page
+  const backgroundLocation =
+    location.state?.background ||
+    (isDirectFormAccess
+      ? {
+          pathname: routes.registry_new.lines,
+          search: "",
+          hash: "",
+          state: null
+        }
+      : null);
+
+  const handleClose = useCallback(() => {
+    if (location.state?.background) {
+      navigate(-1);
+    } else {
+      navigate(routes.registry_new.lines);
+    }
+  }, [location, navigate]);
 
   return (
     <div className="dashboard">
       {!isMobile && <RegistryMenu />}
-      <div className="tw-flex-grow">
+      <div className="dashboard-content">
         <Routes location={backgroundLocation ?? location}>
           <Route
             index
@@ -51,6 +83,11 @@ export default function RegistryRoutes() {
           />
 
           <Route
+            path={toRelative(routes.registry_new.exhaustive)}
+            element={<Exports />}
+          />
+
+          <Route
             path={`${routes.registry_new.index}/*`}
             element={<Navigate to={routes.registry_new.myImports} replace />}
           />
@@ -60,7 +97,7 @@ export default function RegistryRoutes() {
           <Routes location={location}>
             <Route
               path={toRelative(routes.registry_new.form.ssd)}
-              element={<FormContainer />}
+              element={<FormContainer onClose={handleClose} />}
             />
           </Routes>
         )}

@@ -211,6 +211,7 @@ export const toOutgoingWaste = (
     destinationFinalOperationWeights: null,
 
     gistridNumber: outgoingTexs.gistridNumber,
+    movementNumber: outgoingTexs.movementNumber,
     isUpcycled: outgoingTexs.isUpcycled,
     destinationParcelInseeCodes: outgoingTexs.destinationParcelInseeCodes,
     destinationParcelNumbers: outgoingTexs.destinationParcelNumbers,
@@ -224,7 +225,8 @@ const minimalRegistryForLookupSelect = {
   reportForCompanySiret: true,
   reportAsCompanySiret: true,
   wasteCode: true,
-  dispatchDate: true
+  dispatchDate: true,
+  createdAt: true
 };
 
 type MinimalRegistryForLookup = Prisma.RegistryOutgoingTexsGetPayload<{
@@ -244,6 +246,7 @@ const registryToLookupCreateInput = (
     wasteType: RegistryExportWasteType.TEXS,
     wasteCode: registryOutgoingTexs.wasteCode,
     ...generateDateInfos(registryOutgoingTexs.dispatchDate),
+    declaredAt: registryOutgoingTexs.createdAt,
     registryOutgoingTexsId: registryOutgoingTexs.id
   };
 };
@@ -271,6 +274,7 @@ export const updateRegistryLookup = async (
         reportAsSiret: registryOutgoingTexs.reportAsCompanySiret,
         wasteCode: registryOutgoingTexs.wasteCode,
         ...generateDateInfos(registryOutgoingTexs.dispatchDate),
+        declaredAt: registryOutgoingTexs.createdAt,
         registryOutgoingTexsId: registryOutgoingTexs.id
       },
       create: registryToLookupCreateInput(registryOutgoingTexs),

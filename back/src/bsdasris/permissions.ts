@@ -2,6 +2,7 @@ import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
 import type { BsdasriInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { ForbiddenError, UserInputError } from "../common/errors";
+import { isForeignVat } from "@td/constants";
 
 /**
  * Retrieves organisations allowed to read a BSDASRI
@@ -112,6 +113,12 @@ export async function checkCanCreateSynthesis(
   user: User,
   bsdasriInput: BsdasriInput
 ) {
+  if (isForeignVat(bsdasriInput?.transporter?.company?.vatNumber)) {
+    throw new UserInputError(
+      "Un transporteur étranger ne peut pas créer de BSDASRI de synthèse"
+    );
+  }
+
   const authorizedOrgIds = [
     bsdasriInput?.transporter?.company?.siret,
     bsdasriInput?.transporter?.company?.vatNumber

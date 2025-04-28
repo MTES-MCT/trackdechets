@@ -18,7 +18,7 @@ export async function transformAndRefineReason(
 
   return transformAndRefineItemReason<ParsedZodSsdItem>(
     ssdItem,
-    ssdItemInDb?.id,
+    ssdItemInDb,
     ctx
   );
 }

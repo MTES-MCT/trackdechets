@@ -92,7 +92,6 @@ export default function AccountInfo({ me }: Props) {
 
   return (
     <>
-      <hr />
       {!isEditing && (
         <>
           <AccountInfoActionBar

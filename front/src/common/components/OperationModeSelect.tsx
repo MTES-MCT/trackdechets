@@ -40,7 +40,7 @@ const OperationModeSelect = ({ operationCode, name }) => {
       <fieldset>
         <legend>
           Mode de traitement{" "}
-          <Tooltip title="Le mode de traitement correspond à un des 4 choix de la hiérarchie des modes de traitement, il s'impose de lui même ou doit être précisé selon l'opération réalisée" />
+          <Tooltip title="Le mode de traitement correspond à l'un des choix de la hiérarchie des modes de traitement. Selon l'opération réalisée, il s'impose de lui-même ou doit être précisé." />
         </legend>
         <div className="tw-flex">
           {modes.map(mode => (

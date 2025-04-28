@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import {
   Form as Bsdd,
+  BsdType,
   Mutation,
   MutationCreateFormRevisionRequestArgs,
   WasteAcceptationStatus
@@ -30,6 +31,8 @@ import Appendix1ProducerRequestRevision from "./Appendix1ProducerRequestRevision
 import styles from "./BsddRequestRevision.module.scss";
 import Loader from "../../../../../common/Components/Loader/Loaders";
 import NonScrollableInput from "../../../../../common/Components/NonScrollableInput/NonScrollableInput";
+import RhfBroker from "../../../../../Forms/Components/Broker/RhfBroker";
+import RhfTrader from "../../../../../Forms/Components/Trader/RhfTrader";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import {
@@ -45,6 +48,8 @@ import {
   POP,
   TITLE_REQUEST_LIST
 } from "../../../Revision/wordingsRevision";
+import { resetPackagingIfUnchanged } from "../../common/Components/Packagings/packagings";
+import { bsddPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 
 type Props = {
   bsdd: Bsdd;
@@ -97,10 +102,23 @@ export function BsddRequestRevision({ bsdd }: Props) {
     return data;
   };
 
+  const checkIfInitialObjectValueChanged = data => {
+    let newData = resetPopIfUnchanged(data);
+    newData = resetPackagingIfUnchanged(
+      data,
+      bsdd.wasteDetails?.packagingInfos,
+      data.wasteDetails.packagingInfos,
+      () => delete data.wasteDetails.packagingInfos
+    );
+    return newData;
+  };
+
   const onSubmitForm = async (data: BsddRevisionRequestValidationSchema) => {
     const { comment, ...content } = data;
 
-    const cleanedContent = removeEmptyKeys(resetPopIfUnchanged(content));
+    const cleanedContent = removeEmptyKeys(
+      checkIfInitialObjectValueChanged(content)
+    );
 
     await createFormRevisionRequest({
       variables: {
@@ -233,7 +251,10 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   initialValue={bsdd.wasteDetails?.packagingInfos}
                 >
                   <p className="fr-text fr-mb-2w">Nouveaux conditionnements</p>
-                  <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
+                  <RhfPackagingList
+                    fieldName="wasteDetails.packagingInfos"
+                    packagingTypes={bsddPackagingTypes}
+                  />
                 </RhfReviewableField>
 
                 {hasBeenReceived && (
@@ -555,6 +576,36 @@ export function BsddRequestRevision({ bsdd }: Props) {
                     />
                   </RhfReviewableField>
                 )}
+
+                <RhfReviewableField
+                  title="Courtier"
+                  path="broker"
+                  value={
+                    bsdd.broker?.company?.name
+                      ? bsdd.broker.company.name
+                      : "Aucun"
+                  }
+                  defaultValue={initialBsddReview.broker}
+                >
+                  <RhfBroker
+                    bsdType={BsdType.Bsdd}
+                    siret={siret}
+                    showSwitch={false}
+                  />
+                </RhfReviewableField>
+
+                <RhfReviewableField
+                  title="Négociant"
+                  path="trader"
+                  value={
+                    bsdd.trader?.company?.name
+                      ? bsdd.trader.company.name
+                      : "Aucun"
+                  }
+                  defaultValue={initialBsddReview.trader}
+                >
+                  <RhfTrader siret={siret} showSwitch={false} />
+                </RhfReviewableField>
               </div>
             </>
           )}

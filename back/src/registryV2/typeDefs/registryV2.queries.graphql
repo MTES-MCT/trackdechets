@@ -74,5 +74,7 @@ type Query {
     siret: String!
     "Type de registre auquel appartient la déclaration"
     type: RegistryImportType
+    "Identifiant unique de la déclaration, supporte un match partiel"
+    publicId: String
   ): [RegistryLookup!]
 }

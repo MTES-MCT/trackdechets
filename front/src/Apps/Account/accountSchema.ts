@@ -13,7 +13,7 @@ export const validationAccountParametersSchema = z.object({
     if (SSTI_CHARS.some(char => username?.includes(char))) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Les caractères suivants sont interdits: ${SSTI_CHARS.join(
+        message: `Les caractères suivants sont interdits : ${SSTI_CHARS.join(
           " "
         )} `
       });

@@ -5,8 +5,12 @@ import { NavLink } from "react-router-dom";
 import SideBar from "../../Apps/common/Components/SideBar/SideBar";
 import routes from "../../Apps/routes";
 
-export const RegistryMenuContent = () => (
-  <div>
+export const RegistryMenuContent = ({
+  canViewRegistryIHM
+}: {
+  canViewRegistryIHM: boolean;
+}) => (
+  <>
     <Accordion defaultExpanded label="Registre national" className="fr-mt-4w">
       <ul>
         <li className="tw-mb-1">
@@ -33,18 +37,20 @@ export const RegistryMenuContent = () => (
             Imports par établissement
           </NavLink>
         </li>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.registry_new.lines}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Déclarations
-          </NavLink>
-        </li>
+        {canViewRegistryIHM && (
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.lines}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Déclarations
+            </NavLink>
+          </li>
+        )}
       </ul>
     </Accordion>
     <Accordion defaultExpanded label="Exports">
@@ -58,7 +64,19 @@ export const RegistryMenuContent = () => (
                 : "sidebarv2__item sidebarv2__item--indented"
             }
           >
-            Mes exports
+            Règlementaires
+          </NavLink>
+        </li>
+        <li className="tw-mb-1">
+          <NavLink
+            to={routes.registry_new.exhaustive}
+            className={({ isActive }) =>
+              isActive
+                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                : "sidebarv2__item sidebarv2__item--indented"
+            }
+          >
+            Exhaustif
           </NavLink>
         </li>
       </ul>
@@ -77,13 +95,16 @@ export const RegistryMenuContent = () => (
         Donnez votre avis
       </Button>
     </div>
-  </div>
+  </>
 );
 
 export default function RegistryMenu() {
+  const canViewRegistryIHM =
+    import.meta.env.VITE_FLAG_REGISTRY_V2_IHM === "true";
+
   return (
     <SideBar>
-      <RegistryMenuContent />
+      <RegistryMenuContent canViewRegistryIHM={canViewRegistryIHM} />
     </SideBar>
   );
 }

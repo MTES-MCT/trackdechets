@@ -1,30 +1,46 @@
-import React, { useState, useEffect, type ReactNode } from "react";
+import React, { useEffect, type ReactNode } from "react";
 import { Portal } from "../Portal/Portal";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 
 type Props = {
   parentRef: React.RefObject<HTMLElement>;
+  triggerRef?: React.RefObject<HTMLElement>;
   children: ReactNode | ((props: { close: () => void }) => ReactNode);
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
 };
 
-export function ComboBox({ parentRef, children }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+/*
+  If you want the dropdown to be the same width as the parent element (select, input,...)
+  you only need to pass the parent ref to the Combobox.
+  If you need the dropdown to be the width of another element,
+  you can separate the trigger element and the parent element.
+  The trigger element will be used to align the bottom of the dropdown (it can be the button that opens it for example),
+  and the parent element will be used to set the width and horizontal position (it can be a div that takes the whole width of the page for example).
+  In this case, you need to pass both the parent and the trigger refs to the Combobox.
+*/
 
+export function ComboBox({
+  parentRef,
+  triggerRef,
+  children,
+  isOpen,
+  onOpenChange
+}: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setIsOpen(false)
-  });
-
-  useEffect(() => {
-    function handleClick() {
-      setIsOpen(open => !open);
+    onClickOutside: (e: MouseEvent | TouchEvent) => {
+      if (triggerRef) {
+        if (triggerRef.current?.contains(e.target as Node)) {
+          e.preventDefault();
+          return;
+        }
+      } else if (parentRef.current?.contains(e.target as Node)) {
+        e.preventDefault();
+        return;
+      }
+      onOpenChange(false);
     }
-    const element = parentRef.current;
-    element?.addEventListener("click", handleClick);
-
-    return () => {
-      element?.removeEventListener("click", handleClick);
-    };
-  }, [parentRef]);
+  });
 
   useEffect(() => {
     if (!isOpen || !parentRef.current || !targetRef.current) {
@@ -32,23 +48,32 @@ export function ComboBox({ parentRef, children }: Props) {
     }
 
     const parentRect = parentRef.current.getBoundingClientRect();
-    const comboboxRect = targetRef.current.getBoundingClientRect();
+    const triggerRect = triggerRef?.current?.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - (triggerRect ?? parentRect).bottom;
+    const spaceAbove = (triggerRect ?? parentRect).top;
 
-    const dropdownTop = parentRect.bottom + window.scrollY;
     const dropdownLeft = parentRect.left + window.scrollX;
     const dropdownWidth = parentRect.width;
 
-    targetRef.current.style.top = `${dropdownTop}px`;
     targetRef.current.style.left = `${dropdownLeft}px`;
     targetRef.current.style.width = `${dropdownWidth}px`;
 
-    if (dropdownTop + comboboxRect.height > viewportHeight) {
+    // Calculate max height based on available space and substract 20 for good measure
+    const maxHeight = Math.max(spaceBelow, spaceAbove) - 20;
+    targetRef.current.style.maxHeight = `${maxHeight}px`;
+
+    if (maxHeight > spaceBelow && maxHeight <= spaceAbove) {
+      // Calculate bottom position as viewport height minus parent's top position
+      targetRef.current.style.bottom = `${
+        viewportHeight - (triggerRect ?? parentRect).top + window.scrollY
+      }px`;
+    } else {
       targetRef.current.style.top = `${
-        parentRect.top + window.scrollY - comboboxRect.height
+        (triggerRect ?? parentRect).bottom + window.scrollY
       }px`;
     }
-  }, [isOpen, parentRef, targetRef]);
+  }, [isOpen, parentRef, targetRef, triggerRef]);
 
   if (!isOpen) {
     return null;
@@ -63,11 +88,13 @@ export function ComboBox({ parentRef, children }: Props) {
           backgroundColor: "white",
           border: "1px solid #ccc",
           zIndex: 1000,
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+          overflow: "scroll",
+          height: "auto"
         }}
       >
         {typeof children === "function"
-          ? children({ close: () => setIsOpen(false) })
+          ? children({ close: () => onOpenChange(false) })
           : children}
       </div>
     </Portal>

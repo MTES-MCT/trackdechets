@@ -40,7 +40,7 @@ export const CompanyAdminRequest = () => {
             assurer de la relation entre le demandeur et l'établissement.
             Retrouvez les{" "}
             <a
-              href="TODO"
+              href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#option-3-si-ladministrateur-est-inactif-et-que-loption-2-ne-fonctionne-pas"
               target="_blank"
               rel="noopener noreferrer"
               className="fr-link force-external-link-content force-underline-link"

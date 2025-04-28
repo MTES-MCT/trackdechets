@@ -43,6 +43,7 @@ const RecepisseForm = ({
             label="Limite de validité"
             nativeInputProps={{
               type: "date",
+              min: new Date().toISOString().split("T")[0],
               ...inputProps?.validityLimit
             }}
             state={inputErrors?.validityLimit ? "error" : "default"}
