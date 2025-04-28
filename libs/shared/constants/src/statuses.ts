@@ -52,6 +52,7 @@ export const BSDA_VERBOSE_STATUSES: Record<string, string> = {
   SIGNED_BY_PRODUCER: "Signé par le producteur",
   SIGNED_BY_WORKER: "Signé par l'entreprise de travaux",
   SENT: "Envoyé",
+  RECEIVED: "En attente de traitement",
   PROCESSED: "Traité",
   REFUSED: "Refusé",
   AWAITING_CHILD: "En attente d'un BSDA suite",
