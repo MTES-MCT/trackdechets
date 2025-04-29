@@ -309,7 +309,7 @@ export default function ExportsForm({ companies }: IProps) {
               {error && <NotificationError apolloError={error} />}
             </div>
 
-            <div className="fr-col-10 fr-col-offset-8">
+            <div className="fr-col-10" style={{ textAlign: "right" }}>
               <Button type="submit" priority="primary" disabled={loading}>
                 {loading ? <span>Préparation de l'export...</span> : "Exporter"}
               </Button>
