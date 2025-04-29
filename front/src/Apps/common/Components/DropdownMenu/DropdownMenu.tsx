@@ -42,6 +42,7 @@ const DropdownMenu = ({
           onClick={toggleMenu}
           isOpen={isOpen}
           menuTitle={menuTitle}
+          ref={triggerRef}
         />
       ) : (
         <button
