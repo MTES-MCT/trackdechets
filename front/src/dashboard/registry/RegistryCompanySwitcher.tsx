@@ -145,7 +145,12 @@ export function RegistryCompanySwitcher({
         onOpenChange={setComboboxOpen}
       >
         {({ close }) => (
-          <FocusTrap active={isOpen}>
+          <FocusTrap
+            active={isOpen}
+            focusTrapOptions={{
+              allowOutsideClick: true
+            }}
+          >
             <div
               className="tw-bg-white tw-inset-x-0 tw-z-10 tw-px-2 tw-h-full tw-flex tw-flex-col"
               tabIndex={0}
