@@ -54,6 +54,8 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
   const methods = useForm<FormValues>({
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
+      wastePop: false,
+      weightIsEstimate: false,
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
@@ -183,7 +185,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
             reason: RegistryLineReason.Edit,
             transporter: transporters
           });
-          setDisabledFieldNames(["publicId"]);
+          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
       }
     }

@@ -30,8 +30,8 @@
 
     &__buttons {
       display: flex;
-      flex-direction: column;
-
+      flex-direction: row;
+      flex-wrap: wrap;
       @include phone {
         flex-direction: row;
         justify-content: flex-end;

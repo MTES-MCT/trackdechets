@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from "react";
-import { useQuery } from "@apollo/client";
+import { useQuery, useLazyQuery } from "@apollo/client";
 import { CompanyPrivate, CompanyPublic, Query, UserRole } from "@td/codegen-ui";
 import { debounce } from "../../common/helper";
 import {
@@ -12,7 +12,7 @@ import { ComboBox } from "../../Apps/common/Components/Combobox/Combobox";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_COMPANIES } from "./shared";
 import FocusTrap from "focus-trap-react";
-
+import styles from "./RegistryCompanySwitcher.module.scss";
 type Props = {
   onCompanySelect: (orgId: string, isDelegation: boolean) => void;
   wrapperClassName?: string;
@@ -23,6 +23,7 @@ type Props = {
   label?: string;
   defaultSiret?: string;
   excludeDelegations?: boolean;
+  disabled?: boolean;
 };
 
 export function RegistryCompanySwitcher({
@@ -31,7 +32,8 @@ export function RegistryCompanySwitcher({
   allOption,
   label,
   defaultSiret,
-  excludeDelegations = false
+  excludeDelegations = false,
+  disabled = false
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [debouncedClue, setDebouncedClue] = useState("");
@@ -39,6 +41,13 @@ export function RegistryCompanySwitcher({
     allOption ? allOption.name : ""
   );
   const comboboxTriggerRef = useRef<HTMLDivElement | null>(null);
+
+  const [getCompanyBySiret] = useLazyQuery<Pick<Query, "registryCompanies">>(
+    GET_REGISTRY_COMPANIES,
+    {
+      fetchPolicy: "network-only"
+    }
+  );
 
   const setSelectedCompany = (
     key,
@@ -70,6 +79,7 @@ export function RegistryCompanySwitcher({
     },
     onCompleted: data => {
       if (!selectedItem && !allOption) {
+        let firstNodeIsDelegation = false;
         let firstNode: CompanyPrivate | CompanyPublic | undefined =
           data.registryCompanies.myCompanies.find(node =>
             defaultSiret ? node.siret === defaultSiret : node.siret
@@ -78,12 +88,36 @@ export function RegistryCompanySwitcher({
           firstNode = data.registryCompanies.delegators.find(node =>
             defaultSiret ? node.siret === defaultSiret : node.siret
           );
+          firstNodeIsDelegation = true;
         }
         if (firstNode) {
-          setSelectedCompany(firstNode.orgId, {
-            name: firstNode.name,
-            givenName: firstNode.givenName,
-            siret: firstNode.siret
+          if (!defaultSiret) {
+            onCompanySelect(firstNode.orgId, firstNodeIsDelegation);
+          }
+          setSelectedItem(
+            `${firstNode.givenName || firstNode.name || ""} ${
+              firstNode.siret || ""
+            }`
+          );
+        } else if (defaultSiret) {
+          getCompanyBySiret({
+            variables: {
+              search: defaultSiret,
+              firstCompanies: 1,
+              firstDelegators: 1,
+              userRoles: [UserRole.Admin, UserRole.Member, UserRole.Reader]
+            }
+          }).then(result => {
+            const company =
+              result.data?.registryCompanies.myCompanies[0] ??
+              result.data?.registryCompanies.delegators[0];
+            if (company) {
+              setSelectedItem(
+                `${company.givenName || company.name || ""} ${
+                  company.siret || ""
+                }`
+              );
+            }
           });
         }
       }
@@ -118,14 +152,20 @@ export function RegistryCompanySwitcher({
       <div
         id="registry-company-combobox"
         ref={comboboxTriggerRef}
-        className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
+        className={`fr-input tw-flex tw-justify-between ${
+          disabled ? styles.disabledSelect : styles.enabledSelect
+        }`}
         tabIndex={0}
         role="button"
         aria-labelledby="registry-company-label selected-registry-company"
-        onClick={() => setComboboxOpen(!isOpen)}
+        onClick={() => {
+          if (!disabled) {
+            setComboboxOpen(!isOpen);
+          }
+        }}
         aria-expanded={isOpen}
         onKeyDown={e => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !disabled) {
             setComboboxOpen(!isOpen);
           }
         }}

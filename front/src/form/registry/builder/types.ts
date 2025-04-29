@@ -12,6 +12,7 @@ export type FormShapeField =
       label: string;
       required?: boolean;
       validation: Record<string, z.ZodType>;
+      defaultOption?: string;
       choices?: { label: string; value: string | number }[];
       infoText?: string;
     }

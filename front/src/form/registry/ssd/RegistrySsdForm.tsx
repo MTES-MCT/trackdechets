@@ -63,7 +63,7 @@ export function RegistrySsdForm({ onClose }: Props) {
             useDate: isoDateToHtmlDate(definedSsdProps.useDate),
             reason: RegistryLineReason.Edit
           });
-          setDisabledFieldNames(["publicId"]);
+          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
       }
     }

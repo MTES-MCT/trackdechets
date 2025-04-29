@@ -129,7 +129,7 @@ export const ssdFormShape: FormShape = [
         label: "Produit",
         required: true,
         validation: {
-          product: optionalString
+          product: nonEmptyString
         },
         type: "text",
         style: { className: "fr-col-10" }
@@ -185,6 +185,7 @@ export const ssdFormShape: FormShape = [
             type: "select",
             label: "Code de traitement réalisé",
             required: true,
+            defaultOption: "Sélectionnez un traitement",
             validation: {
               operationCode: nonEmptyString
             },
@@ -200,6 +201,7 @@ export const ssdFormShape: FormShape = [
             type: "select",
             label: "Mode de traitement",
             required: true,
+            defaultOption: "Sélectionnez un mode",
             validation: {
               operationMode: nonEmptyString
             },
@@ -245,34 +247,13 @@ export const ssdFormShape: FormShape = [
           excludeTypes: ["PERSONNE_PHYSIQUE"]
         },
         validation: {
-          destinationCompanyType: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyOrgId: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyName: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyAddress: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyPostalCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyCity: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          destinationCompanyCountryCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null)
+          destinationCompanyType: optionalString,
+          destinationCompanyOrgId: optionalString,
+          destinationCompanyName: optionalString,
+          destinationCompanyAddress: optionalString,
+          destinationCompanyPostalCode: optionalString,
+          destinationCompanyCity: optionalString,
+          destinationCompanyCountryCode: optionalString
         },
         shape: "custom",
         names: [

@@ -14,9 +14,15 @@ type Props = {
   methods: UseFormReturn<any>;
   reportForLabel: string;
   reportAsLabel: string;
+  disabled?: boolean;
 };
 
-export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
+export function ReportFor({
+  methods,
+  reportForLabel,
+  reportAsLabel,
+  disabled
+}: Props) {
   const [isDelegation, setIsDelegation] = useState(false);
   const { errors } = methods.formState;
   const reportForCompanySiret = methods.watch("reportForCompanySiret");
@@ -44,6 +50,7 @@ export function ReportFor({ methods, reportForLabel, reportAsLabel }: Props) {
               wrapperClassName="fr-col-8"
               label={reportForLabel}
               defaultSiret={field.value}
+              disabled={disabled}
               onCompanySelect={(siret, isDelegation) => {
                 field.onChange(siret);
                 setIsDelegation(isDelegation);

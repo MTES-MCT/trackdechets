@@ -26,14 +26,13 @@ export function TransporterForm({
   const transporter = methods.watch(fullFieldName);
   const transporterOrgId = transporter?.CompanyOrgId;
   const { errors } = methods.formState;
-  const error =
+  const transporterError =
     typeof index === "number"
       ? errors?.[fieldName]?.[index]
       : errors?.[fieldName];
-
-  console.log(errors);
+  console.log(`error in ${fullFieldName}`, transporterError);
   return (
-    <div className="fr-col">
+    <div className="fr-container fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-8 fr-mb-2w">
           <Select
@@ -85,24 +84,31 @@ export function TransporterForm({
                   `${fullFieldName}.CompanyCountryCode`,
                   company.codePaysEtrangerEtablissement || "FR"
                 );
-                methods.setValue(
-                  `${fullFieldName}.RecepisseNumber`,
-                  company.transporterReceipt?.receiptNumber ?? ""
-                );
-                methods.setValue(
-                  `${fullFieldName}.RecepisseDepartment`,
-                  company.transporterReceipt?.department ?? ""
-                );
-                methods.setValue(
-                  `${fullFieldName}.RecepisseValidityLimit`,
-                  company.transporterReceipt?.validityLimit ?? ""
-                );
+                if (
+                  !transporter.RecepisseNumber &&
+                  company.transporterReceipt?.receiptNumber
+                ) {
+                  methods.setValue(
+                    `${fullFieldName}.RecepisseNumber`,
+                    company.transporterReceipt?.receiptNumber ?? ""
+                  );
+                }
               }
             }}
           />
-          {error && (
-            <Alert description={formatError(error)} severity="error" small />
-          )}
+          {transporterError?.CompanyOrgId ||
+            (transporterError?.CompanyAddress && (
+              <div className="fr-mb-2w">
+                <Alert
+                  description={formatError(
+                    transporterError?.CompanyOrgId ||
+                      transporterError?.CompanyAddress
+                  )}
+                  severity="error"
+                  small
+                />
+              </div>
+            ))}
         </>
       ) : (
         transporter?.CompanyType !== "" && (
@@ -115,8 +121,10 @@ export function TransporterForm({
                     type: "text",
                     ...methods.register(`${fullFieldName}.CompanyOrgId`)
                   }}
-                  state={error?.CompanyOrgId && "error"}
-                  stateRelatedMessage={formatError(error?.CompanyOrgId)}
+                  state={transporterError?.CompanyOrgId && "error"}
+                  stateRelatedMessage={formatError(
+                    transporterError?.CompanyOrgId
+                  )}
                 />
               </div>
             )}
@@ -130,8 +138,10 @@ export function TransporterForm({
                     type: "text",
                     ...methods.register(`${fullFieldName}.CompanyName`)
                   }}
-                  state={error?.CompanyName && "error"}
-                  stateRelatedMessage={formatError(error?.CompanyName)}
+                  state={transporterError?.CompanyName && "error"}
+                  stateRelatedMessage={formatError(
+                    transporterError?.CompanyName
+                  )}
                 />
               </div>
             )}
@@ -168,7 +178,6 @@ export function TransporterForm({
                 inputTitle={"terms"}
                 showCheckedHint={false}
                 defaultChecked={false}
-                disabled={transporter?.CompanyType !== "ETABLISSEMENT_FR"}
                 checked={controllerField.value}
                 onChange={checked => controllerField.onChange(checked)}
               />
@@ -177,22 +186,20 @@ export function TransporterForm({
         </div>
       </div>
 
-      {transporter?.CompanyType === "ETABLISSEMENT_FR" && (
-        <div className={"fr-grid-row fr-grid-row--gutters fr-mb-2w"}>
-          <div className={"fr-col-12"}>
-            <Input
-              label={"Numéro de récépissé"}
-              disabled={transporter?.RecepisseIsExempted}
-              nativeInputProps={{
-                type: "text",
-                ...methods.register(`${fullFieldName}.RecepisseNumber`)
-              }}
-              state={error?.RecepisseNumber && "error"}
-              stateRelatedMessage={formatError(error?.RecepisseNumber)}
-            />
-          </div>
+      <div className={"fr-grid-row fr-grid-row--gutters fr-mb-2w"}>
+        <div className={"fr-col-12"}>
+          <Input
+            label={"Numéro de récépissé"}
+            disabled={transporter?.RecepisseIsExempted}
+            nativeInputProps={{
+              type: "text",
+              ...methods.register(`${fullFieldName}.RecepisseNumber`)
+            }}
+            state={transporterError?.RecepisseNumber && "error"}
+            stateRelatedMessage={formatError(transporterError?.RecepisseNumber)}
+          />
         </div>
-      )}
+      </div>
 
       <div className={"fr-grid-row fr-grid-row--gutters fr-mb-2w"}>
         <div className={"fr-col-12"}>
@@ -202,8 +209,8 @@ export function TransporterForm({
               ...methods.register(`${fullFieldName}.TransportMode`)
             }}
             disabled={false}
-            state={error?.TransportMode && "error"}
-            stateRelatedMessage={formatError(error?.TransportMode)}
+            state={transporterError?.TransportMode && "error"}
+            stateRelatedMessage={formatError(transporterError?.TransportMode)}
           >
             <option value="ROAD">Route</option>
             <option value="AIR">Voie aérienne</option>

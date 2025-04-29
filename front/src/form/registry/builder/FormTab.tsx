@@ -34,6 +34,9 @@ export function FormTab({ fields, methods }: Props) {
                 label={label}
                 nativeInputProps={{
                   type: field.type,
+                  ...(field.type === "date" && {
+                    max: new Date().toISOString().split("T")[0]
+                  }),
                   ...methods.register(field.name)
                 }}
                 disabled={field.disabled}
@@ -51,12 +54,18 @@ export function FormTab({ fields, methods }: Props) {
               <Select
                 label={label}
                 nativeSelectProps={{
-                  ...methods.register(field.name)
+                  ...methods.register(field.name),
+                  ...(field.defaultOption && { defaultValue: "" })
                 }}
                 disabled={field.disabled}
                 state={errors?.[field.name] && "error"}
                 stateRelatedMessage={formatError(errors?.[field.name])}
               >
+                {field.defaultOption && (
+                  <option value={""} disabled hidden>
+                    {field.defaultOption}
+                  </option>
+                )}
                 {field.choices?.map(choice => (
                   <option key={choice.value} value={choice.value}>
                     {choice.label}

@@ -249,7 +249,10 @@ export const makeSearchCompanies =
         if (!resultsInsee) {
           return [];
         }
-        const orgIds = resultsInsee.map(r => r.siret as string);
+        const activeResultsInsee = resultsInsee.filter(
+          r => r.etatAdministratif === "A"
+        );
+        const orgIds = activeResultsInsee.map(r => r.siret as string);
         // Initialize an object with all orgIds set to null
         const companies = orgIds.reduce((acc, id) => {
           acc[id] = null;
@@ -267,7 +270,7 @@ export const makeSearchCompanies =
           companies[org.orgId] = org;
         });
 
-        return resultsInsee.map(companyInsee => ({
+        return activeResultsInsee.map(companyInsee => ({
           ...(companies[companyInsee.siret!]
             ? mergeCompanyToCompanySearchResult(
                 companyInsee.siret!,

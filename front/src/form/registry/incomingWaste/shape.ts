@@ -9,7 +9,8 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray
+  filteredArray,
+  optionalBooleanString
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { InseeCodes } from "../common/InseeCodes";
@@ -108,7 +109,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Déchet dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: booleanString
+          wasteIsDangerous: optionalBooleanString
         }
       },
       {
@@ -156,34 +157,13 @@ export const incomingWasteFormShape: FormShape = [
           label: "producteur"
         },
         validation: {
-          initialEmitterCompanyType: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyOrgId: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyName: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyAddress: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyPostalCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyCity: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          initialEmitterCompanyCountryCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null)
+          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyOrgId: optionalString,
+          initialEmitterCompanyName: optionalString,
+          initialEmitterCompanyAddress: optionalString,
+          initialEmitterCompanyPostalCode: optionalString,
+          initialEmitterCompanyCity: optionalString,
+          initialEmitterCompanyCountryCode: optionalString
         },
         shape: "custom",
         names: [
@@ -221,34 +201,13 @@ export const incomingWasteFormShape: FormShape = [
           label: "expéditeur"
         },
         validation: {
-          emitterCompanyType: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyOrgId: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyName: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyAddress: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyPostalCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyCity: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterCompanyCountryCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null)
+          emitterCompanyType: nonEmptyString,
+          emitterCompanyOrgId: optionalString,
+          emitterCompanyName: optionalString,
+          emitterCompanyAddress: optionalString,
+          emitterCompanyPostalCode: optionalString,
+          emitterCompanyCity: optionalString,
+          emitterCompanyCountryCode: optionalString
         },
         shape: "custom",
         names: [
@@ -387,6 +346,7 @@ export const incomingWasteFormShape: FormShape = [
             type: "select",
             label: "Code de traitement réalisé",
             required: true,
+            defaultOption: "Sélectionnez un traitement",
             validation: {
               operationCode: nonEmptyString
             },
@@ -401,6 +361,7 @@ export const incomingWasteFormShape: FormShape = [
             shape: "generic",
             type: "select",
             label: "Mode de traitement",
+            defaultOption: "Sélectionnez un mode",
             required: false,
             validation: {
               operationMode: optionalString
@@ -426,7 +387,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Rupture de traçabilité autorisée",
         required: false,
         validation: {
-          noTraceability: booleanString
+          noTraceability: optionalBooleanString
         }
       },
       {
@@ -473,7 +434,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Approvisionnement direct (pipeline, convoyeur)",
         required: false,
         validation: {
-          isDirectSupply: booleanString
+          isDirectSupply: optionalBooleanString
         }
       }
     ]
@@ -491,7 +452,7 @@ export const incomingWasteFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: z.boolean().optional(),
+              RecepisseIsExempted: optionalBooleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

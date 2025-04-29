@@ -4,6 +4,8 @@ import { TransporterForm } from "./TransporterForm";
 import { TransportMode } from "@td/codegen-ui";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
+import { formatError } from "../../builder/error";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 type TransporterSelectorProps = {
   methods: UseFormReturn<any>;
@@ -41,7 +43,7 @@ export function TransporterSelector({
     control: methods.control,
     name: `transporter`
   });
-
+  const { errors } = methods.formState;
   // Le fonctionnement du groupe d'accordéons fait qu'un seul à la fois
   // peut être déplié. Cette variable permet d'enregistrer l'index du transporteur
   // qui doit être déplié. Si null, tous les accordéons sont repliés.
@@ -61,19 +63,32 @@ export function TransporterSelector({
     <div className="fr-col">
       {title && <h4 className="fr-h4">{title}</h4>}
       {transporterFields.length === 0 && (
-        <Button
-          type="button"
-          className="transporter__header__button"
-          priority="secondary"
-          iconPosition="right"
-          iconId="ri-add-line"
-          title="Ajouter"
-          onClick={() => {
-            insertNewTransporter(0);
-          }}
-        >
-          Ajouter
-        </Button>
+        <>
+          <Button
+            type="button"
+            className="transporter__header__button"
+            priority="secondary"
+            iconPosition="right"
+            iconId="ri-add-line"
+            title="Ajouter"
+            onClick={() => {
+              insertNewTransporter(0);
+            }}
+          >
+            Ajouter
+          </Button>
+          {errors?.transporter?.[0]?.CompanyOrgId && (
+            <div className="fr-mt-2w">
+              <Alert
+                description={formatError(
+                  errors?.transporter?.[0]?.CompanyOrgId
+                )}
+                severity="error"
+                small
+              />
+            </div>
+          )}
+        </>
       )}
       {transporterFields.map((field, index) => {
         // Désactive le bouton permettant de remonter le transporteur dans
