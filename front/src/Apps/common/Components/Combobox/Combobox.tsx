@@ -8,6 +8,7 @@ type Props = {
   children: ReactNode | ((props: { close: () => void }) => ReactNode);
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  autoWidth?: boolean;
 };
 
 /*
@@ -25,7 +26,8 @@ export function ComboBox({
   triggerRef,
   children,
   isOpen,
-  onOpenChange
+  onOpenChange,
+  autoWidth
 }: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: (e: MouseEvent | TouchEvent) => {
@@ -57,7 +59,9 @@ export function ComboBox({
     const dropdownWidth = parentRect.width;
 
     targetRef.current.style.left = `${dropdownLeft}px`;
-    targetRef.current.style.width = `${dropdownWidth}px`;
+    if (!autoWidth) {
+      targetRef.current.style.width = `${dropdownWidth}px`;
+    }
 
     // Calculate max height based on available space and substract 20 for good measure
     const maxHeight = Math.max(spaceBelow, spaceAbove) - 20;
@@ -89,7 +93,7 @@ export function ComboBox({
           border: "1px solid #ccc",
           zIndex: 1000,
           boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          overflow: "scroll",
+          overflow: "auto",
           height: "auto"
         }}
       >
