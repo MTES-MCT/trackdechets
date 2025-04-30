@@ -91,6 +91,7 @@ export function SignWork({
                     familyCode: "",
                     materialName: "",
                     adr: "",
+                    nonRoadRegulationMention: "",
                     consistence: BsdaConsistence.Solide,
                     sealNumbers: []
                   },
