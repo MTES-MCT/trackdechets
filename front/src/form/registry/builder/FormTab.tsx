@@ -107,6 +107,16 @@ export function FormTab({ fields, methods }: Props) {
   return (
     <div>
       {fields.map((field, index) => {
+        const fieldValues =
+          field.shape === "custom"
+            ? methods.watch(field.names)
+            : field.shape === "layout"
+            ? null
+            : methods.watch(field.name);
+        const infoText =
+          typeof field.infoText === "function"
+            ? field.infoText(fieldValues)
+            : field.infoText;
         return (
           <div className="fr-mb-2w" key={index}>
             <div
@@ -117,9 +127,9 @@ export function FormTab({ fields, methods }: Props) {
             >
               {renderField(field, index)}
             </div>
-            {field.infoText && (
+            {infoText && (
               <div className="fr-mt-5v">
-                <Alert description={field.infoText} severity="info" small />
+                <Alert description={infoText} severity="info" small />
               </div>
             )}
           </div>

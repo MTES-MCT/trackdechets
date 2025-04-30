@@ -14,7 +14,7 @@ export type FormShapeField =
       validation: Record<string, z.ZodType>;
       defaultOption?: string;
       choices?: { label: string; value: string | number }[];
-      infoText?: string;
+      infoText?: string | ((fieldValues: any) => string | null);
     }
   | {
       props?: Record<string, any>;
@@ -27,7 +27,7 @@ export type FormShapeField =
         props?: Record<string, any>;
         methods: UseFormReturn<any>;
       }>;
-      infoText?: string;
+      infoText?: string | ((fieldValues: any) => string | null);
     }
   | {
       shape: "layout";

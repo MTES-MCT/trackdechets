@@ -1,5 +1,6 @@
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
+  ADMINISTRATIVE_ACT_EXPLANATIONS,
   SSD_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import { FormShape } from "../builder/types";
@@ -8,7 +9,6 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
-import { z } from "zod";
 import {
   nonEmptyString,
   optionalString,
@@ -46,35 +46,6 @@ export const ssdFormShape: FormShape = [
           reportAsCompanySiret: optionalString
         },
         shape: "custom"
-      },
-      {
-        shape: "layout",
-        fields: [
-          {
-            name: "useDate",
-            shape: "generic",
-            label: "Date d'utilisation",
-            required: true,
-            validation: {
-              useDate: optionalString
-            },
-            type: "date",
-            style: { className: "fr-col-4" }
-          },
-          {
-            name: "dispatchDate",
-            shape: "generic",
-            label: "Date d'expédition",
-            required: true,
-            validation: {
-              dispatchDate: optionalString
-            },
-            type: "date",
-            style: { className: "fr-col-4" }
-          }
-        ],
-        infoText:
-          "Merci de renseigner une date d'utilisation ou une date d'expédition"
       }
     ]
   },
@@ -122,7 +93,13 @@ export const ssdFormShape: FormShape = [
           secondaryWasteCodes: filteredArray,
           secondaryWasteDescriptions: filteredArray
         }
-      },
+      }
+    ]
+  },
+  {
+    tabId: "processing",
+    tabTitle: "Traitement",
+    fields: [
       {
         name: "product",
         shape: "generic",
@@ -143,13 +120,36 @@ export const ssdFormShape: FormShape = [
           volume: optionalNumber,
           weightIsEstimate: booleanString
         }
-      }
-    ]
-  },
-  {
-    tabId: "processing",
-    tabTitle: "Traitement",
-    fields: [
+      },
+      {
+        shape: "layout",
+        fields: [
+          {
+            name: "useDate",
+            shape: "generic",
+            label: "Date d'utilisation",
+            required: true,
+            validation: {
+              useDate: optionalString
+            },
+            type: "date",
+            style: { className: "fr-col-4" }
+          },
+          {
+            name: "dispatchDate",
+            shape: "generic",
+            label: "Date d'expédition",
+            required: true,
+            validation: {
+              dispatchDate: optionalString
+            },
+            type: "date",
+            style: { className: "fr-col-4" }
+          }
+        ],
+        infoText:
+          "Merci de renseigner une date d'utilisation ou une date d'expédition"
+      },
       {
         shape: "layout",
         fields: [
@@ -223,6 +223,7 @@ export const ssdFormShape: FormShape = [
         shape: "generic",
         type: "select",
         label: "Référence de l'acte administratif",
+        defaultOption: "Sélectionnez une référence",
         required: true,
         validation: {
           administrativeActReference: nonEmptyString
@@ -231,7 +232,13 @@ export const ssdFormShape: FormShape = [
         choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
           label: reference,
           value: reference
-        }))
+        })),
+        infoText: (selectedAct: string | null) => {
+          if (selectedAct) {
+            return ADMINISTRATIVE_ACT_EXPLANATIONS[selectedAct];
+          }
+          return null;
+        }
       }
     ]
   },
