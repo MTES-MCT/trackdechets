@@ -129,7 +129,7 @@ export function StatsTab({ source, siret }: Props) {
             <Stat value={stats?.edited} label="Corrigées" />
             <Stat value={stats?.cancelled} label="Annulées" />
           </div>
-          <div className="tw-flex">
+          <div className="tw-flex tw-flex-wrap">
             <Stat value={stats?.ssd} label="SSD" />
             <Stat value={stats?.incomingWaste} label="D et ND entrants" />
             <Stat value={stats?.outgoingWaste} label="D et ND sortants" />

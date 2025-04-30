@@ -171,7 +171,6 @@ export function FileImportsTable({ siret }: Props) {
           data={tableData}
           headers={HEADERS}
           caption="Déclarations par fichiers"
-          fixed
         />
       )}
     </div>

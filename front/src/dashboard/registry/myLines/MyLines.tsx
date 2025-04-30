@@ -154,7 +154,7 @@ export function MyLines() {
             primary
           />
         </div>
-        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-4w">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-4w">
           <div className="fr-col-7">
             <RegistryCompanySwitcher
               wrapperClassName={""}
@@ -163,7 +163,7 @@ export function MyLines() {
           </div>
         </div>
 
-        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-2w">
           <div className="fr-col-7">
             <Select
               label="Type de déclaration"
@@ -198,7 +198,7 @@ export function MyLines() {
               <option value={RegistryImportType.Managed}>Gérés</option>
             </Select>
           </div>
-          <div className="fr-col-3">
+          <div className="fr-col-3 fr-ml-3w">
             <Input
               label="Numéro unique"
               nativeInputProps={{

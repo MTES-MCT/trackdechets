@@ -1,7 +1,6 @@
 import React from "react";
 
 import Table from "@codegouvfr/react-dsfr/Table";
-import styles from "./RegistryTable.module.scss";
 
 const RegistryTable = ({
   data,
@@ -18,7 +17,6 @@ const RegistryTable = ({
     <Table
       bordered
       noCaption={!caption}
-      className={styles.fullWidthTable}
       data={data}
       headers={headers}
       caption={caption}
