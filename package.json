@@ -120,6 +120,7 @@
     "graphql-tag": "^2.12.6",
     "graylog2": "^0.2.1",
     "helmet": "^6.2.0",
+    "i18next": "^24.2.3",
     "inspector-api": "^1.4.7",
     "ioredis": "^4.28.0",
     "jose": "^4.11.2",
@@ -178,6 +179,7 @@
     "xstate": "^4.37.0",
     "yup": "^0.32.11",
     "zod": "^3.21.4",
+    "zod-i18n-map": "^2.27.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

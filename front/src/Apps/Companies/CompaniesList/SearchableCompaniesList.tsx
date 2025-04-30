@@ -144,7 +144,7 @@ export default function SearchableCompaniesList({
     return (
       <div className="fr-container--fluid">
         <div className="fr-grid-row mb-4w fr-grid-row--bottom">
-          <div className="fr-col-12">
+          <div className="fr-col-12 fr-p-1w">
             <div
               className="fr-search-bar fr-search-bar--lg"
               id="companies-search"

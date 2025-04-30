@@ -8,6 +8,19 @@ import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";
 import { FeatureFlagsProvider } from "./common/contexts/FeatureFlagsContext";
 import { PermissionsProvider } from "./common/contexts/PermissionsContext";
+import i18next from "i18next";
+import { z } from "zod";
+import { zodI18nMap } from "zod-i18n-map";
+import translation from "zod-i18n-map/locales/fr/zod.json";
+
+// Zod in FR
+i18next.init({
+  lng: "fr",
+  resources: {
+    fr: { zod: translation }
+  }
+});
+z.setErrorMap(zodI18nMap);
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary
