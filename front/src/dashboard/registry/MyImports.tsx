@@ -23,6 +23,8 @@ import {
   TYPES
 } from "./shared";
 import RegistryTable from "./RegistryTable";
+import { useMedia } from "../../common/use-media";
+import { MEDIA_QUERIES } from "../../common/config";
 
 const HEADERS = [
   "Importé le",
@@ -142,6 +144,8 @@ export function MyImports() {
       )
     ]) ?? [];
 
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
   return (
     <>
       <>
@@ -206,7 +210,11 @@ export function MyImports() {
                   </Button>
                 </div>
               </div>
-              <RegistryTable data={tableData} headers={HEADERS} />
+              <RegistryTable
+                data={tableData}
+                headers={HEADERS}
+                fixed={!isMobile}
+              />
             </div>
             <div className="tw-flex tw-justify-center">
               <Pagination
