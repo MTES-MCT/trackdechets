@@ -54,3 +54,16 @@ type FormShapeItemWithState = FormShapeItem & {
 export type FormShape = FormShapeItemWithState[];
 
 export type FormShapeWithState = FormShapeItemWithState[];
+
+export type FormTransporter = {
+  TransportMode: TransportMode;
+  CompanyType: RegistryCompanyType;
+  CompanyOrgId?: string;
+  RecepisseIsExempted?: boolean;
+  RecepisseNumber?: string;
+  CompanyName?: string;
+  CompanyAddress?: string;
+  CompanyPostalCode?: string;
+  CompanyCity?: string;
+  CompanyCountryCode?: string;
+};

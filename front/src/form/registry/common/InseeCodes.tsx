@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
+import { formatError } from "../builder/error";
 
 type Props = {
   prefix: string;
@@ -19,7 +20,8 @@ export function InseeCodes({ methods, disabled, prefix, title }: Props) {
     control: methods.control,
     name: `${prefix}MunicipalitiesInseeCodes`
   });
-
+  const { errors } = methods.formState;
+  const inseeCodeErrors = errors?.[`${prefix}MunicipalitiesInseeCodes`];
   return (
     <div className="fr-col">
       {title && <h4 className="fr-h4">{title}</h4>}
@@ -39,6 +41,11 @@ export function InseeCodes({ methods, disabled, prefix, title }: Props) {
                     `${prefix}MunicipalitiesInseeCodes.${index}`
                   )
                 }}
+                state={inseeCodeErrors && inseeCodeErrors[index] && "error"}
+                stateRelatedMessage={
+                  inseeCodeErrors?.[index] &&
+                  formatError(inseeCodeErrors[index])
+                }
               />
             </div>
             <div className="fr-col-4">

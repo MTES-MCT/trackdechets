@@ -21,7 +21,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 
-export const incomingWasteFormShape: FormShape = [
+export const outgoingWasteFormShape: FormShape = [
   {
     tabId: "declaration",
     tabTitle: "Déclaration",
@@ -40,7 +40,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         Component: ReportFor,
         props: {
-          reportForLabel: "SIRET du destinataire",
+          reportForLabel: "SIRET de l'expéditeur ou du détenteur",
           reportAsLabel: "SIRET du déclarant"
         },
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
@@ -109,25 +109,14 @@ export const incomingWasteFormShape: FormShape = [
         }
       },
       {
-        name: "receptionDate",
+        name: "dispatchDate",
         shape: "generic",
-        label: "Date de réception",
+        label: "Date d'expédition",
         required: true,
         validation: {
-          receptionDate: nonEmptyString
+          dispatchDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-4" }
-      },
-      {
-        name: "weighingHour",
-        shape: "generic",
-        label: "Heure de pesée",
-        required: false,
-        validation: {
-          weighingHour: optionalString
-        },
-        type: "time",
         style: { className: "fr-col-4" }
       },
       {
@@ -191,52 +180,26 @@ export const incomingWasteFormShape: FormShape = [
     tabTitle: "Expéditeur",
     fields: [
       {
-        Component: CompanySelector,
-        props: {
-          prefix: "emitter",
-          label: "expéditeur"
-        },
-        validation: {
-          emitterCompanyType: nonEmptyString,
-          emitterCompanyOrgId: optionalString,
-          emitterCompanyName: optionalString,
-          emitterCompanyAddress: optionalString,
-          emitterCompanyPostalCode: optionalString,
-          emitterCompanyCity: optionalString,
-          emitterCompanyCountryCode: optionalString
-        },
-        shape: "custom",
-        names: [
-          "emitterCompanyType",
-          "emitterCompanyOrgId",
-          "emitterCompanyName",
-          "emitterCompanyAddress",
-          "emitterCompanyPostalCode",
-          "emitterCompanyCity",
-          "emitterCompanyCountryCode"
-        ]
-      },
-      {
         Component: Address,
         props: {
-          prefix: "emitterPickupSite",
+          prefix: "reportForPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte"
+          title: "Chantier ou lieu de collecte de l'expéditeur ou du détenteur"
         },
         validation: {
-          emitterPickupSiteName: optionalString,
-          emitterPickupSiteAddress: optionalString,
-          emitterPickupSitePostalCode: optionalString,
-          emitterPickupSiteCity: optionalString,
-          emitterPickupSiteCountryCode: optionalString
+          reportForPickupSiteName: optionalString,
+          reportForPickupSiteAddress: optionalString,
+          reportForPickupSitePostalCode: optionalString,
+          reportForPickupSiteCity: optionalString,
+          reportForPickupSiteCountryCode: optionalString
         },
         shape: "custom",
         names: [
-          "emitterPickupSiteName",
-          "emitterPickupSiteAddress",
-          "emitterPickupSitePostalCode",
-          "emitterPickupSiteCity",
-          "emitterPickupSiteCountryCode"
+          "reportForPickupSiteName",
+          "reportForPickupSiteAddress",
+          "reportForPickupSitePostalCode",
+          "reportForPickupSiteCity",
+          "reportForPickupSiteCountryCode"
         ]
       }
     ]
@@ -362,22 +325,12 @@ export const incomingWasteFormShape: FormShape = [
         ]
       },
       {
-        name: "noTraceability",
+        name: "gistridNumber",
         shape: "generic",
-        type: "checkbox",
-        label: "Rupture de traçabilité autorisée",
+        label: "Numéro de notification ou de déclaration GISTRID",
         required: false,
         validation: {
-          noTraceability: optionalBooleanString
-        }
-      },
-      {
-        name: "ttdImportNumber",
-        shape: "generic",
-        label: "Numéro de notification ou de déclaration d'import",
-        required: false,
-        validation: {
-          ttdImportNumber: optionalString
+          gistridNumber: optionalString
         },
         type: "text",
         style: { className: "fr-col-10" }
@@ -394,21 +347,6 @@ export const incomingWasteFormShape: FormShape = [
         style: { className: "fr-col-10" }
       },
       {
-        name: "nextOperationCode",
-        shape: "generic",
-        type: "select",
-        label: "Code de traitement ultérieur prévu",
-        required: false,
-        validation: {
-          nextOperationCode: optionalString
-        },
-        style: { className: "fr-col-4" },
-        choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-          label: code,
-          value: code
-        }))
-      },
-      {
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
@@ -417,6 +355,59 @@ export const incomingWasteFormShape: FormShape = [
         validation: {
           isDirectSupply: optionalBooleanString
         }
+      }
+    ]
+  },
+  {
+    tabId: "destination",
+    tabTitle: "Destinataire",
+    fields: [
+      {
+        Component: CompanySelector,
+        props: {
+          prefix: "destination",
+          label: "destination"
+        },
+        validation: {
+          destinationCompanyType: nonEmptyString,
+          destinationCompanyOrgId: optionalString,
+          destinationCompanyName: optionalString,
+          destinationCompanyAddress: optionalString,
+          destinationCompanyPostalCode: optionalString,
+          destinationCompanyCity: optionalString,
+          destinationCompanyCountryCode: optionalString
+        },
+        shape: "custom",
+        names: [
+          "destinationCompanyType",
+          "destinationCompanyOrgId",
+          "destinationCompanyName",
+          "destinationCompanyAddress",
+          "destinationCompanyPostalCode",
+          "destinationCompanyCity",
+          "destinationCompanyCountryCode"
+        ]
+      },
+      {
+        Component: Address,
+        props: {
+          prefix: "destinationDropSite",
+          nameEnabled: false,
+          title: "Lieu de dépôt du destinataire"
+        },
+        validation: {
+          destinationDropSiteAddress: optionalString,
+          destinationDropSitePostalCode: optionalString,
+          destinationDropSiteCity: optionalString,
+          destinationDropSiteCountryCode: optionalString
+        },
+        shape: "custom",
+        names: [
+          "destinationDropSiteAddress",
+          "destinationDropSitePostalCode",
+          "destinationDropSiteCity",
+          "destinationDropSiteCountryCode"
+        ]
       }
     ]
   },

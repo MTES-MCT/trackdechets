@@ -4,7 +4,7 @@ import {
   Query,
   RegistryImportType,
   RegistryLineReason,
-  IncomingWasteLineInput
+  OutgoingWasteLineInput
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -16,20 +16,20 @@ import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
 import {
-  ADD_TO_INCOMING_WASTE_REGISTRY,
-  GET_INCOMING_WASTE_REGISTRY_LOOKUP
+  ADD_TO_OUTGOING_WASTE_REGISTRY,
+  GET_OUTGOING_WASTE_REGISTRY_LOOKUP
 } from "../queries";
-import { incomingWasteFormShape } from "./shape";
+import { outgoingWasteFormShape } from "./shape";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormTransporter } from "../builder/types";
 
 type Props = { onClose: () => void };
 
-type FormValues = IncomingWasteLineInput & {
+type FormValues = OutgoingWasteLineInput & {
   transporter: FormTransporter[];
 };
 
-export function RegistryIncomingWasteForm({ onClose }: Props) {
+export function RegistryOutgoingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
@@ -42,24 +42,24 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
-    resolver: zodResolver(schemaFromShape(incomingWasteFormShape))
+    resolver: zodResolver(schemaFromShape(outgoingWasteFormShape))
   });
 
   const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_INCOMING_WASTE_REGISTRY_LOOKUP,
+    GET_OUTGOING_WASTE_REGISTRY_LOOKUP,
     {
       variables: {
-        type: RegistryImportType.IncomingWaste,
+        type: RegistryImportType.OutgoingWaste,
         publicId: queryParams.get("publicId"),
         siret: queryParams.get("siret")
       },
       skip: !queryParams.get("publicId") || !queryParams.get("siret"),
       fetchPolicy: "network-only",
       onCompleted: data => {
-        if (data?.registryLookup?.incomingWaste) {
+        if (data?.registryLookup?.outgoingWaste) {
           const transportersObj: Record<string, Partial<FormTransporter>> = {};
-          const definedIncomingWasteProps = Object.fromEntries(
-            Object.entries(data.registryLookup.incomingWaste).filter(
+          const definedOutgoingWasteProps = Object.fromEntries(
+            Object.entries(data.registryLookup.outgoingWaste).filter(
               ([key, value]) => {
                 if (key.startsWith("transporter")) {
                   const [_, transporterNum, field] =
@@ -76,7 +76,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
                 return value != null;
               }
             )
-          ) as IncomingWasteLineInput;
+          ) as OutgoingWasteLineInput;
 
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
@@ -88,9 +88,9 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
-            ...definedIncomingWasteProps,
-            receptionDate: isoDateToHtmlDate(
-              definedIncomingWasteProps.receptionDate
+            ...definedOutgoingWasteProps,
+            dispatchDate: isoDateToHtmlDate(
+              definedOutgoingWasteProps.dispatchDate
             ),
             reason: RegistryLineReason.Edit,
             transporter: transporters
@@ -101,9 +101,9 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
     }
   );
 
-  const [addToIncomingWasteRegistry, { loading }] = useMutation<
-    Pick<Mutation, "addToIncomingWasteRegistry">
-  >(ADD_TO_INCOMING_WASTE_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
+  const [addToOutgoingWasteRegistry, { loading }] = useMutation<
+    Pick<Mutation, "addToOutgoingWasteRegistry">
+  >(ADD_TO_OUTGOING_WASTE_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
@@ -129,14 +129,14 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       )
     };
 
-    const result = await addToIncomingWasteRegistry({
+    const result = await addToOutgoingWasteRegistry({
       variables: {
         lines: [flattenedData]
       }
     });
 
     const shouldCloseModal = handleMutationResponse(
-      result.data?.addToIncomingWasteRegistry,
+      result.data?.addToOutgoingWasteRegistry,
       methods
     );
 
@@ -149,9 +149,9 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
     <Loader />
   ) : (
     <FormBuilder
-      registryType={RegistryImportType.IncomingWaste}
+      registryType={RegistryImportType.OutgoingWaste}
       methods={methods}
-      shape={incomingWasteFormShape}
+      shape={outgoingWasteFormShape}
       onSubmit={onSubmit}
       loading={loading}
       disabledFieldNames={disabledFieldNames}

@@ -30,7 +30,6 @@ export function TransporterForm({
     typeof index === "number"
       ? errors?.[fieldName]?.[index]
       : errors?.[fieldName];
-  console.log(`error in ${fullFieldName}`, transporterError);
   return (
     <div className="fr-container fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">

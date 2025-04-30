@@ -100,8 +100,8 @@ export const TYPES: { [key in RegistryImportType]: string } = {
 export const TYPES_ROUTES: { [key in RegistryImportType]: string } = {
   SSD: routes.registry_new.form.ssd,
   INCOMING_WASTE: routes.registry_new.form.incomingWaste,
-  OUTGOING_WASTE: routes.registry_new.form.incomingTexs,
-  INCOMING_TEXS: routes.registry_new.form.outgoingWaste,
+  INCOMING_TEXS: routes.registry_new.form.incomingTexs,
+  OUTGOING_WASTE: routes.registry_new.form.outgoingWaste,
   OUTGOING_TEXS: routes.registry_new.form.outgoingTexs,
   TRANSPORTED: routes.registry_new.form.transported,
   MANAGED: routes.registry_new.form.managed
