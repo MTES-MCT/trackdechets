@@ -24,6 +24,8 @@ import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import Pagination from "@codegouvfr/react-dsfr/Pagination";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import RegistryTable from "./RegistryTable";
+import { useMedia } from "../../common/use-media";
+import { MEDIA_QUERIES } from "../../common/config";
 
 const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
   switch (registryType) {
@@ -252,6 +254,8 @@ export function MyExports() {
       : [];
   }, [registryExports, downloadLoadingExportId, downloadRegistryExportFile]);
 
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
   return (
     <>
       <>
@@ -314,6 +318,7 @@ export function MyExports() {
                 "Période",
                 "Fichier"
               ]}
+              fixed={!isMobile}
             />
           ) : (
             <InlineLoader />
