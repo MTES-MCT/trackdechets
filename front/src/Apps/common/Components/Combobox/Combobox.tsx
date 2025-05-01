@@ -95,7 +95,7 @@ export function ComboBox({
 
     // --- Horizontal Positioning ---
     let dropdownLeft = parentRect.left + scrollX;
-    let dropdownWidth = parentRect.width; // Default width for non-autoWidth
+    const dropdownWidth = parentRect.width; // Default width for non-autoWidth
 
     // Reset width/maxWidth first
     targetElement.style.width = "auto";

@@ -1,15 +1,26 @@
 import { prisma } from "@td/prisma";
 import { ttlCache } from "./ttlCache";
-import { Company } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
+
+const companyWithTransporterReceipt =
+  Prisma.validator<Prisma.CompanyDefaultArgs>()({
+    include: { transporterReceipt: true }
+  });
+type CompanyWithTransporterReceipt = Prisma.CompanyGetPayload<
+  typeof companyWithTransporterReceipt
+>;
 
 export async function getCachedCompany(siret: string) {
-  const cachedValue = ttlCache.get<Company>(siret);
+  const cachedValue = ttlCache.get<CompanyWithTransporterReceipt>(siret);
   if (cachedValue) {
     return cachedValue;
   }
 
   const company = await prisma.company.findUnique({
-    where: { orgId: siret }
+    where: { orgId: siret },
+    include: {
+      transporterReceipt: true
+    }
   });
 
   if (!company) {
