@@ -16,6 +16,14 @@ type TransporterFormProps = {
   methods: UseFormReturn<any>;
 };
 
+export const TRANSPORT_MODES = [
+  { label: "Route", value: "ROAD" },
+  { label: "Voie aérienne", value: "AIR" },
+  { label: "Voie ferrée", value: "RAIL" },
+  { label: "Voie fluviale", value: "RIVER" },
+  { label: "Voie maritime", value: "SEA" }
+];
+
 export function TransporterForm({
   fieldName,
   index,
@@ -211,11 +219,11 @@ export function TransporterForm({
             state={transporterError?.TransportMode && "error"}
             stateRelatedMessage={formatError(transporterError?.TransportMode)}
           >
-            <option value="ROAD">Route</option>
-            <option value="AIR">Voie aérienne</option>
-            <option value="RAIL">Voie ferrée</option>
-            <option value="RIVER">Voie fluviale</option>
-            <option value="SEA">Voie maritime</option>
+            {TRANSPORT_MODES.map(({ label, value }) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
           </Select>
         </div>
       </div>

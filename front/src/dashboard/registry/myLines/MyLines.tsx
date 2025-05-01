@@ -177,17 +177,17 @@ export function MyLines() {
                 title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
                 route: generatePath(routes.registry_new.form.outgoingWaste),
                 state: { background: location }
-              }
+              },
               // {
               //   title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
               //   route: generatePath(routes.registry_new.form.outgoingTexs),
               //   state: { background: location }
               // },
-              // {
-              //   title: REGISTRY_NAMES[RegistryImportType.Transported],
-              //   route: generatePath(routes.registry_new.form.transported),
-              //   state: { background: location }
-              // },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.Transported],
+                route: generatePath(routes.registry_new.form.transported),
+                state: { background: location }
+              }
               // {
               //   title: REGISTRY_NAMES[RegistryImportType.Managed],
               //   route: generatePath(routes.registry_new.form.managed),

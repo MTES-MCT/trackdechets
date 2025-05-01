@@ -5,6 +5,7 @@ import { RegistrySsdForm } from "../../../form/registry/ssd/RegistrySsdForm";
 import { RegistryIncomingTexsForm } from "../../../form/registry/incomingTexs/RegistryIncomingTexsForm";
 import { RegistryIncomingWasteForm } from "../../../form/registry/incomingWaste/RegistryIncomingWasteForm";
 import { RegistryOutgoingWasteForm } from "../../../form/registry/outgoingWaste/RegistryOutgoingWasteForm";
+import { RegistryTransportedForm } from "../../../form/registry/transported/RegistryTransportedForm";
 export function FormContainer({
   onClose,
   type
@@ -38,6 +39,8 @@ function getFormComponent(type: RegistryImportType) {
       return RegistryIncomingWasteForm;
     case RegistryImportType.OutgoingWaste:
       return RegistryOutgoingWasteForm;
+    case RegistryImportType.Transported:
+      return RegistryTransportedForm;
     default:
       throw new Error("Unknown form type");
   }

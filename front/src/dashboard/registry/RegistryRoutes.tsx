@@ -132,6 +132,15 @@ export default function RegistryRoutes() {
                 />
               }
             />
+            <Route
+              path={toRelative(routes.registry_new.form.transported)}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.Transported}
+                />
+              }
+            />
           </Routes>
         )}
       </div>

@@ -285,6 +285,85 @@ export const GET_OUTGOING_WASTE_REGISTRY_LOOKUP = gql`
   }
 `;
 
+export const GET_TRANSPORTED_REGISTRY_LOOKUP = gql`
+  query GetTransportedRegistryLookup(
+    $siret: String!
+    $type: RegistryImportType!
+    $publicId: ID!
+  ) {
+    registryLookup(siret: $siret, type: $type, publicId: $publicId) {
+      publicId
+      transportedWaste {
+        publicId
+
+        reportAsCompanySiret
+
+        reportForCompanySiret
+        reportForTransportMode
+        reportForTransportIsWaste
+        reportForRecepisseIsExempted
+        reportForRecepisseNumber
+        reportForTransportAdr
+        reportForTransportOtherTmdCode
+        reportForTransportPlates
+
+        wasteDescription
+        wasteCode
+        wasteCodeBale
+        wastePop
+        wasteIsDangerous
+
+        collectionDate
+        unloadingDate
+        weightValue
+        weightIsEstimate
+        volume
+
+        emitterCompanyType
+        emitterCompanyOrgId
+        emitterCompanyName
+        emitterCompanyAddress
+        emitterCompanyPostalCode
+        emitterCompanyCity
+        emitterCompanyCountryCode
+
+        emitterPickupSiteName
+        emitterPickupSiteAddress
+        emitterPickupSitePostalCode
+        emitterPickupSiteCity
+        emitterPickupSiteCountryCode
+
+        destinationCompanyType
+        destinationCompanyOrgId
+        destinationCompanyName
+        destinationCompanyAddress
+        destinationCompanyCity
+        destinationCompanyPostalCode
+        destinationCompanyCountryCode
+
+        destinationDropSiteAddress
+        destinationDropSitePostalCode
+        destinationDropSiteCity
+        destinationDropSiteCountryCode
+
+        gistridNumber
+        movementNumber
+
+        ecoOrganismeSiret
+        ecoOrganismeName
+
+        brokerCompanySiret
+        brokerCompanyName
+        brokerRecepisseNumber
+
+        traderCompanySiret
+        traderCompanyName
+        traderRecepisseNumber
+      }
+    }
+  }
+`;
+
 export const ADD_TO_SSD_REGISTRY = gql`
   mutation AddToSsdRegistry($lines: [SsdLineInput!]!) {
     addToSsdRegistry(lines: $lines) {
@@ -328,6 +407,26 @@ export const ADD_TO_INCOMING_WASTE_REGISTRY = gql`
 export const ADD_TO_OUTGOING_WASTE_REGISTRY = gql`
   mutation AddToOutgoingWasteRegistry($lines: [OutgoingWasteLineInput!]!) {
     addToOutgoingWasteRegistry(lines: $lines) {
+      stats {
+        errors
+        skipped
+        insertions
+        edits
+        cancellations
+      }
+      errors {
+        issues {
+          path
+          message
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_TO_TRANSPORTED_REGISTRY = gql`
+  mutation AddToTransportedRegistry($lines: [TransportedLineInput!]!) {
+    addToTransportedRegistry(lines: $lines) {
       stats {
         errors
         skipped
