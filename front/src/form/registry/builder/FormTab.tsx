@@ -25,6 +25,11 @@ export function FormTab({ fields, methods }: Props) {
         .join(" ");
       return (
         <>
+          {field.title && (
+            <div className="fr-col-12 fr-mt-2w">
+              <h4 className="fr-h4">{field.title}</h4>
+            </div>
+          )}
           {["text", "number", "date"].includes(field.type) && (
             <div
               className={field.style?.className ?? "fr-col-12"}

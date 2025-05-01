@@ -20,6 +20,7 @@ import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
+import { EcoOrganismes } from "../common/EcoOrganismes";
 
 export const outgoingWasteFormShape: FormShape = [
   {
@@ -148,7 +149,8 @@ export const outgoingWasteFormShape: FormShape = [
           initialEmitterCompanyAddress: optionalString,
           initialEmitterCompanyPostalCode: optionalString,
           initialEmitterCompanyCity: optionalString,
-          initialEmitterCompanyCountryCode: optionalString
+          initialEmitterCompanyCountryCode: optionalString,
+          initialEmitterMunicipalitiesInseeCodes: filteredArray
         },
         shape: "custom",
         names: [
@@ -158,7 +160,8 @@ export const outgoingWasteFormShape: FormShape = [
           "initialEmitterCompanyAddress",
           "initialEmitterCompanyPostalCode",
           "initialEmitterCompanyCity",
-          "initialEmitterCompanyCountryCode"
+          "initialEmitterCompanyCountryCode",
+          "initialEmitterMunicipalitiesInseeCodes"
         ]
       },
       {
@@ -209,11 +212,8 @@ export const outgoingWasteFormShape: FormShape = [
     tabTitle: "Intervenants",
     fields: [
       {
-        Component: FrenchCompanySelector,
+        Component: EcoOrganismes,
         props: {
-          prefix: "ecoOrganisme",
-          shortMode: true,
-          title: "Éco-organisme (optionnel)",
           reducedMargin: true
         },
         validation: {
@@ -366,7 +366,8 @@ export const outgoingWasteFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "destination",
-          label: "destination"
+          label: "destination",
+          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"]
         },
         validation: {
           destinationCompanyType: nonEmptyString,

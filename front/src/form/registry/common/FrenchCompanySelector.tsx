@@ -1,7 +1,7 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { Controller, type UseFormReturn } from "react-hook-form";
-
+import { CompanySearchResult } from "@td/codegen-ui";
 import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { formatError } from "../builder/error";
 import cn from "classnames";
@@ -63,6 +63,7 @@ export function InlineFrenchCompanySelector({
           <CompanySelectorWrapper
             selectedCompanyOrgId={selectedCompanyOrgId}
             disabled={disabled}
+            selectedCompanyError={selectedCompanyError}
             onCompanySelected={company => {
               if (company) {
                 field.onChange(company.orgId);
@@ -105,3 +106,13 @@ export function InlineFrenchCompanySelector({
     />
   );
 }
+
+const selectedCompanyError = (company: CompanySearchResult) => {
+  if (company.etatAdministratif !== "A") {
+    // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
+    // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité
+    // dans le futur, on pourra s'abstenir de gérer cette erreur.
+    return "Cet établissement est fermé";
+  }
+  return null;
+};

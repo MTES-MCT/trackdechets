@@ -16,6 +16,7 @@ import { Address } from "../common/Address";
 import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { TRANSPORT_MODES } from "../common/TransporterSelector/TransporterForm";
 import { TransporterTags } from "../common/TransporterTags";
+import { EcoOrganismes } from "../common/EcoOrganismes";
 
 export const transportedFormShape: FormShape = [
   {
@@ -151,7 +152,8 @@ export const transportedFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "emitter",
-          label: "expéditeur"
+          label: "expéditeur",
+          excludeTypes: ["COMMUNES"]
         },
         validation: {
           emitterCompanyType: nonEmptyString,
@@ -195,6 +197,29 @@ export const transportedFormShape: FormShape = [
           "emitterPickupSiteCity",
           "emitterPickupSiteCountryCode"
         ]
+      },
+      {
+        name: "gistridNumber",
+        shape: "generic",
+        title: "Transfert transfrontalier de déchets",
+        label: "Numéro de notification ou de déclaration GISTRID",
+        required: false,
+        validation: {
+          gistridNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        name: "movementNumber",
+        shape: "generic",
+        label: "Numéro de mouvement",
+        required: false,
+        validation: {
+          movementNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
       }
     ]
   },
@@ -203,11 +228,8 @@ export const transportedFormShape: FormShape = [
     tabTitle: "Intervenants",
     fields: [
       {
-        Component: FrenchCompanySelector,
+        Component: EcoOrganismes,
         props: {
-          prefix: "ecoOrganisme",
-          shortMode: true,
-          title: "Éco-organisme (optionnel)",
           reducedMargin: true
         },
         validation: {
@@ -272,34 +294,6 @@ export const transportedFormShape: FormShape = [
     ]
   },
   {
-    tabId: "operation",
-    tabTitle: "Traitement",
-    fields: [
-      {
-        name: "gistridNumber",
-        shape: "generic",
-        label: "Numéro de notification ou de déclaration GISTRID",
-        required: false,
-        validation: {
-          gistridNumber: optionalString
-        },
-        type: "text",
-        style: { className: "fr-col-10" }
-      },
-      {
-        name: "movementNumber",
-        shape: "generic",
-        label: "Numéro de mouvement",
-        required: false,
-        validation: {
-          movementNumber: optionalString
-        },
-        type: "text",
-        style: { className: "fr-col-10" }
-      }
-    ]
-  },
-  {
     tabId: "destination",
     tabTitle: "Destinataire",
     fields: [
@@ -307,7 +301,8 @@ export const transportedFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "destination",
-          label: "destination"
+          label: "destination",
+          excludeTypes: ["COMMUNES"]
         },
         validation: {
           destinationCompanyType: nonEmptyString,

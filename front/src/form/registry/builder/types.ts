@@ -1,3 +1,5 @@
+import { RegistryCompanyType } from "@td/codegen-ui";
+import { TransportMode } from "@td/codegen-ui";
 import type { ComponentType } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -9,6 +11,7 @@ export type FormShapeField =
       shape: "generic";
       style?: FieldStyle;
       type: string;
+      title?: string;
       label: string;
       required?: boolean;
       validation: Record<string, z.ZodType>;

@@ -48,11 +48,17 @@ export function TransporterForm({
               ...methods.register(`${fullFieldName}.CompanyType`)
             }}
           >
-            {Object.entries(COMPANY_TYPES).map(([key, value]) => (
-              <option value={key} key={key}>
-                {value}
-              </option>
-            ))}
+            {Object.entries(COMPANY_TYPES)
+              .filter(([key]) =>
+                index === 0
+                  ? key !== "COMMUNES"
+                  : !["COMMUNES", "PERSONNE_PHYSIQUE"].includes(key)
+              )
+              .map(([key, value]) => (
+                <option value={key} key={key}>
+                  {value}
+                </option>
+              ))}
           </Select>
         </div>
       </div>

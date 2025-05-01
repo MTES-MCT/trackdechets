@@ -12,6 +12,15 @@ type Props = {
 };
 
 export function InseeCodes({ methods, disabled, prefix, title }: Props) {
+  return (
+    <div className="fr-col">
+      {title && <h4 className="fr-h4">{title}</h4>}
+      <InlineInseeCodes methods={methods} disabled={disabled} prefix={prefix} />
+    </div>
+  );
+}
+
+export function InlineInseeCodes({ methods, disabled, prefix }: Props) {
   const {
     fields: inseeCodeFields,
     append: appendInseeCode,
@@ -23,10 +32,9 @@ export function InseeCodes({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
   const inseeCodeErrors = errors?.[`${prefix}MunicipalitiesInseeCodes`];
   return (
-    <div className="fr-col">
-      {title && <h4 className="fr-h4">{title}</h4>}
+    <>
       {inseeCodeFields.map((field, index) => (
-        <div key={field.id} className="fr-mb-2w">
+        <div key={field.id} className="fr-col-8">
           <p className="fr-mb-2v tw-text-lg tw-font-bold">
             Commune n°{index + 1}
           </p>
@@ -63,15 +71,17 @@ export function InseeCodes({ methods, disabled, prefix, title }: Props) {
         </div>
       ))}
 
-      <Button
-        type="button"
-        className="fr-mt-2v"
-        priority="secondary"
-        onClick={() => appendInseeCode("")}
-        disabled={disabled}
-      >
-        Ajouter une commune
-      </Button>
-    </div>
+      <div className="fr-col-8">
+        <Button
+          type="button"
+          className="fr-mt-2v"
+          priority="secondary"
+          onClick={() => appendInseeCode("")}
+          disabled={disabled}
+        >
+          Ajouter une commune
+        </Button>
+      </div>
+    </>
   );
 }

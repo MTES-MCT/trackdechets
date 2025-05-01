@@ -28,9 +28,10 @@ const GET_ECO_ORGANISMES = gql`
 type Props = {
   methods: UseFormReturn<any>;
   disabled?: boolean;
+  reducedMargin?: boolean;
 };
 
-export function EcoOrganismes({ methods, disabled }: Props) {
+export function EcoOrganismes({ methods, disabled, reducedMargin }: Props) {
   const { data } = useQuery(GET_ECO_ORGANISMES);
 
   const prefix = "ecoOrganisme";
@@ -48,15 +49,18 @@ export function EcoOrganismes({ methods, disabled }: Props) {
         methods={methods}
         disabled={disabled}
         shortMode={true}
+        reducedMargin={reducedMargin}
         title="Éco-organisme (optionnel)"
       />
 
       {selectedSiret && !isKnownEcoOrganisme && (
-        <Alert
-          description="Cet établissement ne figure pas dans notre liste d’éco-organismes. Il se peut qu'elle ne soit pas à jour, donc si le SIRET vous semble correct, vous pouvez l’ajouter à votre déclaration."
-          severity="warning"
-          small
-        />
+        <div className={reducedMargin ? "fr-mt-1w" : ""}>
+          <Alert
+            description="Cet établissement ne figure pas dans notre liste d’éco-organismes. Il se peut qu'elle ne soit pas à jour, donc si le SIRET vous semble correct, vous pouvez l’ajouter à votre déclaration."
+            severity="warning"
+            small
+          />
+        </div>
       )}
     </div>
   );

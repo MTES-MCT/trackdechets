@@ -251,7 +251,7 @@ export const ssdFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["PERSONNE_PHYSIQUE"]
+          excludeTypes: ["PERSONNE_PHYSIQUE", "COMMUNES"]
         },
         validation: {
           destinationCompanyType: optionalString,

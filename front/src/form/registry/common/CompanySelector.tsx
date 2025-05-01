@@ -7,6 +7,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 import { InlineAddress } from "./Address";
 import { InlineFrenchCompanySelector } from "./FrenchCompanySelector";
+import { InlineInseeCodes } from "./InseeCodes";
 
 type Props = {
   prefix: string;
@@ -21,7 +22,8 @@ export const COMPANY_TYPES = {
   ENTREPRISE_UE: "Entreprise UE",
   ENTREPRISE_HORS_UE: "Entreprise hors UE",
   ASSOCIATION: "Association",
-  PERSONNE_PHYSIQUE: "Personne physique"
+  PERSONNE_PHYSIQUE: "Personne physique",
+  COMMUNES: "Communes"
 };
 
 export function CompanySelector({
@@ -37,6 +39,16 @@ export function CompanySelector({
 
   useEffect(() => {
     if (companyType === "") {
+      methods.setValue(`${prefix}CompanyOrgId`, "");
+      methods.setValue(`${prefix}CompanyName`, "");
+      methods.setValue(`${prefix}CompanyAddress`, "");
+      methods.setValue(`${prefix}CompanyPostalCode`, "");
+      methods.setValue(`${prefix}CompanyCity`, "");
+      methods.setValue(`${prefix}CompanyCountryCode`, "");
+    }
+    if (companyType !== "COMMUNES") {
+      methods.setValue(`${prefix}MunicipalitiesInseeCodes`, []);
+    } else {
       methods.setValue(`${prefix}CompanyOrgId`, "");
       methods.setValue(`${prefix}CompanyName`, "");
       methods.setValue(`${prefix}CompanyAddress`, "");
@@ -83,38 +95,45 @@ export function CompanySelector({
       ) : (
         companyType !== "" && (
           <div className="fr-grid-row fr-grid-row--gutters">
-            {companyType !== "COMMUNES" && (
-              <div className="fr-col-8">
-                <Input
-                  label="Numéro d'identification"
-                  nativeInputProps={{
-                    type: "text",
-                    ...methods.register(`${prefix}CompanyOrgId`)
-                  }}
-                  state={errors?.[`${prefix}CompanyOrgId`] && "error"}
-                  stateRelatedMessage={formatError(
-                    errors?.[`${prefix}CompanyOrgId`]
-                  )}
-                />
-              </div>
+            {companyType !== "COMMUNES" ? (
+              <>
+                <div className="fr-col-8">
+                  <Input
+                    label="Numéro d'identification"
+                    nativeInputProps={{
+                      type: "text",
+                      ...methods.register(`${prefix}CompanyOrgId`)
+                    }}
+                    state={errors?.[`${prefix}CompanyOrgId`] && "error"}
+                    stateRelatedMessage={formatError(
+                      errors?.[`${prefix}CompanyOrgId`]
+                    )}
+                  />
+                </div>
+                {companyType !== "PERSONNE_PHYSIQUE" && (
+                  <div className="fr-col-8">
+                    <Input
+                      label="Raison sociale"
+                      nativeInputProps={{
+                        type: "text",
+                        ...methods.register(`${prefix}CompanyName`)
+                      }}
+                      state={errors?.[`${prefix}CompanyName`] && "error"}
+                      stateRelatedMessage={formatError(
+                        errors?.[`${prefix}CompanyName`]
+                      )}
+                    />
+                  </div>
+                )}
+                <InlineAddress prefix={`${prefix}Company`} methods={methods} />
+              </>
+            ) : (
+              <InlineInseeCodes
+                methods={methods}
+                disabled={disabled}
+                prefix={prefix}
+              />
             )}
-            {!["COMMUNES", "PERSONNE_PHYSIQUE"].includes(companyType) && (
-              <div className="fr-col-8">
-                <Input
-                  label="Raison sociale"
-                  nativeInputProps={{
-                    type: "text",
-                    ...methods.register(`${prefix}CompanyName`)
-                  }}
-                  state={errors?.[`${prefix}CompanyName`] && "error"}
-                  stateRelatedMessage={formatError(
-                    errors?.[`${prefix}CompanyName`]
-                  )}
-                />
-              </div>
-            )}
-
-            <InlineAddress prefix={`${prefix}Company`} methods={methods} />
           </div>
         )
       )}

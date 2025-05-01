@@ -13,13 +13,13 @@ import {
   optionalBooleanString
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
-import { InseeCodes } from "../common/InseeCodes";
 import { Address } from "../common/Address";
 import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
+import { EcoOrganismes } from "../common/EcoOrganismes";
 
 export const incomingWasteFormShape: FormShape = [
   {
@@ -150,7 +150,7 @@ export const incomingWasteFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur"
+          label: "producteur initial (optionnel)"
         },
         validation: {
           initialEmitterCompanyType: nonEmptyString,
@@ -159,7 +159,8 @@ export const incomingWasteFormShape: FormShape = [
           initialEmitterCompanyAddress: optionalString,
           initialEmitterCompanyPostalCode: optionalString,
           initialEmitterCompanyCity: optionalString,
-          initialEmitterCompanyCountryCode: optionalString
+          initialEmitterCompanyCountryCode: optionalString,
+          initialEmitterMunicipalitiesInseeCodes: filteredArray
         },
         shape: "custom",
         names: [
@@ -169,20 +170,9 @@ export const incomingWasteFormShape: FormShape = [
           "initialEmitterCompanyAddress",
           "initialEmitterCompanyPostalCode",
           "initialEmitterCompanyCity",
-          "initialEmitterCompanyCountryCode"
+          "initialEmitterCompanyCountryCode",
+          "initialEmitterMunicipalitiesInseeCodes"
         ]
-      },
-      {
-        Component: InseeCodes,
-        props: {
-          prefix: "initialEmitter",
-          title: "Code(s) INSEE de(s) commune(s)"
-        },
-        validation: {
-          initialEmitterMunicipalitiesInseeCodes: filteredArray
-        },
-        shape: "custom",
-        names: ["initialEmitterMunicipalitiesInseeCodes"]
       }
     ]
   },
@@ -194,7 +184,8 @@ export const incomingWasteFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "emitter",
-          label: "expéditeur"
+          label: "expéditeur",
+          excludeTypes: ["COMMUNES"]
         },
         validation: {
           emitterCompanyType: nonEmptyString,
@@ -246,11 +237,8 @@ export const incomingWasteFormShape: FormShape = [
     tabTitle: "Intervenants",
     fields: [
       {
-        Component: FrenchCompanySelector,
+        Component: EcoOrganismes,
         props: {
-          prefix: "ecoOrganisme",
-          shortMode: true,
-          title: "Éco-organisme (optionnel)",
           reducedMargin: true
         },
         validation: {
@@ -398,6 +386,7 @@ export const incomingWasteFormShape: FormShape = [
         shape: "generic",
         type: "select",
         label: "Code de traitement ultérieur prévu",
+        defaultOption: "Sélectionnez un traitement",
         required: false,
         validation: {
           nextOperationCode: optionalString
