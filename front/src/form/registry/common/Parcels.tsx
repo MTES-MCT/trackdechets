@@ -175,7 +175,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
             }
           }
         ]}
-        isDisabled={false}
+        isDisabled={disabled}
         menuTitle={"Ajouter une parcelle"}
       />
 

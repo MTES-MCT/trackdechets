@@ -153,7 +153,8 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "emitter",
           label: "expéditeur",
-          excludeTypes: ["COMMUNES"]
+          excludeTypes: ["COMMUNES"],
+          required: true
         },
         validation: {
           emitterCompanyType: nonEmptyString,
@@ -302,7 +303,8 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["COMMUNES"]
+          excludeTypes: ["COMMUNES"],
+          required: true
         },
         validation: {
           destinationCompanyType: nonEmptyString,

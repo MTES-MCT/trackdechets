@@ -4,6 +4,7 @@ import { z } from "zod";
 import { FormShape } from "../builder/types";
 import {
   booleanString,
+  filteredArray,
   nonEmptyNumber,
   nonEmptyString,
   optionalBooleanString,
@@ -32,7 +33,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Identifiant unique",
         required: true,
         validation: {
-          publicId: z.string().min(1)
+          publicId: nonEmptyString
         },
         style: { className: "fr-col-8" }
       },
@@ -44,8 +45,8 @@ export const incomingTexsFormShape: FormShape = [
         },
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
         validation: {
-          reportForCompanySiret: z.string().min(1),
-          reportAsCompanySiret: z.string().nullish()
+          reportForCompanySiret: nonEmptyString,
+          reportAsCompanySiret: optionalString
         },
         shape: "custom"
       }
@@ -60,9 +61,9 @@ export const incomingTexsFormShape: FormShape = [
         props: { name: "wasteCode" },
         shape: "custom",
         names: ["wasteCode"],
-        required: true,
+        required: false,
         validation: {
-          wasteCode: nonEmptyString
+          wasteCode: optionalString
         },
         style: { parentClassName: "fr-grid-row--bottom tw-relative" }
       },
@@ -138,7 +139,8 @@ export const incomingTexsFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur initial"
+          label: "producteur initial",
+          required: true
         },
         validation: {
           initialEmitterCompanyType: nonEmptyString,
@@ -147,7 +149,8 @@ export const incomingTexsFormShape: FormShape = [
           initialEmitterCompanyAddress: optionalString,
           initialEmitterCompanyPostalCode: optionalString,
           initialEmitterCompanyCity: optionalString,
-          initialEmitterCompanyCountryCode: optionalString
+          initialEmitterCompanyCountryCode: optionalString,
+          initialEmitterMunicipalitiesInseeCodes: filteredArray
         },
         shape: "custom",
         names: [
@@ -157,7 +160,8 @@ export const incomingTexsFormShape: FormShape = [
           "initialEmitterCompanyAddress",
           "initialEmitterCompanyPostalCode",
           "initialEmitterCompanyCity",
-          "initialEmitterCompanyCountryCode"
+          "initialEmitterCompanyCountryCode",
+          "initialEmitterMunicipalitiesInseeCodes"
         ]
       },
       {
@@ -167,9 +171,9 @@ export const incomingTexsFormShape: FormShape = [
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: z.array(z.string()).nullable(),
-          parcelInseeCodes: z.array(z.string()).nullable(),
-          parcelCoordinates: z.array(z.string()).nullable()
+          parcelNumbers: filteredArray,
+          parcelInseeCodes: filteredArray,
+          parcelCoordinates: filteredArray
         },
         shape: "custom"
       },
@@ -215,7 +219,9 @@ export const incomingTexsFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "emitter",
-          label: "détenteur ou expéditeur"
+          label: "détenteur ou expéditeur",
+          excludeTypes: ["COMMUNES"],
+          required: true
         },
         validation: {
           emitterCompanyType: nonEmptyString,
@@ -245,26 +251,11 @@ export const incomingTexsFormShape: FormShape = [
           title: "Chantier ou lieu de collecte"
         },
         validation: {
-          emitterPickupSiteName: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterPickupSiteAddress: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterPickupSitePostalCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterPickupSiteCity: z
-            .string()
-            .nullish()
-            .transform(val => val || null),
-          emitterPickupSiteCountryCode: z
-            .string()
-            .nullish()
-            .transform(val => val || null)
+          emitterPickupSiteName: optionalString,
+          emitterPickupSiteAddress: optionalString,
+          emitterPickupSitePostalCode: optionalString,
+          emitterPickupSiteCity: optionalString,
+          emitterPickupSiteCountryCode: optionalString
         },
         shape: "custom",
         names: [
@@ -284,9 +275,6 @@ export const incomingTexsFormShape: FormShape = [
       {
         Component: EcoOrganismes,
         props: {
-          prefix: "ecoOrganisme",
-          shortMode: true,
-          title: "Éco-organisme (optionnel)",
           reducedMargin: true
         },
         validation: {
@@ -436,17 +424,17 @@ export const incomingTexsFormShape: FormShape = [
         name: "isUpcycled",
         shape: "generic",
         type: "checkbox",
-        label: "Terre valorisée",
-        required: true,
+        label: "Terres valorisées",
+        required: false,
         validation: {
-          test: z.boolean().optional()
+          isUpcycled: optionalBooleanString
         }
       },
       {
         Component: Parcels,
         props: {
           prefix: "destinationParcel",
-          title: "Parcelles si valorisation"
+          title: "Parcelles de destination si valorisation"
         },
         names: [
           "destinationParcelInseeCodes",
@@ -454,9 +442,9 @@ export const incomingTexsFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          parcelNumbers: z.array(z.string()).nullable(),
-          parcelInseeCodes: z.array(z.string()).nullable(),
-          parcelCoordinates: z.array(z.string()).nullable()
+          destinationParcelNumbers: filteredArray,
+          destinationParcelInseeCodes: filteredArray,
+          destinationParcelCoordinates: filteredArray
         },
         shape: "custom"
       }

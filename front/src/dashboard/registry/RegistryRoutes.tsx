@@ -150,6 +150,15 @@ export default function RegistryRoutes() {
                 />
               }
             />
+            <Route
+              path={toRelative(routes.registry_new.form.managed)}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.Managed}
+                />
+              }
+            />
           </Routes>
         )}
       </div>

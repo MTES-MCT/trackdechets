@@ -998,7 +998,7 @@ type OutgoingTexsLine {
   """
   Code déchet
   """
-  wasteCode: String!
+  wasteCode: String
   """
   Code déchet Bâle
   """

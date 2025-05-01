@@ -6,7 +6,7 @@ import {
   RegistryLineReason,
   OutgoingTexsLineInput
 } from "@td/codegen-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 
@@ -39,6 +39,12 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
       weightIsEstimate: false,
+      parcelInseeCodes: [],
+      parcelNumbers: [],
+      parcelCoordinates: [],
+      destinationParcelInseeCodes: [],
+      destinationParcelNumbers: [],
+      destinationParcelCoordinates: [],
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
@@ -100,7 +106,19 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       }
     }
   );
-
+  const isUpcycled = methods.watch("isUpcycled");
+  useEffect(() => {
+    if (isUpcycled) {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "destinationParcelInseeCodes")
+      );
+    } else {
+      setDisabledFieldNames(prev => [...prev, "destinationParcelInseeCodes"]);
+      methods.setValue("destinationParcelInseeCodes", []);
+      methods.setValue("destinationParcelNumbers", []);
+      methods.setValue("destinationParcelCoordinates", []);
+    }
+  }, [isUpcycled, methods]);
   const [addToOutgoingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToOutgoingTexsRegistry">
   >(ADD_TO_OUTGOING_TEXS_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });

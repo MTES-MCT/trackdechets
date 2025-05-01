@@ -14,6 +14,7 @@ type Props = {
   label: string;
   methods: UseFormReturn<any>;
   excludeTypes?: string[];
+  required?: boolean;
   disabled?: boolean;
 };
 
@@ -30,10 +31,14 @@ export function CompanySelector({
   prefix,
   label,
   excludeTypes,
+  required,
   methods,
   disabled
 }: Props) {
-  const companyType = methods.watch(`${prefix}CompanyType`, "ETABLISSEMENT_FR");
+  const companyType = methods.watch(
+    `${prefix}CompanyType`,
+    required ? "ETABLISSEMENT_FR" : ""
+  );
 
   const { errors } = methods.formState;
 
@@ -69,6 +74,7 @@ export function CompanySelector({
             }}
             disabled={disabled}
           >
+            {!required && <option value="">Non renseigné</option>}
             {Object.entries(COMPANY_TYPES)
               .filter(([key]) => !excludeTypes?.includes(key))
               .map(([key, value]) => (

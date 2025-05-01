@@ -187,12 +187,12 @@ export function MyLines() {
                 title: REGISTRY_NAMES[RegistryImportType.Transported],
                 route: generatePath(routes.registry_new.form.transported),
                 state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.Managed],
+                route: generatePath(routes.registry_new.form.managed),
+                state: { background: location }
               }
-              // {
-              //   title: REGISTRY_NAMES[RegistryImportType.Managed],
-              //   route: generatePath(routes.registry_new.form.managed),
-              //   state: { background: location }
-              // }
             ]}
             isDisabled={false}
             menuTitle={"Créer une déclaration"}

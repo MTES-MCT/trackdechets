@@ -63,9 +63,9 @@ export const outgoingTexsFormShape: FormShape = [
         props: { name: "wasteCode" },
         shape: "custom",
         names: ["wasteCode"],
-        required: true,
+        required: false,
         validation: {
-          wasteCode: nonEmptyString
+          wasteCode: optionalString
         },
         style: { parentClassName: "fr-grid-row--bottom tw-relative" }
       },
@@ -141,7 +141,8 @@ export const outgoingTexsFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur"
+          label: "producteur",
+          required: true
         },
         validation: {
           initialEmitterCompanyType: nonEmptyString,
@@ -184,9 +185,9 @@ export const outgoingTexsFormShape: FormShape = [
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: z.array(z.string()).nullable(),
-          parcelInseeCodes: z.array(z.string()).nullable(),
-          parcelCoordinates: z.array(z.string()).nullable()
+          parcelNumbers: filteredArray,
+          parcelInseeCodes: filteredArray,
+          parcelCoordinates: filteredArray
         },
         shape: "custom"
       },
@@ -384,10 +385,10 @@ export const outgoingTexsFormShape: FormShape = [
         name: "isUpcycled",
         shape: "generic",
         type: "checkbox",
-        label: "Terre valorisée",
-        required: true,
+        label: "Terres valorisées",
+        required: false,
         validation: {
-          test: z.boolean().optional()
+          isUpcycled: optionalBooleanString
         }
       },
       {
@@ -402,9 +403,9 @@ export const outgoingTexsFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          parcelNumbers: z.array(z.string()).nullable(),
-          parcelInseeCodes: z.array(z.string()).nullable(),
-          parcelCoordinates: z.array(z.string()).nullable()
+          destinationParcelNumbers: filteredArray,
+          destinationParcelInseeCodes: filteredArray,
+          destinationParcelCoordinates: filteredArray
         },
         shape: "custom"
       }
@@ -419,7 +420,8 @@ export const outgoingTexsFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"]
+          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"],
+          required: true
         },
         validation: {
           destinationCompanyType: nonEmptyString,

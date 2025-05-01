@@ -140,7 +140,8 @@ export const outgoingWasteFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur"
+          label: "producteur",
+          required: true
         },
         validation: {
           initialEmitterCompanyType: nonEmptyString,
@@ -367,7 +368,8 @@ export const outgoingWasteFormShape: FormShape = [
         props: {
           prefix: "destination",
           label: "destination",
-          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"]
+          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"],
+          required: true
         },
         validation: {
           destinationCompanyType: nonEmptyString,

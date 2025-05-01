@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  IncomingTexsLineInput,
+  ManagedLineInput,
   Mutation,
   Query,
   RegistryImportType,
@@ -17,18 +17,18 @@ import { handleMutationResponse } from "../builder/handler";
 import { FormTransporter } from "../builder/types";
 import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
 import {
-  ADD_TO_INCOMING_TEXS_REGISTRY,
-  GET_INCOMING_TEXS_REGISTRY_LOOKUP
+  ADD_TO_MANAGED_REGISTRY,
+  GET_MANAGED_REGISTRY_LOOKUP
 } from "../queries";
-import { incomingTexsFormShape } from "./shape";
+import { managedFormShape } from "./shape";
 
 type Props = { onClose: () => void };
 
-type FormValues = IncomingTexsLineInput & {
+type FormValues = ManagedLineInput & {
   transporter: FormTransporter[];
 };
 
-export function RegistryIncomingTexsForm({ onClose }: Props) {
+export function RegistryManagedForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
@@ -47,24 +47,24 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
-    resolver: zodResolver(schemaFromShape(incomingTexsFormShape))
+    resolver: zodResolver(schemaFromShape(managedFormShape))
   });
 
   const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_INCOMING_TEXS_REGISTRY_LOOKUP,
+    GET_MANAGED_REGISTRY_LOOKUP,
     {
       variables: {
-        type: RegistryImportType.IncomingTexs,
+        type: RegistryImportType.Managed,
         publicId: queryParams.get("publicId"),
         siret: queryParams.get("siret")
       },
       skip: !queryParams.get("publicId") || !queryParams.get("siret"),
       fetchPolicy: "network-only",
       onCompleted: data => {
-        if (data?.registryLookup?.incomingTexs) {
+        if (data?.registryLookup?.managedWaste) {
           const transportersObj: Record<string, Partial<FormTransporter>> = {};
           const definedIncominTexsProps = Object.fromEntries(
-            Object.entries(data.registryLookup.incomingTexs).filter(
+            Object.entries(data.registryLookup.managedWaste).filter(
               ([key, value]) => {
                 if (key.startsWith("transporter")) {
                   const [_, transporterNum, field] =
@@ -81,7 +81,7 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
                 return value != null;
               }
             )
-          ) as IncomingTexsLineInput;
+          ) as ManagedLineInput;
 
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
@@ -94,8 +94,11 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
           // Set the form values with the transformed data
           methods.reset({
             ...definedIncominTexsProps,
-            receptionDate: isoDateToHtmlDate(
-              definedIncominTexsProps.receptionDate
+            managingStartDate: isoDateToHtmlDate(
+              definedIncominTexsProps.managingStartDate
+            ),
+            managingEndDate: isoDateToHtmlDate(
+              definedIncominTexsProps.managingEndDate
             ),
             reason: RegistryLineReason.Edit,
             transporter: transporters
@@ -119,9 +122,9 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
     }
   }, [isUpcycled, methods]);
 
-  const [addToIncomingTexsRegistry, { loading }] = useMutation<
-    Pick<Mutation, "addToIncomingTexsRegistry">
-  >(ADD_TO_INCOMING_TEXS_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
+  const [addToManagedRegistry, { loading }] = useMutation<
+    Pick<Mutation, "addToManagedRegistry">
+  >(ADD_TO_MANAGED_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
@@ -146,14 +149,14 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       )
     };
 
-    const result = await addToIncomingTexsRegistry({
+    const result = await addToManagedRegistry({
       variables: {
         lines: [flattenedData]
       }
     });
 
     const shouldCloseModal = handleMutationResponse(
-      result.data?.addToIncomingTexsRegistry,
+      result.data?.addToManagedRegistry,
       methods
     );
 
@@ -166,9 +169,9 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
     <Loader />
   ) : (
     <FormBuilder
-      registryType={RegistryImportType.IncomingTexs}
+      registryType={RegistryImportType.Managed}
       methods={methods}
-      shape={incomingTexsFormShape}
+      shape={managedFormShape}
       onSubmit={onSubmit}
       loading={loading}
       disabledFieldNames={disabledFieldNames}
