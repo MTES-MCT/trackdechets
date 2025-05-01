@@ -1,13 +1,13 @@
 import { prisma } from "@td/prisma";
 import { ttlCache } from "./ttlCache";
-import { Company, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-const companyWithTransporterReceipt =
+const _companyWithTransporterReceipt =
   Prisma.validator<Prisma.CompanyDefaultArgs>()({
     include: { transporterReceipt: true }
   });
 type CompanyWithTransporterReceipt = Prisma.CompanyGetPayload<
-  typeof companyWithTransporterReceipt
+  typeof _companyWithTransporterReceipt
 >;
 
 export async function getCachedCompany(siret: string) {
