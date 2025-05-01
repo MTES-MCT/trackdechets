@@ -1,11 +1,13 @@
 import { RegistryImportType } from "@td/codegen-ui";
 import React from "react";
 import TdModal from "../../../Apps/common/Components/Modal/Modal";
-import { RegistrySsdForm } from "../../../form/registry/ssd/RegistrySsdForm";
 import { RegistryIncomingTexsForm } from "../../../form/registry/incomingTexs/RegistryIncomingTexsForm";
 import { RegistryIncomingWasteForm } from "../../../form/registry/incomingWaste/RegistryIncomingWasteForm";
+import { RegistryOutgoingTexsForm } from "../../../form/registry/outgoingTexs/RegistryOutgoingTexsForm";
 import { RegistryOutgoingWasteForm } from "../../../form/registry/outgoingWaste/RegistryOutgoingWasteForm";
+import { RegistrySsdForm } from "../../../form/registry/ssd/RegistrySsdForm";
 import { RegistryTransportedForm } from "../../../form/registry/transported/RegistryTransportedForm";
+
 export function FormContainer({
   onClose,
   type
@@ -35,6 +37,8 @@ function getFormComponent(type: RegistryImportType) {
       return RegistrySsdForm;
     case RegistryImportType.IncomingTexs:
       return RegistryIncomingTexsForm;
+    case RegistryImportType.OutgoingTexs:
+      return RegistryOutgoingTexsForm;
     case RegistryImportType.IncomingWaste:
       return RegistryIncomingWasteForm;
     case RegistryImportType.OutgoingWaste:

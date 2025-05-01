@@ -115,6 +115,15 @@ export default function RegistryRoutes() {
               }
             />
             <Route
+              path={toRelative(routes.registry_new.form.outgoingTexs)}
+              element={
+                <FormContainer
+                  onClose={handleClose}
+                  type={RegistryImportType.OutgoingTexs}
+                />
+              }
+            />
+            <Route
               path={toRelative(routes.registry_new.form.incomingWaste)}
               element={
                 <FormContainer

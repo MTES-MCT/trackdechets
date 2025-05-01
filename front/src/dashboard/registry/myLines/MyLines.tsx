@@ -169,20 +169,20 @@ export function MyLines() {
                 state: { background: location }
               },
               {
+                title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
+                route: generatePath(routes.registry_new.form.outgoingWaste),
+                state: { background: location }
+              },
+              {
                 title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
                 route: generatePath(routes.registry_new.form.incomingTexs),
                 state: { background: location }
               },
               {
-                title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
-                route: generatePath(routes.registry_new.form.outgoingWaste),
+                title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
+                route: generatePath(routes.registry_new.form.outgoingTexs),
                 state: { background: location }
               },
-              // {
-              //   title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
-              //   route: generatePath(routes.registry_new.form.outgoingTexs),
-              //   state: { background: location }
-              // },
               {
                 title: REGISTRY_NAMES[RegistryImportType.Transported],
                 route: generatePath(routes.registry_new.form.transported),
