@@ -1,10 +1,24 @@
+import { RegistryCompanyType, TransportMode } from "@td/codegen-ui";
+import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
 import { z } from "zod";
 import { FormShape } from "../builder/types";
-import { ReportFor } from "../common/ReportFor";
+import {
+  booleanString,
+  nonEmptyNumber,
+  nonEmptyString,
+  optionalBooleanString,
+  optionalNumber,
+  optionalString
+} from "../builder/validation";
 import { Address } from "../common/Address";
-import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
+import { CompanySelector } from "../common/CompanySelector";
 import { EcoOrganismes } from "../common/EcoOrganismes";
+import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { Parcels } from "../common/Parcels";
+import { ReportFor } from "../common/ReportFor";
+import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
+import { WasteCodeSelector } from "../common/WasteCodeSelector";
+import { WeightSelector } from "../common/WeightSelector";
 
 export const incomingTexsFormShape: FormShape = [
   {
@@ -34,49 +48,117 @@ export const incomingTexsFormShape: FormShape = [
           reportAsCompanySiret: z.string().nullish()
         },
         shape: "custom"
-      },
+      }
+    ]
+  },
+  {
+    tabId: "waste",
+    tabTitle: "Déchets",
+    fields: [
       {
-        name: "test",
-        shape: "generic",
-        type: "checkbox",
-        label: "Test toggle",
+        Component: WasteCodeSelector,
+        props: { name: "wasteCode" },
+        shape: "custom",
+        names: ["wasteCode"],
         required: true,
         validation: {
-          test: z.boolean().optional()
+          wasteCode: nonEmptyString
+        },
+        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+      },
+      {
+        name: "wasteDescription",
+        shape: "generic",
+        label: "Dénomination du déchet",
+        required: true,
+        validation: {
+          wasteDescription: nonEmptyString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        name: "wasteCodeBale",
+        shape: "generic",
+        label: "Code déchet Bâle",
+        validation: {
+          wasteCodeBale: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-4" }
+      },
+      {
+        name: "wastePop",
+        shape: "generic",
+        type: "checkbox",
+        label: "POP - Contient des polluants organiques persistants",
+        required: true,
+        validation: {
+          wastePop: booleanString
         }
       },
       {
-        Component: Address,
-        props: {
-          prefix: "destinationDropSite"
-        },
-        names: ["testAddress"],
+        name: "wasteIsDangerous",
+        shape: "generic",
+        type: "checkbox",
+        label: "Déchet dangereux",
+        required: false,
         validation: {
-          testAddress: z.string().nullable()
-        },
-        shape: "custom"
+          wasteIsDangerous: optionalBooleanString
+        }
       },
       {
-        Component: FrenchCompanySelector,
-        props: {
-          prefix: "broker",
-          shortMode: true,
-          title: "Courtier (optionnel)"
-        },
-        names: ["brokerSiret"],
+        name: "receptionDate",
+        shape: "generic",
+        label: "Date de réception",
+        required: true,
         validation: {
-          brokerSiret: z.string().nullable()
+          receptionDate: nonEmptyString
         },
-        shape: "custom"
+        type: "date",
+        style: { className: "fr-col-4" }
       },
       {
-        Component: EcoOrganismes,
-        props: {},
-        names: ["ecoOrganismeSiret"],
+        Component: WeightSelector,
+        shape: "custom",
+        names: ["weightValue", "weightIsEstimate", "volume"],
         validation: {
-          ecoOrganismeSiret: z.string().nullable()
+          weightValue: nonEmptyNumber,
+          volume: optionalNumber,
+          weightIsEstimate: booleanString
+        }
+      }
+    ]
+  },
+  {
+    tabId: "initialEmitter",
+    tabTitle: "Producteur",
+    fields: [
+      {
+        Component: CompanySelector,
+        props: {
+          prefix: "initialEmitter",
+          label: "producteur initial"
         },
-        shape: "custom"
+        validation: {
+          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyOrgId: optionalString,
+          initialEmitterCompanyName: optionalString,
+          initialEmitterCompanyAddress: optionalString,
+          initialEmitterCompanyPostalCode: optionalString,
+          initialEmitterCompanyCity: optionalString,
+          initialEmitterCompanyCountryCode: optionalString
+        },
+        shape: "custom",
+        names: [
+          "initialEmitterCompanyType",
+          "initialEmitterCompanyOrgId",
+          "initialEmitterCompanyName",
+          "initialEmitterCompanyAddress",
+          "initialEmitterCompanyPostalCode",
+          "initialEmitterCompanyCity",
+          "initialEmitterCompanyCountryCode"
+        ]
       },
       {
         Component: Parcels,
@@ -90,6 +172,321 @@ export const incomingTexsFormShape: FormShape = [
           parcelCoordinates: z.array(z.string()).nullable()
         },
         shape: "custom"
+      },
+      {
+        name: "sisIdentifier",
+        shape: "generic",
+        label: "Identifiant SIS du terrain",
+        validation: {
+          sisIdentifier: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-4" }
+      },
+      {
+        name: "ttdImportNumber",
+        shape: "generic",
+        label: "Numéro de notification ou de déclaration d'import",
+        required: false,
+        validation: {
+          ttdImportNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        name: "movementNumber",
+        shape: "generic",
+        label: "Numéro de mouvement",
+        required: false,
+        validation: {
+          movementNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      }
+    ]
+  },
+  {
+    tabId: "emitter",
+    tabTitle: "Expéditeur",
+    fields: [
+      {
+        Component: CompanySelector,
+        props: {
+          prefix: "emitter",
+          label: "détenteur ou expéditeur"
+        },
+        validation: {
+          emitterCompanyType: nonEmptyString,
+          emitterCompanyOrgId: optionalString,
+          emitterCompanyName: optionalString,
+          emitterCompanyAddress: optionalString,
+          emitterCompanyPostalCode: optionalString,
+          emitterCompanyCity: optionalString,
+          emitterCompanyCountryCode: optionalString
+        },
+        shape: "custom",
+        names: [
+          "emitterCompanyType",
+          "emitterCompanyOrgId",
+          "emitterCompanyName",
+          "emitterCompanyAddress",
+          "emitterCompanyPostalCode",
+          "emitterCompanyCity",
+          "emitterCompanyCountryCode"
+        ]
+      },
+      {
+        Component: Address,
+        props: {
+          prefix: "emitterPickupSite",
+          nameEnabled: true,
+          title: "Chantier ou lieu de collecte"
+        },
+        validation: {
+          emitterPickupSiteName: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          emitterPickupSiteAddress: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          emitterPickupSitePostalCode: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          emitterPickupSiteCity: z
+            .string()
+            .nullish()
+            .transform(val => val || null),
+          emitterPickupSiteCountryCode: z
+            .string()
+            .nullish()
+            .transform(val => val || null)
+        },
+        shape: "custom",
+        names: [
+          "emitterPickupSiteName",
+          "emitterPickupSiteAddress",
+          "emitterPickupSitePostalCode",
+          "emitterPickupSiteCity",
+          "emitterPickupSiteCountryCode"
+        ]
+      }
+    ]
+  },
+  {
+    tabId: "intermediaries",
+    tabTitle: "Intervenants",
+    fields: [
+      {
+        Component: EcoOrganismes,
+        props: {
+          prefix: "ecoOrganisme",
+          shortMode: true,
+          title: "Éco-organisme (optionnel)",
+          reducedMargin: true
+        },
+        validation: {
+          ecoOrganismeSiret: optionalString,
+          ecoOrganismeName: optionalString
+        },
+        shape: "custom",
+        names: ["ecoOrganismeSiret", "ecoOrganismeName"]
+      },
+      {
+        Component: FrenchCompanySelector,
+        props: {
+          prefix: "broker",
+          shortMode: true,
+          title: "Courtier (optionnel)",
+          reducedMargin: true
+        },
+        validation: {
+          brokerCompanySiret: optionalString,
+          brokerCompanyName: optionalString
+        },
+        shape: "custom",
+        names: ["brokerCompanySiret", "brokerCompanyName"]
+      },
+      {
+        name: "brokerRecepisseNumber",
+        shape: "generic",
+        label: "Numéro de récépissé",
+        required: true,
+        validation: {
+          brokerRecepisseNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        Component: FrenchCompanySelector,
+        props: {
+          prefix: "trader",
+          shortMode: true,
+          title: "Négociant (optionnel)",
+          reducedMargin: true
+        },
+        validation: {
+          traderCompanySiret: optionalString,
+          traderCompanyName: optionalString
+        },
+        shape: "custom",
+        names: ["traderCompanySiret", "traderCompanyName"]
+      },
+      {
+        name: "traderRecepisseNumber",
+        shape: "generic",
+        label: "Numéro de récépissé",
+        required: true,
+        validation: {
+          traderRecepisseNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      }
+    ]
+  },
+  {
+    tabId: "operation",
+    tabTitle: "Traitement",
+    fields: [
+      {
+        shape: "layout",
+        fields: [
+          {
+            name: "operationCode",
+            shape: "generic",
+            type: "select",
+            label: "Code de traitement réalisé",
+            required: true,
+            defaultOption: "Sélectionnez un traitement",
+            validation: {
+              operationCode: nonEmptyString
+            },
+            style: { className: "fr-col-4" },
+            choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
+              label: code,
+              value: code
+            }))
+          },
+          {
+            name: "operationMode",
+            shape: "generic",
+            type: "select",
+            label: "Mode de traitement",
+            defaultOption: "Sélectionnez un mode",
+            required: false,
+            validation: {
+              operationMode: optionalString
+            },
+            style: { className: "fr-col-4" },
+            choices: [
+              { value: "REUTILISATION", label: "Réutilisation" },
+              { value: "RECYCLAGE", label: "Recyclage" },
+              {
+                value: "VALORISATION_ENERGETIQUE",
+                label: "Valorisation énergétique"
+              },
+              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
+              { value: "ELIMINATION", label: "Élimination" }
+            ]
+          }
+        ]
+      },
+      {
+        name: "noTraceability",
+        shape: "generic",
+        type: "checkbox",
+        label: "Rupture de traçabilité autorisée",
+        required: false,
+        validation: {
+          noTraceability: optionalBooleanString
+        }
+      },
+      {
+        name: "nextOperationCode",
+        shape: "generic",
+        type: "select",
+        label: "Code de traitement ultérieur prévu",
+        required: false,
+        validation: {
+          nextOperationCode: optionalString
+        },
+        style: { className: "fr-col-4" },
+        choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
+          label: code,
+          value: code
+        }))
+      },
+      {
+        name: "isDirectSupply",
+        shape: "generic",
+        type: "checkbox",
+        label: "Approvisionnement direct (pipeline, convoyeur)",
+        required: false,
+        validation: {
+          isDirectSupply: optionalBooleanString
+        }
+      },
+      {
+        name: "isUpcycled",
+        shape: "generic",
+        type: "checkbox",
+        label: "Terre valorisée",
+        required: true,
+        validation: {
+          test: z.boolean().optional()
+        }
+      },
+      {
+        Component: Parcels,
+        props: {
+          prefix: "destinationParcel",
+          title: "Parcelles si valorisation"
+        },
+        names: [
+          "destinationParcelInseeCodes",
+          "destinationParcelNumbers",
+          "destinationParcelCoordinates"
+        ],
+        validation: {
+          parcelNumbers: z.array(z.string()).nullable(),
+          parcelInseeCodes: z.array(z.string()).nullable(),
+          parcelCoordinates: z.array(z.string()).nullable()
+        },
+        shape: "custom"
+      }
+    ]
+  },
+  {
+    tabId: "transporter",
+    tabTitle: "Transport",
+    fields: [
+      {
+        Component: TransporterSelector,
+        props: {},
+        validation: {
+          transporter: z.array(
+            z.object({
+              TransportMode: z.nativeEnum(TransportMode),
+              CompanyType: z.nativeEnum(RegistryCompanyType),
+              CompanyOrgId: optionalString,
+              RecepisseIsExempted: optionalBooleanString,
+              RecepisseNumber: optionalString,
+              CompanyName: optionalString,
+              CompanyAddress: optionalString,
+              CompanyPostalCode: optionalString,
+              CompanyCity: optionalString,
+              CompanyCountryCode: optionalString
+            })
+          )
+        },
+        shape: "custom",
+        names: ["transporter"]
       }
     ]
   }

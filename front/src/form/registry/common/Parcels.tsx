@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Select } from "@codegouvfr/react-dsfr/Select";
+import React from "react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import DropdownMenu from "../../../Apps/common/Components/DropdownMenu/DropdownMenu";
+import { formatError } from "../builder/error";
 
 type Props = {
   prefix: string;
@@ -18,6 +19,8 @@ enum Mode {
 }
 
 export function Parcels({ methods, disabled, prefix, title }: Props) {
+  const { errors } = methods.formState;
+
   const {
     fields: inseeCodeFields,
     append: appendInseeCode,
@@ -99,6 +102,25 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
               </Button>
             </div>
           </div>
+
+          {errors?.[`${prefix}InseeCodes`]?.[index] && (
+            <Alert
+              className="fr-mt-2w"
+              description={formatError(
+                errors?.[`${prefix}InseeCodes`]?.[index]
+              )}
+              severity="error"
+              small
+            />
+          )}
+          {errors?.[`${prefix}Numbers`]?.[index] && (
+            <Alert
+              className="fr-mt-2w"
+              description={formatError(errors?.[`${prefix}Numbers`]?.[index])}
+              severity="error"
+              small
+            />
+          )}
         </div>
       ))}
 
@@ -156,6 +178,15 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
         isDisabled={false}
         menuTitle={"Ajouter une parcelle"}
       />
+
+      {errors?.[`${prefix}Coordinates`] && (
+        <Alert
+          className="fr-mt-2w"
+          description={formatError(errors[`${prefix}Coordinates`])}
+          severity="error"
+          small
+        />
+      )}
     </div>
   );
 }
