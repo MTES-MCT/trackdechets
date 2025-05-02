@@ -70,7 +70,8 @@ const DropdownMenu = ({
           <FocusTrap
             active={isOpen}
             focusTrapOptions={{
-              allowOutsideClick: true
+              allowOutsideClick: true,
+              preventScroll: true,
             }}
           >
             <ul

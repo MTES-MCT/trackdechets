@@ -56,15 +56,15 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
 
   return (
     <div className="fr-col">
-      <h4 className="fr-h4">{title ?? "Parcelles"}</h4>
+      <h5 className="fr-h5">{title ?? "Parcelles"}</h5>
 
       {inseeCodeFields.length === 0 && coordinatesFields.length === 0 && (
-        <p className="fr-text--sm fr-mb-2w">Aucune parcelle renseignée.</p>
+        <p className="fr-text--sm fr-mb-2w">Aucune parcelle renseignée</p>
       )}
 
       {inseeCodeFields.length > 0 && (
         <p className="fr-mb-2v tw-text-lg tw-font-bold">
-          Parcelles renseignées par code INSEE:
+          Parcelles renseignées par code INSEE :
         </p>
       )}
       {inseeCodeFields.map((field, index) => (
@@ -76,6 +76,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
                 nativeInputProps={{
                   type: "text",
                   disabled,
+                  placeholder: "Ex 75056",
                   ...methods.register(`${prefix}InseeCodes.${index}`)
                 }}
               />
@@ -86,6 +87,7 @@ export function Parcels({ methods, disabled, prefix, title }: Props) {
                 nativeInputProps={{
                   type: "text",
                   disabled,
+                  placeholder: "Ex 000-AB-125",
                   ...methods.register(`${prefix}Numbers.${index}`)
                 }}
               />

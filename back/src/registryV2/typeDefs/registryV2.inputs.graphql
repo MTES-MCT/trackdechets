@@ -3059,7 +3059,7 @@ input OutgoingTexsLineInput {
   - Format code déchet avec espace : XX XX XX ou XX XX XX*
   - De 8 à 9 caractères (espaces compris)
   """
-  wasteCode: String!
+  wasteCode: String
   """
   **Code déchet Bâle**
 

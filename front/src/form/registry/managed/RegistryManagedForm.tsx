@@ -121,6 +121,17 @@ export function RegistryManagedForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply]);
 
   const [addToManagedRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToManagedRegistry">

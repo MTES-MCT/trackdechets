@@ -51,7 +51,7 @@ export const transportedFormShape: FormShape = [
   },
   {
     tabId: "waste",
-    tabTitle: "Déchets",
+    tabTitle: "Déchet",
     fields: [
       {
         Component: WasteCodeSelector,
@@ -67,7 +67,7 @@ export const transportedFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label: "Dénomination usuelle des terres excavées et sédiments ou des déchets",
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -89,7 +89,7 @@ export const transportedFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "POP - Contient des polluants organiques persistants",
+        label: "Le déchet contient des polluants organiques persistants (POP)",
         required: true,
         validation: {
           wastePop: booleanString
@@ -99,7 +99,7 @@ export const transportedFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Déchet dangereux",
+        label: "Le déchet est dangereux",
         required: false,
         validation: {
           wasteIsDangerous: optionalBooleanString
@@ -181,7 +181,7 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "emitterPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte"
+          title: "Chantier ou lieu de collecte (optionnel)"
         },
         validation: {
           emitterPickupSiteName: optionalString,
@@ -407,7 +407,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportAdr: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10" }
       },
       {
         name: "reportForTransportOtherTmdCode",
@@ -418,7 +418,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportOtherTmdCode: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10" }
       },
       {
         Component: TransporterTags,

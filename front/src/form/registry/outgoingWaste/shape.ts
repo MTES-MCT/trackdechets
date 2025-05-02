@@ -16,7 +16,10 @@ import { CompanySelector } from "../common/CompanySelector";
 import { InseeCodes } from "../common/InseeCodes";
 import { Address } from "../common/Address";
 import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
+import {
+  INCOMING_TEXS_WASTE_CODES,
+  INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+} from "@td/constants";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
@@ -55,11 +58,11 @@ export const outgoingWasteFormShape: FormShape = [
   },
   {
     tabId: "waste",
-    tabTitle: "Déchets",
+    tabTitle: "Déchet",
     fields: [
       {
         Component: WasteCodeSelector,
-        props: { name: "wasteCode" },
+        props: { name: "wasteCode", blackList: INCOMING_TEXS_WASTE_CODES },
         shape: "custom",
         names: ["wasteCode"],
         required: true,
@@ -71,7 +74,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label: "Dénomination usuelle du déchet",
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -93,7 +96,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "POP - Contient des polluants organiques persistants",
+        label: "Le déchet contient des polluants organiques persistants (POP)",
         required: true,
         validation: {
           wastePop: booleanString
@@ -103,7 +106,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Déchet dangereux",
+        label: "Le déchet est dangereux",
         required: false,
         validation: {
           wasteIsDangerous: optionalBooleanString
@@ -140,7 +143,7 @@ export const outgoingWasteFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur",
+          label: "producteur initial (optionnel)",
           required: true
         },
         validation: {
@@ -188,7 +191,7 @@ export const outgoingWasteFormShape: FormShape = [
         props: {
           prefix: "reportForPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte de l'expéditeur ou du détenteur"
+          title: "Chantier ou lieu de collecte (optionnel)"
         },
         validation: {
           reportForPickupSiteName: optionalString,
@@ -227,7 +230,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         Component: FrenchCompanySelector,
         props: {
-          prefix: "broker",
+          prefix: "brokerCompany",
           shortMode: true,
           title: "Courtier (optionnel)",
           reducedMargin: true
@@ -253,7 +256,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         Component: FrenchCompanySelector,
         props: {
-          prefix: "trader",
+          prefix: "traderCompany",
           shortMode: true,
           title: "Négociant (optionnel)",
           reducedMargin: true
@@ -347,16 +350,7 @@ export const outgoingWasteFormShape: FormShape = [
         type: "text",
         style: { className: "fr-col-10" }
       },
-      {
-        name: "isDirectSupply",
-        shape: "generic",
-        type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
-        required: false,
-        validation: {
-          isDirectSupply: optionalBooleanString
-        }
-      }
+      
     ]
   },
   {
@@ -418,6 +412,16 @@ export const outgoingWasteFormShape: FormShape = [
     tabId: "transporter",
     tabTitle: "Transport",
     fields: [
+      {
+        name: "isDirectSupply",
+        shape: "generic",
+        type: "checkbox",
+        label: "Approvisionnement direct (pipeline, convoyeur)",
+        required: false,
+        validation: {
+          isDirectSupply: optionalBooleanString
+        }
+      },
       {
         Component: TransporterSelector,
         props: {},

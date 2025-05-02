@@ -119,6 +119,18 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply]);
+
   const [addToOutgoingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToOutgoingTexsRegistry">
   >(ADD_TO_OUTGOING_TEXS_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });

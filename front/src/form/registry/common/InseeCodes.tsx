@@ -14,7 +14,7 @@ type Props = {
 export function InseeCodes({ methods, disabled, prefix, title }: Props) {
   return (
     <div className="fr-col">
-      {title && <h4 className="fr-h4">{title}</h4>}
+      {title && <h5 className="fr-h5">{title}</h5>}
       <InlineInseeCodes methods={methods} disabled={disabled} prefix={prefix} />
     </div>
   );

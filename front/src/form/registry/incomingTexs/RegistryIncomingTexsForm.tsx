@@ -118,6 +118,17 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply]);
 
   const [addToIncomingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingTexsRegistry">

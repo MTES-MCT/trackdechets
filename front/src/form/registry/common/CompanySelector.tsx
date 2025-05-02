@@ -4,6 +4,7 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import React, { useEffect } from "react";
 import { type UseFormReturn } from "react-hook-form";
 
+import { capitalize } from "../../../common/helper";
 import { formatError } from "../builder/error";
 import { InlineAddress } from "./Address";
 import { InlineFrenchCompanySelector } from "./FrenchCompanySelector";
@@ -68,13 +69,13 @@ export function CompanySelector({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-8 fr-mb-2w">
           <Select
-            label={`Type de ${label}`}
+            label={capitalize(label)}
             nativeSelectProps={{
               ...methods.register(`${prefix}CompanyType`)
             }}
             disabled={disabled}
           >
-            {!required && <option value="">Non renseigné</option>}
+            <option value="">Sélectionnez un type d'acteur</option>
             {Object.entries(COMPANY_TYPES)
               .filter(([key]) => !excludeTypes?.includes(key))
               .map(([key, value]) => (
@@ -105,7 +106,11 @@ export function CompanySelector({
               <>
                 <div className="fr-col-8">
                   <Input
-                    label="Numéro d'identification"
+                    label={
+                      companyType === "PERSONNE_PHYSIQUE"
+                        ? "Nom et prénom"
+                        : "Numéro d'identification"
+                    }
                     nativeInputProps={{
                       type: "text",
                       ...methods.register(`${prefix}CompanyOrgId`)

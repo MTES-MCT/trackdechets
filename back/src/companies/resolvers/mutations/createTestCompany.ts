@@ -43,7 +43,11 @@ const fixtures = {
   address: "Adresse test",
   codeNaf: "XXXXX",
   libelleNaf: "Entreprise de test",
-  codeCommune: "00000"
+  codeCommune: "00000",
+  city: "Ville de test",
+  postalCode: "00000",
+  country: "FR",
+  street: "Rue de test",
 };
 
 const createTestCompany: MutationResolvers["createTestCompany"] = async (

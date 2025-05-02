@@ -10,6 +10,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 type TransporterSelectorProps = {
   methods: UseFormReturn<any>;
   title?: string;
+  disabled: boolean;
 };
 
 const initialTransporter = {
@@ -32,7 +33,8 @@ const initialTransporter = {
  */
 export function TransporterSelector({
   methods,
-  title
+  title,
+  disabled
 }: TransporterSelectorProps) {
   const {
     fields: transporterFields,
@@ -61,7 +63,7 @@ export function TransporterSelector({
 
   return (
     <div className="fr-col">
-      {title && <h4 className="fr-h4">{title}</h4>}
+      {title && <h5 className="fr-h5">{title}</h5>}
       {transporterFields.length === 0 && (
         <>
           <Button
@@ -71,6 +73,7 @@ export function TransporterSelector({
             iconPosition="right"
             iconId="ri-add-line"
             title="Ajouter"
+            disabled={disabled}
             onClick={() => {
               insertNewTransporter(0);
             }}

@@ -32,7 +32,7 @@ export function FrenchCompanySelector({
         "company-selector-reduced-margin": reducedMargin
       })}
     >
-      {title && <h4 className="fr-h4">{title}</h4>}
+      {title && <h5 className="fr-h5">{title}</h5>}
       <InlineFrenchCompanySelector
         prefix={prefix}
         methods={methods}
@@ -64,6 +64,7 @@ export function InlineFrenchCompanySelector({
             selectedCompanyOrgId={selectedCompanyOrgId}
             disabled={disabled}
             selectedCompanyError={selectedCompanyError}
+            allowForeignCompanies={false}
             onCompanySelected={company => {
               if (company) {
                 field.onChange(company.orgId);
