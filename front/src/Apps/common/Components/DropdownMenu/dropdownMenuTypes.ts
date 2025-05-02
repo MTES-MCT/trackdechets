@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ButtonElementProps {
   id: string;
   disabled?: boolean;
@@ -20,7 +22,10 @@ export interface DropdownMenuProps {
     ) => void;
   }[];
   menuTitle: string;
-  ButtonElement?: React.ComponentType<ButtonElementProps>;
+  ButtonElement?: React.ForwardRefExoticComponent<
+    React.PropsWithoutRef<ButtonElementProps> &
+      React.RefAttributes<HTMLButtonElement>
+  >;
   isDisabled?: boolean;
   iconAlone?: boolean;
   primary?: boolean;

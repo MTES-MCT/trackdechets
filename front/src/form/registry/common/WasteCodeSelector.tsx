@@ -88,7 +88,11 @@ export function WasteCodeSelector({
                   ></span>
                 </div>
               ) : (
-                <button onClick={() => onSelect(node.code)} type="button">
+                <button
+                  onClick={() => onSelect(node.code)}
+                  type="button"
+                  className="tw-text-left"
+                >
                   {node.code} - {node.description}
                 </button>
               )}

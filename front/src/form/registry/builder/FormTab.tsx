@@ -1,12 +1,13 @@
 import React from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { type UseFormReturn, Controller } from "react-hook-form";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import { clsx } from "clsx";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
@@ -19,19 +20,28 @@ export function FormTab({ fields, methods }: Props) {
     }
 
     if (field.shape === "generic") {
+      const label = [field.label, !field.required ? "(optionnel)" : ""]
+        .filter(Boolean)
+        .join(" ");
       return (
         <>
+          {field.title && (
+            <div className="fr-col-12 fr-mt-2w">
+              <h4 className="fr-h4">{field.title}</h4>
+            </div>
+          )}
           {["text", "number", "date"].includes(field.type) && (
             <div
               className={field.style?.className ?? "fr-col-12"}
               key={field.name}
             >
               <NonScrollableInput
-                label={[field.label, !field.required ? "(optionnel)" : ""]
-                  .filter(Boolean)
-                  .join(" ")}
+                label={label}
                 nativeInputProps={{
                   type: field.type,
+                  ...(field.type === "date" && {
+                    max: new Date().toISOString().split("T")[0]
+                  }),
                   ...methods.register(field.name)
                 }}
                 disabled={field.disabled}
@@ -47,22 +57,47 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
             >
               <Select
-                label={[field.label, !field.required ? "(optionnel)" : ""]
-                  .filter(Boolean)
-                  .join(" ")}
+                label={label}
                 nativeSelectProps={{
-                  ...methods.register(field.name)
+                  ...methods.register(field.name),
+                  ...(field.defaultOption && { defaultValue: "" })
                 }}
                 disabled={field.disabled}
                 state={errors?.[field.name] && "error"}
                 stateRelatedMessage={formatError(errors?.[field.name])}
               >
+                {field.defaultOption && (
+                  <option value={""} disabled hidden>
+                    {field.defaultOption}
+                  </option>
+                )}
                 {field.choices?.map(choice => (
                   <option key={choice.value} value={choice.value}>
                     {choice.label}
                   </option>
                 ))}
               </Select>
+            </div>
+          )}
+
+          {field.type === "checkbox" && (
+            <div
+              className={field.style?.className ?? "fr-col-12"}
+              key={field.name}
+            >
+              <Controller
+                name={field.name}
+                control={methods.control}
+                render={({ field: controllerField }) => (
+                  <ToggleSwitch
+                    label={label}
+                    inputTitle={field.name}
+                    showCheckedHint={false}
+                    checked={controllerField.value}
+                    onChange={checked => controllerField.onChange(checked)}
+                  />
+                )}
+              />
             </div>
           )}
         </>
@@ -77,6 +112,16 @@ export function FormTab({ fields, methods }: Props) {
   return (
     <div>
       {fields.map((field, index) => {
+        const fieldValues =
+          field.shape === "custom"
+            ? methods.watch(field.names)
+            : field.shape === "layout"
+            ? null
+            : methods.watch(field.name);
+        const infoText =
+          typeof field.infoText === "function"
+            ? field.infoText(fieldValues)
+            : field.infoText;
         return (
           <div className="fr-mb-2w" key={index}>
             <div
@@ -87,9 +132,9 @@ export function FormTab({ fields, methods }: Props) {
             >
               {renderField(field, index)}
             </div>
-            {field.infoText && (
+            {infoText && (
               <div className="fr-mt-5v">
-                <Alert description={field.infoText} severity="info" small />
+                <Alert description={infoText} severity="info" small />
               </div>
             )}
           </div>

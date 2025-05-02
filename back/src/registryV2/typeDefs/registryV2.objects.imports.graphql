@@ -1,0 +1,2648 @@
+"Contenu d'une ligne pour l'import de sortie de statut de déchet"
+type SsdLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+
+  """
+  SIRET de l'émetteur
+  """
+  reportForCompanySiret: String!
+
+  """
+  Date d'utilisation
+  """
+  useDate: DateTime
+
+  """
+  Date d'expédition
+  """
+  dispatchDate: DateTime
+
+  """
+  Dénomination du déchet
+  """
+  wasteDescription: String!
+
+  """
+  Code déchet
+  """
+  wasteCode: String!
+
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+
+  """
+  Dénominations des déchets secondaires
+  """
+  secondaryWasteDescriptions: [String!]
+
+  """
+  Codes déchets secondaires
+  """
+  secondaryWasteCodes: [String!]
+
+  """
+  Produit
+  """
+  product: String!
+
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+
+  """
+  Volume en M3
+  """
+  volume: Float
+
+  """
+  Date de traitement
+  """
+  processingDate: DateTime!
+
+  """
+  Date de fin de traitement
+  """
+  processingEndDate: DateTime
+
+  """
+  Code de traitement réalisé
+  """
+  operationCode: String!
+
+  """
+  Mode de traitement
+  """
+  operationMode: OperationMode!
+
+  """
+  Référence de l'acte administratif
+  """
+  administrativeActReference: String!
+
+  """
+  Type de destinataire
+  """
+  destinationCompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+
+  """
+  Libellé de l'adresse du destinataire
+  """
+  destinationCompanyAddress: String
+
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+}
+
+"Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux entrants"
+type IncomingWasteLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+  """
+  SIRET du destinataire
+  """
+  reportForCompanySiret: String!
+  """
+  Dénomination du déchet
+  """
+  wasteDescription: String!
+  """
+  Code déchet
+  """
+  wasteCode: String!
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+  """
+  POP
+  """
+  wastePop: Boolean!
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+  """
+  Date de réception
+  """
+  receptionDate: DateTime!
+  """
+  Heure de pesée
+  """
+  weighingHour: String
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+  """
+  Volume en M3
+  """
+  volume: Float
+  """
+  Type de producteur initial
+  """
+  initialEmitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du producteur initial
+  """
+  initialEmitterCompanyOrgId: String
+  """
+  Raison sociale du producteur initial
+  """
+  initialEmitterCompanyName: String
+  """
+  Adresse du producteur initial
+  """
+  initialEmitterCompanyAddress: String
+  """
+  Code postal du producteur initial
+  """
+  initialEmitterCompanyPostalCode: String
+  """
+  Commune du producteur initial
+  """
+  initialEmitterCompanyCity: String
+  """
+  Code pays du producteur initial
+  """
+  initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Type d'expéditeur ou détenteur
+  """
+  emitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification de l'expéditeur ou détenteur
+  """
+  emitterCompanyOrgId: String
+  """
+  Raison sociale de l'expéditeur ou détenteur
+  """
+  emitterCompanyName: String
+  """
+  Adresse de l'expéditeur ou détenteur
+  """
+  emitterCompanyAddress: String
+  """
+  Code postal de l'expéditeur ou détenteur
+  """
+  emitterCompanyPostalCode: String
+  """
+  Commune de l'expéditeur ou détenteur
+  """
+  emitterCompanyCity: String
+  """
+  Code pays de l'expéditeur ou détenteur
+  """
+  emitterCompanyCountryCode: String
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteName: String
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteAddress: String
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSitePostalCode: String
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCity: String
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCountryCode: String
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+  """
+  Numéro de récépissé du courtier
+  """
+  brokerRecepisseNumber: String
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+  """
+  Code de traitement réalisé
+  """
+  operationCode: String!
+  """
+  Mode de traitement
+  """
+  operationMode: OperationMode
+  """
+  Rupture de traçabilité autorisée
+  """
+  noTraceability: Boolean
+
+  """
+  Numéro de notification ou de déclaration d'import
+  """
+  ttdImportNumber: String
+
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+  """
+  Code de traitement ultérieur prévu
+  """
+  nextOperationCode: String
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  """
+  isDirectSupply: Boolean
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+  """
+  Pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+  """
+  Pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+  """
+  Pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+  """
+  Pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+  """
+  Pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
+
+"Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux entrants"
+type IncomingTexsLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+  """
+  SIRET du destinataire
+  """
+  reportForCompanySiret: String!
+  """
+  Dénomination usuelle des terres excavées et sédiments ou des déchets
+  """
+  wasteDescription: String!
+  """
+  Code déchet
+  """
+  wasteCode: String
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+  """
+  POP
+  """
+  wastePop: Boolean!
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+  """
+  DAP
+  """
+  wasteDap: String
+  """
+  Date de réception
+  """
+  receptionDate: DateTime!
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+  """
+  Volume en M3
+  """
+  volume: Float
+  """
+  Codes INSEE des parcelles
+  """
+  parcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles
+  """
+  parcelNumbers: [String!]
+  """
+  Coordonnées des parcelles
+  """
+  parcelCoordinates: [String!]
+  """
+  Identifiant SIS du terrain
+  """
+  sisIdentifier: String
+  """
+  Type de producteur initial
+  """
+  initialEmitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du producteur initial
+  """
+  initialEmitterCompanyOrgId: String
+  """
+  Raison sociale du producteur initial
+  """
+  initialEmitterCompanyName: String
+  """
+  Adresse du producteur initial
+  """
+  initialEmitterCompanyAddress: String
+  """
+  Code postal du producteur initial
+  """
+  initialEmitterCompanyPostalCode: String
+  """
+  Commune du producteur initial
+  """
+  initialEmitterCompanyCity: String
+  """
+  Pays du producteur initial
+  """
+  initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Type d'expéditeur ou détenteur
+  """
+  emitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification de l'expéditeur ou détenteur
+  """
+  emitterCompanyOrgId: String
+  """
+  Raison sociale de l'expéditeur ou du détenteur
+  """
+  emitterCompanyName: String
+  """
+  Libellé de l'adresse de l'expéditeur ou du détenteur
+  """
+  emitterCompanyAddress: String
+  """
+  Code postal de l'expéditeur ou du détenteur
+  """
+  emitterCompanyPostalCode: String
+  """
+  Commune de l'expéditeur ou du détenteur
+  """
+  emitterCompanyCity: String
+  """
+  Code pays de l'expéditeur ou du détenteur
+  """
+  emitterCompanyCountryCode: String
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteName: String
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteAddress: String
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSitePostalCode: String
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCity: String
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCountryCode: String
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+  """
+  Numéro de récépissé du courtier
+  """
+  brokerRecepisseNumber: String
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+  """
+  Code de traitement réalisé
+  """
+  operationCode: String!
+  """
+  Mode de traitement
+  """
+  operationMode: OperationMode
+  """
+  Rupture de traçabilité autorisée
+  """
+  noTraceability: Boolean
+  """
+  Numéro de notification ou de déclaration d'import
+  """
+  ttdImportNumber: String
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+  """
+  Code de traitement ultérieur prévu
+  """
+  nextOperationCode: String
+  """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+  """
+  Codes INSEE des parcelles si valorisation
+  """
+  destinationParcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles si valorisation
+  """
+  destinationParcelNumbers: [String!]
+  """
+  Coordonnées des parcelles si valorisation
+  """
+  destinationParcelCoordinates: [String!]
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  """
+  isDirectSupply: Boolean
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+  """
+  Code pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+  """
+  Code pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+  """
+  Code pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+  """
+  Code pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+  """
+  Code pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
+
+"Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux sortants"
+type OutgoingTexsLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+  """
+  SIRET de l'expéditeur ou du détenteur
+  """
+  reportForCompanySiret: String!
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteName: String
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteAddress: String
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSitePostalCode: String
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCity: String
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCountryCode: String
+  """
+  Dénomination usuelle des terres excavées et sédiments ou des déchets
+  """
+  wasteDescription: String!
+  """
+  Code déchet
+  """
+  wasteCode: String
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+  """
+  POP
+  """
+  wastePop: Boolean!
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+  """
+  Date de réception des terres et sédiments ou des déchets sortants
+  """
+  dispatchDate: DateTime!
+  """
+  DAP
+  """
+  wasteDap: String
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+  """
+  Volume en M3
+  """
+  volume: Float
+  """
+  Type de producteur initial
+  """
+  initialEmitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du producteur initial
+  """
+  initialEmitterCompanyOrgId: String
+  """
+  Raison sociale du producteur initial
+  """
+  initialEmitterCompanyName: String
+  """
+  Adresse du producteur initial
+  """
+  initialEmitterCompanyAddress: String
+  """
+  Code postal du producteur initial
+  """
+  initialEmitterCompanyPostalCode: String
+  """
+  Commune du producteur initial
+  """
+  initialEmitterCompanyCity: String
+  """
+  Code pays du producteur initial
+  """
+  initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Codes INSEE des parcelles
+  """
+  parcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles
+  """
+  parcelNumbers: [String!]
+  """
+  Coordonnées des parcelles
+  """
+  parcelCoordinates: [String!]
+  """
+  Identifiant SIS du terrain
+  """
+  sisIdentifier: String
+  """
+  Type de destinataire
+  """
+  destinationCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+  """
+  Adresse du destinataire
+  """
+  destinationCompanyAddress: String
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+  """
+  Libellé de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteAddress: String
+  """
+  Code postal de l'adresse de dépôt du destinataire
+  """
+  destinationDropSitePostalCode: String
+  """
+  Commune de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCity: String
+  """
+  Pays de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCountryCode: String
+  """
+  Code de traitement prévu
+  """
+  operationCode: String!
+  """
+  Mode de traitement prévu
+  """
+  operationMode: OperationMode
+  """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+  """
+  Codes INSEE des parcelles si valorisation
+  """
+  destinationParcelInseeCodes: [String!]
+  """
+  Numéro(s) des parcelles si valorisation
+  """
+  destinationParcelNumbers: [String!]
+  """
+  Coordonnées des parcelles si valorisation
+  """
+  destinationParcelCoordinates: [String!]
+  """
+  Numéro de notification ou de déclaration GISTRID
+  """
+  gistridNumber: String
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+  """
+  Numéro de recépissé du courtier
+  """
+  brokerRecepisseNumber: String
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  """
+  isDirectSupply: Boolean
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+  """
+  Pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+  """
+  Pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+  """
+  Pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+  """
+  Pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+  """
+  Pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
+
+"Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux sortants"
+type OutgoingWasteLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+  """
+  SIRET de l'expéditeur ou du détenteur
+  """
+  reportForCompanySiret: String!
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteName: String
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteAddress: String
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSitePostalCode: String
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCity: String
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  reportForPickupSiteCountryCode: String
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+  """
+  Dénomination du déchet
+  """
+  wasteDescription: String!
+  """
+  Code déchet
+  """
+  wasteCode: String!
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+  """
+  POP
+  """
+  wastePop: Boolean!
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+  """
+  Date d'expédition
+  """
+  dispatchDate: DateTime!
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+  """
+  Volume en M3
+  """
+  volume: Float
+  """
+  Type de producteur initial
+  """
+  initialEmitterCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du producteur initial
+  """
+  initialEmitterCompanyOrgId: String
+  """
+  Raison sociale du producteur initial
+  """
+  initialEmitterCompanyName: String
+  """
+  Adresse du producteur initial
+  """
+  initialEmitterCompanyAddress: String
+  """
+  Code postal du producteur initial
+  """
+  initialEmitterCompanyPostalCode: String
+  """
+  Commune du producteur initial
+  """
+  initialEmitterCompanyCity: String
+  """
+  Code pays du producteur initial
+  """
+  initialEmitterCompanyCountryCode: String
+  """
+  Code(s) INSEE de(s) commune(s)
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+  """
+  Type de destinataire
+  """
+  destinationCompanyType: RegistryCompanyType!
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+  """
+  Libellé de l'adresse du destinataire
+  """
+  destinationCompanyAddress: String
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+  """
+  Libellé de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteAddress: String
+  """
+  Code postal de l'adresse de dépôt du destinataire
+  """
+  destinationDropSitePostalCode: String
+  """
+  Commune de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCity: String
+  """
+  Pays de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCountryCode: String
+  """
+  Code de traitement prévu
+  """
+  operationCode: String!
+  """
+  Mode de traitement prévu
+  """
+  operationMode: OperationMode
+  """
+  Numéro de notification ou de déclaration GISTRID
+  """
+  gistridNumber: String
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+  """
+  Numéro de récépissé du courtier
+  """
+  brokerRecepisseNumber: String
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  """
+  isDirectSupply: Boolean
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+  """
+  Pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+  """
+  Pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+  """
+  Pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+  """
+  Pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: RegistryCompanyType
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+  """
+  Pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
+
+type TransportedLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+
+  """
+  SIRET du transporteur
+  """
+  reportForCompanySiret: String!
+
+  """
+  Mode de transport du transporteur
+  """
+  reportForTransportMode: TransportMode!
+
+  """
+  Transport de déchet
+  """
+  reportForTransportIsWaste: Boolean!
+
+  """
+  Exemption de récépissé du transporteur
+  """
+  reportForRecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur
+  """
+  reportForRecepisseNumber: String
+
+  """
+  Mention ADR
+  """
+  reportForTransportAdr: String
+
+  """
+  Mention RID, ADNR, IMDG
+  """
+  reportForTransportOtherTmdCode: String
+
+  """
+  Numéro(s) d'immatriculation(s)
+  """
+  reportForTransportPlates: [String!]
+
+  """
+  Dénomination du déchet
+  """
+  wasteDescription: String!
+
+  """
+  Code déchet
+  """
+  wasteCode: String!
+
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+
+  """
+  POP
+  """
+  wastePop: Boolean!
+
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+
+  """
+  Date d'enlèvement
+  """
+  collectionDate: DateTime!
+
+  """
+  Date de déchargement
+  """
+  unloadingDate: DateTime!
+
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+
+  """
+  Volume en M3
+  """
+  volume: Float
+
+  """
+  Type d'expéditeur ou détenteur
+  """
+  emitterCompanyType: RegistryCompanyType!
+
+  """
+  Numéro d'identification de l'expéditeur ou détenteur
+  """
+  emitterCompanyOrgId: String
+
+  """
+  Raison sociale de l'expéditeur ou détenteur
+  """
+  emitterCompanyName: String
+
+  """
+  Adresse de l'expéditeur ou détenteur
+  """
+  emitterCompanyAddress: String
+
+  """
+  Code postal de l'expéditeur ou détenteur
+  """
+  emitterCompanyPostalCode: String
+
+  """
+  Commune de l'expéditeur ou détenteur
+  """
+  emitterCompanyCity: String
+
+  """
+  Code pays de l'expéditeur ou détenteur
+  """
+  emitterCompanyCountryCode: String
+
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteName: String
+
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteAddress: String
+
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSitePostalCode: String
+
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCity: String
+
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCountryCode: String
+
+  """
+  Type de destinataire
+  """
+  destinationCompanyType: RegistryCompanyType!
+
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+
+  """
+  Libellé de l'adresse du destinataire
+  """
+  destinationCompanyAddress: String
+
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+
+  """
+  Libellé de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteAddress: String
+
+  """
+  Code postal de l'adresse de dépôt du destinataire
+  """
+  destinationDropSitePostalCode: String
+
+  """
+  Commune de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCity: String
+
+  """
+  Pays de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCountryCode: String
+
+  """
+  Numéro de notification ou de déclaration GISTRID
+  """
+  gistridNumber: String
+
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+
+  """
+  SIRET du courtier
+  """
+  brokerCompanySiret: String
+
+  """
+  Raison sociale du courtier
+  """
+  brokerCompanyName: String
+
+  """
+  Numéro de récépissé du courtier
+  """
+  brokerRecepisseNumber: String
+
+  """
+  SIRET du négociant
+  """
+  traderCompanySiret: String
+
+  """
+  Raison sociale du négociant
+  """
+  traderCompanyName: String
+
+  """
+  Numéro de récépissé du négociant
+  """
+  traderRecepisseNumber: String
+}
+
+type ManagedLine {
+  """
+  Identifiant unique
+  """
+  publicId: ID!
+
+  """
+  SIRET du déclarant
+  """
+  reportAsCompanySiret: String
+
+  """
+  SIRET du courtier ou négociant
+  """
+  reportForCompanySiret: String!
+
+  """
+  Dénomination du déchet
+  """
+  wasteDescription: String!
+
+  """
+  Code déchet
+  """
+  wasteCode: String
+
+  """
+  Code déchet Bâle
+  """
+  wasteCodeBale: String
+
+  """
+  POP
+  """
+  wastePop: Boolean!
+
+  """
+  Dangereux
+  """
+  wasteIsDangerous: Boolean
+
+  """
+  Date d'acquisition ou de début de gestion
+  """
+  managingStartDate: DateTime!
+
+  """
+  Date de cession ou de fin de gestion
+  """
+  managingEndDate: DateTime!
+
+  """
+  Poids en tonnes
+  """
+  weightValue: Float!
+
+  """
+  Type de poids
+  """
+  weightIsEstimate: Boolean!
+
+  """
+  Volume en M3
+  """
+  volume: Float
+
+  """
+  DAP
+  """
+  wasteDap: String
+
+  """
+  Type de producteur initial
+  """
+  initialEmitterCompanyType: RegistryCompanyType!
+
+  """
+  Numéro d'identification du producteur initial
+  """
+  initialEmitterCompanyOrgId: String
+
+  """
+  Raison sociale du producteur initial
+  """
+  initialEmitterCompanyName: String
+
+  """
+  Adresse du producteur initial
+  """
+  initialEmitterCompanyAddress: String
+
+  """
+  Code postal du producteur initial
+  """
+  initialEmitterCompanyPostalCode: String
+
+  """
+  Commune du producteur initial
+  """
+  initialEmitterCompanyCity: String
+
+  """
+  Code pays du producteur initial
+  """
+  initialEmitterCompanyCountryCode: String
+
+  """
+  Code(s) INSEE de(s) commune(s)
+  """
+  initialEmitterMunicipalitiesInseeCodes: [String!]
+
+  """
+  Codes INSEE des parcelles
+  """
+  parcelInseeCodes: [String!]
+
+  """
+  Numéro(s) des parcelles
+  """
+  parcelNumbers: [String!]
+
+  """
+  Coordonnées des parcelles
+  """
+  parcelCoordinates: [String!]
+
+  """
+  Identifiant SIS du terrain
+  """
+  sisIdentifier: String
+
+  """
+  Type d'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyOrgId: String
+
+  """
+  Raison sociale de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyName: String
+
+  """
+  Libellé de l'adresse de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyAddress: String
+
+  """
+  Commune de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyCity: String
+
+  """
+  Code postal de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyPostalCode: String
+
+  """
+  Code pays de l'installation de Tri Transit Regroupement
+  """
+  tempStorerCompanyCountryCode: String
+
+  """
+  Type de destinataire
+  """
+  destinationCompanyType: RegistryCompanyType!
+
+  """
+  Numéro d'identification du destinataire
+  """
+  destinationCompanyOrgId: String
+
+  """
+  Raison sociale du destinataire
+  """
+  destinationCompanyName: String
+
+  """
+  Libellé de l'adresse du destinataire
+  """
+  destinationCompanyAddress: String
+
+  """
+  Commune du destinataire
+  """
+  destinationCompanyCity: String
+
+  """
+  Code postal du destinataire
+  """
+  destinationCompanyPostalCode: String
+
+  """
+  Code pays du destinataire
+  """
+  destinationCompanyCountryCode: String
+
+  """
+  Libellé de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteAddress: String
+
+  """
+  Code postal de l'adresse de dépôt du destinataire
+  """
+  destinationDropSitePostalCode: String
+
+  """
+  Commune de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCity: String
+
+  """
+  Pays de l'adresse de dépôt du destinataire
+  """
+  destinationDropSiteCountryCode: String
+
+  """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+
+  """
+  Codes INSEE des parcelles si valorisation
+  """
+  destinationParcelInseeCodes: [String!]
+
+  """
+  Numéro(s) des parcelles si valorisation
+  """
+  destinationParcelNumbers: [String!]
+
+  """
+  Coordonnées des parcelles si valorisation
+  """
+  destinationParcelCoordinates: [String!]
+
+  """
+  Numéro de notification ou de déclaration GISTRID
+  """
+  gistridNumber: String
+
+  """
+  Numéro de mouvement
+  """
+  movementNumber: String
+
+  """
+  Code de traitement réalisé
+  """
+  operationCode: String!
+
+  """
+  Mode de traitement
+  """
+  operationMode: OperationMode
+
+  """
+  Type d'expéditeur ou détenteur
+  """
+  emitterCompanyType: RegistryCompanyType!
+
+  """
+  Numéro d'identification de l'expéditeur ou détenteur
+  """
+  emitterCompanyOrgId: String
+
+  """
+  Raison sociale de l'expéditeur ou détenteur
+  """
+  emitterCompanyName: String
+
+  """
+  Adresse de l'expéditeur ou détenteur
+  """
+  emitterCompanyAddress: String
+
+  """
+  Code postal de l'expéditeur ou détenteur
+  """
+  emitterCompanyPostalCode: String
+
+  """
+  Commune de l'expéditeur ou détenteur
+  """
+  emitterCompanyCity: String
+
+  """
+  Code pays de l'expéditeur ou détenteur
+  """
+  emitterCompanyCountryCode: String
+
+  """
+  Référence du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteName: String
+
+  """
+  Libellé de l'adresse du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteAddress: String
+
+  """
+  Code postal du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSitePostalCode: String
+
+  """
+  Commune du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCity: String
+
+  """
+  Code pays du chantier ou du lieu de collecte de l'expéditeur ou du détenteur
+  """
+  emitterPickupSiteCountryCode: String
+
+  """
+  SIRET de l'éco-organisme
+  """
+  ecoOrganismeSiret: String
+
+  """
+  Raison sociale de l'éco-organisme
+  """
+  ecoOrganismeName: String
+
+  """
+  Approvisionnement direct (pipeline, convoyeur)
+  """
+  isDirectSupply: Boolean
+
+  """
+  Mode de transport du transporteur n°1
+  """
+  transporter1TransportMode: TransportMode
+
+  """
+  Type de transporteur n°1
+  """
+  transporter1CompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du transporteur n°1
+  """
+  transporter1CompanyOrgId: String
+
+  """
+  Exemption de récépissé du transporteur n°1
+  """
+  transporter1RecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur n°1
+  """
+  transporter1RecepisseNumber: String
+
+  """
+  Raison sociale du transporteur n°1
+  """
+  transporter1CompanyName: String
+
+  """
+  Adresse du transporteur n°1
+  """
+  transporter1CompanyAddress: String
+
+  """
+  Code postal du transporteur n°1
+  """
+  transporter1CompanyPostalCode: String
+
+  """
+  Commune du transporteur n°1
+  """
+  transporter1CompanyCity: String
+
+  """
+  Pays du transporteur n°1
+  """
+  transporter1CompanyCountryCode: String
+
+  """
+  Mode de transport du transporteur n°2
+  """
+  transporter2TransportMode: TransportMode
+
+  """
+  Type de transporteur n°2
+  """
+  transporter2CompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du transporteur n°2
+  """
+  transporter2CompanyOrgId: String
+
+  """
+  Exemption de récépissé du transporteur n°2
+  """
+  transporter2RecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur n°2
+  """
+  transporter2RecepisseNumber: String
+
+  """
+  Raison sociale du transporteur n°2
+  """
+  transporter2CompanyName: String
+
+  """
+  Adresse du transporteur n°2
+  """
+  transporter2CompanyAddress: String
+
+  """
+  Code postal du transporteur n°2
+  """
+  transporter2CompanyPostalCode: String
+
+  """
+  Commune du transporteur n°2
+  """
+  transporter2CompanyCity: String
+
+  """
+  Pays du transporteur n°2
+  """
+  transporter2CompanyCountryCode: String
+
+  """
+  Mode de transport du transporteur n°3
+  """
+  transporter3TransportMode: TransportMode
+
+  """
+  Type de transporteur n°3
+  """
+  transporter3CompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du transporteur n°3
+  """
+  transporter3CompanyOrgId: String
+
+  """
+  Exemption de récépissé du transporteur n°3
+  """
+  transporter3RecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur n°3
+  """
+  transporter3RecepisseNumber: String
+
+  """
+  Raison sociale du transporteur n°3
+  """
+  transporter3CompanyName: String
+
+  """
+  Adresse du transporteur n°3
+  """
+  transporter3CompanyAddress: String
+
+  """
+  Code postal du transporteur n°3
+  """
+  transporter3CompanyPostalCode: String
+
+  """
+  Commune du transporteur n°3
+  """
+  transporter3CompanyCity: String
+
+  """
+  Pays du transporteur n°3
+  """
+  transporter3CompanyCountryCode: String
+
+  """
+  Mode de transport du transporteur n°4
+  """
+  transporter4TransportMode: TransportMode
+
+  """
+  Type de transporteur n°4
+  """
+  transporter4CompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du transporteur n°4
+  """
+  transporter4CompanyOrgId: String
+
+  """
+  Exemption de récépissé du transporteur n°4
+  """
+  transporter4RecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur n°4
+  """
+  transporter4RecepisseNumber: String
+
+  """
+  Raison sociale du transporteur n°4
+  """
+  transporter4CompanyName: String
+
+  """
+  Adresse du transporteur n°4
+  """
+  transporter4CompanyAddress: String
+
+  """
+  Code postal du transporteur n°4
+  """
+  transporter4CompanyPostalCode: String
+
+  """
+  Commune du transporteur n°4
+  """
+  transporter4CompanyCity: String
+
+  """
+  Pays du transporteur n°4
+  """
+  transporter4CompanyCountryCode: String
+
+  """
+  Mode de transport du transporteur n°5
+  """
+  transporter5TransportMode: TransportMode
+
+  """
+  Type de transporteur n°5
+  """
+  transporter5CompanyType: RegistryCompanyType
+
+  """
+  Numéro d'identification du transporteur n°5
+  """
+  transporter5CompanyOrgId: String
+
+  """
+  Exemption de récépissé du transporteur n°5
+  """
+  transporter5RecepisseIsExempted: Boolean
+
+  """
+  Numéro de récépissé du transporteur n°5
+  """
+  transporter5RecepisseNumber: String
+
+  """
+  Raison sociale du transporteur n°5
+  """
+  transporter5CompanyName: String
+
+  """
+  Adresse du transporteur n°5
+  """
+  transporter5CompanyAddress: String
+
+  """
+  Code postal du transporteur n°5
+  """
+  transporter5CompanyPostalCode: String
+
+  """
+  Commune du transporteur n°5
+  """
+  transporter5CompanyCity: String
+
+  """
+  Pays du transporteur n°5
+  """
+  transporter5CompanyCountryCode: String
+}
