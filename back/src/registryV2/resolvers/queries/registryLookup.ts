@@ -1,7 +1,16 @@
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { QueryRegistryLookupArgs } from "@td/codegen-back";
+import {
+  SsdLine,
+  IncomingTexsLine,
+  IncomingWasteLine,
+  OutgoingTexsLine,
+  OutgoingWasteLine,
+  ManagedLine,
+  TransportedLine,
+  QueryRegistryLookupArgs
+} from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { RegistryImportType } from "@prisma/client";
@@ -71,12 +80,12 @@ export async function registryLookup(
     ...lookup,
     publicId: lookup.readableId,
     type,
-    ssd: lookup.registrySsd ?? null,
-    incomingWaste: lookup.registryIncomingWaste ?? null,
-    incomingTexs: lookup.registryIncomingTexs ?? null,
-    outgoingWaste: lookup.registryOutgoingWaste ?? null,
-    outgoingTexs: lookup.registryOutgoingTexs ?? null,
-    managedWaste: lookup.registryManaged ?? null,
-    transportedWaste: lookup.registryTransported ?? null
+    ssd: (lookup.registrySsd as SsdLine) ?? null,
+    incomingWaste: (lookup.registryIncomingWaste as IncomingWasteLine) ?? null,
+    incomingTexs: (lookup.registryIncomingTexs as IncomingTexsLine) ?? null,
+    outgoingWaste: (lookup.registryOutgoingWaste as OutgoingWasteLine) ?? null,
+    outgoingTexs: (lookup.registryOutgoingTexs as OutgoingTexsLine) ?? null,
+    managedWaste: (lookup.registryManaged as ManagedLine) ?? null,
+    transportedWaste: (lookup.registryTransported as TransportedLine) ?? null
   };
 }
