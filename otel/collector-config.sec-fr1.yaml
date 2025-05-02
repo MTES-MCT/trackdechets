@@ -25,6 +25,9 @@ processors:
     send_batch_size: ${env:OTEL_DD_BATCH_SIZE:-100}
     timeout: 10s
 
+  probabilistic_sampler:
+    sampling_percentage: 15
+
   attributes:
     actions:
       - key: graphql.source
@@ -44,13 +47,14 @@ exporters:
       site: datadoghq.eu
       key: ${env:DD_API_KEY}
     traces:
+      ignore_resources: ["OPTIONS /"]
       compute_top_level_by_span_kind: true
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, attributes, batch/datadog_generic]
+      processors: [memory_limiter, probabilistic_sampler, attributes, batch/datadog_generic]
       exporters: [datadog/connector, datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
