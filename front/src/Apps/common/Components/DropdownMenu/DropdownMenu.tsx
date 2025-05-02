@@ -71,7 +71,7 @@ const DropdownMenu = ({
             active={isOpen}
             focusTrapOptions={{
               allowOutsideClick: true,
-              preventScroll: true,
+              preventScroll: true
             }}
           >
             <ul

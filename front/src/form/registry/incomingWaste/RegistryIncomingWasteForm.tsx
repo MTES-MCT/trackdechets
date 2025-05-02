@@ -102,16 +102,16 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
   );
 
   const isDirectSupply = methods.watch("isDirectSupply");
-    useEffect(() => {
-      if (isDirectSupply) {
-        setDisabledFieldNames(prev => [...prev, "transporter"]);
-      } else {
-        setDisabledFieldNames(prev =>
-          prev.filter(field => field !== "transporter")
-        );
-        methods.setValue("transporter", []);
-      }
-    }, [isDirectSupply]);
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply]);
 
   const [addToIncomingWasteRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingWasteRegistry">

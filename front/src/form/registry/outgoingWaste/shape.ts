@@ -349,8 +349,7 @@ export const outgoingWasteFormShape: FormShape = [
         },
         type: "text",
         style: { className: "fr-col-10" }
-      },
-      
+      }
     ]
   },
   {

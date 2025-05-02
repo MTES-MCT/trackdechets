@@ -67,7 +67,8 @@ export const transportedFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle des terres excavées et sédiments ou des déchets",
+        label:
+          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
         required: true,
         validation: {
           wasteDescription: nonEmptyString

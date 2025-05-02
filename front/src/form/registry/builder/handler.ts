@@ -30,7 +30,8 @@ export function handleMutationResponse(
   if (stats.skipped) {
     methods.setError("publicId", {
       type: "server",
-      message: "Le numéro unique saisi est déjà utilisé. Si vous souhaitez modifier une déclaration existante, vous pouvez la retrouver depuis le tableau de bord des déclarations."
+      message:
+        "Le numéro unique saisi est déjà utilisé. Si vous souhaitez modifier une déclaration existante, vous pouvez la retrouver depuis le tableau de bord des déclarations."
     });
     return false;
   }

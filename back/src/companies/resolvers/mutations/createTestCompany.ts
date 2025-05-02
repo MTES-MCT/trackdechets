@@ -47,7 +47,7 @@ const fixtures = {
   city: "Ville de test",
   postalCode: "00000",
   country: "FR",
-  street: "Rue de test",
+  street: "Rue de test"
 };
 
 const createTestCompany: MutationResolvers["createTestCompany"] = async (
