@@ -25,10 +25,6 @@ const DropdownMenu = ({
     setIsOpen(!isOpen);
   };
 
-  const closeMenu = () => {
-    setIsOpen(false);
-  };
-
   return (
     <div
       className={cn("dropdown-menu", className, {
@@ -67,11 +63,16 @@ const DropdownMenu = ({
       <ComboBox
         parentRef={triggerRef}
         isOpen={isOpen}
-        onOpenChange={open => setIsOpen(open)}
+        onOpenChange={setIsOpen}
         autoWidth={true}
       >
-        {() => (
-          <FocusTrap active={isOpen}>
+        {({ close }) => (
+          <FocusTrap
+            active={isOpen}
+            focusTrapOptions={{
+              allowOutsideClick: true
+            }}
+          >
             <ul
               className={cn("dropdown-menu__content", {
                 "dropdown-menu__content__iconAlone": iconAlone,
@@ -88,7 +89,7 @@ const DropdownMenu = ({
                           ...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])
                         ])}
                         onClick={e => {
-                          closeMenu();
+                          close();
                           !!link.handleClick && link.handleClick(e);
                         }}
                       >
@@ -110,7 +111,7 @@ const DropdownMenu = ({
                             ? link.route
                             : { ...link.route }
                         }
-                        onClick={closeMenu}
+                        onClick={() => close()}
                         state={link.state && { ...link.state }}
                         className="fr-raw-link"
                       >

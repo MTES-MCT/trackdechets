@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, cleanup } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 
 import DropdownMenu from "./DropdownMenu";
@@ -16,6 +16,22 @@ const links = [
 ];
 
 describe("DropdownMenu", () => {
+  beforeEach(() => {
+    // Create portal-root element
+    const portalRoot = document.createElement("div");
+    portalRoot.setAttribute("id", "portal-root");
+    document.body.appendChild(portalRoot);
+  });
+
+  afterEach(() => {
+    // Clean up portal-root element
+    const portalRoot = document.getElementById("portal-root");
+    if (portalRoot) {
+      document.body.removeChild(portalRoot);
+    }
+    cleanup();
+  });
+
   it("renders the component", () => {
     const { getByText } = render(
       <DropdownMenu menuTitle="title" links={links} />,
