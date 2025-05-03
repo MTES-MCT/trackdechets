@@ -92,7 +92,6 @@ input SsdLineInput {
   - être dans le futur
   - être antérieure à J-1 an
   - être antérieure ou égale à la date de traitement
-
   Une seule date d'utilisation ou d'expédition doit obligatoirement être renseignée.
 
   Valeurs acceptées :
@@ -173,6 +172,7 @@ input SsdLineInput {
 
   """
   **Codes déchets secondaires**
+
 
   Codes déchets secondaires faisant l'objet de la sortie de statut de déchet.
 
@@ -5482,7 +5482,7 @@ input TransportedLineInput {
   - De 8 à 9 caractères (espaces compris)
   - Format code déchet avec espace : XX XX XX ou XX XX XX*
   """
-  wasteCode: String!
+  wasteCode: String
 
   """
   **Code déchet Bâle**

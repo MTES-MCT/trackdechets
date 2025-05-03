@@ -22,6 +22,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
+import { Operation } from "../common/Operation";
 
 export const incomingWasteFormShape: FormShape = [
   {
@@ -327,57 +328,25 @@ export const incomingWasteFormShape: FormShape = [
     tabTitle: "Traitement",
     fields: [
       {
-        shape: "layout",
-        fields: [
-          {
-            name: "operationCode",
-            shape: "generic",
-            type: "select",
-            label: "Code de traitement réalisé",
-            required: true,
-            defaultOption: "Sélectionnez un traitement",
-            validation: {
-              operationCode: nonEmptyString
-            },
-            style: { className: "fr-col-4" },
-            choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-              label: code,
-              value: code
-            }))
-          },
-          {
-            name: "operationMode",
-            shape: "generic",
-            type: "select",
-            label: "Mode de traitement",
-            defaultOption: "Sélectionnez un mode",
-            required: false,
-            validation: {
-              operationMode: optionalString
-            },
-            style: { className: "fr-col-4" },
-            choices: [
-              { value: "REUTILISATION", label: "Réutilisation" },
-              { value: "RECYCLAGE", label: "Recyclage" },
-              {
-                value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisation énergétique"
-              },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
-              { value: "ELIMINATION", label: "Élimination" }
-            ]
-          }
-        ]
-      },
-      {
-        name: "noTraceability",
-        shape: "generic",
-        type: "checkbox",
-        label: "Rupture de traçabilité autorisée",
-        required: false,
+        Component: Operation,
+        props: {
+          operationCodes: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES,
+          showNoTraceability: true,
+          showNextOperationCode: true
+        },
+        names: [
+          "operationCode",
+          "operationMode",
+          "noTraceability",
+          "nextOperationCode"
+        ],
         validation: {
-          noTraceability: booleanString
-        }
+          operationCode: nonEmptyString,
+          operationMode: optionalString,
+          noTraceability: booleanString,
+          nextOperationCode: optionalString
+        },
+        shape: "custom"
       },
       {
         name: "ttdImportNumber",
@@ -400,22 +369,6 @@ export const incomingWasteFormShape: FormShape = [
         },
         type: "text",
         style: { className: "fr-col-10" }
-      },
-      {
-        name: "nextOperationCode",
-        shape: "generic",
-        type: "select",
-        label: "Code de traitement ultérieur prévu",
-        defaultOption: "Sélectionnez un traitement",
-        required: false,
-        validation: {
-          nextOperationCode: optionalString
-        },
-        style: { className: "fr-col-4" },
-        choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-          label: code,
-          value: code
-        }))
       }
     ]
   },

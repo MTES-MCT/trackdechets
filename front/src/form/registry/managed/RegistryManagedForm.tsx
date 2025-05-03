@@ -28,6 +28,22 @@ type FormValues = ManagedLineInput & {
   transporter: FormTransporter[];
 };
 
+const DEFAULT_VALUES: Partial<FormValues> = {
+  wastePop: false,
+  weightIsEstimate: false,
+  wasteIsDangerous: false,
+  isUpcycled: false,
+  isDirectSupply: false,
+  parcelInseeCodes: [],
+  parcelNumbers: [],
+  parcelCoordinates: [],
+  destinationParcelInseeCodes: [],
+  destinationParcelNumbers: [],
+  destinationParcelCoordinates: [],
+  initialEmitterMunicipalitiesInseeCodes: [],
+  transporter: []
+};
+
 export function RegistryManagedForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -35,20 +51,8 @@ export function RegistryManagedForm({ onClose }: Props) {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      wastePop: false,
-      weightIsEstimate: false,
-      wasteIsDangerous: false,
-      isUpcycled: false,
-      isDirectSupply: false,
-      parcelInseeCodes: [],
-      parcelNumbers: [],
-      parcelCoordinates: [],
-      destinationParcelInseeCodes: [],
-      destinationParcelNumbers: [],
-      destinationParcelCoordinates: [],
-      initialEmitterMunicipalitiesInseeCodes: [],
-      transporter: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(managedFormShape))
   });
@@ -96,6 +100,7 @@ export function RegistryManagedForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedIncominTexsProps,
             managingStartDate: isoDateToHtmlDate(
               definedIncominTexsProps.managingStartDate
@@ -128,11 +133,11 @@ export function RegistryManagedForm({ onClose }: Props) {
   useEffect(() => {
     if (isDirectSupply) {
       setDisabledFieldNames(prev => [...prev, "transporter"]);
+      methods.setValue("transporter", []);
     } else {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
-      methods.setValue("transporter", []);
     }
   }, [isDirectSupply, methods]);
 

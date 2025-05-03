@@ -1,12 +1,10 @@
 import { prisma } from "@td/prisma";
-import {
-  FINAL_OPERATION_CODES,
-  TRIMMED_FINAL_OPERATION_CODES
-} from "../../common/operationCodes";
+import { TRIMMED_FINAL_OPERATION_CODES } from "../../common/operationCodes";
 import { operationHook as bsddOperationHook } from "../../forms/operationHook";
 import { operationHook as bsdaOperationHook } from "../../bsda/operationHook";
 import { operationHook as bsffOperationHook } from "../../bsffs/operationHook";
 import { operationHook as bsdasriOperationHook } from "../../bsdasris/operationHook";
+import { FINAL_OPERATION_CODES } from "@td/constants";
 
 (async () => {
   // On ne prend en compte que les bordereaux donc le traitement final au eu lieu

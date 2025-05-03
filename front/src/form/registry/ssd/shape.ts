@@ -1,7 +1,8 @@
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
   ADMINISTRATIVE_ACT_EXPLANATIONS,
-  SSD_PROCESSING_OPERATIONS_CODES
+  SSD_PROCESSING_OPERATIONS_CODES,
+  SSD_OPERATION_MODES
 } from "@td/constants";
 import { FormShape } from "../builder/types";
 import { CompanySelector } from "../common/CompanySelector";
@@ -17,6 +18,7 @@ import {
   optionalNumber,
   booleanString
 } from "../builder/validation";
+import { Operation } from "../common/Operation";
 
 export const ssdFormShape: FormShape = [
   {
@@ -177,46 +179,19 @@ export const ssdFormShape: FormShape = [
         ]
       },
       {
-        shape: "layout",
-        fields: [
-          {
-            name: "operationCode",
-            shape: "generic",
-            type: "select",
-            label: "Code de traitement réalisé",
-            required: true,
-            defaultOption: "Sélectionnez un traitement",
-            validation: {
-              operationCode: nonEmptyString
-            },
-            style: { className: "fr-col-4" },
-            choices: SSD_PROCESSING_OPERATIONS_CODES.map(code => ({
-              label: code,
-              value: code
-            }))
-          },
-          {
-            name: "operationMode",
-            shape: "generic",
-            type: "select",
-            label: "Mode de traitement",
-            required: true,
-            defaultOption: "Sélectionnez un mode",
-            validation: {
-              operationMode: nonEmptyString
-            },
-            style: { className: "fr-col-4" },
-            choices: [
-              { value: "REUTILISATION", label: "Réutilisation" },
-              { value: "RECYCLAGE", label: "Recyclage" },
-              {
-                value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisation énergétique"
-              },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" }
-            ]
-          }
-        ]
+        Component: Operation,
+        props: {
+          operationCodes: SSD_PROCESSING_OPERATIONS_CODES,
+          operationModes: SSD_OPERATION_MODES,
+          showNoTraceability: false,
+          showNextOperationCode: false
+        },
+        names: ["operationCode", "operationMode"],
+        validation: {
+          operationCode: nonEmptyString,
+          operationMode: nonEmptyString
+        },
+        shape: "custom"
       },
       {
         name: "administrativeActReference",

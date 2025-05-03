@@ -28,6 +28,23 @@ type FormValues = IncomingTexsLineInput & {
   transporter: FormTransporter[];
 };
 
+const DEFAULT_VALUES: Partial<FormValues> = {
+  wastePop: false,
+  weightIsEstimate: false,
+  wasteIsDangerous: false,
+  noTraceability: false,
+  isUpcycled: false,
+  isDirectSupply: false,
+  parcelInseeCodes: [],
+  parcelNumbers: [],
+  parcelCoordinates: [],
+  destinationParcelInseeCodes: [],
+  destinationParcelNumbers: [],
+  destinationParcelCoordinates: [],
+  initialEmitterMunicipalitiesInseeCodes: [],
+  transporter: []
+};
+
 export function RegistryIncomingTexsForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -35,21 +52,8 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      wastePop: false,
-      weightIsEstimate: false,
-      wasteIsDangerous: false,
-      noTraceability: false,
-      isUpcycled: false,
-      isDirectSupply: false,
-      parcelInseeCodes: [],
-      parcelNumbers: [],
-      parcelCoordinates: [],
-      destinationParcelInseeCodes: [],
-      destinationParcelNumbers: [],
-      destinationParcelCoordinates: [],
-      initialEmitterMunicipalitiesInseeCodes: [],
-      transporter: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(incomingTexsFormShape))
   });
@@ -97,6 +101,7 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedIncominTexsProps,
             receptionDate: isoDateToHtmlDate(
               definedIncominTexsProps.receptionDate

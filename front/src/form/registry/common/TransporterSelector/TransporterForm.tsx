@@ -9,7 +9,7 @@ import { formatError } from "../../builder/error";
 import { COMPANY_TYPES } from "../CompanySelector";
 import { InlineAddress } from "../Address";
 import Input from "@codegouvfr/react-dsfr/Input";
-
+import { INITIAL_TRANSPORTER } from "./TransporterSelector";
 type TransporterFormProps = {
   fieldName: string;
   index?: number;
@@ -38,6 +38,9 @@ export function TransporterForm({
     typeof index === "number"
       ? errors?.[fieldName]?.[index]
       : errors?.[fieldName];
+  const { onChange: onChangeCompanyType, ...typeSelectMethods } =
+    methods.register(`${fullFieldName}.CompanyType`);
+
   return (
     <div className="fr-container fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
@@ -45,7 +48,46 @@ export function TransporterForm({
           <Select
             label={`Type de transporteur`}
             nativeSelectProps={{
-              ...methods.register(`${fullFieldName}.CompanyType`)
+              ...typeSelectMethods,
+              onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
+                methods.setValue(
+                  `${fullFieldName}.TransportMode`,
+                  INITIAL_TRANSPORTER.TransportMode
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyOrgId`,
+                  INITIAL_TRANSPORTER.CompanyOrgId
+                );
+                methods.setValue(
+                  `${fullFieldName}.RecepisseIsExempted`,
+                  INITIAL_TRANSPORTER.RecepisseIsExempted
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyName`,
+                  INITIAL_TRANSPORTER.CompanyName
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyAddress`,
+                  INITIAL_TRANSPORTER.CompanyAddress
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyCity`,
+                  INITIAL_TRANSPORTER.CompanyCity
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyPostalCode`,
+                  INITIAL_TRANSPORTER.CompanyPostalCode
+                );
+                methods.setValue(
+                  `${fullFieldName}.CompanyCountryCode`,
+                  INITIAL_TRANSPORTER.CompanyCountryCode
+                );
+                methods.setValue(
+                  `${fullFieldName}.RecepisseNumber`,
+                  INITIAL_TRANSPORTER.RecepisseNumber
+                );
+                onChangeCompanyType(e);
+              }
             }}
           >
             {Object.entries(COMPANY_TYPES)
@@ -109,19 +151,19 @@ export function TransporterForm({
               }
             }}
           />
-          {transporterError?.CompanyOrgId ||
-            (transporterError?.CompanyAddress && (
-              <div className="fr-mb-2w">
-                <Alert
-                  description={formatError(
-                    transporterError?.CompanyOrgId ||
-                      transporterError?.CompanyAddress
-                  )}
-                  severity="error"
-                  small
-                />
-              </div>
-            ))}
+          {(transporterError?.CompanyOrgId ||
+            transporterError?.CompanyAddress) && (
+            <div className="fr-mb-2w">
+              <Alert
+                description={formatError(
+                  transporterError?.CompanyOrgId ||
+                    transporterError?.CompanyAddress
+                )}
+                severity="error"
+                small
+              />
+            </div>
+          )}
         </>
       ) : (
         transporter?.CompanyType !== "" && (

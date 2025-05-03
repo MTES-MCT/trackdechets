@@ -45,7 +45,14 @@ export function InlineAddress({
   nameEnabled
 }: InlineProps) {
   const { errors } = methods.formState;
-
+  // handle errors when this component is used in an array of fields, and the errors are nested
+  // ex: errors.transporter.0.CompanyName
+  let deepErrors = errors;
+  const prefixSplit = prefix.split(".");
+  const finalPrefix = prefixSplit[prefixSplit.length - 1];
+  if (prefixSplit.length > 1) {
+    deepErrors = errors?.[prefixSplit[0]]?.[prefixSplit[1]];
+  }
   return (
     <>
       {nameEnabled && (
@@ -57,8 +64,10 @@ export function InlineAddress({
               disabled,
               ...methods.register(`${prefix}Name`)
             }}
-            state={errors?.[`${prefix}Name`] && "error"}
-            stateRelatedMessage={formatError(errors?.[`${prefix}Name`])}
+            state={deepErrors?.[`${finalPrefix}Name`] && "error"}
+            stateRelatedMessage={formatError(
+              deepErrors?.[`${finalPrefix}Name`]
+            )}
           />
         </div>
       )}
@@ -70,8 +79,10 @@ export function InlineAddress({
             disabled,
             ...methods.register(`${prefix}Address`)
           }}
-          state={errors?.[`${prefix}Address`] && "error"}
-          stateRelatedMessage={formatError(errors?.[`${prefix}Address`])}
+          state={deepErrors?.[`${finalPrefix}Address`] && "error"}
+          stateRelatedMessage={formatError(
+            deepErrors?.[`${finalPrefix}Address`]
+          )}
         />
       </div>
       <div className="fr-col-4">
@@ -82,8 +93,10 @@ export function InlineAddress({
             disabled,
             ...methods.register(`${prefix}PostalCode`)
           }}
-          state={errors?.[`${prefix}PostalCode`] && "error"}
-          stateRelatedMessage={formatError(errors?.[`${prefix}PostalCode`])}
+          state={deepErrors?.[`${finalPrefix}PostalCode`] && "error"}
+          stateRelatedMessage={formatError(
+            deepErrors?.[`${finalPrefix}PostalCode`]
+          )}
         />
       </div>
       <div className="fr-col-8">
@@ -94,8 +107,8 @@ export function InlineAddress({
             disabled,
             ...methods.register(`${prefix}City`)
           }}
-          state={errors?.[`${prefix}City`] && "error"}
-          stateRelatedMessage={formatError(errors?.[`${prefix}City`])}
+          state={deepErrors?.[`${finalPrefix}City`] && "error"}
+          stateRelatedMessage={formatError(deepErrors?.[`${finalPrefix}City`])}
         />
       </div>
       <div className="fr-col-4">

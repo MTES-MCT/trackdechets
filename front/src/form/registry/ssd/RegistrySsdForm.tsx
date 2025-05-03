@@ -24,6 +24,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = { onClose: () => void };
 
+const DEFAULT_VALUES: Partial<SsdLineInput> = {
+  weightIsEstimate: false,
+  secondaryWasteCodes: [],
+  secondaryWasteDescriptions: []
+};
+
 export function RegistrySsdForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -31,10 +37,8 @@ export function RegistrySsdForm({ onClose }: Props) {
 
   const methods = useForm<SsdLineInput>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null,
-      weightIsEstimate: false,
-      secondaryWasteCodes: [],
-      secondaryWasteDescriptions: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null
     },
     resolver: zodResolver(schemaFromShape(ssdFormShape))
   });
@@ -58,6 +62,7 @@ export function RegistrySsdForm({ onClose }: Props) {
           );
 
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedSsdProps,
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
             dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),

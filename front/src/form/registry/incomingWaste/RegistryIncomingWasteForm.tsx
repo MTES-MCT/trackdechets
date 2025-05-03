@@ -29,6 +29,16 @@ type FormValues = IncomingWasteLineInput & {
   transporter: FormTransporter[];
 };
 
+const DEFAULT_VALUES: Partial<FormValues> = {
+  wastePop: false,
+  wasteIsDangerous: false,
+  weightIsEstimate: false,
+  noTraceability: false,
+  isDirectSupply: false,
+  initialEmitterMunicipalitiesInseeCodes: [],
+  transporter: []
+};
+
 export function RegistryIncomingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -36,14 +46,8 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      wastePop: false,
-      wasteIsDangerous: false,
-      weightIsEstimate: false,
-      noTraceability: false,
-      isDirectSupply: false,
-      initialEmitterMunicipalitiesInseeCodes: [],
-      transporter: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(incomingWasteFormShape))
   });
@@ -91,6 +95,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedIncomingWasteProps,
             receptionDate: isoDateToHtmlDate(
               definedIncomingWasteProps.receptionDate
@@ -108,11 +113,11 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
   useEffect(() => {
     if (isDirectSupply) {
       setDisabledFieldNames(prev => [...prev, "transporter"]);
+      methods.setValue("transporter", []);
     } else {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
-      methods.setValue("transporter", []);
     }
   }, [isDirectSupply, methods]);
 
