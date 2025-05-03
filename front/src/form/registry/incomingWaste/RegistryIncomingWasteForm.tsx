@@ -120,6 +120,17 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       );
     }
   }, [isDirectSupply, methods]);
+  const wasteCode = methods.watch("wasteCode");
+  useEffect(() => {
+    if (wasteCode && wasteCode.includes("*")) {
+      setDisabledFieldNames(prev => [...prev, "wasteIsDangerous"]);
+      methods.setValue("wasteIsDangerous", true);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "wasteIsDangerous")
+      );
+    }
+  }, [wasteCode, methods]);
 
   const [addToIncomingWasteRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingWasteRegistry">

@@ -93,6 +93,7 @@ export function FormTab({ fields, methods }: Props) {
                     label={label}
                     inputTitle={field.name}
                     showCheckedHint={false}
+                    disabled={field.disabled}
                     checked={controllerField.value}
                     onChange={checked => controllerField.onChange(checked)}
                   />
