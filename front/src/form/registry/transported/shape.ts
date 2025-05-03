@@ -8,8 +8,7 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray,
-  optionalBooleanString
+  filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -51,7 +50,7 @@ export const transportedFormShape: FormShape = [
   },
   {
     tabId: "waste",
-    tabTitle: "Déchets",
+    tabTitle: "Déchet",
     fields: [
       {
         Component: WasteCodeSelector,
@@ -67,7 +66,8 @@ export const transportedFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label:
+          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -89,7 +89,7 @@ export const transportedFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "POP - Contient des polluants organiques persistants",
+        label: "Le déchet contient des polluants organiques persistants (POP)",
         required: true,
         validation: {
           wastePop: booleanString
@@ -99,10 +99,10 @@ export const transportedFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Déchet dangereux",
+        label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -181,7 +181,7 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "emitterPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte"
+          title: "Chantier ou lieu de collecte (optionnel)"
         },
         validation: {
           emitterPickupSiteName: optionalString,
@@ -246,7 +246,15 @@ export const transportedFormShape: FormShape = [
           prefix: "broker",
           shortMode: true,
           title: "Courtier (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.brokerReceipt?.receiptNumber) {
+              setValue(
+                "brokerRecepisseNumber",
+                company.brokerReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           brokerCompanySiret: optionalString,
@@ -272,7 +280,15 @@ export const transportedFormShape: FormShape = [
           prefix: "trader",
           shortMode: true,
           title: "Négociant (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.traderReceipt?.receiptNumber) {
+              setValue(
+                "traderRecepisseNumber",
+                company.traderReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           traderCompanySiret: optionalString,
@@ -384,7 +400,7 @@ export const transportedFormShape: FormShape = [
           "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement",
         required: false,
         validation: {
-          reportForRecepisseIsExempted: optionalBooleanString
+          reportForRecepisseIsExempted: booleanString
         }
       },
       {
@@ -407,7 +423,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportAdr: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10" }
       },
       {
         name: "reportForTransportOtherTmdCode",
@@ -418,7 +434,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportOtherTmdCode: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10" }
       },
       {
         Component: TransporterTags,

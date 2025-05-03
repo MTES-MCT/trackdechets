@@ -1,6 +1,7 @@
-import React from "react";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import React from "react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 
@@ -14,7 +15,7 @@ type Props = {
 export function InseeCodes({ methods, disabled, prefix, title }: Props) {
   return (
     <div className="fr-col">
-      {title && <h4 className="fr-h4">{title}</h4>}
+      {title && <h5 className="fr-h5">{title}</h5>}
       <InlineInseeCodes methods={methods} disabled={disabled} prefix={prefix} />
     </div>
   );
@@ -81,6 +82,17 @@ export function InlineInseeCodes({ methods, disabled, prefix }: Props) {
         >
           Ajouter une commune
         </Button>
+
+        {errors?.[`${prefix}MunicipalitiesInseeCodes`] && (
+          <Alert
+            className="fr-mt-2w"
+            description={formatError(
+              errors[`${prefix}MunicipalitiesInseeCodes`]
+            )}
+            severity="error"
+            small
+          />
+        )}
       </div>
     </>
   );

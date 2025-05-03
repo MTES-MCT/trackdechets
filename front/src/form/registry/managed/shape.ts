@@ -9,8 +9,7 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray,
-  optionalBooleanString
+  filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -54,7 +53,7 @@ export const managedFormShape: FormShape = [
   },
   {
     tabId: "waste",
-    tabTitle: "Déchets",
+    tabTitle: "Déchet",
     fields: [
       {
         Component: WasteCodeSelector,
@@ -70,7 +69,7 @@ export const managedFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label: "Dénomination usuelle du déchet",
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -92,7 +91,7 @@ export const managedFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "POP - Contient des polluants organiques persistants",
+        label: "Le déchet contient des polluants organiques persistants (POP)",
         required: true,
         validation: {
           wastePop: booleanString
@@ -102,10 +101,10 @@ export const managedFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Déchet dangereux",
+        label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -165,11 +164,11 @@ export const managedFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur initial",
+          label: "producteur initial (optionnel)",
           required: true
         },
         validation: {
-          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyType: optionalString,
           initialEmitterCompanyOrgId: optionalString,
           initialEmitterCompanyName: optionalString,
           initialEmitterCompanyAddress: optionalString,
@@ -254,7 +253,7 @@ export const managedFormShape: FormShape = [
         props: {
           prefix: "emitterPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte de l'expéditeur ou du remettant"
+          title: "Chantier ou lieu de collecte (optionnel)"
         },
         validation: {
           emitterPickupSiteName: optionalString,
@@ -457,17 +456,7 @@ export const managedFormShape: FormShape = [
         label: "Terres valorisées",
         required: false,
         validation: {
-          isUpcycled: optionalBooleanString
-        }
-      },
-      {
-        name: "isDirectSupply",
-        shape: "generic",
-        type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
-        required: false,
-        validation: {
-          isDirectSupply: optionalBooleanString
+          isUpcycled: booleanString
         }
       },
       {
@@ -495,6 +484,16 @@ export const managedFormShape: FormShape = [
     tabTitle: "Transport",
     fields: [
       {
+        name: "isDirectSupply",
+        shape: "generic",
+        type: "checkbox",
+        label: "Approvisionnement direct (pipeline, convoyeur)",
+        required: false,
+        validation: {
+          isDirectSupply: booleanString
+        }
+      },
+      {
         Component: TransporterSelector,
         props: {},
         validation: {
@@ -503,7 +502,7 @@ export const managedFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: optionalBooleanString,
+              RecepisseIsExempted: booleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

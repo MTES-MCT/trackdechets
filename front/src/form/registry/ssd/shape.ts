@@ -67,7 +67,7 @@ export const ssdFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label: "Dénomination usuelle du déchet",
         required: true,
         validation: {
           wasteDescription: nonEmptyString

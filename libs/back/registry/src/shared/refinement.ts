@@ -490,7 +490,7 @@ export const refineTransportersConsistency: Refinement<{
   if (!item.isDirectSupply && !item.transporter1CompanyOrgId) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le transporteur 1 doit être renseigné si le déchet n'est pas envoyé via fourniture directe`,
+      message: `Le transporteur 1 doit être renseigné si le déchet n'est pas directement approvisionné (pipeline, convoyeur)`,
       path: ["transporter1CompanyOrgId"]
     });
   }

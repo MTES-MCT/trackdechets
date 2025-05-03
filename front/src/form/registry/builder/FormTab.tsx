@@ -27,10 +27,10 @@ export function FormTab({ fields, methods }: Props) {
         <>
           {field.title && (
             <div className="fr-col-12 fr-mt-2w">
-              <h4 className="fr-h4">{field.title}</h4>
+              <h5 className="fr-h5">{field.title}</h5>
             </div>
           )}
-          {["text", "number", "date"].includes(field.type) && (
+          {["text", "number", "date", "time"].includes(field.type) && (
             <div
               className={field.style?.className ?? "fr-col-12"}
               key={field.name}
@@ -98,6 +98,14 @@ export function FormTab({ fields, methods }: Props) {
                   />
                 )}
               />
+              {errors?.[field.name] && (
+                <Alert
+                  className="fr-mt-2w"
+                  description={formatError(errors?.[field.name])}
+                  severity="error"
+                  small
+                />
+              )}
             </div>
           )}
         </>

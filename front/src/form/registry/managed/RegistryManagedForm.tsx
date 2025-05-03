@@ -38,6 +38,9 @@ export function RegistryManagedForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
       weightIsEstimate: false,
+      wasteIsDangerous: false,
+      isUpcycled: false,
+      isDirectSupply: false,
       parcelInseeCodes: [],
       parcelNumbers: [],
       parcelCoordinates: [],
@@ -121,6 +124,17 @@ export function RegistryManagedForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply, methods]);
 
   const [addToManagedRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToManagedRegistry">

@@ -3,6 +3,7 @@ import { type UseFormReturn } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { formatError } from "../builder/error";
+import { CountrySelector } from "./CountrySelector";
 
 type InlineProps = {
   prefix: string;
@@ -24,7 +25,7 @@ export function Address({
 }: BlockProps) {
   return (
     <div className="fr-col">
-      {title && <h4 className="fr-h4">{title}</h4>}
+      {title && <h5 className="fr-h5">{title}</h5>}
       <div className="fr-grid-row fr-grid-row--gutters">
         <InlineAddress
           prefix={prefix}
@@ -98,17 +99,7 @@ export function InlineAddress({
         />
       </div>
       <div className="fr-col-4">
-        <Input
-          label="Code pays"
-          nativeInputProps={{
-            type: "text",
-            placeholder: "FR",
-            disabled,
-            ...methods.register(`${prefix}CountryCode`)
-          }}
-          state={errors?.[`${prefix}CountryCode`] && "error"}
-          stateRelatedMessage={formatError(errors?.[`${prefix}CountryCode`])}
-        />
+        <CountrySelector methods={methods} prefix={prefix} />
       </div>
     </>
   );

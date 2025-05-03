@@ -28,7 +28,7 @@ const HEADERS = [
   "Type",
   "N° unique",
   "Déclarant",
-  "Expédié / réceptionné le",
+  "Expédié ou réceptionné le",
   "Code déchet",
   "Actions"
 ];

@@ -1,5 +1,8 @@
 import { RegistryCompanyType, TransportMode } from "@td/codegen-ui";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
+import {
+  INCOMING_TEXS_WASTE_CODES,
+  INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+} from "@td/constants";
 import { z } from "zod";
 import { FormShape } from "../builder/types";
 import {
@@ -7,7 +10,6 @@ import {
   filteredArray,
   nonEmptyNumber,
   nonEmptyString,
-  optionalBooleanString,
   optionalNumber,
   optionalString
 } from "../builder/validation";
@@ -54,11 +56,14 @@ export const incomingTexsFormShape: FormShape = [
   },
   {
     tabId: "waste",
-    tabTitle: "Déchets",
+    tabTitle: "Déchet",
     fields: [
       {
         Component: WasteCodeSelector,
-        props: { name: "wasteCode" },
+        props: {
+          name: "wasteCode",
+          whiteList: INCOMING_TEXS_WASTE_CODES
+        },
         shape: "custom",
         names: ["wasteCode"],
         required: false,
@@ -70,7 +75,8 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination du déchet",
+        label:
+          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -92,7 +98,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "POP - Contient des polluants organiques persistants",
+        label: "Le déchet contient des polluants organiques persistants (POP)",
         required: true,
         validation: {
           wastePop: booleanString
@@ -102,10 +108,10 @@ export const incomingTexsFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Déchet dangereux",
+        label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -139,11 +145,11 @@ export const incomingTexsFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur initial",
-          required: true
+          label: "producteur initial (optionnel)",
+          required: false
         },
         validation: {
-          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyType: optionalString,
           initialEmitterCompanyOrgId: optionalString,
           initialEmitterCompanyName: optionalString,
           initialEmitterCompanyAddress: optionalString,
@@ -167,7 +173,8 @@ export const incomingTexsFormShape: FormShape = [
       {
         Component: Parcels,
         props: {
-          prefix: "parcel"
+          prefix: "parcel",
+          title: "Parcelles d'origine"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
@@ -190,6 +197,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "ttdImportNumber",
         shape: "generic",
+        title: "Transfert transfrontalier de déchets",
         label: "Numéro de notification ou de déclaration d'import",
         required: false,
         validation: {
@@ -248,7 +256,7 @@ export const incomingTexsFormShape: FormShape = [
         props: {
           prefix: "emitterPickupSite",
           nameEnabled: true,
-          title: "Chantier ou lieu de collecte"
+          title: "Chantier ou lieu de collecte (optionnel)"
         },
         validation: {
           emitterPickupSiteName: optionalString,
@@ -287,10 +295,18 @@ export const incomingTexsFormShape: FormShape = [
       {
         Component: FrenchCompanySelector,
         props: {
-          prefix: "broker",
+          prefix: "brokerCompany",
           shortMode: true,
           title: "Courtier (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.brokerReceipt?.receiptNumber) {
+              setValue(
+                "brokerRecepisseNumber",
+                company.brokerReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           brokerCompanySiret: optionalString,
@@ -313,10 +329,18 @@ export const incomingTexsFormShape: FormShape = [
       {
         Component: FrenchCompanySelector,
         props: {
-          prefix: "trader",
+          prefix: "traderCompany",
           shortMode: true,
           title: "Négociant (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.traderReceipt?.receiptNumber) {
+              setValue(
+                "traderRecepisseNumber",
+                company.traderReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           traderCompanySiret: optionalString,
@@ -392,7 +416,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Rupture de traçabilité autorisée",
         required: false,
         validation: {
-          noTraceability: optionalBooleanString
+          noTraceability: booleanString
         }
       },
       {
@@ -411,23 +435,13 @@ export const incomingTexsFormShape: FormShape = [
         }))
       },
       {
-        name: "isDirectSupply",
-        shape: "generic",
-        type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
-        required: false,
-        validation: {
-          isDirectSupply: optionalBooleanString
-        }
-      },
-      {
         name: "isUpcycled",
         shape: "generic",
         type: "checkbox",
         label: "Terres valorisées",
         required: false,
         validation: {
-          isUpcycled: optionalBooleanString
+          isUpcycled: booleanString
         }
       },
       {
@@ -455,6 +469,16 @@ export const incomingTexsFormShape: FormShape = [
     tabTitle: "Transport",
     fields: [
       {
+        name: "isDirectSupply",
+        shape: "generic",
+        type: "checkbox",
+        label: "Approvisionnement direct (pipeline, convoyeur)",
+        required: false,
+        validation: {
+          isDirectSupply: booleanString
+        }
+      },
+      {
         Component: TransporterSelector,
         props: {},
         validation: {
@@ -463,7 +487,7 @@ export const incomingTexsFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: optionalBooleanString,
+              RecepisseIsExempted: booleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

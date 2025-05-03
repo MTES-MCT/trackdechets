@@ -39,6 +39,9 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
       weightIsEstimate: false,
+      wasteIsDangerous: false,
+      isUpcycled: false,
+      isDirectSupply: false,
       parcelInseeCodes: [],
       parcelNumbers: [],
       parcelCoordinates: [],
@@ -119,6 +122,18 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply, methods]);
+
   const [addToOutgoingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToOutgoingTexsRegistry">
   >(ADD_TO_OUTGOING_TEXS_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });

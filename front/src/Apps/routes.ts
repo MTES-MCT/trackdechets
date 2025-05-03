@@ -268,7 +268,21 @@ export const titles = {
   "/registry/export": "Exports règlementaires— Trackdéchets",
   "/registry/exhaustive": "Export exhaustif — Trackdéchets",
   "/registry/lines":
-    "Déclarations par ligne au registre national — Trackdéchets"
+    "Déclarations par ligne au registre national — Trackdéchets",
+  "/registry/form/ssd":
+    "Créer une déclaration pour le registre SSD — Trackdéchets",
+  "/registry/form/incomingWaste":
+    "Créer une déclaration pour le registre déchets dangereux et non dangereux entrants — Trackdéchets",
+  "/registry/form/incomingTexs":
+    "Créer une déclaration pour le registre terres excavées et sédiments, dangereux et non dangereux entrants — Trackdéchets",
+  "/registry/form/outgoingWaste":
+    "Créer une déclaration pour le registre déchets dangereux et non dangereux sortants — Trackdéchets",
+  "/registry/form/outgoingTexs":
+    "Créer une déclaration pour le registre terres excavées et sédiments, dangereux et non dangereux sortants — Trackdéchets",
+  "/registry/form/transported":
+    "Créer une déclaration pour le registre de transport — Trackdéchets",
+  "/registry/form/managed":
+    "Créer une déclaration pour le registre de gestion — Trackdéchets"
 };
 
 export default routes;

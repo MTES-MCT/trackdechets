@@ -91,7 +91,8 @@ export function Modal({
                 // To allow other portals (eg combobox inside modal)
                 clickOutsideDeactivates: e => {
                   return portal != null && portal.contains(e.target as Node);
-                }
+                },
+                preventScroll: true
               }}
             >
               <div className="fr-grid-row fr-grid-row--center">

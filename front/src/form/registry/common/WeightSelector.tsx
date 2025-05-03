@@ -37,7 +37,7 @@ export function WeightSelector({ methods, disabled }: Props) {
         </div>
         <div className="fr-col-4">
           <RadioButtons
-            legend="Valeur"
+            legend="Type de poids"
             name="radio"
             disabled={disabled}
             options={[
@@ -71,6 +71,8 @@ export function WeightSelector({ methods, disabled }: Props) {
               ...methods.register("volume")
             }}
             disabled={disabled}
+            state={errors?.volume && "error"}
+            stateRelatedMessage={formatError(errors?.volume)}
           />
         </div>
       </div>

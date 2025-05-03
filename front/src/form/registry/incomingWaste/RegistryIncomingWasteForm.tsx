@@ -6,7 +6,7 @@ import {
   RegistryLineReason,
   IncomingWasteLineInput
 } from "@td/codegen-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 
@@ -38,7 +38,10 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
+      wasteIsDangerous: false,
       weightIsEstimate: false,
+      noTraceability: false,
+      isDirectSupply: false,
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
@@ -100,6 +103,18 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       }
     }
   );
+
+  const isDirectSupply = methods.watch("isDirectSupply");
+  useEffect(() => {
+    if (isDirectSupply) {
+      setDisabledFieldNames(prev => [...prev, "transporter"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "transporter")
+      );
+      methods.setValue("transporter", []);
+    }
+  }, [isDirectSupply, methods]);
 
   const [addToIncomingWasteRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingWasteRegistry">

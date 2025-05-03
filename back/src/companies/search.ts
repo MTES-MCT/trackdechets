@@ -160,7 +160,13 @@ export async function searchCompany(
         : ("P" as StatutDiffusionEtablissement),
       etatAdministratif: anonymousCompany.etatAdministratif,
       naf: anonymousCompany.codeNaf,
-      codePaysEtrangerEtablissement
+      codePaysEtrangerEtablissement,
+      ...(isTestCompany && {
+        codeCommune: "00000",
+        addressCity: "Ville de test",
+        addressPostalCode: "00000",
+        addressVoie: "Adresse de test"
+      })
     };
     return findCompanyAndMergeInfos(cleanedClue, companyInfo);
   } else if (isTestCompany) {
