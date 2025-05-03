@@ -29,15 +29,19 @@ export function RegistryTransportedForm({ onClose }: Props) {
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
 
+  const DEFAULT_VALUES: Partial<TransportedLineInput> = {
+    reportForTransportIsWaste: false,
+    reportForRecepisseIsExempted: false,
+    reportForTransportPlates: [],
+    wastePop: false,
+    weightIsEstimate: false,
+    wasteIsDangerous: false
+  };
+
   const methods = useForm<TransportedLineInput>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      reportForTransportIsWaste: false,
-      reportForRecepisseIsExempted: false,
-      reportForTransportPlates: [],
-      wastePop: false,
-      weightIsEstimate: false,
-      wasteIsDangerous: false
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(transportedFormShape))
   });
@@ -62,6 +66,7 @@ export function RegistryTransportedForm({ onClose }: Props) {
 
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedTransportedProps,
             collectionDate: isoDateToHtmlDate(
               definedTransportedProps.collectionDate

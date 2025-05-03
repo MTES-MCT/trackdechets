@@ -1,7 +1,7 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Select } from "@codegouvfr/react-dsfr/Select";
-import React, { useEffect } from "react";
+import React from "react";
 import { type UseFormReturn } from "react-hook-form";
 
 import { capitalize } from "../../../common/helper";
@@ -42,27 +42,8 @@ export function CompanySelector({
   );
 
   const { errors } = methods.formState;
-
-  useEffect(() => {
-    if (companyType === "") {
-      methods.setValue(`${prefix}CompanyOrgId`, "");
-      methods.setValue(`${prefix}CompanyName`, "");
-      methods.setValue(`${prefix}CompanyAddress`, "");
-      methods.setValue(`${prefix}CompanyPostalCode`, "");
-      methods.setValue(`${prefix}CompanyCity`, "");
-      methods.setValue(`${prefix}CompanyCountryCode`, "");
-    }
-    if (companyType !== "COMMUNES") {
-      methods.setValue(`${prefix}MunicipalitiesInseeCodes`, []);
-    } else {
-      methods.setValue(`${prefix}CompanyOrgId`, "");
-      methods.setValue(`${prefix}CompanyName`, "");
-      methods.setValue(`${prefix}CompanyAddress`, "");
-      methods.setValue(`${prefix}CompanyPostalCode`, "");
-      methods.setValue(`${prefix}CompanyCity`, "");
-      methods.setValue(`${prefix}CompanyCountryCode`, "");
-    }
-  }, [companyType, methods, prefix]);
+  const { onChange: onChangeCompanyType, ...typeSelectMethods } =
+    methods.register(`${prefix}CompanyType`);
 
   return (
     <div className="fr-col">
@@ -71,7 +52,17 @@ export function CompanySelector({
           <Select
             label={capitalize(label)}
             nativeSelectProps={{
-              ...methods.register(`${prefix}CompanyType`)
+              ...typeSelectMethods,
+              onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
+                methods.setValue(`${prefix}CompanyOrgId`, "");
+                methods.setValue(`${prefix}CompanyName`, "");
+                methods.setValue(`${prefix}CompanyAddress`, "");
+                methods.setValue(`${prefix}CompanyCity`, "");
+                methods.setValue(`${prefix}CompanyPostalCode`, "");
+                methods.setValue(`${prefix}CompanyCountryCode`, "");
+                methods.setValue(`${prefix}MunicipalitiesInseeCodes`, []);
+                onChangeCompanyType(e);
+              }
             }}
             disabled={disabled}
           >

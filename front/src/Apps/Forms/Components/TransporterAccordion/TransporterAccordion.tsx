@@ -5,6 +5,7 @@ import "./TransporterAccordion.scss";
 export type TransporterAccordionProps = {
   name: string;
   numero: number;
+  hasError?: boolean;
   onTransporterAdd: () => void;
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
@@ -29,6 +30,7 @@ export type TransporterAccordionProps = {
 export function TransporterAccordion({
   name,
   numero,
+  hasError,
   expanded,
   onTransporterAdd,
   onTransporterDelete,
@@ -64,7 +66,9 @@ export function TransporterAccordion({
 
   return (
     <section className="transporter">
-      <div className="transporter__header">
+      <div
+        className={`transporter__header ${hasError ? "transporter-error" : ""}`}
+      >
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
           <Button

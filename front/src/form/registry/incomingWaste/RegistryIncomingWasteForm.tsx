@@ -29,6 +29,16 @@ type FormValues = IncomingWasteLineInput & {
   transporter: FormTransporter[];
 };
 
+const DEFAULT_VALUES: Partial<FormValues> = {
+  wastePop: false,
+  wasteIsDangerous: false,
+  weightIsEstimate: false,
+  noTraceability: false,
+  isDirectSupply: false,
+  initialEmitterMunicipalitiesInseeCodes: [],
+  transporter: []
+};
+
 export function RegistryIncomingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -36,14 +46,8 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      wastePop: false,
-      wasteIsDangerous: false,
-      weightIsEstimate: false,
-      noTraceability: false,
-      isDirectSupply: false,
-      initialEmitterMunicipalitiesInseeCodes: [],
-      transporter: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(incomingWasteFormShape))
   });
@@ -80,7 +84,8 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
               }
             )
           ) as IncomingWasteLineInput;
-
+          console.log("definedIncomingWasteProps");
+          console.log(definedIncomingWasteProps);
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
               if (partialTransporter.TransportMode) {
@@ -91,6 +96,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedIncomingWasteProps,
             receptionDate: isoDateToHtmlDate(
               definedIncomingWasteProps.receptionDate

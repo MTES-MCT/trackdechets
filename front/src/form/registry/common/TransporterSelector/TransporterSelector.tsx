@@ -13,7 +13,7 @@ type TransporterSelectorProps = {
   disabled: boolean;
 };
 
-const initialTransporter = {
+export const INITIAL_TRANSPORTER = {
   TransportMode: TransportMode.Road,
   CompanyType: "ETABLISSEMENT_FR",
   CompanyOrgId: "",
@@ -46,6 +46,7 @@ export function TransporterSelector({
     name: `transporter`
   });
   const { errors } = methods.formState;
+  console.log(errors);
   // Le fonctionnement du groupe d'accordéons fait qu'un seul à la fois
   // peut être déplié. Cette variable permet d'enregistrer l'index du transporteur
   // qui doit être déplié. Si null, tous les accordéons sont repliés.
@@ -55,7 +56,7 @@ export function TransporterSelector({
   );
 
   const insertNewTransporter = (idx: number) => {
-    insertTransporter(idx, initialTransporter);
+    insertTransporter(idx, INITIAL_TRANSPORTER);
     setExpandedIdx(idx);
   };
 
@@ -117,6 +118,7 @@ export function TransporterSelector({
             key={field.id}
             numero={index + 1}
             name={accordionName}
+            hasError={!!errors?.transporter?.[index]}
             onTransporterAdd={() => {
               insertNewTransporter(index + 1);
             }}

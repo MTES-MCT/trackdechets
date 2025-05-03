@@ -29,6 +29,14 @@ type FormValues = OutgoingWasteLineInput & {
   transporter: FormTransporter[];
 };
 
+const DEFAULT_VALUES: Partial<FormValues> = {
+  wastePop: false,
+  weightIsEstimate: false,
+  wasteIsDangerous: false,
+  isDirectSupply: false,
+  initialEmitterMunicipalitiesInseeCodes: [],
+  transporter: []
+};
 export function RegistryOutgoingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
@@ -36,13 +44,8 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
 
   const methods = useForm<FormValues>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      wastePop: false,
-      weightIsEstimate: false,
-      wasteIsDangerous: false,
-      isDirectSupply: false,
-      initialEmitterMunicipalitiesInseeCodes: [],
-      transporter: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(outgoingWasteFormShape))
   });
@@ -90,6 +93,7 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
           );
           // Set the form values with the transformed data
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedOutgoingWasteProps,
             dispatchDate: isoDateToHtmlDate(
               definedOutgoingWasteProps.dispatchDate

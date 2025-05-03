@@ -3,6 +3,7 @@ import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 import countries from "world-countries";
 import { type UseFormReturn } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { formatError } from "../builder/error";
 
 const sortedCountries = countries
   .sort((a, b) =>
@@ -23,7 +24,15 @@ export function CountrySelector({ methods, prefix }: Props) {
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-
+  const { errors } = methods.formState;
+  // handle errors when this component is used in an array of fields, and the errors are nested
+  // ex: errors.transporter.0.CompanyName
+  let deepErrors = errors;
+  const prefixSplit = prefix.split(".");
+  const finalPrefix = prefixSplit[prefixSplit.length - 1];
+  if (prefixSplit.length > 1) {
+    deepErrors = errors?.[prefixSplit[0]]?.[prefixSplit[1]];
+  }
   function onSelect(code: string) {
     methods.setValue(`${prefix}CountryCode`, code);
     setSearch("");
@@ -49,6 +58,10 @@ export function CountrySelector({ methods, prefix }: Props) {
           }
         }}
         ref={triggerRef}
+        state={deepErrors?.[`${finalPrefix}CountryCode`] && "error"}
+        stateRelatedMessage={formatError(
+          deepErrors?.[`${finalPrefix}CountryCode`]
+        )}
       />
 
       <ComboBox
