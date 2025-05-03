@@ -78,7 +78,7 @@ export async function mergeInputAndParseBsffAsync(
         other: p.other,
         volume: p.volume,
         numero: p.numero,
-        emissionNumero: p.numero,
+        emissionNumero: p.emissionNumero,
         weight: p.weight
       }))
     },
