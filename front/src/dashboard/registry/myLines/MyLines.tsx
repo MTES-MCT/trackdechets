@@ -1,26 +1,28 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { Mutation, Query, RegistryImportType } from "@td/codegen-ui";
+import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { generatePath, useLocation, useNavigate } from "react-router-dom";
-import { debounce } from "../../../common/helper";
 import DropdownMenu from "../../../Apps/common/Components/DropdownMenu/DropdownMenu";
+import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import routes from "../../../Apps/routes";
+import { MEDIA_QUERIES } from "../../../common/config";
+import { debounce } from "../../../common/helper";
+import { useMedia } from "../../../common/use-media";
 import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
+import RegistryTable from "../RegistryTable";
 import {
   CANCEL_REGISTRY_V2_LINES,
   GET_REGISTRY_LOOKUPS,
   TYPES,
   TYPES_ROUTES
 } from "../shared";
-import { format } from "date-fns";
 import { ActionButton } from "./ActionButton";
-import RegistryTable from "../RegistryTable";
-import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import "./MyLines.scss";
 
 const HEADERS = [
@@ -62,6 +64,8 @@ export function MyLines() {
   const [debouncedPublicId, setDebouncedPublicId] = useState<string>("");
   const [publicIdToDelete, setPublicIdToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   useIsModalOpen(deleteConfirmationModal, {
     onConceal: () => {
@@ -265,7 +269,11 @@ export function MyLines() {
         {recentLookups && (
           <div>
             {tableData && tableData.length > 0 ? (
-              <RegistryTable data={tableData} headers={HEADERS} />
+              <RegistryTable
+                data={tableData}
+                headers={HEADERS}
+                fixed={!isMobile}
+              />
             ) : (
               "Aucune déclaration récente sur cet établissement"
             )}

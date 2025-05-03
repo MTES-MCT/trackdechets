@@ -26,6 +26,7 @@ export function CountrySelector({ methods, prefix }: Props) {
 
   function onSelect(code: string) {
     methods.setValue(`${prefix}CountryCode`, code);
+    setSearch("");
     setShowSearch(false);
   }
 
