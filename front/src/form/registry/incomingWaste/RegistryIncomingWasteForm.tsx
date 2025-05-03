@@ -84,8 +84,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
               }
             )
           ) as IncomingWasteLineInput;
-          console.log("definedIncomingWasteProps");
-          console.log(definedIncomingWasteProps);
+
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
               if (partialTransporter.TransportMode) {
