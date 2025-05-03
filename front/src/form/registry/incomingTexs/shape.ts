@@ -1,7 +1,7 @@
 import { RegistryCompanyType, TransportMode } from "@td/codegen-ui";
 import {
   INCOMING_TEXS_WASTE_CODES,
-  INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
+  INCOMING_TEXS_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import { z } from "zod";
 import { FormShape } from "../builder/types";
@@ -22,6 +22,7 @@ import { ReportFor } from "../common/ReportFor";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
+import { Operation } from "../common/Operation";
 
 export const incomingTexsFormShape: FormShape = [
   {
@@ -367,72 +368,25 @@ export const incomingTexsFormShape: FormShape = [
     tabTitle: "Traitement",
     fields: [
       {
-        shape: "layout",
-        fields: [
-          {
-            name: "operationCode",
-            shape: "generic",
-            type: "select",
-            label: "Code de traitement réalisé",
-            required: true,
-            defaultOption: "Sélectionnez un traitement",
-            validation: {
-              operationCode: nonEmptyString
-            },
-            style: { className: "fr-col-4" },
-            choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-              label: code,
-              value: code
-            }))
-          },
-          {
-            name: "operationMode",
-            shape: "generic",
-            type: "select",
-            label: "Mode de traitement",
-            defaultOption: "Sélectionnez un mode",
-            required: false,
-            validation: {
-              operationMode: optionalString
-            },
-            style: { className: "fr-col-4" },
-            choices: [
-              { value: "REUTILISATION", label: "Réutilisation" },
-              { value: "RECYCLAGE", label: "Recyclage" },
-              {
-                value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisation énergétique"
-              },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
-              { value: "ELIMINATION", label: "Élimination" }
-            ]
-          }
-        ]
-      },
-      {
-        name: "noTraceability",
-        shape: "generic",
-        type: "checkbox",
-        label: "Rupture de traçabilité autorisée",
-        required: false,
+        Component: Operation,
+        props: {
+          operationCodes: INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
+          showNoTraceability: true,
+          showNextOperationCode: true
+        },
+        names: [
+          "operationCode",
+          "operationMode",
+          "noTraceability",
+          "nextOperationCode"
+        ],
         validation: {
-          noTraceability: booleanString
-        }
-      },
-      {
-        name: "nextOperationCode",
-        shape: "generic",
-        type: "select",
-        label: "Code de traitement ultérieur prévu",
-        required: false,
-        validation: {
+          operationCode: nonEmptyString,
+          operationMode: optionalString,
+          noTraceability: booleanString,
           nextOperationCode: optionalString
         },
-        style: { className: "fr-col-4" },
-        choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-          label: code,
-          value: code
-        }))
+        shape: "custom"
       },
       {
         name: "isUpcycled",

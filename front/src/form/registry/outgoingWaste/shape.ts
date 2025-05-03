@@ -23,6 +23,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
+import { Operation } from "../common/Operation";
 
 export const outgoingWasteFormShape: FormShape = [
   {
@@ -289,47 +290,18 @@ export const outgoingWasteFormShape: FormShape = [
     tabTitle: "Traitement",
     fields: [
       {
-        shape: "layout",
-        fields: [
-          {
-            name: "operationCode",
-            shape: "generic",
-            type: "select",
-            label: "Code de traitement réalisé",
-            required: true,
-            defaultOption: "Sélectionnez un traitement",
-            validation: {
-              operationCode: nonEmptyString
-            },
-            style: { className: "fr-col-4" },
-            choices: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES.map(code => ({
-              label: code,
-              value: code
-            }))
-          },
-          {
-            name: "operationMode",
-            shape: "generic",
-            type: "select",
-            label: "Mode de traitement",
-            defaultOption: "Sélectionnez un mode",
-            required: false,
-            validation: {
-              operationMode: optionalString
-            },
-            style: { className: "fr-col-4" },
-            choices: [
-              { value: "REUTILISATION", label: "Réutilisation" },
-              { value: "RECYCLAGE", label: "Recyclage" },
-              {
-                value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisation énergétique"
-              },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" },
-              { value: "ELIMINATION", label: "Élimination" }
-            ]
-          }
-        ]
+        Component: Operation,
+        props: {
+          operationCodes: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES,
+          showNoTraceability: false,
+          showNextOperationCode: false
+        },
+        names: ["operationCode", "operationMode"],
+        validation: {
+          operationCode: nonEmptyString,
+          operationMode: optionalString
+        },
+        shape: "custom"
       },
       {
         name: "gistridNumber",
