@@ -1,6 +1,10 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
-import { Controller, type UseFormReturn } from "react-hook-form";
+import {
+  Controller,
+  type UseFormSetValue,
+  type UseFormReturn
+} from "react-hook-form";
 import { CompanySearchResult } from "@td/codegen-ui";
 import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { formatError } from "../builder/error";
@@ -12,6 +16,10 @@ type InlineProps = {
   disabled?: boolean;
   shortMode?: boolean; // For company on which we only need the SIRET & name. No address, post code...
   title?: string;
+  onCompanySelected?: (
+    company: CompanySearchResult,
+    setValue: UseFormSetValue<any>
+  ) => void;
 };
 
 type BlockProps = InlineProps & {
@@ -24,7 +32,8 @@ export function FrenchCompanySelector({
   disabled,
   shortMode,
   reducedMargin,
-  title
+  title,
+  onCompanySelected
 }: BlockProps) {
   return (
     <div
@@ -38,6 +47,7 @@ export function FrenchCompanySelector({
         methods={methods}
         disabled={disabled}
         shortMode={shortMode}
+        onCompanySelected={onCompanySelected}
       />
     </div>
   );
@@ -47,7 +57,8 @@ export function InlineFrenchCompanySelector({
   prefix,
   methods,
   disabled,
-  shortMode
+  shortMode,
+  onCompanySelected
 }: InlineProps) {
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
 
@@ -84,6 +95,8 @@ export function InlineFrenchCompanySelector({
                   );
                   methods.setValue(`${prefix}CompanyCountryCode`, "FR");
                 }
+
+                onCompanySelected?.(company, methods.setValue);
               }
             }}
           />

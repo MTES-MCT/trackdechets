@@ -169,7 +169,7 @@ export const managedFormShape: FormShape = [
           required: true
         },
         validation: {
-          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyType: optionalString,
           initialEmitterCompanyOrgId: optionalString,
           initialEmitterCompanyName: optionalString,
           initialEmitterCompanyAddress: optionalString,

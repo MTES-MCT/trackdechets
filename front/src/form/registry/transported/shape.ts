@@ -247,7 +247,15 @@ export const transportedFormShape: FormShape = [
           prefix: "broker",
           shortMode: true,
           title: "Courtier (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.brokerReceipt?.receiptNumber) {
+              setValue(
+                "brokerRecepisseNumber",
+                company.brokerReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           brokerCompanySiret: optionalString,
@@ -273,7 +281,15 @@ export const transportedFormShape: FormShape = [
           prefix: "trader",
           shortMode: true,
           title: "Négociant (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.traderReceipt?.receiptNumber) {
+              setValue(
+                "traderRecepisseNumber",
+                company.traderReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           traderCompanySiret: optionalString,

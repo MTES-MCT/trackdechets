@@ -150,7 +150,7 @@ export const incomingTexsFormShape: FormShape = [
           required: false
         },
         validation: {
-          initialEmitterCompanyType: nonEmptyString,
+          initialEmitterCompanyType: optionalString,
           initialEmitterCompanyOrgId: optionalString,
           initialEmitterCompanyName: optionalString,
           initialEmitterCompanyAddress: optionalString,
@@ -299,7 +299,15 @@ export const incomingTexsFormShape: FormShape = [
           prefix: "brokerCompany",
           shortMode: true,
           title: "Courtier (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.brokerReceipt?.receiptNumber) {
+              setValue(
+                "brokerRecepisseNumber",
+                company.brokerReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           brokerCompanySiret: optionalString,
@@ -325,7 +333,15 @@ export const incomingTexsFormShape: FormShape = [
           prefix: "traderCompany",
           shortMode: true,
           title: "Négociant (optionnel)",
-          reducedMargin: true
+          reducedMargin: true,
+          onCompanySelected: (company, setValue) => {
+            if (company.traderReceipt?.receiptNumber) {
+              setValue(
+                "traderRecepisseNumber",
+                company.traderReceipt.receiptNumber
+              );
+            }
+          }
         },
         validation: {
           traderCompanySiret: optionalString,

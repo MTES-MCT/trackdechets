@@ -615,7 +615,7 @@ input IncomingWasteLineInput {
   - PERSONNE_PHYSIQUE
   - COMMUNES
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   **Numéro d'identification du producteur initial**
 
@@ -1831,7 +1831,7 @@ input IncomingTexsLineInput {
   - PERSONNE_PHYSIQUE
   - COMMUNES
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   **Numéro d'identification du producteur initial**
 
@@ -3161,7 +3161,7 @@ input OutgoingTexsLineInput {
   - PERSONNE_PHYSIQUE
   - COMMUNES
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   **Numéro d'identification du producteur initial**
 
@@ -4299,7 +4299,7 @@ input OutgoingWasteLineInput {
   - PERSONNE_PHYSIQUE
   - COMMUNES
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   **Numéro d'identification du producteur initial**
 
@@ -6243,7 +6243,7 @@ input ManagedLineInput {
   - PERSONNE_PHYSIQUE
   - COMMUNES
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
 
   """
   **Numéro d'identification du producteur initial**
