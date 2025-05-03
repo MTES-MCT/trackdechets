@@ -170,18 +170,6 @@ export const outgoingTexsFormShape: FormShape = [
         ]
       },
       {
-        Component: InseeCodes,
-        props: {
-          prefix: "initialEmitter",
-          title: "Code(s) INSEE de(s) commune(s)"
-        },
-        validation: {
-          initialEmitterMunicipalitiesInseeCodes: filteredArray
-        },
-        shape: "custom",
-        names: ["initialEmitterMunicipalitiesInseeCodes"]
-      },
-      {
         Component: Parcels,
         props: {
           prefix: "parcel"

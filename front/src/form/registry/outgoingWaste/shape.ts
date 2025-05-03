@@ -166,18 +166,6 @@ export const outgoingWasteFormShape: FormShape = [
           "initialEmitterCompanyCountryCode",
           "initialEmitterMunicipalitiesInseeCodes"
         ]
-      },
-      {
-        Component: InseeCodes,
-        props: {
-          prefix: "initialEmitter",
-          title: "Code(s) INSEE de(s) commune(s)"
-        },
-        validation: {
-          initialEmitterMunicipalitiesInseeCodes: filteredArray
-        },
-        shape: "custom",
-        names: ["initialEmitterMunicipalitiesInseeCodes"]
       }
     ]
   },
