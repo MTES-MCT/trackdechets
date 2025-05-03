@@ -33,9 +33,11 @@ export function RegistryTransportedForm({ onClose }: Props) {
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       reportForTransportIsWaste: false,
+      reportForRecepisseIsExempted: false,
       reportForTransportPlates: [],
       wastePop: false,
-      weightIsEstimate: false
+      weightIsEstimate: false,
+      wasteIsDangerous: false
     },
     resolver: zodResolver(schemaFromShape(transportedFormShape))
   });

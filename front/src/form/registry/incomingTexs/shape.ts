@@ -10,7 +10,6 @@ import {
   filteredArray,
   nonEmptyNumber,
   nonEmptyString,
-  optionalBooleanString,
   optionalNumber,
   optionalString
 } from "../builder/validation";
@@ -112,7 +111,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -417,7 +416,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Rupture de traçabilité autorisée",
         required: false,
         validation: {
-          noTraceability: optionalBooleanString
+          noTraceability: booleanString
         }
       },
       {
@@ -442,7 +441,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Terres valorisées",
         required: false,
         validation: {
-          isUpcycled: optionalBooleanString
+          isUpcycled: booleanString
         }
       },
       {
@@ -476,7 +475,7 @@ export const incomingTexsFormShape: FormShape = [
         label: "Approvisionnement direct (pipeline, convoyeur)",
         required: false,
         validation: {
-          isDirectSupply: optionalBooleanString
+          isDirectSupply: booleanString
         }
       },
       {
@@ -488,7 +487,7 @@ export const incomingTexsFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: optionalBooleanString,
+              RecepisseIsExempted: booleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

@@ -40,18 +40,6 @@ export const booleanString = z
   .or(z.boolean())
   .transform(val => val === "true" || val === true);
 
-export const optionalBooleanString = z
-  .enum(["true", "false"])
-  .or(z.boolean())
-  .nullish()
-  .transform(val =>
-    val === "true" || val === true
-      ? true
-      : val === "false" || val === false
-      ? false
-      : null
-  );
-
 export const filteredArray = z
   .array(z.string())
   .transform(arr => arr.filter(Boolean));

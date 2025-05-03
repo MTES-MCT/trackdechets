@@ -38,6 +38,9 @@ export function RegistryManagedForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
       weightIsEstimate: false,
+      wasteIsDangerous: false,
+      isUpcycled: false,
+      isDirectSupply: false,
       parcelInseeCodes: [],
       parcelNumbers: [],
       parcelCoordinates: [],
@@ -131,7 +134,7 @@ export function RegistryManagedForm({ onClose }: Props) {
       );
       methods.setValue("transporter", []);
     }
-  }, [isDirectSupply]);
+  }, [isDirectSupply, methods]);
 
   const [addToManagedRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToManagedRegistry">

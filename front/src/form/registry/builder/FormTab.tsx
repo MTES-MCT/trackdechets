@@ -30,7 +30,7 @@ export function FormTab({ fields, methods }: Props) {
               <h5 className="fr-h5">{field.title}</h5>
             </div>
           )}
-          {["text", "number", "date"].includes(field.type) && (
+          {["text", "number", "date", "time"].includes(field.type) && (
             <div
               className={field.style?.className ?? "fr-col-12"}
               key={field.name}

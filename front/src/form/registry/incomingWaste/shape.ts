@@ -9,8 +9,7 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray,
-  optionalBooleanString
+  filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -108,7 +107,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -377,7 +376,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Rupture de traçabilité autorisée",
         required: false,
         validation: {
-          noTraceability: optionalBooleanString
+          noTraceability: booleanString
         }
       },
       {
@@ -431,7 +430,7 @@ export const incomingWasteFormShape: FormShape = [
         label: "Approvisionnement direct (pipeline, convoyeur)",
         required: false,
         validation: {
-          isDirectSupply: optionalBooleanString
+          isDirectSupply: booleanString
         }
       },
       {
@@ -443,7 +442,7 @@ export const incomingWasteFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: optionalBooleanString,
+              RecepisseIsExempted: booleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

@@ -8,8 +8,7 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray,
-  optionalBooleanString
+  filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -103,7 +102,7 @@ export const transportedFormShape: FormShape = [
         label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -401,7 +400,7 @@ export const transportedFormShape: FormShape = [
           "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement",
         required: false,
         validation: {
-          reportForRecepisseIsExempted: optionalBooleanString
+          reportForRecepisseIsExempted: booleanString
         }
       },
       {

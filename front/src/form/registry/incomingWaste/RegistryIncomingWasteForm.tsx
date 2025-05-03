@@ -38,7 +38,10 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
+      wasteIsDangerous: false,
       weightIsEstimate: false,
+      noTraceability: false,
+      isDirectSupply: false,
       initialEmitterMunicipalitiesInseeCodes: [],
       transporter: []
     },
@@ -111,7 +114,7 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       );
       methods.setValue("transporter", []);
     }
-  }, [isDirectSupply]);
+  }, [isDirectSupply, methods]);
 
   const [addToIncomingWasteRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingWasteRegistry">

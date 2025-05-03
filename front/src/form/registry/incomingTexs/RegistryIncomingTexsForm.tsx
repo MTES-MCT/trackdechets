@@ -38,6 +38,10 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
       wastePop: false,
       weightIsEstimate: false,
+      wasteIsDangerous: false,
+      noTraceability: false,
+      isUpcycled: false,
+      isDirectSupply: false,
       parcelInseeCodes: [],
       parcelNumbers: [],
       parcelCoordinates: [],
@@ -128,7 +132,7 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
       );
       methods.setValue("transporter", []);
     }
-  }, [isDirectSupply]);
+  }, [isDirectSupply, methods]);
 
   const [addToIncomingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToIncomingTexsRegistry">

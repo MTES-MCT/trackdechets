@@ -9,8 +9,7 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray,
-  optionalBooleanString
+  filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { InseeCodes } from "../common/InseeCodes";
@@ -111,7 +110,7 @@ export const outgoingTexsFormShape: FormShape = [
         label: "Le déchet est dangereux",
         required: false,
         validation: {
-          wasteIsDangerous: optionalBooleanString
+          wasteIsDangerous: booleanString
         }
       },
       {
@@ -398,7 +397,7 @@ export const outgoingTexsFormShape: FormShape = [
         label: "Terres valorisées",
         required: false,
         validation: {
-          isUpcycled: optionalBooleanString
+          isUpcycled: booleanString
         }
       },
       {
@@ -487,7 +486,7 @@ export const outgoingTexsFormShape: FormShape = [
         label: "Approvisionnement direct (pipeline, convoyeur)",
         required: false,
         validation: {
-          isDirectSupply: optionalBooleanString
+          isDirectSupply: booleanString
         }
       },
       {
@@ -499,7 +498,7 @@ export const outgoingTexsFormShape: FormShape = [
               TransportMode: z.nativeEnum(TransportMode),
               CompanyType: z.nativeEnum(RegistryCompanyType),
               CompanyOrgId: optionalString,
-              RecepisseIsExempted: optionalBooleanString,
+              RecepisseIsExempted: booleanString,
               RecepisseNumber: optionalString,
               CompanyName: optionalString,
               CompanyAddress: optionalString,

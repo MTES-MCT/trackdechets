@@ -32,6 +32,7 @@ export function RegistrySsdForm({ onClose }: Props) {
   const methods = useForm<SsdLineInput>({
     defaultValues: {
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null,
+      weightIsEstimate: false,
       secondaryWasteCodes: [],
       secondaryWasteDescriptions: []
     },
