@@ -42,7 +42,7 @@ export function WeightSelector({ methods, disabled }: Props) {
             disabled={disabled}
             options={[
               {
-                label: "Estimée",
+                label: "Estimé",
                 nativeInputProps: {
                   value: "true",
                   checked: true,
@@ -50,7 +50,7 @@ export function WeightSelector({ methods, disabled }: Props) {
                 }
               },
               {
-                label: "Réelle",
+                label: "Réel",
                 nativeInputProps: {
                   value: "false",
                   ...methods.register("weightIsEstimate")

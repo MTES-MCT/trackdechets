@@ -363,7 +363,7 @@ export const outgoingWasteFormShape: FormShape = [
         props: {
           prefix: "destinationDropSite",
           nameEnabled: false,
-          title: "Lieu de dépôt du destinataire"
+          title: "Lieu de dépôt du destinataire (optionnel)"
         },
         validation: {
           destinationDropSiteAddress: optionalString,

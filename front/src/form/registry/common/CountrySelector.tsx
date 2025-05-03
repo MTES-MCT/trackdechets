@@ -50,6 +50,11 @@ export function CountrySelector({ methods, prefix }: Props) {
     <div>
       <Input
         label="Code pays"
+        iconId={
+          showSearch
+            ? "fr-icon-arrow-up-s-line"
+            : "fr-icon-arrow-down-s-line"
+        }
         nativeInputProps={{
           type: "text",
           ...methods.register(`${prefix}CountryCode`),
