@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2025.05.1] 06/05/2025
+# [2025.05.1] 03/05/2025
 
 #### :nail_care: Améliorations
 
@@ -15,6 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Permet l'ajout du volume et des numéros d'identification sur le BSDA partout où le formulaire de conditionnement apparait (création, modification, bordereau suite, bordereau regroupement,révision) & Passage du formulaire conditionnement au DSFR [PR 4104](https://github.com/MTES-MCT/trackdechets/pull/4104).
+- Ajout des formulaires d'aide à la création et à la modification de déclaration dans le registre national pour l'ensembles des types de déclaration
 
 # [2025.04.1] 08/04/2025
 
