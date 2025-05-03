@@ -57,3 +57,16 @@ export const refineGistridNumber: Refinement<ParsedZodTransportedItem> = (
     });
   }
 };
+
+export const refineWasteCode = (
+  managedItem: ParsedZodTransportedItem,
+  { addIssue }: { addIssue: (issue: z.ZodIssue) => void }
+) => {
+  if (managedItem.reportForTransportIsWaste && !managedItem.wasteCode) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Le code déchet est obligatoire lorsqu'un déchet est transporté",
+      path: ["wasteCode"]
+    });
+  }
+};

@@ -12,7 +12,6 @@ import {
   filteredArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
-import { InseeCodes } from "../common/InseeCodes";
 import { Address } from "../common/Address";
 import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import {

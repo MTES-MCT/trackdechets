@@ -188,7 +188,7 @@ type IncomingWasteLine {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   Numéro d'identification du producteur initial
   """
@@ -602,7 +602,7 @@ type IncomingTexsLine {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   Numéro d'identification du producteur initial
   """
@@ -1034,7 +1034,7 @@ type OutgoingTexsLine {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   Numéro d'identification du producteur initial
   """
@@ -1466,7 +1466,7 @@ type OutgoingWasteLine {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
   """
   Numéro d'identification du producteur initial
   """
@@ -1852,7 +1852,7 @@ type TransportedLine {
   """
   Code déchet
   """
-  wasteCode: String!
+  wasteCode: String
 
   """
   Code déchet Bâle
@@ -2134,7 +2134,7 @@ type ManagedLine {
   """
   Type de producteur initial
   """
-  initialEmitterCompanyType: RegistryCompanyType!
+  initialEmitterCompanyType: RegistryCompanyType
 
   """
   Numéro d'identification du producteur initial

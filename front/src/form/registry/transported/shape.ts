@@ -53,13 +53,23 @@ export const transportedFormShape: FormShape = [
     tabTitle: "Déchet",
     fields: [
       {
+        name: "reportForTransportIsWaste",
+        shape: "generic",
+        type: "checkbox",
+        label: "Le transport concerne un déchet",
+        required: true,
+        validation: {
+          reportForTransportIsWaste: booleanString
+        }
+      },
+      {
         Component: WasteCodeSelector,
         props: { name: "wasteCode" },
         shape: "custom",
         names: ["wasteCode"],
-        required: true,
+        required: false,
         validation: {
-          wasteCode: nonEmptyString
+          wasteCode: optionalString
         },
         style: { parentClassName: "fr-grid-row--bottom tw-relative" }
       },
@@ -381,16 +391,6 @@ export const transportedFormShape: FormShape = [
         },
         style: { className: "fr-col-5" },
         choices: TRANSPORT_MODES
-      },
-      {
-        name: "reportForTransportIsWaste",
-        shape: "generic",
-        type: "checkbox",
-        label: "Transport de déchet",
-        required: true,
-        validation: {
-          reportForTransportIsWaste: booleanString
-        }
       },
       {
         name: "reportForRecepisseIsExempted",

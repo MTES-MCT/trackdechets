@@ -6,7 +6,7 @@ import {
   RegistryLineReason,
   TransportedLineInput
 } from "@td/codegen-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
 
@@ -76,6 +76,18 @@ export function RegistryTransportedForm({ onClose }: Props) {
       }
     }
   );
+
+  const reportForTransportIsWaste = methods.watch("reportForTransportIsWaste");
+  useEffect(() => {
+    if (reportForTransportIsWaste) {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "wasteCode")
+      );
+    } else {
+      setDisabledFieldNames(prev => [...prev, "wasteCode"]);
+      methods.setValue("wasteCode", "");
+    }
+  }, [reportForTransportIsWaste, methods]);
 
   const [addToTransportedRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToTransportedRegistry">

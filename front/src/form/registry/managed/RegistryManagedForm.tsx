@@ -128,11 +128,11 @@ export function RegistryManagedForm({ onClose }: Props) {
   useEffect(() => {
     if (isDirectSupply) {
       setDisabledFieldNames(prev => [...prev, "transporter"]);
+      methods.setValue("transporter", []);
     } else {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
-      methods.setValue("transporter", []);
     }
   }, [isDirectSupply, methods]);
 
