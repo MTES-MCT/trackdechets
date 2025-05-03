@@ -1,4 +1,4 @@
-import { TdOperationCode, isSiret } from "@td/constants";
+import { FINAL_OPERATION_CODES, TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
 import { getWasteCodeSchema } from "./schemas";
@@ -399,15 +399,7 @@ export const refineRequiredOperationMode: Refinement<{
   operationCode: TdOperationCode;
   operationMode?: OperationMode | null;
 }> = (item, { addIssue }) => {
-  const nonFinalOperationCodes = [
-    "R 12",
-    "R 13",
-    "D 9",
-    "D 13",
-    "D 14",
-    "D 15"
-  ];
-  const isFinalOperationCode = !nonFinalOperationCodes.some(
+  const isFinalOperationCode = FINAL_OPERATION_CODES.some(
     code => code === item.operationCode
   );
 
@@ -424,7 +416,12 @@ export const refineOperationModeConsistency: Refinement<{
   operationCode: TdOperationCode;
   operationMode?: OperationMode | null;
 }> = (item, { addIssue }) => {
+  const isFinalOperationCode = FINAL_OPERATION_CODES.some(
+    code => code === item.operationCode
+  );
+
   if (
+    isFinalOperationCode &&
     item.operationCode.startsWith("D") &&
     item.operationMode &&
     item.operationMode !== OperationMode.ELIMINATION

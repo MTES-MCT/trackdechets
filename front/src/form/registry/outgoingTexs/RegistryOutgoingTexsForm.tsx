@@ -138,6 +138,17 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       methods.setValue("transporter", []);
     }
   }, [isDirectSupply, methods]);
+  const wasteCode = methods.watch("wasteCode");
+  useEffect(() => {
+    if (wasteCode && wasteCode.includes("*")) {
+      setDisabledFieldNames(prev => [...prev, "wasteIsDangerous"]);
+      methods.setValue("wasteIsDangerous", true);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "wasteIsDangerous")
+      );
+    }
+  }, [wasteCode, methods]);
 
   const [addToOutgoingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToOutgoingTexsRegistry">

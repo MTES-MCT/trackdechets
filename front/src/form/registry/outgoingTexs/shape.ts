@@ -172,7 +172,8 @@ export const outgoingTexsFormShape: FormShape = [
       {
         Component: Parcels,
         props: {
-          prefix: "parcel"
+          prefix: "parcel",
+          title: "Parcelles d'origine"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
