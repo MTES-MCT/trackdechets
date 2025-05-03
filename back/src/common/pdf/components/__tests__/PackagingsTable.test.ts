@@ -1,5 +1,5 @@
-import { getPackagingsRows } from "../helpers";
 import { PackagingInfo } from "@td/codegen-back";
+import { getPackagingsRows } from "../PackagingsTable";
 
 describe("getPackagingsRows", () => {
   it("should return correct rows for single type of packaging with single volume", () => {
@@ -49,7 +49,7 @@ describe("getPackagingsRows", () => {
     const result = getPackagingsRows(packagingInfos);
     expect(result).toEqual([
       { quantity: 2, packagingsLabel: "Fûts 30l" },
-      { quantity: 1, packagingsLabel: "GRV 1000l" }
+      { quantity: 1, packagingsLabel: "Grand Récipient Vrac (GRV) 1000l" }
     ]);
   });
 

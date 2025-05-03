@@ -1,43 +1,50 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import cn from "classnames";
 import FocusTrap from "focus-trap-react";
-import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
+import React, { useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { ComboBox } from "../Combobox/Combobox";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
-import classNames from "classnames";
 
 import "./dropdownMenu.scss";
 
 const DropdownMenu = ({
   menuTitle,
+  className,
+  ButtonElement,
   links,
   isDisabled,
   iconId,
   iconAlone,
-  primary
+  primary,
+  alignRight
 }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => closeMenu()
-  });
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const closeMenu = () => {
-    setIsOpen(false);
-  };
-
   return (
-    <FocusTrap active={isOpen}>
-      <div
-        ref={targetRef as React.RefObject<HTMLDivElement>}
-        className={classNames("dropdown-menu", {
-          "dropdown-menu--primary": primary
-        })}
-      >
+    <div
+      className={cn("dropdown-menu", className, {
+        "dropdown-menu--primary": primary
+      })}
+    >
+      {ButtonElement ? (
+        <ButtonElement
+          id="create-bsd-btn"
+          disabled={isDisabled}
+          onClick={toggleMenu}
+          isOpen={isOpen}
+          menuTitle={menuTitle}
+          ref={triggerRef}
+        />
+      ) : (
         <button
           id="create-bsd-btn"
-          className={classNames(
+          type="button"
+          className={cn(
             `menu-btn fr-btn fr-btn--${primary ? "primary" : "secondary"}`,
             {
               isOpen: isOpen,
@@ -48,76 +55,93 @@ const DropdownMenu = ({
           disabled={isDisabled}
           onClick={toggleMenu}
           aria-label={isOpen ? `Fermer ${menuTitle}` : `Ouvrir ${menuTitle}`}
+          ref={triggerRef}
         >
           {menuTitle}
         </button>
-        {isOpen && (
-          <ul
-            className={classNames("dropdown-menu__content", {
-              "dropdown-menu__content__iconAlone": iconAlone
-            })}
+      )}
+      <ComboBox
+        parentRef={triggerRef}
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        autoWidth={true}
+      >
+        {({ close }) => (
+          <FocusTrap
+            active={isOpen}
+            focusTrapOptions={{
+              allowOutsideClick: true,
+              preventScroll: true
+            }}
           >
-            {links.map(link => {
-              return (
-                <li key={link.title}>
-                  {link.isButton ? (
-                    <button
-                      type="button"
-                      className={classNames(
-                        "fr-btn fr-btn--tertiary-no-outline",
-                        [...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])]
-                      )}
-                      onClick={e => {
-                        closeMenu();
-                        !!link.handleClick && link.handleClick(e);
-                      }}
-                    >
-                      {link.icon && (
-                        <span
-                          className="dropdown-menu__content__icon"
-                          aria-hidden
-                        >
-                          {link.icon}
-                        </span>
-                      )}
-                      <span className="sr-only">{menuTitle}</span>
-                      {link.title}
-                    </button>
-                  ) : (
-                    <Link
-                      to={
-                        typeof link.route === "string"
-                          ? link.route
-                          : { ...link.route }
-                      }
-                      onClick={closeMenu}
-                      state={link.state && { ...link.state }}
-                    >
-                      {link.icon && (
-                        <span
-                          className="dropdown-menu__content__icon"
-                          aria-hidden
-                        >
-                          {link.icon}
-                        </span>
-                      )}
-                      {link.iconId && (
-                        <span
-                          aria-hidden
-                          className={classNames([iconId, "fr-btn--icon-left"])}
-                        ></span>
-                      )}
-                      <span className="fr-sr-only">{menuTitle}</span>
-                      {link.title}
-                    </Link>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+            <ul
+              className={cn("dropdown-menu__content", {
+                "dropdown-menu__content__iconAlone": iconAlone,
+                "align-right": alignRight
+              })}
+            >
+              {links.map(link => {
+                return (
+                  <li key={link.title}>
+                    {link.isButton ? (
+                      <button
+                        type="button"
+                        className={cn("fr-btn fr-btn--tertiary-no-outline", [
+                          ...(link.iconId ? [iconId, "fr-btn--icon-left"] : [])
+                        ])}
+                        onClick={e => {
+                          close();
+                          !!link.handleClick && link.handleClick(e);
+                        }}
+                      >
+                        {link.icon && (
+                          <span
+                            className="dropdown-menu__content__icon"
+                            aria-hidden
+                          >
+                            {link.icon}
+                          </span>
+                        )}
+                        <span className="sr-only">{menuTitle}</span>
+                        {link.title}
+                      </button>
+                    ) : (
+                      <Link
+                        to={
+                          typeof link.route === "string"
+                            ? link.route
+                            : { ...link.route }
+                        }
+                        onClick={() => close()}
+                        state={link.state && { ...link.state }}
+                        className="fr-raw-link"
+                      >
+                        {link.icon && (
+                          <span
+                            className="dropdown-menu__content__icon"
+                            aria-hidden
+                          >
+                            {link.icon}
+                          </span>
+                        )}
+                        {link.iconId && (
+                          <span
+                            aria-hidden
+                            className={cn([iconId, "fr-btn--icon-left"])}
+                          ></span>
+                        )}
+                        <span className="fr-sr-only">{menuTitle}</span>
+                        {link.title}
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </FocusTrap>
         )}
-      </div>
-    </FocusTrap>
+      </ComboBox>
+    </div>
   );
 };
 

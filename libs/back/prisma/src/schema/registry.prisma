@@ -53,6 +53,7 @@ enum RegistryImportType {
 model RegistrySsd {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -101,6 +102,7 @@ model RegistrySsd {
 model RegistryIncomingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -222,6 +224,7 @@ model RegistryIncomingWaste {
 model RegistryIncomingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -352,6 +355,7 @@ model RegistryIncomingTexs {
 model RegistryOutgoingTexs {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -483,6 +487,7 @@ model RegistryOutgoingTexs {
 model RegistryOutgoingWaste {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -604,6 +609,7 @@ model RegistryOutgoingWaste {
 model RegistryTransported {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -679,6 +685,7 @@ model RegistryTransported {
 model RegistryManaged {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
+    updatedAt DateTime @updatedAt @db.Timestamptz(6)
     importId  String?
 
     isLatest    Boolean @default(true)
@@ -893,6 +900,7 @@ model RegistryLookup {
     wasteType          RegistryExportWasteType
     wasteCode          String?
     date               DateTime
+    declaredAt         DateTime                      @default(now()) @db.Timestamptz(6)
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
@@ -946,7 +954,8 @@ model RegistryLookup {
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
-    @@index([readableId], map: "_RegistryLookupReadableIdIdx", type: Hash)
+    @@index([readableId], map: "_RegistryLookupReadableIdIdx")
+    @@index([siret, declaredAt(sort: Desc), declarationType], map: "_RegistryLookupLinesReadIdx")
 }
 
 enum RegistrySource {
@@ -985,7 +994,7 @@ model RegistryChangeAggregate {
 model RegistryTexsAnalysisFile {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
-    
+
     s3FileKey        String
     originalFileName String
 

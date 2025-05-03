@@ -110,7 +110,7 @@ enum RegistryLineReason {
   CANCEL
 }
 
-enum RegisryCompanyType {
+enum RegistryCompanyType {
   "Etablissement français"
   ETABLISSEMENT_FR
   "Entreprise de l'Union Européenne"

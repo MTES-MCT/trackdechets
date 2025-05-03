@@ -2,10 +2,11 @@
 @import "../../scss/Breakpoints.scss";
 .dashboard-content {
   flex: 1;
-  padding-bottom: 80px; //prevent crisp icon to overlap bsds list
+  padding: 5px 5px 80px 5px; //prevent crisp icon to overlap bsds list
   overflow-x: scroll;
   width: 100%;
   max-width: 100%;
+  margin: 20px 24px 0 24px;
   @include lg-desktop {
     width: calc(100vw - 210px);
     max-width: calc(100vw - 210px);

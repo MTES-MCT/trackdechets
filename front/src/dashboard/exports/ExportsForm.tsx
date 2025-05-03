@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Formik, Form, Field } from "formik";
-import DateInput from "../../form/common/components/custom-inputs/DateInput";
 import styles from "./ExportsForms.module.scss";
-import {
-  CompanyPrivate,
-  CompanyType,
-  Query,
-  WasteRegistryType
-} from "@td/codegen-ui";
+import { CompanyPrivate, Query, WasteRegistryType } from "@td/codegen-ui";
 import WasteTreeModal from "../../Apps/common/Components/search/WasteTreeModal";
 
 import { ALL_WASTES_TREE } from "@td/constants";
@@ -16,6 +10,11 @@ import { NotificationError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { sortCompaniesByName } from "../../common/helper";
 import { wasteCodeValidator } from "../../form/common/wasteCode";
+import Select from "@codegouvfr/react-dsfr/Select";
+import Input from "@codegouvfr/react-dsfr/Input";
+import { format } from "date-fns";
+import Button from "@codegouvfr/react-dsfr/Button";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 interface IProps {
   companies: CompanyPrivate[];
@@ -76,57 +75,8 @@ export const WASTES_REGISTRY_XLS = gql`
 /**
  * Define possible export types based on company types
  */
-function getPossibleExportTypes(companies: CompanyPrivate[]) {
-  const companyTypes = companies.reduce((acc, company) => {
-    company.companyTypes.forEach(t => {
-      if (!acc.includes(t)) {
-        acc.push(t);
-      }
-    });
-    return acc;
-  }, [] as CompanyType[]);
-
+function getPossibleExportTypes() {
   const exportTypes: WasteRegistryType[] = [];
-
-  if (
-    companyTypes.filter(t =>
-      [
-        CompanyType.Producer,
-        CompanyType.WasteVehicles,
-        CompanyType.WasteCenter,
-        CompanyType.Collector,
-        CompanyType.Worker,
-        CompanyType.EcoOrganisme
-      ].includes(t)
-    ).length > 0
-  ) {
-    exportTypes.push(WasteRegistryType.Outgoing);
-  }
-
-  if (
-    companyTypes.filter(t =>
-      [
-        CompanyType.Wasteprocessor,
-        CompanyType.WasteVehicles,
-        CompanyType.Collector
-      ].includes(t)
-    ).length > 0
-  ) {
-    exportTypes.push(WasteRegistryType.Incoming);
-  }
-
-  if (companyTypes.includes(CompanyType.Transporter)) {
-    exportTypes.push(WasteRegistryType.Transported);
-  }
-
-  if (
-    companyTypes.includes(CompanyType.Trader) ||
-    companyTypes.includes(CompanyType.Broker) ||
-    companyTypes.includes(CompanyType.Intermediary)
-  ) {
-    exportTypes.push(WasteRegistryType.Managed);
-  }
-
   exportTypes.push(WasteRegistryType.All);
 
   return exportTypes;
@@ -140,9 +90,9 @@ export default function ExportsForm({ companies }: IProps) {
   const now = new Date();
 
   const initialValues: Values = {
-    exportType: WasteRegistryType.Outgoing,
-    startDate: new Date(now.getFullYear(), 0, 1).toISOString(),
-    endDate: now.toISOString(),
+    exportType: WasteRegistryType.All,
+    startDate: format(new Date(now.getFullYear(), 0, 1), "yyyy-MM-dd"),
+    endDate: format(now, "yyyy-MM-dd"),
     companies,
     wasteCode: "",
     exportFormat: "XLSX"
@@ -176,10 +126,9 @@ export default function ExportsForm({ companies }: IProps) {
     const downloadFile =
       exportFormat === "CSV" ? wastesRegistryCsv : wastesRegistryXls;
 
-    const dateFilter =
-      exportType === WasteRegistryType.Incoming
-        ? { destinationReceptionDate: { _gte: startDate, _lte: endDate } }
-        : { transporterTakenOverAt: { _gte: startDate, _lte: endDate } };
+    const dateFilter = {
+      transporterTakenOverAt: { _gte: startDate, _lte: endDate }
+    };
 
     downloadFile({
       variables: {
@@ -228,7 +177,7 @@ export default function ExportsForm({ companies }: IProps) {
       validate={validate}
     >
       {({ values, setFieldValue }) => {
-        const exportTypes = getPossibleExportTypes(values.companies);
+        const exportTypes = getPossibleExportTypes();
         if (!exportTypes.includes(values.exportType)) {
           setFieldValue("exportType", exportTypes[0]);
         }
@@ -238,112 +187,102 @@ export default function ExportsForm({ companies }: IProps) {
 
         return (
           <Form className={styles.exportForm}>
-            <div className="tw-grid tw-justify-center tw-grid-cols-3 tw-gap-6">
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Type de registre
-              </label>
-              <Field
-                className="tw-col-span-2 tw-max-w-md td-select"
-                name="exportType"
-                as="select"
-              >
-                <option
-                  value={WasteRegistryType.Outgoing}
-                  disabled={!exportTypes.includes(WasteRegistryType.Outgoing)}
-                >
-                  Déchets sortants
-                </option>
-                <option
-                  value={WasteRegistryType.Incoming}
-                  disabled={!exportTypes.includes(WasteRegistryType.Incoming)}
-                >
-                  Déchets entrants
-                </option>
-                <option
-                  value={WasteRegistryType.Transported}
-                  disabled={
-                    !exportTypes.includes(WasteRegistryType.Transported)
-                  }
-                >
-                  Transporteur
-                </option>
-                <option
-                  value={WasteRegistryType.Managed}
-                  disabled={!exportTypes.includes(WasteRegistryType.Managed)}
-                >
-                  Gestion
-                </option>
-                <option value={WasteRegistryType.All}>Exhaustif</option>
-              </Field>
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Début de la période (
-                {values.exportType === WasteRegistryType.Incoming
-                  ? "date de réception"
-                  : "date d'expédition"}
-                )
-              </label>
-              <div className="tw-col-span-2 tw-max-w-md">
-                <Field
-                  className={`td-input ${styles["max-w-xxs"]}`}
-                  name="startDate"
-                  component={DateInput}
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <div className="fr-col-10">
+                <Alert
+                  title=""
+                  description="Le registre exhaustif concerne uniquement les déchets tracés avec un bordereau"
+                  severity="info"
                 />
               </div>
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Fin de la période (
-                {values.exportType === WasteRegistryType.Incoming
-                  ? "date de réception"
-                  : "date d'expédition"}
-                )
-              </label>
-
-              <div className="tw-col-span-2 tw-max-w-md">
-                <Field
-                  className={`td-input ${styles["max-w-xxs"]}`}
-                  name="endDate"
-                  component={DateInput}
-                />
+              <div className="fr-col-10">
+                <Field name="startDate">
+                  {({ field }) => {
+                    return (
+                      <Input
+                        label="Début de la période (date d'expédition)"
+                        nativeInputProps={{
+                          type: "date",
+                          value: field.value,
+                          onChange: field.onChange,
+                          name: field.name
+                        }}
+                      />
+                    );
+                  }}
+                </Field>
+              </div>
+              <div className="fr-col-10">
+                <Field name="endDate">
+                  {({ field }) => {
+                    return (
+                      <Input
+                        label="Fin de la période (date d'expédition)"
+                        nativeInputProps={{
+                          type: "date",
+                          value: field.value,
+                          onChange: field.onChange,
+                          name: field.name
+                        }}
+                      />
+                    );
+                  }}
+                </Field>
                 <RedErrorMessage name="endDate"></RedErrorMessage>
               </div>
 
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold ">
-                Établissement
-              </label>
-
-              <Field name="companies">
-                {() => (
-                  <select
-                    className="tw-col-span-2 tw-max-w-md td-select"
-                    onChange={evt => {
+              <div className="fr-col-10">
+                <Field name="companies">
+                  {({ field, form }) => {
+                    const handleChange = evt => {
                       const value = evt.target.value;
+
                       if (value === "all") {
-                        setFieldValue("companies", sortedCompanies);
+                        form.setFieldValue("companies", sortedCompanies);
                       } else {
-                        setFieldValue(
+                        const selectedCompany = sortedCompanies.find(
+                          c => c.orgId === value
+                        );
+                        form.setFieldValue(
                           "companies",
-                          sortedCompanies.filter(c => c.orgId === value)
+                          selectedCompany ? [selectedCompany] : []
                         );
                       }
-                    }}
-                  >
-                    <option value="all" key="all">
-                      Tous les établissements
-                    </option>
-                    {sortedCompanies.map((company, key) => {
-                      const name =
-                        company.givenName && company.givenName !== ""
-                          ? company.givenName
-                          : company.name;
+                    };
 
-                      return (
-                        <option value={company.orgId} key={key}>
-                          {`${name} - ${company.orgId}`}
+                    return (
+                      <Select
+                        label="Établissement"
+                        nativeSelectProps={{
+                          value:
+                            Array.isArray(field.value) &&
+                            field.value.length === sortedCompanies.length
+                              ? "all"
+                              : field.value?.[0]?.orgId ?? "",
+                          name: field.name,
+                          onChange: handleChange
+                        }}
+                      >
+                        <option value="all" key="all">
+                          Tous les établissements
                         </option>
-                      );
-                    })}
-                  </select>
-                )}
-              </Field>
+                        {sortedCompanies.map((company, key) => {
+                          const name =
+                            company.givenName && company.givenName !== ""
+                              ? company.givenName
+                              : company.name;
+
+                          return (
+                            <option value={company.orgId} key={key}>
+                              {`${name} - ${company.orgId}`}
+                            </option>
+                          );
+                        })}
+                      </Select>
+                    );
+                  }}
+                </Field>
+              </div>
 
               <WasteTreeModal
                 wasteTree={ALL_WASTES_TREE}
@@ -353,30 +292,27 @@ export default function ExportsForm({ companies }: IProps) {
                   setFieldValue("wasteCode", codes[0]);
                 }}
               />
-              <label className="tw-col-span-1 tw-text-right tw-flex tw-items-start tw-justify-end tw-font-bold">
-                Format d'export
-              </label>
-              <Field
-                as="select"
-                name="exportFormat"
-                className="tw-col-span-2 tw-max-w-md td-select"
-              >
-                <option value="XLSX">.xlsx (Excel)</option>
-                <option value="CSV">.csv</option>
-              </Field>
+              <div className="fr-col-10">
+                <Field name="exportFormat">
+                  {({ field }) => {
+                    return (
+                      <Select label="Format d'export" nativeSelectProps={field}>
+                        <option value="XLSX">.xlsx (Excel)</option>
+                        <option value="CSV">.csv</option>{" "}
+                      </Select>
+                    );
+                  }}
+                </Field>
+              </div>
             </div>
-            <div className="tw-mt-5">
+            <div className="fr-col-10 fr-mb-4w">
               {error && <NotificationError apolloError={error} />}
             </div>
 
-            <div className="tw-container tw-flex tw-flex-row-reverse tw-mt-5">
-              <button
-                type="submit"
-                className="btn btn--primary"
-                disabled={loading}
-              >
+            <div className="fr-col-10" style={{ textAlign: "right" }}>
+              <Button type="submit" priority="primary" disabled={loading}>
                 {loading ? <span>Préparation de l'export...</span> : "Exporter"}
-              </button>
+              </Button>
             </div>
           </Form>
         );

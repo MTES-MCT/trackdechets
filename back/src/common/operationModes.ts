@@ -1,6 +1,69 @@
 import { OperationMode } from "@prisma/client";
 import { trim } from "./strings";
 
+/**
+ * Documentation: https://app.gitbook.com/o/-LxvsGVFUcY-b40HZcJs/s/bOGR2l18BC74rMQs4CWK/~/changes/2/general/codes-de-traitement
+ */
+export const CODES_AND_EXPECTED_OPERATION_MODES = {
+  // Opérations d'élimination
+  D1: [OperationMode.ELIMINATION],
+  D2: [OperationMode.ELIMINATION],
+  D3: [OperationMode.ELIMINATION],
+  D4: [OperationMode.ELIMINATION],
+  D5: [OperationMode.ELIMINATION],
+  // "D6": Interdit en France
+  D7: [OperationMode.ELIMINATION],
+  D8: [OperationMode.ELIMINATION],
+  D9: [],
+  D9F: [OperationMode.ELIMINATION],
+  D10: [OperationMode.ELIMINATION],
+  D11: [OperationMode.ELIMINATION],
+  D12: [OperationMode.ELIMINATION],
+  D13: [],
+  D14: [],
+  D15: [],
+
+  // Opérations de valorisation
+  R0: [OperationMode.REUTILISATION],
+  R1: [OperationMode.VALORISATION_ENERGETIQUE],
+  R2: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R3: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R4: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R5: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R6: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
+  R7: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
+  R8: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
+  R9: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R10: [OperationMode.AUTRES_VALORISATIONS],
+  R11: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
+  R12: [],
+  R13: []
+};
+
 export const getOperationModesFromOperationCode = (
   operationCode: string
 ): OperationMode[] => {
@@ -10,45 +73,7 @@ export const getOperationModesFromOperationCode = (
   // In some places we use "X 0", in some other "X0"
   const trimmed = trim(operationCode);
 
-  if (
-    [
-      "D1",
-      "D2",
-      "D3",
-      "D4",
-      "D5",
-      "D6",
-      "D7",
-      "D8",
-      // "D9" traitement non final
-      "D9F",
-      "D10",
-      "D11",
-      "D12"
-    ].includes(trimmed)
-  ) {
-    return [OperationMode.ELIMINATION];
-  }
-
-  if (trimmed === "R0") {
-    return [OperationMode.REUTILISATION];
-  }
-
-  if (trimmed === "R1") {
-    return [OperationMode.VALORISATION_ENERGETIQUE];
-  }
-
-  if (["R2", "R3", "R4", "R5", "R7", "R9", "R11"].includes(trimmed)) {
-    return [OperationMode.REUTILISATION, OperationMode.RECYCLAGE];
-  }
-
-  if (["R6", "R8", "R10"].includes(trimmed)) {
-    return [OperationMode.RECYCLAGE];
-  }
-
-  // Regroupements: D13, D14, D15, R12, R13
-  // D9 traitement non final
-  return [];
+  return CODES_AND_EXPECTED_OPERATION_MODES[trimmed] || [];
 };
 
 export const getOperationModeLabel = (operationMode: OperationMode) => {
@@ -61,5 +86,7 @@ export const getOperationModeLabel = (operationMode: OperationMode) => {
       return "Réutilisation";
     case OperationMode.VALORISATION_ENERGETIQUE:
       return "Valorisation énergétique";
+    case OperationMode.AUTRES_VALORISATIONS:
+      return "Autres valorisations";
   }
 };

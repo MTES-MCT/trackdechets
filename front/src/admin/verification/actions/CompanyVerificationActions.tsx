@@ -135,15 +135,15 @@ export default function CompanyVerificationActions({
   }
 
   const unverifiedCompanyActions = (
-    <>
+    <div className="fr-container--fluid">
       {isSiret(company.orgId) && (
         <Button
           priority="secondary"
           iconId="fr-icon-mail-line"
           onClick={onSendVerificationCodeLetter}
           title="Envoyer un courrier"
-          size="large"
-          className="fr-mx-1w"
+          size="medium"
+          className="fr-mr-1w"
           disabled={loadingLetter}
         />
       )}
@@ -154,14 +154,17 @@ export default function CompanyVerificationActions({
         onClick={onVerify}
         disabled={loadingVerify}
         title="Vérifier"
-        size="large"
-        className="fr-mx-1w"
+        size="medium"
+        className="fr-mr-1w"
       />
-    </>
+    </div>
   );
 
   return (
-    <div className="tw-flex" style={{ justifyContent: "center" }}>
+    <div
+      className="fr-container--fluid tw-flex"
+      style={{ justifyContent: "center" }}
+    >
       {company.verificationStatus === CompanyVerificationStatus.Standby && (
         <Button
           priority="secondary"
@@ -170,8 +173,8 @@ export default function CompanyVerificationActions({
             onStandbyCompanyByAdmin(false);
           }}
           title="Rétablir"
-          size="large"
-          className="fr-mx-1w"
+          size="medium"
+          className="fr-mr-1w"
           disabled={loadingStandby}
         />
       )}
@@ -185,8 +188,8 @@ export default function CompanyVerificationActions({
             onStandbyCompanyByAdmin(true);
           }}
           title="Mettre en stand by"
-          size="large"
-          className="fr-mx-1w"
+          size="medium"
+          className="fr-mr-1w"
           disabled={loadingStandby}
         />
       )}

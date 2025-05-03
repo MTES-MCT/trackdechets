@@ -21,6 +21,7 @@ const BSDPreviewContainer = ({ bsdTypeName }: BSDPreviewContainerProps) => {
       closeLabel="Annuler"
       isOpen
       size="XL"
+      hasFooter={true}
     >
       {formContent[bsdTypeName]}
     </TdModal>

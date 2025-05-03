@@ -2,7 +2,7 @@ import { Form } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import { registerUpdater, Updater } from "./helper/helper";
-import { FINAL_OPERATION_CODES } from "../../src/common/operationCodes";
+import { FINAL_OPERATION_CODES } from "@td/constants";
 import { operationHooksQueue } from "../../src/queue/producers/operationHook";
 
 @registerUpdater(

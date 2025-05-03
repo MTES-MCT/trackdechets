@@ -75,7 +75,7 @@ export function CreateAnonymousCompanyForm() {
 
   return (
     <>
-      <h3 className="fr-h3 fr-mt-2w">Créer une entreprise anonyme</h3>
+      <h3 className="fr-sr-only">Créer une entreprise anonyme</h3>
 
       <Formik
         initialValues={{
@@ -103,12 +103,12 @@ export function CreateAnonymousCompanyForm() {
         }}
       >
         {({ errors, values, setFieldValue }) => (
-          <Form className="fr-my-3w">
+          <Form>
             <Field name="siret">
               {({ field }) => {
                 return (
                   <Input
-                    label="SIRET"
+                    label="SIRET de l'établissement anonyme créé"
                     state={errors.siret ? "error" : "default"}
                     stateRelatedMessage={errors.siret as string}
                     disabled={loading}

@@ -1,0 +1,25 @@
+.actionButton {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 3px 12px;
+  border: 1px solid #dddddd;
+  background: none;
+  width: 32px !important;
+  min-height: 32px !important;
+  height: 32px !important;
+}
+.dots {
+  width: 4px;
+  height: 4px;
+  border-radius: 5px;
+  background: #000091;
+  margin: 2px 0;
+}
+
+.icon {
+  &:before {
+    margin-left: -9px;
+    transform: rotate(90deg);
+  }
+}

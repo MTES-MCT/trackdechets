@@ -4,7 +4,6 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ROAD_CONTROL_SLUG } from "@td/constants";
-import { runWithCorrelationId } from "@td/logger";
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
@@ -24,11 +23,13 @@ import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ErrorCode, UserInputError } from "./common/errors";
+import { correlationIdMiddleware } from "./common/middlewares/correlationId";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { impersonateMiddleware } from "./common/middlewares/impersonate";
 import { loggingMiddleware } from "./common/middlewares/loggingMiddleware";
+import { namedMiddleware } from "./common/middlewares/namedMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
 import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
@@ -54,6 +55,11 @@ import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import configureYup from "./common/yup/configureYup";
+import i18next from "i18next";
+import { z } from "zod";
+import { zodI18nMap } from "zod-i18n-map";
+import translation from "zod-i18n-map/locales/fr/zod.json";
+import { gqlPayloadSizeLimiterPlugin } from "./common/plugins/gqlPayloadSizeLimiterPlugin";
 
 const {
   SESSION_SECRET,
@@ -66,6 +72,15 @@ const {
   TRUST_PROXY_HOPS,
   GERICO_WEBHOOK_SLUG
 } = process.env;
+
+// Zod in FR
+i18next.init({
+  lng: "fr",
+  resources: {
+    fr: { zod: translation }
+  }
+});
+z.setErrorMap(zodI18nMap);
 
 const Sentry = initSentry();
 configureYup();
@@ -127,6 +142,7 @@ export const server = new ApolloServer<GraphQLContext>({
   },
   plugins: [
     gqlInfosPlugin(),
+    gqlPayloadSizeLimiterPlugin(),
     gqlRateLimitPlugin({
       createPasswordResetRequest: {
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
@@ -189,11 +205,7 @@ if (Sentry) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
-app.use((_req, _res, next) => {
-  runWithCorrelationId(() => {
-    next();
-  });
-});
+app.use(correlationIdMiddleware);
 
 /**
  * Set the following headers for cross-domain cookie
@@ -255,7 +267,7 @@ app.use(
  */
 app.use(urlencoded({ extended: false }));
 
-app.use(json({ limit: "1mb" }));
+app.use(json({ limit: "21mb" }));
 
 // allow application/graphql header
 app.use(graphQLPath, graphqlBodyParser);
@@ -263,7 +275,6 @@ app.use(graphQLPath, graphqlBatchLimiterMiddleware());
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
-
 app.use(graphQLPath, timeoutMiddleware());
 
 // configure session for passport local strategy
@@ -396,23 +407,18 @@ export async function startApolloServer() {
 
   app.use(
     graphQLPath,
-    cors({
-      origin: [UI_BASE_URL],
-      methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-      preflightContinue: false,
-      optionsSuccessStatus: 204,
-      credentials: true
-    }),
-    json(),
-    expressMiddleware(server, {
-      context: async ctx => {
-        return {
-          ...ctx,
-          // req.user is made available by passport
-          user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
-          dataloaders: getServerDataloaders()
-        };
-      }
-    })
+    namedMiddleware(
+      "apolloExpress",
+      expressMiddleware(server, {
+        context: async ctx => {
+          return {
+            ...ctx,
+            // req.user is made available by passport
+            user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
+            dataloaders: getServerDataloaders()
+          };
+        }
+      })
+    )
   );
 }

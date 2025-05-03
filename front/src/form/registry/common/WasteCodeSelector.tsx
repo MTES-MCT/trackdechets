@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { ALL_WASTES_TREE } from "@td/constants";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import useOnClickOutsideRefTarget from "../../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { formatError } from "../builder/error";
+import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import clsx from "clsx";
 
 type WasteCode = {
   code: string;
@@ -14,12 +15,23 @@ type WasteCode = {
 
 type Props = {
   name: string;
-  required?: boolean;
   label?: string;
   methods: UseFormReturn<any>;
+  containerRef?: React.RefObject<HTMLDivElement>;
+  disabled?: boolean;
+  whiteList?: string[];
+  blackList?: string[];
 };
 
-export function WasteCodeSelector({ name, required, methods, label }: Props) {
+export function WasteCodeSelector({
+  name,
+  methods,
+  label,
+  containerRef,
+  disabled,
+  whiteList,
+  blackList
+}: Props) {
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
   }
@@ -27,16 +39,21 @@ export function WasteCodeSelector({ name, required, methods, label }: Props) {
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const comboboxRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const { errors } = methods.formState;
 
-  const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => {
-      if (showSearch) {
-        setShowSearch(false);
-      }
+  const filteredWastesTree = useMemo(() => {
+    return filterWasteTreeByLists(ALL_WASTES_TREE, whiteList, blackList);
+  }, [whiteList, blackList]);
+
+  const setComboboxOpen = (open: boolean) => {
+    setShowSearch(open);
+    if (!open) {
+      setSearch("");
     }
-  });
+  };
 
   function onSelect(code: string) {
     if (name) {
@@ -79,7 +96,11 @@ export function WasteCodeSelector({ name, required, methods, label }: Props) {
                   ></span>
                 </div>
               ) : (
-                <button onClick={() => onSelect(node.code)} type="button">
+                <button
+                  onClick={() => onSelect(node.code)}
+                  type="button"
+                  className="tw-text-left"
+                >
                   {node.code} - {node.description}
                 </button>
               )}
@@ -93,48 +114,75 @@ export function WasteCodeSelector({ name, required, methods, label }: Props) {
     );
   }
 
-  return (
+  const searchFields = (
     <>
       <div className="fr-col-4 fr-col-md-4">
         <Input
           label={label ?? "Code déchet"}
           nativeInputProps={{
             type: "text",
-            ...methods.register(name!, { required })
+            ...methods.register(name!)
           }}
+          disabled={disabled}
           state={errors?.[name] && "error"}
           stateRelatedMessage={formatError(errors?.[name])}
         />
       </div>
       <div className="fr-col-2">
-        <Button
-          onClick={() => setShowSearch(!showSearch)}
-          priority="secondary"
-          type="button"
-        >
-          Recherche
-        </Button>
+        <div className={clsx({ "fr-mb-9v": !!errors?.[name] })}>
+          <Button
+            onClick={() => setShowSearch(!showSearch)}
+            priority="secondary"
+            type="button"
+            ref={triggerRef}
+            disabled={disabled}
+          >
+            Recherche
+          </Button>
+        </div>
       </div>
+    </>
+  );
 
-      <div
-        className={`${
-          showSearch ? "tw-block" : "tw-hidden"
-        } tw-absolute tw-bg-white tw-inset-x-0 tw-z-10 tw-p-2 tw-shadow-md tw-overflow-scroll fr-mt-1w`}
-        style={{ maxHeight: "500px", top: "100%" }}
-        ref={targetRef as React.RefObject<HTMLDivElement>}
+  return (
+    <>
+      {containerRef ? (
+        searchFields
+      ) : (
+        <div
+          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          ref={comboboxRef}
+        >
+          {searchFields}
+        </div>
+      )}
+      <ComboBox
+        parentRef={containerRef ?? comboboxRef}
+        triggerRef={triggerRef}
+        isOpen={showSearch}
+        onOpenChange={setComboboxOpen}
       >
-        <Input
-          label=""
-          iconId="fr-icon-search-line"
-          className="tw-sticky tw-top-0 tw-z-20"
-          nativeInputProps={{
-            type: "text",
-            placeholder: "Recherche d'un code déchet...",
-            onChange: e => setSearch(e.target.value)
-          }}
-        />
-        {renderTree(recursiveFilterTree(ALL_WASTES_TREE, search))}
-      </div>
+        {() => (
+          <div className="tw-bg-white tw-inset-x-0 tw-z-10 tw-px-2 tw-h-full tw-flex tw-flex-col">
+            <div className="tw-sticky tw-top-0 tw-bg-white tw-z-10 tw-py-2">
+              <Input
+                iconId="fr-icon-search-line"
+                nativeInputProps={{
+                  type: "text",
+                  placeholder: "Recherche d'un code déchet...",
+                  onChange: e => setSearch(e.target.value)
+                }}
+                label=""
+              />
+            </div>
+            <div className="tw-flex-1 tw-overflow-y-auto">
+              <div>
+                {renderTree(recursiveFilterTree(filteredWastesTree, search))}
+              </div>
+            </div>
+          </div>
+        )}
+      </ComboBox>
     </>
   );
 }
@@ -157,4 +205,49 @@ function recursiveFilterTree(
       return null;
     })
     .filter(Boolean) as WasteCode[];
+}
+
+function filterWasteTreeByLists(
+  nodes: readonly WasteCode[],
+  whiteList?: string[],
+  blackList?: string[]
+): WasteCode[] {
+  if (!nodes) return [];
+
+  const hasWhiteList = whiteList && whiteList.length > 0;
+  const hasBlackList = blackList && blackList.length > 0;
+
+  if (!hasWhiteList && !hasBlackList) {
+    return [...nodes];
+  }
+
+  const shouldIncludeCode = (code: string): boolean => {
+    const isBlacklisted = hasBlackList && blackList!.includes(code);
+    if (isBlacklisted) {
+      return false;
+    }
+
+    const isWhitelisted = hasWhiteList ? whiteList!.includes(code) : true;
+    return isWhitelisted;
+  };
+  return nodes
+    .map(node => {
+      // Only leaf nodes are actual waste codes
+      if (node.children.length === 0) {
+        return shouldIncludeCode(node.code) ? node : null;
+      }
+
+      const filteredChildren = filterWasteTreeByLists(
+        node.children,
+        whiteList,
+        blackList
+      );
+
+      if (filteredChildren.length > 0) {
+        return { ...node, children: filteredChildren };
+      } else {
+        return null;
+      }
+    })
+    .filter((node): node is WasteCode => node !== null);
 }

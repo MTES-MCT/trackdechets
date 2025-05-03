@@ -49,7 +49,7 @@ function AnonymizeUser() {
       >
         {() => (
           <Form>
-            <div className="form__row">
+            <div className="form__row" style={{ marginTop: 0 }}>
               <label>
                 Identifiant (de base de données) du compte à anonymiser et
                 désactiver définitivement (

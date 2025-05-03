@@ -129,7 +129,7 @@ export function BulkProfileUpdateAdmin() {
   return (
     <div>
       <div>
-        <h3 className="fr-h3 fr-mt-4w">
+        <h3 className="fr-sr-only">
           Modification en masse de profils et sous-profils des établissements
         </h3>
         {!data && (

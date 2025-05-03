@@ -237,7 +237,8 @@ const minimalRegistryForLookupSelect = {
   wasteIsDangerous: true,
   wasteCode: true,
   wastePop: true,
-  dispatchDate: true
+  dispatchDate: true,
+  createdAt: true
 };
 
 type MinimalRegistryForLookup = Prisma.RegistryOutgoingWasteGetPayload<{
@@ -259,6 +260,7 @@ const registryToLookupCreateInput = (
       : RegistryExportWasteType.DND,
     wasteCode: registryOutgoingWaste.wasteCode,
     ...generateDateInfos(registryOutgoingWaste.dispatchDate),
+    declaredAt: registryOutgoingWaste.createdAt,
     registryOutgoingWasteId: registryOutgoingWaste.id
   };
 };
@@ -289,6 +291,7 @@ export const updateRegistryLookup = async (
           : RegistryExportWasteType.DND,
         wasteCode: registryOutgoingWaste.wasteCode,
         ...generateDateInfos(registryOutgoingWaste.dispatchDate),
+        declaredAt: registryOutgoingWaste.createdAt,
         registryOutgoingWasteId: registryOutgoingWaste.id
       },
       create: registryToLookupCreateInput(registryOutgoingWaste),

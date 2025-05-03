@@ -65,7 +65,10 @@ export default function AccountFormChangePassword() {
             onReset={onReset}
             isEditing={isEditing}
           />
-          <div className="fr-grid-row fr-grid-row--gutters">
+          <div
+            style={{ margin: 0 }}
+            className="fr-grid-row fr-grid-row--gutters"
+          >
             <div className="fr-col-8">
               <p className="fr-text--bold">Mot de passe</p>
               <p className="fr-text fr-mb-2w" data-testid="password">

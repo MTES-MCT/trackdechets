@@ -1,6 +1,8 @@
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
-  SSD_PROCESSING_OPERATIONS_CODES
+  ADMINISTRATIVE_ACT_EXPLANATIONS,
+  SSD_PROCESSING_OPERATIONS_CODES,
+  SSD_OPERATION_MODES
 } from "@td/constants";
 import { FormShape } from "../builder/types";
 import { CompanySelector } from "../common/CompanySelector";
@@ -8,39 +10,118 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { ReportFor } from "../common/ReportFor";
 import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
+import {
+  nonEmptyString,
+  optionalString,
+  filteredArray,
+  nonEmptyNumber,
+  optionalNumber,
+  booleanString
+} from "../builder/validation";
+import { Operation } from "../common/Operation";
 
 export const ssdFormShape: FormShape = [
   {
+    tabId: "declaration",
     tabTitle: "Déclaration",
     fields: [
-      {
-        name: "reason",
-        shape: "generic",
-        type: "select",
-        label: "Motif",
-        validation: { required: false },
-        style: { className: "fr-col-8" },
-        choices: [
-          { label: "Modifier", value: "EDIT" },
-          { label: "Annuler", value: "CANCEL" }
-        ]
-      },
       {
         name: "publicId",
         shape: "generic",
         type: "text",
         label: "Identifiant unique",
-        validation: { required: true },
+        required: true,
+        validation: {
+          publicId: nonEmptyString
+        },
         style: { className: "fr-col-8" }
       },
       {
         Component: ReportFor,
         props: {
-          reportForLabel: "SIRET du déclarant",
-          reportAsLabel: "SIRET de l'émetteur de la déclaration"
+          reportForLabel: "SIRET de l'émetteur",
+          reportAsLabel: "SIRET du déclarant"
         },
-        names: ["reportAsCompanySiret", "reportForCompanySiret"],
+        names: ["reportForCompanySiret", "reportAsCompanySiret"],
+        validation: {
+          reportForCompanySiret: nonEmptyString,
+          reportAsCompanySiret: optionalString
+        },
         shape: "custom"
+      }
+    ]
+  },
+  {
+    tabId: "waste",
+    tabTitle: "Déchet",
+    fields: [
+      {
+        Component: WasteCodeSelector,
+        props: { name: "wasteCode" },
+        shape: "custom",
+        names: ["wasteCode"],
+        required: true,
+        validation: {
+          wasteCode: nonEmptyString
+        },
+        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+      },
+      {
+        name: "wasteDescription",
+        shape: "generic",
+        label: "Dénomination usuelle du déchet",
+        required: true,
+        validation: {
+          wasteDescription: nonEmptyString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        name: "wasteCodeBale",
+        shape: "generic",
+        label: "Code déchet Bâle",
+        validation: {
+          wasteCodeBale: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-4" }
+      },
+      {
+        Component: SecondaryWasteCodes,
+        shape: "custom",
+        names: ["secondaryWasteCodes", "secondaryWasteDescriptions"],
+        validation: {
+          secondaryWasteCodes: filteredArray,
+          secondaryWasteDescriptions: filteredArray
+        }
+      }
+    ]
+  },
+  {
+    tabId: "processing",
+    tabTitle: "Traitement",
+    fields: [
+      {
+        name: "product",
+        shape: "generic",
+        label: "Produit",
+        required: true,
+        validation: {
+          product: nonEmptyString
+        },
+        type: "text",
+        style: { className: "fr-col-10" }
+      },
+      {
+        Component: WeightSelector,
+        shape: "custom",
+        names: ["weightValue", "weightIsEstimate", "volume"],
+        validation: {
+          weightValue: nonEmptyNumber,
+          volume: optionalNumber,
+          weightIsEstimate: booleanString
+        }
       },
       {
         shape: "layout",
@@ -49,7 +130,10 @@ export const ssdFormShape: FormShape = [
             name: "useDate",
             shape: "generic",
             label: "Date d'utilisation",
-            validation: { required: false },
+            required: true,
+            validation: {
+              useDate: optionalString
+            },
             type: "date",
             style: { className: "fr-col-4" }
           },
@@ -57,63 +141,17 @@ export const ssdFormShape: FormShape = [
             name: "dispatchDate",
             shape: "generic",
             label: "Date d'expédition",
-            validation: { required: false },
+            required: true,
+            validation: {
+              dispatchDate: optionalString
+            },
             type: "date",
             style: { className: "fr-col-4" }
           }
-        ]
-      }
-    ]
-  },
-  {
-    tabTitle: "Déchet",
-    fields: [
-      {
-        Component: WasteCodeSelector,
-        props: { name: "wasteCode", required: true },
-        shape: "custom",
-        names: ["wasteCode"],
-        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+        ],
+        infoText:
+          "Merci de renseigner une date d'utilisation ou une date d'expédition"
       },
-      {
-        name: "wasteDescription",
-        shape: "generic",
-        label: "Dénomination du déchet",
-        validation: { required: true },
-        type: "text",
-        style: { className: "fr-col-10" }
-      },
-      {
-        name: "wasteCodeBale",
-        shape: "generic",
-        label: "Code déchet Bâle",
-        validation: { required: false },
-        type: "text",
-        style: { className: "fr-col-4" }
-      },
-      {
-        Component: SecondaryWasteCodes,
-        shape: "custom",
-        names: ["secondaryWasteCodes", "secondaryWasteDescriptions"]
-      },
-      {
-        name: "product",
-        shape: "generic",
-        label: "Produit",
-        validation: { required: true },
-        type: "text",
-        style: { className: "fr-col-10" }
-      },
-      {
-        Component: WeightSelector,
-        shape: "custom",
-        names: ["weightValue", "weightIsEstimate", "weightIsEstimate"]
-      }
-    ]
-  },
-  {
-    tabTitle: "Traitement",
-    fields: [
       {
         shape: "layout",
         fields: [
@@ -121,7 +159,10 @@ export const ssdFormShape: FormShape = [
             name: "processingDate",
             shape: "generic",
             label: "Date de traitement",
-            validation: { required: true },
+            required: true,
+            validation: {
+              processingDate: nonEmptyString
+            },
             type: "date",
             style: { className: "fr-col-4" }
           },
@@ -129,67 +170,73 @@ export const ssdFormShape: FormShape = [
             name: "processingEndDate",
             shape: "generic",
             label: "Date de fin de traitement",
-            validation: { required: false },
+            validation: {
+              processingEndDate: optionalString
+            },
             type: "date",
             style: { className: "fr-col-4" }
           }
         ]
       },
       {
-        shape: "layout",
-        fields: [
-          {
-            name: "operationCode",
-            shape: "generic",
-            type: "select",
-            label: "Code de traitement réalisé",
-            validation: { required: true },
-            style: { className: "fr-col-4" },
-            choices: SSD_PROCESSING_OPERATIONS_CODES.map(code => ({
-              label: code,
-              value: code
-            }))
-          },
-          {
-            name: "operationMode",
-            shape: "generic",
-            type: "select",
-            label: "Mode de traitement",
-            validation: { required: true },
-            style: { className: "fr-col-4" },
-            choices: [
-              { value: "REUTILISATION", label: "Réutilisation" },
-              { value: "RECYCLAGE", label: "Recyclage" },
-              {
-                value: "VALORISATION_ENERGETIQUE",
-                label: "Valorisatio énergétique"
-              },
-              { value: "ELIMINATION", label: "Elimination" },
-              { value: "AUTRES_VALORISATIONS", label: "Autres valorisations" }
-            ]
-          }
-        ]
+        Component: Operation,
+        props: {
+          operationCodes: SSD_PROCESSING_OPERATIONS_CODES,
+          operationModes: SSD_OPERATION_MODES,
+          showNoTraceability: false,
+          showNextOperationCode: false
+        },
+        names: ["operationCode", "operationMode"],
+        validation: {
+          operationCode: nonEmptyString,
+          operationMode: nonEmptyString
+        },
+        shape: "custom"
       },
       {
         name: "administrativeActReference",
         shape: "generic",
         type: "select",
         label: "Référence de l'acte administratif",
-        validation: { required: true },
+        defaultOption: "Sélectionnez une référence",
+        required: true,
+        validation: {
+          administrativeActReference: nonEmptyString
+        },
         style: { className: "fr-col-4" },
         choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
           label: reference,
           value: reference
-        }))
+        })),
+        infoText: (selectedAct: string | null) => {
+          if (selectedAct) {
+            return ADMINISTRATIVE_ACT_EXPLANATIONS[selectedAct];
+          }
+          return null;
+        }
       }
     ]
   },
   {
+    tabId: "destination",
     tabTitle: "Destinataire",
     fields: [
       {
         Component: CompanySelector,
-        props: { prefix: "destination", label: "destination", required: true },
+        props: {
+          prefix: "destination",
+          label: "destination",
+          excludeTypes: ["PERSONNE_PHYSIQUE", "COMMUNES"]
+        },
+        validation: {
+          destinationCompanyType: optionalString,
+          destinationCompanyOrgId: optionalString,
+          destinationCompanyName: optionalString,
+          destinationCompanyAddress: optionalString,
+          destinationCompanyPostalCode: optionalString,
+          destinationCompanyCity: optionalString,
+          destinationCompanyCountryCode: optionalString
+        },
         shape: "custom",
         names: [
           "destinationCompanyType",

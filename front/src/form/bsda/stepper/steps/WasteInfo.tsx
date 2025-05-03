@@ -2,7 +2,6 @@ import React, { lazy, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
-import Packagings from "../../components/packagings/Packagings";
 import { getBsdaEditionDisabledSteps } from "../../utils/getBsdaEditionDisabledSteps";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "@td/codegen-ui";
@@ -10,6 +9,8 @@ import { FieldSwitch } from "../../../../common/components";
 import { BSDA_WASTES } from "@td/constants";
 import { BsdaContext } from "../../FormContainer";
 import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
+import FormikPackagingList from "../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
+import { bsdaPackagingTypes } from "../../../../Apps/Forms/Components/PackagingList/helpers";
 const TagsInput = lazy(
   () => import("../../../../common/components/tags-input/TagsInput")
 );
@@ -163,7 +164,12 @@ export function WasteInfoWorker({ disabled }) {
       </div>
 
       <h4 className="form__section-heading">Conditionnement</h4>
-      <Field disabled={disabled} name="packagings" component={Packagings} />
+
+      <FormikPackagingList
+        fieldName="packagings"
+        disabled={disabled}
+        packagingTypes={bsdaPackagingTypes}
+      />
 
       <div className="form__row">
         <label>

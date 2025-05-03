@@ -274,15 +274,14 @@ export const emissionSchema: FactorySchemaOf<
 
     emitterWastePackagings: yup
       .array()
-      .requiredIf(
-        context.emissionSignature,
-        `Le détail du conditionnement émis est obligatoire.`
-      )
       .of(packagingInfo(true))
       .test(
         "packaging-info-required",
         "Le détail du conditionnement émis est obligatoire",
         function (value) {
+          if (this.parent.isDraft) {
+            return true;
+          }
           return !!context.emissionSignature ? !!value && !!value.length : true;
         }
       )
@@ -719,6 +718,7 @@ export type BsdasriValidationContext = {
   isSynthesis?: boolean;
   isDraft?: boolean;
 };
+
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,
   context: BsdasriValidationContext

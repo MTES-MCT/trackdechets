@@ -82,6 +82,7 @@ const WorkerCertificationForm = ({
               label="Date de validité"
               nativeInputProps={{
                 type: "date",
+                min: new Date().toISOString().split("T")[0],
                 max: "2999/12/31",
                 ...inputProps?.workerCertification?.validityLimit
               }}

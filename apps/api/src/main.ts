@@ -1,5 +1,5 @@
 import { httpServer, startApolloServer, closeQueues } from "back";
-import { cpuProfiling, memorySampling } from "./heapSnapshot";
+import { cpuProfiling, heapSnapshotToS3Router } from "./heapSnapshot";
 import { envVariables } from "@td/env";
 
 envVariables.parse(process.env);
@@ -19,7 +19,7 @@ async function start() {
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
 
-  process.on("SIGUSR1", memorySampling);
+  process.on("SIGUSR1", heapSnapshotToS3Router);
   process.on("SIGUSR2", cpuProfiling);
 }
 

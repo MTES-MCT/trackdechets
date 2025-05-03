@@ -61,6 +61,7 @@ import { toOutgoingWaste as OutgoingTexsToOutgoingWaste } from "./outgoingTexs/r
 import { toTransportedWaste as TransportedToTransportedWaste } from "./transported/registry";
 import { toManagedWaste as ManagedToManagedWaste } from "./managed/registry";
 export type ParsedLine = {
+  id?: string;
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | null;
   publicId: string;
   reportForCompanySiret: string;

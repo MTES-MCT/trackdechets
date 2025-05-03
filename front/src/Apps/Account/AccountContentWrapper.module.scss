@@ -1,18 +1,15 @@
 @import "../../scss/Breakpoints.scss";
 
 .content {
-  padding: 1em 2em;
-
   @include tablet {
     max-width: calc(1100px + 8em);
-    padding: 2em 4em;
   }
 }
 
 .panelTitle {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: baseline;
 
   button,
   button:active {
@@ -28,5 +25,4 @@
 .additional {
   display: flex;
   align-items: center;
-  margin-left: 8px;
 }

@@ -28,12 +28,26 @@ export async function transformReportForInfos<T extends ParsedLine>(
 
 export async function transformAndRefineItemReason<
   T extends ParsedLine & { id?: string | null }
->(item: T, existingId: string | undefined, { addIssue }: RefinementCtx) {
+>(
+  item: T,
+  existingItem: {
+    id: string;
+    isCancelled: boolean;
+  } | null,
+  { addIssue }: RefinementCtx
+) {
+  const existingId = existingItem?.id;
+
   // If we have an existing ID, set it
   item.id = existingId;
 
   // If the line alreary exists in DB and we dont have a reason, we can simply ignore it
+  // Except if the line is cancelled. In that case we allow recreating it without a reason
   if (existingId && !item.reason) {
+    if (existingItem?.isCancelled) {
+      item.reason = "MODIFIER";
+      return item;
+    }
     item.reason = "IGNORER";
     return item;
   }

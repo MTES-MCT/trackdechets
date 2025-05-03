@@ -51,7 +51,7 @@ const Filters = ({
   }, [advancedFilters, onApplyFilters, quickFilters, filters]);
 
   return (
-    <div className="filters">
+    <div className="filters fr-mt-2w">
       <AdvancedFilters
         open={areAdvancedFiltersOpen}
         filters={advancedFilterList}

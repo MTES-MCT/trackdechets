@@ -205,6 +205,7 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
                         className="fr-btn fr-icon-add-line fr-btn--secondary fr-mr-2w"
                         title="Ajouter une URL de redirection"
                         onClick={_ => append("https://")}
+                        type="button"
                       >
                         Ajouter une URL de redirection
                       </button>
@@ -214,6 +215,7 @@ export default function AccountApplicationsMyApplicationCreateUpdate({
                         className="fr-btn fr-icon-delete-line fr-btn--secondary"
                         title="Supprimer une URL de redirection"
                         onClick={_ => remove(index)}
+                        type="button"
                       >
                         Supprimer une URL de redirection
                       </button>
