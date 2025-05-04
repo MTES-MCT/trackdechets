@@ -34,7 +34,7 @@ export function RegistryTransportedForm({ onClose }: Props) {
     reportForRecepisseIsExempted: false,
     reportForTransportPlates: [],
     wastePop: false,
-    weightIsEstimate: false,
+    weightIsEstimate: true,
     wasteIsDangerous: false
   };
 

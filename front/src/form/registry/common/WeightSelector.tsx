@@ -1,5 +1,6 @@
 import React from "react";
 import type { UseFormReturn } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
 import { formatError } from "../builder/error";
 import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
@@ -12,7 +13,6 @@ type Props = {
 export function WeightSelector({ methods, disabled }: Props) {
   const weightValue = methods.watch("weightValue", 0);
   const { errors } = methods.formState;
-
   return (
     <div className="fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
@@ -36,28 +36,40 @@ export function WeightSelector({ methods, disabled }: Props) {
           />
         </div>
         <div className="fr-col-4">
-          <RadioButtons
-            legend="Type de poids"
-            name="radio"
-            disabled={disabled}
-            options={[
-              {
-                label: "Estimé",
-                nativeInputProps: {
-                  value: "true",
-                  checked: true,
-                  ...methods.register("weightIsEstimate")
+          <Controller
+            control={methods.control}
+            name={"weightIsEstimate"}
+            render={({ field: { onChange, onBlur, value, ref } }) => (
+              <RadioButtons
+                disabled={disabled}
+                legend="Type de poids"
+                orientation="horizontal"
+                state={errors?.weightIsEstimate && "error"}
+                stateRelatedMessage={
+                  (errors?.weightIsEstimate?.message as string) ?? ""
                 }
-              },
-              {
-                label: "Réel",
-                nativeInputProps: {
-                  value: "false",
-                  ...methods.register("weightIsEstimate")
-                }
-              }
-            ]}
-            orientation="horizontal"
+                ref={ref}
+                options={[
+                  {
+                    label: "Estimé",
+                    nativeInputProps: {
+                      checked: value === true,
+                      onBlur: onBlur,
+                      onChange: () => onChange(true)
+                    }
+                  },
+
+                  {
+                    label: "Réel",
+                    nativeInputProps: {
+                      checked: value === false,
+                      onBlur: onBlur,
+                      onChange: () => onChange(false)
+                    }
+                  }
+                ]}
+              />
+            )}
           />
         </div>
       </div>
