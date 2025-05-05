@@ -1,5 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+import React, { useState } from "react";
 import {
   Controller,
   type UseFormSetValue,
@@ -60,6 +60,7 @@ export function InlineFrenchCompanySelector({
   shortMode,
   onCompanySelected
 }: InlineProps) {
+  const [unknownCompanyError, setUnknownCompanyError] = useState(false);
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
 
   const selectedCompanyOrgId = methods.watch(fieldName);
@@ -76,6 +77,7 @@ export function InlineFrenchCompanySelector({
             disabled={disabled}
             selectedCompanyError={selectedCompanyError}
             allowForeignCompanies={false}
+            allowClosedCompanies={true}
             onCompanySelected={company => {
               if (company) {
                 field.onChange(company.orgId);
@@ -97,7 +99,11 @@ export function InlineFrenchCompanySelector({
                 }
 
                 onCompanySelected?.(company, methods.setValue);
+                setUnknownCompanyError(false);
               }
+            }}
+            onUnknownInputCompany={() => {
+              setUnknownCompanyError(true);
             }}
           />
 
@@ -111,6 +117,21 @@ export function InlineFrenchCompanySelector({
           {errors?.[`${prefix}CompanyAddress`] && (
             <Alert
               description={formatError(errors[`${prefix}CompanyAddress`])}
+              severity="error"
+              small
+            />
+          )}
+          {unknownCompanyError && (
+            <Alert
+              title="L'établissement sélectionné est inconnu."
+              description={
+                <div>
+                  <p>SIRET: {selectedCompanyOrgId}</p>
+                  <p>
+                    Dénomination: {methods.getValues(`${prefix}CompanyName`)}
+                  </p>
+                </div>
+              }
               severity="error"
               small
             />

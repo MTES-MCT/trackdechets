@@ -108,8 +108,18 @@ const companySearchPrivateFragment = gql`
 `;
 
 export const SEARCH_COMPANIES = gql`
-  query SearchCompanies($clue: String!, $department: String) {
-    searchCompanies(clue: $clue, department: $department) {
+  query SearchCompanies(
+    $clue: String!
+    $department: String
+    $allowForeignCompanies: Boolean
+    $allowClosedCompanies: Boolean
+  ) {
+    searchCompanies(
+      clue: $clue
+      department: $department
+      allowForeignCompanies: $allowForeignCompanies
+      allowClosedCompanies: $allowClosedCompanies
+    ) {
       ...CompanySearchResultFragment
     }
   }

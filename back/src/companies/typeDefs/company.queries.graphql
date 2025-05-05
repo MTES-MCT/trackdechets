@@ -37,6 +37,10 @@ type Query {
     alors aucun résultat ne sera retourné
     """
     allowForeignCompanies: Boolean
+    """
+    (Optionnel) Autorise les entreprises fermées à être retournées
+    """
+    allowClosedCompanies: Boolean
   ): [CompanySearchResult!]!
 
   """

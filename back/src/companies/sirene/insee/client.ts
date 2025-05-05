@@ -5,16 +5,8 @@ import {
 } from "../types";
 import { libelleFromCodeNaf, buildAddress } from "../utils";
 import { authorizedAxiosGet } from "./token";
-import {
-  AnonymousCompanyError,
-  ClosedCompanyError,
-  SiretNotFoundError
-} from "../errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
-import type {
-  EtatAdministratif,
-  StatutDiffusionEtablissement
-} from "@td/codegen-back";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/api-sirene/prive/3.11";
 
@@ -97,19 +89,7 @@ export async function searchCompany(
   _source_includes?: string[] // ignored
 ): Promise<SireneSearchResult> {
   try {
-    const company = await searchCompanySirene(siret);
-
-    if (company.etatAdministratif === ("F" as EtatAdministratif)) {
-      throw new ClosedCompanyError();
-    }
-
-    if (
-      company.statutDiffusionEtablissement ===
-      ("P" as StatutDiffusionEtablissement)
-    ) {
-      throw new AnonymousCompanyError();
-    }
-    return company;
+    return await searchCompanySirene(siret);
   } catch (error) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx

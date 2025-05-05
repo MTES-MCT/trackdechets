@@ -415,7 +415,9 @@ describe("TransporterForm", () => {
           request: {
             query: SEARCH_COMPANIES,
             variables: {
-              clue: "CODE EN STOCK"
+              clue: "CODE EN STOCK",
+              allowForeignCompanies: true,
+              allowClosedCompanies: false
             }
           },
           result: () => {

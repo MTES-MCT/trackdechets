@@ -19,7 +19,8 @@ import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
-  isProfessional
+  isProfessional,
+  isAnonymousCompany
 } from "@td/constants";
 import { searchCompany } from "../../search";
 import {
@@ -36,6 +37,7 @@ import { companyInputToZodCompany } from "../../validation/helpers";
 import { toGqlCompanyPrivate } from "../../converters";
 import { getDefaultNotifications } from "../../../users/notifications";
 import { CompanyToSplit, getCompanySplittedAddress } from "../../companyUtils";
+import { AnonymousCompanyError } from "../../sirene/errors";
 /**
  * Create a new company and associate it to a user
  * who becomes the first admin of the company
@@ -101,6 +103,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   if (isClosedCompany(companyInfo)) {
     throw new UserInputError(CLOSED_COMPANY_ERROR);
+  }
+
+  if (isAnonymousCompany(companyInfo) && !companyInfo.isRegistered) {
+    throw new AnonymousCompanyError();
   }
 
   const companyCreateInput: Prisma.CompanyCreateInput = {

@@ -1,11 +1,7 @@
 import { errors, estypes } from "@elastic/elasticsearch";
 import { logger } from "@td/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
-import {
-  AnonymousCompanyError,
-  ClosedCompanyError,
-  SiretNotFoundError
-} from "../errors";
+import { SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";
 import {
   SearchHit,
@@ -15,10 +11,6 @@ import {
 } from "./types";
 import client from "./esClient";
 import { SEARCH_COMPANIES_MAX_SIZE } from "../insee/client";
-import type {
-  EtatAdministratif,
-  StatutDiffusionEtablissement
-} from "@td/codegen-back";
 
 const { ResponseError } = errors;
 /**
@@ -101,19 +93,7 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const company = await searchCompanyTD(siret);
-
-    if (company.etatAdministratif === ("F" as EtatAdministratif)) {
-      throw new ClosedCompanyError();
-    }
-
-    if (
-      company.statutDiffusionEtablissement ===
-      ("P" as StatutDiffusionEtablissement)
-    ) {
-      throw new AnonymousCompanyError();
-    }
-    return company;
+    return await searchCompanyTD(siret);
   } catch (error) {
     if (error instanceof ResponseError && error.meta.statusCode === 404) {
       throw new SiretNotFoundError();
@@ -158,15 +138,15 @@ export const searchCompanies = (
     }
   ];
 
+  // this might be a french department code
   if (department?.length === 2 || department?.length === 3) {
-    // this might a french department code
     must.push({
       wildcard: { codePostalEtablissement: `${department}*` }
     });
   }
 
+  // this might be a french postal code
   if (department?.length === 5) {
-    // this might be a french postal code
     must.push({
       term: { codePostalEtablissement: department }
     });
