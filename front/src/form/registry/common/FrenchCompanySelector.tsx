@@ -10,7 +10,7 @@ import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelec
 import { formatError } from "../builder/error";
 import cn from "classnames";
 import "./FrenchCompanySelector.scss";
-type InlineProps = {
+export type InlineFrenchCompanySelectorProps = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
@@ -22,7 +22,7 @@ type InlineProps = {
   ) => void;
 };
 
-type BlockProps = InlineProps & {
+type BlockProps = InlineFrenchCompanySelectorProps & {
   reducedMargin?: boolean;
 };
 
@@ -59,7 +59,7 @@ export function InlineFrenchCompanySelector({
   disabled,
   shortMode,
   onCompanySelected
-}: InlineProps) {
+}: InlineFrenchCompanySelectorProps) {
   const [unknownCompanyError, setUnknownCompanyError] = useState(false);
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
 
@@ -128,7 +128,10 @@ export function InlineFrenchCompanySelector({
                 <div>
                   <p>SIRET: {selectedCompanyOrgId}</p>
                   <p>
-                    Dénomination: {methods.getValues(`${prefix}CompanyName`)}
+                    Dénomination:{" "}
+                    {shortMode
+                      ? methods.getValues(`${prefix}Name`)
+                      : methods.getValues(`${prefix}CompanyName`)}
                   </p>
                 </div>
               }

@@ -13,12 +13,12 @@ import {
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
-import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { TRANSPORT_MODES } from "../common/TransporterSelector/TransporterForm";
 import { TransporterTags } from "../common/TransporterTags";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { type RegistryCompanyInfos } from "../../../dashboard/registry/RegistryCompanySwitcher";
 import { Labels } from "../common/Labels";
+import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 export const transportedFormShape: FormShape = [
   {
     tabId: "declaration",
@@ -270,12 +270,14 @@ export const transportedFormShape: FormShape = [
         names: ["ecoOrganismeSiret", "ecoOrganismeName"]
       },
       {
-        Component: FrenchCompanySelector,
+        Component: OptionalCompanySelector,
         props: {
-          prefix: "broker",
+          prefix: "brokerCompany",
           shortMode: true,
           title: "Courtier (optionnel)",
           reducedMargin: true,
+          toggleLabel: "Présence d'un courtier",
+          recepisseName: "brokerRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.brokerReceipt?.receiptNumber) {
               setValue(
@@ -287,29 +289,25 @@ export const transportedFormShape: FormShape = [
         },
         validation: {
           brokerCompanySiret: optionalString,
-          brokerCompanyName: optionalString
-        },
-        shape: "custom",
-        names: ["brokerCompanySiret", "brokerCompanyName"]
-      },
-      {
-        name: "brokerRecepisseNumber",
-        shape: "generic",
-        label: Labels.brokerRecepisseNumber,
-        required: true,
-        validation: {
+          brokerCompanyName: optionalString,
           brokerRecepisseNumber: optionalString
         },
-        type: "text",
-        style: { className: "fr-col-10" }
+        shape: "custom",
+        names: [
+          "brokerCompanySiret",
+          "brokerCompanyName",
+          "brokerRecepisseNumber"
+        ]
       },
       {
-        Component: FrenchCompanySelector,
+        Component: OptionalCompanySelector,
         props: {
-          prefix: "trader",
+          prefix: "traderCompany",
           shortMode: true,
           title: "Négociant (optionnel)",
           reducedMargin: true,
+          toggleLabel: "Présence d'un négociant",
+          recepisseName: "traderRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.traderReceipt?.receiptNumber) {
               setValue(
@@ -321,21 +319,15 @@ export const transportedFormShape: FormShape = [
         },
         validation: {
           traderCompanySiret: optionalString,
-          traderCompanyName: optionalString
-        },
-        shape: "custom",
-        names: ["traderCompanySiret", "traderCompanyName"]
-      },
-      {
-        name: "traderRecepisseNumber",
-        shape: "generic",
-        label: Labels.traderRecepisseNumber,
-        required: true,
-        validation: {
+          traderCompanyName: optionalString,
           traderRecepisseNumber: optionalString
         },
-        type: "text",
-        style: { className: "fr-col-10" }
+        shape: "custom",
+        names: [
+          "traderCompanySiret",
+          "traderCompanyName",
+          "traderRecepisseNumber"
+        ]
       }
     ]
   },
