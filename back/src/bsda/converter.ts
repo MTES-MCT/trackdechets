@@ -104,6 +104,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
       familyCode: bsda.wasteFamilyCode,
       materialName: bsda.wasteMaterialName,
       sealNumbers: bsda.wasteSealNumbers,
+      isSubjectToADR: bsda.wasteIsSubjectToADR,
       adr: bsda.wasteAdr,
       pop: bsda.wastePop
     }),
@@ -555,6 +556,7 @@ function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
 function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
     wasteCode: chain(waste, w => w.code),
+    wasteIsSubjectToADR: chain(waste, w => w.isSubjectToADR),
     wasteAdr: chain(waste, w => w.adr),
     wasteFamilyCode: chain(waste, w => w.familyCode),
     // TODO: name is deprecated, but still supported as an input for now.
