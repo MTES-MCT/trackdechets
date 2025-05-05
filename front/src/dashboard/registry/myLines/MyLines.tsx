@@ -25,15 +25,36 @@ import {
 import { ActionButton } from "./ActionButton";
 import "./MyLines.scss";
 
-const HEADERS = [
-  "Importé le",
-  "Type",
-  "N° unique",
-  "Déclarant",
-  "Expédié ou réceptionné le",
-  "Code déchet",
-  "Actions"
-];
+const getHeaders = (registryType: RegistryImportType | undefined): string[] => {
+  let dateColumnName: string;
+  switch (registryType) {
+    case RegistryImportType.Ssd:
+      dateColumnName = "Utilisé ou expédié le";
+      break;
+    case RegistryImportType.IncomingWaste:
+    case RegistryImportType.IncomingTexs:
+      dateColumnName = "Réceptionné le";
+      break;
+    case RegistryImportType.OutgoingWaste:
+    case RegistryImportType.OutgoingTexs:
+    case RegistryImportType.Transported:
+    case RegistryImportType.Managed:
+      dateColumnName = "Expédié le";
+      break;
+    default:
+      dateColumnName = "Expédié ou réceptionné le";
+      break;
+  }
+  return [
+    "Importé le",
+    "Type",
+    "N° unique",
+    "Déclarant",
+    dateColumnName,
+    "Code déchet",
+    "Actions"
+  ];
+};
 
 const REGISTRY_NAMES = {
   [RegistryImportType.Ssd]: "Sortie de statut de déchet",
@@ -271,7 +292,7 @@ export function MyLines() {
             {tableData && tableData.length > 0 ? (
               <RegistryTable
                 data={tableData}
-                headers={HEADERS}
+                headers={getHeaders(type)}
                 fixed={!isMobile}
               />
             ) : (

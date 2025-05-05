@@ -88,7 +88,7 @@ export function InlineOperation({
       : OPERATION_MODES;
     return selectedOperationCode && selectedOperationCode.startsWith("D")
       ? possibleOperationModes.filter(mode => mode.value === "ELIMINATION")
-      : possibleOperationModes;
+      : possibleOperationModes.filter(mode => mode.value !== "ELIMINATION");
   }, [selectedOperationCode, operationModes]);
 
   useEffect(() => {
@@ -102,6 +102,8 @@ export function InlineOperation({
       if (showNextOperationCode) {
         methods.setValue("nextOperationCode", "");
       }
+    } else if (selectedOperationCode && !isFinalOperationCode) {
+      methods.setValue("operationMode", "");
     }
   }, [
     selectedOperationCode,
@@ -142,16 +144,14 @@ export function InlineOperation({
           </div>
           <div className={"fr-col-4"}>
             <Select
-              label={`Mode de traitement ${
-                !isFinalOperationCode && selectedOperationCode
-                  ? "(optionnel)"
-                  : ""
-              }`}
+              label={`Mode de traitement`}
               nativeSelectProps={{
                 ...methods.register("operationMode"),
                 defaultValue: ""
               }}
-              disabled={disabled}
+              disabled={
+                disabled || (selectedOperationCode && !isFinalOperationCode)
+              }
               state={errors?.operationMode && "error"}
               stateRelatedMessage={formatError(errors?.operationMode)}
             >

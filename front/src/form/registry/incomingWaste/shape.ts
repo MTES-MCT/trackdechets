@@ -23,6 +23,7 @@ import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
+import { Labels } from "../common/Labels";
 
 export const incomingWasteFormShape: FormShape = [
   {
@@ -33,7 +34,7 @@ export const incomingWasteFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -73,7 +74,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle du déchet",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -84,7 +85,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -95,7 +96,9 @@ export const incomingWasteFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -105,7 +108,9 @@ export const incomingWasteFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -114,7 +119,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "receptionDate",
         shape: "generic",
-        label: "Date de réception",
+        label: Labels.receptionDate,
         required: true,
         validation: {
           receptionDate: nonEmptyString
@@ -125,7 +130,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "weighingHour",
         shape: "generic",
-        label: "Heure de pesée",
+        label: Labels.weighingHour,
         required: false,
         validation: {
           weighingHour: optionalString
@@ -279,7 +284,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "brokerRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.brokerRecepisseNumber,
         required: true,
         validation: {
           brokerRecepisseNumber: optionalString
@@ -313,7 +318,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "traderRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.traderRecepisseNumber,
         required: true,
         validation: {
           traderRecepisseNumber: optionalString
@@ -351,7 +356,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "ttdImportNumber",
         shape: "generic",
-        label: "Numéro de notification ou de déclaration d'import",
+        label: Labels.ttdImportNumber,
         required: false,
         validation: {
           ttdImportNumber: optionalString
@@ -362,7 +367,7 @@ export const incomingWasteFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -380,7 +385,7 @@ export const incomingWasteFormShape: FormShape = [
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
+        label: Labels.isDirectSupply,
         required: false,
         validation: {
           isDirectSupply: booleanString

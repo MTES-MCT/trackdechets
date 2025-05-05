@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import CompanySelectorWrapper from "../../../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";

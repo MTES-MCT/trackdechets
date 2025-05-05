@@ -1,3 +1,4 @@
+import { type UseFormSetValue } from "react-hook-form";
 import { FormShape } from "../builder/types";
 import { ReportFor } from "../common/ReportFor";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
@@ -16,7 +17,8 @@ import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import { TRANSPORT_MODES } from "../common/TransporterSelector/TransporterForm";
 import { TransporterTags } from "../common/TransporterTags";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-
+import { type RegistryCompanyInfos } from "../../../dashboard/registry/RegistryCompanySwitcher";
+import { Labels } from "../common/Labels";
 export const transportedFormShape: FormShape = [
   {
     tabId: "declaration",
@@ -26,7 +28,7 @@ export const transportedFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -37,7 +39,20 @@ export const transportedFormShape: FormShape = [
         Component: ReportFor,
         props: {
           reportForLabel: "SIRET du transporteur",
-          reportAsLabel: "SIRET du déclarant"
+          reportAsLabel: "SIRET du déclarant",
+          onCompanySelect: (
+            _,
+            __,
+            setValue: UseFormSetValue<any>,
+            company?: RegistryCompanyInfos
+          ) => {
+            if (company?.transporterReceipt?.receiptNumber) {
+              setValue(
+                "reportForRecepisseNumber",
+                company.transporterReceipt.receiptNumber
+              );
+            }
+          }
         },
         names: ["reportForCompanySiret", "reportAsCompanySiret"],
         validation: {
@@ -88,7 +103,7 @@ export const transportedFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -99,7 +114,9 @@ export const transportedFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -109,7 +126,9 @@ export const transportedFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -121,7 +140,7 @@ export const transportedFormShape: FormShape = [
           {
             name: "collectionDate",
             shape: "generic",
-            label: "Date d'enlèvement",
+            label: Labels.collectionDate,
             required: true,
             validation: {
               collectionDate: nonEmptyString
@@ -132,7 +151,7 @@ export const transportedFormShape: FormShape = [
           {
             name: "unloadingDate",
             shape: "generic",
-            label: "Date de déchargement",
+            label: Labels.unloadingDate,
             required: true,
             validation: {
               unloadingDate: nonEmptyString
@@ -213,7 +232,7 @@ export const transportedFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
-        label: "Numéro de notification ou de déclaration GISTRID",
+        label: Labels.gistridNumber,
         required: false,
         validation: {
           gistridNumber: optionalString
@@ -224,7 +243,7 @@ export const transportedFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -276,7 +295,7 @@ export const transportedFormShape: FormShape = [
       {
         name: "brokerRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.brokerRecepisseNumber,
         required: true,
         validation: {
           brokerRecepisseNumber: optionalString
@@ -310,7 +329,7 @@ export const transportedFormShape: FormShape = [
       {
         name: "traderRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.traderRecepisseNumber,
         required: true,
         validation: {
           traderRecepisseNumber: optionalString
@@ -396,8 +415,8 @@ export const transportedFormShape: FormShape = [
         name: "reportForRecepisseIsExempted",
         shape: "generic",
         type: "checkbox",
-        label:
-          "Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement",
+        label: Labels.reportForRecepisseIsExempted,
+
         required: false,
         validation: {
           reportForRecepisseIsExempted: booleanString

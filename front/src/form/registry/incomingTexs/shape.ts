@@ -23,6 +23,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { Operation } from "../common/Operation";
+import { Labels } from "../common/Labels";
 
 export const incomingTexsFormShape: FormShape = [
   {
@@ -33,7 +34,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -76,8 +77,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label:
-          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -88,7 +88,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -99,7 +99,9 @@ export const incomingTexsFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -109,7 +111,9 @@ export const incomingTexsFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -118,7 +122,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "receptionDate",
         shape: "generic",
-        label: "Date de réception",
+        label: Labels.receptionDate,
         required: true,
         validation: {
           receptionDate: nonEmptyString
@@ -188,7 +192,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "sisIdentifier",
         shape: "generic",
-        label: "Identifiant SIS du terrain",
+        label: Labels.sisIdentifier,
         validation: {
           sisIdentifier: optionalString
         },
@@ -199,7 +203,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "ttdImportNumber",
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
-        label: "Numéro de notification ou de déclaration d'import",
+        label: Labels.ttdImportNumber,
         required: false,
         validation: {
           ttdImportNumber: optionalString
@@ -210,7 +214,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -319,7 +323,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "brokerRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.brokerRecepisseNumber,
         required: true,
         validation: {
           brokerRecepisseNumber: optionalString
@@ -353,7 +357,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "traderRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.traderRecepisseNumber,
         required: true,
         validation: {
           traderRecepisseNumber: optionalString
@@ -392,7 +396,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "isUpcycled",
         shape: "generic",
         type: "checkbox",
-        label: "Terres valorisées",
+        label: Labels.isUpcycled,
         required: false,
         validation: {
           isUpcycled: booleanString
@@ -426,7 +430,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
+        label: Labels.isDirectSupply,
         required: false,
         validation: {
           isDirectSupply: booleanString

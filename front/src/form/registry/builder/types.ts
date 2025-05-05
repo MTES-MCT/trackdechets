@@ -1,3 +1,4 @@
+import React from "react";
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import type { ComponentType } from "react";
@@ -12,12 +13,13 @@ export type FormShapeField =
       style?: FieldStyle;
       type: string;
       title?: string;
-      label: string;
+      label: string | React.ReactNode;
       required?: boolean;
       validation: Record<string, z.ZodType>;
       defaultOption?: string;
       choices?: { label: string; value: string | number }[];
       infoText?: string | ((fieldValues: any) => string | null);
+      tooltip?: string;
     }
   | {
       props?: Record<string, any>;

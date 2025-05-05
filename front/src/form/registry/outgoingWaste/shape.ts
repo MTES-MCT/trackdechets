@@ -23,6 +23,7 @@ import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
+import { Labels } from "../common/Labels";
 
 export const outgoingWasteFormShape: FormShape = [
   {
@@ -33,7 +34,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -73,7 +74,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle du déchet",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -84,7 +85,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -95,7 +96,9 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -105,7 +108,9 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -114,7 +119,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "dispatchDate",
         shape: "generic",
-        label: "Date d'expédition",
+        label: Labels.dispatchDate,
         required: true,
         validation: {
           dispatchDate: nonEmptyString
@@ -240,7 +245,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "brokerRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.brokerRecepisseNumber,
         required: true,
         validation: {
           brokerRecepisseNumber: optionalString
@@ -274,7 +279,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "traderRecepisseNumber",
         shape: "generic",
-        label: "Numéro de récépissé",
+        label: Labels.traderRecepisseNumber,
         required: true,
         validation: {
           traderRecepisseNumber: optionalString
@@ -305,7 +310,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "gistridNumber",
         shape: "generic",
-        label: "Numéro de notification ou de déclaration GISTRID",
+        label: Labels.gistridNumber,
         required: false,
         validation: {
           gistridNumber: optionalString
@@ -316,7 +321,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -389,7 +394,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
+        label: Labels.isDirectSupply,
         required: false,
         validation: {
           isDirectSupply: booleanString
