@@ -69,6 +69,26 @@ export const machine = createMachine<Record<string, never>, Event>(
       [BsdaStatus.SENT]: {
         on: {
           TRANSPORT: { target: BsdaStatus.SENT }, // multi-modal
+          RECEPTION: {
+            target: BsdaStatus.RECEIVED
+          },
+          OPERATION: [
+            {
+              target: BsdaStatus.REFUSED,
+              cond: "isBsdaRefused"
+            },
+            {
+              target: BsdaStatus.AWAITING_CHILD,
+              cond: "isGroupingOrReshipmentOperation"
+            },
+            {
+              target: BsdaStatus.PROCESSED
+            }
+          ]
+        }
+      },
+      [BsdaStatus.RECEIVED]: {
+        on: {
           OPERATION: [
             {
               target: BsdaStatus.REFUSED,

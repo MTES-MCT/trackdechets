@@ -1707,6 +1707,8 @@ model Bsda {
   destinationOperationNextDestinationCompanyMail          String?
   destinationOperationNextDestinationCap                  String?
   destinationOperationNextDestinationPlannedOperationCode String?
+  destinationReceptionSignatureAuthor                     String?
+  destinationReceptionSignatureDate                       DateTime?               @db.Timestamptz(6)
 
   // Date de signature du premier transporteur
   // Cette valeur est dupliquée entre le modèle Bsda et BsdaTransporter[0]
@@ -2267,6 +2269,7 @@ enum BsdaStatus {
   SIGNED_BY_PRODUCER
   SIGNED_BY_WORKER
   SENT
+  RECEIVED
   PROCESSED
   REFUSED
   AWAITING_CHILD

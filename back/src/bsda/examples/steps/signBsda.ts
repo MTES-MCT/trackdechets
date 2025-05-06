@@ -5,6 +5,7 @@ const expectedStatus = {
   EMISSION: "SIGNED_BY_PRODUCER",
   WORK: "SIGNED_BY_WORKER",
   TRANSPORT: "SENT",
+  RECEPTION: "RECEIVED",
   OPERATION: "PROCESSED"
 };
 
@@ -15,7 +16,12 @@ const expectedStatusWhenGrouping = {
   OPERATION: "AWAITING_CHILD"
 };
 
-type BsdaSignatureType = "EMISSION" | "OPERATION" | "TRANSPORT" | "WORK";
+type BsdaSignatureType =
+  | "EMISSION"
+  | "OPERATION"
+  | "RECEPTION"
+  | "TRANSPORT"
+  | "WORK";
 
 export function signBsda(
   company: string,

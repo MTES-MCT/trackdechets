@@ -151,6 +151,30 @@ function transporterNSignatureUpdateInput() {
   };
 }
 
+function destinationReceptionSignatureUpdateInput() {
+  return {
+    destination: {
+      reception: {
+        acceptationStatus: "ACCEPTED",
+        date: new Date().toISOString() as any,
+        weight: 2.1
+      }
+    }
+  };
+}
+
+function destinationOperationSignatureUpdateInput() {
+  return {
+    destination: {
+      operation: {
+        code: "D 5",
+        mode: "ELIMINATION",
+        date: new Date().toISOString() as any
+      }
+    }
+  };
+}
+
 function destinationSignatureUpdateInput() {
   return {
     destination: {
@@ -215,5 +239,7 @@ export default {
   workerSignatureUpdateInput,
   transporterSignatureUpdateInput,
   transporterNSignatureUpdateInput,
-  destinationSignatureUpdateInput
+  destinationSignatureUpdateInput,
+  destinationOperationSignatureUpdateInput,
+  destinationReceptionSignatureUpdateInput
 };
