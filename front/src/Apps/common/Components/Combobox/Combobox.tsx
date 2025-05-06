@@ -1,4 +1,10 @@
-import React, { useEffect, type ReactNode } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type ReactNode
+} from "react";
 import { Portal } from "../Portal/Portal";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 
@@ -44,8 +50,58 @@ export function ComboBox({
     }
   });
 
+  const [positionRevision, setPositionRevision] = useState(0);
+  const updatePositionCallback = useCallback(() => {
+    // Use requestAnimationFrame to batch updates and avoid layout thrashing
+    requestAnimationFrame(() => {
+      setPositionRevision(r => r + 1);
+    });
+  }, []);
+
+  // If the combobox in in a non-root div that is scrolled, we need to listen to the scroll event of this div
+  // to update the position of the dropdown
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const currentParentRef = parentRef.current;
+    if (!currentParentRef) {
+      return;
+    }
+
+    window.addEventListener("resize", updatePositionCallback);
+    window.addEventListener("scroll", updatePositionCallback, true);
+
+    const scrollableAncestors: HTMLElement[] = [];
+    let el = currentParentRef.parentElement;
+    while (el && el !== document.body) {
+      const style = window.getComputedStyle(el);
+      const overflowY = style.getPropertyValue("overflow-y");
+      const overflowX = style.getPropertyValue("overflow-x");
+      if (
+        overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowX === "auto" ||
+        overflowX === "scroll"
+      ) {
+        scrollableAncestors.push(el);
+        el.addEventListener("scroll", updatePositionCallback);
+      }
+      el = el.parentElement;
+    }
+
+    return () => {
+      window.removeEventListener("resize", updatePositionCallback);
+      window.removeEventListener("scroll", updatePositionCallback, true);
+      scrollableAncestors.forEach(ancestor => {
+        ancestor.removeEventListener("scroll", updatePositionCallback);
+      });
+    };
+  }, [isOpen, parentRef, updatePositionCallback]);
+
   useEffect(() => {
-    const targetElement = targetRef.current; // targetRef comes from the hook
+    const targetElement = targetRef.current;
     if (!isOpen || !parentRef.current || !targetElement) {
       return;
     }
@@ -143,7 +199,7 @@ export function ComboBox({
     }
 
     targetElement.style.left = `${dropdownLeft}px`;
-  }, [isOpen, parentRef, targetRef, triggerRef]);
+  }, [isOpen, parentRef, targetRef, triggerRef, positionRevision]);
 
   if (!isOpen) {
     return null;
