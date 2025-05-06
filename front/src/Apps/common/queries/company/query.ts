@@ -82,6 +82,10 @@ addressPostalCode
 addressCity
 `;
 
+const companyStatusDiffusionSearchString = `
+statutDiffusionEtablissement
+`;
+
 const companySearchResultFragment = gql`
   fragment CompanySearchResultFragment on CompanySearchResult {
     ${commonCompanySearchString}
@@ -93,6 +97,7 @@ const companySearchResultFragment = gql`
     ${vhuAgrementDemolisseurCompanySearchString}
     ${vhuAgrementBroyeurCompanySearchString}
     ${workerCertificationCompanySearchString}
+    ${companyStatusDiffusionSearchString}
   }
 `;
 const companySearchPrivateFragment = gql`

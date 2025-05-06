@@ -81,7 +81,16 @@ export function InlineFrenchCompanySelector({
             onCompanySelected={company => {
               if (company) {
                 field.onChange(company.orgId);
-
+                setUnknownCompanyError(false);
+                // this is not a registry field, it is used to communicate to the outside of this component
+                // so the company selection can be adapted for the case of private companies
+                methods.setValue(
+                  `${prefix}CompanyStatusDiffusion`,
+                  company.statutDiffusionEtablissement
+                );
+                if (company.orgId === selectedCompanyOrgId) {
+                  return;
+                }
                 if (shortMode) {
                   methods.setValue(`${prefix}Name`, company.name);
                 } else {
@@ -99,7 +108,6 @@ export function InlineFrenchCompanySelector({
                 }
 
                 onCompanySelected?.(company, methods.setValue);
-                setUnknownCompanyError(false);
               }
             }}
             onUnknownInputCompany={() => {

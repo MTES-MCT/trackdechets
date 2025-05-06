@@ -4,6 +4,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import { formatError } from "../builder/error";
 import { CountrySelector } from "./CountrySelector";
+import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 
 type InlineProps = {
   prefix: string;
@@ -86,7 +87,7 @@ export function InlineAddress({
         />
       </div>
       <div className="fr-col-4">
-        <Input
+        <NonScrollableInput
           label="Code postal"
           nativeInputProps={{
             type: "number",
