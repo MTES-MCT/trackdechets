@@ -27,6 +27,7 @@ import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync } from "./database";
 import { prisma } from "@td/prisma";
 import { getBsddSubType } from "../common/subTypes";
+import { PackagingInfo } from "@td/codegen-back";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -100,7 +101,9 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     wasteCode: form.wasteDetailsCode ?? "",
     wasteAdr: form.wasteDetailsOnuCode ?? "",
     wasteDescription: form.wasteDetailsName ?? "",
-    packagingNumbers: [],
+    packagingNumbers: (
+      form.wasteDetailsPackagingInfos as PackagingInfo[]
+    )?.flatMap(p => p.identificationNumbers),
     wasteSealNumbers: [],
     identificationNumbers: [],
     ficheInterventionNumbers: [],
