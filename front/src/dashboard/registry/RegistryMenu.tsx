@@ -5,39 +5,36 @@ import { NavLink } from "react-router-dom";
 import SideBar from "../../Apps/common/Components/SideBar/SideBar";
 import routes from "../../Apps/routes";
 
-export const RegistryMenuContent = ({
-  canViewRegistryIHM
-}: {
-  canViewRegistryIHM: boolean;
-}) => (
-  <>
-    <Accordion defaultExpanded label="Registre national" className="fr-mt-4w">
-      <ul>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.registry_new.myImports}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Mes imports
-          </NavLink>
-        </li>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.registry_new.companyImports}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Imports par établissement
-          </NavLink>
-        </li>
-        {canViewRegistryIHM && (
+export default function RegistryMenu() {
+  return (
+    <SideBar>
+      <Accordion defaultExpanded label="Registre national" className="fr-mt-4w">
+        <ul>
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.myImports}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Mes imports
+            </NavLink>
+          </li>
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.companyImports}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Imports par établissement
+            </NavLink>
+          </li>
+
           <li className="tw-mb-1">
             <NavLink
               to={routes.registry_new.lines}
@@ -50,61 +47,50 @@ export const RegistryMenuContent = ({
               Déclarations
             </NavLink>
           </li>
-        )}
-      </ul>
-    </Accordion>
-    <Accordion defaultExpanded label="Exports">
-      <ul>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.registry_new.export}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Règlementaires
-          </NavLink>
-        </li>
-        <li className="tw-mb-1">
-          <NavLink
-            to={routes.registry_new.exhaustive}
-            className={({ isActive }) =>
-              isActive
-                ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
-                : "sidebarv2__item sidebarv2__item--indented"
-            }
-          >
-            Exhaustif
-          </NavLink>
-        </li>
-      </ul>
-    </Accordion>
-    <div className="fr-mt-4w tw-flex tw-justify-center">
-      <Button
-        iconId="fr-icon-draft-line"
-        iconPosition="right"
-        linkProps={{
-          href: "https://tally.so/r/mKWxXA",
-          target: "_blank",
-          rel: "noopener"
-        }}
-        priority="secondary"
-      >
-        Donnez votre avis
-      </Button>
-    </div>
-  </>
-);
-
-export default function RegistryMenu() {
-  const canViewRegistryIHM =
-    import.meta.env.VITE_FLAG_REGISTRY_V2_IHM === "true";
-
-  return (
-    <SideBar>
-      <RegistryMenuContent canViewRegistryIHM={canViewRegistryIHM} />
+        </ul>
+      </Accordion>
+      <Accordion defaultExpanded label="Exports">
+        <ul>
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.export}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Règlementaires
+            </NavLink>
+          </li>
+          <li className="tw-mb-1">
+            <NavLink
+              to={routes.registry_new.exhaustive}
+              className={({ isActive }) =>
+                isActive
+                  ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                  : "sidebarv2__item sidebarv2__item--indented"
+              }
+            >
+              Exhaustif
+            </NavLink>
+          </li>
+        </ul>
+      </Accordion>
+      <div className="fr-mt-4w tw-flex tw-justify-center">
+        <Button
+          iconId="fr-icon-draft-line"
+          iconPosition="right"
+          linkProps={{
+            href: "https://tally.so/r/mKWxXA",
+            target: "_blank",
+            rel: "noopener"
+          }}
+          priority="secondary"
+        >
+          Donnez votre avis
+        </Button>
+      </div>
     </SideBar>
   );
 }
