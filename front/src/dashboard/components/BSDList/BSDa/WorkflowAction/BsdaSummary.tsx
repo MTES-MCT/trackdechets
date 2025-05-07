@@ -2,7 +2,7 @@ import * as React from "react";
 import { Bsda } from "@td/codegen-ui";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import { BsdaJourneySummary } from "../../../../../Apps/Dashboard/Validation/Bsda/BsdaJourneySummary";
-import { InitialBsdas } from "../../../../detail/bsda/InitialBsdas";
+import { InitialBsdas } from "../../../../../Apps/Dashboard/Validation/Bsda/InitialBsdas";
 import { DataListTerm } from "../../../../../common/components";
 
 interface BsdaSummaryProps {
