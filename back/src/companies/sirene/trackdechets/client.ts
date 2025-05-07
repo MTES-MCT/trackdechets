@@ -120,6 +120,7 @@ const fullTextSearchResponseToCompanies = (
 export const searchCompanies = (
   clue: string,
   department?: string,
+  allowClosedCompanies?: boolean,
   options?: Partial<SearchOptions>,
   requestOptions?
 ): Promise<SireneSearchResult[]> => {
@@ -137,6 +138,14 @@ export const searchCompanies = (
       }
     }
   ];
+
+  if (!allowClosedCompanies) {
+    must.push({
+      term: {
+        etatAdministratifEtablissement: "A"
+      }
+    });
+  }
 
   // this might be a french department code
   if (department?.length === 2 || department?.length === 3) {

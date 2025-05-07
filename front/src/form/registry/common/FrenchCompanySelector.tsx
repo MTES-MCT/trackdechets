@@ -131,16 +131,26 @@ export function InlineFrenchCompanySelector({
           )}
           {unknownCompanyError && (
             <Alert
-              title="L'établissement sélectionné est inconnu."
+              title="L'établissement mentionné n'existe pas dans la base SIRENE"
               description={
                 <div>
-                  <p>SIRET: {selectedCompanyOrgId}</p>
+                  <p>SIRET : {selectedCompanyOrgId}</p>
                   <p>
-                    Dénomination:{" "}
+                    Dénomination :{" "}
                     {shortMode
                       ? methods.getValues(`${prefix}Name`)
                       : methods.getValues(`${prefix}CompanyName`)}
                   </p>
+                  {!shortMode && (
+                    <p>
+                      Adresse :{" "}
+                      {[
+                        methods.getValues(`${prefix}CompanyAddress`),
+                        methods.getValues(`${prefix}CompanyPostalCode`),
+                        methods.getValues(`${prefix}CompanyCity`)
+                      ].join(" ")}
+                    </p>
+                  )}
                 </div>
               }
               severity="error"

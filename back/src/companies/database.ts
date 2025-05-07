@@ -28,7 +28,7 @@ import { searchTDSireneFailFast } from "./sirenify";
 import { isSiret, isVat } from "@td/constants";
 import {
   PartialCompanyVatSearchResult,
-  searchVatFrOnlyOrNotFoundFailFast
+  searchByVatNumberOrNotFoundFailFast
 } from "./search";
 import { SireneSearchResult } from "./sirene/types";
 import {
@@ -436,7 +436,7 @@ export async function getUpdatedCompanyNameAndAddress(
   if (isSiret(company.orgId)) {
     searchResult = await searchTDSireneFailFast(company.orgId);
   } else if (isVat(company.orgId)) {
-    searchResult = await searchVatFrOnlyOrNotFoundFailFast(company.orgId);
+    searchResult = await searchByVatNumberOrNotFoundFailFast(company.orgId);
   }
   if (searchResult) {
     return {

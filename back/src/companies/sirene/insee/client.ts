@@ -126,7 +126,8 @@ function fullTextSearchResponseToCompanies(
  */
 export function searchCompanies(
   clue: string,
-  department?: string
+  department?: string,
+  allowClosedCompanies: boolean = true
 ): Promise<SireneSearchResult[]> {
   // list of filters to pass as "q" arguments
   const filters: string[] = [];
@@ -134,7 +135,9 @@ export function searchCompanies(
   const today = format(new Date(), "yyyy-MM-dd");
 
   // exclude closed companies
-  filters.push(`periode(etatAdministratifEtablissement:A)`);
+  if (!allowClosedCompanies) {
+    filters.push(`periode(etatAdministratifEtablissement:A")`);
+  }
 
   if (/[0-9]{14}/.test(clue)) {
     // clue is formatted like a SIRET

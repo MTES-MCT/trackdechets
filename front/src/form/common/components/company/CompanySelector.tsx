@@ -182,7 +182,6 @@ export default function CompanySelector({
 
     const reshapedSearchResults =
       searchCompanies
-        .filter(company => company.etatAdministratif === "A")
         .map(company => ({
           ...company,
           codePaysEtrangerEtablissement:

@@ -27,6 +27,7 @@ interface SearchCompaniesDeps {
   injectedSearchCompanies: (
     clue: string,
     department?: string | null,
+    allowClosedCompanies?: boolean | null,
     options?: Partial<SearchOptions>,
     requestOptions?
   ) => Promise<SireneSearchResult[] | null>;
@@ -185,7 +186,7 @@ export async function searchCompany(
         };
       }
     }
-    const companyInfo = await searchByForeignVatNumber(cleanedClue);
+    const companyInfo = await searchByVatNumber(cleanedClue);
     return {
       ...company,
       ...companyInfo
@@ -204,7 +205,7 @@ export const makeSearchCompanies =
     clue: string,
     department?: string | null,
     allowForeignCompanies?: boolean | null,
-    allowClosedCompanies?: boolean | null
+    allowClosedCompanies: boolean | null = true
   ): Promise<CompanySearchResult[]> => {
     // For a SIRET or VAT number, we dont fuzzy search.
     // We also accept a coma separated list of SIRET or VAT numbers
@@ -237,7 +238,11 @@ export const makeSearchCompanies =
     }
 
     // /!\ Fuzzy searching can only return French companies
-    const inseeResults = await injectedSearchCompanies(clue, department);
+    const inseeResults = await injectedSearchCompanies(
+      clue,
+      department,
+      allowClosedCompanies
+    );
     if (!inseeResults) {
       return [];
     }
@@ -249,29 +254,25 @@ export const makeSearchCompanies =
       select: companySelectedFields
     });
 
-    return inseeResults
-      .map(searchResult => {
-        const tdCompany = companiesInDb.find(
-          company => company.orgId === searchResult.siret
-        );
-        if (tdCompany) {
-          return mergeCompanyToCompanySearchResult(
-            searchResult.siret!,
-            tdCompany,
-            searchResult
-          );
-        }
-
-        return {
-          ...searchResult,
-          orgId: searchResult.siret!,
-          isRegistered: false,
-          isDormant: false
-        };
-      })
-      .filter(
-        company => allowClosedCompanies || company.etatAdministratif === "A"
+    return inseeResults.map(searchResult => {
+      const tdCompany = companiesInDb.find(
+        company => company.orgId === searchResult.siret
       );
+      if (tdCompany) {
+        return mergeCompanyToCompanySearchResult(
+          searchResult.siret!,
+          tdCompany,
+          searchResult
+        );
+      }
+
+      return {
+        ...searchResult,
+        orgId: searchResult.siret!,
+        isRegistered: false,
+        isDormant: false
+      };
+    });
   };
 
 /**
@@ -328,7 +329,7 @@ export interface PartialCompanyVatSearchResult
 /**
  * Search VAT with the VIES client eventually strpping empty/anonymous name and addresses
  */
-async function searchByForeignVatNumber(
+async function searchByVatNumber(
   vatNumber: string
 ): Promise<PartialCompanyVatSearchResult | null> {
   if (isFRVat(vatNumber)) {
@@ -355,7 +356,7 @@ async function searchByForeignVatNumber(
  * @param vatNumber
  * @returns
  */
-export async function searchVatFrOnlyOrNotFoundFailFast(
+export async function searchByVatNumberOrNotFoundFailFast(
   vatNumber: string
 ): Promise<PartialCompanyVatSearchResult | null> {
   // make sure we do not wait more thant 1s here to avoid bottlenecks
@@ -363,7 +364,7 @@ export async function searchVatFrOnlyOrNotFoundFailFast(
     setTimeout(resolve, 1000, null)
   );
 
-  return await Promise.race([searchByForeignVatNumber(vatNumber), raceWith]);
+  return await Promise.race([searchByVatNumber(vatNumber), raceWith]);
 }
 
 export const searchCompanies = makeSearchCompanies({
