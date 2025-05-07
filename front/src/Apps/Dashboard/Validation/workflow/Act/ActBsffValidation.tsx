@@ -3,8 +3,8 @@ import { Bsff, BsffStatus } from "@td/codegen-ui";
 import { SignEmission } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignEmission";
 import { SignTransport } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignTransport";
 import { SignReception } from "../../../../../dashboard/components/BSDList/BSFF/WorkflowAction/SignReception";
-import { SignPackagings } from "../../../Signature/bsff/SignPackagings";
-import SignBsffPackagingModal from "../../../Signature/bsff/SignBsffPackagingModal";
+import { SignPackagings } from "../../bsff/SignPackagings";
+import SignBsffPackagingModal from "../../bsff/SignBsffPackagingModal";
 
 interface ActBsffValidationProps {
   bsd: Bsff;
