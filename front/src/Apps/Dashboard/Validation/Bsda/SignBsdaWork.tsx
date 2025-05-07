@@ -12,7 +12,7 @@ import {
   QueryBsdaArgs
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React, { useState } from "react";
+import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { generatePath, Link, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -25,7 +25,7 @@ import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import {
   GET_BSDA,
-  SIGN_BSDA_EMISSION,
+  SIGN_BsDA,
   UPDATE_BSDA
 } from "../../../common/queries/bsda/queries";
 import { InitialBsdas } from "./InitialBsdas";
@@ -39,7 +39,7 @@ import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
-import TagsInput from "../../../Forms/Components/TagsInput/TagsInput";
+import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
 
 const schema = z.object({
   waste: z.object({
@@ -137,7 +137,6 @@ export type ZodBdsaWork = z.infer<typeof schema>;
 
 const SignBsdaWork = ({ bsdaId, onClose }) => {
   const { siret } = useParams<{ siret: string }>();
-  const [sealNumbersTags, setSealNumbersTags] = useState<string[]>([]);
 
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
@@ -149,7 +148,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
   const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA_EMISSION, {});
+  >(SIGN_BsDA, {});
 
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
@@ -179,7 +178,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
   };
 
   const methods = useForm<ZodBdsaWork>({
-    values: initialState,
+    defaultValues: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
@@ -203,21 +202,6 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
   const isEstimate = watch("weight.isEstimate");
   const pop = watch("waste.pop");
   const isSubjectToADR = watch("waste.isSubjectToADR");
-
-  const handleAddSealNumbers = value => {
-    if (value && ![...sealNumbersTags]?.includes(value)) {
-      setSealNumbersTags([...sealNumbersTags, value]);
-      setValue("waste.sealNumbers", [...sealNumbersTags, value]);
-    }
-  };
-
-  const dismissTag = plateTagIdx => {
-    const newPlates = sealNumbersTags.filter(
-      p => p !== sealNumbersTags[plateTagIdx]
-    );
-    setSealNumbersTags(newPlates);
-    setValue("waste.sealNumbers", newPlates);
-  };
 
   const isDechetterie = bsda?.type === "COLLECTION_2710";
 
@@ -447,11 +431,9 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
               {!isDechetterie && (
                 <>
                   <h4 className="fr-h4 fr-mt-4w">Numéros de scellés</h4>
-                  <TagsInput
+                  <RhfTagsInputWrapper
                     label="Numéros"
-                    onAddTag={handleAddSealNumbers}
-                    onDeleteTag={dismissTag}
-                    tags={sealNumbersTags}
+                    fieldName={"waste.sealNumbers"}
                   />
                 </>
               )}

@@ -21,10 +21,7 @@ import TdModal from "../../../common/Components/Modal/Modal";
 import routes from "../../../routes";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
-import {
-  GET_BSDA,
-  SIGN_BSDA_EMISSION
-} from "../../../common/queries/bsda/queries";
+import { GET_BSDA, SIGN_BsDA } from "../../../common/queries/bsda/queries";
 import { InitialBsdas } from "./InitialBsdas";
 
 const schema = z.object({
@@ -65,7 +62,7 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
   const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
-  >(SIGN_BSDA_EMISSION, {});
+  >(SIGN_BsDA, {});
 
   const title = "Signer le bordereau";
   const TODAY = new Date();
@@ -77,7 +74,7 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
 
   const { handleSubmit, reset, formState, register } = useForm<ZodBdsaEmission>(
     {
-      values: initialState,
+      defaultValues: initialState,
       resolver: async (data, context, options) => {
         return zodResolver(schema)(data, context, options);
       }
