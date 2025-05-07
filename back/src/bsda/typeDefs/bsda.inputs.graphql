@@ -196,8 +196,10 @@ input BsdaWasteInput {
   consistence: BsdaConsistence
   "Numéros de scellés"
   sealNumbers: [String!]
-  "Mention ADR"
+  "Mention au titre du règlement ADR la plus à jour"
   adr: String
+  "Mentions au titre des règlements RID, ADN, IMDG (optionnel)"
+  nonRoadRegulationMention: String
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
 }

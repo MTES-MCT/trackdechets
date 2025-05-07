@@ -124,12 +124,23 @@ export function WasteInfoWorker({ disabled }) {
 
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG - ou "non soumis" le
-          cas échéant
+          Mention au titre du règlement ADR
           <Field
             disabled={disabled}
             type="text"
             name="waste.adr"
+            className="td-input"
+          />
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
+          Mention au titre des règlements RID, ADNR, IMDG (optionnel)
+          <Field
+            disabled={disabled}
+            type="text"
+            name="waste.nonRoadRegulationMention"
             className="td-input"
           />
         </label>

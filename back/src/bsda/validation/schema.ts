@@ -144,6 +144,7 @@ export const rawBsdaSchema = z.object({
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteAdr: z.string().nullish(),
+  wasteNonRoadRegulationMention: z.string().nullish(),
   wastePop: z
     .boolean()
     .nullish()

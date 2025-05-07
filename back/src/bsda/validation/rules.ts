@@ -779,6 +779,10 @@ export const bsdaEditionRules: BsdaEditionRules = {
     readableFieldName: "Le code déchet"
   },
   wasteAdr: { readableFieldName: "La mention ADR", sealed: { from: "WORK" } },
+  wasteNonRoadRegulationMention: {
+    readableFieldName: "La mention RID, ADN, IMDG",
+    sealed: { from: "WORK" }
+  },
   wasteFamilyCode: {
     sealed: {
       // EMISSION ou WORK si il y a une entreprise de travaux

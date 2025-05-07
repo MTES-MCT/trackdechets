@@ -376,6 +376,7 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     wasteAdr: bsda.wasteAdr,
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress,
