@@ -28,7 +28,7 @@ import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { toCompanyInput } from "../../Signature/bsff/SignBsffPackagingForm";
+import { toCompanyInput } from "../bsff/SignBsffPackagingForm";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput/RhfExtraEuropeanCompanyManualInput";
 import CompanyContactInfo from "../../../../Apps/Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
