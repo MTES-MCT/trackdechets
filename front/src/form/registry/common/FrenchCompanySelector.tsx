@@ -163,7 +163,7 @@ export function InlineFrenchCompanySelector({
   );
 }
 
-const selectedCompanyError = (company: CompanySearchResult) => {
+export const selectedCompanyError = (company: CompanySearchResult) => {
   if (company.etatAdministratif !== "A") {
     // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
     // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité

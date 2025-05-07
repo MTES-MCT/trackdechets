@@ -94,6 +94,7 @@ export function CompanySelector({
                 methods.setValue(`${prefix}CompanyPostalCode`, "");
                 methods.setValue(`${prefix}CompanyCountryCode`, "");
                 methods.setValue(`${prefix}MunicipalitiesInseeCodes`, []);
+                methods.setValue(`${prefix}CompanyStatusDiffusion`, null);
                 onChangeCompanyType(e);
               }
             }}
