@@ -9,7 +9,7 @@ import { getUserCompanies } from "../../../../users/database";
 import { UserInputError } from "../../../../common/errors";
 import { getDelegatorsByDelegateForEachCompanies } from "../../../../registryDelegation/database";
 
-export function getTypeFilter(type: RegistryImportType | null) {
+export function getTypeFilter(type: RegistryImportType | null | undefined) {
   switch (type) {
     case "INCOMING_TEXS":
       return {

@@ -24,6 +24,7 @@ import {
 } from "../shared";
 import { ActionButton } from "./ActionButton";
 import "./MyLines.scss";
+import CursorPagination from "../../../Apps/common/Components/CursorPagination/CursorPagination";
 
 const getHeaders = (registryType: RegistryImportType | undefined): string[] => {
   let dateColumnName: string;
@@ -97,9 +98,10 @@ export function MyLines() {
   const {
     loading: loadingRecentLookups,
     error: recentLookupsError,
-    data: recentLookups
+    data: recentLookups,
+    refetch: refetchLookups
   } = useQuery<Pick<Query, "registryLookups">>(GET_REGISTRY_LOOKUPS, {
-    variables: { siret, type, publicId: debouncedPublicId },
+    variables: { siret, type, publicId: debouncedPublicId, first: 10 },
     skip: !siret
   });
 
@@ -114,8 +116,15 @@ export function MyLines() {
     );
   }, []);
 
+  const lookupNodes = useMemo(
+    () => recentLookups?.registryLookups?.edges.map(edge => edge.node),
+    [recentLookups]
+  );
+  const hasNextPage = recentLookups?.registryLookups?.pageInfo.hasNextPage;
+  const hasPreviousPage =
+    recentLookups?.registryLookups?.pageInfo.hasPreviousPage;
   const cancelLine = () => {
-    const line = recentLookups?.registryLookups?.find(
+    const line = lookupNodes?.find(
       lookup => lookup.publicId === publicIdToDelete
     );
     if (!line) {
@@ -135,7 +144,7 @@ export function MyLines() {
     debouncedOnApplyFilters(publicId);
   }, [debouncedOnApplyFilters, publicId]);
 
-  const tableData = recentLookups?.registryLookups?.map(lookup => [
+  const tableData = lookupNodes?.map(lookup => [
     format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
     TYPES[lookup.type],
     lookup.publicId,
@@ -290,11 +299,53 @@ export function MyLines() {
         {recentLookups && (
           <div>
             {tableData && tableData.length > 0 ? (
-              <RegistryTable
-                data={tableData}
-                headers={getHeaders(type)}
-                fixed={!isMobile}
-              />
+              <>
+                <RegistryTable
+                  data={tableData}
+                  headers={getHeaders(type)}
+                  fixed={!isMobile}
+                />
+                <div className="tw-flex tw-justify-center">
+                  <CursorPagination
+                    contentLoading={loadingRecentLookups}
+                    hasNextPage={hasNextPage}
+                    hasPreviousPage={hasPreviousPage}
+                    onFirstClick={() => {
+                      refetchLookups({
+                        before: null,
+                        after: null,
+                        first: 10,
+                        last: null
+                      });
+                    }}
+                    onNextClick={() => {
+                      refetchLookups({
+                        before: null,
+                        after: recentLookups.registryLookups.pageInfo.endCursor,
+                        first: 10,
+                        last: null
+                      });
+                    }}
+                    onPreviousClick={() => {
+                      refetchLookups({
+                        before:
+                          recentLookups.registryLookups.pageInfo.startCursor,
+                        after: null,
+                        first: null,
+                        last: 10
+                      });
+                    }}
+                    onLastClick={() => {
+                      refetchLookups({
+                        before: null,
+                        after: null,
+                        first: null,
+                        last: 10
+                      });
+                    }}
+                  />
+                </div>
+              </>
             ) : (
               "Aucune déclaration récente sur cet établissement"
             )}

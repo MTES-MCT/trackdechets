@@ -1033,9 +1033,9 @@ const bsffToLookupCreateInputs = (
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsff.wasteCode,
       ...generateDateInfos(
-        bsff.destinationReceptionDate ?? bsff.destinationReceptionSignatureDate
+        bsff.destinationReceptionDate ?? bsff.destinationReceptionSignatureDate,
+        bsff.createdAt
       ),
-      declaredAt: bsff.createdAt,
       bsffId: bsff.id
     });
   }
@@ -1058,9 +1058,9 @@ const bsffToLookupCreateInputs = (
         wasteCode: bsff.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!
+            transporter.transporterTransportSignatureDate!,
+          bsff.createdAt
         ),
-        declaredAt: bsff.createdAt,
         bsffId: bsff.id
       });
     });
@@ -1088,9 +1088,9 @@ const bsffToLookupCreateInputs = (
       wasteCode: bsff.wasteCode,
       ...generateDateInfos(
         transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate
+          transporter.transporterTransportSignatureDate,
+        bsff.createdAt
       ),
-      declaredAt: bsff.createdAt,
       bsffId: bsff.id
     });
   });

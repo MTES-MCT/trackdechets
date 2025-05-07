@@ -718,9 +718,9 @@ const bsvhuToLookupCreateInputs = (
       wasteCode: bsvhu.wasteCode,
       ...generateDateInfos(
         bsvhu.destinationReceptionDate ??
-          bsvhu.destinationOperationSignatureDate
+          bsvhu.destinationOperationSignatureDate,
+        bsvhu.createdAt
       ),
-      declaredAt: bsvhu.createdAt,
       bsvhuId: bsvhu.id
     });
   }
@@ -743,9 +743,9 @@ const bsvhuToLookupCreateInputs = (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
           bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!
+            bsvhu.transporterTransportSignatureDate!,
+          bsvhu.createdAt
         ),
-        declaredAt: bsvhu.createdAt,
         bsvhuId: bsvhu.id
       });
     });
@@ -762,9 +762,9 @@ const bsvhuToLookupCreateInputs = (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
           bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!
+            bsvhu.transporterTransportSignatureDate!,
+          bsvhu.createdAt
         ),
-        declaredAt: bsvhu.createdAt,
         bsvhuId: bsvhu.id
       });
     }
@@ -792,9 +792,9 @@ const bsvhuToLookupCreateInputs = (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
           bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!
+            bsvhu.transporterTransportSignatureDate!,
+          bsvhu.createdAt
         ),
-        declaredAt: bsvhu.createdAt,
         bsvhuId: bsvhu.id
       });
     });

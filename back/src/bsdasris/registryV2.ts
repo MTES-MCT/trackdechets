@@ -634,9 +634,9 @@ const bsdasriToLookupCreateInputs = (
       wasteCode: bsdasri.wasteCode,
       ...generateDateInfos(
         bsdasri.destinationReceptionDate ??
-          bsdasri.destinationReceptionSignatureDate
+          bsdasri.destinationReceptionSignatureDate,
+        bsdasri.createdAt
       ),
-      declaredAt: bsdasri.createdAt,
       bsdasriId: bsdasri.id
     });
   }
@@ -659,9 +659,9 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-            bsdasri.transporterTransportSignatureDate!
+            bsdasri.transporterTransportSignatureDate!,
+          bsdasri.createdAt
         ),
-        declaredAt: bsdasri.createdAt,
         bsdasriId: bsdasri.id
       });
     });
@@ -677,9 +677,9 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-            bsdasri.transporterTransportSignatureDate!
+            bsdasri.transporterTransportSignatureDate!,
+          bsdasri.createdAt
         ),
-        declaredAt: bsdasri.createdAt,
         bsdasriId: bsdasri.id
       });
     }

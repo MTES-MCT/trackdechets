@@ -245,8 +245,10 @@ const registryToLookupCreateInput = (
     declarationType: RegistryExportDeclarationType.REGISTRY,
     wasteType: RegistryExportWasteType.TEXS,
     wasteCode: registryOutgoingTexs.wasteCode,
-    ...generateDateInfos(registryOutgoingTexs.dispatchDate),
-    declaredAt: registryOutgoingTexs.createdAt,
+    ...generateDateInfos(
+      registryOutgoingTexs.dispatchDate,
+      registryOutgoingTexs.createdAt
+    ),
     registryOutgoingTexsId: registryOutgoingTexs.id
   };
 };
@@ -273,8 +275,10 @@ export const updateRegistryLookup = async (
         id: registryOutgoingTexs.id,
         reportAsSiret: registryOutgoingTexs.reportAsCompanySiret,
         wasteCode: registryOutgoingTexs.wasteCode,
-        ...generateDateInfos(registryOutgoingTexs.dispatchDate),
-        declaredAt: registryOutgoingTexs.createdAt,
+        ...generateDateInfos(
+          registryOutgoingTexs.dispatchDate,
+          registryOutgoingTexs.createdAt
+        ),
         registryOutgoingTexsId: registryOutgoingTexs.id
       },
       create: registryToLookupCreateInput(registryOutgoingTexs),

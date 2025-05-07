@@ -1263,9 +1263,9 @@ const bsdaToLookupCreateInputs = (
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsda.wasteCode,
       ...generateDateInfos(
-        bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate
+        bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate,
+        bsda.createdAt
       ),
-      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   }
@@ -1289,9 +1289,9 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!
+            transporter.transporterTransportSignatureDate!,
+          bsda.createdAt
         ),
-        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1316,9 +1316,9 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!
+            transporter.transporterTransportSignatureDate!,
+          bsda.createdAt
         ),
-        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1346,9 +1346,9 @@ const bsdaToLookupCreateInputs = (
       wasteCode: bsda.wasteCode,
       ...generateDateInfos(
         transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!
+          transporter.transporterTransportSignatureDate!,
+        bsda.createdAt
       ),
-      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   });
