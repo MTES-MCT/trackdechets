@@ -337,28 +337,10 @@ describe("searchCompanies", () => {
     expect(mockSearchCompaniesBackend).toHaveBeenCalledTimes(1);
     expect(mockSearchCompaniesBackend).toHaveBeenCalledWith(
       "ACME OF TRACKDECHETS",
-      undefined
+      undefined,
+      true
     );
     expect(searchCompanyMock).toHaveBeenCalledTimes(0);
-  });
-
-  it(`should not return closed companies when searching by SIRET`, async () => {
-    const siret = siretify(1);
-    searchCompanyMock.mockResolvedValue({
-      siret,
-      name: "ACME",
-      naf: "NAF",
-      libelleNaf: "Autres activités",
-      codeCommune: "13001",
-      address: "40 boulevard Voltaire 13001 Marseille",
-      addressVoie: "40 boulevard",
-      addressCity: "Marseille",
-      addressPostalCode: "13001",
-      etatAdministratif: "F"
-    });
-    const companies = await searchCompanies(siret);
-    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
-    expect(companies).toStrictEqual([]);
   });
 
   it(`should return [] if SIRET does not exist when searching by SIRET`, async () => {
