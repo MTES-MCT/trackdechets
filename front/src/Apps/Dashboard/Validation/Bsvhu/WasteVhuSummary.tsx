@@ -7,6 +7,7 @@ import {
   DsfrDataListTerm
 } from "../../../../common/components";
 import { isDangerous } from "@td/constants";
+import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 
 interface WasteVhuSummaryProps {
   bsvhu: Bsvhu;
@@ -25,7 +26,7 @@ const WasteVhuSummary = ({ bsvhu }: WasteVhuSummaryProps) => {
         <DsfrDataListDescription>{bsvhu.wasteCode}</DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>
-        <DsfrDataListTerm>Nom usuel du déchet</DsfrDataListTerm>
+        <DsfrDataListTerm>{WASTE_NAME_LABEL}</DsfrDataListTerm>
         <DsfrDataListDescription>{usualName}</DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>
