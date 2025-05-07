@@ -154,7 +154,6 @@ export function TransporterForm({
             allowClosedCompanies={true}
             disabled={false}
             onCompanySelected={(company: CompanySearchResult) => {
-              console.log(company);
               if (company) {
                 setUnknownCompanyError(false);
                 methods.setValue(
