@@ -36,16 +36,14 @@ export function ComboBox({
   autoWidth
 }: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
+    active: isOpen,
     onClickOutside: (e: MouseEvent | TouchEvent) => {
-      if (triggerRef) {
-        if (triggerRef.current?.contains(e.target as Node)) {
-          e.preventDefault();
-          return;
-        }
-      } else if (parentRef.current?.contains(e.target as Node)) {
+      // When clicking on the trigger, if we dont preventDefault,
+      // it closes the dropdown and opens it again
+      if ((triggerRef ?? parentRef).current?.contains(e.target as Node)) {
         e.preventDefault();
-        return;
       }
+
       onOpenChange(false);
     }
   });
