@@ -82,3 +82,12 @@ export const GET_BSDA_PDF = gql`
     }
   }
 `;
+
+export const SIGN_BSDA_EMISSION = gql`
+  mutation SignBsda($id: ID!, $input: BsdaSignatureInput!) {
+    signBsda(id: $id, input: $input) {
+      id
+      status
+    }
+  }
+`;
