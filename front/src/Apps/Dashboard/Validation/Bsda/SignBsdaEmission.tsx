@@ -77,7 +77,7 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
 
   const { handleSubmit, reset, formState, register } = useForm<ZodBdsaEmission>(
     {
-      values: initialState,
+      defaultValues: initialState,
       resolver: async (data, context, options) => {
         return zodResolver(schema)(data, context, options);
       }
