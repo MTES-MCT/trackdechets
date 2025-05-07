@@ -21,11 +21,9 @@ const useOnClickOutsideRefTarget = ({
     }
 
     document.addEventListener("mousedown", handleClick);
-    document.addEventListener("touchend", handleClick);
 
     return () => {
       document.removeEventListener("mousedown", handleClick);
-      document.removeEventListener("touchend", handleClick);
     };
   }, [onClickOutside, active]);
   return { targetRef };

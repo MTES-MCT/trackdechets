@@ -127,7 +127,7 @@ function fullTextSearchResponseToCompanies(
 export function searchCompanies(
   clue: string,
   department?: string,
-  allowClosedCompanies: boolean = true
+  allowClosedCompanies = true
 ): Promise<SireneSearchResult[]> {
   // list of filters to pass as "q" arguments
   const filters: string[] = [];

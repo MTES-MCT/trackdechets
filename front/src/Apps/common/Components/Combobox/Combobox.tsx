@@ -38,10 +38,10 @@ export function ComboBox({
   const { targetRef } = useOnClickOutsideRefTarget({
     active: isOpen,
     onClickOutside: (e: MouseEvent | TouchEvent) => {
-      // When clicking on the trigger, if we dont preventDefault,
+      // When clicking on the trigger, if we call onOpenChange
       // it closes the dropdown and opens it again
       if ((triggerRef ?? parentRef).current?.contains(e.target as Node)) {
-        e.preventDefault();
+        return;
       }
 
       onOpenChange(false);
@@ -197,7 +197,7 @@ export function ComboBox({
     }
 
     targetElement.style.left = `${dropdownLeft}px`;
-  }, [isOpen, parentRef, targetRef, triggerRef, positionRevision]);
+  }, [isOpen, parentRef, targetRef, triggerRef, positionRevision, autoWidth]);
 
   if (!isOpen) {
     return null;
