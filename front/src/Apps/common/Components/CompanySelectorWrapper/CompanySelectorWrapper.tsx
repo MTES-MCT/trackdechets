@@ -52,7 +52,7 @@ export default function CompanySelectorWrapper({
   selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
-  allowClosedCompanies = false,
+  allowClosedCompanies = true,
   selectedCompanyError,
   orgId,
   disabled = false,

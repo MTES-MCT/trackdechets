@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:13.3-alpine
+    image: postgres:16.8-alpine
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       POSTGRES_USER: trackdechets

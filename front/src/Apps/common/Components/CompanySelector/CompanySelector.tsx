@@ -2,7 +2,6 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { CompanySearchResult } from "@td/codegen-ui";
 import React, { useMemo, useRef, useState } from "react";
 import { InlineLoader } from "../../../../Apps/common/Components/Loader/Loaders";
-import useOnClickOutsideRefTarget from "../../../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { debounce } from "../../../../common/helper";
 import { ComboBox } from "../Combobox/Combobox";
 import { IconEmptyCompany } from "../Icons/Icons";
@@ -29,10 +28,6 @@ const CompanySelector = ({
   const [shouldDisplayResults, setShouldDisplayResults] = useState(false);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLDivElement | null>(null);
-
-  const { targetRef } = useOnClickOutsideRefTarget({
-    onClickOutside: () => setShouldDisplayResults(false)
-  });
 
   const handleOnFocus = () => {
     setShouldDisplayResults(true);
@@ -97,10 +92,7 @@ const CompanySelector = ({
   };
 
   return (
-    <div
-      ref={targetRef as React.RefObject<HTMLDivElement>}
-      className="fr-container--fluid company-selector"
-    >
+    <div className="fr-container--fluid company-selector">
       <div
         className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom company-selector-search"
         ref={parentRef}
@@ -144,24 +136,20 @@ const CompanySelector = ({
             }}
           />
         </div>
-        {shouldDisplayResults && (
-          <ComboBox
-            parentRef={parentRef}
-            triggerRef={triggerRef}
-            isOpen={shouldDisplayResults}
-            onOpenChange={open => setShouldDisplayResults(open)}
-          >
-            {() =>
-              loading ? (
-                <InlineLoader></InlineLoader>
-              ) : (
-                <div className="company-selector-results fr-grid-row">
-                  {displayResults()}
-                </div>
-              )
-            }
-          </ComboBox>
-        )}
+        <ComboBox
+          parentRef={parentRef}
+          triggerRef={triggerRef}
+          isOpen={shouldDisplayResults}
+          onOpenChange={() => {}}
+        >
+          {loading ? (
+            <InlineLoader></InlineLoader>
+          ) : (
+            <div className="company-selector-results fr-grid-row">
+              {displayResults()}
+            </div>
+          )}
+        </ComboBox>
       </div>
       {selectedCompany ? (
         <div className="fr-grid-row">
