@@ -211,8 +211,8 @@ export function ComboBox({
           position: "absolute",
           backgroundColor: "white",
           border: "1px solid #ccc",
+          boxShadow: "0px 10px 20px -10px black",
           zIndex: 1000,
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           overflowY: "auto", // Allow vertical scroll
           overflowX: "hidden", // Prevent horizontal scroll within dropdown
           boxSizing: "border-box" // Include padding/border in element's total width and height

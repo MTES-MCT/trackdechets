@@ -130,7 +130,8 @@ export default function CompanySelectorWrapper({
     selectedCompany,
     selectedCompanyOrgId,
     searchCompaniesFromCompanyOrgId,
-    onSelectCompany
+    onSelectCompany,
+    onUnknownInputCompany
   ]);
 
   const onSearchCompany = (searchClue: string, postalCodeClue: string) => {

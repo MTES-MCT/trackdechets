@@ -1,13 +1,14 @@
-import React, { useState, useMemo } from "react";
-import { CompanySelectorProps } from "./companySelectorTypes";
-import CompanySelectorItem from "./CompanySelectorItem";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { InlineLoader } from "../../../../Apps/common/Components/Loader/Loaders";
-import { debounce } from "../../../../common/helper";
-import useOnClickOutsideRefTarget from "../../../../Apps/common/hooks/useOnClickOutsideRefTarget";
 import { CompanySearchResult } from "@td/codegen-ui";
+import React, { useMemo, useRef, useState } from "react";
+import { InlineLoader } from "../../../../Apps/common/Components/Loader/Loaders";
+import useOnClickOutsideRefTarget from "../../../../Apps/common/hooks/useOnClickOutsideRefTarget";
+import { debounce } from "../../../../common/helper";
+import { ComboBox } from "../Combobox/Combobox";
 import { IconEmptyCompany } from "../Icons/Icons";
 import "./companySelector.scss";
+import CompanySelectorItem from "./CompanySelectorItem";
+import { CompanySelectorProps } from "./companySelectorTypes";
 
 const isSearchValid = searchClue => searchClue.length >= 3;
 
@@ -26,6 +27,8 @@ const CompanySelector = ({
   const [searchString, setSearchString] = useState("");
   const [postalCodeString, setPostalCodeString] = useState("");
   const [shouldDisplayResults, setShouldDisplayResults] = useState(false);
+  const parentRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLDivElement | null>(null);
 
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setShouldDisplayResults(false)
@@ -98,7 +101,10 @@ const CompanySelector = ({
       ref={targetRef as React.RefObject<HTMLDivElement>}
       className="fr-container--fluid company-selector"
     >
-      <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom company-selector-search">
+      <div
+        className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom company-selector-search"
+        ref={parentRef}
+      >
         <div className="fr-col-12 fr-col-md-8">
           <Input
             label="N°SIRET ou raison sociale"
@@ -116,6 +122,7 @@ const CompanySelector = ({
                 });
               }
             }}
+            ref={triggerRef}
           />
         </div>
         <div className="fr-col-12 fr-col-md-4">
@@ -137,11 +144,23 @@ const CompanySelector = ({
             }}
           />
         </div>
-        {loading && <InlineLoader></InlineLoader>}
         {shouldDisplayResults && (
-          <div className="company-selector-results fr-grid-row">
-            {displayResults()}
-          </div>
+          <ComboBox
+            parentRef={parentRef}
+            triggerRef={triggerRef}
+            isOpen={shouldDisplayResults}
+            onOpenChange={open => setShouldDisplayResults(open)}
+          >
+            {() =>
+              loading ? (
+                <InlineLoader></InlineLoader>
+              ) : (
+                <div className="company-selector-results fr-grid-row">
+                  {displayResults()}
+                </div>
+              )
+            }
+          </ComboBox>
         )}
       </div>
       {selectedCompany ? (
