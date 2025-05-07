@@ -1,7 +1,7 @@
 import React from "react";
 import SignOperation from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
 import SignTransport from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
-import SignWork from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
+import SignBsdaWork from "../../Bsda/SignBsdaWork";
 import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import { isCollection_2710 } from "../../../dashboardServices";
 import SignBsdaEmission from "../../Bsda/SignBsdaEmission";
@@ -56,13 +56,7 @@ const ActBsdaValidation = ({
       bsd.emitter?.isPrivateIndividual &&
       currentSiret === bsd.worker?.company?.siret
     ) {
-      return (
-        <SignWork
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaWork bsdaId={bsd.id} onClose={onClose} />;
     }
 
     if (currentSiret === bsd.emitter?.company?.siret) {
@@ -84,13 +78,7 @@ const ActBsdaValidation = ({
         />
       );
     }
-    return (
-      <SignWork
-        siret={currentSiret}
-        bsdaId={bsd.id}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignBsdaWork bsdaId={bsd.id} onClose={onClose} />;
   };
   const renderSignedByWorkerModal = () => {
     return (
