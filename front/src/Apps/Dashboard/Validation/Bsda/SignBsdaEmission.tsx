@@ -25,6 +25,7 @@ import {
   GET_BSDA,
   SIGN_BSDA_EMISSION
 } from "../../../common/queries/bsda/queries";
+import { InitialBsdas } from "./InitialBsdas";
 
 const schema = z.object({
   author: z
@@ -94,6 +95,8 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
     onClose();
   };
 
+  const initialBsdas = bsda.forwarding ? [bsda.forwarding] : bsda.grouping;
+
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
       {bsda.metadata?.errors?.some(
@@ -123,6 +126,12 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
         <>
           <BsdaWasteSummary bsda={bsda} />
           <BsdaJourneySummary bsda={bsda} />
+          {!!initialBsdas?.length && (
+            <div className="tw-pb-4">
+              <h4 className="fr-text fr-text--bold">BSDAs associés</h4>
+              <InitialBsdas bsdas={initialBsdas} />
+            </div>
+          )}
 
           <p className="fr-text fr-mb-2w">
             En qualité <strong>d'émetteur du déchet</strong>, j'atteste que les
