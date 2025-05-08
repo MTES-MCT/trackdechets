@@ -432,7 +432,7 @@ describe("TransporterForm", () => {
             variables: {
               clue: "CODE EN STOCK",
               allowForeignCompanies: true,
-              allowClosedCompanies: false
+              allowClosedCompanies: true
             }
           },
           result: () => {

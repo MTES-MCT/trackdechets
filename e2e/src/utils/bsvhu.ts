@@ -56,9 +56,8 @@ const fillEmitterTab = async (page: Page, emitter) => {
 
   // Then, fill siret and select company
   await page.getByLabel("N°SIRET ou raison sociale").fill(emitter.orgId);
-  await page
-    .getByRole("button", { name: `${emitter.name} - ${emitter.orgId}` })
-    .click();
+  const portal = await page.locator("#portal-root");
+  await portal.getByText(`${emitter.name} - ${emitter.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", emitter.contact);
@@ -154,9 +153,8 @@ export const fillTransporterTab = async (page: Page, transporter) => {
 
   // Then, fill siret and select company
   await page.getByLabel("N°SIRET ou raison sociale").fill(transporter.orgId);
-  await page
-    .getByRole("button", { name: `${transporter.name} - ${transporter.orgId}` })
-    .click();
+  const portal = await page.locator("#portal-root");
+  await portal.getByText(`${transporter.name} - ${transporter.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", transporter.contact);
@@ -222,9 +220,8 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   ).not.toBeVisible();
 
   // Transporter should be selected automatically
-  await page
-    .getByRole("button", { name: `${destination.name} - ${destination.orgId}` })
-    .click();
+  const portal = await page.locator("#portal-root");
+  await portal.getByText(`${destination.name} - ${destination.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", destination.contact);
@@ -257,9 +254,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   // Select company
   await page.getByLabel("N°SIRET ou raison sociale").nth(1).fill(broyeur.orgId);
 
-  await page
-    .getByRole("button", { name: `${broyeur.name} - ${broyeur.orgId}` })
-    .click();
+  await portal.getByText(`${broyeur.name} - ${broyeur.orgId}`).click();
 
   const contactValue = await page
     .getByLabel("Personne à contacter")
