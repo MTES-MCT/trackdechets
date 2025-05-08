@@ -1,10 +1,17 @@
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
-import { type UseFormReturn, Controller } from "react-hook-form";
+import {
+  type UseFormReturn,
+  type UseFormSetValue,
+  Controller
+} from "react-hook-form";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import styles from "./ReportFor.module.scss";
-import { RegistryCompanySwitcher } from "../../../dashboard/registry/RegistryCompanySwitcher";
+import {
+  RegistryCompanyInfos,
+  RegistryCompanySwitcher
+} from "../../../dashboard/registry/RegistryCompanySwitcher";
 import { formatError } from "../builder/error";
 import { REGISTRY_DELEGATIONS } from "../../../Apps/common/queries/registryDelegation/queries";
 import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
@@ -15,13 +22,20 @@ type Props = {
   reportForLabel: string;
   reportAsLabel: string;
   disabled?: boolean;
+  onCompanySelect?: (
+    orgId: string,
+    isDelegation: boolean,
+    setValue: UseFormSetValue<any>,
+    company?: RegistryCompanyInfos
+  ) => void;
 };
 
 export function ReportFor({
   methods,
   reportForLabel,
   reportAsLabel,
-  disabled
+  disabled,
+  onCompanySelect
 }: Props) {
   const [isDelegation, setIsDelegation] = useState(false);
   const { errors } = methods.formState;
@@ -51,9 +65,15 @@ export function ReportFor({
               label={reportForLabel}
               defaultSiret={field.value}
               disabled={disabled}
-              onCompanySelect={(siret, isDelegation) => {
+              onCompanySelect={(siret, isDelegation, company) => {
                 field.onChange(siret);
                 setIsDelegation(isDelegation);
+                onCompanySelect?.(
+                  siret,
+                  isDelegation,
+                  methods.setValue,
+                  company
+                );
               }}
             />
           )}

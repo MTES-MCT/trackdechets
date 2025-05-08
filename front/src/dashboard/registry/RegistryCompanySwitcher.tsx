@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from "react";
 import { useQuery, useLazyQuery } from "@apollo/client";
-import { CompanyPrivate, CompanyPublic, Query, UserRole } from "@td/codegen-ui";
+import { CompanyPublic, Query, UserRole } from "@td/codegen-ui";
 import { debounce } from "../../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
@@ -14,7 +14,11 @@ import { GET_REGISTRY_COMPANIES } from "./shared";
 import FocusTrap from "focus-trap-react";
 import styles from "./RegistryCompanySwitcher.module.scss";
 type Props = {
-  onCompanySelect: (orgId: string, isDelegation: boolean) => void;
+  onCompanySelect: (
+    orgId: string,
+    isDelegation: boolean,
+    company?: RegistryCompanyInfos
+  ) => void;
   wrapperClassName?: string;
   allOption?: {
     key: string;
@@ -25,6 +29,16 @@ type Props = {
   excludeDelegations?: boolean;
   disabled?: boolean;
 };
+
+export type RegistryCompanyInfos = Pick<
+  CompanyPublic,
+  | "orgId"
+  | "siret"
+  | "name"
+  | "givenName"
+  | "companyTypes"
+  | "transporterReceipt"
+>;
 
 export function RegistryCompanySwitcher({
   onCompanySelect,
@@ -50,21 +64,24 @@ export function RegistryCompanySwitcher({
   );
 
   const setSelectedCompany = (
-    key,
-    {
-      name,
-      givenName,
-      siret,
-      isDelegation
-    }: {
-      name?: string | null;
-      givenName?: string | null;
-      siret?: string | null;
-      isDelegation?: boolean;
-    }
+    orgId: string,
+    isDelegation: boolean,
+    selected:
+      | {
+          company: RegistryCompanyInfos;
+        }
+      | {
+          all: true;
+        }
   ) => {
-    setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
-    onCompanySelect(key, !!isDelegation);
+    if ("company" in selected) {
+      const { name, givenName, siret } = selected.company;
+      setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
+      onCompanySelect(orgId, !!isDelegation, selected?.company);
+    } else if (selected.all) {
+      setSelectedItem(allOption?.name ?? "");
+      onCompanySelect(orgId, !!isDelegation);
+    }
   };
 
   const { data: companiesData, loading: companiesLoading } = useQuery<
@@ -80,7 +97,7 @@ export function RegistryCompanySwitcher({
     onCompleted: data => {
       if (!selectedItem && !allOption) {
         let firstNodeIsDelegation = false;
-        let firstNode: CompanyPrivate | CompanyPublic | undefined =
+        let firstNode: RegistryCompanyInfos | undefined =
           data.registryCompanies.myCompanies.find(node =>
             defaultSiret ? node.siret === defaultSiret : node.siret
           );
@@ -240,19 +257,15 @@ export function RegistryCompanySwitcher({
                       className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
                       tabIndex={0}
                       onClick={() => {
-                        setSelectedCompany(allOption.key, {
-                          name: allOption.name,
-                          givenName: null,
-                          siret: null
+                        setSelectedCompany(allOption.key, false, {
+                          all: true
                         });
                         close();
                       }}
                       onKeyDown={e => {
                         if (e.key === "Enter") {
-                          setSelectedCompany(allOption.key, {
-                            name: allOption.name,
-                            givenName: null,
-                            siret: null
+                          setSelectedCompany(allOption.key, false, {
+                            all: true
                           });
                           close();
                         }
@@ -267,19 +280,15 @@ export function RegistryCompanySwitcher({
                       className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
                       tabIndex={0}
                       onClick={() => {
-                        setSelectedCompany(node.orgId, {
-                          name: node.name,
-                          givenName: node.givenName,
-                          siret: node.siret
+                        setSelectedCompany(node.orgId, false, {
+                          company: node
                         });
                         close();
                       }}
                       onKeyDown={e => {
                         if (e.key === "Enter") {
-                          setSelectedCompany(node.orgId, {
-                            name: node.name,
-                            givenName: node.givenName,
-                            siret: node.siret
+                          setSelectedCompany(node.orgId, false, {
+                            company: node
                           });
                           close();
                         }
@@ -303,21 +312,15 @@ export function RegistryCompanySwitcher({
                         className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-flex tw-gap-4 tw-justify-between tw-items-center tw-cursor-pointer"
                         tabIndex={0}
                         onClick={() => {
-                          setSelectedCompany(delegator.orgId, {
-                            name: delegator.name,
-                            givenName: delegator.givenName,
-                            siret: delegator.orgId,
-                            isDelegation: true
+                          setSelectedCompany(delegator.orgId, true, {
+                            company: delegator
                           });
                           close();
                         }}
                         onKeyDown={e => {
                           if (e.key === "Enter") {
-                            setSelectedCompany(delegator.orgId, {
-                              name: delegator.name,
-                              givenName: delegator.givenName,
-                              siret: delegator.orgId,
-                              isDelegation: true
+                            setSelectedCompany(delegator.orgId, true, {
+                              company: delegator
                             });
                             close();
                           }

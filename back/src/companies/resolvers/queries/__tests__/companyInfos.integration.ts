@@ -3,10 +3,6 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  AnonymousCompanyError,
-  ClosedCompanyError
-} from "../../../sirene/errors";
 
 const mockSearchSirene = jest.fn();
 jest.mock("../../../sirene/searchCompany", () => ({
@@ -307,28 +303,24 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
         }
       }
     }`;
-    const response = await query<any>(gqlquery);
-    const company = response.data.companyInfos;
-    const expected = {
-      siret,
-      etatAdministratif: "F",
-      name: "OPTIQUE LES AIX",
-      address: "49 Rue de la République 18220 Les Aix-d'Angillon",
-      isRegistered: false,
-      contactEmail: null,
-      contactPhone: null,
-      installation: null,
-      naf: null,
-      libelleNaf: null,
-      website: null
-    };
-    expect(company).toEqual(expected);
+    const { errors } = await query<any>(gqlquery);
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe("Cet établissement est fermé");
+    expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
   });
 
   it("Hides company infos if non-diffusible in INSEE and not registered in TD", async () => {
     const siret = siretify(8);
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon",
+      statutDiffusionEtablissement: "P"
+    });
 
-    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
         companyInfos(siret: "${siret}") {
@@ -366,8 +358,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
   });
 
   it("Hides company infos if non-diffusible in INSEE, even if registered in TD", async () => {
-    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const siret = siretify(8);
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon",
+      statutDiffusionEtablissement: "P"
+    });
 
     await companyFactory({
       siret,
@@ -417,8 +415,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
   it("should return TD-specific infos even if company is anonymous", async () => {
     // Given
-    mockSearchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const siret = siretify(8);
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon",
+      statutDiffusionEtablissement: "P"
+    });
 
     await companyFactory({
       siret,
@@ -443,8 +447,14 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
   it("should return explicit error if non-diffusible AND closed", async () => {
     // Given
-    mockSearchSirene.mockRejectedValueOnce(new ClosedCompanyError());
     const siret = siretify(8);
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "F",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon",
+      statutDiffusionEtablissement: "P"
+    });
 
     // When
     const gqlquery = `

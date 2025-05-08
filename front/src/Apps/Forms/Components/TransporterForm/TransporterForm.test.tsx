@@ -131,6 +131,21 @@ const searchCompaniesMock = (
 });
 
 describe("TransporterForm", () => {
+  beforeEach(() => {
+    // Create portal-root element
+    const portalRoot = document.createElement("div");
+    portalRoot.setAttribute("id", "portal-root");
+    document.body.appendChild(portalRoot);
+  });
+
+  afterEach(() => {
+    // Clean up portal-root element
+    const portalRoot = document.getElementById("portal-root");
+    if (portalRoot) {
+      document.body.removeChild(portalRoot);
+    }
+  });
+
   afterEach(jest.resetAllMocks);
 
   type ComponentProps<T extends Transporter | BsdaTransporter> = {
@@ -415,7 +430,9 @@ describe("TransporterForm", () => {
           request: {
             query: SEARCH_COMPANIES,
             variables: {
-              clue: "CODE EN STOCK"
+              clue: "CODE EN STOCK",
+              allowForeignCompanies: true,
+              allowClosedCompanies: true
             }
           },
           result: () => {

@@ -13,7 +13,6 @@ import {
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
-import { FrenchCompanySelector } from "../common/FrenchCompanySelector";
 import {
   INCOMING_TEXS_WASTE_CODES,
   INCOMING_WASTE_PROCESSING_OPERATIONS_CODES
@@ -23,6 +22,8 @@ import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
+import { Labels } from "../common/Labels";
+import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 
 export const outgoingWasteFormShape: FormShape = [
   {
@@ -33,7 +34,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -73,7 +74,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle du déchet",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -84,7 +85,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -95,7 +96,9 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -105,7 +108,9 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -114,7 +119,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "dispatchDate",
         shape: "generic",
-        label: "Date d'expédition",
+        label: Labels.dispatchDate,
         required: true,
         validation: {
           dispatchDate: nonEmptyString
@@ -215,12 +220,14 @@ export const outgoingWasteFormShape: FormShape = [
         names: ["ecoOrganismeSiret", "ecoOrganismeName"]
       },
       {
-        Component: FrenchCompanySelector,
+        Component: OptionalCompanySelector,
         props: {
           prefix: "brokerCompany",
           shortMode: true,
           title: "Courtier (optionnel)",
           reducedMargin: true,
+          toggleLabel: "Présence d'un courtier",
+          recepisseName: "brokerRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.brokerReceipt?.receiptNumber) {
               setValue(
@@ -232,29 +239,25 @@ export const outgoingWasteFormShape: FormShape = [
         },
         validation: {
           brokerCompanySiret: optionalString,
-          brokerCompanyName: optionalString
-        },
-        shape: "custom",
-        names: ["brokerCompanySiret", "brokerCompanyName"]
-      },
-      {
-        name: "brokerRecepisseNumber",
-        shape: "generic",
-        label: "Numéro de récépissé",
-        required: true,
-        validation: {
+          brokerCompanyName: optionalString,
           brokerRecepisseNumber: optionalString
         },
-        type: "text",
-        style: { className: "fr-col-10" }
+        shape: "custom",
+        names: [
+          "brokerCompanySiret",
+          "brokerCompanyName",
+          "brokerRecepisseNumber"
+        ]
       },
       {
-        Component: FrenchCompanySelector,
+        Component: OptionalCompanySelector,
         props: {
           prefix: "traderCompany",
           shortMode: true,
           title: "Négociant (optionnel)",
           reducedMargin: true,
+          toggleLabel: "Présence d'un négociant",
+          recepisseName: "traderRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.traderReceipt?.receiptNumber) {
               setValue(
@@ -266,21 +269,15 @@ export const outgoingWasteFormShape: FormShape = [
         },
         validation: {
           traderCompanySiret: optionalString,
-          traderCompanyName: optionalString
-        },
-        shape: "custom",
-        names: ["traderCompanySiret", "traderCompanyName"]
-      },
-      {
-        name: "traderRecepisseNumber",
-        shape: "generic",
-        label: "Numéro de récépissé",
-        required: true,
-        validation: {
+          traderCompanyName: optionalString,
           traderRecepisseNumber: optionalString
         },
-        type: "text",
-        style: { className: "fr-col-10" }
+        shape: "custom",
+        names: [
+          "traderCompanySiret",
+          "traderCompanyName",
+          "traderRecepisseNumber"
+        ]
       }
     ]
   },
@@ -305,7 +302,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "gistridNumber",
         shape: "generic",
-        label: "Numéro de notification ou de déclaration GISTRID",
+        label: Labels.gistridNumber,
         required: false,
         validation: {
           gistridNumber: optionalString
@@ -316,7 +313,7 @@ export const outgoingWasteFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -389,7 +386,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
+        label: Labels.isDirectSupply,
         required: false,
         validation: {
           isDirectSupply: booleanString

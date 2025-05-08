@@ -3,7 +3,7 @@ import { useQuery } from "@apollo/client";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import React from "react";
 import { type UseFormReturn } from "react-hook-form";
-import { FrenchCompanySelector } from "./FrenchCompanySelector";
+import { OptionalCompanySelector } from "./OptionalCompanySelector";
 
 const GET_ECO_ORGANISMES = gql`
   query GetEcoOrganismes(
@@ -44,13 +44,14 @@ export function EcoOrganismes({ methods, disabled, reducedMargin }: Props) {
 
   return (
     <div className="fr-col">
-      <FrenchCompanySelector
+      <OptionalCompanySelector
         prefix={prefix}
         methods={methods}
         disabled={disabled}
         shortMode={true}
         reducedMargin={reducedMargin}
         title="Éco-organisme (optionnel)"
+        toggleLabel="Présence d'un éco-organisme"
       />
 
       {selectedSiret && !isKnownEcoOrganisme && (

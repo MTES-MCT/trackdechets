@@ -279,6 +279,9 @@ export const GET_REGISTRY_COMPANIES = gql`
         name
         givenName
         companyTypes
+        transporterReceipt {
+          receiptNumber
+        }
       }
       delegators {
         orgId
@@ -286,6 +289,9 @@ export const GET_REGISTRY_COMPANIES = gql`
         name
         givenName
         companyTypes
+        transporterReceipt {
+          receiptNumber
+        }
       }
     }
   }

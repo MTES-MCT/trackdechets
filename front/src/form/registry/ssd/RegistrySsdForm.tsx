@@ -25,7 +25,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 type Props = { onClose: () => void };
 
 const DEFAULT_VALUES: Partial<SsdLineInput> = {
-  weightIsEstimate: false,
+  weightIsEstimate: true,
   secondaryWasteCodes: [],
   secondaryWasteDescriptions: []
 };

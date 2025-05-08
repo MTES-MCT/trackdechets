@@ -1,8 +1,13 @@
-import * as React from "react";
+import React, { useMemo, useState } from "react";
 import CompanySelectorWrapper from "../../../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import { selectedCompanyError } from "../FrenchCompanySelector";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
-import { CompanySearchResult, FavoriteType } from "@td/codegen-ui";
+import {
+  type CompanySearchResult,
+  FavoriteType,
+  type StatutDiffusionEtablissement
+} from "@td/codegen-ui";
 import { Controller, UseFormReturn } from "react-hook-form";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { formatError } from "../../builder/error";
@@ -29,6 +34,8 @@ export function TransporterForm({
   index,
   methods
 }: TransporterFormProps) {
+  const [unknownCompanyError, setUnknownCompanyError] = useState(false);
+
   const fullFieldName =
     typeof index === "number" ? `${fieldName}.${index}` : fieldName;
   const transporter = methods.watch(fullFieldName);
@@ -40,6 +47,35 @@ export function TransporterForm({
       : errors?.[fieldName];
   const { onChange: onChangeCompanyType, ...typeSelectMethods } =
     methods.register(`${fullFieldName}.CompanyType`);
+
+  const companyStatusDiffusion: StatutDiffusionEtablissement | undefined =
+    methods.watch(`${fullFieldName}.CompanyStatusDiffusion`);
+  const companyType = transporter?.CompanyType;
+  const components = useMemo(() => {
+    if (companyType === "ETABLISSEMENT_FR") {
+      return {
+        companySelector: true,
+        name: companyStatusDiffusion === "P" ? true : false,
+        address: companyStatusDiffusion === "P" ? true : false
+      };
+    } else if (
+      companyType === "ENTREPRISE_UE" ||
+      companyType === "ENTREPRISE_HORS_UE" ||
+      companyType === "ASSOCIATION"
+    ) {
+      return {
+        orgId: true,
+        name: true,
+        address: true
+      };
+    } else if (companyType === "PERSONNE_PHYSIQUE") {
+      return {
+        orgId: true,
+        address: true
+      };
+    }
+    return {};
+  }, [companyType, companyStatusDiffusion]);
 
   return (
     <div className="fr-container fr-col">
@@ -86,6 +122,10 @@ export function TransporterForm({
                   `${fullFieldName}.RecepisseNumber`,
                   INITIAL_TRANSPORTER.RecepisseNumber
                 );
+                methods.setValue(
+                  `${fullFieldName}.CompanyStatusDiffusion`,
+                  null
+                );
                 onChangeCompanyType(e);
               }
             }}
@@ -104,16 +144,25 @@ export function TransporterForm({
           </Select>
         </div>
       </div>
-      {transporter?.CompanyType === "ETABLISSEMENT_FR" ? (
+      {components.companySelector && (
         <>
           <CompanySelectorWrapper
             selectedCompanyOrgId={transporterOrgId}
+            selectedCompanyError={selectedCompanyError}
             favoriteType={FavoriteType.Transporter}
             allowForeignCompanies={false}
+            allowClosedCompanies={true}
             disabled={false}
             onCompanySelected={(company: CompanySearchResult) => {
-              console.log(company);
               if (company) {
+                setUnknownCompanyError(false);
+                methods.setValue(
+                  `${fullFieldName}.CompanyStatusDiffusion`,
+                  company.statutDiffusionEtablissement
+                );
+                if (company.orgId === transporterOrgId) {
+                  return;
+                }
                 methods.setValue(
                   `${fullFieldName}.CompanyOrgId`,
                   company.orgId ?? ""
@@ -150,6 +199,9 @@ export function TransporterForm({
                 }
               }
             }}
+            onUnknownInputCompany={() => {
+              setUnknownCompanyError(true);
+            }}
           />
           {(transporterError?.CompanyOrgId ||
             transporterError?.CompanyAddress) && (
@@ -164,49 +216,72 @@ export function TransporterForm({
               />
             </div>
           )}
+          {unknownCompanyError && (
+            <Alert
+              title="L'établissement mentionné n'existe pas dans la base SIRENE"
+              description={
+                <div>
+                  <p>SIRET : {transporterOrgId}</p>
+                  <p>Dénomination : {transporter?.CompanyName}</p>
+                  {
+                    <p>
+                      Adresse :{" "}
+                      {[
+                        transporter?.CompanyAddress,
+                        transporter?.CompanyPostalCode,
+                        transporter?.CompanyCity
+                      ].join(" ")}
+                    </p>
+                  }
+                </div>
+              }
+              severity="error"
+              small
+            />
+          )}
         </>
-      ) : (
-        transporter?.CompanyType !== "" && (
-          <div className="fr-grid-row fr-grid-row--gutters">
-            {transporter?.CompanyType !== "COMMUNES" && (
-              <div className="fr-col-8">
-                <Input
-                  label="Numéro d'identification"
-                  nativeInputProps={{
-                    type: "text",
-                    ...methods.register(`${fullFieldName}.CompanyOrgId`)
-                  }}
-                  state={transporterError?.CompanyOrgId && "error"}
-                  stateRelatedMessage={formatError(
-                    transporterError?.CompanyOrgId
-                  )}
-                />
-              </div>
-            )}
-            {!["COMMUNES", "PERSONNE_PHYSIQUE"].includes(
-              transporter?.CompanyType
-            ) && (
-              <div className="fr-col-8">
-                <Input
-                  label="Raison sociale"
-                  nativeInputProps={{
-                    type: "text",
-                    ...methods.register(`${fullFieldName}.CompanyName`)
-                  }}
-                  state={transporterError?.CompanyName && "error"}
-                  stateRelatedMessage={formatError(
-                    transporterError?.CompanyName
-                  )}
-                />
-              </div>
-            )}
-
+      )}
+      {(components.orgId || components.name || components.address) && (
+        <div className="fr-grid-row fr-grid-row--gutters fr-mb-2w">
+          {components.orgId && (
+            <div className="fr-col-8">
+              <Input
+                label={
+                  companyType === "PERSONNE_PHYSIQUE"
+                    ? "Nom et prénom"
+                    : "Numéro d'identification"
+                }
+                nativeInputProps={{
+                  type: "text",
+                  ...methods.register(`${fullFieldName}.CompanyOrgId`)
+                }}
+                state={transporterError?.CompanyOrgId && "error"}
+                stateRelatedMessage={formatError(
+                  transporterError?.CompanyOrgId
+                )}
+              />
+            </div>
+          )}
+          {components.name && (
+            <div className="fr-col-8">
+              <Input
+                label="Raison sociale"
+                nativeInputProps={{
+                  type: "text",
+                  ...methods.register(`${fullFieldName}.CompanyName`)
+                }}
+                state={transporterError?.CompanyName && "error"}
+                stateRelatedMessage={formatError(transporterError?.CompanyName)}
+              />
+            </div>
+          )}
+          {components.address && (
             <InlineAddress
               prefix={`${fullFieldName}.Company`}
               methods={methods}
             />
-          </div>
-        )
+          )}
+        </div>
       )}
 
       <div className={"fr-grid-row fr-grid-row--gutters fr-mb-2w"}>

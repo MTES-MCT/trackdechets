@@ -1,4 +1,10 @@
-import React, { useEffect, type ReactNode } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  type ReactNode
+} from "react";
 import { Portal } from "../Portal/Portal";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 
@@ -30,22 +36,70 @@ export function ComboBox({
   autoWidth
 }: Props) {
   const { targetRef } = useOnClickOutsideRefTarget({
+    active: isOpen,
     onClickOutside: (e: MouseEvent | TouchEvent) => {
-      if (triggerRef) {
-        if (triggerRef.current?.contains(e.target as Node)) {
-          e.preventDefault();
-          return;
-        }
-      } else if (parentRef.current?.contains(e.target as Node)) {
-        e.preventDefault();
+      // When clicking on the trigger, if we call onOpenChange
+      // it closes the dropdown and opens it again
+      if ((triggerRef ?? parentRef).current?.contains(e.target as Node)) {
         return;
       }
+
       onOpenChange(false);
     }
   });
 
+  const [positionRevision, setPositionRevision] = useState(0);
+  const updatePositionCallback = useCallback(() => {
+    // Use requestAnimationFrame to batch updates and avoid layout thrashing
+    requestAnimationFrame(() => {
+      setPositionRevision(r => r + 1);
+    });
+  }, []);
+
+  // If the combobox in in a non-root div that is scrolled, we need to listen to the scroll event of this div
+  // to update the position of the dropdown
+  useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const currentParentRef = parentRef.current;
+    if (!currentParentRef) {
+      return;
+    }
+
+    window.addEventListener("resize", updatePositionCallback);
+    window.addEventListener("scroll", updatePositionCallback, true);
+
+    const scrollableAncestors: HTMLElement[] = [];
+    let el = currentParentRef.parentElement;
+    while (el && el !== document.body) {
+      const style = window.getComputedStyle(el);
+      const overflowY = style.getPropertyValue("overflow-y");
+      const overflowX = style.getPropertyValue("overflow-x");
+      if (
+        overflowY === "auto" ||
+        overflowY === "scroll" ||
+        overflowX === "auto" ||
+        overflowX === "scroll"
+      ) {
+        scrollableAncestors.push(el);
+        el.addEventListener("scroll", updatePositionCallback);
+      }
+      el = el.parentElement;
+    }
+
+    return () => {
+      window.removeEventListener("resize", updatePositionCallback);
+      window.removeEventListener("scroll", updatePositionCallback, true);
+      scrollableAncestors.forEach(ancestor => {
+        ancestor.removeEventListener("scroll", updatePositionCallback);
+      });
+    };
+  }, [isOpen, parentRef, updatePositionCallback]);
+
   useEffect(() => {
-    const targetElement = targetRef.current; // targetRef comes from the hook
+    const targetElement = targetRef.current;
     if (!isOpen || !parentRef.current || !targetElement) {
       return;
     }
@@ -143,7 +197,7 @@ export function ComboBox({
     }
 
     targetElement.style.left = `${dropdownLeft}px`;
-  }, [isOpen, parentRef, targetRef, triggerRef]);
+  }, [isOpen, parentRef, targetRef, triggerRef, positionRevision, autoWidth]);
 
   if (!isOpen) {
     return null;
@@ -157,8 +211,8 @@ export function ComboBox({
           position: "absolute",
           backgroundColor: "white",
           border: "1px solid #ccc",
+          boxShadow: "0px 10px 20px -10px black",
           zIndex: 1000,
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
           overflowY: "auto", // Allow vertical scroll
           overflowX: "hidden", // Prevent horizontal scroll within dropdown
           boxSizing: "border-box" // Include padding/border in element's total width and height

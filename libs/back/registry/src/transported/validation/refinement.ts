@@ -70,3 +70,21 @@ export const refineWasteCode = (
     });
   }
 };
+
+export const refinePlates = (
+  managedItem: ParsedZodTransportedItem,
+  { addIssue }: { addIssue: (issue: z.ZodIssue) => void }
+) => {
+  if (
+    managedItem.reportForTransportMode === "ROAD" &&
+    (!managedItem.reportForTransportPlates ||
+      managedItem.reportForTransportPlates.length === 0)
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "Les plaques d'immatriculation sont obligatoires lorsque le mode de transport est par route",
+      path: ["reportForTransportPlates"]
+    });
+  }
+};

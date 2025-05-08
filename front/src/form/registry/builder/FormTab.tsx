@@ -4,10 +4,12 @@ import { Select } from "@codegouvfr/react-dsfr/Select";
 import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import { clsx } from "clsx";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
+import "./FormTab.scss";
 
 type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
@@ -20,9 +22,12 @@ export function FormTab({ fields, methods }: Props) {
     }
 
     if (field.shape === "generic") {
-      const label = [field.label, !field.required ? "(optionnel)" : ""]
-        .filter(Boolean)
-        .join(" ");
+      const label =
+        typeof field.label === "string"
+          ? [field.label, !field.required ? "(optionnel)" : ""]
+              .filter(Boolean)
+              .join(" ")
+          : field.label;
       return (
         <>
           {field.title && (
@@ -36,7 +41,16 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
             >
               <NonScrollableInput
-                label={label}
+                label={
+                  <div className="row-label">
+                    {label}
+                    {field.tooltip && (
+                      <div className="tw-ml-1">
+                        <Tooltip title={field.tooltip} />
+                      </div>
+                    )}
+                  </div>
+                }
                 nativeInputProps={{
                   type: field.type,
                   ...(field.type === "date" && {
@@ -57,7 +71,16 @@ export function FormTab({ fields, methods }: Props) {
               key={field.name}
             >
               <Select
-                label={label}
+                label={
+                  <div className="row-label">
+                    {label}
+                    {field.tooltip && (
+                      <div className="tw-ml-1">
+                        <Tooltip title={field.tooltip} />
+                      </div>
+                    )}
+                  </div>
+                }
                 nativeSelectProps={{
                   ...methods.register(field.name),
                   ...(field.defaultOption && { defaultValue: "" })
@@ -90,7 +113,16 @@ export function FormTab({ fields, methods }: Props) {
                 control={methods.control}
                 render={({ field: controllerField }) => (
                   <ToggleSwitch
-                    label={label}
+                    label={
+                      <div className="row-label">
+                        {label}
+                        {field.tooltip && (
+                          <div className="tw-ml-1">
+                            <Tooltip title={field.tooltip} />
+                          </div>
+                        )}
+                      </div>
+                    }
                     inputTitle={field.name}
                     showCheckedHint={false}
                     disabled={field.disabled}
@@ -99,6 +131,7 @@ export function FormTab({ fields, methods }: Props) {
                   />
                 )}
               />
+
               {errors?.[field.name] && (
                 <Alert
                   className="fr-mt-2w"
@@ -119,7 +152,7 @@ export function FormTab({ fields, methods }: Props) {
   }
 
   return (
-    <div>
+    <div className="registryFormTab">
       {fields.map((field, index) => {
         const fieldValues =
           field.shape === "custom"
