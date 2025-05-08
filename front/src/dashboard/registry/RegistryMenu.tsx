@@ -82,7 +82,7 @@ export default function RegistryMenu() {
           iconId="fr-icon-draft-line"
           iconPosition="right"
           linkProps={{
-            href: "https://tally.so/r/mKWxXA",
+            href: "https://assistance.trackdechets.beta.gouv.fr",
             target: "_blank",
             rel: "noopener"
           }}

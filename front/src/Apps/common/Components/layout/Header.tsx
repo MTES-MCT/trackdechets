@@ -676,9 +676,7 @@ export default function Header() {
 
   if (loading) return null;
 
-  const showRegistry =
-    permissions.includes(UserPermission.RegistryCanRead) &&
-    [UserRole.Admin, UserRole.Member].includes(role!);
+  const showRegistry = permissions.includes(UserPermission.RegistryCanRead);
 
   if (isAuthenticated && data?.me == null) {
     return <Loader />;
