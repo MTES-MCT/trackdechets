@@ -190,9 +190,7 @@ function DashboardSubNav({ currentCompany }) {
   const showMyBsds =
     permissions.includes(UserPermission.BsdCanList) && role !== UserRole.Driver;
 
-  const showRegistryTab =
-    permissions.includes(UserPermission.RegistryCanRead) &&
-    [UserRole.Admin, UserRole.Member].includes(role!);
+  const showRegistryTab = permissions.includes(UserPermission.RegistryCanRead);
 
   return (
     <>
