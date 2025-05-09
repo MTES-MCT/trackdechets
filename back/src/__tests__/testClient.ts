@@ -34,7 +34,7 @@ function makeClient(user?: (User & { auth?: AuthType }) | null) {
               }
             }
           },
-          res: {},
+          res: { locals: {} },
           dataloaders: getServerDataloaders(),
           ...(user && { user: { auth: AuthType.Session, ...user } })
         } as any
