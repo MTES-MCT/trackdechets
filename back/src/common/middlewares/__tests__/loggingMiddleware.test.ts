@@ -1,14 +1,15 @@
-import express, { json } from "express";
-import supertest from "supertest";
-import Transport from "winston-transport";
-import { logger } from "@td/logger";
-import { loggingMiddleware } from "../loggingMiddleware";
-import { gql } from "graphql-tag";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { GraphQLContext } from "../../../types";
-import { gqlInfosPlugin } from "../../plugins/gqlInfosPlugin";
+import { logger } from "@td/logger";
 import cors from "cors";
+import express, { json } from "express";
+import { gql } from "graphql-tag";
+import supertest from "supertest";
+import Transport from "winston-transport";
+import { GraphQLContext } from "../../../types";
+import { UserInputError } from "../../errors";
+import { gqlInfosPlugin } from "../../plugins/gqlInfosPlugin";
+import { loggingMiddleware } from "../loggingMiddleware";
 
 const logMock = jest.fn();
 
@@ -45,11 +46,19 @@ describe("loggingMiddleware", () => {
       }
       type Query {
         foo: Foo
+        error: Foo
+        userError: Foo
       }
     `;
     const resolvers = {
       Query: {
-        foo: () => ({ bar: "bar" })
+        foo: () => ({ bar: "bar" }),
+        error: () => {
+          throw new Error("error");
+        },
+        userError: () => {
+          throw new UserInputError("user error");
+        }
       }
     };
     const server = new ApolloServer<GraphQLContext>({
@@ -105,8 +114,10 @@ describe("loggingMiddleware", () => {
     expect(logMock.mock.calls).toHaveLength(2);
 
     for (const logCall of logMock.mock.calls) {
-      const { message, level, graphql_query } = logCall[0];
-      expect(message).toEqual("POST /graphql");
+      const { message, level, graphql_query, request_timing } = logCall[0];
+      expect(message).toEqual(
+        `POST /graphql${request_timing === "end" ? " foo" : ""}`
+      );
       expect(level).toEqual("info");
       expect(graphql_query).toEqual("{ foo { bar } }");
     }
@@ -121,6 +132,48 @@ describe("loggingMiddleware", () => {
     expect(responseLog.response_body.trim()).toEqual(
       '{"data":{"foo":{"bar":"bar"}}}'
     );
+    expect(responseLog.execution_time_num).toBeGreaterThanOrEqual(0);
+    expect(responseLog.http_status).toEqual(200);
+    expect(responseLog.request_timing).toEqual("end");
+  });
+
+  it("should log undisplayed errors requests as errors", async () => {
+    await request.post("/graphql").send({ query: "{ error { bar } }" });
+    expect(logMock.mock.calls).toHaveLength(2);
+
+    const startLog = logMock.mock.calls[0][0];
+    expect(startLog.request_timing).toEqual("start");
+    expect(startLog.message).toEqual("POST /graphql");
+    expect(startLog.graphql_query).toEqual("{ error { bar } }");
+
+    const endLog = logMock.mock.calls[1][0];
+    expect(endLog.request_timing).toEqual("end");
+    expect(endLog.level).toEqual("error");
+    expect(endLog.graphql_errors).toHaveLength(1);
+    expect(endLog.graphql_errors[0].message).toEqual("error");
+
+    const responseLog = logMock.mock.calls[1][0];
+    expect(responseLog.execution_time_num).toBeGreaterThanOrEqual(0);
+    expect(responseLog.http_status).toEqual(200);
+    expect(responseLog.request_timing).toEqual("end");
+  });
+
+  it("should log user input errors requests as errors", async () => {
+    await request.post("/graphql").send({ query: "{ userError { bar } }" });
+    expect(logMock.mock.calls).toHaveLength(2);
+
+    const startLog = logMock.mock.calls[0][0];
+    expect(startLog.request_timing).toEqual("start");
+    expect(startLog.message).toEqual("POST /graphql");
+    expect(startLog.graphql_query).toEqual("{ userError { bar } }");
+
+    const endLog = logMock.mock.calls[1][0];
+    expect(endLog.request_timing).toEqual("end");
+    expect(endLog.level).toEqual("warn");
+    expect(endLog.graphql_errors).toHaveLength(1);
+    expect(endLog.graphql_errors[0].message).toEqual("user error");
+
+    const responseLog = logMock.mock.calls[1][0];
     expect(responseLog.execution_time_num).toBeGreaterThanOrEqual(0);
     expect(responseLog.http_status).toEqual(200);
     expect(responseLog.request_timing).toEqual("end");

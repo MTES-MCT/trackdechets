@@ -1,6 +1,8 @@
-import { ApolloServerPlugin } from "@apollo/server";
+import type { ApolloServerPlugin } from "@apollo/server";
 import { DefinitionNode, FieldNode, OperationTypeNode } from "graphql";
-import { GraphQLContext } from "../../types";
+import { ValidationError } from "yup";
+import { ZodError } from "zod";
+import type { GraphQLContext } from "../../types";
 
 export type GqlInfo = { operation: OperationTypeNode; name: string };
 
@@ -16,6 +18,20 @@ export function gqlInfosPlugin(): ApolloServerPlugin<GraphQLContext> {
             .filter(Boolean);
 
           requestContext.contextValue.req.gqlInfos = gqlInfos;
+        },
+        async didEncounterErrors(requestContext) {
+          // Keep the errors on the response locals to allow middlewares to read them
+          requestContext.contextValue.res.locals.hasUndisplayedError =
+            requestContext.errors?.some(
+              error =>
+                !(error instanceof ValidationError) &&
+                !(error instanceof ZodError) &&
+                (!error.extensions?.code ||
+                  error.extensions.code === "INTERNAL_SERVER_ERROR")
+            );
+          requestContext.contextValue.res.locals.gqlErrors = [
+            ...requestContext.errors
+          ];
         }
       };
     }

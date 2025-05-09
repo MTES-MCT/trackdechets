@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
+import "express-session";
+import type { GraphQLError } from "graphql";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
+import { createBsdaDataLoaders } from "./bsda/dataloader";
+import { createBspaohDataLoaders } from "./bspaoh/dataloader";
+import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { GqlInfo } from "./common/plugins/gqlInfosPlugin";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
-import { createBsdaDataLoaders } from "./bsda/dataloader";
-import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
-import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { createUserDataLoaders } from "./users/dataloaders";
-import "express-session";
 
 export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
   ReturnType<typeof createCompanyDataLoaders> &
@@ -118,5 +119,9 @@ declare module "express-session" {
 declare module "express" {
   interface Request {
     gqlInfos?: GqlInfo[];
+  }
+  interface Locals {
+    hasUndisplayedError?: boolean;
+    gqlErrors?: GraphQLError[];
   }
 }
