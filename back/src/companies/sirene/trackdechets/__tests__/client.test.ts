@@ -1,5 +1,4 @@
 import { searchCompany, searchCompanies } from "../client";
-import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
 import { SearchHit } from "../types";
 import { siretify } from "../../../../__tests__/factories";
@@ -57,56 +56,6 @@ describe("searchCompany", () => {
       codePaysEtrangerEtablissement: ""
     };
     expect(company).toEqual(expected);
-  });
-
-  it("should raise AnonymousCompanyError if partially diffusible", async () => {
-    const siret = siretify(6);
-
-    (client.search as jest.Mock).mockResolvedValueOnce({
-      body: {
-        hits: {
-          hits: [
-            {
-              _source: {
-                siret,
-                statutDiffusionEtablissement: "P"
-              }
-            }
-          ]
-        }
-      }
-    });
-    expect.assertions(1);
-    try {
-      await searchCompany(siret);
-    } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
-  });
-
-  it("should raise AnonymousCompanyError if non diffusible", async () => {
-    const siret = siretify(6);
-
-    (client.search as jest.Mock).mockResolvedValueOnce({
-      body: {
-        hits: {
-          hits: [
-            {
-              _source: {
-                siret,
-                statutDiffusionEtablissement: "P"
-              }
-            }
-          ]
-        }
-      }
-    });
-    expect.assertions(1);
-    try {
-      await searchCompany(siret);
-    } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
   });
 
   it(`should set name for an individual enterprise

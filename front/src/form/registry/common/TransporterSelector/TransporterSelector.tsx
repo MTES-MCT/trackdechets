@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import { TransporterAccordion } from "../../../../Apps/Forms/Components/TransporterAccordion/TransporterAccordion";
 import { TransporterForm } from "./TransporterForm";
 import { TransportMode } from "@td/codegen-ui";

@@ -20,7 +20,7 @@ import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
-
+import { Labels } from "../common/Labels";
 export const managedFormShape: FormShape = [
   {
     tabId: "declaration",
@@ -30,7 +30,7 @@ export const managedFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -70,7 +70,7 @@ export const managedFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle du déchet",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -81,7 +81,7 @@ export const managedFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -92,7 +92,9 @@ export const managedFormShape: FormShape = [
         name: "wastePop",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet contient des polluants organiques persistants (POP)",
+        label: Labels.wastePop,
+        tooltip:
+          "Le terme POP recouvre un ensemble de substances organiques qui possèdent 4 propriétés : persistantes, bioaccumulables, toxiques et mobiles.",
         required: true,
         validation: {
           wastePop: booleanString
@@ -102,7 +104,9 @@ export const managedFormShape: FormShape = [
         name: "wasteIsDangerous",
         shape: "generic",
         type: "checkbox",
-        label: "Le déchet est dangereux",
+        label: Labels.wasteIsDangerous,
+        tooltip:
+          "Certains déchets avec un code sans astérisque peuvent, selon les cas, être dangereux ou non dangereux.",
         required: false,
         validation: {
           wasteIsDangerous: booleanString
@@ -114,7 +118,7 @@ export const managedFormShape: FormShape = [
           {
             name: "managingStartDate",
             shape: "generic",
-            label: "Date d'acquisition",
+            label: Labels.managingStartDate,
             required: true,
             validation: {
               managingStartDate: nonEmptyString
@@ -125,7 +129,7 @@ export const managedFormShape: FormShape = [
           {
             name: "managingEndDate",
             shape: "generic",
-            label: "Date de fin de gestion",
+            label: Labels.managingEndDate,
             required: true,
             validation: {
               managingEndDate: nonEmptyString
@@ -148,7 +152,7 @@ export const managedFormShape: FormShape = [
       {
         name: "wasteDap",
         shape: "generic",
-        label: "DAP",
+        label: Labels.wasteDap,
         validation: {
           wasteDap: optionalString
         },
@@ -207,7 +211,7 @@ export const managedFormShape: FormShape = [
       {
         name: "sisIdentifier",
         shape: "generic",
-        label: "Identifiant SIS du terrain",
+        label: Labels.sisIdentifier,
         required: false,
         validation: {
           sisIdentifier: optionalString
@@ -364,7 +368,7 @@ export const managedFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         title: "GISTRID",
-        label: "Numéro de notification ou de déclaration GISTRID",
+        label: Labels.gistridNumber,
         required: false,
         validation: {
           gistridNumber: optionalString
@@ -375,7 +379,7 @@ export const managedFormShape: FormShape = [
       {
         name: "movementNumber",
         shape: "generic",
-        label: "Numéro de mouvement",
+        label: Labels.movementNumber,
         required: false,
         validation: {
           movementNumber: optionalString
@@ -425,7 +429,7 @@ export const managedFormShape: FormShape = [
         name: "isUpcycled",
         shape: "generic",
         type: "checkbox",
-        label: "Terres valorisées",
+        label: Labels.isUpcycled,
         required: false,
         validation: {
           isUpcycled: booleanString
@@ -459,7 +463,7 @@ export const managedFormShape: FormShape = [
         name: "isDirectSupply",
         shape: "generic",
         type: "checkbox",
-        label: "Approvisionnement direct (pipeline, convoyeur)",
+        label: Labels.isDirectSupply,
         required: false,
         validation: {
           isDirectSupply: booleanString

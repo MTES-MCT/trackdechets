@@ -32,7 +32,7 @@ type FormValues = IncomingWasteLineInput & {
 const DEFAULT_VALUES: Partial<FormValues> = {
   wastePop: false,
   wasteIsDangerous: false,
-  weightIsEstimate: false,
+  weightIsEstimate: true,
   noTraceability: false,
   isDirectSupply: false,
   initialEmitterMunicipalitiesInseeCodes: [],

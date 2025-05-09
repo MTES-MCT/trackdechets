@@ -1,25 +1,17 @@
 @import "../../../../scss/Breakpoints.scss";
 
 .company-selector {
-  position: relative;
   overflow: visible;
   margin-bottom: 32px;
 }
 
 .company-selector-search {
-  position: relative;
   overflow: visible;
 }
 
 .company-selector-results {
-  z-index: 99;
   background-color: white;
-  box-shadow: 0px 10px 20px -10px black;
-  position: absolute;
-  top: calc(100% - 12px);
-  width: calc(100% - 1.5em);
   min-height: 86px;
-  margin: 0 0.75em;
 }
 
 .company-selector-header {

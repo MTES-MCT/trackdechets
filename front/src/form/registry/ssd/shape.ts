@@ -19,6 +19,7 @@ import {
   booleanString
 } from "../builder/validation";
 import { Operation } from "../common/Operation";
+import { Labels } from "../common/Labels";
 
 export const ssdFormShape: FormShape = [
   {
@@ -29,7 +30,7 @@ export const ssdFormShape: FormShape = [
         name: "publicId",
         shape: "generic",
         type: "text",
-        label: "Identifiant unique",
+        label: Labels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -69,7 +70,7 @@ export const ssdFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: "Dénomination usuelle du déchet",
+        label: Labels.wasteDescription,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -80,7 +81,7 @@ export const ssdFormShape: FormShape = [
       {
         name: "wasteCodeBale",
         shape: "generic",
-        label: "Code déchet Bâle",
+        label: Labels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -105,7 +106,7 @@ export const ssdFormShape: FormShape = [
       {
         name: "product",
         shape: "generic",
-        label: "Produit",
+        label: Labels.product,
         required: true,
         validation: {
           product: nonEmptyString
@@ -129,7 +130,7 @@ export const ssdFormShape: FormShape = [
           {
             name: "useDate",
             shape: "generic",
-            label: "Date d'utilisation",
+            label: Labels.useDate,
             required: true,
             validation: {
               useDate: optionalString
@@ -140,7 +141,7 @@ export const ssdFormShape: FormShape = [
           {
             name: "dispatchDate",
             shape: "generic",
-            label: "Date d'expédition",
+            label: Labels.dispatchDate,
             required: true,
             validation: {
               dispatchDate: optionalString
@@ -158,7 +159,7 @@ export const ssdFormShape: FormShape = [
           {
             name: "processingDate",
             shape: "generic",
-            label: "Date de traitement",
+            label: Labels.processingDate,
             required: true,
             validation: {
               processingDate: nonEmptyString
@@ -169,7 +170,7 @@ export const ssdFormShape: FormShape = [
           {
             name: "processingEndDate",
             shape: "generic",
-            label: "Date de fin de traitement",
+            label: Labels.processingEndDate,
             validation: {
               processingEndDate: optionalString
             },
@@ -197,7 +198,7 @@ export const ssdFormShape: FormShape = [
         name: "administrativeActReference",
         shape: "generic",
         type: "select",
-        label: "Référence de l'acte administratif",
+        label: Labels.administrativeActReference,
         defaultOption: "Sélectionnez une référence",
         required: true,
         validation: {

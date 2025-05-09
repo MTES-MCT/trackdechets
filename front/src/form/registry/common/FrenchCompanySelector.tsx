@@ -1,5 +1,5 @@
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
-import React from "react";
+import React, { useState } from "react";
 import {
   Controller,
   type UseFormSetValue,
@@ -10,7 +10,7 @@ import CompanySelectorWrapper from "../../../Apps/common/Components/CompanySelec
 import { formatError } from "../builder/error";
 import cn from "classnames";
 import "./FrenchCompanySelector.scss";
-type InlineProps = {
+export type InlineFrenchCompanySelectorProps = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
@@ -22,7 +22,7 @@ type InlineProps = {
   ) => void;
 };
 
-type BlockProps = InlineProps & {
+type BlockProps = InlineFrenchCompanySelectorProps & {
   reducedMargin?: boolean;
 };
 
@@ -59,7 +59,8 @@ export function InlineFrenchCompanySelector({
   disabled,
   shortMode,
   onCompanySelected
-}: InlineProps) {
+}: InlineFrenchCompanySelectorProps) {
+  const [unknownCompanyError, setUnknownCompanyError] = useState(false);
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
 
   const selectedCompanyOrgId = methods.watch(fieldName);
@@ -76,10 +77,20 @@ export function InlineFrenchCompanySelector({
             disabled={disabled}
             selectedCompanyError={selectedCompanyError}
             allowForeignCompanies={false}
+            allowClosedCompanies={true}
             onCompanySelected={company => {
               if (company) {
                 field.onChange(company.orgId);
-
+                setUnknownCompanyError(false);
+                // this is not a registry field, it is used to communicate to the outside of this component
+                // so the company selection can be adapted for the case of private companies
+                methods.setValue(
+                  `${prefix}CompanyStatusDiffusion`,
+                  company.statutDiffusionEtablissement
+                );
+                if (company.orgId === selectedCompanyOrgId) {
+                  return;
+                }
                 if (shortMode) {
                   methods.setValue(`${prefix}Name`, company.name);
                 } else {
@@ -99,6 +110,9 @@ export function InlineFrenchCompanySelector({
                 onCompanySelected?.(company, methods.setValue);
               }
             }}
+            onUnknownInputCompany={() => {
+              setUnknownCompanyError(true);
+            }}
           />
 
           {errors?.[fieldName] && (
@@ -115,13 +129,41 @@ export function InlineFrenchCompanySelector({
               small
             />
           )}
+          {unknownCompanyError && (
+            <Alert
+              title="L'établissement mentionné n'existe pas dans la base SIRENE"
+              description={
+                <div>
+                  <p>SIRET : {selectedCompanyOrgId}</p>
+                  <p>
+                    Dénomination :{" "}
+                    {shortMode
+                      ? methods.getValues(`${prefix}Name`)
+                      : methods.getValues(`${prefix}CompanyName`)}
+                  </p>
+                  {!shortMode && (
+                    <p>
+                      Adresse :{" "}
+                      {[
+                        methods.getValues(`${prefix}CompanyAddress`),
+                        methods.getValues(`${prefix}CompanyPostalCode`),
+                        methods.getValues(`${prefix}CompanyCity`)
+                      ].join(" ")}
+                    </p>
+                  )}
+                </div>
+              }
+              severity="error"
+              small
+            />
+          )}
         </>
       )}
     />
   );
 }
 
-const selectedCompanyError = (company: CompanySearchResult) => {
+export const selectedCompanyError = (company: CompanySearchResult) => {
   if (company.etatAdministratif !== "A") {
     // Lors de l'écriture de ces lignes, `searchCompanies` renvoie des établissements
     // fermés lorsque l'on fait une recherche pas raison sociale. Si ce problème est traité

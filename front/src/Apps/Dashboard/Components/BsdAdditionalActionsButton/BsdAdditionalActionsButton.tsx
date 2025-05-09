@@ -64,6 +64,7 @@ function BsdAdditionalActionsButton({
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
+    active: isOpen,
     onClickOutside: () => setisOpen(false)
   });
 

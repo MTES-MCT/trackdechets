@@ -30,7 +30,7 @@ type FormValues = IncomingTexsLineInput & {
 
 const DEFAULT_VALUES: Partial<FormValues> = {
   wastePop: false,
-  weightIsEstimate: false,
+  weightIsEstimate: true,
   wasteIsDangerous: false,
   noTraceability: false,
   isUpcycled: false,
