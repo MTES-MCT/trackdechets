@@ -229,8 +229,10 @@ const registryToLookupCreateInput = (
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
     wasteCode: registryIncomingWaste.wasteCode,
-    ...generateDateInfos(registryIncomingWaste.receptionDate),
-    declaredAt: registryIncomingWaste.createdAt,
+    ...generateDateInfos(
+      registryIncomingWaste.receptionDate,
+      registryIncomingWaste.createdAt
+    ),
     registryIncomingWasteId: registryIncomingWaste.id
   };
 };
@@ -260,8 +262,10 @@ export const updateRegistryLookup = async (
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: registryIncomingWaste.wasteCode,
-        ...generateDateInfos(registryIncomingWaste.receptionDate),
-        declaredAt: registryIncomingWaste.createdAt,
+        ...generateDateInfos(
+          registryIncomingWaste.receptionDate,
+          registryIncomingWaste.createdAt
+        ),
         registryIncomingWasteId: registryIncomingWaste.id
       },
       create: registryToLookupCreateInput(registryIncomingWaste),

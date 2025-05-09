@@ -77,9 +77,9 @@ const registryToLookupCreateInput = (
     wasteType: RegistryExportWasteType.DND,
     wasteCode: registrySsd.wasteCode,
     ...generateDateInfos(
-      (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
+      (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
+      registrySsd.createdAt
     ),
-    declaredAt: registrySsd.createdAt,
     registrySsdId: registrySsd.id
   };
 };
@@ -107,9 +107,9 @@ export const updateRegistryLookup = async (
         reportAsSiret: registrySsd.reportAsCompanySiret,
         wasteCode: registrySsd.wasteCode,
         ...generateDateInfos(
-          (registrySsd.useDate ?? registrySsd.dispatchDate) as Date
+          (registrySsd.useDate ?? registrySsd.dispatchDate) as Date,
+          registrySsd.createdAt
         ),
-        declaredAt: registrySsd.createdAt,
         registrySsdId: registrySsd.id
       },
       create: registryToLookupCreateInput(registrySsd),

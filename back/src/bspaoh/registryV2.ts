@@ -588,9 +588,9 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         bspaoh.destinationReceptionDate ??
-          bspaoh.destinationReceptionSignatureDate
+          bspaoh.destinationReceptionSignatureDate,
+        bspaoh.createdAt
       ),
-      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -608,9 +608,9 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         transporter.transporterTakenOverAt ??
-          transporter.transporterTransportSignatureDate
+          transporter.transporterTransportSignatureDate,
+        bspaoh.createdAt
       ),
-      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -627,9 +627,9 @@ const bspaohToLookupCreateInputs = (
         wasteCode: bspaoh.wasteCode,
         ...generateDateInfos(
           transporter.transporterTakenOverAt ??
-            transporter.transporterTransportSignatureDate
+            transporter.transporterTransportSignatureDate,
+          bspaoh.createdAt
         ),
-        declaredAt: bspaoh.createdAt,
         bspaohId: bspaoh.id
       });
     }

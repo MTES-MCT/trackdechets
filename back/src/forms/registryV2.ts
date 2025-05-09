@@ -1235,6 +1235,7 @@ export const toManagedWasteV2 = (
 
 const minimalBsddForLookupSelect = {
   id: true,
+  createdAt: true,
   readableId: true,
   receivedAt: true,
   sentAt: true,
@@ -1282,7 +1283,7 @@ const bsddToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: getWasteType(form),
       wasteCode: form.wasteDetailsCode,
-      ...generateDateInfos(form.receivedAt),
+      ...generateDateInfos(form.receivedAt, form.createdAt),
       bsddId: form.id
     });
   }
@@ -1303,7 +1304,7 @@ const bsddToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: getWasteType(form),
         wasteCode: form.wasteDetailsCode,
-        ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
+        ...generateDateInfos(form.takenOverAt ?? form.sentAt!, form.createdAt),
         bsddId: form.id
       });
     });
@@ -1329,7 +1330,7 @@ const bsddToLookupCreateInputs = (
         declarationType: RegistryExportDeclarationType.BSD,
         wasteType: getWasteType(form),
         wasteCode: form.wasteDetailsCode,
-        ...generateDateInfos(form.takenOverAt ?? form.sentAt!),
+        ...generateDateInfos(form.takenOverAt ?? form.sentAt!, form.createdAt),
         bsddId: form.id
       });
     });
@@ -1355,7 +1356,7 @@ const bsddToLookupCreateInputs = (
       declarationType: RegistryExportDeclarationType.BSD,
       wasteType: getWasteType(form),
       wasteCode: form.wasteDetailsCode,
-      ...generateDateInfos(transporter.takenOverAt),
+      ...generateDateInfos(transporter.takenOverAt, form.createdAt),
       bsddId: form.id
     });
   });
