@@ -90,7 +90,7 @@ input SsdLineInput {
 
   La date d'utilisation ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
   - être antérieure ou égale à la date de traitement
   Une seule date d'utilisation ou d'expédition doit obligatoirement être renseignée.
 
@@ -106,7 +106,7 @@ input SsdLineInput {
 
   La date d'expédition ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
   - être antérieure ou égale à la date de traitement
 
   Une seule date d'utilisation ou d'expédition doit obligatoirement être renseignée.
@@ -244,7 +244,7 @@ input SsdLineInput {
 
   La date de traitement ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
   - être postérieure à la date d'utilisation ou d'expédition
 
   Valeurs acceptées :
@@ -259,7 +259,7 @@ input SsdLineInput {
 
   La date de fin de traitement ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
   - être antérieure à la date de traitement
 
   Valeurs acceptées :
@@ -542,7 +542,7 @@ input IncomingWasteLineInput {
 
   La date de réception ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   - Format ISO-8601 : YYYY-MM-DD ou YYYY-MM-DDThh:mm:ss.sssZ
@@ -1721,7 +1721,7 @@ input IncomingTexsLineInput {
 
   La date de réception ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
@@ -3099,7 +3099,7 @@ input OutgoingTexsLineInput {
 
   La date d'expédition ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
   - 2000-01-01T00:00:00.000Z
@@ -4239,7 +4239,7 @@ input OutgoingWasteLineInput {
 
   La date d'expédition ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
@@ -5531,7 +5531,7 @@ input TransportedLineInput {
 
   La date d'enlèvement ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
@@ -6147,7 +6147,7 @@ input ManagedLineInput {
 
   La date ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
@@ -6164,7 +6164,7 @@ input ManagedLineInput {
 
   La date ne peut pas :
   - être dans le futur
-  - être antérieure à J-1 an
+  - être antérieure à J-18 mois
 
   Valeurs :
   Formats Date acceptés, avec [ANNEE-MOIS-JOUR] :
