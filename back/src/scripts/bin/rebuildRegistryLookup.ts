@@ -184,7 +184,12 @@ const runIntegrityTest = async () => {
   const pageSize = args.includes("--page-size")
     ? parseInt(args[args.indexOf("--page-size") + 1])
     : 500;
+
+  const threads = args.includes("--threads")
+    ? parseInt(args[args.indexOf("--threads") + 1])
+    : 4;
   console.log("pageSize", pageSize);
+  console.log("threads", threads);
   try {
     if (integrityTest) {
       await runIntegrityTest();
@@ -194,79 +199,79 @@ const runIntegrityTest = async () => {
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("SSD")
     ) {
-      await ssdLookupUtils.rebuildLookup(pageSize);
+      await ssdLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_WASTE")
     ) {
-      await incomingWasteLookupUtils.rebuildLookup(pageSize);
+      await incomingWasteLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("INCOMING_TEXS")
     ) {
-      await incomingTexsLookupUtils.rebuildLookup(pageSize);
+      await incomingTexsLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("OUTGOING_WASTE")
     ) {
-      await outgoingWasteLookupUtils.rebuildLookup(pageSize);
+      await outgoingWasteLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("OUTGOING_TEXS")
     ) {
-      await outgoingTexsLookupUtils.rebuildLookup(pageSize);
+      await outgoingTexsLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("TRANSPORTED")
     ) {
-      await transportedLookupUtils.rebuildLookup(pageSize);
+      await transportedLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("MANAGED")
     ) {
-      await managedLookupUtils.rebuildLookup(pageSize);
+      await managedLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDD")
     ) {
-      await bsddLookupUtils.rebuildLookup(pageSize);
+      await bsddLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDA")
     ) {
-      await bsdaLookupUtils.rebuildLookup(pageSize);
+      await bsdaLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSDASRI")
     ) {
-      await bsdasriLookupUtils.rebuildLookup(pageSize);
+      await bsdasriLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSFF")
     ) {
-      await bsffLookupUtils.rebuildLookup(pageSize);
+      await bsffLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSPAOH")
     ) {
-      await bspaohLookupUtils.rebuildLookup(pageSize);
+      await bspaohLookupUtils.rebuildLookup(pageSize, threads);
     }
     if (
       bsdOrRegistryTypesToIndex.length === 0 ||
       bsdOrRegistryTypesToIndex.includes("BSVHU")
     ) {
-      await bsvhuLookupUtils.rebuildLookup(pageSize);
+      await bsvhuLookupUtils.rebuildLookup(pageSize, threads);
     }
   } catch (error) {
     console.error("Error in rebuildRegistryLookup script, exiting", error);
