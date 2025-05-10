@@ -259,8 +259,10 @@ const registryToLookupCreateInput = (
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
     wasteCode: registryOutgoingWaste.wasteCode,
-    ...generateDateInfos(registryOutgoingWaste.dispatchDate),
-    declaredAt: registryOutgoingWaste.createdAt,
+    ...generateDateInfos(
+      registryOutgoingWaste.dispatchDate,
+      registryOutgoingWaste.createdAt
+    ),
     registryOutgoingWasteId: registryOutgoingWaste.id
   };
 };
@@ -290,8 +292,10 @@ export const updateRegistryLookup = async (
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: registryOutgoingWaste.wasteCode,
-        ...generateDateInfos(registryOutgoingWaste.dispatchDate),
-        declaredAt: registryOutgoingWaste.createdAt,
+        ...generateDateInfos(
+          registryOutgoingWaste.dispatchDate,
+          registryOutgoingWaste.createdAt
+        ),
         registryOutgoingWasteId: registryOutgoingWaste.id
       },
       create: registryToLookupCreateInput(registryOutgoingWaste),
@@ -311,8 +315,9 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100) => {
+export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("OUTGOING_WASTE");
+
   await prisma.registryLookup.deleteMany({
     where: {
       registryOutgoingWasteId: { not: null }
@@ -320,16 +325,37 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
   });
   logger.logDelete();
 
+  // First, get total count for progress calculation
   const total = await prisma.registryOutgoingWaste.count({
     where: {
       isCancelled: false,
       isLatest: true
     }
   });
+
   let done = false;
   let cursorId: string | null = null;
   let processedCount = 0;
+  let operationId = 0;
+  const pendingWrites = new Map<number, Promise<void>>();
+
+  const processWrite = async (items: MinimalRegistryForLookup[]) => {
+    const createArray = items.map(
+      (registryOutgoingWaste: MinimalRegistryForLookup) =>
+        registryToLookupCreateInput(registryOutgoingWaste)
+    );
+
+    await prisma.registryLookup.createMany({
+      data: createArray,
+      skipDuplicates: true
+    });
+
+    processedCount += items.length;
+    logger.logProgress(processedCount, total);
+  };
+
   while (!done) {
+    // Sequential read
     const items = await prisma.registryOutgoingWaste.findMany({
       where: {
         isCancelled: false,
@@ -343,22 +369,31 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
       },
       select: minimalRegistryForLookupSelect
     });
-    const createArray = items.map(
-      (registryOutgoingWaste: MinimalRegistryForLookup) =>
-        registryToLookupCreateInput(registryOutgoingWaste)
-    );
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+
+    // Start the write operation
+    const currentOperationId = operationId++;
+    const writePromise = processWrite(items).finally(() => {
+      pendingWrites.delete(currentOperationId);
     });
-    processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    pendingWrites.set(currentOperationId, writePromise);
+
+    // If we've reached max concurrency, wait for one write to complete
+    if (pendingWrites.size >= threads) {
+      await Promise.race(pendingWrites.values());
+    }
+
     if (items.length < pageSize) {
       done = true;
       break;
     }
     cursorId = items[items.length - 1].id;
   }
+
+  // Wait for any remaining writes to complete
+  if (pendingWrites.size > 0) {
+    await Promise.all(pendingWrites.values());
+  }
+
   logger.logCompletion(processedCount);
 };
 

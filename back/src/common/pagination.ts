@@ -83,6 +83,75 @@ export async function getConnection<T extends { id: string }, N>(
   };
 }
 
+export type PrismaRelativePaginationArgs<T extends Record<string, any>> = {
+  skip?: number;
+  take: number;
+  cursor?: { [key in keyof T]: string };
+};
+
+type PrismaGetRelativeConnectionArgs<T extends Record<string, any>, N> = {
+  findMany: (args: PrismaRelativePaginationArgs<T>) => Promise<T[]>;
+  // a function used to convert prisma resource to connection node type
+  formatNode: (r: T) => N;
+} & GraphqlPaginationArgs;
+
+type GraphqlRelativeConnection<N> = {
+  pageInfo: PageInfo;
+  edges: { cursor: string; node: N }[];
+};
+
+export async function getRelativeConnection<T extends Record<string, any>, N>(
+  args: Exclude<PrismaGetRelativeConnectionArgs<T, N>, "skip" | "totalCount">,
+  cursorKey: keyof T = "id"
+): Promise<GraphqlRelativeConnection<N>> {
+  const gqlPaginationArgs = {
+    first: args.first,
+    after: args.after,
+    last: args.last,
+    before: args.before,
+    skip: args.skip
+  };
+
+  // validate graphql pagination args
+  validateGqlPaginationArgs(gqlPaginationArgs);
+
+  // convert to prisma pagination args
+  const { skip, take, cursor } = getPrismaPaginationArgs(gqlPaginationArgs);
+
+  // retrieves page of records
+  const records = await args.findMany({
+    skip,
+    // take one extra record to know if there is a next page
+    take: take > 0 ? take + 1 : take - 1,
+    cursor: cursor
+      ? ({ [cursorKey]: cursor.id } as { [key in keyof T]: string })
+      : undefined
+  });
+
+  const hasOtherPage = records.length > Math.abs(take);
+
+  const slice = hasOtherPage
+    ? take > 0
+      ? records.slice(0, take)
+      : records.slice(1)
+    : records;
+
+  const edges = slice.map(r => ({
+    node: args.formatNode(r),
+    cursor: r[cursorKey]
+  }));
+
+  return {
+    edges,
+    pageInfo: {
+      startCursor: edges[0]?.cursor,
+      endCursor: edges[edges.length - 1]?.cursor,
+      hasNextPage: take > 0 ? hasOtherPage : !!args.before,
+      hasPreviousPage: take < 0 ? hasOtherPage : !!args.after
+    }
+  };
+}
+
 /**
  * Validate and convert GraphQL pagination args (first, last, after, before)
  * to Prisma connection arguments (take, skip, cursor)

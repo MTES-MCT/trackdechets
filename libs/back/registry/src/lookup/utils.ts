@@ -5,13 +5,17 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { clearLine, cursorTo } from "readline";
 import { performance } from "perf_hooks";
 
-export const generateDateInfos = (date: Date) => ({
+export const generateDateInfos = (date: Date, declaredAt: Date) => ({
   date,
+  declaredAt,
   // generate a uuid v7 id
   // using the date as timestamp, so we can sort by this dateId
   // and be in date order with uniqueness
   dateId: uuidv7({
     msecs: date.getTime()
+  }),
+  declaredAtId: uuidv7({
+    msecs: declaredAt.getTime()
   })
 });
 

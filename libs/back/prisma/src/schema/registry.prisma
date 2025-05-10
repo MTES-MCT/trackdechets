@@ -904,7 +904,8 @@ model RegistryLookup {
     // should be a UUIDv7 using date as time source
     // to allow cursor based queries that required a unique key that should
     // also be the sort order
-    dateId             String                        @db.Uuid
+    dateId             String                        @default(uuid(7)) @db.Uuid
+    declaredAtId       String?                       @default(uuid(7)) @db.Uuid
 
     // foreign keys to registry models
     registrySsdId String?
@@ -947,6 +948,8 @@ model RegistryLookup {
     @@id([id, exportRegistryType, siret], name: "idExportTypeAndSiret")
     // UUIDv7 unique index used for sorting/pagination on exports
     @@unique([dateId(sort: Asc)], map: "_RegistryLookupDateIdIdx")
+    // UUIDv7 unique index used for sorting/pagination on Lookup lists
+    @@unique([declaredAtId(sort: Desc)], map: "_RegistryLookupDeclaredAtIdIdx")
     // array of elements so gin index
     @@index([reportAsSiret], map: "_RegistryLookupReportAsSiretIdx")
     // multi-column index because those columns are mandatory for any export
