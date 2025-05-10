@@ -11,3 +11,8 @@ export function isValidWebsite(s: string): boolean {
     return false;
   }
 }
+
+export const MIN_DATE_FOR_REGISTRY = {
+  years: 1,
+  months: 6
+};
