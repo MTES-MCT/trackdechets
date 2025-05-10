@@ -6,10 +6,12 @@ import { clsx } from "clsx";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { sub } from "date-fns";
 
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
 import "./FormTab.scss";
+import { MIN_DATE_FOR_REGISTRY } from "@td/constants";
 
 type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
@@ -54,6 +56,9 @@ export function FormTab({ fields, methods }: Props) {
                 nativeInputProps={{
                   type: field.type,
                   ...(field.type === "date" && {
+                    min: sub(new Date(), MIN_DATE_FOR_REGISTRY)
+                      .toISOString()
+                      .split("T")[0],
                     max: new Date().toISOString().split("T")[0]
                   }),
                   ...methods.register(field.name)
