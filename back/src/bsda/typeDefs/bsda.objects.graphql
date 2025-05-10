@@ -164,6 +164,8 @@ type BsdaWaste {
   consistence: BsdaConsistence
   "Numéros de scellés"
   sealNumbers: [String!]
+  "Si le déchet est soumis à l'ADR ou non"
+  isSubjectToADR: Boolean
   "Mention ADR"
   adr: String
   "Contient des Polluants Organiques Persistants (POP) oui / non"

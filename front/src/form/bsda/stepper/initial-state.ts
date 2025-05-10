@@ -65,6 +65,7 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
     ecoOrganisme: bsda?.ecoOrganisme ?? null,
     waste: {
       code: bsda?.waste?.code ?? "",
+      isSubjectToADR: bsda?.waste?.isSubjectToADR ?? true,
       familyCode: bsda?.waste?.familyCode ?? "",
       materialName: bsda?.waste?.materialName ?? "",
       consistence: bsda?.waste?.consistence ?? BsdaConsistence.Solide,

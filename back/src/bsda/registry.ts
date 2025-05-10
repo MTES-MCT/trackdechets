@@ -1,5 +1,8 @@
 import { Bsda } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import {
+  getBsdaWasteADRMention,
+  getTransporterCompanyOrgId
+} from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import type {
   AllWaste,
@@ -375,7 +378,10 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr: getBsdaWasteADRMention({
+      adr: bsda?.wasteAdr,
+      isSubjectToADR: bsda?.wasteIsSubjectToADR
+    }),
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress,

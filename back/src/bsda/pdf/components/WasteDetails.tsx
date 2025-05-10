@@ -1,5 +1,6 @@
 import * as React from "react";
 import type { BsdaPackaging, BsdaWaste, BsdaWeight } from "@td/codegen-back";
+import { isDefined } from "../../../common/helpers";
 
 type Props = {
   waste?: BsdaWaste | null;
@@ -13,6 +14,10 @@ const CONSISTANCE = {
   SOLIDE: "Solide"
 };
 export function WasteDetails({ waste, weight }: Props) {
+  const displayADRArticle =
+    Boolean(weight?.isEstimate) &&
+    (!isDefined(waste?.isSubjectToADR) || waste?.isSubjectToADR === true);
+
   return (
     <>
       <p>
@@ -34,7 +39,9 @@ export function WasteDetails({ waste, weight }: Props) {
         />{" "}
         Estimée
         <br />
-        "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2" de l'ADR 2023
+        {displayADRArticle && (
+          <>"QUANTITÉ ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2 de l'ADR"</>
+        )}
       </p>
     </>
   );

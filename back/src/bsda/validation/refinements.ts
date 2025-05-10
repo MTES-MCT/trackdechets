@@ -36,6 +36,7 @@ import {
   refineSiretAndGetCompany
 } from "../../common/validation/zod/refinement";
 import { CompanyRole } from "../../common/validation/zod/schema";
+import { isDefined } from "../../common/helpers";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -633,6 +634,38 @@ export const validateDestinationReceptionWeight: (
         message: `Le poids du déchet reçu doit être renseigné et non nul.`,
         fatal: true
       });
+    }
+  };
+};
+
+export const wasteAdrRefinement: (
+  validationContext: BsdaValidationContext
+) => Refinement<ParsedZodBsda> = validationContext => {
+  const currentSignatureType = validationContext.currentSignatureType;
+  return (bsda, zodContext) => {
+    // Draft
+    if (!currentSignatureType) return;
+
+    const { addIssue } = zodContext;
+    const { wasteAdr, wasteIsSubjectToADR } = bsda;
+
+    // New method: using the switch wasteIsSubjectToADR
+    if (isDefined(wasteIsSubjectToADR)) {
+      if (wasteIsSubjectToADR === true && !isDefined(wasteAdr)) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`,
+          fatal: true
+        });
+        return;
+      } else if (wasteIsSubjectToADR === false && isDefined(wasteAdr)) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR.`,
+          fatal: true
+        });
+        return;
+      }
     }
   };
 };

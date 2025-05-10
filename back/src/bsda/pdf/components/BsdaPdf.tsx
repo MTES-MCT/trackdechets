@@ -15,7 +15,7 @@ import {
   CompanyDescription
 } from "../../../common/pdf/components/Company";
 import Transporter from "../../../common/pdf/components/Transporter";
-import { pluralize } from "@td/constants";
+import { getBsdaWasteADRMention, pluralize } from "@td/constants";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
 
 type Props = {
@@ -154,7 +154,7 @@ export function BsdaPdf({
               weight={bsda?.weight}
             />
             Mention au titre des règlements ADR/RID/ADN/IMDG (le cas échéant) :{" "}
-            {bsda?.waste?.adr}
+            {getBsdaWasteADRMention(bsda?.waste)}
           </div>
           <div className="BoxCol">
             <PackagingsTable packagings={bsda?.packagings ?? []} />
