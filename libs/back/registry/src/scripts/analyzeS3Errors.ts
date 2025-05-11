@@ -136,9 +136,7 @@ async function main() {
   const errorCounts = new Map<string, ErrorStats>();
 
   console.log(`Analyzing errors in S3 bucket: s3://${bucketName}/`);
-  console.log(
-    `Attempting to process up to ${maxFilesToProcess} files.`
-  );
+  console.log(`Attempting to process up to ${maxFilesToProcess} files.`);
   console.log(`Displaying top ${topN} errors.`);
 
   let continuationToken: string | undefined = undefined;
