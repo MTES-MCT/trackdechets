@@ -130,3 +130,13 @@ type RegistryLookup {
   managedWaste: ManagedLine
   transportedWaste: TransportedLine
 }
+
+type RegistryLookupConnection {
+  pageInfo: PageInfo!
+  edges: [RegistryLookupEdge!]!
+}
+
+type RegistryLookupEdge {
+  cursor: String!
+  node: RegistryLookup!
+}

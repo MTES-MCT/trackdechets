@@ -324,25 +324,6 @@ export function MyExports() {
             <InlineLoader />
           )}
         </div>
-
-        {/* <div className="tw-p-6">
-          {!exportsLoading ? (
-            <Table
-              bordered
-              caption="Exports récents"
-              className={styles.fullWidthTable}
-              data={tableData}
-              headers={[
-                "Date",
-                "Établissements",
-                "Type de registre",
-                "Type de déclaration",
-                "Période",
-                "Fichier"
-              ]}
-            />
-          ) : <InlineLoader />}
-        </div> */}
         <div className="tw-flex tw-justify-center">
           <Pagination
             showFirstLast
