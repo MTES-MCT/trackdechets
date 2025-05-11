@@ -8,10 +8,12 @@ const Link = ({
   children: React.ReactNode;
   [key: string]: any;
 }) => {
-  return rest["aria-disabled"] === true ? (
+  return rest.disabled === true ? (
     <a {...rest}>{children}</a>
   ) : (
-    <button {...rest}>{children}</button>
+    <button type="button" {...rest}>
+      {children}
+    </button>
   );
 };
 
@@ -42,13 +44,12 @@ const CursorPagination = ({
         <li>
           <Link
             className="fr-link fr-pagination__link fr-pagination__link--first"
-            onClick={event => {
-              event.preventDefault();
-              if (!contentLoading) {
+            onClick={() => {
+              if (hasPreviousPage && !contentLoading) {
                 onFirstClick();
               }
             }}
-            aria-disabled={!hasPreviousPage || contentLoading}
+            disabled={!hasPreviousPage || contentLoading}
             title="Première page"
           >
             Première page
@@ -57,37 +58,26 @@ const CursorPagination = ({
         <li>
           <Link
             className="fr-link fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
-            onClick={event => {
-              event.preventDefault();
-              if (!contentLoading) {
+            onClick={() => {
+              if (hasPreviousPage && !contentLoading) {
                 onPreviousClick();
               }
             }}
-            aria-disabled={!hasPreviousPage || contentLoading}
+            disabled={!hasPreviousPage || contentLoading}
             title="Page précédente"
           >
             Page précédente
           </Link>
         </li>
-        {/* <li>
-          <Link
-            className="fr-link fr-pagination__link"
-            title={`Page ${currentPage}`}
-            aria-current="page"
-          >
-            {currentPage}
-          </Link>
-        </li> */}
         <li>
           <Link
             className="fr-link fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
-            onClick={event => {
-              event.preventDefault();
-              if (!contentLoading) {
+            onClick={() => {
+              if (hasNextPage && !contentLoading) {
                 onNextClick();
               }
             }}
-            aria-disabled={!hasNextPage || contentLoading}
+            disabled={!hasNextPage || contentLoading}
             title="Page suivante"
           >
             Page suivante
@@ -96,13 +86,12 @@ const CursorPagination = ({
         <li>
           <Link
             className="fr-link fr-pagination__link fr-pagination__link--last"
-            onClick={event => {
-              event.preventDefault();
-              if (!contentLoading) {
+            onClick={() => {
+              if (hasNextPage && !contentLoading) {
                 onLastClick();
               }
             }}
-            aria-disabled={!hasNextPage || contentLoading}
+            disabled={!hasNextPage || contentLoading}
             title="Dernière page"
           >
             Dernière page
