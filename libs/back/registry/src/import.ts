@@ -158,7 +158,7 @@ export async function processStream({
       }
     }
   } catch (err) {
-    logger.error(`Error processing import ${importId}`, { importId, err });
+    logger.error(`Error processing import ${importId}`, err);
     errorStream.write({ errors: INTERNAL_ERROR });
   } finally {
     errorStream.end();
