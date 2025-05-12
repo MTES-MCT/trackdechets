@@ -114,7 +114,7 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
               siret,
               id: bsda.id
             })}
-            className="btn btn--primary"
+            className="fr-btn fr-btn--primary"
           >
             Mettre le bordereau à jour pour le signer
           </Link>

@@ -521,7 +521,6 @@ function BsdCardList({
         <ActBsdaValidation
           bsd={bsdClicked as Bsda}
           currentSiret={siret}
-          isOpen={isModalOpen}
           onClose={onClose}
         />
       )}
@@ -537,7 +536,6 @@ function BsdCardList({
         <ActBsvhuValidation
           bsd={bsdClicked as Bsvhu}
           currentSiret={siret}
-          isOpen={isModalOpen}
           onClose={onClose}
         />
       )}

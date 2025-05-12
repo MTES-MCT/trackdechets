@@ -1,41 +1,28 @@
 import React from "react";
-import SignOperation from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
 import SignBsdaTransport from "../../Bsda/SignBsdaTransport";
 import SignBsdaWork from "../../Bsda/SignBsdaWork";
 import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import { isCollection_2710 } from "../../../dashboardServices";
 import SignBsdaEmission from "../../Bsda/SignBsdaEmission";
+import SignBsdaReception from "../../Bsda/SignBsdaReception";
+import SignBsdaOperation from "../../Bsda/SignBsdaOperation";
 
 interface ActBsdaValidationProps {
   bsd: Bsda;
   currentSiret: string;
-  isOpen: boolean;
   onClose: () => void;
 }
 const ActBsdaValidation = ({
   bsd,
   currentSiret,
-  isOpen,
   onClose
 }: ActBsdaValidationProps) => {
-  const actionButtonAdapterProps = {
-    isModalOpenFromParent: isOpen,
-    onModalCloseFromParent: onClose,
-    displayActionButton: false
-  };
-
   const renderInitialModal = () => {
     if (
       isCollection_2710(bsd["bsdaType"]) &&
       currentSiret === bsd.destination?.company?.siret
     ) {
-      return (
-        <SignOperation
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaReception bsdaId={bsd.id} onClose={onClose} />;
     }
 
     if (
@@ -80,13 +67,11 @@ const ActBsdaValidation = ({
       return <SignBsdaTransport bsdaId={bsd.id} onClose={onClose} />;
     }
 
-    return (
-      <SignOperation
-        siret={currentSiret}
-        bsdaId={bsd.id}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignBsdaReception bsdaId={bsd.id} onClose={onClose} />;
+  };
+
+  const renderReceivedModal = () => {
+    return <SignBsdaOperation bsdaId={bsd.id} onClose={onClose} />;
   };
 
   const status = bsd["bsdaStatus"];
@@ -96,6 +81,7 @@ const ActBsdaValidation = ({
       {status === BsdaStatus.SignedByProducer && renderSignedByProducerModal()}
       {status === BsdaStatus.SignedByWorker && renderSignedByWorkerModal()}
       {status === BsdaStatus.Sent && renderSentModal()}
+      {status === BsdaStatus.Received && renderReceivedModal()}
     </>
   );
 };
