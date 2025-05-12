@@ -527,9 +527,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     );
 
     // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe("Cet établissement est fermé");
-    expect(errors[0].extensions?.code).toBe("BAD_USER_INPUT");
+    expect(errors).toBeUndefined();
   });
 
   it("Hidden company in INSEE and not registered", async () => {

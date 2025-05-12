@@ -1,11 +1,7 @@
 import { AuthType } from "../auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
-import type {
-  CompanySearchResult,
-  CompanyInput,
-  StatutDiffusionEtablissement
-} from "@td/codegen-back";
+import type { CompanySearchResult, CompanyInput } from "@td/codegen-back";
 import { logger } from "@td/logger";
 import { escapeRegExp } from "../utils";
 import { SireneSearchResult } from "./sirene/types";
@@ -168,10 +164,7 @@ export function nextBuildSirenify<T>(
         continue;
       }
       const company = companySearchResult as CompanySearchResult;
-      if (
-        company.statutDiffusionEtablissement ===
-        ("P" as StatutDiffusionEtablissement)
-      ) {
+      if (company.statutDiffusionEtablissement === "P") {
         continue;
       }
       if (company.etatAdministratif === "F") {

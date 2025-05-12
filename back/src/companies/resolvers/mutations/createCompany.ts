@@ -105,8 +105,15 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     throw new UserInputError(CLOSED_COMPANY_ERROR);
   }
 
-  if (isAnonymousCompany(companyInfo) && !companyInfo.isRegistered) {
-    throw new AnonymousCompanyError();
+  if (isAnonymousCompany(companyInfo)) {
+    const anonymousCompany = await prisma.anonymousCompany.findUnique({
+      where: {
+        orgId: companyInfo.orgId
+      }
+    });
+    if (!anonymousCompany) {
+      throw new AnonymousCompanyError();
+    }
   }
 
   const companyCreateInput: Prisma.CompanyCreateInput = {
