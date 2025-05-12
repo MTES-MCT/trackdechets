@@ -51,7 +51,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       const error = errors[0];
@@ -66,7 +66,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       const error = errors[0];
@@ -89,16 +89,17 @@ describe("Error handling", () => {
       mockFoo.mockResolvedValueOnce("bar");
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       expect(body.singleResult.errors).toBeUndefined();
       expect(body.singleResult.data).toEqual({ foo: "bar" });
     });
 
     test("GRAPHQL_VALIDATION_ERROR should resolves correctly", async () => {
-      const { body } = await server.executeOperation({
-        query: "query { foobar }" // query inconnue
-      });
+      const { body } = await server.executeOperation(
+        { query: "query { foobar }" }, // query inconnue
+        { contextValue: { req: {}, res: { locals: {} } } }
+      );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
       const error = errors[0];
@@ -109,9 +110,10 @@ describe("Error handling", () => {
     });
 
     test("GRAPHQL_PARSE_FAILED error should resolves correctly", async () => {
-      const { body } = await server.executeOperation({
-        query: "query { foo" // missing bracket
-      });
+      const { body } = await server.executeOperation(
+        { query: "query { foo" }, // missing bracket
+        { contextValue: { req: {}, res: { locals: {} } } }
+      );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
       const error = errors[0];
@@ -127,7 +129,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -142,7 +144,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -157,7 +159,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -175,7 +177,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -193,7 +195,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -209,7 +211,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       expect(errors).toHaveLength(1);
@@ -227,7 +229,7 @@ describe("Error handling", () => {
           query: BAR,
           variables
         },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       const error = errors[0];
@@ -252,7 +254,7 @@ describe("Error handling", () => {
       });
       const { body } = await server.executeOperation(
         { query: FOO },
-        { contextValue: { req: {} } }
+        { contextValue: { req: {}, res: { locals: {} } } }
       );
       const errors = body.singleResult.errors;
       const error = errors[0];
