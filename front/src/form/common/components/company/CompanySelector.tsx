@@ -181,13 +181,11 @@ export default function CompanySelector({
     );
 
     const reshapedSearchResults =
-      searchCompanies
-        .filter(company => company.etatAdministratif === "A")
-        .map(company => ({
-          ...company,
-          codePaysEtrangerEtablissement:
-            company.codePaysEtrangerEtablissement || "FR"
-        })) ?? [];
+      searchCompanies.map(company => ({
+        ...company,
+        codePaysEtrangerEtablissement:
+          company.codePaysEtrangerEtablissement || "FR"
+      })) ?? [];
 
     const results = [...reshapedSearchResults, ...reshapedFavorites];
     setSearchResults(results);

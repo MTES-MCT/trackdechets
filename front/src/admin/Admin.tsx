@@ -165,11 +165,7 @@ export default function Admin() {
         </Accordion>
       </SideBar>
 
-      <div
-        id="admin-content"
-        className="dashboard-content fr-p-4w"
-        tabIndex={-1}
-      >
+      <div id="admin-content" className="dashboard-content" tabIndex={-1}>
         <Routes>
           <Route
             path={toRelative(routes.admin.verification)}

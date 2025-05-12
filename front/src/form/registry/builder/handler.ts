@@ -13,7 +13,13 @@ export function handleMutationResponse(
   const { stats, errors } = response;
   if (errors?.[0]?.issues) {
     for (const issue of errors[0].issues) {
-      methods.setError(issue.path as any, {
+      const path = issue.path.startsWith("transporter")
+        ? issue.path.replace(
+            /^transporter([1-5])(.*)$/,
+            (_, index, rest) => `transporter.${parseInt(index) - 1}.${rest}`
+          )
+        : issue.path;
+      methods.setError(path as any, {
         type: "server",
         message: issue.message
       });
@@ -22,8 +28,10 @@ export function handleMutationResponse(
   }
 
   if (stats.skipped) {
-    methods.setError("root.skippedError", {
-      type: "server"
+    methods.setError("publicId", {
+      type: "server",
+      message:
+        "Le numéro unique saisi est déjà utilisé. Si vous souhaitez modifier une déclaration existante, vous pouvez la retrouver depuis le tableau de bord des déclarations."
     });
     return false;
   }

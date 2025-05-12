@@ -17,7 +17,7 @@ export async function transformAndRefineReason(
 
   return transformAndRefineItemReason<ParsedZodIncomingTexsItem>(
     incomingTexsItem,
-    incomingTexsItemInDb?.id,
+    incomingTexsItemInDb,
     ctx
   );
 }

@@ -19,7 +19,7 @@ export async function transformAndRefineReason(
 
   return transformAndRefineItemReason<ParsedZodTransportedItem>(
     transportedItem,
-    transportedItemInDb?.id,
+    transportedItemInDb,
     ctx
   );
 }
@@ -31,9 +31,10 @@ export async function transformReportForRecepisseNumber(
 
   if (
     !transportedItem.reportForRecepisseNumber &&
-    company?.transporterReceiptId
+    company?.transporterReceipt?.receiptNumber
   ) {
-    transportedItem.reportForRecepisseNumber = company?.transporterReceiptId;
+    transportedItem.reportForRecepisseNumber =
+      company?.transporterReceipt.receiptNumber;
   }
 
   return transportedItem;

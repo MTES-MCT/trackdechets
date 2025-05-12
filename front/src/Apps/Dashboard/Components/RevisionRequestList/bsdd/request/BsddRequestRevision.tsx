@@ -49,6 +49,7 @@ import {
   TITLE_REQUEST_LIST
 } from "../../../Revision/wordingsRevision";
 import { resetPackagingIfUnchanged } from "../../common/Components/Packagings/packagings";
+import { bsddPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 
 type Props = {
   bsdd: Bsdd;
@@ -250,7 +251,10 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   initialValue={bsdd.wasteDetails?.packagingInfos}
                 >
                   <p className="fr-text fr-mb-2w">Nouveaux conditionnements</p>
-                  <RhfPackagingList fieldName="wasteDetails.packagingInfos" />
+                  <RhfPackagingList
+                    fieldName="wasteDetails.packagingInfos"
+                    packagingTypes={bsddPackagingTypes}
+                  />
                 </RhfReviewableField>
 
                 {hasBeenReceived && (

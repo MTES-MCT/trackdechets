@@ -209,6 +209,10 @@ input BsdaPackagingInput {
   other: String
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
+  "Volume du conditionnement en litre(s)"
+  volume: Float
+  "Numéros des contenants"
+  identificationNumbers: [String!]
 }
 
 input BsdaWeightInput {

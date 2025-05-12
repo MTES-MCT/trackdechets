@@ -19,7 +19,7 @@ import {
   transportModeSchema,
   transportRecepisseNumberSchema,
   booleanSchema,
-  gistridNumberSchema,
+  ttdNumberSchema,
   parcelNumbersSchema,
   getOperationModeSchema
 } from "../schemas";
@@ -217,17 +217,17 @@ describe("Schemas", () => {
     expect(getOperationModeSchema().parse(null)).toBe(null);
   });
 
-  test("gistridNumberSchema", () => {
-    expect(() => gistridNumberSchema.parse("AA1234567890")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("FR 2023 077002")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("AA 1234 567890")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("AAA 1234567890")).toThrow();
-    expect(() => gistridNumberSchema.parse("AA 12345 678901")).toThrow();
+  test("ttdNumberSchema", () => {
+    expect(() => ttdNumberSchema.parse("AA1234567890")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 2023 077002")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("AA 1234 567890")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("AAA 1234567890")).toThrow();
+    expect(() => ttdNumberSchema.parse("AA 12345 678901")).toThrow();
 
-    expect(() => gistridNumberSchema.parse("A7E 2024 063125")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("A7E2024063125")).not.toThrow();
-    expect(() => gistridNumberSchema.parse("A7E 2024 0631256")).toThrow();
-    expect(() => gistridNumberSchema.parse("A7E 2024 06312")).toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 063125")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 0631256")).toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 2024 06312")).toThrow();
   });
 
   test("parcelNumbersSchema", () => {

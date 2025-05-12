@@ -3,13 +3,12 @@ import Tabs from "@codegouvfr/react-dsfr/Tabs";
 
 import { StatsTab } from "./StatsTab";
 import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
-import Container from "../../../Apps/common/Components/Container/Container";
 export function CompanyImports() {
   const [siret, setSiret] = useState<string | undefined>();
   const [selectedTabId, setSelectedTabId] = useState("API");
 
   return (
-    <Container>
+    <>
       <div>
         <RegistryCompanySwitcher onCompanySelect={v => setSiret(v)} />
       </div>
@@ -32,6 +31,6 @@ export function CompanyImports() {
           <StatsTab source={selectedTabId as "API" | "FILE"} siret={siret} />
         </Tabs>
       </div>
-    </Container>
+    </>
   );
 }

@@ -1,4 +1,4 @@
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   Mutation,
   Query,
@@ -17,32 +17,18 @@ import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
-import { GET_SSD_REGISTRY_LOOKUP } from "./query";
+import { ADD_TO_SSD_REGISTRY, GET_SSD_REGISTRY_LOOKUP } from "../queries";
 import { ssdFormShape } from "./shape";
 import { SEARCH_COMPANIES } from "../../../Apps/common/queries/company/query";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = { onClose: () => void };
 
-const ADD_TO_SSD_REGISTRY = gql`
-  mutation AddToSsdRegistry($lines: [SsdLineInput!]!) {
-    addToSsdRegistry(lines: $lines) {
-      stats {
-        errors
-        skipped
-        insertions
-        edits
-        cancellations
-      }
-      errors {
-        issues {
-          path
-          message
-        }
-      }
-    }
-  }
-`;
+const DEFAULT_VALUES: Partial<SsdLineInput> = {
+  weightIsEstimate: true,
+  secondaryWasteCodes: [],
+  secondaryWasteDescriptions: []
+};
 
 export function RegistrySsdForm({ onClose }: Props) {
   const { search } = useLocation();
@@ -51,9 +37,8 @@ export function RegistrySsdForm({ onClose }: Props) {
 
   const methods = useForm<SsdLineInput>({
     defaultValues: {
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined,
-      secondaryWasteCodes: [],
-      secondaryWasteDescriptions: []
+      ...DEFAULT_VALUES,
+      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null
     },
     resolver: zodResolver(schemaFromShape(ssdFormShape))
   });
@@ -77,13 +62,14 @@ export function RegistrySsdForm({ onClose }: Props) {
           );
 
           methods.reset({
+            ...DEFAULT_VALUES,
             ...definedSsdProps,
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
             dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
             useDate: isoDateToHtmlDate(definedSsdProps.useDate),
             reason: RegistryLineReason.Edit
           });
-          setDisabledFieldNames(["publicId"]);
+          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
       }
     }
@@ -145,23 +131,7 @@ export function RegistrySsdForm({ onClose }: Props) {
   async function onSubmit(data: any) {
     const result = await addToSsdRegistry({
       variables: {
-        lines: [
-          {
-            ...data,
-            reason: data.reason || null,
-            wasteCodeBale: data.wasteCodeBale || null,
-            product: data.product || null,
-            dispatchDate: data.dispatchDate || null,
-            useDate: data.useDate || null,
-            secondaryWasteCodes: data.secondaryWasteCodes?.filter(Boolean),
-            secondaryWasteDescriptions:
-              data.secondaryWasteDescriptions?.filter(Boolean),
-            weightValue: data.weightValue ? parseFloat(data.weightValue) : null,
-            volume: data.volume ? parseFloat(data.volume) : null,
-            weightIsEstimate: data.weightIsEstimate === "true",
-            processingEndDate: data.processingEndDate || null
-          }
-        ]
+        lines: [data]
       }
     });
 

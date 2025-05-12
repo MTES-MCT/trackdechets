@@ -17,8 +17,8 @@ const RegistryTable = ({
   return (
     <Table
       bordered
-      noCaption={!caption}
       className={styles.fullWidthTable}
+      noCaption={!caption}
       data={data}
       headers={headers}
       caption={caption}

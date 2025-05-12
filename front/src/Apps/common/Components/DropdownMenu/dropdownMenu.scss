@@ -1,6 +1,4 @@
 .dropdown-menu {
-  position: relative;
-
   &--primary {
     .menu-btn::after {
       background: url("/icons/dashboard/arrow-s-line-primary.svg") !important;
@@ -30,8 +28,6 @@
   }
 
   &__content {
-    position: absolute;
-    display: block;
     background-color: #fff;
     width: fit-content;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);

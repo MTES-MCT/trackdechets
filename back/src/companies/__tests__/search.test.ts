@@ -85,6 +85,7 @@ describe("searchCompany by org identifier", () => {
     process.env.ALLOW_TEST_COMPANY = "false";
     // re-load variables with custom env
     jest.resetModules();
+    const searchCompany = require("../search").searchCompany;
     expect.assertions(1);
     try {
       await searchCompany("00000012354659");
@@ -221,7 +222,7 @@ describe("searchCompanies", () => {
       codePaysEtrangerEtablissement: "FR"
     };
     searchCompanyMock.mockResolvedValue(company);
-    const companies = await searchCompanies(siret.split("").join(","));
+    const companies = await searchCompanies(siret.split("").join("*"));
     expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies[0]).toStrictEqual(company);
   });
@@ -241,7 +242,7 @@ describe("searchCompanies", () => {
       etatAdministratif: "A"
     };
     searchCompanyMock.mockResolvedValue(company);
-    await searchCompanies("IT09301420155");
+    await searchCompanies("IT09301420155", null, true);
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
@@ -260,7 +261,7 @@ describe("searchCompanies", () => {
       etatAdministratif: "A"
     };
     searchCompanyMock.mockResolvedValue(company);
-    await searchCompanies("IT09301420155".split("").join("."));
+    await searchCompanies("IT09301420155".split("").join("*"), null, true);
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
@@ -336,28 +337,10 @@ describe("searchCompanies", () => {
     expect(mockSearchCompaniesBackend).toHaveBeenCalledTimes(1);
     expect(mockSearchCompaniesBackend).toHaveBeenCalledWith(
       "ACME OF TRACKDECHETS",
-      undefined
+      undefined,
+      true
     );
     expect(searchCompanyMock).toHaveBeenCalledTimes(0);
-  });
-
-  it(`should not return closed companies when searching by SIRET`, async () => {
-    const siret = siretify(1);
-    searchCompanyMock.mockResolvedValue({
-      siret,
-      name: "ACME",
-      naf: "NAF",
-      libelleNaf: "Autres activités",
-      codeCommune: "13001",
-      address: "40 boulevard Voltaire 13001 Marseille",
-      addressVoie: "40 boulevard",
-      addressCity: "Marseille",
-      addressPostalCode: "13001",
-      etatAdministratif: "F"
-    });
-    const companies = await searchCompanies(siret);
-    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
-    expect(companies).toStrictEqual([]);
   });
 
   it(`should return [] if SIRET does not exist when searching by SIRET`, async () => {

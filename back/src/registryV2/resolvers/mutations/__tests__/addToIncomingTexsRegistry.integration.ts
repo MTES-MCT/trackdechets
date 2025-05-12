@@ -84,9 +84,8 @@ function getCorrectLine(siret: string) {
     operationCode: "R 5",
     operationMode: "RECYCLAGE",
     noTraceability: false,
-    nextDestinationIsAbroad: false,
     isUpcycled: false,
-    gistridNumber: null,
+    ttdImportNumber: null,
     movementNumber: null,
     nextOperationCode: null,
     transporter1TransportMode: "ROAD",
@@ -417,5 +416,42 @@ describe("Registry - addToIncomingTexsRegistry", () => {
       cancelled: [expect.objectContaining({ publicId: lines[1].publicId })],
       skipped: [expect.objectContaining({ publicId: lines[2].publicId })]
     });
+  });
+
+  it("should allow re-creating a line that was cancelled without passing a reason", async () => {
+    const { user, company } = await userWithCompanyFactory();
+
+    const { mutate } = makeClient(user);
+
+    const lines = [getCorrectLine(company.orgId)];
+
+    // Insert line
+    const res1 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+    expect(res1.errors).toBeUndefined();
+    expect(res1.data.addToIncomingTexsRegistry.stats.insertions).toBe(1);
+
+    // Cancel already existing line
+    const res2 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      {
+        variables: {
+          lines: [{ ...lines[0], reason: "CANCEL" }]
+        }
+      }
+    );
+    expect(res2.errors).toBeUndefined();
+    expect(res2.data.addToIncomingTexsRegistry.stats.cancellations).toBe(1);
+
+    // Now re-create the line without passing a reason
+    const res3 = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+    expect(res3.errors).toBeUndefined();
+    expect(res3.data.addToIncomingTexsRegistry.stats.insertions).toBe(0); // It's not an insertion
+    expect(res3.data.addToIncomingTexsRegistry.stats.edits).toBe(1); // It's an edit, even if no reason was passed in
   });
 });

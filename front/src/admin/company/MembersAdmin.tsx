@@ -32,7 +32,7 @@ export function MembersAdmin() {
   return (
     <div>
       <div>
-        <h3 className="fr-h3 fr-mt-4w">Recherche une entreprise</h3>
+        <h3 className="fr-sr-only">Recherche une entreprise</h3>
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -44,7 +44,7 @@ export function MembersAdmin() {
           <div className="fr-grid-row fr-grid-row--bottom">
             <div className="fr-col-8">
               <Input
-                label="SIRET ou Numéro TVA"
+                label="Recherche par SIRET ou n° de TVA"
                 nativeInputProps={{
                   required: true,
                   name: "clue"

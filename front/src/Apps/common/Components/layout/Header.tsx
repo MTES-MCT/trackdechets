@@ -73,11 +73,7 @@ const MenuLink = ({ entry }) => {
   );
 };
 
-function DashboardSubNav({
-  currentCompany,
-  canViewNewRegistry,
-  canViewRegistryIHM
-}) {
+function DashboardSubNav({ currentCompany }) {
   const { permissions, role } = usePermissions();
 
   const location = useLocation();
@@ -145,6 +141,15 @@ function DashboardSubNav({
     location.pathname
   );
 
+  const matchRegistryLines = matchPath(
+    {
+      path: routes.registry_new.lines,
+      caseSensitive: false,
+      end: false
+    },
+    location.pathname
+  );
+
   const matchRegistryExport = matchPath(
     {
       path: routes.registry_new.export,
@@ -154,9 +159,9 @@ function DashboardSubNav({
     location.pathname
   );
 
-  const matchRegistryLines = matchPath(
+  const matchRegistryExhaustiveExport = matchPath(
     {
-      path: routes.registry_new.lines,
+      path: routes.registry_new.exhaustive,
       caseSensitive: false,
       end: false
     },
@@ -172,8 +177,10 @@ function DashboardSubNav({
   const matchRegistryV2Tab =
     !!matchRegistryImport ||
     !!matchRegistryCompanyImports ||
-    !!matchRegistryExport ||
     !!matchRegistryLines;
+
+  const matchExportTab =
+    !!matchRegistryExport || !!matchRegistryExhaustiveExport;
 
   const { showTransportTabs } = useShowTransportTabs(
     currentCompany.companyTypes,
@@ -347,46 +354,37 @@ function DashboardSubNav({
           </div>
         </li>
       )}
-      {showRegistryTab && canViewNewRegistry && (
-        <li className="fr-nav__item">
-          <button
-            className="fr-nav__btn"
-            aria-expanded={false}
-            aria-current={matchRegistryV2Tab}
-            aria-controls="menu-registry"
-          >
-            {"🆕 Mes registres (beta)"}
-          </button>
-          <div className="fr-collapse fr-menu" id="menu-registry">
-            <ul className="fr-menu__list">
-              <li>
-                <MenuLink
-                  entry={{
-                    navlink: true,
-                    caption: "Mes imports",
-                    href: routes.registry_new.myImports
-                  }}
-                />
-              </li>
-              <li>
-                <MenuLink
-                  entry={{
-                    navlink: true,
-                    caption: "Imports par établissement",
-                    href: routes.registry_new.companyImports
-                  }}
-                />
-              </li>
-              <li>
-                <MenuLink
-                  entry={{
-                    navlink: true,
-                    caption: "Exports",
-                    href: routes.registry_new.export
-                  }}
-                />
-              </li>
-              {canViewRegistryIHM && (
+      {showRegistryTab && (
+        <>
+          <li className="fr-nav__item">
+            <button
+              className="fr-nav__btn"
+              aria-expanded={false}
+              aria-current={matchRegistryV2Tab}
+              aria-controls="menu-registry"
+            >
+              Registre national
+            </button>
+            <div className="fr-collapse fr-menu" id="menu-registry">
+              <ul className="fr-menu__list">
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: "Mes imports",
+                      href: routes.registry_new.myImports
+                    }}
+                  />
+                </li>
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: "Imports par établissement",
+                      href: routes.registry_new.companyImports
+                    }}
+                  />
+                </li>
                 <li>
                   <MenuLink
                     entry={{
@@ -396,10 +394,42 @@ function DashboardSubNav({
                     }}
                   />
                 </li>
-              )}
-            </ul>
-          </div>
-        </li>
+              </ul>
+            </div>
+          </li>
+          <li className="fr-nav__item">
+            <button
+              className="fr-nav__btn"
+              aria-expanded={false}
+              aria-current={matchExportTab}
+              aria-controls="menu-exports"
+            >
+              Exports
+            </button>
+            <div className="fr-collapse fr-menu" id="menu-exports">
+              <ul className="fr-menu__list">
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: "Exports",
+                      href: routes.registry_new.export
+                    }}
+                  />
+                </li>
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: "Exhaustif",
+                      href: routes.registry_new.exhaustive
+                    }}
+                  />
+                </li>
+              </ul>
+            </div>
+          </li>
+        </>
       )}
     </>
   );
@@ -410,11 +440,7 @@ function DashboardSubNav({
  * Navigation subset to be included in the moble slidning panel nav
  * Contains main navigation items from the desktop top level nav (Dashboard, Account etc.)
  */
-function MobileSubNav({
-  currentCompany,
-  canViewNewRegistry,
-  canViewRegistryIHM
-}) {
+function MobileSubNav({ currentCompany }) {
   const location = useLocation();
 
   const matchAccount = matchPath(
@@ -431,13 +457,7 @@ function MobileSubNav({
   if (!currentCompany) {
     dashboardSubNav = null;
   } else {
-    dashboardSubNav = (
-      <DashboardSubNav
-        currentCompany={currentCompany}
-        canViewNewRegistry={canViewNewRegistry}
-        canViewRegistryIHM={canViewRegistryIHM}
-      />
-    );
+    dashboardSubNav = <DashboardSubNav currentCompany={currentCompany} />;
   }
 
   return (
@@ -547,8 +567,7 @@ const getDesktopMenuEntries = (
   isAuthenticated,
   isAdmin,
   showRegistry,
-  currentSiret,
-  canViewNewRegistry
+  currentSiret
 ) => {
   const admin = [
     {
@@ -559,16 +578,13 @@ const getDesktopMenuEntries = (
   ];
 
   const registry = [
-    ...(canViewNewRegistry
-      ? [
-          {
-            caption: "🆕 Mes registres (beta)",
-            href: routes.registry_new.index,
-            navlink: true
-          }
-        ]
-      : [])
+    {
+      caption: "Mes registres",
+      href: routes.registry_new.index,
+      navlink: true
+    }
   ];
+
   const connected = [
     {
       caption: allBsdsMenuEntryLbl,
@@ -660,9 +676,7 @@ export default function Header() {
 
   if (loading) return null;
 
-  const showRegistry =
-    permissions.includes(UserPermission.RegistryCanRead) &&
-    [UserRole.Admin, UserRole.Member].includes(role!);
+  const showRegistry = permissions.includes(UserPermission.RegistryCanRead);
 
   if (isAuthenticated && data?.me == null) {
     return <Loader />;
@@ -673,26 +687,11 @@ export default function Header() {
     company => company.orgId === currentSiret
   );
 
-  const canViewNewRegistry =
-    import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
-    companies?.some(
-      company =>
-        company.featureFlags?.includes("REGISTRY_V2") &&
-        company.userRole &&
-        [UserRole.Admin, UserRole.Member, UserRole.Reader].includes(
-          company.userRole
-        )
-    );
-
-  const canViewRegistryIHM =
-    import.meta.env.VITE_FLAG_REGISTRY_V2_IHM === "true";
-
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
     isAdmin,
     showRegistry,
-    currentSiret,
-    canViewNewRegistry
+    currentSiret
   );
 
   return (
@@ -813,11 +812,7 @@ export default function Header() {
           </button>
         </div>
 
-        <MobileSubNav
-          currentCompany={currentCompany}
-          canViewNewRegistry={canViewNewRegistry}
-          canViewRegistryIHM={canViewRegistryIHM}
-        />
+        <MobileSubNav currentCompany={currentCompany} />
       </div>
 
       {/* Company switcher on top of the page */}

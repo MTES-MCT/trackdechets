@@ -20,12 +20,16 @@ interface CompanySelectorWrapperProps {
   // render lorsqu'on est dans le cas d'un update de bordereau
   selectedCompanyOrgId?: string | null;
   favoriteType?: FavoriteType;
-  // Paramètre qui est passée à `searchCompanies`, les données sont
+  // Paramètres qui sont passés à `searchCompanies`, les données sont
   // filtrées directement côté serveur
   allowForeignCompanies?: boolean;
+  allowClosedCompanies?: boolean;
   // Callback spécifié par le composant parent pour modifier les données
   // du store
   onCompanySelected?: (company?: CompanySearchResult) => void;
+  // Callback spécifié par le composant parent, appelé dans le cas où
+  // l'établissement pré-sélectionné via selectedCompanyOrgId n'est pas trouvé
+  onUnknownInputCompany?: (company?: CompanySearchResult) => void;
   // Permet de valider que l'établissement sélectionné satisfait certains
   // critères (ex : inscrit sur Trackdéchets avec un profil spécifique)
   selectedCompanyError?: (company?: CompanySearchResult) => string | null;
@@ -48,10 +52,12 @@ export default function CompanySelectorWrapper({
   selectedCompanyOrgId,
   favoriteType = FavoriteType.Emitter,
   allowForeignCompanies = false,
+  allowClosedCompanies = true,
   selectedCompanyError,
   orgId,
   disabled = false,
-  onCompanySelected
+  onCompanySelected,
+  onUnknownInputCompany
 }: Readonly<CompanySelectorWrapperProps>) {
   // Établissement sélectionné
   const [selectedCompany, setSelectedCompany] =
@@ -111,6 +117,8 @@ export default function CompanySelectorWrapper({
         onCompleted: result => {
           if (result.searchCompanies?.length > 0) {
             onSelectCompany(result.searchCompanies[0]);
+          } else {
+            onUnknownInputCompany?.();
           }
         }
       });
@@ -122,7 +130,8 @@ export default function CompanySelectorWrapper({
     selectedCompany,
     selectedCompanyOrgId,
     searchCompaniesFromCompanyOrgId,
-    onSelectCompany
+    onSelectCompany,
+    onUnknownInputCompany
   ]);
 
   const onSearchCompany = (searchClue: string, postalCodeClue: string) => {
@@ -140,6 +149,8 @@ export default function CompanySelectorWrapper({
       searchCompaniesFromTextSearch({
         variables: {
           clue: searchClue,
+          allowForeignCompanies,
+          allowClosedCompanies,
           ...(postalCodeClue &&
             postalCodeClue.length >= 2 && { department: postalCodeClue })
         }

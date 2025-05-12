@@ -73,7 +73,7 @@ export const AdminRequests = () => {
 
   return (
     <div>
-      <h3 className="fr-h3">Demandes administrateur</h3>
+      <h3 className="fr-sr-only">Demandes administrateur</h3>
 
       <div className="fr-table--sm fr-table fr-table" id="table-sm-component">
         <div className="fr-table__wrapper">

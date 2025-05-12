@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { ALL_WASTES_TREE } from "@td/constants";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@codegouvfr/react-dsfr/Input";
@@ -19,6 +19,8 @@ type Props = {
   methods: UseFormReturn<any>;
   containerRef?: React.RefObject<HTMLDivElement>;
   disabled?: boolean;
+  whiteList?: string[];
+  blackList?: string[];
 };
 
 export function WasteCodeSelector({
@@ -26,7 +28,9 @@ export function WasteCodeSelector({
   methods,
   label,
   containerRef,
-  disabled
+  disabled,
+  whiteList,
+  blackList
 }: Props) {
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
@@ -39,6 +43,10 @@ export function WasteCodeSelector({
   const triggerRef = useRef<HTMLButtonElement | null>(null);
 
   const { errors } = methods.formState;
+
+  const filteredWastesTree = useMemo(() => {
+    return filterWasteTreeByLists(ALL_WASTES_TREE, whiteList, blackList);
+  }, [whiteList, blackList]);
 
   const setComboboxOpen = (open: boolean) => {
     setShowSearch(open);
@@ -88,7 +96,11 @@ export function WasteCodeSelector({
                   ></span>
                 </div>
               ) : (
-                <button onClick={() => onSelect(node.code)} type="button">
+                <button
+                  onClick={() => onSelect(node.code)}
+                  type="button"
+                  className="tw-text-left"
+                >
                   {node.code} - {node.description}
                 </button>
               )}
@@ -165,7 +177,7 @@ export function WasteCodeSelector({
             </div>
             <div className="tw-flex-1 tw-overflow-y-auto">
               <div>
-                {renderTree(recursiveFilterTree(ALL_WASTES_TREE, search))}
+                {renderTree(recursiveFilterTree(filteredWastesTree, search))}
               </div>
             </div>
           </div>
@@ -193,4 +205,49 @@ function recursiveFilterTree(
       return null;
     })
     .filter(Boolean) as WasteCode[];
+}
+
+function filterWasteTreeByLists(
+  nodes: readonly WasteCode[],
+  whiteList?: string[],
+  blackList?: string[]
+): WasteCode[] {
+  if (!nodes) return [];
+
+  const hasWhiteList = whiteList && whiteList.length > 0;
+  const hasBlackList = blackList && blackList.length > 0;
+
+  if (!hasWhiteList && !hasBlackList) {
+    return [...nodes];
+  }
+
+  const shouldIncludeCode = (code: string): boolean => {
+    const isBlacklisted = hasBlackList && blackList!.includes(code);
+    if (isBlacklisted) {
+      return false;
+    }
+
+    const isWhitelisted = hasWhiteList ? whiteList!.includes(code) : true;
+    return isWhitelisted;
+  };
+  return nodes
+    .map(node => {
+      // Only leaf nodes are actual waste codes
+      if (node.children.length === 0) {
+        return shouldIncludeCode(node.code) ? node : null;
+      }
+
+      const filteredChildren = filterWasteTreeByLists(
+        node.children,
+        whiteList,
+        blackList
+      );
+
+      if (filteredChildren.length > 0) {
+        return { ...node, children: filteredChildren };
+      } else {
+        return null;
+      }
+    })
+    .filter((node): node is WasteCode => node !== null);
 }

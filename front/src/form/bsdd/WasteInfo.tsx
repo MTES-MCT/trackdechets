@@ -24,7 +24,10 @@ import {
   initialFormTransporter
 } from "./utils/initial-state";
 import FormikPackagingList from "../../Apps/Forms/Components/PackagingList/FormikPackagingList";
-import { emptyPackaging } from "../../Apps/Forms/Components/PackagingList/helpers";
+import {
+  bsddPackagingTypes,
+  emptyBsddPackaging
+} from "../../Apps/Forms/Components/PackagingList/helpers";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -195,7 +198,7 @@ export default function WasteInfo({ disabled }) {
               } else {
                 setFieldValue(
                   "wasteDetails.packagingInfos",
-                  [emptyPackaging],
+                  [emptyBsddPackaging],
                   false
                 );
                 setFieldValue("transporters", [initialFormTransporter], false);
@@ -210,6 +213,7 @@ export default function WasteInfo({ disabled }) {
           <h4 className="form__section-heading">Conditionnement</h4>
           <FormikPackagingList
             fieldName="wasteDetails.packagingInfos"
+            packagingTypes={bsddPackagingTypes}
             disabled={disabled}
           />
         </>

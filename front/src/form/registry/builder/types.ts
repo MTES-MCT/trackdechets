@@ -1,3 +1,6 @@
+import React from "react";
+import { RegistryCompanyType } from "@td/codegen-ui";
+import { TransportMode } from "@td/codegen-ui";
 import type { ComponentType } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -9,11 +12,14 @@ export type FormShapeField =
       shape: "generic";
       style?: FieldStyle;
       type: string;
-      label: string;
+      title?: string;
+      label: string | React.ReactNode;
       required?: boolean;
       validation: Record<string, z.ZodType>;
+      defaultOption?: string;
       choices?: { label: string; value: string | number }[];
-      infoText?: string;
+      infoText?: string | ((fieldValues: any) => string | null);
+      tooltip?: string;
     }
   | {
       props?: Record<string, any>;
@@ -26,7 +32,7 @@ export type FormShapeField =
         props?: Record<string, any>;
         methods: UseFormReturn<any>;
       }>;
-      infoText?: string;
+      infoText?: string | ((fieldValues: any) => string | null);
     }
   | {
       shape: "layout";
@@ -53,3 +59,16 @@ type FormShapeItemWithState = FormShapeItem & {
 export type FormShape = FormShapeItemWithState[];
 
 export type FormShapeWithState = FormShapeItemWithState[];
+
+export type FormTransporter = {
+  TransportMode: TransportMode;
+  CompanyType: RegistryCompanyType;
+  CompanyOrgId?: string;
+  RecepisseIsExempted?: boolean;
+  RecepisseNumber?: string;
+  CompanyName?: string;
+  CompanyAddress?: string;
+  CompanyPostalCode?: string;
+  CompanyCity?: string;
+  CompanyCountryCode?: string;
+};

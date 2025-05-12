@@ -16,7 +16,7 @@ import {
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
-const UPDATE_BSFF_PACKAGING = gql`
+export const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
     updateBsffPackaging(id: $id, input: $input) {
       id

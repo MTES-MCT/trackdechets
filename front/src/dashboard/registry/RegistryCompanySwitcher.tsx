@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef } from "react";
-import { useQuery } from "@apollo/client";
-import { CompanyPrivate, CompanyPublic, Query, UserRole } from "@td/codegen-ui";
+import { useQuery, useLazyQuery } from "@apollo/client";
+import { CompanyPublic, Query, UserRole } from "@td/codegen-ui";
 import { debounce } from "../../common/helper";
 import {
   MIN_MY_COMPANIES_SEARCH,
@@ -12,9 +12,13 @@ import { ComboBox } from "../../Apps/common/Components/Combobox/Combobox";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_COMPANIES } from "./shared";
 import FocusTrap from "focus-trap-react";
-
+import styles from "./RegistryCompanySwitcher.module.scss";
 type Props = {
-  onCompanySelect: (orgId: string, isDelegation: boolean) => void;
+  onCompanySelect: (
+    orgId: string,
+    isDelegation: boolean,
+    company?: RegistryCompanyInfos
+  ) => void;
   wrapperClassName?: string;
   allOption?: {
     key: string;
@@ -23,7 +27,18 @@ type Props = {
   label?: string;
   defaultSiret?: string;
   excludeDelegations?: boolean;
+  disabled?: boolean;
 };
+
+export type RegistryCompanyInfos = Pick<
+  CompanyPublic,
+  | "orgId"
+  | "siret"
+  | "name"
+  | "givenName"
+  | "companyTypes"
+  | "transporterReceipt"
+>;
 
 export function RegistryCompanySwitcher({
   onCompanySelect,
@@ -31,7 +46,8 @@ export function RegistryCompanySwitcher({
   allOption,
   label,
   defaultSiret,
-  excludeDelegations = false
+  excludeDelegations = false,
+  disabled = false
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [debouncedClue, setDebouncedClue] = useState("");
@@ -40,22 +56,32 @@ export function RegistryCompanySwitcher({
   );
   const comboboxTriggerRef = useRef<HTMLDivElement | null>(null);
 
-  const setSelectedCompany = (
-    key,
+  const [getCompanyBySiret] = useLazyQuery<Pick<Query, "registryCompanies">>(
+    GET_REGISTRY_COMPANIES,
     {
-      name,
-      givenName,
-      siret,
-      isDelegation
-    }: {
-      name?: string | null;
-      givenName?: string | null;
-      siret?: string | null;
-      isDelegation?: boolean;
+      fetchPolicy: "network-only"
     }
+  );
+
+  const setSelectedCompany = (
+    orgId: string,
+    isDelegation: boolean,
+    selected:
+      | {
+          company: RegistryCompanyInfos;
+        }
+      | {
+          all: true;
+        }
   ) => {
-    setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
-    onCompanySelect(key, !!isDelegation);
+    if ("company" in selected) {
+      const { name, givenName, siret } = selected.company;
+      setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
+      onCompanySelect(orgId, !!isDelegation, selected?.company);
+    } else if (selected.all) {
+      setSelectedItem(allOption?.name ?? "");
+      onCompanySelect(orgId, !!isDelegation);
+    }
   };
 
   const { data: companiesData, loading: companiesLoading } = useQuery<
@@ -70,7 +96,8 @@ export function RegistryCompanySwitcher({
     },
     onCompleted: data => {
       if (!selectedItem && !allOption) {
-        let firstNode: CompanyPrivate | CompanyPublic | undefined =
+        let firstNodeIsDelegation = false;
+        let firstNode: RegistryCompanyInfos | undefined =
           data.registryCompanies.myCompanies.find(node =>
             defaultSiret ? node.siret === defaultSiret : node.siret
           );
@@ -78,12 +105,36 @@ export function RegistryCompanySwitcher({
           firstNode = data.registryCompanies.delegators.find(node =>
             defaultSiret ? node.siret === defaultSiret : node.siret
           );
+          firstNodeIsDelegation = true;
         }
         if (firstNode) {
-          setSelectedCompany(firstNode.orgId, {
-            name: firstNode.name,
-            givenName: firstNode.givenName,
-            siret: firstNode.siret
+          if (!defaultSiret) {
+            onCompanySelect(firstNode.orgId, firstNodeIsDelegation);
+          }
+          setSelectedItem(
+            `${firstNode.givenName || firstNode.name || ""} ${
+              firstNode.siret || ""
+            }`
+          );
+        } else if (defaultSiret) {
+          getCompanyBySiret({
+            variables: {
+              search: defaultSiret,
+              firstCompanies: 1,
+              firstDelegators: 1,
+              userRoles: [UserRole.Admin, UserRole.Member, UserRole.Reader]
+            }
+          }).then(result => {
+            const company =
+              result.data?.registryCompanies.myCompanies[0] ??
+              result.data?.registryCompanies.delegators[0];
+            if (company) {
+              setSelectedItem(
+                `${company.givenName || company.name || ""} ${
+                  company.siret || ""
+                }`
+              );
+            }
           });
         }
       }
@@ -118,14 +169,20 @@ export function RegistryCompanySwitcher({
       <div
         id="registry-company-combobox"
         ref={comboboxTriggerRef}
-        className="fr-input tw-cursor-pointer tw-flex tw-justify-between"
+        className={`fr-input tw-flex tw-justify-between ${
+          disabled ? styles.disabledSelect : styles.enabledSelect
+        }`}
         tabIndex={0}
         role="button"
         aria-labelledby="registry-company-label selected-registry-company"
-        onClick={() => setComboboxOpen(!isOpen)}
+        onClick={() => {
+          if (!disabled) {
+            setComboboxOpen(!isOpen);
+          }
+        }}
         aria-expanded={isOpen}
         onKeyDown={e => {
-          if (e.key === "Enter") {
+          if (e.key === "Enter" && !disabled) {
             setComboboxOpen(!isOpen);
           }
         }}
@@ -145,7 +202,12 @@ export function RegistryCompanySwitcher({
         onOpenChange={setComboboxOpen}
       >
         {({ close }) => (
-          <FocusTrap active={isOpen}>
+          <FocusTrap
+            active={isOpen}
+            focusTrapOptions={{
+              allowOutsideClick: true
+            }}
+          >
             <div
               className="tw-bg-white tw-inset-x-0 tw-z-10 tw-px-2 tw-h-full tw-flex tw-flex-col"
               tabIndex={0}
@@ -195,19 +257,15 @@ export function RegistryCompanySwitcher({
                       className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
                       tabIndex={0}
                       onClick={() => {
-                        setSelectedCompany(allOption.key, {
-                          name: allOption.name,
-                          givenName: null,
-                          siret: null
+                        setSelectedCompany(allOption.key, false, {
+                          all: true
                         });
                         close();
                       }}
                       onKeyDown={e => {
                         if (e.key === "Enter") {
-                          setSelectedCompany(allOption.key, {
-                            name: allOption.name,
-                            givenName: null,
-                            siret: null
+                          setSelectedCompany(allOption.key, false, {
+                            all: true
                           });
                           close();
                         }
@@ -222,19 +280,15 @@ export function RegistryCompanySwitcher({
                       className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-cursor-pointer"
                       tabIndex={0}
                       onClick={() => {
-                        setSelectedCompany(node.orgId, {
-                          name: node.name,
-                          givenName: node.givenName,
-                          siret: node.siret
+                        setSelectedCompany(node.orgId, false, {
+                          company: node
                         });
                         close();
                       }}
                       onKeyDown={e => {
                         if (e.key === "Enter") {
-                          setSelectedCompany(node.orgId, {
-                            name: node.name,
-                            givenName: node.givenName,
-                            siret: node.siret
+                          setSelectedCompany(node.orgId, false, {
+                            company: node
                           });
                           close();
                         }
@@ -258,21 +312,15 @@ export function RegistryCompanySwitcher({
                         className="tw-px-2 tw-py-4 hover:tw-bg-gray-100 tw-flex tw-gap-4 tw-justify-between tw-items-center tw-cursor-pointer"
                         tabIndex={0}
                         onClick={() => {
-                          setSelectedCompany(delegator.orgId, {
-                            name: delegator.name,
-                            givenName: delegator.givenName,
-                            siret: delegator.orgId,
-                            isDelegation: true
+                          setSelectedCompany(delegator.orgId, true, {
+                            company: delegator
                           });
                           close();
                         }}
                         onKeyDown={e => {
                           if (e.key === "Enter") {
-                            setSelectedCompany(delegator.orgId, {
-                              name: delegator.name,
-                              givenName: delegator.givenName,
-                              siret: delegator.orgId,
-                              isDelegation: true
+                            setSelectedCompany(delegator.orgId, true, {
+                              company: delegator
                             });
                             close();
                           }

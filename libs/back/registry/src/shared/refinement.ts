@@ -1,4 +1,4 @@
-import { TdOperationCode, isSiret } from "@td/constants";
+import { FINAL_OPERATION_CODES, TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
 import { getWasteCodeSchema } from "./schemas";
@@ -14,7 +14,8 @@ export function refineTransporterInfos<T>({
   cityKey,
   countryKey,
   recepisseIsExemptedKey,
-  recepisseNumberKey
+  recepisseNumberKey,
+  ttdImportNumberKey
 }: {
   modeKey: string;
   typeKey: string;
@@ -26,6 +27,7 @@ export function refineTransporterInfos<T>({
   countryKey: string;
   recepisseIsExemptedKey: string;
   recepisseNumberKey: string;
+  ttdImportNumberKey?: string;
 }): Refinement<T> {
   return (item, context) => {
     if (item[modeKey] && !item[typeKey]) {
@@ -48,6 +50,16 @@ export function refineTransporterInfos<T>({
           "Le numéro de récépissé est obligatoire si le transporteur n'indique pas en être exempté",
         path: [recepisseNumberKey]
       });
+    }
+
+    // When the declaration comes from abroad and the transporter is not french,
+    // we often have partial or no information about the transporter. So we just skip the actor infos check.
+    if (
+      ["ENTREPRISE_UE", "ENTREPRISE_HORS_UE"].includes(item[typeKey]) &&
+      ttdImportNumberKey &&
+      item[ttdImportNumberKey]
+    ) {
+      return;
     }
 
     refineActorInfos({
@@ -387,15 +399,7 @@ export const refineRequiredOperationMode: Refinement<{
   operationCode: TdOperationCode;
   operationMode?: OperationMode | null;
 }> = (item, { addIssue }) => {
-  const nonFinalOperationCodes = [
-    "R 12",
-    "R 13",
-    "D 9",
-    "D 13",
-    "D 14",
-    "D 15"
-  ];
-  const isFinalOperationCode = !nonFinalOperationCodes.some(
+  const isFinalOperationCode = FINAL_OPERATION_CODES.some(
     code => code === item.operationCode
   );
 
@@ -412,7 +416,12 @@ export const refineOperationModeConsistency: Refinement<{
   operationCode: TdOperationCode;
   operationMode?: OperationMode | null;
 }> = (item, { addIssue }) => {
+  const isFinalOperationCode = FINAL_OPERATION_CODES.some(
+    code => code === item.operationCode
+  );
+
   if (
+    isFinalOperationCode &&
     item.operationCode.startsWith("D") &&
     item.operationMode &&
     item.operationMode !== OperationMode.ELIMINATION
@@ -428,7 +437,6 @@ export const refineOperationModeConsistency: Refinement<{
 export const refineFollowingTraceabilityInfos: Refinement<{
   operationCode: TdOperationCode;
   noTraceability?: boolean | null;
-  nextDestinationIsAbroad?: boolean | null;
   nextOperationCode?: TdOperationCode | null;
 }> = (item, { addIssue }) => {
   const nonFinalOperationCodes = [
@@ -458,14 +466,6 @@ export const refineFollowingTraceabilityInfos: Refinement<{
       path: ["nextOperationCode"]
     });
   }
-
-  if (item.noTraceability === false && item.nextDestinationIsAbroad == null) {
-    addIssue({
-      code: z.ZodIssueCode.custom,
-      message: `Lorsque la rupture de traçabilité n'est pas autorisée, il faut indiquer si la destination ultérieure est à l'étranger ou pas`,
-      path: ["nextDestinationIsAbroad"]
-    });
-  }
 };
 
 export const refineTransportersConsistency: Refinement<{
@@ -487,7 +487,7 @@ export const refineTransportersConsistency: Refinement<{
   if (!item.isDirectSupply && !item.transporter1CompanyOrgId) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le transporteur 1 doit être renseigné si le déchet n'est pas envoyé via fourniture directe`,
+      message: `Le transporteur 1 doit être renseigné si le déchet n'est pas directement approvisionné (pipeline, convoyeur)`,
       path: ["transporter1CompanyOrgId"]
     });
   }

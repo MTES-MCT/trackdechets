@@ -92,7 +92,6 @@ export default function AccountInfo({ me }: Props) {
 
   return (
     <>
-      <hr />
       {!isEditing && (
         <>
           <AccountInfoActionBar
@@ -101,7 +100,10 @@ export default function AccountInfo({ me }: Props) {
             onReset={onReset}
             isEditing={isEditing}
           />
-          <div className="fr-grid-row fr-grid-row--gutters">
+          <div
+            style={{ margin: 0 }}
+            className="fr-grid-row fr-grid-row--gutters"
+          >
             <div className="fr-col-8">
               <p className="fr-text--bold">Prénom et nom</p>
               <p className="fr-text fr-mb-2w" data-testid="username">
