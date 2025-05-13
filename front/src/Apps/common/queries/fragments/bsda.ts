@@ -234,6 +234,7 @@ export const FullBsdaFragment = gql`
       materialName
       consistence
       sealNumbers
+      isSubjectToADR
       adr
       nonRoadRegulationMention
       pop

@@ -27,7 +27,8 @@ import {
   checkWorkerSubSectionThree,
   validateDestination,
   validatePreviousBsdas,
-  validateDestinationReceptionWeight
+  validateDestinationReceptionWeight,
+  wasteAdrRefinement
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -47,6 +48,7 @@ import {
   validateMultiTransporterPlates,
   validateTransporterPlates
 } from "../../common/validation/zod/refinement";
+import { isDefinedStrict } from "../../common/helpers";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -143,7 +145,14 @@ export const rawBsdaSchema = z.object({
   wasteMaterialName: z.string().nullish(),
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
-  wasteAdr: z.string().nullish(),
+  wasteIsSubjectToADR: z.boolean().nullish(),
+  wasteAdr: z
+    .string()
+    .nullish()
+    // Empty values (or spaces) to null
+    .transform(value =>
+      isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
+    ),
   wasteNonRoadRegulationMention: z.string().nullish(),
   wastePop: z
     .boolean()
@@ -322,6 +331,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     )
     .superRefine(validateDestination(context))
     .superRefine(validateDestinationReceptionWeight(context))
+    .superRefine(wasteAdrRefinement(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs

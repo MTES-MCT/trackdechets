@@ -33,7 +33,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
-import { BSDA_VERBOSE_STATUSES } from "@td/constants";
+import { BSDA_VERBOSE_STATUSES, getBsdaWasteADRMention } from "@td/constants";
 import ExpandableList from "./ExpandableList";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
@@ -470,7 +470,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
 
           <div className={styles.detailGrid}>
             <dt>Mention ADR</dt>
-            <dd>{form?.waste?.adr}</dd>
+            <dd>{getBsdaWasteADRMention(form?.waste)}</dd>
 
             <dt>Mention RID, ADNR, IMDG</dt>
             <dd>{form?.waste?.nonRoadRegulationMention}</dd>

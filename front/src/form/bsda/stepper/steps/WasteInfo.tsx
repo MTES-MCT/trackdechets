@@ -11,6 +11,7 @@ import { BsdaContext } from "../../FormContainer";
 import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
 import FormikPackagingList from "../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { bsdaPackagingTypes } from "../../../../Apps/Forms/Components/PackagingList/helpers";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 const TagsInput = lazy(
   () => import("../../../../common/components/tags-input/TagsInput")
 );
@@ -68,7 +69,7 @@ export function WasteInfo({ disabled }) {
 }
 
 export function WasteInfoWorker({ disabled }) {
-  const { values } = useFormikContext<Bsda>();
+  const { values, setFieldValue } = useFormikContext<Bsda>();
   const isDechetterie = values?.type === "COLLECTION_2710";
 
   return (
@@ -122,17 +123,33 @@ export function WasteInfoWorker({ disabled }) {
         </label>
       </div>
 
-      <div className="form__row">
-        <label>
-          Mention au titre du règlement ADR
-          <Field
-            disabled={disabled}
-            type="text"
-            name="waste.adr"
-            className="td-input"
-          />
-        </label>
+      <div className="form__row fr-mt-8v">
+        <ToggleSwitch
+          onChange={e => {
+            setFieldValue("waste.isSubjectToADR", e);
+            if (!e) {
+              setFieldValue("waste.adr", null);
+            }
+          }}
+          inputTitle={"Test"}
+          label="Le déchet est soumis à l'ADR"
+          checked={values.waste?.isSubjectToADR ?? false}
+        />
       </div>
+
+      {values.waste?.isSubjectToADR && (
+        <div className="form__row fr-ml-18v fr-mb-8v">
+          <label>
+            Mention au titre du règlement ADR
+            <Field
+              disabled={disabled}
+              type="text"
+              name="waste.adr"
+              className="td-input"
+            />
+          </label>
+        </div>
+      )}
 
       <div className="form__row">
         <label>

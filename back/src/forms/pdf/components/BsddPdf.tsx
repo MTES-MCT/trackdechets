@@ -105,7 +105,7 @@ function QuantityFields({
       Estimée
       <br />
       {displayADRArticle && (
-        <>"QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2"</>
+        <>"QUANTITÉ ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2 de l'ADR"</>
       )}
     </p>
   );
