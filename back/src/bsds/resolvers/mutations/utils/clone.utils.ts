@@ -156,6 +156,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     type: bsda.type,
     updatedAt: bsda.updatedAt,
     wasteAdr: bsda.wasteAdr,
+    wasteNonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     wasteCode: bsda.wasteCode,
     wasteConsistence: bsda.wasteConsistence,
     wasteFamilyCode: bsda.wasteFamilyCode,

@@ -235,6 +235,7 @@ export const FullBsdaFragment = gql`
       consistence
       sealNumbers
       adr
+      nonRoadRegulationMention
       pop
     }
     weight {

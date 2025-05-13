@@ -472,6 +472,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dt>Mention ADR</dt>
             <dd>{form?.waste?.adr}</dd>
 
+            <dt>Mention RID, ADNR, IMDG</dt>
+            <dd>{form?.waste?.nonRoadRegulationMention}</dd>
+
             <dt>Conditionnement</dt>
             <dd>{conditionnement}</dd>
 
