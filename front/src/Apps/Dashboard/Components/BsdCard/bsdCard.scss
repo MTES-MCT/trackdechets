@@ -35,6 +35,7 @@
     &__infos {
       display: flex;
       flex-wrap: wrap;
+      align-items: flex-start;
 
       p {
         padding: 0 5px 0 0;

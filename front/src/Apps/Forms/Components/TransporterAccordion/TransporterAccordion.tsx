@@ -1,10 +1,11 @@
-import * as React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import "./TransporterAccordion.scss";
 
 export type TransporterAccordionProps = {
   name: string;
   numero: number;
+  hasError?: boolean;
   onTransporterAdd: () => void;
   onTransporterDelete: () => void;
   onTransporterShiftDown: () => void;
@@ -29,6 +30,7 @@ export type TransporterAccordionProps = {
 export function TransporterAccordion({
   name,
   numero,
+  hasError,
   expanded,
   onTransporterAdd,
   onTransporterDelete,
@@ -43,27 +45,30 @@ export function TransporterAccordion({
   deleteLabel
 }: TransporterAccordionProps) {
   const collapseElementId = `transporter__${numero}__form`;
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
 
-  const ref = React.useRef(null);
+  useEffect(() => {
+    if (!contentRef.current) return;
 
-  // FIXME scrollHeight est recalculé à chaque render
-  // Idéalement il faudrait utiliser ResizeObserver pour être notifié
-  // lorsque l'élément change de taille tel que décrit ici
-  // https://legacy.reactjs.org/docs/hooks-faq.html#how-can-i-measure-a-dom-node
-  const scrollHeight = (() => {
-    if (ref.current) {
-      // Cf https://www.w3schools.com/howto/howto_js_collapsible.asp
-      // "Animated Collapsible (Slide Down)"
-      // On a besoin de connaitre la hauteur de l'élément déplié
-      // pour définir la valeur de maxHeight et avoir une animation fluide.
-      return (ref.current as any).scrollHeight;
-    }
-    return 0;
-  })();
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries[0]) {
+        setContentHeight(entries[0].contentRect.height);
+      }
+    });
+
+    resizeObserver.observe(contentRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
 
   return (
     <section className="transporter">
-      <div className="transporter__header">
+      <div
+        className={`transporter__header ${hasError ? "transporter-error" : ""}`}
+      >
         <label className="transporter__header__label">{name}</label>
         <div className="transporter__header__buttons">
           <Button
@@ -114,7 +119,6 @@ export function TransporterAccordion({
           <Button
             type="button"
             className="transporter__header__button"
-            // FIXME Ce serait bien ici d'arriver à reproduire l'animation de l'accordéon du DSFR
             iconId={expanded ? "ri-arrow-up-s-line" : "ri-arrow-down-s-line"}
             title={expanded ? "Replier" : "Déplier"}
             aria-expanded={expanded}
@@ -125,17 +129,12 @@ export function TransporterAccordion({
       </div>
       <div
         id={collapseElementId}
-        ref={ref}
         className="transporter__form"
-        style={
-          expanded
-            ? scrollHeight
-              ? { maxHeight: scrollHeight }
-              : {} // avoid having an animation on first render
-            : { maxHeight: 0 }
-        }
+        style={{
+          maxHeight: expanded ? contentHeight + 28 : 0
+        }}
       >
-        {children}
+        <div ref={contentRef}>{children}</div>
       </div>
     </section>
   );

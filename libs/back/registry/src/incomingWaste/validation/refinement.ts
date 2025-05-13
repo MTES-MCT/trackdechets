@@ -183,10 +183,10 @@ export const refineWeightAndVolume: Refinement<ParsedZodIncomingWasteItem> = (
     });
   }
 
-  if (isUsingRoad && hasWeightHour && item.volume && item.volume > 40) {
+  if (isUsingRoad && hasWeightHour && item.volume && item.volume > 100) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le volume ne peut pas dépasser 40 M3 lorsque le déchet est transporté par la route`,
+      message: `Le volume ne peut pas dépasser 100 M3 lorsque le déchet est transporté par la route`,
       path: ["volume"]
     });
   }

@@ -1,35 +1,31 @@
 import { useEffect, useRef } from "react";
 
 const useOnClickOutsideRefTarget = ({
+  active,
   onClickOutside
 }: {
+  active?: boolean;
   onClickOutside: (e: MouseEvent | TouchEvent) => void;
 }) => {
   const targetRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Close dropdown when click outside of target
-    const clickEvent = document.addEventListener(
-      "mousedown",
-      (e: MouseEvent) => {
-        if (targetRef && !targetRef?.current?.contains(e.target as Node)) {
-          onClickOutside(e);
-        }
+    if (active === false) {
+      return;
+    }
+
+    function handleClick(e: MouseEvent | TouchEvent) {
+      if (targetRef && !targetRef?.current?.contains(e.target as Node)) {
+        onClickOutside(e);
       }
-    );
-    const touchEvent = document.addEventListener(
-      "touchend",
-      (e: TouchEvent) => {
-        if (targetRef && !targetRef?.current?.contains(e.target as Node)) {
-          onClickOutside(e);
-        }
-      }
-    );
+    }
+
+    document.addEventListener("mousedown", handleClick);
+
     return () => {
-      document.removeEventListener("mousedown", clickEvent!);
-      document.removeEventListener("touchend", touchEvent!);
+      document.removeEventListener("mousedown", handleClick);
     };
-  }, [onClickOutside]);
+  }, [onClickOutside, active]);
   return { targetRef };
 };
 

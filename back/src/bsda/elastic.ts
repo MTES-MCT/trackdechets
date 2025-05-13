@@ -33,6 +33,7 @@ import {
 import { getBsdaSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { BsdaPackaging } from "@td/codegen-back";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -319,7 +320,9 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     wasteCode: bsda.wasteCode ?? "",
     wasteAdr: bsda.wasteAdr ?? "",
     wasteDescription: bsda.wasteMaterialName ?? "",
-    packagingNumbers: [],
+    packagingNumbers: (bsda.packagings as BsdaPackaging[])?.flatMap(
+      p => p.identificationNumbers
+    ),
     wasteSealNumbers: bsda.wasteSealNumbers ?? [],
     identificationNumbers: [],
     ficheInterventionNumbers: [],

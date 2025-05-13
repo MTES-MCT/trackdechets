@@ -222,11 +222,7 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
           </div>
           <div className="fr-my-5v">
             <p className="fr-text--bold">
-              {`L'activation est irréversible et prendra effet à 23h59 (heure de Paris) le ${format(
-                new Date(),
-                "d MMMM yyyy",
-                { locale: fr }
-              )}.`}
+              {`Cette action est irréversible. Elle prendra effet à 23h59 (heure de Paris) le jour de l'activation.`}
             </p>
           </div>
           <div className="fr-my-5v">

@@ -18,6 +18,7 @@ import * as yup from "yup";
 import { SignBsda, SIGN_BSDA } from "./SignBsda";
 import DateInput from "../../../../../form/common/components/custom-inputs/DateInput";
 import { subMonths } from "date-fns";
+import { cleanPackagings } from "../../../../../Apps/Forms/Components/PackagingList/helpers";
 
 const validationSchema = yup.object({
   date: yup.date().required("La date est requise"),
@@ -91,6 +92,7 @@ export function SignWork({
                     familyCode: "",
                     materialName: "",
                     adr: "",
+                    nonRoadRegulationMention: "",
                     consistence: BsdaConsistence.Solide,
                     sealNumbers: []
                   },
@@ -109,7 +111,10 @@ export function SignWork({
               await updateBsda({
                 variables: {
                   id: bsda.id,
-                  input: update
+                  input: {
+                    ...update,
+                    packagings: cleanPackagings(update.packagings)
+                  }
                 }
               });
               await signBsda({

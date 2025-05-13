@@ -28,8 +28,6 @@ export type TabContentProps = {
   company: CompanyPrivate;
 };
 
-const REGISTRY_V2_FLAG = "REGISTRY_V2";
-
 const buildTabs = (
   company: CompanyPrivate
 ): {
@@ -37,11 +35,6 @@ const buildTabs = (
   tabsContent: Record<string, React.FC<TabContentProps>>;
 } => {
   const isAdmin = company.userRole === UserRole.Admin;
-
-  // RNDTS features protected by feature flag
-  const canViewRndtsFeatures =
-    import.meta.env.VITE_FLAG_REGISTRY_V2 === "true" ||
-    company.featureFlags.includes(REGISTRY_V2_FLAG);
 
   const iconId = "fr-icon-checkbox-line" as FrIconClassName;
   const tabs = [
@@ -69,6 +62,11 @@ const buildTabs = (
       tabId: "fiche",
       label: "Fiche",
       iconId
+    },
+    {
+      tabId: "registry",
+      label: "Registre national",
+      iconId
     }
   ];
   const tabsContent = {
@@ -76,16 +74,9 @@ const buildTabs = (
     signature: CompanySignature,
     membres: CompanyMembers,
     contact: CompanyContactForm,
-    fiche: CompanyDigestSheetForm
+    fiche: CompanyDigestSheetForm,
+    registry: CompanyRegistry
   };
-  if (canViewRndtsFeatures) {
-    tabs.push({
-      tabId: "registry",
-      label: "Registre national",
-      iconId
-    });
-    tabsContent["registry"] = CompanyRegistry;
-  }
   if (isAdmin) {
     tabs.push({
       tabId: "avance",

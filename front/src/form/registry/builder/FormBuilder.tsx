@@ -1,15 +1,16 @@
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
+import { RegistryImportType, RegistryLineReason } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { type UseFormReturn, FormProvider } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
-import type { FormShape } from "./types";
-import { FormTab } from "./FormTab";
-import { Button } from "@codegouvfr/react-dsfr/Button";
+
+import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
 import { getTabsWithState } from "./error";
 import "./FormBuilder.scss";
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import { RegistryLineReason, RegistryImportType } from "@td/codegen-ui";
-import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
+import { FormTab } from "./FormTab";
+import type { FormShape } from "./types";
 
 type Props = {
   registryType: RegistryImportType;
@@ -99,7 +100,11 @@ export function FormBuilder({
             }))}
           >
             {currentTab && (
-              <FormTab fields={currentTab.fields} methods={methods} />
+              <FormTab
+                key={currentTab.tabId}
+                fields={currentTab.fields}
+                methods={methods}
+              />
             )}
           </Tabs>
 
@@ -108,14 +113,6 @@ export function FormBuilder({
               title="Erreur interne"
               description="Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
               severity="error"
-              className="fr-my-2w"
-            />
-          )}
-          {errors.root?.skippedError && (
-            <Alert
-              title="Modification ignorée"
-              description="Le numéro unique saisi est déjà utilisé. Si vous souhaitez modifier une déclaration existante, vous devez saisir un motif correspondant."
-              severity="info"
               className="fr-my-2w"
             />
           )}

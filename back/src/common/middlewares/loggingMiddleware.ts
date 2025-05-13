@@ -77,15 +77,16 @@ function logExpressRequest(
   }
 ) {
   const path = request.originalUrl.split("?")[0];
-  const message = `${request.method} ${path}`;
 
-  let requestMetadata: Record<string, any> = {
+  const isStartLog = requestTiming === "start";
+
+  const requestMetadata: Record<string, any> = {
     ip: request.ip,
     http_params: request.params,
     http_query: request.query,
     http_path: path,
     http_method: request.method,
-    request_timing: requestTiming
+    request_timing: isStartLog ? "start" : "end" // "end" for both end/error
   };
 
   // GraphQL specific fields
@@ -95,25 +96,36 @@ function logExpressRequest(
     requestMetadata.graphql_query = request.body?.query;
   }
 
-  if (["end", "error"].includes(requestTiming)) {
-    requestMetadata = {
-      ...requestMetadata,
-      user: request.user?.email || "anonyme",
-      auth: request.user?.auth,
-      http_status: response.statusCode,
-      request_timing: "end",
-      execution_time_num: responseTime, // in millis
-      response_body: Buffer.isBuffer(response.locals.body)
-        ? null
-        : response.locals.body,
-      graphql_operation: request.gqlInfos?.[0]?.operation,
-      graphql_selection_name: request.gqlInfos?.[0]?.name
-    };
+  let logAsError = requestTiming === "error"; // True if client closed connection prematurely
+  let logAsWarning = false;
+
+  if (!isStartLog) {
+    // Add metadata specific to finished requests ("end" or "error" types)
+    requestMetadata.user = request.user?.email ?? "anonyme";
+    requestMetadata.auth = request.user?.auth;
+    requestMetadata.http_status = response.statusCode;
+    requestMetadata.execution_time_num = responseTime; // in millis
+    requestMetadata.response_body = Buffer.isBuffer(response.locals.body)
+      ? null
+      : response.locals.body;
+    requestMetadata.graphql_operation = request.gqlInfos?.[0]?.operation;
+    requestMetadata.graphql_selection_name = request.gqlInfos?.[0]?.name;
+    requestMetadata.graphql_errors = response.locals.gqlErrors;
+
+    // Check for GraphQL errors in the response body to log as error
+    if (response.locals.gqlErrors?.length > 0) {
+      if (response.locals.hasUndisplayedError) {
+        logAsError = true;
+      } else {
+        logAsWarning = true;
+      }
+    }
   }
 
-  if (requestTiming === "error") {
-    return logger.error(message, requestMetadata);
-  }
+  const message = [request.method, path, requestMetadata.graphql_selection_name]
+    .filter(Boolean)
+    .join(" ");
 
-  logger.info(message, requestMetadata);
+  const level = logAsError ? "error" : logAsWarning ? "warn" : "info";
+  logger.log(level, message, requestMetadata);
 }

@@ -14,7 +14,8 @@ import type {
   Mutation,
   MutationUpdateBsffArgs,
   QueryBsffArgs,
-  Query
+  Query,
+  MutationUpdateBsffPackagingArgs
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
@@ -37,13 +38,16 @@ import {
   createBsffAfterReception,
   createFicheIntervention,
   createBsffAfterAcceptation,
-  addBsffTransporter
+  createBsffBeforeReception,
+  addBsffTransporter,
+  createBsffPackaging
 } from "../../../__tests__/factories";
 import {
   getFirstTransporter,
   getFirstTransporterSync,
   getTransportersSync
 } from "../../../database";
+import { UPDATE_BSFF_PACKAGING } from "./updateBsffPackaging.integration";
 
 export const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -3216,4 +3220,78 @@ describe("Mutation.updateBsff", () => {
       expect(errors).toBeUndefined();
     }
   );
+
+  it("should correctly diff the BSFF packagings and allow reception", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN", {
+      companyTypes: ["TRANSPORTER"]
+    });
+    await transporterReceiptFactory({ company: transporter.company });
+
+    const destination = await userWithCompanyFactory("ADMIN");
+
+    const bsff = await createBsffBeforeReception(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        data: {
+          packagings: {
+            create: [
+              createBsffPackaging({
+                numero: "NUMERO1",
+                emissionNumero: "EMISSION-NUMERO1"
+              }),
+              createBsffPackaging({
+                numero: "NUMERO2",
+                emissionNumero: "EMISSION-NUMERO2"
+              }),
+              createBsffPackaging({
+                numero: "NUMERO3",
+                emissionNumero: "EMISSION-NUMERO3"
+              })
+            ]
+          }
+        }
+      }
+    );
+
+    // Let's update a packaging
+    const { mutate } = makeClient(destination.user);
+    const { errors: updatePackagingErrors } = await mutate<
+      Pick<Mutation, "updateBsffPackaging">,
+      MutationUpdateBsffPackagingArgs
+    >(UPDATE_BSFF_PACKAGING, {
+      variables: {
+        id: bsff.packagings[2].id,
+        input: {
+          numero: "NUMERO3-UPDATED"
+        }
+      }
+    });
+    expect(updatePackagingErrors).toBeUndefined();
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          destination: {
+            reception: {
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
 });

@@ -103,4 +103,37 @@ describe("Mutation.signBsdasri emission", () => {
     expect(signedByEmitterDasri.emissionSignatoryId).toEqual(user.id);
     expect(signedByEmitterDasri.emittedByEcoOrganisme).toBe(false);
   });
+
+  it("should reject emission signature on dasri when emitterWastePackagings field is empty", async () => {
+    // Test new rule: `emitterWastePackagings` is not required for publication anymore, but for emission signature
+
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        emitterWastePackagings: [],
+        status: BsdasriStatus.INITIAL
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "EMISSION", author: "Marcel" }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le détail du conditionnement émis est obligatoire",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 });

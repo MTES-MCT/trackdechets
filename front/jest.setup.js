@@ -3,6 +3,15 @@ window.getComputedStyle = elt => getComputedStyle(elt);
 
 window.fetch = () => Promise.resolve();
 
+window.ResizeObserver = class ResizeObserver {
+  constructor(callback) {
+    this.callback = callback;
+  }
+  observe = jest.fn();
+  unobserve = jest.fn();
+  disconnect = jest.fn();
+};
+
 // https://stackoverflow.com/questions/39830580/jest-test-fails-typeerror-window-matchmedia-is-not-a-function
 Object.defineProperty(window, "matchMedia", {
   writable: true,

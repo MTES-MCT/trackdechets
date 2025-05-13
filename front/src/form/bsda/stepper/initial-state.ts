@@ -71,6 +71,7 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
       consistence: bsda?.waste?.consistence ?? BsdaConsistence.Solide,
       sealNumbers: bsda?.waste?.sealNumbers ?? [],
       adr: bsda?.waste?.adr ?? "",
+      nonRoadRegulationMention: bsda?.waste?.nonRoadRegulationMention ?? "",
       pop: bsda?.waste?.pop ?? false
     },
     packagings: bsda?.packagings?.length

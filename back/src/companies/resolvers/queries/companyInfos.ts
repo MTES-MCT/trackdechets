@@ -2,6 +2,8 @@ import { UserInputError } from "../../../common/errors";
 import type { CompanyPublic, QueryResolvers } from "@td/codegen-back";
 import { getInstallation } from "../../database";
 import { searchCompany } from "../../search";
+import { ClosedCompanyError } from "../../sirene/errors";
+import { isClosedCompany } from "@td/constants";
 
 /**
  * Recherche et renvoie les données diffusables
@@ -22,6 +24,10 @@ export async function getCompanyInfos(
     );
   }
   const searchResult = await searchCompany(siretOrVat);
+
+  if (isClosedCompany(searchResult)) {
+    throw new ClosedCompanyError();
+  }
 
   return {
     orgId: searchResult.orgId,

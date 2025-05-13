@@ -1,37 +1,75 @@
 import { useMutation, useQuery } from "@apollo/client";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { createModal } from "@codegouvfr/react-dsfr/Modal";
+import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { Mutation, Query, RegistryImportType } from "@td/codegen-ui";
+import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { generatePath, useLocation, useNavigate } from "react-router-dom";
-import { debounce } from "../../../common/helper";
 import DropdownMenu from "../../../Apps/common/Components/DropdownMenu/DropdownMenu";
+import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
 import routes from "../../../Apps/routes";
+import { MEDIA_QUERIES } from "../../../common/config";
+import { debounce } from "../../../common/helper";
+import { useMedia } from "../../../common/use-media";
 import { RegistryCompanySwitcher } from "../RegistryCompanySwitcher";
+import RegistryTable from "../RegistryTable";
 import {
   CANCEL_REGISTRY_V2_LINES,
   GET_REGISTRY_LOOKUPS,
   TYPES,
   TYPES_ROUTES
 } from "../shared";
-import { format } from "date-fns";
 import { ActionButton } from "./ActionButton";
-import RegistryTable from "../RegistryTable";
-import { InlineLoader } from "../../../Apps/common/Components/Loader/Loaders";
-import { createModal } from "@codegouvfr/react-dsfr/Modal";
-import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import "./MyLines.scss";
 
-const HEADERS = [
-  "Importé le",
-  "Type",
-  "N° unique",
-  "Déclarant",
-  "Expédié / réceptionné le",
-  "Code déchet",
-  "Actions"
-];
+const getHeaders = (registryType: RegistryImportType | undefined): string[] => {
+  let dateColumnName: string;
+  switch (registryType) {
+    case RegistryImportType.Ssd:
+      dateColumnName = "Utilisé ou expédié le";
+      break;
+    case RegistryImportType.IncomingWaste:
+    case RegistryImportType.IncomingTexs:
+      dateColumnName = "Réceptionné le";
+      break;
+    case RegistryImportType.OutgoingWaste:
+    case RegistryImportType.OutgoingTexs:
+    case RegistryImportType.Transported:
+    case RegistryImportType.Managed:
+      dateColumnName = "Expédié le";
+      break;
+    default:
+      dateColumnName = "Expédié ou réceptionné le";
+      break;
+  }
+  return [
+    "Importé le",
+    "Type",
+    "N° unique",
+    "Déclarant",
+    dateColumnName,
+    "Code déchet",
+    "Actions"
+  ];
+};
+
+const REGISTRY_NAMES = {
+  [RegistryImportType.Ssd]: "Sortie de statut de déchet",
+  [RegistryImportType.IncomingWaste]:
+    "Déchets dangereux et non dangereux entrants",
+  [RegistryImportType.IncomingTexs]:
+    "Terres excavées et sédiments, dangereux et non dangereux entrants",
+  [RegistryImportType.OutgoingWaste]:
+    "Déchets dangereux et non dangereux sortants",
+  [RegistryImportType.OutgoingTexs]:
+    "Terres excavées et sédiments, dangereux et non dangereux sortants",
+  [RegistryImportType.Transported]: "Transportés",
+  [RegistryImportType.Managed]: "Gérés"
+};
+
 const DEBOUNCE_DELAY = 500;
 
 const deleteConfirmationModal = createModal({
@@ -47,6 +85,8 @@ export function MyLines() {
   const [debouncedPublicId, setDebouncedPublicId] = useState<string>("");
   const [publicIdToDelete, setPublicIdToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
   useIsModalOpen(deleteConfirmationModal, {
     onConceal: () => {
@@ -144,8 +184,38 @@ export function MyLines() {
           <DropdownMenu
             links={[
               {
-                title: "Sortie de statut de déchet",
+                title: REGISTRY_NAMES[RegistryImportType.Ssd],
                 route: generatePath(routes.registry_new.form.ssd),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
+                route: generatePath(routes.registry_new.form.incomingWaste),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
+                route: generatePath(routes.registry_new.form.outgoingWaste),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
+                route: generatePath(routes.registry_new.form.incomingTexs),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
+                route: generatePath(routes.registry_new.form.outgoingTexs),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.Transported],
+                route: generatePath(routes.registry_new.form.transported),
+                state: { background: location }
+              },
+              {
+                title: REGISTRY_NAMES[RegistryImportType.Managed],
+                route: generatePath(routes.registry_new.form.managed),
                 state: { background: location }
               }
             ]}
@@ -154,7 +224,7 @@ export function MyLines() {
             primary
           />
         </div>
-        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-4w">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-4w">
           <div className="fr-col-7">
             <RegistryCompanySwitcher
               wrapperClassName={""}
@@ -163,7 +233,7 @@ export function MyLines() {
           </div>
         </div>
 
-        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom fr-mb-2w">
+        <div className="fr-grid-row fr-grid-row--bottom fr-mb-2w">
           <div className="fr-col-7">
             <Select
               label="Type de déclaration"
@@ -176,29 +246,29 @@ export function MyLines() {
             >
               <option value="">Déclarations récentes</option>
               <option value={RegistryImportType.Ssd}>
-                Sortie de statut de déchet
+                {REGISTRY_NAMES[RegistryImportType.Ssd]}
               </option>
               <option value={RegistryImportType.IncomingWaste}>
-                Déchets dangereux et non dangereux entrants
+                {REGISTRY_NAMES[RegistryImportType.IncomingWaste]}
               </option>
               <option value={RegistryImportType.IncomingTexs}>
-                Terres excavées et sédiments, dangereux et non dangereux
-                entrants
+                {REGISTRY_NAMES[RegistryImportType.IncomingTexs]}
               </option>
               <option value={RegistryImportType.OutgoingWaste}>
-                Déchets dangereux et non dangereux sortants
+                {REGISTRY_NAMES[RegistryImportType.OutgoingWaste]}
               </option>
               <option value={RegistryImportType.OutgoingTexs}>
-                Terres excavées et sédiments, dangereux et non dangereux
-                sortants
+                {REGISTRY_NAMES[RegistryImportType.OutgoingTexs]}
               </option>
               <option value={RegistryImportType.Transported}>
-                Transportés
+                {REGISTRY_NAMES[RegistryImportType.Transported]}
               </option>
-              <option value={RegistryImportType.Managed}>Gérés</option>
+              <option value={RegistryImportType.Managed}>
+                {REGISTRY_NAMES[RegistryImportType.Managed]}
+              </option>
             </Select>
           </div>
-          <div className="fr-col-3">
+          <div className="fr-col-3 fr-ml-3w">
             <Input
               label="Numéro unique"
               nativeInputProps={{
@@ -220,7 +290,11 @@ export function MyLines() {
         {recentLookups && (
           <div>
             {tableData && tableData.length > 0 ? (
-              <RegistryTable data={tableData} headers={HEADERS} />
+              <RegistryTable
+                data={tableData}
+                headers={getHeaders(type)}
+                fixed={!isMobile}
+              />
             ) : (
               "Aucune déclaration récente sur cet établissement"
             )}

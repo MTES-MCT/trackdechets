@@ -382,6 +382,7 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
       adr: bsda?.wasteAdr,
       isSubjectToADR: bsda?.wasteIsSubjectToADR
     }),
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     workerCompanyName: bsda.workerCompanyName,
     workerCompanySiret: bsda.workerCompanySiret,
     workerCompanyAddress,

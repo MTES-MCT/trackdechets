@@ -573,7 +573,8 @@ export const addAutomaticSignaturePartner = async (
   await signatureDiv.getByLabel("N°SIRET ou raison sociale").fill(partnerSiret);
 
   // Partner company should pop in the results
-  const partnerDiv = signatureDiv.getByText(
+  const portal = await page.locator("#portal-root");
+  const partnerDiv = portal.getByText(
     `Établissement de test - ${partnerSiret}`
   );
 

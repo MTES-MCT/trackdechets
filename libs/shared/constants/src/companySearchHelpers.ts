@@ -102,6 +102,11 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
   return luhnCheckSum(num) % modulo === 0;
 };
 
+/**
+ * Cleans the input clue by removing all non-alphanumeric characters
+ * @param clue input
+ * @returns cleaned clue
+ */
 export const cleanClue = (clue: string): string =>
   clue ? clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase() : "";
 
@@ -109,7 +114,7 @@ export const cleanClue = (clue: string): string =>
  * Validateur de numéro de SIRETs
  * @param clue string to validate
  * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
- * @returns
+ * @returns true if the clue is a valid SIRET
  */
 export const isSiret = (
   clue: string | null | undefined,
@@ -218,7 +223,10 @@ export const getIntermediaryCompanyOrgId = (
  * Check for etatAdministratif
  */
 export const isClosedCompany = (companyInfos: any) =>
-  companyInfos.etatAdministratif === "F";
+  companyInfos?.etatAdministratif === "F";
 
 export const CLOSED_COMPANY_ERROR =
   "Impossible de créer un établissement fermé selon l'INSEE";
+
+export const isAnonymousCompany = (companyInfos: any) =>
+  companyInfos?.statutDiffusionEtablissement === "P";

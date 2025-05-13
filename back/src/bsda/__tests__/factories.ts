@@ -180,6 +180,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   wasteConsistence: BsdaConsistence.SOLIDE,
   wasteSealNumbers: ["1", "2", "3"],
   wasteAdr: "Mention ADR",
+  wasteNonRoadRegulationMention: "Mentions RID, ADN, IMDG",
   wastePop: false,
 
   packagings: [

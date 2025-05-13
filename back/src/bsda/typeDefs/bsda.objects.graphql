@@ -166,8 +166,10 @@ type BsdaWaste {
   sealNumbers: [String!]
   "Si le déchet est soumis à l'ADR ou non"
   isSubjectToADR: Boolean
-  "Mention ADR"
+  "Mention au titre du règlement ADR la plus à jour"
   adr: String
+  "Mentions au titre des règlements RID, ADN, IMDG (optionnel)"
+  nonRoadRegulationMention: String
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
 }

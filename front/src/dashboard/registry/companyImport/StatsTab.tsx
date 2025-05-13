@@ -79,7 +79,7 @@ export function StatsTab({ source, siret }: Props) {
 
   return (
     <div>
-      <CallOut title="" className="fr-col-lg-11">
+      <CallOut title="" className="fr-col-lg-10">
         <SegmentedControl
           legend={`Statistiques des déclarations par ${
             source === "API" ? "API" : "fichier"
@@ -129,7 +129,7 @@ export function StatsTab({ source, siret }: Props) {
             <Stat value={stats?.edited} label="Corrigées" />
             <Stat value={stats?.cancelled} label="Annulées" />
           </div>
-          <div className="tw-flex">
+          <div className="tw-flex tw-flex-wrap">
             <Stat value={stats?.ssd} label="SSD" />
             <Stat value={stats?.incomingWaste} label="D et ND entrants" />
             <Stat value={stats?.outgoingWaste} label="D et ND sortants" />

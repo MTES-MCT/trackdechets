@@ -4,11 +4,16 @@ import { searchCompanies } from "../../search";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,
-  { clue, department, allowForeignCompanies },
+  { clue, department, allowForeignCompanies, allowClosedCompanies },
   context
 ) => {
   checkIsAuthenticated(context);
-  return searchCompanies(clue, department, allowForeignCompanies);
+  return searchCompanies(
+    clue,
+    department,
+    allowForeignCompanies,
+    allowClosedCompanies
+  );
 };
 
 export default searchCompaniesResolver;
