@@ -135,7 +135,9 @@ export const SEARCH_COMPANIES = gql`
  * Only query the necessary parts
  */
 export const FAVORITES = (favType: FavoriteType) => {
-  let favFragmentString = commonCompanySearchString;
+  let favFragmentString = commonCompanySearchString.concat(
+    commonCompanyTypesSearchString
+  );
   switch (favType) {
     case FavoriteType.Broker:
       favFragmentString = favFragmentString.concat(

@@ -7,6 +7,14 @@ import { PassThrough, Readable } from "node:stream";
 import { CSV_DELIMITER, ERROR_HEADER, ImportOptions } from "./options";
 import { format } from "date-fns";
 
+export class RegistryImportHeaderError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    this.name = "RegistryImportHeaderError";
+  }
+}
+
 export function getTransformCsvStream(options: ImportOptions) {
   const parseStream = parse({
     headers: rawHeaders => {
@@ -65,7 +73,7 @@ export function getTransformCsvStream(options: ImportOptions) {
       if (errors.length > 0) {
         // Destroy the stream to stop the parsing process without flushing it
         parseStream.destroy(
-          new Error(
+          new RegistryImportHeaderError(
             [
               "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
               ...errors
@@ -138,7 +146,7 @@ export function getTransformXlsxStream(options: ImportOptions) {
           }
 
           if (errors.length > 0) {
-            throw new Error(
+            throw new RegistryImportHeaderError(
               [
                 "Les en-têtes de colonnes ne correspondent pas au modèle. Assurez-vous que vous utilisez le bon modèle. Le détail des colonnes en erreur est précisé ci-dessous:",
                 ...errors

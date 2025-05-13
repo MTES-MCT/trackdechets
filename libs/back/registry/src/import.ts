@@ -1,8 +1,15 @@
 import { logger } from "@td/logger";
-import { Readable, Writable } from "node:stream";
+import { pipeline, Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
+import {
+  getSumOfChanges,
+  incrementLocalChangesForCompany,
+  RegistryChanges,
+  saveCompaniesChanges
+} from "./changeAggregates";
 import { endImport, startImport, updateImportStats } from "./database";
+import { getCsvErrorStream, getXlsxErrorStream } from "./errors";
 import {
   importOptions,
   ImportType,
@@ -11,14 +18,12 @@ import {
   PERMISSION_ERROR,
   UNAUTHORIZED_ERROR
 } from "./options";
-import { getTransformCsvStream, getTransformXlsxStream } from "./transformers";
-import { getCsvErrorStream, getXlsxErrorStream } from "./errors";
 import {
-  RegistryChanges,
-  getSumOfChanges,
-  incrementLocalChangesForCompany,
-  saveCompaniesChanges
-} from "./changeAggregates";
+  getTransformCsvStream,
+  getTransformXlsxStream,
+  RegistryImportHeaderError
+} from "./transformers";
+import { Utf8ValidationError, Utf8ValidatorTransform } from "./utf8Transformer";
 
 export async function processStream({
   importId,
@@ -58,6 +63,8 @@ export async function processStream({
       : getXlsxErrorStream(options);
   errorStream.pipe(outputErrorStream);
 
+  const utf8Validator = new Utf8ValidatorTransform();
+
   const transformStream =
     fileType === "CSV"
       ? getTransformCsvStream(options)
@@ -72,12 +79,8 @@ export async function processStream({
     const parsedLinesStream: AsyncIterable<{
       rawLine: Record<string, string>;
       result: SafeParseReturnType<unknown, ParsedLine>;
-    }> = inputStream.pipe(transformStream).on("error", error => {
-      globalErrorNumber++;
-
-      if (errorStream.writable) {
-        errorStream.write({ errors: formatErrorMessage(error.message) });
-      }
+    }> = pipeline(inputStream, utf8Validator, transformStream, _ => {
+      // Ignoring error as it will be handled in the catch block
     });
 
     for await (const { rawLine, result } of parsedLinesStream) {
@@ -157,9 +160,17 @@ export async function processStream({
         });
       }
     }
-  } catch (err) {
-    logger.error(`Error processing import ${importId}`, { importId, err });
-    errorStream.write({ errors: INTERNAL_ERROR });
+  } catch (error) {
+    globalErrorNumber++;
+
+    const { message, hidden } = formatErrorMessage(error);
+    if (errorStream.writable) {
+      errorStream.write({ errors: message });
+    }
+
+    if (hidden) {
+      logger.error(`Error processing import ${importId}`, error);
+    }
   } finally {
     errorStream.end();
 
@@ -182,13 +193,27 @@ export async function processStream({
   return stats;
 }
 
-function formatErrorMessage(message: string) {
-  // CSV parsing error when the content is unreadable
-  if (message.includes("Parse Error:")) {
-    return "Erreur de format du fichier. Il ne correspond pas au format attendu et n'a pas pu être lu. Vérifiez que le fichier est bien au format CSV ou XLSX";
+function formatErrorMessage(error: Error) {
+  const { message } = error;
+
+  if (error instanceof Utf8ValidationError) {
+    return { hidden: false, message: error.message };
   }
 
-  return message;
+  if (error instanceof RegistryImportHeaderError) {
+    return { hidden: false, message };
+  }
+
+  // CSV parsing error when the content is unreadable
+  if (message.includes("Parse Error:")) {
+    return {
+      hidden: false,
+      message:
+        "Erreur de format du fichier. Il ne correspond pas au format attendu et n'a pas pu être lu. Vérifiez que le fichier est bien au format CSV ou XLSX"
+    };
+  }
+
+  return { hidden: true, message: INTERNAL_ERROR };
 }
 
 export function isAuthorized({
