@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
 import toast from "react-hot-toast";
 import omitDeep from "omit-deep-lodash";
-import React, { lazy, ReactElement, useMemo } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
 import { getComputedState } from "../../Apps/Dashboard/Creation/getComputedState";
@@ -28,8 +28,8 @@ import {
   UPDATE_BSDASRI
 } from "../../Apps/common/queries/bsdasri/queries";
 import { TOAST_DURATION } from "../../common/config";
+import GenericStepList from "../common/stepper/GenericStepList";
 
-const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
   formId?: string;

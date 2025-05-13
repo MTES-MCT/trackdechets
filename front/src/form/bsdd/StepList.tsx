@@ -12,7 +12,7 @@ import {
   QueryFormArgs,
   TransportMode
 } from "@td/codegen-ui";
-import React, { ReactElement, useMemo, lazy } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CreateOrUpdateTransporterInput,
@@ -34,7 +34,8 @@ import {
   UPDATE_FORM
 } from "../../Apps/common/queries/bsdd/queries";
 import { cleanPackagings } from "../../Apps/Forms/Components/PackagingList/helpers";
-const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
+import GenericStepList from "../common/stepper/GenericStepList";
+
 interface Props {
   children: (form: Form | undefined) => ReactElement;
   formId?: string;

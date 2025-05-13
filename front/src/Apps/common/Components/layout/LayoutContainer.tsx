@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import React, { Suspense } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import Loader from "../Loader/Loaders";
 import Layout from "./Layout";
@@ -12,40 +12,26 @@ import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
-const Admin = lazy(() => import("../../../../admin/Admin"));
-const DashboardRoutes = lazy(
-  () => import("../../../Dashboard/DashboardRoutes")
-);
-const CompaniesRoutes = lazy(
-  () => import("../../../Companies/CompaniesRoutes")
-);
-const RegistryRoutes = lazy(
-  () => import("../../../../dashboard/registry/RegistryRoutes")
-);
-const Account = lazy(() => import("../../../Account/Account"));
-const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
+import Admin from"../../../../admin/Admin";
+import DashboardRoutes from "../../../Dashboard/DashboardRoutes";
+import CompaniesRoutes from "../../../Companies/CompaniesRoutes";
+import RegistryRoutes from "../../../../dashboard/registry/RegistryRoutes";
+import Account from "../../../Account/Account";
+import FormContainer from "../../../../form/bsdd/FormContainer";
 
-const BsffFormContainer = lazy(
-  () => import("../../../../form/bsff/FormContainer")
-);
-const BsdasriFormContainer = lazy(
-  () => import("../../../../form/bsdasri/FormContainer")
-);
-const BsdaFormContainer = lazy(
-  () => import("../../../../form/bsda/FormContainer")
-);
+import BsffFormContainer from "../../../../form/bsff/FormContainer";
+import BsdasriFormContainer from "../../../../form/bsdasri/FormContainer";
+import BsdaFormContainer from "../../../../form/bsda/FormContainer";
 
-const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
+import WasteSelector from "../../../../login/WasteSelector";
 
-const Invite = lazy(() => import("../../../../login/Invite"));
-const UserActivation = lazy(() => import("../../../../login/UserActivation"));
-const PasswordResetRequest = lazy(
-  () => import("../../../../login/PasswordResetRequest")
-);
-const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
-const Signup = lazy(() => import("../../../../login/Signup"));
-const Company = lazy(() => import("../../../../Pages/Company/Company"));
-const WasteTree = lazy(() => import("../search/WasteTree"));
+import Invite from "../../../../login/Invite";
+import UserActivation from "../../../../login/UserActivation";
+import PasswordResetRequest from "../../../../login/PasswordResetRequest";
+import PasswordReset from "../../../../login/PasswordReset";
+import Signup from "../../../../login/Signup";
+import Company from "../../../../Pages/Company/Company";
+import WasteTree from "../search/WasteTree";
 
 const BANNER_MESSAGES = [
   <>
