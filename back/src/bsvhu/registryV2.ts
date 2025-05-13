@@ -828,12 +828,6 @@ export const updateRegistryLookup = async (
 
 export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("BSVHU");
-  await prisma.registryLookup.deleteMany({
-    where: {
-      bsvhuId: { not: null }
-    }
-  });
-  logger.logDelete();
 
   const total = await prisma.bsvhu.count({
     where: {
@@ -854,12 +848,23 @@ export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
       const createInputs = bsvhuToLookupCreateInputs(bsvhu);
       createArray = createArray.concat(createInputs);
     }
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+    // Run delete and create operations in a transaction
+    await prisma.$transaction(async tx => {
+      // Delete existing lookups for these items
+      await tx.registryLookup.deleteMany({
+        where: {
+          OR: items.map(item => ({
+            id: item.id
+          }))
+        }
+      });
+      await tx.registryLookup.createMany({
+        data: createArray,
+        skipDuplicates: true
+      });
     });
     processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    logger.logProgress(processedCount, total, pendingWrites.size);
   };
 
   while (!done) {

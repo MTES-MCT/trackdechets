@@ -318,13 +318,6 @@ export const updateRegistryLookup = async (
 export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("MANAGED");
 
-  await prisma.registryLookup.deleteMany({
-    where: {
-      registryManagedId: { not: null }
-    }
-  });
-  logger.logDelete();
-
   // First, get total count for progress calculation
   const total = await prisma.registryManaged.count({
     where: {
@@ -344,13 +337,27 @@ export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
       registryToLookupCreateInput(registryManaged)
     );
 
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+    // Run delete and create operations in a transaction
+    await prisma.$transaction(async tx => {
+      // Delete existing lookups for these items
+      await tx.registryLookup.deleteMany({
+        where: {
+          OR: items.map(item => ({
+            id: item.id,
+            exportRegistryType: RegistryExportType.MANAGED,
+            siret: item.reportForCompanySiret
+          }))
+        }
+      });
+
+      await tx.registryLookup.createMany({
+        data: createArray,
+        skipDuplicates: true
+      });
     });
 
     processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    logger.logProgress(processedCount, total, pendingWrites.size);
   };
 
   while (!done) {
