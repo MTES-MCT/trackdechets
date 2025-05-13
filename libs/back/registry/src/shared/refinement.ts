@@ -43,7 +43,16 @@ export function refineTransporterInfos<T>({
       return;
     }
 
-    if (!item[recepisseIsExemptedKey] && !item[recepisseNumberKey]) {
+    const isForeignTransporter = [
+      "ENTREPRISE_UE",
+      "ENTREPRISE_HORS_UE"
+    ].includes(item[typeKey]);
+
+    if (
+      !item[recepisseIsExemptedKey] &&
+      !isForeignTransporter &&
+      !item[recepisseNumberKey]
+    ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         message:
@@ -55,7 +64,7 @@ export function refineTransporterInfos<T>({
     // When the declaration comes from abroad and the transporter is not french,
     // we often have partial or no information about the transporter. So we just skip the actor infos check.
     if (
-      ["ENTREPRISE_UE", "ENTREPRISE_HORS_UE"].includes(item[typeKey]) &&
+      isForeignTransporter &&
       ttdImportNumberKey &&
       item[ttdImportNumberKey]
     ) {
