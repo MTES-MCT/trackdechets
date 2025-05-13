@@ -97,6 +97,7 @@ describe("mutation / importPaperForm", () => {
           quantity: 1.0,
           quantityType: QuantityType.REAL,
           packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
+          isSubjectToADR: true,
           onuCode: "ONU",
           consistence: Consistence.SOLID
         },

@@ -148,7 +148,7 @@ async function getDuplicateFormInput(
     wasteDetailsIsSubjectToADR:
       form.wasteDetailsIsDangerous || form.wasteDetailsPop
         ? true
-        : form.wasteDetailsIsSubjectToADR,
+        : form.wasteDetailsIsSubjectToADR || false,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     traderCompanyName: trader?.name ?? form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,

@@ -1401,7 +1401,7 @@ describe("Mutation.duplicateForm", () => {
     }
   );
 
-  it.each([true, false, null])(
+  it.each([true, false])(
     "should keep existing wasteDetailsIsSubjectToADR when" +
       " wasteDetailsIsSubjectToADR is %p and waste is not dangerous",
     async wasteDetailsIsSubjectToADR => {
@@ -1431,13 +1431,44 @@ describe("Mutation.duplicateForm", () => {
         }
       });
 
-      expect(duplicatedForm).toEqual(
-        expect.objectContaining({
-          wasteDetailsIsSubjectToADR
-        })
+      expect(duplicatedForm.wasteDetailsIsSubjectToADR).toEqual(
+        wasteDetailsIsSubjectToADR
       );
     }
   );
+
+  it("if wasteDetailsIsSubjectToADR is null in old BSD and waste is not dangerous, wasteDetailsIsSubjectToADR defaults to false in new BSD", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        wasteDetailsIsDangerous: false,
+        wasteDetailsIsSubjectToADR: null
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    // Then
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
+      where: {
+        id: data.duplicateForm.id
+      }
+    });
+
+    expect(duplicatedForm.wasteDetailsIsSubjectToADR).toEqual(false);
+  });
 
   it("should not be possible to duplicate annexe 1", async () => {
     // Given
