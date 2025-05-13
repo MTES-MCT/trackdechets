@@ -25,10 +25,6 @@ export async function getCompanyInfos(
   }
   const searchResult = await searchCompany(siretOrVat);
 
-  if (isClosedCompany(searchResult)) {
-    throw new ClosedCompanyError();
-  }
-
   return {
     orgId: searchResult.orgId,
     siret: searchResult.siret,
@@ -78,9 +74,12 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
       }
     );
   }
-  const companyInfos = (await getCompanyInfos(
-    !!args.siret ? args.siret : args.clue!
-  )) as CompanyPublic;
+  const companyInfos = await getCompanyInfos(args.siret ?? args.clue!);
+
+  if (isClosedCompany(companyInfos)) {
+    throw new ClosedCompanyError();
+  }
+
   if (!["P", "N"].includes(companyInfos.statutDiffusionEtablissement!)) {
     return companyInfos;
   } else {
