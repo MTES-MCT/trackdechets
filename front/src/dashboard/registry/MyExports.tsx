@@ -275,12 +275,23 @@ export function MyExports() {
           </div>
         </div>
         {error && (
-          <Alert
-            closable
-            description={error.message}
-            severity="error"
-            title="Erreur lors du chargement"
-          />
+          <div className="fr-mt-2w">
+            <Alert
+              closable
+              description={error.message}
+              severity="error"
+              title="Erreur lors du chargement"
+            />
+          </div>
+        )}
+        {import.meta.env.VITE_REGISTRY_EXPORT_ISSUE_NOTICE && (
+          <div className="fr-mt-2w">
+            <Alert
+              description={import.meta.env.VITE_REGISTRY_EXPORT_ISSUE_NOTICE}
+              severity="info"
+              small
+            />
+          </div>
         )}
         {registryExports && registryExports.length === 0 && (
           <div className="tw-text-center">
