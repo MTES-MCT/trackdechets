@@ -4,6 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BsdaSignatureType,
+  FormCompany,
   Mutation,
   MutationSignBsdaArgs,
   MutationUpdateBsdaTransporterArgs,
@@ -54,6 +55,11 @@ const schema = z.object({
         invalid_type_error: "Format de date invalide."
       })
       .transform(v => v?.toISOString())
+  }),
+  company: z.object({
+    contact: z.string().nullish(),
+    phone: z.string().nullish(),
+    mail: z.string().nullish()
   }),
   transport: z.object({
     takenOverAt: z.coerce
@@ -107,6 +113,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   );
 
   const initialState = {
+    company: signingTransporter?.company as FormCompany,
     transport: {
       mode: signingTransporter?.transport?.mode ?? TransportMode.Road,
       plates: signingTransporter?.transport?.plates ?? [],
@@ -206,15 +213,46 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
               })}
             >
               <h4 className="fr-h4">Transport du déchet</h4>
-              <div className="fr-col-6 fr-mb-5v">
+              <div className="fr-col-12 fr-col-md-6 fr-mb-2w">
+                <Input
+                  label="Personne à contacter"
+                  nativeInputProps={{
+                    value: bsda.transporter?.company?.contact ?? "",
+                    ...register("company.contact")
+                  }}
+                />
+              </div>
+              <div className="fr-grid-row fr-grid-row--gutters fr-mb-2w">
+                <div className="fr-col-12 fr-col-md-4">
+                  <Input
+                    label="Téléphone"
+                    nativeInputProps={{
+                      value: bsda.transporter?.company?.phone ?? "",
+                      ...register("company.phone")
+                    }}
+                  />
+                </div>
+                <div className="fr-col-12 fr-col-md-6">
+                  <Input
+                    label="Mail"
+                    nativeInputProps={{
+                      value: bsda.transporter?.company?.mail ?? "",
+                      ...register("company.mail")
+                    }}
+                  />
+                </div>
+              </div>
+              <div className="fr-col-4 fr-mb-5v">
                 <RhfTransportModeSelect fieldPath={"transport.mode"} />
               </div>
-              <RhfTagsInputWrapper
-                maxTags={2}
-                label="Immatriculations"
-                fieldName={"transport.plates"}
-                hintText="2 max : Véhicule, remorque"
-              />
+              <div className="fr-col-8">
+                <RhfTagsInputWrapper
+                  maxTags={2}
+                  label="Immatriculations"
+                  fieldName={"transport.plates"}
+                  hintText="2 max : Véhicule, remorque"
+                />
+              </div>
 
               <TransporterRecepisseWrapper transporter={signingTransporter} />
 

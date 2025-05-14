@@ -35,6 +35,7 @@ import { generatePath, Link, useParams } from "react-router-dom";
 import routes from "../../../routes";
 import { getComputedState } from "../../Creation/getComputedState";
 import SignBsdaOperation from "./SignBsdaOperation";
+import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
 
 const schema = z.object({
   author: z
@@ -104,7 +105,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
   const TODAY = new Date();
 
   const initialState = {
-    date: datetimeToYYYYMMDD(TODAY),
+    date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
     ...getComputedState(
       {
@@ -326,12 +327,13 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 </div>
 
                 <p className="fr-text fr-mb-2w">
-                  En qualité de
-                  <strong> destinataire du déchet</strong>, je confirme la
-                  réception des déchets pour la quantité indiquée dans ce
-                  bordereau. Un mail automatique Trackdéchets informera le
-                  producteur de ce refus partiel, accompagné du récépissé PDF.
-                  L'inspection des ICPE et ma société en recevront une copie.
+                  En qualité de <strong>destinataire du déchet</strong>, je
+                  confirme la réception des déchets pour la quantité indiquée
+                  dans ce bordereau. En cas de refus partiel ou total
+                  uniquement, un mail automatique Trackdéchets informera le
+                  producteur de ce refus, accompagné du récépissé PDF.
+                  L'inspection des ICPE et ma société en recevront également une
+                  copie.
                 </p>
 
                 <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">

@@ -31,6 +31,7 @@ import {
 } from "../../../common/queries/bsda/queries";
 import { getComputedState } from "../../Creation/getComputedState";
 import { getInitialCompany } from "../../../common/data/initialState";
+import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
 
 const schema = z.object({
   author: z
@@ -116,7 +117,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   const TODAY = new Date();
 
   const initialState = {
-    date: datetimeToYYYYMMDD(TODAY),
+    date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
     ...getComputedState(
       {
@@ -182,6 +183,20 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <p className="fr-text fr-mb-2w">
+            Vous hésitez sur le type d'opération à choisir ? Vous pouvez
+            consulter la liste de traitement des déchets sur{" "}
+            <a
+              className="fr-link force-external-link-content force-underline-link"
+              href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              legifrance
+            </a>
+            . Le type d'opération figure sur le CAP qui a été émis par le
+            destinataire.
+          </p>
           <Select
             label="Traitement d'élimination / valorisation prévue (code D/R)"
             className="fr-col-12 fr-mt-1w"
@@ -216,11 +231,11 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
               D 15 - Transit incluant le groupement sans transvasement
             </option>
           </Select>
-          {operationCode && (
-            <p className="fr-mt-5v fr-mb-5v fr-info-text">
-              Code de traitement prévu : {operationCode}
-            </p>
-          )}
+
+          <p className="fr-mt-5v fr-mb-5v fr-info-text">
+            Code de traitement prévu : {bsda.destination?.plannedOperationCode}
+          </p>
+
           <RhfOperationModeSelect
             operationCode={operationCode}
             path={"destination.operation.mode"}
@@ -228,7 +243,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
           />
 
           <Input
-            label="Description de l'opération (Optionnel)"
+            label="Description du traitement (Optionnel)"
             nativeInputProps={{
               placeholder: "ISDD, ISDND, etc.",
               ...register("destination.operation.description")
@@ -237,9 +252,9 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
 
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
-            les informations ci-dessus sont correctes et certifie que le
-            traitement indiquée ci-contre a bien été réalisée pour la quantité
-            de déchets renseignée.
+            les informations ci-dessus sont correctes. En signant, je confirme
+            le traitement des déchets pour la quantité indiquée dans ce
+            bordereau.
           </p>
 
           <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
@@ -251,8 +266,14 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
                 max: datetimeToYYYYMMDD(TODAY),
                 ...register("destination.operation.date")
               }}
-              state={formState.errors.date ? "error" : "default"}
-              stateRelatedMessage={formState.errors.date?.message}
+              state={
+                formState.errors.destination?.operation?.date
+                  ? "error"
+                  : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.destination?.operation?.date?.message
+              }
             />
           </div>
           <div className="fr-col-8 fr-mb-2w">

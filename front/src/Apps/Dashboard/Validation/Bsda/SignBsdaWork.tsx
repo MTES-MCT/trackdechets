@@ -232,7 +232,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
         </>
       ) : (
         <>
-          <BsdaWasteSummary bsda={bsda} />
+          <BsdaWasteSummary bsda={bsda} showCap />
           <BsdaJourneySummary bsda={bsda} />
           {!!initialBsdas?.length && (
             <div className="tw-pb-4">

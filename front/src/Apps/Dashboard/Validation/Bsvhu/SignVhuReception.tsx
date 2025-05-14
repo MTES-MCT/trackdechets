@@ -31,6 +31,7 @@ import WasteVhuSummary from "./WasteVhuSummary";
 import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
 import { multiplyByRounded } from "../../../../common/helper";
 import SignVhuOperation from "./SignVhuOperation";
+import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
 
 const schema = z.object({
   author: z
@@ -101,7 +102,7 @@ const SignVhuReception = ({ bsvhuId, onClose }) => {
   const TODAY = new Date();
 
   const initialState = {
-    date: datetimeToYYYYMMDD(TODAY),
+    date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
     destination: {
       reception: {

@@ -4,6 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BsdaSignatureType,
+  BsdaType,
   Mutation,
   MutationSignBsdaArgs,
   Query,
@@ -121,7 +122,14 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
         </>
       ) : (
         <>
-          <BsdaWasteSummary bsda={bsda} />
+          <BsdaWasteSummary
+            bsda={bsda}
+            showScelles={
+              bsda.status === "INITIAL" &&
+              (bsda.type === BsdaType.Gathering ||
+                bsda.type === BsdaType.Reshipment)
+            }
+          />
           <BsdaJourneySummary bsda={bsda} />
           {!!initialBsdas?.length && (
             <div className="tw-pb-4">
@@ -133,7 +141,8 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
           <p className="fr-text fr-mb-2w">
             En qualité <strong>d'émetteur du déchet</strong>, j'atteste que les
             informations ci-dessus sont correctes. En signant ce document,
-            j'autorise le transporteur à prendre en charge le déchet.
+            j'autorise les établissements désignés à prendre en charge le
+            déchet.
           </p>
 
           <form

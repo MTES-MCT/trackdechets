@@ -34,6 +34,7 @@ import Select from "@codegouvfr/react-dsfr/Select";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../common/queries/company/query";
 import { useParams } from "react-router-dom";
 import { SignatureTimestamp } from "../BSPaoh/WorkflowAction/components/Signature";
+import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
 
 const schema = z.object({
   author: z
@@ -123,7 +124,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   const TODAY = new Date();
 
   const initialState = {
-    date: datetimeToYYYYMMDD(TODAY),
+    date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
     destination: {
       operation: {
@@ -245,11 +246,11 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
               </>
             )}
           </Select>
-          {operationCode && (
-            <p className="fr-mt-5v fr-mb-5v fr-info-text">
-              Code de traitement prévu : {operationCode}
-            </p>
-          )}
+
+          <p className="fr-mt-5v fr-mb-5v fr-info-text">
+            Code de traitement prévu : {bsvhu.destination?.plannedOperationCode}
+          </p>
+
           <RhfOperationModeSelect
             operationCode={operationCode}
             path={"destination.operation.mode"}

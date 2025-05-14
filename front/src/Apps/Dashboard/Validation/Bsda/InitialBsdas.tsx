@@ -11,6 +11,7 @@ import { InitialBsda } from "@td/codegen-ui";
 import { IconPdf } from "../../../common/Components/Icons/Icons";
 import { useDownloadPdf } from "../../../../dashboard/components/BSDList/BSDa/BSDaActions/useDownloadPdf";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 
 export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
   const [downloadPdf] = useDownloadPdf({});
@@ -19,7 +20,7 @@ export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
       <TableHead>
         <TableRow>
           <TableHeaderCell>Identifiant</TableHeaderCell>
-          <TableHeaderCell>Dénomination</TableHeaderCell>
+          <TableHeaderCell>{WASTE_NAME_LABEL}</TableHeaderCell>
           <TableHeaderCell>CAP (exutoire)</TableHeaderCell>
           <TableHeaderCell>Qté</TableHeaderCell>
           <TableHeaderCell>Action</TableHeaderCell>
