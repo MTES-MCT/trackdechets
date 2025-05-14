@@ -49,13 +49,28 @@ exporters:
     traces:
       ignore_resources: ["OPTIONS /"]
       compute_top_level_by_span_kind: true
+  
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, probabilistic_sampler, attributes, batch/datadog_generic]
-      exporters: [datadog/connector, datadog/exporter]
+      processors: [memory_limiter, batch/datadog_generic]
+      exporters: [datadog/connector]
+    traces/2:
+      receivers: [datadog/connector]
+      processors:
+        [
+          memory_limiter,
+          batch/datadog_generic,
+          probabilistic_sampler,
+          attributes
+        ]
+      exporters: [datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
       processors: [memory_limiter, batch/datadog_metrics]
