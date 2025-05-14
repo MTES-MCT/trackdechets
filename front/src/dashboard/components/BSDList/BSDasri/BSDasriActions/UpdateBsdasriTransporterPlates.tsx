@@ -8,7 +8,7 @@ import { UPDATE_BSDASRI } from "../../../../../Apps/common/queries/bsdasri/queri
 
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
-import TagsInput from "../../../../../common/components/tags-input/TagsInput"
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 export function UpdateBsdasriTransporterPlates({
   bsdasri,

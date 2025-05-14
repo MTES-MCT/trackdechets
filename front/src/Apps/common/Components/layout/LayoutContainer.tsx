@@ -12,7 +12,7 @@ import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
 
-import Admin from"../../../../admin/Admin";
+import Admin from "../../../../admin/Admin";
 import DashboardRoutes from "../../../Dashboard/DashboardRoutes";
 import CompaniesRoutes from "../../../Companies/CompaniesRoutes";
 import RegistryRoutes from "../../../../dashboard/registry/RegistryRoutes";
