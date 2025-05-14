@@ -54,6 +54,14 @@ export class RegistryLogger {
   private globalStart: number;
   private processingHistory: { timestamp: number; count: number }[] = [];
   private readonly HISTORY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes in milliseconds
+  private segmentSpeeds: number[] = Array(50).fill(0);
+  private maxSpeed = 0;
+  private hasResetMaxSpeed = false;
+
+  // Color codes for red to green gradient
+  private readonly COLOR_CODES = [
+    196, 202, 208, 214, 220, 226, 190, 154, 118, 82, 46
+  ];
 
   constructor(registryType: string) {
     this.registryType = registryType;
@@ -68,6 +76,18 @@ export class RegistryLogger {
         deleteTime
       )}ms`
     );
+  }
+
+  private getColorForSpeed(speed: number): string {
+    if (this.maxSpeed === 0) return "\x1b[38;5;196m"; // Bright red for 0 speed
+
+    const ratio = speed / this.maxSpeed;
+    // Map ratio to color codes (0-10)
+    const colorIndex = Math.min(
+      Math.floor(ratio * (this.COLOR_CODES.length - 1)),
+      this.COLOR_CODES.length - 1
+    );
+    return `\x1b[38;5;${this.COLOR_CODES[colorIndex]}m`;
   }
 
   private calculateProcessingRate(): { ratePerMinute: number } {
@@ -90,6 +110,7 @@ export class RegistryLogger {
 
     const ratePerMinute =
       timeSpanMinutes > 0 ? recordsProcessed / timeSpanMinutes : 0;
+
     return { ratePerMinute };
   }
 
@@ -108,9 +129,36 @@ export class RegistryLogger {
       // Ensure current doesn't exceed total for display purposes
       const displayCurrent = Math.min(current, total);
       const percent = Math.round((displayCurrent / total) * 100);
-      const progressBar =
-        "█".repeat(Math.floor(percent / 2)) +
-        "░".repeat(50 - Math.floor(percent / 2));
+
+      // Calculate current segment and update its speed
+      const currentSegment = Math.floor(percent / 2);
+      if (currentSegment < 50) {
+        this.segmentSpeeds[currentSegment] = ratePerMinute;
+
+        // Reset maxSpeed after first segment is completed
+        if (currentSegment === 1 && !this.hasResetMaxSpeed) {
+          this.maxSpeed = this.segmentSpeeds[0];
+          this.hasResetMaxSpeed = true;
+        } else {
+          this.maxSpeed = Math.max(this.maxSpeed, ratePerMinute);
+        }
+      }
+
+      // Create progress bar with color-coded filled squares and empty squares
+      const filledCount = Math.floor(percent / 2);
+      const progressBar = Array(50)
+        .fill("")
+        .map((_, index) => {
+          if (index < filledCount) {
+            const color = this.getColorForSpeed(this.segmentSpeeds[index]);
+            return `${color}█\x1b[0m`;
+          } else if (index === currentSegment) {
+            const color = this.getColorForSpeed(ratePerMinute);
+            return `${color}█\x1b[0m`;
+          }
+          return "░";
+        })
+        .join("");
 
       clearLine(process.stdout, 0);
       cursorTo(process.stdout, 0);
@@ -151,12 +199,21 @@ export class RegistryLogger {
     // Clear the progress bar line
     clearLine(process.stdout, 0);
     cursorTo(process.stdout, 0);
+
+    // Create the final progress bar with all segments colored
+    const progressBar = this.segmentSpeeds
+      .map(speed => {
+        const color = this.getColorForSpeed(speed);
+        return `${color}█\x1b[0m`;
+      })
+      .join("");
+
     console.log(
       `✅ [${
         this.registryType
       }] Completed! Processed ${processedCount} records in ${Math.round(
         totalTimeSeconds
-      )}s`
+      )}s\n🚀 [${this.registryType}] Final speed profile: ${progressBar}`
     );
   }
 }
