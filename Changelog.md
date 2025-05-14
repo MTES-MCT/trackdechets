@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Supression de la fourniture d'identité pour le RNDTS [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202/)
+- Passer à J-18 mois la limite de l'ensemble des dates liées aux déclarations [PR 4194](https://github.com/MTES-MCT/trackdechets/pull/4194)
 
 #### :rocket: Nouvelles fonctionnalités
 
