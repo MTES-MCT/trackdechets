@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import styles from "./MyExports.module.scss";
 import {
   DeclarationType,
-  FormsRegisterExportFormat,
+  RegistryExportFormat,
   Mutation,
   MutationGenerateRegistryV2ExportArgs,
   Query,
@@ -60,8 +60,6 @@ const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
       return `Registre sortant`;
     case RegistryV2ExportType.Transported:
       return `Registre transporté`;
-    case RegistryV2ExportType.All:
-      return `Registre exhaustif`;
     default:
       return `Registre exhaustif`;
   }
@@ -90,24 +88,6 @@ const getFilterStateForRegistryType = (
 } => {
   if (registryType === RegistryV2ExportType.Ssd) {
     if (filterName.startsWith("wasteTypes")) {
-      return {
-        disabled: true
-      };
-    } else if (filterName === "declarationType") {
-      return {
-        disabled: true
-      };
-    }
-  } else if (registryType === RegistryV2ExportType.All) {
-    if (filterName === "wasteTypes.dnd") {
-      return {
-        disabled: false
-      };
-    } else if (filterName === "wasteTypes.dd") {
-      return {
-        disabled: false
-      };
-    } else if (filterName === "wasteTypes.texs") {
       return {
         disabled: true
       };
@@ -152,11 +132,6 @@ const getDefaultsForRegistryType = (
   } else if (registryType === RegistryV2ExportType.Transported) {
     return {
       declarationType: DeclarationType.All
-    };
-  } else if (registryType === RegistryV2ExportType.All) {
-    return {
-      wasteTypes: [RegistryV2ExportWasteType.Dnd, RegistryV2ExportWasteType.Dd],
-      declarationType: DeclarationType.Bsd
     };
   }
   return {
@@ -226,7 +201,7 @@ const getSchema = () =>
           .nullish()
       ),
       registryType: z.nativeEnum(RegistryV2ExportType),
-      format: z.nativeEnum(FormsRegisterExportFormat),
+      format: z.nativeEnum(RegistryExportFormat),
       declarationType: z.nativeEnum(DeclarationType),
       wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
         message: "Veullez sélectionner au moins un type de déchet"
@@ -256,7 +231,7 @@ const getDefaultValues = () => ({
   delegateSiret: null,
   startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
   registryType: RegistryV2ExportType.Incoming,
-  format: FormsRegisterExportFormat.Csv,
+  format: RegistryExportFormat.Csv,
   declarationType: DeclarationType.All,
   wasteTypes: [
     RegistryV2ExportWasteType.Dd,
@@ -493,7 +468,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
         siret,
         delegateSiret,
         registryType, // RegistryV2ExportType.Ssd
-        format, //FormsRegisterExportFormat.Csv
+        format, //RegistryExportFormat.Csv
         dateRange: {
           _gte: startOfDayStartDate,
           _lt: endOfDayEndDate
@@ -769,14 +744,14 @@ export function ExportModal({ isOpen, onClose }: Props) {
               }}
             >
               <option
-                value={FormsRegisterExportFormat.Csv}
-                key={FormsRegisterExportFormat.Csv}
+                value={RegistryExportFormat.Csv}
+                key={RegistryExportFormat.Csv}
               >
                 {`Texte (.csv)`}
               </option>
               <option
-                value={FormsRegisterExportFormat.Xlsx}
-                key={FormsRegisterExportFormat.Xlsx}
+                value={RegistryExportFormat.Xlsx}
+                key={RegistryExportFormat.Xlsx}
               >
                 {`Excel (.xlsx)`}
               </option>

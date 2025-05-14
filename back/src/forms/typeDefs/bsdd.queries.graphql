@@ -168,47 +168,6 @@ type Query {
   formPdf("ID d'un BSD" id: ID!): FileDownload!
 
   """
-  DEPRECATED - Renvoie un lien de téléchargement pour télécharger le registre BSDD
-  Le lien est valable 10 secondes
-  """
-  formsRegister(
-    """
-    Liste de SIRET pour lesquelles exporter le registre
-    """
-    sirets: [String!]!
-
-    """
-    (Optionnel) Modèle de registre (exhaustif, entrants, sortants, transport, négociants)
-    Défaut: ALL
-    """
-    exportType: FormsRegisterExportType
-
-    """
-    (Optionnel) Filtre les données par une date de début
-    Défaut: aucune valeur
-    """
-    startDate: DateTime
-
-    """
-    (Optionnel) Filtre les données par une date de fin
-    Défaut: aucune valeur
-    """
-    endDate: DateTime
-
-    """
-    (Optionnel) Filtre les données par code déchet
-    Défaut: Tous les codes déchets
-    """
-    wasteCode: String
-
-    """
-    (Optionnel) Format de l'export
-    Défaut: csv
-    """
-    exportFormat: FormsRegisterExportFormat
-  ): FileDownload! @deprecated(reason: "Utiliser wastesDownloadLink")
-
-  """
   Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.
   La liste est paginée par pages de 100 items, ordonnée par date décroissante (champ `loggedAt`)
   Seuls les changements de statut disposant d'un champ `loggedAt` non nul sont retournés

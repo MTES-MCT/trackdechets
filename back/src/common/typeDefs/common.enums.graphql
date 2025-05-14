@@ -110,7 +110,7 @@ enum DeclarationType {
 """
 Format de l'export du registre
 """
-enum FormsRegisterExportFormat {
+enum RegistryExportFormat {
   """
   Fichier csv
   """

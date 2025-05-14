@@ -206,7 +206,7 @@ const registryV2ExportFragment = gql`
 export const GENERATE_REGISTRY_V2_EXPORT = gql`
   mutation GenerateRegistryV2Export(
     $registryType: RegistryV2ExportType!
-    $format: FormsRegisterExportFormat!
+    $format: RegistryExportFormat!
     $siret: String
     $delegateSiret: String
     $dateRange: DateFilter!

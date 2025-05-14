@@ -17,7 +17,6 @@ import type {
   QueryBspaohPdfArgs,
   QueryBsvhuPdfArgs,
   QueryFormPdfArgs,
-  QueryFormsRegisterArgs,
   QueryWastesRegistryCsvArgs,
   QueryWastesRegistryXlsArgs
 } from "@td/codegen-back";
@@ -55,7 +54,6 @@ type DownloadHandlerParams =
   | QueryBsffPdfArgs
   | QueryBsvhuPdfArgs
   | QueryBspaohPdfArgs
-  | QueryFormsRegisterArgs
   | QueryWastesRegistryCsvArgs
   | QueryWastesRegistryXlsArgs
   | MyCompaniesCsvArgs
