@@ -8,7 +8,7 @@ import { CompanyCachedFetcher } from "./utils";
  * Format rows as data flow
  */
 export function wasteFormatterV2<WasteType extends GenericWasteV2>(opts: {
-  exportType: RegistryV2ExportType;
+  exportType: RegistryV2ExportType | "ALL";
   columnSorter?:
     | ((line: Record<string, string>) => Record<string, string>)
     | null;

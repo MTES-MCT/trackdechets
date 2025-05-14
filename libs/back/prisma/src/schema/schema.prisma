@@ -936,10 +936,10 @@ model User {
   StatusLog             StatusLog[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[]                 @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]                 @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]                 @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]                 @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]                  @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]                  @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]                  @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]                  @relation("BsdasriOperationSignature")
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
@@ -952,9 +952,10 @@ model User {
   registryTransported        RegistryTransported[]
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
+  registryExhaustiveExports  RegistryExhaustiveExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
-  adminRequests              AdminRequest[] @relation("AdminRequestUser")
+  adminRequests              AdminRequest[]             @relation("AdminRequestUser")
 }
 
 enum GovernmentPermission {
@@ -1668,18 +1669,18 @@ model Bsda {
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
 
-  wasteCode         String?
-  wasteFamilyCode   String?
-  wasteMaterialName String?
-  wasteConsistence  BsdaConsistence?
-  wasteSealNumbers  String[]
-  wasteIsSubjectToADR Boolean?
-  wasteAdr          String?
+  wasteCode                     String?
+  wasteFamilyCode               String?
+  wasteMaterialName             String?
+  wasteConsistence              BsdaConsistence?
+  wasteSealNumbers              String[]
+  wasteIsSubjectToADR           Boolean?
+  wasteAdr                      String?
   wasteNonRoadRegulationMention String?
-  wastePop          Boolean?         @default(false)
-  packagings        Json             @default("[]")
-  weightValue       Decimal?         @db.Decimal(65, 30)
-  weightIsEstimate  Boolean?
+  wastePop                      Boolean?         @default(false)
+  packagings                    Json             @default("[]")
+  weightValue                   Decimal?         @db.Decimal(65, 30)
+  weightIsEstimate              Boolean?
 
   destinationCompanyName                                  String?
   destinationCompanySiret                                 String?
@@ -2117,24 +2118,24 @@ model AdministrativeTransfer {
 }
 
 model AdminRequest {
-  id         String                       @id @default(cuid())
-  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   // The user initiating the request, wanting to be promoted to admin
-  userId    String  @db.VarChar(30)
-  user User  @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.VarChar(30)
+  user   User   @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
 
   // The orgId of the company the user wants to be admin of
-  companyId String @db.VarChar(30)
-  company Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String  @db.VarChar(30)
+  company   Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
 
   // The collaborator who has been asked to approve the request 
-  collaboratorId String?  @db.VarChar(30)
+  collaboratorId String? @db.VarChar(30)
 
   // The code sent by mail to self-validate the request
-  code  String? @db.VarChar(8)
-  codeAttempts Int @default(0)
+  code         String? @db.VarChar(8)
+  codeAttempts Int     @default(0)
 
   // End of the period during which only the admin can accept the request
   adminOnlyEndDate DateTime?
@@ -2150,7 +2151,7 @@ model AdminRequest {
 
 enum AdminRequestStatus {
   PENDING
-  ACCEPTED 
+  ACCEPTED
   REFUSED
   BLOCKED
   EXPIRED

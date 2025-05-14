@@ -134,11 +134,9 @@ const inputToManagedWaste: ConverterMap<keyof InputMap, ManagedWasteV2> = {
   BSVHU: bsvhuToManagedWasteV2
 };
 
-const registryToWaste: Partial<
-  Record<
-    Exclude<RegistryV2ExportType, "ALL">,
-    Partial<Record<keyof InputMap, any>>
-  >
+const registryToWaste: Record<
+  RegistryV2ExportType,
+  Partial<Record<keyof InputMap, any>>
 > = {
   SSD: inputToSsdWaste,
   INCOMING: inputToIncomingWaste,

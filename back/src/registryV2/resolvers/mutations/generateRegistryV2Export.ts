@@ -122,7 +122,7 @@ export async function generateRegistryV2Export(
       isForAllCompanies,
       sirets: isForAllCompanies ? undefined : { equals: sirets },
       delegateSiret: delegate ?? undefined,
-      registryType: registryType === "ALL" ? null : registryType,
+      registryType,
       wasteTypes: where?.wasteType?._eq
         ? { equals: [where.wasteType._eq] }
         : where?.wasteType?._in?.length
@@ -184,7 +184,7 @@ export async function generateRegistryV2Export(
       delegateSiret: delegate,
       sirets,
       isForAllCompanies,
-      registryType: registryType === "ALL" ? null : registryType,
+      registryType,
       wasteTypes: where?.wasteType?._eq
         ? [where.wasteType._eq]
         : where?.wasteType?._in?.length

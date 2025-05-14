@@ -27,8 +27,7 @@ export function formatRegistryType(typename: RegistryV2ExportType) {
     INCOMING: "Entrant",
     OUTGOING: "Sortant",
     TRANSPORTED: "Transport",
-    MANAGED: "Gestion",
-    ALL: "Exhaustif"
+    MANAGED: "Gestion"
   };
   return typename ? mapping[typename] : "";
 }

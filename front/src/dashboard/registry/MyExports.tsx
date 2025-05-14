@@ -7,7 +7,7 @@ import {
   DeclarationType,
   Query,
   QueryRegistryV2ExportDownloadSignedUrlArgs,
-  RegistryV2ExportStatus,
+  RegistryExportStatus,
   RegistryV2ExportType
 } from "@td/codegen-ui";
 import {
@@ -39,8 +39,6 @@ const getRegistryTypeWording = (registryType: RegistryV2ExportType): string => {
       return `Registre sortant`;
     case RegistryV2ExportType.Transported:
       return `Registre transporté`;
-    case RegistryV2ExportType.All:
-      return `Registre exhaustif`;
     default:
       return `Registre exhaustif`;
   }
@@ -152,8 +150,8 @@ export function MyExports() {
     if (
       registryExports?.some(
         registryExport =>
-          (registryExport.node.status === RegistryV2ExportStatus.Pending ||
-            registryExport.node.status === RegistryV2ExportStatus.Started) &&
+          (registryExport.node.status === RegistryExportStatus.Pending ||
+            registryExport.node.status === RegistryExportStatus.Started) &&
           // condition to avoid infinite refetches on old exports that somehow never finished
           new Date(registryExport.node.createdAt) > subHours(new Date(), 1)
       )
@@ -182,8 +180,8 @@ export function MyExports() {
             </div>
           </div>,
           <div>
-            {(registryExport.node.status === RegistryV2ExportStatus.Started ||
-              registryExport.node.status === RegistryV2ExportStatus.Pending) &&
+            {(registryExport.node.status === RegistryExportStatus.Started ||
+              registryExport.node.status === RegistryExportStatus.Pending) &&
             registryExport.node.companies.length > 1 ? null : (
               <>
                 {[
@@ -228,14 +226,13 @@ export function MyExports() {
             registryExport.node.startDate,
             registryExport.node.endDate
           ),
-          registryExport.node.status === RegistryV2ExportStatus.Pending ||
-          registryExport.node.status === RegistryV2ExportStatus.Started ||
+          registryExport.node.status === RegistryExportStatus.Pending ||
+          registryExport.node.status === RegistryExportStatus.Started ||
           downloadLoadingExportId === registryExport.node.id ? (
             <div className="tw-px-2" style={{ width: "fit-content" }}>
               <InlineLoader size={32} />
             </div>
-          ) : registryExport.node.status ===
-            RegistryV2ExportStatus.Successful ? (
+          ) : registryExport.node.status === RegistryExportStatus.Successful ? (
             <div className="tw-px-2">
               <Button
                 title="Télécharger"

@@ -12,13 +12,13 @@ import { UserInputError } from "../../common/errors";
 import { pipeline, Readable } from "stream";
 import {
   Prisma,
-  RegistryExport,
+  RegistryExhaustiveExport,
   RegistryExportFormat,
   RegistryExportStatus
 } from "@prisma/client";
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatterV2 } from "../../registryV2/streams";
-import { EXPORT_COLUMNS } from "../../registryV2/columns";
+import { EXHAUSTIVE_EXPORT_COLUMNS } from "../../registryV2/columns";
 import {
   RegistryV2BsdaInclude,
   RegistryV2BsdasriInclude,
@@ -31,7 +31,7 @@ import {
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
 // so we need to pass it down
-export type RegistryExportJobArgs = {
+export type RegistryExhaustiveExportJobArgs = {
   exportId: string;
   dateRange: DateFilter;
 };
@@ -118,9 +118,11 @@ const streamLookup = (
   });
 };
 
-async function startExport(exportId: string): Promise<RegistryExport | null> {
+async function startExport(
+  exportId: string
+): Promise<RegistryExhaustiveExport | null> {
   try {
-    const registryExport = await prisma.registryExport.update({
+    const registryExport = await prisma.registryExhaustiveExport.update({
       where: { id: exportId, status: RegistryExportStatus.PENDING },
       data: { status: RegistryExportStatus.STARTED }
     });
@@ -131,7 +133,7 @@ async function startExport(exportId: string): Promise<RegistryExport | null> {
 }
 
 async function failExport(exportId: string) {
-  await prisma.registryExport.updateMany({
+  await prisma.registryExhaustiveExport.updateMany({
     where: { id: exportId },
     data: { status: RegistryExportStatus.FAILED }
   });
@@ -142,21 +144,21 @@ async function endExport(
   siretsEncountered: string[],
   s3FileKey?: string
 ) {
-  const update: Prisma.RegistryExportUpdateArgs["data"] = {
+  const update: Prisma.RegistryExhaustiveExportUpdateArgs["data"] = {
     status: RegistryExportStatus.SUCCESSFUL,
     s3FileKey
   };
   if (siretsEncountered.length > 0) {
     update.sirets = siretsEncountered;
   }
-  await prisma.registryExport.update({
+  await prisma.registryExhaustiveExport.update({
     where: { id: exportId },
     data: update
   });
 }
 
-export async function processRegistryExportJob(
-  job: Job<RegistryExportJobArgs>
+export async function processRegistryExhaustiveExportJob(
+  job: Job<RegistryExhaustiveExportJobArgs>
 ) {
   const { exportId, dateRange } = job.data;
   let upload: Upload | null = null;
@@ -164,13 +166,14 @@ export async function processRegistryExportJob(
   try {
     const registryExport = await startExport(exportId);
     if (!registryExport) {
-      throw new UserInputError(`L'export ${exportId} est introuvable`);
+      throw new UserInputError(
+        `L'export exhaustif ${exportId} est introuvable`
+      );
     }
-    const exportType = registryExport.registryType;
-    const columns = EXPORT_COLUMNS[exportType];
+    const columns = EXHAUSTIVE_EXPORT_COLUMNS;
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
-      bucketName: process.env.S3_REGISTRY_EXPORTS_BUCKET,
+      bucketName: process.env.S3_REGISTRY_EXHAUSTIVE_EXPORTS_BUCKET,
       key: `${exportId}${registryExport.format === "CSV" ? ".csv" : ".xlsx"}`,
       contentType:
         registryExport.format === "CSV"
@@ -180,98 +183,7 @@ export async function processRegistryExportJob(
     upload = streamInfos.upload;
     const outputStream = streamInfos.s3Stream;
 
-    let condition: Prisma.RegistryLookupWhereInput;
-    // if there is a chance that DND BSDs are in the export
-    if (
-      (!registryExport.wasteTypes?.length ||
-        registryExport.wasteTypes.some(wasteType => wasteType === "DND")) && // the user wants DNDs in the export
-      registryExport.declarationType !== "REGISTRY" && // the user only wants BSDs in the export
-      registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry
-    ) {
-      const companies = await prisma.company.findMany({
-        where: {
-          orgId: {
-            in: registryExport.sirets
-          }
-        },
-        select: {
-          orgId: true,
-          hasEnabledRegistryDndFromBsdSince: true
-        }
-      });
-      // create a pre-filter that hides DND BSDs pre-hasEnabledRegistryDndFromBsdSince if it's defined for a company
-      const orCondition = companies.map(company => {
-        if (company.hasEnabledRegistryDndFromBsdSince) {
-          return {
-            siret: company.orgId,
-            OR: [
-              {
-                declarationType: "REGISTRY"
-              },
-              {
-                wasteType: { in: ["DD", "TEXS"] },
-                declarationType: "BSD"
-              },
-              {
-                wasteType: "DND",
-                declarationType: "BSD",
-                date: {
-                  gte: company.hasEnabledRegistryDndFromBsdSince
-                }
-              }
-            ]
-          } as Prisma.RegistryLookupWhereInput;
-        } else {
-          // the company has not enabled DND BSDs, so we always hide them
-          return {
-            siret: company.orgId,
-            OR: [
-              {
-                declarationType: "REGISTRY"
-              },
-              {
-                wasteType: { in: ["DD", "TEXS"] },
-                declarationType: "BSD"
-              }
-            ]
-          } as Prisma.RegistryLookupWhereInput;
-        }
-      });
-      condition = {
-        OR: orCondition
-      };
-    } else {
-      // we know this export will not contain DND BSDs, so we don't need a pre-filter
-      condition = {
-        siret: {
-          in: registryExport.sirets
-        }
-      };
-    }
-    //craft the query
-    const query: Prisma.RegistryLookupWhereInput = {
-      ...condition,
-      reportAsSiret: registryExport.delegateSiret ?? undefined,
-      exportRegistryType: registryExport.registryType ?? undefined,
-      wasteType: registryExport.wasteTypes?.length
-        ? {
-            in: registryExport.wasteTypes
-          }
-        : undefined,
-      wasteCode: registryExport.wasteCodes?.length
-        ? {
-            in: registryExport.wasteCodes
-          }
-        : undefined,
-      declarationType: registryExport.declarationType ?? undefined,
-      date: {
-        lt: dateRange._lt ?? undefined,
-        lte: dateRange._lte ?? undefined,
-        equals: dateRange._eq ?? undefined,
-        gt: dateRange._gt ?? undefined,
-        gte: dateRange._gte ?? undefined
-      }
-    };
+    // TODO craft elastic query from params
 
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
@@ -285,7 +197,6 @@ export async function processRegistryExportJob(
       {
         where: query
       },
-      exportType,
       addEncounteredSiret
     );
 
@@ -297,7 +208,7 @@ export async function processRegistryExportJob(
         alwaysWriteHeaders: true
       });
       const transformer = wasteFormatterV2({
-        exportType,
+        exportType: "ALL",
         useLabelAsKey: true
       });
       pipeline(
@@ -322,7 +233,7 @@ export async function processRegistryExportJob(
       });
       const worksheet = workbook.addWorksheet("registre");
       const transformer = wasteFormatterV2({
-        exportType
+        exportType: "ALL"
       });
       transformer.on("data", waste => {
         if (worksheet.columns === null) {
