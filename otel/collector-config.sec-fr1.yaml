@@ -60,7 +60,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, batch/datadog_generic]
-      exporters: [datadog/connector, debug]
+      exporters: [datadog/connector]
     traces/2:
       receivers: [datadog/connector]
       processors:
