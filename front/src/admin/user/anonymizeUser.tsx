@@ -3,9 +3,11 @@ import { Formik, Form, Field } from "formik";
 import toast from "react-hot-toast";
 import { gql, useMutation } from "@apollo/client";
 import { Mutation, MutationAnonymizeUserArgs } from "@td/codegen-ui";
-import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { DsfrNotificationError } from "../../Apps/common/Components/Error/Error";
 import RedErrorMessage from "../../common/components/RedErrorMessage";
 import { TOAST_DURATION } from "../../common/config";
+import Input from "@codegouvfr/react-dsfr/Input";
+import Button from "@codegouvfr/react-dsfr/Button";
 
 const ANONYMIZE_USER = gql`
   mutation anonymizeUser($id: ID!) {
@@ -47,29 +49,40 @@ function AnonymizeUser() {
               );
         }}
       >
-        {() => (
+        {values => (
           <Form>
-            <div className="form__row" style={{ marginTop: 0 }}>
-              <label>
-                Identifiant (de base de données) du compte à anonymiser et
-                désactiver définitivement (
-                <b className="tw-bg-orange-500">
-                  Attention: action irreversible ! L'utilisateur sera anonymisé
-                  et son compte définitivement désactivé.
-                </b>
-                )
-                <Field name="id" placeholder="userId" className="td-input" />
-              </label>
+            <div className="form__row fr-mt-0 fr-mb-2w">
+              <Field name="id">
+                {({ field }) => {
+                  return (
+                    <Input
+                      label="Identifiant de base de données du compte à
+                          anonymiser et désactiver définitivement"
+                      hintText="Attention: action irreversible ! L'utilisateur sera
+                            anonymisé et son compte définitivement désactivé."
+                      nativeInputProps={{
+                        ...field,
+                        placeholder: "userId"
+                      }}
+                      className="fr-col-8"
+                    />
+                  );
+                }}
+              </Field>
+
               <RedErrorMessage name="id" />
             </div>
-            {error && <InlineError apolloError={error} />}
-            <button
+            <div className="fr-col-8">
+              {error && <DsfrNotificationError apolloError={error} />}
+            </div>
+            <Button
               type="submit"
-              className="btn btn--primary tw-mt-1"
-              disabled={loading}
+              priority="primary"
+              disabled={loading || !values?.values?.id}
+              className="fr-mt-2w"
             >
               {loading ? "Suppression en cours..." : "Supprimer"}
-            </button>
+            </Button>
           </Form>
         )}
       </Formik>
