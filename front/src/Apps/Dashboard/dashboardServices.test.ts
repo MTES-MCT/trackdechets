@@ -615,7 +615,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return VALIDER_TRAITEMENT for BSDA in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSDA in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
@@ -634,7 +634,7 @@ describe("dashboardServices", () => {
         bsdCurrentTab
       );
 
-      expect(result).toEqual(VALIDER_TRAITEMENT);
+      expect(result).toEqual(VALIDER_RECEPTION);
     });
 
     it("should return VALIDER_RECEPTION for BSVHU in actTab and same destination siret", () => {

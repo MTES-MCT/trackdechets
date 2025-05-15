@@ -8,7 +8,6 @@ import SignVhuReception from "../../Bsvhu/SignVhuReception";
 interface ActBsvhuValidationProps {
   bsd: Bsvhu;
   currentSiret: string;
-  isOpen: boolean;
   onClose: () => void;
 }
 const ActBsvhuValidation = ({

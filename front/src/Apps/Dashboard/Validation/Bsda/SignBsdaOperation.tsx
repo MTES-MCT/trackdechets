@@ -3,37 +3,34 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  BsvhuInput,
+  BsdaInput,
+  BsdaSignatureType,
   Mutation,
-  MutationSignBsvhuArgs,
-  MutationUpdateBsvhuArgs,
+  MutationSignBsdaArgs,
+  MutationUpdateBsdaArgs,
   Query,
-  QueryBsvhuArgs,
-  QueryCompanyPrivateInfosArgs,
-  SignatureTypeInput,
-  WasteVehiclesType
+  QueryBsdaArgs
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
-import {
-  GET_VHU_FORM,
-  SIGN_BSVHU,
-  UPDATE_VHU_FORM
-} from "../../../common/queries/bsvhu/queries";
-import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
-import WasteVhuSummary from "./WasteVhuSummary";
-import IdentificationNumber from "../../../Forms/Components/IdentificationNumbers/IdentificationNumber";
 import RhfOperationModeSelect from "../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../common/queries/company/query";
-import { useParams } from "react-router-dom";
 import { SignatureTimestamp } from "../BSPaoh/WorkflowAction/components/Signature";
+import { BsdaWasteSummary } from "./BsdaWasteSummary";
+import { BsdaJourneySummary } from "./BsdaJourneySummary";
+import {
+  GET_BSDA,
+  SIGN_BsDA,
+  UPDATE_BSDA
+} from "../../../common/queries/bsda/queries";
+import { getComputedState } from "../../Creation/getComputedState";
+import { getInitialCompany } from "../../../common/data/initialState";
 import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
 
 const schema = z.object({
@@ -78,7 +75,8 @@ const schema = z.object({
             "REUTILISATION",
             "VALORISATION_ENERGETIQUE"
           ])
-          .nullish()
+          .nullish(),
+        description: z.string().nullish()
       })
       .nullish()
       .nullish(),
@@ -96,29 +94,24 @@ const schema = z.object({
       .nullish()
   })
 });
-export type ZodBsvhuOperation = z.infer<typeof schema>;
+export type ZodBsdaOperation = z.infer<typeof schema>;
 
-const SignVhuOperation = ({ bsvhuId, onClose }) => {
-  const { siret } = useParams<{ siret: string }>();
+const SignBsdaOperation = ({ bsdaId, onClose }) => {
+  const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
+    variables: {
+      id: bsdaId
+    },
+    fetchPolicy: "network-only"
+  });
 
-  const { data } = useQuery<Pick<Query, "bsvhu">, QueryBsvhuArgs>(
-    GET_VHU_FORM,
-    {
-      variables: {
-        id: bsvhuId
-      }
-    }
-  );
-
-  const [updateBsvhu, { error: updateError, loading: loadingUpdate }] =
-    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
-      UPDATE_VHU_FORM
+  const [updateBsda, { loading: loadingUpdate, error: updateError }] =
+    useMutation<Pick<Mutation, "updateBsda">, MutationUpdateBsdaArgs>(
+      UPDATE_BSDA
     );
-
-  const [signBsvhu, { loading, error }] = useMutation<
-    Pick<Mutation, "signBsvhu">,
-    MutationSignBsvhuArgs
-  >(SIGN_BSVHU);
+  const [signBsda, { loading, error }] = useMutation<
+    Pick<Mutation, "signBsda">,
+    MutationSignBsdaArgs
+  >(SIGN_BsDA);
 
   const title = "Signer le traitement";
   const TODAY = new Date();
@@ -126,65 +119,51 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   const initialState = {
     date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
-    destination: {
-      operation: {
-        date: datetimeToYYYYMMDD(TODAY)
-      }
-    }
-  } as ZodBsvhuOperation;
+    ...getComputedState(
+      {
+        destination: {
+          operation: {
+            date: datetimeToYYYYMMDD(TODAY),
+            code: "",
+            nextDestination: { company: getInitialCompany() }
+          }
+        }
+      },
+      data?.bsda
+    )
+  } as ZodBsdaOperation;
 
-  const methods = useForm<ZodBsvhuOperation>({
+  const methods = useForm<ZodBsdaOperation>({
     values: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
   });
 
-  const { handleSubmit, reset, formState, register, watch, setValue } = methods;
-
-  const { data: dataCompany } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
-    variables: { clue: siret! },
-    fetchPolicy: "no-cache"
-  });
+  const { handleSubmit, reset, formState, register, watch } = methods;
 
   const onCancel = () => {
     reset();
     onClose();
   };
 
-  useEffect(() => {
-    setValue("destination.reception.identification.numbers", []);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const operationCode = watch("destination.operation.code");
-
-  useEffect(() => {
-    if (operationCode === "R 4") {
-      setValue("destination.operation.mode", "RECYCLAGE");
-    } else {
-      setValue("destination.operation.mode", null);
-    }
-  }, [operationCode, setValue]);
 
   const onSubmit = async data => {
     const { author, date, ...update } = data;
-    await updateBsvhu({
+    await updateBsda({
       variables: {
-        id: bsvhuId,
-        input: update as BsvhuInput
+        id: bsda.id,
+        input: update as BsdaInput
       }
     });
-    await signBsvhu({
+    await signBsda({
       variables: {
-        id: bsvhu.id,
+        id: bsda.id,
         input: {
+          date,
           author,
-          date: TODAY.toISOString(),
-          type: SignatureTypeInput.Operation
+          type: BsdaSignatureType.Operation
         }
       }
     });
@@ -195,17 +174,31 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
     return <Loader />;
   }
 
-  const { bsvhu } = data;
+  const { bsda } = data;
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
-      <WasteVhuSummary bsvhu={bsvhu} />
-      <BsvhuJourneySummary bsvhu={bsvhu} />
+      <BsdaWasteSummary bsda={bsda} />
+      <BsdaJourneySummary bsda={bsda} />
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
+          <p className="fr-text fr-mb-2w">
+            Vous hésitez sur le type d'opération à choisir ? Vous pouvez
+            consulter la liste de traitement des déchets sur{" "}
+            <a
+              className="fr-link force-external-link-content force-underline-link"
+              href="https://www.legifrance.gouv.fr/loda/article_lc/LEGIARTI000026902174"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              legifrance
+            </a>
+            . Le type d'opération figure sur le CAP qui a été émis par le
+            destinataire.
+          </p>
           <Select
-            label="Traitement d'élimination / valorisation réalisée (code D/R)"
+            label="Traitement d'élimination / valorisation prévue (code D/R)"
             className="fr-col-12 fr-mt-1w"
             nativeSelectProps={{
               ...register("destination.operation.code")
@@ -220,35 +213,27 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             }
           >
             <option value="">Sélectionnez une valeur...</option>
-            {!dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-              WasteVehiclesType.Broyeur
-            ) && (
-              <option value="R 4">
-                R 4 - Recyclage ou récupération des métaux et des composés
-                métalliques
-              </option>
-            )}
-            {(dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-              WasteVehiclesType.Broyeur
-            ) ||
-              dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-                WasteVehiclesType.Demolisseur
-              )) && (
-              <>
-                <option value="R 4">
-                  R 4 - Recyclage ou récupération des métaux et des composés
-                  métalliques
-                </option>
-                <option value="R 12">
-                  R 12 - Échange de déchets en vue de les soumettre à l'une des
-                  opérations numérotées R1 à R11
-                </option>
-              </>
-            )}
+            <option value="R 5">
+              R 5 - Recyclage ou récupération d'autres matières inorganiques
+              (dont vitrification)
+            </option>
+            <option value="D 5">
+              D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
+            </option>
+            <option value="D 9">
+              D 9 - Traitement chimique ou prétraitement (dont vitrification)
+            </option>
+            <option value="R 13">
+              R 13 - Opérations de transit incluant le groupement sans
+              transvasement préalable à R 5
+            </option>
+            <option value="D 15">
+              D 15 - Transit incluant le groupement sans transvasement
+            </option>
           </Select>
 
           <p className="fr-mt-5v fr-mb-5v fr-info-text">
-            Code de traitement prévu : {bsvhu.destination?.plannedOperationCode}
+            Code de traitement prévu : {bsda.destination?.plannedOperationCode}
           </p>
 
           <RhfOperationModeSelect
@@ -257,29 +242,19 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             addedDsfrClass="fr-text--bold"
           />
 
-          {dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-            WasteVehiclesType.Demolisseur
-          ) && (
-            <>
-              <h5 className="fr-h5 fr-mb-2w">
-                Numéro de registre de police entrant
-              </h5>
-              <div className="fr-col-md-12 fr-mb-4w">
-                <IdentificationNumber
-                  title="Codes d'identification utilisés par l'établissement"
-                  disabled={false}
-                  name="destination.reception.identification.numbers"
-                  infoMessage={`Vous avez  complété % numéros sur ${bsvhu.identification?.numbers?.length} VHU acceptés`}
-                />
-              </div>
-            </>
-          )}
+          <Input
+            label="Description du traitement (Optionnel)"
+            nativeInputProps={{
+              placeholder: "ISDD, ISDND, etc.",
+              ...register("destination.operation.description")
+            }}
+          />
 
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
-            les informations ci-dessus sont correctes et certifie que le
-            traitement indiquée ci-contre a bien été réalisée pour la quantité
-            de déchets renseignée.
+            les informations ci-dessus sont correctes. En signant, je confirme
+            le traitement des déchets pour la quantité indiquée dans ce
+            bordereau.
           </p>
 
           <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
@@ -291,8 +266,14 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
                 max: datetimeToYYYYMMDD(TODAY),
                 ...register("destination.operation.date")
               }}
-              state={formState.errors.date ? "error" : "default"}
-              stateRelatedMessage={formState.errors.date?.message}
+              state={
+                formState.errors.destination?.operation?.date
+                  ? "error"
+                  : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.destination?.operation?.date?.message
+              }
             />
           </div>
           <div className="fr-col-8 fr-mb-2w">
@@ -329,4 +310,4 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   );
 };
 
-export default SignVhuOperation;
+export default SignBsdaOperation;

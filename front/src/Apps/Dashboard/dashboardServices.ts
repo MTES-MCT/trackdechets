@@ -820,7 +820,7 @@ export const getSentBtnLabel = (
       isSameSiretDestination(currentSiret, bsd) &&
       permissions.includes(UserPermission.BsdCanSignOperation)
     ) {
-      return VALIDER_TRAITEMENT;
+      return VALIDER_RECEPTION;
     }
   }
   // VHU
