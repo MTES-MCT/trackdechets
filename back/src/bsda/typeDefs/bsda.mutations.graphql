@@ -20,98 +20,113 @@ type Mutation {
   publishBsda(id: ID!): Bsda!
 
   """
-  Signe un Bsda.
+   Signe un Bsda.
 
-  **Champs requis pour `EMISSION` :**
+   **Champs requis pour `EMISSION` :**
 
-  ```
-  emitter {
-    isPrivateIndividual
-    company {
-      siret
-      name
-      address
-      contact
-      mail
-      phone
-    }
-  }
-  waste {
-    code
-    name
-  }
-  destination {
-    company {
-      siret
-      name
-      address
-      contact
-      mail
-      phone
-    }
-    cap
-    plannedOperationCode
-  }
-  worker {
-    company {
-      siret
-      name
-      address
-      contact
-      mail
-      phone
-    }
-  }
-  ```
+   ```
+   emitter {
+     isPrivateIndividual
+     company {
+       siret
+       name
+       address
+       contact
+       mail
+       phone
+     }
+   }
+   waste {
+     code
+     name
+   }
+   destination {
+     company {
+       siret
+       name
+       address
+       contact
+       mail
+       phone
+     }
+     cap
+     plannedOperationCode
+   }
+   worker {
+     company {
+       siret
+       name
+       address
+       contact
+       mail
+       phone
+     }
+   }
+   ```
 
-  **Champs requis pour `WORK` :**
+   **Champs requis pour `WORK` :**
 
-  ```
-  waste {
-    consistence
-  }
-  weight {
-    value
-    isEstimate
-  }
-  ```
+   ```
+   waste {
+     consistence
+   }
+   weight {
+     value
+     isEstimate
+   }
+   ```
 
-  **Champs requis pour `TRANSPORT` :**
+   **Champs requis pour `TRANSPORT` :**
 
-  ```
-  transporter {
-    company {
-      siret
-      name
-      address
-      contact
-      mail
-      phone
-    }
-    recepisse {
-      number
-      department
-      validityLimit
-    }
-  }
-  ```
+   ```
+   transporter {
+     company {
+       siret
+       name
+       address
+       contact
+       mail
+       phone
+     }
+     recepisse {
+       number
+       department
+       validityLimit
+     }
+   }
+   ```
 
-  **Champs requis pour `OPERATION` :**
+  **Champs requis pour `RECEPTION` :**
+   Cette étape est optionnelle, mais si elle est renseignée, les champs
+   associés seront scellés
+   ```
+   destination {
+     reception {
+       acceptationStatus
+       weight
+       date
+     }
+   }
+   ```
 
-  ```
-  destination {
-    reception {
-      date
-      weight
-      acceptationStatus
-    }
-    operation {
-      code
-      mode
-      date
-    }
-  }
-  ```
+   **Champs requis pour `OPERATION` :**
+
+   ```
+   destination {
+     # Si le bordereau n'est pas passé par l'étape de réception,
+     # renseigner ici les données de réception
+     reception {
+       acceptationStatus
+       weight
+       date
+     }
+     operation {
+       code
+       mode
+       date
+     }
+   }
+   ```
   """
   signBsda(id: ID!, input: BsdaSignatureInput!): Bsda!
 

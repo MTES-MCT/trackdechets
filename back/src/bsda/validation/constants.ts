@@ -48,6 +48,10 @@ export const SIGNATURES_HIERARCHY: {
   },
   TRANSPORT_5: {
     signatureDate: bsda => transporterNSignatureDate(bsda, 5),
+    next: "RECEPTION"
+  },
+  RECEPTION: {
+    signatureDate: bsda => bsda.destinationReceptionSignatureDate,
     next: "OPERATION"
   },
   OPERATION: { signatureDate: bsda => bsda.destinationOperationSignatureDate }

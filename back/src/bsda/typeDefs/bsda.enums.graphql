@@ -26,6 +26,8 @@ enum BsdaStatus {
   SIGNED_BY_WORKER
   "Pris en charge par le transporteur"
   SENT
+  "Reçu par le destinataire"
+  RECEIVED
   "Traité"
   PROCESSED
   "Refusé"
@@ -78,6 +80,8 @@ enum BsdaSignatureType {
   WORK
   "Signature transporteur"
   TRANSPORT
-  "Signature destination"
+  "Signature de la destination  pour la réception"
+  RECEPTION
+  "Signature de la destination pour le traitement"
   OPERATION
 }
