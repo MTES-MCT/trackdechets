@@ -343,7 +343,7 @@ function BsffQuantity({
               <br />
               {bsff.weight?.isEstimate && (
                 <div>
-                  "QUANTITÉE ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2 de l'ADR"
+                  "QUANTITÉ ESTIMÉE CONFORMÉMENT AU 5.4.1.1.3.2 de l'ADR"
                 </div>
               )}
             </span>

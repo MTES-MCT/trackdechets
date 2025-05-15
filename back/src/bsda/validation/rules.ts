@@ -784,7 +784,15 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: { from: "EMISSION" },
     readableFieldName: "Le code déchet"
   },
+  wasteIsSubjectToADR: {
+    readableFieldName: "Si le déchet est soumis à l'ADR ou non",
+    sealed: { from: "WORK" }
+  },
   wasteAdr: { readableFieldName: "La mention ADR", sealed: { from: "WORK" } },
+  wasteNonRoadRegulationMention: {
+    readableFieldName: "La mention RID, ADN, IMDG",
+    sealed: { from: "WORK" }
+  },
   wasteFamilyCode: {
     sealed: {
       // EMISSION ou WORK si il y a une entreprise de travaux

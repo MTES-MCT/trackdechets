@@ -1673,7 +1673,9 @@ model Bsda {
   wasteMaterialName String?
   wasteConsistence  BsdaConsistence?
   wasteSealNumbers  String[]
+  wasteIsSubjectToADR Boolean?
   wasteAdr          String?
+  wasteNonRoadRegulationMention String?
   wastePop          Boolean?         @default(false)
   packagings        Json             @default("[]")
   weightValue       Decimal?         @db.Decimal(65, 30)

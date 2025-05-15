@@ -94,6 +94,9 @@ const SIGN_BSDA = gql`
             author
           }
         }
+      waste {
+        isSubjectToADR
+        adr
       }
     }
   }
@@ -2474,5 +2477,176 @@ describe("Mutation.Bsda.sign", () => {
           "La raison du refus du déchet a été verrouillé via signature et ne peut pas être modifié."
       );
     });
+  });
+
+  describe("Mention ADR", () => {
+    it.each([undefined, null, ""])(
+      "if waste is subject to ADR, wasteAdr cannot be %p",
+      async wasteAdr => {
+        // Given
+        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+        const bsda = await bsdaFactory({
+          opt: {
+            emitterCompanySiret: company.siret,
+            wasteIsSubjectToADR: true,
+            wasteAdr
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: user.name,
+              type: "EMISSION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          "Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante."
+        );
+      }
+    );
+
+    it.each([undefined, null, ""])(
+      "if waste is not subject to ADR, wasteAdr can be %p",
+      async wasteAdr => {
+        // Given
+        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+        const bsda = await bsdaFactory({
+          opt: {
+            emitterCompanySiret: company.siret,
+            wasteIsSubjectToADR: false,
+            wasteAdr
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: user.name,
+              type: "EMISSION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+      }
+    );
+
+    it("should not be allowed to provide wasteAdr for wastes not subject to ADR", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteIsSubjectToADR: false,
+          wasteAdr: "Some ADR mention"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR."
+      );
+    });
+
+    it("waste subject to ADR + wasteAdr", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          wasteIsSubjectToADR: true,
+          wasteAdr: "Some ADR mention"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsda?.waste?.isSubjectToADR).toBeTruthy();
+      expect(data.signBsda?.waste?.adr).toBe("Some ADR mention");
+    });
+
+    it.each([null, "ADR"])(
+      "wasteIsSubjectToADR is optional, wasteAdr can be %p",
+      async wasteAdr => {
+        // Given
+        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+        const bsda = await bsdaFactory({
+          opt: {
+            emitterCompanySiret: company.siret,
+            wasteIsSubjectToADR: null,
+            wasteAdr
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors, data } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: user.name,
+              type: "EMISSION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.signBsda?.waste?.isSubjectToADR).toBeNull();
+        expect(data.signBsda?.waste?.adr).toBe(wasteAdr);
+      }
+    );
   });
 });
