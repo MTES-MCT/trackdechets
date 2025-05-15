@@ -94,6 +94,7 @@ const SIGN_BSDA = gql`
             author
           }
         }
+      }
       waste {
         isSubjectToADR
         adr
