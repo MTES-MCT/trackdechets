@@ -26,6 +26,7 @@ import { BsdaForElastic } from "./elastic";
 import { getBsdaSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { bsdaWasteQuantities } from "./utils";
 
 const getPostTempStorageDestination = (bsda: RegistryBsda) => {
   if (!bsda.forwardedIn) return {};
@@ -350,6 +351,10 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
     country: emitterCompanyCountry
   } = splitAddress(bsda.emitterCompanyAddress);
 
+  const wasteQuantities = bsdaWasteQuantities(bsda);
+  const quantityAccepted = wasteQuantities?.quantityAccepted ?? null;
+  const quantityRefused = wasteQuantities?.quantityRefused ?? null;
+
   return {
     wasteDescription: bsda.wasteMaterialName,
     wasteCode: bsda.wasteCode,
@@ -374,6 +379,12 @@ export function toGenericWaste(bsda: RegistryBsda): GenericWaste {
           .dividedBy(1000)
           .toDecimalPlaces(6)
           .toNumber()
+      : null,
+    destinationReceptionAcceptedWeight: quantityAccepted
+      ? quantityAccepted.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
+    destinationReceptionRefusedWeight: quantityRefused
+      ? quantityRefused.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()

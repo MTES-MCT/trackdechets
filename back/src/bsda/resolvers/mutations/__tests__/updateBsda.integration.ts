@@ -32,12 +32,13 @@ import {
   sendDestinationCapModificationMail
 } from "../update";
 import { sendMail } from "../../../../mailer/mailing";
+import gql from "graphql-tag";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
 (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-export const UPDATE_BSDA = `
+export const UPDATE_BSDA = gql`
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
     updateBsda(id: $id, input: $input) {
       id
@@ -67,6 +68,12 @@ export const UPDATE_BSDA = `
       destination {
         company {
           name
+        }
+        reception {
+          weight
+          refusedWeight
+          acceptedWeight
+          acceptationStatus
         }
       }
       intermediaries {
@@ -3160,5 +3167,106 @@ describe("Mutation.updateBsda", () => {
       // Then
       expect(errors).toBeUndefined();
     });
+  });
+
+  it.only("can update destinationReceptionRefusedWeight, and acceptedWeight should be returned", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          destination: {
+            reception: {
+              weight: 4,
+              acceptationStatus: "PARTIALLY_REFUSED",
+              refusalReason: "Nope",
+              refusedWeight: 1.5
+            }
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.updateBsda.destination?.reception?.weight).toBe(4);
+    expect(data.updateBsda.destination?.reception?.acceptationStatus).toBe(
+      "PARTIALLY_REFUSED"
+    );
+    expect(data.updateBsda.destination?.reception?.refusedWeight).toBe(1.5);
+    expect(data.updateBsda.destination?.reception?.acceptedWeight).toBe(2.5);
+
+    const dbBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+    expect(dbBsda.destinationReceptionWeight?.toNumber()).toBe(4000);
+    expect(dbBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(1500);
+    expect(dbBsda.destinationReceptionAcceptationStatus).toBe(
+      "PARTIALLY_REFUSED"
+    );
+  });
+
+  it.only("can update destinationReceptionWeight without specifying destinationReceptionRefusedWeight", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationReceptionRefusedWeight: null
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          destination: {
+            reception: {
+              weight: 4,
+              acceptationStatus: "PARTIALLY_REFUSED",
+              refusalReason: "Nope",
+              refusedWeight: null // Optional
+            }
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.updateBsda.destination?.reception?.weight).toBe(4);
+    expect(data.updateBsda.destination?.reception?.acceptationStatus).toBe(
+      "PARTIALLY_REFUSED"
+    );
+    expect(data.updateBsda.destination?.reception?.refusedWeight).toBe(null);
+    expect(data.updateBsda.destination?.reception?.acceptedWeight).toBe(null);
+
+    const dbBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+    expect(dbBsda.destinationReceptionWeight?.toNumber()).toBe(4000);
+    expect(dbBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(
+      undefined
+    );
+    expect(dbBsda.destinationReceptionAcceptationStatus).toBe(
+      "PARTIALLY_REFUSED"
+    );
   });
 });
