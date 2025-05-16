@@ -52,9 +52,15 @@ import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
 import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
+import { bsdaWasteQuantities } from "./utils";
 
 export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
   const transporter = getFirstTransporterSync(bsda);
+
+  const wasteQuantities = bsdaWasteQuantities(bsda);
+  const quantityAccepted = wasteQuantities?.quantityAccepted ?? null;
+  const quantityRefused = wasteQuantities?.quantityRefused ?? null;
+
   return {
     id: bsda.id,
     createdAt: processDate(bsda.createdAt),
@@ -136,10 +142,11 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
               .dividedBy(1000)
               .toNumber()
           : null,
-        refusedWeight: bsda.destinationReceptionRefusedWeight
-          ? processDecimal(bsda.destinationReceptionRefusedWeight)
-              .dividedBy(1000)
-              .toNumber()
+        refusedWeight: quantityRefused
+          ? processDecimal(quantityRefused).dividedBy(1000).toNumber()
+          : null,
+        acceptedWeight: quantityAccepted
+          ? processDecimal(quantityAccepted).dividedBy(1000).toNumber()
           : null
       }),
       operation: nullIfNoValues<BsdaOperation>({
