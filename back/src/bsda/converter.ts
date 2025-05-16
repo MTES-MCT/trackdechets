@@ -135,6 +135,11 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
           ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
+          : null,
+        refusedWeight: bsda.destinationReceptionRefusedWeight
+          ? processDecimal(bsda.destinationReceptionRefusedWeight)
+              .dividedBy(1000)
+              .toNumber()
           : null
       }),
       operation: nullIfNoValues<BsdaOperation>({
@@ -386,6 +391,13 @@ function flattenBsdaDestinationInput({
     destinationReceptionWeight: chain(destination, d =>
       chain(d.reception, r =>
         r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+      )
+    ),
+    destinationReceptionRefusedWeight: chain(destination, d =>
+      chain(d.reception, r =>
+        r.refusedWeight
+          ? new Decimal(r.refusedWeight).times(1000).toNumber()
+          : r.refusedWeight
       )
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
@@ -668,6 +680,13 @@ export function flattenBsdaRevisionRequestInput(
     ),
     destinationCap: chain(reviewContent, r => chain(r.destination, d => d.cap)),
     destinationReceptionWeight: chain(reviewContent, r =>
+      chain(r.destination, d =>
+        chain(d.reception, r =>
+          r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+        )
+      )
+    ),
+    destinationReceptionRefusedWeight: chain(reviewContent, r =>
       chain(r.destination, d =>
         chain(d.reception, r =>
           r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight

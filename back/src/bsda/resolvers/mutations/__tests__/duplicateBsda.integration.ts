@@ -264,6 +264,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "workerWorkSignatureDate",
       "destinationCustomInfo",
       "destinationReceptionWeight",
+      "destinationReceptionRefusedWeight",
       "destinationReceptionDate",
       "destinationReceptionAcceptationStatus",
       "destinationReceptionRefusalReason",

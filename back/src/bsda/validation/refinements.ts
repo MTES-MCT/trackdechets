@@ -18,7 +18,8 @@ import {
   BsdaType,
   BsdType,
   Company,
-  CompanyType
+  CompanyType,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { getReadonlyBsdaRepository } from "../repository";
@@ -668,4 +669,86 @@ export const wasteAdrRefinement: (
       }
     }
   };
+};
+
+export const checkDestinationReceptionRefusedWeight = (
+  bsd,
+  ctx: z.RefinementCtx
+) => {
+  const path = ["destination", "receotion", "refusedWeight"];
+
+  const {
+    destinationReceptionWeight,
+    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptationStatus
+  } = bsd;
+
+  // Param is optional
+  if (!isDefined(destinationReceptionRefusedWeight)) {
+    return;
+  }
+
+  if (!isDefined(destinationReceptionWeight)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La quantité refusée (destinationReceptionRefusedWeight) ne peut être définie si la quantité reçue (destinationReceptionWeight) ne l'est pas",
+      path
+    });
+    return;
+  }
+
+  if (
+    destinationReceptionRefusedWeight !== 0 &&
+    destinationReceptionAcceptationStatus == WasteAcceptationStatus.ACCEPTED
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La quantité refusée (destinationReceptionRefusedWeight) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)",
+      path
+    });
+    return;
+  }
+
+  if (
+    destinationReceptionAcceptationStatus == WasteAcceptationStatus.REFUSED &&
+    destinationReceptionRefusedWeight !== destinationReceptionWeight
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
+      path
+    });
+    return;
+  }
+
+  if (
+    destinationReceptionAcceptationStatus ==
+    WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    if (
+      destinationReceptionRefusedWeight >= destinationReceptionWeight ||
+      destinationReceptionRefusedWeight === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "La quantité refusée (destinationReceptionRefusedWeight) doit être inférieure à la quantité reçue (destinationReceptionWeight) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)",
+        path
+      });
+      return;
+    }
+  }
+
+  if (destinationReceptionRefusedWeight > destinationReceptionWeight) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message:
+        "La quantité refusée (destinationReceptionRefusedWeight) doit être inférieure ou égale à la quantité réceptionnée (destinationReceptionWeight)",
+      path
+    });
+    return;
+  }
 };

@@ -474,6 +474,11 @@ export const bsdaEditionRules: BsdaEditionRules = {
     sealed: { from: "OPERATION" },
     required: { from: "OPERATION" }
   },
+  destinationReceptionRefusedWeight: {
+    readableFieldName: "Le poids refusé",
+    sealed: { from: "OPERATION" },
+    required: { from: "OPERATION" }
+  },
   destinationReceptionAcceptationStatus: {
     readableFieldName: "L'acceptation du déchet",
     sealed: { from: "OPERATION" },

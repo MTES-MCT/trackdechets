@@ -36,6 +36,7 @@ export default async function duplicate(
     workerWorkSignatureDate,
     destinationCustomInfo,
     destinationReceptionWeight,
+    destinationReceptionRefusedWeight,
     destinationReceptionDate,
     destinationReceptionAcceptationStatus,
     destinationReceptionRefusalReason,
