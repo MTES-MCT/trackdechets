@@ -1,5 +1,5 @@
 import { Form, Formik } from "formik";
-import React, { useState, lazy } from "react";
+import React, { useState } from "react";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "@td/codegen-ui";
@@ -8,9 +8,7 @@ import { UPDATE_BSFF_FORM } from "../../../../../Apps/common/queries/bsff/querie
 import { BsffFragment } from "../types";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 
 export function UpdateTransporterPlates({
   bsff,

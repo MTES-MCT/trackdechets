@@ -5,14 +5,12 @@ import {
   FieldProps,
   useFormikContext
 } from "formik";
-import React, { useMemo, lazy } from "react";
+import React, { useMemo } from "react";
 import TdSwitch from "../../../../common/components/Switch";
 import { Form, ParcelNumber } from "@td/codegen-ui";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
-const TagsInput = lazy(
-  () => import("../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../common/components/tags-input/TagsInput";
 
 const newParcelNumber = {
   city: "",

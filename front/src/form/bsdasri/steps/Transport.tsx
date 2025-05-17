@@ -1,5 +1,5 @@
 import { Field, useFormikContext } from "formik";
-import React, { lazy } from "react";
+import React from "react";
 import classNames from "classnames";
 import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 import WeightWidget from "../components/Weight";
@@ -11,9 +11,7 @@ import { BsdasriStatus, Bsdasri, BsdasriType } from "@td/codegen-ui";
 import Acceptation from "../components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
 import { subMonths } from "date-fns";
-const TagsInput = lazy(
-  () => import("../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../common/components/tags-input/TagsInput";
 
 export default function Transport({ status, editionDisabled = false }) {
   function handleTransportMode(e) {

@@ -1,4 +1,4 @@
-import React, { lazy, useEffect } from "react";
+import React, { useEffect } from "react";
 import { RedErrorMessage } from "../../../../../common/components";
 import {
   BsdasriSignatureType,
@@ -21,9 +21,8 @@ import TransporterRecepisseWrapper from "../../../../../form/common/components/c
 import { subMonths } from "date-fns";
 import OperationModeSelect from "../../../../../common/components/OperationModeSelect";
 import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
+
 export function EmitterSignatureForm() {
   return (
     <>

@@ -5,7 +5,6 @@ import Layout from "./Layout";
 import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
-
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";

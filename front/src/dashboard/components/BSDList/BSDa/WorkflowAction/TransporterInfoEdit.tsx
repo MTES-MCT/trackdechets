@@ -1,15 +1,13 @@
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import React, { useState, lazy } from "react";
+import React, { useState } from "react";
 import { NotificationError } from "../../../../../Apps/common/Components/Error/Error";
 import { IconPaperWrite } from "../../../../../Apps/common/Components/Icons/Icons";
 import TdModal from "../../../../../Apps/common/Components/Modal/Modal";
 import Tooltip from "../../../../../Apps/common/Components/Tooltip/Tooltip";
 import { UPDATE_BSDA } from "../../../../../Apps/common/queries/bsda/queries";
 import { Bsda, Mutation, MutationUpdateBsdaArgs } from "@td/codegen-ui";
-const TagsInput = lazy(
-  () => import("../../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../../common/components/tags-input/TagsInput";
 type Props = {
   bsda: Bsda;
   isModalOpenFromParent?: boolean;

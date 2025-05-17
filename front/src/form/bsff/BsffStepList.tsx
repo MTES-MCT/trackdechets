@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { ReactElement, useMemo, lazy } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../Apps/common/Components";
 import { IStepContainerProps } from "../common/stepper/Step";
@@ -34,8 +34,8 @@ import {
   UPDATE_BSFF_TRANSPORTER
 } from "../../Apps/Forms/Components/query";
 import { isForeignVat } from "@td/constants";
+import GenericStepList from "../common/stepper/GenericStepList";
 
-const GenericStepList = lazy(() => import("../common/stepper/GenericStepList"));
 interface Props {
   children: (bsff: Bsff | undefined) => ReactElement;
   formId?: string;
