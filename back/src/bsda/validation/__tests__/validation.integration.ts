@@ -1446,7 +1446,7 @@ describe("BSDA parsing", () => {
           expect((err as ZodError).issues).toEqual([
             expect.objectContaining({
               message:
-                "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)"
+                "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (destinationReceptionWeight) si le déchet est refusé (REFUSED)"
             })
           ]);
         }

@@ -696,7 +696,9 @@ export function flattenBsdaRevisionRequestInput(
     destinationReceptionRefusedWeight: chain(reviewContent, r =>
       chain(r.destination, d =>
         chain(d.reception, r =>
-          r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+          r.refusedWeight
+            ? new Decimal(r.refusedWeight).times(1000).toNumber()
+            : r.refusedWeight
         )
       )
     ),
@@ -760,7 +762,12 @@ export function expandBsdaRevisionRequestContent(
           ? new Decimal(bsdaRevisionRequest.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : bsdaRevisionRequest.destinationReceptionWeight
+          : bsdaRevisionRequest.destinationReceptionWeight,
+        refusedWeight: bsdaRevisionRequest.destinationReceptionRefusedWeight
+          ? new Decimal(bsdaRevisionRequest.destinationReceptionRefusedWeight)
+              .dividedBy(1000)
+              .toNumber()
+          : bsdaRevisionRequest.destinationReceptionRefusedWeight
       })
     }),
     isCanceled: bsdaRevisionRequest.isCanceled

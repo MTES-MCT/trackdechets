@@ -718,7 +718,7 @@ export const checkDestinationReceptionRefusedWeight = (
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (quantityReceived) si le déchet est refusé (REFUSED)",
+        "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (destinationReceptionWeight) si le déchet est refusé (REFUSED)",
       path
     });
     return;
