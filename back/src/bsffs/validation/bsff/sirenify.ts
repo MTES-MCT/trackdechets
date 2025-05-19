@@ -29,8 +29,7 @@ const sirenifyBsffAccessors = (
   },
   ...(bsff.transporters ?? []).map((_, idx) => ({
     siret: bsff.transporters![idx].transporterCompanySiret,
-    // FIXME skip conditionnaly based on transporter signatures
-    skip: false,
+    skip: bsff.transporters![idx].transporterTransportSignatureDate != null,
     setter: (input, companyInput: CompanyInput) => {
       const transporter = input.transporters[idx];
       transporter.transporterCompanyName = companyInput.name;
