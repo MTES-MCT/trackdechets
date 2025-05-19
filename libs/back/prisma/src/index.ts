@@ -16,18 +16,6 @@ export const prisma = new PrismaClient({
   log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
 });
 
-// TODO: temporary addition to track Form delete operations
-prisma.$use(async (params, next) => {
-  if (
-    params.model === "Form" &&
-    (params.action === "delete" || params.action === "deleteMany")
-  ) {
-    console.trace(`!!! Delete Form detected`);
-    console.log("!!! With params", params);
-  }
-  return next(params);
-});
-
 if (NODE_ENV === "production") {
   collectMetrics(prisma);
 }
