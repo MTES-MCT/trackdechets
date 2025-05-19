@@ -30,14 +30,21 @@ authRouter.post(
         return next(err);
       }
       if (!user) {
+        // retrieve session info to redirect to 2nd factor if needed
+        const userEmail = req.session?.preloggedUser?.userEmail;
+        const expire = req.session?.preloggedUser?.expire;
+
+        if (userEmail && expire && new Date(expire) > new Date()) {
+          return res.redirect(`${UI_BASE_URL}/second-factor`);
+        }
+
         const queries = {
           ...{
-            errorCode: info.code,
-            username: info.username
+            errorCode: info?.code ?? "",
+            username: info?.username ?? ""
           },
           ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
         };
-
         return res.redirect(
           `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
         );
@@ -50,6 +57,35 @@ authRouter.post(
     })(req, res, next);
   }
 );
+
+authRouter.post("/otp", (req, res, next) => {
+  passport.authenticate("totp", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      const queries = {
+        ...{
+          errorCode: info.code
+        },
+        ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
+      };
+      if (info.code === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
+        return res.redirect(
+          `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
+        );
+      }
+      return res.redirect(
+        `${UI_BASE_URL}/second-factor?${querystring.stringify(queries)}`
+      );
+    }
+    req.logIn(user, () => {
+      storeUserSessionsId(user.id, req.session.id);
+      const returnTo = req.body.returnTo || "/";
+      return res.redirect(`${UI_BASE_URL}${returnTo}`);
+    });
+  })(req, res, next);
+});
 
 authRouter.get("/isAuthenticated", nocache, (req, res) => {
   return res.json({ isAuthenticated: req.isAuthenticated() });

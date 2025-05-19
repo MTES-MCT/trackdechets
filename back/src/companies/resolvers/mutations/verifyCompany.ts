@@ -4,7 +4,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { sendMail } from "../../../mailer/mailing";

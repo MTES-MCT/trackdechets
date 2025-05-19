@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Supression de la fourniture d'identité pour le RNDTS [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202/)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un second facteur TOTP pour les administrateurs Trackdéchets [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202)
+
 # [2025.05.1] 03/05/2025
 
 #### :nail_care: Améliorations

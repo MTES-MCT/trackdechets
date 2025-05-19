@@ -1,5 +1,5 @@
 import type { FavoriteType, QueryResolvers } from "@td/codegen-back";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import {

@@ -43,6 +43,21 @@ export const userFactory = async (
 };
 
 /**
+ * Create an admin user with otp fields set up
+ * @param opt: extra parameters
+ */
+export const adminFactory = async (
+  opt: Partial<Prisma.UserCreateInput> = {}
+) => {
+  return userFactory({
+    isAdmin: true,
+    totpActivatedAt: new Date(),
+    totpSeed: "ABCD",
+    ...opt
+  });
+};
+
+/**
  * Return a random valid siret
  * a random number will not pass the luhnCheck
  * @param index numerical index

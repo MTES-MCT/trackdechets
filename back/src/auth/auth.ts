@@ -9,26 +9,28 @@ import express from "express";
 import passport from "passport";
 import { BasicStrategy } from "passport-http";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
-
+import { addMinutes } from "date-fns";
 import { Strategy as LocalStrategy } from "passport-local";
 import {
   Strategy as ClientPasswordStrategy,
   VerifyFunction
 } from "passport-oauth2-client-password";
 import { prisma } from "@td/prisma";
-import { GraphQLContext } from "./types";
+import { GraphQLContext } from "../types";
 import {
   daysBetween,
   sameDayMidnight,
   sanitizeEmail,
   hashToken
-} from "./utils";
+} from "../utils";
 import {
   setUserLoginFailed,
   clearUserLoginNeedsCaptcha,
   doesUserLoginNeedsCaptcha
-} from "./common/redis/captcha";
-import { checkCaptcha } from "./captcha/captchaGen";
+} from "../common/redis/captcha";
+import { checkCaptcha } from "../captcha/captchaGen";
+
+import { TotpStrategy } from "./totpStrategy";
 
 // Set specific type for req.user
 declare global {
@@ -43,7 +45,6 @@ declare global {
 
 export enum AuthType {
   Session = "SESSION",
-  JWT = "JWT",
   Bearer = "BEARER"
 }
 
@@ -51,7 +52,10 @@ enum LoginErrorCode {
   INVALID_USER_OR_PASSWORD = "INVALID_USER_OR_PASSWORD",
   NOT_ACTIVATED = "NOT_ACTIVATED",
   INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA = "INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA",
-  INVALID_CAPTCHA = "INVALID_CAPTCHA"
+  INVALID_CAPTCHA = "INVALID_CAPTCHA",
+  TOTP_TIMEOUT_OR_MISSING_SESSION = "TOTP_TIMEOUT_OR_MISSING_SESSION",
+  MISSING_TOTP = "MISSING_TOTP",
+  INVALID_TOTP = "INVALID_TOTP"
 }
 
 // verbose error message and related errored field
@@ -76,12 +80,20 @@ export const getLoginError = (username: string) => ({
     message:
       "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
     username: username
+  },
+  INVALID_TOTP: {
+    code: LoginErrorCode.INVALID_TOTP,
+    message: "Code d'authentification invalide"
+  },
+  MISSING_TOTP: {
+    code: LoginErrorCode.MISSING_TOTP,
+    message: "Code d'authentification manquant"
   }
 });
 
 // apart from logging the user in, we perform captcha verifications:
-// - if user as performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
-// - if user as performed more failed attemps, check if captcha is correct
+// - if user has performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
+// - if user has performed more failed attempts, check if captcha is correct
 // - if captcha is missing or incorrect, return appropriate error message
 passport.use(
   new LocalStrategy(
@@ -128,9 +140,23 @@ passport.use(
         });
       }
 
+      const needsTotp = !!user.totpActivatedAt && !!user.totpSeed;
+
       const passwordValid = await compare(password, user.password);
+
       if (passwordValid) {
         await clearUserLoginNeedsCaptcha(user.email);
+
+        if (needsTotp) {
+          // we redirect to the totp page without logging the user in.
+          // We store their email in a short-lived session to be retrieved on the 2nd factor page
+          req.session.preloggedUser = {
+            userEmail: user.email,
+            expire: addMinutes(new Date(), 5)
+          };
+
+          return done(null, false, { message: "" });
+        }
         return done(null, { ...user, auth: AuthType.Session });
       }
 
@@ -148,11 +174,15 @@ passport.use(
   )
 );
 
+passport.use(new TotpStrategy());
+
 passport.serializeUser((user: User, done) => {
+  // Store user id in session
   done(null, user.id);
 });
 
 passport.deserializeUser((id: string, done) => {
+  // Fetch the complete user from database using their ID
   prisma.user
     .findUniqueOrThrow({ where: { id } })
     .then(user => done(null, { ...user, auth: AuthType.Session }))

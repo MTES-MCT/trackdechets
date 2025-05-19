@@ -4,7 +4,7 @@ import { userFactory } from "./factories";
 import { resetDatabase } from "../../integration-tests/helper";
 
 import { redisClient } from "../common/redis";
-import { getLoginError } from "../auth";
+import { getLoginError } from "../auth/auth";
 import { setCaptchaToken, getCaptchaToken } from "../common/redis/captcha";
 import queryString from "querystring";
 

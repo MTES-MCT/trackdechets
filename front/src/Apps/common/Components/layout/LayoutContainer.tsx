@@ -7,6 +7,7 @@ import { useQuery, gql } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
+import SecondFactor from "../../../../login/SecondFactor";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { Oauth2Dialog } from "../../../../oauth/AuthDialog";
@@ -107,6 +108,8 @@ export default function LayoutContainer() {
           />
 
           <Route path={routes.login} element={<Login />} />
+
+          <Route path={routes.secondFactor} element={<SecondFactor />} />
 
           <Route path={routes.invite} element={<Invite />} />
 

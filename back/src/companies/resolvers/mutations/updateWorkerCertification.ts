@@ -1,4 +1,4 @@
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {

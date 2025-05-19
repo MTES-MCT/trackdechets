@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAdmin } from "../../../common/permissions";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { hashPassword } from "../../utils";
 import { clearUserSessions } from "../../clearUserSessions";
 import { getUid } from "../../../utils";

@@ -10,7 +10,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { updateAppendix2Fn } from "../../../updateAppendix2";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { CompanyType, WasteProcessorType } from "@prisma/client";
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {

@@ -1,4 +1,4 @@
-import { AuthType } from "../auth";
+import { AuthType } from "../auth/auth";
 import { UserInputError } from "../common/errors";
 import { searchCompany } from "../companies/search";
 import type { CompanySearchResult, CompanyInput } from "@td/codegen-back";

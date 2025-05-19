@@ -18,6 +18,7 @@ const routes = {
     adminRequests: "/admin/admin-requests"
   },
   login: "/login",
+  secondFactor: "/second-factor",
   invite: "/invite",
   signup: {
     index: "/signup",

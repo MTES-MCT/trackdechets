@@ -1,6 +1,6 @@
 import type { BsffResolvers } from "@td/codegen-back";
 import { getFicheInterventions } from "../database";
-import { isSessionUser } from "../../auth";
+import { isSessionUser } from "../../auth/auth";
 import { expandBsffPackagingFromDB } from "../converter";
 import { BsffType } from "@prisma/client";
 import {
