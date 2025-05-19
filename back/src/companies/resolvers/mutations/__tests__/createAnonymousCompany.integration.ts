@@ -4,7 +4,11 @@ import type {
   MutationCreateAnonymousCompanyArgs
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
-import { siretify, userFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userFactory,
+  adminFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_ANONYMOUS_COMPANY = `
@@ -31,7 +35,7 @@ describe("createAnonymousCompany", () => {
   });
 
   it("should create an anonymous company", async () => {
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
 
     await mutate<
@@ -47,7 +51,7 @@ describe("createAnonymousCompany", () => {
 
   it("should create an anonymous company using a VAT number", async () => {
     // Given
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
     const input = {
       ...validInput,
@@ -71,7 +75,7 @@ describe("createAnonymousCompany", () => {
 
   it("should crash if no siret nor VAT number is given", async () => {
     // Given
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
     const input = {
       ...validInput,
@@ -94,7 +98,7 @@ describe("createAnonymousCompany", () => {
 
   it("should crash if both SIRET & VAT number are given", async () => {
     // Given
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
     const input = {
       ...validInput,
@@ -131,7 +135,7 @@ describe("createAnonymousCompany", () => {
   });
 
   it("should prevent creating an anonymous company with an unknown naf code", async () => {
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
 
     const { errors } = await mutate<
@@ -149,7 +153,7 @@ describe("createAnonymousCompany", () => {
   });
 
   it("should prevent creating an anonymous company that already exists (siret)", async () => {
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
 
     await prisma.anonymousCompany.create({
@@ -176,7 +180,7 @@ describe("createAnonymousCompany", () => {
 
   it("should prevent creating an anonymous company that already exists (vatNumber)", async () => {
     // Given
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const { mutate } = makeClient(user);
 
     const input = {

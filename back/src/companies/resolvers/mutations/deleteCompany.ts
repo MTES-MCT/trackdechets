@@ -1,6 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { prisma } from "@td/prisma";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { getCompanyActiveUsers } from "../../database";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";

@@ -4,7 +4,7 @@ import type {
   MutationResolvers
 } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import * as yup from "yup";
 
 /**

@@ -5,7 +5,7 @@ import {
   WasteVehiclesType
 } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";
 import { prisma } from "@td/prisma";
 import type { Query } from "@td/codegen-back";
@@ -14,7 +14,8 @@ import {
   companyFactory,
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -462,7 +463,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       addressPostalCode: "13001"
     });
 
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
 
     const { user: companyMember } = await userWithCompanyFactory("ADMIN", {
       siret,

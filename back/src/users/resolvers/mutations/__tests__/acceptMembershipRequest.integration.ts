@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { sendMail } from "../../../../mailer/mailing";
 import {
   userFactory,

@@ -3,7 +3,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { compare } from "bcrypt";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 import { redisClient } from "../../../../common/redis";

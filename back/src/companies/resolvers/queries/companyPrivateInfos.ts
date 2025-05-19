@@ -1,4 +1,4 @@
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { isSiret, cleanClue as cleanClueFn } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserRoles } from "../../../permissions";

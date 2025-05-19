@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { formFactory, userFactory } from "../../../../__tests__/factories";
+import { formFactory, adminFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 
@@ -16,7 +16,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should return error if ID is invalid", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     // When
     const { mutate } = makeClient(admin);
@@ -39,7 +39,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should work with empty string", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     // When
     const { mutate } = makeClient(admin);
@@ -60,7 +60,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should work with one ID", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const bsdd = await formFactory({ ownerId: admin.id });
 
     // When
@@ -82,7 +82,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should reject invalid ID", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const invalidId = "BSD-20230101-XXXXXXXXX";
 
     // When
@@ -104,7 +104,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should work with multiple IDs, even if malformed", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const bsdd1 = await formFactory({ ownerId: admin.id });
     const bsdd2 = await formFactory({ ownerId: admin.id });
 
@@ -130,7 +130,7 @@ describe("Mutation.reindexBsds", () => {
 
   it("should index all possible IDs, and reject others", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const bsdd1 = await formFactory({ ownerId: admin.id });
     const invalidId = "BSD-20230101-XXXXXXXXX";
     const bsdd2 = await formFactory({ ownerId: admin.id });

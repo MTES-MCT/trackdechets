@@ -1,7 +1,7 @@
 import type { BsdaResolvers } from "@td/codegen-back";
 import { expandBsdaFromDb, toInitialBsda } from "../converter";
 import { getReadonlyBsdaRepository } from "../repository";
-import { isSessionUser } from "../../auth";
+import { isSessionUser } from "../../auth/auth";
 import { isGetBsdsQuery } from "../../bsds/resolvers/queries/bsds";
 
 export const Bsda: BsdaResolvers = {

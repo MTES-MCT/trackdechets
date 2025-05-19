@@ -9,7 +9,7 @@ import {
   importOptions,
   saveCompaniesChanges
 } from "@td/registry";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";

@@ -1,4 +1,4 @@
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { ForbiddenError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";

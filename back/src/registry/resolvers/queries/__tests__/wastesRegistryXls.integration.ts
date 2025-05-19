@@ -216,7 +216,11 @@ describe("query { wastesRegistryXls }", () => {
     const userIP = faker.internet.ipv4();
 
     // user is admin
-    const { accessToken } = await userWithAccessTokenFactory({ isAdmin: true });
+    const { accessToken } = await userWithAccessTokenFactory({
+      isAdmin: true,
+      totpSeed: "ABCD",
+      totpActive: true
+    });
 
     const form = await recipientFormFactory(owner.id, someCompany.siret!);
     await indexForm(await getFormForElastic(form));

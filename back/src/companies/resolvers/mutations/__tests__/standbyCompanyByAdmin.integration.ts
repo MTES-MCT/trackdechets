@@ -3,7 +3,8 @@ import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
@@ -49,7 +50,7 @@ describe("mutation standbyCompanyByAdmin", () => {
 
   it("should put the company in standby", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
@@ -75,7 +76,7 @@ describe("mutation standbyCompanyByAdmin", () => {
 
   it("should get the company out of standby", async () => {
     // Given
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.STANDBY

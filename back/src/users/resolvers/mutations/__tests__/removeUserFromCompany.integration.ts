@@ -1,10 +1,11 @@
 import {
   userWithCompanyFactory,
-  userFactory
+  userFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { getUserRoles } from "../../../../permissions";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
@@ -73,9 +74,7 @@ describe("mutation removeUserFromCompany", () => {
     const { user: userToRemove, company } = await userWithCompanyFactory(
       "ADMIN"
     );
-    const tdAdminUser = await userFactory({
-      isAdmin: true
-    });
+    const tdAdminUser = await adminFactory();
     let isMember = await isMemberFn(userToRemove.id, company.siret!);
     expect(isMember).toEqual(true);
     const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });

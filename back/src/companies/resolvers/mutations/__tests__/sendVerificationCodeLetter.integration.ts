@@ -6,7 +6,8 @@ import { prisma } from "@td/prisma";
 import {
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -47,7 +48,7 @@ describe("mutation sendVerificationCodeLetter", () => {
   });
 
   it("should throw error if company does not exist", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { mutate } = makeClient(admin);
     const { errors } = await mutate(SEND_VERIFICATION_CODE_LETTER, {
@@ -64,7 +65,7 @@ describe("mutation sendVerificationCodeLetter", () => {
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
     });
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const { mutate } = makeClient(admin);
     await mutate(SEND_VERIFICATION_CODE_LETTER, {
       variables: { input: { siret: company.siret } }
