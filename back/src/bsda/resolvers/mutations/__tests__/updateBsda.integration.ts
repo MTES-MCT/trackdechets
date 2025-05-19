@@ -3169,7 +3169,7 @@ describe("Mutation.updateBsda", () => {
     });
   });
 
-  it.only("can update destinationReceptionRefusedWeight, and acceptedWeight should be returned", async () => {
+  it("can update destinationReceptionRefusedWeight, and acceptedWeight should be returned", async () => {
     // Given
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
@@ -3218,7 +3218,7 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  it.only("can update destinationReceptionWeight without specifying destinationReceptionRefusedWeight", async () => {
+  it("can update destinationReceptionWeight without specifying destinationReceptionRefusedWeight", async () => {
     // Given
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
