@@ -15,29 +15,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes("Dashboard")) {
-            return "Dashboard";
-          }
-          if (id.includes("Companies")) {
-            return "Companies";
-          }
-          if (id.includes("registry")) {
-            return "registry";
-          }
-          if (id.includes("form")) {
-            return "form";
-          }
-          if (id.includes("common/components")) {
-            return "components";
-          }
-          if (id.includes("login")) {
-            return "login";
-          }
-          if (id.includes("admin")) {
-            return "admin";
-          }
-        }
+        inlineDynamicImports: true // FIXME: Disable code splitting until we find a better solution
       }
     }
   },
