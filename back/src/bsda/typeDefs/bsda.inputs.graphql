@@ -470,6 +470,9 @@ input BsdaRevisionRequestDestinationInput {
 input BsdaRevisionRequestReceptionInput {
   "Poids présenté"
   weight: Float
+
+  "Poids refusé"
+  refusedWeight: Float
 }
 
 input BsdaRevisionRequestOperationInput {
