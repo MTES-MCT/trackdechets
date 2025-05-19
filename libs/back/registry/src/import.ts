@@ -1,5 +1,5 @@
 import { logger } from "@td/logger";
-import { pipeline, Readable, Writable } from "node:stream";
+import { PassThrough, pipeline, Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
 
 import {
@@ -63,7 +63,9 @@ export async function processStream({
       : getXlsxErrorStream(options);
   errorStream.pipe(outputErrorStream);
 
-  const utf8Validator = new Utf8ValidatorTransform();
+  // Only apply utf8 validation on CSV files
+  const utf8Validator =
+    fileType === "CSV" ? new Utf8ValidatorTransform() : new PassThrough();
 
   const transformStream =
     fileType === "CSV"
