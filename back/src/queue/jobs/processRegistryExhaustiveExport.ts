@@ -6,8 +6,9 @@ import * as Excel from "exceljs";
 
 import { format as csvFormat } from "@fast-csv/format";
 
-import type { DateFilter, RegistryV2ExportType } from "@td/codegen-back";
+import type { DateFilter } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
+import { estypes } from "@elastic/elasticsearch";
 import { UserInputError } from "../../common/errors";
 import { pipeline, Readable } from "stream";
 import {
@@ -16,17 +17,12 @@ import {
   RegistryExportFormat,
   RegistryExportStatus
 } from "@prisma/client";
+import { toPrismaBsds } from "../../registryV2/elastic";
+import { BsdElastic, client, index } from "../../common/elastic";
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatterV2 } from "../../registryV2/streams";
 import { EXHAUSTIVE_EXPORT_COLUMNS } from "../../registryV2/columns";
-import {
-  RegistryV2BsdaInclude,
-  RegistryV2BsdasriInclude,
-  RegistryV2BsddInclude,
-  RegistryV2BsffInclude,
-  RegistryV2BspaohInclude,
-  RegistryV2BsvhuInclude
-} from "../../registryV2/types";
+import { toElasticQuery } from "../../bsds/where";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -39,78 +35,68 @@ export type RegistryExhaustiveExportJobArgs = {
 const LOOKUP_PAGE_SIZE = 100;
 
 const streamLookup = (
-  findManyArgs: Prisma.RegistryLookupFindManyArgs,
-  registryType: RegistryV2ExportType,
-  addEncounteredSiret: (siret: string) => void
+  query: estypes.QueryContainer,
+  addEncounteredSirets: (sirets: string[]) => void
 ): Readable => {
   let cursorId: string | null = null;
+  let cursorDate: number | null = null;
   return new Readable({
     objectMode: true,
     highWaterMark: LOOKUP_PAGE_SIZE * 2,
     async read() {
       try {
-        const items = await prisma.registryLookup.findMany({
-          ...findManyArgs,
-          take: LOOKUP_PAGE_SIZE,
-          skip: cursorId ? 1 : 0,
-          cursor: cursorId ? { dateId: cursorId } : undefined,
-          orderBy: {
-            dateId: "asc"
-          },
-          include: {
-            registrySsd: true,
-            registryIncomingWaste: true,
-            registryIncomingTexs: true,
-            registryOutgoingWaste: true,
-            registryOutgoingTexs: true,
-            registryTransported: true,
-            registryManaged: true,
-            bsdd: {
-              include: RegistryV2BsddInclude
+        const { body } = await client.search({
+          index: index.alias,
+          body: {
+            size:
+              LOOKUP_PAGE_SIZE +
+              // Take one more result to know if there's a next page
+              // it's removed from the actual results though
+              1,
+            query: {
+              bool: {
+                ...query.bool,
+                // make sure ordering is consistent by filtering out possible null value on sort key
+                must: {
+                  exists: { field: "updatedAt" }
+                }
+              }
             },
-            bsda: {
-              include: RegistryV2BsdaInclude
+            sort: {
+              updatedAt: "ASC",
+              id: "ASC"
             },
-            bsdasri: {
-              include: RegistryV2BsdasriInclude
-            },
-            bsff: {
-              include: RegistryV2BsffInclude
-            },
-            bspaoh: {
-              include: RegistryV2BspaohInclude
-            },
-            bsvhu: {
-              include: RegistryV2BsvhuInclude
-            }
+            search_after: cursorDate ? [cursorDate, cursorId] : undefined
           }
         });
-        for (const lookup of items) {
-          addEncounteredSiret(lookup.siret);
-          const mapped = toWaste(registryType, lookup.siret, {
-            SSD: lookup.registrySsd,
-            INCOMING_WASTE: lookup.registryIncomingWaste,
-            INCOMING_TEXS: lookup.registryIncomingTexs,
-            OUTGOING_WASTE: lookup.registryOutgoingWaste,
-            OUTGOING_TEXS: lookup.registryOutgoingTexs,
-            TRANSPORTED: lookup.registryTransported,
-            MANAGED: lookup.registryManaged,
-            BSDD: lookup.bsdd,
-            BSDA: lookup.bsda,
-            BSDASRI: lookup.bsdasri,
-            BSFF: lookup.bsff,
-            BSPAOH: lookup.bspaoh,
-            BSVHU: lookup.bsvhu
+        const searchHits = body.hits as estypes.HitsMetadata<BsdElastic>;
+        const hits = searchHits.hits.slice(0, LOOKUP_PAGE_SIZE);
+        const bsds = await toPrismaBsds(
+          hits.map(hit => hit._source).filter(Boolean)
+        );
+
+        for (const hit of hits) {
+          if (!hit._source) {
+            continue;
+          }
+          const { type, id, readableId, isAllWasteFor } = hit._source;
+          cursorDate = hit._source.updatedAt;
+          cursorId = hit._source.id;
+          addEncounteredSirets(isAllWasteFor as string[]);
+          const waste = bsds[type].find(waste =>
+            type === "BSDD" ? waste.id === readableId : waste.id === id
+          );
+          const mapped = toWaste("ALL", undefined, {
+            [type]: waste
           });
           if (mapped) {
             this.push(mapped);
           }
         }
-        if (items.length < LOOKUP_PAGE_SIZE) {
+        if (searchHits.hits.length <= LOOKUP_PAGE_SIZE) {
           this.push(null);
           return;
         }
-        cursorId = items[items.length - 1].dateId;
       } catch (err) {
         this.destroy(err);
       }
@@ -184,21 +170,43 @@ export async function processRegistryExhaustiveExportJob(
     const outputStream = streamInfos.s3Stream;
 
     // TODO craft elastic query from params
+    // query on registryExport.sirets & dateRange
+    const query: {
+      bool: estypes.BoolQuery & {
+        filter: estypes.QueryContainer[];
+      };
+    } = {
+      bool: {
+        ...toElasticQuery({
+          updatedAt: dateRange
+        }).bool,
+        filter: [
+          {
+            bool: {
+              should: [
+                {
+                  terms: {
+                    isAllWasteFor: registryExport.sirets
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    };
 
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
     // sirets that are never encountered during the export, and update the list of sirets
     // in registryExport at the end
     const unusedSirets = new Set(registryExport.sirets);
-    const addEncounteredSiret = (siret: string) => {
-      unusedSirets.delete(siret);
+    const addEncounteredSirets = (sirets: string[]) => {
+      for (const siret of sirets) {
+        unusedSirets.delete(siret);
+      }
     };
-    const inputStream = streamLookup(
-      {
-        where: query
-      },
-      addEncounteredSiret
-    );
+    const inputStream = streamLookup(query, addEncounteredSirets);
 
     // handle CSV exports
     if (registryExport.format === RegistryExportFormat.CSV) {

@@ -1,11 +1,5 @@
 import { exportOptions } from "@td/registry";
 import {
-  Bsda,
-  Bsdasri,
-  Bsff,
-  Bspaoh,
-  Bsvhu,
-  Form,
   RegistryIncomingTexs,
   RegistryIncomingWaste,
   RegistryOutgoingTexs,
@@ -20,57 +14,72 @@ import type {
   OutgoingWasteV2,
   RegistryV2ExportType,
   SsdWasteV2,
-  TransportedWasteV2
+  TransportedWasteV2,
+  AllWasteV2
 } from "@td/codegen-back";
-import { GenericWasteV2 } from "./types";
+import {
+  GenericWasteV2,
+  RegistryV2Bsdd,
+  RegistryV2Bsda,
+  RegistryV2Bsdasri,
+  RegistryV2Bsff,
+  RegistryV2Bspaoh,
+  RegistryV2Bsvhu
+} from "./types";
 import {
   toIncomingWasteV2 as bsddToIncomingWasteV2,
   toOutgoingWasteV2 as bsddToOutgoingWasteV2,
   toTransportedWasteV2 as bsddToTransportedWasteV2,
-  toManagedWasteV2 as bsddToManagedWasteV2
+  toManagedWasteV2 as bsddToManagedWasteV2,
+  toAllWasteV2 as bsddToAllWasteV2
 } from "../forms/registryV2";
 import {
   toIncomingWasteV2 as bsdaToIncomingWasteV2,
   toOutgoingWasteV2 as bsdaToOutgoingWasteV2,
   toTransportedWasteV2 as bsdaToTransportedWasteV2,
-  toManagedWasteV2 as bsdaToManagedWasteV2
+  toManagedWasteV2 as bsdaToManagedWasteV2,
+  toAllWasteV2 as bsdaToAllWasteV2
 } from "../bsda/registryV2";
 import {
   toIncomingWasteV2 as bsdasriToIncomingWasteV2,
   toOutgoingWasteV2 as bsdasriToOutgoingWasteV2,
-  toTransportedWasteV2 as bsdasriToTransportedWasteV2
+  toTransportedWasteV2 as bsdasriToTransportedWasteV2,
+  toAllWasteV2 as bsdasriToAllWasteV2
 } from "../bsdasris/registryV2";
 import {
   toIncomingWasteV2 as bsffToIncomingWasteV2,
   toOutgoingWasteV2 as bsffToOutgoingWasteV2,
-  toTransportedWasteV2 as bsffToTransportedWasteV2
+  toTransportedWasteV2 as bsffToTransportedWasteV2,
+  toAllWasteV2 as bsffToAllWasteV2
 } from "../bsffs/registryV2";
 import {
   toIncomingWasteV2 as bspaohToIncomingWasteV2,
   toOutgoingWasteV2 as bspaohToOutgoingWasteV2,
-  toTransportedWasteV2 as bspaohToTransportedWasteV2
+  toTransportedWasteV2 as bspaohToTransportedWasteV2,
+  toAllWasteV2 as bspaohToAllWasteV2
 } from "../bspaoh/registryV2";
 import {
   toIncomingWasteV2 as bsvhuToIncomingWasteV2,
   toOutgoingWasteV2 as bsvhuToOutgoingWasteV2,
   toTransportedWasteV2 as bsvhuToTransportedWasteV2,
-  toManagedWasteV2 as bsvhuToManagedWasteV2
+  toManagedWasteV2 as bsvhuToManagedWasteV2,
+  toAllWasteV2 as bsvhuToAllWasteV2
 } from "../bsvhu/registryV2";
 // add other types when other exports are added
 type InputMap = {
-  SSD: RegistrySsd | null;
-  INCOMING_WASTE: RegistryIncomingWaste | null;
-  INCOMING_TEXS: RegistryIncomingTexs | null;
-  OUTGOING_WASTE: RegistryOutgoingWaste | null;
-  OUTGOING_TEXS: RegistryOutgoingTexs | null;
-  TRANSPORTED: RegistryTransported | null;
-  MANAGED: RegistryManaged | null;
-  BSDD: Form | null;
-  BSDA: Bsda | null;
-  BSDASRI: Bsdasri | null;
-  BSFF: Bsff | null;
-  BSPAOH: Bspaoh | null;
-  BSVHU: Bsvhu | null;
+  SSD?: RegistrySsd | null;
+  INCOMING_WASTE?: RegistryIncomingWaste | null;
+  INCOMING_TEXS?: RegistryIncomingTexs | null;
+  OUTGOING_WASTE?: RegistryOutgoingWaste | null;
+  OUTGOING_TEXS?: RegistryOutgoingTexs | null;
+  TRANSPORTED?: RegistryTransported | null;
+  MANAGED?: RegistryManaged | null;
+  BSDD?: RegistryV2Bsdd | null;
+  BSDA?: RegistryV2Bsda | null;
+  BSDASRI?: RegistryV2Bsdasri | null;
+  BSFF?: RegistryV2Bsff | null;
+  BSPAOH?: RegistryV2Bspaoh | null;
+  BSVHU?: RegistryV2Bsvhu | null;
 };
 
 // Helper type to get the non-null type from InputMap
@@ -134,20 +143,35 @@ const inputToManagedWaste: ConverterMap<keyof InputMap, ManagedWasteV2> = {
   BSVHU: bsvhuToManagedWasteV2
 };
 
+const inputToAllWaste: ConverterMap<keyof InputMap, AllWasteV2> = {
+  BSDD: bsddToAllWasteV2,
+  BSDA: bsdaToAllWasteV2,
+  BSDASRI: bsdasriToAllWasteV2,
+  BSFF: bsffToAllWasteV2,
+  BSPAOH: bspaohToAllWasteV2,
+  BSVHU: bsvhuToAllWasteV2
+};
+
 const registryToWaste: Record<
-  RegistryV2ExportType,
+  RegistryV2ExportType | "ALL",
   Partial<Record<keyof InputMap, any>>
 > = {
   SSD: inputToSsdWaste,
   INCOMING: inputToIncomingWaste,
   OUTGOING: inputToOutgoingWaste,
   TRANSPORTED: inputToTransportedWaste,
-  MANAGED: inputToManagedWaste
+  MANAGED: inputToManagedWaste,
+  ALL: inputToAllWaste
 };
 
-export function toWaste<WasteType extends GenericWasteV2>(
-  registryType: RegistryV2ExportType,
-  targetSiret: string,
+export function toWaste<
+  WasteType extends GenericWasteV2,
+  RegistryType extends RegistryV2ExportType
+>(
+  registryType: RegistryV2ExportType | "ALL",
+  targetSiret: RegistryType extends "TRANSPORTED" | "MANAGED"
+    ? string
+    : string | undefined,
   input: InputMap
   // remove undefined once all types are defined
 ): WasteType | undefined {
