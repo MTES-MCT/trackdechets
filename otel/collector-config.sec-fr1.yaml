@@ -15,6 +15,11 @@ processors:
     limit_percentage: 80
     spike_limit_percentage: 15
 
+  groupbytrace:
+    wait_duration: 5s
+    num_traces: 10_000
+    num_workers: 2
+
   batch/datadog_metrics:
     send_batch_max_size: 100
     send_batch_size: 10
@@ -25,21 +30,52 @@ processors:
     send_batch_size: ${env:OTEL_DD_BATCH_SIZE:-100}
     timeout: 10s
 
+  probabilistic_sampler:
+    sampling_percentage: 15
+
+  attributes:
+    actions:
+      - key: graphql.source
+        action: delete
+      - key: db.statement
+        action: delete
+
 connectors:
   datadog/connector:
+    traces:
+      ignore_resources: ["OPTIONS /"]
+      compute_top_level_by_span_kind: true
 
 exporters:
   datadog/exporter:
     api:
       site: datadoghq.eu
       key: ${env:DD_API_KEY}
+    traces:
+      ignore_resources: ["OPTIONS /"]
+      compute_top_level_by_span_kind: true
+
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch/datadog_generic]
-      exporters: [datadog/connector, datadog/exporter]
+      processors: [memory_limiter, groupbytrace, batch/datadog_generic]
+      exporters: [datadog/connector]
+    traces/2:
+      receivers: [datadog/connector]
+      processors:
+        [
+          memory_limiter,
+          batch/datadog_generic,
+          probabilistic_sampler,
+          attributes
+        ]
+      exporters: [datadog/exporter]
     metrics:
       receivers: [datadog/connector, otlp, postgresql/prod, postgresql/sandbox]
       processors: [memory_limiter, batch/datadog_metrics]
