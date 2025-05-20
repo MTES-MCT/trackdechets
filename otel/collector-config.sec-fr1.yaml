@@ -15,6 +15,11 @@ processors:
     limit_percentage: 80
     spike_limit_percentage: 15
 
+  groupbytrace:
+    wait_duration: 5s
+    num_traces: 10_000
+    num_workers: 2
+
   batch/datadog_metrics:
     send_batch_max_size: 100
     send_batch_size: 10
@@ -49,7 +54,7 @@ exporters:
     traces:
       ignore_resources: ["OPTIONS /"]
       compute_top_level_by_span_kind: true
-  
+
   debug:
     verbosity: detailed
     sampling_initial: 5
@@ -59,7 +64,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch/datadog_generic]
+      processors: [memory_limiter, groupbytrace, batch/datadog_generic]
       exporters: [datadog/connector]
     traces/2:
       receivers: [datadog/connector]
