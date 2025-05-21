@@ -40,6 +40,7 @@ import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
 import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
+import { getComputedState } from "../../Creation/getComputedState";
 
 const schema = z.object({
   waste: z.object({
@@ -47,6 +48,7 @@ const schema = z.object({
     materialName: z.string().nullish(),
     consistence: z.string().nullish(),
     adr: z.string().nullish(),
+    nonRoadRegulationMention: z.string().nullish(),
     pop: z.boolean().nullish(),
     isSubjectToADR: z.boolean().nullish(),
     sealNumbers: z.array(z.string()).nullish()
@@ -161,24 +163,29 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
     author: "",
-    waste: {
-      pop: null,
-      isSubjectToADR: null,
-      adr: null,
-      sealNumbers: [],
-      materialName: "",
-      consistence: BsdaConsistence.Solide,
-      familyCode: ""
-    },
-    weight: {
-      value: null,
-      isEstimate: false
-    },
-    packagings: []
+    ...getComputedState(
+      {
+        waste: {
+          familyCode: "",
+          materialName: "",
+          adr: "",
+          isSubjectToADR: null,
+          nonRoadRegulationMention: "",
+          consistence: BsdaConsistence.Solide,
+          sealNumbers: []
+        },
+        weight: {
+          value: null,
+          isEstimate: false
+        },
+        packagings: []
+      },
+      data?.bsda
+    )
   };
 
   const methods = useForm<ZodBdsaWork>({
-    defaultValues: initialState,
+    values: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
@@ -316,18 +323,25 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
                   setValue("waste.isSubjectToADR", checked);
                 }}
                 className="fr-mt-4w"
-                showCheckedHint={false}
               />
 
               {isSubjectToADR && (
                 <Input
-                  label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
+                  label="Mention au titre du règlement ADR"
                   className="fr-mt-2w"
                   nativeInputProps={{
                     ...register("waste.adr")
                   }}
                 />
               )}
+              <hr className="fr-mt-2w" />
+
+              <Input
+                label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
+                nativeInputProps={{
+                  ...register("waste.nonRoadRegulationMention")
+                }}
+              />
 
               <ToggleSwitch
                 label={
@@ -348,10 +362,10 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
                   setValue("waste.pop", checked);
                 }}
                 className="fr-mt-4w"
-                showCheckedHint={false}
               />
+              <hr className="fr-mt-2w" />
 
-              <h4 className="fr-h4 fr-mt-4w">Conditionnement</h4>
+              <h4 className="fr-h4">Conditionnement</h4>
               <RhfPackagingList
                 fieldName="packagings"
                 packagingTypes={bsdaPackagingTypes}
