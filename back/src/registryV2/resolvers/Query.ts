@@ -9,6 +9,9 @@ import { registryImport } from "./queries/registryImport";
 import { registryChangeAggregates } from "./queries/registryChangeAggregates";
 import { registryLookup } from "./queries/registryLookup";
 import { registryLookups } from "./queries/registryLookups";
+import { registryExhaustiveExportDownloadSignedUrl } from "./queries/registryExhaustiveExportDownloadSignedUrl";
+import { registryExhaustiveExports } from "./queries/registryExhaustiveExports";
+import { registryExhaustiveExport } from "./queries/registryExhaustiveExport";
 
 export const Query: QueryResolvers = {
   registryUploadSignedUrl,
@@ -18,6 +21,9 @@ export const Query: QueryResolvers = {
   registryV2ExportDownloadSignedUrl,
   registryV2Exports: registryV2Exports as any,
   registryV2Export: registryV2Export as any,
+  registryExhaustiveExportDownloadSignedUrl,
+  registryExhaustiveExports: registryExhaustiveExports as any,
+  registryExhaustiveExport: registryExhaustiveExport as any,
   registryChangeAggregates: registryChangeAggregates as any,
   registryLookup,
   registryLookups
