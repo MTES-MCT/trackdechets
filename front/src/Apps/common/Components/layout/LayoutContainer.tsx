@@ -9,7 +9,7 @@ import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
+import { Oauth2Dialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -76,15 +76,6 @@ export default function LayoutContainer() {
           element={
             <RequireAuth>
               <Oauth2Dialog />
-            </RequireAuth>
-          }
-        />
-
-        <Route
-          path="/oidc/authorize/dialog"
-          element={
-            <RequireAuth>
-              <OidcDialog />
             </RequireAuth>
           }
         />
