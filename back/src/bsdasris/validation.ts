@@ -250,6 +250,7 @@ export const emissionSchema: FactorySchemaOf<
     emitterWasteWeightValue: weight(WeightUnits.Kilogramme)
       .label("Déchet")
       .when("emitterWasteWeightIsEstimate", {
+        //rule emitterWasteWeightValue-001
         is: value => !!value,
         then: schema =>
           schema.required(
@@ -257,6 +258,7 @@ export const emissionSchema: FactorySchemaOf<
           )
       })
       .when(
+        //rule emitterWasteWeightValue-002
         ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Kilogramme)
       )

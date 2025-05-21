@@ -16,7 +16,7 @@ export const runTransformers = async (
 ): Promise<ParsedZodBsda> => {
   const transformers = [sirenifyBsda, recipifyBsda];
   const sealedFields = await getSealedFields(bsda, context);
-
+  console.log(sealedFields);
   for (const transformer of transformers) {
     bsda = await transformer(bsda, sealedFields);
   }

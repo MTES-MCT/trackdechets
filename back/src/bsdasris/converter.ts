@@ -95,7 +95,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           value: bsdasri.emitterWasteWeightValue
             ? processDecimal(bsdasri.emitterWasteWeightValue).toNumber()
             : null,
-          // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
+          // due to a previous validation2 bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
 
           isEstimate: !!bsdasri.emitterWasteWeightValue
             ? bsdasri.emitterWasteWeightIsEstimate
@@ -136,7 +136,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           value: bsdasri.transporterWasteWeightValue
             ? processDecimal(bsdasri.transporterWasteWeightValue).toNumber()
             : null,
-          // due to a previous validation bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
+          // due to a previous validation2 bug we might have null weigh value and not null isEstimate, thus breaking gql required return type
           isEstimate: !!bsdasri.transporterWasteWeightValue
             ? bsdasri.transporterWasteWeightIsEstimate
             : null

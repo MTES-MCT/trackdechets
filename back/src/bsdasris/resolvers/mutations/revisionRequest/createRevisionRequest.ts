@@ -19,7 +19,10 @@ import { getBsdasriOrNotFound } from "../../../database";
 import { checkCanRequestRevision } from "../../../permissions";
 import { getBsdasriRepository } from "../../../repository";
 
-import { revisionSchema, checkRevisionRules } from "../../../zodSchema";
+import {
+  revisionSchema,
+  checkRevisionRules
+} from "../../../validation2/revisionSchema";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDASRI_STATUSES: BsdasriStatus[] = [
@@ -138,7 +141,7 @@ async function checkIfUserCanRequestRevisionOnBsdasri(
   });
   if (unsettledRevisionRequestsOnbsdasri > 0) {
     throw new ForbiddenError(
-      "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation."
+      "Impossible de créer une révision sur ce bordereau. Une autre révision est déjà en attente de validation2."
     );
   }
 }

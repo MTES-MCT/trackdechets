@@ -2,7 +2,9 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
   bsdasriFactory,
+  initialData,
   readyToPublishData,
+  readyToReceiveData,
   readyToTakeOverData
 } from "../../../__tests__/factories";
 import {
@@ -18,6 +20,7 @@ import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { sirenify } from "../../../sirenify";
+import * as jsdom from "jsdom";
 
 jest.mock("../../../sirenify");
 (sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
@@ -174,19 +177,22 @@ describe("Mutation.updateBsdasri", () => {
     "should be possible to update a %p dasri",
     async draftStatus => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
+
       const dasri = await bsdasriFactory({
         userId: user.id,
         opt: {
           status: BsdasriStatus.INITIAL,
           isDraft: draftStatus === "draft",
           emitterCompanySiret: company.siret,
-          ...readyToPublishData(await companyFactory())
+          ...readyToPublishData(company)
         }
       });
 
       const { mutate } = makeClient(user);
+      const newCompany = await companyFactory();
       const input = {
-        emitter: { company: { mail: "test@test.test" } }
+        emitter: { company: { mail: "test@test.test" } },
+        destination: { company: { siret: newCompany.siret } }
       };
 
       const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
@@ -198,10 +204,13 @@ describe("Mutation.updateBsdasri", () => {
           }
         }
       );
+
       expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
       expect(data.updateBsdasri.type).toBe("SIMPLE");
       // check input is sirenified
-      expect(sirenify).toHaveBeenCalledTimes(1);
+      expect(data.updateBsdasri.destination!.company!.name).toBe(
+        newCompany.name
+      );
     }
   );
 
@@ -393,20 +402,24 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow eco organisme fields update for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const emitterCompany = await companyFactory();
     const ecoOrg = await ecoOrganismeFactory({
       handle: { handleBsdasri: true }
     });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
-      siret: ecoOrg.siret
+      siret: ecoOrg.siret,
+      name: "eco-org"
     });
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(emitterCompany),
         status: BsdasriStatus.INITIAL,
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        ...readyToPublishData(emitterCompany)
       }
     });
 
@@ -418,6 +431,7 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
+
     const updated = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
@@ -435,8 +449,9 @@ describe("Mutation.updateBsdasri", () => {
     });
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
         status: BsdasriStatus.INITIAL,
-        emitterCompanySiret: company.siret,
+
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
@@ -499,9 +514,10 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : L'adresse e-mail de l'émetteur"
     );
   });
+
   it("should disallow eco organisme fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ecoOrg = await ecoOrganismeFactory({
@@ -544,15 +560,15 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ecoOrganismeName, ecoOrganismeSiret"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le nom de l'éco-organisme, Le SIRET de l'éco-organisme"
     );
   });
   it("should allow transporter and destination fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
         status: BsdasriStatus.SIGNED_BY_PRODUCER,
-        emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
@@ -596,8 +612,9 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: company.siret,
+
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
         transporterTransportSignatureDate: new Date().toISOString(),
@@ -629,7 +646,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail, transporterCompanyMail",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : L'adresse e-mail de l'émetteur, L'email du transporteur",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -640,22 +657,27 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow transporter handedOverAt field update after transport signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const transporter = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...readyToTakeOverData(transporter),
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: company.siret,
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transporterTransportSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        transporterTransportSignatureDate: new Date().toISOString()
       }
     });
+
+    const handedOverAt = new Date().toISOString();
 
     const { mutate } = makeClient(user);
     const input = {
       transporter: {
         transport: {
-          handedOverAt: new Date().toISOString()
+          handedOverAt
         }
       }
     };
@@ -663,22 +685,27 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
+
     const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
-    expect(updatedDasri.handedOverToRecipientAt).not.toBeNull();
+    expect(updatedDasri.handedOverToRecipientAt).not.toBe(handedOverAt);
   });
 
   it("should disallow transporter handedOverAt field update after reception signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const transporter = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...readyToTakeOverData(transporter),
         status: BsdasriStatus.RECEIVED,
-        emitterCompanySiret: company.siret,
+
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -701,7 +728,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : handedOverToRecipientAt",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Remis au destinataire",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -715,15 +742,21 @@ describe("Mutation.updateBsdasri", () => {
   });
 
   it("should compute destinationReceptionWasteVolume ", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const emitter = await companyFactory();
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const transporter = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(emitter),
+        ...readyToPublishData(destination),
+        ...readyToTakeOverData(transporter),
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: company.siret,
+
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transporterTransportSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        transporterTransportSignatureDate: new Date().toISOString()
       }
     });
 
@@ -739,13 +772,14 @@ describe("Mutation.updateBsdasri", () => {
       }
     };
 
-    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+    const { data, errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
       UPDATE_DASRI,
       {
         variables: { id: dasri.id, input }
       }
     );
-    expect(data.updateBsdasri.destination!.reception!.volume).toEqual(11);
+
+    expect(data.updateBsdasri.destination!.reception!.volume).toEqual(11); // 3 * 3 + 2 * 1= 11
     const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
@@ -753,15 +787,22 @@ describe("Mutation.updateBsdasri", () => {
   });
 
   it("should allow destination fields update after transport signature", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user, company: destination } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const emitter = await companyFactory();
+
+    const transporter = await companyFactory();
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(emitter),
+        ...readyToPublishData(destination),
+        ...readyToTakeOverData(transporter),
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: company.siret,
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
-        transporterTransportSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        transporterTransportSignatureDate: new Date().toISOString()
       }
     });
 
@@ -790,12 +831,15 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        ...readyToTakeOverData(company),
+        ...readyToReceiveData(),
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -805,7 +849,7 @@ describe("Mutation.updateBsdasri", () => {
         company: {
           mail: "test@test.test"
         },
-        reception: { acceptation: { status: "ACCEPTED" } }
+        reception: { acceptation: { status: "REFUSED" } }
       }
     };
 
@@ -819,7 +863,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanyMail, destinationReceptionAcceptationStatus",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : L'adresse e-mail du destinataire, Le statut d'acceptation du destinataire",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -832,12 +876,15 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        ...readyToTakeOverData(company),
+        ...readyToReceiveData(),
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -855,6 +902,7 @@ describe("Mutation.updateBsdasri", () => {
     const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
+
     expect(updatedDasri.destinationOperationCode).toEqual("D10");
   });
 
@@ -863,12 +911,15 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        ...readyToTakeOverData(company),
+        ...readyToReceiveData(),
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -898,12 +949,15 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        ...readyToTakeOverData(company),
+        ...readyToReceiveData(),
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
@@ -930,12 +984,15 @@ describe("Mutation.updateBsdasri", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        ...readyToTakeOverData(company),
+        ...readyToReceiveData(),
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString(),
-        ...readyToPublishData(await companyFactory())
+        destinationReceptionSignatureDate: new Date().toISOString()
       }
     });
 
