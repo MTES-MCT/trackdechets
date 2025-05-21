@@ -40,6 +40,7 @@ import {
 } from "./Dashboard.utils";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
+import { debounce } from "../common/helper";
 
 import "./dashboard.scss";
 
@@ -58,17 +59,6 @@ const DashboardPage = () => {
   const location = useLocation();
 
   const BSD_PER_PAGE = 25;
-  const bsdCurrentTab = getBsdCurrentTab({
-    isDraftTab,
-    isActTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isReviewedTab,
-    isToReviewTab,
-    isReturnTab
-  });
   const { siret } = useParams<{ siret: string }>();
   const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
 
@@ -120,6 +110,7 @@ const DashboardPage = () => {
   // - Current filters
   const fetchBsds = useCallback(
     (newSiret, newVariables, newTabs) => {
+      if (!newSiret) return;
       const variables = { ...newVariables };
 
       const routePredicate = getRoutePredicate({
@@ -143,6 +134,11 @@ const DashboardPage = () => {
     [lazyFetchBsds]
   );
 
+  const debouncedFetchBsds = useMemo(
+    () => debounce(fetchBsds, 500),
+    [fetchBsds]
+  );
+
   const handleFiltersSubmit = filterValues => {
     // Transform the filters into a GQL query
     const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
@@ -153,10 +149,11 @@ const DashboardPage = () => {
 
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    fetchBsds(siret, bsdsVariables, tabs);
+    debouncedFetchBsds(siret, bsdsVariables, tabs);
   });
 
   useEffect(() => {
+    if (!siret) return;
     fetchBsds(siret, bsdsVariables, tabs);
   }, [bsdsVariables, siret, tabs, fetchBsds]);
 
@@ -173,11 +170,13 @@ const DashboardPage = () => {
     variables: { clue: siret! }
   });
 
-  const siretsWithAutomaticSignature = companyData
-    ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
-        automation => automation.from.siret
-      )
-    : [];
+  const siretsWithAutomaticSignature = useMemo(() => {
+    return companyData
+      ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
+          automation => automation.from.siret
+        )
+      : [];
+  }, [companyData]);
 
   const loadMoreBsds = React.useCallback(() => {
     fetchMore({
@@ -205,11 +204,12 @@ const DashboardPage = () => {
     setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
-  const bsds = data?.bsds.edges;
+  const bsds = useMemo(() => data?.bsds.edges ?? [], [data?.bsds.edges]);
 
   const bsdsTotalCount = data?.bsds.totalCount;
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;
+  const bsdCurrentTab = useMemo(() => getBsdCurrentTab(tabs), [tabs]);
 
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
