@@ -12,7 +12,7 @@ import type {
   MutationSubmitBsdaRevisionRequestApprovalArgs
 } from "@td/codegen-back";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
-import { BsdaStatus, UserRole } from "@prisma/client";
+import { BsdaStatus, UserRole, WasteAcceptationStatus } from "@prisma/client";
 import { operationHook } from "../../../../operationHook";
 import { operationHooksQueue } from "../../../../../queue/producers/operationHook";
 import { sendMail } from "../../../../../mailer/mailing";
@@ -1586,6 +1586,208 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       expect(workerErrors).toBeUndefined();
 
       expect(sendMail as jest.Mock).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe("weight & refused weight", () => {
+    it("should update weight & refused weight", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.PARTIALLY_REFUSED,
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 5
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          comment: "",
+          destinationReceptionWeight: 15,
+          destinationReceptionRefusedWeight: 6
+        }
+      });
+
+      // When
+      const { data, errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.submitBsdaRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsda = await prisma.bsda.findFirstOrThrow({
+        where: { id: bsda.id }
+      });
+
+      expect(updatedBsda.destinationReceptionWeight?.toNumber()).toBe(15);
+      expect(updatedBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(6);
+    });
+
+    it("should update weight only", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.PARTIALLY_REFUSED,
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 5
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          comment: "",
+          destinationReceptionWeight: 15
+        }
+      });
+
+      // When
+      const { data, errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.submitBsdaRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsda = await prisma.bsda.findFirstOrThrow({
+        where: { id: bsda.id }
+      });
+
+      expect(updatedBsda.destinationReceptionWeight?.toNumber()).toBe(15);
+      expect(updatedBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(5);
+    });
+
+    it("should update refused weight only", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.PARTIALLY_REFUSED,
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 5
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          comment: "",
+          destinationReceptionRefusedWeight: 9
+        }
+      });
+
+      // When
+      const { data, errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.submitBsdaRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsda = await prisma.bsda.findFirstOrThrow({
+        where: { id: bsda.id }
+      });
+
+      expect(updatedBsda.destinationReceptionWeight?.toNumber()).toBe(10);
+      expect(updatedBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(9);
+    });
+
+    it("should add refusedWeight even though none was provided in initial BSD", async () => {
+      // Given
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.PARTIALLY_REFUSED,
+          destinationReceptionWeight: 10
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret! } },
+          comment: "",
+          destinationReceptionRefusedWeight: 9
+        }
+      });
+
+      // When
+      const { data, errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.submitBsdaRevisionRequestApproval.status).toBe("ACCEPTED");
+
+      const updatedBsda = await prisma.bsda.findFirstOrThrow({
+        where: { id: bsda.id }
+      });
+
+      expect(updatedBsda.destinationReceptionWeight?.toNumber()).toBe(10);
+      expect(updatedBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(9);
     });
   });
 });

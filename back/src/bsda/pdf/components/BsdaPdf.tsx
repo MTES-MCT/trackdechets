@@ -8,7 +8,7 @@ import { WasteDetails } from "./WasteDetails";
 import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
 import { Signature } from "../../../bspaoh/pdf/components/Signature";
 import {
   CompanyContact,
@@ -17,6 +17,8 @@ import {
 import Transporter from "../../../common/pdf/components/Transporter";
 import { getBsdaWasteADRMention, pluralize } from "@td/constants";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
+import { bsdaWasteQuantities } from "../../utils";
+import { displayWasteQuantity } from "../../../registry/utils";
 
 type Props = {
   bsda: Bsda;
@@ -32,6 +34,14 @@ export function BsdaPdf({
   renderEmpty = false
 }: Props) {
   const intermediaryCount = bsda?.intermediaries?.length ?? 0;
+
+  const wasteQuantities = bsdaWasteQuantities({
+    destinationReceptionAcceptationStatus:
+      bsda.destination?.reception?.acceptationStatus,
+    destinationReceptionRefusedWeight:
+      bsda.destination?.reception?.refusedWeight,
+    destinationReceptionWeight: bsda.destination?.reception?.weight
+  });
 
   return (
     <Document title={bsda.id}>
@@ -352,7 +362,16 @@ export function BsdaPdf({
               partiellement
               <br />
               <br />
-              Quantité réelle acceptée : {bsda?.destination?.reception?.weight}
+              Quantité présentée nette :{" "}
+              {isDefined(bsda?.destination?.reception?.weight)
+                ? `${bsda?.destination?.reception?.weight} tonne(s)`
+                : ""}
+              <br />
+              Quantité acceptée nette :{" "}
+              {displayWasteQuantity(wasteQuantities?.quantityAccepted)}
+              <br />
+              Quantité refusée nette :{" "}
+              {displayWasteQuantity(wasteQuantities?.quantityRefused)}
               <br />
               Motif de refus (le cas échéant) :{" "}
               {bsda?.destination?.reception?.refusalReason}

@@ -219,6 +219,10 @@ type BsdaReception {
   date: DateTime
   "Poids présenté"
   weight: Float
+  "Poids refusé (optionnel)"
+  refusedWeight: Float
+  "Poids accepté (déduit des poids réceptionnés & refusés)"
+  acceptedWeight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus
   "Motif de refus"
@@ -432,6 +436,9 @@ type BsdaRevisionRequestDestination {
 type BsdaRevisionRequestReception {
   "Poids présenté"
   weight: Float
+
+  "Poids refusé"
+  refusedWeight: Float
 }
 
 type BsdaRevisionRequestOperation {

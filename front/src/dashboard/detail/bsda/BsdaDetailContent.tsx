@@ -37,6 +37,12 @@ import { BSDA_VERBOSE_STATUSES, getBsdaWasteADRMention } from "@td/constants";
 import ExpandableList from "./ExpandableList";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
+import {
+  BSD_DETAILS_QTY_TOOLTIP,
+  NON_RENSEIGNE
+} from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
+import { isDefined } from "../../../common/helper";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -182,9 +188,37 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow value={destination?.cap} label="CAP" />
         <DetailRow
           value={destination?.reception?.weight}
-          label="Poids reçu"
+          label="Quantité réceptionnée"
           units="tonne(s)"
         />
+        {isDefined(destination?.reception?.weight) && (
+          <>
+            <DetailRow
+              value={
+                destination?.reception?.refusedWeight ? (
+                  `${destination?.reception?.refusedWeight} tonne(s)`
+                ) : (
+                  <>
+                    {NON_RENSEIGNE} <Tooltip title={BSD_DETAILS_QTY_TOOLTIP} />
+                  </>
+                )
+              }
+              label="Quantité refusée"
+            />
+            <DetailRow
+              value={
+                destination?.reception?.acceptedWeight ? (
+                  `${destination?.reception?.acceptedWeight} tonne(s)`
+                ) : (
+                  <>
+                    {NON_RENSEIGNE} <Tooltip title={BSD_DETAILS_QTY_TOOLTIP} />
+                  </>
+                )
+              }
+              label="Quantité acceptée"
+            />
+          </>
+        )}
         <DetailRow
           value={getVerboseAcceptationStatus(
             destination?.reception?.acceptationStatus

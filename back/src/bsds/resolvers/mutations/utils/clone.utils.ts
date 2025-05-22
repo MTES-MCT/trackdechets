@@ -112,6 +112,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     destinationReceptionDate: bsda.destinationReceptionDate,
     destinationReceptionRefusalReason: bsda.destinationReceptionRefusalReason,
     destinationReceptionWeight: bsda.destinationReceptionWeight,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight,
     ecoOrganismeName: bsda.ecoOrganismeName,
     ecoOrganismeSiret: bsda.ecoOrganismeSiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,

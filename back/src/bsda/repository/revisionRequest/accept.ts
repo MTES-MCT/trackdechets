@@ -191,6 +191,8 @@ async function getUpdateFromRevisionRequest(
       ? revisionRequest.destinationCap
       : null,
     destinationReceptionWeight: revisionRequest.destinationReceptionWeight,
+    destinationReceptionRefusedWeight:
+      revisionRequest.destinationReceptionRefusedWeight,
     destinationOperationCode: revisionRequest.destinationOperationCode,
     destinationOperationDescription:
       revisionRequest.destinationOperationDescription,

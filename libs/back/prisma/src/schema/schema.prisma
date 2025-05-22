@@ -1692,6 +1692,7 @@ model Bsda {
   destinationPlannedOperationCode                         String?
   destinationReceptionDate                                DateTime?               @db.Timestamptz(6)
   destinationReceptionWeight                              Decimal?                @db.Decimal(65, 30)
+  destinationReceptionRefusedWeight                       Decimal?                @db.Decimal(65, 30)
   destinationReceptionAcceptationStatus                   WasteAcceptationStatus?
   destinationReceptionRefusalReason                       String?
   destinationOperationCode                                String?
@@ -1851,6 +1852,7 @@ model BsdaRevisionRequest {
   // Nouveau CAP de *l'exutoire* (même si le bordereau a un TTR)
   destinationCap                  String?
   destinationReceptionWeight      Float?
+  destinationReceptionRefusedWeight Float?
   destinationOperationCode        String?
   destinationOperationDescription String?
   destinationOperationMode        OperationMode?
@@ -1876,6 +1878,7 @@ model BsdaRevisionRequest {
   initialWasteMaterialName               String?
   initialDestinationCap                  String?
   initialDestinationReceptionWeight      Decimal?
+  initialDestinationReceptionRefusedWeight Decimal?
   initialDestinationOperationCode        String?
   initialDestinationOperationDescription String?
   initialDestinationOperationMode        OperationMode?
