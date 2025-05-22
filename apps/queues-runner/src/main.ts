@@ -16,7 +16,9 @@ import {
   registryImportQueue,
   processRegistryImportJob,
   registryExportQueue,
-  processRegistryExportJob
+  processRegistryExportJob,
+  registryExhaustiveExportQueue,
+  processRegistryExhaustiveExportJob
 } from "back";
 
 import { schema } from "@td/env";
@@ -41,6 +43,7 @@ function startConsumers() {
   updateAppendix2Queue.process(updateAppendix2Job);
   registryImportQueue.process(processRegistryImportJob);
   registryExportQueue.process(processRegistryExportJob);
+  registryExhaustiveExportQueue.process(processRegistryExhaustiveExportJob);
 }
 
 startConsumers();

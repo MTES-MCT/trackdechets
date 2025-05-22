@@ -6,7 +6,7 @@ import * as Excel from "exceljs";
 
 import { format as csvFormat } from "@fast-csv/format";
 
-import type { DateFilter } from "@td/codegen-back";
+import type { AllWasteV2, DateFilter } from "@td/codegen-back";
 import { Upload } from "@aws-sdk/lib-storage";
 import { estypes } from "@elastic/elasticsearch";
 import { UserInputError } from "../../common/errors";
@@ -17,12 +17,14 @@ import {
   RegistryExportFormat,
   RegistryExportStatus
 } from "@prisma/client";
-import { toPrismaBsds } from "../../registryV2/elastic";
+import {
+  dateFilterToElasticFilter,
+  toPrismaBsds
+} from "../../registryV2/elastic";
 import { BsdElastic, client, index } from "../../common/elastic";
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatterV2 } from "../../registryV2/streams";
 import { EXHAUSTIVE_EXPORT_COLUMNS } from "../../registryV2/columns";
-import { toElasticQuery } from "../../bsds/where";
 
 // we have all verified infos in the registryExport,
 // but the date range is a bit more fine in the query than in the object
@@ -58,6 +60,7 @@ const streamLookup = (
                 ...query.bool,
                 // make sure ordering is consistent by filtering out possible null value on sort key
                 must: {
+                  ...query.bool?.must,
                   exists: { field: "updatedAt" }
                 }
               }
@@ -74,21 +77,24 @@ const streamLookup = (
         const bsds = await toPrismaBsds(
           hits.map(hit => hit._source).filter(Boolean)
         );
-
         for (const hit of hits) {
           if (!hit._source) {
             continue;
           }
-          const { type, id, readableId, isAllWasteFor } = hit._source;
+          const { type, id, isAllWasteFor, updatedAt } = hit._source;
+          console.log("updatedAt", new Date(updatedAt).toISOString());
           cursorDate = hit._source.updatedAt;
           cursorId = hit._source.id;
           addEncounteredSirets(isAllWasteFor as string[]);
-          const waste = bsds[type].find(waste =>
-            type === "BSDD" ? waste.id === readableId : waste.id === id
-          );
+          const waste = bsds[type].find(waste => waste.id === id);
           const mapped = toWaste("ALL", undefined, {
             [type]: waste
-          });
+          }) as AllWasteV2;
+          console.log(
+            "mapped updatedAt",
+            mapped?.updatedAt && new Date(mapped.updatedAt).toISOString()
+          );
+
           if (mapped) {
             this.push(mapped);
           }
@@ -150,6 +156,7 @@ export async function processRegistryExhaustiveExportJob(
   let upload: Upload | null = null;
 
   try {
+    logger.info(`Starting export ${exportId}`);
     const registryExport = await startExport(exportId);
     if (!registryExport) {
       throw new UserInputError(
@@ -177,10 +184,8 @@ export async function processRegistryExhaustiveExportJob(
       };
     } = {
       bool: {
-        ...toElasticQuery({
-          updatedAt: dateRange
-        }).bool,
         filter: [
+          dateFilterToElasticFilter("updatedAt", dateRange),
           {
             bool: {
               should: [
@@ -195,7 +200,7 @@ export async function processRegistryExhaustiveExportJob(
         ]
       }
     };
-
+    console.log(JSON.stringify(query, null, 2));
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
     // sirets that are never encountered during the export, and update the list of sirets
@@ -219,6 +224,7 @@ export async function processRegistryExhaustiveExportJob(
         exportType: "ALL",
         useLabelAsKey: true
       });
+
       pipeline(
         inputStream,
         transformer,
@@ -233,7 +239,6 @@ export async function processRegistryExhaustiveExportJob(
           logger.info(`Finished processing export ${exportId}`, { exportId });
         }
       );
-
       // handle XLSX exports
     } else {
       const workbook = new Excel.stream.xlsx.WorkbookWriter({
@@ -243,6 +248,7 @@ export async function processRegistryExhaustiveExportJob(
       const transformer = wasteFormatterV2({
         exportType: "ALL"
       });
+
       transformer.on("data", waste => {
         if (worksheet.columns === null) {
           // write headers if not present

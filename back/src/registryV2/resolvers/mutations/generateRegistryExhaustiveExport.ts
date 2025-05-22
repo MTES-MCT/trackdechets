@@ -18,7 +18,7 @@ import {
 import { enqueueRegistryExhaustiveExportJob } from "../../../queue/producers/registryExhaustiveExport";
 import { subMinutes } from "date-fns";
 
-export async function generateRegistryV2Export(
+export async function generateRegistryExhaustiveExport(
   _,
   { format, siret, dateRange }: MutationGenerateRegistryExhaustiveExportArgs,
   context: GraphQLContext
@@ -61,7 +61,6 @@ export async function generateRegistryV2Export(
       }
     }
   }
-
   const recentSameExport = await prisma.registryExhaustiveExport.findFirst({
     where: {
       createdById: user.id,

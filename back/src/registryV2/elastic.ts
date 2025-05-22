@@ -1,4 +1,6 @@
 import { prisma } from "@td/prisma";
+import { estypes } from "@elastic/elasticsearch";
+import { DateFilter } from "@td/codegen-back";
 import {
   RegistryV2Bsdd,
   RegistryV2Bsdasri,
@@ -14,6 +16,7 @@ import {
   RegistryV2BsvhuInclude
 } from "./types";
 import { BsdElastic, groupByBsdType } from "../common/elastic";
+import { toElasticDateQuery } from "../common/where";
 
 export type RegistryV2BsdMap = {
   BSDD: RegistryV2Bsdd[];
@@ -109,4 +112,11 @@ export async function toPrismaBsds(
     BSFF: bsffs,
     BSPAOH: bspaohs
   };
+}
+
+export function dateFilterToElasticFilter(
+  fieldName: keyof BsdElastic,
+  dateFilter: DateFilter
+): estypes.QueryContainer {
+  return toElasticDateQuery(fieldName, dateFilter) ?? {};
 }
