@@ -1,7 +1,7 @@
 import { User } from "@prisma/client";
 import { server, getServerDataloaders } from "../server";
 import { DocumentNode, print } from "graphql";
-import { AuthType } from "../auth";
+import { AuthType } from "../auth/auth";
 import assert from "node:assert";
 
 type StringOrAst = string | DocumentNode;

@@ -6,7 +6,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Query } from "@td/codegen-back";
 import {

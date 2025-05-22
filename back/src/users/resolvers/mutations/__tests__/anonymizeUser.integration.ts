@@ -6,9 +6,10 @@ import { logIn } from "../../../../__tests__/auth.helper";
 import {
   userFactory,
   userWithAccessTokenFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import makeClient from "../../../../__tests__/testClient";
 import { redisClient } from "../../../../common/redis";
 import { USER_SESSIONS_CACHE_KEY } from "../../../../common/redis/users";
@@ -59,7 +60,8 @@ describe("disconnectDeletedUser Middleware", () => {
 
   it("should disconnect a user with a cookie", async () => {
     const user = await userFactory();
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
+
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     const { sessionCookie } = await logIn(app, user.email, "pass");
@@ -101,7 +103,8 @@ describe("disconnectDeletedUser Middleware", () => {
 
   it("must not disconnect a user when associated with a company with only one admin", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
+
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     const { sessionCookie } = await logIn(app, user.email, "pass");
@@ -135,7 +138,8 @@ describe("disconnectDeletedUser Middleware", () => {
 
   it("should disconnect api user with a bearer token", async () => {
     const { user, accessToken } = await userWithAccessTokenFactory();
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
+
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
     const res = await request
       .post("/")

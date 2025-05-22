@@ -10,7 +10,7 @@ import {
 import { getMembershipRequestRepository } from "../../repository";
 import { isDefined } from "../../../common/helpers";
 import { MembershipRequestStatus, User } from "@prisma/client";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkUserPermissions, Permission } from "../../../permissions";
 
 export const argsSchema = z.object({

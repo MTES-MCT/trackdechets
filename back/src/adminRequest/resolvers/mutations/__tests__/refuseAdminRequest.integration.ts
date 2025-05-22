@@ -5,7 +5,8 @@ import type { Mutation } from "@td/codegen-back";
 import {
   companyFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import {
   AdminRequestStatus,
@@ -244,7 +245,7 @@ describe("Mutation refuseAdminRequest", () => {
     // Given
     const { company } = await userWithCompanyFactory();
     const requestAuthor = await userFactory();
-    const tdAdmin = await userFactory({ isAdmin: true });
+    const tdAdmin = await adminFactory();
 
     const adminRequest = await prisma.adminRequest.create({
       data: {

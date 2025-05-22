@@ -1,7 +1,7 @@
 import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { renderMail, inviteUserToJoin } from "@td/mail";

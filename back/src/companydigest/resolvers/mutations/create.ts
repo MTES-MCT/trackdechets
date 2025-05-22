@@ -9,7 +9,7 @@ import { getUserRoles } from "../../../permissions";
 import { format } from "date-fns";
 import { prisma } from "@td/prisma";
 import { sendGericoApiRequest } from "../../../queue/producers/gerico";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { CompanyDigestStatus } from "@prisma/client";
 
 const createCompanyDigestResolver = async (

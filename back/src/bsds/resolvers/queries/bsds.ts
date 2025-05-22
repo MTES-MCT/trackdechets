@@ -4,7 +4,7 @@ import type {
   QueryBsdsArgs,
   OrderType
 } from "@td/codegen-back";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { client, BsdElastic, index } from "../../../common/elastic";
 

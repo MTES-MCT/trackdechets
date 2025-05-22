@@ -13,7 +13,7 @@ import {
   sirenifyBsffCreateInput,
   sirenifyBsffTransporterCreateInput
 } from "../sirenify";
-import { AuthType } from "../../auth";
+import { AuthType } from "../../auth/auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { Prisma } from "@prisma/client";
 

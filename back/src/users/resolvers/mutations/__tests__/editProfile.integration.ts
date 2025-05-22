@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 

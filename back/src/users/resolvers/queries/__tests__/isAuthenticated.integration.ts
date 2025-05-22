@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { userFactory } from "../../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 
 const IS_AUTHENTICATED = `
   query IsAuthenticated {

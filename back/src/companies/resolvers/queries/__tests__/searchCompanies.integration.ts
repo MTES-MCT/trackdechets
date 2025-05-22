@@ -7,7 +7,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { searchCompanies } from "../../../search";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 
 jest.mock("../../../search");
 

@@ -2,7 +2,7 @@ import {
   updateAccessTokenLastUsed,
   AuthType,
   applyAuthStrategies
-} from "../auth";
+} from "../auth/auth";
 import { AccessToken, User } from "@prisma/client";
 import { GraphQLContext } from "../types";
 import { sameDayMidnight } from "../utils";

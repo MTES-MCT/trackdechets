@@ -2,10 +2,11 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   companyFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import { createUserAccountHash } from "../../../database";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, inviteUserToJoin } from "@td/mail";
@@ -59,9 +60,7 @@ describe("mutation resendInvitation", () => {
     const company = await companyFactory();
     const usrToInvite = "john.snow@trackdechets.fr";
     await createUserAccountHash(usrToInvite, "MEMBER", company.siret!);
-    const tdAdminUser = await userFactory({
-      isAdmin: true
-    });
+    const tdAdminUser = await adminFactory();
     const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
     // Call the mutation to resend the invitation
     const res = await mutate(RESEND_INVITATION, {

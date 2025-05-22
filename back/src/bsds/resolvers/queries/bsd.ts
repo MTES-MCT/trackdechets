@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { AuthType, applyAuthStrategies } from "../../../auth";
+import { AuthType, applyAuthStrategies } from "../../../auth/auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import type { QueryBsdArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";

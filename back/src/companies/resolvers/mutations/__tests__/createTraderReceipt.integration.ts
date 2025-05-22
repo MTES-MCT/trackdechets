@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";

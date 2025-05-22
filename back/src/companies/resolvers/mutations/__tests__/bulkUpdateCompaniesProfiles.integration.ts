@@ -5,7 +5,8 @@ import { prisma } from "@td/prisma";
 import {
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -59,7 +60,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should raise an error if companies does not exist in db", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -107,7 +108,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should not update companies which do not belong to the adminEmail", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -162,7 +163,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should raise an error if there are duplicatess", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -207,7 +208,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should raise an error if profiles and subprofiles do not validate (collectorTypes)", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -245,7 +246,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should raise an error if profiles and subprofiles do not validate (wasteProcessorTypes)", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -283,7 +284,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should raise an error if profiles and subprofiles do not validate (wasteVehiclesTypes)", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,
@@ -321,7 +322,7 @@ describe("mutation bulkUpdateCompaniesProfiles", () => {
   });
 
   it("should update companies", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user, company } = await userWithCompanyFactory(
       UserRole.ADMIN,

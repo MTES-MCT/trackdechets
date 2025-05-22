@@ -20,3 +20,24 @@ export async function logIn(
 
   return { sessionCookie: setCookie[0] };
 }
+
+export async function secondFactor(
+  app: Express,
+  totp: string,
+  prelogCookie: string
+): Promise<{ sessionCookie: string }> {
+  const request = supertest(app);
+
+  const login = await request
+    .post("/otp")
+    .send(`totp=${totp}`)
+    .set("Cookie", prelogCookie);
+
+  const setCookie = login.header["set-cookie"];
+
+  if (setCookie.length === 0) {
+    throw Error("Not Authorized");
+  }
+
+  return { sessionCookie: setCookie[0] };
+}

@@ -11,7 +11,7 @@ import {
   sirenifyFormInput,
   sirenifyResealedFormInput
 } from "../sirenify";
-import { AuthType } from "../../auth";
+import { AuthType } from "../../auth/auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { EmitterType, Prisma, Status } from "@prisma/client";
 

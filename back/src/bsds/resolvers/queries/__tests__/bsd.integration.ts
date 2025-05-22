@@ -5,7 +5,8 @@ import type { Query, QueryBsdArgs } from "@td/codegen-back";
 import {
   formFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -32,7 +33,7 @@ describe("query bsd", () => {
   });
 
   it("should return the bsd infos if user is admin", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { query } = makeClient(admin);
     const form = await formFactory({ ownerId: user.id });

@@ -3,7 +3,7 @@ import type {
   AnonymousCompanyInput,
   MutationResolvers
 } from "@td/codegen-back";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
 import { nafCodes } from "@td/constants";

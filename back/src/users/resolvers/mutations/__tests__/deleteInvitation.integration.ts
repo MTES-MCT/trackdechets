@@ -1,8 +1,9 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { ErrorCode } from "../../../../common/errors";
 import {
+  adminFactory,
   companyFactory,
   userFactory,
   userWithCompanyFactory
@@ -77,9 +78,7 @@ describe("mutation deleteInvitation", () => {
       "MEMBER",
       company.siret!
     );
-    const tdAdminUser = await userFactory({
-      isAdmin: true
-    });
+    const tdAdminUser = await adminFactory();
     const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
     // Call the mutation to delete the invitation
     const { data } = await mutate<Pick<Mutation, "deleteInvitation">>(

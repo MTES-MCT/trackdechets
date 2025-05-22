@@ -1,7 +1,7 @@
 import type { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { UserInputError } from "../../../common/errors";
 
 const myApplications: QueryResolvers["myApplications"] = async (
