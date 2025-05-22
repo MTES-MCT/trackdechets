@@ -11,6 +11,7 @@ Au cours de son cycle de vie, le BSDA peut passer par différents états décrit
 - `SIGNED_BY_PRODUCER` : Bsda signé par le producteur.
 - `SIGNED_BY_WORKER` : Bsda signé par l'entreprise de travaux.
 - `SENT` : Bsda pris en charge par le transporteur.
+- `RECEIVED`: Bsda réceptionné.
 - `PROCESSED` : Bsda traité.
 - `REFUSED` : Bsda refusé.
 - `AWAITING_CHILD` : Bsda en attente d'un bordereau suite.
@@ -37,6 +38,10 @@ B -->|"signBsda (OPERATION) 2710"| F(PROCESSED)
 C -->|"signBsda (WORK)"| D(SIGNED_BY_WORKER)
 C -->|"signBsda (TRANSPORT)"| D(SENT)
 D -->|"signBsda (TRANSPORT)"| E(SENT)
+E -->|"signBsda (RECEPTION)"| I(RECEIVED)
+I -->|"signBsda (OPERATION)"| F(PROCESSED)
+I -->|"signBsda (OPERATION) groupement"| G(AWAITING_CHILD)
+I -->|"signBsda (OPERATION) refus"| H(REFUSED)
 E -->|"signBsda (OPERATION)"| F(PROCESSED)
 E -->|"signBsda (OPERATION) groupement"| G(AWAITING_CHILD)
 E -->|"signBsda (OPERATION) refus"| H(REFUSED)

@@ -194,6 +194,8 @@ export const rawBsdaSchema = z.object({
   destinationReceptionRefusalReason: z.string().nullish(),
   destinationOperationCode: ZodOperationEnum.nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
+  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureDate: z.coerce.date().nullish(),
   destinationOperationDescription: z.string().nullish(),
   destinationOperationDate: z.coerce
     .date()
