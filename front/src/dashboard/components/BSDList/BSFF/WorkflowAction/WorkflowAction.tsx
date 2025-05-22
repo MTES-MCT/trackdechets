@@ -5,10 +5,10 @@ import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
-import { SignPackagings } from "../../../../../Apps/Dashboard/Signature/bsff/SignPackagings";
+import { SignPackagings } from "../../../../../Apps/Dashboard/Validation/bsff/SignPackagings";
 import { useParams } from "react-router-dom";
 import { usePermissions } from "../../../../../common/contexts/PermissionsContext";
-import SignBsffPackagingButton from "../../../../../Apps/Dashboard/Signature/bsff/SignBsffPackagingButton";
+import SignBsffPackagingButton from "../../../../../Apps/Dashboard/Validation/bsff/SignBsffPackagingButton";
 
 export interface WorkflowActionProps {
   form: BsffFragment;

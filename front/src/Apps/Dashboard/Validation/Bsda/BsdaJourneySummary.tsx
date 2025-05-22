@@ -5,7 +5,7 @@ import {
   JourneyStop,
   JourneyStopName,
   JourneyStopDescription
-} from "../../../../../common/components";
+} from "../../../../common/components";
 
 interface Props {
   bsda: Bsda;
