@@ -243,18 +243,17 @@ model AccessToken {
 }
 
 model Application {
-  id            String           @id @default(cuid()) @db.VarChar(30)
-  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
-  clientSecret  String
-  name          String
-  redirectUris  String[]
-  adminId       String?
-  admin         User?            @relation(fields: [adminId], references: [id], onDelete: Restrict)
-  goal          ApplicationGoal?
-  openIdEnabled Boolean          @default(false)
-  AccessToken   AccessToken[]
-  Grant         Grant[]
+  id           String           @id @default(cuid()) @db.VarChar(30)
+  createdAt    DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime         @updatedAt @db.Timestamptz(6)
+  clientSecret String
+  name         String
+  redirectUris String[]
+  adminId      String?
+  admin        User?            @relation(fields: [adminId], references: [id], onDelete: Restrict)
+  goal         ApplicationGoal?
+  AccessToken  AccessToken[]
+  Grant        Grant[]
 }
 
 model Company {
@@ -422,8 +421,8 @@ model EcoOrganisme {
   handleBsvhu   Boolean @default(false)
 }
 
-// Permet de faire le lien entre un bordereau "initial" et le ou 
-// les bordereaux plus loin dans la chaine de traçabilité qui 
+// Permet de faire le lien entre un bordereau "initial" et le ou
+// les bordereaux plus loin dans la chaine de traçabilité qui
 // ont reçu un traitement final ou un regroupement avec perte
 // de traçabilité.
 model BsddFinalOperation {
@@ -434,8 +433,8 @@ model BsddFinalOperation {
   operationCode  String
   noTraceability Boolean
   // quantité qui doit être affectée à ce traitement final (en cas de regroupement avec ventilation
-  // des quantités quelque part dans la chaîne de traçabilité. La somme des quantités de toutes les 
-  // opération finales doit être égale à la quantité acceptée du bordereau 
+  // des quantités quelque part dans la chaîne de traçabilité. La somme des quantités de toutes les
+  // opération finales doit être égale à la quantité acceptée du bordereau
   quantity       Decimal @db.Decimal(65, 30)
 
   finalFormId String
@@ -760,7 +759,6 @@ model Grant {
   code          String      @unique(map: "Grant.code._UNIQUE")
   expires       Int
   redirectUri   String
-  openIdEnabled Boolean     @default(false)
   scope         String[]    @default([])
   nonce         String?
   applicationId String      @db.VarChar(30)
@@ -936,10 +934,10 @@ model User {
   StatusLog             StatusLog[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[]                 @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[]                 @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[]                 @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[]                 @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]                  @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]                  @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]                  @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]                  @relation("BsdasriOperationSignature")
   Form                       Form[]
   UserActivationHash         UserActivationHash[]
   CompanyDigest              CompanyDigest[]
@@ -954,7 +952,7 @@ model User {
   registryExports            RegistryExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
-  adminRequests              AdminRequest[] @relation("AdminRequestUser")
+  adminRequests              AdminRequest[]             @relation("AdminRequestUser")
 }
 
 enum GovernmentPermission {
@@ -1387,7 +1385,7 @@ model BsdasriRevisionRequest {
   // Quantité traitée
   destinationReceptionWasteWeightValue Float?
 
-  // Code de l'opération D/R et mode de traitement 
+  // Code de l'opération D/R et mode de traitement
   destinationOperationCode String?
   destinationOperationMode OperationMode?
 
@@ -1456,7 +1454,7 @@ model Bsff {
   weightIsEstimate               Boolean?
   wasteDescription               String?
 
-  // Date de signature du premier transporteur 
+  // Date de signature du premier transporteur
   // Cette valeur est dupliquée entre le modèle Bsff et BsffTransporter[0]
   // pour optimiser certains calculs
   transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
@@ -1668,18 +1666,18 @@ model Bsda {
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
 
-  wasteCode         String?
-  wasteFamilyCode   String?
-  wasteMaterialName String?
-  wasteConsistence  BsdaConsistence?
-  wasteSealNumbers  String[]
-  wasteIsSubjectToADR Boolean?
-  wasteAdr          String?
+  wasteCode                     String?
+  wasteFamilyCode               String?
+  wasteMaterialName             String?
+  wasteConsistence              BsdaConsistence?
+  wasteSealNumbers              String[]
+  wasteIsSubjectToADR           Boolean?
+  wasteAdr                      String?
   wasteNonRoadRegulationMention String?
-  wastePop          Boolean?         @default(false)
-  packagings        Json             @default("[]")
-  weightValue       Decimal?         @db.Decimal(65, 30)
-  weightIsEstimate  Boolean?
+  wastePop                      Boolean?         @default(false)
+  packagings                    Json             @default("[]")
+  weightValue                   Decimal?         @db.Decimal(65, 30)
+  weightIsEstimate              Boolean?
 
   destinationCompanyName                                  String?
   destinationCompanySiret                                 String?
@@ -1758,7 +1756,7 @@ model Bsda {
   canAccessDraftOrgIds String[] @default([])
 
   // Relation vers les infos de traçabilité finales
-  // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait 
+  // Même si aujourd'hui il ne peut y avoir qu'une opération finale, on anticipe le fait
   // qu'on puisse à terme faire des regroupements avec ventilation des quantités
   finalOperations           BsdaFinalOperation[] @relation("FinalOperationToInitialBsda")
   FinalOperationToFinalForm BsdaFinalOperation[] @relation("FinalOperationToFinalBsda")
@@ -2117,24 +2115,24 @@ model AdministrativeTransfer {
 }
 
 model AdminRequest {
-  id         String                       @id @default(cuid())
-  createdAt  DateTime                     @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime                     @updatedAt @db.Timestamptz(6)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   // The user initiating the request, wanting to be promoted to admin
-  userId    String  @db.VarChar(30)
-  user User  @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  userId String @db.VarChar(30)
+  user   User   @relation("AdminRequestUser", fields: [userId], references: [id], onDelete: Cascade)
 
   // The orgId of the company the user wants to be admin of
-  companyId String @db.VarChar(30)
-  company Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
+  companyId String  @db.VarChar(30)
+  company   Company @relation("AdminRequestCompany", fields: [companyId], references: [id], onDelete: Cascade)
 
-  // The collaborator who has been asked to approve the request 
-  collaboratorId String?  @db.VarChar(30)
+  // The collaborator who has been asked to approve the request
+  collaboratorId String? @db.VarChar(30)
 
   // The code sent by mail to self-validate the request
-  code  String? @db.VarChar(8)
-  codeAttempts Int @default(0)
+  code         String? @db.VarChar(8)
+  codeAttempts Int     @default(0)
 
   // End of the period during which only the admin can accept the request
   adminOnlyEndDate DateTime?
@@ -2150,7 +2148,7 @@ model AdminRequest {
 
 enum AdminRequestStatus {
   PENDING
-  ACCEPTED 
+  ACCEPTED
   REFUSED
   BLOCKED
   EXPIRED
