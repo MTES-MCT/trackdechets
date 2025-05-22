@@ -42,6 +42,7 @@ import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 
 import "./dashboard.scss";
+import { debounce } from "../common/helper";
 
 const DashboardPage = () => {
   const { permissions } = usePermissions();
@@ -143,6 +144,11 @@ const DashboardPage = () => {
     [lazyFetchBsds]
   );
 
+  const debouncedFetchBsds = useMemo(
+    () => debounce(fetchBsds, 1000),
+    [fetchBsds]
+  );
+
   const handleFiltersSubmit = filterValues => {
     // Transform the filters into a GQL query
     const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
@@ -153,7 +159,7 @@ const DashboardPage = () => {
 
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    fetchBsds(siret, bsdsVariables, tabs);
+    debouncedFetchBsds(siret, bsdsVariables, tabs);
   });
 
   useEffect(() => {
