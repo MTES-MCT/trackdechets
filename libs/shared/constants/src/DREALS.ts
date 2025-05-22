@@ -213,7 +213,7 @@ export const Dreals = [
     DrealRegion: "DREAL Nouvelle-Aquitaine",
     name: "UD 33 (Unité départementale Gironde)",
     Dept: "33",
-    email: "ud-33.dreal-na@developpement-durable.gouv.fr"
+    email: "trackdechets.ud-33.dreal-na@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Occitanie",

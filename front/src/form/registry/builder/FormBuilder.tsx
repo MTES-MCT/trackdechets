@@ -108,53 +108,60 @@ export function FormBuilder({
             )}
           </Tabs>
 
-          {errors.root?.serverError && (
-            <Alert
-              title="Erreur interne"
-              description="Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
-              severity="error"
-              className="fr-my-2w"
-            />
-          )}
           <div className="fr-modal__footer fr-py-3w fr-mt-0">
-            <div className="fr-btns-group fr-btns-group--inline">
-              <div>
-                <div>
-                  <Button
-                    onClick={onPrevTab}
-                    priority="tertiary"
-                    disabled={selectedTabId === firstTabId}
-                    type="button"
-                  >
-                    Précédent
-                  </Button>
-
-                  <Button
-                    onClick={onNextTab}
-                    priority="tertiary"
-                    disabled={selectedTabId === lastTabId}
-                    type="button"
-                  >
-                    Suivant
-                  </Button>
+            <div className="error-container">
+              {errors.root?.serverError && (
+                <div tabIndex={-1}>
+                  <Alert
+                    title="Erreur interne"
+                    description={
+                      errors.root.serverError.message ??
+                      "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+                    }
+                    severity="error"
+                    className="fr-mb-2w"
+                  />
                 </div>
-
+              )}
+              <div className="fr-btns-group fr-btns-group--inline">
                 <div>
-                  <Button
-                    priority="secondary"
-                    type="button"
-                    onClick={() => navigate(-1)}
-                  >
-                    Fermer
-                  </Button>
+                  <div>
+                    <Button
+                      onClick={onPrevTab}
+                      priority="tertiary"
+                      disabled={selectedTabId === firstTabId}
+                      type="button"
+                    >
+                      Précédent
+                    </Button>
 
-                  <Button type="submit" disabled={loading}>
-                    {reason === RegistryLineReason.Edit
-                      ? "Modifier la déclaration"
-                      : reason === RegistryLineReason.Cancel
-                      ? "Annuler la déclaration"
-                      : "Créer la déclaration"}
-                  </Button>
+                    <Button
+                      onClick={onNextTab}
+                      priority="tertiary"
+                      disabled={selectedTabId === lastTabId}
+                      type="button"
+                    >
+                      Suivant
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      priority="secondary"
+                      type="button"
+                      onClick={() => navigate(-1)}
+                    >
+                      Fermer
+                    </Button>
+
+                    <Button type="submit" disabled={loading}>
+                      {reason === RegistryLineReason.Edit
+                        ? "Modifier la déclaration"
+                        : reason === RegistryLineReason.Cancel
+                        ? "Annuler la déclaration"
+                        : "Créer la déclaration"}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -71,8 +71,7 @@ const sirenifyBsdaAccessors = (
     (_, idx) =>
       ({
         siret: bsda.transporters![idx].transporterCompanySiret,
-        // FIXME skip conditionnaly based on transporter signatures
-        skip: false,
+        skip: bsda.transporters![idx].transporterTransportSignatureDate != null,
         setter: (input, companyInput) => {
           const transporter = input.transporters![idx];
           if (companyInput.name) {

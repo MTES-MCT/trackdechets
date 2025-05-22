@@ -38,6 +38,14 @@ export function refineTransporterInfos<T>({
         path: [typeKey]
       });
     }
+    if (!item[modeKey] && item[typeKey]) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le mode de transport doit être renseigné si les informations du transporteur le sont",
+        path: [modeKey]
+      });
+    }
 
     if (!item[typeKey]) {
       return;

@@ -93,7 +93,10 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
 
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
-              if (partialTransporter.TransportMode) {
+              if (
+                partialTransporter.TransportMode ||
+                partialTransporter.CompanyType
+              ) {
                 return true;
               }
               return false;

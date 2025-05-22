@@ -588,9 +588,9 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         bspaoh.destinationReceptionDate ??
-          bspaoh.destinationReceptionSignatureDate
+          bspaoh.destinationReceptionSignatureDate,
+        bspaoh.createdAt
       ),
-      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -608,9 +608,9 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         transporter.transporterTakenOverAt ??
-          transporter.transporterTransportSignatureDate
+          transporter.transporterTransportSignatureDate,
+        bspaoh.createdAt
       ),
-      declaredAt: bspaoh.createdAt,
       bspaohId: bspaoh.id
     });
   }
@@ -627,9 +627,9 @@ const bspaohToLookupCreateInputs = (
         wasteCode: bspaoh.wasteCode,
         ...generateDateInfos(
           transporter.transporterTakenOverAt ??
-            transporter.transporterTransportSignatureDate
+            transporter.transporterTransportSignatureDate,
+          bspaoh.createdAt
         ),
-        declaredAt: bspaoh.createdAt,
         bspaohId: bspaoh.id
       });
     }
@@ -661,14 +661,8 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100) => {
+export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("BSPAOH");
-  await prisma.registryLookup.deleteMany({
-    where: {
-      bspaohId: { not: null }
-    }
-  });
-  logger.logDelete();
 
   const total = await prisma.bspaoh.count({
     where: {
@@ -678,10 +672,47 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
       }
     }
   });
+
   let done = false;
   let cursorId: string | null = null;
   let processedCount = 0;
+  let operationId = 0;
+  const pendingWrites = new Map<number, Promise<void>>();
+
+  const processWrite = async (items: MinimalBspaohForLookup[]) => {
+    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+    for (const bspaoh of items) {
+      const createInputs = bspaohToLookupCreateInputs(bspaoh);
+      createArray = createArray.concat(createInputs);
+    }
+    // Run delete and create operations in a transaction
+    await prisma.$transaction(
+      async tx => {
+        // Delete existing lookups for these items
+        await tx.registryLookup.deleteMany({
+          where: {
+            OR: items.map(item => ({
+              id: item.id
+            }))
+          }
+        });
+        await tx.registryLookup.createMany({
+          data: createArray,
+          skipDuplicates: true
+        });
+      },
+      {
+        maxWait: 20000,
+        timeout: 60000
+      }
+    );
+
+    processedCount += items.length;
+    logger.logProgress(processedCount, total, pendingWrites.size);
+  };
+
   while (!done) {
+    // Sequential read
     const items = await prisma.bspaoh.findMany({
       where: {
         isDeleted: false,
@@ -697,23 +728,31 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
       },
       select: minimalBspaohForLookupSelect
     });
-    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
-    for (const bspaoh of items) {
-      const createInputs = bspaohToLookupCreateInputs(bspaoh);
-      createArray = createArray.concat(createInputs);
-    }
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+
+    // Start the write operation
+    const currentOperationId = operationId++;
+    const writePromise = processWrite(items).finally(() => {
+      pendingWrites.delete(currentOperationId);
     });
-    processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    pendingWrites.set(currentOperationId, writePromise);
+
+    // If we've reached max concurrency, wait for one write to complete
+    if (pendingWrites.size >= threads) {
+      await Promise.race(pendingWrites.values());
+    }
+
     if (items.length < pageSize) {
       done = true;
       break;
     }
     cursorId = items[items.length - 1].id;
   }
+
+  // Wait for any remaining writes to complete
+  if (pendingWrites.size > 0) {
+    await Promise.all(pendingWrites.values());
+  }
+
   logger.logCompletion(processedCount);
 };
 

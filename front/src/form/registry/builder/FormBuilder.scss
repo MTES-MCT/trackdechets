@@ -50,6 +50,12 @@
       var(--border-default-grey),
       var(--border-default-grey)
     );
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      // gap: 16px;
+    }
   }
   .fr-tabs {
     box-shadow: none;
