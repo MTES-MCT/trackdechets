@@ -57,6 +57,7 @@ const formData: Partial<Form> = {
 
   wasteDetailsCode: "16 06 01*",
   wasteDetailsName: "Déchets divers",
+  wasteDetailsIsSubjectToADR: true,
   wasteDetailsOnuCode: "AAA",
   wasteDetailsPackagingInfos: [
     { type: "FUT", other: null, quantity: 1 },

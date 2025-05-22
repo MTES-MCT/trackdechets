@@ -239,6 +239,8 @@ type ProcessedInfo = Pick<
   | "nextDestinationNotificationNumber"
 >;
 
+export const MEP_2025_05_2 = new Date("2025-05-27");
+
 export type Form = Emitter &
   Recipient &
   WasteDetails &
@@ -903,8 +905,21 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
         const {
           wasteDetailsIsDangerous,
           wasteDetailsIsSubjectToADR,
-          wasteDetailsOnuCode
+          wasteDetailsOnuCode,
+          createdAt
         } = ctx.parent;
+
+        // Field becomes required after MEP_2025_05_2. Be careful and don't break BSDs created before
+        if (
+          !isDefined(createdAt) ||
+          new Date(createdAt).getTime() >= MEP_2025_05_2.getTime()
+        ) {
+          if (!isDefined(wasteDetailsIsSubjectToADR)) {
+            return new yup.ValidationError(
+              `Vous devez préciser si le bordereau est soumis à l'ADR ou non (champ wasteDetailsIsSubjectToADR).`
+            );
+          }
+        }
 
         // New method: using the switch wasteDetailsIsSubjectToADR
         if (isDefined(wasteDetailsIsSubjectToADR)) {
