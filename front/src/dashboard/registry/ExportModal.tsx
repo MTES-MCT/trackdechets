@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./MyExports.module.scss";
+
 import {
   DeclarationType,
   RegistryExportFormat,
@@ -7,7 +8,7 @@ import {
   RegistryV2ExportType
 } from "@td/codegen-ui";
 
-import { FieldError } from "react-hook-form";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
 import { format, getYear, startOfYear, endOfYear, subYears } from "date-fns";
 import { Modal } from "../../common/components";
@@ -24,8 +25,10 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import { getDeclarationTypeWording, getRegistryTypeWording } from "./MyExports";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
 
-const displayError = (error: FieldError | undefined) => {
-  return error ? error.message : null;
+const displayError = (
+  error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
+): string | null => {
+  return error ? (error.message as string) : null;
 };
 
 const getFilterStateForRegistryType = (
@@ -112,6 +115,7 @@ export function ExportModal() {
     setValue,
     watch
   } = methods;
+
   const dateButtons = getDateButtons();
   const isDelegation = type === "registryV2" ? watch("isDelegation") : false;
   const registryType = type === "registryV2" ? watch("registryType") : null;

@@ -30,15 +30,19 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { REGISTRY_DELEGATIONS } from "../../Apps/common/queries/registryDelegation/queries";
 import { useRegistryExport } from "./RegistryV2ExportContext";
+import {
+  exhaustiveValidationSchema,
+  RegistryExhaustiveExportModalContext
+} from "./RegistryExhaustiveExportModalContext";
 
 export type BaseRegistryExportModalContext = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
   isLoading: boolean;
-  companiesError: ApolloError | undefined;
   error: string | null;
   submit: () => void;
+  methods: UseFormReturn<any>;
 };
 
 export type RegistryExportModalContextType =
@@ -46,73 +50,46 @@ export type RegistryExportModalContextType =
       type: "registryV2";
       registryDelegationsData: Pick<Query, "registryDelegations"> | undefined;
       registryDelegationsLoading: boolean;
-      methods: UseFormReturn<z.infer<typeof validationSchema>>;
+      companiesError: ApolloError | undefined;
       possibleExportTypes: RegistryV2ExportType[];
     })
   | (BaseRegistryExportModalContext & {
       type: "registryExhaustive";
-      registryDelegationsData: never;
-      registryDelegationsLoading: never;
-      // TODOchange the type when the new context is created
-      methods: UseFormReturn<z.infer<typeof validationSchema>>;
-      possibleExportTypes: never;
+      registryDelegationsData?: never;
+      registryDelegationsLoading?: never;
+      companiesError?: never;
+      possibleExportTypes?: never;
     });
 
 export const RegistryV2ExportModalContext =
   createContext<RegistryExportModalContextType | null>(null);
 
 export const useRegistryExportModal = (): RegistryExportModalContextType => {
-  // const exhaustiveContext = useContext(RegistryExhaustiveExportContext);
+  const exhaustiveContext = useContext(RegistryExhaustiveExportModalContext);
   const v2Context = useContext(RegistryV2ExportModalContext);
 
-  if (/*!exhaustiveContext && */ !v2Context) {
+  if (!exhaustiveContext && !v2Context) {
     throw new Error(
       "useRegistryExport has to be used within <RegistryExhaustiveExportModalContext.Provider> or <RegistryExportModalContext.Provider>"
     );
   }
 
-  return /*exhaustiveContext ||*/ v2Context as RegistryExportModalContextType;
+  return exhaustiveContext || (v2Context as RegistryExportModalContextType);
 };
 
-const validationSchema = z
-  .object({
-    companyOrgId: z.string({ required_error: "Ce champ est requis" }),
-    isDelegation: z.boolean(),
-    delegateSiret: z.string().nullable(),
-    startDate: z.coerce
-      .date({
-        required_error: "La date de début est requise",
-        invalid_type_error: "La date de début est invalide"
-      })
-      .max(new Date(), {
-        message: "La date de début ne peut pas être dans le futur"
-      })
-      .transform(val => val.toISOString()),
-    // Date & "" hack: https://github.com/colinhacks/zod/issues/1721
-    endDate: z.preprocess(
-      arg => (arg === "" ? null : arg),
-      z.coerce
-        .date({
-          invalid_type_error: "La date de fin est invalide"
-        })
-        .max(new Date(), {
-          message: "La date de fin ne peut pas être dans le futur"
-        })
-        .transform(val => {
-          if (val) return val.toISOString();
-          return val;
-        })
-        .nullish()
-    ),
-    registryType: z.nativeEnum(RegistryV2ExportType),
-    format: z.nativeEnum(RegistryExportFormat),
-    declarationType: z.nativeEnum(DeclarationType),
-    wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
-      message: "Veullez sélectionner au moins un type de déchet"
-    }),
-    wasteCodes: z.string().array()
-  })
-  .superRefine(({ startDate, endDate }, ctx) => {
+export const validationSchema = exhaustiveValidationSchema.extend({
+  isDelegation: z.boolean(),
+  delegateSiret: z.string().nullable(),
+  registryType: z.nativeEnum(RegistryV2ExportType),
+  declarationType: z.nativeEnum(DeclarationType),
+  wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
+    message: "Veullez sélectionner au moins un type de déchet"
+  }),
+  wasteCodes: z.string().array()
+});
+
+const refinedSchema = validationSchema.superRefine(
+  ({ startDate, endDate }, ctx) => {
     if (startDate && endDate) {
       if (new Date(startDate) > new Date(endDate)) {
         ctx.addIssue({
@@ -127,7 +104,61 @@ const validationSchema = z
         });
       }
     }
-  });
+  }
+);
+// .object({
+//   companyOrgId: z.string({ required_error: "Ce champ est requis" }),
+//   isDelegation: z.boolean(),
+//   delegateSiret: z.string().nullable(),
+//   startDate: z.coerce
+//     .date({
+//       required_error: "La date de début est requise",
+//       invalid_type_error: "La date de début est invalide"
+//     })
+//     .max(new Date(), {
+//       message: "La date de début ne peut pas être dans le futur"
+//     })
+//     .transform(val => val.toISOString()),
+//   // Date & "" hack: https://github.com/colinhacks/zod/issues/1721
+//   endDate: z.preprocess(
+//     arg => (arg === "" ? null : arg),
+//     z.coerce
+//       .date({
+//         invalid_type_error: "La date de fin est invalide"
+//       })
+//       .max(new Date(), {
+//         message: "La date de fin ne peut pas être dans le futur"
+//       })
+//       .transform(val => {
+//         if (val) return val.toISOString();
+//         return val;
+//       })
+//       .nullish()
+//   ),
+//   registryType: z.nativeEnum(RegistryV2ExportType),
+//   format: z.nativeEnum(RegistryExportFormat),
+//   declarationType: z.nativeEnum(DeclarationType),
+//   wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
+//     message: "Veullez sélectionner au moins un type de déchet"
+//   }),
+//   wasteCodes: z.string().array()
+// })
+// .superRefine(({ startDate, endDate }, ctx) => {
+//   if (startDate && endDate) {
+//     if (new Date(startDate) > new Date(endDate)) {
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["startDate"],
+//         message: "La date de début doit être avant la date de fin."
+//       });
+//       ctx.addIssue({
+//         code: z.ZodIssueCode.custom,
+//         path: ["endDate"],
+//         message: "La date de début doit être avant la date de fin."
+//       });
+//     }
+//   }
+// });
 
 const getDefaultsForRegistryType = (
   registryType: RegistryV2ExportType
@@ -205,9 +236,9 @@ export const RegistryV2ExportModalProvider: React.FC<{
     refetchQueries: [GET_REGISTRY_V2_EXPORTS]
   });
 
-  const methods = useForm<z.infer<typeof validationSchema>>({
+  const methods = useForm<z.infer<typeof refinedSchema>>({
     defaultValues: getDefaultValues(),
-    resolver: zodResolver(validationSchema)
+    resolver: zodResolver(refinedSchema)
   });
   const {
     handleSubmit,
@@ -349,7 +380,7 @@ export const RegistryV2ExportModalProvider: React.FC<{
   }, [registryType]);
 
   const onSubmit = useCallback(
-    async (input: z.infer<typeof validationSchema>) => {
+    async (input: z.infer<typeof refinedSchema>) => {
       setError(null);
       const {
         companyOrgId,

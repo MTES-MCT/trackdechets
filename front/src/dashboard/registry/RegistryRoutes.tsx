@@ -21,6 +21,7 @@ import { RegistryImportType } from "@td/codegen-ui";
 import { RegistryV2ExportProvider } from "./RegistryV2ExportContext";
 import { RegistryExhaustiveExportProvider } from "./RegistryExhaustiveExportContext";
 import { RegistryV2ExportModalProvider } from "./RegistryV2ExportModalContext";
+import { RegistryExhaustiveExportModalProvider } from "./RegistryExhaustiveExportModalContext";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -95,9 +96,9 @@ export default function RegistryRoutes() {
             path={toRelative(routes.registry_new.exhaustive)}
             element={
               <RegistryExhaustiveExportProvider>
-                <RegistryV2ExportModalProvider>
+                <RegistryExhaustiveExportModalProvider>
                   <MyExports />
-                </RegistryV2ExportModalProvider>
+                </RegistryExhaustiveExportModalProvider>
               </RegistryExhaustiveExportProvider>
             }
           />

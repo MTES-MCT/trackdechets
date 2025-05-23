@@ -256,6 +256,23 @@ const registryExhaustiveExportFragment = gql`
   }
 `;
 
+export const GENERATE_REGISTRY_EXHAUSTIVE_EXPORT = gql`
+  mutation GenerateRegistryExhaustiveExport(
+    $format: RegistryExportFormat!
+    $siret: String
+    $dateRange: DateFilter!
+  ) {
+    generateRegistryExhaustiveExport(
+      dateRange: $dateRange
+      format: $format
+      siret: $siret
+    ) {
+      ...RegistryExhaustiveExportFragment
+    }
+  }
+  ${registryExhaustiveExportFragment}
+`;
+
 export const GET_REGISTRY_EXHAUSTIVE_EXPORTS = gql`
   query RegistryExhaustiveExports($first: Int = 20, $skip: Int = 0) {
     registryExhaustiveExports(first: $first, skip: $skip) {
