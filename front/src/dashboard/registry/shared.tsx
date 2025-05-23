@@ -264,6 +264,44 @@ export const REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL = gql`
   }
 `;
 
+const registryExhaustiveExportFragment = gql`
+  fragment RegistryExhaustiveExportFragment on RegistryExhaustiveExport {
+    id
+    startDate
+    endDate
+    format
+    status
+    companies {
+      name
+      orgId
+    }
+    createdAt
+  }
+`;
+
+export const GET_REGISTRY_EXHAUSTIVE_EXPORTS = gql`
+  query RegistryExhaustiveExports($first: Int = 20, $skip: Int = 0) {
+    registryExhaustiveExports(first: $first, skip: $skip) {
+      edges {
+        node {
+          ...RegistryExhaustiveExportFragment
+        }
+      }
+      totalCount
+    }
+  }
+  ${registryExhaustiveExportFragment}
+`;
+
+export const REGISTRY_EXHAUSTIVE_EXPORT_DOWNLOAD_SIGNED_URL = gql`
+  query RegistryExhaustiveExportDownloadSignedUrl($exportId: String!) {
+    registryExhaustiveExportDownloadSignedUrl(exportId: $exportId) {
+      fileKey
+      signedUrl
+    }
+  }
+`;
+
 export const GET_MY_COMPANIES = gql`
   query MyCompaniesWithDelegators($first: Int, $after: ID, $search: String) {
     myCompanies(first: $first, after: $after, search: $search) {
