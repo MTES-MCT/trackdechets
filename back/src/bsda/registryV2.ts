@@ -2,6 +2,7 @@ import {
   IncomingWasteV2,
   ManagedWasteV2,
   OutgoingWasteV2,
+  PackagingInfo,
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
@@ -29,6 +30,17 @@ import {
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+
+const getQuantity = (packagings: Prisma.JsonValue) => {
+  if (!packagings || !(packagings as PackagingInfo[])?.length) {
+    return null;
+  }
+
+  return (packagings as PackagingInfo[])?.reduce(
+    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
+    0
+  );
+};
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -233,7 +245,7 @@ export const toIncomingWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -501,7 +513,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -786,7 +798,7 @@ export const toTransportedWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsda.weightIsEstimate,
     volume: null,
@@ -1041,7 +1053,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
