@@ -7,7 +7,6 @@ import {
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -23,6 +22,7 @@ import { getRevisionOrgIds } from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
@@ -258,7 +258,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     revisionRequests: bsdasri.bsdasriRevisionRequests,
 
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsdasri),
+    ...getElasticExhaustiveRegistryFields(bsdasri),
     rawBsd: bsdasri,
 
     // ALL actors from the BSDASRI, for quick search

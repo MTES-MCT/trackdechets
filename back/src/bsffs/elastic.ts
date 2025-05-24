@@ -7,7 +7,6 @@ import {
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
@@ -28,6 +27,7 @@ import {
 import { getBsffSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
@@ -319,7 +319,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     isRevisedFor: [] as string[],
     ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
-    ...getRegistryFields(bsff),
+    ...getElasticExhaustiveRegistryFields(bsff),
     rawBsd: bsff,
     revisionRequests: [],
 

@@ -6,6 +6,7 @@ import {
 } from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
+  Bsdasri,
   Prisma,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -783,6 +784,24 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (bsdasri: Bsdasri) => {
+  const registryFields: Record<"isAllWasteFor", string[]> = {
+    isAllWasteFor: []
+  };
+  if (!bsdasri.isDraft) {
+    registryFields.isAllWasteFor = [
+      bsdasri.destinationCompanySiret,
+      bsdasri.emitterCompanySiret,
+      bsdasri.ecoOrganismeSiret
+    ].filter(Boolean);
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
+    if (transporterCompanyOrgId) {
+      registryFields.isAllWasteFor.push(transporterCompanyOrgId);
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsdasriForLookupSelect = {

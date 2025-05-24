@@ -15,7 +15,6 @@ import {
   FormWithAppendix1GroupingInfoInclude
 } from "./types";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import {
   getSiretsByTab,
   getRecipient,
@@ -28,6 +27,7 @@ import { getFirstTransporterSync } from "./database";
 import { prisma } from "@td/prisma";
 import { getBsddSubType } from "../common/subTypes";
 import { PackagingInfo } from "@td/codegen-back";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -185,7 +185,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     ...getFormRevisionOrgIds(form),
     revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
-    ...getRegistryFields(form),
+    ...getElasticExhaustiveRegistryFields(form),
     intermediaries: form.intermediaries,
     rawBsd: form,
 

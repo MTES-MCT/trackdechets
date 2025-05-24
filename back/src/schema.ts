@@ -10,7 +10,6 @@ import dasriResolvers from "./bsdasris/resolvers";
 import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
 import bspaohResolvers from "./bspaoh/resolvers";
-import registryResolvers from "./registry/resolvers";
 import adminRequestResolvers from "./adminRequest/resolvers";
 import registryV2Resolvers from "./registryV2/resolvers";
 import applicationResolvers from "./applications/resolvers";
@@ -32,7 +31,6 @@ const repositories = [
   "bsffs",
   "bsda",
   "bspaoh",
-  "registry",
   "registryV2",
   "applications",
   "webhooks",
@@ -60,7 +58,6 @@ const resolvers = [
   bsffResolvers,
   bsdaResolvers,
   bspaohResolvers,
-  registryResolvers,
   registryV2Resolvers,
   applicationResolvers,
   webhookResolvers,

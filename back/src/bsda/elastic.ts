@@ -9,7 +9,6 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import {
   BsdaWithForwardedIn,
   BsdaWithForwardedInInclude,
@@ -34,6 +33,7 @@ import { getBsdaSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
 import { BsdaPackaging } from "@td/codegen-back";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &
@@ -395,7 +395,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     ...getBsdaReturnOrgIds(bsda),
     revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsda),
+    ...getElasticExhaustiveRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
     rawBsd: bsda,
 

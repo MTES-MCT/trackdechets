@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import {
+  BspaohStatus,
   Prisma,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -30,6 +31,7 @@ import {
   generateDateInfos
 } from "@td/registry";
 import { logger } from "@td/logger";
+import { BspaohForElastic } from "./elastic";
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
@@ -721,6 +723,29 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (
+  bspaoh: BspaohForElastic
+) => {
+  const registryFields: Record<"isAllWasteFor", string[]> = {
+    isAllWasteFor: []
+  };
+  if (bspaoh.status !== BspaohStatus.DRAFT) {
+    registryFields.isAllWasteFor = [
+      bspaoh.destinationCompanySiret,
+      bspaoh.emitterCompanySiret
+    ].filter(Boolean);
+    if (bspaoh.transporters?.length) {
+      for (const transporter of bspaoh.transporters) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isAllWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBspaohForLookupSelect = {
