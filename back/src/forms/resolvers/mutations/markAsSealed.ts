@@ -38,7 +38,10 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
   const transporter = await getFirstTransporter(form);
   // validate form data
-  await checkCanBeSealed({ ...form, ...transporter });
+  await checkCanBeSealed({
+    ...form,
+    transporters: transporter ? [transporter] : []
+  } as any);
 
   const transporterAfterTempStorage = form.forwardedIn
     ? getFirstTransporterSync(form.forwardedIn)

@@ -551,7 +551,7 @@ describe("Mutation.markAsSealed", () => {
 
   it(
     "should be required to provide onuCode for dangerous wastes" +
-      " when `wasteDetailsIsSubjectToADR` is not speified ",
+      " when `wasteDetailsIsSubjectToADR` is not specified ",
     async () => {
       const { user, company: emitterCompany } = await userWithCompanyFactory(
         "MEMBER"
@@ -560,6 +560,7 @@ describe("Mutation.markAsSealed", () => {
       const form = await formFactory({
         ownerId: user.id,
         opt: {
+          createdAt: new Date("2023-01-01"),
           status: "DRAFT",
           emitterCompanySiret: emitterCompany.siret,
           recipientCompanySiret: recipientCompany.siret,
@@ -835,6 +836,7 @@ describe("Mutation.markAsSealed", () => {
             ownerId: user.id,
             opt: {
               status: "DRAFT",
+              createdAt: new Date("2023-01-01"),
               emitterCompanySiret: emitterCompany.siret,
               recipientCompanySiret: recipientCompany.siret,
               wasteDetailsIsSubjectToADR: null,
@@ -868,6 +870,7 @@ describe("Mutation.markAsSealed", () => {
             ownerId: user.id,
             opt: {
               status: "DRAFT",
+              createdAt: new Date("2023-01-04T00:00:00.000Z"),
               emitterCompanySiret: emitterCompany.siret,
               recipientCompanySiret: recipientCompany.siret,
               wasteDetailsIsSubjectToADR: null,
@@ -908,6 +911,7 @@ describe("Mutation.markAsSealed", () => {
           ownerId: user.id,
           opt: {
             status: "DRAFT",
+            createdAt: new Date("2023-01-04T00:00:00.000Z"),
             emitterCompanySiret: emitterCompany.siret,
             recipientCompanySiret: recipientCompany.siret,
             wasteDetailsIsSubjectToADR: null,
@@ -927,6 +931,73 @@ describe("Mutation.markAsSealed", () => {
 
         // Then
         expect(errors).toBeUndefined();
+      });
+
+      it("[legacy] if waste has been created before MEP_2025_05_2, wasteDetailsIsDangerous can be null", async () => {
+        // Given
+        const { user, company: emitterCompany } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const recipientCompany = await destinationFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            createdAt: new Date("2024-05-26T00:00:00.000Z"),
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteDetailsIsSubjectToADR: null,
+            wasteDetailsCode: "01 01 01",
+            wasteDetailsIsDangerous: undefined, // Not possible!
+            wasteDetailsOnuCode: "Some ADR mention"
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate(MARK_AS_SEALED, {
+          variables: {
+            id: form.id
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+      });
+
+      it("if waste has been created past MEP_2025_05_2, wasteDetailsIsDangerous cannot be null", async () => {
+        // Given
+        const { user, company: emitterCompany } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const recipientCompany = await destinationFactory();
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            status: "DRAFT",
+            createdAt: new Date("2025-05-27T00:00:01.000Z"),
+            emitterCompanySiret: emitterCompany.siret,
+            recipientCompanySiret: recipientCompany.siret,
+            wasteDetailsIsSubjectToADR: null, // Not possible!
+            wasteDetailsCode: "01 01 01",
+            wasteDetailsIsDangerous: undefined,
+            wasteDetailsOnuCode: "Some ADR mention"
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { errors } = await mutate(MARK_AS_SEALED, {
+          variables: {
+            id: form.id
+          }
+        });
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toContain(
+          "Erreur(s): Vous devez préciser si le bordereau est soumis à l'ADR ou non (champ wasteDetailsIsSubjectToADR)"
+        );
       });
     });
   });
