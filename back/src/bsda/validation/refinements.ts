@@ -675,7 +675,7 @@ export const checkDestinationReceptionRefusedWeight = (
   bsd,
   ctx: z.RefinementCtx
 ) => {
-  const path = ["destination", "receotion", "refusedWeight"];
+  const path = ["destination", "reception", "refusedWeight"];
 
   const {
     destinationReceptionWeight,
