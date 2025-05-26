@@ -2954,20 +2954,10 @@ describe("Mutation.updateBsda", () => {
       });
 
       // Then
-      expect(data.updateBsda).toEqual(
-        expect.objectContaining({
-          destination: {
-            company: {
-              name: company1.name
-            }
-          },
-          emitter: {
-            company: {
-              name: company2.name
-            }
-          }
-        })
+      expect(data.updateBsda?.destination?.company?.name).toEqual(
+        company1.name
       );
+      expect(data.updateBsda?.emitter?.company?.name).toEqual(company2.name);
     });
   });
 
