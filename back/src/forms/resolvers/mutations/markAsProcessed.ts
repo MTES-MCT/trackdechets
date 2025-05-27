@@ -82,11 +82,11 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   if (form.status === Status.TEMP_STORER_ACCEPTED) {
     // The form was flagged as temporary storage but the recipient decides to
-    // fo a final treatement or a groupement
+    // do a final treatment or a groupement
     formUpdateInput = {
       ...formUpdateInput,
       recipientIsTempStorage: false,
-      forwardedIn: { delete: true }
+      forwardedIn: { disconnect: true }
     };
   } else if (!!form.forwardedInId) {
     // Processed info is applied on BSD suite
@@ -108,10 +108,11 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   );
 
   const processedForm = await runInTransaction(async transaction => {
-    const { updateAppendix1Forms, update } = getFormRepository(
-      user,
-      transaction
-    );
+    const {
+      updateAppendix1Forms,
+      update,
+      delete: deleteForm
+    } = getFormRepository(user, transaction);
 
     const processedForm = await update(
       { id: form.id, status: form.status },
@@ -123,6 +124,13 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
         ...formUpdateInput
       }
     );
+
+    // The form.update unlinks the form from its forwardedIn
+    // but we still need to soft delete it
+    // We explicitely dont use { delete: true } to avoid a hard delete
+    if (form.status === Status.TEMP_STORER_ACCEPTED && form.forwardedIn) {
+      await deleteForm({ id: form.forwardedIn!.id });
+    }
 
     // mark appendix2Forms as PROCESSED
     if (form.emitterType === EmitterType.APPENDIX2) {
