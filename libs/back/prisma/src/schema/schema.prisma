@@ -1852,7 +1852,7 @@ model BsdaRevisionRequest {
   // Nouveau CAP de *l'exutoire* (même si le bordereau a un TTR)
   destinationCap                  String?
   destinationReceptionWeight      Float?
-  destinationReceptionRefusedWeight Float?
+  destinationReceptionRefusedWeight Decimal?
   destinationOperationCode        String?
   destinationOperationDescription String?
   destinationOperationMode        OperationMode?
