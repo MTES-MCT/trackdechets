@@ -105,6 +105,7 @@ export interface BsdElastic {
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
   isAllWasteFor: string[];
+  isExhaustiveWasteFor: string[];
 
   // Liste des établissements concernés par une demande de révision en cours sur ce bordereau
   isInRevisionFor: string[];
@@ -295,6 +296,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
   isAllWasteFor: stringField,
+  isExhaustiveWasteFor: stringField,
   isInRevisionFor: stringField,
   isRevisedFor: stringField,
 
@@ -339,7 +341,7 @@ export const index: BsdIndexationConfig = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v1.1.2",
+  mappings_version: "v1.1.3",
   mappings: {
     properties
   },

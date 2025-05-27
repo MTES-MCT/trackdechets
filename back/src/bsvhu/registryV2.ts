@@ -30,6 +30,7 @@ import {
   generateDateInfos
 } from "@td/registry";
 import { logger } from "@td/logger";
+import { BsvhuForElastic } from "./elastic";
 
 export const toIncomingWasteV2 = (
   bsvhu: RegistryV2Bsvhu
@@ -848,6 +849,31 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (bsvhu: BsvhuForElastic) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (!bsvhu.isDraft) {
+    registryFields.isExhaustiveWasteFor = [
+      bsvhu.destinationCompanySiret,
+      bsvhu.emitterCompanySiret,
+      bsvhu.transporterCompanySiret,
+      bsvhu.ecoOrganismeSiret,
+      bsvhu.brokerCompanySiret,
+      bsvhu.traderCompanySiret
+    ].filter(Boolean);
+    if (bsvhu.intermediaries?.length) {
+      for (const intermediary of bsvhu.intermediaries) {
+        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
+        if (intermediaryOrgId) {
+          registryFields.isExhaustiveWasteFor.push(intermediaryOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsvhuForLookupSelect = {

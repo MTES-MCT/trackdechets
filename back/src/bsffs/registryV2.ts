@@ -35,6 +35,7 @@ import {
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
+import { BsffWithTransporters } from "./types";
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1274,6 +1275,30 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (
+  bsff: BsffWithTransporters
+) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (!bsff.isDraft) {
+    registryFields.isExhaustiveWasteFor = [
+      bsff.destinationCompanySiret,
+      bsff.emitterCompanySiret,
+      ...bsff.detenteurCompanySirets
+    ].filter(Boolean);
+    for (const transporter of bsff.transporters ?? []) {
+      if (transporter.transporterTransportSignatureDate) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsffForLookupSelect = {

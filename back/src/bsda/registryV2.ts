@@ -24,6 +24,7 @@ import {
 import { splitAddress } from "../common/addresses";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
 import { getBsdaSubType } from "../common/subTypes";
+import { BsdaForElastic } from "./elastic";
 import {
   deleteRegistryLookup,
   generateDateInfos,
@@ -1521,6 +1522,38 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (bsda: BsdaForElastic) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (!bsda.isDraft) {
+    registryFields.isExhaustiveWasteFor = [
+      bsda.destinationCompanySiret,
+      bsda.emitterCompanySiret,
+      bsda.ecoOrganismeSiret,
+      bsda.workerCompanySiret,
+      bsda.brokerCompanySiret
+    ].filter(Boolean);
+    if (bsda.intermediaries?.length) {
+      for (const intermediary of bsda.intermediaries) {
+        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
+        if (intermediaryOrgId) {
+          registryFields.isExhaustiveWasteFor.push(intermediaryOrgId);
+        }
+      }
+    }
+    for (const transporter of bsda.transporters ?? []) {
+      if (transporter.transporterTransportSignatureDate) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsdaForLookupSelect = {

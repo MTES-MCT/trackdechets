@@ -81,8 +81,7 @@ const streamLookup = (
           if (!hit._source) {
             continue;
           }
-          const { type, id, isAllWasteFor, updatedAt } = hit._source;
-          console.log("updatedAt", new Date(updatedAt).toISOString());
+          const { type, id, isAllWasteFor } = hit._source;
           cursorDate = hit._source.updatedAt;
           cursorId = hit._source.id;
           addEncounteredSirets(isAllWasteFor as string[]);
@@ -90,11 +89,6 @@ const streamLookup = (
           const mapped = toWaste("ALL", undefined, {
             [type]: waste
           }) as AllWasteV2;
-          console.log(
-            "mapped updatedAt",
-            mapped?.updatedAt && new Date(mapped.updatedAt).toISOString()
-          );
-
           if (mapped) {
             this.push(mapped);
           }
@@ -191,7 +185,7 @@ export async function processRegistryExhaustiveExportJob(
               should: [
                 {
                   terms: {
-                    isAllWasteFor: registryExport.sirets
+                    isExhaustiveWasteFor: registryExport.sirets
                   }
                 }
               ]

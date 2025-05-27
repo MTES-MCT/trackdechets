@@ -10,7 +10,8 @@ import {
   RegistryExportType,
   RegistryExportDeclarationType,
   RegistryExportWasteType,
-  Prisma
+  Prisma,
+  Status
 } from "@prisma/client";
 import {
   emptyIncomingWasteV2,
@@ -36,6 +37,7 @@ import {
   isDangerous
 } from "@td/constants";
 import { logger } from "@td/logger";
+import { FormForElastic } from "./elastic";
 
 const getInitialEmitterData = (bsdd: BsddV2) => {
   const initialEmitter: Record<string, string | null> = {
@@ -1526,6 +1528,38 @@ export const toAllWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const getElasticExhaustiveRegistryFields = (form: FormForElastic) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (form.status !== Status.DRAFT) {
+    registryFields.isExhaustiveWasteFor = [
+      form.recipientCompanySiret,
+      form.emitterCompanySiret,
+      form.ecoOrganismeSiret,
+      form.traderCompanySiret,
+      form.brokerCompanySiret
+    ].filter(Boolean);
+    if (form.intermediaries?.length) {
+      for (const intermediary of form.intermediaries) {
+        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
+        if (intermediaryOrgId) {
+          registryFields.isExhaustiveWasteFor.push(intermediaryOrgId);
+        }
+      }
+    }
+    for (const transporter of form.transporters ?? []) {
+      if (transporter.takenOverAt) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsddForLookupSelect = {
