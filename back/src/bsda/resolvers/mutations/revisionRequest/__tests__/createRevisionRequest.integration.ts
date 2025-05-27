@@ -1714,7 +1714,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             revision.initialDestinationReceptionRefusedWeight?.toNumber()
           ).toBe(destinationReceptionRefusedWeight);
           expect(revision.destinationReceptionWeight).toBe(10000);
-          expect(revision.destinationReceptionRefusedWeight).toBe(0);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            0
+          );
         }
       );
 
@@ -1758,7 +1760,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         expect(
           revision.initialDestinationReceptionRefusedWeight?.toNumber()
         ).toBe(0);
-        expect(revision.destinationReceptionRefusedWeight).toBe(0);
+        expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(0);
         expect(revision.initialDestinationReceptionWeight?.toNumber()).toBe(10);
         expect(revision.destinationReceptionWeight).toBe(5000);
       });
@@ -1865,7 +1867,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             revision.initialDestinationReceptionRefusedWeight?.toNumber()
           ).toBe(destinationReceptionRefusedWeight);
           expect(revision.destinationReceptionWeight).toBe(10000);
-          expect(revision.destinationReceptionRefusedWeight).toBe(10000);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            10000
+          );
         }
       );
 
@@ -1909,7 +1913,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         expect(
           revision.initialDestinationReceptionRefusedWeight?.toNumber()
         ).toBe(10);
-        expect(revision.destinationReceptionRefusedWeight).toBe(5000);
+        expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+          5000
+        );
         expect(revision.initialDestinationReceptionWeight?.toNumber()).toBe(10);
         expect(revision.destinationReceptionWeight).toBe(5000);
       });
@@ -2016,7 +2022,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             revision.initialDestinationReceptionRefusedWeight?.toNumber()
           ).toBe(destinationReceptionRefusedWeight);
           expect(revision.destinationReceptionWeight).toBe(10000);
-          expect(revision.destinationReceptionRefusedWeight).toBe(5000);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            5000
+          );
         }
       );
     });
