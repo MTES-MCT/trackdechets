@@ -76,5 +76,18 @@ type Query {
     type: RegistryImportType
     "Identifiant unique de la déclaration, supporte un match partiel"
     publicId: String
-  ): [RegistryLookup!]
+    """
+    (Optionnel) PAGINATION
+    Cursor de la page à récupérer (endCursor de la page précédente)
+    """
+    after: String
+
+    before: String
+    """
+    (Optionnel) PAGINATION
+    Nombre d'éléments à récupérer
+    """
+    first: Int
+    last: Int
+  ): RegistryLookupConnection!
 }

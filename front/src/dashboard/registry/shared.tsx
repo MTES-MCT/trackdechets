@@ -56,15 +56,38 @@ export const GET_REGISTRY_LOOKUPS = gql`
     $siret: String!
     $type: RegistryImportType
     $publicId: String
+    $first: Int
+    $last: Int
+    $after: String
+    $before: String
   ) {
-    registryLookups(siret: $siret, type: $type, publicId: $publicId) {
-      declaredAt
-      publicId
-      type
-      siret
-      reportAsSiret
-      date
-      wasteCode
+    registryLookups(
+      siret: $siret
+      type: $type
+      publicId: $publicId
+      first: $first
+      last: $last
+      after: $after
+      before: $before
+    ) {
+      pageInfo {
+        startCursor
+        endCursor
+        hasNextPage
+        hasPreviousPage
+      }
+      edges {
+        node {
+          declaredAt
+          publicId
+          type
+          siret
+          reportAsSiret
+          date
+          wasteCode
+        }
+        cursor
+      }
     }
   }
 `;
