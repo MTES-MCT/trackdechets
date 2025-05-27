@@ -166,6 +166,8 @@ describe("Query.bsds workflow", () => {
         },
         wasteDetails: {
           code: "01 01 01",
+          isSubjectToADR: false,
+          onuCode: null,
           name: "Stylos bille",
           consistence: "SOLID",
           packagingInfos: [
