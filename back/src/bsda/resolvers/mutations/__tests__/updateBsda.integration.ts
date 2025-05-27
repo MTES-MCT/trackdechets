@@ -302,57 +302,6 @@ describe("Mutation.updateBsda", () => {
     ]);
   });
 
-  it("should allow updating emitter if they didn't sign", async () => {
-    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
-    const { company: company2, user: _user2 } = await userWithCompanyFactory(
-      UserRole.ADMIN
-    );
-    const bsda = await bsdaFactory({
-      opt: {
-        emitterCompanySiret: company.siret
-      }
-    });
-
-    const { mutate } = makeClient(user);
-
-    const input = {
-      emitter: {
-        company: {
-          siret: company2.orgId
-        }
-      },
-      destination: {
-        company: {
-          siret: company.orgId
-        }
-      }
-    };
-    const { data } = await mutate<
-      Pick<Mutation, "updateBsda">,
-      MutationUpdateBsdaArgs
-    >(UPDATE_BSDA, {
-      variables: {
-        id: bsda.id,
-        input
-      }
-    });
-
-    expect(data.updateBsda).toEqual(
-      expect.objectContaining({
-        destination: {
-          company: {
-            name: company.name
-          }
-        },
-        emitter: {
-          company: {
-            name: company2.name
-          }
-        }
-      })
-    );
-  });
-
   it("should not update emitter if they signed already", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
@@ -2901,6 +2850,117 @@ describe("Mutation.updateBsda", () => {
           })
         );
       });
+    });
+  });
+
+  describe("closed sirets", () => {
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      await resetDatabase();
+    });
+
+    it("should allow updating emitter if they didn't sign", async () => {
+      // Given
+      const { company: company1, user } = await userWithCompanyFactory(
+        UserRole.ADMIN,
+        {
+          name: "Company 1"
+        }
+      );
+      const { company: company2, user: _user2 } = await userWithCompanyFactory(
+        UserRole.ADMIN,
+        {
+          name: "Company 2"
+        }
+      );
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company1.siret,
+          emitterCompanyName: company1.name,
+          destinationCompanySiret: company2.siret,
+          destinationCompanyName: company2.name
+        }
+      });
+
+      searchCompanyMock.mockImplementation(siret => {
+        if (siret === company1.siret) {
+          return {
+            siret,
+            etatAdministratif: "O",
+            address: company1.address,
+            name: company1.name
+          };
+        }
+
+        if (siret === company2.siret) {
+          return {
+            siret,
+            etatAdministratif: "O",
+            address: company2.address,
+            name: company2.name
+          };
+        }
+      });
+
+      const { mutate } = makeClientLocal(user);
+
+      const input = {
+        emitter: {
+          company: {
+            siret: company2.orgId
+          }
+        },
+        destination: {
+          company: {
+            siret: company1.orgId
+          }
+        }
+      };
+
+      // When
+      const { data } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input
+        }
+      });
+
+      // Then
+      expect(data.updateBsda).toEqual(
+        expect.objectContaining({
+          destination: {
+            company: {
+              name: company1.name
+            }
+          },
+          emitter: {
+            company: {
+              name: company2.name
+            }
+          }
+        })
+      );
     });
   });
 
