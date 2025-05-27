@@ -168,7 +168,8 @@ export function createAppendix1Form(
           transporter: fixtures.transporterInput(collecteur.siret),
           wasteDetails: {
             code: "13 05 02*",
-            onuCode: "Non Soumis",
+            isSubjectToADR: false,
+            onuCode: null,
             name: "Huiles",
             consistence: "LIQUID"
           }
