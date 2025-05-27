@@ -1,10 +1,9 @@
 import React from "react";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { useOAuth2, AuthorizePayload } from "./use-oauth2";
-import { useOIDC } from "./use-oidc";
+
 import { localAuthService } from "../login/auth.service";
-import { useLocation } from "react-router-dom";
-import * as queryString from "query-string";
+
 import Button from "@codegouvfr/react-dsfr/Button";
 
 export function Oauth2Dialog() {
@@ -17,24 +16,6 @@ export function Oauth2Dialog() {
       authorizePayload={authorizePayload}
       loading={loading}
       error={error}
-    ></AuthDialog>
-  );
-}
-
-export function OidcDialog() {
-  const { VITE_API_ENDPOINT } = import.meta.env;
-  const { loading, error, authorizePayload } = useOIDC();
-
-  const location = useLocation();
-  const { nonce } = queryString.parse(location.search);
-
-  return (
-    <AuthDialog
-      authorizeDecisionUrl={`${VITE_API_ENDPOINT}/oidc/authorize/decision`}
-      authorizePayload={authorizePayload}
-      loading={loading}
-      error={error}
-      nonce={nonce}
     ></AuthDialog>
   );
 }
