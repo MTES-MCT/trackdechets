@@ -346,7 +346,13 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   return bsd;
 }
 
-export async function indexBsff(bsff: BsffForElastic, ctx?: GraphQLContext) {
+export async function indexBsff(
+  bsff: BsffForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsff), ctx);
 }
 
