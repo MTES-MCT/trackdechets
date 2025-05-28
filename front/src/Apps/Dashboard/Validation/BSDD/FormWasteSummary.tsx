@@ -12,6 +12,7 @@ import {
 } from "../../../../common/components";
 import { isDefined } from "../../../../common/helper";
 import { getFormWasteDetailsADRMention } from "@td/constants";
+import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 
 interface FormWasteSummaryProps {
   form: Form;
@@ -29,7 +30,7 @@ export function FormWasteSummary({ form }: FormWasteSummaryProps) {
         <DataListDescription>{form.wasteDetails?.code}</DataListDescription>
       </DataListItem>
       <DataListItem>
-        <DataListTerm>Appellation du déchet</DataListTerm>
+        <DataListTerm>{WASTE_NAME_LABEL}</DataListTerm>
         <DataListDescription>{form.wasteDetails?.name}</DataListDescription>
       </DataListItem>
       <DataListItem>
@@ -107,7 +108,7 @@ export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
         </DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>
-        <DsfrDataListTerm>Dénomination usuelle</DsfrDataListTerm>
+        <DsfrDataListTerm>{WASTE_NAME_LABEL}</DsfrDataListTerm>
         <DsfrDataListDescription>
           {form.wasteDetails?.name}
         </DsfrDataListDescription>
