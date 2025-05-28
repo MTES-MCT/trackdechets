@@ -24,6 +24,7 @@ import { bsdaEditionRules } from "../../../validation/rules";
 import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
+import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -261,7 +262,12 @@ async function getFlatContent(
     );
   }
 
-  await schema.parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
+  await schema
+    // For the refused weight, we need the bsda previous state
+    .superRefine((flatContent, ctx) =>
+      checkDestinationReceptionRefusedWeight({ ...bsda, ...flatContent }, ctx)
+    )
+    .parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
 
   return flatContent;
 }
@@ -278,6 +284,7 @@ const schema = rawBsdaSchema
     destinationOperationMode: true,
     destinationOperationDescription: true,
     destinationReceptionWeight: true,
+    destinationReceptionRefusedWeight: true,
     brokerCompanyName: true,
     brokerCompanySiret: true,
     brokerCompanyAddress: true,
@@ -372,6 +379,8 @@ function getBsdaHistory(bsda: Bsda) {
     initialDestinationCap:
       bsda.destinationOperationNextDestinationCap ?? bsda.destinationCap,
     initialDestinationReceptionWeight: bsda.destinationReceptionWeight,
+    initialDestinationReceptionRefusedWeight:
+      bsda.destinationReceptionRefusedWeight,
     initialDestinationOperationCode: bsda.destinationOperationCode,
     initialDestinationOperationDescription:
       bsda.destinationOperationDescription,

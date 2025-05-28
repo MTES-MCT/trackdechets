@@ -49,6 +49,8 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
       wasteMaterialName: parent.initialWasteMaterialName,
       destinationCap: parent.initialDestinationCap,
       destinationReceptionWeight: parent.initialDestinationReceptionWeight,
+      destinationReceptionRefusedWeight:
+        parent.initialDestinationReceptionRefusedWeight,
       destinationOperationCode: parent.initialDestinationOperationCode,
       destinationOperationDescription:
         parent.initialDestinationOperationDescription,

@@ -1316,6 +1316,214 @@ describe("BSDA parsing", () => {
       );
     });
   });
+
+  describe("destinationReceptionRefusedWeight", () => {
+    it("refusedWeight is not mandatory", async () => {
+      // Given
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWeight: 10,
+        destinationReceptionRefusedWeight: null
+      };
+
+      // When
+      const parsed = parseBsda(data, context);
+
+      // Then
+      expect(parsed).toBeDefined();
+    });
+
+    it("refusedWeight cannot be defined if weight is not", async () => {
+      // Given
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: null,
+        destinationReceptionWeight: null,
+        destinationReceptionRefusedWeight: 10
+      };
+
+      expect.assertions(1);
+
+      // When
+      try {
+        parseBsda(data, context);
+      } catch (err) {
+        // Then
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "La quantité refusée (destinationReceptionRefusedWeight) ne peut être définie si la quantité reçue (destinationReceptionWeight) ne l'est pas"
+          })
+        ]);
+      }
+    });
+
+    it.each([null, undefined, 0])(
+      "waste is ACCEPTED > weight = 10 > refusedWeight can be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        // When
+        const parsed = parseBsda(data, context);
+
+        // Then
+        expect(parsed).toBeDefined();
+      }
+    );
+
+    it.each([5, 10, 15])(
+      "waste is ACCEPTED > weight = 10 > refusedWeight can NOT be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        expect.assertions(1);
+
+        // When
+        try {
+          parseBsda(data, context);
+        } catch (err) {
+          // Then
+          expect((err as ZodError).issues).toEqual([
+            expect.objectContaining({
+              message:
+                "La quantité refusée (destinationReceptionRefusedWeight) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+            })
+          ]);
+        }
+      }
+    );
+
+    it.each([null, undefined, 10])(
+      "waste is REFUSED > weight = 10 > refusedWeight can be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        // When
+        const parsed = parseBsda(data, context);
+
+        // Then
+        expect(parsed).toBeDefined();
+      }
+    );
+
+    it.each([0, 3, 15])(
+      "waste is REFUSED > weight = 10 > refusedWeight can NOT be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        expect.assertions(1);
+
+        // When
+        try {
+          parseBsda(data, context);
+        } catch (err) {
+          // Then
+          expect((err as ZodError).issues).toEqual([
+            expect.objectContaining({
+              message:
+                "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (destinationReceptionWeight) si le déchet est refusé (REFUSED)"
+            })
+          ]);
+        }
+      }
+    );
+
+    it.each([0, 10, 15])(
+      "waste is PARTIALLY_REFUSED > weight = 10 > refusedWeight can NOT be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        expect.assertions(1);
+
+        // When
+        try {
+          parseBsda(data, context);
+        } catch (err) {
+          // Then
+          expect((err as ZodError).issues).toEqual([
+            expect.objectContaining({
+              message:
+                "La quantité refusée (destinationReceptionRefusedWeight) doit être inférieure à la quantité reçue (destinationReceptionWeight) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+            })
+          ]);
+        }
+      }
+    );
+
+    it.each([1, 5, 9.99])(
+      "waste is PARTIALLY_REFUSED > weight = 10 > refusedWeight can be %p",
+      async destinationReceptionRefusedWeight => {
+        // Given
+        const data: ZodBsda = {
+          ...bsda,
+          destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight
+        };
+
+        // When
+        const parsed = parseBsda(data, context);
+
+        // Then
+        expect(parsed).toBeDefined();
+      }
+    );
+
+    it("refusedWeight must be positive", async () => {
+      // Given
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+        destinationReceptionWeight: 10,
+        destinationReceptionRefusedWeight: -5
+      };
+
+      expect.assertions(1);
+
+      // When
+      try {
+        parseBsda(data, context);
+      } catch (err) {
+        // Then
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "Le nombre doit être supérieur ou égal à 0"
+          })
+        ]);
+      }
+    });
+  });
 });
 
 describe("mergeInputAndParseBsdaAsync", () => {

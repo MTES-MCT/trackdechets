@@ -52,9 +52,15 @@ import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
 import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
+import { bsdaWasteQuantities } from "./utils";
 
 export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
   const transporter = getFirstTransporterSync(bsda);
+
+  const wasteQuantities = bsdaWasteQuantities(bsda);
+  const quantityAccepted = wasteQuantities?.quantityAccepted ?? null;
+  const quantityRefused = wasteQuantities?.quantityRefused ?? null;
+
   return {
     id: bsda.id,
     createdAt: processDate(bsda.createdAt),
@@ -135,6 +141,12 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
           ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
+          : null,
+        refusedWeight: quantityRefused
+          ? processDecimal(quantityRefused).dividedBy(1000).toNumber()
+          : null,
+        acceptedWeight: quantityAccepted
+          ? processDecimal(quantityAccepted).dividedBy(1000).toNumber()
           : null,
         signature: nullIfNoValues<Signature>({
           date: processDate(bsda.destinationReceptionSignatureDate),
@@ -390,6 +402,13 @@ function flattenBsdaDestinationInput({
     destinationReceptionWeight: chain(destination, d =>
       chain(d.reception, r =>
         r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+      )
+    ),
+    destinationReceptionRefusedWeight: chain(destination, d =>
+      chain(d.reception, r =>
+        r.refusedWeight
+          ? new Decimal(r.refusedWeight).times(1000).toNumber()
+          : r.refusedWeight
       )
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
@@ -678,6 +697,15 @@ export function flattenBsdaRevisionRequestInput(
         )
       )
     ),
+    destinationReceptionRefusedWeight: chain(reviewContent, r =>
+      chain(r.destination, d =>
+        chain(d.reception, r =>
+          r.refusedWeight
+            ? new Decimal(r.refusedWeight).times(1000).toNumber()
+            : r.refusedWeight
+        )
+      )
+    ),
     isCanceled: undefinedOrDefault(
       chain(reviewContent, c => chain(c, r => r.isCanceled)),
       false
@@ -738,7 +766,12 @@ export function expandBsdaRevisionRequestContent(
           ? new Decimal(bsdaRevisionRequest.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : bsdaRevisionRequest.destinationReceptionWeight
+          : bsdaRevisionRequest.destinationReceptionWeight,
+        refusedWeight: bsdaRevisionRequest.destinationReceptionRefusedWeight
+          ? new Decimal(bsdaRevisionRequest.destinationReceptionRefusedWeight)
+              .dividedBy(1000)
+              .toNumber()
+          : bsdaRevisionRequest.destinationReceptionRefusedWeight
       })
     }),
     isCanceled: bsdaRevisionRequest.isCanceled

@@ -28,7 +28,8 @@ import {
   validateDestination,
   validatePreviousBsdas,
   validateDestinationReceptionWeight,
-  wasteAdrRefinement
+  wasteAdrRefinement,
+  checkDestinationReceptionRefusedWeight
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -188,6 +189,7 @@ export const rawBsdaSchema = z.object({
   destinationCustomInfo: z.string().nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationReceptionWeight: z.number().nullish(),
+  destinationReceptionRefusedWeight: z.number().min(0).nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
@@ -288,7 +290,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
   .superRefine(checkTransporters)
-  .superRefine(validateMultiTransporterPlates);
+  .superRefine(validateMultiTransporterPlates)
+  .superRefine(checkDestinationReceptionRefusedWeight);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

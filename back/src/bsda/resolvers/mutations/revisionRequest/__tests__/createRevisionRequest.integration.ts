@@ -16,7 +16,8 @@ import {
 import {
   BsdaRevisionRequestApproval,
   BsdaStatus,
-  BsdaType
+  BsdaType,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 
@@ -29,7 +30,13 @@ const CREATE_BSDA_REVISION_REQUEST = `
       }
       content {
         waste { code }
-        destination { cap }
+        destination { 
+          cap
+          reception {
+            weight
+            refusedWeight
+          }
+        }
       }
       authoringCompany {
         siret
@@ -1565,5 +1572,461 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         expectApprovalsAreEqual(expectedApprovals, revision.approvals);
       }
     );
+  });
+
+  describe("weight & refusedWeight", () => {
+    const createBsdaAndCompanies = async (opt = {}) => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: BsdaStatus.PROCESSED,
+          ...opt
+        }
+      });
+
+      return { user, company, bsda, destinationCompany };
+    };
+
+    const createRevisionRequest = async (
+      user,
+      company,
+      bsda,
+      inputContent = {}
+    ) => {
+      const { mutate } = makeClient(user);
+      return await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            authoringCompanySiret: company.siret!,
+            bsdaId: bsda.id,
+            comment: "Change all that jazz",
+            content: inputContent
+          }
+        }
+      });
+    };
+
+    describe("wasteAcceptationStatus = ACCEPTED", () => {
+      it.each([undefined, 0])(
+        "cannot specify refusedWeight > 0 (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.ACCEPTED,
+            destinationReceptionRefusalReason: "Raison",
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When 1: with weight
+          const { errors: errors1 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 1
+                }
+              }
+            }
+          );
+
+          // Then 1
+          expect(errors1).not.toBeUndefined();
+          expect(errors1[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+          );
+
+          // When 2: without weight
+          const { errors: errors2 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  refusedWeight: 1
+                }
+              }
+            }
+          );
+
+          // Then 2
+          expect(errors2).not.toBeUndefined();
+          expect(errors2[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) ne peut être supérieure à zéro si le déchet est accepté (ACCEPTED)"
+          );
+        }
+      );
+
+      it.each([undefined, 10])(
+        "can specify refusedWeight = 0 (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.ACCEPTED,
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When
+          const { errors, data } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 0
+                }
+              }
+            }
+          );
+
+          // Then
+          expect(errors).toBeUndefined();
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.weight
+          ).toEqual(10);
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.refusedWeight
+          ).toEqual(0);
+
+          const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+            where: { id: data.createBsdaRevisionRequest.id }
+          });
+          expect(
+            revision.initialDestinationReceptionRefusedWeight?.toNumber()
+          ).toBe(destinationReceptionRefusedWeight);
+          expect(revision.destinationReceptionWeight).toBe(10000);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            0
+          );
+        }
+      );
+
+      it("can review weight & refusedWeight", async () => {
+        // Given
+        const { user, company, bsda } = await createBsdaAndCompanies({
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.ACCEPTED,
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 0
+        });
+
+        // When
+        const { errors, data } = await createRevisionRequest(
+          user,
+          company,
+          bsda,
+          {
+            destination: {
+              reception: {
+                weight: 5,
+                refusedWeight: 0
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(
+          data.createBsdaRevisionRequest.content?.destination?.reception?.weight
+        ).toEqual(5);
+        expect(
+          data.createBsdaRevisionRequest.content?.destination?.reception
+            ?.refusedWeight
+        ).toEqual(0);
+
+        const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+          where: { id: data.createBsdaRevisionRequest.id }
+        });
+        expect(
+          revision.initialDestinationReceptionRefusedWeight?.toNumber()
+        ).toBe(0);
+        expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(0);
+        expect(revision.initialDestinationReceptionWeight?.toNumber()).toBe(10);
+        expect(revision.destinationReceptionWeight).toBe(5000);
+      });
+    });
+
+    describe("wasteAcceptationStatus = REFUSED", () => {
+      it.each([undefined, 10])(
+        "cannot specify refusedWeight < weight (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.REFUSED,
+            destinationReceptionRefusalReason: "Raison",
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When 1: with weight
+          const { errors: errors1 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 9
+                }
+              }
+            }
+          );
+
+          // Then 1
+          expect(errors1).not.toBeUndefined();
+          expect(errors1[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (destinationReceptionWeight) si le déchet est refusé (REFUSED)"
+          );
+
+          // When 2: without weight
+          const { errors: errors2 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  refusedWeight: 9
+                }
+              }
+            }
+          );
+
+          // Then 2
+          expect(errors2).not.toBeUndefined();
+          expect(errors2[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) doit être égale à la quantité reçue (destinationReceptionWeight) si le déchet est refusé (REFUSED)"
+          );
+        }
+      );
+
+      it.each([undefined, 10])(
+        "can specify refusedWeight = weight (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.REFUSED,
+            destinationReceptionRefusalReason: "Raison",
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When
+          const { errors, data } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 10
+                }
+              }
+            }
+          );
+
+          // Then
+          expect(errors).toBeUndefined();
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.weight
+          ).toEqual(10);
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.refusedWeight
+          ).toEqual(10);
+
+          const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+            where: { id: data.createBsdaRevisionRequest.id }
+          });
+          expect(
+            revision.initialDestinationReceptionRefusedWeight?.toNumber()
+          ).toBe(destinationReceptionRefusedWeight);
+          expect(revision.destinationReceptionWeight).toBe(10000);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            10000
+          );
+        }
+      );
+
+      it("can review weight & refusedWeight", async () => {
+        // Given
+        const { user, company, bsda } = await createBsdaAndCompanies({
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          destinationReceptionRefusalReason: "Nope",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 10
+        });
+
+        // When
+        const { errors, data } = await createRevisionRequest(
+          user,
+          company,
+          bsda,
+          {
+            destination: {
+              reception: {
+                weight: 5,
+                refusedWeight: 5
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(
+          data.createBsdaRevisionRequest.content?.destination?.reception?.weight
+        ).toEqual(5);
+        expect(
+          data.createBsdaRevisionRequest.content?.destination?.reception
+            ?.refusedWeight
+        ).toEqual(5);
+
+        const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+          where: { id: data.createBsdaRevisionRequest.id }
+        });
+        expect(
+          revision.initialDestinationReceptionRefusedWeight?.toNumber()
+        ).toBe(10);
+        expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+          5000
+        );
+        expect(revision.initialDestinationReceptionWeight?.toNumber()).toBe(10);
+        expect(revision.destinationReceptionWeight).toBe(5000);
+      });
+    });
+
+    describe("wasteAcceptationStatus = PARTIALLY_REFUSED", () => {
+      it.each([undefined, 5])(
+        "cannot specify refusedWeight = weight (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.PARTIALLY_REFUSED,
+            destinationReceptionRefusalReason: "Raison",
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When 1: with weight
+          const { errors: errors1 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 10
+                }
+              }
+            }
+          );
+
+          // Then 1
+          expect(errors1).not.toBeUndefined();
+          expect(errors1[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) doit être inférieure à la quantité reçue (destinationReceptionWeight) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+          );
+
+          // When 2: without weight
+          const { errors: errors2 } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  refusedWeight: 10
+                }
+              }
+            }
+          );
+
+          // Then 2
+          expect(errors2).not.toBeUndefined();
+          expect(errors2[0].message).toBe(
+            "La quantité refusée (destinationReceptionRefusedWeight) doit être inférieure à la quantité reçue (destinationReceptionWeight) et supérieure à zéro si le déchet est partiellement refusé (PARTIALLY_REFUSED)"
+          );
+        }
+      );
+
+      it.each([undefined, 10])(
+        "can specify 0 < refusedWeight <= weight (initial destinationReceptionRefusedWeight: %p)",
+        async destinationReceptionRefusedWeight => {
+          // Given
+          const { user, company, bsda } = await createBsdaAndCompanies({
+            destinationReceptionAcceptationStatus:
+              WasteAcceptationStatus.PARTIALLY_REFUSED,
+            destinationReceptionRefusalReason: "Raison",
+            destinationReceptionWeight: 10,
+            destinationReceptionRefusedWeight
+          });
+
+          // When
+          const { errors, data } = await createRevisionRequest(
+            user,
+            company,
+            bsda,
+            {
+              destination: {
+                reception: {
+                  weight: 10,
+                  refusedWeight: 5
+                }
+              }
+            }
+          );
+
+          // Then
+          expect(errors).toBeUndefined();
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.weight
+          ).toEqual(10);
+          expect(
+            data.createBsdaRevisionRequest.content?.destination?.reception
+              ?.refusedWeight
+          ).toEqual(5);
+
+          const revision = await prisma.bsdaRevisionRequest.findUniqueOrThrow({
+            where: { id: data.createBsdaRevisionRequest.id }
+          });
+          expect(
+            revision.initialDestinationReceptionRefusedWeight?.toNumber()
+          ).toBe(destinationReceptionRefusedWeight);
+          expect(revision.destinationReceptionWeight).toBe(10000);
+          expect(revision.destinationReceptionRefusedWeight?.toNumber()).toBe(
+            5000
+          );
+        }
+      );
+    });
   });
 });
