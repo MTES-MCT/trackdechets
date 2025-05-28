@@ -99,6 +99,8 @@ export const emptyBsda: BsdaForPDF = {
   destinationOperationNextDestinationCompanyMail: null,
   destinationOperationNextDestinationCap: null,
   destinationOperationNextDestinationPlannedOperationCode: null,
+  destinationReceptionSignatureAuthor: null,
+  destinationReceptionSignatureDate: null,
   transporterTransportSignatureDate: new Date(),
   workerCompanyName: null,
   workerCompanySiret: null,
@@ -135,7 +137,9 @@ export const emptyBsda: BsdaForPDF = {
     bsdaTransporter,
     bsdaTransporter,
     bsdaTransporter
-  ]
+  ],
+  intermediaries: [],
+  isDuplicateOf: null
 };
 
 export const emptyBsdasri: Bsdasri = {
@@ -230,7 +234,9 @@ export const emptyBsdasri: Bsdasri = {
   groupedInId: null,
   synthesizedInId: null,
   groupingEmitterSirets: [],
-  synthesisEmitterSirets: []
+  synthesisEmitterSirets: [],
+  canAccessDraftOrgIds: [],
+  isDuplicateOf: null
 };
 
 const BsddTransporter = {
@@ -519,7 +525,9 @@ export const emptyBsff: BsffForBuildPdf = {
       transporterTransportSignatureDate: new Date()
     }
   ],
-  previousBsffs: []
+  previousBsffs: [],
+  canAccessDraftOrgIds: [],
+  isDuplicateOf: null
 };
 
 export const emptyBsvhu: Bsvhu = {
@@ -597,5 +605,34 @@ export const emptyBsvhu: Bsvhu = {
   transporterTransportTakenOverAt: new Date(),
   transporterCustomInfo: null,
   transporterTransportPlates: [],
-  transporterRecepisseIsExempted: false
+  transporterRecepisseIsExempted: false,
+  customId: null,
+  isDuplicateOf: null,
+  emitterNotOnTD: null,
+  destinationReceptionSignatureAuthor: null,
+  destinationReceptionSignatureDate: null,
+  transporterTransportMode: null,
+  containsElectricOrHybridVehicles: null,
+  ecoOrganismeName: null,
+  ecoOrganismeSiret: null,
+  brokerCompanyName: null,
+  brokerCompanySiret: null,
+  brokerCompanyAddress: null,
+  brokerCompanyContact: null,
+  brokerCompanyPhone: null,
+  brokerCompanyMail: null,
+  brokerRecepisseNumber: null,
+  brokerRecepisseDepartment: null,
+  brokerRecepisseValidityLimit: null,
+  traderCompanyName: null,
+  traderCompanySiret: null,
+  traderCompanyAddress: null,
+  traderCompanyContact: null,
+  traderCompanyPhone: null,
+  traderCompanyMail: null,
+  traderRecepisseNumber: null,
+  traderRecepisseDepartment: null,
+  traderRecepisseValidityLimit: null,
+  intermediariesOrgIds: [],
+  canAccessDraftOrgIds: []
 };

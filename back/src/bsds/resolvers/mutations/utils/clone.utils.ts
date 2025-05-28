@@ -183,7 +183,10 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     workerIsDisabled: bsda.workerIsDisabled,
     workerWorkHasEmitterPaperSignature: bsda.workerWorkHasEmitterPaperSignature,
     workerWorkSignatureAuthor: bsda.workerWorkSignatureAuthor,
-    workerWorkSignatureDate: bsda.workerWorkSignatureDate
+    workerWorkSignatureDate: bsda.workerWorkSignatureDate,
+    destinationReceptionSignatureAuthor:
+      bsda.destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate: bsda.destinationReceptionSignatureDate
   };
 
   const newBsda = await create(newBsdaCreateInput);

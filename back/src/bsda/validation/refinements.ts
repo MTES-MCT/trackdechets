@@ -185,7 +185,8 @@ export const checkRequiredFields: (
         const isRequired = isBsdaFieldRequired(
           required,
           bsda,
-          signaturesToCheck
+          signaturesToCheck,
+          validationContext.currentSignatureType
         );
         if (isRequired) {
           if (
