@@ -215,6 +215,15 @@ function formatErrorMessage(error: Error) {
     };
   }
 
+  // Cannot unzip file or file is not a valid zip
+  if (message.includes("invalid signature: 0x")) {
+    return {
+      hidden: false,
+      message:
+        "Type de fichier invalide. Vérifiez que le fichier est bien au format XLSX (XLS n'est pas supporté) ou CSV."
+    };
+  }
+
   return { hidden: true, message: INTERNAL_ERROR };
 }
 

@@ -29,22 +29,29 @@ export async function indexBsdJob(
   const bsdId = job.data;
   const indexed = await getElasticBsdById(bsdId);
 
+  const hit = indexed?.body?.hits?.hits?.[0];
+
   // we keep track of previously indexed sirets in order to be able to notify a
   // company which would be removed from a bsd.
   // Next they're passed to the notify jobs (sse and webhooks)
-  const siretsBeforeUpdate =
-    indexed?.body?.hits?.hits?.[0]?._source?.sirets || [];
+  const siretsBeforeUpdate = hit?._source?.sirets || [];
+
+  const optimisticCtx = {
+    seqNo: hit?._seq_no,
+    primaryTerm: hit?._primary_term
+  };
+
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await getBsdaForElastic({ id: bsdId });
 
     const elasticBsda = toBsdaElastic(bsda);
-    await indexBsd(elasticBsda);
+    await indexBsd(elasticBsda, { optimisticCtx });
     await bsdaLookupUtils.update(bsda);
     return { ...elasticBsda, siretsBeforeUpdate };
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
     const rawForm = await getFormForElastic({ readableId: bsdId });
-    const elasticBsdd = await indexForm(rawForm);
+    const elasticBsdd = await indexForm(rawForm, { optimisticCtx });
     await bsddLookupUtils.update(rawForm);
     if (rawForm.forwardedIn) {
       await bsddLookupUtils.update({
@@ -59,7 +66,7 @@ export async function indexBsdJob(
     const bsdasri = await getBsdasriForElastic({ id: bsdId });
 
     const elasticBsdasri = toBsdasriElastic(bsdasri);
-    await indexBsd(elasticBsdasri);
+    await indexBsd(elasticBsdasri, { optimisticCtx });
     await bsdasriLookupUtils.update(bsdasri);
     return { ...elasticBsdasri, siretsBeforeUpdate };
   }
@@ -68,7 +75,7 @@ export async function indexBsdJob(
     const bsvhu = await getBsvhuForElastic({ id: bsdId });
 
     const elasticBsvhu = toBsvhuElastic(bsvhu);
-    await indexBsd(elasticBsvhu);
+    await indexBsd(elasticBsvhu, { optimisticCtx });
     await bsvhuLookupUtils.update(bsvhu);
 
     return { ...elasticBsvhu, siretsBeforeUpdate };
@@ -85,7 +92,7 @@ export async function indexBsdJob(
     });
 
     const elasticBsff = toBsffElastic(bsff);
-    await indexBsd(elasticBsff);
+    await indexBsd(elasticBsff, { optimisticCtx });
     await bsffLookupUtils.update(bsff);
 
     return { ...elasticBsff, siretsBeforeUpdate };
@@ -99,7 +106,7 @@ export async function indexBsdJob(
 
     const elasticBspaoh = toBspaohElastic(bspaoh);
 
-    await indexBsd(elasticBspaoh);
+    await indexBsd(elasticBspaoh, { optimisticCtx });
     await bspaohLookupUtils.update(bspaoh);
 
     return { ...elasticBspaoh, siretsBeforeUpdate };

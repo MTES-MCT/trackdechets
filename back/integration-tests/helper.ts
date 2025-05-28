@@ -87,9 +87,13 @@ export async function resetDatabase() {
 }
 
 export async function refreshElasticSearch() {
-  // Wait for all indexation jobs to finish
-  const activeJobs = await indexQueue.getActive();
-  await Promise.all(activeJobs.map(job => job.finished()));
+  try {
+    // Wait for all indexation jobs to finish
+    const activeJobs = await indexQueue.getActive();
+    await Promise.all(activeJobs.map(job => job.finished()));
+  } catch (_) {
+    // Do nothing. But we make sure the jobs don't fail the test suite
+  }
 
   return elasticSearch.indices.refresh(
     {

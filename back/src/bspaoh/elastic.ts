@@ -256,7 +256,10 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
 
 export function indexBspaoh(
   bspaoh: BspaohWithTransporters,
-  ctx?: GraphQLContext
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
 ) {
   return indexBsd(toBsdElastic(bspaoh), ctx);
 }

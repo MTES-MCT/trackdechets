@@ -231,7 +231,10 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
 
 export async function indexForm(
   form: FormForElastic,
-  ctx?: GraphQLContext
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
 ): Promise<BsdElastic> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {

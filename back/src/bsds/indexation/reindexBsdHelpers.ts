@@ -9,13 +9,20 @@ import {
   indexForm,
   isBsddNotIndexable
 } from "../../forms/elastic";
-import { deleteBsd } from "../../common/elastic";
+import { deleteBsd, getElasticBsdById } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
 import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
 import { getReadonlyBsdasriRepository } from "../../bsdasris/repository";
 import { getReadonlyBspaohRepository } from "../../bspaoh/repository";
 
 export async function reindex(bsdId, exitFn) {
+  const indexed = await getElasticBsdById(bsdId);
+
+  const optimisticCtx = {
+    seqNo: indexed?.body?._seq_no,
+    primaryTerm: indexed?.body?._primary_term
+  };
+
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await getReadonlyBsdaRepository().findUnique(
       { id: bsdId },
@@ -24,7 +31,7 @@ export async function reindex(bsdId, exitFn) {
       }
     );
     if (!!bsda && !bsda.isDeleted) {
-      await indexBsda(bsda);
+      await indexBsda(bsda, { optimisticCtx });
     } else {
       await deleteBsd({ id: bsdId });
     }
@@ -40,7 +47,7 @@ export async function reindex(bsdId, exitFn) {
     );
 
     if (!!bsdasri && !bsdasri.isDeleted) {
-      await indexBsdasri(bsdasri);
+      await indexBsdasri(bsdasri, { optimisticCtx });
     } else {
       await deleteBsd({ id: bsdId });
     }
@@ -53,7 +60,7 @@ export async function reindex(bsdId, exitFn) {
     });
 
     if (!!bsff) {
-      await indexBsff(await getBsffForElastic(bsff));
+      await indexBsff(await getBsffForElastic(bsff), { optimisticCtx });
     } else {
       await deleteBsd({ id: bsdId });
     }
@@ -66,7 +73,7 @@ export async function reindex(bsdId, exitFn) {
     });
 
     if (!!bsvhu && !bsvhu.isDeleted) {
-      await indexBsvhu(await getBsvhuForElastic(bsvhu));
+      await indexBsvhu(await getBsvhuForElastic(bsvhu), { optimisticCtx });
     } else {
       await deleteBsd({ id: bsdId });
     }
@@ -79,7 +86,7 @@ export async function reindex(bsdId, exitFn) {
     });
 
     if (!!bspaoh && !bspaoh.isDeleted) {
-      await indexBspaoh(await getBspaohForElastic(bspaoh));
+      await indexBspaoh(await getBspaohForElastic(bspaoh), { optimisticCtx });
     } else {
       await deleteBsd({ id: bsdId });
     }
@@ -92,7 +99,7 @@ export async function reindex(bsdId, exitFn) {
     if (isBsddNotIndexable(formForElastic)) {
       await deleteBsd({ id: formForElastic.id });
     } else {
-      await indexForm(formForElastic);
+      await indexForm(formForElastic, { optimisticCtx });
     }
     return exitFn(true);
   }

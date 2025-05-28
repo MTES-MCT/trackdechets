@@ -366,29 +366,45 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 }
 
 /**
+ * Set optimistic concurrency control parameters if seqNo and primaryTerm are provided.
+ * This is used to ensure that the document is not modified by another process
+ * before the current operation completes.
+ * cf https://www.elastic.co/guide/en/elasticsearch/reference/8.18/optimistic-concurrency-control.html
+ */
+function optimisticConcurrency(ctx?: { seqNo?: number; primaryTerm?: number }) {
+  return ctx?.seqNo && ctx?.primaryTerm
+    ? {
+        if_seq_no: ctx.seqNo,
+        if_primary_term: ctx.primaryTerm
+      }
+    : {};
+}
+
+/**
  * Create/update one document in Elastic Search.
  */
-export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
+export async function indexBsd(
+  bsd: BsdElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   logger.info(`Indexing BSD ${bsd.id}`);
-  return client.index(
-    {
-      index: index.alias,
-      id: bsd.id,
-      body: bsd,
-      version_type: "external_gte",
-      version: bsd.updatedAt,
-      ...refresh(ctx)
-    },
-    {
-      // do not throw version conflict errors
-      ignore: [409]
-    }
-  );
+
+  return client.index({
+    index: index.alias,
+    id: bsd.id,
+    body: bsd,
+    ...optimisticConcurrency(ctx?.optimisticCtx),
+    ...refresh(ctx?.gqlCtx)
+  });
 }
 
 export async function getElasticBsdById(id) {
   const result = await client.search({
     index: index.alias,
+    seq_no_primary_term: true,
     body: {
       query: {
         term: {
@@ -422,9 +438,7 @@ export async function indexBsds(
       {
         index: {
           _index: indexName,
-          _id: bsd.id,
-          version_type: "external_gte",
-          version: bsd.updatedAt
+          _id: bsd.id
         }
       },
       bsd
