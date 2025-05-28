@@ -2,7 +2,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { sendVerificationCodeLetter } from "../../../common/post";
 import type { MutationResolvers } from "@td/codegen-back";

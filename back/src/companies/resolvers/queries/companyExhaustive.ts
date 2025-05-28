@@ -1,7 +1,7 @@
 import type { QueryResolvers } from "@td/codegen-back";
 
 import { checkIsAdmin } from "../../../common/permissions";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { prisma } from "@td/prisma";
 import { searchCompanyTD } from "../../sirene/trackdechets/client";
 import { searchCompanySirene } from "../../sirene/insee/client";

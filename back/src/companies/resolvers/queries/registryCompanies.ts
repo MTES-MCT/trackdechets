@@ -3,7 +3,7 @@ import { getPrismaPaginationArgs } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
-import { AuthType, applyAuthStrategies } from "../../../auth";
+import { AuthType, applyAuthStrategies } from "../../../auth/auth";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH

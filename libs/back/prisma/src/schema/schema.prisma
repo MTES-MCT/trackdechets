@@ -925,6 +925,8 @@ model User {
   isAdmin               Boolean                 @default(false)
   governmentAccountId   String?                 @unique
   governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id])
+  totpSeed              String?
+  totpActivatedAt       DateTime?               @db.Timestamptz(6)
   AccessToken           AccessToken[]
   applications          Application[]
   companyAssociations   CompanyAssociation[]

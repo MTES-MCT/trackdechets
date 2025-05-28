@@ -17,7 +17,7 @@ import path from "path";
 import { ValidationError } from "yup";
 import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
-import { passportBearerMiddleware } from "./auth";
+import { passportBearerMiddleware } from "./auth/auth";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
@@ -279,6 +279,15 @@ app.use(graphQLPath, timeoutMiddleware());
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
 
+declare module "express-session" {
+  interface SessionData {
+    preloggedUser?: {
+      userEmail: string;
+      expire: Date;
+    };
+  }
+}
+
 export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
@@ -303,7 +312,6 @@ app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 if (SESSION_COOKIE_SECURE === "true" && sess.cookie) {
   sess.cookie.secure = true; // serve secure cookies
 }
-
 app.use(session(sess));
 
 app.use(passport.initialize());

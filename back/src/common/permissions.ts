@@ -11,7 +11,7 @@ export function checkIsAuthenticated(context: GraphQLContext): Express.User {
 
 export function checkIsAdmin(context: GraphQLContext): Express.User {
   const user = checkIsAuthenticated(context);
-  if (!user.isAdmin) {
+  if (!user.isAdmin || !user.totpActivatedAt || !user.totpSeed) {
     throw new NotAdmin();
   }
   return user;

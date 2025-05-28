@@ -23,6 +23,10 @@ function getErrorMessage(errorCode: string) {
     return "Le test anti-robots est incorrect";
   }
 
+  if (errorCode === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
+    return "Le délai d'attente pour remplir votre code d'authentification est dépassé, merci de recommencer la procédure";
+  }
+
   return "Email ou mot de passe incorrect";
 }
 
@@ -40,6 +44,7 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [captchaInput, setCaptchaInput] = useState("");
 
   const queries = queryString.parse(location.search);
@@ -148,7 +153,8 @@ export default function Login() {
               {returnTo && (
                 <input type="hidden" name="returnTo" value={returnTo} />
               )}
-              {!!showCaptcha && !!captchaData?.token && !!captchaData?.img && (
+
+              {showCaptcha && !!captchaData?.token && !!captchaData?.img && (
                 <>
                   <input
                     type="hidden"

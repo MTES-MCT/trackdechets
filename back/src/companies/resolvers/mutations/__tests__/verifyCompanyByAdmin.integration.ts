@@ -9,7 +9,8 @@ import { prisma } from "@td/prisma";
 import {
   siretify,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -49,7 +50,7 @@ describe("mutation verifyCompanyByAdmin", () => {
   });
 
   it("should throw error if company does not exist", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { mutate } = makeClient(admin);
 
@@ -68,7 +69,7 @@ describe("mutation verifyCompanyByAdmin", () => {
   });
 
   it("should verify company, set verification mode and verificationComment", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
@@ -102,7 +103,7 @@ describe("mutation verifyCompanyByAdmin", () => {
   });
 
   it("should verify a foreign company, set verification mode and verificationComment", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
 
     const { user: _, company } = await userWithCompanyFactory(UserRole.ADMIN, {
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED,

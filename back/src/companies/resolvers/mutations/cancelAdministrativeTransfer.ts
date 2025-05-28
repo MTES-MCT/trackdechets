@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import type { MutationResolvers } from "@td/codegen-back";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import {

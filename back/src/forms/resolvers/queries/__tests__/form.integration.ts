@@ -13,7 +13,8 @@ import {
   bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory,
-  formWithTempStorageFactory
+  formWithTempStorageFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
@@ -198,7 +199,7 @@ describe("Query.form", () => {
   });
 
   it("should allow access to admin user not on the bsd", async () => {
-    const user = await userFactory({ isAdmin: true });
+    const user = await adminFactory();
     const form = await createForm({});
 
     const { query } = makeClient(user);

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
 import { GraphQLContext } from "../types";
-import { AuthType } from "../auth";
+import { AuthType } from "../auth/auth";
 import { logger } from "@td/logger";
 import type { BsdSubType, BsdType, FormCompany } from "@td/codegen-back";
 import {

@@ -6,7 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { renderMail, membershipRequestRefused } from "@td/mail";
 import type { Mutation } from "@td/codegen-back";
 
