@@ -194,7 +194,6 @@ export async function processRegistryExhaustiveExportJob(
         ]
       }
     };
-    console.log(JSON.stringify(query, null, 2));
     // if the export was for all of a user's companies, all the sirets are in the registryExport at the beginning
     // in order to cleanup the exports list, we memorize the
     // sirets that are never encountered during the export, and update the list of sirets
