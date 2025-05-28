@@ -1,8 +1,9 @@
 import request from "supertest";
 import { app } from "../../server";
-import { userFactory } from "../../__tests__/factories";
-import { logIn } from "../../__tests__/auth.helper";
+import { userFactory, adminFactory } from "../../__tests__/factories";
+import { logIn, secondFactor } from "../../__tests__/auth.helper";
 import { resetDatabase } from "../../../integration-tests/helper";
+import { TOTP } from "totp-generator";
 
 describe("Auth Router", () => {
   afterEach(resetDatabase);
@@ -35,8 +36,15 @@ describe("Auth Router", () => {
     });
 
     it("should return 400 if user is admin and impersonated user is not found", async () => {
-      const user = await userFactory({ isAdmin: true });
-      const { sessionCookie } = await logIn(app, user.email, "pass");
+      const user = await adminFactory();
+
+      const { sessionCookie: prelogCookie } = await logIn(
+        app,
+        user.email,
+        "pass"
+      );
+      const { otp } = TOTP.generate(user.totpSeed!);
+      const { sessionCookie } = await secondFactor(app, otp, prelogCookie);
 
       const response = await request(app)
         .post("/impersonate")
@@ -51,8 +59,15 @@ describe("Auth Router", () => {
     it("should redirect if user is admin and user is found", async () => {
       const impersonatedUser = await userFactory();
 
-      const user = await userFactory({ isAdmin: true });
-      const { sessionCookie } = await logIn(app, user.email, "pass");
+      const user = await adminFactory();
+
+      const { sessionCookie: prelogCookie } = await logIn(
+        app,
+        user.email,
+        "pass"
+      );
+      const { otp } = TOTP.generate(user.totpSeed!);
+      const { sessionCookie } = await secondFactor(app, otp, prelogCookie);
 
       const response = await request(app)
         .post("/impersonate")

@@ -1,4 +1,4 @@
-import React, { lazy, useContext } from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
@@ -12,9 +12,7 @@ import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQua
 import FormikPackagingList from "../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { bsdaPackagingTypes } from "../../../../Apps/Forms/Components/PackagingList/helpers";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
-const TagsInput = lazy(
-  () => import("../../../../common/components/tags-input/TagsInput")
-);
+import TagsInput from "../../../../common/components/tags-input/TagsInput";
 
 export function WasteInfo({ disabled }) {
   const bsdaContext = useContext(BsdaContext);

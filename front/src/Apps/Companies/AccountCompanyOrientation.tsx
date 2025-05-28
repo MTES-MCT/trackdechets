@@ -21,14 +21,17 @@ export default function AccountCompanyOrientation() {
               }
             }}
           >
-            Vous produisez des déchets dangereux dans le cadre de votre activité
-            et vous les faites traiter par un professionnel des déchets.
+            Vous produisez des déchets dangereux ou non dangereux dans le cadre
+            de votre activité et vous les faites traiter par un professionnel
+            des déchets.
             <br />
             Exemples : ateliers de réparation de véhicules, laboratoires,
             ateliers de traitement de surfaces, détenteurs d'équipements
             contenant des fluides frigorigènes et les opérateurs, producteurs de
             déchets infectieux (hôpitaux, EHPAD, médecins, infirmier(e)s,
-            tatoueurs, dentistes, etc.) maître d'ouvrage d'amiante, etc.
+            tatoueurs, dentistes, etc.), maître d'ouvrage chantiers
+            d'excavations de terres et sédiments, maître d'ouvrage retrait
+            d'amiante, etc.
           </CallOut>
         </div>
         {/* <div className="fr-col-12">
@@ -62,9 +65,10 @@ export default function AccountCompanyOrientation() {
             Vous exploitez une entreprise de collecte et/ou tri et/ou transit
             et/ou regroupement et/ou traitement de déchets. Vous êtes négociant
             et/ou courtier de déchets et/ou eco-organisme. Exemples :
-            Déchèterie, collecteur de déchets, casse automobile, entreprise de
-            travaux amiante, transporteur, centre d'enfouissement, installation
-            de traitement de déchets, incinérateur, crématorium.
+            Déchèterie, collecteur de déchets, casse automobile, maître
+            d'ouvrage pour un chantier accueillant des terres ou sédiments,
+            entreprise de travaux, transporteur, centre d'enfouissement,
+            installation de traitement de déchets, incinérateur, crématorium.
           </CallOut>
         </div>
         <div className="fr-col-12">

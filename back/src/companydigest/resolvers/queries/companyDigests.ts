@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 
 import type { QueryResolvers } from "@td/codegen-back";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 
 import { UserInputError } from "../../../common/errors";
 import { getUserRoles } from "../../../permissions";

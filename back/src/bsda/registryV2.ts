@@ -2,6 +2,7 @@ import {
   IncomingWasteV2,
   ManagedWasteV2,
   OutgoingWasteV2,
+  PackagingInfo,
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
@@ -29,6 +30,17 @@ import {
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+
+const getQuantity = (packagings: Prisma.JsonValue) => {
+  if (!packagings || !(packagings as PackagingInfo[])?.length) {
+    return null;
+  }
+
+  return (packagings as PackagingInfo[])?.reduce(
+    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
+    0
+  );
+};
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -233,7 +245,7 @@ export const toIncomingWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -501,7 +513,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -786,7 +798,7 @@ export const toTransportedWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsda.weightIsEstimate,
     volume: null,
@@ -1041,7 +1053,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -1263,9 +1275,9 @@ const bsdaToLookupCreateInputs = (
       wasteType: RegistryExportWasteType.DD,
       wasteCode: bsda.wasteCode,
       ...generateDateInfos(
-        bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate
+        bsda.destinationReceptionDate ?? bsda.destinationOperationSignatureDate,
+        bsda.createdAt
       ),
-      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   }
@@ -1289,9 +1301,9 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!
+            transporter.transporterTransportSignatureDate!,
+          bsda.createdAt
         ),
-        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1316,9 +1328,9 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-            transporter.transporterTransportSignatureDate!
+            transporter.transporterTransportSignatureDate!,
+          bsda.createdAt
         ),
-        declaredAt: bsda.createdAt,
         bsdaId: bsda.id
       });
     });
@@ -1346,9 +1358,9 @@ const bsdaToLookupCreateInputs = (
       wasteCode: bsda.wasteCode,
       ...generateDateInfos(
         transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!
+          transporter.transporterTransportSignatureDate!,
+        bsda.createdAt
       ),
-      declaredAt: bsda.createdAt,
       bsdaId: bsda.id
     });
   });
@@ -1405,14 +1417,8 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100) => {
+export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("BSDA");
-  await prisma.registryLookup.deleteMany({
-    where: {
-      bsdaId: { not: null }
-    }
-  });
-  logger.logDelete();
 
   const total = await prisma.bsda.count({
     where: {
@@ -1424,8 +1430,42 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
   let done = false;
   let cursorId: string | null = null;
   let processedCount = 0;
+  let operationId = 0;
+  const pendingWrites = new Map<number, Promise<void>>();
+
+  const processWrite = async (items: MinimalBsdaForLookup[]) => {
+    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+    for (const bsda of items) {
+      const createInputs = bsdaToLookupCreateInputs(bsda);
+      createArray = createArray.concat(createInputs);
+    }
+    // Run delete and create operations in a transaction
+    await prisma.$transaction(
+      async tx => {
+        // Delete existing lookups for these items
+        await tx.registryLookup.deleteMany({
+          where: {
+            OR: items.map(item => ({
+              id: item.id
+            }))
+          }
+        });
+        await tx.registryLookup.createMany({
+          data: createArray,
+          skipDuplicates: true
+        });
+      },
+      {
+        maxWait: 20000,
+        timeout: 60000
+      }
+    );
+    processedCount += items.length;
+    logger.logProgress(processedCount, total, pendingWrites.size);
+  };
 
   while (!done) {
+    // Sequential read
     const items = await prisma.bsda.findMany({
       where: {
         isDeleted: false,
@@ -1440,17 +1480,17 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
       select: minimalBsdaForLookupSelect
     });
 
-    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
-    for (const bsda of items) {
-      const createInputs = bsdaToLookupCreateInputs(bsda);
-      createArray = createArray.concat(createInputs);
-    }
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+    // Start the write operation
+    const currentOperationId = operationId++;
+    const writePromise = processWrite(items).finally(() => {
+      pendingWrites.delete(currentOperationId);
     });
-    processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    pendingWrites.set(currentOperationId, writePromise);
+
+    // If we've reached max concurrency, wait for one write to complete
+    if (pendingWrites.size >= threads) {
+      await Promise.race(pendingWrites.values());
+    }
 
     if (items.length < pageSize) {
       done = true;
@@ -1458,6 +1498,12 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
     }
     cursorId = items[items.length - 1].id;
   }
+
+  // Wait for any remaining writes to complete
+  if (pendingWrites.size > 0) {
+    await Promise.all(pendingWrites.values());
+  }
+
   logger.logCompletion(processedCount);
 };
 

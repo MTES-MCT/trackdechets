@@ -31,7 +31,6 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
-    - [Clefs de signature token OpenID](#clefs-de-signature-token-openid)
     - [Reindexer un bordereau individuel](#reindexer-un-bordereau-individuel)
     - [Réindexer un type de bordereau](#réindexer-un-type-de-bordereau)
   - [Dépannage](#dépannage)
@@ -857,19 +856,6 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
-
-### Clefs de signature token OpenID
-
-Une clef de signature RSA est nécessaire pour signer les tokens d'identité d'Openid.
-
-```
-   openssl genrsa -out keypair.pem 2048
-   openssl rsa -in keypair.pem -pubout -out publickey.crt
-   openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out pkcs8.key
-```
-
-Le contenu de pkcs8.key va dans la vairable d'env OIDC_PRIVATE_KEY.
-Le contenu de publickey.crt est destiné aux applications clientes d'OpenId connect.
 
 ### Reindexer un bordereau individuel
 

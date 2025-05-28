@@ -9,7 +9,7 @@ import type { Query } from "@td/codegen-back";
 import { associateUserToCompany } from "../../../database";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import { subDays } from "date-fns";
 
 const MY_COMPANIES = gql`

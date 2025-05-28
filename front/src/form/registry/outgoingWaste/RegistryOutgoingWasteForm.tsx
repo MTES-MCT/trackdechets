@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation } from "react-router-dom";
+import { ApolloError } from "@apollo/client";
 
 import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
@@ -85,7 +86,10 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
 
           const transporters = Object.values(transportersObj).filter(
             partialTransporter => {
-              if (partialTransporter.TransportMode) {
+              if (
+                partialTransporter.TransportMode ||
+                partialTransporter.CompanyType
+              ) {
                 return true;
               }
               return false;
@@ -158,19 +162,40 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
       )
     };
 
-    const result = await addToOutgoingWasteRegistry({
-      variables: {
-        lines: [flattenedData]
+    try {
+      const result = await addToOutgoingWasteRegistry({
+        variables: {
+          lines: [flattenedData]
+        }
+      });
+
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToOutgoingWasteRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToOutgoingWasteRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      console.log(error);
+      if (error instanceof ApolloError) {
+        console.log("AQUI");
+        // Handle GraphQL errors
+        methods.setError("root.serverError", {
+          type: "server",
+          message:
+            error.message ||
+            "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+        });
+      } else {
+        console.log("AQUI 2");
+        methods.setError("root.serverError", {
+          type: "server",
+          message:
+            "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+        });
+      }
     }
   }
 

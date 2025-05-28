@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { lazy, ReactElement, useMemo } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "../../../Apps/common/Components";
 import { IStepContainerProps } from "../../common/stepper/Step";
@@ -36,10 +36,7 @@ import {
 } from "../../../Apps/Forms/Components/query";
 import { isForeignVat } from "@td/constants";
 import { cleanPackagings } from "../../../Apps/Forms/Components/PackagingList/helpers";
-
-const GenericStepList = lazy(
-  () => import("../../common/stepper/GenericStepList")
-);
+import GenericStepList from "../../common/stepper/GenericStepList";
 
 interface Props {
   children: (bsda: Bsda | undefined) => ReactElement;

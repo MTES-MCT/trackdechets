@@ -230,7 +230,11 @@ describe("query { wastesRegistryCsv }", () => {
     const userIP = faker.internet.ipv4();
 
     // user is admin
-    const { accessToken } = await userWithAccessTokenFactory({ isAdmin: true });
+    const { accessToken } = await userWithAccessTokenFactory({
+      isAdmin: true,
+      totpSeed: "ABCD",
+      totpActivatedAt: new Date()
+    });
 
     const form = await recipientFormFactory(owner.id, someCompany.siret!);
     await indexForm(await getFormForElastic(form));

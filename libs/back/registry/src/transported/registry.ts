@@ -170,8 +170,10 @@ const registryToLookupCreateInput = (
       ? RegistryExportWasteType.DD
       : RegistryExportWasteType.DND,
     wasteCode: registryTransported.wasteCode,
-    ...generateDateInfos(registryTransported.collectionDate),
-    declaredAt: registryTransported.createdAt,
+    ...generateDateInfos(
+      registryTransported.collectionDate,
+      registryTransported.createdAt
+    ),
     registryTransportedId: registryTransported.id
   };
 };
@@ -201,8 +203,10 @@ export const updateRegistryLookup = async (
           ? RegistryExportWasteType.DD
           : RegistryExportWasteType.DND,
         wasteCode: registryTransported.wasteCode,
-        ...generateDateInfos(registryTransported.collectionDate),
-        declaredAt: registryTransported.createdAt,
+        ...generateDateInfos(
+          registryTransported.collectionDate,
+          registryTransported.createdAt
+        ),
         registryTransportedId: registryTransported.id
       },
       create: registryToLookupCreateInput(registryTransported),
@@ -220,25 +224,53 @@ export const updateRegistryLookup = async (
   }
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100) => {
+export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
   const logger = createRegistryLogger("TRANSPORTED");
-  await prisma.registryLookup.deleteMany({
-    where: {
-      registryTransportedId: { not: null }
-    }
-  });
-  logger.logDelete();
 
+  // First, get total count for progress calculation
   const total = await prisma.registryTransported.count({
     where: {
       isCancelled: false,
       isLatest: true
     }
   });
+
   let done = false;
   let cursorId: string | null = null;
   let processedCount = 0;
+  let operationId = 0;
+  const pendingWrites = new Map<number, Promise<void>>();
+
+  const processWrite = async (items: MinimalRegistryForLookup[]) => {
+    const createArray = items.map(
+      (registryTransported: MinimalRegistryForLookup) =>
+        registryToLookupCreateInput(registryTransported)
+    );
+    // Run delete and create operations in a transaction
+    await prisma.$transaction(async tx => {
+      // Delete existing lookups for these items
+      await tx.registryLookup.deleteMany({
+        where: {
+          OR: items.map(item => ({
+            id: item.id,
+            exportRegistryType: RegistryExportType.TRANSPORTED,
+            siret: item.reportForCompanySiret
+          }))
+        }
+      });
+
+      await tx.registryLookup.createMany({
+        data: createArray,
+        skipDuplicates: true
+      });
+    });
+
+    processedCount += items.length;
+    logger.logProgress(processedCount, total, pendingWrites.size);
+  };
+
   while (!done) {
+    // Sequential read
     const items = await prisma.registryTransported.findMany({
       where: {
         isCancelled: false,
@@ -252,22 +284,31 @@ export const rebuildRegistryLookup = async (pageSize = 100) => {
       },
       select: minimalRegistryForLookupSelect
     });
-    const createArray = items.map(
-      (registryTransported: MinimalRegistryForLookup) =>
-        registryToLookupCreateInput(registryTransported)
-    );
-    await prisma.registryLookup.createMany({
-      data: createArray,
-      skipDuplicates: true
+
+    // Start the write operation
+    const currentOperationId = operationId++;
+    const writePromise = processWrite(items).finally(() => {
+      pendingWrites.delete(currentOperationId);
     });
-    processedCount += items.length;
-    logger.logProgress(processedCount, total);
+    pendingWrites.set(currentOperationId, writePromise);
+
+    // If we've reached max concurrency, wait for one write to complete
+    if (pendingWrites.size >= threads) {
+      await Promise.race(pendingWrites.values());
+    }
+
     if (items.length < pageSize) {
       done = true;
       break;
     }
     cursorId = items[items.length - 1].id;
   }
+
+  // Wait for any remaining writes to complete
+  if (pendingWrites.size > 0) {
+    await Promise.all(pendingWrites.values());
+  }
+
   logger.logCompletion(processedCount);
 };
 

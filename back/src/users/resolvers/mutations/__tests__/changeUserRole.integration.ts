@@ -1,12 +1,13 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
-  userFactory
+  userFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
 import { hash } from "bcrypt";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
@@ -219,9 +220,7 @@ describe("mutation changeUserRole", () => {
     const { user: userToModify, company } = await userWithCompanyFactory(
       "MEMBER"
     );
-    const tdAdminUser = await userFactory({
-      isAdmin: true
-    });
+    const tdAdminUser = await adminFactory();
     const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
 
     const { data } = await mutate<Pick<Mutation, "changeUserRole">>(

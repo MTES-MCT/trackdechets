@@ -12,7 +12,12 @@ export default defineConfig({
     commonjsOptions: {
       transformMixedEsModules: true
     },
-    sourcemap: true
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        inlineDynamicImports: true // FIXME: Disable code splitting until we find a better solution
+      }
+    }
   },
   cacheDir: "../node_modules/.vite/front",
   plugins: [

@@ -7,7 +7,7 @@ import type {
 } from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 
 const CREATE_FORM_TRANSPORTER = gql`
   mutation CreateFormTransporter($input: TransporterInput!) {

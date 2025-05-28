@@ -43,6 +43,21 @@ export const userFactory = async (
 };
 
 /**
+ * Create an admin user with otp fields set up
+ * @param opt: extra parameters
+ */
+export const adminFactory = async (
+  opt: Partial<Prisma.UserCreateInput> = {}
+) => {
+  return userFactory({
+    isAdmin: true,
+    totpActivatedAt: new Date(),
+    totpSeed: "ABCD",
+    ...opt
+  });
+};
+
+/**
  * Return a random valid siret
  * a random number will not pass the luhnCheck
  * @param index numerical index
@@ -367,6 +382,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsCode: "05 01 04*",
   wasteDetailsName: "Déchets divers",
   wasteDetailsIsDangerous: true,
+  wasteDetailsIsSubjectToADR: true,
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsQuantity: 1,
@@ -596,7 +612,7 @@ export const statusLogFactory = async ({
   });
 };
 
-export const applicationFactory = async (openIdEnabled?: boolean) => {
+export const applicationFactory = async () => {
   const admin = await userFactory();
 
   const applicationIndex = (await prisma.application.count()) + 1;
@@ -606,8 +622,7 @@ export const applicationFactory = async (openIdEnabled?: boolean) => {
       admin: { connect: { id: admin.id } },
       clientSecret: `Secret_${applicationIndex}`,
       name: `Application_${applicationIndex}`,
-      redirectUris: ["https://acme.inc/authorize"],
-      openIdEnabled: !!openIdEnabled
+      redirectUris: ["https://acme.inc/authorize"]
     }
   });
 

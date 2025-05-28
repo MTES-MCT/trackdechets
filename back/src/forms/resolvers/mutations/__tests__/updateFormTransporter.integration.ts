@@ -13,7 +13,7 @@ import type {
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 
 const UPDATE_FORM_TRANSPORTER = gql`
   mutation UpdateFormTransporter($id: ID!, $input: TransporterInput!) {

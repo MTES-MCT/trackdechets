@@ -2,7 +2,7 @@ import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { Job } from "bull";
 import { getFormRepository } from "../../forms/repository";
-import { AuthType } from "../../auth";
+import { AuthType } from "../../auth/auth";
 import { getBsdaRepository } from "../../bsda/repository";
 
 export type AdministrativeTransferArgs = { fromOrgId: string; toOrgId: string };

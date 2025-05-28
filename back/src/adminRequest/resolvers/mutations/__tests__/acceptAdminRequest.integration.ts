@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import {
+  adminFactory,
   companyFactory,
   userFactory,
   userInCompany,
@@ -504,7 +505,7 @@ describe("Mutation acceptAdminRequest", () => {
     // Given
     const { company } = await userWithCompanyFactory();
     const requestAuthor = await userFactory();
-    const tdAdmin = await userFactory({ isAdmin: true });
+    const tdAdmin = await adminFactory();
 
     const adminRequest = await prisma.adminRequest.create({
       data: {
