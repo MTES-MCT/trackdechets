@@ -274,6 +274,8 @@ describe("Mutation.Bsda.duplicate", () => {
       "destinationOperationDate",
       "destinationOperationSignatureAuthor",
       "destinationOperationSignatureDate",
+      "destinationReceptionSignatureAuthor",
+      "destinationReceptionSignatureDate",
       "wasteSealNumbers",
       "packagings",
       "weightValue",

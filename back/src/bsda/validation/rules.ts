@@ -18,6 +18,7 @@ import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
 import { AllBsdaSignatureType } from "../types";
 import { v20250201 } from "../../common/validation";
+import { BsdaSignatureType } from "@td/codegen-back";
 
 // Liste des champs éditables sur l'objet Bsda
 export type BsdaEditableFields = Required<
@@ -31,6 +32,8 @@ export type BsdaEditableFields = Required<
     | "emitterEmissionSignatureDate"
     | "destinationOperationSignatureAuthor"
     | "destinationOperationSignatureDate"
+    | "destinationReceptionSignatureDate"
+    | "destinationReceptionSignatureAuthor"
     | "transporterTransportSignatureAuthor"
     | "transporterTransportSignatureDate"
     | "workerWorkSignatureAuthor"
@@ -73,7 +76,10 @@ type EditionRule<T extends ZodBsda | ZodBsdaTransporter> = {
   // permettant de calculer cette signature
   from: AllBsdaSignatureType | GetBsdaSignatureTypeFn<T>;
   // Condition supplémentaire à vérifier pour que le champ soit requis.
-  when?: (bsda: T) => boolean;
+  when?: (
+    bsvhu: T,
+    currentSignatureType: AllBsdaSignatureType | undefined
+  ) => boolean;
   customErrorMessage?: string;
 };
 
@@ -466,28 +472,28 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationReceptionDate: {
     readableFieldName: "La date de réception",
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" }
+    required: { from: "RECEPTION", when: isReceptionSignatureStep },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
   },
   destinationReceptionWeight: {
     readableFieldName: "Le poids du déchet",
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" }
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    required: { from: "RECEPTION" }
   },
   destinationReceptionRefusedWeight: {
     readableFieldName: "Le poids refusé",
     sealed: { from: "OPERATION" }
   },
   destinationReceptionAcceptationStatus: {
-    readableFieldName: "L'acceptation du déchet",
-    sealed: { from: "OPERATION" },
-    required: { from: "OPERATION" }
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    required: { from: "RECEPTION" },
+    readableFieldName: "L'acceptation du déchet"
   },
   destinationReceptionRefusalReason: {
     readableFieldName: "La raison du refus du déchet",
-    sealed: { from: "OPERATION" },
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     required: {
-      from: "OPERATION",
+      from: "RECEPTION",
       // le déchet est refusé ou partiellement refusé
       when: isRefusedOrPartiallyRefused
     }
@@ -880,6 +886,17 @@ function isNotRefused(bsda: ZodBsda) {
   );
 }
 
+function isReceptionSignatureStep(_, currentSignatureType: BsdaSignatureType) {
+  return currentSignatureType === "RECEPTION";
+}
+
+function isReceptionDataSealed(bsda: ZodBsda) {
+  return (
+    Boolean(bsda.destinationReceptionSignatureDate) ||
+    Boolean(bsda.destinationOperationSignatureDate)
+  );
+}
+
 /**
  * Cette fonction permet de vérifier qu'un utilisateur n'est pas
  * en train d'essayer de modifier des données qui ont été verrouillée
@@ -1041,7 +1058,8 @@ function isRuleApplied<T extends ZodBsda | ZodBsdaTransporter>(
   rule: EditionRule<T>,
   resource: T,
   signatures: AllBsdaSignatureType[],
-  context?: RuleContext<T>
+  context?: RuleContext<T>,
+  currentSignatureType?: AllBsdaSignatureType | undefined
 ) {
   const from =
     typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
@@ -1049,7 +1067,7 @@ function isRuleApplied<T extends ZodBsda | ZodBsdaTransporter>(
   const isApplied =
     from &&
     signatures.includes(from) &&
-    (rule.when === undefined || rule.when(resource));
+    (rule.when === undefined || rule.when(resource, currentSignatureType));
 
   return isApplied;
 }
@@ -1075,9 +1093,10 @@ function isBsdaTransporterFieldSealed(
 export function isBsdaFieldRequired(
   rule: EditionRule<ZodBsda>,
   bsda: ZodBsda,
-  signatures: AllBsdaSignatureType[]
+  signatures: AllBsdaSignatureType[],
+  currentSignatureType: AllBsdaSignatureType | undefined
 ) {
-  return isRuleApplied(rule, bsda, signatures);
+  return isRuleApplied(rule, bsda, signatures, undefined, currentSignatureType);
 }
 
 export function isBsdaTransporterFieldRequired(
