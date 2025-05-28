@@ -365,6 +365,12 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
     : { refresh: false };
 }
 
+/**
+ * Set optimistic concurrency control parameters if seqNo and primaryTerm are provided.
+ * This is used to ensure that the document is not modified by another process
+ * before the current operation completes.
+ * cf https://www.elastic.co/guide/en/elasticsearch/reference/8.18/optimistic-concurrency-control.html
+ */
 function optimisticConcurrency(ctx?: { seqNo?: number; primaryTerm?: number }) {
   return ctx?.seqNo && ctx?.primaryTerm
     ? {
