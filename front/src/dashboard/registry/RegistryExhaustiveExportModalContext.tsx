@@ -11,7 +11,9 @@ import {
 } from "@td/codegen-ui";
 import {
   GENERATE_REGISTRY_EXHAUSTIVE_EXPORT,
-  GET_REGISTRY_EXHAUSTIVE_EXPORTS
+  GENERATE_REGISTRY_EXHAUSTIVE_EXPORT_AS_ADMIN,
+  GET_REGISTRY_EXHAUSTIVE_EXPORTS,
+  GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN
 } from "./shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRegistryExport } from "./RegistryV2ExportContext";
@@ -69,28 +71,42 @@ const refinedSchema = exhaustiveValidationSchema.superRefine(
   }
 );
 
-const getDefaultValues = () => ({
-  companyOrgId: "all",
+const getDefaultValues = (asAdmin: boolean) => ({
+  companyOrgId: asAdmin ? "" : "all",
   startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
   format: RegistryExportFormat.Csv
 });
 
 export const RegistryExhaustiveExportModalProvider: React.FC<{
   children: React.ReactNode;
-}> = ({ children }) => {
+  asAdmin?: boolean;
+}> = ({ children, asAdmin = false }) => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { refetch: refetchExports } = useRegistryExport();
 
   const [generateExport, { loading: generateLoading }] = useMutation<
-    Pick<Mutation, "generateRegistryExhaustiveExport">,
+    Pick<
+      Mutation,
+      | "generateRegistryExhaustiveExport"
+      | "generateRegistryExhaustiveExportAsAdmin"
+    >,
     MutationGenerateRegistryExhaustiveExportArgs
-  >(GENERATE_REGISTRY_EXHAUSTIVE_EXPORT, {
-    refetchQueries: [GET_REGISTRY_EXHAUSTIVE_EXPORTS]
-  });
+  >(
+    asAdmin
+      ? GENERATE_REGISTRY_EXHAUSTIVE_EXPORT_AS_ADMIN
+      : GENERATE_REGISTRY_EXHAUSTIVE_EXPORT,
+    {
+      refetchQueries: [
+        asAdmin
+          ? GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN
+          : GET_REGISTRY_EXHAUSTIVE_EXPORTS
+      ]
+    }
+  );
 
   const methods = useForm<z.infer<typeof refinedSchema>>({
-    defaultValues: getDefaultValues(),
+    defaultValues: getDefaultValues(asAdmin),
     resolver: zodResolver(refinedSchema)
   });
   const {
@@ -101,10 +117,10 @@ export const RegistryExhaustiveExportModalProvider: React.FC<{
 
   const onClose = useCallback(() => {
     setError(null);
-    reset(getDefaultValues());
+    reset(getDefaultValues(asAdmin));
     setIsExportModalOpen(false);
     refetchExports();
-  }, [reset, refetchExports]);
+  }, [reset, refetchExports, asAdmin]);
 
   const onSubmit = useCallback(
     async (input: z.infer<typeof refinedSchema>) => {
@@ -150,7 +166,8 @@ export const RegistryExhaustiveExportModalProvider: React.FC<{
         isLoading,
         error,
         methods,
-        submit
+        submit,
+        asAdmin
       }}
     >
       {children}

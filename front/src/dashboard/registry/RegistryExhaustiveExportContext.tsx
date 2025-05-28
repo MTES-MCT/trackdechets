@@ -10,6 +10,7 @@ import {
 import {
   downloadFromSignedUrl,
   GET_REGISTRY_EXHAUSTIVE_EXPORTS,
+  GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN,
   REGISTRY_EXHAUSTIVE_EXPORT_DOWNLOAD_SIGNED_URL
 } from "./shared";
 import { RegistryExportContextType } from "./RegistryV2ExportContext";
@@ -20,8 +21,9 @@ export const RegistryExhaustiveExportContext =
   createContext<RegistryExportContextType | null>(null);
 
 export const RegistryExhaustiveExportProvider: React.FC<{
+  asAdmin?: boolean;
   children: React.ReactNode;
-}> = ({ children }) => {
+}> = ({ asAdmin = false, children }) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [downloadLoadingExportId, setDownloadLoadingExportId] = useState<
     string | null
@@ -33,15 +35,28 @@ export const RegistryExhaustiveExportProvider: React.FC<{
     refetch,
     startPolling,
     stopPolling
-  } = useQuery<Pick<Query, "registryExhaustiveExports">>(
-    GET_REGISTRY_EXHAUSTIVE_EXPORTS,
+  } = useQuery<
+    Pick<
+      Query,
+      "registryExhaustiveExports" | "registryExhaustiveExportsAsAdmin"
+    >
+  >(
+    asAdmin
+      ? GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN
+      : GET_REGISTRY_EXHAUSTIVE_EXPORTS,
     {
       variables: { first: PAGE_SIZE },
       fetchPolicy: "cache-and-network"
     }
   );
-  const registryExports = exportsData?.registryExhaustiveExports?.edges;
-  const totalCount = exportsData?.registryExhaustiveExports?.totalCount;
+  const registryExports =
+    exportsData?.[
+      asAdmin ? "registryExhaustiveExportsAsAdmin" : "registryExhaustiveExports"
+    ]?.edges;
+  const totalCount =
+    exportsData?.[
+      asAdmin ? "registryExhaustiveExportsAsAdmin" : "registryExhaustiveExports"
+    ]?.totalCount;
   const pageCount = totalCount ? Math.ceil(totalCount / PAGE_SIZE) : 0;
 
   const [getDownloadLink] = useLazyQuery<

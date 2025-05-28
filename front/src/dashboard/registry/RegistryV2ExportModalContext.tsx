@@ -25,7 +25,10 @@ import {
 import {
   GENERATE_REGISTRY_V2_EXPORT,
   GET_REGISTRY_V2_EXPORTS,
-  GET_MY_COMPANIES
+  GET_MY_COMPANIES,
+  GENERATE_REGISTRY_V2_EXPORT_AS_ADMIN,
+  GET_REGISTRY_V2_EXPORTS_AS_ADMIN,
+  SEARCH_COMPANIES
 } from "./shared";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { REGISTRY_DELEGATIONS } from "../../Apps/common/queries/registryDelegation/queries";
@@ -43,6 +46,7 @@ export type BaseRegistryExportModalContext = {
   error: string | null;
   submit: () => void;
   methods: UseFormReturn<any>;
+  asAdmin: boolean;
 };
 
 export type RegistryExportModalContextType =
@@ -106,59 +110,6 @@ const refinedSchema = validationSchema.superRefine(
     }
   }
 );
-// .object({
-//   companyOrgId: z.string({ required_error: "Ce champ est requis" }),
-//   isDelegation: z.boolean(),
-//   delegateSiret: z.string().nullable(),
-//   startDate: z.coerce
-//     .date({
-//       required_error: "La date de début est requise",
-//       invalid_type_error: "La date de début est invalide"
-//     })
-//     .max(new Date(), {
-//       message: "La date de début ne peut pas être dans le futur"
-//     })
-//     .transform(val => val.toISOString()),
-//   // Date & "" hack: https://github.com/colinhacks/zod/issues/1721
-//   endDate: z.preprocess(
-//     arg => (arg === "" ? null : arg),
-//     z.coerce
-//       .date({
-//         invalid_type_error: "La date de fin est invalide"
-//       })
-//       .max(new Date(), {
-//         message: "La date de fin ne peut pas être dans le futur"
-//       })
-//       .transform(val => {
-//         if (val) return val.toISOString();
-//         return val;
-//       })
-//       .nullish()
-//   ),
-//   registryType: z.nativeEnum(RegistryV2ExportType),
-//   format: z.nativeEnum(RegistryExportFormat),
-//   declarationType: z.nativeEnum(DeclarationType),
-//   wasteTypes: z.nativeEnum(RegistryV2ExportWasteType).array().nonempty({
-//     message: "Veullez sélectionner au moins un type de déchet"
-//   }),
-//   wasteCodes: z.string().array()
-// })
-// .superRefine(({ startDate, endDate }, ctx) => {
-//   if (startDate && endDate) {
-//     if (new Date(startDate) > new Date(endDate)) {
-//       ctx.addIssue({
-//         code: z.ZodIssueCode.custom,
-//         path: ["startDate"],
-//         message: "La date de début doit être avant la date de fin."
-//       });
-//       ctx.addIssue({
-//         code: z.ZodIssueCode.custom,
-//         path: ["endDate"],
-//         message: "La date de début doit être avant la date de fin."
-//       });
-//     }
-//   }
-// });
 
 const getDefaultsForRegistryType = (
   registryType: RegistryV2ExportType
@@ -202,8 +153,8 @@ const getDefaultsForRegistryType = (
   };
 };
 
-const getDefaultValues = () => ({
-  companyOrgId: "all",
+const getDefaultValues = (asAdmin: boolean) => ({
+  companyOrgId: asAdmin ? "" : "all",
   isDelegation: false,
   delegateSiret: null,
   startDate: format(startOfYear(new Date()), "yyyy-MM-dd"),
@@ -220,24 +171,35 @@ const getDefaultValues = () => ({
 
 export const RegistryV2ExportModalProvider: React.FC<{
   children: React.ReactNode;
-}> = ({ children }) => {
+  asAdmin?: boolean;
+}> = ({ children, asAdmin = false }) => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { refetch: refetchExports } = useRegistryExport();
 
   const [generateExport, { loading: generateLoading }] = useMutation<
-    Pick<Mutation, "generateRegistryV2Export">,
+    Pick<
+      Mutation,
+      "generateRegistryV2Export" | "generateRegistryV2ExportAsAdmin"
+    >,
     Omit<MutationGenerateRegistryV2ExportArgs, "where"> & {
       declarationType: DeclarationType;
       wasteTypes: RegistryV2ExportWasteType[] | null;
       wasteCodes: string[] | null;
     }
-  >(GENERATE_REGISTRY_V2_EXPORT, {
-    refetchQueries: [GET_REGISTRY_V2_EXPORTS]
-  });
+  >(
+    asAdmin
+      ? GENERATE_REGISTRY_V2_EXPORT_AS_ADMIN
+      : GENERATE_REGISTRY_V2_EXPORT,
+    {
+      refetchQueries: [
+        asAdmin ? GET_REGISTRY_V2_EXPORTS_AS_ADMIN : GET_REGISTRY_V2_EXPORTS
+      ]
+    }
+  );
 
   const methods = useForm<z.infer<typeof refinedSchema>>({
-    defaultValues: getDefaultValues(),
+    defaultValues: getDefaultValues(asAdmin),
     resolver: zodResolver(refinedSchema)
   });
   const {
@@ -273,16 +235,26 @@ export const RegistryV2ExportModalProvider: React.FC<{
     variables: {
       search: companyOrgId
     },
-    skip: isDelegation,
+    skip: isDelegation || asAdmin,
+    fetchPolicy: "network-only"
+  });
+
+  const { data: searchCompaniesData, error: searchCompaniesError } = useQuery<
+    Pick<Query, "searchCompanies">
+  >(SEARCH_COMPANIES, {
+    variables: {
+      clue: companyOrgId
+    },
+    skip: !asAdmin,
     fetchPolicy: "network-only"
   });
 
   const onClose = useCallback(() => {
     setError(null);
-    reset(getDefaultValues());
+    reset(getDefaultValues(asAdmin));
     setIsExportModalOpen(false);
     refetchExports();
-  }, [reset, refetchExports]);
+  }, [reset, refetchExports, asAdmin]);
 
   // get a list of possible export types for the selected company (or all companies) to grey out
   // the export types that are impossible
@@ -296,13 +268,15 @@ export const RegistryV2ExportModalProvider: React.FC<{
         RegistryV2ExportType.Ssd
       ];
     }
-    const companies = isDelegation
+    const companies = asAdmin
+      ? searchCompaniesData?.searchCompanies
+      : isDelegation
       ? registryDelegationsData?.registryDelegations.edges.map(
           d => d.node.delegator
         )
       : companiesData?.myCompanies.edges.map(c => c.node);
     const selectedCompany = companies?.find(c => c.orgId === companyOrgId);
-    if (!selectedCompany) {
+    if (!selectedCompany || !selectedCompany.companyTypes) {
       return [
         RegistryV2ExportType.Outgoing,
         RegistryV2ExportType.Incoming,
@@ -355,7 +329,14 @@ export const RegistryV2ExportModalProvider: React.FC<{
     }
     exportTypes.push(RegistryV2ExportType.Ssd);
     return exportTypes;
-  }, [companyOrgId, isDelegation, companiesData, registryDelegationsData]);
+  }, [
+    companyOrgId,
+    isDelegation,
+    companiesData,
+    registryDelegationsData,
+    searchCompaniesData,
+    asAdmin
+  ]);
 
   // if the registry type is not in the possible export types, set the first possible export type
   useEffect(() => {
@@ -466,11 +447,15 @@ export const RegistryV2ExportModalProvider: React.FC<{
         registryDelegationsData,
         registryDelegationsLoading,
         isLoading,
-        companiesError: registryDelegationsError || registryCompaniesError,
+        companiesError:
+          registryDelegationsError ||
+          registryCompaniesError ||
+          searchCompaniesError,
         error,
         methods,
         submit,
-        possibleExportTypes
+        possibleExportTypes,
+        asAdmin: !!asAdmin
       }}
     >
       {children}

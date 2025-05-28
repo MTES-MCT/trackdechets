@@ -862,6 +862,7 @@ model RegistryExport {
     createdAt   DateTime             @default(now()) @db.Timestamptz(6)
     updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
     createdById String
+    asAdmin     Boolean              @default(false)
     status      RegistryExportStatus @default(PENDING)
     s3FileKey   String?
 
@@ -891,6 +892,7 @@ model RegistryExhaustiveExport {
     createdAt   DateTime             @default(now()) @db.Timestamptz(6)
     updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
     createdById String
+    asAdmin     Boolean              @default(false)
     status      RegistryExportStatus @default(PENDING)
     s3FileKey   String?
 

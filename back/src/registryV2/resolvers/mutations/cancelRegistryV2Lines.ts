@@ -9,7 +9,6 @@ import {
   importOptions,
   saveCompaniesChanges
 } from "@td/registry";
-import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getUserCompanies } from "../../../users/database";
@@ -24,8 +23,6 @@ export async function cancelRegistryV2Lines(
   { publicIds, siret, delegateSiret, type }: MutationCancelRegistryV2LinesArgs,
   context: GraphQLContext
 ): Promise<CancelRegistryV2LineResponse> {
-  // Browser only
-  applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const userCompanies = await getUserCompanies(user.id);
 

@@ -3,13 +3,13 @@ import { addToSsdRegistry } from "./mutations/addToSsdRegistry";
 import { addToIncomingWasteRegistry } from "./mutations/addToIncomingWasteRegistry";
 import { addToIncomingTexsRegistry } from "./mutations/addToIncomingTexsRegistry";
 import { importFile } from "./mutations/importFile";
-import { generateRegistryV2Export } from "./mutations/generateRegistryV2Export";
+import { getGenerateRegistryV2Export } from "./mutations/generateRegistryV2Export";
 import { addToOutgoingTexsRegistry } from "./mutations/addToOutgoingTexsRegistry";
 import { addToOutgoingWasteRegistry } from "./mutations/addToOutgoingWasteRegistry";
 import { addToTransportedRegistry } from "./mutations/addToTransportedRegistry";
 import { addToManagedRegistry } from "./mutations/addToManagedRegistry";
 import { cancelRegistryV2Lines } from "./mutations/cancelRegistryV2Lines";
-import { generateRegistryExhaustiveExport } from "./mutations/generateRegistryExhaustiveExport";
+import { getGenerateRegistryExhaustiveExport } from "./mutations/generateRegistryExhaustiveExport";
 
 export const Mutation: MutationResolvers = {
   importFile: importFile as any,
@@ -21,6 +21,16 @@ export const Mutation: MutationResolvers = {
   addToTransportedRegistry,
   addToManagedRegistry,
   cancelRegistryV2Lines,
-  generateRegistryV2Export: generateRegistryV2Export as any,
-  generateRegistryExhaustiveExport: generateRegistryExhaustiveExport as any
+  generateRegistryV2Export: getGenerateRegistryV2Export({
+    asAdmin: false
+  }) as any,
+  generateRegistryV2ExportAsAdmin: getGenerateRegistryV2Export({
+    asAdmin: true
+  }) as any,
+  generateRegistryExhaustiveExport: getGenerateRegistryExhaustiveExport({
+    asAdmin: false
+  }) as any,
+  generateRegistryExhaustiveExportAsAdmin: getGenerateRegistryExhaustiveExport({
+    asAdmin: true
+  }) as any
 };

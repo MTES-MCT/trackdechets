@@ -24,6 +24,7 @@ import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { getDeclarationTypeWording, getRegistryTypeWording } from "./MyExports";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
+import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 
 const displayError = (
   error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
@@ -107,7 +108,8 @@ export function ExportModal() {
     submit,
     registryDelegationsData,
     registryDelegationsLoading,
-    possibleExportTypes
+    possibleExportTypes,
+    asAdmin
   } = useRegistryExportModal();
   const {
     register,
@@ -117,6 +119,7 @@ export function ExportModal() {
   } = methods;
 
   const dateButtons = getDateButtons();
+  const selectedCompanyOrgId = watch("companyOrgId");
   const isDelegation = type === "registryV2" ? watch("isDelegation") : false;
   const registryType = type === "registryV2" ? watch("registryType") : null;
   const startDate = watch("startDate");
@@ -134,18 +137,37 @@ export function ExportModal() {
       ) : (
         <form onSubmit={submit}>
           <div className="fr-mb-8v">
-            <RegistryCompanySwitcher
-              onCompanySelect={(orgId, isDelegation) => {
-                setValue("companyOrgId", orgId);
-                setValue("isDelegation", isDelegation);
-                setValue("delegateSiret", null);
-              }}
-              wrapperClassName={"tw-relative"}
-              allOption={{
-                key: "all",
-                name: "Tous les établissements"
-              }}
-            />
+            {asAdmin ? (
+              <CompanySelectorWrapper
+                selectedCompanyOrgId={selectedCompanyOrgId}
+                selectedCompanyError={companiesError}
+                allowForeignCompanies={true}
+                allowClosedCompanies={true}
+                onCompanySelected={company => {
+                  if (company) {
+                    if (company.orgId === selectedCompanyOrgId) {
+                      return;
+                    }
+                    setValue("companyOrgId", company.orgId);
+                    setValue("isDelegation", false);
+                    setValue("delegateSiret", null);
+                  }
+                }}
+              />
+            ) : (
+              <RegistryCompanySwitcher
+                onCompanySelect={(orgId, isDelegation) => {
+                  setValue("companyOrgId", orgId);
+                  setValue("isDelegation", isDelegation);
+                  setValue("delegateSiret", null);
+                }}
+                wrapperClassName={"tw-relative"}
+                allOption={{
+                  key: "all",
+                  name: "Tous les établissements"
+                }}
+              />
+            )}
             {type === "registryV2" && isDelegation ? (
               registryDelegationsLoading ? (
                 <div className="fr-mt-2v">

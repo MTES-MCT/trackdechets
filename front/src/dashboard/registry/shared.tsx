@@ -232,6 +232,33 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
   ${registryV2ExportFragment}
 `;
 
+export const GENERATE_REGISTRY_V2_EXPORT_AS_ADMIN = gql`
+  mutation GenerateRegistryV2ExportAsAdmin(
+    $registryType: RegistryV2ExportType!
+    $format: RegistryExportFormat!
+    $siret: String!
+    $dateRange: DateFilter!
+    $declarationType: DeclarationType
+    $wasteTypes: [RegistryV2ExportWasteType!]
+    $wasteCodes: [String!]
+  ) {
+    generateRegistryV2ExportAsAdmin(
+      dateRange: $dateRange
+      format: $format
+      registryType: $registryType
+      siret: $siret
+      where: {
+        declarationType: { _eq: $declarationType }
+        wasteType: { _in: $wasteTypes }
+        wasteCode: { _in: $wasteCodes }
+      }
+    ) {
+      ...RegistryV2ExportFragment
+    }
+  }
+  ${registryV2ExportFragment}
+`;
+
 export const GET_REGISTRY_V2_EXPORTS = gql`
   query RegistryV2Exports($first: Int = 20, $skip: Int = 0) {
     registryV2Exports(first: $first, skip: $skip) {
@@ -246,10 +273,15 @@ export const GET_REGISTRY_V2_EXPORTS = gql`
   ${registryV2ExportFragment}
 `;
 
-export const GET_REGISTRY_V2_EXPORT = gql`
-  query RegistryV2Export($id: ID!) {
-    registryV2Export(id: $id) {
-      ...RegistryV2ExportFragment
+export const GET_REGISTRY_V2_EXPORTS_AS_ADMIN = gql`
+  query RegistryV2ExportsAsAdmin($first: Int = 20, $skip: Int = 0) {
+    registryV2ExportsAsAdmin(first: $first, skip: $skip) {
+      edges {
+        node {
+          ...RegistryV2ExportFragment
+        }
+      }
+      totalCount
     }
   }
   ${registryV2ExportFragment}
@@ -296,9 +328,40 @@ export const GENERATE_REGISTRY_EXHAUSTIVE_EXPORT = gql`
   ${registryExhaustiveExportFragment}
 `;
 
+export const GENERATE_REGISTRY_EXHAUSTIVE_EXPORT_AS_ADMIN = gql`
+  mutation GenerateRegistryExhaustiveExportAsAdmin(
+    $format: RegistryExportFormat!
+    $siret: String!
+    $dateRange: DateFilter!
+  ) {
+    generateRegistryExhaustiveExportAsAdmin(
+      dateRange: $dateRange
+      format: $format
+      siret: $siret
+    ) {
+      ...RegistryExhaustiveExportFragment
+    }
+  }
+  ${registryExhaustiveExportFragment}
+`;
+
 export const GET_REGISTRY_EXHAUSTIVE_EXPORTS = gql`
   query RegistryExhaustiveExports($first: Int = 20, $skip: Int = 0) {
     registryExhaustiveExports(first: $first, skip: $skip) {
+      edges {
+        node {
+          ...RegistryExhaustiveExportFragment
+        }
+      }
+      totalCount
+    }
+  }
+  ${registryExhaustiveExportFragment}
+`;
+
+export const GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN = gql`
+  query RegistryExhaustiveExportsAsAdmin($first: Int = 20, $skip: Int = 0) {
+    registryExhaustiveExportsAsAdmin(first: $first, skip: $skip) {
       edges {
         node {
           ...RegistryExhaustiveExportFragment
@@ -320,7 +383,7 @@ export const REGISTRY_EXHAUSTIVE_EXPORT_DOWNLOAD_SIGNED_URL = gql`
 `;
 
 export const GET_MY_COMPANIES = gql`
-  query MyCompaniesWithDelegators($first: Int, $after: ID, $search: String) {
+  query MyCompaniesForRegistryExport($first: Int, $after: ID, $search: String) {
     myCompanies(first: $first, after: $after, search: $search) {
       edges {
         node {
@@ -332,6 +395,17 @@ export const GET_MY_COMPANIES = gql`
           companyTypes
         }
       }
+    }
+  }
+`;
+
+export const SEARCH_COMPANIES = gql`
+  query SearchCompaniesForAdminRegistryExport($clue: String!) {
+    searchCompanies(clue: $clue) {
+      name
+      orgId
+      siret
+      companyTypes
     }
   }
 `;
