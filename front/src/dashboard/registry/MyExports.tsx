@@ -280,13 +280,13 @@ export function MyExports() {
               <RegistryTable
                 data={tableData}
                 headers={[
-                "Date",
-                "Établissements",
-                ...(type === "registryV2"
-                  ? ["Type de registre", "Type de déclaration"]
-                  : []),
-                "Période",
-                "Fichier"
+                  "Date",
+                  "Établissements",
+                  ...(type === "registryV2"
+                    ? ["Type de registre", "Type de déclaration"]
+                    : []),
+                  "Période",
+                  "Fichier"
                 ]}
               />
             ) : (
