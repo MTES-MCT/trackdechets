@@ -51,12 +51,7 @@ export function FormBuilder({
   const readOnly = queryParams.get("readonly") === "1";
   const navigate = useNavigate();
   const { errors } = methods.formState;
-  const shapeWithState = getTabsWithState(
-    shape,
-    errors,
-    disabledFieldNames,
-    readOnly
-  );
+  const shapeWithState = getTabsWithState(shape, errors, disabledFieldNames);
   console.log(shapeWithState);
   const tabIds = shape.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
