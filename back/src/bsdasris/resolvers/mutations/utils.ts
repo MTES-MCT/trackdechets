@@ -4,6 +4,10 @@ import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import type { CompanyInput } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
+import {
+  BsdasriPackagingSchema,
+  ZodBsdasriPackagingEnum
+} from "../../validation/schema";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
@@ -165,18 +169,18 @@ export const aggregatePackagings = (
     Bsdasri,
     "id" | "transporterWasteVolume" | "transporterWastePackagings"
   >[]
-) => {
+): BsdasriPackagingSchema[] => {
   const packagingsArray = dasrisToAssociate.map(dasri =>
     Array.isArray(dasri.transporterWastePackagings)
       ? <dbPackaging[]>dasri.transporterWastePackagings
       : []
   );
 
-  return packagingsArray.reduce((prev, cur) => {
+  const res = packagingsArray.reduce((prev, cur) => {
     for (const packaging of cur) {
       const found = prev.find(
         item =>
-          item.type === packaging.type &&
+          item.type === (packaging.type as ZodBsdasriPackagingEnum) &&
           item.other === packaging.other &&
           item.volume === packaging.volume
       );
@@ -188,4 +192,6 @@ export const aggregatePackagings = (
     }
     return prev;
   }, []);
+
+  return res as BsdasriPackagingSchema[];
 };

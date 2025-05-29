@@ -13,6 +13,10 @@ import type { Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { ErrorCode } from "../../../../common/errors";
+import { sirenify } from "../../../sirenify";
+
+jest.mock("../../../sirenify");
+(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -26,10 +30,13 @@ const CREATE_DASRI = gql`
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
+    (sirenify as jest.Mock).mockClear();
   });
 
   it("should build a synthesis dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "el transporteur",
+      address: "playa del mar",
       companyTypes: {
         set: ["COLLECTOR", "TRANSPORTER"]
       }
@@ -116,12 +123,13 @@ describe("Mutation.createDasri", () => {
       { type: "FUT", volume: 100, quantity: 3 }
     ];
     const totalVolume = 100 + 30;
+
     // transporter company fields are recorded on emitter too
     expect(created.type).toEqual("SYNTHESIS");
-    expect(created.emitterCompanyName).toEqual("le transporteur");
+    expect(created.emitterCompanyName).toEqual("el transporteur");
     expect(created.emitterCompanySiret).toEqual(company.siret);
     expect(created.emitterCompanyContact).toEqual("jean durand");
-    expect(created.emitterCompanyAddress).toEqual("avenue de la mer");
+    expect(created.emitterCompanyAddress).toEqual("playa del mar");
     expect(created.emitterCompanyPhone).toEqual("06 18 76 02 00");
     expect(created.emitterCompanyMail).toEqual("transporteur@test.fr");
     // packagins and volume are computed
@@ -259,8 +267,6 @@ describe("Mutation.createDasri", () => {
       synthesizing: [toAssociate1.id]
     };
 
-    console.log("Before GQL request");
-
     // When
     const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
@@ -271,9 +277,6 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-
-    console.log("GQL request gone");
-    console.log("errors", errors);
 
     // Then
     expect(errors).toBeUndefined();

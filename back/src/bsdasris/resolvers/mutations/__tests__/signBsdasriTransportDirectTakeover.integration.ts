@@ -64,14 +64,19 @@ describe("Mutation.signBsdasri transport", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER", {
       allowBsdasriTakeOverWithoutSignature: true // company allow takeover without signature
     });
-
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
     const groupingDasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+
         ...readyToTakeOverData(transporterCompany),
+
         status: BsdasriStatus.INITIAL,
         type: "GROUPING"
       }
@@ -120,23 +125,28 @@ describe("Mutation.signBsdasri transport", () => {
         input: { type: "TRANSPORT", author: "Jimmy" }
       }
     });
+
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "La mention ADR est obligatoire."
+        message: "Le code adr est un champ requis."
       })
     ]);
   });
 
   it("should not put transport signature on an INITIAL dasri if not allowed by emitter company", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER"); // company forbid takeover without signature
-
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
     let dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
+
         status: BsdasriStatus.INITIAL
       }
     });

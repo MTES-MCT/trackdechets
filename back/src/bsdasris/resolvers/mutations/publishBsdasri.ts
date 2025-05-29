@@ -1,10 +1,11 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
-import { getBsdasriOrNotFound } from "../../database";
+import { getFullBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
-import { validateBsdasri } from "../../validation";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanUpdate, checkIsBsdasriPublishable } from "../../permissions";
+import { parseBsdasriAsync } from "../../validation";
+import { prismaToZodBsdasri } from "../../validation/helpers";
 
 const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   _,
@@ -13,24 +14,33 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const { grouping, synthesizing, ...bsdasri } = await getBsdasriOrNotFound({
-    id,
-    includeAssociated: true
+  const existingBsdasri = await getFullBsdasriOrNotFound(id, {
+    include: {
+      grouping: true,
+      synthesizing: true
+    }
   });
-  await checkCanUpdate(user, bsdasri);
+
+  await checkCanUpdate(user, existingBsdasri);
 
   await checkIsBsdasriPublishable(
-    bsdasri,
-    grouping.map(el => el.id)
+    existingBsdasri,
+    existingBsdasri.grouping.map(el => el.id)
   );
 
-  await validateBsdasri(bsdasri as any, { emissionSignature: true });
+  await parseBsdasriAsync(
+    { ...prismaToZodBsdasri(existingBsdasri) },
+    {
+      user,
+      currentSignatureType: "EMISSION"
+    }
+  );
 
   const bsdasriRepository = getBsdasriRepository(user);
 
   // publish  dasri
   const publishedBsdasri = await bsdasriRepository.update(
-    { id: bsdasri.id },
+    { id: existingBsdasri.id },
     { isDraft: false }
   );
 

@@ -198,7 +198,10 @@ describe("Mutation.signBsdasri transport", () => {
         ...readyToTakeOverData(transporterCompany),
         emitterEmissionSignatureDate: new Date(),
         emitterEmissionSignatureAuthor: "Producteur",
-        status: BsdasriStatus.SIGNED_BY_PRODUCER
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null
       }
     });
     const { mutate } = makeClient(transporter); // transporter
@@ -209,17 +212,17 @@ describe("Mutation.signBsdasri transport", () => {
         input: { type: "TRANSPORT", author: "Jimmy" }
       }
     });
+
     expect(errors[0].message).toMatch(
-      "Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+      "Le numéro de récépissé du transporteur est un champ requis. L'établissement doit renseigner son récépissé dans Trackdéchets"
     );
     expect(errors[0].message).toMatch(
-      "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+      "Le département de récépissé du transporteur est un champ requis. L'établissement doit renseigner son récépissé dans Trackdéchets"
     );
     expect(errors[0].message).toMatch(
-      "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+      "La date de validité du récépissé du transporteur est un champ requis. L'établissement doit renseigner son récépissé dans Trackdéchets"
     );
   });
-
   it("should mark a dasri as refused when transporter acceptation is refused", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
@@ -330,7 +333,9 @@ describe("Mutation.signBsdasri transport", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+      expect(errors[0].message).toBe(
+        "Le mode de transport est un champ requis."
+      );
     });
 
     it("should work if transport mode is in initial BSD", async () => {
@@ -379,7 +384,9 @@ describe("Mutation.signBsdasri transport", () => {
 
       // Then
       expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Le mode de transport est obligatoire.");
+      expect(errors[0].message).toBe(
+        "Le mode de transport est un champ requis."
+      );
     });
 
     it("transport mode is not required for synthesis DASRI", async () => {

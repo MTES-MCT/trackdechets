@@ -81,6 +81,7 @@ describe("Mutation.createDasri", () => {
       })
     ]);
   });
+
   it("denies dasri creation if data does not validate", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const input = {
@@ -119,17 +120,31 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Le code déchet est obligatoire\n" +
-          "Émetteur: Le contact dans l'entreprise est obligatoire",
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          extensions: expect.objectContaining({
+            code: "BAD_USER_INPUT",
+            issues: expect.arrayContaining([
+              expect.objectContaining({
+                code: "custom",
+                message:
+                  "La personne à contacter chez l'émetteur est un champ requis.",
+                path: expect.arrayContaining(["emitter", "company", "contact"])
+              }),
+              expect.objectContaining({
+                code: "custom",
+                message: "Le code déchet est un champ requis.",
+                path: expect.arrayContaining(["waste", "code"])
+              })
+            ])
+          })
         })
-      })
-    ]);
+      ])
+    );
   });
+
   it("create a dasri with an emitter and a recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -137,7 +152,6 @@ describe("Mutation.createDasri", () => {
       waste: { adr: "xyz 33", code: "18 01 03*" },
       emitter: {
         company: {
-          name: "hopital blanc",
           siret: company.siret,
           contact: "jean durand",
           phone: "06 18 76 02 00",
@@ -179,8 +193,106 @@ describe("Mutation.createDasri", () => {
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
     expect(created.groupingEmitterSirets).toEqual([]);
-    // check input is sirenified
-    expect(sirenify).toHaveBeenCalledTimes(1);
+    expect(created.emitterCompanyName).toEqual(company.name);
+    expect(created.emitterCompanyAddress).toEqual(company.address);
+  });
+
+  it("packagings needs a positive quantity", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 0
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo())
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "La quantité doit être un nombre positif",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("packagings needs a positive volume", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 0,
+              quantity: 1
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo())
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le volume doit être un nombre positif",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
   });
 
   it("create a dasri with a default transport mode", async () => {
@@ -254,6 +366,8 @@ describe("Mutation.createDasri", () => {
       companyTypes: ["TRANSPORTER"]
     });
     await transporterReceiptFactory({
+      number: "my recepisse",
+      department: "31",
       company: transporter
     });
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -314,9 +428,9 @@ describe("Mutation.createDasri", () => {
       }
     );
     expect(data.createBsdasri.transporter!.recepisse!.number).toEqual(
-      "the number"
+      "my recepisse"
     );
-    expect(data.createBsdasri.transporter!.recepisse!.department).toEqual("83");
+    expect(data.createBsdasri.transporter!.recepisse!.department).toEqual("31");
     expect(data.createBsdasri.transporter!.recepisse!.validityLimit).toEqual(
       "2055-01-01T00:00:00.000Z"
     );
@@ -405,10 +519,10 @@ describe("Mutation.createDasri validation scenarii", () => {
       waste: { adr: "xyz 33", code: "18 01 03*" },
       emitter: {
         company: {
-          mail: "emitter@test.fr",
           name: "hopital blanc",
+          mail: "emitter@test.fr",
+          contact: "-",
           siret: company.siret,
-          contact: "jean durand",
           phone: "06 18 76 02 00",
           address: "avenue de la mer"
         },
@@ -440,13 +554,14 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets émis",
+          "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets émis.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
       })
     ]);
   });
+
   it("Emitter weight value is required when isEstimate is provided", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const input = {
@@ -484,16 +599,30 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée",
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          extensions: expect.objectContaining({
+            code: "BAD_USER_INPUT",
+            issues: expect.arrayContaining([
+              expect.objectContaining({
+                code: "custom",
+                message:
+                  "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée.",
+                path: expect.arrayContaining([
+                  "emitter",
+                  "emission",
+                  "weight",
+                  "isEstimate"
+                ])
+              })
+            ])
+          })
         })
-      })
-    ]);
+      ])
+    );
   });
+
   it("create a dasri without emission weight", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -661,10 +790,11 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
+
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée",
+          "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -877,7 +1007,7 @@ describe("Mutation.createDasri validation scenarii", () => {
     ]);
   });
 
-  it("should fail creating the form if plate humbers are invalid", async () => {
+  it("should fail creating the form if plate numbers are invalid", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory();
 
@@ -915,7 +1045,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           address: "avenue de la mer"
         },
         transport: {
-          plates: ["AB"],
+          plates: ["AB"], // invalid plate number
           weight: { value: 22, isEstimate: false },
           packagings: [
             {

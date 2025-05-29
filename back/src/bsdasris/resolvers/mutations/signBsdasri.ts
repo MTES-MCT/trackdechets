@@ -14,12 +14,11 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsdasriOrNotFound } from "../../database";
+import { getFullBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { checkCanEditBsdasri } from "../../permissions";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { FullDbBsdasri } from "../../types";
-import { validateBsdasri } from "../../validation";
 import { getNextStatus } from "../../workflow/dasriTransition";
 import {
   Permission,
@@ -33,6 +32,8 @@ import { BsdasriRepository, getBsdasriRepository } from "../../repository";
 import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { operationHook } from "../../operationHook";
+import { prismaToZodBsdasri } from "../../validation/helpers";
+import { parseBsdasriAsync } from "../../validation";
 
 const signBsdasri: MutationResolvers["signBsdasri"] = async (
   _,
@@ -40,14 +41,27 @@ const signBsdasri: MutationResolvers["signBsdasri"] = async (
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
-  const existingBsdasri = await getBsdasriOrNotFound({
-    id,
-    includeAssociated: true
+  const existingBsdasri = await getFullBsdasriOrNotFound(id, {
+    include: {
+      grouping: true,
+      synthesizing: true
+    }
   });
   checkCanEditBsdasri(existingBsdasri);
 
   const authorizedOrgIds = getAuthorizedOrgIds(existingBsdasri, input.type);
   await checkCanSignFor(user, input.type, authorizedOrgIds);
+
+  const zodBsdasri = prismaToZodBsdasri(existingBsdasri);
+
+  // Check that all necessary fields are filled
+  await parseBsdasriAsync(
+    { ...zodBsdasri },
+    {
+      user,
+      currentSignatureType: input.type
+    }
+  );
 
   const sign = signatures[input.type];
   const signedBsdasri = await sign(user, existingBsdasri, input);
@@ -130,8 +144,6 @@ export async function signEmission(
     );
   }
 
-  await validateBsdasri(bsdasri as any, { emissionSignature: true });
-
   // 'signatureAuthor' can be used in signBsdasriEmissionWithSecretCode to
   // specify that a signature with secret code is made on behalf of the eco-organisme
   let emittedByEcoOrganisme = input.signatureAuthor === "ECO_ORGANISME";
@@ -213,17 +225,6 @@ async function signTransport(
 
   const transporterReceipt = await getTransporterReceipt(bsdasri);
 
-  await validateBsdasri(
-    {
-      ...(bsdasri as any),
-      ...transporterReceipt
-    },
-    {
-      emissionSignature: true,
-      transportSignature: true
-    }
-  );
-
   const updateInput: Prisma.BsdasriUpdateInput = {
     transporterTransportSignatureAuthor: input.author,
     transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
@@ -256,8 +257,6 @@ async function signReception(
   bsdasri: FullDbBsdasri,
   input: BsdasriSignatureInput
 ) {
-  await validateBsdasri(bsdasri as any, { receptionSignature: true });
-
   const updateInput: Prisma.BsdasriUpdateInput = {
     destinationReceptionSignatureAuthor: input.author,
     destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
@@ -289,8 +288,6 @@ async function signOperation(
   bsdasri: FullDbBsdasri,
   input: BsdasriSignatureInput
 ) {
-  await validateBsdasri(bsdasri as any, { operationSignature: true });
-
   const updateInput: Prisma.BsdasriUpdateInput = {
     destinationOperationSignatureAuthor: input.author,
     destinationOperationSignatureDate: new Date(input.date ?? Date.now()),
