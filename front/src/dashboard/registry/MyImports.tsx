@@ -100,7 +100,12 @@ export function MyImports() {
       importData.node.associations
         .map(
           association =>
-            `${association.reportedFor.name} - ${association.reportedFor.siret}`
+            `${
+              association.reportedFor.givenName &&
+              association.reportedFor.givenName !== ""
+                ? association.reportedFor.givenName
+                : association.reportedFor.name
+            } - ${association.reportedFor.siret}`
         )
         .slice(0, 3)
         .concat(

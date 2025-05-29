@@ -37,10 +37,12 @@ export const GET_REGISTRY_IMPORTS = gql`
           }
           associations {
             reportedFor {
-              siret
+              givenName
               name
+              siret
             }
             reportedAs {
+              givenName
               siret
               name
             }
@@ -85,6 +87,18 @@ export const GET_REGISTRY_LOOKUPS = gql`
           reportAsSiret
           date
           wasteCode
+          reportFor {
+            givenName
+            name
+            siret
+            userPermissions
+          }
+          reportAs {
+            givenName
+            name
+            siret
+            userPermissions
+          }
         }
         cursor
       }

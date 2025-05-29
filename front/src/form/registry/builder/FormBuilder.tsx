@@ -4,7 +4,7 @@ import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { RegistryImportType, RegistryLineReason } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { type UseFormReturn, FormProvider } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
 import { getTabsWithState } from "./error";
@@ -46,9 +46,18 @@ export function FormBuilder({
   disabledFieldNames
 }: Props) {
   const [selectedTabId, setSelectedTabId] = useState<string>(shape[0].tabId);
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+  const readOnly = queryParams.get("readonly") === "1";
   const navigate = useNavigate();
   const { errors } = methods.formState;
-  const shapeWithState = getTabsWithState(shape, errors, disabledFieldNames);
+  const shapeWithState = getTabsWithState(
+    shape,
+    errors,
+    disabledFieldNames,
+    readOnly
+  );
+  console.log(shapeWithState);
   const tabIds = shape.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -76,10 +85,10 @@ export function FormBuilder({
   return (
     <div id="formBuilder" className="registryFormBuilder">
       <h3 className="fr-h3 fr-mb-1v">
-        {reason === RegistryLineReason.Edit
+        {readOnly
+          ? "Afficher "
+          : reason === RegistryLineReason.Edit
           ? "Modifier "
-          : reason === RegistryLineReason.Cancel
-          ? "Annuler "
           : "Créer "}
         une déclaration
       </h3>
@@ -154,13 +163,15 @@ export function FormBuilder({
                       Fermer
                     </Button>
 
-                    <Button type="submit" disabled={loading}>
-                      {reason === RegistryLineReason.Edit
-                        ? "Modifier la déclaration"
-                        : reason === RegistryLineReason.Cancel
-                        ? "Annuler la déclaration"
-                        : "Créer la déclaration"}
-                    </Button>
+                    {!readOnly && (
+                      <Button type="submit" disabled={loading}>
+                        {reason === RegistryLineReason.Edit
+                          ? "Modifier la déclaration"
+                          : reason === RegistryLineReason.Cancel
+                          ? "Annuler la déclaration"
+                          : "Créer la déclaration"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
