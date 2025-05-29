@@ -25,7 +25,7 @@ import { getBsdaSubType } from "../common/subTypes";
 import {
   deleteRegistryLookup,
   generateDateInfos,
-  createRegistryLogger
+  rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
@@ -1417,95 +1417,39 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
-  const logger = createRegistryLogger("BSDA");
-
-  const total = await prisma.bsda.count({
-    where: {
-      isDeleted: false,
-      isDraft: false
+export const rebuildRegistryLookup =
+  rebuildRegistryLookupGeneric<MinimalBsdaForLookup>({
+    name: "BSDA",
+    getTotalCount: () =>
+      prisma.bsda.count({
+        where: {
+          isDeleted: false,
+          isDraft: false
+        }
+      }),
+    findMany: (pageSize, cursorId) =>
+      prisma.bsda.findMany({
+        where: {
+          isDeleted: false,
+          isDraft: false
+        },
+        take: pageSize,
+        skip: cursorId ? 1 : 0,
+        cursor: cursorId ? { id: cursorId } : undefined,
+        orderBy: {
+          id: "desc"
+        },
+        select: minimalBsdaForLookupSelect
+      }),
+    toLookupData: items => {
+      let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+      for (const bsda of items) {
+        const createInputs = bsdaToLookupCreateInputs(bsda);
+        createArray = createArray.concat(createInputs);
+      }
+      return createArray;
     }
   });
-
-  let done = false;
-  let cursorId: string | null = null;
-  let processedCount = 0;
-  let operationId = 0;
-  const pendingWrites = new Map<number, Promise<void>>();
-
-  const processWrite = async (items: MinimalBsdaForLookup[]) => {
-    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
-    for (const bsda of items) {
-      const createInputs = bsdaToLookupCreateInputs(bsda);
-      createArray = createArray.concat(createInputs);
-    }
-    // Run delete and create operations in a transaction
-    await prisma.$transaction(
-      async tx => {
-        // Delete existing lookups for these items
-        await tx.registryLookup.deleteMany({
-          where: {
-            OR: items.map(item => ({
-              id: item.id
-            }))
-          }
-        });
-        await tx.registryLookup.createMany({
-          data: createArray,
-          skipDuplicates: true
-        });
-      },
-      {
-        maxWait: 20000,
-        timeout: 60000
-      }
-    );
-    processedCount += items.length;
-    logger.logProgress(processedCount, total, pendingWrites.size);
-  };
-
-  while (!done) {
-    // Sequential read
-    const items = await prisma.bsda.findMany({
-      where: {
-        isDeleted: false,
-        isDraft: false
-      },
-      take: pageSize,
-      skip: cursorId ? 1 : 0,
-      cursor: cursorId ? { id: cursorId } : undefined,
-      orderBy: {
-        id: "desc"
-      },
-      select: minimalBsdaForLookupSelect
-    });
-
-    // Start the write operation
-    const currentOperationId = operationId++;
-    const writePromise = processWrite(items).finally(() => {
-      pendingWrites.delete(currentOperationId);
-    });
-    pendingWrites.set(currentOperationId, writePromise);
-
-    // If we've reached max concurrency, wait for one write to complete
-    if (pendingWrites.size >= threads) {
-      await Promise.race(pendingWrites.values());
-    }
-
-    if (items.length < pageSize) {
-      done = true;
-      break;
-    }
-    cursorId = items[items.length - 1].id;
-  }
-
-  // Wait for any remaining writes to complete
-  if (pendingWrites.size > 0) {
-    await Promise.all(pendingWrites.values());
-  }
-
-  logger.logCompletion(processedCount);
-};
 
 export const lookupUtils = {
   update: updateRegistryLookup,
