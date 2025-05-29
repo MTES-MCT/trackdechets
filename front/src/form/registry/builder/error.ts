@@ -23,13 +23,15 @@ export function formatError(
 const getFieldsWithState = (
   fields: FormShapeField[],
   errors: FieldErrors<any>,
-  disabledFieldNames?: string[]
+  disabledFieldNames?: string[],
+  readonly?: boolean
 ) => {
   return fields.map(field => {
     if (field.shape === "generic") {
       return {
         ...field,
-        ...(disabledFieldNames?.includes(field.name) && { disabled: true })
+        ...(disabledFieldNames?.includes(field.name) && { disabled: true }),
+        ...(readonly && { readOnly: true })
       };
     } else if (field.shape === "custom") {
       return {
@@ -38,13 +40,15 @@ const getFieldsWithState = (
           ...field.props,
           ...(disabledFieldNames?.some(disabledFieldName =>
             field.names.includes(disabledFieldName)
-          ) && { disabled: true })
+          ) && { disabled: true }),
+          ...(readonly && { readOnly: true })
         }
       };
     } else if (field.shape === "layout") {
       return {
         ...field,
-        fields: getFieldsWithState(field.fields, errors, disabledFieldNames)
+        fields: getFieldsWithState(field.fields, errors, disabledFieldNames),
+        ...(readonly && { readOnly: true })
       };
     }
     return field;
@@ -54,14 +58,16 @@ const getFieldsWithState = (
 export function getTabsWithState(
   formShape: FormShape,
   errors: FieldErrors<any>,
-  disabledFieldNames?: string[]
+  disabledFieldNames?: string[],
+  readonly?: boolean
 ): FormShapeWithState {
   return formShape.map(item => {
     const tabHasError = hasError(item.fields, errors);
     const fieldsWithState = getFieldsWithState(
       item.fields,
       errors,
-      disabledFieldNames
+      disabledFieldNames,
+      readonly
     );
     return {
       ...item,

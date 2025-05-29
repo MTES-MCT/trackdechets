@@ -60,7 +60,12 @@ export function FileImportsTable({ siret }: Props) {
         a => !!a.reportedAs.siret && a.reportedAs.siret !== a.reportedFor.siret
       );
       const reportedBy = reportedByAssociation
-        ? `${importData.node.createdBy.name} - ${reportedByAssociation.reportedAs.name} (${reportedByAssociation.reportedAs.siret})`
+        ? `${importData.node.createdBy.name} - ${
+            reportedByAssociation.reportedAs.givenName &&
+            reportedByAssociation.reportedAs.givenName !== ""
+              ? reportedByAssociation.reportedAs.givenName
+              : reportedByAssociation.reportedAs.name
+          } (${reportedByAssociation.reportedAs.siret})`
         : importData.node.createdBy.name;
       return [
         format(new Date(importData.node.createdAt), "dd/MM/yyyy HH'h'mm"),

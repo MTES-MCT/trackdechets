@@ -1,11 +1,26 @@
-import { Prisma } from "@prisma/client";
+import { Company, Prisma } from "@prisma/client";
 import type { RegistryV2ExportResolvers } from "@td/codegen-back";
 import { GraphQLContext } from "../../types";
 
-export const RegistryV2Export: RegistryV2ExportResolvers<
-  GraphQLContext,
-  Prisma.RegistryExportGetPayload<{ include: { createdBy: true } }>
-> = {
+type ParentType = Prisma.RegistryExportGetPayload<{
+  include: { createdBy: true };
+}>;
+
+export const RegistryV2Export: Omit<
+  RegistryV2ExportResolvers<GraphQLContext, ParentType>,
+  "delegate" | "companies"
+> & {
+  delegate: (
+    parent: ParentType,
+    args: unknown,
+    context: GraphQLContext
+  ) => Promise<Company | null>;
+  companies: (
+    parent: ParentType,
+    args: unknown,
+    context: GraphQLContext
+  ) => Promise<Company[]>;
+} = {
   registryType: parent => parent.registryType,
   declarationType: parent => parent.declarationType ?? "ALL",
   delegate: async (parent, _, context) => {
