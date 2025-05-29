@@ -303,54 +303,56 @@ export function MyExports() {
             </p>
           </div>
         )}
-        <div className="tw-mt-8">
-          <div className="tw-flex tw-justify-between">
-            <h2 className="tw-text-2xl tw-font-bold">Exports récents</h2>
-            <div>
-              <Button
-                priority="secondary"
-                iconId="fr-icon-refresh-line"
-                iconPosition="right"
-                size="small"
-                onClick={() => refetch()}
-              >
-                Rafraîchir
-              </Button>
+        {registryExports && registryExports.length > 0 && (
+          <div className="tw-mt-8">
+            <div className="tw-flex tw-justify-between">
+              <h2 className="tw-text-2xl tw-font-bold">Exports récents</h2>
+              <div>
+                <Button
+                  priority="secondary"
+                  iconId="fr-icon-refresh-line"
+                  iconPosition="right"
+                  size="small"
+                  onClick={() => refetch()}
+                >
+                  Rafraîchir
+                </Button>
+              </div>
+            </div>
+            {!exportsLoading ? (
+              <RegistryTable
+                data={tableData}
+                headers={[
+                  "Date",
+                  "Établissements",
+                  "Type de registre",
+                  "Type de déclaration",
+                  "Période",
+                  "Fichier"
+                ]}
+                fixed={!isMobile}
+              />
+            ) : (
+              <InlineLoader />
+            )}
+            <div className="tw-flex tw-justify-center">
+              <Pagination
+                showFirstLast
+                count={pageCount}
+                defaultPage={pageIndex + 1}
+                getPageLinkProps={pageNumber => ({
+                  onClick: event => {
+                    event.preventDefault();
+                    gotoPage(pageNumber - 1);
+                  },
+                  href: "#",
+                  key: `pagination-link-${pageNumber}`
+                })}
+                className={"fr-mt-1w"}
+              />
             </div>
           </div>
-          {!exportsLoading ? (
-            <RegistryTable
-              data={tableData}
-              headers={[
-                "Date",
-                "Établissements",
-                "Type de registre",
-                "Type de déclaration",
-                "Période",
-                "Fichier"
-              ]}
-              fixed={!isMobile}
-            />
-          ) : (
-            <InlineLoader />
-          )}
-        </div>
-        <div className="tw-flex tw-justify-center">
-          <Pagination
-            showFirstLast
-            count={pageCount}
-            defaultPage={pageIndex + 1}
-            getPageLinkProps={pageNumber => ({
-              onClick: event => {
-                event.preventDefault();
-                gotoPage(pageNumber - 1);
-              },
-              href: "#",
-              key: `pagination-link-${pageNumber}`
-            })}
-            className={"fr-mt-1w"}
-          />
-        </div>
+        )}
       </>
       <ExportModal
         isOpen={isExportModalOpen}
