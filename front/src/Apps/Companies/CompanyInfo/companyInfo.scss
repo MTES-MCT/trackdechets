@@ -3,4 +3,8 @@
     --border-default-blue-france: #000091;
     margin: 0;
   }
+  .fr-label {
+    color: var(--text-label-grey) !important;
+    cursor: inherit !important;
+  }
 }
