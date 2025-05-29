@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import { RegistryV2ExportProvider } from "../../dashboard/registry/RegistryV2ExportContext";
 import { RegistryV2ExportModalProvider } from "../../dashboard/registry/RegistryV2ExportModalContext";
@@ -15,14 +14,6 @@ export function Registry() {
   return (
     <div>
       <h3 className="fr-sr-only">Registre</h3>
-
-      <Alert
-        className="fr-mb-5v"
-        description="Votre compte doit être associé à un compte gouvernemental pour disposer des permissions nécessaires"
-        severity="info"
-        small
-      />
-
       <Select
         className="fr-col-3 fr-mb-5v"
         label="Type de registre"
