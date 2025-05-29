@@ -1,0 +1,25 @@
+type Mutation {
+  "Renvoie un lien permettant de télécharger un registre au format CSV"
+  generateRegistryV2ExportAsAdmin(
+    "Type de registre de déchets"
+    registryType: RegistryV2ExportType!
+    "Format d'export attendu"
+    format: RegistryExportFormat!
+    "établissment pour lequel on veut faire un export de registre"
+    siret: String!
+    "plage de dates à exporter, une date de début est obligatoire"
+    dateRange: DateFilter!
+    "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
+    where: RegistryV2ExportWhere
+  ): RegistryV2Export!
+
+  "Renvoie un lien permettant de télécharger un registre exhaustif au format CSV"
+  generateRegistryExhaustiveExportAsAdmin(
+    "Format d'export attendu"
+    format: RegistryExportFormat!
+    "établissment pour lequel on veut faire un export de registre"
+    siret: String!
+    "plage de dates à exporter, une date de début est obligatoire"
+    dateRange: DateFilter!
+  ): RegistryExhaustiveExport!
+}

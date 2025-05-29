@@ -344,10 +344,13 @@ describe("renderFormRefusedEmail", () => {
     expect(email!.to).toEqual([
       { email: emitter.user.email, name: emitter.user.name }
     ]);
-    expect(email!.cc).toEqual([
-      { email: ttr.user.email, name: ttr.user.name },
-      { email: destination.user.email, name: destination.user.name }
-    ]);
+    expect(email!.cc).toEqual(
+      expect.arrayContaining([
+        { email: ttr.user.email, name: ttr.user.name },
+        { email: destination.user.email, name: destination.user.name }
+      ])
+    );
+    expect(email!.cc?.length).toEqual(2);
     expect(email!.body).toContain(`<p>
   Nous vous informons que la société ${destination.company.name}
   (${destination.company.siret}) a refusé le 2 janvier 2022, le déchet de

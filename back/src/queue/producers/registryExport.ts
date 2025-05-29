@@ -1,6 +1,6 @@
 import { logger } from "@td/logger";
 import Queue, { Job, JobOptions } from "bull";
-import { RegistryExportJobArgs } from "../jobs/processRegistryExport";
+import { type RegistryExportJobArgs } from "../jobs/processRegistryExport";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 

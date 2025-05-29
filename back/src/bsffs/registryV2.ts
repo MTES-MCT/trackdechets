@@ -1,7 +1,8 @@
 import {
   IncomingWasteV2,
   OutgoingWasteV2,
-  TransportedWasteV2
+  TransportedWasteV2,
+  AllWasteV2
 } from "@td/codegen-back";
 import Decimal from "decimal.js";
 import {
@@ -20,6 +21,7 @@ import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
   emptyTransportedWasteV2,
+  emptyAllWasteV2,
   RegistryV2Bsff
 } from "../registryV2/types";
 import { getFirstTransporterSync, getTransportersSync } from "./database";
@@ -33,6 +35,7 @@ import {
 import { Nullable } from "../types";
 import { isFinalOperation } from "./constants";
 import { logger } from "@td/logger";
+import { BsffWithTransporters } from "./types";
 
 const getInitialEmitterData = (bsff: RegistryV2Bsff) => {
   const initialEmitter: Record<string, string | null> = {
@@ -991,6 +994,311 @@ export const toTransportedWasteV2 = (
     gistridNumber: null,
     movementNumber: null
   };
+};
+
+export const toAllWasteV2 = (
+  bsff: RegistryV2Bsff
+): Omit<Required<AllWasteV2>, "__typename"> => {
+  const transporters = getTransportersSync(bsff);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+  const {
+    initialEmitterCompanyName,
+    initialEmitterCompanySiret,
+    initialEmitterCompanyAddress,
+    initialEmitterCompanyPostalCode,
+    initialEmitterCompanyCity,
+    initialEmitterCompanyCountry
+  } = getInitialEmitterData(bsff);
+  const {
+    nextDestinationPlannedOperationCodes,
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    destinationFinalOperationCompanySirets
+  } = getFinalOperationsData(bsff);
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
+  const {
+    destinationReceptionAcceptationStatus,
+    destinationReceptionWeight,
+    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight,
+    destinationOperationCodes,
+    destinationOperationModes,
+    destinationOperationDate
+  } = toBsffDestination(bsff.packagings);
+
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsff.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bsff.emitterCompanyAddress);
+
+  return {
+    ...emptyAllWasteV2,
+    id: bsff.id,
+    bsdId: bsff.id,
+    createdAt: bsff.createdAt,
+    updatedAt: bsff.updatedAt,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
+    destinationReceptionDate: bsff.destinationReceptionDate,
+    destinationOperationDate,
+    bsdType: "BSFF",
+    bsdSubType: getBsffSubType(bsff),
+    customId: null,
+    status: bsff.status,
+    wasteDescription: bsff.wasteDescription,
+    wasteCode: bsff.wasteCode,
+    wastePop: false,
+    wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
+    weight: bsff.weightValue
+      ? bsff.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
+    initialEmitterCompanyName,
+    initialEmitterCompanySiret,
+    initialEmitterCompanyAddress,
+    initialEmitterCompanyPostalCode,
+    initialEmitterCompanyCity,
+    initialEmitterCompanyCountry,
+    emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
+    emitterCompanySiret: bsff.emitterCompanySiret,
+    emitterCompanyName: bsff.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bsff.emitterCompanyMail,
+    emitterPickupsiteName: null,
+    emitterPickupsiteAddress: null,
+    emitterPickupsitePostalCode: null,
+    emitterPickupsiteCity: null,
+    emitterPickupsiteCountry: null,
+    workerCompanySiret: null,
+    workerCompanyName: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    parcelCities: null,
+    parcelInseeCodes: null,
+    parcelNumbers: null,
+    parcelCoordinates: null,
+    sisIdentifiers: null,
+    ecoOrganismeSiret: null,
+    ecoOrganismeName: null,
+    brokerCompanySiret: null,
+    brokerCompanyName: null,
+    brokerCompanyMail: null,
+    brokerRecepisseNumber: null,
+    traderCompanySiret: null,
+    traderCompanyName: null,
+    traderCompanyMail: null,
+    traderRecepisseNumber: null,
+    isDirectSupply: false,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1UnloadingDate: null,
+    transporter1TransportPlates: transporter?.transporterTransportPlates,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
+
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2UnloadingDate: null,
+    transporter2TransportPlates: transporter2?.transporterTransportPlates,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3UnloadingDate: null,
+    transporter3TransportPlates: transporter3?.transporterTransportPlates,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4UnloadingDate: null,
+    transporter4TransportPlates: transporter4?.transporterTransportPlates,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5UnloadingDate: null,
+    transporter5TransportPlates: transporter5?.transporterTransportPlates,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+
+    wasteAdr: bsff.wasteAdr,
+    nonRoadRegulationMention: null,
+    destinationCap: null,
+    wasteDap: null,
+    destinationCompanySiret: bsff.destinationCompanySiret,
+    destinationCompanyName: bsff.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bsff.destinationCompanyMail,
+
+    postTempStorageDestinationName: null,
+    postTempStorageDestinationSiret: null,
+    postTempStorageDestinationAddress: null,
+    postTempStorageDestinationPostalCode: null,
+    postTempStorageDestinationCity: null,
+    postTempStorageDestinationCountry: null,
+    destinationReceptionAcceptationStatus,
+    destinationReceptionWeight: destinationReceptionWeight
+      ? new Decimal(destinationReceptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionWeight,
+    destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight,
+    destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
+    destinationPlannedOperationMode: null,
+    destinationOperationCodes,
+    destinationOperationModes,
+    nextDestinationPlannedOperationCodes,
+    destinationHasCiterneBeenWashedOut: null,
+    destinationOperationNoTraceability: false,
+    destinationFinalOperationCompanySirets,
+    destinationFinalOperationCodes,
+    destinationFinalOperationWeights,
+    gistridNumber: null,
+    isUpcycled: null,
+    destinationParcelInseeCodes: null,
+    destinationParcelNumbers: null,
+    destinationParcelCoordinates: null
+  };
+};
+
+export const getElasticExhaustiveRegistryFields = (
+  bsff: BsffWithTransporters
+) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (!bsff.isDraft) {
+    registryFields.isExhaustiveWasteFor = [
+      bsff.destinationCompanySiret,
+      bsff.emitterCompanySiret,
+      ...bsff.detenteurCompanySirets
+    ].filter(Boolean);
+    for (const transporter of bsff.transporters ?? []) {
+      if (transporter.transporterTransportSignatureDate) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsffForLookupSelect = {

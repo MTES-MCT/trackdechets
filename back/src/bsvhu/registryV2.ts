@@ -9,7 +9,8 @@ import type {
   IncomingWasteV2,
   ManagedWasteV2,
   OutgoingWasteV2,
-  TransportedWasteV2
+  TransportedWasteV2,
+  AllWasteV2
 } from "@td/codegen-back";
 import { getWasteDescription } from "./utils";
 import { getBsvhuSubType } from "../common/subTypes";
@@ -20,6 +21,7 @@ import {
   emptyManagedWasteV2,
   emptyOutgoingWasteV2,
   emptyTransportedWasteV2,
+  emptyAllWasteV2,
   RegistryV2Bsvhu
 } from "../registryV2/types";
 import {
@@ -28,6 +30,7 @@ import {
   rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { logger } from "@td/logger";
+import { BsvhuForElastic } from "./elastic";
 
 export const toIncomingWasteV2 = (
   bsvhu: RegistryV2Bsvhu
@@ -70,7 +73,7 @@ export const toIncomingWasteV2 = (
     bsdId: bsvhu.id,
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
-    updatedAt: bsvhu.createdAt,
+    updatedAt: bsvhu.updatedAt,
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weighingHour: null,
@@ -201,7 +204,7 @@ export const toOutgoingWasteV2 = (
     bsdId: bsvhu.id,
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
-    updatedAt: bsvhu.createdAt,
+    updatedAt: bsvhu.updatedAt,
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationOperationDate: bsvhu.destinationOperationDate,
     bsdType: "BSVHU",
@@ -380,7 +383,7 @@ export const toTransportedWasteV2 = (
     bsdId: bsvhu.id,
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
-    updatedAt: bsvhu.createdAt,
+    updatedAt: bsvhu.updatedAt,
     transporterTakenOverAt:
       bsvhu.transporterTransportTakenOverAt ??
       bsvhu.transporterTransportSignatureDate,
@@ -536,7 +539,7 @@ export const toManagedWasteV2 = (
     reportAsSiret: null,
     reportForSiret: targetSiret,
     createdAt: bsvhu.createdAt,
-    updatedAt: bsvhu.createdAt,
+    updatedAt: bsvhu.updatedAt,
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     destinationOperationDate: bsvhu.destinationOperationDate,
     bsdType: "BSVHU",
@@ -671,6 +674,206 @@ export const toManagedWasteV2 = (
     destinationParcelNumbers: null,
     destinationParcelCoordinates: null
   };
+};
+
+export const toAllWasteV2 = (
+  bsvhu: RegistryV2Bsvhu
+): Omit<Required<AllWasteV2>, "__typename"> => {
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = bsvhu.emitterCompanyStreet &&
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
+        street: bsvhu.emitterCompanyStreet,
+        postalCode: bsvhu.emitterCompanyPostalCode,
+        city: bsvhu.emitterCompanyCity,
+        country: "FR"
+      }
+    : splitAddress(bsvhu.emitterCompanyAddress);
+
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    bsvhu.transporterCompanyAddress,
+    bsvhu.transporterCompanyVatNumber
+  );
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bsvhu.destinationCompanyAddress);
+  return {
+    ...emptyAllWasteV2,
+    id: bsvhu.id,
+    bsdId: bsvhu.id,
+    createdAt: bsvhu.createdAt,
+    updatedAt: bsvhu.updatedAt,
+    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    destinationReceptionDate: bsvhu.destinationReceptionDate,
+    destinationOperationDate: bsvhu.destinationOperationDate,
+    bsdType: "BSVHU",
+    bsdSubType: getBsvhuSubType(bsvhu),
+    customId: bsvhu.customId,
+    status: bsvhu.status,
+    wasteDescription: getWasteDescription(bsvhu.wasteCode),
+    wasteCode: bsvhu.wasteCode,
+    wastePop: false,
+    wasteIsDangerous: true,
+    quantity: bsvhu.quantity,
+    wasteContainsElectricOrHybridVehicles:
+      bsvhu.containsElectricOrHybridVehicles,
+    weight: bsvhu.weightValue
+      ? new Decimal(bsvhu.weightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bsvhu.weightValue,
+    weightIsEstimate: bsvhu.weightIsEstimate,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    emitterCompanyIrregularSituation: !!bsvhu.emitterIrregularSituation,
+    emitterCompanyType: null,
+    emitterCompanySiret: bsvhu.emitterCompanySiret,
+    emitterCompanyName: bsvhu.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bsvhu.emitterCompanyMail,
+    emitterPickupsiteName: null,
+    emitterPickupsiteAddress: null,
+    emitterPickupsitePostalCode: null,
+    emitterPickupsiteCity: null,
+    emitterPickupsiteCountry: null,
+    workerCompanySiret: null,
+    workerCompanyName: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    parcelCities: null,
+    parcelInseeCodes: null,
+    parcelNumbers: null,
+    parcelCoordinates: null,
+    sisIdentifiers: null,
+    ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
+    ecoOrganismeName: bsvhu.ecoOrganismeName,
+    brokerCompanySiret: bsvhu.brokerCompanySiret,
+    brokerCompanyName: bsvhu.brokerCompanyName,
+    brokerCompanyMail: bsvhu.brokerCompanyMail,
+    brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
+    traderCompanySiret: bsvhu.traderCompanySiret,
+    traderCompanyName: bsvhu.traderCompanyName,
+    traderCompanyMail: bsvhu.traderCompanyMail,
+    traderRecepisseNumber: bsvhu.traderRecepisseNumber,
+    intermediary1CompanySiret: bsvhu.intermediaries?.[0]?.siret,
+    intermediary1CompanyName: bsvhu.intermediaries?.[0]?.name,
+    intermediary2CompanySiret: bsvhu.intermediaries?.[1]?.siret,
+    intermediary2CompanyName: bsvhu.intermediaries?.[1]?.name,
+    intermediary3CompanySiret: bsvhu.intermediaries?.[2]?.siret,
+    intermediary3CompanyName: bsvhu.intermediaries?.[2]?.name,
+    isDirectSupply: false,
+    transporter1CompanySiret:
+      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
+    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
+    transporter1TransportMode: null,
+    transporter1UnloadingDate: null,
+    transporter1TransportPlates: bsvhu.transporterTransportPlates,
+    transporter1CompanyMail: bsvhu.transporterCompanyMail,
+    wasteAdr: null,
+    nonRoadRegulationMention: null,
+    destinationCap: null,
+    wasteDap: null,
+    destinationCompanySiret: bsvhu.destinationCompanySiret,
+    destinationCompanyName: bsvhu.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bsvhu.destinationCompanyMail,
+    postTempStorageDestinationSiret: null,
+    postTempStorageDestinationName: null,
+    postTempStorageDestinationAddress: null,
+    postTempStorageDestinationPostalCode: null,
+    postTempStorageDestinationCity: null,
+    postTempStorageDestinationCountry: null,
+
+    destinationReceptionAcceptationStatus:
+      bsvhu.destinationReceptionAcceptationStatus,
+    destinationReceptionWeight: bsvhu.destinationReceptionWeight
+      ? new Decimal(bsvhu.destinationReceptionWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bsvhu.destinationReceptionWeight,
+    destinationReceptionAcceptedWeight: null,
+    destinationReceptionRefusedWeight: null,
+    destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
+    destinationPlannedOperationMode: null,
+    destinationOperationCodes: bsvhu.destinationOperationCode
+      ? [bsvhu.destinationOperationCode]
+      : null,
+    destinationOperationModes: bsvhu.destinationOperationMode
+      ? [bsvhu.destinationOperationMode]
+      : null,
+    nextDestinationPlannedOperationCodes: null,
+    destinationHasCiterneBeenWashedOut: null,
+    destinationOperationNoTraceability: false,
+    destinationFinalOperationCompanySirets: null,
+    destinationFinalOperationCodes: null,
+    destinationFinalOperationWeights: null,
+    gistridNumber: null,
+    isUpcycled: null,
+    destinationParcelInseeCodes: null,
+    destinationParcelNumbers: null,
+    destinationParcelCoordinates: null
+  };
+};
+
+export const getElasticExhaustiveRegistryFields = (bsvhu: BsvhuForElastic) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (!bsvhu.isDraft) {
+    registryFields.isExhaustiveWasteFor = [
+      bsvhu.destinationCompanySiret,
+      bsvhu.emitterCompanySiret,
+      bsvhu.transporterCompanySiret,
+      bsvhu.ecoOrganismeSiret,
+      bsvhu.brokerCompanySiret,
+      bsvhu.traderCompanySiret
+    ].filter(Boolean);
+    if (bsvhu.intermediaries?.length) {
+      for (const intermediary of bsvhu.intermediaries) {
+        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
+        if (intermediaryOrgId) {
+          registryFields.isExhaustiveWasteFor.push(intermediaryOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
 };
 
 const minimalBsvhuForLookupSelect = {

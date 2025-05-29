@@ -2,6 +2,7 @@
 
 type Query {
   """
+  DEPRECATED - Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2
   Registre entrant.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
   a été signé et sont triés par date de réception du déchet.
@@ -21,8 +22,12 @@ type Query {
     "Pagination décroissante avec last et before"
     before: ID
   ): IncomingWasteConnection!
+    @deprecated(
+      reason: "Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2"
+    )
 
   """
+  DEPRECATED - Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2
   Registre sortant.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
   a été signé et sont triés par date d'enlèvement du déchet.
@@ -42,8 +47,12 @@ type Query {
     "Pagination décroissante avec last et before"
     last: Int
   ): OutgoingWasteConnection!
+    @deprecated(
+      reason: "Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2"
+    )
 
   """
+  DEPRECATED - Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2
   Registre de transport.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
   a été signé et sont triés par date d'enlèvement du déchet.
@@ -63,8 +72,12 @@ type Query {
     "Pagination décroissante avec last et before"
     last: Int
   ): TransportedWasteConnection!
+    @deprecated(
+      reason: "Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2"
+    )
 
   """
+  DEPRECATED - Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2
   Registre de gestion.
   Registre réglementaire, les déchets apparaissent à partir du moment où l'enlèvement
   a été signé et sont triés par date d'enlèvement du déchet (la date d'acquisition ou
@@ -86,8 +99,12 @@ type Query {
     "Pagination décroissante avec last et before"
     last: Int
   ): ManagedWasteConnection!
+    @deprecated(
+      reason: "Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryV2Export pour générer un export de registre V2"
+    )
 
   """
+  DEPRECATED - Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2
   Registre exhaustif.
   Registre qui n'est pas réglementaire et qui est indépendant des autres registres. Il permet
   d'exporter un nombre d'informations conséquent sur l'ensemble des bordereaux sur lesquels un
@@ -108,8 +125,14 @@ type Query {
     "Pagination décroissante avec last et before"
     last: Int
   ): AllWasteConnection!
+    @deprecated(
+      reason: "Utiliser registryLookups pour récupérer des déclarations de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2"
+    )
 
-  "Renvoie un lien permettant de télécharger un registre au format CSV"
+  """
+  DEPRECATED - Utiliser generateRegistryV2Export pour générer un export de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2
+  Renvoie un lien permettant de télécharger un registre au format CSV
+  """
   wastesRegistryCsv(
     "Type de registre de déchets"
     registryType: WasteRegistryType!
@@ -118,8 +141,14 @@ type Query {
     "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
     where: WasteRegistryWhere
   ): FileDownload!
+    @deprecated(
+      reason: "Utiliser generateRegistryV2Export pour générer un export de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2"
+    )
 
-  "Renvoie un lien permettant de télécharger un registre au format Excel"
+  """
+  DEPRECATED - Utiliser generateRegistryV2Export pour générer un export de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2
+  Renvoie un lien permettant de télécharger un registre au format Excel
+  """
   wastesRegistryXls(
     "Type de registre de déchets"
     registryType: WasteRegistryType!
@@ -128,4 +157,7 @@ type Query {
     "Filtres additionnels sur les dates d'expédition / réception, le code déchet, l'opération de traitement, etc "
     where: WasteRegistryWhere
   ): FileDownload!
+    @deprecated(
+      reason: "Utiliser generateRegistryV2Export pour générer un export de registre V2 ou generateRegistryExhaustiveExport pour générer un export de registre exhaustif V2"
+    )
 }

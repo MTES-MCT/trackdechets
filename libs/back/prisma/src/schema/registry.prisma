@@ -862,6 +862,7 @@ model RegistryExport {
     createdAt   DateTime             @default(now()) @db.Timestamptz(6)
     updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
     createdById String
+    asAdmin     Boolean              @default(false)
     status      RegistryExportStatus @default(PENDING)
     s3FileKey   String?
 
@@ -869,7 +870,7 @@ model RegistryExport {
     delegateSiret     String?
     sirets            String[]
     isForAllCompanies Boolean                        @default(false)
-    registryType      RegistryExportType?
+    registryType      RegistryExportType
     wasteTypes        RegistryExportWasteType[]      @default([])
     wasteCodes        String[]                       @default([])
     declarationType   RegistryExportDeclarationType?
@@ -881,6 +882,31 @@ model RegistryExport {
 
     @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
     @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
+}
+
+// This object is created when a user requests an exhaustive registry export
+// it is used in the export processing job to get the export parameters
+// and to display the export history with their statuses on the frontend
+model RegistryExhaustiveExport {
+    id          String               @id @default(cuid())
+    createdAt   DateTime             @default(now()) @db.Timestamptz(6)
+    updatedAt   DateTime             @updatedAt @db.Timestamptz(6)
+    createdById String
+    asAdmin     Boolean              @default(false)
+    status      RegistryExportStatus @default(PENDING)
+    s3FileKey   String?
+
+    // if this export is made as a delegate
+    sirets            String[]
+    isForAllCompanies Boolean              @default(false)
+    startDate         DateTime             @db.Timestamptz(6)
+    endDate           DateTime?            @db.Timestamptz(6)
+    format            RegistryExportFormat
+
+    createdBy User @relation(fields: [createdById], references: [id])
+
+    @@index([createdById], map: "_RegistryExhaustiveExportCreatedByIdIdx")
+    @@index([sirets], map: "_RegistryExhaustiveExportSiretsIdx", type: Gin)
 }
 
 // This object is associated with every BSD/registry entry, and is used for efficient lookup

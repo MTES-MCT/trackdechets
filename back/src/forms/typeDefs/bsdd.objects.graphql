@@ -732,27 +732,6 @@ type TransportSegment {
   segmentNumber: Int
 }
 
-"Statistiques d'un établissement"
-type CompanyStat {
-  "Établissement"
-  company: FormCompany
-
-  "Liste des statistiques"
-  stats: [Stat!]!
-}
-
-"Statistiques"
-type Stat {
-  "Code déchet"
-  wasteCode: String!
-
-  "Quantité entrante en tonnes"
-  incoming: Float!
-
-  "Qantité sortante"
-  outgoing: Float!
-}
-
 "Demande de révision BSDD"
 type FormRevisionRequest {
   "Identifiant de la demande de révison"

@@ -10,6 +10,7 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import {
   BsdaWithForwardedIn,
   BsdaWithForwardedInInclude,
@@ -396,6 +397,7 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     revisionRequests: bsda.bsdaRevisionRequests,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
+    ...getElasticExhaustiveRegistryFields(bsda),
     intermediaries: bsda.intermediaries,
     rawBsd: bsda,
 

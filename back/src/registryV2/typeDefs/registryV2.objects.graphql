@@ -14,7 +14,7 @@ type RegistryV2Export {
   createdAt: DateTime!
   updatedAt: DateTime!
   createdBy: User!
-  status: RegistryV2ExportStatus!
+  status: RegistryExportStatus!
   delegate: RegistryCompany
   delegateSirets: String
   sirets: [String!]!
@@ -25,7 +25,31 @@ type RegistryV2Export {
   declarationType: DeclarationType!
   startDate: DateTime!
   endDate: DateTime
-  format: FormsRegisterExportFormat!
+  format: RegistryExportFormat!
+}
+
+type RegistryExhaustiveExportConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryExhaustiveExportEdge!]!
+}
+
+type RegistryExhaustiveExportEdge {
+  cursor: String!
+  node: RegistryExhaustiveExport!
+}
+
+type RegistryExhaustiveExport {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: User!
+  status: RegistryExportStatus!
+  sirets: [String!]!
+  companies: [RegistryCompany!]!
+  startDate: DateTime!
+  endDate: DateTime
+  format: RegistryExportFormat!
 }
 
 type RegistryCompany {

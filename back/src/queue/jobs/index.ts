@@ -8,3 +8,4 @@ export { processAdministrativeTransferJob } from "./administrativeTransfer";
 export { updateAppendix2Job } from "./updateAppendix2";
 export { processRegistryImportJob } from "./processRegistryImport";
 export { processRegistryExportJob } from "./processRegistryExport";
+export { processRegistryExhaustiveExportJob } from "./processRegistryExhaustiveExport";

@@ -4,8 +4,6 @@ import forms from "./queries/forms";
 import formPdf from "./queries/formPdf";
 import appendixForms from "./queries/appendixForms";
 import formsLifeCycle from "./queries/formsLifeCycle";
-import formsRegister from "./queries/formsRegister";
-import stats from "./queries/stats";
 import formRevisionRequests from "./queries/formRevisionRequests";
 
 export type FormQueryResolvers = Pick<
@@ -15,8 +13,6 @@ export type FormQueryResolvers = Pick<
   | "formPdf"
   | "appendixForms"
   | "formsLifeCycle"
-  | "formsRegister"
-  | "stats"
   | "formRevisionRequests"
 >;
 
@@ -26,8 +22,6 @@ const Query: FormQueryResolvers = {
   formPdf,
   appendixForms,
   formsLifeCycle,
-  formsRegister,
-  stats,
   formRevisionRequests: formRevisionRequests as any
 };
 

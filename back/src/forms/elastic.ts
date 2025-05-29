@@ -16,6 +16,7 @@ import {
 } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import {
   getSiretsByTab,
   getRecipient,
@@ -186,6 +187,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     revisionRequests: form.bsddRevisionRequests,
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
+    ...getElasticExhaustiveRegistryFields(form),
     intermediaries: form.intermediaries,
     rawBsd: form,
 
