@@ -37,9 +37,11 @@ type UniversalTransporter =
  * et de requêter `companyPrivateInfos` pour avoir les infos de récépissé à jour.
  */
 export default function TransporterRecepisseWrapper({
-  transporter
+  transporter,
+  customClass = ""
 }: {
   transporter: UniversalTransporter;
+  customClass?: string;
 }) {
   /**
    * Universal Receipt exemption detection
@@ -114,6 +116,7 @@ export default function TransporterRecepisseWrapper({
       number={receipt?.receiptNumber}
       department={receipt?.department}
       validityLimit={receipt?.validityLimit}
+      customClass={customClass}
     />
   ) : null;
 }

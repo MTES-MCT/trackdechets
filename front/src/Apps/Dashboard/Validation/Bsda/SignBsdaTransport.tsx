@@ -30,6 +30,7 @@ import { UPDATE_BSDA_TRANSPORTER } from "../../../Forms/Components/query";
 import { RhfTransportModeSelect } from "../../../Forms/Components/TransportMode/TransportMode";
 import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
 import TransporterRecepisseWrapper from "../../../../form/common/components/company/TransporterRecepisseWrapper";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const schema = z.object({
   signature: z.object({
@@ -254,7 +255,25 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                 />
               </div>
 
-              <TransporterRecepisseWrapper transporter={signingTransporter} />
+              <TransporterRecepisseWrapper
+                transporter={signingTransporter}
+                customClass="fr-col-md-11 fr-mb-2w fr-mt-2w"
+              />
+
+              {bsda.waste?.adr && (
+                <div className="fr-col-md-11 fr-mb-2w fr-mt-2w">
+                  <Alert
+                    title="Mentions RID et ADR"
+                    severity="info"
+                    description={
+                      <>
+                        <p className="fr-mb-1w">ADR : {bsda.waste.adr}</p>
+                        <p>RID : {bsda.waste.nonRoadRegulationMention}</p>
+                      </>
+                    }
+                  />
+                </div>
+              )}
 
               <p className="fr-text fr-mb-2w">
                 En qualité de <strong>transporteur du déchet</strong>, j'atteste

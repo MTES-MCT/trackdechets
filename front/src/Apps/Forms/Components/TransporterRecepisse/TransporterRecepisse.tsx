@@ -9,13 +9,20 @@ export type TransporterRecepisseProps = {
   number?: string | null;
   // Limite de validité du récépissé.
   validityLimit?: string | null;
+  customClass?: string;
 };
 
 export default function TransporterRecepisse(
   recepisse: TransporterRecepisseProps
 ) {
   return (
-    <div className="fr-grid-row fr-mb-2w fr-mt-2w">
+    <div
+      className={
+        recepisse?.customClass
+          ? recepisse?.customClass
+          : "fr-grid-row fr-mb-2w fr-mt-2w"
+      }
+    >
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
         severity={recepisse?.number?.length ? "info" : "error"}
