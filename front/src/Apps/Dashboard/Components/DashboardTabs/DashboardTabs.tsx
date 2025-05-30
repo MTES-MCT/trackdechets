@@ -1,12 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import {
-  CompanyPrivate,
-  Query,
-  QueryBsdsArgs,
-  UserPermission,
-  UserRole
-} from "@td/codegen-ui";
+import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
@@ -29,16 +23,8 @@ import {
 
 import "./DashboardTabs.scss";
 import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
-import { gql, useQuery } from "@apollo/client";
 import { useNotifier } from "../../../../dashboard/components/BSDList/useNotifier";
-
-const NOTIFICATION_QUERY = gql`
-  query GetBsds($where: BsdWhere) {
-    bsds(first: 1, where: $where) {
-      totalCount
-    }
-  }
-`;
+import { useNotificationQueries } from "./useNotificationQueries";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -57,31 +43,10 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
   const { permissions, role } = usePermissions();
   const navigate = useNavigate();
 
-  const { data: dataAction, refetch: refetchAction } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isForActionFor: [currentCompany.orgId] } }
-  });
-
-  const { data: dataRevision, refetch: refetchRevision } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isInRevisionFor: [currentCompany.orgId] } }
-  });
-
-  const { data: dataTransport, refetch: refetchTransport } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isToCollectFor: [currentCompany.orgId] } }
-  });
+  const { data, refetchAll } = useNotificationQueries(currentCompany.orgId);
 
   useNotifier(currentCompany.orgId, () => {
-    refetchAction();
-    refetchRevision();
-    refetchTransport();
+    refetchAll();
   });
 
   const { showTransportTabs } = useShowTransportTabs(
@@ -175,7 +140,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {ACTS}
                 </NavLink>
-                {displayNotification(dataAction?.bsds.totalCount, isReaderRole)}
+                {displayNotification(data.actionCount, isReaderRole)}
               </li>
 
               <li>
@@ -229,10 +194,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {TO_REVIEW}
                 </NavLink>
-                {displayNotification(
-                  dataRevision?.bsds.totalCount,
-                  isReaderRole
-                )}
+                {displayNotification(data.revisionCount, isReaderRole)}
               </li>
               <li>
                 <NavLink
@@ -274,10 +236,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               >
                 {TO_COLLECT}
               </NavLink>
-              {displayNotification(
-                dataTransport?.bsds.totalCount,
-                isReaderRole
-              )}
+              {displayNotification(data.transportCount, isReaderRole)}
             </li>
             <li>
               <NavLink
