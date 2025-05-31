@@ -19,11 +19,11 @@ export function CompanyImports() {
           tabs={[
             {
               tabId: "API",
-              label: "Déclaration par API"
+              label: "Déclaration par API ou via formulaire"
             },
             {
               tabId: "FILE",
-              label: "Déclaration par fichiers"
+              label: "Déclaration par fichier"
             }
           ]}
           onTabChange={setSelectedTabId}

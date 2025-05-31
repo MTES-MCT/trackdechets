@@ -90,7 +90,7 @@ export function InlineAddress({
         <NonScrollableInput
           label="Code postal"
           nativeInputProps={{
-            type: "number",
+            type: "text",
             disabled,
             ...methods.register(`${prefix}PostalCode`)
           }}
