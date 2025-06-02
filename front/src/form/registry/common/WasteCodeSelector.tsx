@@ -1,12 +1,13 @@
-import React, { useMemo, useRef, useState } from "react";
-import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
-import type { UseFormReturn } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Button } from "@codegouvfr/react-dsfr/Button";
-import { formatError } from "../builder/error";
-import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
-import clsx from "clsx";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
+import clsx from "clsx";
+import React, { useMemo, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import { capitalize } from "../../../common/helper";
+import { formatError } from "../builder/error";
 
 type WasteCode = {
   code: string;
@@ -148,7 +149,7 @@ export function WasteCodeSelector({
       </div>
       {description && (
         <div className="fr-col-12">
-          <Alert description={description} severity="info" small />
+          <Alert description={capitalize(description)} severity="info" small />
         </div>
       )}
     </>
