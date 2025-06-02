@@ -373,7 +373,7 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   },
 
   transporterWastePackagings: {
-    readableFieldName: "le conditionnament du transporteur",
+    readableFieldName: "le conditionnement du transporteur",
     sealed: { from: "TRANSPORT" },
     path: ["transporter", "transport", "packagings"],
     required: {

@@ -9,10 +9,7 @@ import { getTransporterReceipt } from "../../companies/recipify";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
 import { parseBsdasri } from "../validation";
-import {
-  prismaToZodBsdasri,
-  getNextSignatureType
-} from "../validation/helpers";
+import { prismaToZodBsdasri } from "../validation/helpers";
 
 import { ZodIssue } from "zod";
 
@@ -39,10 +36,10 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
       ...transporterReceipt
     });
     const currentSignature = getNextSignature(bsdasri);
-    const nextSignature = getNextSignatureType(currentSignature);
+
     try {
       parseBsdasri(zodBsdasri, {
-        currentSignatureType: nextSignature
+        currentSignatureType: currentSignature
       });
       return [];
     } catch (errors) {
@@ -50,7 +47,7 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
         return {
           message: e.message,
           path: `${e.path[0]}`, // e.path is an array, first element should be the path name
-          requiredFor: nextSignature
+          requiredFor: currentSignature
         };
       });
     }
