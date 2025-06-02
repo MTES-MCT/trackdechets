@@ -23,7 +23,7 @@ import {
   BsdaWithTransportersInclude
 } from "./types";
 import { prisma } from "@td/prisma";
-import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { getRevisionOrgIds, RevisionTab } from "../common/elasticHelpers";
 import {
   getFirstTransporterSync,
   getLastTransporterSync,
@@ -438,7 +438,7 @@ export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
  */
 export function getBsdaRevisionOrgIds(
   bsda: BsdaForElastic
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+): Pick<BsdElastic, RevisionTab> {
   return getRevisionOrgIds(bsda.bsdaRevisionRequests);
 }
 

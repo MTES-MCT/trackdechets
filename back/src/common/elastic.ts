@@ -106,9 +106,18 @@ export interface BsdElastic {
   isManagedWasteFor: string[];
   isAllWasteFor: string[];
 
-  // Liste des établissements concernés par une demande de révision en cours sur ce bordereau
-  isInRevisionFor: string[];
-  // Liste des établissements concernés par une demande de révision passée sur ce bordereau
+  // Révisions
+  // > Onglet 'En cours'.
+  // Toutes les révisions dont je suis l'auteur ou la cible, et qui n'ont pas encore été résolues.
+  isPendingRevisionFor: string[];
+  // > Onglet 'Emises'
+  // Toutes les révisions que mon entreprise a émises, et qui n'ont pas encore été résolues.
+  isEmittedRevisionFor: string[];
+  // > Onglet 'Reçues'
+  // Toutes les révisions dont mon entreprise est la cible, et qui n'ont pas encore été résolues.
+  isReceivedRevisionFor: string[];
+  // > Onglet 'Révisées'
+  // Toutes les révisions qui ont été résolues.
   isRevisedFor: string[];
 
   intermediaries?: FormCompany[] | null;
@@ -295,7 +304,9 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isTransportedWasteFor: stringField,
   isManagedWasteFor: stringField,
   isAllWasteFor: stringField,
-  isInRevisionFor: stringField,
+  isPendingRevisionFor: stringField,
+  isEmittedRevisionFor: stringField,
+  isReceivedRevisionFor: stringField,
   isRevisedFor: stringField,
 
   intermediaries: {

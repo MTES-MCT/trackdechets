@@ -89,6 +89,7 @@ export async function resetDatabase() {
 export async function refreshElasticSearch() {
   // Wait for all indexation jobs to finish
   const activeJobs = await indexQueue.getActive();
+  console.log("activeJobs", activeJobs);
   await Promise.all(activeJobs.map(job => job.finished()));
 
   return elasticSearch.indices.refresh(

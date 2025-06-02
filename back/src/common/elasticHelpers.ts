@@ -15,6 +15,20 @@ type RevisionRequest = {
   };
 };
 
+export type RevisionTab =
+  // > Onglet 'En cours'.
+  // Toutes les révisions dont je suis l'auteur ou la cible, et qui n'ont pas encore été résolues.
+  | "isPendingRevisionFor"
+  // > Onglet 'Emises'
+  // Toutes les révisions que mon entreprise a émises, et qui n'ont pas encore été résolues.
+  | "isEmittedRevisionFor"
+  // > Onglet 'Reçues'
+  // Toutes les révisions dont mon entreprise est la cible, et qui n'ont pas encore été résolues.
+  | "isReceivedRevisionFor"
+  // > Onglet 'Révisées'
+  // Toutes les révisions qui ont été résolues.
+  | "isRevisedFor";
+
 /**
  * Pour une liste de demandes de révisions BSDD, BSDA ou Bsdasri, retourne l'ensemble
  * des identifiants d'établissements pour lesquels il y a une demande de révision
@@ -22,47 +36,69 @@ type RevisionRequest = {
  */
 export function getRevisionOrgIds(
   revisionRequests: RevisionRequest[]
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
-  const { isInRevisionFor, isRevisedFor } = revisionRequests.reduce<
-    ReturnType<typeof getRevisionOrgIds>
-  >(
+): Pick<BsdElastic, RevisionTab> {
+  const {
+    isPendingRevisionFor,
+    isEmittedRevisionFor,
+    isReceivedRevisionFor,
+    isRevisedFor
+  } = revisionRequests.reduce<ReturnType<typeof getRevisionOrgIds>>(
     // Pour chaque demande de révision en cours ou passés sur le bordereau
-    ({ isInRevisionFor, isRevisedFor }, revisionRequest) => {
-      // On commence par calculer la liste des identifiants d'établissements
-      // concernés par la demande de révision. En théorie cette liste est plus ou
-      // moins la même d'une demande de révision à l'autre
-      const revisionRequestOrgIds = [
-        revisionRequest.authoringCompany.orgId,
-        ...revisionRequest.approvals.map(a => a.approverSiret)
-      ];
-      // En fonction du statut de la demande de révision, on affecte les identifiants
-      // d'établissements soit à `isInRevisionFor`, soit à `isRevisedFor`. L'utilisation
-      // de `new Set(...)` permet de s'assurer que les identifiants sont uniques dans la liste.
+    (
+      {
+        isPendingRevisionFor,
+        isEmittedRevisionFor,
+        isReceivedRevisionFor,
+        isRevisedFor
+      },
+      revisionRequest
+    ) => {
+      // Les acteurs de la révision
+      const authorOrgId = revisionRequest.authoringCompany.orgId;
+      const targetsOrgIds = revisionRequest.approvals.map(a => a.approverSiret);
+      const companiesOrgIds = [authorOrgId, ...targetsOrgIds];
 
-      return revisionRequest.status === "PENDING"
-        ? {
-            isInRevisionFor: [
-              ...new Set([...isInRevisionFor, ...revisionRequestOrgIds])
-            ],
-            isRevisedFor
-          }
-        : {
-            isInRevisionFor,
-            isRevisedFor: [
-              ...new Set([...isRevisedFor, ...revisionRequestOrgIds])
-            ]
-          };
+      // La révision est toujours en cours
+      if (revisionRequest.status === "PENDING") {
+        return {
+          isPendingRevisionFor: [
+            ...new Set([...isPendingRevisionFor, ...companiesOrgIds])
+          ],
+          isEmittedRevisionFor: [
+            ...new Set([...isEmittedRevisionFor, authorOrgId])
+          ],
+          isReceivedRevisionFor: [
+            ...new Set([...isReceivedRevisionFor, ...targetsOrgIds])
+          ],
+          isRevisedFor
+        };
+      }
+
+      // La révision a abouti
+      return {
+        isPendingRevisionFor,
+        isEmittedRevisionFor,
+        isReceivedRevisionFor,
+        isRevisedFor: [...new Set([...isRevisedFor, ...companiesOrgIds])]
+      };
     },
-    { isInRevisionFor: [], isRevisedFor: [] }
+    {
+      isPendingRevisionFor: [],
+      isEmittedRevisionFor: [],
+      isReceivedRevisionFor: [],
+      isRevisedFor: []
+    }
   );
 
   // Si on a à la fois une demande de révision en cours et des demandes de révision passées
-  // on veut que le bordereau apparaisse uniquement dans l'onglet `En révision`. On ajoute donc
-  // un filtre sur `isRevisedFor` pour s'assurer qu'un identifiant d'établissement apparaisse
-  // soit dans `isInRevisionFor`, soit dans `isRevisedFor` mais pas dans les deux.
+  // on ne veut pas que le bordereau apparaisse dans l'onglet 'Révisés'.
   return {
-    isInRevisionFor: isInRevisionFor,
-    isRevisedFor: isRevisedFor.filter(orgId => !isInRevisionFor.includes(orgId))
+    isPendingRevisionFor,
+    isEmittedRevisionFor,
+    isReceivedRevisionFor,
+    isRevisedFor: isRevisedFor.filter(
+      orgId => !isPendingRevisionFor.includes(orgId)
+    )
   };
 }
 /**

@@ -50,7 +50,9 @@ async function buildQuery(
     isArchivedFor: where?.isArchivedFor,
     isToCollectFor: where?.isToCollectFor,
     isCollectedFor: where?.isCollectedFor,
-    isInRevisionFor: where?.isInRevisionFor,
+    isPendingRevisionFor: where?.isPendingRevisionFor,
+    isEmittedRevisionFor: where?.isEmittedRevisionFor,
+    isReceivedRevisionFor: where?.isReceivedRevisionFor,
     isRevisedFor: where?.isRevisedFor,
     isReturnFor: where?.isReturnFor
   })

@@ -25,6 +25,7 @@ export default async function create(
 }
 
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
+  console.log(">> genericCreate");
   const user = checkIsAuthenticated(context);
   await checkCanCreate(user, input);
   const companies = await getUserCompanies(user.id);
