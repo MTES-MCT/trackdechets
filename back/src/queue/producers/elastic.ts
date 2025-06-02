@@ -1,15 +1,16 @@
-import Queue, { JobOptions } from "bull";
+import { errors } from "@elastic/elasticsearch";
 import { logger } from "@td/logger";
-import { scheduleWebhook } from "./webhooks";
-import {
-  INDEX_JOB_NAME,
-  INDEX_CREATED_JOB_NAME,
-  INDEX_UPDATED_JOB_NAME,
-  DELETE_JOB_NAME
-} from "./jobNames";
-import { updatesQueue } from "./bsdUpdate";
-import { operationHooksQueue } from "./operationHook";
+import Queue, { JobOptions } from "bull";
 import { updateFavorites } from "../../companies/database";
+import { updatesQueue } from "./bsdUpdate";
+import {
+  DELETE_JOB_NAME,
+  INDEX_CREATED_JOB_NAME,
+  INDEX_JOB_NAME,
+  INDEX_UPDATED_JOB_NAME
+} from "./jobNames";
+import { operationHooksQueue } from "./operationHook";
+import { scheduleWebhook } from "./webhooks";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
@@ -17,7 +18,7 @@ export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
 export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
   defaultJobOptions: {
     attempts: 3,
-    backoff: { type: "fixed", delay: 100 },
+    backoff: { type: "fixed", delay: 1000 }, // ES refresh takes around 1s
     removeOnComplete: 10_000,
     timeout: 10000
   }
@@ -116,7 +117,13 @@ indexQueue.on("completed", async job => {
 
 indexQueue.on("failed", (job, err) => {
   const id = job.data;
-  logger.error(`Indexation job failed for bsd "${id}"`, { id, err });
+
+  // Don't log 409 conflicts. Those are retried and not problematic.
+  if (err instanceof errors.ResponseError && err.statusCode === 409) {
+    return;
+  }
+
+  logger.error(`Indexation job failed for bsd "${id}"`, err);
 });
 
 type JobName = typeof INDEX_CREATED_JOB_NAME | typeof INDEX_UPDATED_JOB_NAME;

@@ -428,7 +428,13 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
   };
 }
 
-export function indexBsda(bsda: BsdaForElastic, ctx?: GraphQLContext) {
+export function indexBsda(
+  bsda: BsdaForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsda), ctx);
 }
 

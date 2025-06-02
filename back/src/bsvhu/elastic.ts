@@ -303,7 +303,13 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
   };
 }
 
-export function indexBsvhu(bsvhu: BsvhuForElastic, ctx?: GraphQLContext) {
+export function indexBsvhu(
+  bsvhu: BsvhuForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsvhu), ctx);
 }
 
