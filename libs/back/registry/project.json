@@ -23,6 +23,15 @@
       "configurations": {
         "integration": {}
       }
+    },
+    "errors": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsx --tsconfig libs/back/registry/tsconfig.lib.json libs/back/registry/src/scripts/analyzeS3Errors.ts"
+      },
+      "configurations": {
+        "integration": {}
+      }
     }
   },
   "tags": []
