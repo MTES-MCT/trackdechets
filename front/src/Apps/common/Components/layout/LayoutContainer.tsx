@@ -48,11 +48,7 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
-  <>
-    <strong>IMPORTANT : </strong> À compter du 5 mai, toutes les déclarations au
-    RNDTS doivent être effectuées directement sur Trackdéchets depuis l'onglet
-    Mes registres.
-  </>
+  "Aidez nous à améliorer Trackdéchets, nous avons besoin de votre avis :"
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -89,10 +85,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/informations-generales-and-impacts-utilisateurs"
+                    title: "Je donne mon avis",
+                    href: "https://tally.so/r/np9ZXV"
                   }}
-                  persistedSurveyName="td-20250505"
+                  persistedSurveyName="td-20250603"
                 />
               }
             />
