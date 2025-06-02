@@ -81,7 +81,6 @@ bulkIndexMasterQueue.on("stalled", opt => {
 });
 
 indexQueue.on("completed", async job => {
-  console.log(">> indexQueue onCompleted!");
   const id = job.data;
 
   const { sirets, siretsBeforeUpdate, status } = job.returnvalue;
@@ -127,7 +126,6 @@ async function enqueueBsdToIndex(
   jobName: JobName,
   options?: JobOptions
 ): Promise<void> {
-  console.log(">> enqueueBsdToIndex", bsdId, jobName, options);
   logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add(jobName, bsdId, options);
 }
@@ -136,7 +134,6 @@ export async function enqueueCreatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  console.log(">> enqueueCreatedBsdToIndex", bsdId, options);
   await enqueueBsdToIndex(bsdId, INDEX_CREATED_JOB_NAME, options);
 }
 

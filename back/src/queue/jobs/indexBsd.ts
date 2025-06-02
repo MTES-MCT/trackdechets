@@ -26,7 +26,6 @@ import { lookupUtils as bsvhuLookupUtils } from "../../bsvhu/registryV2";
 export async function indexBsdJob(
   job: Job<string>
 ): Promise<BsdElastic & { siretsBeforeUpdate: string[] }> {
-  console.log(">> indexBsdJob", job.data);
   const bsdId = job.data;
   const indexed = await getElasticBsdById(bsdId);
 
