@@ -105,6 +105,15 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     setFieldValue("waste.code", bsda?.waste?.code ?? initialState!.waste!.code);
     setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState!.waste!.adr);
     setFieldValue(
+      "waste.isSubjectToADR",
+      bsda?.waste?.isSubjectToADR ?? initialState!.waste!.isSubjectToADR
+    );
+    setFieldValue(
+      "waste.nonRoadRegulationMention",
+      bsda?.waste?.nonRoadRegulationMention ??
+        initialState!.waste!.nonRoadRegulationMention
+    );
+    setFieldValue(
       "waste.familyCode",
       bsda?.waste?.familyCode ?? initialState!.waste!.familyCode
     );
