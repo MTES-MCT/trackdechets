@@ -15,6 +15,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un second facteur TOTP pour les administrateurs Trackdéchets [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202)
+- BSDA: il est désormais possible de distinguer la mention ADR de la mention "RID, ADN, IMDG" [PR 4155](https://github.com/MTES-MCT/trackdechets/pull/4155)
+- BSDA: il est désormais possible de préciser la quantité refusée [PR 4196](https://github.com/MTES-MCT/trackdechets/pull/4196)
+- BSDA: il est désormais possible de signer la réception et le traitement du déchet en 2 temps [PR 4150](https://github.com/MTES-MCT/trackdechets/pull/4150)
+
+#### :bug: Corrections de bugs
+
+- BSDA: le nombre total de conditionnements remonte désormais dans la colonne "Nombre d'unités" du registre [PR 4209](https://github.com/MTES-MCT/trackdechets/pull/4209)
+
+#### :boom: Breaking Change
+
+- BSDD: le champ `wasteDetailsIsSubjectToADR` est maintenant obligatoire via API [PR 4183](https://github.com/MTES-MCT/trackdechets/pull/4183)
 
 # [2025.05.1] 03/05/2025
 
