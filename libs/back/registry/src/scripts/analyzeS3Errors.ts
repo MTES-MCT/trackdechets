@@ -234,13 +234,16 @@ async function main() {
     }
 
     const sortedErrors = Array.from(errorCounts.entries()).sort(
-      ([, statsA], [, statsB]) => statsB.totalCount - statsA.totalCount
+      ([, statsA], [, statsB]) =>
+        // Sort by number of files first, then by total count if tied
+        statsB.distinctFiles.size - statsA.distinctFiles.size ||
+        statsB.totalCount - statsA.totalCount
     );
 
     console.log(
       `\nTop ${Math.min(topN, sortedErrors.length)} errors (out of ${
         sortedErrors.length
-      } unique errors):`
+      } unique errors) sorted by number of files affected:`
     );
     for (let i = 0; i < Math.min(topN, sortedErrors.length); i++) {
       const [error, stats] = sortedErrors[i];
