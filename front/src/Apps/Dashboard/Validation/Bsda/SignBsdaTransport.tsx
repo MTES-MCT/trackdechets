@@ -268,7 +268,9 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                     description={
                       <>
                         <p className="fr-mb-1w">ADR : {bsda.waste.adr}</p>
-                        <p>RID : {bsda.waste.nonRoadRegulationMention}</p>
+                        {bsda.waste.nonRoadRegulationMention && (
+                          <p>RID : {bsda.waste.nonRoadRegulationMention}</p>
+                        )}
                       </>
                     }
                   />

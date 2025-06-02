@@ -268,7 +268,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 />
 
                 <h4 className="fr-h4">
-                  <strong>Réception</strong>
+                  <strong>Réception et acceptation</strong>
                 </h4>
                 <div className="fr-grid-row fr-grid-row--top">
                   <div className="fr-grid-row fr-grid-row--gutters fr-mb-0">
