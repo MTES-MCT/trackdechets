@@ -25,7 +25,6 @@ import { registryImportQueue } from "./producers/registryImport";
 export const serverAdapter = new ExpressAdapter();
 export const bullBoardPath = `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`;
 
-console.log(">> Create bull board!");
 createBullBoard({
   queues: [
     new BullAdapter(mailQueue),
