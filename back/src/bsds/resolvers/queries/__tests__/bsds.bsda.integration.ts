@@ -92,6 +92,21 @@ const GET_BSDS = gql`
   }
 `;
 
+const getTabRevision = async (
+  userAndCompany: { user: User; company: Company },
+  tab: RevisionTab
+) => {
+  const { user, company } = userAndCompany;
+  const { query } = makeClient(user);
+  return await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
+    variables: {
+      where: {
+        [tab]: [company.siret!]
+      }
+    }
+  });
+};
+
 describe("Query.bsds.bsda base workflow", () => {
   let emitter: { user: User; company: Company };
   let worker: { user: User; company: Company };
@@ -209,7 +224,6 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       });
-      console.log("errors", errors);
       bsdaId = data.createDraftBsda.id;
       await refreshElasticSearch();
     });
@@ -237,7 +251,7 @@ describe("Query.bsds.bsda base workflow", () => {
       ]);
     });
 
-    it.only("draft bsda should be isDraftFor emitter", async () => {
+    it("draft bsda should be isDraftFor emitter", async () => {
       const res = await client.search({
         index: index.alias,
         body: {
@@ -248,7 +262,6 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       });
-      console.log("res", res.body.hits.hits);
 
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
@@ -762,7 +775,7 @@ describe("Query.bsds.bsda base workflow", () => {
     });
   });
 
-  describe("when the BSDA is under revision", () => {
+  describe("when the BSDA is under revision (created by destination)", () => {
     beforeAll(async () => {
       expect(bsdaId).toBeDefined();
 
@@ -794,20 +807,6 @@ describe("Query.bsds.bsda base workflow", () => {
       revisionRequestId = data.createBsdaRevisionRequest.id;
       await refreshElasticSearch();
     });
-
-    const getTabRevision = async (
-      userAndCompany: { user: User; company: Company },
-      tab: RevisionTab
-    ) => {
-      const { query } = makeClient(emitter.user);
-      return await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
-        variables: {
-          where: {
-            [tab]: [userAndCompany.company.siret!]
-          }
-        }
-      });
-    };
 
     describe("emitter", () => {
       it("should list bsd in 'isPendingRevisionFor'", async () => {
@@ -859,9 +858,114 @@ describe("Query.bsds.bsda base workflow", () => {
         expect(data.bsds.edges.length).toBe(0);
       });
     });
+
+    describe("destination", () => {
+      it("should list bsd in 'isPendingRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isPendingRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
+
+      it("should list bsd in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isEmittedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
+
+      it("should NOT list bsd in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isReceivedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isRevisedFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isRevisedFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+    });
+
+    describe("worker", () => {
+      it("should list bsd in 'isPendingRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isPendingRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
+
+      it("should NOT list bsd in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isEmittedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should list bsd in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isReceivedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
+
+      it("should NOT list bsd in 'isRevisedFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(worker, "isRevisedFor");
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+    });
   });
 
-  describe("when the BSDA revision has been accepted", () => {
+  describe("when the BSDA revision has been accepted (created by destination)", () => {
     beforeAll(async () => {
       expect(bsdaId).toBeDefined();
       const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = gql`
@@ -908,62 +1012,158 @@ describe("Query.bsds.bsda base workflow", () => {
       await refreshElasticSearch();
     });
 
-    it("should list bsd in emitter `isRevisedFor` bsdas", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isRevisedFor: [emitter.company.siret!]
-            }
-          }
-        }
-      );
+    describe("emitter", () => {
+      it("should NOT list bsd in 'isPendingRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          emitter,
+          "isPendingRevisionFor"
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          emitter,
+          "isEmittedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should list bsd in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          emitter,
+          "isReceivedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should list bsd in 'isRevisedFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(emitter, "isRevisedFor");
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
     });
 
-    it("should list bsd in worker `isRevisedFor` bsdas", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isRevisedFor: [emitter.company.siret!]
-            }
-          }
-        }
-      );
+    describe("destination", () => {
+      it("should NOT list bsd in 'isPendingRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isPendingRevisionFor"
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isEmittedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isReceivedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should list bsd in 'isRevisedFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          destination,
+          "isRevisedFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
     });
 
-    it("should list bsd in destination `isRevisedFor` bsdas", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isRevisedFor: [destination.company.siret!]
-            }
-          }
-        }
-      );
+    describe("worker", () => {
+      it("should NOT list bsd in 'isPendingRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isPendingRevisionFor"
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdaId } })
-      ]);
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isEmittedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should NOT list bsd in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(
+          worker,
+          "isReceivedRevisionFor"
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges.length).toBe(0);
+      });
+
+      it("should list bsd in 'isRevisedFor'", async () => {
+        // When
+        const { errors, data } = await getTabRevision(worker, "isRevisedFor");
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdaId } })
+        ]);
+      });
     });
   });
 
-  describe.skip("when the bsda operation is signed by the destination (AWAITING_CHILD)", () => {
+  describe("when the bsda operation is signed by the destination (AWAITING_CHILD)", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(destination.user);
 
@@ -1064,7 +1264,7 @@ describe("Query.bsds.bsda base workflow", () => {
     });
   });
 
-  describe.skip("when the bsda is refused", () => {
+  describe("when the bsda is refused", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(destination.user);
 
@@ -1168,7 +1368,7 @@ describe("Query.bsds.bsda base workflow", () => {
   });
 });
 
-describe.skip("Query.bsds.bsdas multi-modal workflow", () => {
+describe("Query.bsds.bsdas multi-modal workflow", () => {
   let emitter: UserWithCompany;
   let worker: UserWithCompany;
   let transporter1: UserWithCompany;
@@ -1488,7 +1688,7 @@ describe.skip("Query.bsds.bsdas multi-modal workflow", () => {
   });
 });
 
-describe.skip("Query.bsds.bsdas mutations", () => {
+describe("Query.bsds.bsdas mutations", () => {
   afterAll(resetDatabase);
 
   it("deleted bsda should be removed from ES index", async () => {
@@ -1603,7 +1803,7 @@ describe.skip("Query.bsds.bsdas mutations", () => {
   });
 });
 
-describe.skip("Bsda sub-resolvers in query bsds", () => {
+describe("Bsda sub-resolvers in query bsds", () => {
   afterEach(resetDatabase);
 
   const GET_BSDS = gql`
