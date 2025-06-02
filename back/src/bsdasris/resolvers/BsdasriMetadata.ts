@@ -47,7 +47,7 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
         return {
           message: e.message,
           path: `${e.path[0]}`, // e.path is an array, first element should be the path name
-          requiredFor: currentSignature
+          requiredFor: [currentSignature]
         };
       });
     }
