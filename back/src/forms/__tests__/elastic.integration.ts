@@ -721,9 +721,11 @@ describe("toBsdElastic > APPENDIX1", () => {
       expect(elasticBsd.isArchivedFor).toEqual([]);
       expect(elasticBsd.isToCollectFor).toEqual([]);
       expect(elasticBsd.isCollectedFor).toEqual([]);
-      expect(elasticBsd.isInRevisionFor).toEqual([]);
       expect(elasticBsd.isReturnFor).toEqual([]);
-      expect(elasticBsd.isRevisedFor).toEqual([]);
+      expect(elasticBsd.isPendingRevisionFor).toEqual([]);
+      expect(elasticBsd.isEmittedRevisionFor).toEqual([]);
+      expect(elasticBsd.isReceivedRevisionFor).toEqual([]);
+      expect(elasticBsd.isReviewedRevisionFor).toEqual([]);
     }
   );
 
@@ -801,8 +803,10 @@ describe("toBsdElastic > APPENDIX1", () => {
     expect(elasticBsd.isArchivedFor).toEqual([]);
     expect(elasticBsd.isToCollectFor).toEqual([]);
     expect(elasticBsd.isCollectedFor).toEqual([]);
-    expect(elasticBsd.isInRevisionFor).toEqual([]);
     expect(elasticBsd.isReturnFor).toEqual([]);
-    expect(elasticBsd.isRevisedFor).toEqual([]);
+    expect(elasticBsd.isPendingRevisionFor).toEqual([]);
+    expect(elasticBsd.isEmittedRevisionFor).toEqual([]);
+    expect(elasticBsd.isReceivedRevisionFor).toEqual([]);
+    expect(elasticBsd.isReviewedRevisionFor).toEqual([]);
   });
 });
