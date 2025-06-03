@@ -22,7 +22,8 @@ const CREATE_FORM_REVISION_REQUEST = gql`
 describe("getFormRevisionOrgIds", () => {
   afterEach(resetDatabase);
 
-  it("should list organisation identifiers in `isInRevisionFor` and `isRevisedFor`", async () => {
+  it("should list organisation identifiers correct revision tabs", async () => {
+    // Etape 1: on crée le bordereau
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
     const recipient = await userWithCompanyFactory("ADMIN", {
@@ -45,14 +46,17 @@ describe("getFormRevisionOrgIds", () => {
       }
     });
 
-    const { mutate } = makeClient(emitter.user);
-
+    // A ce stade, les onglets de révisions devraient être vides
     const formForElastic = await getFormForElastic(form);
     const revisionOrgIds = getFormRevisionOrgIds(formForElastic);
 
-    expect(revisionOrgIds.isInRevisionFor).toHaveLength(0);
-    expect(revisionOrgIds.isRevisedFor).toHaveLength(0);
+    expect(revisionOrgIds.isPendingRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds.isEmittedRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds.isReceivedRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds.isReviewedRevisionFor).toHaveLength(0);
 
+    // L'émetteur crée la révision
+    const { mutate } = makeClient(emitter.user);
     const { errors, data } = await mutate<
       Pick<Mutation, "createFormRevisionRequest">,
       MutationCreateFormRevisionRequestArgs
@@ -67,20 +71,38 @@ describe("getFormRevisionOrgIds", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     const revisionRequest = data.createFormRevisionRequest;
 
-    expect(errors).toBeUndefined();
-
+    // La révision devrait commencer à apparaître dans les différents onglets
     const formForElastic2 = await getFormForElastic(form);
     const revisionOrgIds2 = getFormRevisionOrgIds(formForElastic2);
 
-    // Une demande de révision est en cours, les bordereaux doivent apparaitre dans
-    // l'onglet "Révision en cours"
-    expect(revisionOrgIds2.isInRevisionFor).toHaveLength(2);
-    expect(revisionOrgIds2.isInRevisionFor).toContain(emitter.company.siret);
-    expect(revisionOrgIds2.isInRevisionFor).toContain(recipient.company.siret);
-    expect(revisionOrgIds2.isRevisedFor).toHaveLength(0);
+    // L'émetteur et le destinataire voient la révisions dans "En cours"
+    expect(revisionOrgIds2.isPendingRevisionFor).toHaveLength(2);
+    expect(revisionOrgIds2.isPendingRevisionFor).toContain(
+      emitter.company.siret
+    );
+    expect(revisionOrgIds2.isPendingRevisionFor).toContain(
+      recipient.company.siret
+    );
 
+    // L'émetteur voit la révision dans "Émises"
+    expect(revisionOrgIds2.isEmittedRevisionFor).toHaveLength(1);
+    expect(revisionOrgIds2.isEmittedRevisionFor).toContain(
+      emitter.company.siret
+    );
+
+    // Le destinataire voit la révision dans "Reçues"
+    expect(revisionOrgIds2.isReceivedRevisionFor).toHaveLength(1);
+    expect(revisionOrgIds2.isReceivedRevisionFor).toContain(
+      recipient.company.siret
+    );
+
+    // Rien dans "Finalisées"
+    expect(revisionOrgIds2.isReviewedRevisionFor).toHaveLength(0);
+
+    // On passe la révision à acceptée
     await prisma.bsddRevisionRequest.update({
       where: { id: revisionRequest.id },
       data: { status: "ACCEPTED" }
@@ -89,13 +111,19 @@ describe("getFormRevisionOrgIds", () => {
     const formForElastic3 = await getFormForElastic(form);
     const revisionOrgIds3 = getFormRevisionOrgIds(formForElastic3);
 
-    // La demande de révision a été accepté, les bordereaux doivent apparaitre
-    // dans l'onglet "Révisions passés"
-    expect(revisionOrgIds3.isInRevisionFor).toHaveLength(0);
-    expect(revisionOrgIds3.isRevisedFor).toHaveLength(2);
-    expect(revisionOrgIds3.isRevisedFor).toContain(emitter.company.siret);
-    expect(revisionOrgIds3.isRevisedFor).toContain(recipient.company.siret);
+    // Les différents onglets ont bougé
+    expect(revisionOrgIds3.isPendingRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds3.isEmittedRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds3.isReceivedRevisionFor).toHaveLength(0);
+    expect(revisionOrgIds3.isReviewedRevisionFor).toHaveLength(2);
+    expect(revisionOrgIds3.isReviewedRevisionFor).toContain(
+      recipient.company.siret
+    );
+    expect(revisionOrgIds3.isReviewedRevisionFor).toContain(
+      emitter.company.siret
+    );
 
+    // On crée une nouvelle demande de révision
     await mutate<
       Pick<Mutation, "createFormRevisionRequest">,
       MutationCreateFormRevisionRequestArgs
@@ -110,14 +138,32 @@ describe("getFormRevisionOrgIds", () => {
       }
     });
 
+    // La révision ré-apparaître dans les différents onglets
     const formForElastic4 = await getFormForElastic(form);
     const revisionOrgIds4 = getFormRevisionOrgIds(formForElastic4);
 
-    // Une nouvelle demande de révision a été effectuée, le bordereau doit
-    // rebasculer dans l'onglet "Révision en cours"
-    expect(revisionOrgIds4.isInRevisionFor).toHaveLength(2);
-    expect(revisionOrgIds4.isInRevisionFor).toContain(emitter.company.siret);
-    expect(revisionOrgIds4.isInRevisionFor).toContain(recipient.company.siret);
-    expect(revisionOrgIds4.isRevisedFor).toHaveLength(0);
+    // L'émetteur et le destinataire voient la révisions dans "En cours"
+    expect(revisionOrgIds4.isPendingRevisionFor).toHaveLength(2);
+    expect(revisionOrgIds4.isPendingRevisionFor).toContain(
+      emitter.company.siret
+    );
+    expect(revisionOrgIds4.isPendingRevisionFor).toContain(
+      recipient.company.siret
+    );
+
+    // L'émetteur voit la révision dans "Émises"
+    expect(revisionOrgIds4.isEmittedRevisionFor).toHaveLength(1);
+    expect(revisionOrgIds4.isEmittedRevisionFor).toContain(
+      emitter.company.siret
+    );
+
+    // Le destinataire voit la révision dans "Reçues"
+    expect(revisionOrgIds4.isReceivedRevisionFor).toHaveLength(1);
+    expect(revisionOrgIds4.isReceivedRevisionFor).toContain(
+      recipient.company.siret
+    );
+
+    // Rien dans "Finalisées"
+    expect(revisionOrgIds4.isReviewedRevisionFor).toHaveLength(0);
   });
 });

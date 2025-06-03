@@ -15,7 +15,7 @@ import {
   getTransportersSync
 } from "./database";
 import { FormForElastic } from "./elastic";
-import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { getRevisionOrgIds, RevisionTab } from "../common/elasticHelpers";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
 
@@ -342,6 +342,6 @@ function getFormSirets(form: FullForm) {
  */
 export function getFormRevisionOrgIds(
   form: FormForElastic
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+): Pick<BsdElastic, RevisionTab> {
   return getRevisionOrgIds(form.bsddRevisionRequests);
 }

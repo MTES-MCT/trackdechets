@@ -19,7 +19,7 @@ import {
   BsdasriWithRevisionRequestsInclude
 } from "./types";
 import { prisma } from "@td/prisma";
-import { getRevisionOrgIds } from "../common/elasticHelpers";
+import { getRevisionOrgIds, RevisionTab } from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
@@ -289,7 +289,7 @@ export function indexBsdasri(bsdasri: BsdasriForElastic, ctx?: GraphQLContext) {
  */
 export function getBsdasriRevisionOrgIds(
   bsdasri: BsdasriForElastic
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+): Pick<BsdElastic, RevisionTab> {
   return getRevisionOrgIds(bsdasri.bsdasriRevisionRequests);
 }
 

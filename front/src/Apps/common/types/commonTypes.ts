@@ -8,8 +8,10 @@ export type BsdCurrentTab =
   | "toCollectTab"
   | "followTab"
   | "archivesTab"
-  | "reviewedTab"
-  | "toReviewTab"
   | "collectedTab"
   | "returnTab"
-  | "allBsdsTab";
+  | "allBsdsTab"
+  | "pendingRevisionForTab"
+  | "emittedRevisionForTab"
+  | "receivedRevisionForTab"
+  | "reviewedRevisionForTab";

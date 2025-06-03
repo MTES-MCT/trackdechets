@@ -647,9 +647,11 @@ export const getBsdCurrentTab = ({
   isArchivesTab,
   isToCollectTab,
   isCollectedTab,
-  isReviewedTab,
-  isToReviewTab,
-  isReturnTab
+  isReturnTab,
+  isPendingRevisionForTab,
+  isEmittedRevisionForTab,
+  isReceivedRevisionForTab,
+  isReviewedRevisionForTab
 }): BsdCurrentTab => {
   if (isDraftTab) {
     return "draftTab";
@@ -663,12 +665,6 @@ export const getBsdCurrentTab = ({
   if (isArchivesTab) {
     return "archivesTab";
   }
-  if (isReviewedTab) {
-    return "reviewedTab";
-  }
-  if (isToReviewTab) {
-    return "toReviewTab";
-  }
   if (isToCollectTab) {
     return "toCollectTab";
   }
@@ -677,6 +673,18 @@ export const getBsdCurrentTab = ({
   }
   if (isReturnTab) {
     return "returnTab";
+  }
+  if (isPendingRevisionForTab) {
+    return "pendingRevisionForTab";
+  }
+  if (isEmittedRevisionForTab) {
+    return "emittedRevisionForTab";
+  }
+  if (isReceivedRevisionForTab) {
+    return "receivedRevisionForTab";
+  }
+  if (isReviewedRevisionForTab) {
+    return "reviewedRevisionForTab";
   }
   // default tab
   return "allBsdsTab";
