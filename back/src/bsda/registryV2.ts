@@ -2,6 +2,7 @@ import {
   IncomingWasteV2,
   ManagedWasteV2,
   OutgoingWasteV2,
+  PackagingInfo,
   TransportedWasteV2
 } from "@td/codegen-back";
 import {
@@ -24,11 +25,22 @@ import { getBsdaSubType } from "../common/subTypes";
 import {
   deleteRegistryLookup,
   generateDateInfos,
-  createRegistryLogger
+  rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+
+const getQuantity = (packagings: Prisma.JsonValue) => {
+  if (!packagings || !(packagings as PackagingInfo[])?.length) {
+    return null;
+  }
+
+  return (packagings as PackagingInfo[])?.reduce(
+    (totalQuantity, p) => totalQuantity + (p.quantity ?? 0),
+    0
+  );
+};
 
 const getInitialEmitterData = (bsda: RegistryV2Bsda) => {
   const initialEmitter: Record<string, string | null> = {
@@ -233,7 +245,7 @@ export const toIncomingWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     initialEmitterCompanyName,
     initialEmitterCompanySiret,
@@ -292,7 +304,7 @@ export const toIncomingWasteV2 = (
     transporter1TransportMode: transporter?.transporterTransportMode,
     transporter1CompanyMail: transporter?.transporterCompanyMail,
     wasteAdr: bsda.wasteAdr,
-    nonRoadRegulationMention: null,
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
     destinationCompanyName: bsda.destinationCompanyName,
@@ -501,7 +513,7 @@ export const toOutgoingWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -613,7 +625,7 @@ export const toOutgoingWasteV2 = (
     transporter5TransportMode: transporter5?.transporterTransportMode,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
     wasteAdr: bsda.wasteAdr,
-    nonRoadRegulationMention: null,
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
     destinationCompanySiret: bsda.destinationCompanySiret,
@@ -786,7 +798,7 @@ export const toTransportedWasteV2 = (
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsda.weightIsEstimate,
     volume: null,
@@ -894,7 +906,7 @@ export const toTransportedWasteV2 = (
     transporter5TransportPlates: transporter5?.transporterTransportPlates,
 
     wasteAdr: bsda.wasteAdr,
-    nonRoadRegulationMention: null,
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
 
     destinationCompanySiret: bsda.destinationCompanySiret,
@@ -1041,7 +1053,7 @@ export const toManagedWasteV2 = (
     wasteCodeBale: null,
     wastePop: bsda.wastePop,
     wasteIsDangerous: true,
-    quantity: null,
+    quantity: getQuantity(bsda.packagings),
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsda.weightValue
       ? bsda.weightValue.dividedBy(1000).toDecimalPlaces(6).toNumber()
@@ -1161,7 +1173,7 @@ export const toManagedWasteV2 = (
     transporter5TransportMode: transporter5?.transporterTransportMode,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
     wasteAdr: bsda.wasteAdr,
-    nonRoadRegulationMention: null,
+    nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
     destinationCompanySiret: bsda.destinationCompanySiret,
@@ -1405,95 +1417,39 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
-  const logger = createRegistryLogger("BSDA");
-
-  const total = await prisma.bsda.count({
-    where: {
-      isDeleted: false,
-      isDraft: false
+export const rebuildRegistryLookup =
+  rebuildRegistryLookupGeneric<MinimalBsdaForLookup>({
+    name: "BSDA",
+    getTotalCount: () =>
+      prisma.bsda.count({
+        where: {
+          isDeleted: false,
+          isDraft: false
+        }
+      }),
+    findMany: (pageSize, cursorId) =>
+      prisma.bsda.findMany({
+        where: {
+          isDeleted: false,
+          isDraft: false
+        },
+        take: pageSize,
+        skip: cursorId ? 1 : 0,
+        cursor: cursorId ? { id: cursorId } : undefined,
+        orderBy: {
+          id: "desc"
+        },
+        select: minimalBsdaForLookupSelect
+      }),
+    toLookupData: items => {
+      let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+      for (const bsda of items) {
+        const createInputs = bsdaToLookupCreateInputs(bsda);
+        createArray = createArray.concat(createInputs);
+      }
+      return createArray;
     }
   });
-
-  let done = false;
-  let cursorId: string | null = null;
-  let processedCount = 0;
-  let operationId = 0;
-  const pendingWrites = new Map<number, Promise<void>>();
-
-  const processWrite = async (items: MinimalBsdaForLookup[]) => {
-    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
-    for (const bsda of items) {
-      const createInputs = bsdaToLookupCreateInputs(bsda);
-      createArray = createArray.concat(createInputs);
-    }
-    // Run delete and create operations in a transaction
-    await prisma.$transaction(
-      async tx => {
-        // Delete existing lookups for these items
-        await tx.registryLookup.deleteMany({
-          where: {
-            OR: items.map(item => ({
-              id: item.id
-            }))
-          }
-        });
-        await tx.registryLookup.createMany({
-          data: createArray,
-          skipDuplicates: true
-        });
-      },
-      {
-        maxWait: 20000,
-        timeout: 60000
-      }
-    );
-    processedCount += items.length;
-    logger.logProgress(processedCount, total, pendingWrites.size);
-  };
-
-  while (!done) {
-    // Sequential read
-    const items = await prisma.bsda.findMany({
-      where: {
-        isDeleted: false,
-        isDraft: false
-      },
-      take: pageSize,
-      skip: cursorId ? 1 : 0,
-      cursor: cursorId ? { id: cursorId } : undefined,
-      orderBy: {
-        id: "desc"
-      },
-      select: minimalBsdaForLookupSelect
-    });
-
-    // Start the write operation
-    const currentOperationId = operationId++;
-    const writePromise = processWrite(items).finally(() => {
-      pendingWrites.delete(currentOperationId);
-    });
-    pendingWrites.set(currentOperationId, writePromise);
-
-    // If we've reached max concurrency, wait for one write to complete
-    if (pendingWrites.size >= threads) {
-      await Promise.race(pendingWrites.values());
-    }
-
-    if (items.length < pageSize) {
-      done = true;
-      break;
-    }
-    cursorId = items[items.length - 1].id;
-  }
-
-  // Wait for any remaining writes to complete
-  if (pendingWrites.size > 0) {
-    await Promise.all(pendingWrites.values());
-  }
-
-  logger.logCompletion(processedCount);
-};
 
 export const lookupUtils = {
   update: updateRegistryLookup,

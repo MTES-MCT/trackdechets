@@ -31,7 +31,6 @@ export const schema = z.object({
   API_HOST: z.string(),
   API_PORT: z.string().optional().default("80").refine(isNumber),
   API_URL_SCHEME: z.string().optional(),
-  OIDC_PRIVATE_KEY: z.string(),
   // -------
   // Misc
   USERS_BLACKLIST: z.string().optional(),

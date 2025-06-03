@@ -46,7 +46,6 @@ describe("ActBsvhuValidation", () => {
           <ActBsvhuValidation
             bsd={bsd}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -68,7 +67,6 @@ describe("ActBsvhuValidation", () => {
           <ActBsvhuValidation
             bsd={signedByProducerBsvhu}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -87,7 +85,6 @@ describe("ActBsvhuValidation", () => {
           <ActBsvhuValidation
             bsd={sentBsvhu}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>

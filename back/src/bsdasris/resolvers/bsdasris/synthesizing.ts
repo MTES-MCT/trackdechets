@@ -2,7 +2,7 @@ import type { BsdasriResolvers } from "@td/codegen-back";
 
 import { BsdasriType } from "@prisma/client";
 import { expandSynthesizingDasri } from "../../converter";
-import { isSessionUser } from "../../../auth";
+import { isSessionUser } from "../../../auth/auth";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import { isGetBsdsQuery } from "../../../bsds/resolvers/queries/bsds";
 

@@ -43,6 +43,11 @@ const CREATE_BSDA = gql`
       intermediaries {
         siret
       }
+      waste {
+        isSubjectToADR
+        adr
+        nonRoadRegulationMention
+      }
     }
   }
 `;
@@ -2068,6 +2073,340 @@ describe("Mutation.Bsda.create", () => {
         // When > Then
         await testCreatingBsdaWithDormantSiret(siret);
       });
+    });
+  });
+
+  it.each(["", "     "])(
+    "should convert empty wasteAdr to null",
+    async wasteAdr => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const transporter = await companyFactory();
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: wasteAdr,
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: ["1", "2"]
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsda.waste?.adr).toBeNull();
+
+      const createdBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: data.createBsda.id }
+      });
+      expect(createdBsda.wasteAdr).toBeNull();
+    }
+  );
+
+  it("should save wasteIsSubjectToADR", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const transporter = await companyFactory();
+    const worker = await companyFactory();
+
+    const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: worker.siret,
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      transporter: {
+        company: { siret: transporter.siret }
+      },
+      waste: {
+        code: "06 07 01*",
+        isSubjectToADR: true,
+        adr: "MENTION ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+      CREATE_BSDA,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createBsda.waste?.isSubjectToADR).toBeTruthy();
+
+    const createdBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.createBsda.id }
+    });
+    expect(createdBsda.wasteIsSubjectToADR).toBeTruthy();
+  });
+
+  describe("ADR and non-road regulation mention", () => {
+    it("should allow to create a form with a nonRoadRegulationMention", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "MENTION ADR",
+          nonRoadRegulationMention: "Mentions RID, ADN, IMDG",
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: null
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsda.waste?.adr).toMatch("MENTION ADR");
+      expect(data.createBsda.waste?.nonRoadRegulationMention).toMatch(
+        "Mentions RID, ADN, IMDG"
+      );
+
+      const bsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: data.createBsda.id }
+      });
+
+      expect(bsda.wasteAdr).toMatch("MENTION ADR");
+      expect(bsda.wasteNonRoadRegulationMention).toMatch(
+        "Mentions RID, ADN, IMDG"
+      );
+    });
+
+    it("nonRoadRegulationMention is not required", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "MENTION ADR",
+          nonRoadRegulationMention: null, // not provided
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: null
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsda.waste?.adr).toMatch("MENTION ADR");
+      expect(data.createBsda.waste?.nonRoadRegulationMention).toBeNull();
+
+      const bsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: data.createBsda.id }
+      });
+
+      expect(bsda.wasteAdr).toMatch("MENTION ADR");
+      expect(bsda.wasteNonRoadRegulationMention).toBeNull();
     });
   });
 });

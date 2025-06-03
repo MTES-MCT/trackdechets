@@ -256,7 +256,7 @@ const transformedBsvhuSyncSchema = refinedBsvhuSchema.transform(
 );
 
 /**
- * Modification du schéma Zod pour appliquer des tranformations et
+ * Modification du schéma Zod pour appliquer des transformations et
  * des vérifications **synchrones** qui nécessite de connaitre le contexte d'appel.
  *
  * Exemple : pour valider les champs requis dans une mutation de signature,
@@ -267,7 +267,7 @@ export const contextualBsvhuSchema = (context: BsvhuValidationContext) => {
 };
 
 /**
- * Modification du schéma Zod pour appliquer des tranformations et
+ * Modification du schéma Zod pour appliquer des transformations et
  * des vérifications **asynchrones** qui nécessite de connaitre le contexte d'appel.
  */
 export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {

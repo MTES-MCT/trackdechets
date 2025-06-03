@@ -10,7 +10,7 @@ import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 
 import axios from "axios";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { getUserRoles } from "../../../permissions";
 
 import { UserInputError } from "../../../common/errors";

@@ -17,7 +17,7 @@ import path from "path";
 import { ValidationError } from "yup";
 import { ZodError } from "zod";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
-import { passportBearerMiddleware } from "./auth";
+import { passportBearerMiddleware } from "./auth/auth";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
@@ -46,7 +46,6 @@ import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
-import { oidcRouter } from "./routers/oidc-router";
 import { gericoWebhookHandler } from "./routers/gericoWebhookRouter";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
@@ -280,6 +279,15 @@ app.use(graphQLPath, timeoutMiddleware());
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
 
+declare module "express-session" {
+  interface SessionData {
+    preloggedUser?: {
+      userEmail: string;
+      expire: Date;
+    };
+  }
+}
+
 export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
@@ -304,7 +312,6 @@ app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 if (SESSION_COOKIE_SECURE === "true" && sess.cookie) {
   sess.cookie.secure = true; // serve secure cookies
 }
-
 app.use(session(sess));
 
 app.use(passport.initialize());
@@ -313,7 +320,6 @@ app.use(passport.session());
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
-app.use(oidcRouter);
 
 app.use(impersonateMiddleware);
 

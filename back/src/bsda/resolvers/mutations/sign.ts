@@ -129,6 +129,7 @@ export function getAuthorizedOrgIds(
       transportNthAuthorizedOrgIds(bsda, 4),
     TRANSPORT_5: (bsda: BsdaForSignature) =>
       transportNthAuthorizedOrgIds(bsda, 5),
+    RECEPTION: (bsda: BsdaForSignature) => [bsda.destinationCompanySiret],
     OPERATION: (bsda: Bsda) => [bsda.destinationCompanySiret]
   };
 
@@ -151,6 +152,7 @@ const signatures: Record<
   EMISSION: signEmission,
   WORK: signWork,
   TRANSPORT: signTransport,
+  RECEPTION: signReception,
   OPERATION: signOperation
 };
 
@@ -245,6 +247,26 @@ async function signTransport(
     // transporteur sur le BSDA
     updateInput.transporterTransportSignatureDate = signatureDate;
   }
+
+  return updateBsda(user, bsda, updateInput);
+}
+
+async function signReception(
+  user: Express.User,
+  bsda: BsdaForSignature,
+  input: BsdaSignatureInput
+) {
+  if (bsda.destinationReceptionSignatureDate !== null) {
+    throw new AlreadySignedError();
+  }
+
+  const nextStatus = await getNextStatus(bsda, input.type);
+
+  const updateInput: Prisma.BsdaUpdateInput = {
+    destinationReceptionSignatureAuthor: input.author,
+    destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
+    status: nextStatus
+  };
 
   return updateBsda(user, bsda, updateInput);
 }
@@ -430,7 +452,11 @@ function checkSignatureTypeSpecificRules(
   bsda: Bsda,
   input: BsdaSignatureInput
 ) {
-  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
+  if (
+    bsda.type === BsdaType.COLLECTION_2710 &&
+    input.type !== "RECEPTION" &&
+    input.type !== "OPERATION"
+  ) {
     throw new UserInputError(
       "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
@@ -442,12 +468,6 @@ function checkSignatureTypeSpecificRules(
   ) {
     throw new UserInputError(
       "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
-    );
-  }
-
-  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
-    throw new UserInputError(
-      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
   }
 }

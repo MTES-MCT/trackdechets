@@ -1,5 +1,7 @@
+import Decimal from "decimal.js";
 import { getUserCompanies } from "../users/database";
 import { BsdaWithIntermediaries, BsdaWithTransporters } from "./types";
+import { WasteQuantities, wasteQuantities } from "../common/wasteQuantities";
 
 export const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -48,4 +50,20 @@ export const getCanAccessDraftOrgIds = async (
     canAccessDraftOrgIds.push(...userOrgIdsInForm);
   }
   return canAccessDraftOrgIds;
+};
+
+export const bsdaWasteQuantities = ({
+  destinationReceptionAcceptationStatus,
+  destinationReceptionWeight,
+  destinationReceptionRefusedWeight
+}: {
+  destinationReceptionAcceptationStatus?: string | null;
+  destinationReceptionWeight?: Decimal | number | null;
+  destinationReceptionRefusedWeight?: Decimal | number | null;
+}): WasteQuantities | null => {
+  return wasteQuantities({
+    wasteAcceptationStatus: destinationReceptionAcceptationStatus,
+    quantityReceived: destinationReceptionWeight,
+    quantityRefused: destinationReceptionRefusedWeight
+  });
 };

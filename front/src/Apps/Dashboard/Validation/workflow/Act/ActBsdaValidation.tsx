@@ -1,41 +1,28 @@
 import React from "react";
-import { SignEmission } from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignEmission";
-import SignOperation from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignOperation";
-import SignTransport from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignTransport";
-import SignWork from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignWork";
+import SignBsdaTransport from "../../Bsda/SignBsdaTransport";
+import SignBsdaWork from "../../Bsda/SignBsdaWork";
 import { Bsda, BsdaStatus } from "@td/codegen-ui";
 import { isCollection_2710 } from "../../../dashboardServices";
+import SignBsdaEmission from "../../Bsda/SignBsdaEmission";
+import SignBsdaReception from "../../Bsda/SignBsdaReception";
+import SignBsdaOperation from "../../Bsda/SignBsdaOperation";
 
 interface ActBsdaValidationProps {
   bsd: Bsda;
   currentSiret: string;
-  isOpen: boolean;
   onClose: () => void;
 }
 const ActBsdaValidation = ({
   bsd,
   currentSiret,
-  isOpen,
   onClose
 }: ActBsdaValidationProps) => {
-  const actionButtonAdapterProps = {
-    isModalOpenFromParent: isOpen,
-    onModalCloseFromParent: onClose,
-    displayActionButton: false
-  };
-
   const renderInitialModal = () => {
     if (
       isCollection_2710(bsd["bsdaType"]) &&
       currentSiret === bsd.destination?.company?.siret
     ) {
-      return (
-        <SignOperation
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaReception bsdaId={bsd.id} onClose={onClose} />;
     }
 
     if (
@@ -43,36 +30,18 @@ const ActBsdaValidation = ({
       bsd.worker?.isDisabled &&
       currentSiret === bsd.transporter?.company?.orgId
     ) {
-      return (
-        <SignTransport
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaTransport bsdaId={bsd.id} onClose={onClose} />;
     }
 
     if (
       bsd.emitter?.isPrivateIndividual &&
       currentSiret === bsd.worker?.company?.siret
     ) {
-      return (
-        <SignWork
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaWork bsdaId={bsd.id} onClose={onClose} />;
     }
 
     if (currentSiret === bsd.emitter?.company?.siret) {
-      return (
-        <SignEmission
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaEmission bsdaId={bsd.id} onClose={onClose} />;
     }
   };
 
@@ -82,30 +51,12 @@ const ActBsdaValidation = ({
       bsd["bsdaType"] === "RESHIPMENT" ||
       bsd.worker?.isDisabled
     ) {
-      return (
-        <SignTransport
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaTransport bsdaId={bsd.id} onClose={onClose} />;
     }
-    return (
-      <SignWork
-        siret={currentSiret}
-        bsdaId={bsd.id}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignBsdaWork bsdaId={bsd.id} onClose={onClose} />;
   };
   const renderSignedByWorkerModal = () => {
-    return (
-      <SignTransport
-        siret={currentSiret}
-        bsdaId={bsd.id}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignBsdaTransport bsdaId={bsd.id} onClose={onClose} />;
   };
   const renderSentModal = () => {
     const nextTransporter = (bsd.transporters ?? []).find(
@@ -113,22 +64,14 @@ const ActBsdaValidation = ({
     );
 
     if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
-      return (
-        <SignTransport
-          siret={currentSiret}
-          bsdaId={bsd.id}
-          {...actionButtonAdapterProps}
-        />
-      );
+      return <SignBsdaTransport bsdaId={bsd.id} onClose={onClose} />;
     }
 
-    return (
-      <SignOperation
-        siret={currentSiret}
-        bsdaId={bsd.id}
-        {...actionButtonAdapterProps}
-      />
-    );
+    return <SignBsdaReception bsdaId={bsd.id} onClose={onClose} />;
+  };
+
+  const renderReceivedModal = () => {
+    return <SignBsdaOperation bsdaId={bsd.id} onClose={onClose} />;
   };
 
   const status = bsd["bsdaStatus"];
@@ -138,6 +81,7 @@ const ActBsdaValidation = ({
       {status === BsdaStatus.SignedByProducer && renderSignedByProducerModal()}
       {status === BsdaStatus.SignedByWorker && renderSignedByWorkerModal()}
       {status === BsdaStatus.Sent && renderSentModal()}
+      {status === BsdaStatus.Received && renderReceivedModal()}
     </>
   );
 };

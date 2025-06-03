@@ -30,13 +30,19 @@ import React, { useMemo } from "react";
 import QRCodeIcon from "react-qr-code";
 import { generatePath, useNavigate, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { InitialBsdas } from "./InitialBsdas";
+import { InitialBsdas } from "../../../Apps/Dashboard/Validation/Bsda/InitialBsdas";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import EstimatedQuantityTooltip from "../../../common/components/EstimatedQuantityTooltip";
-import { BSDA_VERBOSE_STATUSES } from "@td/constants";
+import { BSDA_VERBOSE_STATUSES, getBsdaWasteADRMention } from "@td/constants";
 import ExpandableList from "./ExpandableList";
 import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { getPackagingInfosSummary } from "../../../Apps/common/utils/packagingsBsddSummary";
+import {
+  BSD_DETAILS_QTY_TOOLTIP,
+  NON_RENSEIGNE
+} from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
+import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
+import { isDefined } from "../../../common/helper";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -182,9 +188,37 @@ const Recipient = ({ form }: { form: Bsda }) => {
         <DetailRow value={destination?.cap} label="CAP" />
         <DetailRow
           value={destination?.reception?.weight}
-          label="Poids reçu"
+          label="Quantité réceptionnée"
           units="tonne(s)"
         />
+        {isDefined(destination?.reception?.weight) && (
+          <>
+            <DetailRow
+              value={
+                destination?.reception?.refusedWeight ? (
+                  `${destination?.reception?.refusedWeight} tonne(s)`
+                ) : (
+                  <>
+                    {NON_RENSEIGNE} <Tooltip title={BSD_DETAILS_QTY_TOOLTIP} />
+                  </>
+                )
+              }
+              label="Quantité refusée"
+            />
+            <DetailRow
+              value={
+                destination?.reception?.acceptedWeight ? (
+                  `${destination?.reception?.acceptedWeight} tonne(s)`
+                ) : (
+                  <>
+                    {NON_RENSEIGNE} <Tooltip title={BSD_DETAILS_QTY_TOOLTIP} />
+                  </>
+                )
+              }
+              label="Quantité acceptée"
+            />
+          </>
+        )}
         <DetailRow
           value={getVerboseAcceptationStatus(
             destination?.reception?.acceptationStatus
@@ -470,7 +504,10 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
 
           <div className={styles.detailGrid}>
             <dt>Mention ADR</dt>
-            <dd>{form?.waste?.adr}</dd>
+            <dd>{getBsdaWasteADRMention(form?.waste)}</dd>
+
+            <dt>Mention RID, ADNR, IMDG</dt>
+            <dd>{form?.waste?.nonRoadRegulationMention}</dd>
 
             <dt>Conditionnement</dt>
             <dd>{conditionnement}</dd>

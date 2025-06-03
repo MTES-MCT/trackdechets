@@ -52,9 +52,15 @@ import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
 import { BsdaWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";
+import { bsdaWasteQuantities } from "./utils";
 
 export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
   const transporter = getFirstTransporterSync(bsda);
+
+  const wasteQuantities = bsdaWasteQuantities(bsda);
+  const quantityAccepted = wasteQuantities?.quantityAccepted ?? null;
+  const quantityRefused = wasteQuantities?.quantityRefused ?? null;
+
   return {
     id: bsda.id,
     createdAt: processDate(bsda.createdAt),
@@ -104,7 +110,9 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
       familyCode: bsda.wasteFamilyCode,
       materialName: bsda.wasteMaterialName,
       sealNumbers: bsda.wasteSealNumbers,
+      isSubjectToADR: bsda.wasteIsSubjectToADR,
       adr: bsda.wasteAdr,
+      nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
       pop: bsda.wastePop
     }),
     weight: nullIfNoValues<BsdaWeight>({
@@ -133,7 +141,17 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
           ? processDecimal(bsda.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : null
+          : null,
+        refusedWeight: quantityRefused
+          ? processDecimal(quantityRefused).dividedBy(1000).toNumber()
+          : null,
+        acceptedWeight: quantityAccepted
+          ? processDecimal(quantityAccepted).dividedBy(1000).toNumber()
+          : null,
+        signature: nullIfNoValues<Signature>({
+          date: processDate(bsda.destinationReceptionSignatureDate),
+          author: bsda.destinationReceptionSignatureAuthor
+        })
       }),
       operation: nullIfNoValues<BsdaOperation>({
         code: bsda.destinationOperationCode,
@@ -386,6 +404,13 @@ function flattenBsdaDestinationInput({
         r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
       )
     ),
+    destinationReceptionRefusedWeight: chain(destination, d =>
+      chain(d.reception, r =>
+        r.refusedWeight
+          ? new Decimal(r.refusedWeight).times(1000).toNumber()
+          : r.refusedWeight
+      )
+    ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
       chain(d.reception, r => r.acceptationStatus)
     ),
@@ -555,7 +580,12 @@ function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
 function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
   return {
     wasteCode: chain(waste, w => w.code),
+    wasteIsSubjectToADR: chain(waste, w => w.isSubjectToADR),
     wasteAdr: chain(waste, w => w.adr),
+    wasteNonRoadRegulationMention: chain(
+      waste,
+      w => w.nonRoadRegulationMention
+    ),
     wasteFamilyCode: chain(waste, w => w.familyCode),
     // TODO: name is deprecated, but still supported as an input for now.
     // As `name` was previously mandatory, and `materialName` optional, to avoid breaking integrations we fallback to `name` for now.
@@ -667,6 +697,15 @@ export function flattenBsdaRevisionRequestInput(
         )
       )
     ),
+    destinationReceptionRefusedWeight: chain(reviewContent, r =>
+      chain(r.destination, d =>
+        chain(d.reception, r =>
+          r.refusedWeight
+            ? new Decimal(r.refusedWeight).times(1000).toNumber()
+            : r.refusedWeight
+        )
+      )
+    ),
     isCanceled: undefinedOrDefault(
       chain(reviewContent, c => chain(c, r => r.isCanceled)),
       false
@@ -727,7 +766,12 @@ export function expandBsdaRevisionRequestContent(
           ? new Decimal(bsdaRevisionRequest.destinationReceptionWeight)
               .dividedBy(1000)
               .toNumber()
-          : bsdaRevisionRequest.destinationReceptionWeight
+          : bsdaRevisionRequest.destinationReceptionWeight,
+        refusedWeight: bsdaRevisionRequest.destinationReceptionRefusedWeight
+          ? new Decimal(bsdaRevisionRequest.destinationReceptionRefusedWeight)
+              .dividedBy(1000)
+              .toNumber()
+          : bsdaRevisionRequest.destinationReceptionRefusedWeight
       })
     }),
     isCanceled: bsdaRevisionRequest.isCanceled

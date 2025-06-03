@@ -1,16 +1,23 @@
 import queryString from "querystring";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
-import { getLoginError } from "../auth";
+import { getLoginError } from "../auth/auth";
 import { prisma } from "@td/prisma";
 import { app, sess } from "../server";
 import { getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";
+import { TOTP } from "totp-generator";
 
 const { UI_HOST } = process.env;
 
 const request = supertest(app);
 const loginError = getLoginError("Some User");
+
+const cookieRegExp = new RegExp(
+  `${sess.name}=(.+); Domain=${
+    sess.cookie!.domain
+  }; Path=/; Expires=.+; HttpOnly`
+);
 
 describe("POST /login", () => {
   afterEach(() => resetDatabase());
@@ -25,11 +32,7 @@ describe("POST /login", () => {
 
     // should send trackdechets.connect.sid cookie
     expect(login.header["set-cookie"]).toHaveLength(1);
-    const cookieRegExp = new RegExp(
-      `${sess.name}=(.+); Domain=${
-        sess.cookie!.domain
-      }; Path=/; Expires=.+; HttpOnly`
-    );
+
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
 
@@ -205,6 +208,120 @@ describe("POST /login", () => {
   });
 });
 
+describe("Second factor", () => {
+  it("redirect to second factor page if user has totp activated", async () => {
+    const user = await userFactory({
+      totpSeed: "A",
+      totpActivatedAt: new Date()
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    // should send trackdechets.connect.sid cookie
+    expect(login.header["set-cookie"]).toHaveLength(1);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    expect(sessionCookie).toMatch(cookieRegExp);
+
+    // should redirect to /
+    expect(login.status).toBe(302);
+    expect(login.header.location).toBe(`http://${UI_HOST}/second-factor`);
+
+    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+
+    // the user is not authenticated yet
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+    const { data, errors } = res.body;
+    expect(data).toEqual(null);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
+  });
+
+  it("should log the user in with second factor", async () => {
+    const totpSeed = "ABCD";
+    const user = await userFactory({ totpSeed, totpActivatedAt: new Date() });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    // should send trackdechets.connect.sid cookie
+    expect(login.header["set-cookie"]).toHaveLength(1);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+
+    const { otp } = TOTP.generate(totpSeed);
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=${otp}`)
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    // should redirect to /
+    expect(secondFactor.status).toBe(302);
+    expect(secondFactor.header.location).toBe(`http://${UI_HOST}/`);
+
+    const otpSessionCookie = secondFactor.header["set-cookie"][0];
+    const otpCookieValue2 = otpSessionCookie.match(cookieRegExp)[1];
+
+    // should persist user across requests
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${otpCookieValue2}`);
+
+    expect(res.body.data).toEqual({
+      me: { email: user.email }
+    });
+  });
+
+  it("should deny user when otp is wrong", async () => {
+    const totpSeed = "ABCD";
+    const user = await userFactory({ totpSeed, totpActivatedAt: new Date() });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    // should send trackdechets.connect.sid cookie
+    expect(login.header["set-cookie"]).toHaveLength(1);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=XYZ`) // wrong otp
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    // should redirect to /
+    expect(secondFactor.status).toBe(302);
+    expect(secondFactor.header.location).toBe(
+      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
+    );
+    expect(secondFactor.header["set-cookie"]).toBeUndefined();
+
+    // the user is not authenticated yet
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+    const { data, errors } = res.body;
+    expect(data).toEqual(null);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
+  });
+});
 describe("POST /logout", () => {
   it("should change sessionID", async () => {
     const logout1 = await request.post("/logout");

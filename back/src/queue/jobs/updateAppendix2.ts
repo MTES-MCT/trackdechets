@@ -1,7 +1,7 @@
 import { Job } from "bull";
 import { updateAppendix2Fn } from "../../forms/updateAppendix2";
 import { logger } from "@td/logger";
-import { AuthType } from "../../auth";
+import { AuthType } from "../../auth/auth";
 import { prisma } from "@td/prisma";
 
 export type UpdateAppendix2JobArgs = {

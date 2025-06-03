@@ -27,7 +27,9 @@ import {
   checkWorkerSubSectionThree,
   validateDestination,
   validatePreviousBsdas,
-  validateDestinationReceptionWeight
+  validateDestinationReceptionWeight,
+  wasteAdrRefinement,
+  checkDestinationReceptionRefusedWeight
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -47,6 +49,7 @@ import {
   validateMultiTransporterPlates,
   validateTransporterPlates
 } from "../../common/validation/zod/refinement";
+import { isDefinedStrict } from "../../common/helpers";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -143,7 +146,15 @@ export const rawBsdaSchema = z.object({
   wasteMaterialName: z.string().nullish(),
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
-  wasteAdr: z.string().nullish(),
+  wasteIsSubjectToADR: z.boolean().nullish(),
+  wasteAdr: z
+    .string()
+    .nullish()
+    // Empty values (or spaces) to null
+    .transform(value =>
+      isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
+    ),
+  wasteNonRoadRegulationMention: z.string().nullish(),
   wastePop: z
     .boolean()
     .nullish()
@@ -178,12 +189,15 @@ export const rawBsdaSchema = z.object({
   destinationCustomInfo: z.string().nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationReceptionWeight: z.number().nullish(),
+  destinationReceptionRefusedWeight: z.number().min(0).nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
   destinationReceptionRefusalReason: z.string().nullish(),
   destinationOperationCode: ZodOperationEnum.nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
+  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureDate: z.coerce.date().nullish(),
   destinationOperationDescription: z.string().nullish(),
   destinationOperationDate: z.coerce
     .date()
@@ -276,7 +290,8 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoWorkerWhenCollection2710)
   .superRefine(checkNoBothGroupingAndForwarding)
   .superRefine(checkTransporters)
-  .superRefine(validateMultiTransporterPlates);
+  .superRefine(validateMultiTransporterPlates)
+  .superRefine(checkDestinationReceptionRefusedWeight);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -321,6 +336,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     )
     .superRefine(validateDestination(context))
     .superRefine(validateDestinationReceptionWeight(context))
+    .superRefine(wasteAdrRefinement(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs

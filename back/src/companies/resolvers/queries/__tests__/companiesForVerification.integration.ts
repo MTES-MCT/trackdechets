@@ -11,7 +11,8 @@ import type {
 } from "@td/codegen-back";
 import {
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
@@ -45,7 +46,7 @@ describe("query companies", () => {
   });
 
   it("should return the list of companies in Trackdechets if user is admin", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const { company: company1, user: user1 } = await userWithCompanyFactory(
       UserRole.ADMIN,
       {
@@ -84,7 +85,7 @@ describe("query companies", () => {
   });
 
   it("should filter based on companyVerificationStatus", async () => {
-    const admin = await userFactory({ isAdmin: true });
+    const admin = await adminFactory();
     const { company: _company1, user: _user1 } = await userWithCompanyFactory(
       UserRole.ADMIN,
       {

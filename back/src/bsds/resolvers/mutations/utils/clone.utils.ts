@@ -112,6 +112,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     destinationReceptionDate: bsda.destinationReceptionDate,
     destinationReceptionRefusalReason: bsda.destinationReceptionRefusalReason,
     destinationReceptionWeight: bsda.destinationReceptionWeight,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight,
     ecoOrganismeName: bsda.ecoOrganismeName,
     ecoOrganismeSiret: bsda.ecoOrganismeSiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
@@ -155,7 +156,9 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     transporterTransportSignatureDate: bsda.transporterTransportSignatureDate,
     type: bsda.type,
     updatedAt: bsda.updatedAt,
+    wasteIsSubjectToADR: bsda.wasteIsSubjectToADR,
     wasteAdr: bsda.wasteAdr,
+    wasteNonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     wasteCode: bsda.wasteCode,
     wasteConsistence: bsda.wasteConsistence,
     wasteFamilyCode: bsda.wasteFamilyCode,
@@ -181,7 +184,10 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     workerIsDisabled: bsda.workerIsDisabled,
     workerWorkHasEmitterPaperSignature: bsda.workerWorkHasEmitterPaperSignature,
     workerWorkSignatureAuthor: bsda.workerWorkSignatureAuthor,
-    workerWorkSignatureDate: bsda.workerWorkSignatureDate
+    workerWorkSignatureDate: bsda.workerWorkSignatureDate,
+    destinationReceptionSignatureAuthor:
+      bsda.destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate: bsda.destinationReceptionSignatureDate
   };
 
   const newBsda = await create(newBsdaCreateInput);

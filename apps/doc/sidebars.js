@@ -106,7 +106,6 @@ module.exports = {
         "guides/registre",
         "guides/sirene",
         "guides/oauth2",
-        "guides/openidconnect",
         "guides/webhooks",
       ],
     },

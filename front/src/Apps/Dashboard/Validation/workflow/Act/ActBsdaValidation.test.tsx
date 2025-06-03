@@ -3,7 +3,7 @@ import ActBsdaValidation from "./ActBsdaValidation";
 import { MockedProvider } from "@apollo/client/testing";
 import { screen } from "@testing-library/dom";
 import { render } from "@testing-library/react";
-import { SIGN_BSDA } from "../../../../../dashboard/components/BSDList/BSDa/WorkflowAction/SignBsda";
+import { SIGN_BsDA as SIGN_BSDA } from "../../../../common/queries/bsda/queries";
 import { Bsda, BsdaSignatureType } from "@td/codegen-ui";
 import { MemoryRouter } from "react-router-dom";
 
@@ -52,7 +52,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={initialCollection2710Bsda}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -76,7 +75,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={initialBsdaSameTransporter}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -99,7 +97,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={initialBsdaSameWorker}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -121,7 +118,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={initialBsdaSameEmitter}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -145,7 +141,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={signedByProducerBsda}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -169,7 +164,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={signedByProducerBsdaReshipment}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -191,7 +185,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={signedByProducerBsdaNoWorker}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -213,7 +206,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={signedByWorkerBsda}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>
@@ -232,7 +224,6 @@ describe("ActBsdaValidation", () => {
           <ActBsdaValidation
             bsd={sentBsda}
             currentSiret={currentSiret}
-            isOpen
             onClose={onClose}
           />
         </MemoryRouter>

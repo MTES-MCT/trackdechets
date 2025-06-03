@@ -1,4 +1,4 @@
-import React, { lazy, useContext } from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "../../../common/components/custom-inputs/NumberInput";
@@ -11,9 +11,8 @@ import { BsdaContext } from "../../FormContainer";
 import EstimatedQuantityTooltip from "../../../../common/components/EstimatedQuantityTooltip";
 import FormikPackagingList from "../../../../Apps/Forms/Components/PackagingList/FormikPackagingList";
 import { bsdaPackagingTypes } from "../../../../Apps/Forms/Components/PackagingList/helpers";
-const TagsInput = lazy(
-  () => import("../../../../common/components/tags-input/TagsInput")
-);
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
+import TagsInput from "../../../../common/components/tags-input/TagsInput";
 
 export function WasteInfo({ disabled }) {
   const bsdaContext = useContext(BsdaContext);
@@ -68,7 +67,7 @@ export function WasteInfo({ disabled }) {
 }
 
 export function WasteInfoWorker({ disabled }) {
-  const { values } = useFormikContext<Bsda>();
+  const { values, setFieldValue } = useFormikContext<Bsda>();
   const isDechetterie = values?.type === "COLLECTION_2710";
 
   return (
@@ -122,14 +121,41 @@ export function WasteInfoWorker({ disabled }) {
         </label>
       </div>
 
+      <div className="form__row fr-mt-8v">
+        <ToggleSwitch
+          onChange={e => {
+            setFieldValue("waste.isSubjectToADR", e);
+            if (!e) {
+              setFieldValue("waste.adr", null);
+            }
+          }}
+          inputTitle={"Test"}
+          label="Le déchet est soumis à l'ADR"
+          checked={values.waste?.isSubjectToADR ?? false}
+        />
+      </div>
+
+      {values.waste?.isSubjectToADR && (
+        <div className="form__row fr-ml-18v fr-mb-8v">
+          <label>
+            Mention au titre du règlement ADR
+            <Field
+              disabled={disabled}
+              type="text"
+              name="waste.adr"
+              className="td-input"
+            />
+          </label>
+        </div>
+      )}
+
       <div className="form__row">
         <label>
-          Mention au titre des règlements ADR/RID/ADN/IMDG - ou "non soumis" le
-          cas échéant
+          Mention au titre des règlements RID, ADNR, IMDG (optionnel)
           <Field
             disabled={disabled}
             type="text"
-            name="waste.adr"
+            name="waste.nonRoadRegulationMention"
             className="td-input"
           />
         </label>

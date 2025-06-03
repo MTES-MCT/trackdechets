@@ -1,7 +1,7 @@
 import type { MutationResolvers } from "@td/codegen-back";
 
 import { checkIsAdmin } from "../../../common/permissions";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { reindex } from "../../indexation/reindexBsdHelpers";
 import { splitIntoBsdIds } from "../../indexation/reindexBsdsUtils";
 

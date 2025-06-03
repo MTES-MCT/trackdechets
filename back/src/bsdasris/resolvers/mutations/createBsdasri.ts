@@ -1,32 +1,14 @@
 import type { BsdasriInput } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
-import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
+import { expandBsdasriFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { validateBsdasri, BsdasriValidationContext } from "../../validation";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
-import { sirenify } from "../../sirenify";
-import { recipify } from "../../recipify";
-import { checkCanCreate } from "../../permissions";
 
-const getValidationContext = ({
-  isDraft,
-  isGrouping = false,
-  isSynthesizing = false
-}: {
-  isDraft: boolean;
-  isGrouping?: boolean;
-  isSynthesizing?: boolean;
-}): BsdasriValidationContext => {
-  if (isSynthesizing) {
-    return { emissionSignature: true };
-  }
-  return isDraft
-    ? { isGrouping, isDraft: true }
-    : { emissionSignature: true, isGrouping };
-};
+import { checkCanCreate } from "../../permissions";
+import { parseBsdasriAsync } from "../../validation";
+import { graphQlInputToZodBsdasri } from "../../validation/helpers";
 
 /**
  * Bsdasri creation mutation
@@ -40,39 +22,41 @@ const createBsdasri = async (
   isDraft: boolean
 ) => {
   const user = checkIsAuthenticated(context);
-  const { grouping, synthesizing, ...rest } = input;
+  const { grouping } = input;
 
   await checkCanCreate(user, input);
 
-  const sirenifiedInput = await sirenify(rest, user);
+  const zodBsdasri = graphQlInputToZodBsdasri(input);
 
-  const autocompletedInput = await recipify(sirenifiedInput);
-
-  const flattenedInput = flattenBsdasriInput(autocompletedInput);
+  const { createdAt, ...parsedZodBsdasri } = await parseBsdasriAsync(
+    { ...zodBsdasri, isDraft, createdAt: new Date() },
+    {
+      user,
+      currentSignatureType: !isDraft ? "EMISSION" : undefined,
+      unsealed: true
+    }
+  );
 
   const isGrouping = !!grouping && !!grouping.length;
 
   // grouping perms check
   if (isGrouping) {
-    await emitterIsAllowedToGroup(flattenedInput?.emitterCompanySiret);
-    await checkDasrisAreGroupable(grouping, flattenedInput.emitterCompanySiret);
+    await emitterIsAllowedToGroup(zodBsdasri.emitterCompanySiret);
+    await checkDasrisAreGroupable(grouping, zodBsdasri.emitterCompanySiret);
   }
 
   const groupedBsdasris = isGrouping ? grouping.map(id => ({ id })) : [];
 
-  await validateBsdasri(
-    flattenedInput,
-    getValidationContext({ isDraft, isGrouping })
-  );
   const bsdasriRepository = getBsdasriRepository(user);
 
   const bsdasriType: BsdasriType = isGrouping
     ? BsdasriType.GROUPING
     : BsdasriType.SIMPLE;
 
+  const { synthesizing, ...createInput } = parsedZodBsdasri;
+
   const newDasri = await bsdasriRepository.create({
-    ...flattenedInput,
-    id: getReadableId(ReadableIdPrefix.DASRI),
+    ...createInput,
     type: bsdasriType,
     grouping: { connect: groupedBsdasris },
 

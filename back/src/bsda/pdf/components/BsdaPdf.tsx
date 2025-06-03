@@ -8,15 +8,17 @@ import { WasteDetails } from "./WasteDetails";
 import { BsdaStatus, OperationMode } from "@prisma/client";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
-import { dateToXMonthAtHHMM } from "../../../common/helpers";
+import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
 import { Signature } from "../../../bspaoh/pdf/components/Signature";
 import {
   CompanyContact,
   CompanyDescription
 } from "../../../common/pdf/components/Company";
 import Transporter from "../../../common/pdf/components/Transporter";
-import { pluralize } from "@td/constants";
+import { getBsdaWasteADRMention, pluralize } from "@td/constants";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
+import { bsdaWasteQuantities } from "../../utils";
+import { displayWasteQuantity } from "../../../registry/utils";
 
 type Props = {
   bsda: Bsda;
@@ -32,6 +34,14 @@ export function BsdaPdf({
   renderEmpty = false
 }: Props) {
   const intermediaryCount = bsda?.intermediaries?.length ?? 0;
+
+  const wasteQuantities = bsdaWasteQuantities({
+    destinationReceptionAcceptationStatus:
+      bsda.destination?.reception?.acceptationStatus,
+    destinationReceptionRefusedWeight:
+      bsda.destination?.reception?.refusedWeight,
+    destinationReceptionWeight: bsda.destination?.reception?.weight
+  });
 
   return (
     <Document title={bsda.id}>
@@ -153,8 +163,14 @@ export function BsdaPdf({
               packagings={bsda?.packagings}
               weight={bsda?.weight}
             />
-            Mention au titre des règlements ADR/RID/ADN/IMDG (le cas échéant) :{" "}
-            {bsda?.waste?.adr}
+            <p>
+              Mention au titre du règlement ADR (le cas échéant) :{" "}
+              {getBsdaWasteADRMention(bsda?.waste)}
+            </p>
+            <p>
+              Mentions au titre des règlements RID, ADNR, IMDG (le cas échéant)
+              : {bsda?.waste?.nonRoadRegulationMention}
+            </p>
           </div>
           <div className="BoxCol">
             <PackagingsTable packagings={bsda?.packagings ?? []} />
@@ -346,7 +362,16 @@ export function BsdaPdf({
               partiellement
               <br />
               <br />
-              Quantité réelle acceptée : {bsda?.destination?.reception?.weight}
+              Quantité présentée nette :{" "}
+              {isDefined(bsda?.destination?.reception?.weight)
+                ? `${bsda?.destination?.reception?.weight} tonne(s)`
+                : ""}
+              <br />
+              Quantité acceptée nette :{" "}
+              {displayWasteQuantity(wasteQuantities?.quantityAccepted)}
+              <br />
+              Quantité refusée nette :{" "}
+              {displayWasteQuantity(wasteQuantities?.quantityRefused)}
               <br />
               Motif de refus (le cas échéant) :{" "}
               {bsda?.destination?.reception?.refusalReason}

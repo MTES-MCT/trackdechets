@@ -1,11 +1,13 @@
-import React, { useMemo, useRef, useState } from "react";
-import { ALL_WASTES_TREE } from "@td/constants";
-import type { UseFormReturn } from "react-hook-form";
-import { Input } from "@codegouvfr/react-dsfr/Input";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
-import { formatError } from "../builder/error";
-import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import { Input } from "@codegouvfr/react-dsfr/Input";
+import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
 import clsx from "clsx";
+import React, { useMemo, useRef, useState } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import { capitalize } from "../../../common/helper";
+import { formatError } from "../builder/error";
 
 type WasteCode = {
   code: string;
@@ -114,6 +116,10 @@ export function WasteCodeSelector({
     );
   }
 
+  const description = ALL_WASTES.find(
+    waste => waste.code === methods.getValues(name)
+  )?.description;
+
   const searchFields = (
     <>
       <div className="fr-col-4 fr-col-md-4">
@@ -121,7 +127,7 @@ export function WasteCodeSelector({
           label={label ?? "Code déchet"}
           nativeInputProps={{
             type: "text",
-            ...methods.register(name!)
+            ...methods.register(name)
           }}
           disabled={disabled}
           state={errors?.[name] && "error"}
@@ -141,6 +147,11 @@ export function WasteCodeSelector({
           </Button>
         </div>
       </div>
+      {description && (
+        <div className="fr-col-12">
+          <Alert description={capitalize(description)} severity="info" small />
+        </div>
+      )}
     </>
   );
 
@@ -150,7 +161,7 @@ export function WasteCodeSelector({
         searchFields
       ) : (
         <div
-          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom"
           ref={comboboxRef}
         >
           {searchFields}

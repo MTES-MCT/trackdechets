@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
-import { AuthType } from "../../../auth";
+import { AuthType } from "../../../auth/auth";
 import {
   userWithCompanyFactory,
   formFactory,

@@ -1,7 +1,7 @@
 import type { QueryResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getApplicationOrApplicationNotFound } from "../../database";
-import { applyAuthStrategies, AuthType } from "../../../auth";
+import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { ForbiddenError } from "../../../common/errors";
 
 const applicationResolver: QueryResolvers["application"] = async (

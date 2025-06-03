@@ -200,6 +200,8 @@ export const FullBsdaFragment = gql`
       reception {
         date
         weight
+        refusedWeight
+        acceptedWeight
         acceptationStatus
         refusalReason
       }
@@ -234,7 +236,9 @@ export const FullBsdaFragment = gql`
       materialName
       consistence
       sealNumbers
+      isSubjectToADR
       adr
+      nonRoadRegulationMention
       pop
     }
     weight {

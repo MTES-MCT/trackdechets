@@ -36,6 +36,16 @@ export const machine = createMachine<Record<string, never>, Event>(
             target: BsdaStatus.SENT,
             cond: "isPrivateIndividualWithNoWorkerBsda"
           },
+          RECEPTION: [
+            {
+              target: BsdaStatus.RECEIVED,
+              cond: "isCollectedBy2710AndGroupingOrReshipmentOperation"
+            },
+            {
+              target: BsdaStatus.RECEIVED,
+              cond: "isCollectedBy2710"
+            }
+          ],
           OPERATION: [
             {
               target: BsdaStatus.AWAITING_CHILD,
@@ -69,6 +79,26 @@ export const machine = createMachine<Record<string, never>, Event>(
       [BsdaStatus.SENT]: {
         on: {
           TRANSPORT: { target: BsdaStatus.SENT }, // multi-modal
+          RECEPTION: {
+            target: BsdaStatus.RECEIVED
+          },
+          OPERATION: [
+            {
+              target: BsdaStatus.REFUSED,
+              cond: "isBsdaRefused"
+            },
+            {
+              target: BsdaStatus.AWAITING_CHILD,
+              cond: "isGroupingOrReshipmentOperation"
+            },
+            {
+              target: BsdaStatus.PROCESSED
+            }
+          ]
+        }
+      },
+      [BsdaStatus.RECEIVED]: {
+        on: {
           OPERATION: [
             {
               target: BsdaStatus.REFUSED,

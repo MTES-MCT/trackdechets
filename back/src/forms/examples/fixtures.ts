@@ -105,7 +105,8 @@ function ttrInput(siret: string) {
 
 const wasteDetailsInput = {
   code: "06 05 02*",
-  onuCode: "Non Soumis",
+  isSubjectToADR: false,
+  onuCode: null,
   name: "Boues",
   packagingInfos: [{ type: "CITERNE", quantity: 1 }],
   quantity: 1,
@@ -116,7 +117,7 @@ const wasteDetailsInput = {
 function signEmissionFormInput() {
   return {
     quantity: 1,
-    onuCode: "non soumis",
+    onuCode: null,
     transporterNumberPlate: "AA-123456-BB",
     emittedAt: "2020-04-03T14:48:00",
     emittedBy: "Isabelle Guichard",

@@ -3,11 +3,12 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,
   userFactory,
-  companyFactory
+  companyFactory,
+  adminFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth";
+import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
@@ -149,9 +150,7 @@ describe("mutation inviteUserToCompany", () => {
 
   test("TD admin user can invite a new user to a company", async () => {
     const company = await companyFactory();
-    const tdAdminUser = await userFactory({
-      isAdmin: true
-    });
+    const tdAdminUser = await adminFactory();
     const { mutate } = makeClient({ ...tdAdminUser, auth: AuthType.Session });
 
     // Call the mutation to send an invitation

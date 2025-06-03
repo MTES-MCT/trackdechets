@@ -5,12 +5,12 @@ import Layout from "./Layout";
 import routes from "../../../routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
-
 import ResendActivationEmail from "../../../../login/ResendActivationEmail";
 import Login from "../../../../login/Login";
+import SecondFactor from "../../../../login/SecondFactor";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
-import { Oauth2Dialog, OidcDialog } from "../../../../oauth/AuthDialog";
+import { Oauth2Dialog } from "../../../../oauth/AuthDialog";
 
 const Admin = lazy(() => import("../../../../admin/Admin"));
 const DashboardRoutes = lazy(
@@ -48,11 +48,7 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
-  <>
-    <strong>IMPORTANT : </strong> À compter du 5 mai, toutes les déclarations au
-    RNDTS doivent être effectuées directement sur Trackdéchets depuis l'onglet
-    Mes registres.
-  </>
+  "Aidez-nous à améliorer Trackdéchets, nous avons besoin de votre avis :"
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -82,15 +78,6 @@ export default function LayoutContainer() {
         />
 
         <Route
-          path="/oidc/authorize/dialog"
-          element={
-            <RequireAuth>
-              <OidcDialog />
-            </RequireAuth>
-          }
-        />
-
-        <Route
           element={
             <Layout
               isAuthenticated={data?.isAuthenticated}
@@ -98,10 +85,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/informations-generales-and-impacts-utilisateurs"
+                    title: "Je donne mon avis",
+                    href: "https://tally.so/r/np9ZXV"
                   }}
-                  persistedSurveyName="td-20250505"
+                  persistedSurveyName="td-20250603"
                 />
               }
             />
@@ -117,6 +104,8 @@ export default function LayoutContainer() {
           />
 
           <Route path={routes.login} element={<Login />} />
+
+          <Route path={routes.secondFactor} element={<SecondFactor />} />
 
           <Route path={routes.invite} element={<Invite />} />
 

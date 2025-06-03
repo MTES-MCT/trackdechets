@@ -9,7 +9,8 @@ import {
 import {
   companyFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  adminFactory
 } from "../../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 
@@ -94,7 +95,7 @@ describe("Query adminRequests", () => {
     );
     const company2 = await companyFactory();
     const user2 = await userFactory();
-    const tdAdmin = await userFactory({ isAdmin: true });
+    const tdAdmin = await adminFactory();
 
     await prisma.adminRequest.create({
       data: {
