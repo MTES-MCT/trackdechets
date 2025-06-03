@@ -23,7 +23,7 @@ export function Registry() {
           value: registryType
         }}
       >
-        <option value="registryV2">Registre V2</option>
+        <option value="registryV2">Registre réglementaire</option>
         <option value="exhaustive">Registre exhaustif</option>
       </Select>
       {registryType === "registryV2" && (
