@@ -48,7 +48,7 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
-  "Aidez nous à améliorer Trackdéchets, nous avons besoin de votre avis :"
+  "Aidez-nous à améliorer Trackdéchets, nous avons besoin de votre avis :"
 ];
 
 const IS_AUTHENTICATED = gql`
