@@ -38,7 +38,14 @@ const inputOutgoingWasteSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  reportForPickupSiteName: z.string().trim().nullish(),
+  reportForPickupSiteName: z
+    .string()
+    .trim()
+    .max(
+      300,
+      "La référence du chantier ne peut pas faire plus de 300 caractères"
+    )
+    .nullish(),
   reportForPickupSiteAddress: actorAddressSchema.nullish(),
   reportForPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   reportForPickupSiteCity: actorCitySchema.nullish(),
