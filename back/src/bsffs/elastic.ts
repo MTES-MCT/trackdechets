@@ -318,7 +318,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     isPendingRevisionFor: [] as string[],
     isEmittedRevisionFor: [] as string[],
     isReceivedRevisionFor: [] as string[],
-    isRevisedFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
     ...getRegistryFields(bsff),

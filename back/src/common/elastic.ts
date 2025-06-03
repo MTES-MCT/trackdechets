@@ -118,7 +118,7 @@ export interface BsdElastic {
   isReceivedRevisionFor: string[];
   // > Onglet 'Révisées'
   // Toutes les révisions qui ont été résolues.
-  isRevisedFor: string[];
+  isReviewedRevisionFor: string[];
 
   intermediaries?: FormCompany[] | null;
 
@@ -307,7 +307,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isPendingRevisionFor: stringField,
   isEmittedRevisionFor: stringField,
   isReceivedRevisionFor: stringField,
-  isRevisedFor: stringField,
+  isReviewedRevisionFor: stringField,
 
   intermediaries: {
     properties: {

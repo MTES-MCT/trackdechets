@@ -53,7 +53,7 @@ async function buildQuery(
     isPendingRevisionFor: where?.isPendingRevisionFor,
     isEmittedRevisionFor: where?.isEmittedRevisionFor,
     isReceivedRevisionFor: where?.isReceivedRevisionFor,
-    isRevisedFor: where?.isRevisedFor,
+    isReviewedRevisionFor: where?.isReviewedRevisionFor,
     isReturnFor: where?.isReturnFor
   })
     .filter(([_, value]) => value != null)

@@ -230,7 +230,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     isPendingRevisionFor: [] as string[],
     isEmittedRevisionFor: [] as string[],
     isReceivedRevisionFor: [] as string[],
-    isRevisedFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBspaohReturnOrgIds(bspaoh),
     sirets: distinct(Object.values(where).flat()),
     ...getRegistryFields(bspaoh),

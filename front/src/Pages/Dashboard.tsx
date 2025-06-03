@@ -49,8 +49,18 @@ const DashboardPage = () => {
   const isDraftTab = !!useMatch(routes.dashboard.bsds.drafts);
   const isFollowTab = !!useMatch(routes.dashboard.bsds.follow);
   const isArchivesTab = !!useMatch(routes.dashboard.bsds.history);
-  const isToReviewTab = !!useMatch(routes.dashboard.bsds.toReview);
-  const isReviewedTab = !!useMatch(routes.dashboard.bsds.reviewed);
+  const isPendingRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.pending
+  );
+  const isEmittedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.emitted
+  );
+  const isReceivedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.received
+  );
+  const isReviewedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.reviewed
+  );
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
   const isReturnTab = !!useMatch(routes.dashboard.transport.return);
@@ -65,8 +75,10 @@ const DashboardPage = () => {
     isArchivesTab,
     isToCollectTab,
     isCollectedTab,
-    isReviewedTab,
-    isToReviewTab,
+    isPendingRevisionForTab,
+    isEmittedRevisionForTab,
+    isReceivedRevisionForTab,
+    isReviewedRevisionForTab,
     isReturnTab
   });
   const { siret } = useParams<{ siret: string }>();
@@ -96,8 +108,10 @@ const DashboardPage = () => {
       isToCollectTab,
       isCollectedTab,
       isAllBsdsTab,
-      isReviewedTab,
-      isToReviewTab,
+      isPendingRevisionForTab,
+      isEmittedRevisionForTab,
+      isReceivedRevisionForTab,
+      isReviewedRevisionForTab,
       isReturnTab
     }),
     [
@@ -107,9 +121,11 @@ const DashboardPage = () => {
       isCollectedTab,
       isDraftTab,
       isFollowTab,
-      isReviewedTab,
       isToCollectTab,
-      isToReviewTab,
+      isPendingRevisionForTab,
+      isEmittedRevisionForTab,
+      isReceivedRevisionForTab,
+      isReviewedRevisionForTab,
       isReturnTab
     ]
   );

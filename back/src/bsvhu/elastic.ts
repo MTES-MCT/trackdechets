@@ -271,7 +271,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     isPendingRevisionFor: [] as string[],
     isEmittedRevisionFor: [] as string[],
     isReceivedRevisionFor: [] as string[],
-    isRevisedFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBsvhuReturnOrgIds(bsvhu),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),

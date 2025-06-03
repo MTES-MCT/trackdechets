@@ -250,17 +250,22 @@ function DashboardRoutes() {
           />
 
           <Route
-            path={toRelative(routes.dashboard.bsds.reviewed)}
+            path={toRelative(routes.dashboard.revisions.pending)}
             element={<DashboardPage />}
           />
 
           <Route
-            path={toRelative(routes.dashboard.bsds.toReview)}
+            path={toRelative(routes.dashboard.revisions.emitted)}
             element={<DashboardPage />}
           />
 
           <Route
-            path={toRelative(routes.dashboard.bsds.reviewed)}
+            path={toRelative(routes.dashboard.revisions.received)}
+            element={<DashboardPage />}
+          />
+
+          <Route
+            path={toRelative(routes.dashboard.revisions.reviewed)}
             element={<DashboardPage />}
           />
 

@@ -39,7 +39,7 @@ input BsdWhere {
   # Toutes les révisions dont mon entreprise est la cible, et qui n'ont pas encore été résolues.
   isReceivedRevisionFor: [String!]
   # Toutes les révisions qui ont été résolues.
-  isRevisedFor: [String!]
+  isReviewedRevisionFor: [String!]
 
   sirets: StringNullableListFilter
 

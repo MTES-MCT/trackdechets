@@ -181,7 +181,7 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
           isPendingRevisionFor: [],
           isEmittedRevisionFor: [],
           isReceivedRevisionFor: [],
-          isRevisedFor: []
+          isReviewedRevisionFor: []
         }
       : siretsByTab),
 

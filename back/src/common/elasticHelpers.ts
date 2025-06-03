@@ -27,7 +27,7 @@ export type RevisionTab =
   | "isReceivedRevisionFor"
   // > Onglet 'Révisées'
   // Toutes les révisions qui ont été résolues.
-  | "isRevisedFor";
+  | "isReviewedRevisionFor";
 
 /**
  * Pour une liste de demandes de révisions BSDD, BSDA ou Bsdasri, retourne l'ensemble
@@ -41,7 +41,7 @@ export function getRevisionOrgIds(
     isPendingRevisionFor,
     isEmittedRevisionFor,
     isReceivedRevisionFor,
-    isRevisedFor
+    isReviewedRevisionFor
   } = revisionRequests.reduce<ReturnType<typeof getRevisionOrgIds>>(
     // Pour chaque demande de révision en cours ou passés sur le bordereau
     (
@@ -49,7 +49,7 @@ export function getRevisionOrgIds(
         isPendingRevisionFor,
         isEmittedRevisionFor,
         isReceivedRevisionFor,
-        isRevisedFor
+        isReviewedRevisionFor
       },
       revisionRequest
     ) => {
@@ -70,7 +70,7 @@ export function getRevisionOrgIds(
           isReceivedRevisionFor: [
             ...new Set([...isReceivedRevisionFor, ...targetsOrgIds])
           ],
-          isRevisedFor
+          isReviewedRevisionFor
         };
       }
 
@@ -79,14 +79,16 @@ export function getRevisionOrgIds(
         isPendingRevisionFor,
         isEmittedRevisionFor,
         isReceivedRevisionFor,
-        isRevisedFor: [...new Set([...isRevisedFor, ...companiesOrgIds])]
+        isReviewedRevisionFor: [
+          ...new Set([...isReviewedRevisionFor, ...companiesOrgIds])
+        ]
       };
     },
     {
       isPendingRevisionFor: [],
       isEmittedRevisionFor: [],
       isReceivedRevisionFor: [],
-      isRevisedFor: []
+      isReviewedRevisionFor: []
     }
   );
 
@@ -96,7 +98,7 @@ export function getRevisionOrgIds(
     isPendingRevisionFor,
     isEmittedRevisionFor,
     isReceivedRevisionFor,
-    isRevisedFor: isRevisedFor.filter(
+    isReviewedRevisionFor: isReviewedRevisionFor.filter(
       orgId => !isPendingRevisionFor.includes(orgId)
     )
   };
