@@ -280,7 +280,13 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
   };
 }
 
-export function indexBsdasri(bsdasri: BsdasriForElastic, ctx?: GraphQLContext) {
+export function indexBsdasri(
+  bsdasri: BsdasriForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsdasri), ctx);
 }
 /**

@@ -4,7 +4,6 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
-import { getBsdasriForElastic, indexBsdasri } from "../../elastic";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanCreateSynthesis } from "../../permissions";
@@ -94,7 +93,6 @@ const createSynthesisBsdasri = async (
   });
 
   const expandeBsdasri = expandBsdasriFromDB(newDasri);
-  await indexBsdasri(await getBsdasriForElastic(newDasri), context); // why ?
 
   return expandeBsdasri;
 };
