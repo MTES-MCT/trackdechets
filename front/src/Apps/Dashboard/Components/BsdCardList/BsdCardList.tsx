@@ -56,8 +56,12 @@ function BsdCardList({
   const navigate = useNavigate();
   const { bsdId } = useParams();
   const location = useLocation();
-  const isReviewsTab =
-    bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
+  const isReviewsTab = [
+    "pendingRevisionForTab",
+    "emittedRevisionForTab",
+    "receivedRevisionForTab",
+    "isReviewedRevisionForTab"
+  ].includes(bsdCurrentTab);
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isReturnTab = bsdCurrentTab === "returnTab";
