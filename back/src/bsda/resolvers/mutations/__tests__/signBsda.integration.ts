@@ -1435,6 +1435,68 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.id).toBeTruthy();
     });
 
+    it("destination should be able to sign reception + operation for COLLECTION_2710", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "INITIAL",
+          type: "COLLECTION_2710",
+          destinationCompanySiret: company.siret,
+          workerCompanyName: null,
+          workerCompanySiret: null
+        },
+        transporterOpt: {
+          transporterCompanyName: null,
+          transporterCompanySiret: null
+        }
+      });
+
+      // il n'y a pas de transporteur sur les bordereaux de collecte
+      // en déchetterie
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: { transporters: { deleteMany: {} } }
+      });
+
+      // When: sign reception
+      const { mutate } = makeClient(user);
+      const { errors: receptionErrors, data: receptionData } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "RECEPTION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(receptionErrors).toBeUndefined();
+      expect(receptionData.signBsda.status).toBe("RECEIVED");
+
+      // When: sign operation
+      const { errors: operationErrors, data: operationData } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(operationErrors).toBeUndefined();
+      expect(operationData.signBsda.status).toBe("PROCESSED");
+    });
+
     it("should disallow destination to sign operation when required data is missing", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
 
