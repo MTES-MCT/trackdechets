@@ -66,11 +66,18 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
     variables: { where: { isForActionFor: [currentCompany.orgId] } }
   });
 
-  const { data: dataRevision, refetch: refetchRevision } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isPendingRevisionFor: [currentCompany.orgId] } }
+  const {
+    data: dataIsEmittedRevisionFor,
+    refetch: refetchIsEmittedRevisionFor
+  } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(NOTIFICATION_QUERY, {
+    variables: { where: { isEmittedRevisionFor: [currentCompany.orgId] } }
+  });
+
+  const {
+    data: dataIsReceivedRevisionFor,
+    refetch: refetchIsReceivedRevisionFor
+  } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(NOTIFICATION_QUERY, {
+    variables: { where: { isReceivedRevisionFor: [currentCompany.orgId] } }
   });
 
   const { data: dataTransport, refetch: refetchTransport } = useQuery<
@@ -82,7 +89,8 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   useNotifier(currentCompany.orgId, () => {
     refetchAction();
-    refetchRevision();
+    refetchIsEmittedRevisionFor();
+    refetchIsReceivedRevisionFor();
     refetchTransport();
   });
 
@@ -231,10 +239,6 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {PENDING}
                 </NavLink>
-                {displayNotification(
-                  dataRevision?.bsds.totalCount,
-                  isReaderRole
-                )}
               </li>
               <li>
                 <NavLink
@@ -250,7 +254,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   {EMITTED}
                 </NavLink>
                 {displayNotification(
-                  dataRevision?.bsds.totalCount,
+                  dataIsEmittedRevisionFor?.bsds.totalCount,
                   isReaderRole
                 )}
               </li>
@@ -268,7 +272,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                   {RECEIVED}
                 </NavLink>
                 {displayNotification(
-                  dataRevision?.bsds.totalCount,
+                  dataIsReceivedRevisionFor?.bsds.totalCount,
                   isReaderRole
                 )}
               </li>
