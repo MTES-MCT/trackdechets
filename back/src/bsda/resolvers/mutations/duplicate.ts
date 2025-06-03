@@ -45,6 +45,8 @@ export default async function duplicate(
     destinationOperationSignatureAuthor,
     destinationOperationSignatureDate,
     destinationOperationDate,
+    destinationReceptionSignatureAuthor,
+    destinationReceptionSignatureDate,
     wasteSealNumbers,
     packagings,
     weightValue,

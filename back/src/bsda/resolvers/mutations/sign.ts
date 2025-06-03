@@ -452,7 +452,11 @@ function checkSignatureTypeSpecificRules(
   bsda: Bsda,
   input: BsdaSignatureInput
 ) {
-  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
+  if (
+    bsda.type === BsdaType.COLLECTION_2710 &&
+    input.type !== "RECEPTION" &&
+    input.type !== "OPERATION"
+  ) {
     throw new UserInputError(
       "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
@@ -464,12 +468,6 @@ function checkSignatureTypeSpecificRules(
   ) {
     throw new UserInputError(
       "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
-    );
-  }
-
-  if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
-    throw new UserInputError(
-      "Ce type de bordereau ne peut être signé qu'à la réception par la déchetterie."
     );
   }
 }

@@ -36,6 +36,16 @@ export const machine = createMachine<Record<string, never>, Event>(
             target: BsdaStatus.SENT,
             cond: "isPrivateIndividualWithNoWorkerBsda"
           },
+          RECEPTION: [
+            {
+              target: BsdaStatus.RECEIVED,
+              cond: "isCollectedBy2710AndGroupingOrReshipmentOperation"
+            },
+            {
+              target: BsdaStatus.RECEIVED,
+              cond: "isCollectedBy2710"
+            }
+          ],
           OPERATION: [
             {
               target: BsdaStatus.AWAITING_CHILD,

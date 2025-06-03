@@ -114,6 +114,8 @@ async function createBsda(opt: Partial<Prisma.BsdaCreateInput> = {}) {
       workerWorkSignatureAuthor: "John",
       destinationOperationSignatureDate: new Date(),
       destinationOperationSignatureAuthor: "John",
+      destinationReceptionSignatureDate: new Date(),
+      destinationReceptionSignatureAuthor: "John",
       ...opt
     },
     transporterOpt: {
