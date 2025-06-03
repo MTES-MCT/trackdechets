@@ -5,7 +5,7 @@ import { RegistryImportType, RegistryLineReason } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { type UseFormReturn, FormProvider } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import cn from "classnames";
 import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
 import { getTabsWithState } from "./error";
 import "./FormBuilder.scss";
@@ -52,7 +52,6 @@ export function FormBuilder({
   const navigate = useNavigate();
   const { errors } = methods.formState;
   const shapeWithState = getTabsWithState(shape, errors, disabledFieldNames);
-  console.log(shapeWithState);
   const tabIds = shape.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -87,9 +86,25 @@ export function FormBuilder({
           : "Créer "}
         une déclaration
       </h3>
-      <div className="fr-hint-text fr-mb-2w fr-text--md">
+      <div
+        className={cn(
+          "fr-hint-text",
+          readOnly ? "fr-mb-1w" : "fr-mb-2w",
+          "fr-text--md"
+        )}
+      >
         {getRegistryNameFromImportType(registryType)}
       </div>
+      {readOnly && (
+        <div>
+          <Alert
+            description="La vue Affichage ne permet pas d'effectuer ou enregistrer des modifications sur les déclarations"
+            severity="info"
+            className="fr-mb-2w fr-pb-1w"
+            small
+          />
+        </div>
+      )}
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)}>
           <Tabs
