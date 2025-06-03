@@ -12,7 +12,10 @@ import {
   RegistryExportWasteType,
   Prisma
 } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import {
+  getBsdaWasteADRMention,
+  getTransporterCompanyOrgId
+} from "@td/constants";
 import {
   emptyIncomingWasteV2,
   emptyManagedWasteV2,
@@ -306,7 +309,11 @@ export const toIncomingWasteV2 = (
     transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
     transporter1TransportMode: transporter?.transporterTransportMode,
     transporter1CompanyMail: transporter?.transporterCompanyMail,
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr:
+      getBsdaWasteADRMention({
+        adr: bsda.wasteAdr,
+        isSubjectToADR: bsda.wasteIsSubjectToADR
+      }) ?? null,
     nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
@@ -325,7 +332,12 @@ export const toIncomingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    destinationReceptionRefusedWeight: null,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
+      ? bsda.destinationReceptionRefusedWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
@@ -627,7 +639,11 @@ export const toOutgoingWasteV2 = (
     transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
     transporter5TransportMode: transporter5?.transporterTransportMode,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr:
+      getBsdaWasteADRMention({
+        adr: bsda.wasteAdr,
+        isSubjectToADR: bsda.wasteIsSubjectToADR
+      }) ?? null,
     nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
@@ -659,7 +675,12 @@ export const toOutgoingWasteV2 = (
           .toNumber()
       : null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: null,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
+      ? bsda.destinationReceptionRefusedWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -908,7 +929,11 @@ export const toTransportedWasteV2 = (
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
     transporter5TransportPlates: transporter5?.transporterTransportPlates,
 
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr:
+      getBsdaWasteADRMention({
+        adr: bsda.wasteAdr,
+        isSubjectToADR: bsda.wasteIsSubjectToADR
+      }) ?? null,
     nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
 
@@ -935,7 +960,12 @@ export const toTransportedWasteV2 = (
           .toNumber()
       : null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: null,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
+      ? bsda.destinationReceptionRefusedWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -1175,7 +1205,11 @@ export const toManagedWasteV2 = (
     transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
     transporter5TransportMode: transporter5?.transporterTransportMode,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr:
+      getBsdaWasteADRMention({
+        adr: bsda.wasteAdr,
+        isSubjectToADR: bsda.wasteIsSubjectToADR
+      }) ?? null,
     nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
@@ -1201,7 +1235,12 @@ export const toManagedWasteV2 = (
           .toNumber()
       : null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: null,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
+      ? bsda.destinationReceptionRefusedWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -1471,7 +1510,11 @@ export const toAllWasteV2 = (
     transporter5UnloadingDate: null,
     transporter5TransportPlates: transporter5?.transporterTransportPlates,
     transporter5CompanyMail: transporter5?.transporterCompanyMail,
-    wasteAdr: bsda.wasteAdr,
+    wasteAdr:
+      getBsdaWasteADRMention({
+        adr: bsda.wasteAdr,
+        isSubjectToADR: bsda.wasteIsSubjectToADR
+      }) ?? null,
     nonRoadRegulationMention: bsda.wasteNonRoadRegulationMention,
     destinationCap: bsda.destinationCap,
     wasteDap: null,
@@ -1498,7 +1541,12 @@ export const toAllWasteV2 = (
           .toNumber()
       : null,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: null,
+    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
+      ? bsda.destinationReceptionRefusedWeight
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
