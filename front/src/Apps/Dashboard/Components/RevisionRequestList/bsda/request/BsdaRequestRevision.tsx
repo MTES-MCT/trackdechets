@@ -16,7 +16,7 @@ import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 import { removeEmptyKeys } from "../../../../../../common/helper";
-import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
+import DsfrfWorkSiteAddress from "../../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import { Loader } from "../../../../../common/Components";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
@@ -403,7 +403,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.emitter?.pickupSite}
               >
                 <div className="form__row">
-                  <WorkSiteAddress
+                  <DsfrfWorkSiteAddress
                     address={formValues?.emitter?.pickupSite?.address}
                     city={formValues?.emitter?.pickupSite?.city}
                     postalCode={formValues?.emitter?.pickupSite?.postalCode}

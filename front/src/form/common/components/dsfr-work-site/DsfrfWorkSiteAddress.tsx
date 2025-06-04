@@ -97,7 +97,8 @@ export default function DsfrfWorkSiteAddress({
   onAddressSelection,
   designation,
   disabled = false,
-  placeholder = "Recherchez une adresse puis sélectionnez un des choix qui apparait..."
+  placeholder = "Recherchez une adresse puis sélectionnez un des choix qui apparait...",
+  titleForRevision = ""
 }: {
   address?: string | null;
   city?: string | null;
@@ -111,6 +112,7 @@ export default function DsfrfWorkSiteAddress({
     postcode: string | null | undefined;
     label: string;
   }) => void;
+  titleForRevision?: string;
 }) {
   const [state, dispatch] = useReducer(
     reducer,
@@ -175,7 +177,9 @@ export default function DsfrfWorkSiteAddress({
 
   return (
     <div className="form__row">
-      <label className="fr-label fr-mb-1w">Adresse {designation}</label>
+      <label className="fr-label fr-mb-1w">
+        {!titleForRevision ? `Adresse ${designation}` : titleForRevision}
+      </label>
 
       <SearchInput
         id="eco-search"
@@ -190,7 +194,6 @@ export default function DsfrfWorkSiteAddress({
       <ToggleSwitch
         inputTitle="showAdressFields"
         defaultChecked={false}
-        showCheckedHint={false}
         className="fr-mb-2w"
         onChange={e => {
           setShowAdressFields(e);

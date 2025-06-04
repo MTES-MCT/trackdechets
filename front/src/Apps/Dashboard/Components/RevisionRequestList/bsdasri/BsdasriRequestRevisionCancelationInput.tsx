@@ -41,7 +41,6 @@ export function BsdasriRequestRevisionCancelationInput({
         disabled={!canBeCancelled}
         inputTitle="cancellation"
         onChange={onChange}
-        showCheckedHint={false}
         helperText={
           canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG
         }
