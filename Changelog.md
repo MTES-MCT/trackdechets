@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Supression de la fourniture d'identité pour le RNDTS [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202/)
 - Passer à J-18 mois la limite de l'ensemble des dates liées aux déclarations [PR 4194](https://github.com/MTES-MCT/trackdechets/pull/4194)
+- Ajout de la nouvelle version des registres exhaustif, interface et API harmonisée avec les registres réglementaires [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
+- Débloquage de la query cancelRegistryV2Lines pour utilisation API [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -26,6 +28,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking Change
 
 - BSDD: le champ `wasteDetailsIsSubjectToADR` est maintenant obligatoire via API [PR 4183](https://github.com/MTES-MCT/trackdechets/pull/4183)
+
+#### :boom: Breaking Change
+
+- Suppression de la query formsRegister (dépréciée depuis plusieurs années) [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 # [2025.05.1] 03/05/2025
 

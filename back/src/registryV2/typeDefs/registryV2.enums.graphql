@@ -34,14 +34,6 @@ enum RegistryV2ExportType {
   https://www.legifrance.gouv.fr/jorf/article_jo/JORFARTI000043884599
   """
   MANAGED
-  """
-  Registre exhaustif.
-  Registre qui n'est pas réglementaire et qui est indépendant des autres registres. Il permet
-  d'exporter un nombre d'informations conséquent sur l'ensemble des bordereaux sur lesquels un
-  acteur a été visé à partir du moment où l'enlèvement a été signé. Dans cet export, les bordereaux
-  sont triés par date d'enlèvement du déchet.
-  """
-  ALL
 }
 
 "Type de déchets"
@@ -62,7 +54,7 @@ enum RegistryV2ExportSource {
   REGISTRY
 }
 
-enum RegistryV2ExportStatus {
+enum RegistryExportStatus {
   PENDING
   STARTED
   SUCCESSFUL

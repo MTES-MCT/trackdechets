@@ -6,7 +6,7 @@ export const RegistryV2Export: RegistryV2ExportResolvers<
   GraphQLContext,
   Prisma.RegistryExportGetPayload<{ include: { createdBy: true } }>
 > = {
-  registryType: parent => parent.registryType ?? "ALL",
+  registryType: parent => parent.registryType,
   declarationType: parent => parent.declarationType ?? "ALL",
   delegate: async (parent, _, context) => {
     if (!parent.delegateSiret) {
