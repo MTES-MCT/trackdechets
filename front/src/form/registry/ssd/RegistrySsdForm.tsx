@@ -87,6 +87,9 @@ export function RegistrySsdForm({ onClose }: Props) {
                   | null
               )?.map(description => ({ value: description })) ?? [],
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
+            processingEndDate: isoDateToHtmlDate(
+              definedSsdProps.processingEndDate
+            ),
             dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
             useDate: isoDateToHtmlDate(definedSsdProps.useDate),
             reason: RegistryLineReason.Edit
