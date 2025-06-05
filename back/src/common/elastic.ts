@@ -333,7 +333,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   rawBsd: rawField,
 
   companyNames: textField,
-  companyOrgIds: stringField
+  companyOrgIds: stringField,
+  nonPendingLatestRevisionRequestUpdatedAt: dateField
 };
 
 export type BsdIndexationConfig = {
