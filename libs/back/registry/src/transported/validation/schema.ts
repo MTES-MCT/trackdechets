@@ -40,8 +40,17 @@ const inputTransportedSchema = z.object({
   reportForTransportIsWaste: booleanSchema,
   reportForRecepisseIsExempted: booleanSchema.nullish(),
   reportForRecepisseNumber: transportRecepisseNumberSchema.nullish(),
-  reportForTransportAdr: z.string().nullish(),
-  reportForTransportOtherTmdCode: z.string().nullish(),
+  reportForTransportAdr: z
+    .string()
+    .max(300, "La mention ADR ne peut pas faire plus de 300 caractères")
+    .nullish(),
+  reportForTransportOtherTmdCode: z
+    .string()
+    .max(
+      300,
+      "La mention RID, ADN, IMDG ne peut pas faire plus de 300 caractères"
+    )
+    .nullish(),
   reportForTransportPlates: transportPlatesSchema,
   wasteDescription: wasteDescriptionSchema,
   wasteCode: getWasteCodeSchema().nullish(),
