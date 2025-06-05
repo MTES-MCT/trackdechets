@@ -288,7 +288,8 @@ export const outgoingWasteFormShape: FormShape = [
         props: {
           operationCodes: INCOMING_WASTE_PROCESSING_OPERATIONS_CODES,
           showNoTraceability: false,
-          showNextOperationCode: false
+          showNextOperationCode: false,
+          isPlannedOperation: true
         },
         names: ["operationCode", "operationMode"],
         validation: {

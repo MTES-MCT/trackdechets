@@ -314,7 +314,8 @@ export const outgoingTexsFormShape: FormShape = [
         props: {
           operationCodes: INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
           showNoTraceability: false,
-          showNextOperationCode: false
+          showNextOperationCode: false,
+          isPlannedOperation: true
         },
         names: ["operationCode", "operationMode"],
         validation: {
