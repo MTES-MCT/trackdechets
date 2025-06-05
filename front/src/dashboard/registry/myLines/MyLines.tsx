@@ -209,17 +209,17 @@ export function MyLines() {
                         state: { background: location }
                       });
                     }
+                  },
+                  {
+                    title: "Annuler",
+                    isButton: true,
+                    handleClick: () => {
+                      setPublicIdToDelete(lookup.publicId);
+                      deleteConfirmationModal.open();
+                    }
                   }
                 ]
-              : []),
-            {
-              title: "Annuler",
-              isButton: true,
-              handleClick: () => {
-                setPublicIdToDelete(lookup.publicId);
-                deleteConfirmationModal.open();
-              }
-            }
+              : [])
           ]}
           isDisabled={false}
         />
