@@ -1,5 +1,8 @@
 import { ApiResponse } from "@elastic/elasticsearch";
-import { UpdateByQueryResponse } from "@elastic/elasticsearch/api/types";
+import {
+  SearchResponse,
+  UpdateByQueryResponse
+} from "@elastic/elasticsearch/api/types";
 import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
@@ -14,6 +17,7 @@ export type RevisionRequest = {
   authoringCompany: {
     orgId: string;
   };
+  isCanceled: boolean;
 };
 
 export type RevisionTab =
@@ -163,4 +167,134 @@ export const cleanUpIsReturnForTab = async (alias = index.alias) => {
   );
 
   return body;
+};
+
+/**
+ * Dans l'onget "Révisés", on retire les révisions acceptées / refusées / annulées
+ * de plus de 6 mois
+ */
+export const cleanUpIsRevisedForTab = async (alias = index.alias) => {
+  const size = 100;
+  const sort = { id: "ASC" };
+  const search_after = undefined;
+
+  const { body }: ApiResponse<SearchResponse<BsdElastic>> = await client.search(
+    {
+      index: alias,
+      body: {
+        size:
+          size +
+          // Take one more result to know if there's a next page
+          // it's removed from the actual results though
+          1,
+        query: {
+          bool: {
+            filter: [
+              {
+                exists: {
+                  field: "isReturnFor"
+                }
+              }
+            ]
+          }
+        },
+        sort,
+        search_after
+      }
+    }
+  );
+
+  console.log("body.hits", body.hits);
+  // const hits = body.hits.hits.slice(0, size);
+
+  //   logger.info(
+  //     `[cleanUpIsRevisedForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
+  //   );
+
+  // const bsddWhere = {
+  //     updatedAt: { lt: addMonths(new Date(), -6) },
+  //     OR: [
+  //       { status: { not: RevisionRequestStatus.PENDING } },
+  //       { isCanceled: true }
+  //     ]
+  //   };
+
+  //   const bsddRevisionRequestsCount = await prisma.bsddRevisionRequest.count({
+  //     where: bsddWhere,
+  //   });
+
+  //   logger.info(`${bsddRevisionRequestsCount} révisions BSDD à réindexer`);
+
+  //   const BATCH_SIZE = 100;
+  //   let lastId: string | null = null;
+  //   let finished = false;
+  //   let skip = 0;
+  //   let updatedBsdds = 0;
+  //   const startDate = new Date();
+  //   let errors = 0;
+  //   while (!finished) {
+  //     const bsddRevisionRequests = await prisma.bsddRevisionRequest.findMany({
+  //       take: BATCH_SIZE,
+  //       where: bsddWhere,
+  //       skip, // Skip the cursor
+  //       ...(lastId
+  //         ? {
+  //             cursor: {
+  //               id: lastId
+  //             }
+  //           }
+  //         : {}),
+  //       orderBy: {
+  //         createdAt: "asc"
+  //       },
+  //       select: {
+  //         id: true,
+  //         bsddId: true,
+  //       }
+  //     });
+
+  //     if (bsddRevisionRequests.length < 10) {
+  //       finished = true;
+  //     }
+  //     if (bsddRevisionRequests.length === 0) {
+  //       break;
+  //     }
+
+  //     lastId = bsddRevisionRequests[bsddRevisionRequests.length - 1].id;
+  //     skip = 1;
+
+  //     // Reindex each BSDD
+  //     for (const bsddRevisionRequest of bsddRevisionRequests) {
+  //       updatedBsdds += 1;
+
+  //       try {
+  //         // TODO: Do something here
+  //         logger.info(`Réindexation du BSDD ${bsddRevisionRequest.bsddId}`);
+  //       } catch (e) {
+  //         errors++;
+
+  //         logger.error(
+  //           `/!\\ Erreur pour le BSDD ${bsddRevisionRequest.bsddId}: ${e.message}`
+  //         );
+  //       }
+  //     }
+
+  //     // Info debug
+  //     const loopDuration = new Date().getTime() - startDate.getTime();
+  //     logger.info(
+  //       `${updatedBsdds} BSDDs réindexés en ${toHHmmss(
+  //         loopDuration
+  //       )} (temps total estimé: ${toHHmmss(
+  //         (loopDuration / updatedBsdds) * bsddRevisionRequestsCount
+  //       )})`
+  //     );
+  //   }
+
+  //   // Info debug
+  //   const duration = new Date().getTime() - startDate.getTime();
+  //   logger.info(
+  //     `${updatedBsdds} BSDDs réindexés, ${errors} erreurs (${Math.round(
+  //       (errors / bsddRevisionRequestsCount) * 100
+  //     )}%) en ${toHHmmss(duration)}!`
+  //   );
 };
