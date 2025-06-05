@@ -140,7 +140,6 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
-    console.log(data);
     // Flatten transporter array back into individual fields
     const flattenedData = {
       ...rest,
@@ -178,9 +177,7 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
         onClose();
       }
     } catch (error) {
-      console.log(error);
       if (error instanceof ApolloError) {
-        console.log("AQUI");
         // Handle GraphQL errors
         methods.setError("root.serverError", {
           type: "server",
@@ -189,7 +186,6 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
             "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
         });
       } else {
-        console.log("AQUI 2");
         methods.setError("root.serverError", {
           type: "server",
           message:
