@@ -1,4 +1,10 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef
+} from "react";
 import { useParams, useMatch, useLocation } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
@@ -40,6 +46,7 @@ import {
 } from "./Dashboard.utils";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
+import throttle from "lodash/throttle";
 
 import "./dashboard.scss";
 
@@ -56,19 +63,9 @@ const DashboardPage = () => {
   const isReturnTab = !!useMatch(routes.dashboard.transport.return);
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
   const location = useLocation();
+  const prevPathname = useRef(location.pathname);
 
   const BSD_PER_PAGE = 25;
-  const bsdCurrentTab = getBsdCurrentTab({
-    isDraftTab,
-    isActTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isReviewedTab,
-    isToReviewTab,
-    isReturnTab
-  });
   const { siret } = useParams<{ siret: string }>();
   const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
 
@@ -120,6 +117,7 @@ const DashboardPage = () => {
   // - Current filters
   const fetchBsds = useCallback(
     (newSiret, newVariables, newTabs) => {
+      if (!newSiret) return;
       const variables = { ...newVariables };
 
       const routePredicate = getRoutePredicate({
@@ -143,6 +141,11 @@ const DashboardPage = () => {
     [lazyFetchBsds]
   );
 
+  const throttledFetchBsds = useMemo(
+    () => throttle(fetchBsds, 500),
+    [fetchBsds]
+  );
+
   const handleFiltersSubmit = filterValues => {
     // Transform the filters into a GQL query
     const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
@@ -153,12 +156,21 @@ const DashboardPage = () => {
 
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    fetchBsds(siret, bsdsVariables, tabs);
+    throttledFetchBsds(siret, bsdsVariables, tabs);
   });
 
   useEffect(() => {
-    fetchBsds(siret, bsdsVariables, tabs);
-  }, [bsdsVariables, siret, tabs, fetchBsds]);
+    // Flush throttle dès que la route change
+    if (prevPathname.current !== location.pathname) {
+      throttledFetchBsds.flush();
+      prevPathname.current = location.pathname;
+    }
+  }, [location.pathname, throttledFetchBsds]);
+
+  useEffect(() => {
+    if (!siret) return;
+    throttledFetchBsds(siret, bsdsVariables, tabs);
+  }, [bsdsVariables, siret, tabs, throttledFetchBsds]);
 
   useEffect(() => {
     if (error) {
@@ -173,11 +185,13 @@ const DashboardPage = () => {
     variables: { clue: siret! }
   });
 
-  const siretsWithAutomaticSignature = companyData
-    ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
-        automation => automation.from.siret
-      )
-    : [];
+  const siretsWithAutomaticSignature = useMemo(() => {
+    return companyData
+      ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
+          automation => automation.from.siret
+        )
+      : [];
+  }, [companyData]);
 
   const loadMoreBsds = React.useCallback(() => {
     fetchMore({
@@ -205,11 +219,12 @@ const DashboardPage = () => {
     setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
-  const bsds = data?.bsds.edges;
+  const bsds = useMemo(() => data?.bsds.edges ?? [], [data?.bsds.edges]);
 
   const bsdsTotalCount = data?.bsds.totalCount;
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;
+  const bsdCurrentTab = useMemo(() => getBsdCurrentTab(tabs), [tabs]);
 
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
@@ -218,7 +233,6 @@ const DashboardPage = () => {
           <div className="create-btn">
             <BsdCreateDropdown
               links={dropdownCreateLinks(siret, location)}
-              isDisabled={loading}
               menuTitle={dropdown_create_btn}
               primary
             />
@@ -230,7 +244,6 @@ const DashboardPage = () => {
             className="fr-btn fr-btn--secondary"
             aria-expanded={areAdvancedFiltersOpen}
             onClick={toggleFiltersBlock}
-            disabled={loading}
           >
             {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
           </button>
