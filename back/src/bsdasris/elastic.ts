@@ -19,7 +19,11 @@ import {
   BsdasriWithRevisionRequestsInclude
 } from "./types";
 import { prisma } from "@td/prisma";
-import { getRevisionOrgIds, RevisionTab } from "../common/elasticHelpers";
+import {
+  getNonPendingLatestRevisionRequestUpdatedAt,
+  getRevisionOrgIds,
+  RevisionTab
+} from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
@@ -256,6 +260,10 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...getBsdasriRevisionOrgIds(bsdasri),
     ...getBsdasriReturnOrgIds(bsdasri),
     revisionRequests: bsdasri.bsdasriRevisionRequests,
+    nonPendingLatestRevisionRequestUpdatedAt:
+      getNonPendingLatestRevisionRequestUpdatedAt(
+        bsdasri.bsdasriRevisionRequests
+      ),
 
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),

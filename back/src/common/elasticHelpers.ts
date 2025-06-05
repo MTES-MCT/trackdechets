@@ -5,7 +5,8 @@ import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
 
-type RevisionRequest = {
+export type RevisionRequest = {
+  updatedAt: Date;
   status: RevisionRequestStatus;
   approvals: {
     approverSiret: string;
@@ -103,6 +104,24 @@ export function getRevisionOrgIds(
     )
   };
 }
+
+export function getNonPendingLatestRevisionRequestUpdatedAt(
+  revisionRequests: RevisionRequest[]
+): number | undefined {
+  if (!revisionRequests?.length) return undefined;
+
+  // If there is at least one pending revision, return undefined. We want to keep the BSD in the dashboard
+  const hasPendingRevision = revisionRequests.find(
+    r => r.status === RevisionRequestStatus.PENDING
+  );
+  if (hasPendingRevision) return undefined;
+
+  // Else, return the updatedAt of the most recent revision request
+  const updatedAts = revisionRequests.map(r => r.updatedAt);
+  const latest = Math.max(...updatedAts.map(date => date.getTime()));
+  return isFinite(latest) ? latest : undefined;
+}
+
 /**
  * The "isReturnFor" tab contains BSDs with characteristics that make them valuable for
  * transporters, but only for so long. That's why we need to regularly clean this tab up

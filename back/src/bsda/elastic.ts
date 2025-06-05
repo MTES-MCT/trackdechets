@@ -23,7 +23,11 @@ import {
   BsdaWithTransportersInclude
 } from "./types";
 import { prisma } from "@td/prisma";
-import { getRevisionOrgIds, RevisionTab } from "../common/elasticHelpers";
+import {
+  getNonPendingLatestRevisionRequestUpdatedAt,
+  getRevisionOrgIds,
+  RevisionTab
+} from "../common/elasticHelpers";
 import {
   getFirstTransporterSync,
   getLastTransporterSync,
@@ -394,6 +398,8 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
     ...getBsdaRevisionOrgIds(bsda),
     ...getBsdaReturnOrgIds(bsda),
     revisionRequests: bsda.bsdaRevisionRequests,
+    nonPendingLatestRevisionRequestUpdatedAt:
+      getNonPendingLatestRevisionRequestUpdatedAt(bsda.bsdaRevisionRequests),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
     intermediaries: bsda.intermediaries,

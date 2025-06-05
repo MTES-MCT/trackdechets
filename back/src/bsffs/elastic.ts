@@ -324,6 +324,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ...getRegistryFields(bsff),
     rawBsd: bsff,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
 
     // ALL actors from the BSFF, for quick search
     companyNames: [
