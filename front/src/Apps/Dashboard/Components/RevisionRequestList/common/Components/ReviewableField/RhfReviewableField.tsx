@@ -77,7 +77,6 @@ const RhfReviewableField = ({
         label={<LabelContent labelText={title} value={value} suffix={suffix} />}
         inputTitle="terms" // todo: change
         defaultChecked={false}
-        showCheckedHint={false}
         helperText={hint}
         onChange={handleIsEditingChange}
         disabled={disabled}
