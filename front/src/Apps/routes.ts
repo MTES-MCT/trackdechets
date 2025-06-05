@@ -193,9 +193,13 @@ export const titles = {
   "/dashboard/:siret/bsds/act": "Pour action — Trackdéchets",
   "/dashboard/:siret/bsds/follow": "Bordereaux suivis — Trackdéchets",
   "/dashboard/:siret/bsds/history": "Bordereaux archivés — Trackdéchets",
-  "/dashboard/:siret/bsds/to-review/:bsdId?":
+  "/dashboard/:siret/revisions/pending/:bsdId?":
     "Révisions en cours — Trackdéchets",
-  "/dashboard/:siret/bsds/reviewed": "Révisions passées — Trackdéchets",
+  "/dashboard/:siret/revisions/emitted/:bsdId?":
+    "Révisions émises — Trackdéchets",
+  "/dashboard/:siret/revisions/received/:bsdId?":
+    "Révisions reçues — Trackdéchets",
+  "/dashboard/:siret/revisions/reviewed": "Révisions finalisées — Trackdéchets",
   "/dashboard/:siret/bsdds/create": "Créer un BSDD — Trackdéchets",
   "/dashboard/:siret/bsdds/edit/:id": "Modifier le BSDD — Trackdéchets",
   "/dashboard/:siret/bsdds/view/:id": "Aperçu du BSDD — Trackdéchets",
