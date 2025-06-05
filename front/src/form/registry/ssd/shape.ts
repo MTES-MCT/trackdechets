@@ -1,3 +1,4 @@
+import { z } from "zod";
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
   ADMINISTRATIVE_ACT_EXPLANATIONS,
@@ -13,7 +14,6 @@ import { SecondaryWasteCodes } from "./SecondaryWasteCodes";
 import {
   nonEmptyString,
   optionalString,
-  filteredArray,
   nonEmptyNumber,
   optionalNumber,
   booleanString
@@ -93,8 +93,12 @@ export const ssdFormShape: FormShape = [
         shape: "custom",
         names: ["secondaryWasteCodes", "secondaryWasteDescriptions"],
         validation: {
-          secondaryWasteCodes: filteredArray,
-          secondaryWasteDescriptions: filteredArray
+          secondaryWasteCodes: z
+            .array(z.object({ value: optionalString }))
+            .transform(arr => arr.map(({ value }) => value)),
+          secondaryWasteDescriptions: z
+            .array(z.object({ value: optionalString }))
+            .transform(arr => arr.map(({ value }) => value))
         }
       }
     ]
