@@ -125,6 +125,7 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       }
     }
   );
+
   const isUpcycled = methods.watch("isUpcycled");
   useEffect(() => {
     if (isUpcycled) {
@@ -138,6 +139,7 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       methods.setValue("destinationParcelCoordinates", []);
     }
   }, [isUpcycled, methods]);
+
   const isDirectSupply = methods.watch("isDirectSupply");
   useEffect(() => {
     if (isDirectSupply) {
@@ -149,6 +151,7 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       methods.setValue("transporter", []);
     }
   }, [isDirectSupply, methods]);
+
   const wasteCode = methods.watch("wasteCode");
   useEffect(() => {
     if (wasteCode && wasteCode.includes("*")) {
@@ -160,6 +163,17 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
       );
     }
   }, [wasteCode, methods]);
+
+  const operationCode = methods.watch("operationCode");
+  useEffect(() => {
+    if (operationCode && operationCode.startsWith("D")) {
+      setDisabledFieldNames(prev => [...prev, "isUpcycled"]);
+    } else {
+      setDisabledFieldNames(prev =>
+        prev.filter(field => field !== "isUpcycled")
+      );
+    }
+  }, [operationCode, methods]);
 
   const [addToOutgoingTexsRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToOutgoingTexsRegistry">
