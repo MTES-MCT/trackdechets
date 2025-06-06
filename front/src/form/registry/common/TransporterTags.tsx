@@ -1,6 +1,5 @@
 import React from "react";
 import { FieldError, type UseFormReturn } from "react-hook-form";
-import { formatError } from "../builder/error";
 import TagsInput from "../../../Apps/Forms/Components/TagsInput/TagsInput";
 
 type Props = {
