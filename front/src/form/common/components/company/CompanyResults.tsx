@@ -26,6 +26,7 @@ export type CompanyResultBase = Pick<
   | "isRegistered"
   | "vatNumber"
   | "codePaysEtrangerEtablissement"
+  | "etatAdministratif"
 >;
 
 export function isSelected<T extends CompanyResultBase>(
@@ -94,6 +95,9 @@ export function CompanyResult<T extends CompanyResultBase>({
             <div className="tw-ml-1">
               <IconTrackDechetsCheck />
             </div>
+          )}
+          {item.etatAdministratif === "F" && (
+            <div className="tw-ml-1 tw-text-red-600">Etablissement fermé</div>
           )}
         </h6>
         <p>

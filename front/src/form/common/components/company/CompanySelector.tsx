@@ -69,6 +69,7 @@ interface CompanySelectorProps {
   // whether the company is optional
   optional?: boolean;
   initialAutoSelectFirstCompany?: boolean;
+  allowClosedCompanies?: boolean;
 }
 
 export default function CompanySelector({
@@ -83,7 +84,8 @@ export default function CompanySelector({
   isBsdaTransporter = false,
   optional = false,
   initialAutoSelectFirstCompany = true,
-  onCompanyPrivateInfos = undefined
+  onCompanyPrivateInfos = undefined,
+  allowClosedCompanies = false
 }: CompanySelectorProps) {
   // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
@@ -251,6 +253,10 @@ export default function CompanySelector({
         return;
       }
 
+      if (!allowClosedCompanies && company.etatAdministratif === "F") {
+        return;
+      }
+
       // Side effects
       const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
       setMustBeRegistered(
@@ -300,7 +306,8 @@ export default function CompanySelector({
       setMustBeRegistered,
       disabled,
       field.name,
-      registeredOnlyCompanies
+      registeredOnlyCompanies,
+      allowClosedCompanies
     ]
   );
 
