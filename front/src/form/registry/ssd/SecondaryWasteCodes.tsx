@@ -48,7 +48,6 @@ export function SecondaryWasteCodes({ methods }: Props) {
   }, [codeFields, addLine]);
 
   const { errors } = methods.formState;
-  console.log("errors", errors);
   return (
     <div className="fr-col">
       {codeFields.map(({ id }, index) => (
