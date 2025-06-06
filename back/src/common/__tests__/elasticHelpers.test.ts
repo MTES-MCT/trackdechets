@@ -20,6 +20,20 @@ describe("elasticHelpers", () => {
         undefined
       ],
       [
+        [
+          {
+            status: "ACCEPTED",
+            updatedAt: sameDayMidnight(addDays(new Date(), -1))
+          },
+          {
+            status: "PENDING",
+            isCanceled: true,
+            updatedAt: addDays(new Date(), -3)
+          }
+        ],
+        sameDayMidnight(addDays(new Date(), -1)).getTime()
+      ],
+      [
         [{ status: "REFUSED", updatedAt: addDays(new Date(), -1) }],
         addDays(new Date(), -1).getTime()
       ],
@@ -34,7 +48,7 @@ describe("elasticHelpers", () => {
         ],
         sameDayMidnight(addDays(new Date(), -2)).getTime()
       ]
-    ])("%p should return %p", (input, output) => {
+    ])("%o should return %p", (input, output) => {
       // When
       const latestUpdatedAt = getNonPendingLatestRevisionRequestUpdatedAt(
         input as RevisionRequest[]

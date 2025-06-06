@@ -113,7 +113,7 @@ export function getNonPendingLatestRevisionRequestUpdatedAt(
 
   // If there is at least one pending revision, return undefined. We want to keep the BSD in the dashboard
   const hasPendingRevision = revisionRequests.find(
-    r => r.status === RevisionRequestStatus.PENDING
+    r => r.status === RevisionRequestStatus.PENDING && !r.isCanceled
   );
   if (hasPendingRevision) return undefined;
 
