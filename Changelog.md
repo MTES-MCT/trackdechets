@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.07.1] 29/07/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+
 # [2025.06.1] 03/06/2025
 
 #### :nail_care: Améliorations
