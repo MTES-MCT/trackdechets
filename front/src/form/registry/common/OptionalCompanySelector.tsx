@@ -10,10 +10,11 @@ import {
 import Input from "@codegouvfr/react-dsfr/Input";
 import { formatError } from "../builder/error";
 import { InlineAddress } from "./Address";
+import { capitalize } from "../../../common/helper";
 
-type BlockProps = InlineFrenchCompanySelectorProps & {
+type BlockProps = Omit<InlineFrenchCompanySelectorProps, "title"> & {
   reducedMargin?: boolean;
-  toggleLabel?: string;
+  label: string;
   recepisseName?: string;
 };
 
@@ -23,15 +24,14 @@ export function OptionalCompanySelector({
   disabled,
   shortMode,
   reducedMargin,
-  title,
-  toggleLabel,
+  label,
   recepisseName,
   onCompanySelected
 }: BlockProps) {
   const fieldName = shortMode ? `${prefix}Siret` : `${prefix}CompanyOrgId`;
   const selectedCompanyOrgId = methods.getValues(fieldName);
   const [isCompanyEnabled, setIsCompanyEnabled] = useState(
-    toggleLabel ? (selectedCompanyOrgId ? true : false) : true
+    selectedCompanyOrgId ? true : false
   );
   const companyStatusDiffusion: StatutDiffusionEtablissement | undefined =
     methods.watch(`${prefix}CompanyStatusDiffusion`);
@@ -59,23 +59,21 @@ export function OptionalCompanySelector({
         "company-selector-reduced-margin": reducedMargin
       })}
     >
-      {title && <h5 className="fr-h5">{title}</h5>}
-      {toggleLabel && (
-        <div>
-          <div className={"fr-grid-row fr-grid-row--gutters"}>
-            <div className={"fr-col-12"}>
-              <ToggleSwitch
-                label={toggleLabel}
-                inputTitle={toggleLabel}
-                showCheckedHint={false}
-                checked={isCompanyEnabled}
-                onChange={checked => setIsCompanyEnabled(checked)}
-                disabled={disabled}
-              />
-            </div>
+      {label && <h5 className="fr-h5">{capitalize(label)} (optionnel)</h5>}
+      <div>
+        <div className={"fr-grid-row fr-grid-row--gutters"}>
+          <div className={"fr-col-12"}>
+            <ToggleSwitch
+              label={`Présence d'un ${label}`}
+              inputTitle={`Présence d'un ${label}`}
+              showCheckedHint={false}
+              checked={isCompanyEnabled}
+              onChange={checked => setIsCompanyEnabled(checked)}
+              disabled={disabled}
+            />
           </div>
         </div>
-      )}
+      </div>
       {isCompanyEnabled && (
         <InlineFrenchCompanySelector
           prefix={prefix}
