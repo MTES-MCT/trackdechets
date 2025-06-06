@@ -37,7 +37,8 @@ export function WasteCodeSelector({
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
   }
-
+  const splitName = useMemo(() => name.split("."), [name]);
+  const isArrayField = splitName.length > 1;
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -130,12 +131,26 @@ export function WasteCodeSelector({
             ...methods.register(name)
           }}
           disabled={disabled}
-          state={errors?.[name] && "error"}
-          stateRelatedMessage={formatError(errors?.[name])}
+          state={
+            (isArrayField
+              ? errors?.[splitName[0]]?.[splitName[1]]?.value
+              : errors?.[name]) && "error"
+          }
+          stateRelatedMessage={formatError(
+            isArrayField
+              ? errors?.[splitName[0]]?.[splitName[1]]?.value
+              : errors?.[name]
+          )}
         />
       </div>
-      <div className="fr-col-2">
-        <div className={clsx({ "fr-mb-9v": !!errors?.[name] })}>
+      <div className="fr-col-2" style={{ paddingTop: "44px" }}>
+        <div
+          className={clsx({
+            "fr-mb-9v": !!(isArrayField
+              ? errors?.[splitName[0]]?.[splitName[1]]?.value
+              : errors?.[name])
+          })}
+        >
           <Button
             onClick={() => setShowSearch(!showSearch)}
             priority="secondary"
@@ -161,7 +176,10 @@ export function WasteCodeSelector({
         searchFields
       ) : (
         <div
-          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom"
+          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          style={{
+            alignItems: "flex-start"
+          }}
           ref={comboboxRef}
         >
           {searchFields}

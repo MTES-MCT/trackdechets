@@ -33,7 +33,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = { onClose: () => void };
 
-const DEFAULT_VALUES: Partial<SsdLineInput> = {
+type FormValues = Omit<
+  SsdLineInput,
+  "secondaryWasteCodes" | "secondaryWasteDescriptions"
+> & {
+  secondaryWasteCodes: { value: string }[];
+  secondaryWasteDescriptions: { value: string }[];
+};
+
+const DEFAULT_VALUES: Partial<FormValues> = {
   weightIsEstimate: true,
   secondaryWasteCodes: [],
   secondaryWasteDescriptions: []
@@ -44,7 +52,7 @@ export function RegistrySsdForm({ onClose }: Props) {
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
 
-  const methods = useForm<SsdLineInput>({
+  const methods = useForm<FormValues>({
     defaultValues: {
       ...DEFAULT_VALUES,
       reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null
@@ -73,6 +81,20 @@ export function RegistrySsdForm({ onClose }: Props) {
           methods.reset({
             ...DEFAULT_VALUES,
             ...definedSsdProps,
+            secondaryWasteCodes:
+              (
+                definedSsdProps.secondaryWasteCodes as
+                  | string[]
+                  | undefined
+                  | null
+              )?.map(code => ({ value: code })) ?? [],
+            secondaryWasteDescriptions:
+              (
+                definedSsdProps.secondaryWasteDescriptions as
+                  | string[]
+                  | undefined
+                  | null
+              )?.map(description => ({ value: description })) ?? [],
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
             processingEndDate: isoDateToHtmlDate(
               definedSsdProps.processingEndDate
@@ -143,13 +165,54 @@ export function RegistrySsdForm({ onClose }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [useDate, reportForCompanySiret, methods]);
 
-  async function onSubmit(data: any) {
-    try {
-      const result = await addToSsdRegistry({
-        variables: {
-          lines: [data]
+  async function onSubmit(data: SsdLineInput) {
+try {
+    const { secondaryWasteCodes, secondaryWasteDescriptions, ...rest } = data;
+
+    if (secondaryWasteCodes && secondaryWasteDescriptions) {
+      let hasError = false;
+      secondaryWasteCodes.forEach((code, index) => {
+        console.log(code, secondaryWasteDescriptions[index]);
+        if (index === 0) {
+          if (code && !secondaryWasteDescriptions[index]) {
+            methods.setError("secondaryWasteDescriptions.0.value", {
+              message: "La description est requise si le code est renseigné"
+            });
+            hasError = true;
+          }
+        } else {
+          if (!code) {
+            methods.setError(`secondaryWasteCodes.${index}.value`, {
+              message:
+                "Le code est requis, supprimez la ligne si elle n'est pas utile"
+            });
+            hasError = true;
+          }
+          if (code && !secondaryWasteDescriptions[index]) {
+            methods.setError(`secondaryWasteDescriptions.${index}.value`, {
+              message: "La description est requise si le code est renseigné"
+            });
+            hasError = true;
+          }
         }
       });
+      if (hasError) {
+        return;
+      }
+    }
+
+    const result = await addToSsdRegistry({
+      variables: {
+        lines: [
+          {
+            ...rest,
+            secondaryWasteCodes: secondaryWasteCodes?.filter(Boolean) ?? [],
+            secondaryWasteDescriptions:
+              secondaryWasteDescriptions?.filter(Boolean) ?? []
+          }
+        ]
+      }
+    });
 
       const shouldCloseModal = handleMutationResponse(
         result.data?.addToSsdRegistry,
