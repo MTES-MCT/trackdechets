@@ -4,6 +4,7 @@ import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
+import { addMonths } from "date-fns";
 
 export type RevisionRequest = {
   updatedAt: Date;
@@ -161,6 +162,50 @@ export const cleanUpIsReturnForTab = async (alias = index.alias) => {
 
   logger.info(
     `[cleanUpIsReturnForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
+  );
+
+  return body;
+};
+
+/**
+ * On ne veut plus afficher dans le dashboard les révisions qui ont été
+ * acceptées, refusées ou annulées il y a plus de 6 mois.
+ */
+export const cleanUpIsReviewedRevisionForTab = async (alias = index.alias) => {
+  const sixMonthsAgo = addMonths(new Date(), -6);
+
+  const { body }: ApiResponse<UpdateByQueryResponse> =
+    await client.updateByQuery({
+      index: alias,
+      refresh: true,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                exists: {
+                  field: "nonPendingLatestRevisionRequestUpdatedAt"
+                }
+              },
+              {
+                range: {
+                  nonPendingLatestRevisionRequestUpdatedAt: {
+                    lt: sixMonthsAgo.toISOString()
+                  }
+                }
+              }
+            ]
+          }
+        },
+        script: {
+          source:
+            "ctx._source.isReviewedRevisionFor = []; ctx._source.nonPendingLatestRevisionRequestUpdatedAt = null"
+        }
+      }
+    });
+
+  logger.info(
+    `[cleanUpIsReviewedRevisionForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
   );
 
   return body;
