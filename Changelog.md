@@ -7,9 +7,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.07.1] 29/07/2025
 
+#### :nail_care: Améliorations
+
+- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 # [2025.06.1] 03/06/2025
 
