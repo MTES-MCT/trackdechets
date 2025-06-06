@@ -239,7 +239,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationNotificationNumber"
 >;
 
-export const MEP_2025_05_2 = new Date("2025-05-27");
+export const MEP_2025_05_2 = new Date("2025-06-04");
 
 export type Form = Emitter &
   Recipient &
