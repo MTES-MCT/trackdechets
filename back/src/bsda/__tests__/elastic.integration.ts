@@ -15,6 +15,7 @@ import {
   Mutation,
   MutationCreateBsdaRevisionRequestArgs
 } from "@td/codegen-back";
+import { addMonths } from "date-fns";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
@@ -298,5 +299,71 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(nonPendingLatestRevisionRequestUpdatedAt).toBe(
       revision.updatedAt.getTime()
     );
+  });
+
+  test("if old revision request > should not populate nonPendingLatestRevisionRequestUpdatedAt & isReviewedRevisionFor", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory();
+    const destination = await userWithCompanyFactory("ADMIN", {
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: ["DANGEROUS_WASTES_INCINERATION"]
+    });
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "PROCESSED",
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        destinationOperationDate: new Date(),
+        destinationOperationSignatureAuthor: "Test",
+        destinationOperationSignatureDate: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(destination.user);
+    const CREATE_BSDA_REVISION_REQUEST = gql`
+      mutation CreateBsdaRevisionRequest(
+        $input: CreateBsdaRevisionRequestInput!
+      ) {
+        createBsdaRevisionRequest(input: $input) {
+          id
+        }
+      }
+    `;
+
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          authoringCompanySiret: destination.company.siret!,
+          comment: "oups",
+          content: { waste: { code: "06 07 01*" } }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const revision = await prisma.bsdaRevisionRequest.update({
+      where: {
+        id: data.createBsdaRevisionRequest.id
+      },
+      data: {
+        status: "ACCEPTED",
+        updatedAt: addMonths(new Date(), -7)
+      }
+    });
+
+    // When
+    const bsdaForElastic = await getBsdaForElastic(bsda);
+    const { nonPendingLatestRevisionRequestUpdatedAt, isReviewedRevisionFor } =
+      toBsdElastic(bsdaForElastic);
+
+    // Then
+    expect(nonPendingLatestRevisionRequestUpdatedAt).toBe(
+      revision.updatedAt.getTime()
+    );
+    expect(isReviewedRevisionFor).toStrictEqual([]);
   });
 });

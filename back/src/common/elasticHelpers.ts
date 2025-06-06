@@ -4,7 +4,7 @@ import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
-import { addMonths } from "date-fns";
+import { addMonths, addYears } from "date-fns";
 
 export type RevisionRequest = {
   updatedAt: Date;
@@ -77,14 +77,24 @@ export function getRevisionOrgIds(
         };
       }
 
-      // La révision a abouti
+      // La révision a abouti (et a moins de 6 mois)
+      const SIX_MONTHS_AGO = addMonths(new Date(), -6).getTime();
+      if (revisionRequest.updatedAt.getTime() >= SIX_MONTHS_AGO) {
+        return {
+          isPendingRevisionFor,
+          isEmittedRevisionFor,
+          isReceivedRevisionFor,
+          isReviewedRevisionFor: [
+            ...new Set([...isReviewedRevisionFor, ...companiesOrgIds])
+          ]
+        };
+      }
+
       return {
         isPendingRevisionFor,
         isEmittedRevisionFor,
         isReceivedRevisionFor,
-        isReviewedRevisionFor: [
-          ...new Set([...isReviewedRevisionFor, ...companiesOrgIds])
-        ]
+        isReviewedRevisionFor
       };
     },
     {
