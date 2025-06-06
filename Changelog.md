@@ -14,6 +14,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Ajout d'un icône éco-organisme sur le composant de groupement de dasris [PR 4235](https://github.com/MTES-MCT/trackdechets/pull/4235/)
+- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 # [2025.06.1] 03/06/2025
 
