@@ -339,7 +339,10 @@ export const checkCompanies = async (
           transporter.transporterRecepisseIsExempted ?? false
       },
       zodContext,
-      !sealedFields.includes("transporters")
+      // Transporters are sealed when all transporters have signed
+      // If one of the transporter has already signed, we should not block if he is sleeping
+      transporter.transporterTransportSignatureDate == null ||
+        !sealedFields.includes("transporters")
     );
     await isRegisteredVatNumberRefinement(
       transporter.transporterCompanyVatNumber,
