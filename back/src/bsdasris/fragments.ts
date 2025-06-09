@@ -142,6 +142,29 @@ export const fullBsdasriFragment = gql`
         }
       }
     }
+    broker {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        validityLimit
+        department
+      }
+    }
+    trader {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        number
+        validityLimit
+        department
+      }
+    }
+    intermediaries {
+      ...CompanyFragment
+    }
   }
 `;
 export const fullGroupingBsdasriFragment = gql`

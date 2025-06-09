@@ -113,6 +113,7 @@ export type RegistryBsda = Prisma.BsdaGetPayload<{
 export const RegistryBsdasriInclude = Prisma.validator<Prisma.BsdasriInclude>()(
   {
     grouping: true,
+    intermediaries: true,
     finalOperations: {
       include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
     }

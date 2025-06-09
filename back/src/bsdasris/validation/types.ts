@@ -8,6 +8,8 @@ export type BsdasriUserFunctions = {
   isDestination: boolean;
   isTransporter: boolean;
   isEcoOrganisme: boolean;
+  isBroker: boolean;
+  isTrader: boolean;
 };
 
 export type BsdasriValidationContext = {
@@ -29,7 +31,8 @@ export type ZodBsdasriTransformer = (
 export const BsdasriForParsingInclude =
   Prisma.validator<Prisma.BsdasriInclude>()({
     grouping: true,
-    synthesizing: true
+    synthesizing: true,
+    intermediaries: true
   });
 
 export type PrismaBsdasriForParsing = Prisma.BsdasriGetPayload<{

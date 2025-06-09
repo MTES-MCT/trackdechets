@@ -17,7 +17,8 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   const existingBsdasri = await getFullBsdasriOrNotFound(id, {
     include: {
       grouping: true,
-      synthesizing: true
+      synthesizing: true,
+      intermediaries: true
     }
   });
 

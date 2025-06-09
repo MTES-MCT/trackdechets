@@ -16,7 +16,7 @@ import {
 } from "../../common/validation/zod/schema";
 
 import { BsdasriValidationContext } from "./types";
-import { runTransformers } from "./transformers";
+import { runTransformers, fillIntermediariesOrgIds } from "./transformers";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import {
@@ -27,12 +27,17 @@ import {
   validateSynthesisTransporterAcceptation,
   validateSynthesisDestinationAcceptation,
   validateRecipientIsCollectorForGroupingCodes,
-  validateDestinationOperationCode
+  validateDestinationOperationCode,
+  forbidSynthesisTraderBrokerIntermediaries
 } from "./refinements";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 
 import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../../common/validation/messages";
 import { validateTransporterPlates } from "../../common/validation/zod/refinement";
+import {
+  intermediariesRefinement,
+  intermediarySchema
+} from "../../common/validation/intermediaries";
 
 const ZodBsdasriWasteCodeEnum = z.enum(DASRI_WASTE_CODES_VALUES).nullish();
 
@@ -213,6 +218,35 @@ export const rawBsdasriSchema = z.object({
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   emittedByEcoOrganisme: z.boolean().default(false),
 
+  // broker
+  brokerCompanyName: z.string().nullish(),
+  brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
+  brokerCompanyAddress: z.string().nullish(),
+  brokerCompanyContact: z.string().nullish(),
+  brokerCompanyPhone: z.string().nullish(),
+  brokerCompanyMail: z.string().nullish(),
+  brokerRecepisseNumber: z.string().nullish(),
+  brokerRecepisseDepartment: z.string().nullish(),
+  brokerRecepisseValidityLimit: z.coerce.date().nullish(),
+
+  // trader
+  traderCompanyName: z.string().nullish(),
+  traderCompanySiret: siretSchema(CompanyRole.Trader).nullish(),
+  traderCompanyAddress: z.string().nullish(),
+  traderCompanyContact: z.string().nullish(),
+  traderCompanyPhone: z.string().nullish(),
+  traderCompanyMail: z.string().nullish(),
+  traderRecepisseNumber: z.string().nullish(),
+  traderRecepisseDepartment: z.string().nullish(),
+  traderRecepisseValidityLimit: z.coerce.date().nullish(),
+
+  // intermediaries
+  intermediaries: z
+    .array(intermediarySchema)
+    .nullish()
+    .superRefine(intermediariesRefinement), // max 3
+  intermediariesOrgIds: z.array(z.string()).optional(),
+
   // Identification fields
   identificationNumbers: z.array(z.string()).optional(),
 
@@ -237,10 +271,10 @@ const refinedBsdasriSchema = rawBsdasriSchema
   .superRefine(validateTransporterPlates)
   .superRefine(checkOperationMode);
 
-// Transformations synchrones qui sont toujours
-// joués même si `enableCompletionTransformers=false`
-const transformedBsdasriSyncSchema = refinedBsdasriSchema; // todo: supprimer si pas de transform utile
-
+// Transformations synchrones qui sont toujours jouées
+const transformedBsdasriSyncSchema = refinedBsdasriSchema.transform(
+  fillIntermediariesOrgIds
+);
 /**
  * Modification du schéma Zod pour appliquer des transformations et
  * des vérifications **synchrones** qui nécessite de connaitre le contexte d'appel.
@@ -267,6 +301,7 @@ export const contextualBsdasriSchemaAsync = (
     .superRefine(validateSynthesisDestinationAcceptation(context))
     .superRefine(validateRecipientIsCollectorForGroupingCodes(context))
     .superRefine(validateDestinationOperationCode(context))
+    .superRefine(forbidSynthesisTraderBrokerIntermediaries())
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où des transformations auto-complètent certains champs

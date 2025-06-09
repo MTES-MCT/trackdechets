@@ -66,6 +66,17 @@ const updateSynthesisBsdasri = async ({
     );
   }
 
+  // Validate form input
+  if (
+    inputGrouping &&
+    inputGrouping.length > 0 &&
+    dbBsdasri.type !== BsdasriType.GROUPING
+  ) {
+    throw new UserInputError(
+      "Le champ grouping n'est accessible que sur les dasri de groupement"
+    );
+  }
+
   if (inputSynthesizing !== undefined) {
     if (dbBsdasri.status !== BsdasriStatus.INITIAL) {
       throw new UserInputError(
@@ -112,7 +123,8 @@ const updateSynthesisBsdasri = async ({
     // le nombre d'évenements crées dans Mongo.
     return expandBsdasriFromDB(dbBsdasri);
   }
-  const { createdAt, grouping, synthesizing, ...newBsdasri } = parsedBsdasri;
+  const { createdAt, grouping, synthesizing, intermediaries, ...newBsdasri } =
+    parsedBsdasri;
 
   const synthesizingArgs = !!inputSynthesizing?.length
     ? {

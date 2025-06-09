@@ -269,6 +269,31 @@ export const fullDasriFragment = gql`
         }
       }
     }
+    trader {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        validityLimit
+        number
+        department
+        isExempted
+      }
+    }
+    broker {
+      company {
+        ...CompanyFragment
+      }
+      recepisse {
+        validityLimit
+        number
+        department
+        isExempted
+      }
+    }
+    intermediaries {
+      ...CompanyFragment
+    }
     grouping {
       ...InitialDasriFragment
     }
