@@ -1,7 +1,8 @@
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { searchCompany } from "../../companies/search";
 import type { BsdasriInput, CompanySearchResult } from "@td/codegen-back";
-import { sirenify, sirenifyBsdasriCreateInput } from "../sirenify";
+import { sirenifyBsdasriCreateInput } from "../sirenify";
+import { sirenifyBsdasri as sirenify } from "../validation/sirenify";
 import { AuthType } from "../../auth/auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { Prisma } from "@prisma/client";

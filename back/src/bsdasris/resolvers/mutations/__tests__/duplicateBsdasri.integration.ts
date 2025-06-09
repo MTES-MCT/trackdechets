@@ -5,7 +5,15 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData,
+  readyToTakeOverData,
+  traderData,
+  brokerData,
+  intermediaryData
+} from "../../../__tests__/factories";
 import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { BsdasriType } from "@prisma/client";
 import { prisma } from "@td/prisma";
@@ -56,13 +64,58 @@ describe("Mutation.duplicateBsdasri", () => {
       })
     ]);
   });
+
   it("should disallow users not belonging to the duplicated dasri", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
     const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
+    const transporter = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: {
+          receiptNumber: "BROKER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "BROKER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
+      where: { id: broker.brokerReceiptId! }
+    });
+    const trader = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: {
+          receiptNumber: "TRADER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRADER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const traderReceipt = await prisma.traderReceipt.findUniqueOrThrow({
+      where: { id: trader.traderReceiptId! }
+    });
+    const destination = await companyFactory({
+      companyTypes: ["WASTE_VEHICLES"]
+    });
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(otherCompany)
+        ...initialData(otherCompany),
+        ...readyToPublishData(otherCompany),
+        ...readyToTakeOverData(transporter),
+        ...traderData(trader),
+        ...brokerData(broker)
+        // ...intermediaryData()
       }
     });
 
@@ -123,7 +176,7 @@ describe("Mutation.duplicateBsdasri", () => {
     }
   );
 
-  it("should duplicate a  dasri", async () => {
+  it("should duplicate a dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({

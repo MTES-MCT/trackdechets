@@ -16,8 +16,11 @@ function readers(bsdasri: Bsdasri): string[] {
         bsdasri.transporterCompanyVatNumber,
         bsdasri.destinationCompanySiret,
         bsdasri.ecoOrganismeSiret,
+        bsdasri.brokerCompanySiret,
+        bsdasri.traderCompanySiret,
         ...bsdasri.synthesisEmitterSirets,
-        ...bsdasri.groupingEmitterSirets
+        ...bsdasri.groupingEmitterSirets,
+        ...bsdasri.intermediariesOrgIds
       ].filter(Boolean);
 }
 
@@ -81,7 +84,9 @@ function creators(input: BsdasriInput) {
     input.transporter?.company?.siret,
     input.transporter?.company?.vatNumber,
     input.destination?.company?.siret,
-    input.ecoOrganisme?.siret
+    input.ecoOrganisme?.siret,
+    input.broker?.company?.siret,
+    input.trader?.company?.siret
   ].filter(Boolean);
 }
 

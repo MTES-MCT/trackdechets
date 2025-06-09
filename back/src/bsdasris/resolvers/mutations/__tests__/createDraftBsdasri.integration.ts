@@ -107,6 +107,91 @@ describe("Mutation.createDraftBsdasri", () => {
       input.destination.company
     );
   });
+  it("create a draft dasri (trader)", async () => {
+    const { user, company: trader } = await userWithCompanyFactory("MEMBER");
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      emitter: {
+        company: {
+          siret: emitter.siret
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.siret
+        }
+      },
+      trader: {
+        company: {
+          siret: trader.siret
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createDraftBsdasri.isDraft).toBe(true);
+    expect(data.createDraftBsdasri.status).toBe("INITIAL");
+    expect(data.createDraftBsdasri.type).toBe("SIMPLE");
+    expect(data.createDraftBsdasri.destination!.company).toMatchObject(
+      input.destination.company
+    );
+    expect(data.createDraftBsdasri.trader!.company).toMatchObject(
+      input.trader.company
+    );
+  });
+
+  it("create a draft dasri (broker)", async () => {
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      emitter: {
+        company: {
+          siret: emitter.siret
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.siret
+        }
+      },
+      broker: {
+        company: {
+          siret: broker.siret
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createDraftBsdasri.isDraft).toBe(true);
+    expect(data.createDraftBsdasri.status).toBe("INITIAL");
+    expect(data.createDraftBsdasri.type).toBe("SIMPLE");
+    expect(data.createDraftBsdasri.destination!.company).toMatchObject(
+      input.destination.company
+    );
+    expect(data.createDraftBsdasri.broker!.company).toMatchObject(
+      input.broker.company
+    );
+  });
 
   it.each([
     ["R12", undefined],

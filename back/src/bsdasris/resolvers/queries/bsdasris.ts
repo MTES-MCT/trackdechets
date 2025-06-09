@@ -30,7 +30,10 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
       { transporterCompanySiret: { in: orgIdsWithListPermission } },
       { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
-      { ecoOrganismeSiret: { in: orgIdsWithListPermission } }
+      { ecoOrganismeSiret: { in: orgIdsWithListPermission } },
+      { brokerCompanySiret: { in: orgIdsWithListPermission } },
+      { traderCompanySiret: { in: orgIdsWithListPermission } },
+      { intermediariesOrgIds: { hasSome: orgIdsWithListPermission } }
     ]
   };
 
