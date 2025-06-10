@@ -1615,6 +1615,37 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     };
 
     describe("wasteAcceptationStatus = ACCEPTED", () => {
+      // Cas un peu particulier, on autorise de réviser le poids réceptionné à
+      // zéro puisqu'il est impossible d'annuler un BSDA déjà réceptionné.
+      it("can specify reception weight = 0", async () => {
+        // Given
+        const { user, company, bsda } = await createBsdaAndCompanies({
+          destinationReceptionAcceptationStatus:
+            WasteAcceptationStatus.ACCEPTED,
+          destinationReceptionRefusalReason: "Raison",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 0
+        });
+
+        // When 1: with weight
+        const { errors: errors1 } = await createRevisionRequest(
+          user,
+          company,
+          bsda,
+          {
+            destination: {
+              reception: {
+                weight: 0,
+                refusedWeight: 0
+              }
+            }
+          }
+        );
+
+        // Then 1
+        expect(errors1).toBeUndefined();
+      });
+
       it.each([undefined, 0])(
         "cannot specify refusedWeight > 0 (initial destinationReceptionRefusedWeight: %p)",
         async destinationReceptionRefusedWeight => {

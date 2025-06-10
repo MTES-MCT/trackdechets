@@ -620,8 +620,12 @@ export const validateDestinationReceptionWeight: (
   validationContext: BsdaValidationContext
 ) => Refinement<ParsedZodBsda> = validationContext => {
   const currentSignatureType = validationContext.currentSignatureType;
+
   return async (bsda, { addIssue }) => {
-    if (currentSignatureType !== "OPERATION") {
+    if (
+      currentSignatureType !== "RECEPTION" &&
+      currentSignatureType !== "OPERATION"
+    ) {
       return;
     }
 
