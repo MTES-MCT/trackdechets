@@ -17,11 +17,7 @@ const TransportPlates = ({
     return (
       <Field name={fieldName}>
         {({ field }) => (
-          <Input
-            label="Immatriculation"
-            nativeInputProps={field}
-            hintText="Max 2 plaques, séparées par une virgule"
-          />
+          <Input label="Immatriculation" nativeInputProps={field} />
         )}
       </Field>
     );
