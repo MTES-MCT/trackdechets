@@ -203,9 +203,12 @@ export default function BsdaStepsList(props: Props) {
     // set to null, but the toggle is automatically set to true.
     const initialBsda = bsdaQuery.data?.bsda;
     if (
+      // If legacy BSDA...
       initialBsda?.waste?.isSubjectToADR === null &&
+      // ...and the user did not change the toggle (nor the ADR value)
       bsdaInput.waste?.isSubjectToADR === true &&
-      !isDefinedStrict(bsdaInput.waste?.adr)
+      (!isDefinedStrict(bsdaInput.waste?.adr) ||
+        bsdaInput.waste?.adr === initialBsda.waste?.adr)
     ) {
       bsdaInput.waste.isSubjectToADR = null;
     }
