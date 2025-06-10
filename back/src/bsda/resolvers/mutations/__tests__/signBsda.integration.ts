@@ -2346,7 +2346,7 @@ describe("Mutation.Bsda.sign", () => {
       const bsda = await createBsda();
 
       // When
-      const { errors } = await updateBsda(destinationUser, bsda.id, {
+      await updateBsda(destinationUser, bsda.id, {
         // Reception data
         destination: {
           reception: {
@@ -2357,10 +2357,13 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le poids réceptionné doit être supérieur à zéro"
+        "Le poids du déchet reçu doit être renseigné et non nul."
       );
     });
 

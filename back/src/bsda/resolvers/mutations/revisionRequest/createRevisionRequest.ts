@@ -301,8 +301,6 @@ const schema = rawBsdaSchema
     emitterPickupSiteInfos: true
   })
   .extend({ isCanceled: z.boolean().nullish() })
-  // Pour les révisions on autorise un poids réceptionné à 0
-  .extend({ destinationReceptionWeight: z.number().min(0).nullish() })
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
