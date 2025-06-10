@@ -47,7 +47,6 @@ export function BsddRequestRevisionCancelationInput({ bsdd, onChange }: Props) {
         disabled={!canBeCancelled}
         inputTitle="cancellation"
         onChange={onChange}
-        showCheckedHint={false}
         helperText={
           isAppendix1
             ? CANCELATION_NOT_POSSIBLE_FOR_APPENDIX1_MSG
