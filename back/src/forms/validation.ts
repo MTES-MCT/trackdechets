@@ -82,6 +82,7 @@ import {
   ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
   ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
 } from "../common/validation/messages";
+import { getBsddSubType } from "../common/subTypes";
 
 // set yup default error messages
 configureYup();
@@ -908,6 +909,12 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           wasteDetailsOnuCode,
           createdAt
         } = ctx.parent;
+
+        // User must be able to forward a legacy BSD without wasteDetailsIsSubjectToADR
+        const bsdSubType = getBsddSubType(ctx.parent);
+        if (bsdSubType === "TEMP_STORED") {
+          return true;
+        }
 
         // Field becomes required after MEP_2025_05_2. Be careful and don't break BSDs created before
         if (

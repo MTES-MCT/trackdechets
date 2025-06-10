@@ -40,7 +40,7 @@ interface BsddForSubType {
 export const getBsddSubType = (bsdd: BsddForSubType): BsdSubType => {
   if (
     bsdd.forwardedInId ||
-    bsdd.id.endsWith("-suite") ||
+    bsdd.id?.endsWith("-suite") ||
     bsdd.readableId?.endsWith("-suite")
   ) {
     return "TEMP_STORED";
