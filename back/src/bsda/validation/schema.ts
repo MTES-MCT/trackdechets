@@ -188,7 +188,10 @@ export const rawBsdaSchema = z.object({
   destinationPlannedOperationCode: ZodOperationEnum,
   destinationCustomInfo: z.string().nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
-  destinationReceptionWeight: z.number().nullish(),
+  destinationReceptionWeight: z
+    .number()
+    .positive("Le poids réceptionné doit être supérieur à zéro")
+    .nullish(),
   destinationReceptionRefusedWeight: z.number().min(0).nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)

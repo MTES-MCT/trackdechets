@@ -2341,6 +2341,29 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.status).toBe("RECEIVED");
     });
 
+    it("should not be able to sign reception after transport if quantityReceived = 0", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+      const { errors } = await updateBsda(destinationUser, bsda.id, {
+        // Reception data
+        destination: {
+          reception: {
+            acceptationStatus: "ACCEPTED",
+            weight: 0,
+            date: new Date().toISOString() as any
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le poids réceptionné doit être supérieur à zéro"
+      );
+    });
+
     it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
       // Given
       const bsda = await createBsda();
