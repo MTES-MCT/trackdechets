@@ -4,7 +4,7 @@ import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
-import { addMonths, addYears } from "date-fns";
+import { addMonths } from "date-fns";
 
 export type RevisionRequest = {
   updatedAt: Date;
