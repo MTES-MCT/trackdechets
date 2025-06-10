@@ -9,7 +9,7 @@ import styles from "./Login.module.scss";
 
 function getErrorMessage(errorCode: string) {
   if (errorCode === "INVALID_OR_MISSING_HASH") {
-    return "Le lien est invalide, vous pouvez demander un nouvel email d'activation";
+    return "Le lien est invalide, vous pouvez demander un nouveau courriel d'activation";
   }
 
   return "Invalide";
@@ -85,10 +85,10 @@ export default function UserActivation() {
                   </a>
                 </p>
                 <p className="fr-text--md">
-                  Vous n'avez pas reçu d'email d'activation suite à votre
+                  Vous n'avez pas reçu le courriel d'activation suite à votre
                   inscription ?{" "}
                   <a href={routes.resendActivationEmail} className="fr-link">
-                    Renvoyer l'email d'activation
+                    Renvoyer le courriel d'activation
                   </a>
                 </p>
               </div>

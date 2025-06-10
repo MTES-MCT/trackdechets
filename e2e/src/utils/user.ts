@@ -11,7 +11,7 @@ export const login = async (page: Page, { email, password }) => {
   await goTo(page, "/login");
 
   // Fill credentials and click button
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Courriel").fill(email);
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
   await page.getByRole("button", { name: "Se connecter" }).click();
 
@@ -34,7 +34,9 @@ export const failedLogin = async (page: Page, { email, password }) => {
 
   // Error should pop
   await expect(page.getByRole("heading", { name: "Erreur" })).toBeVisible();
-  await expect(page.getByText("Email ou mot de passe incorrect")).toBeVisible();
+  await expect(
+    page.getByText("Courriel ou mot de passe incorrect")
+  ).toBeVisible();
 
   // Login button still visible
   await expect(
@@ -72,7 +74,7 @@ export const fillSignupInfo = async (
   await page.getByLabel("Nom et prénom").fill(username);
 
   // Email
-  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Courriel").fill(email);
 
   // Password
   await page.getByLabel("Mot de passe", { exact: true }).fill(password);
