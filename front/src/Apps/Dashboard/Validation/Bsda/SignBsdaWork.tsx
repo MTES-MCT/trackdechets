@@ -406,7 +406,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
                     label="Poids total en tonnes"
                     nativeInputProps={{
                       inputMode: "decimal",
-                      step: "0.1",
+                      step: "0.001",
                       type: "number",
                       ...register("weight.value")
                     }}
