@@ -128,7 +128,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   };
 
   const methods = useForm<ZodBdsaTransport>({
-    defaultValues: initialState,
+    values: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }

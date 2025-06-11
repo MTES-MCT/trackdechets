@@ -124,7 +124,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
   } as ZodBsdaReception;
 
   const methods = useForm<ZodBsdaReception>({
-    defaultValues: initialState,
+    values: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
