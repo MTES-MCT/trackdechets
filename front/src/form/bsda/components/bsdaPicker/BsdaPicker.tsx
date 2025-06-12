@@ -106,7 +106,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     setFieldValue("waste.code", bsda?.waste?.code ?? initialState!.waste!.code);
     setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState!.waste!.adr);
 
-    // Careful when forwarding legacy BSDAs with isSubjectToADR = null
+    // Attention avec les bordereaux qui réexpédient un BSDA legacy où isSubjectToADR = null
     let isSubjectToADR =
       bsda?.waste?.isSubjectToADR ?? initialState!.waste!.isSubjectToADR;
     if (bsda?.waste?.isSubjectToADR === null) {
