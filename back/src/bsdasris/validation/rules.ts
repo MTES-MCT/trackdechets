@@ -471,7 +471,6 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   },
   destinationCompanyMail: {
     sealed: { from: "RECEPTION" },
-    // required: { from: "EMISSION" },
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
