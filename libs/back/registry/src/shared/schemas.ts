@@ -329,11 +329,16 @@ export const municipalitiesNamesSchema = z.union([
   municipalitiesNamesArraySchema
 ]);
 
+/*
+  les contraintes de format sont les suivantes:
+  [2 à 3 lettres][espace (facultatif)][1 à 4 chiffres (facultatif)][espace (facultatif)][6 chiffres]
+*/
+
 export const ttdNumberSchema = z
   .string()
   .transform(v => v.replace(/\s+/g, ""))
   .refine(
-    v => /^[A-Z]{2}[0-9]{10}$/.test(v) || /^A7[EI][0-9]{10}$/.test(v),
+    v => /^(?:[A-Z]{2,3}|A7[EI])[0-9]{0,4}[0-9]{6}$/.test(v),
     "Le numéro de notification ou de déclaration de transfert transfrontalier de déchet ne respecte pas le format attendu"
   )
   .nullish();
