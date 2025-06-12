@@ -68,18 +68,26 @@ export function prismaToZodBsdasri(
     emitterWastePackagings:
       bsdasri.emitterWastePackagings as BsdasriPackaging[],
 
-    emitterWasteWeightValue: emitterWasteWeightValue?.toNumber(),
-    transporterWasteWeightValue: transporterWasteWeightValue?.toNumber(),
+    emitterWasteWeightValue: emitterWasteWeightValue
+      ? emitterWasteWeightValue.toNumber()
+      : null,
+    transporterWasteWeightValue: transporterWasteWeightValue
+      ? transporterWasteWeightValue.toNumber()
+      : null,
     transporterWastePackagings:
       bsdasri.transporterWastePackagings as BsdasriPackaging[],
-    transporterWasteRefusedWeightValue:
-      transporterWasteRefusedWeightValue?.toNumber(),
-    destinationReceptionWasteWeightValue:
-      destinationReceptionWasteWeightValue?.toNumber(),
+    transporterWasteRefusedWeightValue: transporterWasteRefusedWeightValue
+      ? transporterWasteRefusedWeightValue.toNumber()
+      : null,
+    destinationReceptionWasteWeightValue: destinationReceptionWasteWeightValue
+      ? destinationReceptionWasteWeightValue.toNumber()
+      : null,
     destinationWastePackagings:
       bsdasri.destinationWastePackagings as BsdasriPackaging[],
     destinationReceptionWasteRefusedWeightValue:
-      destinationReceptionWasteRefusedWeightValue?.toNumber(),
+      destinationReceptionWasteRefusedWeightValue
+        ? destinationReceptionWasteRefusedWeightValue.toNumber()
+        : null,
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
     grouping: grouping.map(bsd => bsd.id),
     synthesizing: synthesizing.map(bsd => bsd.id)
@@ -182,6 +190,7 @@ export function getCurrentSignatureType(
     }
     return signatures;
   }
+
   const signatures = getSignatures("EMISSION", []);
 
   if (signatures.length > 0) {

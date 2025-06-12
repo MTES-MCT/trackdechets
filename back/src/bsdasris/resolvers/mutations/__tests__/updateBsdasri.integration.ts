@@ -649,6 +649,46 @@ describe("Mutation.updateBsdasri", () => {
     ]);
   });
 
+  it("BUGFIX: it should ignore null emitter weight update", async () => {
+    // a bug in a helper function used to raise an error when receiving null weight on a persisted null weight
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+
+        ...readyToPublishData(await companyFactory()),
+        emitterWasteWeightValue: null,
+        emitterWasteWeightIsEstimate: null,
+        status: BsdasriStatus.SIGNED_BY_PRODUCER
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      emitter: {
+        emission: {
+          weight: { value: null }
+        }
+      },
+      transporter: {
+        company: { mail: "trs@test.com" }
+      }
+    };
+
+    const { errors, data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+
+    expect(data.updateBsdasri?.transporter!.company?.mail).toEqual(
+      "trs@test.com"
+    );
+  });
+
   it("should allow transporter handedOverAt field update after transport signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const destination = await companyFactory();
