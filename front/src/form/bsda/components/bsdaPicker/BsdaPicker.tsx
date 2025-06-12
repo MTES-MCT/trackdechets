@@ -23,7 +23,7 @@ import { useParams } from "react-router-dom";
 import { getInitialState } from "../../stepper/initial-state";
 import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 import { mergePackagings } from "../../../../common/packagings";
-import { isDefinedStrict } from "../../../../common/helper";
+import { isDefined, isDefinedStrict } from "../../../../common/helper";
 
 type Props = { name: string; bsdaId: string };
 
@@ -109,7 +109,7 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     // Attention avec les bordereaux qui réexpédient un BSDA legacy où isSubjectToADR = null
     let isSubjectToADR =
       bsda?.waste?.isSubjectToADR ?? initialState!.waste!.isSubjectToADR;
-    if (bsda?.waste?.isSubjectToADR === null) {
+    if (!isDefined(bsda?.waste?.isSubjectToADR)) {
       if (!isDefinedStrict(bsda?.waste?.adr)) {
         // Si rien dans la mention ADR, on peut supposer que le déchet n'est pas soumis à l'ADR
         isSubjectToADR = false;
