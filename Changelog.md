@@ -5,11 +5,15 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2025.07.1] 29/07/2025
+# [2025.07.1] 01/07/2025
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+
+#### :nail_care: Améliorations
+
+- Ajout d'un icône éco-organisme sur le composant de groupement de dasris [PR 4235](https://github.com/MTES-MCT/trackdechets/pull/4235/)
 
 # [2025.06.1] 03/06/2025
 
@@ -97,7 +101,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking Change
 
-- BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
+- BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur
+  `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
 - La quantité refusée est désormais obligatoire à l'étape d'acceptation du déchet sur le BSDD [PR 3823](https://github.com/MTES-MCT/trackdechets/pull/3823)
 - Le type de retour des API permettant d'ajouter des lignes au RNDTS a été modifié. Il contient désormais le détail des opération effectuées, en remplacement d'un simple booléen [PR 4026](https://github.com/MTES-MCT/trackdechets/pull/4026)
 

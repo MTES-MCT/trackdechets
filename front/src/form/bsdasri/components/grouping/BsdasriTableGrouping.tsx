@@ -13,6 +13,7 @@ import {
 import { formatDate } from "../../../../common/datetime";
 import { RefreshButton } from "./Common";
 import { aggregatePackagings } from "./utils";
+import styles from "./grouping.module.scss";
 
 const GET_GROUPABLE_BSDASRIS = gql`
   query Bsdasris($where: BsdasriWhere) {
@@ -27,6 +28,9 @@ const GET_GROUPABLE_BSDASRIS = gql`
             company {
               name
             }
+          }
+          ecoOrganisme {
+            siret
           }
           destination {
             reception {
@@ -151,6 +155,7 @@ export default function BsdasriTableGrouping({
               }
             />
           </th>
+          <th></th>
           <th>Numéro</th>
           <th>Code déchet</th>
           <th>Producteur</th>
@@ -176,6 +181,15 @@ export default function BsdasriTableGrouping({
                 checked={selectedItems.indexOf(edge.node.id) > -1}
                 onChange={() => true}
               />
+            </td>
+            <td>
+              {edge.node.ecoOrganisme?.siret ? (
+                <img
+                  src="/icons/dashboard/eco-organism.svg"
+                  alt="Eco-organisme prsent sur le bsdasri"
+                  className={styles.groupingIconEcoOrganism}
+                />
+              ) : null}
             </td>
             <td>{edge.node.id}</td>
 
