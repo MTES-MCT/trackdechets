@@ -91,6 +91,46 @@ describe("Mutation markAsResealed", () => {
     expect(sirenifyResealedFormInput as jest.Mock).toHaveBeenCalledTimes(1);
   });
 
+  test("the temp storer of the BSD can reseal it even if initial BSD is legacy and has wasteDetailsIsSubjectToADR = null", async () => {
+    // Given
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1,
+        wasteDetailsIsSubjectToADR: null // legacy form
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(resealedForm.status).toEqual("RESEALED");
+  });
+
   test("can convert a simple form to a form with temporary storage", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(

@@ -82,6 +82,7 @@ import {
   ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
   ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
 } from "../common/validation/messages";
+import { getBsddSubType } from "../common/subTypes";
 
 // set yup default error messages
 configureYup();
@@ -239,7 +240,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationNotificationNumber"
 >;
 
-export const MEP_2025_05_2 = new Date("2025-05-27");
+export const MEP_2025_05_2 = new Date("2025-06-04");
 
 export type Form = Emitter &
   Recipient &
@@ -908,6 +909,12 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
           wasteDetailsOnuCode,
           createdAt
         } = ctx.parent;
+
+        // User must be able to forward a legacy BSD without wasteDetailsIsSubjectToADR
+        const bsdSubType = getBsddSubType(ctx.parent);
+        if (bsdSubType === "TEMP_STORED") {
+          return true;
+        }
 
         // Field becomes required after MEP_2025_05_2. Be careful and don't break BSDs created before
         if (

@@ -92,9 +92,14 @@ export const validateRecipientIsCollectorForGroupingCodes: (
 
 export const validateSynthesisTransporterAcceptation: (
   validationContext: BsdasriValidationContext
-) => Refinement<ParsedZodBsdasri> = () => {
+) => Refinement<ParsedZodBsdasri> = validationContext => {
   return async (bsdasri, { addIssue }) => {
     if (bsdasri.type !== BsdasriType.SYNTHESIS) {
+      return;
+    }
+    const currentSignatureType = validationContext.currentSignatureType;
+
+    if (currentSignatureType !== "TRANSPORT") {
       return;
     }
 

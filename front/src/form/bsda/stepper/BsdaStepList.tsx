@@ -37,6 +37,7 @@ import {
 import { isForeignVat } from "@td/constants";
 import { cleanPackagings } from "../../../Apps/Forms/Components/PackagingList/helpers";
 import GenericStepList from "../../common/stepper/GenericStepList";
+import { isDefinedStrict } from "../../../common/helper";
 
 interface Props {
   children: (bsda: Bsda | undefined) => ReactElement;
@@ -197,6 +198,20 @@ export default function BsdaStepsList(props: Props) {
       transporters: transporterIds,
       packagings: cleanPackagings(packagings ?? [])
     };
+
+    // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field
+    // set to null, but the toggle is automatically set to true.
+    const initialBsda = bsdaQuery.data?.bsda;
+    if (
+      // If legacy BSDA...
+      initialBsda?.waste?.isSubjectToADR === null &&
+      // ...and the user did not change the toggle (nor the ADR value)
+      bsdaInput.waste?.isSubjectToADR === true &&
+      (!isDefinedStrict(bsdaInput.waste?.adr) ||
+        bsdaInput.waste?.adr === initialBsda.waste?.adr)
+    ) {
+      bsdaInput.waste.isSubjectToADR = null;
+    }
 
     saveBsda(bsdaInput)
       .then(_ => {

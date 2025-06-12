@@ -2341,6 +2341,32 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.status).toBe("RECEIVED");
     });
 
+    it("should not be able to sign reception after transport if quantityReceived = 0", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // When
+      await updateBsda(destinationUser, bsda.id, {
+        // Reception data
+        destination: {
+          reception: {
+            acceptationStatus: "ACCEPTED",
+            weight: 0,
+            date: new Date().toISOString() as any
+          }
+        }
+      });
+
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le poids du déchet reçu doit être renseigné et non nul."
+      );
+    });
+
     it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
       // Given
       const bsda = await createBsda();
