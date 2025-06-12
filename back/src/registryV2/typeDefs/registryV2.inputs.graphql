@@ -295,7 +295,7 @@ input SsdLineInput {
   - VALORISATION_ENERGETIQUE
   - AUTRES_VALORISATIONS
   """
-  operationMode: OperationMode!
+  operationMode: OperationMode
 
   """
   **Référence de l'acte administratif**

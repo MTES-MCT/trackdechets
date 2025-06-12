@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement des règles de validation SSD: Le mode de traitement devient facultatif (car inutile) dans le cas d'un code R12 ou R13 [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 # [2025.06.1] 03/06/2025
 
@@ -43,9 +44,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking Change
 
 - BSDD: le champ `wasteDetailsIsSubjectToADR` est maintenant obligatoire via API [PR 4183](https://github.com/MTES-MCT/trackdechets/pull/4183)
-
-#### :boom: Breaking Change
-
 - Suppression de la query formsRegister (dépréciée depuis plusieurs années) [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 # [2025.05.1] 03/05/2025
