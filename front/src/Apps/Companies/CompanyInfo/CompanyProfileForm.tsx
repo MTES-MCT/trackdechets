@@ -434,9 +434,15 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
             data.workerCertification?.hasSubSectionFour ?? false,
           hasSubSectionThree:
             data.workerCertification?.hasSubSectionThree ?? false,
-          certificationNumber: data.workerCertification?.certificationNumber,
-          validityLimit: data.workerCertification?.validityLimit,
-          organisation: data.workerCertification?.organisation
+          certificationNumber: data.workerCertification?.hasSubSectionThree
+            ? data.workerCertification?.certificationNumber
+            : null,
+          validityLimit: data.workerCertification?.hasSubSectionThree
+            ? data.workerCertification?.validityLimit
+            : null,
+          organisation: data.workerCertification?.hasSubSectionThree
+            ? data.workerCertification?.organisation
+            : null
         };
 
         if (company.workerCertification) {
