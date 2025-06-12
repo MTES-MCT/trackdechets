@@ -47,14 +47,18 @@ export const CODES_AND_EXPECTED_OPERATION_MODES = {
     OperationMode.AUTRES_VALORISATIONS
   ],
   R6: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
-  R7: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
+  R7: [
+    OperationMode.REUTILISATION,
+    OperationMode.RECYCLAGE,
+    OperationMode.AUTRES_VALORISATIONS
+  ],
   R8: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
   R9: [
     OperationMode.REUTILISATION,
     OperationMode.RECYCLAGE,
     OperationMode.AUTRES_VALORISATIONS
   ],
-  R10: [OperationMode.AUTRES_VALORISATIONS],
+  R10: [OperationMode.RECYCLAGE, OperationMode.AUTRES_VALORISATIONS],
   R11: [
     OperationMode.REUTILISATION,
     OperationMode.RECYCLAGE,
