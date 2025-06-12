@@ -194,7 +194,7 @@ export const ssdFormShape: FormShape = [
         names: ["operationCode", "operationMode"],
         validation: {
           operationCode: nonEmptyString,
-          operationMode: nonEmptyString
+          operationMode: optionalString
         },
         shape: "custom"
       },
