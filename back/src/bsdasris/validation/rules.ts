@@ -165,13 +165,11 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
 
   emitterCompanyMail: {
     sealed: { from: "EMISSION" },
-
     readableFieldName: "L'adresse e-mail de l'émetteur",
     path: ["emitter", "company", "mail"]
   },
   emitterWasteVolume: {
     sealed: { from: "EMISSION" },
-
     readableFieldName: "Le volume de déchet émis"
   },
   emitterWasteWeightValue: {
@@ -296,7 +294,6 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" },
     path: ["transporter", "company", "mail"]
   },
   transporterRecepisseNumber: {
@@ -471,7 +468,6 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   },
   destinationCompanyMail: {
     sealed: { from: "RECEPTION" },
-    // required: { from: "EMISSION" },
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
