@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 - Assouplissement des règles de validation SSD: Le mode de traitement devient facultatif (car inutile) dans le cas d'un code R12 ou R13 [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement de la règle de validation numéro GISTRID/numéro de notification sur les déclarations [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 # [2025.06.1] 03/06/2025
 
