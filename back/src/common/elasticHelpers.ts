@@ -200,7 +200,7 @@ export const cleanUpIsReviewedRevisionForTab = async (alias = index.alias) => {
               {
                 range: {
                   nonPendingLatestRevisionRequestUpdatedAt: {
-                    lt: sixMonthsAgo.toISOString()
+                    lt: sixMonthsAgo.getTime()
                   }
                 }
               }
