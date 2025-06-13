@@ -2,6 +2,7 @@ import {
   ImportType,
   RegistryChanges,
   UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_WITH_DELEGATION_ERROR,
   getSumOfChanges,
   importOptions,
   incrementLocalChangesForCompany,
@@ -73,6 +74,13 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
     if (result.success) {
       const { reportAsCompanySiret, reportForCompanySiret } = result.data;
+      console.log("reportAsCompanySiret", reportAsCompanySiret);
+      console.log("reportForCompanySiret", reportForCompanySiret);
+      console.log(
+        "delegatorSiretsByDelegateSirets",
+        delegatorSiretsByDelegateSirets
+      );
+      console.log("userSirets", userSirets);
 
       if (
         !isAuthorized({
@@ -82,8 +90,27 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
           allowedSirets: userSirets
         })
       ) {
+        if (!reportAsCompanySiret && delegatorSiretsByDelegateSirets.size > 0) {
+          const arrayDelegates = [
+            ...delegatorSiretsByDelegateSirets.values()
+          ].flat();
+          if (arrayDelegates.includes(reportForCompanySiret)) {
+            errors.set(line.publicId, [
+              {
+                path: ["reportForCompanySiret"],
+                code: "unauthorized",
+                message: UNAUTHORIZED_WITH_DELEGATION_ERROR
+              } as any
+            ]);
+            continue;
+          }
+        }
         errors.set(line.publicId, [
-          { path: [], code: "unauthorized", message: UNAUTHORIZED_ERROR } as any
+          {
+            path: ["reportForCompanySiret"],
+            code: "unauthorized",
+            message: UNAUTHORIZED_ERROR
+          } as any
         ]);
         continue;
       }
