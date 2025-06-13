@@ -74,13 +74,6 @@ export async function genericAddToRegistry<T extends UnparsedLine>(
 
     if (result.success) {
       const { reportAsCompanySiret, reportForCompanySiret } = result.data;
-      console.log("reportAsCompanySiret", reportAsCompanySiret);
-      console.log("reportForCompanySiret", reportForCompanySiret);
-      console.log(
-        "delegatorSiretsByDelegateSirets",
-        delegatorSiretsByDelegateSirets
-      );
-      console.log("userSirets", userSirets);
 
       if (
         !isAuthorized({
