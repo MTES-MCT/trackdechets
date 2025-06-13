@@ -1,6 +1,11 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
-import { cleanUpIsReturnForTab, expireAdminRequests, initSentry } from "back";
+import {
+  cleanUpIsReturnForTab,
+  cleanUpIsReviewedRevisionForTab,
+  expireAdminRequests,
+  initSentry
+} from "back";
 import {
   sendAdminRequestEmail,
   sendExpiringRegistryDelegationWarning,
@@ -99,6 +104,13 @@ if (CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE) {
       cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
       onTick: async () => {
         await cleanUpIsReturnForTab();
+      },
+      timeZone: TZ
+    }),
+    new cron.CronJob({
+      cronTime: CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE,
+      onTick: async () => {
+        await cleanUpIsReviewedRevisionForTab();
       },
       timeZone: TZ
     }),

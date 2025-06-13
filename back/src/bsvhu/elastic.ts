@@ -277,6 +277,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
     intermediaries: bsvhu.intermediaries,
 
     // ALL actors from the BSVHU, for quick search

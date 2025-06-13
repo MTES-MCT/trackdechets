@@ -236,6 +236,7 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     ...getRegistryFields(bspaoh),
     rawBsd: bspaoh,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
 
     // ALL actors from the BSPAOH, for quick search
     companyNames: distinct(
