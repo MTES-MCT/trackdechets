@@ -164,6 +164,12 @@ const createFormResolver = async (
     transporters
   };
 
+  // Do not take into account the packaging infos. Those a specified in the grouped BSDs,
+  // not the parent one. Deleting the info here helps avoid any breaking change.
+  if (form.emitterType === "APPENDIX1") {
+    delete formCreateInput.wasteDetailsPackagingInfos;
+  }
+
   if (temporaryStorageDetail) {
     if (formContent.recipient?.isTempStorage !== true) {
       // The user is trying to set a temporary storage without
