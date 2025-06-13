@@ -139,6 +139,16 @@ export const incomingTexsFormShape: FormShape = [
           volume: optionalNumber,
           weightIsEstimate: booleanString
         }
+      },
+      {
+        name: "wasteDap",
+        shape: "generic",
+        label: Labels.wasteDap,
+        validation: {
+          wasteDap: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-4" }
       }
     ]
   },
