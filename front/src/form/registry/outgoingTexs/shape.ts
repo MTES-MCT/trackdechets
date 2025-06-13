@@ -138,6 +138,16 @@ export const outgoingTexsFormShape: FormShape = [
           volume: optionalNumber,
           weightIsEstimate: booleanString
         }
+      },
+      {
+        name: "wasteDap",
+        shape: "generic",
+        label: Labels.wasteDap,
+        validation: {
+          wasteDap: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-4" }
       }
     ]
   },
@@ -149,8 +159,8 @@ export const outgoingTexsFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur initial (optionnel)",
-          required: true
+          label: "producteur initial",
+          required: false
         },
         validation: {
           initialEmitterCompanyType: optionalString,
@@ -250,9 +260,8 @@ export const outgoingTexsFormShape: FormShape = [
         props: {
           prefix: "brokerCompany",
           shortMode: true,
-          title: "Courtier (optionnel)",
           reducedMargin: true,
-          toggleLabel: "Présence d'un courtier",
+          label: "courtier",
           recepisseName: "brokerRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.brokerReceipt?.receiptNumber) {
@@ -280,9 +289,8 @@ export const outgoingTexsFormShape: FormShape = [
         props: {
           prefix: "traderCompany",
           shortMode: true,
-          title: "Négociant (optionnel)",
           reducedMargin: true,
-          toggleLabel: "Présence d'un négociant",
+          label: "négociant",
           recepisseName: "traderRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.traderReceipt?.receiptNumber) {
@@ -316,7 +324,8 @@ export const outgoingTexsFormShape: FormShape = [
         props: {
           operationCodes: INCOMING_TEXS_PROCESSING_OPERATIONS_CODES,
           showNoTraceability: false,
-          showNextOperationCode: false
+          showNextOperationCode: false,
+          isPlannedOperation: true
         },
         names: ["operationCode", "operationMode"],
         validation: {
@@ -441,7 +450,7 @@ export const outgoingTexsFormShape: FormShape = [
         shape: "generic",
         type: "checkbox",
         label: Labels.isDirectSupply,
-        required: false,
+        required: true,
         validation: {
           isDirectSupply: booleanString
         }

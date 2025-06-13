@@ -32,8 +32,8 @@ export function SecondaryWasteCodes({ methods }: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const addLine = useCallback(() => {
-    appendCode("");
-    appendDescription("");
+    appendCode({ value: "" });
+    appendDescription({ value: "" });
   }, [appendCode, appendDescription]);
 
   function removeLine(index: number) {
@@ -48,38 +48,40 @@ export function SecondaryWasteCodes({ methods }: Props) {
   }, [codeFields, addLine]);
 
   const { errors } = methods.formState;
-
   return (
     <div className="fr-col">
-      {codeFields.map((code, index) => (
+      {codeFields.map(({ id }, index) => (
         <div
           className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          style={{
+            alignItems: "flex-start"
+          }}
           ref={containerRef}
           key={index}
         >
           <WasteCodeSelector
             methods={methods}
-            key={code.id}
-            name={`secondaryWasteCodes.${index}`}
+            key={id}
+            name={`secondaryWasteCodes.${index}.value`}
             label="Code déchet secondaire (optionnel)"
             containerRef={containerRef}
           />
           <div className="fr-col-4">
             <Input
-              label="Dénomination"
+              label="Dénomination secondaire"
               key={descriptionFields[index].id}
               nativeInputProps={{
                 type: "text",
-                ...methods.register(`secondaryWasteDescriptions.${index}`)
+                ...methods.register(`secondaryWasteDescriptions.${index}.value`)
               }}
-              state={errors?.secondaryWasteDescriptions && "error"}
+              state={errors?.secondaryWasteDescriptions?.[index] && "error"}
               stateRelatedMessage={formatError(
-                errors?.secondaryWasteDescriptions
+                errors?.secondaryWasteDescriptions?.[index]?.value
               )}
             />
           </div>
 
-          <div className="fr-col-2">
+          <div className="fr-col-2" style={{ paddingTop: "36px" }}>
             <Button
               className="fr-mr-1w"
               nativeButtonProps={{ type: "button" }}

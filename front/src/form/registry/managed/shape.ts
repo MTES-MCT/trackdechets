@@ -169,8 +169,8 @@ export const managedFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "initialEmitter",
-          label: "producteur initial (optionnel)",
-          required: true
+          label: "producteur initial",
+          required: false
         },
         validation: {
           initialEmitterCompanyType: optionalString,
@@ -286,8 +286,9 @@ export const managedFormShape: FormShape = [
         Component: CompanySelector,
         props: {
           prefix: "tempStorer",
-          label: "installation de Tri Transit Regroupement (optionnel)",
-          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"]
+          label: "installation de Tri Transit Regroupement",
+          excludeTypes: ["COMMUNES", "PERSONNE_PHYSIQUE"],
+          required: false
         },
         validation: {
           tempStorerCompanyType: optionalString,
@@ -464,7 +465,7 @@ export const managedFormShape: FormShape = [
         shape: "generic",
         type: "checkbox",
         label: Labels.isDirectSupply,
-        required: false,
+        required: true,
         validation: {
           isDirectSupply: booleanString
         }

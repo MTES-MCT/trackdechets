@@ -13,6 +13,7 @@ type InlineProps = {
   disabled?: boolean;
   showNoTraceability?: boolean;
   showNextOperationCode?: boolean;
+  isPlannedOperation?: boolean;
 };
 
 type Props = InlineProps & {
@@ -37,7 +38,8 @@ export function Operation({
   operationCodes,
   operationModes,
   showNoTraceability,
-  showNextOperationCode
+  showNextOperationCode,
+  isPlannedOperation
 }: Props) {
   return (
     <div className="fr-col">
@@ -49,6 +51,7 @@ export function Operation({
         operationModes={operationModes}
         showNoTraceability={showNoTraceability}
         showNextOperationCode={showNextOperationCode}
+        isPlannedOperation={isPlannedOperation}
       />
     </div>
   );
@@ -60,7 +63,8 @@ export function InlineOperation({
   operationCodes,
   operationModes,
   showNoTraceability,
-  showNextOperationCode
+  showNextOperationCode,
+  isPlannedOperation
 }: InlineProps) {
   const { errors } = methods.formState;
   const selectedOperationCode = methods.watch("operationCode");
@@ -123,7 +127,11 @@ export function InlineOperation({
         <div className={"fr-grid-row fr-grid-row--gutters"}>
           <div className={"fr-col-4"} key={"operationCode"}>
             <Select
-              label={"Code de traitement réalisé"}
+              label={
+                isPlannedOperation
+                  ? "Code de traitement prévu"
+                  : "Code de traitement réalisé"
+              }
               nativeSelectProps={{
                 ...methods.register("operationCode"),
                 defaultValue: ""
@@ -144,7 +152,11 @@ export function InlineOperation({
           </div>
           <div className={"fr-col-4"}>
             <Select
-              label={`Mode de traitement`}
+              label={
+                isPlannedOperation
+                  ? "Mode de traitement prévu (optionnel)"
+                  : "Mode de traitement réalisé"
+              }
               nativeSelectProps={{
                 ...methods.register("operationMode"),
                 defaultValue: ""

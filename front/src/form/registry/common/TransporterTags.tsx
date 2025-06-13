@@ -1,6 +1,5 @@
 import React from "react";
-import { type UseFormReturn } from "react-hook-form";
-import { formatError } from "../builder/error";
+import { FieldError, type UseFormReturn } from "react-hook-form";
 import TagsInput from "../../../Apps/Forms/Components/TagsInput/TagsInput";
 
 type Props = {
@@ -22,9 +21,17 @@ export function TransporterTags({
 }: Props) {
   const { errors } = methods.formState;
   const fieldName = `${prefix}Plates`;
-  const error = errors?.[fieldName];
+  const errorArray = errors?.[fieldName];
+  const errorsUnique = errorArray
+    ? [
+        ...new Set(
+          (errorArray as unknown as FieldError[])
+            ?.map(error => error.message)
+            .filter(Boolean)
+        )
+      ]
+    : [];
   const tags = methods.watch(fieldName);
-
   return (
     <div className="fr-col">
       <div className="fr-mb-2w">
@@ -39,7 +46,7 @@ export function TransporterTags({
                 tags.splice(idx, 1);
                 methods.setValue(fieldName, [...tags]);
               }}
-              errorMessage={formatError(error)}
+              errorMessage={errorsUnique.join(", ")}
               hintText={infoText}
               disabled={disabled}
             />

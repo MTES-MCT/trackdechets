@@ -7,9 +7,19 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.07.1] 29/07/2025
 
+#### :nail_care: Améliorations
+
+- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement des règles de validation SSD: Le mode de traitement devient facultatif (car inutile) dans le cas d'un code R12 ou R13 [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement de la règle de validation numéro GISTRID/numéro de notification sur les déclarations [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 # [2025.06.1] 03/06/2025
 
@@ -34,9 +44,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking Change
 
 - BSDD: le champ `wasteDetailsIsSubjectToADR` est maintenant obligatoire via API [PR 4183](https://github.com/MTES-MCT/trackdechets/pull/4183)
-
-#### :boom: Breaking Change
-
 - Suppression de la query formsRegister (dépréciée depuis plusieurs années) [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 # [2025.05.1] 03/05/2025
