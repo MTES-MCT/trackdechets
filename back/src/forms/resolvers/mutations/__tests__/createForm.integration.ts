@@ -2855,6 +2855,70 @@ describe("Mutation.createForm", () => {
       expect(data.createForm.grouping!.length).toBe(2);
     });
 
+    // TRA-16364: Ce n'est pas logique d'ajouter des conditionnements à une Annexe 1 (chapeau),
+    // mais on l'a autorisé via API. Sauf que si un intégrateur remplit les infos à moitié,
+    // puis poursuit le workflow, il va se retrouver bloqué à causes d'erreurs sur les
+    // conditionnements, qu'il ne peut plus modifier.
+    // Pour éviter le breaking change, on ignore les infos de condtionnement en cas
+    // d'Annexe 1 (chapeau).
+    it("should not allow adding packagings to an APPENDIX1", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1_1 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+      const appendix1_2 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      // When
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            grouping: [
+              { form: { id: appendix1_1.id } },
+              { form: { id: appendix1_2.id } }
+            ],
+            wasteDetails: {
+              // L'utilisateur envoie des infos de conditionnement...
+              packagingInfos: [{ type: "CITERNE", quantity: 1 }]
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createForm.id).toBeDefined();
+      // ... Mais on les ignore
+      expect(data.createForm.wasteDetails?.packagingInfos).toStrictEqual([]);
+    });
+
     it("should seal grouped appendix 1 items when necessary", async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const { company: producerCompany } = await userWithCompanyFactory(
@@ -2946,14 +3010,11 @@ describe("Mutation.createForm", () => {
           }
         }
       );
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: "Impossible d'ajouter des intermédiaires sur une annexe 1",
-          extensions: {
-            code: "BAD_USER_INPUT"
-          }
-        })
-      ]);
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Impossible d'ajouter des intermédiaires sur une annexe 1"
+      );
+      expect(errors[0]?.extensions?.code).toBe("BAD_USER_INPUT");
     });
 
     it("should create an appendix 1 child and copy parent's ADR info in it", async () => {
