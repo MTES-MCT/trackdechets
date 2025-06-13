@@ -87,7 +87,14 @@ export function FormBuilder({
         {getRegistryNameFromImportType(registryType)}
       </div>
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+        >
           <Tabs
             selectedTabId={selectedTabId}
             onTabChange={onTabChange}

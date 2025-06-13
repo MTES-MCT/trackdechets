@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import {
   Mutation,
   Query,
@@ -14,7 +14,11 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import {
   ADD_TO_INCOMING_WASTE_REGISTRY,
   GET_INCOMING_WASTE_REGISTRY_LOOKUP
@@ -108,6 +112,9 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error);
       }
     }
   );
@@ -163,19 +170,23 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       )
     };
 
-    const result = await addToIncomingWasteRegistry({
-      variables: {
-        lines: [flattenedData]
+    try {
+      const result = await addToIncomingWasteRegistry({
+        variables: {
+          lines: [flattenedData]
+        }
+      });
+
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToIncomingWasteRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToIncomingWasteRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 

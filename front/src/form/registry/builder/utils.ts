@@ -1,7 +1,8 @@
 import { RegistryLineReason } from "@td/codegen-ui";
-
-import { FormShapeField, FormShape } from "./types";
+import { type UseFormReturn } from "react-hook-form";
+import { type FormShapeField, type FormShape } from "./types";
 import { z } from "zod";
+import { ApolloError } from "@apollo/client";
 
 export function isoDateToHtmlDate(date: unknown) {
   if (typeof date !== "string") {
@@ -44,4 +45,25 @@ export const schemaFromShape = (shape: FormShape) => {
   );
 
   return z.object(validations);
+};
+
+export const handleServerError = (
+  methods: UseFormReturn<any>,
+  error: ApolloError | Error
+) => {
+  if (error instanceof ApolloError) {
+    // Handle GraphQL errors
+    methods.setError("root.serverError", {
+      type: "server",
+      message:
+        error.message ||
+        "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+    });
+  } else {
+    methods.setError("root.serverError", {
+      type: "server",
+      message:
+        "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+    });
+  }
 };
