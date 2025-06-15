@@ -82,7 +82,14 @@ const inputIncomingTexsSchema = z.object({
   emitterCompanyPostalCode: actorPostalCodeSchema.nullish(),
   emitterCompanyCity: actorCitySchema.nullish(),
   emitterCompanyCountryCode: actorCountryCodeSchema.nullish(),
-  emitterPickupSiteName: z.string().trim().nullish(),
+  emitterPickupSiteName: z
+    .string()
+    .trim()
+    .max(
+      300,
+      "Le nom du site de collecte ne peut pas faire plus de 300 caractères"
+    )
+    .nullish(),
   emitterPickupSiteAddress: actorAddressSchema.nullish(),
   emitterPickupSitePostalCode: actorPostalCodeSchema.nullish(),
   emitterPickupSiteCity: actorCitySchema.nullish(),
