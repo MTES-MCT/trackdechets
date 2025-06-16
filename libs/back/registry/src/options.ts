@@ -145,6 +145,8 @@ export const importOptions: Record<ImportType, ImportOptions> = {
 export const CSV_DELIMITER = ";";
 export const UNAUTHORIZED_ERROR =
   "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours";
+export const UNAUTHORIZED_WITH_DELEGATION_ERROR =
+  "Vous ne pouvez pas déclarer pour ce SIRET sans préciser un établissement délégataire.";
 export const PERMISSION_ERROR =
   "Votre rôle pour cet établissement ne vous permet pas d'effectuer des déclarations";
 export const INTERNAL_ERROR =
