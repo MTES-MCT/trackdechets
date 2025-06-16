@@ -199,9 +199,9 @@ describe("<Appendix2MultiSelect />", () => {
     expect(headers[3]).toHaveTextContent("Émetteur initial");
     //expect(headers[4]).toHaveTextContent("Date de l'acceptation");
     expect(headers[4]).toHaveTextContent("Opération réalisée");
-    expect(headers[5]).toHaveTextContent("Qté acceptée (en T)");
-    expect(headers[6]).toHaveTextContent("Qté restante (en T)");
-    expect(headers[7]).toHaveTextContent("Qté à regrouper (en T)");
+    expect(headers[5]).toHaveTextContent("Quantité acceptée (en t)");
+    expect(headers[6]).toHaveTextContent("Quantité restante (en t)");
+    expect(headers[7]).toHaveTextContent("Quantité à regrouper (en t)");
 
     const rows = screen.getAllByRole("row");
 
