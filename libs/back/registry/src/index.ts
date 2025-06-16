@@ -5,6 +5,7 @@ export {
   ParsedLine,
   IMPORT_TYPES,
   UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_WITH_DELEGATION_ERROR,
   importOptions,
   exportOptions
 } from "./options";

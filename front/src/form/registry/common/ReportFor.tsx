@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
 import {
@@ -37,9 +37,10 @@ export function ReportFor({
   disabled,
   onCompanySelect
 }: Props) {
-  const [isDelegation, setIsDelegation] = useState(false);
   const { errors } = methods.formState;
   const reportForCompanySiret = methods.watch("reportForCompanySiret");
+  const reportAsCompanySiret = methods.watch("reportAsCompanySiret");
+  const [isDelegation, setIsDelegation] = useState(!!reportAsCompanySiret);
   const { data: registryDelegationsData, loading: registryDelegationsLoading } =
     useQuery<Pick<Query, "registryDelegations">>(REGISTRY_DELEGATIONS, {
       variables: {
@@ -53,6 +54,20 @@ export function ReportFor({
       fetchPolicy: "network-only"
     });
 
+  useEffect(() => {
+    if (
+      isDelegation &&
+      registryDelegationsData?.registryDelegations.edges.length === 1
+    ) {
+      methods.setValue(
+        "reportAsCompanySiret",
+        registryDelegationsData.registryDelegations.edges[0].node.delegate.orgId
+      );
+    } else if (!isDelegation) {
+      methods.setValue("reportAsCompanySiret", null);
+    }
+  }, [isDelegation, registryDelegationsData, methods]);
+
   return (
     <div className="fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
@@ -65,9 +80,9 @@ export function ReportFor({
               label={reportForLabel}
               defaultSiret={field.value}
               disabled={disabled}
+              setIsDelegation={setIsDelegation}
               onCompanySelect={(siret, isDelegation, company) => {
                 field.onChange(siret);
-                setIsDelegation(isDelegation);
                 onCompanySelect?.(
                   siret,
                   isDelegation,
@@ -97,7 +112,9 @@ export function ReportFor({
               {registryDelegationsData.registryDelegations.edges.length ===
               1 ? (
                 <p className={styles.delegationHint}>
-                  {`Cette déclaration sera faite en tant que :\n`}
+                  {disabled
+                    ? `Cette déclaration a été faite en tant que :\n`
+                    : `Cette déclaration sera faite en tant que :\n`}
                   <br />
                   <b>
                     {`${
@@ -115,6 +132,7 @@ export function ReportFor({
               ) : (
                 <Select
                   label={reportAsLabel}
+                  disabled={disabled}
                   style={{ width: "100%" }}
                   nativeSelectProps={{
                     ...methods.register("reportAsCompanySiret")

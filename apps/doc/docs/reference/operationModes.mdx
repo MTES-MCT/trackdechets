@@ -1,0 +1,53 @@
+---
+title: Hiérarchie des modes de traitement
+---
+
+import ScrollableTable from "../../src/components/ScrollableTable"
+
+La réglementation registre impose de connaitre le mode de traitement au regard de la hiérarchie des modes de traitement qui sont :
+- La réutilisation
+- Le recyclage et les autres formes de valorisation de la matière
+- La valorisation énergétique
+- L'élimination (incinération sans valorisation énergétique et stockage en décharge)
+
+Les BSDs ont donc un champ qui permet de renseigner le mode de traitement choisi :
+- BSDD, BSDA, BSDASRI, BSVHU : `destinationOperationMode`
+- BSFF : `packaging.operationMode`
+
+Les modes de traitement dépendent directement du code de traitement sélectionné. Voici les correspondances possibles :
+
+<ScrollableTable maxHeight="600px">
+
+| Code | Élimination | Réutilisation | Recyclage | Valorisation énergétique | Autres valorisations |
+|------|-------------|---------------|-----------|--------------------------|----------------------|
+| D1   | X           |               |           |                          |                      |
+| D2   | X           |               |           |                          |                      |
+| D3   | X           |               |           |                          |                      |
+| D4   | X           |               |           |                          |                      |
+| D5   | X           |               |           |                          |                      |
+| D7   | X           |               |           |                          |                      |
+| D8   | X           |               |           |                          |                      |
+| D9   |             |               |           |                          |                      |
+| D9F  | X           |               |           |                          |                      |
+| D10  | X           |               |           |                          |                      |
+| D11  | X           |               |           |                          |                      |
+| D12  | X           |               |           |                          |                      |
+| D13  |             |               |           |                          |                      |
+| D14  |             |               |           |                          |                      |
+| D15  |             |               |           |                          |                      |
+| R0   |             | X             |           |                          |                      |
+| R1   |             |               |           | X                        |                      |
+| R2   |             | X             | X         |                          | X                    |
+| R3   |             | X             | X         |                          | X                    |
+| R4   |             | X             | X         |                          | X                    |
+| R5   |             | X             | X         |                          | X                    |
+| R6   |             |               | X         |                          | X                    |
+| R7   |             | X             | X         |                          | X                    |
+| R8   |             |               | X         |                          | X                    |
+| R9   |             | X             | X         |                          | X                    |
+| R10  |             |               | X         |                          | X                    |
+| R11  |             | X             | X         |                          | X                    |
+| R12  |             |               |           |                          |                      |
+| R13  |             |               |           |                          |                      |
+
+</ScrollableTable>
