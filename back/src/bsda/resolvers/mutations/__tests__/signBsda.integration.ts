@@ -1,5 +1,6 @@
 import {
   BsdaStatus,
+  OperationMode,
   Prisma,
   TransportMode,
   User,
@@ -31,6 +32,10 @@ import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { AllBsdaSignatureType } from "../../../types";
 import gql from "graphql-tag";
+import {
+  CODES_AND_EXPECTED_OPERATION_MODES,
+  getOperationModesFromOperationCode
+} from "../../../../common/operationModes";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -2735,6 +2740,174 @@ describe("Mutation.Bsda.sign", () => {
         expect(errors).toBeUndefined();
         expect(data.signBsda?.waste?.isSubjectToADR).toBeNull();
         expect(data.signBsda?.waste?.adr).toBe(wasteAdr);
+      }
+    );
+  });
+
+  describe("TRA-15816 no final codes for temp storage operation", () => {
+    const createUserAndBsda = async (
+      input: Partial<Prisma.BsdaCreateInput> = {}
+    ) => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
+      const user = emitterCompanyAndUser.user;
+      const emitter = emitterCompanyAndUser.company;
+      const { user: destinationUser, company: destination } =
+        await userWithCompanyFactory("MEMBER", {
+          name: "Destination"
+        });
+      const nextDestination = await companyFactory({ name: "Destination" });
+      const transporter = await companyFactory({ name: "Transporter" });
+      const { company: worker } = await userWithCompanyFactory("MEMBER", {
+        name: "Worker"
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.INITIAL,
+          emitterCompanySiret: emitter.siret,
+          destinationCompanySiret: destination.siret,
+          destinationOperationNextDestinationCompanySiret:
+            nextDestination.siret,
+          destinationOperationNextDestinationCompanyName: nextDestination.name,
+          destinationOperationNextDestinationCompanyAddress:
+            "Next destination address",
+          destinationOperationNextDestinationCompanyContact:
+            "Next destination contact",
+          destinationOperationNextDestinationCompanyPhone: "060102030405",
+          destinationOperationNextDestinationCompanyMail:
+            "next.destination@mail.com",
+          destinationOperationNextDestinationCap: "Next destination CAP",
+          destinationOperationNextDestinationPlannedOperationCode: "R5",
+          workerCompanySiret: worker.siret,
+          forwarding: {},
+          grouping: {},
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter.siret,
+                  transporterCompanyName: transporter.name
+                }
+              ]
+            }
+          },
+          ...input
+        }
+      });
+
+      return { user, bsda, destinationUser };
+    };
+
+    // TODO: D 9 ?
+    it.each(["R 5", "D 5"])(
+      "temp storage cannot use final operation code %p",
+      async operationCode => {
+        // Given
+        const { bsda, destinationUser } = await createUserAndBsda({
+          status: "RECEIVED",
+          destinationReceptionDate: new Date(),
+          destinationReceptionSignatureDate: new Date(),
+          destinationReceptionSignatureAuthor: "Reception signature",
+          destinationOperationCode: operationCode,
+          destinationOperationMode:
+            getOperationModesFromOperationCode(operationCode)[0],
+          destinationOperationDate: new Date()
+        });
+
+        // When
+        const { mutate } = makeClient(destinationUser);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: destinationUser.name,
+              type: "OPERATION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        expect(errors[0].message).toBe(
+          `Vous ne pouvez pas renseigner un code de traitement final`
+        );
+      }
+    );
+
+    it.each(["R 13", "D 15"])(
+      "temp storage can use non-final operation code %p",
+      async operationCode => {
+        // Given
+        const { bsda, destinationUser } = await createUserAndBsda({
+          status: "RECEIVED",
+          destinationReceptionDate: new Date(),
+          destinationReceptionSignatureDate: new Date(),
+          destinationReceptionSignatureAuthor: "Reception signature",
+          destinationOperationCode: operationCode,
+          destinationOperationMode:
+            CODES_AND_EXPECTED_OPERATION_MODES[operationCode]?.[0],
+          destinationOperationDate: new Date()
+        });
+
+        // When
+        const { mutate } = makeClient(destinationUser);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: destinationUser.name,
+              type: "OPERATION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+      }
+    );
+
+    it.each(["R 5", "D 5", "D 9"])(
+      "destination on regular BSDA can use final operation code %p",
+      async operationCode => {
+        // Given
+        const { bsda, destinationUser } = await createUserAndBsda({
+          status: "RECEIVED",
+          destinationReceptionDate: new Date(),
+          destinationReceptionSignatureDate: new Date(),
+          destinationReceptionSignatureAuthor: "Reception signature",
+          destinationOperationCode: operationCode,
+          destinationOperationMode:
+            getOperationModesFromOperationCode(operationCode)[0],
+          destinationOperationDate: new Date(),
+          destinationOperationNextDestinationCompanySiret: null
+        });
+
+        // When
+        const { mutate } = makeClient(destinationUser);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsda">,
+          MutationSignBsdaArgs
+        >(SIGN_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              author: destinationUser.name,
+              type: "OPERATION"
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
       }
     );
   });
