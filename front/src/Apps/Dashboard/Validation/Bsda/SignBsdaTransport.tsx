@@ -13,7 +13,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { generatePath, Link, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -106,7 +106,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   >(UPDATE_BSDA_TRANSPORTER);
 
   const title = "Signer l'enlèvement";
-  const TODAY = new Date();
+  const TODAY = useMemo(() => new Date(), []);
 
   const signingTransporter = useMemo(
     () => data?.bsda?.transporters?.find(t => !t.transport?.signature?.date),
@@ -128,13 +128,32 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   };
 
   const methods = useForm<ZodBdsaTransport>({
-    values: initialState,
+    defaultValues: initialState, // on garde defaultValues pour eviter une boucle infinie sur signingTransporter
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
   });
 
   const { handleSubmit, reset, register } = methods;
+
+  // mettre à jour les valeurs quand signingTransporter est dispo
+  useEffect(() => {
+    if (!signingTransporter) return;
+
+    reset({
+      company: signingTransporter.company as FormCompany,
+      transport: {
+        mode: signingTransporter.transport?.mode ?? TransportMode.Road,
+        plates: signingTransporter.transport?.plates ?? [],
+        takenOverAt:
+          signingTransporter.transport?.takenOverAt ?? new Date().toISOString()
+      },
+      signature: {
+        author: "",
+        date: datetimeToYYYYMMDD(TODAY)
+      }
+    });
+  }, [signingTransporter, reset, TODAY]);
 
   const onCancel = () => {
     reset();
