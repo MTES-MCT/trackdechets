@@ -58,7 +58,7 @@ export default function ResendActivationEmail() {
     <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Succès"
-        description="Si votre compte est effectivement en attente sur notre plateforme, un email d'activation vous a été renvoyé."
+        description="Si votre compte est effectivement en attente sur notre plateforme, un courriel d'activation vous a été renvoyé."
         severity="success"
       />
     </div>
@@ -89,14 +89,16 @@ export default function ResendActivationEmail() {
           {errorAlert}
           <div className="fr-grid-row fr-grid-row--center fr-mb-2w">
             <div className="fr-col fr-m-auto">
-              <h1 className="fr-h3 fr-mb-3w">Renvoyer l'email d'activation</h1>
+              <h1 className="fr-h3 fr-mb-3w">
+                Renvoyer le courriel d'activation
+              </h1>
               <p className="fr-text--md">
-                Si vous n'avez pas reçu d'email d'activation suite à votre
+                Si vous n'avez pas reçu de courriel d'activation suite à votre
                 inscription, vous pouvez en renvoyer un en renseignant votre
-                adresse email ci-dessous :
+                courriel ci-dessous :
               </p>
               <Input
-                label="Email"
+                label="Courriel"
                 nativeInputProps={{
                   name: "email",
                   required: true,
@@ -122,7 +124,7 @@ export default function ResendActivationEmail() {
                 size="medium"
                 onClick={handleSubmit}
               >
-                Renvoyer l'email
+                Renvoyer le courriel
               </Button>
             </div>
           </div>

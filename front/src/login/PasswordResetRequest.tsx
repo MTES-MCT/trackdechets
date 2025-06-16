@@ -67,7 +67,7 @@ export default function PasswordResetRequest() {
     <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Succès"
-        description="Si l'adresse email existe dans notre système, vous allez recevoir un email (veuillez également vérifier dans votre dossier de courrier indésirable)."
+        description="Si le courriel existe dans notre système, vous allez recevoir un courriel (veuillez également vérifier dans votre dossier de courrier indésirable)."
         severity="success"
       />
     </div>
@@ -104,10 +104,10 @@ export default function PasswordResetRequest() {
               </h1>
               <p className="fr-text--md">
                 Afin de réinitialiser votre mot de passe, merci de saisir votre
-                email. Un lien vous sera transmis à cette adresse email.
+                courriel. Un lien vous sera transmis à ce courriel.
               </p>
               <Input
-                label="Email"
+                label="Courriel"
                 nativeInputProps={{
                   name: "email",
                   value: email,

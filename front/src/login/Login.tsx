@@ -12,22 +12,55 @@ import { Loader } from "../Apps/common/Components";
 
 import styles from "./Login.module.scss";
 
-function getErrorMessage(errorCode: string) {
+function getErrorMessage(errorCode: string): {
+  description: string | React.ReactElement;
+  title?: string;
+} {
   if (errorCode === "NOT_ACTIVATED") {
-    return "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support";
+    return {
+      title: "Votre compte n'est pas activé",
+      description: (
+        <>
+          Suite à la création de votre compte, un courriel d’activation vous a
+          été envoyé.
+          <ul>
+            <li>- Vérifiez dans les indésirables (SPAM).</li>
+            <li>
+              - Vous ne l'avez pas reçu ?{" "}
+              <a
+                href={routes.resendActivationEmail}
+                className="fr-link force-underline-link"
+              >
+                Renvoyer le courriel d'activation
+              </a>
+            </li>
+          </ul>
+        </>
+      )
+    };
   }
   if (errorCode === "INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA") {
-    return "Email ou mot de passe incorrect - Veuillez également compléter le test anti-robots";
+    return {
+      description:
+        "Courriel ou mot de passe incorrect - Veuillez également compléter le test anti-robots"
+    };
   }
   if (errorCode === "INVALID_CAPTCHA") {
-    return "Le test anti-robots est incorrect";
+    return {
+      description: "Le test anti-robots est incorrect"
+    };
   }
 
   if (errorCode === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
-    return "Le délai d'attente pour remplir votre code d'authentification est dépassé, merci de recommencer la procédure";
+    return {
+      description:
+        "Le délai d'attente pour remplir votre code d'authentification est dépassé, merci de recommencer la procédure"
+    };
   }
 
-  return "Email ou mot de passe incorrect";
+  return {
+    description: "Courriel ou mot de passe incorrect"
+  };
 }
 
 function displayCaptcha(errorCode?: string) {
@@ -85,11 +118,13 @@ export default function Login() {
 
   const showCaptcha = displayCaptcha(errorCode);
 
-  const alert = errorCode ? (
+  const errorObject = errorCode ? getErrorMessage(errorCode) : null;
+
+  const alert = errorObject ? (
     <div className="fr-grid-row fr-mb-2w">
       <Alert
-        title="Erreur"
-        description={getErrorMessage(errorCode)}
+        title={errorObject.title ?? "Erreur"}
+        description={errorObject.description}
         severity="error"
       />
     </div>
@@ -139,7 +174,7 @@ export default function Login() {
                   required: true,
                   onChange: e => setEmail(e.target.value)
                 }}
-                label="Email"
+                label="Courriel"
               />
               <PasswordInput
                 nativeInputProps={{
@@ -172,9 +207,15 @@ export default function Login() {
                   />
                 </>
               )}
+              <a
+                href={routes.passwordResetRequest}
+                className="fr-link force-underline-link"
+              >
+                Mot de passe oublié ?
+              </a>
             </div>
           </div>
-          <div className="fr-grid-row fr-grid-row--right">
+          <div className="fr-grid-row fr-grid-row">
             <div className={`fr-col ${styles.resetFlexCol}`}>
               <Button size="medium" nativeButtonProps={{ type: "submit" }}>
                 Se connecter
@@ -185,21 +226,11 @@ export default function Login() {
             <div className="fr-col">
               <p className="fr-text--md">
                 Vous n'avez pas encore de compte ?{" "}
-                <a href={routes.signup.index} className="fr-link">
-                  Inscrivez-vous
-                </a>
-              </p>
-              <p className="fr-text--md">
-                Vous n'avez pas reçu d'email d'activation suite à votre
-                inscription ?{" "}
-                <a href={routes.resendActivationEmail} className="fr-link">
-                  Renvoyer l'email d'activation
-                </a>
-              </p>
-              <p className="fr-text--md">
-                Vous avez perdu votre mot de passe ?{" "}
-                <a href={routes.passwordResetRequest} className="fr-link">
-                  Réinitialisez-le
+                <a
+                  href={routes.signup.index}
+                  className="fr-link force-underline-link"
+                >
+                  Inscrivez-vous maintenant
                 </a>
               </p>
             </div>
