@@ -340,7 +340,35 @@ describe("Registry - addToIncomingTexsRegistry", () => {
 
     expect(data.addToIncomingTexsRegistry.stats.errors).toBe(100);
     expect(data.addToIncomingTexsRegistry.errors![0].message).toBe(
-      "Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours"
+      "reportForCompanySiret: Vous ne pouvez pas déclarer pour ce SIRET dans la mesure où votre compte utilisateur n'y est pas rattaché et qu'aucune délégation est en cours"
+    );
+  });
+
+  it("should fail if the current user has delegation rights on the reportFor SIRET but didn't declare a reportAs SIRET", async () => {
+    const { company } = await userWithCompanyFactory();
+    const { user, company: delegateCompany } = await userWithCompanyFactory();
+
+    await prisma.registryDelegation.create({
+      data: {
+        startDate: new Date(),
+        delegateId: delegateCompany.id,
+        delegatorId: company.id
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const lines = Array.from({ length: 100 }, () => ({
+      ...getCorrectLine(company.siret!)
+    }));
+
+    const { data } = await mutate<Pick<Mutation, "addToIncomingTexsRegistry">>(
+      ADD_TO_INCOMING_TEXS_REGISTRY,
+      { variables: { lines } }
+    );
+
+    expect(data.addToIncomingTexsRegistry.stats.errors).toBe(100);
+    expect(data.addToIncomingTexsRegistry.errors![0].message).toBe(
+      "reportForCompanySiret: Vous ne pouvez pas déclarer pour ce SIRET sans préciser un établissement délégataire."
     );
   });
 

@@ -19,6 +19,7 @@ type Props = {
     isDelegation: boolean,
     company?: RegistryCompanyInfos
   ) => void;
+  setIsDelegation?: (isDelegation: boolean) => void;
   wrapperClassName?: string;
   allOption?: {
     key: string;
@@ -42,6 +43,7 @@ export type RegistryCompanyInfos = Pick<
 
 export function RegistryCompanySwitcher({
   onCompanySelect,
+  setIsDelegation,
   wrapperClassName,
   allOption,
   label,
@@ -77,9 +79,11 @@ export function RegistryCompanySwitcher({
     if ("company" in selected) {
       const { name, givenName, siret } = selected.company;
       setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
+      setIsDelegation?.(!!isDelegation);
       onCompanySelect(orgId, !!isDelegation, selected?.company);
     } else if (selected.all) {
       setSelectedItem(allOption?.name ?? "");
+      setIsDelegation?.(!!isDelegation);
       onCompanySelect(orgId, !!isDelegation);
     }
   };
@@ -111,6 +115,7 @@ export function RegistryCompanySwitcher({
           if (!defaultSiret) {
             onCompanySelect(firstNode.orgId, firstNodeIsDelegation);
           }
+          setIsDelegation?.(!!firstNodeIsDelegation);
           setSelectedItem(
             `${firstNode.givenName || firstNode.name || ""} ${
               firstNode.siret || ""
@@ -125,10 +130,15 @@ export function RegistryCompanySwitcher({
               userRoles: [UserRole.Admin, UserRole.Member, UserRole.Reader]
             }
           }).then(result => {
-            const company =
-              result.data?.registryCompanies.myCompanies[0] ??
-              result.data?.registryCompanies.delegators[0];
+            let isDelegation = false;
+            let company: RegistryCompanyInfos | undefined =
+              result.data?.registryCompanies.myCompanies[0];
+            if (!company) {
+              company = result.data?.registryCompanies.delegators[0];
+              isDelegation = true;
+            }
             if (company) {
+              setIsDelegation?.(!!isDelegation);
               setSelectedItem(
                 `${company.givenName || company.name || ""} ${
                   company.siret || ""

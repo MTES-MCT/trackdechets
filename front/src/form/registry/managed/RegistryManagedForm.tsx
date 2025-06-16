@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ManagedLineInput,
@@ -15,7 +15,11 @@ import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { FormTransporter } from "../builder/types";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import {
   ADD_TO_MANAGED_REGISTRY,
   GET_MANAGED_REGISTRY_LOOKUP
@@ -116,6 +120,9 @@ export function RegistryManagedForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error as ApolloError | Error);
       }
     }
   );
@@ -182,19 +189,23 @@ export function RegistryManagedForm({ onClose }: Props) {
       )
     };
 
-    const result = await addToManagedRegistry({
-      variables: {
-        lines: [flattenedData]
+    try {
+      const result = await addToManagedRegistry({
+        variables: {
+          lines: [flattenedData]
+        }
+      });
+
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToManagedRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToManagedRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 

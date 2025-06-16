@@ -1,4 +1,9 @@
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  ApolloError,
+  useLazyQuery,
+  useMutation,
+  useQuery
+} from "@apollo/client";
 import {
   Mutation,
   Query,
@@ -16,7 +21,11 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import { ADD_TO_SSD_REGISTRY, GET_SSD_REGISTRY_LOOKUP } from "../queries";
 import { ssdFormShape } from "./shape";
 import { SEARCH_COMPANIES } from "../../../Apps/common/queries/company/query";
@@ -65,12 +74,18 @@ export function RegistrySsdForm({ onClose }: Props) {
             ...DEFAULT_VALUES,
             ...definedSsdProps,
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
+            processingEndDate: isoDateToHtmlDate(
+              definedSsdProps.processingEndDate
+            ),
             dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
             useDate: isoDateToHtmlDate(definedSsdProps.useDate),
             reason: RegistryLineReason.Edit
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error as ApolloError | Error);
       }
     }
   );
@@ -129,19 +144,23 @@ export function RegistrySsdForm({ onClose }: Props) {
   }, [useDate, reportForCompanySiret, methods]);
 
   async function onSubmit(data: any) {
-    const result = await addToSsdRegistry({
-      variables: {
-        lines: [data]
+    try {
+      const result = await addToSsdRegistry({
+        variables: {
+          lines: [data]
+        }
+      });
+
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToSsdRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToSsdRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 
