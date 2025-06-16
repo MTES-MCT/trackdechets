@@ -30,6 +30,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - BSDA: le nombre total de conditionnements remonte désormais dans la colonne "Nombre d'unités" du registre [PR 4209](https://github.com/MTES-MCT/trackdechets/pull/4209)
+- BSDD: l'application de la récursivité sur les statuts des bordereaux se fait également sur les bordereaux suite pour les bordereaux ayant un entreposage provisoire [PR 4261](https://github.com/MTES-MCT/trackdechets/pull/4261)
 
 #### :boom: Breaking Change
 
