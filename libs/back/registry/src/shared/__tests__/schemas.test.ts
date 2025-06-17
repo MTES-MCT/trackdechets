@@ -218,16 +218,32 @@ describe("Schemas", () => {
   });
 
   test("ttdNumberSchema", () => {
-    expect(() => ttdNumberSchema.parse("AA1234567890")).not.toThrow();
-    expect(() => ttdNumberSchema.parse("FR 2023 077002")).not.toThrow();
-    expect(() => ttdNumberSchema.parse("AA 1234 567890")).not.toThrow();
-    expect(() => ttdNumberSchema.parse("AAA 1234567890")).toThrow();
-    expect(() => ttdNumberSchema.parse("AA 12345 678901")).toThrow();
+    expect(() => ttdNumberSchema.parse("A7E123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7I 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7I12123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 12 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 1234123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("A7E 1234 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR12123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 12 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 1234123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FR 1234 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ12123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ 12 123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ 1234123456")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ 1234 123456")).not.toThrow();
 
-    expect(() => ttdNumberSchema.parse("A7E 2024 063125")).not.toThrow();
-    expect(() => ttdNumberSchema.parse("A7E2024063125")).not.toThrow();
+    expect(() => ttdNumberSchema.parse("F123456")).toThrow();
+    expect(() => ttdNumberSchema.parse("FRZA123456")).toThrow();
+    expect(() => ttdNumberSchema.parse("12345678")).toThrow();
+    expect(() => ttdNumberSchema.parse("FR 1234 1234")).toThrow();
+    expect(() => ttdNumberSchema.parse("FRZ 12 1234567")).toThrow();
+    expect(() => ttdNumberSchema.parse("AAAA 1234567890")).toThrow();
     expect(() => ttdNumberSchema.parse("A7E 2024 0631256")).toThrow();
-    expect(() => ttdNumberSchema.parse("A7E 2024 06312")).toThrow();
   });
 
   test("parcelNumbersSchema", () => {
