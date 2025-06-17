@@ -46,6 +46,7 @@ const getCorrectLine = (siret: string, reportAsSiret?: string) => {
     destinationCompanyPostalCode: "75001",
     destinationCompanyCountryCode: "FR",
     operationCode: "R 5",
+    operationMode: "RECYCLAGE",
     qualificationCode: "Recyclage",
     administrativeActReference: "Arrêté du 24 août 2016"
   };
