@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   NavLink,
   Link,
@@ -9,10 +9,10 @@ import {
 } from "react-router-dom";
 
 import { localAuthService } from "../../../../login/auth.service";
-import { useQuery, gql } from "@apollo/client";
 import Loader from "../Loader/Loaders";
-import { Query, UserPermission, UserRole } from "@td/codegen-ui";
+import { UserPermission, UserRole } from "@td/codegen-ui";
 import { usePermissions } from "../../../../common/contexts/PermissionsContext";
+import { useAuth } from "../../../../common/contexts/AuthContext";
 import { useShowTransportTabs } from "../../../Dashboard/hooks/useShowTransportTabs";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 
@@ -35,29 +35,8 @@ import {
 
 import routes from "../../../routes";
 import styles from "./Header.module.scss";
-import CompanySwitcher, {
-  getDefaultOrgId
-} from "../CompanySwitcher/CompanySwitcher";
-
-export const GET_ME = gql`
-  {
-    me {
-      id
-      isAdmin
-      companies {
-        id
-        name
-        givenName
-        userRole
-        orgId
-        securityCode
-        companyTypes
-        userPermissions
-        featureFlags
-      }
-    }
-  }
-`;
+import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
+import { useMyCompany } from "../../hooks/useMyCompany";
 
 const MenuLink = ({ entry }) => {
   return entry.navlink ? (
@@ -76,7 +55,9 @@ const MenuLink = ({ entry }) => {
 };
 
 function DashboardSubNav({ currentCompany }) {
-  const { permissions, role } = usePermissions();
+  const {
+    orgPermissions: { permissions, role }
+  } = usePermissions(currentCompany.orgId);
 
   const location = useLocation();
 
@@ -642,7 +623,11 @@ const getDesktopMenuEntries = (
 export default function Header() {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const location = useLocation();
-  const { updatePermissions, role, permissions } = usePermissions();
+  const { user, isAuthenticated } = useAuth();
+  const {
+    permissionsInfos: { roles, permissions },
+    defaultOrgId
+  } = usePermissions();
   const navigate = useNavigate();
 
   const matchDashboard = matchPath(
@@ -654,37 +639,17 @@ export default function Header() {
     location.pathname
   );
 
-  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
-
-  const isAuthenticated = !loading && data != null;
-  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
-
-  const defaultOrgId = getDefaultOrgId(data?.me.companies ?? []);
-
   // Catching siret from url when not available from props (just after login)
   const currentSiret = matchDashboard?.params["siret"] || defaultOrgId;
+  const isAdmin = isAuthenticated && Boolean(user?.isAdmin);
 
-  useEffect(() => {
-    if (isAuthenticated && data && currentSiret) {
-      const companies = data.me.companies;
-      const currentCompany = companies.find(
-        company => company.orgId === currentSiret
-      );
-      if (currentCompany) {
-        updatePermissions(
-          currentCompany.userPermissions,
-          currentCompany.userRole!,
-          currentSiret
-        );
-      }
-    }
-  }, [updatePermissions, data, currentSiret, isAuthenticated]);
+  const { company: currentCompany, loading } = useMyCompany(currentSiret);
 
   const handleCompanyChange = useCallback(
     orgId => {
       navigate(
         generatePath(
-          role?.includes(UserRole.Driver)
+          roles.length === 1 && roles?.includes(UserRole.Driver)
             ? routes.dashboard.transport.toCollect
             : routes.dashboard.bsds.index,
           {
@@ -693,21 +658,16 @@ export default function Header() {
         )
       );
     },
-    [navigate, role]
+    [navigate, roles]
   );
 
   if (loading) return null;
 
   const showRegistry = permissions.includes(UserPermission.RegistryCanRead);
 
-  if (isAuthenticated && data?.me == null) {
+  if (isAuthenticated && !user) {
     return <Loader />;
   }
-  const companies = data?.me.companies;
-
-  const currentCompany = companies?.find(
-    company => company.orgId === currentSiret
-  );
 
   const menuEntries = getDesktopMenuEntries(
     isAuthenticated,
@@ -838,12 +798,11 @@ export default function Header() {
       </div>
 
       {/* Company switcher on top of the page */}
-      {!!matchDashboard && companies && currentCompany && (
+      {!!matchDashboard && currentCompany && (
         <div className={styles.companySelector}>
           <div className="company-select">
             <CompanySwitcher
               currentOrgId={currentCompany.orgId}
-              companies={companies}
               handleCompanyChange={handleCompanyChange}
             />
           </div>

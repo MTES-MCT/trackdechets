@@ -6,6 +6,7 @@ import LayoutContainer from "./Apps/common/Components/layout/LayoutContainer";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import ErrorBoundary from "./ErrorBoundary";
+import { AuthProvider } from "./common/contexts/AuthContext";
 import { FeatureFlagsProvider } from "./common/contexts/FeatureFlagsContext";
 import { PermissionsProvider } from "./common/contexts/PermissionsContext";
 import i18next from "i18next";
@@ -35,13 +36,15 @@ export default function App() {
     <BrowserDetect>
       <ErrorBoundary>
         <ApolloProvider client={client}>
-          <PermissionsProvider defaultPermissions={[]}>
-            <FeatureFlagsProvider defaultFeatureFlags={{}}>
-              <div className="App">
-                <RouterProvider router={router} />
-              </div>
-            </FeatureFlagsProvider>
-          </PermissionsProvider>
+          <AuthProvider>
+            <PermissionsProvider defaultPermissions={[]}>
+              <FeatureFlagsProvider defaultFeatureFlags={{}}>
+                <div className="App">
+                  <RouterProvider router={router} />
+                </div>
+              </FeatureFlagsProvider>
+            </PermissionsProvider>
+          </AuthProvider>
         </ApolloProvider>
       </ErrorBoundary>
     </BrowserDetect>

@@ -17,7 +17,7 @@ export interface WorkflowActionProps {
 export function WorkflowAction(props: WorkflowActionProps) {
   const { siret } = useParams<{ siret: string }>();
   const { form } = props;
-  const { permissions } = usePermissions();
+  const { orgPermissions: { permissions } } = usePermissions(siret);
 
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.orgId;
