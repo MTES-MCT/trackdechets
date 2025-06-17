@@ -1,6 +1,5 @@
 import {
   BsdaStatus,
-  OperationMode,
   Prisma,
   TransportMode,
   User,
