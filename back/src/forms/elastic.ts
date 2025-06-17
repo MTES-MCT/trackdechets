@@ -29,6 +29,7 @@ import { getFirstTransporterSync } from "./database";
 import { prisma } from "@td/prisma";
 import { getBsddSubType } from "../common/subTypes";
 import { PackagingInfo } from "@td/codegen-back";
+import { getNonPendingLatestRevisionRequestUpdatedAt } from "../common/elasticHelpers";
 
 export type FormForElastic = Form &
   FormWithTransporters &
@@ -188,6 +189,8 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
 
     ...getFormRevisionOrgIds(form),
     revisionRequests: form.bsddRevisionRequests,
+    nonPendingLatestRevisionRequestUpdatedAt:
+      getNonPendingLatestRevisionRequestUpdatedAt(form.bsddRevisionRequests),
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     ...getElasticExhaustiveRegistryFields(form),

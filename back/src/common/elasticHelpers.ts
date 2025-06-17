@@ -4,8 +4,10 @@ import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
 import { RevisionRequestStatus } from "@prisma/client";
 import { logger } from "@td/logger";
+import { addMonths } from "date-fns";
 
-type RevisionRequest = {
+export type RevisionRequest = {
+  updatedAt: Date;
   status: RevisionRequestStatus;
   isCanceled: boolean;
   approvals: {
@@ -14,6 +16,7 @@ type RevisionRequest = {
   authoringCompany: {
     orgId: string;
   };
+  isCanceled: boolean;
 };
 
 export type RevisionTab =
@@ -75,14 +78,24 @@ export function getRevisionOrgIds(
         };
       }
 
-      // La révision a abouti
+      // La révision a abouti (et a moins de 6 mois)
+      const SIX_MONTHS_AGO = addMonths(new Date(), -6).getTime();
+      if (revisionRequest.updatedAt.getTime() >= SIX_MONTHS_AGO) {
+        return {
+          isPendingRevisionFor,
+          isEmittedRevisionFor,
+          isReceivedRevisionFor,
+          isReviewedRevisionFor: [
+            ...new Set([...isReviewedRevisionFor, ...companiesOrgIds])
+          ]
+        };
+      }
+
       return {
         isPendingRevisionFor,
         isEmittedRevisionFor,
         isReceivedRevisionFor,
-        isReviewedRevisionFor: [
-          ...new Set([...isReviewedRevisionFor, ...companiesOrgIds])
-        ]
+        isReviewedRevisionFor
       };
     },
     {
@@ -104,6 +117,24 @@ export function getRevisionOrgIds(
     )
   };
 }
+
+export function getNonPendingLatestRevisionRequestUpdatedAt(
+  revisionRequests: RevisionRequest[]
+): number | undefined {
+  if (!revisionRequests?.length) return undefined;
+
+  // If there is at least one pending revision, return undefined. We want to keep the BSD in the dashboard
+  const hasPendingRevision = revisionRequests.find(
+    r => r.status === RevisionRequestStatus.PENDING && !r.isCanceled
+  );
+  if (hasPendingRevision) return undefined;
+
+  // Else, return the updatedAt of the most recent revision request
+  const updatedAts = revisionRequests.map(r => r.updatedAt);
+  const latest = Math.max(...updatedAts.map(date => date.getTime()));
+  return isFinite(latest) ? latest : undefined;
+}
+
 /**
  * The "isReturnFor" tab contains BSDs with characteristics that make them valuable for
  * transporters, but only for so long. That's why we need to regularly clean this tab up
@@ -142,6 +173,50 @@ export const cleanUpIsReturnForTab = async (alias = index.alias) => {
 
   logger.info(
     `[cleanUpIsReturnForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
+  );
+
+  return body;
+};
+
+/**
+ * On ne veut plus afficher dans le dashboard les révisions qui ont été
+ * acceptées, refusées ou annulées il y a plus de 6 mois.
+ */
+export const cleanUpIsReviewedRevisionForTab = async (alias = index.alias) => {
+  const sixMonthsAgo = addMonths(new Date(), -6);
+
+  const { body }: ApiResponse<UpdateByQueryResponse> =
+    await client.updateByQuery({
+      index: alias,
+      refresh: true,
+      body: {
+        query: {
+          bool: {
+            filter: [
+              {
+                exists: {
+                  field: "nonPendingLatestRevisionRequestUpdatedAt"
+                }
+              },
+              {
+                range: {
+                  nonPendingLatestRevisionRequestUpdatedAt: {
+                    lt: sixMonthsAgo.getTime()
+                  }
+                }
+              }
+            ]
+          }
+        },
+        script: {
+          source:
+            "ctx._source.isReviewedRevisionFor = []; ctx._source.nonPendingLatestRevisionRequestUpdatedAt = null"
+        }
+      }
+    });
+
+  logger.info(
+    `[cleanUpIsReviewedRevisionForTab] Update ended! ${body.updated} bsds updated in ${body.took}ms!`
   );
 
   return body;

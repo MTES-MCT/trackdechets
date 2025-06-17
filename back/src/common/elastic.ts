@@ -91,6 +91,10 @@ export interface BsdElastic {
   destinationAcceptationWeight: number | null;
   destinationOperationDate: number | undefined;
 
+  // If the BSD only has non-pending revision requests, the date
+  // of the most recent one
+  nonPendingLatestRevisionRequestUpdatedAt: number | undefined;
+
   isDraftFor: string[];
   isForActionFor: string[];
   isFollowFor: string[];
@@ -331,7 +335,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   rawBsd: rawField,
 
   companyNames: textField,
-  companyOrgIds: stringField
+  companyOrgIds: stringField,
+  nonPendingLatestRevisionRequestUpdatedAt: dateField
 };
 
 export type BsdIndexationConfig = {
