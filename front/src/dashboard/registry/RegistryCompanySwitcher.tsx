@@ -14,11 +14,7 @@ import { GET_REGISTRY_COMPANIES } from "./shared";
 import FocusTrap from "focus-trap-react";
 import styles from "./RegistryCompanySwitcher.module.scss";
 type Props = {
-  onCompanySelect: (
-    orgId: string,
-    isDelegation: boolean,
-    company?: RegistryCompanyInfos
-  ) => void;
+  onCompanySelect: (orgId: string, company?: RegistryCompanyInfos) => void;
   setIsDelegation?: (isDelegation: boolean) => void;
   wrapperClassName?: string;
   allOption?: {
@@ -80,11 +76,11 @@ export function RegistryCompanySwitcher({
       const { name, givenName, siret } = selected.company;
       setSelectedItem(`${givenName || name || ""} ${siret || ""}`);
       setIsDelegation?.(!!isDelegation);
-      onCompanySelect(orgId, !!isDelegation, selected?.company);
+      onCompanySelect(orgId, selected?.company);
     } else if (selected.all) {
       setSelectedItem(allOption?.name ?? "");
       setIsDelegation?.(!!isDelegation);
-      onCompanySelect(orgId, !!isDelegation);
+      onCompanySelect(orgId);
     }
   };
 
@@ -113,7 +109,7 @@ export function RegistryCompanySwitcher({
         }
         if (firstNode) {
           if (!defaultSiret) {
-            onCompanySelect(firstNode.orgId, firstNodeIsDelegation);
+            onCompanySelect(firstNode.orgId);
           }
           setIsDelegation?.(!!firstNodeIsDelegation);
           setSelectedItem(

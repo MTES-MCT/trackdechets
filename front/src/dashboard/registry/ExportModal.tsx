@@ -459,7 +459,7 @@ export function ExportModal({ isOpen, onClose }: Props) {
         if (registryDelegationsData?.registryDelegations.edges.length === 1) {
           const tmpSiret =
             registryDelegationsData.registryDelegations.edges[0].node.delegate
-              .siret;
+              .orgId;
           if (tmpSiret) {
             delegateSiret = tmpSiret;
           }
@@ -529,9 +529,12 @@ export function ExportModal({ isOpen, onClose }: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="fr-mb-8v">
             <RegistryCompanySwitcher
-              onCompanySelect={(orgId, isDelegation) => {
-                setValue("companyOrgId", orgId);
+              setIsDelegation={isDelegation => {
                 setValue("isDelegation", isDelegation);
+                setValue("delegateSiret", null);
+              }}
+              onCompanySelect={orgId => {
+                setValue("companyOrgId", orgId);
                 setValue("delegateSiret", null);
               }}
               wrapperClassName={"tw-relative"}
