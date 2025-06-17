@@ -166,53 +166,53 @@ export function RegistrySsdForm({ onClose }: Props) {
   }, [useDate, reportForCompanySiret, methods]);
 
   async function onSubmit(data: SsdLineInput) {
-try {
-    const { secondaryWasteCodes, secondaryWasteDescriptions, ...rest } = data;
+    try {
+      const { secondaryWasteCodes, secondaryWasteDescriptions, ...rest } = data;
 
-    if (secondaryWasteCodes && secondaryWasteDescriptions) {
-      let hasError = false;
-      secondaryWasteCodes.forEach((code, index) => {
-        console.log(code, secondaryWasteDescriptions[index]);
-        if (index === 0) {
-          if (code && !secondaryWasteDescriptions[index]) {
-            methods.setError("secondaryWasteDescriptions.0.value", {
-              message: "La description est requise si le code est renseigné"
-            });
-            hasError = true;
+      if (secondaryWasteCodes && secondaryWasteDescriptions) {
+        let hasError = false;
+        secondaryWasteCodes.forEach((code, index) => {
+          console.log(code, secondaryWasteDescriptions[index]);
+          if (index === 0) {
+            if (code && !secondaryWasteDescriptions[index]) {
+              methods.setError("secondaryWasteDescriptions.0.value", {
+                message: "La description est requise si le code est renseigné"
+              });
+              hasError = true;
+            }
+          } else {
+            if (!code) {
+              methods.setError(`secondaryWasteCodes.${index}.value`, {
+                message:
+                  "Le code est requis, supprimez la ligne si elle n'est pas utile"
+              });
+              hasError = true;
+            }
+            if (code && !secondaryWasteDescriptions[index]) {
+              methods.setError(`secondaryWasteDescriptions.${index}.value`, {
+                message: "La description est requise si le code est renseigné"
+              });
+              hasError = true;
+            }
           }
-        } else {
-          if (!code) {
-            methods.setError(`secondaryWasteCodes.${index}.value`, {
-              message:
-                "Le code est requis, supprimez la ligne si elle n'est pas utile"
-            });
-            hasError = true;
-          }
-          if (code && !secondaryWasteDescriptions[index]) {
-            methods.setError(`secondaryWasteDescriptions.${index}.value`, {
-              message: "La description est requise si le code est renseigné"
-            });
-            hasError = true;
-          }
+        });
+        if (hasError) {
+          return;
+        }
+      }
+
+      const result = await addToSsdRegistry({
+        variables: {
+          lines: [
+            {
+              ...rest,
+              secondaryWasteCodes: secondaryWasteCodes?.filter(Boolean) ?? [],
+              secondaryWasteDescriptions:
+                secondaryWasteDescriptions?.filter(Boolean) ?? []
+            }
+          ]
         }
       });
-      if (hasError) {
-        return;
-      }
-    }
-
-    const result = await addToSsdRegistry({
-      variables: {
-        lines: [
-          {
-            ...rest,
-            secondaryWasteCodes: secondaryWasteCodes?.filter(Boolean) ?? [],
-            secondaryWasteDescriptions:
-              secondaryWasteDescriptions?.filter(Boolean) ?? []
-          }
-        ]
-      }
-    });
 
       const shouldCloseModal = handleMutationResponse(
         result.data?.addToSsdRegistry,
