@@ -16,36 +16,53 @@ export function useNotificationQueries(orgId: string) {
     { variables: { where: { isForActionFor: [orgId] } } }
   );
 
-  const queryRevision = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isInRevisionFor: [orgId] } } }
-  );
-
   const queryTransport = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
     NOTIFICATION_QUERY,
     { variables: { where: { isToCollectFor: [orgId] } } }
   );
 
+  const queryIsEmittedRevisionFor = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isEmittedRevisionFor: [orgId] } }
+  });
+
+  const queryIsReceivedRevisionFor = useQuery<
+    Pick<Query, "bsds">,
+    QueryBsdsArgs
+  >(NOTIFICATION_QUERY, {
+    variables: { where: { isReceivedRevisionFor: [orgId] } }
+  });
+
   const loading =
-    queryAction.loading || queryRevision.loading || queryTransport.loading;
+    queryAction.loading ||
+    queryTransport.loading ||
+    queryIsEmittedRevisionFor.loading ||
+    queryIsReceivedRevisionFor.loading;
 
   const data = useMemo(
     () => ({
       actionCount: queryAction.data?.bsds.totalCount ?? 0,
-      revisionCount: queryRevision.data?.bsds.totalCount ?? 0,
-      transportCount: queryTransport.data?.bsds.totalCount ?? 0
+      transportCount: queryTransport.data?.bsds.totalCount ?? 0,
+      isEmittedRevisionForCount:
+        queryIsEmittedRevisionFor.data?.bsds.totalCount ?? 0,
+      isReceivedRevisionForCount:
+        queryIsReceivedRevisionFor.data?.bsds.totalCount ?? 0
     }),
     [
       queryAction.data?.bsds.totalCount,
-      queryRevision.data?.bsds.totalCount,
-      queryTransport.data?.bsds.totalCount
+      queryTransport.data?.bsds.totalCount,
+      queryIsEmittedRevisionFor.data?.bsds.totalCount,
+      queryIsReceivedRevisionFor.data?.bsds.totalCount
     ]
   );
 
   const refetchAll = () => {
     queryAction.refetch();
-    queryRevision.refetch();
     queryTransport.refetch();
+    queryIsEmittedRevisionFor.refetch();
+    queryIsReceivedRevisionFor.refetch();
   };
 
   return { loading, data, refetchAll };

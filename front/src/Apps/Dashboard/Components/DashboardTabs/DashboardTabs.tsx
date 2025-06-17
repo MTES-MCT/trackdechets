@@ -16,9 +16,11 @@ import {
   REVIEWED,
   REVIEWS,
   TO_COLLECT,
-  TO_REVIEW,
   TRANSPORT,
-  RETURN
+  RETURN,
+  PENDING,
+  EMITTED,
+  RECEIVED
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
@@ -183,7 +185,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.bsds.toReview, {
+                  to={generatePath(routes.dashboard.revisions.pending, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -192,13 +194,48 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                       : "sidebarv2__item sidebarv2__item--indented"
                   }
                 >
-                  {TO_REVIEW}
+                  {PENDING}
                 </NavLink>
-                {displayNotification(data.revisionCount, isReaderRole)}
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.bsds.reviewed, {
+                  to={generatePath(routes.dashboard.revisions.emitted, {
+                    siret: currentCompany.orgId
+                  })}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
+                >
+                  {EMITTED}
+                </NavLink>
+                {displayNotification(
+                  data.isEmittedRevisionForCount,
+                  isReaderRole
+                )}
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboard.revisions.received, {
+                    siret: currentCompany.orgId
+                  })}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
+                >
+                  {RECEIVED}
+                </NavLink>
+                {displayNotification(
+                  data.isReceivedRevisionForCount,
+                  isReaderRole
+                )}
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboard.revisions.reviewed, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>

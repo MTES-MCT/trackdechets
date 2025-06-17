@@ -184,7 +184,6 @@ export const bpaohPublishDraft = `Cette action aura pour effet de démarrer le c
             signature n'a été apposée.`;
 // tabs
 export const ALL_BSDS = "Tous les bordereaux";
-export const ALL_REVIEWS = "Toutes les révisions";
 export const DRAFTS = "Brouillons";
 export const ACTS = "Pour action";
 export const FOLLOWS = "Suivis";
@@ -194,8 +193,10 @@ export const TRANSPORT = "Transport";
 export const TO_COLLECT = "À collecter";
 export const COLLECTED = "Collectés";
 export const REGISTER = "Registre";
-export const TO_REVIEW = "En cours";
-export const REVIEWED = "Révisés";
+export const PENDING = "En cours";
+export const EMITTED = "Émises";
+export const RECEIVED = "Reçues";
+export const REVIEWED = "Finalisées";
 export const RETURN = "Retours";
 
 // Reviews

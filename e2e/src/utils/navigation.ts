@@ -84,8 +84,12 @@ export type BsdMenu =
   | "Pour action"
   | "Suivis"
   | "Archives"
+  // Révisions
   | "En cours"
-  | "Révisés"
+  | "Émises"
+  | "Reçues"
+  | "Finalisées"
+  // Transport
   | "À collecter"
   | "Collectés";
 
@@ -95,8 +99,12 @@ const BsdMenuUrls = {
   "Pour action": "/bsds/act",
   Suivis: "/bsds/follow",
   Archives: "/bsds/history",
-  "En cours": "/bsds/to-review",
-  Révisés: "/bsds/reviewed",
+  // Révisions
+  "En cours": "/revisions/pending",
+  Émises: "/revisions/emitted",
+  Reçues: "/revisions/received",
+  Finalisées: "/revisions/reviewed",
+  // Transport
   "À collecter": "/transport/to-collect",
   Collectés: "/transport/collected"
 };

@@ -26,9 +26,11 @@ import {
   REVIEWS,
   TO_COLLECT,
   TRANSPORT,
-  TO_REVIEW,
   REVIEWED,
-  RETURN
+  RETURN,
+  PENDING,
+  EMITTED,
+  RECEIVED
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import routes from "../../../routes";
@@ -107,7 +109,7 @@ function DashboardSubNav({ currentCompany }) {
 
   const matchReviewsToReview = matchPath(
     {
-      path: routes.dashboard.bsds.toReview,
+      path: routes.dashboard.revisions.pending,
       caseSensitive: false,
       end: false
     },
@@ -116,7 +118,7 @@ function DashboardSubNav({ currentCompany }) {
 
   const matchReviewsReviewed = matchPath(
     {
-      path: routes.dashboard.bsds.reviewed,
+      path: routes.dashboard.revisions.reviewed,
       caseSensitive: false,
       end: false
     },
@@ -280,8 +282,30 @@ function DashboardSubNav({ currentCompany }) {
                   <MenuLink
                     entry={{
                       navlink: true,
-                      caption: TO_REVIEW,
-                      href: generatePath(routes.dashboard.bsds.toReview, {
+                      caption: PENDING,
+                      href: generatePath(routes.dashboard.revisions.pending, {
+                        siret: currentCompany.orgId
+                      })
+                    }}
+                  />
+                </li>
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: EMITTED,
+                      href: generatePath(routes.dashboard.revisions.emitted, {
+                        siret: currentCompany.orgId
+                      })
+                    }}
+                  />
+                </li>
+                <li>
+                  <MenuLink
+                    entry={{
+                      navlink: true,
+                      caption: RECEIVED,
+                      href: generatePath(routes.dashboard.revisions.received, {
                         siret: currentCompany.orgId
                       })
                     }}
@@ -292,7 +316,7 @@ function DashboardSubNav({ currentCompany }) {
                     entry={{
                       navlink: true,
                       caption: REVIEWED,
-                      href: generatePath(routes.dashboard.bsds.reviewed, {
+                      href: generatePath(routes.dashboard.revisions.reviewed, {
                         siret: currentCompany.orgId
                       })
                     }}

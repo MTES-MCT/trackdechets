@@ -27,8 +27,10 @@ export type Tabs = {
   isToCollectTab;
   isCollectedTab;
   isAllBsdsTab;
-  isToReviewTab;
-  isReviewedTab;
+  isPendingRevisionForTab;
+  isEmittedRevisionForTab;
+  isReceivedRevisionForTab;
+  isReviewedRevisionForTab;
   isReturnTab;
 };
 
@@ -42,8 +44,10 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
     isToCollectTab,
     isCollectedTab,
     isAllBsdsTab,
-    isToReviewTab,
-    isReviewedTab,
+    isPendingRevisionForTab,
+    isEmittedRevisionForTab,
+    isReceivedRevisionForTab,
+    isReviewedRevisionForTab,
     isReturnTab
   } = props;
 
@@ -85,14 +89,24 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
       isArchivedFor: [siret]
     };
   }
-  if (isToReviewTab) {
+  if (isPendingRevisionForTab) {
     return {
-      isInRevisionFor: [siret]
+      isPendingRevisionFor: [siret]
     };
   }
-  if (isReviewedTab) {
+  if (isEmittedRevisionForTab) {
     return {
-      isRevisedFor: [siret]
+      isEmittedRevisionFor: [siret]
+    };
+  }
+  if (isReceivedRevisionForTab) {
+    return {
+      isReceivedRevisionFor: [siret]
+    };
+  }
+  if (isReviewedRevisionForTab) {
+    return {
+      isReviewedRevisionFor: [siret]
     };
   }
   if (isReturnTab) {
@@ -108,8 +122,10 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
     isDraftTab,
     isFollowTab,
     isArchivesTab,
-    isReviewedTab,
-    isToReviewTab,
+    isPendingRevisionForTab,
+    isEmittedRevisionForTab,
+    isReceivedRevisionForTab,
+    isReviewedRevisionForTab,
     isReturnTab
   } = tabs;
 
@@ -125,7 +141,12 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   if (isArchivesTab) {
     return blankstate_history_title;
   }
-  if (isReviewedTab || isToReviewTab) {
+  if (
+    isPendingRevisionForTab ||
+    isEmittedRevisionForTab ||
+    isReceivedRevisionForTab ||
+    isReviewedRevisionForTab
+  ) {
     return blankstate_reviews_title;
   }
   if (isReturnTab) {
@@ -139,8 +160,10 @@ export const getBlankslateDescription = ({
   isDraftTab,
   isFollowTab,
   isArchivesTab,
-  isReviewedTab,
-  isToReviewTab,
+  isPendingRevisionForTab,
+  isEmittedRevisionForTab,
+  isReceivedRevisionForTab,
+  isReviewedRevisionForTab,
   isReturnTab
 }: Tabs) => {
   if (isActTab) {
@@ -162,7 +185,12 @@ export const getBlankslateDescription = ({
   if (isArchivesTab) {
     return blankstate_history_desc;
   }
-  if (isReviewedTab || isToReviewTab) {
+  if (
+    isPendingRevisionForTab ||
+    isEmittedRevisionForTab ||
+    isReceivedRevisionForTab ||
+    isReviewedRevisionForTab
+  ) {
     return blankstate_reviews_desc;
   }
   if (isReturnTab) {
