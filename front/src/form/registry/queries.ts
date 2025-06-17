@@ -306,6 +306,7 @@ export const GET_INCOMING_TEXS_REGISTRY_LOOKUP = gql`
         weightValue
         weightIsEstimate
         volume
+        wasteDap
         parcelInseeCodes
         parcelNumbers
         parcelCoordinates
@@ -438,6 +439,7 @@ export const GET_OUTGOING_TEXS_REGISTRY_LOOKUP = gql`
         weightValue
         weightIsEstimate
         volume
+        wasteDap
 
         initialEmitterCompanyType
         initialEmitterCompanyOrgId
