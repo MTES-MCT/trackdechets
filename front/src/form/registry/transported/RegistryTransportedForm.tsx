@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import {
   Mutation,
   Query,
@@ -14,7 +14,11 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import {
   ADD_TO_TRANSPORTED_REGISTRY,
   GET_TRANSPORTED_REGISTRY_LOOKUP
@@ -78,6 +82,9 @@ export function RegistryTransportedForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error as ApolloError | Error);
       }
     }
   );
@@ -110,19 +117,23 @@ export function RegistryTransportedForm({ onClose }: Props) {
   >(ADD_TO_TRANSPORTED_REGISTRY, { refetchQueries: [GET_REGISTRY_LOOKUPS] });
 
   async function onSubmit(data: TransportedLineInput) {
-    const result = await addToTransportedRegistry({
-      variables: {
-        lines: [data]
+    try {
+      const result = await addToTransportedRegistry({
+        variables: {
+          lines: [data]
+        }
+      });
+
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToTransportedRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToTransportedRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 

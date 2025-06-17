@@ -8,7 +8,7 @@ import type {
 import { checkIsAuthenticated } from "../../../common/permissions";
 
 import { GraphQLContext } from "../../../types";
-import { getBsdasriOrNotFound } from "../../database";
+import { getFullBsdasriOrNotFound } from "../../database";
 
 import updateSynthesisBsdasri from "./updateSynthesisBsdasri";
 import updateBsdasri from "./updateSimpleBsdasri";
@@ -26,9 +26,11 @@ const updateBsdasriResolver = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const existingBsdasri = await getBsdasriOrNotFound({
-    id,
-    includeAssociated: true
+  const existingBsdasri = await getFullBsdasriOrNotFound(id, {
+    include: {
+      grouping: true,
+      synthesizing: true
+    }
   });
 
   const {
@@ -48,13 +50,19 @@ const updateBsdasriResolver = async (
     return updateSynthesisBsdasri({
       id,
       input,
-      dbBsdasri,
+      dbBsdasri: existingBsdasri,
       dbSynthesizing,
       user
     });
   }
 
-  return updateBsdasri({ id, input, dbBsdasri, dbGrouping, user });
+  return updateBsdasri({
+    id,
+    input,
+    dbBsdasri: existingBsdasri,
+    dbGrouping,
+    user
+  });
 };
 
 export default updateBsdasriResolver;

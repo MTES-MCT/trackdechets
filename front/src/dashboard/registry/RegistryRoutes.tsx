@@ -16,9 +16,12 @@ import { MyExports } from "./MyExports";
 import { MyImports } from "./MyImports";
 import { MyLines } from "./myLines/MyLines";
 import { FormContainer } from "./myLines/FormContainer";
-import Exports from "../exports/Registry";
 import "../../Apps/Dashboard/dashboard.scss";
 import { RegistryImportType } from "@td/codegen-ui";
+import { RegistryV2ExportProvider } from "./RegistryV2ExportContext";
+import { RegistryExhaustiveExportProvider } from "./RegistryExhaustiveExportContext";
+import { RegistryV2ExportModalProvider } from "./RegistryV2ExportModalContext";
+import { RegistryExhaustiveExportModalProvider } from "./RegistryExhaustiveExportModalContext";
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -75,7 +78,13 @@ export default function RegistryRoutes() {
 
           <Route
             path={toRelative(routes.registry_new.export)}
-            element={<MyExports />}
+            element={
+              <RegistryV2ExportProvider>
+                <RegistryV2ExportModalProvider>
+                  <MyExports />
+                </RegistryV2ExportModalProvider>
+              </RegistryV2ExportProvider>
+            }
           />
 
           <Route
@@ -85,7 +94,13 @@ export default function RegistryRoutes() {
 
           <Route
             path={toRelative(routes.registry_new.exhaustive)}
-            element={<Exports />}
+            element={
+              <RegistryExhaustiveExportProvider>
+                <RegistryExhaustiveExportModalProvider>
+                  <MyExports />
+                </RegistryExhaustiveExportModalProvider>
+              </RegistryExhaustiveExportProvider>
+            }
           />
 
           <Route

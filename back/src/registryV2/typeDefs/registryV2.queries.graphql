@@ -1,10 +1,12 @@
 # https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000043884563
 
 type Query {
+  # Registre réglementaire
+
   "Renvoie un lien permettant de téléverser un registre au format CSV ou Excel"
   registryUploadSignedUrl(fileName: String!): SignedUrlResponse!
 
-  "Renvoie un lien permettant de témécharger un fichier du registre"
+  "Renvoie un lien permettant de télécharger un fichier du registre"
   registryDownloadSignedUrl(
     importId: String!
     target: RegistryDownloadTarget!
@@ -90,4 +92,31 @@ type Query {
     first: Int
     last: Int
   ): RegistryLookupConnection!
+
+  # Registre exhaustif
+
+  "Renvoie un lien permettant de télécharger un export de registre exhaustif précédemment généré"
+  registryExhaustiveExportDownloadSignedUrl(
+    exportId: String!
+  ): SignedUrlResponse!
+
+  "Liste des exports de registre exhaustif demandés"
+  registryExhaustiveExports(
+    """
+    (Optionnel) PAGINATION
+    Nombre d'éléments à ne pas récupérer en début de liste (pagination par "offset")
+    """
+    skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet de spécifier le nombre d'éléments à récupérer
+    """
+    first: Int
+  ): RegistryExhaustiveExportConnection!
+
+  """
+  Permet de récupérer un export exhaustif en particulier
+  """
+  registryExhaustiveExport(id: ID!): RegistryExhaustiveExport!
 }

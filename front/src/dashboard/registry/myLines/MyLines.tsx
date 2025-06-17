@@ -4,7 +4,12 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { Mutation, Query, RegistryImportType } from "@td/codegen-ui";
+import {
+  Mutation,
+  Query,
+  RegistryImportType,
+  UserPermission
+} from "@td/codegen-ui";
 import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { generatePath, useLocation, useNavigate } from "react-router-dom";
@@ -144,47 +149,83 @@ export function MyLines() {
     debouncedOnApplyFilters(publicId);
   }, [debouncedOnApplyFilters, publicId]);
 
-  const tableData = lookupNodes?.map(lookup => [
-    format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
-    TYPES[lookup.type],
-    lookup.publicId,
-    lookup.reportAsSiret ?? lookup.siret,
-    format(new Date(lookup.date), "dd/MM/yyyy"),
-    lookup.wasteCode ?? "",
-    <div className="tw-px-2 line-actions-dropdown-container">
-      <DropdownMenu
-        className="line-actions-dropdown"
-        menuTitle={`Menu d'action de la déclaration ${lookup.publicId}`}
-        ButtonElement={ActionButton}
-        alignRight
-        links={[
-          {
-            title: "Modifier",
-            isButton: true,
-            handleClick: () => {
-              const path = generatePath(TYPES_ROUTES[lookup.type]);
-              const queryString = new URLSearchParams({
-                siret: lookup.siret,
-                publicId: lookup.publicId
-              }).toString();
-              navigate(`${path}?${queryString}`, {
-                state: { background: location }
-              });
-            }
-          },
-          {
-            title: "Annuler",
-            isButton: true,
-            handleClick: () => {
-              setPublicIdToDelete(lookup.publicId);
-              deleteConfirmationModal.open();
-            }
-          }
-        ]}
-        isDisabled={false}
-      />
-    </div>
-  ]);
+  const tableData = lookupNodes?.map(lookup => {
+    let companyText = lookup.reportAsSiret ?? lookup.siret;
+    let canEdit = false;
+    if (lookup.reportAs) {
+      companyText = `${lookup.reportAs.givenName ?? lookup.reportAs.name} - ${
+        lookup.reportAs.siret
+      }`;
+      const permissions = lookup.reportAs.userPermissions;
+      canEdit = permissions.includes(UserPermission.RegistryCanImport);
+    } else if (lookup.reportFor) {
+      companyText = `${lookup.reportFor.givenName ?? lookup.reportFor.name} - ${
+        lookup.reportFor.siret
+      }`;
+      const permissions = lookup.reportFor.userPermissions;
+      canEdit = permissions.includes(UserPermission.RegistryCanImport);
+    }
+    return [
+      format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
+      TYPES[lookup.type],
+      lookup.publicId,
+      companyText,
+      format(new Date(lookup.date), "dd/MM/yyyy"),
+      lookup.wasteCode ?? "",
+      <div className="tw-px-2 line-actions-dropdown-container">
+        <DropdownMenu
+          className="line-actions-dropdown"
+          menuTitle={`Menu d'action de la déclaration ${lookup.publicId}`}
+          ButtonElement={ActionButton}
+          alignRight
+          links={[
+            {
+              title: "Afficher",
+              isButton: true,
+              handleClick: () => {
+                const path = generatePath(TYPES_ROUTES[lookup.type]);
+                const queryString = new URLSearchParams({
+                  siret: lookup.siret,
+                  publicId: lookup.publicId,
+                  readonly: "1"
+                }).toString();
+                navigate(`${path}?${queryString}`, {
+                  state: { background: location }
+                });
+              }
+            },
+            ...(canEdit
+              ? [
+                  {
+                    title: "Modifier",
+                    isButton: true,
+                    handleClick: () => {
+                      const path = generatePath(TYPES_ROUTES[lookup.type]);
+                      const queryString = new URLSearchParams({
+                        siret: lookup.siret,
+                        publicId: lookup.publicId
+                      }).toString();
+                      navigate(`${path}?${queryString}`, {
+                        state: { background: location }
+                      });
+                    }
+                  },
+                  {
+                    title: "Annuler",
+                    isButton: true,
+                    handleClick: () => {
+                      setPublicIdToDelete(lookup.publicId);
+                      deleteConfirmationModal.open();
+                    }
+                  }
+                ]
+              : [])
+          ]}
+          isDisabled={false}
+        />
+      </div>
+    ];
+  });
 
   return (
     <>

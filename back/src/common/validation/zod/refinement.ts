@@ -317,6 +317,12 @@ export async function isEcoOrganismeRefinement(
         path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
+    } else if (bsdType === BsdType.BSDASRI && !ecoOrganisme.handleBsdasri) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDASRI`
+      });
     }
   }
 }

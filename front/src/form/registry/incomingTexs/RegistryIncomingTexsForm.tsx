@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   IncomingTexsLineInput,
@@ -15,7 +15,11 @@ import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { FormTransporter } from "../builder/types";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import {
   ADD_TO_INCOMING_TEXS_REGISTRY,
   GET_INCOMING_TEXS_REGISTRY_LOOKUP
@@ -114,6 +118,9 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error);
       }
     }
   );
@@ -179,20 +186,23 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
         {}
       )
     };
+    try {
+      const result = await addToIncomingTexsRegistry({
+        variables: {
+          lines: [flattenedData]
+        }
+      });
 
-    const result = await addToIncomingTexsRegistry({
-      variables: {
-        lines: [flattenedData]
+      const shouldCloseModal = handleMutationResponse(
+        result.data?.addToIncomingTexsRegistry,
+        methods
+      );
+
+      if (shouldCloseModal) {
+        onClose();
       }
-    });
-
-    const shouldCloseModal = handleMutationResponse(
-      result.data?.addToIncomingTexsRegistry,
-      methods
-    );
-
-    if (shouldCloseModal) {
-      onClose();
+    } catch (error) {
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 

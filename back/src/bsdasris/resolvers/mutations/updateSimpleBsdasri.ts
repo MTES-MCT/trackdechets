@@ -1,14 +1,15 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
-import { BsdasriType, Bsdasri } from "@prisma/client";
+import { BsdasriType } from "@prisma/client";
 
 import type { BsdasriInput } from "@td/codegen-back";
-import { validateBsdasri } from "../../validation";
+
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";
-import { checkEditionRules } from "../../edition";
-import { sirenify } from "../../sirenify";
-import { recipify } from "../../recipify";
+
 import { UserInputError } from "../../../common/errors";
+
+import { mergeInputAndParseBsdasriAsync } from "../../validation";
+import { PrismaBsdasriForParsing } from "../../validation/types";
 
 const getGroupedBsdasriArgs = (
   inputRegroupedBsdasris: string[] | null | undefined
@@ -40,7 +41,7 @@ const updateBsdasri = async ({
   user
 }: {
   id: string;
-  dbBsdasri: Bsdasri;
+  dbBsdasri: PrismaBsdasriForParsing;
   input: BsdasriInput;
   dbGrouping: { id: string }[];
 
@@ -48,9 +49,7 @@ const updateBsdasri = async ({
 }) => {
   const { grouping: inputGrouping, synthesizing: inputSynthesizing } = input;
   const isGroupingType = dbBsdasri.type === BsdasriType.GROUPING;
-  const sirenifiedInput = await sirenify(input, user);
-  const autocompletedInput = await recipify(sirenifiedInput);
-  const flattenedInput = flattenBsdasriInput(autocompletedInput);
+  const flattenedInput = flattenBsdasriInput(input);
 
   if (inputSynthesizing && inputSynthesizing.length > 0) {
     throw new UserInputError(
@@ -83,22 +82,27 @@ const updateBsdasri = async ({
     );
   }
 
-  const expectedBsdasri = { ...dbBsdasri, ...flattenedInput };
+  const { parsedBsdasri, updatedFields } = await mergeInputAndParseBsdasriAsync(
+    dbBsdasri,
+    input,
+    { user }
+  );
 
-  // Validate form input
-
-  await validateBsdasri(expectedBsdasri as any, {
-    isGrouping: isGroupingType
-  });
-
-  await checkEditionRules(dbBsdasri, input, user);
+  if (updatedFields.length === 0) {
+    // Évite de faire un update "à blanc" si l'input
+    // ne modifie pas les données. Cela permet de limiter
+    // le nombre d'évenements crées dans Mongo.
+    return expandBsdasriFromDB(dbBsdasri);
+  }
 
   const bsdasriRepository = getBsdasriRepository(user);
+
+  const { createdAt, grouping, synthesizing, ...newBsdasri } = parsedBsdasri;
 
   const updatedDasri = await bsdasriRepository.update(
     { id },
     {
-      ...flattenedInput,
+      ...newBsdasri,
       ...getGroupedBsdasriArgs(inputGrouping)
     }
   );

@@ -13,7 +13,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { generatePath, Link, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -30,6 +30,7 @@ import { UPDATE_BSDA_TRANSPORTER } from "../../../Forms/Components/query";
 import { RhfTransportModeSelect } from "../../../Forms/Components/TransportMode/TransportMode";
 import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
 import TransporterRecepisseWrapper from "../../../../form/common/components/company/TransporterRecepisseWrapper";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 
 const schema = z.object({
   signature: z.object({
@@ -105,7 +106,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   >(UPDATE_BSDA_TRANSPORTER);
 
   const title = "Signer l'enlèvement";
-  const TODAY = new Date();
+  const TODAY = useMemo(() => new Date(), []);
 
   const signingTransporter = useMemo(
     () => data?.bsda?.transporters?.find(t => !t.transport?.signature?.date),
@@ -127,13 +128,32 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   };
 
   const methods = useForm<ZodBdsaTransport>({
-    defaultValues: initialState,
+    defaultValues: initialState, // on garde defaultValues pour eviter une boucle infinie sur signingTransporter
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
   });
 
   const { handleSubmit, reset, register } = methods;
+
+  // mettre à jour les valeurs quand signingTransporter est dispo
+  useEffect(() => {
+    if (!signingTransporter) return;
+
+    reset({
+      company: signingTransporter.company as FormCompany,
+      transport: {
+        mode: signingTransporter.transport?.mode ?? TransportMode.Road,
+        plates: signingTransporter.transport?.plates ?? [],
+        takenOverAt:
+          signingTransporter.transport?.takenOverAt ?? new Date().toISOString()
+      },
+      signature: {
+        author: "",
+        date: datetimeToYYYYMMDD(TODAY)
+      }
+    });
+  }, [signingTransporter, reset, TODAY]);
 
   const onCancel = () => {
     reset();
@@ -254,7 +274,27 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                 />
               </div>
 
-              <TransporterRecepisseWrapper transporter={signingTransporter} />
+              <TransporterRecepisseWrapper
+                transporter={signingTransporter}
+                customClass="fr-col-md-11 fr-mb-2w fr-mt-2w"
+              />
+
+              {bsda.waste?.adr && (
+                <div className="fr-col-md-11 fr-mb-2w fr-mt-2w">
+                  <Alert
+                    title="Mentions RID et ADR"
+                    severity="info"
+                    description={
+                      <>
+                        <p className="fr-mb-1w">ADR : {bsda.waste.adr}</p>
+                        {bsda.waste.nonRoadRegulationMention && (
+                          <p>RID : {bsda.waste.nonRoadRegulationMention}</p>
+                        )}
+                      </>
+                    }
+                  />
+                </div>
+              )}
 
               <p className="fr-text fr-mb-2w">
                 En qualité de <strong>transporteur du déchet</strong>, j'atteste

@@ -8,6 +8,7 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
@@ -322,6 +323,7 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
     ...getRegistryFields(bsff),
+    ...getElasticExhaustiveRegistryFields(bsff),
     rawBsd: bsff,
     revisionRequests: [],
 
@@ -348,7 +350,13 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   return bsd;
 }
 
-export async function indexBsff(bsff: BsffForElastic, ctx?: GraphQLContext) {
+export async function indexBsff(
+  bsff: BsffForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsff), ctx);
 }
 

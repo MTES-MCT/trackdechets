@@ -1,5 +1,6 @@
 import Decimal from "decimal.js";
 import {
+  BspaohStatus,
   Prisma,
   RegistryExportDeclarationType,
   RegistryExportType,
@@ -9,7 +10,8 @@ import { prisma } from "@td/prisma";
 import {
   IncomingWasteV2,
   OutgoingWasteV2,
-  TransportedWasteV2
+  TransportedWasteV2,
+  AllWasteV2
 } from "@td/codegen-back";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { getBspaohSubType } from "../common/subTypes";
@@ -20,14 +22,16 @@ import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,
   RegistryV2Bspaoh,
-  emptyTransportedWasteV2
+  emptyTransportedWasteV2,
+  emptyAllWasteV2
 } from "../registryV2/types";
 import {
-  createRegistryLogger,
   deleteRegistryLookup,
-  generateDateInfos
+  generateDateInfos,
+  rebuildRegistryLookupGeneric
 } from "@td/registry";
 import { logger } from "@td/logger";
+import { BspaohForElastic } from "./elastic";
 
 export const toIncomingWasteV2 = (
   bspaoh: RegistryV2Bspaoh
@@ -544,6 +548,206 @@ export const toTransportedWasteV2 = (
   };
 };
 
+export const toAllWasteV2 = (
+  bspaoh: RegistryV2Bspaoh
+): Omit<Required<AllWasteV2>, "__typename"> => {
+  const {
+    street: destinationCompanyAddress,
+    postalCode: destinationCompanyPostalCode,
+    city: destinationCompanyCity,
+    country: destinationCompanyCountry
+  } = splitAddress(bspaoh.destinationCompanyAddress);
+
+  const {
+    street: emitterCompanyAddress,
+    postalCode: emitterCompanyPostalCode,
+    city: emitterCompanyCity,
+    country: emitterCompanyCountry
+  } = splitAddress(bspaoh.emitterCompanyAddress);
+
+  const transporter = getFirstTransporterSync(bspaoh);
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
+  );
+
+  return {
+    ...emptyAllWasteV2,
+    id: bspaoh.id,
+    bsdId: bspaoh.id,
+    createdAt: bspaoh.createdAt,
+    updatedAt: bspaoh.updatedAt,
+    transporterTakenOverAt: bspaoh.transporterTransportTakenOverAt,
+    destinationReceptionDate: bspaoh.destinationReceptionDate,
+    destinationOperationDate: bspaoh.destinationOperationDate,
+    bsdType: "BSPAOH",
+    bsdSubType: getBspaohSubType(bspaoh),
+    customId: null,
+    status: bspaoh.status,
+    wasteDescription: bspaoh.wasteCode
+      ? getWasteDescription(bspaoh.wasteType)
+      : "",
+    wasteCode: bspaoh.wasteCode,
+    wastePop: false,
+    wasteIsDangerous: true,
+    quantity: null,
+    wasteContainsElectricOrHybridVehicles: null,
+    weight: bspaoh.emitterWasteWeightValue
+      ? new Decimal(bspaoh.emitterWasteWeightValue)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : bspaoh.emitterWasteWeightValue,
+    weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
+    initialEmitterCompanyName: null,
+    initialEmitterCompanySiret: null,
+    initialEmitterCompanyAddress: null,
+    initialEmitterCompanyPostalCode: null,
+    initialEmitterCompanyCity: null,
+    initialEmitterCompanyCountry: null,
+    emitterCompanyIrregularSituation: null,
+    emitterCompanyType: null,
+    emitterCompanySiret: bspaoh.emitterCompanySiret,
+    emitterCompanyName: bspaoh.emitterCompanyName,
+    emitterCompanyGivenName: null,
+    emitterCompanyAddress,
+    emitterCompanyPostalCode,
+    emitterCompanyCity,
+    emitterCompanyCountry,
+    emitterCompanyMail: bspaoh.emitterCompanyMail,
+    emitterPickupsiteName: bspaoh.emitterPickupSiteName,
+    emitterPickupsiteAddress: bspaoh.emitterPickupSiteAddress,
+    emitterPickupsitePostalCode: bspaoh.emitterPickupSitePostalCode,
+    emitterPickupsiteCity: bspaoh.emitterPickupSiteCity,
+    emitterPickupsiteCountry: bspaoh.emitterPickupSiteAddress ? "FR" : null,
+    workerCompanySiret: null,
+    workerCompanyName: null,
+    workerCompanyAddress: null,
+    workerCompanyPostalCode: null,
+    workerCompanyCity: null,
+    workerCompanyCountry: null,
+    parcelCities: null,
+    parcelInseeCodes: null,
+    parcelNumbers: null,
+    parcelCoordinates: null,
+    sisIdentifiers: null,
+    ecoOrganismeName: null,
+    ecoOrganismeSiret: null,
+    brokerCompanySiret: null,
+    brokerCompanyName: null,
+    brokerCompanyMail: null,
+    brokerRecepisseNumber: null,
+    traderCompanySiret: null,
+    traderCompanyName: null,
+    traderCompanyMail: null,
+    traderRecepisseNumber: null,
+    isDirectSupply: false,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName ?? null,
+    transporter1CompanyGivenName: null,
+    transporter1CompanyAddress,
+    transporter1CompanyPostalCode,
+    transporter1CompanyCity,
+    transporter1CompanyCountry,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted ?? null,
+    transporter1RecepisseNumber:
+      transporter?.transporterRecepisseNumber ?? null,
+    transporter1TransportMode: transporter?.transporterTransportMode ?? null,
+    transporter1UnloadingDate: null,
+    transporter1TransportPlates:
+      transporter?.transporterTransportPlates ?? null,
+    transporter1CompanyMail: transporter?.transporterCompanyMail ?? null,
+    wasteAdr: bspaoh.wasteAdr,
+    nonRoadRegulationMention: null,
+    destinationCap: bspaoh.destinationCap,
+    wasteDap: null,
+    destinationCompanySiret: bspaoh.destinationCompanySiret,
+    destinationCompanyName: bspaoh.destinationCompanyName,
+    destinationCompanyGivenName: null,
+    destinationCompanyAddress,
+    destinationCompanyPostalCode,
+    destinationCompanyCity,
+    destinationCompanyCountry,
+    destinationCompanyMail: bspaoh.destinationCompanyMail,
+    postTempStorageDestinationSiret: null,
+    postTempStorageDestinationName: null,
+    postTempStorageDestinationAddress: null,
+    postTempStorageDestinationPostalCode: null,
+    postTempStorageDestinationCity: null,
+    postTempStorageDestinationCountry: null,
+
+    destinationReceptionAcceptationStatus:
+      bspaoh.destinationReceptionAcceptationStatus,
+    destinationReceptionWeight:
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : bspaoh.destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionAcceptedWeight:
+      bspaoh.destinationReceptionWasteAcceptedWeightValue
+        ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : bspaoh.destinationReceptionWasteAcceptedWeightValue,
+    destinationReceptionRefusedWeight:
+      bspaoh.destinationReceptionWasteRefusedWeightValue
+        ? new Decimal(bspaoh.destinationReceptionWasteRefusedWeightValue)
+            .dividedBy(1000)
+            .toDecimalPlaces(6)
+            .toNumber()
+        : bspaoh.destinationReceptionWasteRefusedWeightValue,
+    destinationPlannedOperationCode: null,
+    destinationPlannedOperationMode: null,
+    destinationOperationCodes: bspaoh.destinationOperationCode
+      ? [bspaoh.destinationOperationCode]
+      : null,
+    destinationOperationModes: ["ELIMINATION"],
+    nextDestinationPlannedOperationCodes: null,
+    destinationHasCiterneBeenWashedOut: null,
+    destinationOperationNoTraceability: false,
+    destinationFinalOperationCompanySirets: null,
+    destinationFinalOperationCodes: null,
+    destinationFinalOperationWeights: null,
+    gistridNumber: null,
+    isUpcycled: null,
+    destinationParcelInseeCodes: null,
+    destinationParcelNumbers: null,
+    destinationParcelCoordinates: null
+  };
+};
+
+export const getElasticExhaustiveRegistryFields = (
+  bspaoh: BspaohForElastic
+) => {
+  const registryFields: Record<"isExhaustiveWasteFor", string[]> = {
+    isExhaustiveWasteFor: []
+  };
+  if (bspaoh.status !== BspaohStatus.DRAFT) {
+    registryFields.isExhaustiveWasteFor = [
+      bspaoh.destinationCompanySiret,
+      bspaoh.emitterCompanySiret
+    ].filter(Boolean);
+    if (bspaoh.transporters?.length) {
+      for (const transporter of bspaoh.transporters) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
+  }
+  return registryFields;
+};
+
 const minimalBspaohForLookupSelect = {
   id: true,
   createdAt: true,
@@ -661,100 +865,43 @@ export const updateRegistryLookup = async (
   });
 };
 
-export const rebuildRegistryLookup = async (pageSize = 100, threads = 4) => {
-  const logger = createRegistryLogger("BSPAOH");
-
-  const total = await prisma.bspaoh.count({
-    where: {
-      isDeleted: false,
-      NOT: {
-        status: "DRAFT"
+export const rebuildRegistryLookup =
+  rebuildRegistryLookupGeneric<MinimalBspaohForLookup>({
+    name: "BSPAOH",
+    getTotalCount: () =>
+      prisma.bspaoh.count({
+        where: {
+          isDeleted: false,
+          NOT: {
+            status: "DRAFT"
+          }
+        }
+      }),
+    findMany: (pageSize, cursorId) =>
+      prisma.bspaoh.findMany({
+        where: {
+          isDeleted: false,
+          NOT: {
+            status: "DRAFT"
+          }
+        },
+        take: pageSize,
+        skip: cursorId ? 1 : 0,
+        cursor: cursorId ? { id: cursorId } : undefined,
+        orderBy: {
+          id: "desc"
+        },
+        select: minimalBspaohForLookupSelect
+      }),
+    toLookupData: items => {
+      let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+      for (const bspaoh of items) {
+        const createInputs = bspaohToLookupCreateInputs(bspaoh);
+        createArray = createArray.concat(createInputs);
       }
+      return createArray;
     }
   });
-
-  let done = false;
-  let cursorId: string | null = null;
-  let processedCount = 0;
-  let operationId = 0;
-  const pendingWrites = new Map<number, Promise<void>>();
-
-  const processWrite = async (items: MinimalBspaohForLookup[]) => {
-    let createArray: Prisma.RegistryLookupUncheckedCreateInput[] = [];
-    for (const bspaoh of items) {
-      const createInputs = bspaohToLookupCreateInputs(bspaoh);
-      createArray = createArray.concat(createInputs);
-    }
-    // Run delete and create operations in a transaction
-    await prisma.$transaction(
-      async tx => {
-        // Delete existing lookups for these items
-        await tx.registryLookup.deleteMany({
-          where: {
-            OR: items.map(item => ({
-              id: item.id
-            }))
-          }
-        });
-        await tx.registryLookup.createMany({
-          data: createArray,
-          skipDuplicates: true
-        });
-      },
-      {
-        maxWait: 20000,
-        timeout: 60000
-      }
-    );
-
-    processedCount += items.length;
-    logger.logProgress(processedCount, total, pendingWrites.size);
-  };
-
-  while (!done) {
-    // Sequential read
-    const items = await prisma.bspaoh.findMany({
-      where: {
-        isDeleted: false,
-        NOT: {
-          status: "DRAFT"
-        }
-      },
-      take: pageSize,
-      skip: cursorId ? 1 : 0,
-      cursor: cursorId ? { id: cursorId } : undefined,
-      orderBy: {
-        id: "desc"
-      },
-      select: minimalBspaohForLookupSelect
-    });
-
-    // Start the write operation
-    const currentOperationId = operationId++;
-    const writePromise = processWrite(items).finally(() => {
-      pendingWrites.delete(currentOperationId);
-    });
-    pendingWrites.set(currentOperationId, writePromise);
-
-    // If we've reached max concurrency, wait for one write to complete
-    if (pendingWrites.size >= threads) {
-      await Promise.race(pendingWrites.values());
-    }
-
-    if (items.length < pageSize) {
-      done = true;
-      break;
-    }
-    cursorId = items[items.length - 1].id;
-  }
-
-  // Wait for any remaining writes to complete
-  if (pendingWrites.size > 0) {
-    await Promise.all(pendingWrites.values());
-  }
-
-  logger.logCompletion(processedCount);
-};
 
 export const lookupUtils = {
   update: updateRegistryLookup,

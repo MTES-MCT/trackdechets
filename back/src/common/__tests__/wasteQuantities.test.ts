@@ -1,9 +1,9 @@
 import Decimal from "decimal.js";
-import { bsddWasteQuantities } from "../bsddWasteQuantities";
+import { wasteQuantities } from "../wasteQuantities";
 
-describe("bsddWasteQuantities", () => {
+describe("wasteQuantities", () => {
   describe("Null use-cases", () => {
-    test("BSDD hasn't been received yet > should not return any value", () => {
+    test("bsd hasn't been received yet > should not return any value", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: null,
@@ -12,13 +12,13 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();
     });
 
-    test("BSDD has no wasteAcceptationStatus > should not return any value", () => {
+    test("bsd has no wasteAcceptationStatus > should not return any value", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: null,
@@ -27,13 +27,13 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();
     });
 
-    test("BSDD has no quantityReceived > should not return any value", () => {
+    test("bsd has no quantityReceived > should not return any value", () => {
       // Given
       const bsdd = {
         wasteAcceptationStatus: "ACCEPTED",
@@ -42,7 +42,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();
@@ -59,7 +59,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities?.quantityAccepted?.toNumber()).toEqual(15);
@@ -75,7 +75,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();
@@ -92,7 +92,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities?.quantityAccepted?.toNumber()).toEqual(0);
@@ -108,7 +108,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();
@@ -125,7 +125,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities?.quantityAccepted?.toNumber()).toEqual(8);
@@ -141,7 +141,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities?.quantityAccepted?.toNumber()).toEqual(7.573);
@@ -157,7 +157,7 @@ describe("bsddWasteQuantities", () => {
       };
 
       // When
-      const quantities = bsddWasteQuantities(bsdd);
+      const quantities = wasteQuantities(bsdd);
 
       // Then
       expect(quantities).toBeNull();

@@ -114,6 +114,14 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        methods.setError("root.serverError", {
+          type: "server",
+          message:
+            error.message ||
+            "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
+        });
       }
     }
   );

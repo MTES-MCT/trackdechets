@@ -4,8 +4,8 @@ import { Tabs } from "@codegouvfr/react-dsfr/Tabs";
 import { RegistryImportType, RegistryLineReason } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { type UseFormReturn, FormProvider } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import cn from "classnames";
 import { getRegistryNameFromImportType } from "../../../dashboard/registry/shared";
 import { getTabsWithState } from "./error";
 import "./FormBuilder.scss";
@@ -46,6 +46,9 @@ export function FormBuilder({
   disabledFieldNames
 }: Props) {
   const [selectedTabId, setSelectedTabId] = useState<string>(shape[0].tabId);
+  const { search } = useLocation();
+  const queryParams = new URLSearchParams(search);
+  const readOnly = queryParams.get("readonly") === "1";
   const navigate = useNavigate();
   const { errors } = methods.formState;
   const shapeWithState = getTabsWithState(shape, errors, disabledFieldNames);
@@ -76,18 +79,41 @@ export function FormBuilder({
   return (
     <div id="formBuilder" className="registryFormBuilder">
       <h3 className="fr-h3 fr-mb-1v">
-        {reason === RegistryLineReason.Edit
+        {readOnly
+          ? "Afficher "
+          : reason === RegistryLineReason.Edit
           ? "Modifier "
-          : reason === RegistryLineReason.Cancel
-          ? "Annuler "
           : "Créer "}
         une déclaration
       </h3>
-      <div className="fr-hint-text fr-mb-2w fr-text--md">
+      <div
+        className={cn(
+          "fr-hint-text",
+          readOnly ? "fr-mb-1w" : "fr-mb-2w",
+          "fr-text--md"
+        )}
+      >
         {getRegistryNameFromImportType(registryType)}
       </div>
+      {readOnly && (
+        <div>
+          <Alert
+            description="La vue Affichage ne permet pas d'effectuer ou enregistrer des modifications sur les déclarations"
+            severity="info"
+            className="fr-mb-2w fr-pb-1w"
+            small
+          />
+        </div>
+      )}
       <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)}>
+        <form
+          onSubmit={methods.handleSubmit(onSubmit)}
+          onKeyDown={e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          }}
+        >
           <Tabs
             selectedTabId={selectedTabId}
             onTabChange={onTabChange}
@@ -154,13 +180,15 @@ export function FormBuilder({
                       Fermer
                     </Button>
 
-                    <Button type="submit" disabled={loading}>
-                      {reason === RegistryLineReason.Edit
-                        ? "Modifier la déclaration"
-                        : reason === RegistryLineReason.Cancel
-                        ? "Annuler la déclaration"
-                        : "Créer la déclaration"}
-                    </Button>
+                    {!readOnly && (
+                      <Button type="submit" disabled={loading}>
+                        {reason === RegistryLineReason.Edit
+                          ? "Modifier la déclaration"
+                          : reason === RegistryLineReason.Cancel
+                          ? "Annuler la déclaration"
+                          : "Créer la déclaration"}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

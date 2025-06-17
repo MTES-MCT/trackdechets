@@ -239,7 +239,7 @@ describe("Mutation.signBsdasri operation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
+          "Le poids du déchet traité en kg est un champ requis. (Si le code correspond à un traitement final)",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

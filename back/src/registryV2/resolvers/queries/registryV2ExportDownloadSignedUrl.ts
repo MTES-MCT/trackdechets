@@ -30,7 +30,7 @@ export async function registryV2ExportDownloadSignedUrl(
   }
   const bucketName = process.env.S3_REGISTRY_EXPORTS_BUCKET!;
   const fileName = getRegistryFileName(
-    registryExport.registryType ?? "ALL",
+    registryExport.registryType,
     registryExport.sirets,
     registryExport.createdAt
   );

@@ -257,6 +257,16 @@ input BsdaReceptionInput {
   Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
   """
   weight: Float
+
+  """
+  Quantité refusée (optionnelle)
+  Si définie:
+  - doit être supérieure à 0 et inférieure ou égale à weight si le déchet est partiellement refusé.
+  - doit être égale à 0 si le déchet est totalement accepté.
+  - doit être égale à weight si le déchet est totalement refusé.
+  """
+  refusedWeight: Float
+
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus
   "Motif de refus"
@@ -460,6 +470,9 @@ input BsdaRevisionRequestDestinationInput {
 input BsdaRevisionRequestReceptionInput {
   "Poids présenté"
   weight: Float
+
+  "Poids refusé"
+  refusedWeight: Float
 }
 
 input BsdaRevisionRequestOperationInput {

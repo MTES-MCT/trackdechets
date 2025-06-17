@@ -15,7 +15,11 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
-import { isoDateToHtmlDate, schemaFromShape } from "../builder/utils";
+import {
+  handleServerError,
+  isoDateToHtmlDate,
+  schemaFromShape
+} from "../builder/utils";
 import {
   ADD_TO_OUTGOING_WASTE_REGISTRY,
   GET_OUTGOING_WASTE_REGISTRY_LOOKUP
@@ -107,6 +111,9 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }
+      },
+      onError: error => {
+        handleServerError(methods, error as ApolloError | Error);
       }
     }
   );
@@ -140,7 +147,6 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
-    console.log(data);
     // Flatten transporter array back into individual fields
     const flattenedData = {
       ...rest,
@@ -178,24 +184,7 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
         onClose();
       }
     } catch (error) {
-      console.log(error);
-      if (error instanceof ApolloError) {
-        console.log("AQUI");
-        // Handle GraphQL errors
-        methods.setError("root.serverError", {
-          type: "server",
-          message:
-            error.message ||
-            "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
-        });
-      } else {
-        console.log("AQUI 2");
-        methods.setError("root.serverError", {
-          type: "server",
-          message:
-            "Une erreur inconnue est survenue, merci de réessayer dans quelques instants. Si le problème persiste vous pouvez contacter le support"
-        });
-      }
+      handleServerError(methods, error as ApolloError | Error);
     }
   }
 

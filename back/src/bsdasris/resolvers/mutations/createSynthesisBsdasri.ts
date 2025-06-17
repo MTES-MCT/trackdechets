@@ -1,18 +1,15 @@
 import type { BsdasriInput } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 
-import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
-import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
+import { expandBsdasriFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { validateBsdasri } from "../../validation";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
-import { getBsdasriForElastic, indexBsdasri } from "../../elastic";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
-import { sirenify } from "../../sirenify";
 import { checkCanCreateSynthesis } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
-
+import { parseBsdasriAsync } from "../../validation";
+import { graphQlInputToZodBsdasri } from "../../validation/helpers";
 /**
  * Bsdasri creation mutation :
  * sets bsdasri type to `SYNTHESIS`
@@ -40,7 +37,7 @@ const createSynthesisBsdasri = async (
 
   await checkCanCreateSynthesis(user, input);
 
-  const { synthesizing, ...rest } = input;
+  const { synthesizing } = input;
 
   if (!synthesizing || !synthesizing.length) {
     throw new UserInputError(
@@ -60,38 +57,42 @@ const createSynthesisBsdasri = async (
     .map(dasri => dasri.transporterWasteVolume ?? 0)
     .reduce((prev, curr) => prev + curr, 0);
 
-  const sirenifiedInput = await sirenify(rest, user);
+  const zodBsdasri = graphQlInputToZodBsdasri(input);
 
-  const flattenedInput = {
-    ...flattenBsdasriInput(sirenifiedInput),
-    emitterCompanyName: rest.transporter?.company?.name,
-    emitterCompanySiret: rest.transporter?.company?.siret,
-    emitterCompanyAddress: rest.transporter?.company?.address,
-    emitterCompanyContact: rest.transporter?.company?.contact,
-    emitterCompanyPhone: rest.transporter?.company?.phone,
-    emitterCompanyMail: rest.transporter?.company?.mail,
+  const payload = {
+    ...zodBsdasri,
+    emitterCompanyName: zodBsdasri.transporterCompanyName,
+    emitterCompanySiret: zodBsdasri.transporterCompanySiret,
+    emitterCompanyAddress: zodBsdasri.transporterCompanyAddress,
+    emitterCompanyContact: zodBsdasri.transporterCompanyContact,
+    emitterCompanyPhone: zodBsdasri.transporterCompanyPhone,
+    emitterCompanyMail: zodBsdasri.transporterCompanyMail,
     emitterWastePackagings: aggregatedPackagings,
     emitterWasteVolume: summedVolumes,
     transporterWastePackagings: aggregatedPackagings,
     transporterWasteVolume: summedVolumes
   };
 
-  const synthesizedBsdasrisId = synthesizing.map(id => ({ id }));
+  const synthesizedBsdasris = synthesizing.map(id => ({ id }));
 
-  await validateBsdasri(flattenedInput, {
-    emissionSignature: true,
-    isSynthesis: true
-  });
+  const { createdAt, ...parsedZodBsdasri } = await parseBsdasriAsync(
+    { ...payload, isDraft: false, createdAt: new Date() },
+    {
+      user,
+      currentSignatureType: "EMISSION"
+    }
+  );
+
+  const { grouping, ...createInput } = parsedZodBsdasri;
+
   const bsdasriRepository = getBsdasriRepository(user);
-
   const newDasri = await bsdasriRepository.create({
-    ...flattenedInput,
-    id: getReadableId(ReadableIdPrefix.DASRI),
+    ...createInput,
     type: BsdasriType.SYNTHESIS,
-    synthesizing: { connect: synthesizedBsdasrisId }
+    synthesizing: { connect: synthesizedBsdasris }
   });
+
   const expandeBsdasri = expandBsdasriFromDB(newDasri);
-  await indexBsdasri(await getBsdasriForElastic(newDasri), context);
 
   return expandeBsdasri;
 };

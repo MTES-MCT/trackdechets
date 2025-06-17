@@ -5,7 +5,12 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdasriStatus, BsdasriType, CompanyType } from "@prisma/client";
+import {
+  BsdasriStatus,
+  BsdasriType,
+  CompanyType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
@@ -141,6 +146,64 @@ describe("Mutation.updateBsdasri", () => {
     expect(updatedDasri.synthesisEmitterSirets).toEqual([emitterCompanySiret]);
     expect(updatedDasri.groupingEmitterSirets).toEqual([]);
   });
+
+  it.each([WasteAcceptationStatus.ACCEPTED, null])(
+    "BUGFIX: should allow update on INITIAL synthesis dasri with transporterAcceptationStatus = %p",
+    async acceptationStatus => {
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
+
+      const destinationCompany = await companyFactory();
+
+      const associated = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+          status: BsdasriStatus.INITIAL
+        }
+      });
+
+      const initialPackagings = [
+        { type: "BOITE_CARTON", volume: 10, quantity: 9 },
+        { type: "FUT", volume: 100, quantity: 3 }
+      ];
+
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(transporterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+          transporterAcceptationStatus: acceptationStatus,
+          status: BsdasriStatus.INITIAL,
+          type: BsdasriType.SYNTHESIS,
+          synthesizing: { connect: [{ id: associated.id }] },
+          emitterWastePackagings: initialPackagings,
+          emitterWasteVolume: 1234,
+          transporterWastePackagings: initialPackagings,
+          transporterWasteVolume: 1234
+        }
+      });
+
+      const { mutate } = makeClient(transporter);
+
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: { transporter: { customInfo: "plop" } }
+          }
+        }
+      );
+
+      expect(errors).toBeUndefined();
+    }
+  );
 
   it("should forbid empty associated bsds fields on INITIAL synthesis dasri", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");

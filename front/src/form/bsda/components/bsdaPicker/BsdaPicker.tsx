@@ -23,6 +23,7 @@ import { useParams } from "react-router-dom";
 import { getInitialState } from "../../stepper/initial-state";
 import { getInitialCompany } from "../../../../Apps/common/data/initialState";
 import { mergePackagings } from "../../../../common/packagings";
+import { isDefined, isDefinedStrict } from "../../../../common/helper";
 
 type Props = { name: string; bsdaId: string };
 
@@ -104,6 +105,27 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     );
     setFieldValue("waste.code", bsda?.waste?.code ?? initialState!.waste!.code);
     setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState!.waste!.adr);
+
+    // Attention avec les bordereaux qui réexpédient un BSDA legacy où isSubjectToADR = null
+    let isSubjectToADR =
+      bsda?.waste?.isSubjectToADR ?? initialState!.waste!.isSubjectToADR;
+    if (!isDefined(bsda?.waste?.isSubjectToADR)) {
+      if (!isDefinedStrict(bsda?.waste?.adr)) {
+        // Si rien dans la mention ADR, on peut supposer que le déchet n'est pas soumis à l'ADR
+        isSubjectToADR = false;
+      } else {
+        // Si la mention ADR n'est pas vide, on ne peut pas deviner la valeur de isSubjectToADR,
+        // parce que le champ adr peut être égal à "Non soumis" ou équivalent
+        isSubjectToADR = null;
+      }
+    }
+    setFieldValue("waste.isSubjectToADR", isSubjectToADR);
+
+    setFieldValue(
+      "waste.nonRoadRegulationMention",
+      bsda?.waste?.nonRoadRegulationMention ??
+        initialState!.waste!.nonRoadRegulationMention
+    );
     setFieldValue(
       "waste.familyCode",
       bsda?.waste?.familyCode ?? initialState!.waste!.familyCode

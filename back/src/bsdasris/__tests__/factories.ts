@@ -12,6 +12,7 @@ import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";
 import { computeTotalVolume } from "../converter";
 import { getCanAccessDraftOrgIds } from "../utils";
+import { ZodBsdasriPackagingEnum } from "../validation/schema";
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
   id: getReadableId(ReadableIdPrefix.DASRI),
@@ -110,7 +111,9 @@ export const initialData = company => ({
   emitterWasteWeightValue: 22,
   emitterWasteWeightIsEstimate: true,
   emitterWasteVolume: 66,
-  emitterWastePackagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }]
+  emitterWastePackagings: [
+    { type: "BOITE_CARTON" as ZodBsdasriPackagingEnum, volume: 22, quantity: 3 }
+  ]
 });
 
 export const readyToPublishData = destination => ({
@@ -137,7 +140,7 @@ export const readyToTakeOverData = company => ({
   transporterTransportPlates: ["AB-65-ML"],
   transporterTransportMode: TransportMode.ROAD,
   transporterWastePackagings: [
-    { type: "BOITE_CARTON", volume: 22, quantity: 3 }
+    { type: "BOITE_CARTON" as ZodBsdasriPackagingEnum, volume: 22, quantity: 3 }
   ],
   transporterWasteWeightValue: 33,
   transporterWasteWeightIsEstimate: true,
@@ -148,7 +151,7 @@ export const readyToTakeOverData = company => ({
 
 export const readyToReceiveData = () => ({
   destinationWastePackagings: [
-    { type: "BOITE_CARTON", volume: 22, quantity: 3 }
+    { type: "BOITE_CARTON" as ZodBsdasriPackagingEnum, volume: 22, quantity: 3 }
   ],
   destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
   destinationReceptionDate: new Date()

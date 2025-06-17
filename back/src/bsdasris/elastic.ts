@@ -8,6 +8,7 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -259,6 +260,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
 
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
+    ...getElasticExhaustiveRegistryFields(bsdasri),
     rawBsd: bsdasri,
 
     // ALL actors from the BSDASRI, for quick search
@@ -280,7 +282,13 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
   };
 }
 
-export function indexBsdasri(bsdasri: BsdasriForElastic, ctx?: GraphQLContext) {
+export function indexBsdasri(
+  bsdasri: BsdasriForElastic,
+  ctx?: {
+    gqlCtx?: GraphQLContext;
+    optimisticCtx?: { seqNo: number; primaryTerm: number };
+  }
+) {
   return indexBsd(toBsdElastic(bsdasri), ctx);
 }
 /**

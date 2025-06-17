@@ -73,6 +73,7 @@ describe("Mutation.publishBsdasri", () => {
         }
       }
     );
+
     expect(data.publishBsdasri.status).toBe("INITIAL");
     expect(data.publishBsdasri.isDraft).toBe(false);
   });
@@ -137,7 +138,7 @@ describe("Mutation.publishBsdasri", () => {
     ]);
   });
 
-  it("should not publish a draft dasri if mandatory fields are not filled", async () => {
+  it("should  publish a draft dasri if auto completable fields are not filled", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
@@ -146,10 +147,39 @@ describe("Mutation.publishBsdasri", () => {
         isDraft: true,
         ...initialData(company),
         ...readyToPublishData(destination),
-        emitterCompanyName: null, // missing field
-        destinationCompanyName: null // missing field
+        emitterCompanyName: null, // missing field, will be completed by sirenify
+        destinationCompanyName: null // missing field, will be completed by sirenify
       }
     });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "publishBsdasri">>(
+      PUBLISH_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+    expect(data.publishBsdasri.status).toBe("INITIAL");
+    expect(data.publishBsdasri.isDraft).toBe(false);
+  });
+
+  it("should  not  publish a draft dasri if mandatory fields are  not filled", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      userId: user.id,
+      opt: {
+        isDraft: true,
+        ...initialData(company),
+        ...readyToPublishData(destination),
+
+        destinationCompanySiret: null // missing field
+      }
+    });
+
     const { mutate } = makeClient(user); // emitter
 
     const { errors } = await mutate<Pick<Mutation, "publishBsdasri">>(
@@ -163,8 +193,7 @@ describe("Mutation.publishBsdasri", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Destinataire: Le nom de l'entreprise est obligatoire
-Émetteur: Le nom de l'entreprise est obligatoire`,
+        message: "Le N° SIRET du destinataire est un champ requis.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

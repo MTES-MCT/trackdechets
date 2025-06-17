@@ -35,7 +35,6 @@ export function BsdaRequestRevisionCancelationInput({ bsda, onChange }: Props) {
         inputTitle="cancellation"
         disabled={!canBeCancelled}
         onChange={onChange}
-        showCheckedHint={false}
         helperText={
           canBeCancelled ? CANCELATION_MSG : CANCELATION_NOT_POSSIBLE_MSG
         }

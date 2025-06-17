@@ -5,6 +5,7 @@ export {
   ParsedLine,
   IMPORT_TYPES,
   UNAUTHORIZED_ERROR,
+  UNAUTHORIZED_WITH_DELEGATION_ERROR,
   importOptions,
   exportOptions
 } from "./options";
@@ -16,7 +17,8 @@ export { SSD_HEADERS } from "./ssd/constants";
 export {
   generateDateInfos,
   deleteRegistryLookup,
-  createRegistryLogger
+  createRegistryLogger,
+  rebuildRegistryLookupGeneric
 } from "./lookup/utils";
 
 export { lookupUtils as ssdLookupUtils } from "./ssd/registry";

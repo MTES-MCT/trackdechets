@@ -14,7 +14,7 @@ type RegistryV2Export {
   createdAt: DateTime!
   updatedAt: DateTime!
   createdBy: User!
-  status: RegistryV2ExportStatus!
+  status: RegistryExportStatus!
   delegate: RegistryCompany
   delegateSirets: String
   sirets: [String!]!
@@ -25,7 +25,31 @@ type RegistryV2Export {
   declarationType: DeclarationType!
   startDate: DateTime!
   endDate: DateTime
-  format: FormsRegisterExportFormat!
+  format: RegistryExportFormat!
+}
+
+type RegistryExhaustiveExportConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [RegistryExhaustiveExportEdge!]!
+}
+
+type RegistryExhaustiveExportEdge {
+  cursor: String!
+  node: RegistryExhaustiveExport!
+}
+
+type RegistryExhaustiveExport {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  createdBy: User!
+  status: RegistryExportStatus!
+  sirets: [String!]!
+  companies: [RegistryCompany!]!
+  startDate: DateTime!
+  endDate: DateTime
+  format: RegistryExportFormat!
 }
 
 type RegistryCompany {
@@ -37,6 +61,8 @@ type RegistryCompany {
   siret: String
   "SIRET ou num de TVA de l'établissement"
   orgId: String
+  "Liste des permissions de l'utilisateur authentifié au sein de cet établissement"
+  userPermissions: [UserPermission!]!
 }
 
 type RegistryImportConnection {
@@ -113,21 +139,41 @@ type CancelRegistryV2LineResponse {
   publicIds: [ID!]!
 }
 
+"""
+Permet de récupérer l'ensemble des déclarations au registre RNDTS.
+"""
 type RegistryLookup {
+  "publicId de la déclaration associée"
   publicId: ID!
+  "type de registre dans lequel apparaît cette déclaration"
   type: RegistryImportType!
+  "SIRET de l'établissement visé par la déclaration (reportForSiret)"
   siret: String!
+  "SIRET de l'établissement qui a fait la déclaration (reportAsSiret), null si c'est le même que l'établissement visé"
   reportAsSiret: String
+  "Date de l'action déclarée"
   date: DateTime!
+  "Date de la déclaration"
   declaredAt: DateTime!
+  "Code de déchets"
   wasteCode: String
-
+  "établissement qui a fait la déclaration"
+  reportFor: RegistryCompany
+  "établissement qui a fait la déclaration"
+  reportAs: RegistryCompany
+  "Déclaration SSD: contient la ligne de registre si il s'agit d'une déclaration SSD"
   ssd: SsdLine
+  "Déclaration de réception de déchets: contient la ligne de registre si il s'agit d'une déclaration de réception de déchets"
   incomingWaste: IncomingWasteLine
+  "Déclaration de réception de terres et sédiments: contient la ligne de registre si il s'agit d'une déclaration de réception de terres et sédiments"
   incomingTexs: IncomingTexsLine
+  "Déclaration d'expédition de déchets: contient la ligne de registre si il s'agit d'une déclaration d'expédition de déchets"
   outgoingWaste: OutgoingWasteLine
+  "Déclaration d'expédition de terres et sédiments: contient la ligne de registre si il s'agit d'une déclaration d'expédition de terres et sédiments"
   outgoingTexs: OutgoingTexsLine
+  "Déclaration de gestion de déchets: contient la ligne de registre si il s'agit d'une déclaration de gestion de déchets"
   managedWaste: ManagedLine
+  "Déclaration de transport de déchets: contient la ligne de registre si il s'agit d'une déclaration de transport de déchets"
   transportedWaste: TransportedLine
 }
 

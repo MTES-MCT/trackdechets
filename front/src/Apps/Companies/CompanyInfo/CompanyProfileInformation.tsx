@@ -7,6 +7,7 @@ import {
   WASTE_PROCESSOR_TYPE_OPTIONS,
   formatDateViewDisplay
 } from "../common/utils";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
@@ -46,10 +47,20 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
         return (
           companyType.isChecked && (
             <li key={companyType.value}>
-              {companyType.label}
+              <Checkbox
+                options={[
+                  {
+                    label: companyType.label,
+                    nativeInputProps: {
+                      checked: true,
+                      disabled: true
+                    }
+                  }
+                ]}
+              />
 
               {companyType.value === CompanyType.Worker && (
-                <div data-testid="company-worker-section">
+                <div data-testid="company-worker-section" className="fr-mb-3w">
                   <Highlight>
                     <p className="companyFormWrapper__title-field">
                       Travaux relevant de la sous-section 4
@@ -104,7 +115,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                 </div>
               )}
               {companyType.value === CompanyType.Broker && (
-                <div data-testid="brokerReceipt">
+                <div data-testid="brokerReceipt" className="fr-mb-3w">
                   <Highlight>
                     <p className="companyFormWrapper__title-field">
                       Numéro de récépissé
@@ -139,7 +150,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                 </div>
               )}
               {companyType.value === CompanyType.Trader && (
-                <div data-testid="traderReceipt">
+                <div data-testid="traderReceipt" className="fr-mb-3w">
                   <Highlight>
                     <p className="companyFormWrapper__title-field">
                       Numéro de récépissé
@@ -174,7 +185,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                 </div>
               )}
               {companyType.value === CompanyType.Transporter && (
-                <div data-testid="transporterReceipt">
+                <div data-testid="transporterReceipt" className="fr-mb-3w">
                   <Highlight>
                     <p className="companyFormWrapper__title-field">
                       Numéro de récépissé
@@ -235,7 +246,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                 company.wasteVehiclesTypes.includes(
                   WasteVehiclesType.Demolisseur
                 ) && (
-                  <div data-testid="wasteVehiculesReceipt">
+                  <div data-testid="wasteVehiculesReceipt" className="fr-mb-3w">
                     <Highlight>
                       <p className="companyFormWrapper__title-field">
                         Casse automobile / démolisseur
@@ -264,9 +275,18 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                       );
                     if (wasteProcessorFound) {
                       return (
-                        <p key={wasteProcessorFound.value}>
-                          {wasteProcessorFound.label}
-                        </p>
+                        <Checkbox
+                          key={wasteProcessorFound.value}
+                          options={[
+                            {
+                              label: wasteProcessorFound.label,
+                              nativeInputProps: {
+                                checked: true,
+                                disabled: true
+                              }
+                            }
+                          ]}
+                        />
                       );
                     }
                     return null;
@@ -281,14 +301,24 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                     );
                     if (collectorFound) {
                       return (
-                        <p key={collectorFound.value}>{collectorFound.label}</p>
+                        <Checkbox
+                          key={collectorFound.value}
+                          options={[
+                            {
+                              label: collectorFound.label,
+                              nativeInputProps: {
+                                checked: true,
+                                disabled: true
+                              }
+                            }
+                          ]}
+                        />
                       );
                     }
                     return null;
                   })}
                 </Highlight>
               )}
-              <br />
             </li>
           )
         );

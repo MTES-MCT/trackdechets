@@ -616,7 +616,9 @@ export function flattenBsdasriInput(
 
     ...flattenDestinationInput(formInput),
 
-    ...flattenContainersInput(formInput)
+    ...flattenContainersInput(formInput),
+
+    grouping: formInput.grouping
   });
 }
 

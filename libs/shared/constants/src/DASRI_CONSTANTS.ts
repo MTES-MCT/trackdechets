@@ -17,6 +17,8 @@ export const DASRI_WASTE_CODES = [
   }
 ];
 
+export const DASRI_WASTE_CODES_VALUES = ["18 01 03*", "18 02 02*"] as const;
+
 export const DASRI_WASTE_CODES_MAPPING = DASRI_WASTE_CODES.reduce(
   (acc, item) => ({ ...acc, ...{ [item.code]: item.description } }),
   {}
@@ -54,12 +56,14 @@ export const DASRI_GROUPING_OPERATIONS = [
   }
 ];
 
-export const DASRI_GROUPING_OPERATIONS_CODES: string[] =
-  DASRI_GROUPING_OPERATIONS.map(operation => operation.code);
+export const DASRI_GROUPING_OPERATIONS_CODES = DASRI_GROUPING_OPERATIONS.map(
+  operation => operation.code
+);
 
-export const DASRI_PROCESSING_OPERATIONS_CODES: string[] =
+export const DASRI_PROCESSING_OPERATIONS_CODES =
   DASRI_PROCESSING_OPERATIONS.map(operation => operation.code);
-export const DASRI_ALL_OPERATIONS_CODES: string[] = [
+
+export const DASRI_ALL_OPERATIONS_CODES = [
   ...DASRI_PROCESSING_OPERATIONS_CODES,
   ...DASRI_GROUPING_OPERATIONS_CODES
-];
+] as [string, ...string[]];

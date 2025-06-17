@@ -166,7 +166,7 @@ export async function processRegistryExportJob(
     if (!registryExport) {
       throw new UserInputError(`L'export ${exportId} est introuvable`);
     }
-    const exportType = registryExport.registryType ?? "ALL";
+    const exportType = registryExport.registryType;
     const columns = EXPORT_COLUMNS[exportType];
     // create s3 file with stream
     const streamInfos = getUploadWithWritableStream({
