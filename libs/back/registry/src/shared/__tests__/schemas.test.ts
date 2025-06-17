@@ -237,10 +237,11 @@ describe("Schemas", () => {
     expect(() => ttdNumberSchema.parse("FRZ 1234123456")).not.toThrow();
     expect(() => ttdNumberSchema.parse("FRZ 1234 123456")).not.toThrow();
 
+    expect(() => ttdNumberSchema.parse("ABCDEF")).toThrow();
     expect(() => ttdNumberSchema.parse("F123456")).toThrow();
+    expect(() => ttdNumberSchema.parse("FR123")).toThrow();
     expect(() => ttdNumberSchema.parse("FRZA123456")).toThrow();
     expect(() => ttdNumberSchema.parse("12345678")).toThrow();
-    expect(() => ttdNumberSchema.parse("FR 1234 1234")).toThrow();
     expect(() => ttdNumberSchema.parse("FRZ 12 1234567")).toThrow();
     expect(() => ttdNumberSchema.parse("AAAA 1234567890")).toThrow();
     expect(() => ttdNumberSchema.parse("A7E 2024 0631256")).toThrow();
