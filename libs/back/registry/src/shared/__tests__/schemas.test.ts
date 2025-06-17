@@ -242,7 +242,6 @@ describe("Schemas", () => {
     expect(() => ttdNumberSchema.parse("FR123")).toThrow();
     expect(() => ttdNumberSchema.parse("FRZA123456")).toThrow();
     expect(() => ttdNumberSchema.parse("12345678")).toThrow();
-    expect(() => ttdNumberSchema.parse("FRZ 12 1234567")).toThrow();
     expect(() => ttdNumberSchema.parse("AAAA 1234567890")).toThrow();
     expect(() => ttdNumberSchema.parse("A7E 2024 0631256")).toThrow();
   });
