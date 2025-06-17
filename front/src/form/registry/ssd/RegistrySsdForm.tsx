@@ -172,7 +172,6 @@ export function RegistrySsdForm({ onClose }: Props) {
       if (secondaryWasteCodes && secondaryWasteDescriptions) {
         let hasError = false;
         secondaryWasteCodes.forEach((code, index) => {
-          console.log(code, secondaryWasteDescriptions[index]);
           if (index === 0) {
             if (code && !secondaryWasteDescriptions[index]) {
               methods.setError("secondaryWasteDescriptions.0.value", {
