@@ -42,7 +42,6 @@ export const transportedFormShape: FormShape = [
           reportAsLabel: "SIRET du déclarant",
           onCompanySelect: (
             _,
-            __,
             setValue: UseFormSetValue<any>,
             company?: RegistryCompanyInfos
           ) => {
