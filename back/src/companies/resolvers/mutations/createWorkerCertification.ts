@@ -30,7 +30,10 @@ export const workerCertificationSchema = yup.object({
   }),
   validityLimit: yup
     .date()
-    .min(todayAtMidnight())
+    .min(
+      todayAtMidnight(),
+      "La date de validité de la certification Amiante doit être dans le futur"
+    )
     .when("hasSubSectionThree", {
       is: true,
       then: schema => schema.required(),
