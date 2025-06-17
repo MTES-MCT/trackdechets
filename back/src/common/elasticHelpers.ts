@@ -16,7 +16,6 @@ export type RevisionRequest = {
   authoringCompany: {
     orgId: string;
   };
-  isCanceled: boolean;
 };
 
 export type RevisionTab =
