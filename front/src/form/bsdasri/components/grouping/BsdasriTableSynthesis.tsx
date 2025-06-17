@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery, gql } from "@apollo/client";
 import { useFormikContext } from "formik";
 import { InlineError } from "../../../../Apps/common/Components/Error/Error";
@@ -23,8 +23,12 @@ import { aggregatePackagings } from "./utils";
 import { verbosePackagings } from "../../../../dashboard/detail/bsdasri/BsdasriDetailContent";
 
 const GET_ELIGIBLE_BSDASRIS = gql`
-  query Bsdasris($where: BsdasriWhere) {
-    bsdasris(where: $where) {
+  query Bsdasris($where: BsdasriWhere, $first: Int, $after: ID) {
+    bsdasris(where: $where, first: $first, after: $after) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       edges {
         node {
           id
@@ -122,11 +126,11 @@ export default function BsdasriTableSynthesis({
     Bsdasri & { dbRegroupedBsdasris: string[] }
   >();
 
-  const { loading, error, data, refetch } = useQuery<
-    Pick<Query, "bsdasris">,
-    QueryBsdasrisArgs
-  >(GET_ELIGIBLE_BSDASRIS, {
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const variables = {
     variables: {
+      first: 50, // make default explicit
       where: {
         _or: [
           {
@@ -144,13 +148,47 @@ export default function BsdasriTableSynthesis({
         ]
       }
     }
-  });
+  };
+  const { loading, error, data, refetch, fetchMore } = useQuery<
+    Pick<Query, "bsdasris">,
+    QueryBsdasrisArgs
+  >(GET_ELIGIBLE_BSDASRIS, variables);
+
+  const handleLoadMore = async () => {
+    if (!data?.bsdasris?.pageInfo?.endCursor || loadingMore) return;
+
+    setLoadingMore(true);
+
+    try {
+      await fetchMore({
+        variables: {
+          ...variables,
+          after: data.bsdasris.pageInfo.endCursor
+        },
+        updateQuery: (prev, { fetchMoreResult }) => {
+          if (!fetchMoreResult?.bsdasris) return prev;
+
+          return {
+            ...prev,
+            bsdasris: {
+              ...fetchMoreResult.bsdasris,
+              edges: [...prev.bsdasris.edges, ...fetchMoreResult.bsdasris.edges]
+            }
+          };
+        }
+      });
+    } catch (error) {
+      console.error("Error", error); // ignore, user will click again
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   if (loading) return <p>Chargement...</p>;
   if (error) return <InlineError apolloError={error} />;
 
   const bsdasris = data?.bsdasris?.edges ?? [];
-
+  const pageInfo = data?.bsdasris.pageInfo;
   if (!bsdasris.length) {
     return (
       <div className="notification notification--error">
@@ -231,6 +269,20 @@ export default function BsdasriTableSynthesis({
           ))}
         </TableBody>
       </Table>
+
+      {pageInfo?.hasNextPage && (
+        <div className="tw-mt-4 tw-text-center">
+          <button
+            type="button"
+            className="btn btn--small btn--primary tw-mb-2"
+            onClick={handleLoadMore}
+            disabled={loadingMore || disabled}
+          >
+            {loadingMore ? "Chargement..." : "Charger plus de bordereaux"}
+          </button>
+        </div>
+      )}
+
       <SelectedBsdasrisDigest selectedItems={selectedBsdasris} />
     </>
   );
