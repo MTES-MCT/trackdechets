@@ -7,6 +7,7 @@ import { logger } from "@td/logger";
 
 type RevisionRequest = {
   status: RevisionRequestStatus;
+  isCanceled: boolean;
   approvals: {
     approverSiret: string;
   }[];
@@ -59,7 +60,7 @@ export function getRevisionOrgIds(
       const companiesOrgIds = [authorOrgId, ...targetsOrgIds];
 
       // La révision est toujours en cours
-      if (revisionRequest.status === "PENDING") {
+      if (revisionRequest.status === "PENDING" && !revisionRequest.isCanceled) {
         return {
           isPendingRevisionFor: [
             ...new Set([...isPendingRevisionFor, ...companiesOrgIds])

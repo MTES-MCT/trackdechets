@@ -184,7 +184,6 @@ export const bpaohPublishDraft = `Cette action aura pour effet de démarrer le c
             signature n'a été apposée.`;
 // tabs
 export const ALL_BSDS = "Tous les bordereaux";
-export const ALL_REVIEWS = "Toutes les révisions";
 export const DRAFTS = "Brouillons";
 export const ACTS = "Pour action";
 export const FOLLOWS = "Suivis";
