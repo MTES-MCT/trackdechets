@@ -262,7 +262,9 @@ export default function BspaohDetailContent({
 }: Readonly<BspaohDetailContentProps>) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
-  const { orgPermissions: { permissions } } = usePermissions(siret);
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate] = useBspaohDuplicate({
     variables: { id: form.id },

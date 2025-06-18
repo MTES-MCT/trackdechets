@@ -28,7 +28,7 @@ const Query: QueryResolvers = {
   warningMessage,
   myCompaniesCsv,
   myCompaniesXls,
-  permissionsInfos,
+  permissionsInfos
 };
 
 export default Query;
