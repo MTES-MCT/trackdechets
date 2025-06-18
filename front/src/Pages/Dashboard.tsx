@@ -49,7 +49,7 @@ import { useMyCompany } from "../Apps/common/hooks/useMyCompany";
 const DashboardPage = () => {
   const { siret } = useParams<{ siret: string | undefined }>();
   const {
-    orgPermissions: { permissions }
+    permissionsInfos: { permissions: globalPermissions }
   } = usePermissions(siret);
   const { company } = useMyCompany(siret);
   const isActTab = !!useMatch(routes.dashboard.bsds.act);
@@ -235,7 +235,7 @@ const DashboardPage = () => {
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
       <div className="dashboard-page__actions">
-        {permissions.includes(UserPermission.BsdCanCreate) && (
+        {globalPermissions.includes(UserPermission.BsdCanCreate) && (
           <div className="create-btn">
             <BsdCreateDropdown
               links={dropdownCreateLinks(siret, location)}
