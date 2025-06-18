@@ -108,9 +108,7 @@ function DashboardRoutes() {
     <div id="dashboard" className="dashboard">
       {!isMobile && (
         <SideBar>
-          <DashboardTabs
-            currentCompany={currentCompany}
-          />
+          <DashboardTabs currentCompany={currentCompany} />
         </SideBar>
       )}
       <div className="dashboard-content">
