@@ -30,6 +30,7 @@ import {
 import { ActionButton } from "./ActionButton";
 import "./MyLines.scss";
 import CursorPagination from "../../../Apps/common/Components/CursorPagination/CursorPagination";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 const getHeaders = (registryType: RegistryImportType | undefined): string[] => {
   let dateColumnName: string;
@@ -91,6 +92,9 @@ export function MyLines() {
   const [debouncedPublicId, setDebouncedPublicId] = useState<string>("");
   const [publicIdToDelete, setPublicIdToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
@@ -227,53 +231,56 @@ export function MyLines() {
     ];
   });
 
+  const canCreateLine = permissions.includes(UserPermission.RegistryCanImport);
+
   return (
     <>
       <>
-        <div className="fr-mb-4w">
-          <DropdownMenu
-            links={[
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Ssd],
-                route: generatePath(routes.registry_new.form.ssd),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
-                route: generatePath(routes.registry_new.form.incomingWaste),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
-                route: generatePath(routes.registry_new.form.outgoingWaste),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
-                route: generatePath(routes.registry_new.form.incomingTexs),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
-                route: generatePath(routes.registry_new.form.outgoingTexs),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Transported],
-                route: generatePath(routes.registry_new.form.transported),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Managed],
-                route: generatePath(routes.registry_new.form.managed),
-                state: { background: location }
-              }
-            ]}
-            isDisabled={false}
-            menuTitle={"Créer une déclaration"}
-            primary
-          />
-        </div>
+        {canCreateLine && (
+          <div className="fr-mb-4w">
+            <DropdownMenu
+              links={[
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Ssd],
+                  route: generatePath(routes.registry_new.form.ssd),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
+                  route: generatePath(routes.registry_new.form.incomingWaste),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
+                  route: generatePath(routes.registry_new.form.outgoingWaste),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
+                  route: generatePath(routes.registry_new.form.incomingTexs),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
+                  route: generatePath(routes.registry_new.form.outgoingTexs),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Transported],
+                  route: generatePath(routes.registry_new.form.transported),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Managed],
+                  route: generatePath(routes.registry_new.form.managed),
+                  state: { background: location }
+                }
+              ]}
+              menuTitle={"Créer une déclaration"}
+              primary
+            />
+          </div>
+        )}
         <div className="fr-grid-row fr-grid-row--bottom fr-mb-4w">
           <div className="fr-col-7">
             <RegistryCompanySwitcher
