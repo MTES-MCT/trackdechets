@@ -1,4 +1,10 @@
-import { Bsdasri, BsdasriStatus, BsdasriType, Prisma } from "@prisma/client";
+import {
+  Bsdasri,
+  BsdasriStatus,
+  BsdasriType,
+  Prisma,
+  User
+} from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type {
@@ -6,12 +12,15 @@ import type {
   MutationResolvers
 } from "@td/codegen-back";
 import { expandBsdasriFromDB } from "../../converter";
-import { getBsdasriOrNotFound } from "../../database";
+import { getFullBsdasriOrNotFound } from "../../database";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
 import { prisma } from "@td/prisma";
 import { ForbiddenError } from "../../../common/errors";
-import { sirenifyBsdasriCreateInput } from "../../sirenify";
+
+import { prismaToZodBsdasri } from "../../validation/helpers";
+import { PrismaBsdasriForParsing } from "../../validation/types";
+import { parseBsdasriAsync } from "../../validation";
 
 /**
  *
@@ -29,31 +38,43 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const bsdasri = await getBsdasriOrNotFound({
-    id
+  const prismaBsdasri = await getFullBsdasriOrNotFound(id, {
+    include: {
+      grouping: true,
+      synthesizing: true,
+      intermediaries: true
+    }
   });
 
-  if (bsdasri.type !== BsdasriType.SIMPLE) {
+  if (prismaBsdasri.type !== BsdasriType.SIMPLE) {
     throw new ForbiddenError(
       "Les dasris de synthèse ou de groupement ne sont pas duplicables"
     );
   }
 
-  await checkCanDuplicate(user, bsdasri);
+  await checkCanDuplicate(user, prismaBsdasri);
 
-  const newBsdasri = await duplicateBsdasri(user, bsdasri);
+  const bsdasriRepository = getBsdasriRepository(user);
+
+  const duplicateData = await getDuplicateData(prismaBsdasri, user);
+
+  const newBsdasri = await bsdasriRepository.create(duplicateData);
+
   return expandBsdasriFromDB(newBsdasri);
 };
 
-async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
+async function getDuplicateData(
+  bsdasri: PrismaBsdasriForParsing,
+  user: User
+): Promise<Prisma.BsdasriCreateInput> {
   const {
     id,
     createdAt,
-    updatedAt,
-    rowNumber,
-    isDuplicateOf,
 
-    emissionSignatoryId,
+    isDraft,
+    isDeleted,
+
+    // emissionSignatoryId,
     emitterEmissionSignatureDate,
     emitterEmissionSignatureAuthor,
 
@@ -75,10 +96,9 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     transporterWasteVolume,
     transporterTransportPlates,
     handedOverToRecipientAt,
-    transportSignatoryId,
+    // transportSignatoryId,
     transporterTransportSignatureDate,
     transporterTransportSignatureAuthor,
-
     destinationWastePackagings,
     destinationReceptionAcceptationStatus,
     destinationReceptionWasteRefusalReason,
@@ -87,7 +107,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     destinationReceptionWasteVolume,
     destinationReceptionDate,
 
-    receptionSignatoryId,
+    // receptionSignatoryId,
     destinationReceptionSignatureDate,
     destinationReceptionSignatureAuthor,
 
@@ -95,68 +115,127 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     destinationOperationCode,
     destinationOperationMode,
 
-    operationSignatoryId,
+    // operationSignatoryId,
     destinationOperationSignatureDate,
     destinationOperationSignatureAuthor,
-    groupedInId,
-    synthesizedInId,
+    // groupedInId,
+    // synthesizedInId,
     identificationNumbers,
-    synthesisEmitterSirets,
-    groupingEmitterSirets,
-    canAccessDraftOrgIds,
-    ...fieldsToCopy
-  } = bsdasri;
+    // synthesisEmitterSirets,
+    // groupingEmitterSirets,
+    // canAccessDraftOrgIds,
 
-  const bsdasriRepository = getBsdasriRepository(user);
+    intermediariesOrgIds,
+    ...zodBdasri
+  } = prismaToZodBsdasri(bsdasri);
 
-  const { emitter, transporter, destination } = await getBsdasriCompanies(
-    bsdasri
+  const { intermediaries, ...parsedBsdasri } = await parseBsdasriAsync(
+    zodBdasri,
+    {
+      user
+    }
   );
 
-  const input: Prisma.BsdasriCreateInput = {
-    ...fieldsToCopy,
+  const { emitter, transporter, destination, broker, trader } =
+    await getBsdasriCompanies(bsdasri);
+
+  let data: Prisma.BsdasriCreateInput = {
+    ...parsedBsdasri,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true,
     isDuplicateOf: bsdasri.id,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    groupedIn: undefined,
+    synthesizedIn: undefined,
+    grouping: undefined, // el famoso ceinture et bretelles® technology
+    synthesizing: undefined,
     // Emitter company info
-    emitterCompanyAddress: emitter?.address ?? bsdasri.emitterCompanyAddress,
-    emitterCompanyMail: emitter?.contactEmail ?? bsdasri.emitterCompanyMail,
-    emitterCompanyPhone: emitter?.contactPhone ?? bsdasri.emitterCompanyPhone,
-    emitterCompanyName: emitter?.name ?? bsdasri.emitterCompanyName,
-    emitterCompanyContact: emitter?.contact ?? bsdasri.emitterCompanyContact,
+    emitterCompanyName: emitter?.name ?? parsedBsdasri.emitterCompanyName,
+    emitterCompanyAddress:
+      emitter?.address ?? parsedBsdasri.emitterCompanyAddress,
+    emitterCompanyContact:
+      emitter?.contact ?? parsedBsdasri.emitterCompanyContact,
+    emitterCompanyPhone:
+      emitter?.contactPhone ?? parsedBsdasri.emitterCompanyPhone,
+    emitterCompanyMail:
+      emitter?.contactEmail ?? parsedBsdasri.emitterCompanyMail,
     // Destination company info
+    destinationCompanyName:
+      destination?.name ?? parsedBsdasri.destinationCompanyName,
     destinationCompanyAddress:
-      destination?.address ?? bsdasri.destinationCompanyAddress,
-    destinationCompanyMail:
-      destination?.contactEmail ?? bsdasri.destinationCompanyMail,
-    destinationCompanyPhone:
-      destination?.contactPhone ?? bsdasri.destinationCompanyPhone,
-    destinationCompanyName: destination?.name ?? bsdasri.destinationCompanyName,
+      destination?.address ?? parsedBsdasri.destinationCompanyAddress,
     destinationCompanyContact:
-      destination?.contact ?? bsdasri.destinationCompanyContact,
+      destination?.contact ?? parsedBsdasri.destinationCompanyContact,
+    destinationCompanyPhone:
+      destination?.contactPhone ?? parsedBsdasri.destinationCompanyPhone,
+    destinationCompanyMail:
+      destination?.contactEmail ?? parsedBsdasri.destinationCompanyMail,
     // Transporter company info
+    transporterCompanyName:
+      transporter?.name ?? parsedBsdasri.transporterCompanyName,
     transporterCompanyAddress:
-      transporter?.address ?? bsdasri.transporterCompanyAddress,
-    transporterCompanyMail:
-      transporter?.contactEmail ?? bsdasri.transporterCompanyMail,
-    transporterCompanyPhone:
-      transporter?.contactPhone ?? bsdasri.transporterCompanyPhone,
-    transporterCompanyName: transporter?.name ?? bsdasri.transporterCompanyName,
+      transporter?.address ?? parsedBsdasri.transporterCompanyAddress,
     transporterCompanyContact:
-      transporter?.contact ?? bsdasri.transporterCompanyContact,
+      transporter?.contact ?? parsedBsdasri.transporterCompanyContact,
+    transporterCompanyPhone:
+      transporter?.contactPhone ?? parsedBsdasri.transporterCompanyPhone,
+    transporterCompanyMail:
+      transporter?.contactEmail ?? parsedBsdasri.transporterCompanyMail,
+    transporterCompanyVatNumber: parsedBsdasri.transporterCompanyVatNumber,
     // Transporter recepisse
     transporterRecepisseNumber:
       transporter?.transporterReceipt?.receiptNumber ?? null,
     transporterRecepisseValidityLimit:
       transporter?.transporterReceipt?.validityLimit ?? null,
     transporterRecepisseDepartment:
-      transporter?.transporterReceipt?.department ?? null
+      transporter?.transporterReceipt?.department ?? null,
+    // Broker company info
+
+    brokerCompanyName: broker?.name ?? parsedBsdasri.brokerCompanyName,
+    brokerCompanyAddress: broker?.address ?? parsedBsdasri.brokerCompanyAddress,
+    brokerCompanyMail: broker?.contactEmail ?? bsdasri.brokerCompanyMail,
+    brokerCompanyPhone: broker?.contactPhone ?? bsdasri.brokerCompanyPhone,
+    brokerCompanyContact: broker?.contact ?? bsdasri.brokerCompanyContact,
+
+    // Broker recepisse
+    brokerRecepisseNumber: broker?.brokerReceipt?.receiptNumber ?? null,
+    brokerRecepisseValidityLimit: broker?.brokerReceipt?.validityLimit ?? null,
+    brokerRecepisseDepartment: broker?.brokerReceipt?.department ?? null,
+    // Trader company info
+
+    traderCompanyName: trader?.name ?? parsedBsdasri.traderCompanyName,
+    traderCompanyAddress: trader?.address ?? parsedBsdasri.traderCompanyAddress,
+
+    traderCompanyMail: trader?.contactEmail ?? bsdasri.traderCompanyMail,
+    traderCompanyPhone: trader?.contactPhone ?? bsdasri.traderCompanyPhone,
+    traderCompanyContact: trader?.contact ?? bsdasri.traderCompanyContact,
+    // Trader recepisse
+    traderRecepisseNumber: trader?.traderReceipt?.receiptNumber ?? null,
+    traderRecepisseValidityLimit: trader?.traderReceipt?.validityLimit ?? null,
+    traderRecepisseDepartment: trader?.traderReceipt?.department ?? null
   };
-
-  const sirenified = await sirenifyBsdasriCreateInput(input, []);
-
-  return bsdasriRepository.create(sirenified);
+  if (intermediaries) {
+    data = {
+      ...data,
+      intermediaries: {
+        createMany: {
+          data: intermediaries.map(intermediary => ({
+            siret: intermediary.siret!,
+            address: intermediary.address,
+            vatNumber: intermediary.vatNumber,
+            name: intermediary.name!,
+            contact: intermediary.contact!,
+            phone: intermediary.phone,
+            mail: intermediary.mail
+          }))
+        }
+      },
+      intermediariesOrgIds
+    };
+  }
+  return data;
 }
 
 async function getBsdasriCompanies(bsdasri: Bsdasri) {
@@ -164,7 +243,9 @@ async function getBsdasriCompanies(bsdasri: Bsdasri) {
     bsdasri.emitterCompanySiret,
     bsdasri.transporterCompanySiret,
     bsdasri.transporterCompanyVatNumber,
-    bsdasri.destinationCompanySiret
+    bsdasri.destinationCompanySiret,
+    bsdasri.brokerCompanySiret,
+    bsdasri.traderCompanySiret
   ].filter(Boolean);
 
   // Batch call all companies involved
@@ -175,7 +256,9 @@ async function getBsdasriCompanies(bsdasri: Bsdasri) {
       }
     },
     include: {
-      transporterReceipt: true
+      transporterReceipt: true,
+      brokerReceipt: true,
+      traderReceipt: true
     }
   });
 
@@ -191,7 +274,15 @@ async function getBsdasriCompanies(bsdasri: Bsdasri) {
     company => company.orgId === bsdasri.destinationCompanySiret
   );
 
-  return { emitter, transporter, destination };
+  const broker = companies.find(
+    company => company.orgId === bsdasri.brokerCompanySiret
+  );
+
+  const trader = companies.find(
+    company => company.orgId === bsdasri.traderCompanySiret
+  );
+
+  return { emitter, transporter, destination, broker, trader };
 }
 
 export default duplicateBsdasriResolver;

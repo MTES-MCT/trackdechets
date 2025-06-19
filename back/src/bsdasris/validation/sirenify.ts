@@ -42,7 +42,40 @@ const sirenifyBsdasriAccessors = (
         input.ecoOrganismeName = companyInput.name;
       }
     }
-  }
+  },
+
+  {
+    siret: bsdasri?.brokerCompanySiret,
+    skip: sealedFields.includes("brokerCompanySiret"),
+    setter: (input, companyInput) => {
+      input.brokerCompanyName = companyInput.name;
+      input.brokerCompanyAddress = companyInput.address;
+    }
+  },
+  {
+    siret: bsdasri?.traderCompanySiret,
+    skip: sealedFields.includes("traderCompanySiret"),
+    setter: (input, companyInput) => {
+      input.traderCompanyName = companyInput.name;
+      input.traderCompanyAddress = companyInput.address;
+    }
+  },
+  ...(bsdasri.intermediaries ?? []).map(
+    (_, idx) =>
+      ({
+        siret: bsdasri.intermediaries![idx].siret,
+        skip: sealedFields.includes("intermediaries"),
+        setter: (input, companyInput) => {
+          const intermediary = input.intermediaries![idx];
+          if (companyInput.name) {
+            intermediary!.name = companyInput.name;
+          }
+          if (companyInput.address) {
+            intermediary!.address = companyInput.address;
+          }
+        }
+      } as NextCompanyInputAccessor<ParsedZodBsdasri>)
+  )
 ];
 
 export const sirenifyBsdasri = nextBuildSirenify<ParsedZodBsdasri>(

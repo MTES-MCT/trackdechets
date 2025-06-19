@@ -6,7 +6,13 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  brokerData,
+  traderData,
+  intermediaryData
+} from "../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
 import { BsdasriType, GovernmentPermission } from "@prisma/client";
 import { faker } from "@faker-js/faker";
@@ -68,6 +74,61 @@ describe("Query.BsdasriPdf", () => {
         })
       })
     ]);
+  });
+
+  it("should allow access to broker", async () => {
+    const company = await companyFactory();
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...brokerData(broker)
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: dasri.id }
+    });
+    expect(data.bsdasriPdf.token).toBeTruthy();
+  });
+
+  it("should allow access to trader", async () => {
+    const company = await companyFactory();
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...traderData(broker)
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: dasri.id }
+    });
+    expect(data.bsdasriPdf.token).toBeTruthy();
+  });
+
+  it("should allow access to intermediary", async () => {
+    const company = await companyFactory();
+    const { user, company: intermediaryCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        intermediaries: {
+          create: [intermediaryData(intermediaryCompany)]
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: dasri.id }
+    });
+    expect(data.bsdasriPdf.token).toBeTruthy();
   });
 
   it("should return a token for requested id (simple dasri)", async () => {

@@ -5,7 +5,13 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  brokerData,
+  bsdasriFactory,
+  initialData,
+  intermediaryData,
+  traderData
+} from "../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
 import { fullBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
@@ -96,6 +102,106 @@ describe("Query.Bsdasris", () => {
 
     expect(data.bsdasris.totalCount).toBe(3);
     expect(data.bsdasris.pageInfo.startCursor).toBe(dasri3.id);
+    expect(data.bsdasris.pageInfo.endCursor).toBe(dasri1.id);
+    expect(data.bsdasris.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it("should get user (broker) dasris", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+    const params = {
+      opt: {
+        ...initialData(company),
+        ...brokerData(broker)
+      }
+    };
+    const dasri1 = await bsdasriFactory(params);
+    const dasri2 = await bsdasriFactory(params);
+    await bsdasriFactory({
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS);
+    const ids = data.bsdasris.edges.map(edge => edge.node.id);
+    expect(ids.length).toBe(2);
+
+    expect(ids.includes(dasri1.id)).toBe(true);
+    expect(ids.includes(dasri2.id)).toBe(true);
+
+    expect(data.bsdasris.totalCount).toBe(2);
+    expect(data.bsdasris.pageInfo.startCursor).toBe(dasri2.id);
+    expect(data.bsdasris.pageInfo.endCursor).toBe(dasri1.id);
+    expect(data.bsdasris.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it("should get user (trader) dasris", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const { user, company: trader } = await userWithCompanyFactory("MEMBER");
+    const params = {
+      opt: {
+        ...initialData(company),
+        ...traderData(trader)
+      }
+    };
+    const dasri1 = await bsdasriFactory(params);
+    const dasri2 = await bsdasriFactory(params);
+    await bsdasriFactory({
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS);
+    const ids = data.bsdasris.edges.map(edge => edge.node.id);
+    expect(ids.length).toBe(2);
+
+    expect(ids.includes(dasri1.id)).toBe(true);
+    expect(ids.includes(dasri2.id)).toBe(true);
+
+    expect(data.bsdasris.totalCount).toBe(2);
+    expect(data.bsdasris.pageInfo.startCursor).toBe(dasri2.id);
+    expect(data.bsdasris.pageInfo.endCursor).toBe(dasri1.id);
+    expect(data.bsdasris.pageInfo.hasNextPage).toBe(false);
+  });
+
+  it("should get user (intermediary) dasris", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const { user, company: intermediaryCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const params = {
+      opt: {
+        ...initialData(company),
+        intermediaries: {
+          create: [intermediaryData(intermediaryCompany)]
+        }
+      }
+    };
+    const dasri1 = await bsdasriFactory(params);
+    const dasri2 = await bsdasriFactory(params);
+    await bsdasriFactory({
+      opt: {
+        ...initialData(company)
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasris">>(GET_BSDASRIS);
+    const ids = data.bsdasris.edges.map(edge => edge.node.id);
+    expect(ids.length).toBe(2);
+
+    expect(ids.includes(dasri1.id)).toBe(true);
+    expect(ids.includes(dasri2.id)).toBe(true);
+
+    expect(data.bsdasris.totalCount).toBe(2);
+    expect(data.bsdasris.pageInfo.startCursor).toBe(dasri2.id);
     expect(data.bsdasris.pageInfo.endCursor).toBe(dasri1.id);
     expect(data.bsdasris.pageInfo.hasNextPage).toBe(false);
   });

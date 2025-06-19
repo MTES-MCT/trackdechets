@@ -64,11 +64,11 @@ input BsdasriWhere {
   (Optionnel) Filtre sur l'état de regroupement des bordereaux
   Si aucun filtre n'est passé, les bordereaux seront retournés sans filtrage supplémentaire
   Si groupable: true, les bordereaux retournés:
-    - ne regroupent pas d'autres bordereaux (groupement ou synthèse)
-    - ne sont pas associés à un bordereau de synthèse ou de groupement
+  - ne regroupent pas d'autres bordereaux (groupement ou synthèse)
+  - ne sont pas associés à un bordereau de synthèse ou de groupement
   Si groupable: false les bordereaux retournés:
-    - sont déjà associés à un bordereau de synthèse ou de groupement
-    - ou regroupent d'autres bordereaux (groupement ou synthèse)
+  - sont déjà associés à un bordereau de synthèse ou de groupement
+  - ou regroupent d'autres bordereaux (groupement ou synthèse)
   """
   groupable: Boolean
 
@@ -266,6 +266,23 @@ input BsdasriIdentificationInput {
   "Numéros d'identification des conteneurs concernés"
   numbers: [String!]
 }
+input BsdasriRecepisseInput {
+  "Exemption de récépissé"
+  isExempted: Boolean
+}
+input BsdasriBrokerInput {
+  "Coordonnées de l'entreprise courtier"
+  company: CompanyInput
+  "Récépissé courtier"
+  recepisse: BsdasriRecepisseInput
+}
+
+input BsdasriTraderInput {
+  "Coordonnées de l'entreprise de négoce"
+  company: CompanyInput
+  "Récépissé courtier"
+  recepisse: BsdasriRecepisseInput
+}
 
 input BsdasriInput {
   waste: BsdasriWasteInput
@@ -284,6 +301,19 @@ input BsdasriInput {
 
   destination: BsdasriDestinationInput
 
+  "Courtier"
+  broker: BsdasriBrokerInput
+
+  "Négociant"
+  trader: BsdasriTraderInput
+
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
+
+  Le nombre maximal d'intermédiaires sur un bordereau est de 3.
+  """
+  intermediaries: [CompanyInput!]
   """
   Optionnel: liste d'identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis
   à disposition des utilisateur permet de retrouver aisément des Bsdasris grâce à un identifiant de conteneur (cf. query bsdasris)

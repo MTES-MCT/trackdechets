@@ -19,6 +19,7 @@ import { BsdasriType, OperationMode } from "@prisma/client";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM } from "../../../common/helpers";
 import { Recepisse } from "../../../common/pdf/components/Recepisse";
+import { pluralize } from "@td/constants";
 
 type Props = {
   bsdasri: Bsdasri;
@@ -32,6 +33,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
     bsdasri.emitter?.pickupSite?.postalCode,
     bsdasri.emitter?.pickupSite?.city
   ]);
+  const intermediaryCount = bsdasri?.intermediaries?.length ?? 0;
 
   return (
     <Document title={bsdasri.id}>
@@ -497,7 +499,68 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
           </div>
         </div>
         {/* end Destination */}
+
+        {/* Trader */}
+        {bsdasri.trader && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>4.{bsdasri.broker ? "1" : ""} Négociant</strong>
+              </p>
+              <div className="Row">
+                <div className="Col">
+                  <FormCompanyFields company={bsdasri.trader.company} />
+                </div>
+                <div className="Col">
+                  <Recepisse recepisse={bsdasri.trader.recepisse} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* End Trader */}
+        {/* Broker */}
+        {bsdasri.broker && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>4.{bsdasri.trader ? "2" : ""} Courtier</strong>
+              </p>
+              <div className="Row">
+                <div className="Col">
+                  <FormCompanyFields company={bsdasri.broker.company} />
+                </div>
+                <div className="Col">
+                  <Recepisse recepisse={bsdasri.broker.recepisse} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* End Broker */}
       </div>
+
+      {/* Intermediaries */}
+      {bsdasri.intermediaries && bsdasri.intermediaries.length > 0 && (
+        <div className="BoxRow">
+          <div className="BoxCol">
+            <p>
+              <strong>
+                {pluralize("Autre", intermediaryCount)}{" "}
+                {pluralize("intermédiaire", intermediaryCount)}
+              </strong>
+            </p>
+            {bsdasri.intermediaries.map(intermediary => (
+              <div className="Row" key={intermediary.orgId}>
+                <div className="Col">
+                  <FormCompanyFields company={intermediary} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {/* End intermediaries */}
 
       {!!associatedBsdasris?.length && (
         <>

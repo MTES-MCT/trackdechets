@@ -25,16 +25,24 @@ import { objectDiff } from "../../forms/workflow/diff";
 export function graphQlInputToZodBsdasri(input: BsdasriInput): ZodBsdasri {
   const { ...bsdasriInput } = input;
 
-  const {
-    wasteCode,
-
-    ...flatBdasriInput
-  } = flattenBsdasriInput(bsdasriInput);
+  const { wasteCode, intermediaries, ...flatBdasriInput } =
+    flattenBsdasriInput(bsdasriInput);
 
   return safeInput({
     ...flatBdasriInput,
 
-    wasteCode: wasteCode as ZodBsdasriWasteCodeEnum
+    wasteCode: wasteCode as ZodBsdasriWasteCodeEnum,
+    intermediaries: intermediaries?.map(i =>
+      safeInput({
+        siret: i.siret!,
+        vatNumber: i.vatNumber,
+        address: i.address!,
+        name: i.name!,
+        contact: i.contact!,
+        phone: i.phone,
+        mail: i.mail
+      })
+    )
   });
 }
 
@@ -57,6 +65,7 @@ export function prismaToZodBsdasri(
     destinationReceptionWasteRefusedWeightValue,
     grouping,
     synthesizing,
+    intermediaries,
     ...data
   } = bsdasri;
 
@@ -90,7 +99,11 @@ export function prismaToZodBsdasri(
         : null,
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
     grouping: grouping.map(bsd => bsd.id),
-    synthesizing: synthesizing.map(bsd => bsd.id)
+    synthesizing: synthesizing.map(bsd => bsd.id),
+    intermediaries: intermediaries.map(i => {
+      const { bsdasriId, id, createdAt, ...intermediaryData } = i;
+      return { ...intermediaryData, address: intermediaryData.address! };
+    })
   };
 }
 
@@ -131,7 +144,13 @@ export async function getBsdasriUserFunctions(
         orgIds.includes(bsdasri.transporterCompanyVatNumber)),
     isEcoOrganisme:
       bsdasri.ecoOrganismeSiret != null &&
-      orgIds.includes(bsdasri.ecoOrganismeSiret)
+      orgIds.includes(bsdasri.ecoOrganismeSiret),
+    isBroker:
+      bsdasri.brokerCompanySiret != null &&
+      orgIds.includes(bsdasri.brokerCompanySiret),
+    isTrader:
+      bsdasri.traderCompanySiret != null &&
+      orgIds.includes(bsdasri.traderCompanySiret)
   };
 }
 

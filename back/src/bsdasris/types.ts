@@ -58,3 +58,12 @@ export const BsdasriWithRevisionRequestsInclude =
 export type BsdasriWithRevisionRequests = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithRevisionRequestsInclude;
 }>;
+
+export const BsdasriWithIntermediariesInclude =
+  Prisma.validator<Prisma.BsdasriInclude>()({
+    intermediaries: true
+  });
+
+export type BsdasriWithIntermediaries = Prisma.BsdasriGetPayload<{
+  include: typeof BsdasriWithIntermediariesInclude;
+}>;

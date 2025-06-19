@@ -1,20 +1,21 @@
 import React, { ReactNode } from "react";
-import { CompanyType, FavoriteType, TraderInput } from "@td/codegen-ui";
+import { CompanyType, FavoriteType } from "@td/codegen-ui";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { getInitialCompany } from "../../../common/data/initialState";
 import CompanySelectorWrapper, {
   selectedCompanyError
 } from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import Recepisse from "../../../Dashboard/Components/Recepisse/Recepisse";
+import { CommonTraderInput } from "./types";
 
 type FormikTraderProps = {
   // N°SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
   // Set les données vers le store Formik ou Rhf en fonctionde l'implémentation
-  setTrader: (trader: TraderInput | null) => void;
+  setTrader: (trader: CommonTraderInput | null) => void;
   // Valeur en lecture de l'état du formulaire (obtenue via Formik ou Rhf)
-  trader: TraderInput | null;
+  trader: CommonTraderInput | null;
   // Portion de formulaire permettant de renseigner les infos de contact
   // de l'établissement. À adapter en fonction de l'implémentation (Formik ou Rhf)
   companyContactInfo: ReactNode;
@@ -46,9 +47,7 @@ const Trader = ({
               setTrader(null);
             } else {
               setTrader({
-                receipt: null,
-                department: null,
-                validityLimit: null,
+                recepisse: null,
                 company: getInitialCompany()
               });
             }
@@ -90,20 +89,22 @@ const Trader = ({
                         }
                       : {})
                   },
-                  receipt: company.traderReceipt?.receiptNumber,
-                  department: company.traderReceipt?.department,
-                  validityLimit: company.traderReceipt?.validityLimit ?? null
+                  recepisse: {
+                    number: company.brokerReceipt?.receiptNumber,
+                    department: company.brokerReceipt?.department,
+                    validityLimit: company.brokerReceipt?.validityLimit ?? null
+                  }
                 });
               }
             }}
           />
           {companyContactInfo}
-          {trader?.receipt && (
+          {trader?.recepisse && (
             <Recepisse
               title="Récépissé de négoce"
-              numero={trader?.receipt}
-              departement={trader?.department}
-              validityLimit={trader?.validityLimit}
+              numero={trader?.recepisse?.number}
+              departement={trader?.recepisse?.department}
+              validityLimit={trader?.recepisse?.validityLimit}
             />
           )}
         </div>

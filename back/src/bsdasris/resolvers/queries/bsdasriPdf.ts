@@ -1,7 +1,7 @@
 import type { QueryBsdasriPdfArgs, QueryResolvers } from "@td/codegen-back";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsdasriOrNotFound } from "../../database";
+import { getBsdasriOrNotFound, getFullBsdasriOrNotFound } from "../../database";
 import { buildPdf } from "../../pdf/generator";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
@@ -11,7 +11,14 @@ import { hasGovernmentReadAllBsdsPermOrThrow } from "../../../permissions";
 export const bsdasriPdfDownloadHandler: DownloadHandler<QueryBsdasriPdfArgs> = {
   name: "bsdasriPdf",
   handler: async (_, res, { id }) => {
-    const bsdasri = await getBsdasriOrNotFound({ id });
+    const bsdasri = await getFullBsdasriOrNotFound(id, {
+      include: {
+        grouping: true,
+        synthesizing: true,
+        intermediaries: true
+      }
+    });
+
     const readableStream = await buildPdf(bsdasri);
     readableStream.pipe(createPDFResponse(res, bsdasri.id));
   }

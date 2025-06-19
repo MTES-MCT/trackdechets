@@ -3,7 +3,7 @@ import { CommonBrokerInput } from "./types";
 
 type AnyBrokerInput = BrokerInput | BsdaBrokerInput | null;
 
-export const mapBsdBroker = (
+const mapBsdBroker = (
   broker: AnyBrokerInput | null,
   bsdType: BsdType
 ): CommonBrokerInput | null => {

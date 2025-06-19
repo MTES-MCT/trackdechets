@@ -4,7 +4,6 @@ import type {
   BsdasriMetadataResolvers
 } from "@td/codegen-back";
 import { getFullBsdasriOrNotFound } from "../database";
-import { getTransporterReceipt } from "../../companies/recipify";
 
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
@@ -26,16 +25,14 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
     const bsdasri = await getFullBsdasriOrNotFound(metadata.id, {
       include: {
         grouping: true,
-        synthesizing: true
+        synthesizing: true,
+        intermediaries: true
       }
     });
-    const transporterReceipt = await getTransporterReceipt(bsdasri);
 
-    const zodBsdasri = prismaToZodBsdasri({
-      ...bsdasri,
-      ...transporterReceipt
-    });
     const currentSignature = getNextSignature(bsdasri);
+
+    const zodBsdasri = prismaToZodBsdasri(bsdasri);
 
     try {
       parseBsdasri(zodBsdasri, {

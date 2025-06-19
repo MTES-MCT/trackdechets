@@ -3,7 +3,7 @@ import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 type ChainableBsdasri = Pick<
   Prisma.Prisma__BsdasriClient<Bsdasri | null, null>,
-  "synthesizedIn" | "synthesizing" | "groupedIn" | "grouping"
+  "synthesizedIn" | "synthesizing" | "groupedIn" | "grouping" | "intermediaries"
 >;
 
 export type FindRelatedEntityFn = (

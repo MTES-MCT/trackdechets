@@ -1,20 +1,27 @@
 import React from "react";
-import { TraderInput } from "@td/codegen-ui";
+import { BsdType } from "@td/codegen-ui";
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 import { useField } from "formik";
 import Trader from "./Trader";
+import useTrader from "./useTrader";
 
 type FormikTraderProps = {
+  bsdType: BsdType;
   // N°SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
 };
 
-const FormikTrader = ({ siret, disabled = false }: FormikTraderProps) => {
+const FormikTrader = ({
+  bsdType = BsdType.Bsdd,
+  siret,
+  disabled = false
+}: FormikTraderProps) => {
   const [field, _, { setValue }] = useField("trader");
 
-  const trader = field.value;
-  const setTrader = (trader: TraderInput) => setValue(trader);
+  const { trader, setTrader } = useTrader(bsdType, field.value, trader =>
+    setValue(trader)
+  );
 
   return (
     <Trader

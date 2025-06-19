@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+- Ajout des rôles courtiers, négociant et intermédiaire sur le Bsadri [PR 4264](https://github.com/MTES-MCT/trackdechets/pull/4264)
 
 #### :nail_care: Améliorations
 

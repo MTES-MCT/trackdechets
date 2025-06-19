@@ -178,6 +178,32 @@ type InitialBsdasri {
   "Code postal du lieu de collecte"
   postalCode: String
 }
+
+type BsdasriRecepisse {
+  "Exemption de récépissé"
+  isExempted: Boolean
+  "Numéro de récépissé"
+  number: String
+  "Département"
+  department: String
+  "Date limite de validité"
+  validityLimit: DateTime
+}
+
+type BsdasriBroker {
+  "Coordonnées de l'entreprise courtier"
+  company: FormCompany
+  "Récépissé courtier"
+  recepisse: BsdasriRecepisse
+}
+
+type BsdasriTrader {
+  "Coordonnées de l'entreprise de négoce"
+  company: FormCompany
+  "Récépissé négociant"
+  recepisse: BsdasriRecepisse
+}
+
 "Bordereau Bsdasri"
 type Bsdasri {
   id: ID!
@@ -202,6 +228,18 @@ type Bsdasri {
   transporter: BsdasriTransporter
 
   destination: BsdasriDestination
+
+  "Courtier"
+  broker: BsdasriBroker
+
+  "Négociant"
+  trader: BsdasriTrader
+
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
+  """
+  intermediaries: [FormCompany!]
 
   """
   Liste des identifiants des conteneurs concernés. Modifiable par tous les acteurs du bsd, ce champ mis

@@ -1,5 +1,8 @@
 import { Bsdasri } from "@prisma/client";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import {
+  getIntermediaryCompanyOrgId,
+  getTransporterCompanyOrgId
+} from "@td/constants";
 import { BsdElastic } from "../common/elastic";
 import type {
   AllWaste,
@@ -22,6 +25,7 @@ import { RegistryBsdasri } from "../registry/elastic";
 import { getBsdasriSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
 import { isFinalOperationCode } from "../common/operationCodes";
+import { BsdasriForElastic } from "./elastic";
 
 const getOperationData = (bsdasri: Bsdasri) => ({
   destinationPlannedOperationCode: bsdasri.destinationOperationCode,
@@ -123,7 +127,7 @@ export const getTransporterData = (bsdasri: Bsdasri, includePlates = false) => {
 };
 
 export function getRegistryFields(
-  bsdasri: Bsdasri
+  bsdasri: BsdasriForElastic
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
@@ -149,6 +153,25 @@ export function getRegistryFields(
     if (transporterCompanyOrgId) {
       registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
       registryFields.isAllWasteFor.push(transporterCompanyOrgId);
+    }
+
+    if (bsdasri.brokerCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsdasri.brokerCompanySiret);
+      registryFields.isAllWasteFor.push(bsdasri.brokerCompanySiret);
+    }
+    if (bsdasri.traderCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsdasri.traderCompanySiret);
+      registryFields.isAllWasteFor.push(bsdasri.traderCompanySiret);
+    }
+
+    if (bsdasri.intermediaries?.length) {
+      for (const intermediary of bsdasri.intermediaries) {
+        const intermediaryOrgId = getIntermediaryCompanyOrgId(intermediary);
+        if (intermediaryOrgId) {
+          registryFields.isManagedWasteFor.push(intermediaryOrgId);
+          registryFields.isAllWasteFor.push(intermediaryOrgId);
+        }
+      }
     }
   }
 
@@ -250,12 +273,12 @@ export function toIncomingWaste(
     ...genericWaste,
     ...getTransporterData(bsdasri),
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+    traderRecepisseNumber: bsdasri.traderRecepisseNumber,
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    brokerRecepisseNumber: bsdasri.brokerRecepisseNumber,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     ...getOperationData(bsdasri),
     ...getInitialEmitterData()
@@ -272,13 +295,13 @@ export function toOutgoingWaste(
     ...emptyOutgoingWaste,
     ...genericWaste,
     ...getTransporterData(bsdasri),
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
     destinationPlannedOperationMode: null,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+    traderRecepisseNumber: bsdasri.traderRecepisseNumber,
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    brokerRecepisseNumber: bsdasri.brokerRecepisseNumber,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue
           .dividedBy(1000)
@@ -308,20 +331,16 @@ export function toTransportedWaste(
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+    traderRecepisseNumber: bsdasri.traderRecepisseNumber,
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    brokerRecepisseNumber: bsdasri.brokerRecepisseNumber,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
 }
 
-/**
- * BSDASRI has no trader or broker so this function should not
- * be called. We implement it anyway in case it is added later on
- */
 export function toManagedWaste(
   bsdasri: RegistryBsdasri
 ): Required<ManagedWaste> {
@@ -332,10 +351,12 @@ export function toManagedWaste(
     ...emptyManagedWaste,
     ...genericWaste,
     ...getTransporterData(bsdasri),
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+
     destinationPlannedOperationMode: null,
     emitterCompanyMail: bsdasri.emitterCompanyMail
   };
@@ -351,19 +372,36 @@ export function toAllWaste(bsdasri: RegistryBsdasri): Required<AllWaste> {
     ...getTransporterData(bsdasri, true),
     createdAt: bsdasri.createdAt,
     destinationReceptionDate: bsdasri.destinationReceptionDate,
-    brokerCompanyName: null,
-    brokerCompanySiret: null,
-    brokerRecepisseNumber: null,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+    traderRecepisseNumber: bsdasri.traderRecepisseNumber,
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    brokerRecepisseNumber: bsdasri.brokerRecepisseNumber,
     destinationPlannedOperationMode: null,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue.dividedBy(1000).toNumber()
       : null,
-    traderCompanyName: null,
-    traderCompanySiret: null,
-    traderRecepisseNumber: null,
+
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     ...getOperationData(bsdasri),
     ...getFinalOperationsData(bsdasri),
-    ...getInitialEmitterData()
+    ...getInitialEmitterData(),
+    ...getIntermediariesData(bsdasri)
   };
 }
+
+const getIntermediariesData = (bsdasri: RegistryBsdasri) => ({
+  intermediary1CompanyName: bsdasri.intermediaries?.[0]?.name ?? null,
+  intermediary1CompanySiret: bsdasri.intermediaries?.[0]
+    ? getIntermediaryCompanyOrgId(bsdasri.intermediaries[0])
+    : null,
+  intermediary2CompanyName: bsdasri.intermediaries?.[1]?.name ?? null,
+  intermediary2CompanySiret: bsdasri.intermediaries?.[1]
+    ? getIntermediaryCompanyOrgId(bsdasri.intermediaries[1])
+    : null,
+  intermediary3CompanyName: bsdasri.intermediaries?.[2]?.name ?? null,
+  intermediary3CompanySiret: bsdasri.intermediaries?.[2]
+    ? getIntermediaryCompanyOrgId(bsdasri.intermediaries[2])
+    : null
+});

@@ -17,7 +17,9 @@ import {
   isEcoOrganismeRefinement,
   isEmitterRefinement,
   isRegisteredVatNumberRefinement,
-  isTransporterRefinement
+  isTransporterRefinement,
+  isTraderRefinement,
+  isBrokerRefinement
 } from "../../common/validation/zod/refinement";
 import { isDefined } from "../../common/helpers";
 
@@ -59,6 +61,43 @@ export const validateDestinationOperationCode: (
     }
   };
 };
+
+export const forbidSynthesisTraderBrokerIntermediaries: () => Refinement<ParsedZodBsdasri> =
+  () => {
+    return async (bsdasri, { addIssue }) => {
+      const { intermediaries, synthesizing } = bsdasri;
+
+      if (bsdasri.type !== BsdasriType.SYNTHESIS && !synthesizing?.length) {
+        return;
+      }
+
+      if (bsdasri.traderCompanySiret) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          fatal: true,
+          path: ["trader", "company", "siret"],
+          message: "Le dasri de synthèse n'admet pas de courtier"
+        });
+      }
+      if (bsdasri.brokerCompanySiret) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          fatal: true,
+          path: ["broker", "company", "siret"],
+          message: "Le dasri de synthèse n'admet pas de négociant"
+        });
+      }
+
+      if (intermediaries?.length) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          fatal: true,
+          path: ["intermediaries"],
+          message: "Le dasri de synthèse n'admet pas d'intermédiaires"
+        });
+      }
+    };
+  };
 
 export const validateRecipientIsCollectorForGroupingCodes: (
   validationContext: BsdasriValidationContext
@@ -234,6 +273,9 @@ export const checkCompanies: Refinement<ParsedZodBsdasri> = async (
     BsdType.BSDASRI,
     zodContext
   );
+
+  await isBrokerRefinement(bsdasri.brokerCompanySiret, zodContext);
+  await isTraderRefinement(bsdasri.traderCompanySiret, zodContext);
 };
 
 export const checkOperationMode: Refinement<ParsedZodBsdasri> = (

@@ -37,7 +37,11 @@ import type {
   BsdasriRevisionRequestWaste,
   BsdasriRevisionRequestDestination,
   BsdasriRevisionRequestOperation,
-  BsdasriRevisionRequestReception
+  BsdasriRevisionRequestReception,
+  BsdasriBroker,
+  BsdasriRecepisse,
+  BsdasriTrader,
+  CompanyInput
 } from "@td/codegen-back";
 import {
   nullIfNoValues,
@@ -209,6 +213,38 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         })
       })
     }),
+
+    broker: nullIfNoValues<BsdasriBroker>({
+      company: nullIfNoValues<FormCompany>({
+        name: bsdasri.brokerCompanyName,
+        siret: bsdasri.brokerCompanySiret,
+        address: bsdasri.brokerCompanyAddress,
+        contact: bsdasri.brokerCompanyContact,
+        phone: bsdasri.brokerCompanyPhone,
+        mail: bsdasri.brokerCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsdasriRecepisse>({
+        department: bsdasri.brokerRecepisseDepartment,
+        number: bsdasri.brokerRecepisseNumber,
+        validityLimit: processDate(bsdasri.brokerRecepisseValidityLimit)
+      })
+    }),
+    trader: nullIfNoValues<BsdasriTrader>({
+      company: nullIfNoValues<FormCompany>({
+        name: bsdasri.traderCompanyName,
+        siret: bsdasri.traderCompanySiret,
+        address: bsdasri.traderCompanyAddress,
+        contact: bsdasri.traderCompanyContact,
+        phone: bsdasri.traderCompanyPhone,
+        mail: bsdasri.traderCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsdasriRecepisse>({
+        department: bsdasri.traderRecepisseDepartment,
+        number: bsdasri.traderRecepisseNumber,
+        validityLimit: processDate(bsdasri.traderRecepisseValidityLimit)
+      })
+    }),
+
     identification: nullIfNoValues<BsdasriIdentification>({
       numbers: bsdasri.identificationNumbers
     }),
@@ -522,12 +558,12 @@ function flattenDestinationInput(input: {
       chain(r.company, c => c.mail)
     ),
     destinationCustomInfo: chain(input.destination, e => e.customInfo),
-    ...flattenReceptiontInput(input.destination),
+    ...flattenReceptionInput(input.destination),
     ...flattenOperationInput(input.destination)
   };
 }
 
-function flattenReceptiontInput(
+function flattenReceptionInput(
   input?: {
     reception?: BsdasriReceptionInput | null;
   } | null
@@ -592,6 +628,28 @@ function flattenContainersInput(input: {
   };
 }
 
+function flattenBsdasriBrokerInput({ broker }: Pick<BsdasriInput, "broker">) {
+  return {
+    brokerCompanyName: chain(broker, b => chain(b.company, c => c.name)),
+    brokerCompanySiret: chain(broker, b => chain(b.company, c => c.siret)),
+    brokerCompanyAddress: chain(broker, b => chain(b.company, c => c.address)),
+    brokerCompanyContact: chain(broker, b => chain(b.company, c => c.contact)),
+    brokerCompanyPhone: chain(broker, b => chain(b.company, c => c.phone)),
+    brokerCompanyMail: chain(broker, b => chain(b.company, c => c.mail))
+  };
+}
+
+function flattenBsdasriTraderInput({ trader }: Pick<BsdasriInput, "trader">) {
+  return {
+    traderCompanyName: chain(trader, b => chain(b.company, c => c.name)),
+    traderCompanySiret: chain(trader, b => chain(b.company, c => c.siret)),
+    traderCompanyAddress: chain(trader, b => chain(b.company, c => c.address)),
+    traderCompanyContact: chain(trader, b => chain(b.company, c => c.contact)),
+    traderCompanyPhone: chain(trader, b => chain(b.company, c => c.phone)),
+    traderCompanyMail: chain(trader, b => chain(b.company, c => c.mail))
+  };
+}
+
 export function flattenBsdasriInput(
   formInput: Pick<
     BsdasriInput,
@@ -600,6 +658,9 @@ export function flattenBsdasriInput(
     | "ecoOrganisme"
     | "transporter"
     | "destination"
+    | "broker"
+    | "trader"
+    | "intermediaries"
     | "identification"
     | "grouping"
     | "synthesizing"
@@ -616,9 +677,15 @@ export function flattenBsdasriInput(
 
     ...flattenDestinationInput(formInput),
 
-    ...flattenContainersInput(formInput),
+    ...flattenBsdasriBrokerInput(formInput),
 
-    grouping: formInput.grouping
+    ...flattenBsdasriTraderInput(formInput),
+
+    ...flattenContainersInput(formInput),
+    intermediaries: formInput.intermediaries,
+
+    grouping: formInput.grouping,
+    synthesizing: formInput.synthesizing
   });
 }
 
@@ -704,4 +771,22 @@ export function expandBsdasriRevisionRequestContent(
 
     isCanceled: bsdasriRevisionRequest.isCanceled
   };
+}
+
+export function companyToIntermediaryInput(
+  companies: CompanyInput[]
+): Prisma.IntermediaryBsdasriAssociationCreateManyBsdasriInput[] {
+  if (!companies) return [];
+
+  return companies.map(company => {
+    return {
+      name: company.name!,
+      siret: company.siret!,
+      vatNumber: company.vatNumber,
+      address: company.address,
+      contact: company.contact!,
+      phone: company.phone,
+      mail: company.mail
+    };
+  });
 }

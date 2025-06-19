@@ -44,6 +44,7 @@ import {
   toIncomingWasteV2 as bsdasriToIncomingWasteV2,
   toOutgoingWasteV2 as bsdasriToOutgoingWasteV2,
   toTransportedWasteV2 as bsdasriToTransportedWasteV2,
+  toManagedWasteV2 as bsdasriToManagedWasteV2,
   toAllWasteV2 as bsdasriToAllWasteV2
 } from "../bsdasris/registryV2";
 import {
@@ -137,7 +138,7 @@ const inputToManagedWaste: ConverterMap<keyof InputMap, ManagedWasteV2> = {
   MANAGED: exportOptions.MANAGED?.toManagedWaste,
   BSDD: bsddToManagedWasteV2,
   BSDA: bsdaToManagedWasteV2,
-  BSDASRI: () => null,
+  BSDASRI: bsdasriToManagedWasteV2,
   BSFF: () => null,
   BSPAOH: () => null,
   BSVHU: bsvhuToManagedWasteV2

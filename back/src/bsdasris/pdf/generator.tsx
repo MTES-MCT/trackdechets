@@ -12,6 +12,8 @@ import { prisma } from "@td/prisma";
 import { BsdasriPdf } from "./components/BsdasriPdf";
 import { emptyValues } from "../../common/pdf/emptypdf";
 
+import { BsdasriWithIntermediaries } from "../types";
+
 const getAssociatedBsdasris = async (bsdasri: Bsdasri) => {
   if (bsdasri.type === BsdasriType.SYNTHESIS) {
     const associated = await prisma.bsdasri.findMany({
@@ -32,15 +34,22 @@ const getAssociatedBsdasris = async (bsdasri: Bsdasri) => {
   return null;
 };
 
-export async function buildPdf(bsdasri: Bsdasri, renderEmptyPdf?: boolean) {
+export async function buildPdf(
+  bsdasri: BsdasriWithIntermediaries,
+  renderEmptyPdf?: boolean
+) {
   const qrCode = renderEmptyPdf
     ? ""
     : await QRCode.toString(bsdasri.id, { type: "svg" });
-  let expandedBsdasri = expandBsdasriFromDB(bsdasri);
+  let expandedBsdasri = {
+    ...expandBsdasriFromDB(bsdasri),
+    intermediaries: bsdasri.intermediaries
+  };
 
   let associatedBsdasris = await getAssociatedBsdasris(bsdasri);
   if (renderEmptyPdf) {
     expandedBsdasri = emptyValues(expandedBsdasri);
+    associatedBsdasris = emptyValues(associatedBsdasris);
     associatedBsdasris = emptyValues(associatedBsdasris);
   }
   const html = ReactDOMServer.renderToStaticMarkup(

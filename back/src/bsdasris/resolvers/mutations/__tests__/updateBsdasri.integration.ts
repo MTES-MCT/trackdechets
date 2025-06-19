@@ -1,11 +1,14 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
+  brokerData,
   bsdasriFactory,
   initialData,
+  intermediaryData,
   readyToPublishData,
   readyToReceiveData,
-  readyToTakeOverData
+  readyToTakeOverData,
+  traderData
 } from "../../../__tests__/factories";
 import {
   userWithCompanyFactory,
@@ -19,10 +22,6 @@ import { prisma } from "@td/prisma";
 import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
-import { sirenify } from "../../../sirenify";
-
-jest.mock("../../../sirenify");
-(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -36,8 +35,6 @@ const UPDATE_DASRI = gql`
 describe("Mutation.updateBsdasri", () => {
   afterEach(async () => {
     await resetDatabase();
-    (sirenify as jest.Mock).mockClear();
-    (sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
   });
 
   it("should disallow unauthenticated user to edit a dasri", async () => {
@@ -79,6 +76,46 @@ describe("Mutation.updateBsdasri", () => {
 
     const { user: connectedUser } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(connectedUser);
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            emitter: { company: { mail: "test@test.test" } }
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparaît pas",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
+  it("should deny dasri update to intermdiary", async () => {
+    const { user, company: intermediary } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const company = await companyFactory();
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(company),
+        intermediaries: {
+          create: [intermediaryData(intermediary)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
     const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
       UPDATE_DASRI,
       {
@@ -172,6 +209,7 @@ describe("Mutation.updateBsdasri", () => {
       ]);
     }
   );
+
   it.each(["draft", "published"])(
     "should be possible to update a %p dasri",
     async draftStatus => {
@@ -212,6 +250,230 @@ describe("Mutation.updateBsdasri", () => {
       );
     }
   );
+
+  it("should be possible for a trader to update a dasri", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+
+    const { company: trader, user } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...traderData(trader)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      emitter: { company: { mail: "test@test.test" } }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
+  });
+
+  it("should be possible for a broker to update a dasri", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+
+    const { company: broker, user } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...brokerData(broker)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      emitter: { company: { mail: "test@test.test" } }
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
+  });
+
+  it("should set broker data to null and void recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+
+    const { company: broker } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...brokerData(broker)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      broker: null
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.broker).toBe(null);
+  });
+
+  it("should set trader data to null and void recepisse", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
+
+    const { company: broker } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        ...traderData(broker)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      trader: null
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.broker).toBe(null);
+  });
+
+  it("should update intermediaries on a dasri", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination, user } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const intermediary = await companyFactory();
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination)
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          name: intermediary.name,
+          address: intermediary.address,
+          contact: intermediary.contact
+        }
+      ]
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.intermediaries).toStrictEqual([
+      {
+        siret: intermediary.siret,
+        orgId: intermediary.siret,
+        vatNumber: null,
+        mail: null,
+        name: intermediary.name,
+        address: intermediary.address,
+        country: "FR",
+        phone: null,
+        contact: intermediary.contact
+      }
+    ]);
+  });
+
+  it("should update intermediaries to null on a dasri", async () => {
+    const { company } = await userWithCompanyFactory("MEMBER");
+
+    const { company: destination, user } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const intermediary = await companyFactory();
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        intermediaries: {
+          create: [intermediaryData(intermediary)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: { intermediaries: [] }
+        }
+      }
+    );
+
+    expect(data.updateBsdasri.intermediaries).toStrictEqual([]);
+  });
 
   it("should forbid invalid transporter plates", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

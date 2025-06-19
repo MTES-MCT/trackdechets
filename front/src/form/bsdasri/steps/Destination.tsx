@@ -1,8 +1,8 @@
 import CompanySelector from "../../common/components/company/CompanySelector";
 
-import { Field } from "formik";
+import { Field, useFormikContext } from "formik";
 import React from "react";
-import { BsdasriStatus } from "@td/codegen-ui";
+import { Bsdasri, BsdasriStatus, BsdasriType, BsdType } from "@td/codegen-ui";
 
 import Reception from "./Reception";
 import Operation from "./Operation";
@@ -11,8 +11,16 @@ import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import classNames from "classnames";
 import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
 import { customInfoToolTip } from "./Emitter";
+import FormikBroker from "../../../Apps/Forms/Components/Broker/FormikBroker";
+import FormikTrader from "../../../Apps/Forms/Components/Trader/FormikTrader";
+import FormikIntermediaryList from "../../../Apps/Forms/Components/IntermediaryList/FormikIntermediaryList";
+import { useParams } from "react-router-dom";
 
 export default function Destination({ status, stepName, disabled = false }) {
+  const { siret } = useParams<{ siret: string }>();
+  const { values } = useFormikContext<Bsdasri>();
+
+  const isSynthesizing = values.type === BsdasriType.Synthesis;
   const receptionDisabled = disabled || BsdasriStatus.Received === status;
 
   const operationEmphasis = stepName === "operation";
@@ -51,8 +59,27 @@ export default function Destination({ status, stepName, disabled = false }) {
       <h4 className="form__section-heading">Traitement du déchet</h4>
 
       <Operation status={status} disabled={disabled} />
+      {!isSynthesizing && (
+        <>
+          <h4 className="form__section-heading">Autres acteurs</h4>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+          >
+            <FormikBroker
+              bsdType={BsdType.Bsdasri}
+              siret={siret}
+              disabled={disabled}
+            />
 
-      <h4 className="form__section-heading">Traitement du déchet</h4>
+            <FormikTrader
+              bsdType={BsdType.Bsdasri}
+              siret={siret}
+              disabled={disabled}
+            />
+            <FormikIntermediaryList siret={siret} disabled={disabled} />
+          </div>
+        </>
+      )}
     </>
   );
 }
