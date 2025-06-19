@@ -118,8 +118,9 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
     transport: {
       mode: signingTransporter?.transport?.mode ?? TransportMode.Road,
       plates: signingTransporter?.transport?.plates ?? [],
-      takenOverAt:
-        signingTransporter?.transport?.takenOverAt ?? new Date().toISOString()
+      takenOverAt: signingTransporter?.transport?.takenOverAt
+        ? datetimeToYYYYMMDD(new Date(signingTransporter.transport.takenOverAt))
+        : new Date().toISOString()
     },
     signature: {
       author: "",
@@ -145,8 +146,11 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
       transport: {
         mode: signingTransporter.transport?.mode ?? TransportMode.Road,
         plates: signingTransporter.transport?.plates ?? [],
-        takenOverAt:
-          signingTransporter.transport?.takenOverAt ?? new Date().toISOString()
+        takenOverAt: signingTransporter?.transport?.takenOverAt
+          ? datetimeToYYYYMMDD(
+              new Date(signingTransporter.transport.takenOverAt)
+            )
+          : new Date().toISOString()
       },
       signature: {
         author: "",
@@ -309,7 +313,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                     type: "date",
                     min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
                     max: datetimeToYYYYMMDD(TODAY),
-                    ...register("signature.date")
+                    ...register("transport.takenOverAt")
                   }}
                 />
               </div>
