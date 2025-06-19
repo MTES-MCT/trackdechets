@@ -107,16 +107,21 @@ export async function updateAppendix2Fn(args: UpdateAppendix2FnArgs) {
     ? Status.GROUPED
     : Status.AWAITING_GROUP;
 
-  const { update: updateForm, findGroupedFormsById } = getFormRepository(user);
+  const { updateMany: updateManyForms, findGroupedFormsById } =
+    getFormRepository(user);
 
   if (
     nextStatus !== form.status ||
     !quantityGrouped.equals(new Decimal(form.quantityGrouped))
   ) {
-    await updateForm(
-      { id: form.id },
-      { quantityGrouped: quantityGrouped.toNumber(), status: nextStatus }
+    await updateManyForms(
+      [form.id, ...(form.forwardedIn ? [form.forwardedIn.id] : [])],
+      {
+        status: nextStatus,
+        quantityGrouped: quantityGrouped.toNumber()
+      }
     );
+
     if (
       form.emitterType === EmitterType.APPENDIX2 &&
       nextStatus === "PROCESSED"
