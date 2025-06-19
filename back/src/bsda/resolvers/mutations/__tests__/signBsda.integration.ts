@@ -2800,8 +2800,7 @@ describe("Mutation.Bsda.sign", () => {
       return { user, bsda, destinationUser };
     };
 
-    // TODO: D 9 ?
-    it.each(["R 5", "D 5"])(
+    it.each(["R 5", "D 5", "D 9"])(
       "temp storage cannot use final operation code %p",
       async operationCode => {
         // Given

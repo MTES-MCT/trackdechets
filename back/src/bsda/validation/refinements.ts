@@ -38,7 +38,7 @@ import {
 } from "../../common/validation/zod/refinement";
 import { CompanyRole } from "../../common/validation/zod/schema";
 import { isDefined } from "../../common/helpers";
-import { isFinalOperationCode } from "../../common/operationCodes";
+import { isBSDAFinalOperationCode } from "../../common/operationCodes";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -782,7 +782,7 @@ export const validateReceptionOperationCode: (
     // Attention! Lors d'une réception sur une étape d'entreposage provisoire,
     // on ne doit pas pouvoir renseigner un code de traitement final!
     if (
-      isFinalOperationCode(destinationOperationCode ?? null) &&
+      isBSDAFinalOperationCode(destinationOperationCode ?? null) &&
       isTempStorageReception
     ) {
       addIssue({
