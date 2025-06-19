@@ -19,7 +19,6 @@ import {
   EmitterType,
   InitialFormFraction,
   Query,
-  QueryCompanyPrivateInfosArgs,
   OperationMode,
   QuerySearchCompaniesArgs,
   CompanyType,
@@ -71,10 +70,7 @@ import {
 } from "@td/constants";
 import { Appendix1ProducerForm } from "../../../form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
-import {
-  COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS,
-  SEARCH_COMPANIES
-} from "../../../Apps/common/queries/company/query";
+import { SEARCH_COMPANIES } from "../../../Apps/common/queries/company/query";
 import { getOperationModeLabel } from "../../../Apps/common/operationModes";
 import { mapBsdd } from "../../../Apps/Dashboard/bsdMapper";
 import { hasAppendix1Cta } from "../../../Apps/Dashboard/dashboardServices";
@@ -82,6 +78,7 @@ import { usePermissions } from "../../../common/contexts/PermissionsContext";
 import { isDefined } from "../../../common/helper";
 import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../Apps/common/utils/citerneBsddSummary";
+import { useMyCompany } from "../../../Apps/common/hooks/useMyCompany";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -557,16 +554,13 @@ const Appendix1 = ({
   container: Form;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { permissions } = usePermissions();
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
+  const { company } = useMyCompany(siret);
 
-  const { data } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret }
-  });
-  const siretsWithAutomaticSignature = data
-    ? data.companyPrivateInfos.receivedSignatureAutomations.map(
+  const siretsWithAutomaticSignature = company
+    ? company.receivedSignatureAutomations.map(
         automation => automation.from.siret
       )
     : [];
@@ -719,7 +713,9 @@ export default function BSDDetailContent({
   const { siret = "" } = useParams<{ siret: string }>();
   const query = useQueryString();
   const navigate = useNavigate();
-  const { permissions } = usePermissions();
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
   const [duplicate, { loading: isDuplicating }] = useDuplicate({

@@ -97,3 +97,18 @@ type MembershipRequestsConnection {
   pageInfo: PageInfo!
   edges: [MembershipRequestEdge!]!
 }
+
+type PermissionsInfos {
+  orgPermissionsInfos: [OrgPermissionsInfos!]!
+  permissions: [UserPermission!]!
+  roles: [UserRole!]!
+}
+
+type OrgPermissionsInfos {
+  "Identifiant de l'établissement"
+  orgId: ID!
+  "Liste des permissions de l'utilisateur"
+  permissions: [UserPermission!]!
+  "Rôle de l'utilisateur"
+  role: UserRole!
+}

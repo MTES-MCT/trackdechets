@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { Query, CompanyPrivate } from "@td/codegen-ui";
+import { Query } from "@td/codegen-ui";
 import { CompanySwitcherProps } from "./companySwitcherTypes";
 import { debounce } from "../../../../common/helper";
-import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
@@ -11,11 +10,13 @@ import {
 import { InlineLoader } from "../Loader/Loaders";
 import useOnClickOutsideRefTarget from "../../hooks/useOnClickOutsideRefTarget";
 import "./companySwitcher.scss";
+import { useMyCompany } from "../../hooks/useMyCompany";
+import { usePermissions } from "../../../../common/contexts/PermissionsContext";
 
 export const SIRET_STORAGE_KEY = "td-siret";
 
 const MY_COMPANIES = gql`
-  query MyCompanies($first: Int, $after: ID, $search: String) {
+  query SearchMyCompanies($first: Int, $after: ID, $search: String) {
     myCompanies(first: $first, after: $after, search: $search) {
       totalCount
       pageInfo {
@@ -51,21 +52,18 @@ const saveOrgIdToLocalStorage = orgId => {
   window.localStorage.setItem(SIRET_STORAGE_KEY, JSON.stringify(orgId));
 };
 
-export const getDefaultOrgId = (companies: CompanyPrivate[]) => {
-  const storedCompany = companies.find(
-    company => company.orgId === getLocalStorageOrgId()
-  );
-  const defaultOrgId = companies.length > 0 ? companies[0].orgId : "";
-
-  return storedCompany?.orgId ?? defaultOrgId;
+export const getDefaultOrgId = (userOrgIds: string[]) => {
+  const persistedOrgId = getLocalStorageOrgId();
+  if (userOrgIds.includes(persistedOrgId)) {
+    return persistedOrgId;
+  }
+  return userOrgIds[0];
 };
 
 const CompanySwitcher = ({
   currentOrgId,
-  companies,
   handleCompanyChange
 }: CompanySwitcherProps) => {
-  const { updatePermissions } = usePermissions();
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [displayPreloader, setDisplayPreloader] = useState(false);
@@ -80,20 +78,11 @@ const CompanySwitcher = ({
     onClickOutside: () => setOpen(false)
   });
 
-  const defaultCompany = useMemo(() => {
-    return companies.find(company => company.orgId === currentOrgId);
-  }, [companies, currentOrgId]);
+  const { orgIds } = usePermissions(currentOrgId);
+  const { company: defaultCompany } = useMyCompany(currentOrgId);
+  const nbOfCompanies = orgIds.length;
 
   const handleOnClickCompany = (orgId: string) => {
-    const selectedCompany = companies.find(company => company.orgId === orgId);
-    if (selectedCompany) {
-      updatePermissions(
-        selectedCompany?.userPermissions,
-        selectedCompany.userRole!,
-        orgId
-      );
-    }
-
     setOpen(false);
     handleOnResetSearch();
     saveOrgIdToLocalStorage(orgId);
@@ -159,7 +148,7 @@ const CompanySwitcher = ({
               {company.givenName || company.name}
             </div>
           )}
-          {current && companies.length > 1 && (
+          {current && nbOfCompanies > 1 && (
             <span
               className="fr-icon-arrow-down-s-line company-switcher-item__arrow"
               aria-hidden="true"
@@ -203,7 +192,7 @@ const CompanySwitcher = ({
     if (searchCompanies && searchCompanies.length > 0)
       return (
         <>
-          <div className="company-switcher-count">{`${searchCompanies.length} sur ${companies.length} établissements`}</div>
+          <div className="company-switcher-count">{`${searchCompanies.length} sur ${nbOfCompanies} établissements`}</div>
           {searchCompanies?.map(company =>
             displayedItem(company, () => handleOnClickCompany(company.orgId))
           )}
@@ -216,19 +205,19 @@ const CompanySwitcher = ({
   return (
     <div
       className={`company-switcher ${open && "company-switcher--open"} ${
-        companies.length === 1 && "company-switcher--unique"
+        nbOfCompanies === 1 && "company-switcher--unique"
       }`}
       ref={targetRef as React.RefObject<HTMLDivElement>}
     >
       {displayedItem(
         defaultCompany,
         () => {
-          if (companies.length > 1) setOpen(open => !open);
+          if (nbOfCompanies > 1) setOpen(open => !open);
         },
         true
       )}
       <div className="company-switcher-list">
-        {companies.length > 10 && (
+        {nbOfCompanies > 10 && (
           <div className="company-switcher-search">
             <div className="fr-search-bar" id="search-540" role="search">
               <label className="fr-label" htmlFor="search-540-input">

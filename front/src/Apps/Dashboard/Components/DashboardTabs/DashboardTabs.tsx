@@ -30,7 +30,6 @@ import { useNotificationQueries } from "./useNotificationQueries";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
-  companies: CompanyPrivate[];
 }
 
 const displayNotification = (count, isReaderRole) => {
@@ -39,10 +38,12 @@ const displayNotification = (count, isReaderRole) => {
   ) : null;
 };
 
-const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
+const DashboardTabs = ({ currentCompany }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const { permissions, role } = usePermissions();
+  const {
+    orgPermissions: { permissions, role }
+  } = usePermissions(currentCompany.orgId);
   const navigate = useNavigate();
 
   const { data, refetchAll } = useNotificationQueries(currentCompany.orgId);
@@ -86,7 +87,6 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       <div id="company-dashboard-select" className="company-select">
         <CompanySwitcher
           currentOrgId={currentCompany.orgId}
-          companies={companies}
           handleCompanyChange={handleCompanyChange}
         />
       </div>

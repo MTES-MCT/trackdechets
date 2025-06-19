@@ -12,6 +12,7 @@ import warningMessage from "./queries/warningMessage";
 import myCompaniesCsv from "./queries/myCompaniesCsv";
 import myCompaniesXls from "./queries/myCompaniesXls";
 import isAuthenticated from "./queries/isAuthenticated";
+import permissionsInfos from "./queries/permissionsInfos";
 
 const Query: QueryResolvers = {
   me,
@@ -26,7 +27,8 @@ const Query: QueryResolvers = {
   passwordResetRequest,
   warningMessage,
   myCompaniesCsv,
-  myCompaniesXls
+  myCompaniesXls,
+  permissionsInfos
 };
 
 export default Query;
