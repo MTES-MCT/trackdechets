@@ -14,3 +14,6 @@
 - [Thomas Bouchardon](https://github.com/alfabouch) - Développeur
 - [Elias Showk](https://github.com/elishowk) - Développeur
 - [Julien Seren-Rosso](https://github.com/kornifex) - Développeur
+- [Gaël Ferrand](https://github.com/GaelFerrand) - Développeur
+- [Juliana Jean-Marie](https://github.com/JulianaJM) - Développeuse
+- [Pierre-Antoine Meley](https://github.com/silto) - Développeur
