@@ -1,18 +1,26 @@
 import React, { useRef, useState } from "react";
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 import countries from "world-countries";
-import { type UseFormReturn } from "react-hook-form";
+import { Controller, type UseFormReturn } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { formatError } from "../builder/error";
 
-const sortedCountries = countries
-  .sort((a, b) =>
-    a.translations.fra.common.localeCompare(b.translations.fra.common)
-  )
-  .map(country => ({
-    label: country.translations.fra.common,
-    code: country.cca2
-  }));
+const france = countries.find(country => country.cca2 === "FR");
+const otherCountries = countries.filter(country => country.cca2 !== "FR");
+
+const sortedCountries = [
+  ...(france
+    ? [{ label: france.translations.fra.common, code: france.cca2 }]
+    : []),
+  ...otherCountries
+    .sort((a, b) =>
+      a.translations.fra.common.localeCompare(b.translations.fra.common)
+    )
+    .map(country => ({
+      label: country.translations.fra.common,
+      code: country.cca2
+    }))
+];
 
 type Props = {
   prefix: string;
@@ -48,22 +56,32 @@ export function CountrySelector({ methods, prefix }: Props) {
 
   return (
     <div>
-      <Input
-        label="Code pays"
-        iconId={
-          showSearch ? "fr-icon-arrow-up-s-line" : "fr-icon-arrow-down-s-line"
-        }
-        nativeInputProps={{
-          type: "text",
-          ...methods.register(`${prefix}CountryCode`),
-          onClick: () => {
-            setShowSearch(true);
-          }
-        }}
-        ref={triggerRef}
-        state={deepErrors?.[`${finalPrefix}CountryCode`] && "error"}
-        stateRelatedMessage={formatError(
-          deepErrors?.[`${finalPrefix}CountryCode`]
+      <Controller
+        name={`${prefix}CountryCode`}
+        control={methods.control}
+        render={({ field }) => (
+          <Input
+            label="Pays"
+            iconId={
+              showSearch
+                ? "fr-icon-arrow-up-s-line"
+                : "fr-icon-arrow-down-s-line"
+            }
+            nativeInputProps={{
+              type: "text",
+              value: countries.find(c => c.cca2 === field.value)?.translations
+                .fra.common,
+              readOnly: true,
+              onClick: () => {
+                setShowSearch(true);
+              }
+            }}
+            ref={triggerRef}
+            state={deepErrors?.[`${finalPrefix}CountryCode`] && "error"}
+            stateRelatedMessage={formatError(
+              deepErrors?.[`${finalPrefix}CountryCode`]
+            )}
+          />
         )}
       />
 
