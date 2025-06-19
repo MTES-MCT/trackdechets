@@ -29,7 +29,8 @@ import {
   validatePreviousBsdas,
   validateDestinationReceptionWeight,
   wasteAdrRefinement,
-  checkDestinationReceptionRefusedWeight
+  checkDestinationReceptionRefusedWeight,
+  validateReceptionOperationCode
 } from "./refinements";
 import {
   fillIntermediariesOrgIds,
@@ -337,6 +338,7 @@ export const contextualSchemaAsync = (context: BsdaValidationContext) => {
     .superRefine(validateDestination(context))
     .superRefine(validateDestinationReceptionWeight(context))
     .superRefine(wasteAdrRefinement(context))
+    .superRefine(validateReceptionOperationCode(context))
     .superRefine(
       // run le check sur les champs requis après les transformations
       // au cas où une des transformations auto-complète certains champs
