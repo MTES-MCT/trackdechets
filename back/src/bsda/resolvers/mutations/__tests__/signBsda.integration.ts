@@ -2459,6 +2459,57 @@ describe("Mutation.Bsda.sign", () => {
       expect(cleanse(body)).toContain(cleanse(expectedBody));
     });
 
+    it("should send a mail if waste is PARTIALLY_REFUSED - legacy BSDAs", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "PARTIALLY_REFUSED",
+              refusalReason: "Pas bon",
+              weight: 10,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+      expect(to).toMatchObject([
+        { email: emitterUser.email, name: emitterUser.name }
+      ]);
+
+      expect(subject).toBe(
+        `Le déchet de l’entreprise emitter company a été partiellement refusé à réception`
+      );
+
+      const expectedBody = `<li>Quantité réelle présentée nette : 10 tonnes</li> <li>Quantité refusée nette : Non renseignée</li> <li>Quantité acceptée nette : Non renseignée</li>`;
+      expect(cleanse(body)).toContain(cleanse(expectedBody));
+    });
+
     it("should not send a mail if waste is ACCEPTED", async () => {
       // Given
       const bsda = await createBsda();
