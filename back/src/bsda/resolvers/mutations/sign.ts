@@ -268,6 +268,26 @@ async function signReception(
     status: nextStatus
   };
 
+  // Le déchet a été refusé: envoi d'un email
+  if (
+    bsda.destinationReceptionAcceptationStatus &&
+    [
+      WasteAcceptationStatus.REFUSED,
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+    ].includes(bsda.destinationReceptionAcceptationStatus) &&
+    (!bsda.emitterIsPrivateIndividual ||
+      // N'envoie rien si on ne connait pas l'adresse e-mail de l'émetteur particulier
+      // FIXME il serait bien de quand même pouvoir envoyer l'email à la DREAL
+      // mais ça demande un refacto de renderBsdaRefusedEmail
+      (bsda.emitterIsPrivateIndividual && bsda.emitterCompanyMail))
+  ) {
+    const refusedEmail = await renderBsdaRefusedEmail(bsda);
+
+    if (refusedEmail) {
+      sendMail(refusedEmail);
+    }
+  }
+
   return updateBsda(user, bsda, updateInput);
 }
 
@@ -296,7 +316,9 @@ async function signOperation(
 
   let refusedEmail: Mail | undefined = undefined;
 
+  // Le déchet a été refusée: envoi d'un email
   if (
+    bsda.status !== "RECEIVED" && // Le mail est déjà parti à l'étape de réception!
     bsda.destinationReceptionAcceptationStatus &&
     [
       WasteAcceptationStatus.REFUSED,

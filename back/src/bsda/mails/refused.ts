@@ -11,6 +11,7 @@ import {
 } from "@td/mail";
 import { BsdaWithIntermediaries, BsdaWithTransporters } from "../types";
 import { getFirstTransporterSync } from "../database";
+import { bsdaWasteQuantities } from "../utils";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -30,6 +31,7 @@ export async function renderBsdaRefusedEmail(
   const emitterCompanyAdmins = bsda.emitterCompanySiret
     ? await getCompanyAdminUsers(bsda.emitterCompanySiret)
     : [];
+
   const destinationCompanyAdmins = await getCompanyAdminUsers(
     bsda.destinationCompanySiret!
   );
@@ -78,6 +80,8 @@ export async function renderBsdaRefusedEmail(
 
   const transporter = getFirstTransporterSync(bsda);
 
+  const quantities = bsdaWasteQuantities(bsda);
+
   return renderMail(mailTemplate, {
     to,
     cc,
@@ -101,6 +105,12 @@ export async function renderBsdaRefusedEmail(
         sentBy: bsda.emitterEmissionSignatureAuthor,
         quantityReceived: bsda.destinationReceptionWeight
           ? bsda.destinationReceptionWeight.dividedBy(1000).toNumber()
+          : null,
+        quantityRefused: quantities?.quantityRefused
+          ? quantities?.quantityRefused.dividedBy(1000).toNumber()
+          : null,
+        quantityAccepted: quantities?.quantityAccepted
+          ? quantities?.quantityAccepted.dividedBy(1000).toNumber()
           : null
       }
     },
