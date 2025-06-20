@@ -26,14 +26,20 @@ import {
   bsdaFactory,
   bsdaTransporterFactory
 } from "../../../__tests__/factories";
+import { sendMail } from "../../../../mailer/mailing";
 import { buildPdfAsBase64 } from "../../../pdf/generator";
 import { getTransportersSync } from "../../../database";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { AllBsdaSignatureType } from "../../../types";
 import gql from "graphql-tag";
+import { cleanse } from "../../../../__tests__/utils";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
+
+// No mails
+jest.mock("../../../../mailer/mailing");
+(sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
 export const UPDATE_BSDA = gql`
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -1170,6 +1176,279 @@ describe("Mutation.Bsda.sign", () => {
   });
 
   describe("OPERATION", () => {
+    afterEach(() => {
+      jest.resetAllMocks();
+    });
+    it("should not send a mail if waste is ACCEPTED", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE"
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).not.toHaveBeenCalled();
+    });
+
+    it("should send a mail if no reception and waste is REFUSED", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user: emitterCompanyUser, company: emitterCompany } =
+        await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionRefusalReason: "Not good",
+          destinationReceptionRefusedWeight: 10000,
+          destinationReceptionWeight: 10000
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+      expect(to).toMatchObject([
+        { email: emitterCompanyUser.email, name: emitterCompanyUser.name }
+      ]);
+
+      expect(subject).toBe(
+        `Le déchet de l’entreprise ${emitterCompany.name} a été totalement refusé à réception`
+      );
+
+      const expectedBody = `<li>Quantité refusée nette : 10 tonnes</li> <li>Quantité acceptée nette : Non renseignée</li>`;
+      expect(cleanse(body)).toContain(cleanse(expectedBody));
+    });
+
+    it("should NOT send a mail if reception and waste is REFUSED (mail was sent at reception", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionRefusalReason: "Not good",
+          destinationReceptionRefusedWeight: 10000,
+          destinationReceptionWeight: 10000
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).not.toHaveBeenCalled();
+    });
+
+    it("should send a mail if no reception and waste is PARTIALLY_REFUSED", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { user: emitterCompanyUser, company: emitterCompany } =
+        await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+          destinationReceptionRefusalReason: "Not good",
+          destinationReceptionRefusedWeight: 5000,
+          destinationReceptionWeight: 10000
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+      expect(to).toMatchObject([
+        { email: emitterCompanyUser.email, name: emitterCompanyUser.name }
+      ]);
+
+      expect(subject).toBe(
+        `Le déchet de l’entreprise ${emitterCompany.name} a été partiellement refusé à réception`
+      );
+
+      const expectedBody = `<li>Quantité réelle présentée nette : 10 tonnes</li> <li>Quantité refusée nette : 5 tonnes</li> <li>Quantité acceptée nette : 5 tonnes</li>`;
+      expect(cleanse(body)).toContain(cleanse(expectedBody));
+    });
+
+    it("should NOT send a mail if reception and waste is PARTIALLY_REFUSED (mail was sent at reception)", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterCompanySiret: emitterCompany.siret,
+          emitterCompanyName: emitterCompany.name,
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+          destinationReceptionRefusalReason: "Not good",
+          destinationReceptionRefusedWeight: 5000,
+          destinationReceptionWeight: 10000
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).not.toHaveBeenCalled();
+    });
+
     it("should allow destination to sign operation", async () => {
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -1938,275 +2217,6 @@ describe("Mutation.Bsda.sign", () => {
     });
   });
 
-  describe("closed sirets", () => {
-    // eslint-disable-next-line prefer-const
-    let searchCompanyMock = jest.fn().mockReturnValue({});
-    let makeClientLocal: typeof makeClient;
-
-    beforeAll(async () => {
-      // Mock les appels à la base SIRENE
-      jest.mock("../../../../companies/search", () => ({
-        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
-        ...jest.requireActual("../../../../companies/search"),
-        searchCompany: searchCompanyMock
-      }));
-
-      // Ré-importe makeClient pour que searchCompany soit bien mocké
-      jest.resetModules();
-      makeClientLocal = require("../../../../__tests__/testClient")
-        .default as typeof makeClient;
-    });
-
-    afterEach(async () => {
-      jest.restoreAllMocks();
-      await resetDatabase();
-    });
-
-    const createUserAndBsda = async (
-      input: Partial<Prisma.BsdaCreateInput> = {}
-    ) => {
-      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
-        name: "Emitter"
-      });
-      const user = emitterCompanyAndUser.user;
-      const emitter = emitterCompanyAndUser.company;
-      const destination = await companyFactory({ name: "Destination" });
-      const nextDestination = await companyFactory({ name: "Destination" });
-      const transporter = await companyFactory({ name: "Transporter" });
-      const { user: workerUser, company: worker } =
-        await userWithCompanyFactory("MEMBER", { name: "Worker" });
-      const broker = await companyFactory({
-        name: "Broker",
-        companyTypes: ["BROKER"],
-        brokerReceipt: {
-          create: {
-            receiptNumber: "recepisse",
-            department: "07",
-            validityLimit: new Date()
-          }
-        }
-      });
-      const intermediary = await companyFactory({ name: "Intermediary" });
-      const ecoOrganisme = await ecoOrganismeFactory({
-        handle: { handleBsda: true },
-        createAssociatedCompany: true
-      });
-
-      const bsda = await bsdaFactory({
-        opt: {
-          status: BsdaStatus.INITIAL,
-          emitterCompanySiret: emitter.siret,
-          destinationCompanySiret: destination.siret,
-          destinationOperationNextDestinationCompanySiret:
-            nextDestination.siret,
-          destinationOperationNextDestinationCompanyName: nextDestination.name,
-          destinationOperationNextDestinationCompanyAddress:
-            "Next destination address",
-          destinationOperationNextDestinationCompanyContact:
-            "Next destination contact",
-          destinationOperationNextDestinationCompanyPhone: "060102030405",
-          destinationOperationNextDestinationCompanyMail:
-            "next.destination@mail.com",
-          destinationOperationNextDestinationCap: "Next destination CAP",
-          destinationOperationNextDestinationPlannedOperationCode: "R5",
-          workerCompanySiret: worker.siret,
-          brokerCompanySiret: broker.siret,
-          transporters: {
-            createMany: {
-              data: [
-                {
-                  number: 1,
-                  transporterCompanySiret: transporter.siret,
-                  transporterCompanyName: transporter.name
-                }
-              ]
-            }
-          },
-          intermediaries: {
-            create: [
-              {
-                siret: intermediary.siret!,
-                name: intermediary.name,
-                address: "intermediary address",
-                contact: "intermediary"
-              }
-            ]
-          },
-          ecoOrganismeSiret: ecoOrganisme.siret,
-          ...input
-        }
-      });
-
-      return { user, workerUser, bsda };
-    };
-
-    it("should not be able to sign if a siret is closed", async () => {
-      // In this example the emitter is closed, so he shouldn't
-      // be able to sign the EMISSION step
-
-      // Given
-      const { user, bsda } = await createUserAndBsda();
-
-      searchCompanyMock.mockImplementation(siret => {
-        return {
-          siret,
-          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
-          address: "Company address",
-          name: "Company name"
-        };
-      });
-
-      // When
-      const { mutate } = makeClientLocal(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            author: user.name,
-            type: "EMISSION"
-          }
-        }
-      });
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        `L'établissement ${bsda.emitterCompanySiret} est fermé selon le répertoire SIRENE`
-      );
-    });
-
-    it("should be able to sign if a siret is closed but field is sealed", async () => {
-      // In this example the emitter has closed but it's ok because
-      // EMISSION has already been signed. The worker can go on with
-      // the workflow
-
-      // Given
-      const { workerUser, bsda } = await createUserAndBsda({
-        emitterEmissionSignatureDate: new Date(),
-        emitterEmissionSignatureAuthor: "Emitter",
-        status: "SIGNED_BY_PRODUCER"
-      });
-
-      searchCompanyMock.mockImplementation(siret => {
-        return {
-          siret,
-          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
-          address: "Company address",
-          name: "Company name"
-        };
-      });
-
-      // When
-      const { mutate } = makeClientLocal(workerUser);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            author: workerUser.name,
-            type: "WORK"
-          }
-        }
-      });
-
-      // Then
-      expect(errors).toBeUndefined();
-    });
-
-    it("should not be able to sign if a siret is dormant", async () => {
-      // In this example the emitter is dormant, so he shouldn't
-      // be able to sign the EMISSION step
-
-      // Given
-      const { user, bsda } = await createUserAndBsda();
-
-      searchCompanyMock.mockImplementation(siret => {
-        return {
-          siret,
-          etatAdministratif: "O",
-          address: "Company address",
-          name: "Company name"
-        };
-      });
-
-      await prisma.company.update({
-        where: { siret: bsda.emitterCompanySiret! },
-        data: { isDormantSince: new Date() }
-      });
-
-      // When
-      const { mutate } = makeClientLocal(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            author: user.name,
-            type: "EMISSION"
-          }
-        }
-      });
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        `L'établissement avec le SIRET ${bsda.emitterCompanySiret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
-      );
-    });
-
-    it("should be able to sign if a siret is dormant but field is sealed", async () => {
-      // In this example the emitter has gone dormant but it's ok because
-      // EMISSION has already been signed. The worker can go on with
-      // the workflow
-
-      // Given
-      const { workerUser, bsda } = await createUserAndBsda({
-        emitterEmissionSignatureDate: new Date(),
-        emitterEmissionSignatureAuthor: "Emitter",
-        status: "SIGNED_BY_PRODUCER"
-      });
-
-      searchCompanyMock.mockImplementation(siret => {
-        return {
-          siret,
-          etatAdministratif: "O",
-          address: "Company address",
-          name: "Company name"
-        };
-      });
-
-      await prisma.company.update({
-        where: { siret: bsda.emitterCompanySiret! },
-        data: { isDormantSince: new Date() }
-      });
-
-      // When
-      const { mutate } = makeClientLocal(workerUser);
-      const { errors } = await mutate<
-        Pick<Mutation, "signBsda">,
-        MutationSignBsdaArgs
-      >(SIGN_BSDA, {
-        variables: {
-          id: bsda.id,
-          input: {
-            author: workerUser.name,
-            type: "WORK"
-          }
-        }
-      });
-
-      // Then
-      expect(errors).toBeUndefined();
-    });
-  });
-
   // New signature step "RECEPTION".
   // As it is a non-breaking change, it is optional and can be skipped.
   describe("RECEPTION", () => {
@@ -2222,14 +2232,14 @@ describe("Mutation.Bsda.sign", () => {
       await resetDatabase();
 
       // Emitter
-      const emitter = await userWithCompanyFactory("MEMBER", {
+      const emitter = await userWithCompanyFactory("ADMIN", {
         companyTypes: ["PRODUCER"]
       });
       emitterUser = emitter.user;
       emitterCompany = emitter.company;
 
       // Destination
-      const destination = await userWithCompanyFactory("MEMBER", {
+      const destination = await userWithCompanyFactory("ADMIN", {
         companyTypes: ["WASTE_VEHICLES"],
         wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
       });
@@ -2237,13 +2247,17 @@ describe("Mutation.Bsda.sign", () => {
       destinationCompany = destination.company;
 
       // Transporter
-      const transporter = await userWithCompanyFactory("MEMBER", {
+      const transporter = await userWithCompanyFactory("ADMIN", {
         companyTypes: ["TRANSPORTER"]
       });
       transporterCompany = transporter.company;
     });
 
     afterAll(resetDatabase);
+
+    afterEach(async () => {
+      jest.resetAllMocks();
+    });
 
     const createBsda = async (opt: Partial<Prisma.BsdaCreateInput> = {}) => {
       return await bsdaFactory({
@@ -2340,6 +2354,151 @@ describe("Mutation.Bsda.sign", () => {
       );
       expect(data.signBsda.status).toBe("RECEIVED");
     });
+
+    it("should send a mail if waste is REFUSED", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "REFUSED",
+              refusedWeight: 10,
+              refusalReason: "Pas bon",
+              weight: 10,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+      expect(to).toMatchObject([
+        { email: emitterUser.email, name: emitterUser.name }
+      ]);
+
+      expect(subject).toBe(
+        `Le déchet de l’entreprise emitter company a été totalement refusé à réception`
+      );
+
+      const expectedBody = `<li>Quantité refusée nette : 10 tonnes</li> <li>Quantité acceptée nette : Non renseignée</li>`;
+      expect(cleanse(body)).toContain(cleanse(expectedBody));
+    });
+
+    it("should send a mail if waste is PARTIALLY_REFUSED", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "PARTIALLY_REFUSED",
+              refusedWeight: 5,
+              refusalReason: "Pas bon",
+              weight: 10,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+      const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+
+      expect(to).toMatchObject([
+        { email: emitterUser.email, name: emitterUser.name }
+      ]);
+
+      expect(subject).toBe(
+        `Le déchet de l’entreprise emitter company a été partiellement refusé à réception`
+      );
+
+      const expectedBody = `<li>Quantité réelle présentée nette : 10 tonnes</li> <li>Quantité refusée nette : 5 tonnes</li> <li>Quantité acceptée nette : 5 tonnes</li>`;
+      expect(cleanse(body)).toContain(cleanse(expectedBody));
+    });
+
+    it("should not send a mail if waste is ACCEPTED", async () => {
+      // Given
+      const bsda = await createBsda();
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              refusedWeight: 0,
+              weight: 10,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(sendMail as jest.Mock).not.toHaveBeenCalled();
+    });
+
+    // TODO: si opération, pas de mail si réception
+    // TODO: si opération, mail si pas de réception
 
     it("should not be able to sign reception after transport if quantityReceived = 0", async () => {
       // Given
@@ -2737,5 +2896,274 @@ describe("Mutation.Bsda.sign", () => {
         expect(data.signBsda?.waste?.adr).toBe(wasteAdr);
       }
     );
+  });
+
+  describe("closed sirets", () => {
+    // eslint-disable-next-line prefer-const
+    let searchCompanyMock = jest.fn().mockReturnValue({});
+    let makeClientLocal: typeof makeClient;
+
+    beforeAll(async () => {
+      // Mock les appels à la base SIRENE
+      jest.mock("../../../../companies/search", () => ({
+        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
+        ...jest.requireActual("../../../../companies/search"),
+        searchCompany: searchCompanyMock
+      }));
+
+      // Ré-importe makeClient pour que searchCompany soit bien mocké
+      jest.resetModules();
+      makeClientLocal = require("../../../../__tests__/testClient")
+        .default as typeof makeClient;
+    });
+
+    afterEach(async () => {
+      jest.restoreAllMocks();
+      await resetDatabase();
+    });
+
+    const createUserAndBsda = async (
+      input: Partial<Prisma.BsdaCreateInput> = {}
+    ) => {
+      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
+        name: "Emitter"
+      });
+      const user = emitterCompanyAndUser.user;
+      const emitter = emitterCompanyAndUser.company;
+      const destination = await companyFactory({ name: "Destination" });
+      const nextDestination = await companyFactory({ name: "Destination" });
+      const transporter = await companyFactory({ name: "Transporter" });
+      const { user: workerUser, company: worker } =
+        await userWithCompanyFactory("MEMBER", { name: "Worker" });
+      const broker = await companyFactory({
+        name: "Broker",
+        companyTypes: ["BROKER"],
+        brokerReceipt: {
+          create: {
+            receiptNumber: "recepisse",
+            department: "07",
+            validityLimit: new Date()
+          }
+        }
+      });
+      const intermediary = await companyFactory({ name: "Intermediary" });
+      const ecoOrganisme = await ecoOrganismeFactory({
+        handle: { handleBsda: true },
+        createAssociatedCompany: true
+      });
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.INITIAL,
+          emitterCompanySiret: emitter.siret,
+          destinationCompanySiret: destination.siret,
+          destinationOperationNextDestinationCompanySiret:
+            nextDestination.siret,
+          destinationOperationNextDestinationCompanyName: nextDestination.name,
+          destinationOperationNextDestinationCompanyAddress:
+            "Next destination address",
+          destinationOperationNextDestinationCompanyContact:
+            "Next destination contact",
+          destinationOperationNextDestinationCompanyPhone: "060102030405",
+          destinationOperationNextDestinationCompanyMail:
+            "next.destination@mail.com",
+          destinationOperationNextDestinationCap: "Next destination CAP",
+          destinationOperationNextDestinationPlannedOperationCode: "R5",
+          workerCompanySiret: worker.siret,
+          brokerCompanySiret: broker.siret,
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  number: 1,
+                  transporterCompanySiret: transporter.siret,
+                  transporterCompanyName: transporter.name
+                }
+              ]
+            }
+          },
+          intermediaries: {
+            create: [
+              {
+                siret: intermediary.siret!,
+                name: intermediary.name,
+                address: "intermediary address",
+                contact: "intermediary"
+              }
+            ]
+          },
+          ecoOrganismeSiret: ecoOrganisme.siret,
+          ...input
+        }
+      });
+
+      return { user, workerUser, bsda };
+    };
+
+    it("should not be able to sign if a siret is closed", async () => {
+      // In this example the emitter is closed, so he shouldn't
+      // be able to sign the EMISSION step
+
+      // Given
+      const { user, bsda } = await createUserAndBsda();
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement ${bsda.emitterCompanySiret} est fermé selon le répertoire SIRENE`
+      );
+    });
+
+    it("should be able to sign if a siret is closed but field is sealed", async () => {
+      // In this example the emitter has closed but it's ok because
+      // EMISSION has already been signed. The worker can go on with
+      // the workflow
+
+      // Given
+      const { workerUser, bsda } = await createUserAndBsda({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: "SIGNED_BY_PRODUCER"
+      });
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: siret === bsda.emitterCompanySiret ? "F" : "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      // When
+      const { mutate } = makeClientLocal(workerUser);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: workerUser.name,
+            type: "WORK"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
+
+    it("should not be able to sign if a siret is dormant", async () => {
+      // In this example the emitter is dormant, so he shouldn't
+      // be able to sign the EMISSION step
+
+      // Given
+      const { user, bsda } = await createUserAndBsda();
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      await prisma.company.update({
+        where: { siret: bsda.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClientLocal(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: user.name,
+            type: "EMISSION"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `L'établissement avec le SIRET ${bsda.emitterCompanySiret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
+      );
+    });
+
+    it("should be able to sign if a siret is dormant but field is sealed", async () => {
+      // In this example the emitter has gone dormant but it's ok because
+      // EMISSION has already been signed. The worker can go on with
+      // the workflow
+
+      // Given
+      const { workerUser, bsda } = await createUserAndBsda({
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Emitter",
+        status: "SIGNED_BY_PRODUCER"
+      });
+
+      searchCompanyMock.mockImplementation(siret => {
+        return {
+          siret,
+          etatAdministratif: "O",
+          address: "Company address",
+          name: "Company name"
+        };
+      });
+
+      await prisma.company.update({
+        where: { siret: bsda.emitterCompanySiret! },
+        data: { isDormantSince: new Date() }
+      });
+
+      // When
+      const { mutate } = makeClientLocal(workerUser);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            author: workerUser.name,
+            type: "WORK"
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
   });
 });
