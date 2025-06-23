@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.07.1] 01/07/2025
 
+#### :nail_care: Améliorations
+
+- Amélioration du sélecteur de pays pour la saisie de déclarations RNDTS [PR 4242](https://github.com/MTES-MCT/trackdechets/pull/4242)
+
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
