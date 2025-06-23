@@ -9,6 +9,7 @@ import {
 import { PACKAGINGS_NAMES } from "../../../../form/bsda/components/packagings/Packagings";
 import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 import ExpandableList from "../../../../dashboard/detail/bsda/ExpandableList";
+import { isDefined } from "../../../../common/helper";
 
 interface Props {
   bsda: Bsda;
@@ -49,15 +50,14 @@ export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
           </DsfrDataListDescription>
         </DsfrDataListItem>
       )}
-      {bsda.destination?.reception?.acceptedWeight !== null &&
-        bsda.destination?.reception?.acceptedWeight !== undefined && (
-          <DsfrDataListItem>
-            <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
-            <DsfrDataListDescription>
-              {`${bsda.destination?.reception?.acceptedWeight}t`}
-            </DsfrDataListDescription>
-          </DsfrDataListItem>
-        )}
+      {isDefined(bsda.destination?.reception?.acceptedWeight) && (
+        <DsfrDataListItem>
+          <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
+          <DsfrDataListDescription>
+            {`${bsda.destination?.reception?.acceptedWeight}t`}
+          </DsfrDataListDescription>
+        </DsfrDataListItem>
+      )}
       <DsfrDataListItem>
         <DsfrDataListTerm>Conditionnement</DsfrDataListTerm>
         <DsfrDataListDescription>
