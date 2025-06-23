@@ -5,12 +5,18 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
-import type { CompanySearchResult, Mutation } from "@td/codegen-back";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData,
+  readyToTakeOverData,
+  traderData,
+  brokerData
+} from "../../../__tests__/factories";
+import type { Mutation } from "@td/codegen-back";
 import { BsdasriType } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
-import { searchCompany } from "../../../../companies/search";
 
 jest.mock("../../../../companies/search");
 
@@ -56,13 +62,56 @@ describe("Mutation.duplicateBsdasri", () => {
       })
     ]);
   });
+
   it("should disallow users not belonging to the duplicated dasri", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
     const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
+    const transporter = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRANSPORTER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: {
+          receiptNumber: "BROKER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "BROKER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    await prisma.brokerReceipt.findUniqueOrThrow({
+      where: { id: broker.brokerReceiptId! }
+    });
+    const trader = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: {
+          receiptNumber: "TRADER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString() as any,
+          department: "TRADER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    await prisma.traderReceipt.findUniqueOrThrow({
+      where: { id: trader.traderReceiptId! }
+    });
+
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(otherCompany)
+        ...initialData(otherCompany),
+        ...readyToPublishData(otherCompany),
+        ...readyToTakeOverData(transporter),
+        ...traderData(trader),
+        ...brokerData(broker)
+        // ...intermediaryData()
       }
     });
 
@@ -123,7 +172,7 @@ describe("Mutation.duplicateBsdasri", () => {
     }
   );
 
-  it("should duplicate a  dasri", async () => {
+  it("should duplicate a dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
@@ -155,7 +204,7 @@ describe("Mutation.duplicateBsdasri", () => {
         create: {
           receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
           validityLimit: TODAY.toISOString(),
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+          department: "TRANSPORTER-RECEIPT-DEPARTMENT"
         }
       }
     });
@@ -164,6 +213,33 @@ describe("Mutation.duplicateBsdasri", () => {
         where: { id: transporterCompany.transporterReceiptId! }
       });
     const destinationCompany = await companyFactory();
+
+    const traderCompany = await companyFactory({
+      traderReceipt: {
+        create: {
+          receiptNumber: "TRADER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "TRADER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const traderReceipt = await prisma.traderReceipt.findUniqueOrThrow({
+      where: { id: traderCompany.traderReceiptId! }
+    });
+
+    const brokerCompany = await companyFactory({
+      brokerReceipt: {
+        create: {
+          receiptNumber: "BROKER-RECEIPT-NUMBER",
+          validityLimit: TODAY.toISOString(),
+          department: "BROKER-RECEIPT-DEPARTMENT"
+        }
+      }
+    });
+    const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
+      where: { id: brokerCompany.brokerReceiptId! }
+    });
+
     const bsdasri = await bsdasriFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
@@ -172,6 +248,7 @@ describe("Mutation.duplicateBsdasri", () => {
         emitterCompanyContact: emitter.company.contact,
         emitterCompanyMail: emitter.company.contactEmail,
         emitterCompanyPhone: emitter.company.contactPhone,
+
         transporterCompanySiret: transporterCompany.siret,
         transporterCompanyName: transporterCompany.name,
         transporterCompanyAddress: transporterCompany.address,
@@ -181,12 +258,27 @@ describe("Mutation.duplicateBsdasri", () => {
         transporterRecepisseNumber: transporterReceipt.receiptNumber,
         transporterRecepisseDepartment: transporterReceipt.department,
         transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+
         destinationCompanySiret: destinationCompany.siret,
         destinationCompanyName: destinationCompany.name,
         destinationCompanyAddress: destinationCompany.address,
         destinationCompanyContact: destinationCompany.contact,
         destinationCompanyMail: destinationCompany.contactEmail,
-        destinationCompanyPhone: destinationCompany.contactPhone
+        destinationCompanyPhone: destinationCompany.contactPhone,
+
+        traderCompanySiret: traderCompany.siret,
+        traderCompanyName: traderCompany.name,
+        traderCompanyAddress: traderCompany.address,
+        traderCompanyContact: traderCompany.contact,
+        traderCompanyMail: traderCompany.contactEmail,
+        traderCompanyPhone: traderCompany.contactPhone,
+
+        brokerCompanySiret: brokerCompany.siret,
+        brokerCompanyName: brokerCompany.name,
+        brokerCompanyAddress: brokerCompany.address,
+        brokerCompanyContact: brokerCompany.contact,
+        brokerCompanyMail: brokerCompany.contactEmail,
+        brokerCompanyPhone: brokerCompany.contactPhone
       }
     });
     const { mutate } = makeClient(emitter.user);
@@ -230,6 +322,44 @@ describe("Mutation.duplicateBsdasri", () => {
         contact: "UPDATED-DESTINATION-CONTACT",
         contactPhone: "UPDATED-DESTINATION-PHONE",
         contactEmail: "UPDATED-DESTINATION-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: traderCompany.id },
+      data: {
+        name: "UPDATED-TRADER-NAME",
+        address: "UPDATED-TRADER-ADDRESS",
+        contact: "UPDATED-TRADER-CONTACT",
+        contactPhone: "UPDATED-TRADER-PHONE",
+        contactEmail: "UPDATED-TRADER-MAIL"
+      }
+    });
+    await prisma.traderReceipt.update({
+      where: { id: traderReceipt.id },
+      data: {
+        receiptNumber: "UPDATED-TRADER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-TRADER-RECEIPT-DEPARTMENT"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: brokerCompany.id },
+      data: {
+        name: "UPDATED-BROKER-NAME",
+        address: "UPDATED-BROKER-ADDRESS",
+        contact: "UPDATED-BROKER-CONTACT",
+        contactPhone: "UPDATED-BROKER-PHONE",
+        contactEmail: "UPDATED-BROKER-MAIL"
+      }
+    });
+    await prisma.brokerReceipt.update({
+      where: { id: brokerReceipt.id },
+      data: {
+        receiptNumber: "UPDATED-BROKER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-BROKER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -303,6 +433,49 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedBsdasri.destinationCompanyPhone).toEqual(
       "UPDATED-DESTINATION-PHONE"
     );
+
+    expect(duplicatedBsdasri.brokerCompanyName).toEqual("UPDATED-BROKER-NAME");
+    expect(duplicatedBsdasri.brokerCompanyAddress).toEqual(
+      "UPDATED-BROKER-ADDRESS"
+    );
+    expect(duplicatedBsdasri.brokerCompanyContact).toEqual(
+      "UPDATED-BROKER-CONTACT"
+    );
+    expect(duplicatedBsdasri.brokerCompanyMail).toEqual("UPDATED-BROKER-MAIL");
+    expect(duplicatedBsdasri.brokerCompanyPhone).toEqual(
+      "UPDATED-BROKER-PHONE"
+    );
+    expect(duplicatedBsdasri.brokerRecepisseNumber).toEqual(
+      "UPDATED-BROKER-RECEIPT-NUMBER"
+    );
+    expect(duplicatedBsdasri.brokerRecepisseValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedBsdasri.brokerRecepisseDepartment).toEqual(
+      "UPDATED-BROKER-RECEIPT-DEPARTMENT"
+    );
+
+    expect(duplicatedBsdasri.traderCompanyName).toEqual("UPDATED-TRADER-NAME");
+    expect(duplicatedBsdasri.traderCompanyAddress).toEqual(
+      "UPDATED-TRADER-ADDRESS"
+    );
+    expect(duplicatedBsdasri.traderCompanyContact).toEqual(
+      "UPDATED-TRADER-CONTACT"
+    );
+    expect(duplicatedBsdasri.traderCompanyMail).toEqual("UPDATED-TRADER-MAIL");
+    expect(duplicatedBsdasri.traderCompanyPhone).toEqual(
+      "UPDATED-TRADER-PHONE"
+    );
+    expect(duplicatedBsdasri.traderRecepisseNumber).toEqual(
+      "UPDATED-TRADER-RECEIPT-NUMBER"
+    );
+    expect(duplicatedBsdasri.traderRecepisseValidityLimit).toEqual(
+      FOUR_DAYS_AGO
+    );
+    expect(duplicatedBsdasri.traderRecepisseDepartment).toEqual(
+      "UPDATED-TRADER-RECEIPT-DEPARTMENT"
+    );
+
     // Test emptying Transporter receipt
     await prisma.transporterReceipt.delete({
       where: { id: transporterCompany.transporterReceiptId! }
@@ -323,105 +496,6 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(duplicatedBsdasri2.transporterRecepisseNumber).toBeNull();
     expect(duplicatedBsdasri2.transporterRecepisseValidityLimit).toBeNull();
     expect(duplicatedBsdasri2.transporterRecepisseDepartment).toBeNull();
-  });
-
-  test("duplicated BSDASRI should have the updated SIRENE data when company info changes", async () => {
-    const emitter = await userWithCompanyFactory("MEMBER");
-    const transporterCompany = await companyFactory({
-      transporterReceipt: {
-        create: {
-          receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
-          validityLimit: TODAY.toISOString(),
-          department: "TRANSPORTER- RECEIPT-DEPARTMENT"
-        }
-      }
-    });
-    const transporterReceipt =
-      await prisma.transporterReceipt.findUniqueOrThrow({
-        where: { id: transporterCompany.transporterReceiptId! }
-      });
-    const destinationCompany = await companyFactory();
-    const bsdasri = await bsdasriFactory({
-      opt: {
-        emitterCompanySiret: emitter.company.siret,
-        emitterCompanyName: emitter.company.name,
-        emitterCompanyAddress: emitter.company.address,
-        emitterCompanyContact: emitter.company.contact,
-        emitterCompanyMail: emitter.company.contactEmail,
-        emitterCompanyPhone: emitter.company.contactPhone,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyName: transporterCompany.name,
-        transporterCompanyAddress: transporterCompany.address,
-        transporterCompanyContact: transporterCompany.contact,
-        transporterCompanyMail: transporterCompany.contactEmail,
-        transporterCompanyPhone: transporterCompany.contactPhone,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
-        destinationCompanySiret: destinationCompany.siret,
-        destinationCompanyName: destinationCompany.name,
-        destinationCompanyAddress: destinationCompany.address,
-        destinationCompanyContact: destinationCompany.contact,
-        destinationCompanyMail: destinationCompany.contactEmail,
-        destinationCompanyPhone: destinationCompany.contactPhone
-      }
-    });
-    const { mutate } = makeClient(emitter.user);
-
-    function searchResult(companyName: string) {
-      return {
-        name: `updated ${companyName} name`,
-        address: `updated ${companyName} address`,
-        statutDiffusionEtablissement: "O"
-      } as CompanySearchResult;
-    }
-
-    const searchResults = {
-      [emitter.company.siret!]: searchResult("emitter"),
-      [transporterCompany.siret!]: searchResult("transporter"),
-      [destinationCompany.siret!]: searchResult("destination")
-    };
-
-    (searchCompany as jest.Mock).mockImplementation((clue: string) => {
-      return Promise.resolve(searchResults[clue]);
-    });
-
-    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-      DUPLICATE_DASRI,
-      {
-        variables: {
-          id: bsdasri.id
-        }
-      }
-    );
-
-    const duplicatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: data.duplicateBsdasri.id }
-    });
-
-    // Emitter
-    expect(duplicatedBsdasri.emitterCompanyName).toEqual(
-      "updated emitter name"
-    );
-    expect(duplicatedBsdasri.emitterCompanyAddress).toEqual(
-      "updated emitter address"
-    );
-
-    // Transporter
-    expect(duplicatedBsdasri.transporterCompanyName).toEqual(
-      "updated transporter name"
-    );
-    expect(duplicatedBsdasri.transporterCompanyAddress).toEqual(
-      "updated transporter address"
-    );
-
-    // Destination
-    expect(duplicatedBsdasri.destinationCompanyName).toEqual(
-      "updated destination name"
-    );
-    expect(duplicatedBsdasri.destinationCompanyAddress).toEqual(
-      "updated destination address"
-    );
   });
 
   it("should *not* duplicate waste details", async () => {

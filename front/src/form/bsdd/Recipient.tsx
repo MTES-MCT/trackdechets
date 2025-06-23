@@ -138,7 +138,11 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           siret={siret}
           disabled={disabled}
         />
-        <FormikTrader siret={siret} disabled={disabled} />
+        <FormikTrader
+          bsdType={BsdType.Bsdd}
+          siret={siret}
+          disabled={disabled}
+        />
         <FormikIntermediaryList siret={siret} disabled={disabled} />
       </div>
     </>

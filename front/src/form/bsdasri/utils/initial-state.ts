@@ -79,7 +79,10 @@ const getInitialState = (f?: Bsdasri | null) => ({
     }
   },
   grouping: [],
-  synthesizing: []
+  synthesizing: [],
+  broker: null,
+  trader: null,
+  intermediaries: []
 });
 
 export default getInitialState;
