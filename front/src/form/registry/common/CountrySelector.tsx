@@ -5,22 +5,15 @@ import { Controller, type UseFormReturn } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { formatError } from "../builder/error";
 
-const france = countries.find(country => country.cca2 === "FR");
-const otherCountries = countries.filter(country => country.cca2 !== "FR");
-
-const sortedCountries = [
-  ...(france
-    ? [{ label: france.translations.fra.common, code: france.cca2 }]
-    : []),
-  ...otherCountries
-    .sort((a, b) =>
-      a.translations.fra.common.localeCompare(b.translations.fra.common)
-    )
-    .map(country => ({
-      label: country.translations.fra.common,
-      code: country.cca2
-    }))
-];
+const sortedCountries = countries
+  .sort((a, b) => {
+    if (a.cca2 === "FR") return -1; // France first
+    return a.translations.fra.common.localeCompare(b.translations.fra.common);
+  })
+  .map(country => ({
+    label: country.translations.fra.common,
+    code: country.cca2
+  }));
 
 type Props = {
   prefix: string;
