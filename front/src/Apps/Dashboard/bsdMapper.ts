@@ -276,7 +276,10 @@ const mapBsda = (bsda: Bsda): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda?.destination?.reception?.weight || bsda?.weight?.value
+      weight:
+        bsda?.destination?.reception?.acceptedWeight ??
+        bsda?.destination?.reception?.weight ??
+        bsda?.weight?.value
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
