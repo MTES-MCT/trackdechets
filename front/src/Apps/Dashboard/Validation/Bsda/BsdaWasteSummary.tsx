@@ -54,7 +54,7 @@ export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
         <DsfrDataListItem>
           <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
           <DsfrDataListDescription>
-            {`${bsda.destination?.reception?.acceptedWeight}t`}
+            {`${bsda.destination?.reception?.acceptedWeight} t`}
           </DsfrDataListDescription>
         </DsfrDataListItem>
       )}
