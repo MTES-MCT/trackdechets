@@ -187,6 +187,7 @@ export const getOperationModeSchema = (
 const numberAsStringSchema = z
   .string()
   .trim()
+  .max(50, "Le nombre ne peut pas dépasser 50 caractères")
   .nullish()
   .transform(val => (val ? Number(val.replace(",", ".")) : undefined));
 

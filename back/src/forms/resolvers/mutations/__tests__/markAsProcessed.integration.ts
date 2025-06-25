@@ -1546,7 +1546,7 @@ describe("mutation.markAsProcessed", () => {
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
   });
 
-  it("should mark appendix2 forms as processed  despite rogue decimal digits", async () => {
+  it("should mark appendix2 forms as processed despite rogue decimal digits", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
     const groupedForm1 = await formFactory({
@@ -1616,9 +1616,11 @@ describe("mutation.markAsProcessed", () => {
     expect(updatedGroupedForm1.status).toEqual("PROCESSED");
 
     const updatedGroupedForm2 = await prisma.form.findUniqueOrThrow({
-      where: { id: groupedForm2.id }
+      where: { id: groupedForm2.id },
+      include: { forwardedIn: true }
     });
     expect(updatedGroupedForm2.status).toEqual("PROCESSED");
+    expect(updatedGroupedForm2.forwardedIn?.status).toEqual("PROCESSED");
   });
 
   it.each([0.1, 1])(

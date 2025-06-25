@@ -214,7 +214,8 @@ export const bsdasriInclude = {
   grouping: true,
   groupedIn: true,
   synthesizedIn: true,
-  synthesizing: true
+  synthesizing: true,
+  intermediaries: true
 };
 
 export const cloneBsdasri = async (user: Express.User, id: string) => {
@@ -382,6 +383,34 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
     updatedAt: bsdasri.updatedAt,
     wasteAdr: bsdasri.wasteAdr,
     wasteCode: bsdasri.wasteCode,
+
+    brokerCompanyName: bsdasri.brokerCompanyName,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    brokerCompanyAddress: bsdasri.brokerCompanyAddress,
+    brokerCompanyContact: bsdasri.brokerCompanyContact,
+    brokerCompanyPhone: bsdasri.brokerCompanyPhone,
+    brokerCompanyMail: bsdasri.brokerCompanyMail,
+    brokerRecepisseNumber: bsdasri.brokerRecepisseNumber,
+    brokerRecepisseDepartment: bsdasri.brokerRecepisseDepartment,
+    brokerRecepisseValidityLimit: bsdasri.brokerRecepisseValidityLimit,
+    traderCompanyName: bsdasri.traderCompanyName,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+    traderCompanyAddress: bsdasri.traderCompanyAddress,
+    traderCompanyContact: bsdasri.traderCompanyContact,
+    traderCompanyPhone: bsdasri.traderCompanyPhone,
+    traderCompanyMail: bsdasri.traderCompanyMail,
+    traderRecepisseNumber: bsdasri.traderRecepisseNumber,
+    traderRecepisseDepartment: bsdasri.traderRecepisseDepartment,
+    traderRecepisseValidityLimit: bsdasri.traderRecepisseValidityLimit,
+
+    intermediaries: bsdasri.intermediaries.length
+      ? {
+          createMany: {
+            data: bsdasri.intermediaries
+          }
+        }
+      : {},
+    intermediariesOrgIds: bsdasri.intermediariesOrgIds,
     canAccessDraftOrgIds: bsdasri.canAccessDraftOrgIds
   };
 

@@ -38,6 +38,7 @@ import {
 } from "../../common/validation/zod/refinement";
 import { CompanyRole } from "../../common/validation/zod/schema";
 import { isDefined } from "../../common/helpers";
+import { isBSDAFinalOperationCode } from "../../common/operationCodes";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -339,7 +340,10 @@ export const checkCompanies = async (
           transporter.transporterRecepisseIsExempted ?? false
       },
       zodContext,
-      !sealedFields.includes("transporters")
+      // Transporters are sealed when all transporters have signed
+      // If one of the transporter has already signed, we should not block if he is sleeping
+      transporter.transporterTransportSignatureDate == null ||
+        !sealedFields.includes("transporters")
     );
     await isRegisteredVatNumberRefinement(
       transporter.transporterCompanyVatNumber,
@@ -756,4 +760,41 @@ export const checkDestinationReceptionRefusedWeight = (
     });
     return;
   }
+};
+
+export const validateReceptionOperationCode: (
+  validationContext: BsdaValidationContext
+) => Refinement<ParsedZodBsda> = validationContext => {
+  const currentSignatureType = validationContext.currentSignatureType;
+
+  return async (bsda, { addIssue }) => {
+    if (currentSignatureType !== "OPERATION") {
+      return;
+    }
+
+    const {
+      destinationOperationCode,
+      destinationOperationNextDestinationCompanySiret
+    } = bsda;
+
+    const isTempStorageReception =
+      !bsda.forwarding &&
+      !bsda.grouping?.length &&
+      isDefined(destinationOperationNextDestinationCompanySiret);
+
+    // Attention! Lors d'une réception sur une étape d'entreposage provisoire,
+    // on ne doit pas pouvoir renseigner un code de traitement final!
+    if (
+      isBSDAFinalOperationCode(destinationOperationCode ?? null) &&
+      isTempStorageReception
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Vous ne pouvez pas renseigner un code de traitement final",
+        path: ["destination", "operation", "code"]
+      });
+    }
+
+    return;
+  };
 };

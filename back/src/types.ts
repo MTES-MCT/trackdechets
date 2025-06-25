@@ -119,6 +119,7 @@ declare module "express-session" {
 declare module "express" {
   interface Request {
     gqlInfos?: GqlInfo[];
+    timedOut?: boolean;
   }
   interface Locals {
     hasUndisplayedError?: boolean;

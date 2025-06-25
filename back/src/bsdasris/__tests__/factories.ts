@@ -5,7 +5,8 @@ import {
   Prisma,
   BsdasriType,
   OperationMode,
-  TransportMode
+  TransportMode,
+  Company
 } from "@prisma/client";
 import type { BsdasriPackagingsInput } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
@@ -13,6 +14,7 @@ import { distinct } from "../../common/arrays";
 import { computeTotalVolume } from "../converter";
 import { getCanAccessDraftOrgIds } from "../utils";
 import { ZodBsdasriPackagingEnum } from "../validation/schema";
+
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
   id: getReadableId(ReadableIdPrefix.DASRI),
@@ -26,6 +28,11 @@ export const bsdasriFactory = async ({
   userId?: string;
   opt?: Partial<Prisma.BsdasriCreateInput>;
 }) => {
+  const bsdasriInclude = {
+    synthesizing: true,
+    grouping: true,
+    intermediaries: true
+  };
   const dasriParams = {
     ...dasriData(),
     ...opt,
@@ -42,40 +49,49 @@ export const bsdasriFactory = async ({
     data: {
       ...dasriParams
     },
-    include: { synthesizing: true, grouping: true }
+    include: bsdasriInclude
   });
+  const intermediariesOrgIds: string[] = created.intermediaries
+    ? created.intermediaries
+        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        .filter(Boolean)
+    : [];
 
   if (created.type === BsdasriType.SYNTHESIS) {
     const synthesisEmitterSirets = distinct(
       created.synthesizing.map(associated => associated.emitterCompanySiret)
     ).filter(Boolean);
 
-    return prisma.bsdasri.update({
+    await prisma.bsdasri.update({
       where: { id: created.id },
       data: { synthesisEmitterSirets }
     });
   }
+
   if (created.type === BsdasriType.GROUPING) {
     const groupingEmitterSirets = distinct(
       created.grouping.map(grouped => grouped.emitterCompanySiret)
     ).filter(Boolean);
 
-    return prisma.bsdasri.update({
+    await prisma.bsdasri.update({
       where: { id: created.id },
       data: { groupingEmitterSirets }
     });
   }
 
-  if (created.isDraft && userId) {
-    const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(created, userId);
+  const canAccessDraftOrgIds =
+    created.isDraft && userId
+      ? await getCanAccessDraftOrgIds(created, userId)
+      : [];
 
-    return prisma.bsdasri.update({
-      where: { id: created.id },
-      data: { canAccessDraftOrgIds }
-    });
-  }
-
-  return created;
+  return prisma.bsdasri.update({
+    where: { id: created.id },
+    data: {
+      ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
+      ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
+    },
+    include: bsdasriInclude
+  });
 };
 
 export const bsdasriFinalOperationFactory = async ({
@@ -114,6 +130,40 @@ export const initialData = company => ({
   emitterWastePackagings: [
     { type: "BOITE_CARTON" as ZodBsdasriPackagingEnum, volume: 22, quantity: 3 }
   ]
+});
+
+export const brokerData = (company: Company) => ({
+  brokerCompanySiret: company.siret,
+  brokerCompanyName: company.name,
+  brokerCompanyContact: company.contact,
+  brokerCompanyPhone: company.contactPhone,
+  brokerCompanyAddress: company.address,
+  brokerCompanyMail: company.contactEmail,
+  brokerRecepisseNumber: "recep broker",
+  brokerRecepisseDepartment: "13",
+  brokerRecepisseValidityLimit: new Date()
+});
+export const traderData = (company: Company) => ({
+  traderCompanySiret: company.siret,
+  traderCompanyName: company.name,
+  traderCompanyContact: company.contact,
+  traderCompanyPhone: company.contactPhone,
+  traderCompanyAddress: company.address,
+  traderCompanyMail: company.contactEmail,
+
+  traderRecepisseNumber: "recep trader",
+  traderRecepisseDepartment: "83",
+  traderRecepisseValidityLimit: new Date()
+});
+
+export const intermediaryData = (
+  company: Company,
+  contact = "intermediary"
+) => ({
+  siret: company.siret!,
+  name: company.name,
+  address: company.address,
+  contact
 });
 
 export const readyToPublishData = destination => ({

@@ -18,7 +18,7 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
 
     const bsdasri = await prisma.bsdasri.create({
       data,
-      include: { synthesizing: true, grouping: true }
+      include: { synthesizing: true, grouping: true, intermediaries: true }
     });
     // denormalize synthesis emitter sirets
     let synthesisEmitterSirets: string[] = [];

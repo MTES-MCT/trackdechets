@@ -68,6 +68,8 @@ export const searchCompanyTD = async (siret: string) => {
   const response = await client.search<SearchResponse>({
     index,
     body: {
+      size: 1,
+      sort: { dateDernierTraitementEtablissement: "desc" },
       query: {
         term: {
           siret: {

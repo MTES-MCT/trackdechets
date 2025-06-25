@@ -1,6 +1,9 @@
 import type { BsdasriInput } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { expandBsdasriFromDB } from "../../converter";
+import {
+  expandBsdasriFromDB,
+  companyToIntermediaryInput
+} from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
@@ -36,7 +39,13 @@ const createBsdasri = async (
       unsealed: true
     }
   );
-
+  const intermediaries =
+    parsedZodBsdasri.intermediaries &&
+    parsedZodBsdasri.intermediaries.length > 0
+      ? {
+          create: companyToIntermediaryInput(parsedZodBsdasri.intermediaries)
+        }
+      : undefined;
   const isGrouping = !!grouping && !!grouping.length;
 
   // grouping perms check
@@ -59,6 +68,7 @@ const createBsdasri = async (
     ...createInput,
     type: bsdasriType,
     grouping: { connect: groupedBsdasris },
+    intermediaries,
 
     isDraft
   });

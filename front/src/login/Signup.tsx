@@ -91,7 +91,7 @@ export default function Signup() {
       setEmailValue(value);
       setErrorMessage("");
     } else {
-      setErrorMessage("Format de l'email invalide");
+      setErrorMessage("Format du courriel invalide");
     }
     if (!value) {
       setErrorMessage("");
@@ -120,7 +120,7 @@ export default function Signup() {
               }}
             />
             <Input
-              label="Email"
+              label="Courriel"
               nativeInputProps={{
                 required: true,
                 type: "email",
@@ -130,7 +130,7 @@ export default function Signup() {
             {Boolean(emailValue) && isGenericEmail(emailValue) && (
               <Alert
                 className="fr-mb-3w"
-                description="Dans le cas où vous posséderiez une adresse e-mail professionnelle avec un nom de domaine d'entreprise (ex : nom@votre-entreprise.fr), nous vous recommandons de l'utiliser pour la création de votre compte, afin de faciliter le processus de vérification de rattachement à votre établissement."
+                description="Dans le cas où vous posséderiez un courriel professionnel avec un nom de domaine d'entreprise (ex : nom@votre-entreprise.fr), nous vous recommandons de l'utiliser pour la création de votre compte, afin de faciliter le processus de vérification de rattachement à votre établissement."
                 severity="info"
                 closable={false}
                 small
@@ -196,7 +196,7 @@ export default function Signup() {
         <div className="fr-col fr-m-auto fr-pr-2w">
           <h1 className="fr-h3 fr-mb-1w">On y est presque !</h1>
           <p className="fr-text--md fr-mb-1w">
-            Un email de confirmation vous a été envoyé à l'adresse{" "}
+            Un courriel de confirmation vous a été envoyé à l'adresse{" "}
             <strong>{emailValue}</strong> 📨
           </p>
           <p className="fr-text--md">
@@ -221,20 +221,20 @@ export default function Signup() {
             <span role="img" aria-label="emoji finger">
               👉
             </span>{" "}
-            Si vous n'avez pas reçu l'email de confirmation au bout d'une heure,
-            vous pouvez le renvoyer depuis{" "}
+            Si vous n'avez pas reçu le courriel de confirmation au bout d'une
+            heure, vous pouvez le renvoyer depuis{" "}
             <a href={routes.resendActivationEmail} className="fr-link">
               cette page
             </a>
           </p>
           <p className="fr-text--md">
             Le message peut ne pas arriver pour les raisons suivantes :<br />-
-            adresse email erronée
+            courriel erroné
             <br />- antivirus ou suite logicielle de sécurité trop restrictifs
           </p>
           <p className="fr-text--md">
             Pour finaliser votre inscription, cliquez sur le lien qui vous a été
-            envoyé par email. Vous pourrez ensuite vous connecter à
+            envoyé par courriel. Vous pourrez ensuite vous connecter à
             Trackdéchets.{" "}
             <span role="img" aria-label="emoji rocket">
               🚀

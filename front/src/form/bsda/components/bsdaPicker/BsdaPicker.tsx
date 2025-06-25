@@ -229,7 +229,7 @@ function PickerTable({
             <TableHeaderCell>Numéro</TableHeaderCell>
             <TableHeaderCell>Code déchet</TableHeaderCell>
             <TableHeaderCell>Nom du matériau</TableHeaderCell>
-            <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
+            <TableHeaderCell>Quantité acceptée (en t)</TableHeaderCell>
             <TableHeaderCell>Émetteur</TableHeaderCell>
             <TableHeaderCell>CAP final</TableHeaderCell>
             <TableHeaderCell>Exutoire</TableHeaderCell>
@@ -267,7 +267,10 @@ function PickerTable({
                 <TableCell>{bsda.id}</TableCell>
                 <TableCell>{bsda.waste?.code}</TableCell>
                 <TableCell>{bsda.waste?.materialName ?? "inconnu"}</TableCell>
-                <TableCell>{bsda.destination?.reception?.weight}</TableCell>
+                <TableCell>
+                  {bsda.destination?.reception?.acceptedWeight ??
+                    bsda.destination?.reception?.weight}
+                </TableCell>
                 <TableCell>{bsda.emitter?.company?.name}</TableCell>
                 <TableCell>
                   {bsda.destination?.operation?.nextDestination?.cap ??
