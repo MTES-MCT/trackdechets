@@ -284,7 +284,8 @@ export const initialBsdaReview = {
   destination: {
     cap: "",
     reception: {
-      weight: null
+      weight: null,
+      refusedWeight: null
     },
     operation: {
       code: "",
@@ -375,7 +376,8 @@ export const validationBsdaSchema = z.object({
     .object({
       cap: z.string().nullish(),
       reception: z.object({
-        weight: z.coerce.number().nonnegative().nullish()
+        weight: z.coerce.number().nonnegative().nullish(),
+        refusedWeight: z.coerce.number().nonnegative().nullish()
       }),
       operation: z.object({
         code: z.string().nullish(),
