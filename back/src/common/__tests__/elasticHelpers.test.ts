@@ -20,6 +20,20 @@ describe("elasticHelpers", () => {
         undefined
       ],
       [
+        [
+          {
+            status: "ACCEPTED",
+            updatedAt: addDays(new Date(), -3)
+          },
+          {
+            status: "ACCEPTED",
+            isCanceled: true,
+            updatedAt: sameDayMidnight(addDays(new Date(), -1))
+          }
+        ],
+        sameDayMidnight(addDays(new Date(), -1)).getTime()
+      ],
+      [
         [{ status: "REFUSED", updatedAt: addDays(new Date(), -1) }],
         addDays(new Date(), -1).getTime()
       ],
