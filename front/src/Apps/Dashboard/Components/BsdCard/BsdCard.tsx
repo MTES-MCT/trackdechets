@@ -112,7 +112,7 @@ function BsdCard({
     "pendingRevisionForTab",
     "emittedRevisionForTab",
     "receivedRevisionForTab",
-    "isReviewedRevisionForTab"
+    "reviewedRevisionForTab"
   ].includes(bsdCurrentTab ?? "");
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
