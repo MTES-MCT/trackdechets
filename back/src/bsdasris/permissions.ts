@@ -8,7 +8,6 @@ import { isForeignVat } from "@td/constants";
  * Retrieves organisations allowed to read a BSDASRI
  */
 function readers(bsdasri: Bsdasri): string[] {
-  //plop
   return bsdasri.isDraft
     ? [...bsdasri.canAccessDraftOrgIds]
     : [
