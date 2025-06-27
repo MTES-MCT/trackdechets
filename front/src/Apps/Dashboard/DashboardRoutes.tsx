@@ -93,7 +93,10 @@ function DashboardRoutes() {
                   .find(infos => infos.orgId === defaultOrgId)
                   ?.role?.includes(UserRole.Driver)
                   ? routes.dashboard.transport.toCollect
-                  : routes.dashboard.bsds.index
+                  : routes.dashboard.bsds.index,
+                {
+                  siret: defaultOrgId
+                }
               )
             : routes.companies.index
         }
