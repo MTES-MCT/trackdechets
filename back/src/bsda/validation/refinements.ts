@@ -10,6 +10,7 @@ import {
   getSealedFields
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
+import { Decimal } from "decimal.js";
 import { capitalize } from "../../common/strings";
 import { isArray } from "../../common/dataTypes";
 import {
@@ -707,8 +708,12 @@ export const checkDestinationReceptionRefusedWeight = (
     return;
   }
 
+  // Weights can come from the frontend (numbers) or the DB (Decimals). Harmonize
+  const receptionWeight = new Decimal(destinationReceptionWeight);
+  const refusedWeight = new Decimal(destinationReceptionRefusedWeight);
+
   if (
-    destinationReceptionRefusedWeight !== 0 &&
+    !refusedWeight.equals(0) &&
     destinationReceptionAcceptationStatus == WasteAcceptationStatus.ACCEPTED
   ) {
     ctx.addIssue({
@@ -722,7 +727,7 @@ export const checkDestinationReceptionRefusedWeight = (
 
   if (
     destinationReceptionAcceptationStatus == WasteAcceptationStatus.REFUSED &&
-    destinationReceptionRefusedWeight !== destinationReceptionWeight
+    !refusedWeight?.equals(receptionWeight)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -738,8 +743,8 @@ export const checkDestinationReceptionRefusedWeight = (
     WasteAcceptationStatus.PARTIALLY_REFUSED
   ) {
     if (
-      destinationReceptionRefusedWeight >= destinationReceptionWeight ||
-      destinationReceptionRefusedWeight === 0
+      refusedWeight.greaterThanOrEqualTo(receptionWeight) ||
+      refusedWeight.equals(0)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -751,7 +756,7 @@ export const checkDestinationReceptionRefusedWeight = (
     }
   }
 
-  if (destinationReceptionRefusedWeight > destinationReceptionWeight) {
+  if (refusedWeight.greaterThan(receptionWeight)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
