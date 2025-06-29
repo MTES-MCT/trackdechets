@@ -11,7 +11,8 @@ import {
   Form,
   Query,
   UserPermission,
-  Bsd
+  Bsd,
+  UserRole
 } from "@td/codegen-ui";
 import React, { useState } from "react";
 import BsdCard from "../../Apps/Dashboard/Components/BsdCard/BsdCard";
@@ -212,8 +213,19 @@ export function BsdAdmin() {
             {/* Override permissions context to hide the card's actions except PDF & aperçu */}
             <PermissionsContext.Provider
               value={{
-                permissions: [UserPermission.BsdCanRead],
-                updatePermissions: () => {}
+                permissionsInfos: {
+                  orgPermissionsInfos: [
+                    {
+                      orgId: "unset",
+                      role: UserRole.Reader,
+                      permissions: [UserPermission.BsdCanRead]
+                    }
+                  ],
+                  roles: [],
+                  permissions: [UserPermission.BsdCanRead]
+                },
+                defaultOrgId: "unset",
+                orgIds: ["unset"]
               }}
             >
               <BsdCard

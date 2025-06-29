@@ -1,53 +1,101 @@
-import React, { useContext, useState, useCallback, useMemo } from "react";
-import { UserPermission, UserRole } from "@td/codegen-ui";
+import React, { PropsWithChildren, useContext, useMemo } from "react";
+import { Query, UserPermission, UserRole } from "@td/codegen-ui";
+import { gql, useQuery } from "@apollo/client";
+import { useAuth } from "./AuthContext";
+import { getDefaultOrgId } from "../../Apps/common/Components/CompanySwitcher/CompanySwitcher";
 
-interface InterfacePermissions {
-  children: React.ReactNode;
-  defaultPermissions: UserPermission[];
-}
+type OrgPermissions = {
+  orgId: string | undefined;
+  role: UserRole | undefined;
+  permissions: UserPermission[];
+};
+
+type PermissionsInfos = {
+  orgPermissionsInfos: OrgPermissions[];
+  roles: UserRole[];
+  permissions: UserPermission[];
+};
 
 type PermissionsContextType = {
-  permissions: UserPermission[];
-  role?: UserRole;
-  orgId?: string;
-  updatePermissions: (
-    newPermissions: UserPermission[],
-    newRole: UserRole,
-    orgId: string
-  ) => void;
+  permissionsInfos: PermissionsInfos;
+  orgIds: string[];
+  defaultOrgId: string | undefined;
 };
+
+const PERMISSIONS_INFOS = gql`
+  query PermissionsInfos {
+    permissionsInfos {
+      orgPermissionsInfos {
+        orgId
+        role
+        permissions
+      }
+      roles
+      permissions
+    }
+  }
+`;
 
 export const PermissionsContext =
   React.createContext<PermissionsContextType | null>(null);
 
-export function usePermissions() {
-  return useContext(PermissionsContext) as PermissionsContextType;
+export function usePermissions(orgId?: string) {
+  const context = useContext(PermissionsContext);
+  if (!context) {
+    throw new Error("usePermissions must be used within a PermissionsProvider");
+  }
+
+  const { permissionsInfos, orgIds, defaultOrgId } = context;
+
+  const orgPermissions = permissionsInfos?.orgPermissionsInfos?.find(
+    infos => infos.orgId === orgId
+  ) ?? {
+    orgId,
+    role: UserRole.Reader,
+    permissions: []
+  };
+
+  return {
+    permissionsInfos,
+    orgPermissions,
+    orgIds,
+    defaultOrgId
+  };
 }
 
 export function PermissionsProvider({
-  children,
-  defaultPermissions = []
-}: InterfacePermissions) {
-  const [permissions, setPermissions] =
-    useState<UserPermission[]>(defaultPermissions);
-  const [role, setRole] = useState<UserRole>();
-  const [orgId, setOrgId] = useState<string>();
-
-  const updatePermissions = useCallback(
-    (newPermissions: UserPermission[], newRole: UserRole, orgId: string) => {
-      setPermissions(newPermissions);
-      setRole(newRole);
-      setOrgId(orgId);
-    },
-    [setPermissions, setRole, setOrgId]
+  children
+}: PropsWithChildren<{ defaultPermissions: UserPermission[] }>) {
+  const { isAuthenticated } = useAuth();
+  const { data } = useQuery<Pick<Query, "permissionsInfos">>(
+    PERMISSIONS_INFOS,
+    { skip: !isAuthenticated }
   );
 
-  const permissionsObject = useMemo(() => {
-    return { permissions, role, orgId, updatePermissions };
-  }, [permissions, role, orgId, updatePermissions]);
+  const permissionsInfos: PermissionsInfos = useMemo(() => {
+    return (
+      data?.permissionsInfos ?? {
+        orgPermissionsInfos: [],
+        roles: [],
+        permissions: []
+      }
+    );
+  }, [data]);
+
+  const orgIds = useMemo(() => {
+    return permissionsInfos.orgPermissionsInfos
+      .map(infos => infos.orgId)
+      .filter(Boolean) as string[];
+  }, [permissionsInfos.orgPermissionsInfos]);
+
+  const defaultOrgId = useMemo(() => {
+    return getDefaultOrgId(orgIds);
+  }, [orgIds]);
 
   return (
-    <PermissionsContext.Provider value={permissionsObject}>
+    <PermissionsContext.Provider
+      value={{ permissionsInfos, orgIds, defaultOrgId }}
+    >
       {children}
     </PermissionsContext.Provider>
   );

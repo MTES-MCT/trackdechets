@@ -52,7 +52,9 @@ export function BsffDetailContent({ form: bsff }: Props) {
   const { siret = "" } = useParams<{ siret: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: bsff.id } });
-  const { permissions } = usePermissions();
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
 
   const emitterLabel =
     bsff.type === BsffType.CollectePetitesQuantites
