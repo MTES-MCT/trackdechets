@@ -3319,4 +3319,122 @@ describe("Mutation.updateBsda", () => {
       "PARTIALLY_REFUSED"
     );
   });
+
+  describe("update of reception data", () => {
+    it("can update destinationReceptionRefusedWeight before reception", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: company.siret,
+          destinationReceptionRefusedWeight: null,
+          transporterTransportSignatureDate: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              reception: {
+                weight: 4,
+                acceptationStatus: "PARTIALLY_REFUSED",
+                refusalReason: "Nope",
+                refusedWeight: 1
+              }
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
+
+    it("can update destinationReceptionRefusedWeight before operation (no reception)", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: company.siret,
+          destinationReceptionRefusedWeight: null,
+          transporterTransportSignatureDate: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              reception: {
+                weight: 4,
+                acceptationStatus: "PARTIALLY_REFUSED",
+                refusalReason: "Nope",
+                refusedWeight: 1
+              }
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+    });
+
+    it("can NOT update destinationReceptionRefusedWeight before operation if reception was signed", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterCompanySiret: company.siret,
+          transporterTransportSignatureDate: new Date(),
+          destinationReceptionRefusedWeight: 5,
+          destinationReceptionWeight: 10,
+          destinationReceptionAcceptationStatus: "PARTIALLY_REFUSED",
+          destinationReceptionRefusalReason: "Nope",
+          destinationReceptionSignatureDate: new Date(),
+          destinationReceptionSignatureAuthor: "Someone"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              reception: {
+                refusedWeight: 1
+              }
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toContain(
+        "Le poids refusé a été verrouillé via signature et ne peut pas être modifié"
+      );
+    });
+  });
 });
