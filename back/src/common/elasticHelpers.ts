@@ -9,7 +9,6 @@ import { addMonths } from "date-fns";
 export type RevisionRequest = {
   updatedAt: Date;
   status: RevisionRequestStatus;
-  isCanceled: boolean;
   approvals: {
     approverSiret: string;
   }[];
@@ -62,7 +61,7 @@ export function getRevisionOrgIds(
       const companiesOrgIds = [authorOrgId, ...targetsOrgIds];
 
       // La révision est toujours en cours
-      if (revisionRequest.status === "PENDING" && !revisionRequest.isCanceled) {
+      if (revisionRequest.status === "PENDING") {
         return {
           isPendingRevisionFor: [
             ...new Set([...isPendingRevisionFor, ...companiesOrgIds])
@@ -124,7 +123,7 @@ export function getNonPendingLatestRevisionRequestUpdatedAt(
 
   // If there is at least one pending revision, return undefined. We want to keep the BSD in the dashboard
   const hasPendingRevision = revisionRequests.find(
-    r => r.status === RevisionRequestStatus.PENDING && !r.isCanceled
+    r => r.status === RevisionRequestStatus.PENDING
   );
   if (hasPendingRevision) return undefined;
 

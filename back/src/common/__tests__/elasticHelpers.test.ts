@@ -23,12 +23,12 @@ describe("elasticHelpers", () => {
         [
           {
             status: "ACCEPTED",
-            updatedAt: sameDayMidnight(addDays(new Date(), -1))
+            updatedAt: addDays(new Date(), -3)
           },
           {
-            status: "PENDING",
+            status: "ACCEPTED",
             isCanceled: true,
-            updatedAt: addDays(new Date(), -3)
+            updatedAt: sameDayMidnight(addDays(new Date(), -1))
           }
         ],
         sameDayMidnight(addDays(new Date(), -1)).getTime()
