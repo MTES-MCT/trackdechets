@@ -20,10 +20,10 @@ jobs:
           main-branch-name: 'dev'
       - run: git branch --track dev origin/dev
 
+      - run: npx nx reset
       - run: npx nx format:check
       - run: npx nx affected -t lint --parallel=3
       - run: npx nx affected -t test --parallel=3
-      - run: npx nx reset
         env:
           EMAIL_BACKEND: "console"
           SIB_BASE_URL: "http://mailservice"
