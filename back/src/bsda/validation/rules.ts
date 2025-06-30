@@ -482,7 +482,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   destinationReceptionRefusedWeight: {
     readableFieldName: "Le poids refusé",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
   },
   destinationReceptionAcceptationStatus: {
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
