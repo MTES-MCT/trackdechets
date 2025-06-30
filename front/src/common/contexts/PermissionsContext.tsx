@@ -47,13 +47,17 @@ export function usePermissions(orgId?: string) {
 
   const { permissionsInfos, orgIds, defaultOrgId } = context;
 
-  const orgPermissions = permissionsInfos?.orgPermissionsInfos?.find(
-    infos => infos.orgId === orgId
-  ) ?? {
-    orgId,
-    role: UserRole.Reader,
-    permissions: []
-  };
+  const orgPermissions = useMemo(
+    () =>
+      permissionsInfos?.orgPermissionsInfos?.find(
+        infos => infos.orgId === orgId
+      ) ?? {
+        orgId,
+        role: UserRole.Reader,
+        permissions: []
+      },
+    [permissionsInfos, orgId]
+  );
 
   return {
     permissionsInfos,
