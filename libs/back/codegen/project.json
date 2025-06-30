@@ -5,7 +5,7 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "inputs": ["{workspaceRoot}/back/**/*.graphql"],
+      "inputs": ["{workspaceRoot}/back/src/**/*.graphql"],
       "cache": true,
       "executor": "nx:run-commands",
       "options": {
