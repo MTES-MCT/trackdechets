@@ -95,7 +95,7 @@ jobs:
 
       # Playwright
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps --skip-nx-cache
+        run: npx playwright install chromium --with-deps
 
       # Debug ssh version
       # - name: Setup upterm session
