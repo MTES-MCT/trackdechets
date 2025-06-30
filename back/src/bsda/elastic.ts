@@ -286,6 +286,10 @@ function getWhere(bsda: BsdaForElastic): Pick<BsdElastic, WhereKeys> {
       break;
     }
 
+    case BsdaStatus.RECEIVED: {
+      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
+      break;
+    }
     case BsdaStatus.REFUSED:
     case BsdaStatus.PROCESSED:
     case BsdaStatus.CANCELED:
