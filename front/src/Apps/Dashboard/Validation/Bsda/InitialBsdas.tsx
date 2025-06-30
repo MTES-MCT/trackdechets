@@ -35,7 +35,10 @@ export function InitialBsdas({ bsdas }: { bsdas: InitialBsda[] }) {
               {bsda.destination?.operation?.nextDestination?.cap ??
                 bsda.destination?.cap}
             </TableCell>
-            <TableCell>{bsda?.destination?.reception?.weight}</TableCell>
+            <TableCell>
+              {bsda.destination?.reception?.acceptedWeight ??
+                bsda.destination?.reception?.weight}
+            </TableCell>
             <TableCell>
               <Button
                 type="button"

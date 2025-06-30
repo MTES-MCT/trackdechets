@@ -62,10 +62,12 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     setFieldValue("waste.code", groupedBsdas?.[0]?.waste?.code ?? "");
     setFieldValue(
       "weight.value",
-      groupedBsdas?.reduce(
-        (prev, cur) => prev + (cur.destination?.reception?.weight ?? 0),
-        0
-      ) ?? 0
+      groupedBsdas?.reduce((prev, cur) => {
+        const weight =
+          cur.destination?.reception?.acceptedWeight ??
+          cur.destination?.reception?.weight;
+        return prev + (weight ?? 0);
+      }, 0) ?? 0
     );
     setFieldValue(
       "waste.sealNumbers",
