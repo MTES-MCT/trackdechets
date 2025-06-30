@@ -30,9 +30,9 @@ jobs:
         run: docker compose up -d
       - name: Init DB & ES index
         run: |
-          npx nx run @td/codegen-back:build
-          npx nx run @td/prisma:generate
-          npx nx run @td/codegen-ui:build
+          npx nx run @td/codegen-back:build --skip-nx-cache
+          npx nx run @td/prisma:generate --skip-nx-cache
+          npx nx run @td/codegen-ui:build --skip-nx-cache
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Create MinIO buckets
         run: |
@@ -42,17 +42,17 @@ jobs:
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_EXPORTS_BUCKET"
       - name: Start TD applications
         run: |
-          npx nx run api:serve >> /tmp/td-api.log &
+          npx nx run api:serve --skip-nx-cache >> /tmp/td-api.log &
           sleep 1s
-          npx nx run queues-indexation:serve >> /tmp/td-queues-indexation.log &
+          npx nx run queues-indexation:serve --skip-nx-cache >> /tmp/td-queues-indexation.log &
           sleep 1s
-          npx nx run queues-webhooks:serve >> /tmp/td-queues-webhooks.log &
+          npx nx run queues-webhooks:serve --skip-nx-cache >> /tmp/td-queues-webhooks.log &
           sleep 1s
-          npx nx run queues-runner:serve >> /tmp/td-queues-runner.log &
+          npx nx run queues-runner:serve --skip-nx-cache >> /tmp/td-queues-runner.log &
           sleep 1s
-          npx nx run notifier:serve >> /tmp/td-notifier.log &
+          npx nx run notifier:serve --skip-nx-cache >> /tmp/td-notifier.log &
           sleep 1s
-          npx nx run front:serve >> /tmp/td-front.log &
+          npx nx run front:serve --skip-nx-cache >> /tmp/td-front.log &
           sleep 20s
 
       # Wait
@@ -95,7 +95,7 @@ jobs:
 
       # Playwright
       - name: Install Playwright Browsers
-        run: npx playwright install chromium --with-deps
+        run: npx playwright install chromium --with-deps --skip-nx-cache
 
       # Debug ssh version
       # - name: Setup upterm session
@@ -107,7 +107,7 @@ jobs:
       #     # wait-timeout-minutes: 5
 
       - name: Run Playwright tests
-        run: npx nx run e2e:ci
+        run: npx nx run e2e:ci --skip-nx-cache
 
 
 env:
