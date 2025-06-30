@@ -6,6 +6,7 @@
   "targets": {
     "build": {
       "inputs": ["sharedGql"],
+      "outputs": ["{projectRoot}/src/generated"],
       "cache": true,
       "executor": "nx:run-commands",
       "options": {
