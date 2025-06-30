@@ -7,7 +7,10 @@ import { formatError } from "../builder/error";
 
 const sortedCountries = countries
   .sort((a, b) => {
-    if (a.cca2 === "FR") return -1; // France first
+    // France first
+    if (a.cca2 === "FR") return -1;
+    if (b.cca2 === "FR") return 1;
+
     return a.translations.fra.common.localeCompare(b.translations.fra.common);
   })
   .map(country => ({

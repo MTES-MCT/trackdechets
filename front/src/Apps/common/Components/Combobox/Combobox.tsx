@@ -138,7 +138,7 @@ export function ComboBox({
     if (positionAbove) {
       // Position above the trigger/parent
       targetElement.style.bottom = `${
-        viewportHeight - triggerOrParentRect.top + scrollY
+        viewportHeight - triggerOrParentRect.top - scrollY
       }px`;
       targetElement.style.maxHeight = `${Math.max(0, spaceAbove - margin)}px`; // Ensure non-negative
     } else {
