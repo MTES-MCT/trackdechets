@@ -30,6 +30,7 @@
     "gql-docs": {
       "dependsOn": ["build-workflows"],
       "inputs": ["{workspaceRoot}/back/src/**/*.graphql"],
+      "outputs": ["{projectRoot}/docs/reference/api-reference"],
       "cache": true,
       "executor": "nx:run-commands",
       "options": {
