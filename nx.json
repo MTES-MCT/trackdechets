@@ -4,7 +4,8 @@
     "sharedGlobals": [
       "{workspaceRoot}/babel.config.json",
       "{workspaceRoot}/.github/workflows/ci.yml"
-    ]
+    ],
+    "sharedGql": ["{workspaceRoot}/back/src/**/*.graphql"]
   },
   "targetDefaults": {
     "build-storybook": {
