@@ -30,9 +30,9 @@ jobs:
         run: docker compose up -d
       - name: Init DB & ES index
         run: |
-          npx nx run @td/codegen-back:build --skip-nx-cache
-          npx nx run @td/prisma:generate --skip-nx-cache
-          npx nx run @td/codegen-ui:build --skip-nx-cache
+          npx nx run @td/codegen-back:build
+          npx nx run @td/prisma:generate
+          npx nx run @td/codegen-ui:build
           TERM=xterm bash ./scripts/deploy-db.sh
       - name: Create MinIO buckets
         run: |
@@ -107,7 +107,7 @@ jobs:
       #     # wait-timeout-minutes: 5
 
       - name: Run Playwright tests
-        run: npx nx run e2e:ci --skip-nx-cache
+        run: npx nx run e2e:ci
 
 
 env:
