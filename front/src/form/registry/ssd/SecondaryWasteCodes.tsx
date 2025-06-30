@@ -4,6 +4,9 @@ import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { formatError } from "../builder/error";
+import Alert from "@codegouvfr/react-dsfr/Alert";
+import { ALL_WASTES } from "@td/constants";
+import { capitalize } from "../../../common/helper";
 
 type Props = {
   name: string;
@@ -50,55 +53,84 @@ export function SecondaryWasteCodes({ methods }: Props) {
   const { errors } = methods.formState;
   return (
     <div className="fr-col">
-      {codeFields.map(({ id }, index) => (
-        <div
-          className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
-          style={{
-            alignItems: "flex-start"
-          }}
-          ref={containerRef}
-          key={index}
-        >
-          <WasteCodeSelector
-            methods={methods}
-            key={id}
-            name={`secondaryWasteCodes.${index}.value`}
-            label="Code déchet secondaire (optionnel)"
-            containerRef={containerRef}
-          />
-          <div className="fr-col-4">
-            <Input
-              label="Dénomination secondaire"
-              key={descriptionFields[index].id}
-              nativeInputProps={{
-                type: "text",
-                ...methods.register(`secondaryWasteDescriptions.${index}.value`)
-              }}
-              state={errors?.secondaryWasteDescriptions?.[index] && "error"}
-              stateRelatedMessage={formatError(
-                errors?.secondaryWasteDescriptions?.[index]?.value
-              )}
+      {codeFields.map(({ id }, index) => {
+        const description = ALL_WASTES.find(
+          waste =>
+            waste.code ===
+            methods.getValues(`secondaryWasteCodes.${index}.value`)
+        )?.description;
+        return (
+          <div
+            className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+            style={{
+              alignItems: "flex-start"
+            }}
+            ref={containerRef}
+            key={index}
+          >
+            <WasteCodeSelector
+              methods={methods}
+              key={id}
+              name={`secondaryWasteCodes.${index}.value`}
+              label="Code déchet secondaire (optionnel)"
+              containerRef={containerRef}
+              displayDescription={false}
             />
-          </div>
+            <div className="fr-col-4">
+              <Input
+                label="Dénomination secondaire"
+                key={descriptionFields[index].id}
+                nativeInputProps={{
+                  type: "text",
+                  ...methods.register(
+                    `secondaryWasteDescriptions.${index}.value`
+                  )
+                }}
+                state={errors?.secondaryWasteDescriptions?.[index] && "error"}
+                stateRelatedMessage={formatError(
+                  errors?.secondaryWasteDescriptions?.[index]?.value
+                )}
+              />
+            </div>
 
-          <div className="fr-col-2" style={{ paddingTop: "36px" }}>
-            <Button
-              className="fr-mr-1w"
-              nativeButtonProps={{ type: "button" }}
-              iconId="fr-icon-add-line"
-              onClick={addLine}
-              title="Label button"
-            />
-            <Button
-              className="fr-mt-1w"
-              nativeButtonProps={{ type: "button" }}
-              iconId="fr-icon-delete-line"
-              onClick={() => removeLine(index)}
-              title="Label button"
+            <div className="fr-col-2" style={{ paddingTop: "36px" }}>
+              <Button
+                className="fr-mr-1w"
+                nativeButtonProps={{ type: "button" }}
+                iconId="fr-icon-add-line"
+                onClick={addLine}
+                title="Label button"
+              />
+              <Button
+                className="fr-mt-1w"
+                nativeButtonProps={{ type: "button" }}
+                iconId="fr-icon-delete-line"
+                onClick={() => removeLine(index)}
+                title="Label button"
+              />
+            </div>
+            {description && (
+              <div className="fr-col-12">
+                <Alert
+                  description={capitalize(description)}
+                  severity="info"
+                  small
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+      {errors?.secondaryWasteCodes &&
+        !Array.isArray(errors?.secondaryWasteCodes) && (
+          <div className="fr-col-12 fr-mt-2w">
+            <Alert
+              description={formatError(errors.secondaryWasteCodes)}
+              severity="error"
+              small
             />
           </div>
-        </div>
-      ))}
+        )}
     </div>
   );
 }

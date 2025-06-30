@@ -23,6 +23,7 @@ type Props = {
   disabled?: boolean;
   whiteList?: string[];
   blackList?: string[];
+  displayDescription?: boolean;
 };
 
 export function WasteCodeSelector({
@@ -32,7 +33,8 @@ export function WasteCodeSelector({
   containerRef,
   disabled,
   whiteList,
-  blackList
+  blackList,
+  displayDescription = true
 }: Props) {
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
@@ -162,7 +164,7 @@ export function WasteCodeSelector({
           </Button>
         </div>
       </div>
-      {description && (
+      {displayDescription && description && (
         <div className="fr-col-12">
           <Alert description={capitalize(description)} severity="info" small />
         </div>
