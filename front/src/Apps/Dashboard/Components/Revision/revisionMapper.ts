@@ -254,18 +254,21 @@ export const mapRevision = (
       },
       {
         dataName: DataNameEnum.QTY_RECEIVED,
-        dataOldValue: review?.[bsdName]?.quantityReceived,
-        dataNewValue: review?.content?.quantityReceived
+        dataOldValue:
+          review?.[bsdName]?.quantityReceived ||
+          review?.[bsdName]?.destination?.reception?.weight,
+        dataNewValue:
+          review?.content?.quantityReceived ||
+          review?.content?.destination?.reception?.weight
       },
       {
         dataName: DataNameEnum.QTY_REFUSED,
-        dataOldValue: review?.[bsdName]?.quantityRefused,
-        dataNewValue: review?.content?.quantityRefused
-      },
-      {
-        dataName: DataNameEnum.QTY_PROCESSED,
-        dataOldValue: review?.[bsdName]?.destination?.reception?.weight,
-        dataNewValue: review?.content?.destination?.reception?.weight
+        dataOldValue:
+          review?.[bsdName]?.quantityRefused ||
+          review?.[bsdName]?.destination?.reception?.refusedWeight,
+        dataNewValue:
+          review?.content?.quantityRefused ||
+          review?.content?.destination?.reception?.refusedWeight
       },
       {
         dataName: DataNameEnum.QTY_PROCESSED_KG,
