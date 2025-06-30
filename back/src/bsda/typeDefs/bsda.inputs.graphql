@@ -503,9 +503,6 @@ input BsdaRevisionRequestWasteInput {
 input BsdaRevisionRequestWhere {
   "Permet de filtrer sur un statut de demande de révision"
   status: RevisionRequestStatus
-  "Permet de filtrer sur un numéro de bordereau"
+  "Permet de filtrer sur un numéro de bordereau Reset cache"
   bsdaId: StringFilter
 }
-
-
-"Reset cache ??"
