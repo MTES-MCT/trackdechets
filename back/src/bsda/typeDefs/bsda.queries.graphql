@@ -78,5 +78,3 @@ type Query {
     first: Int
   ): BsdaRevisionRequestConnection!
 }
-
-"TO remove: Force cache reset"
