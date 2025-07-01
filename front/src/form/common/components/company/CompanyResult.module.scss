@@ -9,9 +9,12 @@
 
   margin: 10px 0;
   padding: 10px;
-  cursor: pointer;
   display: flex;
   align-items: center;
+
+  &.clickable {
+    cursor: pointer;
+  }
 
   .content {
     flex: 1;
@@ -27,7 +30,7 @@
     font-size: 1.5em;
   }
 
-  &:hover .icon,
+  &.clickable:hover .icon,
   &.isSelected .icon {
     color: #03bd5b;
   }
