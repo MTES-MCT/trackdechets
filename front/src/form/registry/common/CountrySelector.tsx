@@ -102,14 +102,13 @@ export function CountrySelector({ methods, prefix }: Props) {
               />
             </div>
             {filterCountries(sortedCountries, search).map(country => (
-              <option
+              <div
                 className="tw-px-2 tw-py-2 hover:tw-bg-gray-100 tw-cursor-pointer"
-                value={country.code}
                 key={country.code}
                 onClick={() => onSelect(country.code)}
               >
                 {country.label}
-              </option>
+              </div>
             ))}
           </div>
         )}
