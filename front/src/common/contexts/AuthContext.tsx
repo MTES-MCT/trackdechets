@@ -7,13 +7,13 @@ type AuthContextType = {
   user: { id: string; email: string; isAdmin?: boolean | null } | undefined;
 };
 
-const IS_AUTHENTICATED = gql`
+export const IS_AUTHENTICATED = gql`
   query IsAuthenticated {
     isAuthenticated
   }
 `;
 
-const GET_ME = gql`
+export const GET_ME = gql`
   query Me {
     me {
       id

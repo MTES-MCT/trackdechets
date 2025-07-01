@@ -13,14 +13,52 @@ import {
 import { BsdCurrentTab } from "../../../common/types/commonTypes";
 import { MockedProvider } from "@apollo/client/testing";
 import { MemoryRouter } from "react-router-dom";
-import { PermissionsProvider } from "../../../../common/contexts/PermissionsContext";
+import {
+  PERMISSIONS_INFOS,
+  PermissionsProvider
+} from "../../../../common/contexts/PermissionsContext";
+import {
+  AuthProvider,
+  GET_ME,
+  IS_AUTHENTICATED
+} from "../../../../common/contexts/AuthContext";
+import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../../Apps/common/queries/company/query";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
   const functionMock = jest.fn();
   const bsdCurrentTab: BsdCurrentTab = "draftTab";
-  const mocks = [];
+  const mocks = [
+    {
+      request: { query: IS_AUTHENTICATED },
+      result: {
+        data: {
+          isAuthenticated: true
+        }
+      },
+      maxUsageCount: Number.POSITIVE_INFINITY
+    },
+    {
+      request: { query: GET_ME },
+      result: {
+        data: {
+          me: {
+            __typename: "User",
+            id: "user-123",
+            email: "user@example.com",
+            isAdmin: false
+          }
+        }
+      },
+      maxUsageCount: Number.POSITIVE_INFINITY
+    },
+    {
+      request: { query: COMPANY_SELECTOR_PRIVATE_INFOS },
+      variableMatcher: () => true,
+      result: { data: { companyPrivateInfos: [] } }
+    }
+  ];
   const route = "/dashboard/12345678901235";
 
   describe("case: INITITAL(draft=true)", () => {
@@ -152,32 +190,51 @@ describe("Bsd card primary action label", () => {
     test("Bsdd", async () => {
       const onValidate = functionMock;
 
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS, variables: {} },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [
+                    UserPermission.BsdCanUpdate,
+                    UserPermission.BsdCanDelete,
+                    UserPermission.BsdCanCreate
+                  ]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[
-            UserPermission.BsdCanUpdate,
-            UserPermission.BsdCanDelete,
-            UserPermission.BsdCanCreate
-          ]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                currentSiret={siretEmmiter}
-                posInSet={0}
-                setSize={1}
-                bsd={bsdd}
-                onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  currentSiret={siretEmmiter}
+                  posInSet={0}
+                  setSize={1}
+                  bsd={bsdd}
+                  onValidate={onValidate}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId(
+      const primaryActionBtn = await screen.findByTestId(
         `bsd-card-btn-primary-${bsdd.readableId}`
       );
       expect(
@@ -200,29 +257,52 @@ describe("Bsd card primary action label", () => {
     test("Bsdd emitterType appendix1_producer", async () => {
       const onValidate = functionMock;
 
-      const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[UserPermission.BsdCanList]}>
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={
-                  { ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanList]
                 }
-                onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
+      const { queryByTestId } = render(
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={
+                    { ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form
+                  }
+                  onValidate={onValidate}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
       fireEvent.click(buttonActions);
       expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
@@ -288,33 +368,51 @@ describe("Bsd card primary action label", () => {
         __typename: "Bsda"
       } as unknown as Bsda;
       const onValidate = functionMock;
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [
+                    UserPermission.BsdCanSignEmission,
+                    UserPermission.BsdCanDelete,
+                    UserPermission.BsdCanUpdate,
+                    UserPermission.BsdCanCreate
+                  ]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[
-            UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanDelete,
-            UserPermission.BsdCanUpdate,
-            UserPermission.BsdCanCreate
-          ]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsda}
-                onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsda}
+                  onValidate={onValidate}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId(
+      const primaryActionBtn = await screen.findByTestId(
         `bsd-card-btn-primary-${bsda.id}`
       );
       expect(primaryActionBtn).toHaveTextContent("Publier");
@@ -458,35 +556,53 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu same siret", async () => {
       const onValidate = functionMock;
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [
+                    UserPermission.BsdCanUpdate,
+                    UserPermission.BsdCanDelete,
+                    UserPermission.BsdCanRead,
+                    UserPermission.BsdCanSignEmission,
+                    UserPermission.BsdCanCreate
+                  ]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[
-            UserPermission.BsdCanUpdate,
-            UserPermission.BsdCanDelete,
-            UserPermission.BsdCanRead,
-            UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanCreate
-          ]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsvhu}
-                onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-                bsdCurrentTab="actTab"
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsvhu}
+                  onValidate={onValidate}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                  bsdCurrentTab="actTab"
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
-      const primaryActionBtn = screen.getByTestId(
+      const primaryActionBtn = await screen.findByTestId(
         `bsd-card-btn-primary-${bsvhu.id}`
       );
       expect(primaryActionBtn).toHaveTextContent("Signer");
@@ -504,92 +620,154 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsvhu same siret (status processed)", () => {
+    test("Bsvhu same siret (status processed)", async () => {
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignOperation]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignOperation]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsvhuProcessed}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsvhuProcessed}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
       fireEvent.click(buttonActions);
       expect(queryByTestId("bsd-update-btn")).toBeFalsy();
     });
 
-    test("Bsvhu different siret", () => {
+    test("Bsvhu different siret", async () => {
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: []
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
       const { queryByTestId } = render(
-        <PermissionsProvider defaultPermissions={[]}>
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretTransporter}
-                bsd={bsvhu}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretTransporter}
+                  bsd={bsvhu}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       expect(queryByTestId(`bsd-card-btn-primary-${bsvhu.id}`)).toBeFalsy();
 
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
     });
 
     test("Bsff same siret", async () => {
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [
+                    UserPermission.BsdCanSignEmission,
+                    UserPermission.BsdCanRead,
+                    UserPermission.BsdCanDelete,
+                    UserPermission.BsdCanCreate,
+                    UserPermission.BsdCanUpdate
+                  ]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const onValidate = functionMock;
       render(
-        <PermissionsProvider
-          defaultPermissions={[
-            UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanRead,
-            UserPermission.BsdCanDelete,
-            UserPermission.BsdCanCreate,
-            UserPermission.BsdCanUpdate
-          ]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsff}
-                bsdCurrentTab="actTab"
-                onValidate={onValidate}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsff}
+                  bsdCurrentTab="actTab"
+                  onValidate={onValidate}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
-      const primaryActionBtn = screen.getByTestId(
+      const primaryActionBtn = await screen.findByTestId(
         `bsd-card-btn-primary-${bsff.id}`
       );
       const { getByText } = within(primaryActionBtn);
@@ -609,38 +787,59 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsff different siret", () => {
+    test("Bsff different siret", async () => {
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [
+                    UserPermission.BsdCanSignEmission,
+                    UserPermission.BsdCanRead
+                  ]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[
-            UserPermission.BsdCanSignEmission,
-            UserPermission.BsdCanRead
-          ]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsffDifferentSiret}
-                bsdCurrentTab={bsdCurrentTab}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsffDifferentSiret}
+                  bsdCurrentTab={bsdCurrentTab}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
       expect(
         queryByTestId(`bsd-card-btn-primary-${bsffDifferentSiret.id}`)
       ).toBeFalsy();
 
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
       fireEvent.click(buttonActions);
 
@@ -649,10 +848,10 @@ describe("Bsd card primary action label", () => {
 
       expect(queryByTestId("bsd-duplicate-btn")).toBeFalsy();
       expect(queryByTestId("bsd-update-btn")).toBeFalsy();
-      expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
+      expect(await screen.findByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsda same siret", () => {
+    test("Bsda same siret", async () => {
       const bsda = {
         id: "BSDA-20220706-NAS1E8MET",
         bsdaType: "RESHIPMENT",
@@ -703,30 +902,49 @@ describe("Bsd card primary action label", () => {
         __typename: "Bsda"
       } as unknown as Bsda;
 
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignEmission]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignEmission]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsda}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-                bsdCurrentTab="actTab"
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsda}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                  bsdCurrentTab="actTab"
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsda.id}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsda.id}`)
       );
       expect(getByText("Signer")).toBeInTheDocument();
 
@@ -736,7 +954,7 @@ describe("Bsd card primary action label", () => {
   });
 
   describe("case: SEALED", () => {
-    test("Bsdd same emmiter", () => {
+    test("Bsdd same emmiter", async () => {
       const bsdd = {
         id: "cl6aspea41164399s1y46n2h9",
         readableId: "BSD-20220801-PGFCKB28G",
@@ -816,29 +1034,49 @@ describe("Bsd card primary action label", () => {
         nextTransporterSiret: null,
         __typename: "Form"
       } as unknown as Form;
+
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignEmission]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignEmission]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdd}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdd}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
       expect(getByText("Signer")).toBeInTheDocument();
 
@@ -849,7 +1087,7 @@ describe("Bsd card primary action label", () => {
   });
 
   describe("case: SENT", () => {
-    test("Bsdd sans entreposage provisoire", () => {
+    test("Bsdd sans entreposage provisoire", async () => {
       const bsdd = {
         id: "ckou9ctpn073534ozmk0mreuu",
         readableId: "BSD-20210518-DRX5BG957",
@@ -943,30 +1181,50 @@ describe("Bsd card primary action label", () => {
         nextTransporterSiret: "13001045700013",
         __typename: "Form"
       } as unknown as Form;
+
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignAcceptation]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdd}
-                bsdCurrentTab="actTab"
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdd}
+                  bsdCurrentTab="actTab"
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
       expect(getByText("Valider la réception")).toBeInTheDocument();
 
@@ -974,7 +1232,7 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsdd multi-modal - Signature par un transporteur N > 1", () => {
+    test("Bsdd multi-modal - Signature par un transporteur N > 1", async () => {
       const siretNextTransporter = "85001946400021";
 
       const bsdd = {
@@ -1089,31 +1347,50 @@ describe("Bsd card primary action label", () => {
         __typename: "Form"
       } as unknown as Form;
 
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretNextTransporter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignTransport]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignTransport]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretNextTransporter}
-                bsd={bsdd}
-                bsdCurrentTab="toCollectTab"
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretNextTransporter}
+                  bsd={bsdd}
+                  bsdCurrentTab="toCollectTab"
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
 
       const signerBtn = getByText("Signer");
@@ -1124,7 +1401,7 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsdasri synthetized in", () => {
+    test("Bsdasri synthetized in", async () => {
       const bsdari = {
         id: "DASRI-20220603-CFZ337QCS",
         bsdasriStatus: "SENT",
@@ -1193,36 +1470,58 @@ describe("Bsd card primary action label", () => {
         },
         __typename: "Bsdasri"
       } as unknown as Bsdasri;
+
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignAcceptation]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdari}
-                bsdCurrentTab="actTab"
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdari}
+                  bsdCurrentTab="actTab"
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
       expect(queryByTestId(`bsd-card-btn-primary-${bsdari.id}`)).toBeFalsy();
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
       expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
     });
 
-    test("Bsdasri simple", () => {
+    test("Bsdasri simple", async () => {
       const bsdari = {
         id: "DASRI-20220603-CFZ337QCS",
         bsdasriStatus: "SENT",
@@ -1287,30 +1586,50 @@ describe("Bsd card primary action label", () => {
         allowDirectTakeOver: false,
         __typename: "Bsdasri"
       } as unknown as Bsdasri;
+
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignAcceptation]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       const { queryByTestId } = render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignAcceptation]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdari}
-                bsdCurrentTab="actTab"
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdari}
+                  bsdCurrentTab="actTab"
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsdari.id}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsdari.id}`)
       );
       expect(getByText("Valider la réception")).toBeInTheDocument();
 
@@ -1321,7 +1640,7 @@ describe("Bsd card primary action label", () => {
   });
 
   describe("case: Bsd Suite", () => {
-    test("Bsdd", () => {
+    test("Bsdd", async () => {
       const bsdd = {
         id: "cl32r54js30083339sw9nabhn0",
         readableId: "BSD-20220512-6609ESJPV",
@@ -1404,29 +1723,48 @@ describe("Bsd card primary action label", () => {
         __typename: "Form"
       } as unknown as Form;
 
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanSignOperation]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       render(
-        <PermissionsProvider
-          defaultPermissions={[UserPermission.BsdCanSignOperation]}
-        >
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdd}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdd}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
       const { getByText } = within(
-        screen.getByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
+        await screen.findByTestId(`bsd-card-btn-primary-${bsdd.readableId}`)
       );
       expect(getByText("Signer le traitement")).toBeInTheDocument();
 
@@ -1437,7 +1775,7 @@ describe("Bsd card primary action label", () => {
   });
 
   describe("case: Appendix 1", () => {
-    test("Bsdd", () => {
+    test("Bsdd", async () => {
       const bsdd = {
         id: "cl32r54js30083339sw9nabhn0",
         readableId: "BSD-20220512-6609ESJPV",
@@ -1449,29 +1787,52 @@ describe("Bsd card primary action label", () => {
         __typename: "Form"
       } as unknown as Form;
 
+      const permMock = {
+        request: { query: PERMISSIONS_INFOS },
+        result: {
+          data: {
+            permissionsInfos: {
+              orgPermissionsInfos: [
+                {
+                  orgId: siretEmmiter,
+                  role: "ADMIN",
+                  permissions: [UserPermission.BsdCanUpdate]
+                }
+              ],
+              roles: [],
+              permissions: []
+            }
+          }
+        }
+      };
+
       render(
-        <PermissionsProvider defaultPermissions={[UserPermission.BsdCanUpdate]}>
-          <MockedProvider mocks={mocks} addTypename={false}>
-            <MemoryRouter initialEntries={[route]}>
-              <BsdCard
-                posInSet={0}
-                setSize={1}
-                currentSiret={siretEmmiter}
-                bsd={bsdd}
-                onValidate={functionMock}
-                secondaryActions={{
-                  onUpdate: functionMock,
-                  onOverview: functionMock
-                }}
-              />
-            </MemoryRouter>
-          </MockedProvider>
-        </PermissionsProvider>
+        <MockedProvider mocks={[...mocks, permMock]} addTypename={false}>
+          <AuthProvider>
+            <PermissionsProvider>
+              <MemoryRouter initialEntries={[route]}>
+                <BsdCard
+                  posInSet={0}
+                  setSize={1}
+                  currentSiret={siretEmmiter}
+                  bsd={bsdd}
+                  onValidate={functionMock}
+                  secondaryActions={{
+                    onUpdate: functionMock,
+                    onOverview: functionMock
+                  }}
+                />
+              </MemoryRouter>
+            </PermissionsProvider>
+          </AuthProvider>
+        </MockedProvider>
       );
 
-      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      const buttonActions = await screen.findByTestId(
+        "bsd-actions-secondary-btn"
+      );
       expect(buttonActions).toBeInTheDocument();
-      expect(screen.getByTestId("appendix1-btn")).toBeInTheDocument();
+      expect(await screen.findByTestId("appendix1-btn")).toBeInTheDocument();
     });
   });
 });

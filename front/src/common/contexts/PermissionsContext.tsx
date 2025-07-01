@@ -22,7 +22,7 @@ type PermissionsContextType = {
   defaultOrgId: string | undefined;
 };
 
-const PERMISSIONS_INFOS = gql`
+export const PERMISSIONS_INFOS = gql`
   query PermissionsInfos {
     permissionsInfos {
       orgPermissionsInfos {
@@ -67,9 +67,7 @@ export function usePermissions(orgId?: string) {
   };
 }
 
-export function PermissionsProvider({
-  children
-}: PropsWithChildren<{ defaultPermissions: UserPermission[] }>) {
+export function PermissionsProvider({ children }: PropsWithChildren<{}>) {
   const { isAuthenticated } = useAuth();
   const { data } = useQuery<Pick<Query, "permissionsInfos">>(
     PERMISSIONS_INFOS,

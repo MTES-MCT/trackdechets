@@ -37,7 +37,7 @@ export default function App() {
       <ErrorBoundary>
         <ApolloProvider client={client}>
           <AuthProvider>
-            <PermissionsProvider defaultPermissions={[]}>
+            <PermissionsProvider>
               <FeatureFlagsProvider defaultFeatureFlags={{}}>
                 <div className="App">
                   <RouterProvider router={router} />
