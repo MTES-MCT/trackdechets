@@ -73,7 +73,7 @@ const apolloClient = new ApolloClient({
       Query: {
         fields: {
           // https://www.apollographql.com/docs/react/pagination/cursor-based/#relay-style-cursor-pagination
-          myCompanies: relayStylePagination()
+          myCompanies: relayStylePagination(["search"])
         }
       },
       Form: {

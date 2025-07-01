@@ -7,7 +7,8 @@ import {
   RegistryExportStatus,
   RegistryV2ExportType,
   RegistryV2Export,
-  RegistryExhaustiveExport
+  RegistryExhaustiveExport,
+  UserPermission
 } from "@td/codegen-ui";
 import { badges } from "./shared";
 
@@ -20,6 +21,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import RegistryTable from "./RegistryTable";
 import { useRegistryExport } from "./RegistryV2ExportContext";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
+import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 export const getRegistryTypeWording = (
   registryType: RegistryV2ExportType
@@ -99,6 +101,12 @@ export function MyExports() {
     error
   } = useRegistryExport();
   const { onOpen: onOpenExportModal } = useRegistryExportModal();
+
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
+
+  const canExport = permissions.includes(UserPermission.RegistryCanRead);
 
   const tableData = useMemo(() => {
     if (!registryExports) return [];
@@ -216,21 +224,23 @@ export function MyExports() {
   return (
     <>
       <>
-        <div>
-          <div className="tw-flex">
-            <div>
-              <Button
-                id="export-reglementaire-btn"
-                priority="primary"
-                iconId="fr-icon-download-line"
-                iconPosition="right"
-                onClick={onOpenExportModal}
-              >
-                Exporter
-              </Button>
+        {canExport && (
+          <div>
+            <div className="tw-flex">
+              <div>
+                <Button
+                  id="export-reglementaire-btn"
+                  priority="primary"
+                  iconId="fr-icon-download-line"
+                  iconPosition="right"
+                  onClick={onOpenExportModal}
+                >
+                  Exporter
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
         {error && (
           <div className="fr-mt-2w">
             <Alert

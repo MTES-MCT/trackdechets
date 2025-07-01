@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect } from "react";
-import { gql, useQuery } from "@apollo/client";
+import React, { useCallback } from "react";
 import { Modal } from "../../common/components";
 import SideBar from "../common/Components/SideBar/SideBar";
 import routes, { getRelativeRoute } from "../routes";
@@ -7,7 +6,7 @@ import { RouteControlPdf } from "../../dashboard/components/BSDList/BSDasri/BSDa
 import { RoutePublishBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
 import { RouteSignBsdasri } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
 import { RouteBSDasrisSignEmissionSecretCode } from "../../dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
-import { BsdasriSignatureType, Query, UserRole } from "@td/codegen-ui";
+import { BsdasriSignatureType, UserRole } from "@td/codegen-ui";
 import DashboardPage from "../../Pages/Dashboard";
 import { Redirect } from "../utils/routerUtils";
 import {
@@ -32,33 +31,15 @@ import {
   RouteBspaohsView
 } from "../../dashboard/detail";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
-import { usePermissions } from "../../common/contexts/PermissionsContext";
 import "./dashboard.scss";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
 import FormContainer from "./Creation/FormContainer";
 import { BsdTypename } from "../common/types/bsdTypes";
-import { getDefaultOrgId } from "../common/Components/CompanySwitcher/CompanySwitcher";
 import BSDPreviewContainer from "./Preview/BSDPreviewContainer";
-
-export const GET_ME = gql`
-  {
-    me {
-      id
-      companies {
-        id
-        name
-        givenName
-        userRole
-        siret
-        orgId
-        companyTypes
-        userPermissions
-        securityCode
-      }
-    }
-  }
-`;
+import { usePermissions } from "../../common/contexts/PermissionsContext";
+import { useAuth } from "../../common/contexts/AuthContext";
+import { useMyCompany } from "../common/hooks/useMyCompany";
 
 const toRelative = route => {
   return getRelativeRoute(routes.dashboard.index, route);
@@ -66,8 +47,10 @@ const toRelative = route => {
 
 function DashboardRoutes() {
   const { siret } = useParams<{ siret: string | undefined }>();
-  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME);
-  const { updatePermissions } = usePermissions();
+  const { user } = useAuth();
+  const { company: currentCompany, loading: loadingCompany } =
+    useMyCompany(siret);
+  const { defaultOrgId, permissionsInfos } = usePermissions(siret);
 
   const navigate = useNavigate();
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
@@ -95,40 +78,28 @@ function DashboardRoutes() {
     );
   }, [navigate, siret]);
 
-  useEffect(() => {
-    if (data && siret) {
-      const companies = data.me.companies;
-      const currentCompany = companies.find(company => company.orgId === siret);
-      if (currentCompany) {
-        updatePermissions(
-          currentCompany.userPermissions,
-          currentCompany.userRole!,
-          siret
-        );
-      }
-    }
-  }, [updatePermissions, data, siret]);
-
-  if (loading || data?.me == null) {
+  if (!user || loadingCompany) {
     return <Loader />;
   }
-
-  const companies = data.me.companies;
-  const currentCompany = companies.find(company => company.orgId === siret);
 
   // if the user is not part of the company whose siret is in the url
   // redirect them to their first company or account if they're not part of any company
   if (!currentCompany) {
+    const isDriverForOrg = permissionsInfos.orgPermissionsInfos.some(
+      orgPermission =>
+        orgPermission.orgId === defaultOrgId &&
+        orgPermission.role === UserRole.Driver
+    );
     return (
       <Navigate
         to={
-          companies.length > 0
+          defaultOrgId
             ? generatePath(
-                companies[0].userRole?.includes(UserRole.Driver)
+                isDriverForOrg
                   ? routes.dashboard.transport.toCollect
                   : routes.dashboard.bsds.index,
                 {
-                  siret: getDefaultOrgId(companies)
+                  siret: defaultOrgId
                 }
               )
             : routes.companies.index
@@ -144,10 +115,7 @@ function DashboardRoutes() {
     <div id="dashboard" className="dashboard">
       {!isMobile && (
         <SideBar>
-          <DashboardTabs
-            currentCompany={currentCompany}
-            companies={companies}
-          />
+          <DashboardTabs currentCompany={currentCompany} />
         </SideBar>
       )}
       <div className="dashboard-content">

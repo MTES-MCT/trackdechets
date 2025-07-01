@@ -6,15 +6,11 @@ import React, {
   useRef
 } from "react";
 import { useParams, useMatch, useLocation } from "react-router-dom";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
 import { GET_BSDS } from "../Apps/common/queries";
-import {
-  Query,
-  QueryBsdsArgs,
-  QueryCompanyPrivateInfosArgs
-} from "@td/codegen-ui";
+import { Query, QueryBsdsArgs } from "@td/codegen-ui";
 import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
@@ -36,7 +32,6 @@ import {
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "../common/contexts/PermissionsContext";
 import { UserPermission } from "@td/codegen-ui";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 import {
   filtersToQueryBsdsArgs,
   getBlankslateDescription,
@@ -49,9 +44,14 @@ import { NotificationError } from "../Apps/common/Components/Error/Error";
 import throttle from "lodash/throttle";
 
 import "./dashboard.scss";
+import { useMyCompany } from "../Apps/common/hooks/useMyCompany";
 
 const DashboardPage = () => {
-  const { permissions } = usePermissions();
+  const { siret } = useParams<{ siret: string | undefined }>();
+  const {
+    permissionsInfos: { permissions: globalPermissions }
+  } = usePermissions(siret);
+  const { company } = useMyCompany(siret);
   const isActTab = !!useMatch(routes.dashboard.bsds.act);
   const isDraftTab = !!useMatch(routes.dashboard.bsds.drafts);
   const isFollowTab = !!useMatch(routes.dashboard.bsds.follow);
@@ -76,7 +76,6 @@ const DashboardPage = () => {
   const prevPathname = useRef(location.pathname);
 
   const BSD_PER_PAGE = 25;
-  const { siret } = useParams<{ siret: string }>();
   const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
@@ -192,20 +191,13 @@ const DashboardPage = () => {
     }
   }, [error]);
 
-  const { data: companyData } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret! }
-  });
-
   const siretsWithAutomaticSignature = useMemo(() => {
-    return companyData
-      ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
+    return company
+      ? company.receivedSignatureAutomations.map(
           automation => automation.from.siret
         )
       : [];
-  }, [companyData]);
+  }, [company]);
 
   const loadMoreBsds = React.useCallback(() => {
     fetchMore({
@@ -243,7 +235,7 @@ const DashboardPage = () => {
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
       <div className="dashboard-page__actions">
-        {permissions.includes(UserPermission.BsdCanCreate) && (
+        {globalPermissions.includes(UserPermission.BsdCanCreate) && (
           <div className="create-btn">
             <BsdCreateDropdown
               links={dropdownCreateLinks(siret, location)}

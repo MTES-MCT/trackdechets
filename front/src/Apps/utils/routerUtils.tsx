@@ -1,31 +1,14 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Navigate,
   generatePath,
   useLocation,
   useParams
 } from "react-router-dom";
-import { useQuery, gql } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
-import { Query } from "@td/codegen-ui";
 import Loader from "../common/Components/Loader/Loaders";
 import routes from "../routes";
-
-const GET_ME = gql`
-  query GetMe {
-    me {
-      id
-      email
-      isAdmin
-      companies {
-        orgId
-        siret
-        securityCode
-      }
-      featureFlags
-    }
-  }
-`;
+import { useAuth } from "../../common/contexts/AuthContext";
 
 export function RequireAuth({
   children,
@@ -33,19 +16,17 @@ export function RequireAuth({
   replace = false
 }) {
   const location = useLocation();
+  const { isAuthenticated, user } = useAuth();
 
-  const { data, loading } = useQuery<Pick<Query, "me">>(GET_ME, {
-    onCompleted: ({ me }) => {
-      if (import.meta.env.VITE_SENTRY_DSN && me.email) {
-        Sentry.setUser({ email: me.email });
-      }
+  useEffect(() => {
+    if (import.meta.env.VITE_SENTRY_DSN && user?.email) {
+      Sentry.setUser({ email: user.email });
     }
-  });
+  }, [user?.email]);
 
-  const isAuthenticated = !loading && data != null;
-  const isAdmin = isAuthenticated && Boolean(data?.me?.isAdmin);
+  const isAdmin = isAuthenticated && Boolean(user?.isAdmin);
 
-  if (loading) {
+  if (isAuthenticated && !user) {
     return <Loader />;
   }
 

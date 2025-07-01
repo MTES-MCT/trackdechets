@@ -360,6 +360,11 @@ export const CompanyDetailsfragment = {
       featureFlags
       isDormantSince
       hasEnabledRegistryDndFromBsdSince
+      receivedSignatureAutomations {
+        from {
+          siret
+        }
+      }
       givenAdministrativeTransfers {
         id
         status
