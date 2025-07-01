@@ -233,8 +233,9 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
   useEffect(() => {
     if (initialState) {
       reset(initialState);
+      setValue("destination.reception.date", datetimeToYYYYMMDD(TODAY));
     }
-  }, [initialState, reset]);
+  }, [initialState, reset, TODAY, setValue]);
 
   useEffect(() => {
     if (["ACCEPTED", "RECEIVED"].includes(acceptationStatus)) {
