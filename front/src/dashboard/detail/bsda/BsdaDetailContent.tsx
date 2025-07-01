@@ -421,7 +421,9 @@ const Intermediaries = ({ intermediaries }) => (
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
-  const { permissions } = usePermissions();
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
 
   const [duplicate] = useDuplicate({
     variables: { id: form.id },

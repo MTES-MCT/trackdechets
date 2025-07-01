@@ -8,7 +8,11 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getTransporterCompanyOrgId } from "@td/constants";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
+import {
+  getIntermediaryCompanyOrgId,
+  getTransporterCompanyOrgId
+} from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import {
   BsdasriWithGrouping,
@@ -16,10 +20,16 @@ import {
   BsdasriWithGroupingInclude,
   BsdasriWithSynthesizingInclude,
   BsdasriWithRevisionRequests,
-  BsdasriWithRevisionRequestsInclude
+  BsdasriWithRevisionRequestsInclude,
+  BsdasriWithIntermediaries,
+  BsdasriWithIntermediariesInclude
 } from "./types";
 import { prisma } from "@td/prisma";
-import { getRevisionOrgIds } from "../common/elasticHelpers";
+import {
+  getNonPendingLatestRevisionRequestUpdatedAt,
+  getRevisionOrgIds,
+  RevisionTab
+} from "../common/elasticHelpers";
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
@@ -27,12 +37,14 @@ import { xDaysAgo } from "../utils";
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &
   BsdasriWithSynthesizing &
+  BsdasriWithIntermediaries &
   BsdasriWithRevisionRequests;
 
 export const BsdasriForElasticInclude = {
   ...BsdasriWithGroupingInclude,
   ...BsdasriWithSynthesizingInclude,
-  ...BsdasriWithRevisionRequestsInclude
+  ...BsdasriWithRevisionRequestsInclude,
+  ...BsdasriWithIntermediariesInclude
 };
 
 export async function getBsdasriForElastic(
@@ -49,14 +61,37 @@ type ElasticSirets = {
   ecoOrganismeSiret: string | null | undefined;
   destinationCompanySiret: string | null | undefined;
   transporterCompanySiret: string | null | undefined;
+  brokerCompanySiret: string | null | undefined;
+  traderCompanySiret: string | null | undefined;
+  intermediarySiret1?: string | null | undefined;
+  intermediarySiret2?: string | null | undefined;
+  intermediarySiret3?: string | null | undefined;
 };
 
 const getBsdasriSirets = (bsdasri: BsdasriForElastic): ElasticSirets => {
-  const bsdasriSirets = {
+  const intermediarySirets = bsdasri.intermediaries.reduce(
+    (sirets, intermediary) => {
+      const orgId = getIntermediaryCompanyOrgId(intermediary);
+      if (orgId) {
+        const nbOfKeys = Object.keys(sirets).length;
+        return {
+          ...sirets,
+          [`intermediarySiret${nbOfKeys + 1}`]: orgId
+        };
+      }
+      return sirets;
+    },
+    {}
+  );
+  const bsdasriSirets: ElasticSirets = {
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
-    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
+    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret,
+    brokerCompanySiret: bsdasri.brokerCompanySiret,
+    traderCompanySiret: bsdasri.traderCompanySiret,
+
+    ...intermediarySirets
   };
 
   // Drafts only appear in the dashboard for companies the bsdasri owner belongs to
@@ -223,13 +258,13 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     destinationCustomInfo: bsdasri.destinationCustomInfo ?? "",
     destinationCap: "",
 
-    brokerCompanyName: "",
-    brokerCompanySiret: "",
-    brokerCompanyAddress: "",
+    brokerCompanyName: bsdasri.brokerCompanyName ?? "",
+    brokerCompanySiret: bsdasri.brokerCompanySiret ?? "",
+    brokerCompanyAddress: bsdasri.brokerCompanyAddress ?? "",
 
-    traderCompanyName: "",
-    traderCompanySiret: "",
-    traderCompanyAddress: "",
+    traderCompanyName: bsdasri.traderCompanyName ?? "",
+    traderCompanySiret: bsdasri.traderCompanySiret ?? "",
+    traderCompanyAddress: bsdasri.traderCompanyAddress ?? "",
 
     ecoOrganismeName: bsdasri.ecoOrganismeName ?? "",
     ecoOrganismeSiret: bsdasri.ecoOrganismeSiret ?? "",
@@ -256,9 +291,14 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     ...getBsdasriRevisionOrgIds(bsdasri),
     ...getBsdasriReturnOrgIds(bsdasri),
     revisionRequests: bsdasri.bsdasriRevisionRequests,
+    nonPendingLatestRevisionRequestUpdatedAt:
+      getNonPendingLatestRevisionRequestUpdatedAt(
+        bsdasri.bsdasriRevisionRequests
+      ),
 
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
+    ...getElasticExhaustiveRegistryFields(bsdasri),
     rawBsd: bsdasri,
 
     // ALL actors from the BSDASRI, for quick search
@@ -266,7 +306,10 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
       bsdasri.emitterCompanyName,
       bsdasri.ecoOrganismeName,
       bsdasri.transporterCompanyName,
-      bsdasri.destinationCompanyName
+      bsdasri.destinationCompanyName,
+      bsdasri.brokerCompanyName,
+      bsdasri.traderCompanyName,
+      ...bsdasri.intermediaries.map(intermediary => intermediary.name)
     ]
       .filter(Boolean)
       .join(" "),
@@ -275,7 +318,11 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
       bsdasri.ecoOrganismeSiret,
       bsdasri.transporterCompanySiret,
       bsdasri.transporterCompanyVatNumber,
-      bsdasri.destinationCompanySiret
+      bsdasri.destinationCompanySiret,
+      bsdasri.brokerCompanySiret,
+      bsdasri.traderCompanySiret,
+      ...bsdasri.intermediaries.map(intermediary => intermediary.siret),
+      ...bsdasri.intermediaries.map(intermediary => intermediary.vatNumber)
     ].filter(Boolean)
   };
 }
@@ -295,7 +342,7 @@ export function indexBsdasri(
  */
 export function getBsdasriRevisionOrgIds(
   bsdasri: BsdasriForElastic
-): Pick<BsdElastic, "isInRevisionFor" | "isRevisedFor"> {
+): Pick<BsdElastic, RevisionTab> {
   return getRevisionOrgIds(bsdasri.bsdasriRevisionRequests);
 }
 

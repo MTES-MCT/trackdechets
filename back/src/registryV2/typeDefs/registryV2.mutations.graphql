@@ -75,7 +75,7 @@ type Mutation {
     "Type de registre de déchets"
     registryType: RegistryV2ExportType!
     "Format d'export attendu"
-    format: FormsRegisterExportFormat!
+    format: RegistryExportFormat!
     "établissment pour lequel on veut faire un export de registre"
     siret: String
     "établissement délégataire via lequel on veut faire un export de registre. Le champ siret est obligatoire si l'export est demandé en tant que délégataire."
@@ -99,4 +99,16 @@ type Mutation {
     "Type de registre auquel appartient la déclaration"
     type: RegistryImportType!
   ): CancelRegistryV2LineResponse!
+
+  # Registre exhaustif
+
+  "Renvoie un lien permettant de télécharger un registre exhaustif au format CSV"
+  generateRegistryExhaustiveExport(
+    "Format d'export attendu"
+    format: RegistryExportFormat!
+    "établissment pour lequel on veut faire un export de registre"
+    siret: String
+    "plage de dates à exporter, une date de début est obligatoire"
+    dateRange: DateFilter!
+  ): RegistryExhaustiveExport!
 }

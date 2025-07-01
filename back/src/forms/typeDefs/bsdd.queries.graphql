@@ -146,12 +146,6 @@ type Query {
     customId: String
   ): [Form!]!
 
-  "DEPRECATED - Renvoie des statistiques sur le volume de déchets entrant et sortant"
-  stats: [CompanyStat!]!
-    @deprecated(
-      reason: "Ne fonctionne pas avec des comptes utilisateurs ayant de nombreux établissements"
-    )
-
   "Renvoie des BSD candidats à un regroupement dans une annexe 2"
   appendixForms(
     "Siret d'un des établissements dont je suis membre"
@@ -166,47 +160,6 @@ type Query {
   Il est valable 10 secondes
   """
   formPdf("ID d'un BSD" id: ID!): FileDownload!
-
-  """
-  DEPRECATED - Renvoie un lien de téléchargement pour télécharger le registre BSDD
-  Le lien est valable 10 secondes
-  """
-  formsRegister(
-    """
-    Liste de SIRET pour lesquelles exporter le registre
-    """
-    sirets: [String!]!
-
-    """
-    (Optionnel) Modèle de registre (exhaustif, entrants, sortants, transport, négociants)
-    Défaut: ALL
-    """
-    exportType: FormsRegisterExportType
-
-    """
-    (Optionnel) Filtre les données par une date de début
-    Défaut: aucune valeur
-    """
-    startDate: DateTime
-
-    """
-    (Optionnel) Filtre les données par une date de fin
-    Défaut: aucune valeur
-    """
-    endDate: DateTime
-
-    """
-    (Optionnel) Filtre les données par code déchet
-    Défaut: Tous les codes déchets
-    """
-    wasteCode: String
-
-    """
-    (Optionnel) Format de l'export
-    Défaut: csv
-    """
-    exportFormat: FormsRegisterExportFormat
-  ): FileDownload! @deprecated(reason: "Utiliser wastesDownloadLink")
 
   """
   Renvoie les changements de statut des bordereaux de l'entreprise sélectionnée.

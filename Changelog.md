@@ -5,12 +5,36 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.07.1] 01/07/2025
+
+#### :nail_care: Améliorations
+
+- Amélioration du sélecteur de pays pour la saisie de déclarations RNDTS [PR 4242](https://github.com/MTES-MCT/trackdechets/pull/4242)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
+- Ajout des rôles courtiers, négociant et intermédiaire sur le Bsadri [PR 4264](https://github.com/MTES-MCT/trackdechets/pull/4264)
+
+#### :nail_care: Améliorations
+
+- Ajout d'un icône éco-organisme sur le composant de groupement de dasris [PR 4235](https://github.com/MTES-MCT/trackdechets/pull/4235/)
+- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+
+#### :bug: Corrections de bugs
+
+- Résolution d'un bug d'affichage des codes déchets secondaires (SSD) dans la modification de déclarations RNDTS qui pouvait faire crasher l'application [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement des règles de validation SSD: Le mode de traitement devient facultatif (car inutile) dans le cas d'un code R12 ou R13 [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+- Assouplissement de la règle de validation numéro GISTRID/numéro de notification sur les déclarations [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
+
 # [2025.06.1] 03/06/2025
 
 #### :nail_care: Améliorations
 
 - Supression de la fourniture d'identité pour le RNDTS [PR 4202](https://github.com/MTES-MCT/trackdechets/pull/4202/)
 - Passer à J-18 mois la limite de l'ensemble des dates liées aux déclarations [PR 4194](https://github.com/MTES-MCT/trackdechets/pull/4194)
+- Ajout de la nouvelle version des registres exhaustif, interface et API harmonisée avec les registres réglementaires [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
+- Débloquage de la query cancelRegistryV2Lines pour utilisation API [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -22,10 +46,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - BSDA: le nombre total de conditionnements remonte désormais dans la colonne "Nombre d'unités" du registre [PR 4209](https://github.com/MTES-MCT/trackdechets/pull/4209)
+- BSDD: l'application de la récursivité sur les statuts des bordereaux se fait également sur les bordereaux suite pour les bordereaux ayant un entreposage provisoire [PR 4261](https://github.com/MTES-MCT/trackdechets/pull/4261)
 
 #### :boom: Breaking Change
 
 - BSDD: le champ `wasteDetailsIsSubjectToADR` est maintenant obligatoire via API [PR 4183](https://github.com/MTES-MCT/trackdechets/pull/4183)
+- Suppression de la query formsRegister (dépréciée depuis plusieurs années) [PR 4214](https://github.com/MTES-MCT/trackdechets/pull/4214)
 
 # [2025.05.1] 03/05/2025
 
@@ -85,7 +111,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking Change
 
-- BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
+- BSDD - Le type de conditionnement PIPELINE est déprécié sur l'enum [Packagings](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/enums#packagings). Il est nécessaire de renseigner un nouveau champ booléen `isDirectSupply` sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) pouvant correspondre à un acheminement par pipeline ou par convoyeur. Aucun conditionnement ne devra être renseigné en cas d'acheminement direct, c'est à dire que lorsque `isDirectSupply` est true, le champ packagingsInfos sur [FormInput](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/inputObjects#forminput) devra valoir null ou []. Les données existantes seront migrées de sorte qu'il vous faudra prendre en compte en lecture le nouveau champ `isDirectSupply` sur l'objet [Form](https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects#form). Nous continuerons d'accepter la valeur
+  `PIPELINE` comme type de packagings en écriture mais les données entrantes seront automatiquement converties pour s'adapter au nouveau format de données.
 - La quantité refusée est désormais obligatoire à l'étape d'acceptation du déchet sur le BSDD [PR 3823](https://github.com/MTES-MCT/trackdechets/pull/3823)
 - Le type de retour des API permettant d'ajouter des lignes au RNDTS a été modifié. Il contient désormais le détail des opération effectuées, en remplacement d'un simple booléen [PR 4026](https://github.com/MTES-MCT/trackdechets/pull/4026)
 

@@ -119,7 +119,7 @@ export function ComboBox({
     const spaceBelow = viewportHeight - triggerOrParentRect.bottom;
     const spaceAbove = triggerOrParentRect.top;
     // Consider a minimum height for the dropdown before flipping
-    const minDropdownHeightThreshold = 50;
+    const minDropdownHeightThreshold = 300;
 
     let positionAbove = false;
     // Decide to position above if space below is insufficient (< threshold + margin)
@@ -138,7 +138,7 @@ export function ComboBox({
     if (positionAbove) {
       // Position above the trigger/parent
       targetElement.style.bottom = `${
-        viewportHeight - triggerOrParentRect.top + scrollY
+        viewportHeight - triggerOrParentRect.top - scrollY
       }px`;
       targetElement.style.maxHeight = `${Math.max(0, spaceAbove - margin)}px`; // Ensure non-negative
     } else {

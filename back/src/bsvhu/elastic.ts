@@ -12,6 +12,7 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { getBsvhuSubType } from "../common/subTypes";
 import { getAddress } from "./converter";
 import {
@@ -268,13 +269,17 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     destinationAcceptationWeight: bsvhu.destinationReceptionWeight,
     destinationOperationDate: bsvhu.destinationOperationDate?.getTime(),
     ...where,
-    isInRevisionFor: [],
-    isRevisedFor: [],
+    isPendingRevisionFor: [] as string[],
+    isEmittedRevisionFor: [] as string[],
+    isReceivedRevisionFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBsvhuReturnOrgIds(bsvhu),
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),
+    ...getElasticExhaustiveRegistryFields(bsvhu),
     rawBsd: bsvhu,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
     intermediaries: bsvhu.intermediaries,
 
     // ALL actors from the BSVHU, for quick search

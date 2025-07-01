@@ -83,7 +83,12 @@ const createSynthesisBsdasri = async (
     }
   );
 
-  const { grouping, ...createInput } = parsedZodBsdasri;
+  const {
+    grouping,
+    synthesizing: x,
+    intermediaries,
+    ...createInput
+  } = parsedZodBsdasri;
 
   const bsdasriRepository = getBsdasriRepository(user);
   const newDasri = await bsdasriRepository.create({
@@ -92,9 +97,7 @@ const createSynthesisBsdasri = async (
     synthesizing: { connect: synthesizedBsdasris }
   });
 
-  const expandeBsdasri = expandBsdasriFromDB(newDasri);
-
-  return expandeBsdasri;
+  return expandBsdasriFromDB(newDasri);
 };
 
 export default createSynthesisBsdasri;

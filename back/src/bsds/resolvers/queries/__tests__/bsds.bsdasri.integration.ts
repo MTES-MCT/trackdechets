@@ -651,40 +651,160 @@ describe("Query.bsds.dasris base workflow", () => {
       await refreshElasticSearch();
     });
 
-    it("should list bsd in emitter `isIsRevisionFor` bsdasris", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isInRevisionFor: [emitter.company.siret!]
+    describe("destination", () => {
+      it("bsd should be in 'isPendingRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isPendingRevisionFor: [destination.company.siret!]
+              }
             }
           }
-        }
-      );
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
+
+      it("bsd should be in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isEmittedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
+
+      it("bsd should NOT be in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReceivedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should NOT be in 'isReviewedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReviewedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
     });
 
-    it("should list bsd in destination `isIsRevisionFor` bsdasris", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isInRevisionFor: [destination.company.siret!]
+    describe("emitter", () => {
+      it("bsd should be in 'isPendingRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isPendingRevisionFor: [emitter.company.siret!]
+              }
             }
           }
-        }
-      );
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
+
+      it("bsd should NOT be in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isEmittedRevisionFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should be in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReceivedRevisionFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
+
+      it("bsd should NOT be in 'isReviewedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReviewedRevisionFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
     });
   });
 
@@ -722,40 +842,156 @@ describe("Query.bsds.dasris base workflow", () => {
       await refreshElasticSearch();
     });
 
-    it("should list bsd in emitter `isRevisedFor` bsdasris", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isRevisedFor: [emitter.company.siret!]
+    describe("destination", () => {
+      it("bsd should NOT be in 'isPendingRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isPendingRevisionFor: [destination.company.siret!]
+              }
             }
           }
-        }
-      );
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should NOT be in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isEmittedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should NOT be in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReceivedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should be in 'isReviewedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReviewedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
     });
 
-    it("should list bsd in destination `isRevisedFor` bsdas", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isRevisedFor: [destination.company.siret!]
+    describe("emitter", () => {
+      it("bsd should NOT be in 'isPendingRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isPendingRevisionFor: [emitter.company.siret!]
+              }
             }
           }
-        }
-      );
+        );
 
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: bsdasriId } })
-      ]);
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should NOT be in 'isEmittedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isEmittedRevisionFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should NOT be in 'isReceivedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(destination.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReceivedRevisionFor: [emitter.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([]);
+      });
+
+      it("bsd should be in 'isReviewedRevisionFor'", async () => {
+        // When
+        const { query } = makeClient(emitter.user);
+        const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+          GET_BSDS,
+          {
+            variables: {
+              where: {
+                isReviewedRevisionFor: [destination.company.siret!]
+              }
+            }
+          }
+        );
+
+        // Then
+        expect(data.bsds.edges).toEqual([
+          expect.objectContaining({ node: { id: bsdasriId } })
+        ]);
+      });
     });
   });
 

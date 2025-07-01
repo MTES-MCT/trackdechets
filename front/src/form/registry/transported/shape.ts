@@ -273,9 +273,8 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "brokerCompany",
           shortMode: true,
-          title: "Courtier (optionnel)",
+          label: "courtier",
           reducedMargin: true,
-          toggleLabel: "Présence d'un courtier",
           recepisseName: "brokerRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.brokerReceipt?.receiptNumber) {
@@ -303,9 +302,8 @@ export const transportedFormShape: FormShape = [
         props: {
           prefix: "traderCompany",
           shortMode: true,
-          title: "Négociant (optionnel)",
+          label: "négociant",
           reducedMargin: true,
-          toggleLabel: "Présence d'un négociant",
           recepisseName: "traderRecepisseNumber",
           onCompanySelected: (company, setValue) => {
             if (company.traderReceipt?.receiptNumber) {

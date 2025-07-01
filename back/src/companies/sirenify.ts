@@ -46,11 +46,6 @@ export default function buildSirenify<T>(
   companyInputAccessors: (input: T) => CompanyInputAccessor<T>[]
 ): SirenifyFn<T> {
   return async (input, user) => {
-    if (user?.auth === AuthType.Session) {
-      // data sent from TD UI is considered to be sane
-      return input;
-    }
-
     // by pass some users
     for (const r of SIRENIFY_BYPASS_USER_EMAILS) {
       if (user && user.email?.match(r)) {

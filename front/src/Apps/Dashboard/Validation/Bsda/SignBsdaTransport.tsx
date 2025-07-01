@@ -62,20 +62,31 @@ const schema = z.object({
     phone: z.string().nullish(),
     mail: z.string().nullish()
   }),
-  transport: z.object({
-    takenOverAt: z.coerce
-      .date()
-      .nullish()
-      .transform(v => v?.toISOString()),
-    mode: z.string().nullish(),
-    plates: z.preprocess(
-      (val: string) => (typeof val === "string" ? val.split(",") : val ?? []),
-      z
-        .string()
-        .array()
-        .max(2, { message: "Un maximum de 2 plaques est accepté" })
-    )
-  }),
+  transport: z
+    .object({
+      takenOverAt: z.coerce
+        .date()
+        .nullish()
+        .transform(v => v?.toISOString()),
+      mode: z.string().nullish(),
+      plates: z.preprocess(
+        val => (Array.isArray(val) ? val : [val]).filter(Boolean),
+        z
+          .string()
+          .array()
+
+          .max(2, "2 plaques d'immatriculation maximum")
+      )
+    })
+    .superRefine((val, ctx) => {
+      if (val.mode === "ROAD" && !val.plates?.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["plates"],
+          message: `Ce champ est requis pour le transport routier`
+        });
+      }
+    }),
   recepisse: z
     .object({
       isExempted: z.boolean().nullish()
@@ -135,7 +146,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
     }
   });
 
-  const { handleSubmit, reset, register } = methods;
+  const { handleSubmit, reset, register, formState } = methods;
 
   // mettre à jour les valeurs quand signingTransporter est dispo
   useEffect(() => {
@@ -320,9 +331,15 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
               <div className="fr-col-8 fr-mb-2w">
                 <Input
                   label="Nom et prénom"
+                  state={
+                    formState.errors.signature?.author ? "error" : "default"
+                  }
                   nativeInputProps={{
                     ...register("signature.author")
                   }}
+                  stateRelatedMessage={
+                    formState.errors.signature?.author?.message
+                  }
                 />
               </div>
               <div className="fr-mb-8w">

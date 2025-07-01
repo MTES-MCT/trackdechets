@@ -24,7 +24,7 @@ import TdModal from "../../../common/Components/Modal/Modal";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import NonScrollableInput from "../../../common/Components/NonScrollableInput/NonScrollableInput";
-import { multiplyByRounded } from "../../../../common/helper";
+import { isDefinedStrict, multiplyByRounded } from "../../../../common/helper";
 
 import {
   GET_BSDA,
@@ -36,50 +36,98 @@ import routes from "../../../routes";
 import { getComputedState } from "../../Creation/getComputedState";
 import SignBsdaOperation from "./SignBsdaOperation";
 import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
+import Decimal from "decimal.js";
 
-const schema = z.object({
-  author: z
-    .string({
-      required_error: "Le nom et prénom de l'auteur de la signature sont requis"
-    })
-    .refine(val => val.trim() !== "", {
-      message: "Le nom et prénom de l'auteur de la signature sont requis"
-    })
-    .pipe(
-      z
-        .string()
-        .min(
-          2,
-          "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
-        )
-    ),
-  date: z.coerce
-    .date()
-    .nullish()
-    .transform(v => v?.toISOString()),
-  destination: z.object({
-    reception: z
-      .object({
-        acceptationStatus: z.enum(
-          ["ACCEPTED", "PARTIALLY_REFUSED", "REFUSED"],
-          {
-            errorMap: () => ({
-              message: "Le statut de l'acceptation est requis"
-            })
-          }
-        ),
-        weight: z.coerce.number().nonnegative().nullish(),
-        refusalReason: z.string().nullish(),
-        date: z.coerce
-          .date({
-            required_error: "La date de réception est requise",
-            invalid_type_error: "Format de date invalide."
-          })
-          .transform(v => v?.toISOString())
+const schema = z
+  .object({
+    author: z
+      .string({
+        required_error:
+          "Le nom et prénom de l'auteur de la signature sont requis"
       })
+      .refine(val => val.trim() !== "", {
+        message: "Le nom et prénom de l'auteur de la signature sont requis"
+      })
+      .pipe(
+        z
+          .string()
+          .min(
+            2,
+            "Le nom et prénom de l'auteur de la signature doit comporter au moins 2 caractères"
+          )
+      ),
+    date: z.coerce
+      .date()
       .nullish()
+      .transform(v => v?.toISOString()),
+    destination: z.object({
+      reception: z
+        .object({
+          acceptationStatus: z.enum(
+            ["ACCEPTED", "PARTIALLY_REFUSED", "REFUSED"],
+            {
+              errorMap: () => ({
+                message: "Le statut de l'acceptation est requis"
+              })
+            }
+          ),
+          weight: z.coerce.number().nonnegative().nullish(),
+          refusedWeight: z.coerce.number().nonnegative().nullish(),
+          acceptedWeight: z.coerce.number().nonnegative().nullish(),
+          refusalReason: z.string().nullish(),
+          date: z.coerce
+            .date({
+              required_error: "La date de réception est requise",
+              invalid_type_error: "Format de date invalide."
+            })
+            .transform(v => v?.toISOString())
+        })
+        .nullish()
+    })
   })
-});
+  .superRefine((val, ctx) => {
+    if (
+      ["PARTIALLY_REFUSED", "REFUSED"].includes(
+        val?.destination?.reception?.acceptationStatus as string
+      ) &&
+      !val?.destination?.reception?.refusalReason
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["destination.reception.refusalReason"],
+
+        message: `Vous devez préciser un motif de refus`
+      });
+    }
+
+    if (
+      (val?.destination?.reception?.refusedWeight ?? 0) >
+      (val?.destination?.reception?.weight ?? 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["destination.reception.refusedWeight"],
+
+        message: `Vous ne pouvez refuser un poids supérieur au poids reçu`
+      });
+    }
+
+    if (
+      val?.destination?.reception?.acceptationStatus === "PARTIALLY_REFUSED"
+    ) {
+      if (
+        !val?.destination?.reception?.refusedWeight &&
+        val?.destination?.reception?.weight
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["destination.reception.refusedWeight"],
+
+          message: `Vous devez préciser le poids refusé`
+        });
+      }
+    }
+  });
 export type ZodBsdaReception = z.infer<typeof schema>;
 
 const SignBsdaReception = ({ bsdaId, onClose }) => {
@@ -102,41 +150,47 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
   >(SIGN_BsDA);
 
   const title = "Signer la réception et l'acceptation";
-  const TODAY = new Date();
+  const TODAY = React.useMemo(() => new Date(), []);
 
-  const initialState = {
-    date: datetimeToYYYYMMDDHHSS(TODAY),
-    author: "",
-    ...getComputedState(
-      {
-        destination: {
-          plannedOperationCode: data?.bsda?.destination?.plannedOperationCode,
-          reception: {
-            date: datetimeToYYYYMMDD(TODAY),
-            acceptationStatus: "",
-            refusalReason: "",
-            weight: null
+  const initialState = React.useMemo(() => {
+    if (!data?.bsda) return undefined;
+
+    return {
+      date: datetimeToYYYYMMDDHHSS(TODAY),
+      author: "",
+      ...getComputedState(
+        {
+          destination: {
+            plannedOperationCode: data.bsda.destination?.plannedOperationCode,
+            reception: {
+              date: datetimeToYYYYMMDD(TODAY),
+              acceptationStatus: "",
+              refusalReason: "",
+              weight: data.bsda.weight?.value
+            }
           }
-        }
-      },
-      data?.bsda
-    )
-  } as ZodBsdaReception;
+        },
+        data.bsda
+      )
+    } as ZodBsdaReception;
+  }, [data, TODAY]);
 
   const methods = useForm<ZodBsdaReception>({
-    values: initialState,
+    defaultValues: initialState,
     resolver: async (data, context, options) => {
       return zodResolver(schema)(data, context, options);
     }
   });
 
-  const { handleSubmit, reset, formState, register, watch, setValue } = methods;
+  const { handleSubmit, reset, formState, register, watch, setValue, trigger } =
+    methods;
 
   const onCancel = () => {
     reset();
     onClose();
   };
 
+  const acceptationStatus = watch("destination.reception.acceptationStatus");
   const acceptationRadioOptions = [
     {
       label: "La réception et l'acceptation",
@@ -163,13 +217,42 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
   ];
 
   const receivedWeight = watch("destination.reception.weight");
-  const acceptationStatus = watch("destination.reception.acceptationStatus");
+  const refusedWeight = watch("destination.reception.refusedWeight");
+  const isFormValid = !Object.keys(formState.errors ?? {}).length;
+
+  const refusedWeightDisabled =
+    !receivedWeight || ["ACCEPTED", "REFUSED"].includes(acceptationStatus);
+
+  const acceptedWeight = receivedWeight
+    ? new Decimal(receivedWeight ?? 0)
+        .minus(isDefinedStrict(refusedWeight) ? refusedWeight! : 0)
+        .toDecimalPlaces(6)
+        .toNumber()
+    : 0;
 
   useEffect(() => {
-    if (acceptationStatus === "REFUSED") {
-      setValue("destination.reception.weight", 0);
+    if (initialState) {
+      reset(initialState);
+      setValue("destination.reception.date", datetimeToYYYYMMDD(TODAY));
     }
-  }, [acceptationStatus, setValue]);
+  }, [initialState, reset, TODAY, setValue]);
+
+  useEffect(() => {
+    if (["ACCEPTED", "RECEIVED"].includes(acceptationStatus)) {
+      setValue("destination.reception.refusedWeight", 0);
+      setValue("destination.reception.refusalReason", "");
+    }
+    if (acceptationStatus === "REFUSED" && !!receivedWeight) {
+      setValue("destination.reception.refusedWeight", receivedWeight);
+    }
+
+    if (acceptationStatus === "PARTIALLY_REFUSED" && !!receivedWeight) {
+      setValue("destination.reception.refusedWeight", 0);
+      return;
+    }
+    // manually set values do not trigger re-validation
+    trigger("destination.reception.refusedWeight");
+  }, [acceptationStatus, receivedWeight, setValue, trigger]);
 
   const [isOperationModalOpended, setIsOperationModalOpened] = useState(false);
   const isTwoStepSignature = useRef(false);
@@ -268,7 +351,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 />
 
                 <h4 className="fr-h4">
-                  <strong>Réception et acceptation</strong>
+                  <strong>Réception</strong>
                 </h4>
                 <div className="fr-grid-row fr-grid-row--top">
                   <div className="fr-grid-row fr-grid-row--gutters fr-mb-0">
@@ -302,29 +385,105 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                       </p>
                     </div>
                   </div>
-
-                  {[
-                    WasteAcceptationStatus.Refused,
-                    WasteAcceptationStatus.PartiallyRefused
-                  ].includes(acceptationStatus as WasteAcceptationStatus) && (
-                    <Input
-                      label="Motif de refus"
-                      textArea
-                      className="fr-col-12 fr-mb-2w"
-                      state={
-                        formState.errors?.destination?.reception
-                          ?.refusalReason && "error"
-                      }
-                      stateRelatedMessage={
-                        (formState.errors?.destination?.reception?.refusalReason
-                          ?.message as string) ?? ""
-                      }
-                      nativeTextAreaProps={{
-                        ...register("destination.reception.refusalReason")
-                      }}
-                    />
-                  )}
                 </div>
+
+                {[
+                  WasteAcceptationStatus.Accepted,
+                  WasteAcceptationStatus.Refused,
+                  WasteAcceptationStatus.PartiallyRefused
+                ].includes(acceptationStatus as WasteAcceptationStatus) && (
+                  <>
+                    <h4 className="fr-h4">
+                      <strong>Acceptation</strong>
+                    </h4>
+                    <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+                      <div className="fr-col-12 fr-col-md-4">
+                        <h6 className="fr-text--lg">
+                          <strong>Poids refusé</strong>
+                        </h6>
+                        <NonScrollableInput
+                          label="Poids total net en tonnes"
+                          disabled={refusedWeightDisabled}
+                          className="fr-col-12"
+                          state={
+                            formState.errors?.destination?.reception
+                              ?.refusedWeight && "error"
+                          }
+                          stateRelatedMessage={
+                            (formState.errors?.destination?.reception
+                              ?.refusedWeight?.message as string) ?? ""
+                          }
+                          nativeInputProps={{
+                            inputMode: "decimal",
+                            step: "0.000001",
+                            type: "number",
+                            ...register("destination.reception.refusedWeight")
+                          }}
+                        />
+                        <p
+                          className="fr-text fr-text--xs"
+                          style={{ color: "#0063CB" }}
+                        >
+                          <span className="fr-icon-info-fill fr-mr-1w"></span>
+                          Soit {multiplyByRounded(refusedWeight)} kilos
+                        </p>
+                      </div>
+                      <div className="fr-col-12 fr-col-md-4">
+                        <h6 className="fr-text--lg">
+                          <strong>Poids accepté</strong>
+                        </h6>
+                        <NonScrollableInput
+                          label="Poids total net en tonnes"
+                          disabled
+                          className="fr-col-12"
+                          state={
+                            formState.errors?.destination?.reception
+                              ?.acceptedWeight && "error"
+                          }
+                          stateRelatedMessage={
+                            (formState.errors?.destination?.reception
+                              ?.acceptedWeight?.message as string) ?? ""
+                          }
+                          nativeInputProps={{
+                            value: acceptedWeight,
+                            inputMode: "decimal",
+                            step: "0.000001",
+                            type: "number",
+                            ...register("destination.reception.acceptedWeight")
+                          }}
+                        />
+                        <p
+                          className="fr-text fr-text--xs"
+                          style={{ color: "#0063CB" }}
+                        >
+                          <span className="fr-icon-info-fill fr-mr-1w"></span>
+                          Soit {multiplyByRounded(acceptedWeight)} kilos
+                        </p>
+                      </div>
+                    </div>
+                    {[
+                      WasteAcceptationStatus.Refused,
+                      WasteAcceptationStatus.PartiallyRefused
+                    ].includes(acceptationStatus as WasteAcceptationStatus) && (
+                      <Input
+                        label="Motif de refus"
+                        textArea
+                        className="fr-col-12 fr-mb-2w"
+                        state={
+                          formState.errors?.destination?.reception
+                            ?.refusalReason && "error"
+                        }
+                        stateRelatedMessage={
+                          (formState.errors?.destination?.reception
+                            ?.refusalReason?.message as string) ?? ""
+                        }
+                        nativeTextAreaProps={{
+                          ...register("destination.reception.refusalReason")
+                        }}
+                      />
+                    )}
+                  </>
+                )}
 
                 <p className="fr-text fr-mb-2w">
                   En qualité de <strong>destinataire du déchet</strong>, je
@@ -386,13 +545,19 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                   {acceptationStatus !== "REFUSED" && (
                     <Button
                       type="button"
-                      disabled={loading || loadingUpdate}
+                      disabled={
+                        loading || formState.isSubmitting || !isFormValid
+                      }
                       onClick={onClickTwoStepSignature}
                     >
                       Signer et passer à l'étape traitement
                     </Button>
                   )}
-                  <Button disabled={loading || loadingUpdate}>Signer</Button>
+                  <Button
+                    disabled={loading || formState.isSubmitting || !isFormValid}
+                  >
+                    Signer
+                  </Button>
                 </div>
               </form>
             </FormProvider>

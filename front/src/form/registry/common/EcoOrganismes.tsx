@@ -50,8 +50,7 @@ export function EcoOrganismes({ methods, disabled, reducedMargin }: Props) {
         disabled={disabled}
         shortMode={true}
         reducedMargin={reducedMargin}
-        title="Éco-organisme (optionnel)"
-        toggleLabel="Présence d'un éco-organisme"
+        label="éco-organisme"
       />
 
       {selectedSiret && !isKnownEcoOrganisme && (

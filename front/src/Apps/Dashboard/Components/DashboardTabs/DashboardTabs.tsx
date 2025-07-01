@@ -1,12 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { NavLink, generatePath, useNavigate } from "react-router-dom";
-import {
-  CompanyPrivate,
-  Query,
-  QueryBsdsArgs,
-  UserPermission,
-  UserRole
-} from "@td/codegen-ui";
+import { CompanyPrivate, UserPermission, UserRole } from "@td/codegen-ui";
 import routes from "../../../routes";
 
 import { useShowTransportTabs } from "../../hooks/useShowTransportTabs";
@@ -22,27 +16,20 @@ import {
   REVIEWED,
   REVIEWS,
   TO_COLLECT,
-  TO_REVIEW,
   TRANSPORT,
-  RETURN
+  RETURN,
+  PENDING,
+  EMITTED,
+  RECEIVED
 } from "../../../common/wordings/dashboard/wordingsDashboard";
 
 import "./DashboardTabs.scss";
 import CompanySwitcher from "../../../common/Components/CompanySwitcher/CompanySwitcher";
-import { gql, useQuery } from "@apollo/client";
 import { useNotifier } from "../../../../dashboard/components/BSDList/useNotifier";
-
-const NOTIFICATION_QUERY = gql`
-  query GetBsds($where: BsdWhere) {
-    bsds(first: 1, where: $where) {
-      totalCount
-    }
-  }
-`;
+import { useNotificationQueries } from "./useNotificationQueries";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
-  companies: CompanyPrivate[];
 }
 
 const displayNotification = (count, isReaderRole) => {
@@ -51,37 +38,19 @@ const displayNotification = (count, isReaderRole) => {
   ) : null;
 };
 
-const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
+const DashboardTabs = ({ currentCompany }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const { permissions, role } = usePermissions();
+  const {
+    orgPermissions: { permissions, role },
+    permissionsInfos
+  } = usePermissions(currentCompany.orgId);
   const navigate = useNavigate();
 
-  const { data: dataAction, refetch: refetchAction } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isForActionFor: [currentCompany.orgId] } }
-  });
-
-  const { data: dataRevision, refetch: refetchRevision } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isInRevisionFor: [currentCompany.orgId] } }
-  });
-
-  const { data: dataTransport, refetch: refetchTransport } = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isToCollectFor: [currentCompany.orgId] } }
-  });
+  const { data, refetchAll } = useNotificationQueries(currentCompany.orgId);
 
   useNotifier(currentCompany.orgId, () => {
-    refetchAction();
-    refetchRevision();
-    refetchTransport();
+    refetchAll();
   });
 
   const { showTransportTabs } = useShowTransportTabs(
@@ -94,18 +63,22 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
 
   const handleCompanyChange = useCallback(
     orgId => {
-      navigate(
-        generatePath(
-          role?.includes(UserRole.Driver)
-            ? routes.dashboard.transport.toCollect
-            : routes.dashboard.bsds.index,
-          {
-            siret: orgId
-          }
-        )
+      const isDriverForOrg = permissionsInfos.orgPermissionsInfos.some(
+        orgPermission =>
+          orgPermission.orgId === orgId &&
+          orgPermission.role === UserRole.Driver
       );
+      const path = generatePath(
+        isDriverForOrg
+          ? routes.dashboard.transport.toCollect
+          : routes.dashboard.bsds.index,
+        {
+          siret: orgId
+        }
+      );
+      navigate(path);
     },
-    [navigate, role]
+    [navigate, permissionsInfos]
   );
 
   const handleToggle = () => {
@@ -119,7 +92,6 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
       <div id="company-dashboard-select" className="company-select">
         <CompanySwitcher
           currentOrgId={currentCompany.orgId}
-          companies={companies}
           handleCompanyChange={handleCompanyChange}
         />
       </div>
@@ -175,7 +147,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                 >
                   {ACTS}
                 </NavLink>
-                {displayNotification(dataAction?.bsds.totalCount, isReaderRole)}
+                {displayNotification(data.actionCount, isReaderRole)}
               </li>
 
               <li>
@@ -218,7 +190,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
             <ul>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.bsds.toReview, {
+                  to={generatePath(routes.dashboard.revisions.pending, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -227,16 +199,48 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
                       : "sidebarv2__item sidebarv2__item--indented"
                   }
                 >
-                  {TO_REVIEW}
+                  {PENDING}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboard.revisions.emitted, {
+                    siret: currentCompany.orgId
+                  })}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
+                >
+                  {EMITTED}
                 </NavLink>
                 {displayNotification(
-                  dataRevision?.bsds.totalCount,
+                  data.isEmittedRevisionForCount,
                   isReaderRole
                 )}
               </li>
               <li>
                 <NavLink
-                  to={generatePath(routes.dashboard.bsds.reviewed, {
+                  to={generatePath(routes.dashboard.revisions.received, {
+                    siret: currentCompany.orgId
+                  })}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "sidebarv2__item sidebarv2__item--indented sidebarv2__item--active"
+                      : "sidebarv2__item sidebarv2__item--indented"
+                  }
+                >
+                  {RECEIVED}
+                </NavLink>
+                {displayNotification(
+                  data.isReceivedRevisionForCount,
+                  isReaderRole
+                )}
+              </li>
+              <li>
+                <NavLink
+                  to={generatePath(routes.dashboard.revisions.reviewed, {
                     siret: currentCompany.orgId
                   })}
                   className={({ isActive }) =>
@@ -274,10 +278,7 @@ const DashboardTabs = ({ currentCompany, companies }: DashboardTabsProps) => {
               >
                 {TO_COLLECT}
               </NavLink>
-              {displayNotification(
-                dataTransport?.bsds.totalCount,
-                isReaderRole
-              )}
+              {displayNotification(data.transportCount, isReaderRole)}
             </li>
             <li>
               <NavLink

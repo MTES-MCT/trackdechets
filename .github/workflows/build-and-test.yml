@@ -48,5 +48,6 @@ jobs:
           S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
           S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
           S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
+          S3_REGISTRY_EXHAUSTIVE_EXPORTS_BUCKET: registry-exhaustive-exports-integration
           S3_REGISTRY_MODELS_BUCKET: registry-models-integration
       - run: npx nx affected -t build --parallel=3

@@ -52,4 +52,9 @@ type Query {
   Ne retourne pas d'erreur si l'utilisateur n'est pas authentifié
   """
   isAuthenticated: Boolean!
+
+  """
+  Liste les permissions que l'utilisateur a sur au moins un de ses établissements.
+  """
+  permissionsInfos: PermissionsInfos!
 }

@@ -4,4 +4,33 @@ type Query {
     window: Int!
     source: RegistryImportSource!
   ): [ChangeAggregate!]
+
+  "Liste des exports de registre demandés en tant qu'administrateur"
+  registryV2ExportsAsAdmin(
+    """
+    (Optionnel) PAGINATION
+    Nombre d'éléments à ne pas récupérer en début de liste (pagination par "offset")
+    """
+    skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet de spécifier le nombre d'éléments à récupérer
+    """
+    first: Int
+  ): RegistryV2ExportConnection!
+
+  registryExhaustiveExportsAsAdmin(
+    """
+    (Optionnel) PAGINATION
+    Nombre d'éléments à ne pas récupérer en début de liste (pagination par "offset")
+    """
+    skip: Int
+
+    """
+    (Optionnel) PAGINATION
+    Permet de spécifier le nombre d'éléments à récupérer
+    """
+    first: Int
+  ): RegistryExhaustiveExportConnection!
 }

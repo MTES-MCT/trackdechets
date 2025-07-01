@@ -122,13 +122,6 @@ export function InlineFrenchCompanySelector({
               small
             />
           )}
-          {errors?.[`${prefix}CompanyAddress`] && (
-            <Alert
-              description={formatError(errors[`${prefix}CompanyAddress`])}
-              severity="error"
-              small
-            />
-          )}
           {unknownCompanyError && (
             <Alert
               title="L'établissement mentionné n'existe pas dans la base SIRENE"

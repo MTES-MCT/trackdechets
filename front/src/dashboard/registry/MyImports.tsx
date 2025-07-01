@@ -7,7 +7,8 @@ import {
   Query,
   QueryRegistryDownloadSignedUrlArgs,
   RegistryDownloadTarget,
-  RegistryImportStatus
+  RegistryImportStatus,
+  UserPermission
 } from "@td/codegen-ui";
 import { format } from "date-fns";
 import React, { useState } from "react";
@@ -25,6 +26,7 @@ import {
 import RegistryTable from "./RegistryTable";
 import { useMedia } from "../../common/use-media";
 import { MEDIA_QUERIES } from "../../common/config";
+import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 const HEADERS = [
   "Importé le",
@@ -40,6 +42,11 @@ const PAGE_SIZE = 20;
 export function MyImports() {
   const [pageIndex, setPageIndex] = useState(0);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
+
+  const canImport = permissions.includes(UserPermission.RegistryCanImport);
 
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "registryImports">
@@ -100,7 +107,12 @@ export function MyImports() {
       importData.node.associations
         .map(
           association =>
-            `${association.reportedFor.name} - ${association.reportedFor.siret}`
+            `${
+              association.reportedFor.givenName &&
+              association.reportedFor.givenName !== ""
+                ? association.reportedFor.givenName
+                : association.reportedFor.name
+            } - ${association.reportedFor.siret}`
         )
         .slice(0, 3)
         .concat(
@@ -150,17 +162,19 @@ export function MyImports() {
     <>
       <>
         <div className="tw-flex tw-gap-6">
-          <div>
-            <Button
-              id="import-registry-btn"
-              priority="primary"
-              iconId="fr-icon-upload-line"
-              iconPosition="right"
-              onClick={() => setIsImportModalOpen(true)}
-            >
-              Importer
-            </Button>
-          </div>
+          {canImport && (
+            <div>
+              <Button
+                id="import-registry-btn"
+                priority="primary"
+                iconId="fr-icon-upload-line"
+                iconPosition="right"
+                onClick={() => setIsImportModalOpen(true)}
+              >
+                Importer
+              </Button>
+            </div>
+          )}
           <div className="tw-flex tw-items-center">
             <a
               href="https://faq.trackdechets.fr/integration-du-rndts-dans-trackdechets/importer-un-registre"

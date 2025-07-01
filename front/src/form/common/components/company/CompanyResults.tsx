@@ -26,6 +26,7 @@ export type CompanyResultBase = Pick<
   | "isRegistered"
   | "vatNumber"
   | "codePaysEtrangerEtablissement"
+  | "etatAdministratif"
 >;
 
 export function isSelected<T extends CompanyResultBase>(
@@ -75,11 +76,13 @@ export function CompanyResult<T extends CompanyResultBase>({
   onSelect,
   onUnselect
 }: CompanyResultProp<T>) {
+  const isClosedCompany = item.etatAdministratif === "F";
   return (
     <li
       key={item.orgId!}
       className={classNames(styles.resultsItem, {
-        [styles.isSelected]: isSelected(item, selectedItem)
+        [styles.isSelected]: isSelected(item, selectedItem),
+        [styles.clickable]: !isClosedCompany
       })}
       onClick={() =>
         isSelected(item, selectedItem) ? onUnselect?.() : onSelect(item)
@@ -94,6 +97,9 @@ export function CompanyResult<T extends CompanyResultBase>({
             <div className="tw-ml-1">
               <IconTrackDechetsCheck />
             </div>
+          )}
+          {isClosedCompany && (
+            <div className="tw-ml-1 tw-text-red-600">Etablissement fermé</div>
           )}
         </h6>
         <p>

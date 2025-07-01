@@ -8,6 +8,7 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
@@ -315,13 +316,17 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     destinationAcceptationWeight: bsffDestination?.receptionWeight,
     destinationOperationDate: bsffDestination?.operationDate?.getTime(),
     ...tabs,
-    isInRevisionFor: [] as string[],
-    isRevisedFor: [] as string[],
+    isPendingRevisionFor: [] as string[],
+    isEmittedRevisionFor: [] as string[],
+    isReceivedRevisionFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBsffReturnOrgIds(bsff),
     sirets: Object.values(tabs).flat(),
     ...getRegistryFields(bsff),
+    ...getElasticExhaustiveRegistryFields(bsff),
     rawBsd: bsff,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
 
     // ALL actors from the BSFF, for quick search
     companyNames: [

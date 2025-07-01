@@ -73,7 +73,8 @@ export class Utf8ValidatorTransform extends Transform {
 
     try {
       // This throws if the buffer is not valid UTF-8
-      this.decoder.decode(bufferConcat);
+      // Use stream: true to avoid failure when decoding partial buffers
+      this.decoder.decode(bufferConcat, { stream: true });
 
       this.push(bufferConcat);
       this.buffer = [];

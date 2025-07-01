@@ -6,12 +6,17 @@ const TIMEOUT_MS = 1000 * (60 + 5);
 
 export function timeoutMiddleware(delay?: number) {
   return function timeoutLongRequests(
-    _req: Request,
+    req: Request,
     res: Response,
     next: NextFunction
   ) {
     res.setTimeout(delay ?? TIMEOUT_MS, () => {
+      if (res.headersSent) {
+        return;
+      }
+
       res.status(408).send("Request has timed out.");
+      req.timedOut = true; // Mark the request as timed out
     });
 
     next();

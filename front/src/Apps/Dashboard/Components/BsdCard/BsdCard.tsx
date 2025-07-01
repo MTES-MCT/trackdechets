@@ -107,9 +107,16 @@ function BsdCard({
   },
   hasAutomaticSignature
 }: BsdCardProps) {
-  const { permissions } = usePermissions();
-  const isReviewsTab =
-    bsdCurrentTab === "reviewedTab" || bsdCurrentTab === "toReviewTab";
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(currentSiret);
+  const isReviewsTab = [
+    "pendingRevisionForTab",
+    "emittedRevisionForTab",
+    "receivedRevisionForTab",
+    "reviewedRevisionForTab"
+  ].includes(bsdCurrentTab ?? "");
+
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
   const isCollectedTab = bsdCurrentTab === "collectedTab";
   const bsdDisplay = getBsdView(bsd);

@@ -62,10 +62,12 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     setFieldValue("waste.code", groupedBsdas?.[0]?.waste?.code ?? "");
     setFieldValue(
       "weight.value",
-      groupedBsdas?.reduce(
-        (prev, cur) => prev + (cur.destination?.reception?.weight ?? 0),
-        0
-      ) ?? 0
+      groupedBsdas?.reduce((prev, cur) => {
+        const weight =
+          cur.destination?.reception?.acceptedWeight ??
+          cur.destination?.reception?.weight;
+        return prev + (weight ?? 0);
+      }, 0) ?? 0
     );
     setFieldValue(
       "waste.sealNumbers",
@@ -94,7 +96,12 @@ export function BsdaPicker({ name, bsdaId }: Props) {
   }
 
   function onForwardingChange(bsda: Bsda) {
-    setFieldValue("weight.value", bsda?.destination?.reception?.weight ?? 0);
+    setFieldValue(
+      "weight.value",
+      bsda?.destination?.reception?.acceptedWeight ??
+        bsda?.destination?.reception?.weight ??
+        0
+    );
     setFieldValue(
       "waste.sealNumbers",
       bsda?.waste?.sealNumbers ?? initialState!.waste!.sealNumbers
@@ -229,7 +236,7 @@ function PickerTable({
             <TableHeaderCell>Numéro</TableHeaderCell>
             <TableHeaderCell>Code déchet</TableHeaderCell>
             <TableHeaderCell>Nom du matériau</TableHeaderCell>
-            <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
+            <TableHeaderCell>Quantité acceptée (en t)</TableHeaderCell>
             <TableHeaderCell>Émetteur</TableHeaderCell>
             <TableHeaderCell>CAP final</TableHeaderCell>
             <TableHeaderCell>Exutoire</TableHeaderCell>
@@ -267,7 +274,10 @@ function PickerTable({
                 <TableCell>{bsda.id}</TableCell>
                 <TableCell>{bsda.waste?.code}</TableCell>
                 <TableCell>{bsda.waste?.materialName ?? "inconnu"}</TableCell>
-                <TableCell>{bsda.destination?.reception?.weight}</TableCell>
+                <TableCell>
+                  {bsda.destination?.reception?.acceptedWeight ??
+                    bsda.destination?.reception?.weight}
+                </TableCell>
                 <TableCell>{bsda.emitter?.company?.name}</TableCell>
                 <TableCell>
                   {bsda.destination?.operation?.nextDestination?.cap ??

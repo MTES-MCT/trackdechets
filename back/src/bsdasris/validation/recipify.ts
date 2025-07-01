@@ -33,6 +33,43 @@ const recipifyBsdasriAccessors = (
         bsdasri.transporterRecepisseDepartment = receipt?.department ?? null;
       }
     }
+  },
+  {
+    role: CompanyRole.Broker,
+    skip: sealedFields.includes("brokerRecepisseNumber"),
+    orgIdGetter: () => {
+      return bsd.brokerCompanySiret ?? null;
+    },
+    setter: async (bsdasri: ParsedZodBsdasri, receipt) => {
+      if (!bsdasri.brokerRecepisseNumber && receipt?.receiptNumber) {
+        bsdasri.brokerRecepisseNumber = receipt.receiptNumber;
+
+        if (!bsdasri.brokerRecepisseValidityLimit && receipt?.validityLimit) {
+          bsdasri.brokerRecepisseValidityLimit = receipt.validityLimit;
+        }
+        if (!bsdasri.brokerRecepisseDepartment && receipt?.department) {
+          bsdasri.brokerRecepisseDepartment = receipt.department;
+        }
+      }
+    }
+  },
+  {
+    role: CompanyRole.Trader,
+    skip: sealedFields.includes("traderRecepisseNumber"),
+    orgIdGetter: () => {
+      return bsd.traderCompanySiret ?? null;
+    },
+    setter: async (bsdasri: ParsedZodBsdasri, receipt) => {
+      if (!bsdasri.traderRecepisseNumber && receipt?.receiptNumber) {
+        bsdasri.traderRecepisseNumber = receipt.receiptNumber;
+      }
+      if (!bsdasri.traderRecepisseValidityLimit && receipt?.validityLimit) {
+        bsdasri.traderRecepisseValidityLimit = receipt.validityLimit;
+      }
+      if (!bsdasri.traderRecepisseDepartment && receipt?.department) {
+        bsdasri.traderRecepisseDepartment = receipt.department;
+      }
+    }
   }
 ];
 

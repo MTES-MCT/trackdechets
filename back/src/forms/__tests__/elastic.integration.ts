@@ -24,6 +24,12 @@ import { getSiretsByTab } from "../elasticHelpers";
 import { getFormForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { xDaysAgo } from "../../utils";
+import makeClient from "../../__tests__/testClient";
+import gql from "graphql-tag";
+import {
+  Mutation,
+  MutationCreateFormRevisionRequestArgs
+} from "@td/codegen-back";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -721,9 +727,11 @@ describe("toBsdElastic > APPENDIX1", () => {
       expect(elasticBsd.isArchivedFor).toEqual([]);
       expect(elasticBsd.isToCollectFor).toEqual([]);
       expect(elasticBsd.isCollectedFor).toEqual([]);
-      expect(elasticBsd.isInRevisionFor).toEqual([]);
       expect(elasticBsd.isReturnFor).toEqual([]);
-      expect(elasticBsd.isRevisedFor).toEqual([]);
+      expect(elasticBsd.isPendingRevisionFor).toEqual([]);
+      expect(elasticBsd.isEmittedRevisionFor).toEqual([]);
+      expect(elasticBsd.isReceivedRevisionFor).toEqual([]);
+      expect(elasticBsd.isReviewedRevisionFor).toEqual([]);
     }
   );
 
@@ -801,8 +809,87 @@ describe("toBsdElastic > APPENDIX1", () => {
     expect(elasticBsd.isArchivedFor).toEqual([]);
     expect(elasticBsd.isToCollectFor).toEqual([]);
     expect(elasticBsd.isCollectedFor).toEqual([]);
-    expect(elasticBsd.isInRevisionFor).toEqual([]);
     expect(elasticBsd.isReturnFor).toEqual([]);
-    expect(elasticBsd.isRevisedFor).toEqual([]);
+    expect(elasticBsd.isPendingRevisionFor).toEqual([]);
+    expect(elasticBsd.isEmittedRevisionFor).toEqual([]);
+    expect(elasticBsd.isReceivedRevisionFor).toEqual([]);
+    expect(elasticBsd.isReviewedRevisionFor).toEqual([]);
+  });
+
+  test("if no revision request > nonPendingLatestRevisionRequestUpdatedAt should be undefined", async () => {
+    // Given
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id
+    });
+
+    // When
+    const formForElastic = await getFormForElastic(form);
+    const { nonPendingLatestRevisionRequestUpdatedAt } =
+      toBsdElastic(formForElastic);
+
+    // Then
+    expect(nonPendingLatestRevisionRequestUpdatedAt).toBeUndefined();
+  });
+
+  test("if revision request > should populate nonPendingLatestRevisionRequestUpdatedAt", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory();
+    const destination = await userWithCompanyFactory("ADMIN", {
+      companyTypes: ["WASTEPROCESSOR"],
+      wasteProcessorTypes: ["DANGEROUS_WASTES_INCINERATION"]
+    });
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret
+      }
+    });
+
+    const { mutate } = makeClient(destination.user);
+    const CREATE_FORM_REVISION_REQUEST = gql`
+      mutation CreateFormRevisionRequest(
+        $input: CreateFormRevisionRequestInput!
+      ) {
+        createFormRevisionRequest(input: $input) {
+          id
+        }
+      }
+    `;
+
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: form.id,
+          authoringCompanySiret: destination.company.siret!,
+          comment: "oups",
+          content: { wasteDetails: { code: "04 01 03*" } }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+
+    const revision = await prisma.bsddRevisionRequest.update({
+      where: {
+        id: data.createFormRevisionRequest.id
+      },
+      data: {
+        status: "ACCEPTED"
+      }
+    });
+
+    // When
+    const formForElastic = await getFormForElastic(form);
+    const { nonPendingLatestRevisionRequestUpdatedAt } =
+      toBsdElastic(formForElastic);
+
+    // Then
+    expect(nonPendingLatestRevisionRequestUpdatedAt).toBe(
+      revision.updatedAt.getTime()
+    );
   });
 });

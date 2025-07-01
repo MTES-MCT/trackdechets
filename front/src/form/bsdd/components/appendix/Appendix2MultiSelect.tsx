@@ -258,8 +258,8 @@ export default function Appendix2MultiSelect({
             {form.readableId}
           </div>,
           <div>
-            <p>{form.wasteDetails?.code}</p>
-            <p
+            <div>{form.wasteDetails?.code}</div>
+            <div
               style={{
                 maxHeight: "25px",
                 overflow: "hidden",
@@ -268,7 +268,7 @@ export default function Appendix2MultiSelect({
               aria-describedby={form.readableId}
             >
               {form.wasteDetails?.name}
-            </p>
+            </div>
             <span
               className="fr-tooltip fr-placement"
               id={form.readableId}
@@ -358,9 +358,9 @@ export default function Appendix2MultiSelect({
       "Code déchet",
       "Émetteur initial",
       "Opération réalisée",
-      "Qté acceptée (en T)",
-      "Qté restante (en T)",
-      "Qté à regrouper (en T)"
+      "Quantité acceptée (en t)",
+      "Quantité restante (en t)",
+      "Quantité à regrouper (en t)"
     ];
 
     return (

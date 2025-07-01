@@ -56,6 +56,8 @@ export const RhfTagsInputWrapper = ({
 
   const { error } = getFieldState(fieldName);
 
+  const errorMessage = !tags.length ? error?.message : "";
+
   return (
     <TagsInput
       label={label}
@@ -67,7 +69,7 @@ export const RhfTagsInputWrapper = ({
         tags.splice(idx, 1);
         setValue(fieldName, [...tags]);
       }}
-      errorMessage={error?.message}
+      errorMessage={errorMessage}
       hintText={hintText}
       disabled={disabled}
     />

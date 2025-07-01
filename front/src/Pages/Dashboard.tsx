@@ -1,14 +1,16 @@
-import React, { useMemo, useState, useEffect, useCallback } from "react";
+import React, {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  useRef
+} from "react";
 import { useParams, useMatch, useLocation } from "react-router-dom";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import * as Sentry from "@sentry/browser";
 import routes from "../Apps/routes";
 import { GET_BSDS } from "../Apps/common/queries";
-import {
-  Query,
-  QueryBsdsArgs,
-  QueryCompanyPrivateInfosArgs
-} from "@td/codegen-ui";
+import { Query, QueryBsdsArgs } from "@td/codegen-ui";
 import BsdCardList from "../Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
   Blankslate,
@@ -30,7 +32,6 @@ import {
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "../common/contexts/PermissionsContext";
 import { UserPermission } from "@td/codegen-ui";
-import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "../Apps/common/queries/company/query";
 import {
   filtersToQueryBsdsArgs,
   getBlankslateDescription,
@@ -40,36 +41,41 @@ import {
 } from "./Dashboard.utils";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
+import throttle from "lodash/throttle";
 
 import "./dashboard.scss";
+import { useMyCompany } from "../Apps/common/hooks/useMyCompany";
 
 const DashboardPage = () => {
-  const { permissions } = usePermissions();
+  const { siret } = useParams<{ siret: string | undefined }>();
+  const {
+    permissionsInfos: { permissions: globalPermissions }
+  } = usePermissions(siret);
+  const { company } = useMyCompany(siret);
   const isActTab = !!useMatch(routes.dashboard.bsds.act);
   const isDraftTab = !!useMatch(routes.dashboard.bsds.drafts);
   const isFollowTab = !!useMatch(routes.dashboard.bsds.follow);
   const isArchivesTab = !!useMatch(routes.dashboard.bsds.history);
-  const isToReviewTab = !!useMatch(routes.dashboard.bsds.toReview);
-  const isReviewedTab = !!useMatch(routes.dashboard.bsds.reviewed);
+  const isPendingRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.pending
+  );
+  const isEmittedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.emitted
+  );
+  const isReceivedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.received
+  );
+  const isReviewedRevisionForTab = !!useMatch(
+    routes.dashboard.revisions.reviewed
+  );
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
   const isReturnTab = !!useMatch(routes.dashboard.transport.return);
   const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
   const location = useLocation();
+  const prevPathname = useRef(location.pathname);
 
   const BSD_PER_PAGE = 25;
-  const bsdCurrentTab = getBsdCurrentTab({
-    isDraftTab,
-    isActTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isReviewedTab,
-    isToReviewTab,
-    isReturnTab
-  });
-  const { siret } = useParams<{ siret: string }>();
   const [areAdvancedFiltersOpen, setAreAdvancedFiltersOpen] = useState(false);
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
@@ -96,8 +102,10 @@ const DashboardPage = () => {
       isToCollectTab,
       isCollectedTab,
       isAllBsdsTab,
-      isReviewedTab,
-      isToReviewTab,
+      isPendingRevisionForTab,
+      isEmittedRevisionForTab,
+      isReceivedRevisionForTab,
+      isReviewedRevisionForTab,
       isReturnTab
     }),
     [
@@ -107,9 +115,11 @@ const DashboardPage = () => {
       isCollectedTab,
       isDraftTab,
       isFollowTab,
-      isReviewedTab,
       isToCollectTab,
-      isToReviewTab,
+      isPendingRevisionForTab,
+      isEmittedRevisionForTab,
+      isReceivedRevisionForTab,
+      isReviewedRevisionForTab,
       isReturnTab
     ]
   );
@@ -120,6 +130,7 @@ const DashboardPage = () => {
   // - Current filters
   const fetchBsds = useCallback(
     (newSiret, newVariables, newTabs) => {
+      if (!newSiret) return;
       const variables = { ...newVariables };
 
       const routePredicate = getRoutePredicate({
@@ -143,6 +154,11 @@ const DashboardPage = () => {
     [lazyFetchBsds]
   );
 
+  const throttledFetchBsds = useMemo(
+    () => throttle(fetchBsds, 500),
+    [fetchBsds]
+  );
+
   const handleFiltersSubmit = filterValues => {
     // Transform the filters into a GQL query
     const variables = filtersToQueryBsdsArgs(filterValues, bsdsVariables);
@@ -153,12 +169,21 @@ const DashboardPage = () => {
 
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    fetchBsds(siret, bsdsVariables, tabs);
+    throttledFetchBsds(siret, bsdsVariables, tabs);
   });
 
   useEffect(() => {
-    fetchBsds(siret, bsdsVariables, tabs);
-  }, [bsdsVariables, siret, tabs, fetchBsds]);
+    // Flush throttle dès que la route change
+    if (prevPathname.current !== location.pathname) {
+      throttledFetchBsds.flush();
+      prevPathname.current = location.pathname;
+    }
+  }, [location.pathname, throttledFetchBsds]);
+
+  useEffect(() => {
+    if (!siret) return;
+    throttledFetchBsds(siret, bsdsVariables, tabs);
+  }, [bsdsVariables, siret, tabs, throttledFetchBsds]);
 
   useEffect(() => {
     if (error) {
@@ -166,18 +191,13 @@ const DashboardPage = () => {
     }
   }, [error]);
 
-  const { data: companyData } = useQuery<
-    Pick<Query, "companyPrivateInfos">,
-    QueryCompanyPrivateInfosArgs
-  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
-    variables: { clue: siret! }
-  });
-
-  const siretsWithAutomaticSignature = companyData
-    ? companyData.companyPrivateInfos.receivedSignatureAutomations.map(
-        automation => automation.from.siret
-      )
-    : [];
+  const siretsWithAutomaticSignature = useMemo(() => {
+    return company
+      ? company.receivedSignatureAutomations.map(
+          automation => automation.from.siret
+        )
+      : [];
+  }, [company]);
 
   const loadMoreBsds = React.useCallback(() => {
     fetchMore({
@@ -205,20 +225,20 @@ const DashboardPage = () => {
     setAreAdvancedFiltersOpen(!areAdvancedFiltersOpen);
   };
 
-  const bsds = data?.bsds.edges;
+  const bsds = useMemo(() => data?.bsds.edges ?? [], [data?.bsds.edges]);
 
   const bsdsTotalCount = data?.bsds.totalCount;
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;
+  const bsdCurrentTab = useMemo(() => getBsdCurrentTab(tabs), [tabs]);
 
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
       <div className="dashboard-page__actions">
-        {permissions.includes(UserPermission.BsdCanCreate) && (
+        {globalPermissions.includes(UserPermission.BsdCanCreate) && (
           <div className="create-btn">
             <BsdCreateDropdown
               links={dropdownCreateLinks(siret, location)}
-              isDisabled={loading}
               menuTitle={dropdown_create_btn}
               primary
             />
@@ -230,7 +250,6 @@ const DashboardPage = () => {
             className="fr-btn fr-btn--secondary"
             aria-expanded={areAdvancedFiltersOpen}
             onClick={toggleFiltersBlock}
-            disabled={loading}
           >
             {!areAdvancedFiltersOpen ? filter_show_btn : filter_reset_btn}
           </button>

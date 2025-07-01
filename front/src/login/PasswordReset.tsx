@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useMutation, useQuery, gql } from "@apollo/client";
 import * as yup from "yup";
 import * as queryString from "query-string";
@@ -8,10 +8,11 @@ import { Mutation, MutationResetPasswordArgs, Query } from "@td/codegen-ui";
 import Loader from "../Apps/common/Components/Loader/Loaders";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
 import { Formik, Form, Field } from "formik";
-import PasswordHelper from "../common/components/PasswordHelper";
 import RedErrorMessage from "../common/components/RedErrorMessage";
-import { IconLock1, IconView } from "../Apps/common/Components/Icons/Icons";
 import routes from "../Apps/routes";
+import PasswordInput from "@codegouvfr/react-dsfr/blocks/PasswordInput";
+import zxcvbn from "zxcvbn";
+import Button from "@codegouvfr/react-dsfr/Button";
 
 const PASSWORD_RESET_REQUEST = gql`
   query PasswordResetRequest($hash: String!) {
@@ -26,7 +27,8 @@ const RESET_PASSWORD = gql`
 `;
 
 export default function PasswordReset() {
-  const [passwordType, setPasswordType] = useState("password");
+  const MIN_LENGTH = 10;
+  const MIN_SCORE = 3;
 
   // parse qs and get rid of extra parameters
   const location = useLocation();
@@ -97,12 +99,12 @@ export default function PasswordReset() {
           .catch(_ => setSubmitting(false));
       }}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, values }) => (
         <section className="section section-white">
           <div className="container-narrow">
             <Form>
-              <h1 className="h1 tw-my-4">Changement de mot de passe</h1>
-              <p className="body-text">
+              <h3 className="fr-h3 fr-mb-2w">Modifier le mot de passe</h3>
+              <p className="fr-text fr-mb-4w">
                 Veuillez entrer votre nouveau mot de passe pour le mettre à
                 jour.
               </p>
@@ -111,36 +113,34 @@ export default function PasswordReset() {
                   <NotificationError apolloError={mutationError} />
                 )}
                 <div className="form__row">
-                  <label>Nouveau mot de passe</label>
-
                   <Field name="password">
                     {({ field }) => {
+                      const { score } = zxcvbn(values.password);
                       return (
-                        <>
-                          <div className="field-with-icon-wrapper">
-                            <input
-                              type={passwordType}
-                              {...field}
-                              className="td-input"
-                            />
-                            <i>
-                              <IconLock1 />
-                            </i>
-                          </div>
-                          <span
-                            className="showPassword"
-                            onClick={() =>
-                              setPasswordType(
-                                passwordType === "password"
-                                  ? "text"
-                                  : "password"
-                              )
+                        <PasswordInput
+                          nativeInputProps={{ ...field }}
+                          label="Mot de passe"
+                          className="fr-mb-2w"
+                          messages={[
+                            {
+                              message: `contenir ${MIN_LENGTH} caractères minimum`,
+                              severity: !values.password
+                                ? "info"
+                                : values.password.length < MIN_LENGTH
+                                ? "error"
+                                : "valid"
+                            },
+                            {
+                              message:
+                                "avoir une complexité suffisante. Nous vous recommandons d'utiliser une phrase de passe (plusieurs mots accolés) ou un gestionnaire de mots de passe",
+                              severity: !values.password
+                                ? "info"
+                                : score >= MIN_SCORE
+                                ? "valid"
+                                : "error"
                             }
-                          >
-                            <IconView /> <span>Afficher le mot de passe</span>
-                          </span>
-                          <PasswordHelper password={field.value} />
-                        </>
+                          ]}
+                        />
                       );
                     }}
                   </Field>
@@ -148,15 +148,13 @@ export default function PasswordReset() {
                   <RedErrorMessage name="password" />
                 </div>
               </div>
-              <div className="form__actions">
-                <button
-                  className="btn btn--primary"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  Mettre à jour mon mot de passe
-                </button>
-              </div>
+              <Button
+                priority="primary"
+                disabled={isSubmitting}
+                className="fr-mt-4w"
+              >
+                Modifier
+              </Button>
             </Form>
           </div>
         </section>
@@ -168,17 +166,17 @@ export default function PasswordReset() {
 const PasswordChangedSuccess = () => (
   <div className="container-narrow">
     <section className="section section-white">
-      <h2 className="h2 tw-my-4">Mot de passe mis à jour</h2>
-      <p className="body-text">
+      <h3 className="fr-h3 fr-mb-4w">Mot de passe modifié</h3>
+      <p className="fr-text fr-mb-4w">
         Votre mot de passe a été mis à jour avec succès.
       </p>
 
-      <p className="body-text">
+      <p className="fr-text">
         Connectez-vous à votre compte pour accéder à votre tableau de bord et
         accéder aux bordereaux de ces établissements.
       </p>
-      <div className="form__actions">
-        <Link to={routes.login} className="btn btn--primary">
+      <div className="fr-mt-4w">
+        <Link to={routes.login} className="fr-btn fr-btn--primary">
           Se connecter
         </Link>
       </div>

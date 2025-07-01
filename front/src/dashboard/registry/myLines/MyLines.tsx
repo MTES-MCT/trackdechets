@@ -4,7 +4,12 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import { createModal } from "@codegouvfr/react-dsfr/Modal";
 import { useIsModalOpen } from "@codegouvfr/react-dsfr/Modal/useIsModalOpen";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { Mutation, Query, RegistryImportType } from "@td/codegen-ui";
+import {
+  Mutation,
+  Query,
+  RegistryImportType,
+  UserPermission
+} from "@td/codegen-ui";
 import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { generatePath, useLocation, useNavigate } from "react-router-dom";
@@ -25,6 +30,7 @@ import {
 import { ActionButton } from "./ActionButton";
 import "./MyLines.scss";
 import CursorPagination from "../../../Apps/common/Components/CursorPagination/CursorPagination";
+import { usePermissions } from "../../../common/contexts/PermissionsContext";
 
 const getHeaders = (registryType: RegistryImportType | undefined): string[] => {
   let dateColumnName: string;
@@ -86,6 +92,9 @@ export function MyLines() {
   const [debouncedPublicId, setDebouncedPublicId] = useState<string>("");
   const [publicIdToDelete, setPublicIdToDelete] = useState<string | null>(null);
   const navigate = useNavigate();
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
 
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
 
@@ -144,95 +153,134 @@ export function MyLines() {
     debouncedOnApplyFilters(publicId);
   }, [debouncedOnApplyFilters, publicId]);
 
-  const tableData = lookupNodes?.map(lookup => [
-    format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
-    TYPES[lookup.type],
-    lookup.publicId,
-    lookup.reportAsSiret ?? lookup.siret,
-    format(new Date(lookup.date), "dd/MM/yyyy"),
-    lookup.wasteCode ?? "",
-    <div className="tw-px-2 line-actions-dropdown-container">
-      <DropdownMenu
-        className="line-actions-dropdown"
-        menuTitle={`Menu d'action de la déclaration ${lookup.publicId}`}
-        ButtonElement={ActionButton}
-        alignRight
-        links={[
-          {
-            title: "Modifier",
-            isButton: true,
-            handleClick: () => {
-              const path = generatePath(TYPES_ROUTES[lookup.type]);
-              const queryString = new URLSearchParams({
-                siret: lookup.siret,
-                publicId: lookup.publicId
-              }).toString();
-              navigate(`${path}?${queryString}`, {
-                state: { background: location }
-              });
-            }
-          },
-          {
-            title: "Annuler",
-            isButton: true,
-            handleClick: () => {
-              setPublicIdToDelete(lookup.publicId);
-              deleteConfirmationModal.open();
-            }
-          }
-        ]}
-        isDisabled={false}
-      />
-    </div>
-  ]);
+  const tableData = lookupNodes?.map(lookup => {
+    let companyText = lookup.reportAsSiret ?? lookup.siret;
+    let canEdit = false;
+    if (lookup.reportAs) {
+      companyText = `${lookup.reportAs.givenName ?? lookup.reportAs.name} - ${
+        lookup.reportAs.siret
+      }`;
+      const permissions = lookup.reportAs.userPermissions;
+      canEdit = permissions.includes(UserPermission.RegistryCanImport);
+    } else if (lookup.reportFor) {
+      companyText = `${lookup.reportFor.givenName ?? lookup.reportFor.name} - ${
+        lookup.reportFor.siret
+      }`;
+      const permissions = lookup.reportFor.userPermissions;
+      canEdit = permissions.includes(UserPermission.RegistryCanImport);
+    }
+    return [
+      format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
+      TYPES[lookup.type],
+      lookup.publicId,
+      companyText,
+      format(new Date(lookup.date), "dd/MM/yyyy"),
+      lookup.wasteCode ?? "",
+      <div className="tw-px-2 line-actions-dropdown-container">
+        <DropdownMenu
+          className="line-actions-dropdown"
+          menuTitle={`Menu d'action de la déclaration ${lookup.publicId}`}
+          ButtonElement={ActionButton}
+          alignRight
+          links={[
+            {
+              title: "Afficher",
+              isButton: true,
+              handleClick: () => {
+                const path = generatePath(TYPES_ROUTES[lookup.type]);
+                const queryString = new URLSearchParams({
+                  siret: lookup.siret,
+                  publicId: lookup.publicId,
+                  readonly: "1"
+                }).toString();
+                navigate(`${path}?${queryString}`, {
+                  state: { background: location }
+                });
+              }
+            },
+            ...(canEdit
+              ? [
+                  {
+                    title: "Modifier",
+                    isButton: true,
+                    handleClick: () => {
+                      const path = generatePath(TYPES_ROUTES[lookup.type]);
+                      const queryString = new URLSearchParams({
+                        siret: lookup.siret,
+                        publicId: lookup.publicId
+                      }).toString();
+                      navigate(`${path}?${queryString}`, {
+                        state: { background: location }
+                      });
+                    }
+                  },
+                  {
+                    title: "Annuler",
+                    isButton: true,
+                    handleClick: () => {
+                      setPublicIdToDelete(lookup.publicId);
+                      deleteConfirmationModal.open();
+                    }
+                  }
+                ]
+              : [])
+          ]}
+          isDisabled={false}
+        />
+      </div>
+    ];
+  });
+
+  const canCreateLine = permissions.includes(UserPermission.RegistryCanImport);
 
   return (
     <>
       <>
-        <div className="fr-mb-4w">
-          <DropdownMenu
-            links={[
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Ssd],
-                route: generatePath(routes.registry_new.form.ssd),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
-                route: generatePath(routes.registry_new.form.incomingWaste),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
-                route: generatePath(routes.registry_new.form.outgoingWaste),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
-                route: generatePath(routes.registry_new.form.incomingTexs),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
-                route: generatePath(routes.registry_new.form.outgoingTexs),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Transported],
-                route: generatePath(routes.registry_new.form.transported),
-                state: { background: location }
-              },
-              {
-                title: REGISTRY_NAMES[RegistryImportType.Managed],
-                route: generatePath(routes.registry_new.form.managed),
-                state: { background: location }
-              }
-            ]}
-            isDisabled={false}
-            menuTitle={"Créer une déclaration"}
-            primary
-          />
-        </div>
+        {canCreateLine && (
+          <div className="fr-mb-4w">
+            <DropdownMenu
+              links={[
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Ssd],
+                  route: generatePath(routes.registry_new.form.ssd),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.IncomingWaste],
+                  route: generatePath(routes.registry_new.form.incomingWaste),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.OutgoingWaste],
+                  route: generatePath(routes.registry_new.form.outgoingWaste),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.IncomingTexs],
+                  route: generatePath(routes.registry_new.form.incomingTexs),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.OutgoingTexs],
+                  route: generatePath(routes.registry_new.form.outgoingTexs),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Transported],
+                  route: generatePath(routes.registry_new.form.transported),
+                  state: { background: location }
+                },
+                {
+                  title: REGISTRY_NAMES[RegistryImportType.Managed],
+                  route: generatePath(routes.registry_new.form.managed),
+                  state: { background: location }
+                }
+              ]}
+              menuTitle={"Créer une déclaration"}
+              primary
+            />
+          </div>
+        )}
         <div className="fr-grid-row fr-grid-row--bottom fr-mb-4w">
           <div className="fr-col-7">
             <RegistryCompanySwitcher

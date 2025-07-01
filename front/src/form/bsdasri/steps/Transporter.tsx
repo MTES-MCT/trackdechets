@@ -61,7 +61,7 @@ export default function Transporter({ status, stepName }) {
             disabled={disabled}
             name="transporter.company"
             heading="Entreprise de transport"
-            optionalMail={true}
+            optionalMail={false}
             allowForeignCompanies={true}
             registeredOnlyCompanies={true}
           />
@@ -212,7 +212,7 @@ function CurrentCompanyWidget({ disabled = false }) {
         </div>
         <div className="form__row">
           <label>
-            Mail (optionnel)
+            Mail
             <Field
               type="email"
               name={`transporter.company.mail`}

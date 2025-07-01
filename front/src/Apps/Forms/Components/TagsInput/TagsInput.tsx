@@ -71,6 +71,8 @@ const TagsInput = ({
             Ajouter
           </Button>
         }
+        state={errorMessage ? "error" : "default"}
+        stateRelatedMessage={errorMessage}
       />
       <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
         {tags?.map((plate, idx) => (
@@ -92,7 +94,6 @@ const TagsInput = ({
           </div>
         ))}
       </div>
-      {errorMessage && <p className="fr-error-text fr-mt-0">{errorMessage}</p>}
     </>
   );
 };

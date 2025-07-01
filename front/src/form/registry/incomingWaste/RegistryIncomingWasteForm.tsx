@@ -148,7 +148,6 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
 
   async function onSubmit(data: FormValues) {
     const { transporter, ...rest } = data;
-    console.log(data);
     // Flatten transporter array back into individual fields
     const flattenedData = {
       ...rest,

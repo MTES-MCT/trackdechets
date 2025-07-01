@@ -11,7 +11,8 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import {
   companyFactory,
   formFactory,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
   BsdIndexationConfig,
@@ -19,36 +20,153 @@ import {
   index as globalIndex
 } from "../../common/elastic";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation";
-import { cleanUpIsReturnForTab } from "../elasticHelpers";
+import {
+  cleanUpIsReturnForTab,
+  cleanUpIsReviewedRevisionForTab
+} from "../elasticHelpers";
 import { xDaysAgo } from "../../utils";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import { createBsff } from "../../bsffs/__tests__/factories";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../bspaoh/__tests__/factories";
+import { addMonths, addYears } from "date-fns";
+import { isDefined } from "../helpers";
 
 describe("elasticHelpers", () => {
-  describe("cleanUpIsReturnForTab", () => {
-    // do not use INDEX_ALIAS_NAME_SEPARATOR
-    const testAlias = "testbsds";
+  // do not use INDEX_ALIAS_NAME_SEPARATOR
+  const testAlias = "testbsds";
 
-    const testIndex: BsdIndexationConfig = {
-      ...globalIndex,
-      alias: testAlias
-    };
+  const testIndex: BsdIndexationConfig = {
+    ...globalIndex,
+    alias: testAlias
+  };
 
-    async function deleteTestIndexes() {
-      await client.indices.delete(
-        { index: `${testAlias}*` },
-        { ignore: [404] }
-      );
-    }
+  async function deleteTestIndexes() {
+    await client.indices.delete({ index: `${testAlias}*` }, { ignore: [404] });
+  }
 
-    afterEach(async () => {
-      await resetDatabase();
-      await deleteTestIndexes();
+  afterEach(async () => {
+    await resetDatabase();
+    await deleteTestIndexes();
+  });
+
+  const reindex = async () => {
+    await reindexAllBsdsInBulk({ index: testIndex });
+    await client.indices.refresh({
+      index: testIndex.alias
+    });
+  };
+
+  interface CreateOpt {
+    wasteAcceptationStatus: WasteAcceptationStatus;
+  }
+
+  const seedBsdd = async (opt?: CreateOpt) => {
+    const user = await userFactory();
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.RECEIVED,
+        receivedAt: new Date(),
+        wasteAcceptationStatus:
+          opt?.wasteAcceptationStatus ??
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+      }
     });
 
+    return bsdd;
+  };
+
+  const seedBsda = async (opt?: CreateOpt) => {
+    const user = await userFactory();
+    const bsda = await bsdaFactory({
+      userId: user.id,
+      opt: {
+        status: BsdaStatus.PROCESSED,
+        destinationReceptionDate: new Date(),
+        destinationReceptionAcceptationStatus:
+          opt?.wasteAcceptationStatus ??
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+      }
+    });
+
+    return bsda;
+  };
+
+  const seedBsff = async (opt?: CreateOpt) => {
+    const transporter = await companyFactory();
+    const emitter = await userWithCompanyFactory();
+    const bsff = await createBsff(
+      { emitter },
+      {
+        data: {
+          status: BsffStatus.RECEIVED,
+          destinationReceptionDate: new Date()
+        },
+        packagingData: {
+          acceptationStatus:
+            opt?.wasteAcceptationStatus ??
+            WasteAcceptationStatus.PARTIALLY_REFUSED
+        },
+        transporterData: {
+          transporterCompanySiret: transporter.siret
+        }
+      }
+    );
+
+    return bsff;
+  };
+
+  const seedBsdasri = async (opt?: CreateOpt) => {
+    const transporter = await companyFactory();
+    const emitter = await userWithCompanyFactory();
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.RECEIVED,
+        emitterCompanySiret: emitter.company?.siret,
+        destinationReceptionDate: new Date(),
+        destinationReceptionAcceptationStatus:
+          opt?.wasteAcceptationStatus ??
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    return bsdasri;
+  };
+
+  const seedBsvhu = async (opt?: CreateOpt) => {
+    const transporter = await companyFactory();
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        status: BsvhuStatus.PROCESSED,
+        destinationReceptionDate: new Date(),
+        destinationReceptionAcceptationStatus:
+          opt?.wasteAcceptationStatus ??
+          WasteAcceptationStatus.PARTIALLY_REFUSED,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    return bsvhu;
+  };
+
+  const seedBspaoh = async (opt?: CreateOpt) => {
+    const bspaoh = await bspaohFactory({
+      opt: {
+        status: BspaohStatus.RECEIVED,
+        destinationReceptionDate: new Date(),
+        destinationReceptionAcceptationStatus:
+          opt?.wasteAcceptationStatus ??
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+      }
+    });
+
+    return bspaoh;
+  };
+
+  describe("cleanUpIsReturnForTab", () => {
     const countIsReturnForBSDs = async () => {
       const countResponse1 = await client.count({
         index: testIndex.alias,
@@ -90,118 +208,6 @@ describe("elasticHelpers", () => {
           }
         }
       });
-    };
-
-    const reindex = async () => {
-      await reindexAllBsdsInBulk({ index: testIndex });
-      await client.indices.refresh({
-        index: testIndex.alias
-      });
-    };
-
-    interface CreateOpt {
-      wasteAcceptationStatus: WasteAcceptationStatus;
-    }
-
-    const seedBsdd = async (opt?: CreateOpt) => {
-      const user = await userFactory();
-      const bsdd = await formFactory({
-        ownerId: user.id,
-        opt: {
-          status: Status.RECEIVED,
-          receivedAt: new Date(),
-          wasteAcceptationStatus:
-            opt?.wasteAcceptationStatus ??
-            WasteAcceptationStatus.PARTIALLY_REFUSED
-        }
-      });
-
-      return bsdd;
-    };
-
-    const seedBsda = async (opt?: CreateOpt) => {
-      const user = await userFactory();
-      const bsda = await bsdaFactory({
-        userId: user.id,
-        opt: {
-          status: BsdaStatus.PROCESSED,
-          destinationReceptionDate: new Date(),
-          destinationReceptionAcceptationStatus:
-            opt?.wasteAcceptationStatus ??
-            WasteAcceptationStatus.PARTIALLY_REFUSED
-        }
-      });
-
-      return bsda;
-    };
-
-    const seedBsff = async (opt?: CreateOpt) => {
-      const transporter = await companyFactory();
-      const bsff = await createBsff(
-        {},
-        {
-          data: {
-            status: BsffStatus.RECEIVED,
-            destinationReceptionDate: new Date()
-          },
-          packagingData: {
-            acceptationStatus:
-              opt?.wasteAcceptationStatus ??
-              WasteAcceptationStatus.PARTIALLY_REFUSED
-          },
-          transporterData: {
-            transporterCompanySiret: transporter.siret
-          }
-        }
-      );
-
-      return bsff;
-    };
-
-    const seedBsdasri = async (opt?: CreateOpt) => {
-      const transporter = await companyFactory();
-      const bsdasri = await bsdasriFactory({
-        opt: {
-          status: BsdasriStatus.RECEIVED,
-          destinationReceptionDate: new Date(),
-          destinationReceptionAcceptationStatus:
-            opt?.wasteAcceptationStatus ??
-            WasteAcceptationStatus.PARTIALLY_REFUSED,
-          transporterCompanySiret: transporter.siret
-        }
-      });
-
-      return bsdasri;
-    };
-
-    const seedBsvhu = async (opt?: CreateOpt) => {
-      const transporter = await companyFactory();
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: BsvhuStatus.PROCESSED,
-          destinationReceptionDate: new Date(),
-          destinationReceptionAcceptationStatus:
-            opt?.wasteAcceptationStatus ??
-            WasteAcceptationStatus.PARTIALLY_REFUSED,
-          transporterCompanySiret: transporter.siret
-        }
-      });
-
-      return bsvhu;
-    };
-
-    const seedBspaoh = async (opt?: CreateOpt) => {
-      const bspaoh = await bspaohFactory({
-        opt: {
-          status: BspaohStatus.RECEIVED,
-          destinationReceptionDate: new Date(),
-          destinationReceptionAcceptationStatus:
-            opt?.wasteAcceptationStatus ??
-            WasteAcceptationStatus.PARTIALLY_REFUSED
-        }
-      });
-
-      return bspaoh;
     };
 
     describe.each([
@@ -369,6 +375,175 @@ describe("elasticHelpers", () => {
 
         // BSDs should have disappeared
         expect(body.updated).toEqual(6);
+      });
+    });
+  });
+
+  describe("cleanUpIsReviewedRevisionForTab", () => {
+    const changeRevisionUpdatedAtAndRevisionTab = async (
+      bsdId: string,
+      nonPendingLatestRevisionRequestUpdatedAt: Date,
+      isReviewedRevisionFor: string[]
+    ) => {
+      const source =
+        ` ctx._source.nonPendingLatestRevisionRequestUpdatedAt = ` +
+        `new SimpleDateFormat('yyyy-MM-dd').parse('${
+          nonPendingLatestRevisionRequestUpdatedAt.toISOString().split("T")[0]
+        }'); ctx._source.isReviewedRevisionFor = ${JSON.stringify(
+          isReviewedRevisionFor
+        )}`;
+
+      await client.updateByQuery({
+        index: testIndex.alias,
+        refresh: true,
+        body: {
+          query: {
+            match: {
+              id: bsdId
+            }
+          },
+          script: {
+            source
+          }
+        }
+      });
+    };
+
+    const getESBsds = async () => {
+      const response = await client.search({
+        index: testIndex.alias
+      });
+
+      return response.body.hits.hits.map(hit => hit._source);
+    };
+
+    describe("all BSDs mixed together", () => {
+      const SIX_MONTHS_AGO = addMonths(new Date(), -6);
+      const EIGHT_MONTHS_AGO = addMonths(new Date(), -8);
+      const THREE_MONTHS_AGO = addMonths(new Date(), -3);
+      const ONE_MONTH_AGO = addMonths(new Date(), -1);
+      const ONE_YEAR_AGO = addYears(new Date(), -1);
+      const TODAY = new Date();
+
+      it("should remove old revisions", async () => {
+        // Given
+        const bsda = await seedBsda();
+        const bsdasri = await seedBsdasri();
+        const bsdd = await seedBsdd();
+        const bsff = await seedBsff();
+        const bspaoh = await seedBspaoh();
+        const bsvhu = await seedBsvhu();
+        await reindex();
+
+        // Manually update BSDs to add false revision fields
+        await changeRevisionUpdatedAtAndRevisionTab(bsda.id, SIX_MONTHS_AGO, [
+          bsda.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bsdasri.id,
+          EIGHT_MONTHS_AGO,
+          [bsdasri.emitterCompanySiret!]
+        );
+        await changeRevisionUpdatedAtAndRevisionTab(bsdd.id, EIGHT_MONTHS_AGO, [
+          bsdd.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bsff.id, ONE_YEAR_AGO, [
+          bsff.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bspaoh.id, SIX_MONTHS_AGO, [
+          bspaoh.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bsvhu.id, ONE_YEAR_AGO, [
+          bsvhu.emitterCompanySiret!
+        ]);
+
+        // BSDs should all have old revision data
+        const bsds = await getESBsds();
+        expect(bsds.length).toEqual(6);
+        expect(
+          bsds.find(b => !isDefined(b.nonPendingLatestRevisionRequestUpdatedAt))
+        ).toBeUndefined();
+        expect(bsds.find(b => !b.isReviewedRevisionFor.length)).toBeUndefined();
+
+        // Given
+        const body = await cleanUpIsReviewedRevisionForTab(testIndex.alias);
+
+        // BSDs should have disappeared
+        expect(body.updated).toEqual(6);
+
+        // BSDs should all have old revision data
+        const updatedBsds = await getESBsds();
+
+        expect(updatedBsds.length).toEqual(6);
+        expect(
+          updatedBsds.filter(
+            b => !isDefined(b.nonPendingLatestRevisionRequestUpdatedAt)
+          ).length
+        ).toEqual(6);
+        expect(
+          updatedBsds.filter(b => !b.isReviewedRevisionFor.length).length
+        ).toEqual(6);
+      });
+
+      it("should not remove recent revisions", async () => {
+        // Given
+        const bsda = await seedBsda();
+        const bsdasri = await seedBsdasri();
+        const bsdd = await seedBsdd();
+        const bsff = await seedBsff();
+        const bspaoh = await seedBspaoh();
+        const bsvhu = await seedBsvhu();
+        await reindex();
+
+        // Manually update BSDs to add false revision fields
+        await changeRevisionUpdatedAtAndRevisionTab(bsda.id, ONE_MONTH_AGO, [
+          bsda.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bsdasri.id, TODAY, [
+          bsdasri.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bsdd.id, TODAY, [
+          bsdd.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(bsff.id, ONE_MONTH_AGO, [
+          bsff.emitterCompanySiret!
+        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bspaoh.id,
+          THREE_MONTHS_AGO,
+          [bspaoh.emitterCompanySiret!]
+        );
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bsvhu.id,
+          THREE_MONTHS_AGO,
+          [bsvhu.emitterCompanySiret!]
+        );
+
+        // BSDs should all have revision data
+        const bsds = await getESBsds();
+        expect(bsds.length).toEqual(6);
+        expect(
+          bsds.find(b => !isDefined(b.nonPendingLatestRevisionRequestUpdatedAt))
+        ).toBeUndefined();
+        expect(bsds.find(b => !b.isReviewedRevisionFor.length)).toBeUndefined();
+
+        // Given
+        const body = await cleanUpIsReviewedRevisionForTab(testIndex.alias);
+
+        // BSDs should not have disappeared
+        expect(body.updated).toEqual(0);
+
+        // BSDs should all have revision data
+        const updatedBsds = await getESBsds();
+        expect(updatedBsds.length).toEqual(6);
+        expect(
+          updatedBsds.find(
+            b => !isDefined(b.nonPendingLatestRevisionRequestUpdatedAt)
+          )
+        ).toBeUndefined();
+        expect(
+          updatedBsds.find(b => !b.isReviewedRevisionFor.length)
+        ).toBeUndefined();
       });
     });
   });

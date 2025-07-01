@@ -9,6 +9,7 @@ import {
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
 import { getFirstTransporterSync, getLastTransporterSync } from "./converter";
@@ -227,13 +228,17 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
       bspaoh.destinationReceptionWasteAcceptedWeightValue,
     destinationOperationDate: bspaoh.destinationOperationDate?.getTime(),
     ...where,
-    isInRevisionFor: [],
-    isRevisedFor: [],
+    isPendingRevisionFor: [] as string[],
+    isEmittedRevisionFor: [] as string[],
+    isReceivedRevisionFor: [] as string[],
+    isReviewedRevisionFor: [] as string[],
     ...getBspaohReturnOrgIds(bspaoh),
     sirets: distinct(Object.values(where).flat()),
     ...getRegistryFields(bspaoh),
+    ...getElasticExhaustiveRegistryFields(bspaoh),
     rawBsd: bspaoh,
     revisionRequests: [],
+    nonPendingLatestRevisionRequestUpdatedAt: undefined,
 
     // ALL actors from the BSPAOH, for quick search
     companyNames: distinct(

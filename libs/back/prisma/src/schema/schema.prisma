@@ -952,6 +952,7 @@ model User {
   registryTransported        RegistryTransported[]
   registryManaged            RegistryManaged[]
   registryExports            RegistryExport[]
+  registryExhaustiveExports  RegistryExhaustiveExport[]
   registryChangeAggregates   RegistryChangeAggregate[]
   registryTexsAnalysisFiles  RegistryTexsAnalysisFile[]
   adminRequests              AdminRequest[]             @relation("AdminRequestUser")
@@ -1292,6 +1293,28 @@ model Bsdasri {
   emittedByEcoOrganisme                       Boolean                 @default(false)
   destinationOperationMode                    OperationMode?
 
+  // broker
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+  // trader
+  traderCompanyName            String?
+  traderCompanySiret           String?
+  traderCompanyAddress         String?
+  traderCompanyContact         String?
+  traderCompanyPhone           String?
+  traderCompanyMail            String?
+  traderRecepisseNumber        String?
+  traderRecepisseDepartment    String?
+  traderRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
   emissionSignatoryId  String?
   emissionSignatory    User?   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id], onDelete: Cascade)
   transportSignatoryId String?
@@ -1324,10 +1347,12 @@ model Bsdasri {
   finalOperations              BsdasriFinalOperation[] @relation("FinalOperationToInitialBsdasri")
   FinalOperationToFinalBsdasri BsdasriFinalOperation[] @relation("FinalOperationToFinalBsdasri")
 
+  intermediaries IntermediaryBsdasriAssociation[]
+
   canAccessDraftOrgIds String[] @default([])
+  intermediariesOrgIds String[] @default([])
 
   // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
-
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsdasriTransporterCompanyVatNumberIdx")
@@ -1341,6 +1366,24 @@ model Bsdasri {
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
   @@index([groupingEmitterSirets], map: "_BsdasriGroupingEmitterSiretIdx", type: Gin)
   @@index([synthesisEmitterSirets], map: "_BsdasriSynthesisEmitterSiretsIdx", type: Gin)
+}
+
+model IntermediaryBsdasriAssociation {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  bsdasriId String
+  bsdasri   Bsdasri  @relation(fields: [bsdasriId], references: [id])
+
+  @@index([bsdasriId], map: "_IntermediaryBsdasriAssociationBsvhuIdIdx")
+  @@index([siret], map: "IntermediaryBsdasriAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryBsdasriAssociationVatNumberIdx")
 }
 
 model BsdasriFinalOperation {
@@ -1846,58 +1889,58 @@ model BsdaRevisionRequest {
 
   approvals BsdaRevisionRequestApproval[]
 
-  wasteCode                       String?
-  wastePop                        Boolean?
-  packagings                      Json?
-  wasteSealNumbers                String[]
-  wasteMaterialName               String?
+  wasteCode                         String?
+  wastePop                          Boolean?
+  packagings                        Json?
+  wasteSealNumbers                  String[]
+  wasteMaterialName                 String?
   // Nouveau CAP de *l'exutoire* (même si le bordereau a un TTR)
-  destinationCap                  String?
-  destinationReceptionWeight      Float?
+  destinationCap                    String?
+  destinationReceptionWeight        Float?
   destinationReceptionRefusedWeight Decimal?
-  destinationOperationCode        String?
-  destinationOperationDescription String?
-  destinationOperationMode        OperationMode?
-  brokerCompanyName               String?
-  brokerCompanySiret              String?
-  brokerCompanyAddress            String?
-  brokerCompanyContact            String?
-  brokerCompanyPhone              String?
-  brokerCompanyMail               String?
-  brokerRecepisseNumber           String?
-  brokerRecepisseDepartment       String?
-  brokerRecepisseValidityLimit    DateTime?      @db.Timestamptz(6)
-  emitterPickupSiteName           String?
-  emitterPickupSiteAddress        String?
-  emitterPickupSiteCity           String?
-  emitterPickupSitePostalCode     String?
-  emitterPickupSiteInfos          String?
+  destinationOperationCode          String?
+  destinationOperationDescription   String?
+  destinationOperationMode          OperationMode?
+  brokerCompanyName                 String?
+  brokerCompanySiret                String?
+  brokerCompanyAddress              String?
+  brokerCompanyContact              String?
+  brokerCompanyPhone                String?
+  brokerCompanyMail                 String?
+  brokerRecepisseNumber             String?
+  brokerRecepisseDepartment         String?
+  brokerRecepisseValidityLimit      DateTime?      @db.Timestamptz(6)
+  emitterPickupSiteName             String?
+  emitterPickupSiteAddress          String?
+  emitterPickupSiteCity             String?
+  emitterPickupSitePostalCode       String?
+  emitterPickupSiteInfos            String?
 
-  initialWasteCode                       String?
-  initialWastePop                        Boolean?
-  initialPackagings                      Json?
-  initialWasteSealNumbers                String[]
-  initialWasteMaterialName               String?
-  initialDestinationCap                  String?
-  initialDestinationReceptionWeight      Decimal?
+  initialWasteCode                         String?
+  initialWastePop                          Boolean?
+  initialPackagings                        Json?
+  initialWasteSealNumbers                  String[]
+  initialWasteMaterialName                 String?
+  initialDestinationCap                    String?
+  initialDestinationReceptionWeight        Decimal?
   initialDestinationReceptionRefusedWeight Decimal?
-  initialDestinationOperationCode        String?
-  initialDestinationOperationDescription String?
-  initialDestinationOperationMode        OperationMode?
-  initialBrokerCompanyName               String?
-  initialBrokerCompanySiret              String?
-  initialBrokerCompanyAddress            String?
-  initialBrokerCompanyContact            String?
-  initialBrokerCompanyPhone              String?
-  initialBrokerCompanyMail               String?
-  initialBrokerRecepisseNumber           String?
-  initialBrokerRecepisseDepartment       String?
-  initialBrokerRecepisseValidityLimit    DateTime?      @db.Timestamptz(6)
-  initialEmitterPickupSiteName           String?
-  initialEmitterPickupSiteAddress        String?
-  initialEmitterPickupSiteCity           String?
-  initialEmitterPickupSitePostalCode     String?
-  initialEmitterPickupSiteInfos          String?
+  initialDestinationOperationCode          String?
+  initialDestinationOperationDescription   String?
+  initialDestinationOperationMode          OperationMode?
+  initialBrokerCompanyName                 String?
+  initialBrokerCompanySiret                String?
+  initialBrokerCompanyAddress              String?
+  initialBrokerCompanyContact              String?
+  initialBrokerCompanyPhone                String?
+  initialBrokerCompanyMail                 String?
+  initialBrokerRecepisseNumber             String?
+  initialBrokerRecepisseDepartment         String?
+  initialBrokerRecepisseValidityLimit      DateTime?      @db.Timestamptz(6)
+  initialEmitterPickupSiteName             String?
+  initialEmitterPickupSiteAddress          String?
+  initialEmitterPickupSiteCity             String?
+  initialEmitterPickupSitePostalCode       String?
+  initialEmitterPickupSiteInfos            String?
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([status], map: "_BsdaRevisionRequestStatusIdx")

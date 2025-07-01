@@ -15,8 +15,8 @@ import React, { useEffect, useState } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
-import { removeEmptyKeys } from "../../../../../../common/helper";
-import WorkSiteAddress from "../../../../../../form/common/components/work-site/WorkSiteAddress";
+import { isDefined, removeEmptyKeys } from "../../../../../../common/helper";
+import DsfrfWorkSiteAddress from "../../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import { Loader } from "../../../../../common/Components";
 import RhfOperationModeSelect from "../../../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import { CREATE_BSDA_REVISION_REQUEST } from "../../../../../common/queries/reviews/BsdaReviewQuery";
@@ -48,6 +48,7 @@ import {
 import { bsdaPackagingTypes } from "../../../../../Forms/Components/PackagingList/helpers";
 import RhfPackagingList from "../../../../../Forms/Components/PackagingList/RhfPackagingList";
 import { getPackagingInfosSummary } from "../../../../../common/utils/packagingsBsddSummary";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 type Props = {
   bsda: Bsda;
 };
@@ -140,6 +141,11 @@ export function BsdaRequestRevision({ bsda }: Props) {
   const formValues = watch();
 
   const areModificationsDisabled = formValues.isCanceled;
+
+  const hasBeenReceived = isDefined(bsda.destination?.reception?.date);
+  const hasBeenAccepted = isDefined(
+    bsda.destination?.reception?.acceptationStatus
+  );
 
   const handleAddSealNumbers = value => {
     if (value && ![...sealNumbersTags]?.includes(value)) {
@@ -283,37 +289,105 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 />
               </RhfReviewableField>
 
-              <RhfReviewableField
-                title="Quantité traitée (en tonnes)"
-                path="destination.reception.weight"
-                value={bsda.destination?.reception?.weight}
-                defaultValue={initialBsdaReview.destination?.reception?.weight}
-              >
-                <NonScrollableInput
-                  label={NOUVEAU_POIDS_EN_TONNES}
-                  className="fr-col-4"
-                  state={errors.destination?.reception?.weight && "error"}
-                  stateRelatedMessage={
-                    errors.destination?.reception?.weight?.message ?? ""
+              {hasBeenReceived && (
+                <RhfReviewableField
+                  title="Quantité reçue"
+                  path="destination.reception.weight"
+                  value={bsda.destination?.reception?.weight}
+                  defaultValue={
+                    initialBsdaReview?.destination?.reception?.weight
                   }
-                  nativeInputProps={{
-                    ...register("destination.reception.weight", {
-                      valueAsNumber: true
-                    }),
-                    type: "number",
-                    inputMode: "decimal",
-                    step: "0.000001"
-                  }}
-                />
-                {Boolean(formValues.destination?.reception?.weight) && (
-                  <p className="fr-info-text">
-                    Soit{" "}
-                    {Number(formValues.destination?.reception?.weight) * 1000}
-                    kg
-                  </p>
-                )}
-              </RhfReviewableField>
+                >
+                  {bsda.destination?.reception?.acceptationStatus ===
+                    "PARTIALLY_REFUSED" && (
+                    <Alert
+                      className="fr-my-2w"
+                      small
+                      description="En cas de refus partiel, la quantité reçue et refusée peuvent être révisées, impactant la quantité traitée : quantité acceptée = quantité reçue - quantité refusée."
+                      severity="info"
+                    />
+                  )}
+                  {bsda.destination?.reception?.acceptationStatus ===
+                    "ACCEPTED" && (
+                    <Alert
+                      className="fr-my-2w"
+                      small
+                      description="L'acceptation étant totale, la quantité acceptée et traitée correspondra à la quantité reçue."
+                      severity="info"
+                    />
+                  )}
 
+                  <NonScrollableInput
+                    label={NOUVEAU_POIDS_EN_TONNES}
+                    className="fr-col-4"
+                    state={errors.destination?.reception?.weight && "error"}
+                    stateRelatedMessage={
+                      errors.destination?.reception?.weight?.message ?? ""
+                    }
+                    nativeInputProps={{
+                      ...register("destination.reception.weight", {
+                        valueAsNumber: true
+                      }),
+                      type: "number",
+                      inputMode: "decimal",
+                      step: "0.000001",
+                      min: 0
+                    }}
+                  />
+                  {isDefined(formValues?.destination?.reception?.weight) && (
+                    <p className="fr-info-text">
+                      Soit{" "}
+                      {Number(formValues.destination?.reception?.weight) * 1000}{" "}
+                      kg
+                    </p>
+                  )}
+                </RhfReviewableField>
+              )}
+
+              {hasBeenAccepted &&
+                bsda.destination?.reception?.acceptationStatus ===
+                  "PARTIALLY_REFUSED" && (
+                  <RhfReviewableField
+                    title="Quantité refusée"
+                    path="destination.reception.refusedWeight"
+                    value={bsda.destination?.reception?.refusedWeight}
+                    defaultValue={
+                      initialBsdaReview?.destination?.reception?.refusedWeight
+                    }
+                  >
+                    <NonScrollableInput
+                      label={NOUVEAU_POIDS_EN_TONNES}
+                      className="fr-col-4"
+                      state={
+                        errors.destination?.reception?.refusedWeight && "error"
+                      }
+                      stateRelatedMessage={
+                        errors.destination?.reception?.refusedWeight?.message ??
+                        ""
+                      }
+                      nativeInputProps={{
+                        ...register("destination.reception.refusedWeight", {
+                          valueAsNumber: true
+                        }),
+                        type: "number",
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        min: 0
+                      }}
+                    />
+                    {isDefined(
+                      formValues?.destination?.reception?.refusedWeight
+                    ) && (
+                      <p className="fr-info-text">
+                        Soit{" "}
+                        {Number(
+                          formValues.destination?.reception?.refusedWeight
+                        ) * 1000}{" "}
+                        kg
+                      </p>
+                    )}
+                  </RhfReviewableField>
+                )}
               <RhfReviewableField
                 title={CODE_TRAITEMENT}
                 path="destination.operation.code"
@@ -403,7 +477,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.emitter?.pickupSite}
               >
                 <div className="form__row">
-                  <WorkSiteAddress
+                  <DsfrfWorkSiteAddress
                     address={formValues?.emitter?.pickupSite?.address}
                     city={formValues?.emitter?.pickupSite?.city}
                     postalCode={formValues?.emitter?.pickupSite?.postalCode}

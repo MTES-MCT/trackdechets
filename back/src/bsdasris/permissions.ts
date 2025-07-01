@@ -16,8 +16,11 @@ function readers(bsdasri: Bsdasri): string[] {
         bsdasri.transporterCompanyVatNumber,
         bsdasri.destinationCompanySiret,
         bsdasri.ecoOrganismeSiret,
+        bsdasri.brokerCompanySiret,
+        bsdasri.traderCompanySiret,
         ...bsdasri.synthesisEmitterSirets,
-        ...bsdasri.groupingEmitterSirets
+        ...bsdasri.groupingEmitterSirets,
+        ...bsdasri.intermediariesOrgIds
       ].filter(Boolean);
 }
 
@@ -37,6 +40,8 @@ function contributors(bsdasri: Bsdasri, input?: BsdasriInput) {
     input?.transporter?.company?.vatNumber;
   const updatedDestinationCompanySiret = input?.destination?.company?.siret;
   const updateEcoOrgansimeSiret = input?.ecoOrganisme?.siret;
+  const updateBrokerCompanySiret = input?.broker?.company?.siret;
+  const updateTraderCompanySiret = input?.trader?.company?.siret;
 
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
@@ -63,12 +68,24 @@ function contributors(bsdasri: Bsdasri, input?: BsdasriInput) {
       ? updateEcoOrgansimeSiret
       : bsdasri.ecoOrganismeSiret;
 
+  const brokerCompanySiret =
+    updateBrokerCompanySiret !== undefined
+      ? updateBrokerCompanySiret
+      : bsdasri.brokerCompanySiret;
+
+  const traderCompanySiret =
+    updateTraderCompanySiret !== undefined
+      ? updateTraderCompanySiret
+      : bsdasri.traderCompanySiret;
+
   return [
     emitterCompanySiret,
     transporterCompanySiret,
     transporterCompanyVatNumber,
     destinationCompanySiret,
-    ecoOrganismeSiret
+    ecoOrganismeSiret,
+    brokerCompanySiret,
+    traderCompanySiret
   ].filter(Boolean);
 }
 
@@ -81,7 +98,9 @@ function creators(input: BsdasriInput) {
     input.transporter?.company?.siret,
     input.transporter?.company?.vatNumber,
     input.destination?.company?.siret,
-    input.ecoOrganisme?.siret
+    input.ecoOrganisme?.siret,
+    input.broker?.company?.siret,
+    input.trader?.company?.siret
   ].filter(Boolean);
 }
 
@@ -90,6 +109,7 @@ export function checkCanRead(user: User, bsdasri: Bsdasri) {
     return true;
   }
   const authorizedOrgIds = readers(bsdasri);
+
   return checkUserPermissions(
     user,
     authorizedOrgIds,

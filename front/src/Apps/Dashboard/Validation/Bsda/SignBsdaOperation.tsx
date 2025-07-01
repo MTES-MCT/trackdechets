@@ -12,7 +12,7 @@ import {
   QueryBsdaArgs
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
@@ -114,24 +114,28 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   >(SIGN_BsDA);
 
   const title = "Signer le traitement";
-  const TODAY = new Date();
+  const TODAY = useMemo(() => new Date(), []);
 
-  const initialState = {
-    date: datetimeToYYYYMMDDHHSS(TODAY),
-    author: "",
-    ...getComputedState(
-      {
-        destination: {
-          operation: {
-            date: datetimeToYYYYMMDD(TODAY),
-            code: "",
-            nextDestination: { company: getInitialCompany() }
+  const initialState = useMemo(() => {
+    if (!data?.bsda) return undefined;
+
+    return {
+      date: datetimeToYYYYMMDDHHSS(TODAY),
+      author: "",
+      ...getComputedState(
+        {
+          destination: {
+            operation: {
+              date: datetimeToYYYYMMDD(TODAY),
+              code: "",
+              nextDestination: { company: getInitialCompany() }
+            }
           }
-        }
-      },
-      data?.bsda
-    )
-  } as ZodBsdaOperation;
+        },
+        data?.bsda
+      )
+    } as ZodBsdaOperation;
+  }, [TODAY, data?.bsda]);
 
   const methods = useForm<ZodBsdaOperation>({
     values: initialState,
@@ -140,7 +144,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
     }
   });
 
-  const { handleSubmit, reset, formState, register, watch } = methods;
+  const { handleSubmit, reset, formState, register, watch, setValue } = methods;
 
   const onCancel = () => {
     reset();
@@ -148,6 +152,10 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   };
 
   const operationCode = watch("destination.operation.code");
+
+  useEffect(() => {
+    setValue("destination.operation.date", datetimeToYYYYMMDD(TODAY));
+  }, [TODAY, setValue, initialState]);
 
   const onSubmit = async data => {
     const { author, date, ...update } = data;
@@ -175,6 +183,11 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   }
 
   const { bsda } = data;
+
+  const isTempStorageReception =
+    !bsda.forwarding &&
+    !bsda.grouping?.length &&
+    bsda.destination?.operation?.nextDestination?.company?.siret;
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
@@ -213,16 +226,21 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             }
           >
             <option value="">Sélectionnez une valeur...</option>
-            <option value="R 5">
-              R 5 - Recyclage ou récupération d'autres matières inorganiques
-              (dont vitrification)
-            </option>
-            <option value="D 5">
-              D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
-            </option>
-            <option value="D 9">
-              D 9 - Traitement chimique ou prétraitement (dont vitrification)
-            </option>
+            {!isTempStorageReception && (
+              <>
+                <option value="R 5">
+                  R 5 - Recyclage ou récupération d'autres matières inorganiques
+                  (dont vitrification)
+                </option>
+                <option value="D 5">
+                  D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
+                </option>
+                <option value="D 9">
+                  D 9 - Traitement chimique ou prétraitement (dont
+                  vitrification)
+                </option>
+              </>
+            )}
             <option value="R 13">
               R 13 - Opérations de transit incluant le groupement sans
               transvasement préalable à R 5

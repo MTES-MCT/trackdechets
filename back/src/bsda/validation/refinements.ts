@@ -10,6 +10,7 @@ import {
   getSealedFields
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
+import { Decimal } from "decimal.js";
 import { capitalize } from "../../common/strings";
 import { isArray } from "../../common/dataTypes";
 import {
@@ -38,6 +39,7 @@ import {
 } from "../../common/validation/zod/refinement";
 import { CompanyRole } from "../../common/validation/zod/schema";
 import { isDefined } from "../../common/helpers";
+import { isBSDAFinalOperationCode } from "../../common/operationCodes";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -706,8 +708,12 @@ export const checkDestinationReceptionRefusedWeight = (
     return;
   }
 
+  // Weights can come from the frontend (numbers) or the DB (Decimals). Harmonize
+  const receptionWeight = new Decimal(destinationReceptionWeight);
+  const refusedWeight = new Decimal(destinationReceptionRefusedWeight);
+
   if (
-    destinationReceptionRefusedWeight !== 0 &&
+    !refusedWeight.equals(0) &&
     destinationReceptionAcceptationStatus == WasteAcceptationStatus.ACCEPTED
   ) {
     ctx.addIssue({
@@ -721,7 +727,7 @@ export const checkDestinationReceptionRefusedWeight = (
 
   if (
     destinationReceptionAcceptationStatus == WasteAcceptationStatus.REFUSED &&
-    destinationReceptionRefusedWeight !== destinationReceptionWeight
+    !refusedWeight?.equals(receptionWeight)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -737,8 +743,8 @@ export const checkDestinationReceptionRefusedWeight = (
     WasteAcceptationStatus.PARTIALLY_REFUSED
   ) {
     if (
-      destinationReceptionRefusedWeight >= destinationReceptionWeight ||
-      destinationReceptionRefusedWeight === 0
+      refusedWeight.greaterThanOrEqualTo(receptionWeight) ||
+      refusedWeight.equals(0)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -750,7 +756,7 @@ export const checkDestinationReceptionRefusedWeight = (
     }
   }
 
-  if (destinationReceptionRefusedWeight > destinationReceptionWeight) {
+  if (refusedWeight.greaterThan(receptionWeight)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message:
@@ -759,4 +765,41 @@ export const checkDestinationReceptionRefusedWeight = (
     });
     return;
   }
+};
+
+export const validateReceptionOperationCode: (
+  validationContext: BsdaValidationContext
+) => Refinement<ParsedZodBsda> = validationContext => {
+  const currentSignatureType = validationContext.currentSignatureType;
+
+  return async (bsda, { addIssue }) => {
+    if (currentSignatureType !== "OPERATION") {
+      return;
+    }
+
+    const {
+      destinationOperationCode,
+      destinationOperationNextDestinationCompanySiret
+    } = bsda;
+
+    const isTempStorageReception =
+      !bsda.forwarding &&
+      !bsda.grouping?.length &&
+      isDefined(destinationOperationNextDestinationCompanySiret);
+
+    // Attention! Lors d'une réception sur une étape d'entreposage provisoire,
+    // on ne doit pas pouvoir renseigner un code de traitement final!
+    if (
+      isBSDAFinalOperationCode(destinationOperationCode ?? null) &&
+      isTempStorageReception
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Vous ne pouvez pas renseigner un code de traitement final",
+        path: ["destination", "operation", "code"]
+      });
+    }
+
+    return;
+  };
 };

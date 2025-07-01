@@ -6,17 +6,16 @@ import {
   companyFactory,
   siretify,
   getDestinationCompanyInfo,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  intermediaryReceiptFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
-import { sirenify } from "../../../sirenify";
 
-jest.mock("../../../sirenify");
-(sirenify as jest.Mock).mockImplementation(input => Promise.resolve(input));
+import { CompanyRole } from "../../../../common/validation/zod/schema";
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -30,7 +29,6 @@ const CREATE_DASRI = gql`
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
-    (sirenify as jest.Mock).mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -145,14 +143,18 @@ describe("Mutation.createDasri", () => {
     );
   });
 
-  it("create a dasri with an emitter and a recipient", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
+  it("create a dasri with an emitter, transporter and a recipient", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER", {
+      name: "PRED-COMPANY",
+      address: "PRED-ADDRESS"
+    });
+    const transporter = await companyFactory({ name: "TRS-NAME" });
+    const destination = await companyFactory({ name: "DEST-NAME" });
     const input = {
       waste: { adr: "xyz 33", code: "18 01 03*" },
       emitter: {
         company: {
-          siret: company.siret,
+          siret: emitter.siret,
           contact: "jean durand",
           phone: "06 18 76 02 00",
           // email not required
@@ -170,11 +172,24 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationCompanyInfo())
+      transporter: {
+        company: {
+          siret: transporter.siret,
+          contact: "jean valjean",
+          phone: "06 18 76 02 00"
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.siret,
+          contact: "jean tourloupe",
+          phone: "06 18 76 02 00"
+        }
+      }
     };
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+    const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
       CREATE_DASRI,
       {
         variables: {
@@ -182,19 +197,42 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-
+    console.log(errors);
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(emitter.siret);
+    expect(data.createBsdasri.emitter!.company!.name).toEqual(emitter.name);
+    expect(data.createBsdasri.emitter!.company!.address).toEqual(
+      emitter.address
+    );
+
+    expect(data.createBsdasri.transporter!.company!.siret).toEqual(
+      transporter.siret
+    );
+    expect(data.createBsdasri.transporter!.company!.name).toEqual(
+      transporter.name
+    );
+    expect(data.createBsdasri.transporter!.company!.address).toEqual(
+      transporter.address
+    );
+    expect(data.createBsdasri.destination!.company!.siret).toEqual(
+      destination.siret
+    );
+    expect(data.createBsdasri.destination!.company!.name).toEqual(
+      destination.name
+    );
+    expect(data.createBsdasri.destination!.company!.address).toEqual(
+      destination.address
+    );
     const created = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: data.createBsdasri.id }
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
     expect(created.groupingEmitterSirets).toEqual([]);
-    expect(created.emitterCompanyName).toEqual(company.name);
-    expect(created.emitterCompanyAddress).toEqual(company.address);
+    expect(created.emitterCompanyName).toEqual(emitter.name);
+    expect(created.emitterCompanyAddress).toEqual(emitter.address);
   });
 
   it("packagings needs a positive quantity", async () => {
@@ -433,6 +471,603 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.transporter!.recepisse!.department).toEqual("31");
     expect(data.createBsdasri.transporter!.recepisse!.validityLimit).toEqual(
       "2055-01-01T00:00:00.000Z"
+    );
+  });
+
+  it("create a dasri with intermediaries", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const intermediary1 = await companyFactory();
+    const intermediary2 = await companyFactory();
+    const intermediary3 = await companyFactory();
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      intermediaries: [
+        {
+          siret: intermediary1.siret,
+          name: intermediary1.name,
+          address: intermediary1.address,
+          contact: intermediary1.contact
+        },
+        {
+          siret: intermediary2.siret,
+          name: intermediary2.name,
+          address: intermediary2.address,
+          contact: intermediary2.contact
+        },
+        {
+          siret: intermediary3.siret,
+          name: intermediary3.name,
+          address: intermediary3.address,
+          contact: intermediary3.contact
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toBeUndefined();
+
+    const { intermediaries } = data.createBsdasri;
+    expect(intermediaries?.length).toBe(3);
+  });
+
+  it("deny dasri creation with more than 3 intermediaries", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const intermediary1 = await companyFactory();
+    const intermediary2 = await companyFactory();
+    const intermediary3 = await companyFactory();
+    const intermediary4 = await companyFactory();
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      intermediaries: [
+        {
+          siret: intermediary1.siret,
+          name: intermediary1.name,
+          address: intermediary1.address,
+          contact: intermediary1.contact
+        },
+        {
+          siret: intermediary2.siret,
+          name: intermediary2.name,
+          address: intermediary2.address,
+          contact: intermediary2.contact
+        },
+        {
+          siret: intermediary3.siret,
+          name: intermediary3.name,
+          address: intermediary3.address,
+          contact: intermediary3.contact
+        },
+        {
+          siret: intermediary4.siret,
+          name: intermediary4.name,
+          address: intermediary4.address,
+          contact: intermediary4.contact
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("deny dasri creation by an intermediary", async () => {
+    const { user, company: intermediary } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const destination = await companyFactory();
+    const emitter = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      intermediaries: [
+        {
+          siret: intermediary.siret,
+          name: intermediary.name,
+          address: intermediary.address,
+          contact: intermediary.contact
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
+  it("create a dasri (trader)", async () => {
+    const { user, company: trader } = await userWithCompanyFactory("MEMBER");
+
+    await intermediaryReceiptFactory({
+      role: CompanyRole.Trader,
+      company: trader
+    });
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      trader: {
+        company: {
+          siret: trader.siret,
+          contact: "-",
+          phone: "06 18 76 02 00"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsdasri.status).toBe("INITIAL");
+    expect(data.createBsdasri.type).toBe("SIMPLE");
+
+    expect(data.createBsdasri.trader!.company).toMatchObject(
+      input.trader.company
+    );
+  });
+
+  it("won't create a dasri (trader) if company has not expected profile", async () => {
+    const { user, company: trader } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
+      }
+    });
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      trader: {
+        company: {
+          siret: trader.siret,
+          contact: "-",
+          phone: "06 18 76 02 00"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "Cet établissement n'a pas le profil Négociant."
+          ),
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ])
+    );
+  });
+
+  it("create a dasri (broker)", async () => {
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+
+    await intermediaryReceiptFactory({
+      role: CompanyRole.Broker,
+      company: broker
+    });
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      broker: {
+        company: {
+          siret: broker.siret,
+          contact: "-",
+          phone: "06 18 76 02 00"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsdasri.broker!.company).toMatchObject(
+      input.broker.company
+    );
+  });
+
+  it("won't create a dasri (broker) if company has not expected profile", async () => {
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
+      }
+    });
+    const emitter = await companyFactory();
+    const destination = await companyFactory();
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: destination.siret
+        },
+        customInfo: null,
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: emitter.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      },
+      ...(await getDestinationCompanyInfo()),
+      broker: {
+        company: {
+          siret: broker.siret,
+          contact: "-",
+          phone: "06 18 76 02 00"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          message: expect.stringContaining(
+            "Cet établissement n'a pas le profil Courtier."
+          ),
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ])
     );
   });
 

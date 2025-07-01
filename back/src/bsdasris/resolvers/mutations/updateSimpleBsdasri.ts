@@ -1,4 +1,8 @@
-import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
+import {
+  companyToIntermediaryInput,
+  expandBsdasriFromDB,
+  flattenBsdasriInput
+} from "../../converter";
 import { BsdasriType } from "@prisma/client";
 
 import type { BsdasriInput } from "@td/codegen-back";
@@ -88,6 +92,18 @@ const updateBsdasri = async ({
     { user }
   );
 
+  const newIntermediaries = dbBsdasri.intermediaries
+    ? {
+        deleteMany: {},
+        ...(parsedBsdasri?.intermediaries &&
+          parsedBsdasri?.intermediaries?.length > 0 && {
+            createMany: {
+              data: companyToIntermediaryInput(parsedBsdasri.intermediaries)
+            }
+          })
+      }
+    : undefined;
+
   if (updatedFields.length === 0) {
     // Évite de faire un update "à blanc" si l'input
     // ne modifie pas les données. Cela permet de limiter
@@ -97,13 +113,15 @@ const updateBsdasri = async ({
 
   const bsdasriRepository = getBsdasriRepository(user);
 
-  const { createdAt, grouping, synthesizing, ...newBsdasri } = parsedBsdasri;
+  const { createdAt, grouping, synthesizing, intermediaries, ...newBsdasri } =
+    parsedBsdasri;
 
   const updatedDasri = await bsdasriRepository.update(
     { id },
     {
       ...newBsdasri,
-      ...getGroupedBsdasriArgs(inputGrouping)
+      ...getGroupedBsdasriArgs(inputGrouping),
+      intermediaries: newIntermediaries
     }
   );
 

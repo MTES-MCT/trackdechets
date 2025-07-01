@@ -50,8 +50,10 @@ async function buildQuery(
     isArchivedFor: where?.isArchivedFor,
     isToCollectFor: where?.isToCollectFor,
     isCollectedFor: where?.isCollectedFor,
-    isInRevisionFor: where?.isInRevisionFor,
-    isRevisedFor: where?.isRevisedFor,
+    isPendingRevisionFor: where?.isPendingRevisionFor,
+    isEmittedRevisionFor: where?.isEmittedRevisionFor,
+    isReceivedRevisionFor: where?.isReceivedRevisionFor,
+    isReviewedRevisionFor: where?.isReviewedRevisionFor,
     isReturnFor: where?.isReturnFor
   })
     .filter(([_, value]) => value != null)

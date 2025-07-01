@@ -44,6 +44,7 @@ export type BsdasriEditableFields = Required<
     // | "destinationReceptionWasteVolume"
     | "emittedByEcoOrganisme"
     // | "destinationCustomInfo"
+    | "intermediariesOrgIds"
   >
 >;
 
@@ -470,7 +471,6 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   },
   destinationCompanyMail: {
     sealed: { from: "RECEPTION" },
-    // required: { from: "EMISSION" },
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
@@ -603,6 +603,217 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
       when: bsdasri => !!bsdasri.ecoOrganismeName
     }
   },
+
+  brokerCompanyName: {
+    readableFieldName: "le nom du courtier",
+    sealed: {
+      from: "OPERATION"
+    },
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    path: ["broker", "company", "name"]
+  },
+  brokerCompanySiret: {
+    readableFieldName: "le SIRET du courtier",
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "company", "siret"]
+  },
+  brokerCompanyAddress: {
+    readableFieldName: "l'adresse du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "company", "address"]
+  },
+  brokerCompanyContact: {
+    readableFieldName: "le nom de contact du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "company", "contact"]
+  },
+  brokerCompanyPhone: {
+    readableFieldName: "le téléphone du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "company", "phone"]
+  },
+  brokerCompanyMail: {
+    readableFieldName: "le mail du courtier",
+
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "company", "mail"]
+  },
+  brokerRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "recepisse", "number"]
+  },
+  brokerRecepisseDepartment: {
+    readableFieldName: "le département du récépissé du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "recepisse", "department"]
+  },
+  brokerRecepisseValidityLimit: {
+    readableFieldName: "la date de validité du récépissé du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.brokerCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["broker", "recepisse", "validityLimit"]
+  },
+
+  traderCompanyName: {
+    readableFieldName: "le nom du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "name"]
+  },
+  traderCompanySiret: {
+    readableFieldName: "le SIRET du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "siret"]
+  },
+  traderCompanyAddress: {
+    readableFieldName: "l'adresse du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "address"]
+  },
+  traderCompanyContact: {
+    readableFieldName: "le nom de contact du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "contact"]
+  },
+  traderCompanyPhone: {
+    readableFieldName: "le téléphone du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "phone"]
+  },
+  traderCompanyMail: {
+    readableFieldName: "le mail du négociant",
+
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "company", "mail"]
+  },
+  traderRecepisseNumber: {
+    readableFieldName: "le numéro de récépissé du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "recepisse", "number"]
+  },
+  traderRecepisseDepartment: {
+    readableFieldName: "le département du récépissé du négociant",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "recepisse", "department"]
+  },
+  traderRecepisseValidityLimit: {
+    readableFieldName: "la date de validité du récépissé du courtier",
+    required: {
+      from: "EMISSION",
+      // il y a un SIRET de courtier
+      when: bsdasri => !!bsdasri.traderCompanySiret
+    },
+    sealed: {
+      from: "OPERATION"
+    },
+    path: ["trader", "recepisse", "validityLimit"]
+  },
+  intermediaries: {
+    readableFieldName: "les intermédiaires",
+    sealed: { from: "OPERATION" },
+    path: ["intermediaries"]
+  },
+
   grouping: { sealed: { from: "EMISSION" } },
   synthesizing: { sealed: { from: "EMISSION" } }
 };

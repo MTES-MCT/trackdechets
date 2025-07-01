@@ -76,6 +76,7 @@ const reviewFragment = gql`
         }
         reception {
           weight
+          refusedWeight
         }
         operation {
           code
@@ -130,6 +131,7 @@ const reviewFragment = gql`
         cap
         reception {
           weight
+          refusedWeight
         }
         operation {
           code

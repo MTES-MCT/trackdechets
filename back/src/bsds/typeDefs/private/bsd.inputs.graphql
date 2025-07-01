@@ -31,10 +31,15 @@ input BsdWhere {
   isToCollectFor: [String!]
   isCollectedFor: [String!]
   isReturnFor: [String!]
-  # Révisions en cours
-  isInRevisionFor: [String!]
-  # Révisions passées
-  isRevisedFor: [String!]
+
+  # Toutes les révisions dont je suis l'auteur ou la cible, et qui n'ont pas encore été résolues.
+  isPendingRevisionFor: [String!]
+  # Toutes les révisions que mon entreprise a émises, et qui n'ont pas encore été résolues.
+  isEmittedRevisionFor: [String!]
+  # Toutes les révisions dont mon entreprise est la cible, et qui n'ont pas encore été résolues.
+  isReceivedRevisionFor: [String!]
+  # Toutes les révisions qui ont été résolues.
+  isReviewedRevisionFor: [String!]
 
   sirets: StringNullableListFilter
 

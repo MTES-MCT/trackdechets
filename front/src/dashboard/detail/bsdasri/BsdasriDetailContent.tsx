@@ -20,7 +20,8 @@ import {
   IconRenewableEnergyEarth,
   IconBSDasri,
   IconDuplicateFile,
-  IconPdf
+  IconPdf,
+  IconWarehousePackage
 } from "../../../Apps/common/Components/Icons/Icons";
 import { InitialDasris } from "./InitialDasris";
 import QRCodeIcon from "react-qr-code";
@@ -298,11 +299,106 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
     </>
   );
 };
+const Trader = ({ trader }) => (
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Négociant</dt>
+      <dd>{trader.company?.name}</dd>
+
+      <dt>Siret</dt>
+      <dd>{trader.company?.siret}</dd>
+
+      <dt>Adresse</dt>
+      <dd>{trader.company?.address}</dd>
+
+      <dt>Tél</dt>
+      <dd>{trader.company?.phone}</dd>
+
+      <dt>Mél</dt>
+      <dd>{trader.company?.mail}</dd>
+
+      <dt>Contact</dt>
+      <dd>{trader.company?.contact}</dd>
+    </div>
+    <div className={styles.detailGrid}>
+      <DetailRow value={trader.recepisse.number} label="Récépissé" />
+      <DetailRow value={trader.recepisse.department} label="Départment" />
+      <DateRow
+        value={trader.recepisse.validityLimit}
+        label="Date de validité"
+      />
+    </div>
+  </div>
+);
+const Broker = ({ broker }) => (
+  <div className={styles.detailColumns}>
+    <div className={styles.detailGrid}>
+      <dt>Courtier</dt>
+      <dd>{broker.company?.name}</dd>
+
+      <dt>Siret</dt>
+      <dd>{broker.company?.siret}</dd>
+
+      <dt>Adresse</dt>
+      <dd>{broker.company?.address}</dd>
+
+      <dt>Tél</dt>
+      <dd>{broker.company?.phone}</dd>
+
+      <dt>Mél</dt>
+      <dd>{broker.company?.mail}</dd>
+
+      <dt>Contact</dt>
+      <dd>{broker.company?.contact}</dd>
+    </div>
+    <div className={styles.detailGrid}>
+      <DetailRow value={broker.recepisse.number} label="Récépissé" />
+      <DetailRow value={broker.recepisse.department} label="Départment" />
+      <DateRow
+        value={broker.recepisse.validityLimit}
+        label="Date de validité"
+      />
+    </div>
+  </div>
+);
+
+const Intermediaries = ({ intermediaries }) => (
+  <>
+    {intermediaries.map(intermediary => (
+      <div className={styles.detailColumns} key={intermediary.orgId}>
+        <div className={styles.detailGrid}>
+          <dt>Établissement intermédiaire</dt>
+          <dd>{intermediary?.name}</dd>
+
+          <dt>Siret</dt>
+          <dd>{intermediary?.siret}</dd>
+
+          <dt>Numéro de TVA</dt>
+          <dd>{intermediary?.vatNumber}</dd>
+
+          <dt>Adresse</dt>
+          <dd>{intermediary?.address}</dd>
+
+          <dt>Tél</dt>
+          <dd>{intermediary?.phone}</dd>
+
+          <dt>Mél</dt>
+          <dd>{intermediary?.mail}</dd>
+
+          <dt>Contact</dt>
+          <dd>{intermediary?.contact}</dd>
+        </div>
+      </div>
+    ))}
+  </>
+);
 
 export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const navigate = useNavigate();
-  const { permissions } = usePermissions();
+  const {
+    orgPermissions: { permissions }
+  } = usePermissions(siret);
 
   const [duplicate] = useBsdasriDuplicate({
     variables: { id: form.id },
@@ -385,18 +481,34 @@ export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
             <IconWaterDam size="25px" />
             <span className={styles.detailTabCaption}>Producteur</span>
           </Tab>
-
           <Tab className={styles.detailTab}>
             <IconWarehouseDelivery size="25px" />
             <span className={styles.detailTabCaption}>
               <span> Transporteur</span>
             </span>
           </Tab>
-
           <Tab className={styles.detailTab}>
             <IconRenewableEnergyEarth size="25px" />
             <span className={styles.detailTabCaption}>Destinataire</span>
-          </Tab>
+          </Tab>{" "}
+          {!!form?.trader?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Négociant</span>
+            </Tab>
+          )}
+          {!!form?.broker?.company?.name && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Courtier</span>
+            </Tab>
+          )}
+          {Boolean(form?.intermediaries?.length) && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Intermédiaires</span>
+            </Tab>
+          )}
           {[BsdasriType.Synthesis, BsdasriType.Grouping].includes(
             form?.type
           ) && (
@@ -428,6 +540,26 @@ export default function BsdasriDetailContent({ form }: SlipDetailContentProps) {
               <Recipient form={form} />
             </div>
           </TabPanel>
+          {/* Other actors tab panel */}
+          {!!form?.trader?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Trader trader={form.trader} />
+            </TabPanel>
+          )}
+          {/* Broker tab panel */}
+          {!!form?.broker?.company?.name && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Broker broker={form.broker} />
+            </TabPanel>
+          )}
+
+          {/* Intermdiaries tab panel */}
+          {Boolean(form?.intermediaries?.length) && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Intermediaries intermediaries={form?.intermediaries} />
+            </TabPanel>
+          )}
+
           {form?.type === BsdasriType.Grouping && (
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>

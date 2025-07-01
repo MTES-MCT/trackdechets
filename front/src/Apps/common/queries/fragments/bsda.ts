@@ -52,6 +52,7 @@ export const bsdaFragment = gql`
       }
       reception {
         weight
+        acceptedWeight
       }
       operation {
         nextDestination {
@@ -311,6 +312,8 @@ export const FullBsdaFragment = gql`
         }
         reception {
           weight
+          refusedWeight
+          acceptedWeight
         }
       }
     }

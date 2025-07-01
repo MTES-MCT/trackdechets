@@ -40,9 +40,7 @@ const routes = {
       drafts: "/dashboard/:siret/bsds/drafts",
       act: "/dashboard/:siret/bsds/act",
       follow: "/dashboard/:siret/bsds/follow",
-      history: "/dashboard/:siret/bsds/history",
-      toReview: "/dashboard/:siret/bsds/to-review/:bsdId?",
-      reviewed: "/dashboard/:siret/bsds/reviewed"
+      history: "/dashboard/:siret/bsds/history"
     },
     bsdds: {
       create: "/dashboard/:siret/bsdds/create",
@@ -90,6 +88,12 @@ const routes = {
       create: "/dashboard/:siret/bspaohs/create",
       edit: "/dashboard/:siret/bspaohs/edit/:id",
       view: "/dashboard/:siret/bspaohs/view/:id"
+    },
+    revisions: {
+      pending: "/dashboard/:siret/revisions/pending/:bsdId?",
+      emitted: "/dashboard/:siret/revisions/emitted/:bsdId?",
+      received: "/dashboard/:siret/revisions/received/:bsdId?",
+      reviewed: "/dashboard/:siret/revisions/reviewed"
     },
     transport: {
       index: "/dashboard/:siret/transport",
@@ -189,9 +193,13 @@ export const titles = {
   "/dashboard/:siret/bsds/act": "Pour action — Trackdéchets",
   "/dashboard/:siret/bsds/follow": "Bordereaux suivis — Trackdéchets",
   "/dashboard/:siret/bsds/history": "Bordereaux archivés — Trackdéchets",
-  "/dashboard/:siret/bsds/to-review/:bsdId?":
+  "/dashboard/:siret/revisions/pending/:bsdId?":
     "Révisions en cours — Trackdéchets",
-  "/dashboard/:siret/bsds/reviewed": "Révisions passées — Trackdéchets",
+  "/dashboard/:siret/revisions/emitted/:bsdId?":
+    "Révisions émises — Trackdéchets",
+  "/dashboard/:siret/revisions/received/:bsdId?":
+    "Révisions reçues — Trackdéchets",
+  "/dashboard/:siret/revisions/reviewed": "Révisions finalisées — Trackdéchets",
   "/dashboard/:siret/bsdds/create": "Créer un BSDD — Trackdéchets",
   "/dashboard/:siret/bsdds/edit/:id": "Modifier le BSDD — Trackdéchets",
   "/dashboard/:siret/bsdds/view/:id": "Aperçu du BSDD — Trackdéchets",

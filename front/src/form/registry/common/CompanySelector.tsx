@@ -37,10 +37,7 @@ export function CompanySelector({
   methods,
   disabled
 }: Props) {
-  const companyType = methods.watch(
-    `${prefix}CompanyType`,
-    required ? "ETABLISSEMENT_FR" : ""
-  );
+  const companyType = methods.watch(`${prefix}CompanyType`, "");
   const companyStatusDiffusion: StatutDiffusionEtablissement | undefined =
     methods.watch(`${prefix}CompanyStatusDiffusion`);
 
@@ -83,7 +80,7 @@ export function CompanySelector({
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-8 fr-mb-2w">
           <Select
-            label={capitalize(label)}
+            label={`${capitalize(label)}${required ? "" : " (optionnel)"}`}
             nativeSelectProps={{
               ...typeSelectMethods,
               onChange: (e: React.ChangeEvent<HTMLSelectElement>) => {
