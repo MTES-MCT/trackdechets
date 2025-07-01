@@ -116,22 +116,26 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   const title = "Signer le traitement";
   const TODAY = useMemo(() => new Date(), []);
 
-  const initialState = {
-    date: datetimeToYYYYMMDDHHSS(TODAY),
-    author: "",
-    ...getComputedState(
-      {
-        destination: {
-          operation: {
-            date: datetimeToYYYYMMDD(TODAY),
-            code: "",
-            nextDestination: { company: getInitialCompany() }
+  const initialState = useMemo(() => {
+    if (!data?.bsda) return undefined;
+
+    return {
+      date: datetimeToYYYYMMDDHHSS(TODAY),
+      author: "",
+      ...getComputedState(
+        {
+          destination: {
+            operation: {
+              date: datetimeToYYYYMMDD(TODAY),
+              code: "",
+              nextDestination: { company: getInitialCompany() }
+            }
           }
-        }
-      },
-      data?.bsda
-    )
-  } as ZodBsdaOperation;
+        },
+        data?.bsda
+      )
+    } as ZodBsdaOperation;
+  }, [TODAY, data?.bsda]);
 
   const methods = useForm<ZodBsdaOperation>({
     values: initialState,
@@ -151,7 +155,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
 
   useEffect(() => {
     setValue("destination.operation.date", datetimeToYYYYMMDD(TODAY));
-  }, [TODAY, setValue]);
+  }, [TODAY, setValue, initialState]);
 
   const onSubmit = async data => {
     const { author, date, ...update } = data;

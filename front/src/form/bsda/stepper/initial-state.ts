@@ -108,10 +108,6 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
       operation: {
         description: bsda?.destination?.operation?.description ?? "",
         nextDestination: bsda?.destination?.operation?.nextDestination ?? null
-      },
-      reception: {
-        refusedWeight: bsda?.destination?.reception?.refusedWeight ?? null,
-        weight: bsda?.destination?.reception?.weight ?? null
       }
     },
     grouping: bsda?.grouping?.map(g => g.id) ?? [],
