@@ -48,7 +48,8 @@ const toRelative = route => {
 function DashboardRoutes() {
   const { siret } = useParams<{ siret: string | undefined }>();
   const { user } = useAuth();
-  const { company: currentCompany } = useMyCompany(siret);
+  const { company: currentCompany, loading: loadingCompany } =
+    useMyCompany(siret);
   const { defaultOrgId, permissionsInfos } = usePermissions(siret);
 
   const navigate = useNavigate();
@@ -77,21 +78,24 @@ function DashboardRoutes() {
     );
   }, [navigate, siret]);
 
-  if (!user) {
+  if (!user || loadingCompany) {
     return <Loader />;
   }
 
   // if the user is not part of the company whose siret is in the url
   // redirect them to their first company or account if they're not part of any company
   if (!currentCompany) {
+    const isDriverForOrg = permissionsInfos.orgPermissionsInfos.some(
+      orgPermission =>
+        orgPermission.orgId === defaultOrgId &&
+        orgPermission.role === UserRole.Driver
+    );
     return (
       <Navigate
         to={
           defaultOrgId
             ? generatePath(
-                permissionsInfos.orgPermissionsInfos
-                  .find(infos => infos.orgId === defaultOrgId)
-                  ?.role?.includes(UserRole.Driver)
+                isDriverForOrg
                   ? routes.dashboard.transport.toCollect
                   : routes.dashboard.bsds.index,
                 {

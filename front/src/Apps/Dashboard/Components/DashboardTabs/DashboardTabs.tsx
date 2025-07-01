@@ -42,7 +42,8 @@ const DashboardTabs = ({ currentCompany }: DashboardTabsProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const {
-    orgPermissions: { permissions, role }
+    orgPermissions: { permissions, role },
+    permissionsInfos
   } = usePermissions(currentCompany.orgId);
   const navigate = useNavigate();
 
@@ -62,18 +63,22 @@ const DashboardTabs = ({ currentCompany }: DashboardTabsProps) => {
 
   const handleCompanyChange = useCallback(
     orgId => {
-      navigate(
-        generatePath(
-          role?.includes(UserRole.Driver)
-            ? routes.dashboard.transport.toCollect
-            : routes.dashboard.bsds.index,
-          {
-            siret: orgId
-          }
-        )
+      const isDriverForOrg = permissionsInfos.orgPermissionsInfos.some(
+        orgPermission =>
+          orgPermission.orgId === orgId &&
+          orgPermission.role === UserRole.Driver
       );
+      const path = generatePath(
+        isDriverForOrg
+          ? routes.dashboard.transport.toCollect
+          : routes.dashboard.bsds.index,
+        {
+          siret: orgId
+        }
+      );
+      navigate(path);
     },
-    [navigate, role]
+    [navigate, permissionsInfos]
   );
 
   const handleToggle = () => {
