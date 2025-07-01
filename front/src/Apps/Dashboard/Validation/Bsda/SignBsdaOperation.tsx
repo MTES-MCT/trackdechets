@@ -12,7 +12,7 @@ import {
   QueryBsdaArgs
 } from "@td/codegen-ui";
 import { subMonths } from "date-fns";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
@@ -114,7 +114,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   >(SIGN_BsDA);
 
   const title = "Signer le traitement";
-  const TODAY = new Date();
+  const TODAY = useMemo(() => new Date(), []);
 
   const initialState = {
     date: datetimeToYYYYMMDDHHSS(TODAY),
@@ -148,13 +148,10 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
   };
 
   const operationCode = watch("destination.operation.code");
-  const operationDate = watch("destination.operation.date");
 
   useEffect(() => {
-    if (!operationDate) {
-      setValue("destination.operation.date", datetimeToYYYYMMDD(TODAY));
-    }
-  }, [TODAY, operationDate, setValue]);
+    setValue("destination.operation.date", datetimeToYYYYMMDD(TODAY));
+  }, [TODAY, setValue]);
 
   const onSubmit = async data => {
     const { author, date, ...update } = data;
