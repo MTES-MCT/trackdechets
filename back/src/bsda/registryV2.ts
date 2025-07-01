@@ -36,6 +36,7 @@ import {
 import { prisma } from "@td/prisma";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { logger } from "@td/logger";
+import { bsdaWasteQuantities } from "./utils";
 
 const getQuantity = (packagings: Prisma.JsonValue) => {
   if (!packagings || !(packagings as PackagingInfo[])?.length) {
@@ -226,6 +227,10 @@ export const toIncomingWasteV2 = (
     country: emitterCompanyCountry
   } = splitAddress(bsda.emitterCompanyAddress);
 
+  const wasteQuantities = bsdaWasteQuantities(bsda);
+  const quantityAccepted = wasteQuantities?.quantityAccepted ?? null;
+  const quantityRefused = wasteQuantities?.quantityRefused ?? null;
+
   return {
     ...emptyIncomingWasteV2,
     id: bsda.id,
@@ -332,13 +337,12 @@ export const toIncomingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
-    destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
-      ? bsda.destinationReceptionRefusedWeight
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
+    destinationReceptionRefusedWeight: quantityRefused
+      ? quantityRefused.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    destinationReceptionAcceptedWeight: null,
+    destinationReceptionAcceptedWeight: quantityAccepted
+      ? quantityAccepted.dividedBy(1000).toDecimalPlaces(6).toNumber()
+      : null,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
