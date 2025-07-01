@@ -156,9 +156,12 @@ export function ExportModal() {
               />
             ) : (
               <RegistryCompanySwitcher
-                onCompanySelect={(orgId, isDelegation) => {
-                  setValue("companyOrgId", orgId);
+                setIsDelegation={isDelegation => {
                   setValue("isDelegation", isDelegation);
+                  setValue("delegateSiret", null);
+                }}
+                onCompanySelect={orgId => {
+                  setValue("companyOrgId", orgId);
                   setValue("delegateSiret", null);
                 }}
                 wrapperClassName={"tw-relative"}

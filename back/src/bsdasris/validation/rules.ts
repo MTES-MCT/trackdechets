@@ -297,7 +297,6 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
     sealed: {
       from: "TRANSPORT"
     },
-    required: { from: "TRANSPORT" },
     path: ["transporter", "company", "mail"]
   },
   transporterRecepisseNumber: {
