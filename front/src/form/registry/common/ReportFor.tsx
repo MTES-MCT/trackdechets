@@ -24,7 +24,6 @@ type Props = {
   disabled?: boolean;
   onCompanySelect?: (
     orgId: string,
-    isDelegation: boolean,
     setValue: UseFormSetValue<any>,
     company?: RegistryCompanyInfos
   ) => void;
@@ -81,14 +80,9 @@ export function ReportFor({
               defaultSiret={field.value}
               disabled={disabled}
               setIsDelegation={setIsDelegation}
-              onCompanySelect={(siret, isDelegation, company) => {
+              onCompanySelect={(siret, company) => {
                 field.onChange(siret);
-                onCompanySelect?.(
-                  siret,
-                  isDelegation,
-                  methods.setValue,
-                  company
-                );
+                onCompanySelect?.(siret, methods.setValue, company);
               }}
             />
           )}
