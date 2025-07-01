@@ -96,7 +96,12 @@ export function BsdaPicker({ name, bsdaId }: Props) {
   }
 
   function onForwardingChange(bsda: Bsda) {
-    setFieldValue("weight.value", bsda?.destination?.reception?.weight ?? 0);
+    setFieldValue(
+      "weight.value",
+      bsda?.destination?.reception?.acceptedWeight ??
+        bsda?.destination?.reception?.weight ??
+        0
+    );
     setFieldValue(
       "waste.sealNumbers",
       bsda?.waste?.sealNumbers ?? initialState!.waste!.sealNumbers
