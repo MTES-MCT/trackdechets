@@ -331,6 +331,8 @@ export const FullBsdaFragment = gql`
         }
         reception {
           weight
+          refusedWeight
+          acceptedWeight
         }
       }
     }
