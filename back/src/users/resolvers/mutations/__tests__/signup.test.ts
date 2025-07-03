@@ -18,7 +18,7 @@ jest.mock("@td/prisma", () => ({
     user: {
       create: jest.fn(() => Promise.resolve(userInfos)),
       update: jest.fn(() => Promise.resolve(userInfos)),
-      findUnique: jest.fn(() => Promise.resolve(userInfos)),
+      findUnique: jest.fn(() => Promise.resolve(null)),
       findFirst: jest.fn(() => Promise.resolve(null)),
       findMany: jest.fn(() => Promise.resolve([])),
       count: jest.fn(() => Promise.resolve(0))

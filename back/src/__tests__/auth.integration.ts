@@ -7,6 +7,7 @@ import { app, sess } from "../server";
 import { getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";
 import { TOTP } from "totp-generator";
+import { clearUserLoginNeedsCaptcha } from "../common/redis/captcha";
 
 const { UI_HOST } = process.env;
 
@@ -20,7 +21,9 @@ const cookieRegExp = new RegExp(
 );
 
 describe("POST /login", () => {
-  afterEach(() => resetDatabase());
+  beforeEach(() => clearUserLoginNeedsCaptcha("user_1@td.io"));
+
+  afterEach(async () => resetDatabase());
 
   it("create a persistent session if login form is valid", async () => {
     const user = await userFactory();
