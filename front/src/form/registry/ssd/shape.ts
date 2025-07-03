@@ -19,7 +19,7 @@ import {
   booleanString
 } from "../builder/validation";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 
 export const ssdFormShape: FormShape = [
   {
@@ -31,6 +31,7 @@ export const ssdFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -82,6 +83,7 @@ export const ssdFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -99,6 +101,28 @@ export const ssdFormShape: FormShape = [
           secondaryWasteDescriptions: z
             .array(z.object({ value: optionalString }))
             .transform(arr => arr.map(({ value }) => value))
+        }
+      },
+      {
+        name: "administrativeActReference",
+        shape: "generic",
+        type: "select",
+        label: Labels.administrativeActReference,
+        defaultOption: "Sélectionnez une référence",
+        required: true,
+        validation: {
+          administrativeActReference: nonEmptyString
+        },
+        style: { className: "fr-col-4" },
+        choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
+          label: reference,
+          value: reference
+        })),
+        infoText: (selectedAct: string | null) => {
+          if (selectedAct) {
+            return ADMINISTRATIVE_ACT_EXPLANATIONS[selectedAct];
+          }
+          return null;
         }
       }
     ]
@@ -127,35 +151,6 @@ export const ssdFormShape: FormShape = [
           volume: optionalNumber,
           weightIsEstimate: booleanString
         }
-      },
-      {
-        shape: "layout",
-        fields: [
-          {
-            name: "useDate",
-            shape: "generic",
-            label: Labels.useDate,
-            required: true,
-            validation: {
-              useDate: optionalString
-            },
-            type: "date",
-            style: { className: "fr-col-4" }
-          },
-          {
-            name: "dispatchDate",
-            shape: "generic",
-            label: Labels.dispatchDate,
-            required: true,
-            validation: {
-              dispatchDate: optionalString
-            },
-            type: "date",
-            style: { className: "fr-col-4" }
-          }
-        ],
-        infoText:
-          "Merci de renseigner une date d'utilisation ou une date d'expédition"
       },
       {
         shape: "layout",
@@ -197,34 +192,12 @@ export const ssdFormShape: FormShape = [
           operationMode: optionalString
         },
         shape: "custom"
-      },
-      {
-        name: "administrativeActReference",
-        shape: "generic",
-        type: "select",
-        label: Labels.administrativeActReference,
-        defaultOption: "Sélectionnez une référence",
-        required: true,
-        validation: {
-          administrativeActReference: nonEmptyString
-        },
-        style: { className: "fr-col-4" },
-        choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
-          label: reference,
-          value: reference
-        })),
-        infoText: (selectedAct: string | null) => {
-          if (selectedAct) {
-            return ADMINISTRATIVE_ACT_EXPLANATIONS[selectedAct];
-          }
-          return null;
-        }
       }
     ]
   },
   {
     tabId: "destination",
-    tabTitle: "Destinataire",
+    tabTitle: "Produit",
     fields: [
       {
         Component: CompanySelector,
@@ -253,6 +226,35 @@ export const ssdFormShape: FormShape = [
           "destinationCompanyCity",
           "destinationCompanyCountryCode"
         ]
+      },
+      {
+        shape: "layout",
+        fields: [
+          {
+            name: "useDate",
+            shape: "generic",
+            label: Labels.useDate,
+            required: true,
+            validation: {
+              useDate: optionalString
+            },
+            type: "date",
+            style: { className: "fr-col-4" }
+          },
+          {
+            name: "dispatchDate",
+            shape: "generic",
+            label: Labels.dispatchDate,
+            required: true,
+            validation: {
+              dispatchDate: optionalString
+            },
+            type: "date",
+            style: { className: "fr-col-4" }
+          }
+        ],
+        infoText:
+          "Renseigner une date d'utilisation sur le site ou date d'expédition"
       }
     ]
   }
