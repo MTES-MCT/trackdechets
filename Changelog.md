@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Changement de la validation de présence d'entreprise de travaux BSDA [PR 4302](https://github.com/MTES-MCT/trackdechets/pull/4302)
+- Traduction du message d'erreur de date de validité de récépissé [PR 4303](https://github.com/MTES-MCT/trackdechets/pull/4303)
 
 # [2025.07.1] 01/07/2025
 
