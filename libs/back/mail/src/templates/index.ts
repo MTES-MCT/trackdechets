@@ -20,6 +20,12 @@ export const onSignup: MailTemplate<{ activationHash: string }> = {
   templateId: templateIds.LAYOUT
 };
 
+export const onSignupExistingUser: MailTemplate = {
+  subject: "Vous avez déjà un compte sur Trackdéchets",
+  body: mustacheRenderer("confirmation-de-compte-existant.html"),
+  templateId: templateIds.LAYOUT
+};
+
 export const inviteUserToJoin: MailTemplate<{
   hash: string;
   companyName: string;
