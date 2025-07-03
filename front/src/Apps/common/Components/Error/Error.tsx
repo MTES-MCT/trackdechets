@@ -65,13 +65,29 @@ export function NotificationError({ apolloError, className, message }: Props) {
 }
 
 export function DsfrNotificationError({ apolloError, message }: Props) {
+  // Format error so that \n are transformed into divs with confortable spacing
+  // Note: css `white-space: pre-line;` would achieve the same but we would have
+  // no control on the spacing between lines.
+  const formatError = error => {
+    const errors = error.message.split("\n");
+    return (
+      <>
+        {errors.map(e => (
+          <div className="fr-mt-1w">{e}</div>
+        ))}
+      </>
+    );
+  };
+
   return (
     <ErrorProvider apolloError={apolloError}>
       {({ error, idx }) => (
         <Alert
           key={`${idx}-${error.message}`}
           title="Erreur"
-          description={message ? message(apolloError) : error.message}
+          description={
+            message ? message(apolloError) : formatError(apolloError)
+          }
           severity="error"
         />
       )}
