@@ -15,11 +15,7 @@ jest.mock("../../../../mailer/mailing");
 
 const SIGNUP = `
   mutation SignUp($userInfos: SignupInput!) {
-    signup(userInfos: $userInfos) {
-      email
-      name
-      phone
-    }
+    signup(userInfos: $userInfos)
   }
 `;
 
@@ -76,16 +72,17 @@ describe("Mutation.signup", () => {
   it("should return the same result if email already exist", async () => {
     const alreadyExistingUser = await userFactory();
 
-    const { data } = await mutate(SIGNUP, {
+    const { data, errors } = await mutate(SIGNUP, {
       variables: {
         userInfos: {
           email: alreadyExistingUser.email,
-          password: "newUserPassword",
+          password: "newUserPassword&",
           name: alreadyExistingUser.name,
           phone: alreadyExistingUser.phone
         }
       }
     });
+    console.log(errors);
     expect(data.signup).toEqual(true);
   });
 
