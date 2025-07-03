@@ -49,9 +49,9 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup({ userInfos });
+    const res = await signup({ userInfos });
 
-    expect(user.id).toBe("new_user");
+    expect(res).toBe(true);
   });
 
   test("should create activation hash", async () => {
