@@ -13,6 +13,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Traduction du message d'erreur de date de validité de récépissé [PR 4303](https://github.com/MTES-MCT/trackdechets/pull/4303)
 - Changements divers sur formulaires de déclaration [PR 4310](https://github.com/MTES-MCT/trackdechets/pull/4310)
 
+#### :bug: Corrections de bugs
+
+- Modification de signup/signin pour éviter l'énumération [PR 4306](https://github.com/MTES-MCT/trackdechets/pull/4306)
+
 # [2025.07.1] 01/07/2025
 
 #### :nail_care: Améliorations
