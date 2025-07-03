@@ -637,7 +637,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   workerIsDisabled: {
     readableFieldName: "La présence d'une entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
       // il s'agit d'une collecte sur un chantier et workerIsDisabled est à true
