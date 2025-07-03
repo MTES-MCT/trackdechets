@@ -18,7 +18,13 @@ import countries, { Country } from "world-countries";
 import { todayAtMidnight } from "../utils";
 
 export const receiptSchema = yup.object().shape({
-  validityLimit: yup.date().min(todayAtMidnight()).required()
+  validityLimit: yup
+    .date()
+    .min(
+      todayAtMidnight(),
+      "La limite de validité du récépissé doit être dans le futur"
+    )
+    .required()
 });
 
 export function isCollector(company: Company) {
