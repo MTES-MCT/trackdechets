@@ -134,12 +134,6 @@ passport.use(
         });
       }
 
-      if (!user.isActive) {
-        return done(null, false, {
-          ...getLoginError(username).NOT_ACTIVATED
-        });
-      }
-
       const needsTotp = !!user.totpActivatedAt && !!user.totpSeed;
 
       const passwordValid = await compare(password, user.password);
@@ -147,6 +141,11 @@ passport.use(
       if (passwordValid) {
         await clearUserLoginNeedsCaptcha(user.email);
 
+        if (!user.isActive) {
+          return done(null, false, {
+            ...getLoginError(username).NOT_ACTIVATED
+          });
+        }
         if (needsTotp) {
           // we redirect to the totp page without logging the user in.
           // We store their email in a short-lived session to be retrieved on the 2nd factor page

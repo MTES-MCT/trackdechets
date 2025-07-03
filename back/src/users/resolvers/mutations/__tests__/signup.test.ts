@@ -18,6 +18,7 @@ jest.mock("@td/prisma", () => ({
     user: {
       create: jest.fn(() => Promise.resolve(userInfos)),
       update: jest.fn(() => Promise.resolve(userInfos)),
+      findUnique: jest.fn(() => Promise.resolve(null)),
       findFirst: jest.fn(() => Promise.resolve(null)),
       findMany: jest.fn(() => Promise.resolve([])),
       count: jest.fn(() => Promise.resolve(0))
@@ -49,9 +50,9 @@ describe("signup", () => {
   });
 
   test("should create user", async () => {
-    const user = await signup({ userInfos });
+    const res = await signup({ userInfos });
 
-    expect(user.id).toBe("new_user");
+    expect(res).toBe(true);
   });
 
   test("should create activation hash", async () => {
