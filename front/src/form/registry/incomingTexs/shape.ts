@@ -22,7 +22,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
 import { WeightSelector } from "../common/WeightSelector";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 
 export const incomingTexsFormShape: FormShape = [
@@ -35,6 +35,7 @@ export const incomingTexsFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -64,11 +65,11 @@ export const incomingTexsFormShape: FormShape = [
         Component: WasteCodeSelector,
         props: {
           name: "wasteCode",
-          whiteList: INCOMING_TEXS_WASTE_CODES
+          whiteList: INCOMING_TEXS_WASTE_CODES,
+          required: false
         },
         shape: "custom",
         names: ["wasteCode"],
-        required: false,
         validation: {
           wasteCode: optionalString
         },
@@ -77,7 +78,7 @@ export const incomingTexsFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label: Labels.wasteDescription,
+        label: Labels.wasteDescriptionTexs,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -89,6 +90,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -203,6 +205,7 @@ export const incomingTexsFormShape: FormShape = [
         name: "sisIdentifier",
         shape: "generic",
         label: Labels.sisIdentifier,
+        infoLabel: InfoLabels.sisIdentifier,
         validation: {
           sisIdentifier: optionalString
         },
@@ -397,7 +400,7 @@ export const incomingTexsFormShape: FormShape = [
         shape: "generic",
         type: "checkbox",
         label: Labels.isUpcycled,
-        required: false,
+        required: true,
         validation: {
           isUpcycled: booleanString
         }

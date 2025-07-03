@@ -14,6 +14,7 @@ import { StatutDiffusionEtablissement } from "@td/codegen-ui";
 type Props = {
   prefix: string;
   label: string;
+  infoText?: string;
   methods: UseFormReturn<any>;
   excludeTypes?: string[];
   required?: boolean;
@@ -32,6 +33,7 @@ export const COMPANY_TYPES = {
 export function CompanySelector({
   prefix,
   label,
+  infoText,
   excludeTypes,
   required,
   methods,
@@ -171,6 +173,11 @@ export function CompanySelector({
               prefix={prefix}
             />
           )}
+        </div>
+      )}
+      {infoText && (
+        <div className="fr-mt-5v">
+          <Alert description={infoText} severity="info" small />
         </div>
       )}
     </div>
