@@ -5,14 +5,9 @@ import * as yup from "yup";
 import { sendMail } from "../../../mailer/mailing";
 import type { MutationResolvers, MutationSignupArgs } from "@td/codegen-back";
 import { sanitizeEmail } from "../../../utils";
-import {
-  acceptNewUserCompanyInvitations,
-  userExists,
-  createUser
-} from "../../database";
+import { acceptNewUserCompanyInvitations, createUser } from "../../database";
 import { hashPassword, checkPasswordCriteria } from "../../utils";
-import { onSignup, renderMail } from "@td/mail";
-import { UserInputError } from "../../../common/errors";
+import { onSignup, onSignupExistingUser, renderMail } from "@td/mail";
 
 function validateArgs(args: MutationSignupArgs) {
   const signupSchema = yup.object({
@@ -41,11 +36,19 @@ function validateArgs(args: MutationSignupArgs) {
 export async function signupFn({
   userInfos: { name, password, phone, email: unsafeEmail }
 }: MutationSignupArgs) {
-  const exists = await userExists(unsafeEmail);
-  if (exists) {
-    throw new UserInputError(
-      "Impossible de créer cet utilisateur. Cet email a déjà un compte"
+  // add a random delay to avoid leaking the existence of an account
+  // by timing attacks
+  await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+  const existingUser = await prisma.user.findUnique({
+    where: { email: sanitizeEmail(unsafeEmail) }
+  });
+  if (existingUser) {
+    await sendMail(
+      renderMail(onSignupExistingUser, {
+        to: [{ name: existingUser.name, email: existingUser.email }]
+      })
     );
+    return true;
   }
 
   const hashedPassword = await hashPassword(password);
@@ -69,12 +72,7 @@ export async function signupFn({
     })
   );
 
-  return {
-    ...user,
-    // companies are resolved through a separate resolver (User.companies)
-    companies: [],
-    featureFlags: []
-  };
+  return true;
 }
 
 const signupResolver: MutationResolvers["signup"] = async (parent, args) => {
