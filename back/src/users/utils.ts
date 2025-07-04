@@ -7,10 +7,16 @@ import zxcvbn from "zxcvbn";
 import { UserInputError } from "../common/errors";
 
 const saltRound = 10;
-export const minimalPasswordLength = 10; // update frontend validation if this value is edited
+export const minimalPasswordLength = 12; // update frontend validation if this value is edited
 const maximalPasswordLength = 64; // prevent dos attack with insanely long passwords
 const minimalPasswordScore = 3; // ensure there is at least 8 different characters in password
 export const passwordVersion = 2; // 11/2022
+const CHAR_CLASSES_REGEX = {
+  lower: /[a-z]/,
+  upper: /[A-Z]/,
+  number: /[0-9]/,
+  special: /[^a-zA-Z0-9]/
+};
 
 export function isPasswordLongEnough(password: string): boolean {
   return password.length >= minimalPasswordLength;
@@ -18,6 +24,10 @@ export function isPasswordLongEnough(password: string): boolean {
 
 export function isPasswordShortEnough(password: string): boolean {
   return password.length <= maximalPasswordLength;
+}
+
+export function isPasswordContainingAllCharClasses(password: string): boolean {
+  return Object.values(CHAR_CLASSES_REGEX).every(regex => regex.test(password));
 }
 
 export function isPasswordStrongEnough(password: string): boolean {
@@ -33,6 +43,7 @@ export function hashPassword(password: string) {
  * Check password meets our criteria
  * - min length
  * - max length
+ * - at least one of each character class (lower, upper, number, special)
  * - entropy (zxcvbn score >= 3)
  * @param trimmedPassword
  */
@@ -49,6 +60,14 @@ export function checkPasswordCriteria(trimmedPassword: string) {
   if (!isPasswordShortEnough(trimmedPassword)) {
     throw new UserInputError(
       `Le mot de passe est trop long.(Il fait ${passwordLength} caractères, le maximum est de ${maximalPasswordLength} caractères)`,
+      {
+        invalidArgs: ["newPassword"]
+      }
+    );
+  }
+  if (!isPasswordContainingAllCharClasses(trimmedPassword)) {
+    throw new UserInputError(
+      `Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial.`,
       {
         invalidArgs: ["newPassword"]
       }
