@@ -1,4 +1,4 @@
-import { dateToXMonthAtHHMM } from "../helpers";
+import { dateToXMonthAtHHMM, getSafeReturnTo } from "../helpers";
 
 describe("dateToXMonthAtHHMM", () => {
   test("should return date formatted as 'X mois YYYY à HH:mm", () => {
@@ -7,5 +7,25 @@ describe("dateToXMonthAtHHMM", () => {
 
     // Then
     expect(result).toBe("8 juillet 2024 à 17:49");
+  });
+});
+
+describe("getSafeReturnTo", () => {
+  test("should return the safe returnTo URL if it is valid", () => {
+    const result = getSafeReturnTo("/dashboard", "https://example.com");
+    expect(result).toBe("/dashboard");
+  });
+
+  test("should return '/' if the returnTo URL is not valid", () => {
+    const result = getSafeReturnTo(
+      "https://malicious.com",
+      "https://example.com"
+    );
+    expect(result).toBe("/");
+  });
+
+  test("should return '/' if the returnTo URL is not valid", () => {
+    const result = getSafeReturnTo("@google.fr", "https://example.com");
+    expect(result).toBe("/");
   });
 });
