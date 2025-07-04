@@ -177,6 +177,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
         contact: bsdasri.destinationCompanyContact
       }),
       customInfo: bsdasri.destinationCustomInfo,
+      cap: bsdasri.destinationCap,
       reception: nullIfNoValues<BsdasriReception>({
         volume: bsdasri.destinationReceptionWasteVolume,
         packagings: bsdasri.destinationWastePackagings as BsdasriPackaging[],
@@ -558,6 +559,7 @@ function flattenDestinationInput(input: {
       chain(r.company, c => c.mail)
     ),
     destinationCustomInfo: chain(input.destination, e => e.customInfo),
+    destinationCap: chain(input.destination, e => e.cap),
     ...flattenReceptionInput(input.destination),
     ...flattenOperationInput(input.destination)
   };

@@ -592,4 +592,84 @@ describe("Mutation.createDasri", () => {
       "Un transporteur étranger ne peut pas créer de BSDASRI de synthèse"
     );
   });
+
+  it("cannot create a synthesis dasri with a destination CAP", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "el transporteur",
+      address: "playa del mar",
+      companyTypes: {
+        set: ["COLLECTOR", "TRANSPORTER"]
+      }
+    });
+
+    const toAssociate1 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SENT,
+        emitterCompanySiret: siretify(1),
+        transporterCompanySiret: company.siret,
+        destinationCompanySiret: siretify(2),
+        destinationOperationCode: "D9",
+        transporterWastePackagings: [
+          { type: "BOITE_CARTON", volume: 10, quantity: 3 }
+        ],
+        transporterWasteVolume: 100
+      }
+    });
+
+    const toAssociate2 = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SENT,
+        emitterCompanySiret: siretify(3),
+        transporterCompanySiret: company.siret,
+        destinationCompanySiret: siretify(4),
+        destinationOperationCode: "D10",
+        transporterWastePackagings: [
+          { type: "BOITE_CARTON", volume: 10, quantity: 6 },
+          { type: "FUT", volume: 100, quantity: 3 }
+        ],
+        transporterWasteVolume: 30
+      }
+    });
+
+    const destinationCompanyInfos = await getDestinationCompanyInfo({
+      cap: "DEST-CAP"
+    });
+
+    const input = {
+      waste: {
+        adr: "xyz 33",
+        code: "18 01 03*"
+      },
+      transporter: {
+        company: {
+          name: "le transporteur",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          mail: "transporteur@test.fr",
+          address: "avenue de la mer"
+        }
+      },
+      ...destinationCompanyInfos,
+      synthesizing: [toAssociate1.id, toAssociate2.id]
+    };
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous ne pouvez pas renseigner le CAP de la destination sur les DASRI de synthèse."
+    );
+  });
 });

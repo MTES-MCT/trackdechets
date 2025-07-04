@@ -4,9 +4,10 @@ import { getcompanyCountry } from "../../../companies/validation";
 
 type FormCompanyFieldsProps = {
   company?: FormCompany | null;
+  cap?: string | null;
 };
 
-export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
+export function FormCompanyFields({ company, cap }: FormCompanyFieldsProps) {
   const companyCountry = getcompanyCountry(company);
 
   return (
@@ -50,6 +51,12 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         Mail (facultatif) : {company?.mail}
         <br />
         Personne à contacter : {company?.contact}
+        {cap && (
+          <>
+            <br />
+            CAP : {cap}
+          </>
+        )}
       </p>
     </>
   );

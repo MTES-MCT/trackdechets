@@ -67,6 +67,7 @@ const getInitialState = (f?: Bsdasri | null) => ({
   destination: {
     company: getInitialCompany(),
     customInfo: "",
+    cap: null,
     reception: {
       packagings: [],
       acceptation: null,
