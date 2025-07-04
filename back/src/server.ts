@@ -310,7 +310,7 @@ export const sess: session.SessionOptions = {
     httpOnly: true,
     sameSite: "lax",
     domain: SESSION_COOKIE_HOST || UI_HOST,
-    maxAge: 2 * 3600 * 1000
+    maxAge: 4 * 3600 * 1000
   }
 };
 
