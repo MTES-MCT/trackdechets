@@ -93,7 +93,7 @@ describe("redactOrShowEmail", () => {
 });
 
 describe("generatePassword", () => {
-  it("should generate a 10 characters password", () => {
+  it("should generate a 12 characters password", () => {
     const pw = generatePassword();
     expect(pw.length).toEqual(minimalPasswordLength);
     expect(pw.toLowerCase()).toEqual(pw); // is lowercased ?
@@ -102,7 +102,7 @@ describe("generatePassword", () => {
 
 describe("checkPasswordCriteria", () => {
   it("should accept a strong password", () => {
-    checkPasswordCriteria("trackdechets#");
+    checkPasswordCriteria("Trackdechets1#");
   });
 
   it("should throw on short passwords", () => {

@@ -46,11 +46,20 @@ app.use(
         imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
-        mediaSrc: ["'self'", "data:"]
+        mediaSrc: ["'self'", "data:"],
+        requireTrustedTypesFor: ["'script'", "style"]
       }
     }
   })
 );
+
+app.use((_, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "accelerometer=(), geolocation=(), fullscreen=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=()"
+  );
+  next();
+});
 
 const directory = path.join(__dirname, "../../../../../front");
 app.use(express.static(directory));

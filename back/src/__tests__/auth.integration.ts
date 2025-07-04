@@ -16,7 +16,7 @@ const loginError = getLoginError("Some User");
 const cookieRegExp = new RegExp(
   `${sess.name}=(.+); Domain=${
     sess.cookie!.domain
-  }; Path=/; Expires=.+; HttpOnly`
+  }; Path=/; Expires=.+; HttpOnly; SameSite=Lax`
 );
 
 describe("POST /login", () => {
@@ -195,8 +195,11 @@ describe("POST /login", () => {
       .send(`email=${user.email.toUpperCase()}`)
       .send(`password=invalidPwd`);
 
-    // should not set a session cookie
-    expect(login.header["set-cookie"]).toBeUndefined();
+    // should not set a new session cookie
+    // but as sessions are rolling, we should keep the previous one
+    const sessionCookie = nonAdminLogin.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+    expect(login.header["set-cookie"][0]).toContain(cookieValue);
 
     // should redirect to /login with error message
     expect(login.status).toBe(302);
@@ -309,7 +312,8 @@ describe("Second factor", () => {
     expect(secondFactor.header.location).toBe(
       `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
     );
-    expect(secondFactor.header["set-cookie"]).toBeUndefined();
+    // rolling session cookie should be kept
+    expect(secondFactor.header["set-cookie"][0]).toContain(cookieValue);
 
     // the user is not authenticated yet
     const res = await request

@@ -36,3 +36,15 @@ export const areDefined = (...obj: any[]) => {
   if (obj.some(o => !isDefined(o))) return false;
   return true;
 };
+
+export function getSafeReturnTo(returnTo: string, base: string) {
+  try {
+    const url = new URL(`${base}${returnTo}`);
+    if (url.origin === new URL(base).origin) {
+      return returnTo;
+    }
+    return "/";
+  } catch (_) {
+    return "/";
+  }
+}

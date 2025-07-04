@@ -7,7 +7,7 @@ import { renderMail, onSignup } from "@td/mail";
 import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
 
-const viablePassword = "trackdechets#";
+const viablePassword = "Trackdechets1#";
 
 // No mails
 jest.mock("../../../../mailer/mailing");

@@ -62,7 +62,7 @@ describe("changePassword", () => {
       "userId",
       {
         oldPassword: "oldPassword",
-        newPassword: "trackdechets#"
+        newPassword: "Trackdechets1#"
       },
       "xyz"
     );

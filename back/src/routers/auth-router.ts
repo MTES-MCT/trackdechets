@@ -7,6 +7,7 @@ import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
 import { storeUserSessionsId } from "../common/redis/users";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
+import { getSafeReturnTo } from "../common/helpers";
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -43,7 +44,9 @@ authRouter.post(
             errorCode: info?.code ?? "",
             username: info?.username ?? ""
           },
-          ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
+          ...(req.body.returnTo
+            ? { returnTo: getSafeReturnTo(req.body.returnTo, UI_BASE_URL) }
+            : {})
         };
         return res.redirect(
           `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
@@ -51,7 +54,7 @@ authRouter.post(
       }
       req.logIn(user, () => {
         storeUserSessionsId(user.id, req.session.id);
-        const returnTo = req.body.returnTo || "/";
+        const returnTo = getSafeReturnTo(req.body.returnTo, UI_BASE_URL);
         return res.redirect(`${UI_BASE_URL}${returnTo}`);
       });
     })(req, res, next);
@@ -68,7 +71,9 @@ authRouter.post("/otp", (req, res, next) => {
         ...{
           errorCode: info.code
         },
-        ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})
+        ...(req.body.returnTo
+          ? { returnTo: getSafeReturnTo(req.body.returnTo, UI_BASE_URL) }
+          : {})
       };
       if (info.code === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
         return res.redirect(
@@ -81,7 +86,7 @@ authRouter.post("/otp", (req, res, next) => {
     }
     req.logIn(user, () => {
       storeUserSessionsId(user.id, req.session.id);
-      const returnTo = req.body.returnTo || "/";
+      const returnTo = getSafeReturnTo(req.body.returnTo, UI_BASE_URL);
       return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });
   })(req, res, next);
