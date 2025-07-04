@@ -17,7 +17,7 @@ const RESET_PASSWORD = `
     resetPassword(newPassword:$newPassword, hash: $hash )
   }
 `;
-const viablePassword = "trackdechets#";
+const viablePassword = "Trackdechets1#";
 
 describe("mutation resetPassword", () => {
   afterEach(resetDatabase);
@@ -268,7 +268,7 @@ describe("mutation resetPassword", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le mot de passe est trop court (Il fait 4 caractères, le minimum est de 10 caractères)`
+        message: `Le mot de passe est trop court (Il fait 4 caractères, le minimum est de 12 caractères)`
       })
     ]);
 

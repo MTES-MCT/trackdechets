@@ -84,11 +84,11 @@ export function checkPasswordCriteria(trimmedPassword: string) {
 }
 
 /**
- * Generates a cryptographically-sure random 10 characters password
+ * Generates a cryptographically-sure random 12 characters password
  */
 export function generatePassword(): string {
-  const randomHex = crypto.randomBytes(7).toString("hex");
-  return base32Encode(parseInt(randomHex, 16)).slice(-10).toLocaleLowerCase();
+  const randomHex = crypto.randomBytes(8).toString("hex");
+  return base32Encode(parseInt(randomHex, 16)).slice(-12).toLocaleLowerCase();
 }
 
 export const getEmailDomain = email =>
