@@ -361,7 +361,10 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
             <p>
               <strong>3. Installation de destination</strong>
             </p>
-            <FormCompanyFields company={bsdasri.destination?.company} />
+            <FormCompanyFields
+              company={bsdasri.destination?.company}
+              cap={bsdasri.destination?.cap}
+            />
           </div>
           <div className="BoxCol">
             <p>

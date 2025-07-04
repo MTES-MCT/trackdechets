@@ -255,7 +255,7 @@ export const createMembershipRequest = async (
 /**
  * Returns the destination info for a BSD
  */
-export const getDestinationCompanyInfo = async () => {
+export const getDestinationCompanyInfo = async (destinationOpt = {}) => {
   const destinationCompany = await companyFactory();
   return {
     destination: {
@@ -265,7 +265,8 @@ export const getDestinationCompanyInfo = async () => {
         phone: destinationCompany.contactPhone,
         siret: destinationCompany.siret,
         contact: destinationCompany.contact
-      }
+      },
+      ...destinationOpt
     }
   };
 };

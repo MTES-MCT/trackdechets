@@ -216,7 +216,7 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     bsdSubType: getBsdasriSubType(bsdasri),
     status: bsdasri.status,
     customId: null,
-    destinationCap: null,
+    destinationCap: bsdasri.destinationCap,
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
@@ -266,6 +266,8 @@ export function toIncomingWaste(
   bsdasri: RegistryBsdasri
 ): Required<IncomingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
+
+  console.log("bsdasri", bsdasri);
 
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing

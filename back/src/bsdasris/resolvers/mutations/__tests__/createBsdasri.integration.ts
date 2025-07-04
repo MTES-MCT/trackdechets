@@ -189,7 +189,7 @@ describe("Mutation.createDasri", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
       CREATE_DASRI,
       {
         variables: {
@@ -197,7 +197,6 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-    console.log(errors);
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
@@ -233,6 +232,158 @@ describe("Mutation.createDasri", () => {
     expect(created.groupingEmitterSirets).toEqual([]);
     expect(created.emitterCompanyName).toEqual(emitter.name);
     expect(created.emitterCompanyAddress).toEqual(emitter.address);
+  });
+
+  describe("[TRA-16173] Destination CAP", () => {
+    it("create a dasri with a destination CAP", async () => {
+      // Given
+      const { user, company: emitter } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          name: "PRED-COMPANY",
+          address: "PRED-ADDRESS"
+        }
+      );
+      const transporter = await companyFactory({ name: "TRS-NAME" });
+      const destination = await companyFactory({ name: "DEST-NAME" });
+      const input = {
+        waste: { adr: "xyz 33", code: "18 01 03*" },
+        emitter: {
+          company: {
+            siret: emitter.siret,
+            name: "Emitter",
+            contact: "jean durand",
+            phone: "06 18 76 02 00",
+            // email not required
+            address: "avenue de la mer"
+          },
+          emission: {
+            weight: { value: 23.2, isEstimate: false },
+            packagings: [
+              {
+                type: "BOITE_CARTON",
+                volume: 22,
+                quantity: 3
+              }
+            ]
+          }
+        },
+        transporter: {
+          company: {
+            siret: transporter.siret,
+            name: "Transporter",
+            contact: "jean valjean",
+            phone: "06 18 76 02 00"
+          }
+        },
+        destination: {
+          cap: "DESTINATION-CAP",
+          company: {
+            siret: destination.siret,
+            name: "Destination",
+            address: "Destination address",
+            contact: "jean tourloupe",
+            phone: "06 18 76 02 00"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+        CREATE_DASRI,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsdasri?.destination?.cap).toEqual("DESTINATION-CAP");
+
+      const dasri = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: data.createBsdasri?.id }
+      });
+
+      expect(dasri.destinationCap).toBe("DESTINATION-CAP");
+    });
+
+    it("create a dasri without a destination CAP", async () => {
+      // Given
+      const { user, company: emitter } = await userWithCompanyFactory(
+        "MEMBER",
+        {
+          name: "PRED-COMPANY",
+          address: "PRED-ADDRESS"
+        }
+      );
+      const transporter = await companyFactory({ name: "TRS-NAME" });
+      const destination = await companyFactory({ name: "DEST-NAME" });
+      const input = {
+        waste: { adr: "xyz 33", code: "18 01 03*" },
+        emitter: {
+          company: {
+            siret: emitter.siret,
+            name: "Emitter",
+            contact: "jean durand",
+            phone: "06 18 76 02 00",
+            // email not required
+            address: "avenue de la mer"
+          },
+          emission: {
+            weight: { value: 23.2, isEstimate: false },
+            packagings: [
+              {
+                type: "BOITE_CARTON",
+                volume: 22,
+                quantity: 3
+              }
+            ]
+          }
+        },
+        transporter: {
+          company: {
+            siret: transporter.siret,
+            name: "Transporter",
+            contact: "jean valjean",
+            phone: "06 18 76 02 00"
+          }
+        },
+        destination: {
+          cap: null, // No CAP
+          company: {
+            siret: destination.siret,
+            name: "Destination",
+            address: "Destination address",
+            contact: "jean tourloupe",
+            phone: "06 18 76 02 00"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "createBsdasri">>(
+        CREATE_DASRI,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsdasri?.destination?.cap).toBeNull();
+
+      const dasri = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: data.createBsdasri?.id }
+      });
+
+      expect(dasri.destinationCap).toBeNull();
+    });
   });
 
   it("packagings needs a positive quantity", async () => {
