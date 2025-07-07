@@ -43,6 +43,19 @@ export default function Destination({ status, stepName, disabled = false }) {
           optionalMail={true}
         />
       </div>
+      {!isSynthesizing && (
+        <div className="form__row">
+          <label>
+            Numéro de CAP (optionnel)
+            <Field
+              type="text"
+              name="destination.cap"
+              disabled={disabled}
+              className="td-input"
+            />
+          </label>
+        </div>
+      )}
       <div className="form__row">
         <label>
           Champ libre (optionnel) <Tooltip title={customInfoToolTip} />

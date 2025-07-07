@@ -31,6 +31,10 @@ type BsdasriDestination {
 
   "Champ libre"
   customInfo: String
+
+  "N° de CAP (le cas échéant)"
+  cap: String
+
   reception: BsdasriReception
   operation: BsdasriOperation
 }

@@ -1309,4 +1309,78 @@ describe("Mutation.updateBsdasri", () => {
     // Then
     expect(errors).toBeUndefined();
   });
+
+  describe("[TRA-16173] Destination CAP", () => {
+    it("destination CAP can be updated before RECEPTION", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(company),
+          ...readyToPublishData(company),
+          ...readyToTakeOverData(company),
+          status: BsdasriStatus.SENT,
+          emitterCompanySiret: company.siret,
+          destinationCap: "DESTINATION-CAP"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const input = {
+        destination: {
+          cap: "NEW-DESTINATION-CAP"
+        }
+      };
+      const { errors, data } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: { id: dasri.id, input }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.updateBsdasri.destination?.cap).toBe("NEW-DESTINATION-CAP");
+    });
+
+    it("destination CAP can NOT be updated after RECEPTION", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(company),
+          ...readyToPublishData(company),
+          ...readyToTakeOverData(company),
+          ...readyToReceiveData(),
+          status: BsdasriStatus.RECEIVED,
+          emitterCompanySiret: company.siret,
+          destinationReceptionSignatureAuthor: user.name,
+          receptionSignatory: { connect: { id: user.id } },
+          destinationReceptionSignatureDate: new Date().toISOString(),
+          destinationCap: "DESTINATION-CAP"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const input = {
+        destination: {
+          cap: "NEW-DESTINATION-CAP"
+        }
+      };
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: { id: dasri.id, input }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le CAP du destinataire"
+      );
+    });
+  });
 });

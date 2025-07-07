@@ -241,6 +241,7 @@ export const fullDasriFragment = gql`
     }
 
     destination {
+      cap
       company {
         ...CompanyFragment
       }

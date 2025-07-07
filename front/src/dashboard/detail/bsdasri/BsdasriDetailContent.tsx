@@ -52,9 +52,10 @@ const getVerboseWasteName = (code: string): string => {
 };
 type CompanyProps = {
   company?: FormCompany | null;
+  cap?: string | null;
   label: string;
 };
-const Company = ({ company, label }: CompanyProps) => (
+const Company = ({ company, cap, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
@@ -63,6 +64,11 @@ const Company = ({ company, label }: CompanyProps) => (
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
     <dt>Contact</dt> <dd>{company?.contact}</dd>
+    {cap && (
+      <>
+        <dt>CAP</dt> <dd>{cap}</dd>
+      </>
+    )}
   </>
 );
 
@@ -226,7 +232,11 @@ const Recipient = ({ form }: { form: Bsdasri }) => {
   return (
     <>
       <div className={styles.detailGrid}>
-        <Company label="Destinataire" company={destination?.company} />
+        <Company
+          label="Destinataire"
+          company={destination?.company}
+          cap={destination?.cap}
+        />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow

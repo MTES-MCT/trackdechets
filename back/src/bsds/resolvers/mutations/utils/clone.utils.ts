@@ -411,7 +411,8 @@ export const cloneBsdasri = async (user: Express.User, id: string) => {
         }
       : {},
     intermediariesOrgIds: bsdasri.intermediariesOrgIds,
-    canAccessDraftOrgIds: bsdasri.canAccessDraftOrgIds
+    canAccessDraftOrgIds: bsdasri.canAccessDraftOrgIds,
+    destinationCap: bsdasri.destinationCap
   };
 
   const newBsdasri = await create(newBsdasriCreateInput);

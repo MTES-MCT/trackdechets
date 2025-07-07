@@ -28,7 +28,8 @@ import {
   validateSynthesisDestinationAcceptation,
   validateRecipientIsCollectorForGroupingCodes,
   validateDestinationOperationCode,
-  forbidSynthesisTraderBrokerIntermediaries
+  forbidSynthesisTraderBrokerIntermediaries,
+  validateCap
 } from "./refinements";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 
@@ -178,6 +179,7 @@ export const rawBsdasriSchema = z.object({
   ).nullish(),
 
   // Destination fields
+  destinationCap: z.string().nullish(),
   destinationCompanyName: z.string().nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
   destinationCompanyAddress: z.string().nullish(),
@@ -269,6 +271,7 @@ export type ParsedZodBsdasri = z.output<typeof rawBsdasriSchema>;
 const refinedBsdasriSchema = rawBsdasriSchema
   .superRefine(checkWeights)
   .superRefine(validateTransporterPlates)
+  .superRefine(validateCap)
   .superRefine(checkOperationMode);
 
 // Transformations synchrones qui sont toujours jouées
