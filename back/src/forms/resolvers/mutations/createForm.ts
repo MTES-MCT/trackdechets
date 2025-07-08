@@ -36,6 +36,8 @@ const createFormResolver = async (
   { createFormInput }: MutationCreateFormArgs,
   context: GraphQLContext
 ) => {
+  console.log(">> createFormResolver");
+  console.log("createFormInput", createFormInput);
   const user = checkIsAuthenticated(context);
 
   const sirenifiedFormInput = await sirenifyFormInput(createFormInput, user);
