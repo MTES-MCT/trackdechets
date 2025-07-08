@@ -304,7 +304,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -315,7 +315,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },

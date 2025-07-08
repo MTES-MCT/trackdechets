@@ -235,7 +235,7 @@ export const transportedFormShape: FormShape = [
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -246,7 +246,7 @@ export const transportedFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },

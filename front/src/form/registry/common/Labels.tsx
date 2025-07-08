@@ -58,7 +58,7 @@ export const Labels = {
   wasteDap: "DAP",
   weighingHour: "Heure de pesée",
   ttdImportNumber: "Numéro de notification ou de déclaration d'import",
-  movementNumber: "Numéro de mouvement",
+  movementNumber: "Numéro de mouvement GISTRID",
   isDirectSupply: "Approvisionnement direct (pipeline, convoyeur)",
   sisIdentifier: "Identifiant SIS du terrain",
   isUpcycled: "Terres valorisées",
