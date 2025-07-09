@@ -16,6 +16,7 @@ import {
 import { Address } from "../common/Address";
 import { CompanySelector } from "../common/CompanySelector";
 import { EcoOrganismes } from "../common/EcoOrganismes";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer";
 import { Parcels } from "../common/Parcels";
 import { ReportFor } from "../common/ReportFor";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
@@ -188,7 +189,7 @@ export const incomingTexsFormShape: FormShape = [
         ]
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "parcel",
           title: "Parcelles d'origine"
