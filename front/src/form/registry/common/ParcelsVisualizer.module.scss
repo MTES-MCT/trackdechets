@@ -1,0 +1,17 @@
+.controls {
+  input[type="radio"]:not(.fr-radio-group input):checked {
+    opacity: 0;
+  }
+}
+
+.or {
+  font-size: 0.875rem;
+  // color: var(--text-mention-grey);
+  font-weight: 600;
+}
+
+.gpsButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
