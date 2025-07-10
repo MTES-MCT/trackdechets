@@ -19,12 +19,12 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import classNames from "classnames";
 import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { WasteCodeSwitcher } from "./WasteCodeSwitcher";
 import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { getDeclarationTypeWording, getRegistryTypeWording } from "./MyExports";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
 import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import { WasteCodeSelector } from "../../form/registry/common/WasteCodeSelector";
 
 const displayError = (
   error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
@@ -326,15 +326,12 @@ export function ExportModal() {
                   ]}
                 />
               </div>
-              <div className="fr-mb-8v">
-                <WasteCodeSwitcher
-                  id={"wasteCodeSwitcher"}
-                  onSelectChange={wasteCodes => {
-                    setValue(
-                      "wasteCodes",
-                      wasteCodes.map(({ code }) => code)
-                    );
-                  }}
+              <div className="fr-container--fluid fr-mb-8v">
+                <WasteCodeSelector
+                  label="Codes déchets"
+                  name="wasteCodes"
+                  methods={methods}
+                  multiple
                 />
               </div>
             </>
