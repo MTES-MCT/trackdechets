@@ -1,13 +1,19 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import styles from "./ParcelsVisualizer.module.scss";
 import clsx from "clsx";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
+// leaflet
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+// extensions
+import { Services, LExtended } from "geoportal-extensions-leaflet";
+import "geoportal-extensions-leaflet/dist/GpPluginLeaflet-src.css";
 
 type Props = {
   prefix: string;
@@ -20,6 +26,23 @@ enum Mode {
   CODE = "CODE",
   GPS = "GPS"
 }
+
+const createMap = () => {
+  // Création de la map
+  const layer = LExtended.geoportalLayer.WMS({
+    layer: "ORTHOIMAGERY.ORTHOPHOTOS"
+  });
+
+  const map = L.map("parcels-map", {
+    zoom: 19,
+    center: L.latLng(48.8449, 2.4245)
+  });
+
+  layer.addTo(map);
+
+  const search = LExtended.geoportalControl.SearchEngine();
+  map.addControl(search);
+};
 
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
@@ -46,6 +69,12 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     control: methods.control,
     name: `${prefix}Coordinates`
   });
+
+  useEffect(() => {
+    Services.getConfig({
+      onSuccess: createMap
+    });
+  }, []);
 
   function deleteParcel(mode: Mode, index: number) {
     if (mode === Mode.CODE) {
@@ -84,7 +113,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
       <h5 className="fr-h5">{title ?? "Parcelles"}</h5>
 
       <div className="fr-mb-2w">
-        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+        <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
           <div className={clsx(styles.controls, "fr-col-6")}>
             <SegmentedControl
               hideLegend
@@ -198,7 +227,12 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
               </div>
             )}
           </div>
-          <div className="fr-col-6"></div>
+          <div className="fr-col-6">
+            <div
+              id="parcels-map"
+              style={{ height: "380px", width: "100%" }}
+            ></div>
+          </div>
         </div>
       </div>
 
