@@ -1,19 +1,22 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import styles from "./ParcelsVisualizer.module.scss";
 import clsx from "clsx";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
+import { debounce } from "../../../common/helper";
+
 // leaflet
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 // extensions
 import { Services, LExtended } from "geoportal-extensions-leaflet";
 import "geoportal-extensions-leaflet/dist/GpPluginLeaflet-src.css";
+import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 
 type Props = {
   prefix: string;
@@ -27,26 +30,84 @@ enum Mode {
   GPS = "GPS"
 }
 
-const createMap = () => {
+const createMap = (): L.Map => {
   // Création de la map
-  const layer = LExtended.geoportalLayer.WMS({
+  const baseLayer = (LExtended as any).geoportalLayer.WMTS({
     layer: "ORTHOIMAGERY.ORTHOPHOTOS"
   });
 
-  const map = L.map("parcels-map", {
-    zoom: 19,
-    center: L.latLng(48.8449, 2.4245)
+  const cadastralLayer = (LExtended as any).geoportalLayer.WMTS({
+    layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
   });
 
-  layer.addTo(map);
+  const roadsLayer = (LExtended as any).geoportalLayer.WMTS(
+    {
+      layer: "TRANSPORTNETWORKS.ROADS"
+    },
+    {
+      opacity: 0.7,
+      minZoom: 14
+    }
+  );
 
-  const search = LExtended.geoportalControl.SearchEngine();
-  map.addControl(search);
+  const map = L.map("parcels-map", {
+    zoom: 5,
+    center: L.latLng(46.4983, 2.1752)
+  });
+
+  map.on("click", e => {
+    console.log("click", e);
+  });
+  map.on("zoomend", e => {
+    console.log(map.getZoom());
+  });
+
+  map.on("moveend", () => {
+    console.log(map.getCenter());
+  });
+
+  baseLayer.addTo(map);
+  cadastralLayer.addTo(map);
+  roadsLayer.addTo(map);
+  return map;
+};
+
+const searchAddress = async (
+  searchString: string
+): Promise<{
+  status: string;
+  results: {
+    fulltext: string;
+    x: number;
+    y: number;
+  }[];
+}> => {
+  const response = await fetch(
+    `https://data.geopf.fr/geocodage/completion?maximumResponses=5&text=${searchString}`
+  );
+  const data = await response.json();
+  console.log(data);
+  return data;
+};
+
+type AddressSuggestion = {
+  fulltext: string;
+  lat: number;
+  lng: number;
 };
 
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
   const [mode, setMode] = useState<Mode>(Mode.CODE);
+  const [map, setMap] = useState<L.Map | null>(null);
+  const [searchString, setSearchString] = useState<string>("");
+  const [showSearch, setShowSearch] = useState(false);
+  // const [selectedAddress, setSelectedAddress] =
+  //   useState<AddressSuggestion | null>(null);
+  const [addressesSuggestions, setAddressesSuggestions] = useState<
+    AddressSuggestion[]
+  >([]);
+  const addressInputRef = useRef<HTMLInputElement | null>(null);
   const {
     fields: inseeCodeFields,
     append: appendInseeCode,
@@ -72,9 +133,47 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
 
   useEffect(() => {
     Services.getConfig({
-      onSuccess: createMap
+      onSuccess: () => {
+        const map = createMap();
+        setMap(map);
+      }
     });
   }, []);
+
+  const setSelectedAddress = (address: AddressSuggestion) => {
+    if (map) {
+      map.setView([address.lat, address.lng], 17);
+    }
+  };
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async text => {
+        if (text.length < 3) {
+          setAddressesSuggestions([]);
+          return;
+        }
+        try {
+          const res = await searchAddress(text);
+          if (res.status === "OK") {
+            setAddressesSuggestions(
+              res.results.map(r => ({
+                fulltext: r.fulltext,
+                lat: r.y,
+                lng: r.x
+              }))
+            );
+            setShowSearch(true);
+            return;
+          }
+          setAddressesSuggestions([]);
+        } catch (error) {
+          console.error(error);
+          setAddressesSuggestions([]);
+        }
+      }, 500),
+    []
+  );
 
   function deleteParcel(mode: Mode, index: number) {
     if (mode === Mode.CODE) {
@@ -135,14 +234,73 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                 }
               ]}
             />
-            <Input
-              label="Adresse complète"
-              className="fr-mt-1w fr-mb-1w"
-              hintText="Ex: 21 avenue de Ségur, Paris"
-              nativeInputProps={{
-                type: "search"
-              }}
-            />
+            {/* <label className="fr-label fr-mt-1w" htmlFor="parcels-search">
+              Adresse complète
+            </label> */}
+            <div className={styles.searchBar}>
+              <Input
+                id="parcels-search"
+                label="Adresse complète"
+                className="fr-mt-1w fr-mb-1w"
+                ref={addressInputRef}
+                nativeInputProps={{
+                  value: searchString,
+                  type: "search",
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    setSearchString(e.currentTarget.value);
+                    debouncedSearch(e.currentTarget.value);
+                  }
+                }}
+              />
+              {searchString && (
+                <button
+                  type="button"
+                  className={styles.customCancelButton}
+                  onClick={() => {
+                    setSearchString("");
+                    setAddressesSuggestions([]);
+                    setShowSearch(false);
+                    if (addressInputRef.current) {
+                      addressInputRef.current.focus();
+                    }
+                  }}
+                  aria-label="Effacer la recherche"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="fr-icon-close-circle-fill fr-icon--sm"
+                  ></span>
+                </button>
+              )}
+            </div>
+
+            <ComboBox
+              parentRef={addressInputRef}
+              isOpen={showSearch}
+              onOpenChange={setShowSearch}
+            >
+              {() => (
+                <div>
+                  {addressesSuggestions.map((address, index) => (
+                    <div
+                      className="tw-px-2 tw-py-2 hover:tw-bg-gray-100 tw-cursor-pointer"
+                      key={`${address.fulltext}-${index}`}
+                      onClick={() => {
+                        setSelectedAddress({
+                          fulltext: address.fulltext,
+                          lat: address.lat,
+                          lng: address.lng
+                        });
+                        setSearchString(address.fulltext);
+                        setShowSearch(false);
+                      }}
+                    >
+                      {address.fulltext}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ComboBox>
             <div className={styles.or}>{"ou"}</div>
             {mode === Mode.CODE ? (
               <div className="fr-mt-1w">
@@ -228,10 +386,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
             )}
           </div>
           <div className="fr-col-6">
-            <div
-              id="parcels-map"
-              style={{ height: "380px", width: "100%" }}
-            ></div>
+            <div id="parcels-map" className={styles.map}></div>
           </div>
         </div>
       </div>
