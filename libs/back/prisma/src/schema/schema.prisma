@@ -1541,6 +1541,24 @@ model Bsff {
   @@index([canAccessDraftOrgIds], map: "_BsffCanAccessDraftOrgIdsIdx", type: Gin)
 }
 
+model BsffPackagingToBsffFicheIntervention {
+  id String    @id @default(cuid()) @db.VarChar(30)
+
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime   @updatedAt @db.Timestamptz(6)
+
+  packagingId  String    @db.VarChar(30)
+  packaging    BsffPackaging @relation(fields: [packagingId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "BsffPackagingToBsffFicheIntervention_bsffPackaging_fkey")   
+  
+  ficheInterventionId String @db.VarChar(30)
+  ficheIntervention BsffFicheIntervention @relation(fields: [ficheInterventionId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "BsffPackagingToBsffFicheIntervention_bsffFicheIntervention_fkey")   
+
+  @@index([packagingId], map: "_BsffPackagingToBsffFicheInterventionPackagingIdIdx")
+  @@index([ficheInterventionId], map: "_BsffPackagingToBsffFicheInterventionFicheInterventionIdIdx")
+  @@unique([packagingId, ficheInterventionId], name: "_PackagingIdAndFicheInterventionIdUniqueIdx")
+} 
+
+
 model BsffTransporter {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -1618,6 +1636,8 @@ model BsffFicheIntervention {
 
   bsffs Bsff[] @relation("BsffToBsffFicheIntervention")
 
+  BsffPackagingToBsffFicheIntervention BsffPackagingToBsffFicheIntervention[] @relation(map: "BsffPackagingToBsffFicheIntervention_bsffFicheIntervention_fkey")
+  
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
 }
@@ -1671,6 +1691,8 @@ model BsffPackaging {
   // Relation vers les infos de traçabilité finales
   finalOperations                    BsffPackagingFinalOperation[] @relation("FinalOperationToInitialBsffPackaging")
   FinalOperationToFinalBsffPackaging BsffPackagingFinalOperation[] @relation("FinalOperationToFinalBsffPackaging")
+
+  BsffPackagingToBsffFicheIntervention BsffPackagingToBsffFicheIntervention[] @relation(map: "BsffPackagingToBsffFicheIntervention_bsffPackaging_fkey")
 
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
