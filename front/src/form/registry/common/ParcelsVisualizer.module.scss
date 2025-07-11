@@ -27,6 +27,14 @@
   :global(.leaflet-control-attribution) {
     display: none;
   }
+  :global(.leaflet-zoom-anim) {
+    transition-timing-function: linear;
+    transition-duration: 100ms;
+  }
+  :global(.leaflet-zoom-animated) {
+    transition-timing-function: linear;
+    transition-duration: 10ms;
+  }
 }
 
 .searchBar {

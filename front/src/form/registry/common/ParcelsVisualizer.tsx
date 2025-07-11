@@ -1,7 +1,13 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
@@ -10,12 +16,17 @@ import clsx from "clsx";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { debounce } from "../../../common/helper";
 
-// leaflet
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-// extensions
-import { Services, LExtended } from "geoportal-extensions-leaflet";
-import "geoportal-extensions-leaflet/dist/GpPluginLeaflet-src.css";
+import { Feature, View, Map, getUid } from "ol";
+import { Vector as VectorLayer } from "ol/layer";
+import { Vector as VectorSource } from "ol/source";
+import { Style, Icon } from "ol/style";
+import { Point } from "ol/geom";
+import { fromLonLat, toLonLat } from "ol/proj";
+
+import { Services, olExtended } from "geoportal-extensions-openlayers";
+import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
+import "ol/ol.css";
+
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 
 type Props = {
@@ -30,46 +41,93 @@ enum Mode {
   GPS = "GPS"
 }
 
-const createMap = (): L.Map => {
+const createMap = (): { map: Map; markerLayerId: string } => {
+  const markerLayer = new VectorLayer({
+    source: new VectorSource(),
+    style: new Style({
+      image: new Icon({
+        anchor: [0.5, 1],
+        scale: 1.5,
+        src: "/mapbox/map-pin.svg"
+      })
+    })
+  });
+  const markerLayerId = getUid(markerLayer);
+
+  const map = new Map({
+    target: "parcels-map",
+    layers: [
+      new olExtended.layer.GeoportalWMS({
+        layer: "ORTHOIMAGERY.ORTHOPHOTOS",
+        olParams: {
+          maxZoom: 19
+        }
+      }),
+      new olExtended.layer.GeoportalWMS({
+        layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS",
+        olParams: {
+          maxZoom: 19
+        }
+      }),
+      new olExtended.layer.GeoportalWMS({
+        layer: "TRANSPORTNETWORKS.ROADS",
+        olParams: {
+          opacity: 0.7,
+          minZoom: 8,
+          maxZoom: 19
+        }
+      }),
+      markerLayer
+    ],
+    view: new View({
+      center: fromLonLat([2.1752, 46.4983]),
+      zoom: 3.5,
+      zoomFactor: 3,
+      maxZoom: 13
+    })
+  });
+
   // Création de la map
-  const baseLayer = (LExtended as any).geoportalLayer.WMTS({
-    layer: "ORTHOIMAGERY.ORTHOPHOTOS"
+  // const baseLayer = (LExtended as any).geoportalLayer.WMTS({
+  //   layer: "ORTHOIMAGERY.ORTHOPHOTOS"
+  // });
+
+  // const cadastralLayer = (LExtended as any).geoportalLayer.WMTS({
+  //   layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
+  // });
+
+  // const roadsLayer = (LExtended as any).geoportalLayer.WMTS(
+  //   {
+  //     layer: "TRANSPORTNETWORKS.ROADS"
+  //   },
+  //   {
+  //     opacity: 0.7,
+  //     minZoom: 14
+  //   }
+  // );
+
+  // const map = L.map("parcels-map", {
+  //   zoom: 5,
+  //   center: L.latLng(46.4983, 2.1752),
+  //   zoomSnap: 0.1,
+  //   wheelDebounceTime: 10
+  // });
+
+  // map.on("singleclick", e => {
+  //   console.log("click", toLonLat(e.coordinate));
+  // });
+  // map.on("zoomend", e => {
+  //   console.log(map.getZoom());
+  // });
+
+  map.on("moveend", e => {
+    console.log(map.getView().getZoom());
   });
 
-  const cadastralLayer = (LExtended as any).geoportalLayer.WMTS({
-    layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
-  });
-
-  const roadsLayer = (LExtended as any).geoportalLayer.WMTS(
-    {
-      layer: "TRANSPORTNETWORKS.ROADS"
-    },
-    {
-      opacity: 0.7,
-      minZoom: 14
-    }
-  );
-
-  const map = L.map("parcels-map", {
-    zoom: 5,
-    center: L.latLng(46.4983, 2.1752)
-  });
-
-  map.on("click", e => {
-    console.log("click", e);
-  });
-  map.on("zoomend", e => {
-    console.log(map.getZoom());
-  });
-
-  map.on("moveend", () => {
-    console.log(map.getCenter());
-  });
-
-  baseLayer.addTo(map);
-  cadastralLayer.addTo(map);
-  roadsLayer.addTo(map);
-  return map;
+  // baseLayer.addTo(map);
+  // cadastralLayer.addTo(map);
+  // roadsLayer.addTo(map);
+  return { map, markerLayerId };
 };
 
 const searchAddress = async (
@@ -96,12 +154,27 @@ type AddressSuggestion = {
   lng: number;
 };
 
+const lonLatFromCoordinatesString = (coordinates: string): number[] | null => {
+  const split = coordinates.split(" ");
+  if (split.length === 2) {
+    const lat = Number(split[0]);
+    const lng = Number(split[1]);
+    if (isNaN(lat) || isNaN(lng)) {
+      return null;
+    }
+    return fromLonLat([lng, lat]);
+  }
+  return null;
+};
+
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
   const [mode, setMode] = useState<Mode>(Mode.CODE);
-  const [map, setMap] = useState<L.Map | null>(null);
+  const [map, setMap] = useState<Map | null>(null);
+  const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
   const [searchString, setSearchString] = useState<string>("");
   const [showSearch, setShowSearch] = useState(false);
+  const [coordinates, setCoordinates] = useState<string>("");
   // const [selectedAddress, setSelectedAddress] =
   //   useState<AddressSuggestion | null>(null);
   const [addressesSuggestions, setAddressesSuggestions] = useState<
@@ -131,18 +204,113 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     name: `${prefix}Coordinates`
   });
 
+  const exploitCoordinates = useCallback(
+    (coordinates: { lat: number; lng: number }) => {
+      if (mode === Mode.CODE) {
+      } else {
+        setCoordinates(`${coordinates.lat} ${coordinates.lng}`);
+      }
+    },
+    [mode, setCoordinates]
+  );
+
+  const displayCoordinates = useCallback(
+    (coordinates: string) => {
+      const lonLat = lonLatFromCoordinatesString(coordinates);
+      if (lonLat) {
+        if (map) {
+          map.setView(
+            new View({
+              center: lonLat,
+              zoom: 10,
+              zoomFactor: 3,
+              maxZoom: 13
+            })
+          );
+        }
+      }
+    },
+    [map]
+  );
+
+  const addPointToMap = useCallback(
+    (point: Feature<Point>) => {
+      if (map) {
+        const markerLayer = map
+          .getLayers()
+          .getArray()
+          .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
+          VectorSource<Point>
+        >;
+        if (markerLayer) {
+          console.log("markerLayer", markerLayer);
+          markerLayer.getSource().addFeature(point);
+        }
+      }
+    },
+    [map, markerLayerId]
+  );
+
+  const removePointFromMap = useCallback(
+    (featureId: string) => {
+      if (map) {
+        const markerLayer = map
+          .getLayers()
+          .getArray()
+          .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
+          VectorSource<Point>
+        >;
+        if (markerLayer) {
+          console.log("markerLayer", markerLayer);
+          console.log("featureId", featureId);
+          const feature = markerLayer.getSource().getFeatureByUid(featureId);
+          console.log("feature", feature);
+          if (feature) {
+            markerLayer.getSource().removeFeature(feature);
+          }
+        }
+      }
+    },
+    [map, markerLayerId]
+  );
+
   useEffect(() => {
     Services.getConfig({
       onSuccess: () => {
-        const map = createMap();
+        const { map, markerLayerId } = createMap();
         setMap(map);
+        setMarkerLayerId(markerLayerId);
+        console.log("markerLayerId", markerLayerId);
       }
     });
   }, []);
 
+  useEffect(() => {
+    const handler = e => {
+      const lonLat = toLonLat(e.coordinate);
+      exploitCoordinates({ lat: lonLat[1], lng: lonLat[0] });
+    };
+    if (map) {
+      map.on("singleclick", handler);
+    }
+    return () => {
+      if (map) {
+        map.un("singleclick", handler);
+      }
+    };
+  }, [map, exploitCoordinates]);
+
   const setSelectedAddress = (address: AddressSuggestion) => {
     if (map) {
-      map.setView([address.lat, address.lng], 17);
+      map.setView(
+        new View({
+          center: fromLonLat([address.lng, address.lat]),
+          zoom: 10,
+          zoomFactor: 3,
+          maxZoom: 13
+        })
+      );
+      // map.setView([address.lat, address.lng], 17);
     }
   };
 
@@ -175,22 +343,27 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     []
   );
 
+  const inseeCodeValues: { value: string }[] = methods.watch(
+    `${prefix}InseeCodes`
+  );
+  const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
+  const coordinatesValues: { value: string; featureId: string }[] =
+    methods.watch(`${prefix}Coordinates`);
+
   function deleteParcel(mode: Mode, index: number) {
     if (mode === Mode.CODE) {
       removeInseeCode(index);
       removeNumber(index);
     }
     if (mode === Mode.GPS) {
+      const featureId = coordinatesValues[index]?.featureId;
+      if (featureId) {
+        removePointFromMap(featureId);
+      }
       removeCoordinate(index);
     }
   }
-  const inseeCodeValues: { value: string }[] = methods.watch(
-    `${prefix}InseeCodes`
-  );
-  const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
-  const coordinatesValues: { value: string }[] = methods.watch(
-    `${prefix}Coordinates`
-  );
+
   const tags = useMemo(() => {
     const numberFields = inseeCodeValues.map((field, index) => {
       return {
@@ -344,16 +517,33 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   hintText="Format: un point pour les décimales, exemple: 48.852197 2.310674"
                   nativeInputProps={{
                     type: "text",
+                    value: coordinates,
                     onChange: e => {
-                      console.log(e.currentTarget.value);
+                      setCoordinates(e.currentTarget.value);
                     }
                   }}
                 />
                 <div className={styles.gpsButtons}>
-                  <Button type="button" priority="secondary" onClick={() => {}}>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    onClick={() => displayCoordinates(coordinates)}
+                  >
                     Afficher les coordonnées
                   </Button>
-                  <Button type="button" priority="secondary" onClick={() => {}}>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    onClick={() => {
+                      const lonLat = lonLatFromCoordinatesString(coordinates);
+                      if (lonLat) {
+                        const feature = new Feature(new Point(lonLat));
+                        const featureId = getUid(feature);
+                        appendCoordinate({ value: coordinates, featureId });
+                        addPointToMap(feature);
+                      }
+                    }}
+                  >
                     Ajouter le point
                   </Button>
                 </div>
