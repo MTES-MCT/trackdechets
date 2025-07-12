@@ -148,6 +148,63 @@ const searchAddress = async (
   return data;
 };
 
+const getParcel = async (
+  lat: number,
+  lng: number
+): Promise<{ inseeCode: string; parcelNumber: string } | null> => {
+  const response = await fetch(
+    `https://data.geopf.fr/geocodage/reverse?index=parcel&limit=1&returntruegeometry=true&searchgeom=${encodeURIComponent(
+      JSON.stringify({
+        type: "Point",
+        coordinates: [lng, lat]
+      })
+    )}`,
+    {
+      headers: {
+        Accept: "application/json"
+      }
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+  if (data.features.length > 0) {
+    const parcelNumber = `${data.features[0].properties.sheet}-${data.features[0].properties.section}-${data.features[0].properties.number}`;
+    const inseeCode = `${data.features[0].properties.departmentcode}${data.features[0].properties.municipalitycode}`;
+    return { inseeCode, parcelNumber };
+  }
+  return null;
+};
+
+const getCoordinatesFromParcel = async (
+  inseeCode: string,
+  parcelNumber: string
+): Promise<{ lat: number; lng: number } | null> => {
+  const departmentCode = inseeCode.slice(0, 2);
+  const municipalityCode = inseeCode.slice(2);
+  const split = parcelNumber.split("-");
+  const sheet = split[0];
+  const section = split[1];
+  const number = split[2];
+
+  const response = await fetch(
+    `https://data.geopf.fr/geocodage/search?autocomplete=0&index=parcel&limit=1&departmentcode=${departmentCode}&municipalitycode=${municipalityCode}&sheet=${sheet}&section=${section}&number=${number}`,
+    {
+      headers: {
+        Accept: "application/json"
+      }
+    }
+  );
+  const data = await response.json();
+  console.log(data);
+  if (data.features.length > 0) {
+    return {
+      lat: data.features[0].geometry.coordinates[1],
+      lng: data.features[0].geometry.coordinates[0]
+    };
+  }
+  return null;
+};
+
 type AddressSuggestion = {
   fulltext: string;
   lat: number;
@@ -175,6 +232,8 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const [searchString, setSearchString] = useState<string>("");
   const [showSearch, setShowSearch] = useState(false);
   const [coordinates, setCoordinates] = useState<string>("");
+  const [parcelNumber, setParcelNumber] = useState<string>("");
+  const [inseeCode, setInseeCode] = useState<string>("");
   // const [selectedAddress, setSelectedAddress] =
   //   useState<AddressSuggestion | null>(null);
   const [addressesSuggestions, setAddressesSuggestions] = useState<
@@ -205,8 +264,13 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   });
 
   const exploitCoordinates = useCallback(
-    (coordinates: { lat: number; lng: number }) => {
+    async (coordinates: { lat: number; lng: number }) => {
       if (mode === Mode.CODE) {
+        const parcel = await getParcel(coordinates.lat, coordinates.lng);
+        if (parcel) {
+          setParcelNumber(parcel.parcelNumber);
+          setInseeCode(parcel.inseeCode);
+        }
       } else {
         setCoordinates(`${coordinates.lat} ${coordinates.lng}`);
       }
@@ -222,11 +286,36 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
           map.setView(
             new View({
               center: lonLat,
-              zoom: 10,
+              zoom: 11,
               zoomFactor: 3,
               maxZoom: 13
             })
           );
+        }
+      }
+    },
+    [map]
+  );
+
+  const displayParcel = useCallback(
+    async (inseeCode: string, parcelNumber: string) => {
+      const coordinates = await getCoordinatesFromParcel(
+        inseeCode,
+        parcelNumber
+      );
+      if (coordinates) {
+        const lonLat = fromLonLat([coordinates.lng, coordinates.lat]);
+        if (lonLat) {
+          if (map) {
+            map.setView(
+              new View({
+                center: lonLat,
+                zoom: 11,
+                zoomFactor: 3,
+                maxZoom: 13
+              })
+            );
+          }
         }
       }
     },
@@ -305,7 +394,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
       map.setView(
         new View({
           center: fromLonLat([address.lng, address.lat]),
-          zoom: 10,
+          zoom: 11,
           zoomFactor: 3,
           maxZoom: 13
         })
@@ -367,7 +456,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const tags = useMemo(() => {
     const numberFields = inseeCodeValues.map((field, index) => {
       return {
-        value: `${field.value}-${numberValues[index].value}`,
+        value: `${field.value} | ${numberValues[index].value}`,
         mode: Mode.CODE
       };
     });
@@ -481,11 +570,13 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <div className="fr-col-6">
                     <Input
                       label="Commune"
+                      className="fr-mb-1w"
                       hintText="Code postal ou code INSEE"
                       nativeInputProps={{
                         type: "text",
+                        value: inseeCode,
                         onChange: e => {
-                          console.log(e.currentTarget.value);
+                          setInseeCode(e.currentTarget.value);
                         }
                       }}
                     />
@@ -493,19 +584,35 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <div className="fr-col-6">
                     <Input
                       label="Numéro de parcelle"
+                      className="fr-mb-1w"
                       hintText="Ex: 000-AB-125"
                       nativeInputProps={{
                         type: "text",
+                        value: parcelNumber,
                         onChange: e => {
-                          console.log(e.currentTarget.value);
+                          setParcelNumber(e.currentTarget.value);
                         }
                       }}
                     />
                   </div>
                 </div>
-                <div className="fr-mt-1w">
-                  <Button type="button" priority="secondary" onClick={() => {}}>
-                    Afficher la parcelle et sélectionner sur la carte
+                <div className={styles.gpsButtons}>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    onClick={() => displayParcel(inseeCode, parcelNumber)}
+                  >
+                    Afficher sur la carte
+                  </Button>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    onClick={() => {
+                      appendInseeCode({ value: inseeCode });
+                      appendNumber({ value: parcelNumber });
+                    }}
+                  >
+                    Ajouter la parcelle
                   </Button>
                 </div>
               </div>
@@ -529,7 +636,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     priority="secondary"
                     onClick={() => displayCoordinates(coordinates)}
                   >
-                    Afficher les coordonnées
+                    Afficher sur la carte
                   </Button>
                   <Button
                     type="button"
