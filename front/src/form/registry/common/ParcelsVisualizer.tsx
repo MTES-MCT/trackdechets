@@ -19,9 +19,10 @@ import { debounce } from "../../../common/helper";
 import { Feature, View, Map, getUid } from "ol";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
-import { Style, Icon } from "ol/style";
-import { Point } from "ol/geom";
+import { Style, Icon, Stroke, Fill } from "ol/style";
+import { Geometry, Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
+import { GeoJSON } from "ol/format";
 
 import { Services, olExtended } from "geoportal-extensions-openlayers";
 import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
@@ -41,7 +42,11 @@ enum Mode {
   GPS = "GPS"
 }
 
-const createMap = (): { map: Map; markerLayerId: string } => {
+const createMap = (): {
+  map: Map;
+  markerLayerId: string;
+  parcelLayerId: string;
+} => {
   const markerLayer = new VectorLayer({
     source: new VectorSource(),
     style: new Style({
@@ -53,6 +58,20 @@ const createMap = (): { map: Map; markerLayerId: string } => {
     })
   });
   const markerLayerId = getUid(markerLayer);
+
+  const parcelLayer = new VectorLayer({
+    source: new VectorSource(),
+    style: new Style({
+      stroke: new Stroke({
+        color: "#ff0000",
+        width: 3
+      }),
+      fill: new Fill({
+        color: "rgba(255, 0, 0, 0.3)"
+      })
+    })
+  });
+  const parcelLayerId = getUid(parcelLayer);
 
   const map = new Map({
     target: "parcels-map",
@@ -77,7 +96,8 @@ const createMap = (): { map: Map; markerLayerId: string } => {
           maxZoom: 19
         }
       }),
-      markerLayer
+      markerLayer,
+      parcelLayer
     ],
     view: new View({
       center: fromLonLat([2.1752, 46.4983]),
@@ -120,14 +140,14 @@ const createMap = (): { map: Map; markerLayerId: string } => {
   //   console.log(map.getZoom());
   // });
 
-  map.on("moveend", e => {
-    console.log(map.getView().getZoom());
-  });
+  // map.on("moveend", e => {
+  //   console.log(map.getView().getZoom());
+  // });
 
   // baseLayer.addTo(map);
   // cadastralLayer.addTo(map);
   // roadsLayer.addTo(map);
-  return { map, markerLayerId };
+  return { map, markerLayerId, parcelLayerId };
 };
 
 const searchAddress = async (
@@ -178,7 +198,7 @@ const getParcel = async (
 const getCoordinatesFromParcel = async (
   inseeCode: string,
   parcelNumber: string
-): Promise<{ lat: number; lng: number } | null> => {
+): Promise<{ lat: number; lng: number; geometry: Geometry } | null> => {
   const departmentCode = inseeCode.slice(0, 2);
   const municipalityCode = inseeCode.slice(2);
   const split = parcelNumber.split("-");
@@ -187,7 +207,7 @@ const getCoordinatesFromParcel = async (
   const number = split[2];
 
   const response = await fetch(
-    `https://data.geopf.fr/geocodage/search?autocomplete=0&index=parcel&limit=1&departmentcode=${departmentCode}&municipalitycode=${municipalityCode}&sheet=${sheet}&section=${section}&number=${number}`,
+    `https://data.geopf.fr/geocodage/search?autocomplete=0&index=parcel&limit=1&returntruegeometry=true&departmentcode=${departmentCode}&municipalitycode=${municipalityCode}&sheet=${sheet}&section=${section}&number=${number}`,
     {
       headers: {
         Accept: "application/json"
@@ -199,7 +219,14 @@ const getCoordinatesFromParcel = async (
   if (data.features.length > 0) {
     return {
       lat: data.features[0].geometry.coordinates[1],
-      lng: data.features[0].geometry.coordinates[0]
+      lng: data.features[0].geometry.coordinates[0],
+      geometry: new GeoJSON().readGeometry(
+        data.features[0].properties.truegeometry,
+        {
+          dataProjection: "EPSG:4326",
+          featureProjection: "EPSG:3857"
+        }
+      )
     };
   }
   return null;
@@ -229,6 +256,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const [mode, setMode] = useState<Mode>(Mode.CODE);
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
+  const [parcelLayerId, setParcelLayerId] = useState<string | null>(null);
   const [searchString, setSearchString] = useState<string>("");
   const [showSearch, setShowSearch] = useState(false);
   const [coordinates, setCoordinates] = useState<string>("");
@@ -240,11 +268,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     AddressSuggestion[]
   >([]);
   const addressInputRef = useRef<HTMLInputElement | null>(null);
-  const {
-    fields: inseeCodeFields,
-    append: appendInseeCode,
-    remove: removeInseeCode
-  } = useFieldArray({
+  const { append: appendInseeCode, remove: removeInseeCode } = useFieldArray({
     control: methods.control,
     name: `${prefix}InseeCodes`
   });
@@ -254,11 +278,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     name: `${prefix}Numbers`
   });
 
-  const {
-    fields: coordinatesFields,
-    append: appendCoordinate,
-    remove: removeCoordinate
-  } = useFieldArray({
+  const { append: appendCoordinate, remove: removeCoordinate } = useFieldArray({
     control: methods.control,
     name: `${prefix}Coordinates`
   });
@@ -270,6 +290,9 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         if (parcel) {
           setParcelNumber(parcel.parcelNumber);
           setInseeCode(parcel.inseeCode);
+        } else {
+          setParcelNumber("");
+          setInseeCode("");
         }
       } else {
         setCoordinates(`${coordinates.lat} ${coordinates.lng}`);
@@ -323,7 +346,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   );
 
   const addPointToMap = useCallback(
-    (point: Feature<Point>) => {
+    (point: Point): string | null => {
       if (map) {
         const markerLayer = map
           .getLayers()
@@ -333,9 +356,13 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         >;
         if (markerLayer) {
           console.log("markerLayer", markerLayer);
-          markerLayer.getSource().addFeature(point);
+          const feature = new Feature(point);
+          const featureId = getUid(feature);
+          markerLayer.getSource().addFeature(feature);
+          return featureId;
         }
       }
+      return null;
     },
     [map, markerLayerId]
   );
@@ -363,13 +390,62 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     [map, markerLayerId]
   );
 
+  const addParcelToMap = useCallback(
+    async (inseeCode: string, parcelNumber: string): Promise<string | null> => {
+      if (map) {
+        const res = await getCoordinatesFromParcel(inseeCode, parcelNumber);
+        if (res?.geometry) {
+          const parcelLayer = map
+            .getLayers()
+            .getArray()
+            .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
+            VectorSource<Geometry>
+          >;
+          if (parcelLayer) {
+            const feature = new Feature(res.geometry);
+            const featureId = getUid(feature);
+            parcelLayer.getSource().addFeature(feature);
+            console.log("featureId", featureId);
+            return featureId;
+          }
+        }
+      }
+      return null;
+    },
+    [map, parcelLayerId]
+  );
+
+  const removeParcelFromMap = useCallback(
+    (featureId: string) => {
+      console.log("removeParcelFromMap", featureId);
+      if (map) {
+        const parcelLayer = map
+          .getLayers()
+          .getArray()
+          .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
+          VectorSource<Geometry>
+        >;
+        if (parcelLayer) {
+          console.log("parcelLayer", parcelLayer);
+          console.log("featureId", featureId);
+          const feature = parcelLayer.getSource().getFeatureByUid(featureId);
+          console.log("feature", feature);
+          if (feature) {
+            parcelLayer.getSource().removeFeature(feature);
+          }
+        }
+      }
+    },
+    [map, parcelLayerId]
+  );
+
   useEffect(() => {
     Services.getConfig({
       onSuccess: () => {
-        const { map, markerLayerId } = createMap();
+        const { map, markerLayerId, parcelLayerId } = createMap();
         setMap(map);
         setMarkerLayerId(markerLayerId);
-        console.log("markerLayerId", markerLayerId);
+        setParcelLayerId(parcelLayerId);
       }
     });
   }, []);
@@ -429,10 +505,10 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
           setAddressesSuggestions([]);
         }
       }, 500),
-    []
+    [setAddressesSuggestions, setShowSearch]
   );
 
-  const inseeCodeValues: { value: string }[] = methods.watch(
+  const inseeCodeValues: { value: string; featureId: string }[] = methods.watch(
     `${prefix}InseeCodes`
   );
   const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
@@ -441,6 +517,10 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
 
   function deleteParcel(mode: Mode, index: number) {
     if (mode === Mode.CODE) {
+      const featureId = inseeCodeValues[index]?.featureId;
+      if (featureId) {
+        removeParcelFromMap(featureId);
+      }
       removeInseeCode(index);
       removeNumber(index);
     }
@@ -607,8 +687,12 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
-                    onClick={() => {
-                      appendInseeCode({ value: inseeCode });
+                    onClick={async () => {
+                      const featureId = await addParcelToMap(
+                        inseeCode,
+                        parcelNumber
+                      );
+                      appendInseeCode({ value: inseeCode, featureId });
                       appendNumber({ value: parcelNumber });
                     }}
                   >
@@ -644,10 +728,8 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     onClick={() => {
                       const lonLat = lonLatFromCoordinatesString(coordinates);
                       if (lonLat) {
-                        const feature = new Feature(new Point(lonLat));
-                        const featureId = getUid(feature);
+                        const featureId = addPointToMap(new Point(lonLat));
                         appendCoordinate({ value: coordinates, featureId });
-                        addPointToMap(feature);
                       }
                     }}
                   >
