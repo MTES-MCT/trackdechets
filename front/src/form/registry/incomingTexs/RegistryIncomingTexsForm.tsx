@@ -28,8 +28,14 @@ import { incomingTexsFormShape } from "./shape";
 
 type Props = { onClose: () => void };
 
-type FormValues = IncomingTexsLineInput & {
+type FormValues = Omit<
+  IncomingTexsLineInput,
+  "parcelInseeCodes" | "parcelNumbers" | "parcelCoordinates"
+> & {
   transporter: FormTransporter[];
+  parcelInseeCodes: { value: string }[];
+  parcelNumbers: { value: string }[];
+  parcelCoordinates: { value: string }[];
 };
 
 const DEFAULT_VALUES: Partial<FormValues> = {
@@ -113,6 +119,18 @@ export function RegistryIncomingTexsForm({ onClose }: Props) {
             receptionDate: isoDateToHtmlDate(
               definedIncominTexsProps.receptionDate
             ),
+            parcelInseeCodes:
+              definedIncominTexsProps.parcelInseeCodes?.map(inseeCode => ({
+                value: inseeCode
+              })) ?? [],
+            parcelNumbers:
+              definedIncominTexsProps.parcelNumbers?.map(number => ({
+                value: number
+              })) ?? [],
+            parcelCoordinates:
+              definedIncominTexsProps.parcelCoordinates?.map(coordinate => ({
+                value: coordinate
+              })) ?? [],
             reason: RegistryLineReason.Edit,
             transporter: transporters
           });
