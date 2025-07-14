@@ -196,9 +196,15 @@ export const incomingTexsFormShape: FormShape = [
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: filteredArray,
-          parcelInseeCodes: filteredArray,
-          parcelCoordinates: filteredArray
+          parcelNumbers: z
+            .array(z.object({ value: optionalString }))
+            .transform(arr => arr.map(({ value }) => value)),
+          parcelInseeCodes: z
+            .array(z.object({ value: optionalString }))
+            .transform(arr => arr.map(({ value }) => value)),
+          parcelCoordinates: z
+            .array(z.object({ value: optionalString }))
+            .transform(arr => arr.map(({ value }) => value))
         },
         shape: "custom"
       },

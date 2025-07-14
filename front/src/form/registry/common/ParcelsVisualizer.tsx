@@ -29,6 +29,12 @@ import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
 import "ol/ol.css";
 
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
+import {
+  Extent,
+  createEmpty as createEmptyExtent,
+  extend as extendExtent,
+  isEmpty as isEmptyExtent
+} from "ol/extent";
 
 type Props = {
   prefix: string;
@@ -106,47 +112,6 @@ const createMap = (): {
       maxZoom: 13
     })
   });
-
-  // Création de la map
-  // const baseLayer = (LExtended as any).geoportalLayer.WMTS({
-  //   layer: "ORTHOIMAGERY.ORTHOPHOTOS"
-  // });
-
-  // const cadastralLayer = (LExtended as any).geoportalLayer.WMTS({
-  //   layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS"
-  // });
-
-  // const roadsLayer = (LExtended as any).geoportalLayer.WMTS(
-  //   {
-  //     layer: "TRANSPORTNETWORKS.ROADS"
-  //   },
-  //   {
-  //     opacity: 0.7,
-  //     minZoom: 14
-  //   }
-  // );
-
-  // const map = L.map("parcels-map", {
-  //   zoom: 5,
-  //   center: L.latLng(46.4983, 2.1752),
-  //   zoomSnap: 0.1,
-  //   wheelDebounceTime: 10
-  // });
-
-  // map.on("singleclick", e => {
-  //   console.log("click", toLonLat(e.coordinate));
-  // });
-  // map.on("zoomend", e => {
-  //   console.log(map.getZoom());
-  // });
-
-  // map.on("moveend", e => {
-  //   console.log(map.getView().getZoom());
-  // });
-
-  // baseLayer.addTo(map);
-  // cadastralLayer.addTo(map);
-  // roadsLayer.addTo(map);
   return { map, markerLayerId, parcelLayerId };
 };
 
@@ -164,7 +129,6 @@ const searchAddress = async (
     `https://data.geopf.fr/geocodage/completion?maximumResponses=5&text=${searchString}`
   );
   const data = await response.json();
-  console.log(data);
   return data;
 };
 
@@ -186,7 +150,6 @@ const getParcel = async (
     }
   );
   const data = await response.json();
-  console.log(data);
   if (data.features.length > 0) {
     const parcelNumber = `${data.features[0].properties.sheet}-${data.features[0].properties.section}-${data.features[0].properties.number}`;
     const inseeCode = `${data.features[0].properties.departmentcode}${data.features[0].properties.municipalitycode}`;
@@ -215,7 +178,6 @@ const getCoordinatesFromParcel = async (
     }
   );
   const data = await response.json();
-  console.log(data);
   if (data.features.length > 0) {
     return {
       lat: data.features[0].geometry.coordinates[1],
@@ -251,6 +213,137 @@ const lonLatFromCoordinatesString = (coordinates: string): number[] | null => {
   return null;
 };
 
+const addPointToMap = (
+  point: Point,
+  map: Map | null,
+  markerLayerId: string | null
+): { featureId: string; extent: Extent } | null => {
+  if (map && markerLayerId) {
+    const markerLayer = map
+      .getLayers()
+      .getArray()
+      .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
+      VectorSource<Point>
+    >;
+    if (markerLayer) {
+      const feature = new Feature(point);
+      const featureId = getUid(feature);
+      markerLayer.getSource().addFeature(feature);
+      const extent = point.getExtent();
+      return { featureId, extent };
+    }
+  }
+  return null;
+};
+
+const removePointFromMap = (
+  featureId: string,
+  map: Map | null,
+  markerLayerId: string | null
+) => {
+  if (map && markerLayerId) {
+    const markerLayer = map
+      .getLayers()
+      .getArray()
+      .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
+      VectorSource<Point>
+    >;
+    if (markerLayer) {
+      const feature = markerLayer.getSource().getFeatureByUid(featureId);
+      if (feature) {
+        markerLayer.getSource().removeFeature(feature);
+      }
+    }
+  }
+};
+
+const addParcelToMap = async (
+  inseeCode: string,
+  parcelNumber: string,
+  map: Map | null,
+  parcelLayerId: string | null
+): Promise<{ featureId: string; extent: Extent } | null> => {
+  if (map && parcelLayerId) {
+    const res = await getCoordinatesFromParcel(inseeCode, parcelNumber);
+    if (res?.geometry) {
+      const parcelLayer = map
+        .getLayers()
+        .getArray()
+        .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
+        VectorSource<Geometry>
+      >;
+      if (parcelLayer) {
+        const feature = new Feature(res.geometry);
+        const featureId = getUid(feature);
+        parcelLayer.getSource().addFeature(feature);
+        const extent = res.geometry.getExtent();
+        return { featureId, extent };
+      }
+    }
+  }
+  return null;
+};
+
+const removeParcelFromMap = (
+  featureId: string,
+  map: Map | null,
+  parcelLayerId: string | null
+) => {
+  if (map && parcelLayerId) {
+    const parcelLayer = map
+      .getLayers()
+      .getArray()
+      .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
+      VectorSource<Geometry>
+    >;
+    if (parcelLayer) {
+      const feature = parcelLayer.getSource().getFeatureByUid(featureId);
+      if (feature) {
+        parcelLayer.getSource().removeFeature(feature);
+      }
+    }
+  }
+};
+
+const displayCoordinates = (coordinates: string, map: Map | null) => {
+  const lonLat = lonLatFromCoordinatesString(coordinates);
+  if (lonLat) {
+    if (map) {
+      map.setView(
+        new View({
+          center: lonLat,
+          zoom: 11,
+          zoomFactor: 3,
+          maxZoom: 13
+        })
+      );
+    }
+  }
+};
+
+const displayParcel = async (
+  inseeCode: string,
+  parcelNumber: string,
+  map: Map | null
+) => {
+  const coordinates = await getCoordinatesFromParcel(inseeCode, parcelNumber);
+  if (coordinates) {
+    const lonLat = fromLonLat([coordinates.lng, coordinates.lat]);
+    if (lonLat) {
+      if (map) {
+        map.setView(
+          new View({
+            center: lonLat,
+            zoom: 11,
+            zoomFactor: 3,
+            maxZoom: 13
+          })
+        );
+      }
+    }
+  }
+};
+
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
   const [mode, setMode] = useState<Mode>(Mode.CODE);
@@ -268,17 +361,29 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     AddressSuggestion[]
   >([]);
   const addressInputRef = useRef<HTMLInputElement | null>(null);
-  const { append: appendInseeCode, remove: removeInseeCode } = useFieldArray({
+  const {
+    append: appendInseeCode,
+    remove: removeInseeCode,
+    update: updateInseeCode
+  } = useFieldArray({
     control: methods.control,
     name: `${prefix}InseeCodes`
   });
 
-  const { append: appendNumber, remove: removeNumber } = useFieldArray({
+  const {
+    append: appendNumber,
+    remove: removeNumber,
+    update: updateNumber
+  } = useFieldArray({
     control: methods.control,
     name: `${prefix}Numbers`
   });
 
-  const { append: appendCoordinate, remove: removeCoordinate } = useFieldArray({
+  const {
+    append: appendCoordinate,
+    remove: removeCoordinate,
+    update: updateCoordinate
+  } = useFieldArray({
     control: methods.control,
     name: `${prefix}Coordinates`
   });
@@ -298,156 +403,75 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         setCoordinates(`${coordinates.lat} ${coordinates.lng}`);
       }
     },
-    [mode, setCoordinates]
+    [mode, setCoordinates, setParcelNumber, setInseeCode]
   );
 
-  const displayCoordinates = useCallback(
-    (coordinates: string) => {
-      const lonLat = lonLatFromCoordinatesString(coordinates);
-      if (lonLat) {
-        if (map) {
-          map.setView(
-            new View({
-              center: lonLat,
-              zoom: 11,
-              zoomFactor: 3,
-              maxZoom: 13
-            })
-          );
-        }
-      }
-    },
-    [map]
-  );
-
-  const displayParcel = useCallback(
-    async (inseeCode: string, parcelNumber: string) => {
-      const coordinates = await getCoordinatesFromParcel(
-        inseeCode,
-        parcelNumber
-      );
-      if (coordinates) {
-        const lonLat = fromLonLat([coordinates.lng, coordinates.lat]);
-        if (lonLat) {
-          if (map) {
-            map.setView(
-              new View({
-                center: lonLat,
-                zoom: 11,
-                zoomFactor: 3,
-                maxZoom: 13
-              })
-            );
-          }
-        }
-      }
-    },
-    [map]
-  );
-
-  const addPointToMap = useCallback(
-    (point: Point): string | null => {
-      if (map) {
-        const markerLayer = map
-          .getLayers()
-          .getArray()
-          .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
-          VectorSource<Point>
-        >;
-        if (markerLayer) {
-          console.log("markerLayer", markerLayer);
-          const feature = new Feature(point);
-          const featureId = getUid(feature);
-          markerLayer.getSource().addFeature(feature);
-          return featureId;
-        }
-      }
-      return null;
-    },
-    [map, markerLayerId]
-  );
-
-  const removePointFromMap = useCallback(
-    (featureId: string) => {
-      if (map) {
-        const markerLayer = map
-          .getLayers()
-          .getArray()
-          .find(layer => getUid(layer) === markerLayerId) as VectorLayer<
-          VectorSource<Point>
-        >;
-        if (markerLayer) {
-          console.log("markerLayer", markerLayer);
-          console.log("featureId", featureId);
-          const feature = markerLayer.getSource().getFeatureByUid(featureId);
-          console.log("feature", feature);
-          if (feature) {
-            markerLayer.getSource().removeFeature(feature);
-          }
-        }
-      }
-    },
-    [map, markerLayerId]
-  );
-
-  const addParcelToMap = useCallback(
-    async (inseeCode: string, parcelNumber: string): Promise<string | null> => {
-      if (map) {
-        const res = await getCoordinatesFromParcel(inseeCode, parcelNumber);
-        if (res?.geometry) {
-          const parcelLayer = map
-            .getLayers()
-            .getArray()
-            .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
-            VectorSource<Geometry>
-          >;
-          if (parcelLayer) {
-            const feature = new Feature(res.geometry);
-            const featureId = getUid(feature);
-            parcelLayer.getSource().addFeature(feature);
-            console.log("featureId", featureId);
-            return featureId;
-          }
-        }
-      }
-      return null;
-    },
-    [map, parcelLayerId]
-  );
-
-  const removeParcelFromMap = useCallback(
-    (featureId: string) => {
-      console.log("removeParcelFromMap", featureId);
-      if (map) {
-        const parcelLayer = map
-          .getLayers()
-          .getArray()
-          .find(layer => getUid(layer) === parcelLayerId) as VectorLayer<
-          VectorSource<Geometry>
-        >;
-        if (parcelLayer) {
-          console.log("parcelLayer", parcelLayer);
-          console.log("featureId", featureId);
-          const feature = parcelLayer.getSource().getFeatureByUid(featureId);
-          console.log("feature", feature);
-          if (feature) {
-            parcelLayer.getSource().removeFeature(feature);
-          }
-        }
-      }
-    },
-    [map, parcelLayerId]
-  );
+  const inseeCodeValues: { value: string; featureId?: string }[] =
+    methods.watch(`${prefix}InseeCodes`);
+  const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
+  const coordinatesValues: { value: string; featureId?: string }[] =
+    methods.watch(`${prefix}Coordinates`);
 
   useEffect(() => {
     Services.getConfig({
-      onSuccess: () => {
+      onSuccess: async () => {
         const { map, markerLayerId, parcelLayerId } = createMap();
         setMap(map);
         setMarkerLayerId(markerLayerId);
         setParcelLayerId(parcelLayerId);
+        let globalExtent = createEmptyExtent();
+        if (inseeCodeValues.length > 0) {
+          for (let i = 0; i < inseeCodeValues.length; i++) {
+            const inseeCode = inseeCodeValues[i];
+            const number = numberValues[i];
+            if (inseeCode.value && number.value) {
+              const res = await addParcelToMap(
+                inseeCode.value,
+                number.value,
+                map,
+                parcelLayerId
+              );
+              if (res) {
+                updateInseeCode(i, {
+                  value: inseeCode.value,
+                  featureId: res.featureId
+                });
+                updateNumber(i, { value: number.value });
+                globalExtent = extendExtent(globalExtent, res.extent);
+              }
+            }
+          }
+        }
+        if (coordinatesValues.length > 0) {
+          for (let i = 0; i < coordinatesValues.length; i++) {
+            const coordinate = coordinatesValues[i];
+            if (coordinate.value) {
+              const lonLat = lonLatFromCoordinatesString(coordinate.value);
+              if (lonLat) {
+                const res = addPointToMap(
+                  new Point(lonLat),
+                  map,
+                  markerLayerId
+                );
+                if (res) {
+                  updateCoordinate(i, {
+                    value: coordinate.value,
+                    featureId: res.featureId
+                  });
+                  globalExtent = extendExtent(globalExtent, res.extent);
+                }
+              }
+            }
+          }
+        }
+        if (!isEmptyExtent(globalExtent)) {
+          map.getView().fit(globalExtent, {
+            padding: [50, 50, 50, 50]
+          });
+        }
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -475,7 +499,6 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
           maxZoom: 13
         })
       );
-      // map.setView([address.lat, address.lng], 17);
     }
   };
 
@@ -508,18 +531,11 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     [setAddressesSuggestions, setShowSearch]
   );
 
-  const inseeCodeValues: { value: string; featureId: string }[] = methods.watch(
-    `${prefix}InseeCodes`
-  );
-  const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
-  const coordinatesValues: { value: string; featureId: string }[] =
-    methods.watch(`${prefix}Coordinates`);
-
   function deleteParcel(mode: Mode, index: number) {
     if (mode === Mode.CODE) {
       const featureId = inseeCodeValues[index]?.featureId;
       if (featureId) {
-        removeParcelFromMap(featureId);
+        removeParcelFromMap(featureId, map, parcelLayerId);
       }
       removeInseeCode(index);
       removeNumber(index);
@@ -527,23 +543,25 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     if (mode === Mode.GPS) {
       const featureId = coordinatesValues[index]?.featureId;
       if (featureId) {
-        removePointFromMap(featureId);
+        removePointFromMap(featureId, map, markerLayerId);
       }
       removeCoordinate(index);
     }
   }
 
-  const tags = useMemo(() => {
+  const tags = useMemo((): { value: string; mode: Mode; index: number }[] => {
     const numberFields = inseeCodeValues.map((field, index) => {
       return {
         value: `${field.value} | ${numberValues[index].value}`,
-        mode: Mode.CODE
+        mode: Mode.CODE,
+        index
       };
     });
-    const coordinatesFields = coordinatesValues.map(field => {
+    const coordinatesFields = coordinatesValues.map((field, index) => {
       return {
         value: field.value,
-        mode: Mode.GPS
+        mode: Mode.GPS,
+        index
       };
     });
     return [...numberFields, ...coordinatesFields];
@@ -680,7 +698,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
-                    onClick={() => displayParcel(inseeCode, parcelNumber)}
+                    onClick={() => displayParcel(inseeCode, parcelNumber, map)}
                   >
                     Afficher sur la carte
                   </Button>
@@ -688,12 +706,19 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     type="button"
                     priority="secondary"
                     onClick={async () => {
-                      const featureId = await addParcelToMap(
+                      const res = await addParcelToMap(
                         inseeCode,
-                        parcelNumber
+                        parcelNumber,
+                        map,
+                        parcelLayerId
                       );
-                      appendInseeCode({ value: inseeCode, featureId });
-                      appendNumber({ value: parcelNumber });
+                      if (res) {
+                        appendInseeCode({
+                          value: inseeCode,
+                          featureId: res.featureId
+                        });
+                        appendNumber({ value: parcelNumber });
+                      }
                     }}
                   >
                     Ajouter la parcelle
@@ -718,7 +743,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
-                    onClick={() => displayCoordinates(coordinates)}
+                    onClick={() => displayCoordinates(coordinates, map)}
                   >
                     Afficher sur la carte
                   </Button>
@@ -728,8 +753,17 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     onClick={() => {
                       const lonLat = lonLatFromCoordinatesString(coordinates);
                       if (lonLat) {
-                        const featureId = addPointToMap(new Point(lonLat));
-                        appendCoordinate({ value: coordinates, featureId });
+                        const res = addPointToMap(
+                          new Point(lonLat),
+                          map,
+                          markerLayerId
+                        );
+                        if (res) {
+                          appendCoordinate({
+                            value: coordinates,
+                            featureId: res.featureId
+                          });
+                        }
                       }
                     }}
                   >
@@ -743,7 +777,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                 <div>Parcelles sélectionnées sur la carte</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                   {tags?.map((parcel, idx) => (
-                    <div key={idx}>
+                    <div key={`${parcel.value}-${idx}`}>
                       <Tag
                         className="fr-mb-1v"
                         dismissible={!disabled}
@@ -751,7 +785,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           type: "button",
                           disabled,
                           onClick: () => {
-                            deleteParcel(parcel.mode, idx);
+                            deleteParcel(parcel.mode, parcel.index);
                           },
                           ...{ "data-testid": "tagsInputTags" }
                         }}
