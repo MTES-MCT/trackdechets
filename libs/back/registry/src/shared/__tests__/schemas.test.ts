@@ -252,6 +252,9 @@ describe("Schemas", () => {
     expect(() => parcelNumbersSchema.parse("1-AA-1")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("123-AA-1234")).not.toThrow();
     expect(() => parcelNumbersSchema.parse("12-AA-12")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("1234-AA-12")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("123-12-12")).not.toThrow();
+    expect(() => parcelNumbersSchema.parse("1234-A2-12")).not.toThrow();
     expect(() =>
       parcelNumbersSchema.parse("123-AA-1234,123-AA-1234")
     ).not.toThrow();
