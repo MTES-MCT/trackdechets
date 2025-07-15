@@ -46,15 +46,25 @@ const BATCH_SIZE = 10;
 export async function run() {
   console.log(">> Run script to associate BSFF fiches to packagings!");
 
+  // On cible les BSFF qui ont au moins 1 contenant et 1 fiche d'intervention
+  const where = {
+    // Syntaxe prisma: https://github.com/prisma/prisma/discussions/2772#discussioncomment-1712222
+    ficheInterventions: { some: {} },
+    packagings: { some: {} }
+  };
+
+  const count = await prisma.bsff.count({ where });
+  console.log(`Found ${count} BSFFs`);
+
   let finished = false;
   let lastId: string | null = null;
   while (!finished) {
     let bsffs: BsffWithFicheInterventionAndPackagings[] = [];
     try {
-      // Fetch all the bsffs
+      // Récupère les BSFF
       bsffs = await prisma.bsff.findMany({
         take: BATCH_SIZE,
-        skip: 1, // Skip the cursor
+        skip: 1, // Skip le curseur
         ...(lastId
           ? {
               cursor: {
@@ -62,6 +72,7 @@ export async function run() {
               }
             }
           : {}),
+        where,
         include: {
           ficheInterventions: true,
           packagings: true
@@ -75,7 +86,7 @@ export async function run() {
             bsff.ficheInterventions.map(async fiche => {
               await Promise.all(
                 bsff.packagings.map(async packaging => {
-                  // Could fail if ficheId / packagingId tuple already exists in DB
+                  // Peut échouer si le couple fiche / contenant existe déjà en DB
                   try {
                     await prisma.bsffPackagingToBsffFicheIntervention.create({
                       data: {
@@ -88,20 +99,17 @@ export async function run() {
                       `Done creating record for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}')`
                     );
                   } catch (error) {
-                    // Duplicate record. Ignore
+                    // Doublon. Ignore
                     if (
                       error instanceof Prisma.PrismaClientKnownRequestError &&
                       error.code === "P2002"
                     ) {
-                      // Ignore
-                      console.log(
-                        `Record already existing for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}')`
-                      );
+                      // Skip
                     } else {
                       console.log(
-                        `Failed to create record for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}')`
+                        `Failed to create record for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}'): `,
+                        error
                       );
-                      console.log(error);
                     }
                   }
                 })
@@ -109,7 +117,7 @@ export async function run() {
             })
           );
 
-          // Re-index bsff
+          // Re-index le BSFF
           enqueueUpdatedBsdToIndex(bsff.id);
 
           console.log(`Done fixing BSFF ${bsff.id}`);
@@ -120,7 +128,7 @@ export async function run() {
       console.log(error);
     }
 
-    // Update cursor
+    // Met le curseur à jour
     lastId = bsffs[bsffs.length - 1].id;
 
     if (bsffs.length < BATCH_SIZE) {
@@ -132,5 +140,5 @@ export async function run() {
     }
   }
 
-  console.log(">> Done!");
+  console.log(">> Terminé!");
 }
