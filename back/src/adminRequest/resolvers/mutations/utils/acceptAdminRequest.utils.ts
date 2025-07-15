@@ -43,6 +43,9 @@ export const getAdminRequestOrThrow = async (
       include: {
         company: true,
         user: true
+      },
+      orderBy: {
+        createdAt: "desc"
       }
     }
   )) as unknown as AdminRequestWithUserAndCompany;
