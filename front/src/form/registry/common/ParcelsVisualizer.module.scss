@@ -17,7 +17,7 @@
 }
 
 .map {
-  height: 380px;
+  height: 430px;
   width: 100%;
   :global(.leaflet-control-zoom) {
     a {
@@ -83,5 +83,25 @@
   // Add right padding to input to make room for the cancel button
   input[type="search"] {
     padding-right: 40px;
+  }
+}
+
+.errorTag {
+  :global(.fr-tag) {
+    background-color: var(--error-425-625);
+    --hover: var(--error-425-625-hover);
+    --active: var(--error-425-625-active);
+  }
+}
+
+.parcelNumber {
+  :global(.fr-hint-text) {
+    white-space: pre-line;
+  }
+}
+
+.controlledInput {
+  :global(.fr-messages-group) {
+    display: none;
   }
 }
