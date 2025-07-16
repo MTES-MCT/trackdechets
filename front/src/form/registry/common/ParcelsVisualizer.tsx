@@ -377,6 +377,67 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     severity: AlertProps.Severity;
     field: "inseeCode" | "parcelNumber" | "coordinates" | null;
   } | null>(null);
+
+  /**
+   * Custom tag content component with text and dismissible cross
+   */
+  const TagContent = ({
+    text,
+    onDismiss,
+    onTagClick
+  }: {
+    text: string;
+    onDismiss: () => void;
+    onTagClick?: () => void;
+  }) => (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        width: "100%",
+        gap: "4px"
+      }}
+    >
+      <span
+        onClick={onTagClick}
+        style={{
+          flex: 1,
+          cursor: onTagClick ? "pointer" : "default"
+        }}
+      >
+        {text}
+      </span>
+      {!disabled && (
+        <button
+          type="button"
+          onClick={e => {
+            e.stopPropagation();
+            onDismiss();
+          }}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            minWidth: "16px",
+            height: "16px",
+            marginRight: "-0.25rem"
+          }}
+          aria-label="Supprimer"
+        >
+          <span
+            className="fr-icon--sm fr-icon-close-line"
+            style={{ fontSize: "12px" }}
+            aria-hidden="true"
+          />
+        </button>
+      )}
+    </div>
+  );
+
   const [mode, setMode] = useState<Mode>(Mode.CODE);
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
@@ -448,27 +509,45 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const numberValues: { value: string }[] = methods.watch(`${prefix}Numbers`);
   const coordinatesValues: { value: string; featureId?: string }[] =
     methods.watch(`${prefix}Coordinates`);
-
+  const inseeCodeErrors = errors?.[`${prefix}InseeCodes`];
+  const numberErrors = errors?.[`${prefix}Numbers`];
+  const coordinatesErrors = errors?.[`${prefix}Coordinates`];
+  console.log("errors", errors);
   const backendErrors = useMemo(() => {
+    console.log("in memo");
+    // this looks dumb, but poor typing prevents us from simply enumerating the errors as an array
     const errs: FieldError[] = [];
     inseeCodeValues.forEach((_, index) => {
-      if (errors?.[`${prefix}InseeCodes`]?.[index]) {
-        errs.push(errors?.[`${prefix}InseeCodes`]?.[index]);
+      if (inseeCodeErrors?.[index]) {
+        errs.push(inseeCodeErrors?.[index]);
       }
     });
+    console.log("numberValues", numberValues);
     numberValues.forEach((_, index) => {
-      if (errors?.[`${prefix}Numbers`]?.[index]) {
-        errs.push(errors?.[`${prefix}Numbers`]?.[index]);
+      console.log("number error index", index);
+      console.log("number error", numberErrors?.[index]);
+      if (numberErrors?.[index]) {
+        console.log("number error", numberErrors?.[index]);
+        errs.push(numberErrors?.[index]);
       }
     });
     coordinatesValues.forEach((_, index) => {
-      if (errors?.[`${prefix}Coordinates`]?.[index]) {
-        errs.push(errors?.[`${prefix}Coordinates`]?.[index]);
+      if (coordinatesErrors?.[index]) {
+        errs.push(coordinatesErrors?.[index]);
       }
     });
     return errs;
-  }, [errors, inseeCodeValues, numberValues, coordinatesValues, prefix]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    inseeCodeErrors,
+    numberErrors,
+    coordinatesErrors,
+    inseeCodeValues,
+    numberValues,
+    coordinatesValues,
+    prefix
+  ]);
+  console.log("backendErrors", backendErrors);
   useEffect(() => {
     Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
@@ -857,6 +936,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           featureId: res.featureId
                         });
                         appendNumber({ value: parcelNumber });
+                        setClientError(null);
                       } else {
                         setClientError({
                           text: "Impossible d'ajouter la parcelle, etes vous sûr que le numéro de parcelle est correct ?",
@@ -910,7 +990,9 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           severity: "warning",
                           field: null
                         });
+                        return;
                       }
+                      setClientError(null);
                     }}
                   >
                     Afficher sur la carte
@@ -926,12 +1008,26 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           map,
                           markerLayerId
                         );
-                        if (res) {
-                          appendCoordinate({
-                            value: coordinates,
-                            featureId: res.featureId
+                        console.log("res", res);
+                        if (!res) {
+                          setClientError({
+                            text: "Impossible d'ajouter le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                            severity: "warning",
+                            field: null
                           });
+                          return;
                         }
+                        appendCoordinate({
+                          value: coordinates,
+                          featureId: res.featureId
+                        });
+                        setClientError(null);
+                      } else {
+                        setClientError({
+                          text: "Impossible d'ajouter le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                          severity: "warning",
+                          field: null
+                        });
                       }
                     }}
                   >
@@ -968,26 +1064,43 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                       className={
                         (
                           parcel.mode === Mode.CODE
-                            ? errors?.[`${prefix}InseeCodes`]?.[parcel.index]
-                            : errors?.[`${prefix}Coordinates`]?.[parcel.index]
+                            ? inseeCodeErrors?.[parcel.index] ||
+                              numberErrors?.[parcel.index]
+                            : coordinatesErrors?.[parcel.index]
                         )
                           ? styles.errorTag
-                          : ""
+                          : styles.tag
                       }
                     >
                       <Tag
                         className="fr-mb-1v"
-                        dismissible={!disabled}
+                        dismissible={false}
                         nativeButtonProps={{
                           type: "button",
-                          disabled,
-                          onClick: () => {
-                            deleteParcel(parcel.mode, parcel.index);
-                          },
-                          ...{ "data-testid": "tagsInputTags" }
+                          disabled
                         }}
                       >
-                        {parcel.value}
+                        <TagContent
+                          text={parcel.value}
+                          onDismiss={() =>
+                            deleteParcel(parcel.mode, parcel.index)
+                          }
+                          onTagClick={() => {
+                            if (parcel.mode === Mode.CODE) {
+                              displayParcel(
+                                inseeCodeValues[parcel.index].value,
+                                numberValues[parcel.index].value,
+                                map
+                              );
+                            } else {
+                              displayCoordinates(
+                                coordinatesValues[parcel.index].value,
+                                map
+                              );
+                            }
+                          }}
+                        />
+                        {/* {parcel.value} */}
                       </Tag>
                     </div>
                   ))}

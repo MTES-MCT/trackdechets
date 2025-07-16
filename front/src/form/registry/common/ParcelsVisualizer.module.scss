@@ -86,8 +86,19 @@
   }
 }
 
+.tag {
+  :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
+    background-color: var(--background-action-high-blue-france);
+    --idle: transparent;
+    --hover: var(--background-action-high-blue-france-hover);
+    --active: var(--background-action-high-blue-france-active);
+  }
+}
+
 .errorTag {
   :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
     background-color: var(--error-425-625);
     --hover: var(--error-425-625-hover);
     --active: var(--error-425-625-active);
