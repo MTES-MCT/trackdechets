@@ -1,4 +1,4 @@
-import Alert from "@codegouvfr/react-dsfr/Alert";
+import Alert, { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 import React, {
@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState
 } from "react";
-import { useFieldArray, type UseFormReturn } from "react-hook-form";
+import { FieldError, useFieldArray, type UseFormReturn } from "react-hook-form";
 import { formatError } from "../builder/error";
 import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import styles from "./ParcelsVisualizer.module.scss";
@@ -48,6 +48,15 @@ enum Mode {
   GPS = "GPS"
 }
 
+const getView = (lonLat: number[], zoom: number) => {
+  return new View({
+    center: lonLat,
+    zoom: zoom,
+    zoomFactor: 3,
+    maxZoom: 12
+  });
+};
+
 const createMap = (): {
   map: Map;
   markerLayerId: string;
@@ -81,6 +90,7 @@ const createMap = (): {
 
   const map = new Map({
     target: "parcels-map",
+    maxTilesLoading: 5,
     layers: [
       new olExtended.layer.GeoportalWMS({
         layer: "ORTHOIMAGERY.ORTHOPHOTOS",
@@ -105,13 +115,17 @@ const createMap = (): {
       markerLayer,
       parcelLayer
     ],
-    view: new View({
-      center: fromLonLat([2.1752, 46.4983]),
-      zoom: 3.5,
-      zoomFactor: 3,
-      maxZoom: 13
-    })
+    view: getView(fromLonLat([2.1752, 46.4983]), 3.5)
   });
+
+  map.on("moveend", () => {
+    const view = map.getView();
+    const center = view.getCenter();
+    const zoom = view.getZoom();
+    console.log("center", center);
+    console.log("zoom", zoom);
+  });
+
   return { map, markerLayerId, parcelLayerId };
 };
 
@@ -151,7 +165,7 @@ const getParcel = async (
   );
   const data = await response.json();
   if (data.features.length > 0) {
-    const parcelNumber = `${data.features[0].properties.sheet}-${data.features[0].properties.section}-${data.features[0].properties.number}`;
+    const parcelNumber = `${data.features[0].properties.districtcode}-${data.features[0].properties.section}-${data.features[0].properties.number}`;
     const inseeCode = `${data.features[0].properties.departmentcode}${data.features[0].properties.municipalitycode}`;
     return { inseeCode, parcelNumber };
   }
@@ -165,12 +179,33 @@ const getCoordinatesFromParcel = async (
   const departmentCode = inseeCode.slice(0, 2);
   const municipalityCode = inseeCode.slice(2);
   const split = parcelNumber.split("-");
-  const sheet = split[0];
+  const prefixOrSheet = split[0];
   const section = split[1];
   const number = split[2];
 
+  let sheet: string | null, prefix: string | null;
+  if (prefixOrSheet.length === 3) {
+    prefix = prefixOrSheet;
+    sheet = null;
+  } else {
+    sheet = prefixOrSheet;
+    prefix = null;
+  }
+
+  if (
+    !departmentCode ||
+    !municipalityCode ||
+    (!prefix && !sheet) ||
+    !section ||
+    !number
+  ) {
+    return null;
+  }
+
   const response = await fetch(
-    `https://data.geopf.fr/geocodage/search?autocomplete=0&index=parcel&limit=1&returntruegeometry=true&departmentcode=${departmentCode}&municipalitycode=${municipalityCode}&sheet=${sheet}&section=${section}&number=${number}`,
+    `https://data.geopf.fr/geocodage/search?autocomplete=0&index=parcel&limit=1&returntruegeometry=true&departmentcode=${departmentCode}&municipalitycode=${municipalityCode}${
+      prefix ? `&districtcode=${prefix}` : ""
+    }${sheet ? `&sheet=${sheet}` : ""}&section=${section}&number=${number}`,
     {
       headers: {
         Accept: "application/json"
@@ -178,7 +213,7 @@ const getCoordinatesFromParcel = async (
     }
   );
   const data = await response.json();
-  if (data.features.length > 0) {
+  if (data?.features?.length > 0) {
     return {
       lat: data.features[0].geometry.coordinates[1],
       lng: data.features[0].geometry.coordinates[0],
@@ -305,47 +340,43 @@ const removeParcelFromMap = (
   }
 };
 
-const displayCoordinates = (coordinates: string, map: Map | null) => {
+const displayCoordinates = (coordinates: string, map: Map | null): boolean => {
   const lonLat = lonLatFromCoordinatesString(coordinates);
+  console.log("lonLat", lonLat);
   if (lonLat) {
     if (map) {
-      map.setView(
-        new View({
-          center: lonLat,
-          zoom: 11,
-          zoomFactor: 3,
-          maxZoom: 13
-        })
-      );
+      map.setView(getView(lonLat, 11));
     }
+    return true;
   }
+  return false;
 };
 
 const displayParcel = async (
   inseeCode: string,
   parcelNumber: string,
   map: Map | null
-) => {
+): Promise<boolean> => {
   const coordinates = await getCoordinatesFromParcel(inseeCode, parcelNumber);
   if (coordinates) {
     const lonLat = fromLonLat([coordinates.lng, coordinates.lat]);
     if (lonLat) {
       if (map) {
-        map.setView(
-          new View({
-            center: lonLat,
-            zoom: 11,
-            zoomFactor: 3,
-            maxZoom: 13
-          })
-        );
+        map.setView(getView(lonLat, 11));
       }
+      return true;
     }
   }
+  return false;
 };
 
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
+  const [clientError, setClientError] = useState<{
+    text: string;
+    severity: AlertProps.Severity;
+    field: "inseeCode" | "parcelNumber" | "coordinates" | null;
+  } | null>(null);
   const [mode, setMode] = useState<Mode>(Mode.CODE);
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
@@ -390,6 +421,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
 
   const exploitCoordinates = useCallback(
     async (coordinates: { lat: number; lng: number }) => {
+      setClientError(null);
       if (mode === Mode.CODE) {
         const parcel = await getParcel(coordinates.lat, coordinates.lng);
         if (parcel) {
@@ -398,6 +430,11 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         } else {
           setParcelNumber("");
           setInseeCode("");
+          setClientError({
+            text: "Aucune parcelle à ces coordonnées, utilisez les coordonnées GPS si vous voulez ajouter ce point",
+            severity: "info",
+            field: null
+          });
         }
       } else {
         setCoordinates(`${coordinates.lat} ${coordinates.lng}`);
@@ -412,10 +449,50 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const coordinatesValues: { value: string; featureId?: string }[] =
     methods.watch(`${prefix}Coordinates`);
 
+  const backendErrors = useMemo(() => {
+    const errs: FieldError[] = [];
+    inseeCodeValues.forEach((_, index) => {
+      if (errors?.[`${prefix}InseeCodes`]?.[index]) {
+        errs.push(errors?.[`${prefix}InseeCodes`]?.[index]);
+      }
+    });
+    numberValues.forEach((_, index) => {
+      if (errors?.[`${prefix}Numbers`]?.[index]) {
+        errs.push(errors?.[`${prefix}Numbers`]?.[index]);
+      }
+    });
+    coordinatesValues.forEach((_, index) => {
+      if (errors?.[`${prefix}Coordinates`]?.[index]) {
+        errs.push(errors?.[`${prefix}Coordinates`]?.[index]);
+      }
+    });
+    return errs;
+  }, [errors, inseeCodeValues, numberValues, coordinatesValues, prefix]);
+
   useEffect(() => {
     Services.getConfig({
+      customConfigFile: "/mapbox/customConfig.json",
+      callbackSuffix: "",
       onSuccess: async () => {
-        const { map, markerLayerId, parcelLayerId } = createMap();
+        console.log("onSuccess");
+        let map: Map;
+        let markerLayerId: string;
+        let parcelLayerId: string;
+        try {
+          const res = createMap();
+          map = res.map;
+          markerLayerId = res.markerLayerId;
+          parcelLayerId = res.parcelLayerId;
+        } catch (e) {
+          console.error(e);
+          setClientError({
+            text: "Erreur lors de la création de la carte",
+            severity: "error",
+            field: null
+          });
+          return;
+        }
+
         setMap(map);
         setMarkerLayerId(markerLayerId);
         setParcelLayerId(parcelLayerId);
@@ -491,14 +568,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
 
   const setSelectedAddress = (address: AddressSuggestion) => {
     if (map) {
-      map.setView(
-        new View({
-          center: fromLonLat([address.lng, address.lat]),
-          zoom: 11,
-          zoomFactor: 3,
-          maxZoom: 13
-        })
-      );
+      map.setView(getView(fromLonLat([address.lng, address.lat]), 11));
     }
   };
 
@@ -609,6 +679,11 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
                     setSearchString(e.currentTarget.value);
                     debouncedSearch(e.currentTarget.value);
+                  },
+                  onFocus: () => {
+                    if (addressesSuggestions.length > 0) {
+                      setShowSearch(true);
+                    }
                   }
                 }}
               />
@@ -651,6 +726,9 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           lat: address.lat,
                           lng: address.lng
                         });
+                        setAddressesSuggestions(
+                          addressesSuggestions.filter((a, idx) => idx === index)
+                        );
                         setSearchString(address.fulltext);
                         setShowSearch(false);
                       }}
@@ -665,13 +743,17 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
             {mode === Mode.CODE ? (
               <div className="fr-mt-1w">
                 <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-                  <div className="fr-col-6">
+                  <div className={clsx("fr-col-6", styles.controlledInput)}>
                     <Input
                       label="Commune"
                       className="fr-mb-1w"
-                      hintText="Code postal ou code INSEE"
+                      hintText="Code INSEE"
+                      state={
+                        clientError?.field === "inseeCode" ? "error" : undefined
+                      }
                       nativeInputProps={{
                         type: "text",
+                        placeholder: "75056",
                         value: inseeCode,
                         onChange: e => {
                           setInseeCode(e.currentTarget.value);
@@ -679,13 +761,25 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                       }}
                     />
                   </div>
-                  <div className="fr-col-6">
+                  <div
+                    className={clsx(
+                      "fr-col-6",
+                      styles.parcelNumber,
+                      styles.controlledInput
+                    )}
+                  >
                     <Input
                       label="Numéro de parcelle"
                       className="fr-mb-1w"
-                      hintText="Ex: 000-AB-125"
+                      hintText={`Préfixe-Section-Numéro`}
+                      state={
+                        clientError?.field === "parcelNumber"
+                          ? "error"
+                          : undefined
+                      }
                       nativeInputProps={{
                         type: "text",
+                        placeholder: "000-AB-125",
                         value: parcelNumber,
                         onChange: e => {
                           setParcelNumber(e.currentTarget.value);
@@ -698,7 +792,36 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
-                    onClick={() => displayParcel(inseeCode, parcelNumber, map)}
+                    onClick={async () => {
+                      if (!inseeCode) {
+                        setClientError({
+                          text: "Impossible d'afficher la parcelle, veuillez renseigner le code INSEE",
+                          severity: "error",
+                          field: "inseeCode"
+                        });
+                        return;
+                      }
+                      if (!parcelNumber) {
+                        setClientError({
+                          text: "Impossible d'afficher la parcelle, veuillez renseigner le numéro de parcelle",
+                          severity: "error",
+                          field: "parcelNumber"
+                        });
+                        return;
+                      }
+                      const res = await displayParcel(
+                        inseeCode,
+                        parcelNumber,
+                        map
+                      );
+                      if (!res) {
+                        setClientError({
+                          text: "Impossible d'afficher la parcelle, etes vous sûr que le numéro de parcelle est correct ?",
+                          severity: "warning",
+                          field: null
+                        });
+                      }
+                    }}
                   >
                     Afficher sur la carte
                   </Button>
@@ -706,6 +829,22 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     type="button"
                     priority="secondary"
                     onClick={async () => {
+                      if (!inseeCode) {
+                        setClientError({
+                          text: "Impossible d'afficher la parcelle, veuillez renseigner le code INSEE",
+                          severity: "error",
+                          field: "inseeCode"
+                        });
+                        return;
+                      }
+                      if (!parcelNumber) {
+                        setClientError({
+                          text: "Impossible d'afficher la parcelle, veuillez renseigner le numéro de parcelle",
+                          severity: "error",
+                          field: "parcelNumber"
+                        });
+                        return;
+                      }
                       const res = await addParcelToMap(
                         inseeCode,
                         parcelNumber,
@@ -718,6 +857,12 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           featureId: res.featureId
                         });
                         appendNumber({ value: parcelNumber });
+                      } else {
+                        setClientError({
+                          text: "Impossible d'ajouter la parcelle, etes vous sûr que le numéro de parcelle est correct ?",
+                          severity: "warning",
+                          field: null
+                        });
                       }
                     }}
                   >
@@ -727,23 +872,46 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
               </div>
             ) : (
               <div className="fr-mt-1w">
-                <Input
-                  label="Coordonnées GPS"
-                  className="fr-mb-1w"
-                  hintText="Format: un point pour les décimales, exemple: 48.852197 2.310674"
-                  nativeInputProps={{
-                    type: "text",
-                    value: coordinates,
-                    onChange: e => {
-                      setCoordinates(e.currentTarget.value);
+                <div className={clsx("fr-col-12", styles.controlledInput)}>
+                  <Input
+                    label="Coordonnées GPS"
+                    className="fr-mb-1w"
+                    hintText="Format: un point pour les décimales"
+                    state={
+                      clientError?.field === "coordinates" ? "error" : undefined
                     }
-                  }}
-                />
+                    nativeInputProps={{
+                      placeholder: "48.852197 2.310674",
+                      type: "text",
+                      value: coordinates,
+                      onChange: e => {
+                        setCoordinates(e.currentTarget.value);
+                      }
+                    }}
+                  />
+                </div>
                 <div className={styles.gpsButtons}>
                   <Button
                     type="button"
                     priority="secondary"
-                    onClick={() => displayCoordinates(coordinates, map)}
+                    onClick={() => {
+                      if (!coordinates) {
+                        setClientError({
+                          text: "Impossible d'afficher le point, veuillez renseigner les coordonnées GPS",
+                          severity: "error",
+                          field: "coordinates"
+                        });
+                        return;
+                      }
+                      const res = displayCoordinates(coordinates, map);
+                      if (!res) {
+                        setClientError({
+                          text: "Impossible d'afficher le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                          severity: "warning",
+                          field: null
+                        });
+                      }
+                    }}
                   >
                     Afficher sur la carte
                   </Button>
@@ -772,12 +940,41 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                 </div>
               </div>
             )}
+            {clientError && (
+              <Alert
+                className="fr-mt-2w"
+                description={clientError.text}
+                severity={clientError.severity}
+                small
+              />
+            )}
+            {backendErrors.length > 0 &&
+              backendErrors.map((error, index) => (
+                <Alert
+                  key={`${index}`}
+                  className="fr-mt-2w"
+                  description={formatError(error)}
+                  severity="error"
+                  small
+                />
+              ))}
             {tags.length > 0 && (
               <div className="fr-mt-1w">
                 <div>Parcelles sélectionnées sur la carte</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
                   {tags?.map((parcel, idx) => (
-                    <div key={`${parcel.value}-${idx}`}>
+                    <div
+                      key={`${parcel.value}-${idx}`}
+                      className={
+                        (
+                          parcel.mode === Mode.CODE
+                            ? errors?.[`${prefix}InseeCodes`]?.[parcel.index]
+                            : errors?.[`${prefix}Coordinates`]?.[parcel.index]
+                        )
+                          ? styles.errorTag
+                          : ""
+                      }
+                    >
                       <Tag
                         className="fr-mb-1v"
                         dismissible={!disabled}
