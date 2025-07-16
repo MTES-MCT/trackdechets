@@ -20,7 +20,8 @@ import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
+
 export const managedFormShape: FormShape = [
   {
     tabId: "declaration",
@@ -31,6 +32,7 @@ export const managedFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -82,6 +84,7 @@ export const managedFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -368,9 +371,9 @@ export const managedFormShape: FormShape = [
       {
         name: "gistridNumber",
         shape: "generic",
-        title: "GISTRID",
+        title: "Transfert transfrontalier de déchets",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -381,7 +384,7 @@ export const managedFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },

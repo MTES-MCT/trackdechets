@@ -22,7 +22,7 @@ import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 
 export const outgoingWasteFormShape: FormShape = [
@@ -35,6 +35,7 @@ export const outgoingWasteFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -86,6 +87,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -115,17 +117,6 @@ export const outgoingWasteFormShape: FormShape = [
         validation: {
           wasteIsDangerous: booleanString
         }
-      },
-      {
-        name: "dispatchDate",
-        shape: "generic",
-        label: Labels.dispatchDate,
-        required: true,
-        validation: {
-          dispatchDate: nonEmptyString
-        },
-        type: "date",
-        style: { className: "fr-col-4" }
       },
       {
         Component: WeightSelector,
@@ -178,6 +169,17 @@ export const outgoingWasteFormShape: FormShape = [
     tabId: "emitter",
     tabTitle: "Expéditeur",
     fields: [
+      {
+        name: "dispatchDate",
+        shape: "generic",
+        label: Labels.dispatchDate,
+        required: true,
+        validation: {
+          dispatchDate: nonEmptyString
+        },
+        type: "date",
+        style: { className: "fr-col-4" }
+      },
       {
         Component: Address,
         props: {
@@ -302,7 +304,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -313,7 +315,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },

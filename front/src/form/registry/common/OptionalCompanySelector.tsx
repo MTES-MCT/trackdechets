@@ -59,7 +59,7 @@ export function OptionalCompanySelector({
         "company-selector-reduced-margin": reducedMargin
       })}
     >
-      {label && <h5 className="fr-h5">{capitalize(label)} (optionnel)</h5>}
+      {label && <h5 className="fr-h5">{capitalize(label)}</h5>}
       <div>
         <div className={"fr-grid-row fr-grid-row--gutters"}>
           <div className={"fr-col-12"}>

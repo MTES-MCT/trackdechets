@@ -64,8 +64,18 @@ export function FormTab({ fields, methods }: Props) {
                   ...methods.register(field.name)
                 }}
                 disabled={field.disabled}
-                state={errors?.[field.name] && "error"}
-                stateRelatedMessage={formatError(errors?.[field.name])}
+                state={
+                  errors?.[field.name]
+                    ? "error"
+                    : field.infoLabel
+                    ? "info"
+                    : undefined
+                }
+                stateRelatedMessage={
+                  errors?.[field.name]
+                    ? formatError(errors?.[field.name])
+                    : field.infoLabel
+                }
               />
             </div>
           )}

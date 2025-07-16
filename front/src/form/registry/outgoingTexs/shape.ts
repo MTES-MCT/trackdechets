@@ -23,7 +23,7 @@ import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 
 export const outgoingTexsFormShape: FormShape = [
@@ -36,6 +36,7 @@ export const outgoingTexsFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -63,10 +64,13 @@ export const outgoingTexsFormShape: FormShape = [
     fields: [
       {
         Component: WasteCodeSelector,
-        props: { name: "wasteCode", whiteList: INCOMING_TEXS_WASTE_CODES },
+        props: {
+          name: "wasteCode",
+          whiteList: INCOMING_TEXS_WASTE_CODES,
+          required: false
+        },
         shape: "custom",
         names: ["wasteCode"],
-        required: false,
         validation: {
           wasteCode: optionalString
         },
@@ -75,8 +79,7 @@ export const outgoingTexsFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label:
-          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
+        label: Labels.wasteDescriptionTexs,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -88,6 +91,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -202,6 +206,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "sisIdentifier",
         shape: "generic",
         label: Labels.sisIdentifier,
+        infoLabel: InfoLabels.sisIdentifier,
         validation: {
           sisIdentifier: optionalString
         },
@@ -338,7 +343,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -349,7 +354,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },
