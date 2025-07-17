@@ -9,6 +9,7 @@ import { validationAccountParametersSchema } from "../accountSchema";
 import AccountInfoActionBar from "./AccountInfoActionBar";
 import { DsfrNotificationError } from "../../common/Components/Error/Error";
 import AccountFormChangePassword from "./AccountFormChangePassword";
+import AccountFormChangeTrackingSetting from "./AccountFormChangeTrackingSetting";
 
 type Props = {
   readonly me: User;
@@ -37,6 +38,14 @@ const AccountFieldNameFragments = {
     }
   `
 };
+const AccountFieldTrackingConsentFragment = {
+  me: gql`
+    fragment AccountFieldTrackingConsentFragment on User {
+      id
+      trackingConsent
+    }
+  `
+};
 
 AccountInfo.fragments = {
   me: gql`
@@ -44,9 +53,12 @@ AccountInfo.fragments = {
       email
       ...AccountFieldPhoneFragment
       ...AccountFieldNameFragment
+      ...AccountFieldTrackingConsentFragment
     }
+
     ${AccountFieldPhoneFragments.me},
     ${AccountFieldNameFragments.me}
+    ${AccountFieldTrackingConsentFragment.me}
   `
 };
 
@@ -178,6 +190,8 @@ export default function AccountInfo({ me }: Props) {
 
       <hr className="fr-mt-2w" />
       <AccountFormChangePassword />
+      <hr className="fr-mt-2w" />
+      <AccountFormChangeTrackingSetting />
     </>
   );
 }

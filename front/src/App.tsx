@@ -9,6 +9,7 @@ import ErrorBoundary from "./ErrorBoundary";
 import { AuthProvider } from "./common/contexts/AuthContext";
 import { FeatureFlagsProvider } from "./common/contexts/FeatureFlagsContext";
 import { PermissionsProvider } from "./common/contexts/PermissionsContext";
+import { MatomoTracker } from "./common/tracking/Tracking";
 import i18next from "i18next";
 import { z } from "zod";
 import { zodI18nMap } from "zod-i18n-map";
@@ -40,6 +41,7 @@ export default function App() {
             <PermissionsProvider>
               <FeatureFlagsProvider defaultFeatureFlags={{}}>
                 <div className="App">
+                  <MatomoTracker />
                   <RouterProvider router={router} />
                 </div>
               </FeatureFlagsProvider>

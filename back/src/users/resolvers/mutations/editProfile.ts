@@ -6,7 +6,8 @@ import type {
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import * as yup from "yup";
-
+import { addDays } from "date-fns";
+const TRACKING_CONSENT_PERIOD = 6 * 30; // 6 months
 /**
  * Edit user profile
  * Each field can be edited separately so we need to handle
@@ -27,15 +28,23 @@ export async function editProfileFn(
         name => name?.length !== 0
       )
       .isSafeSSTI(),
-    phone: yup.string()
+    phone: yup.string(),
+    trackingConsent: yup.boolean()
   });
+
   editProfileSchema.validateSync(payload);
 
-  const { name, phone } = payload;
+  const { name, phone, trackingConsent } = payload;
 
   const data: { name?: string; phone?: string | null } = {
     ...(name != null ? { name } : {}),
-    ...(phone !== undefined ? { phone } : {})
+    ...(phone !== undefined ? { phone } : {}),
+    ...(trackingConsent !== undefined
+      ? {
+          trackingConsent,
+          trackingConsentUntil: addDays(new Date(), TRACKING_CONSENT_PERIOD)
+        }
+      : {})
   };
 
   const updatedUser = await prisma.user.update({
