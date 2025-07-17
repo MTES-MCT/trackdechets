@@ -140,7 +140,7 @@ const CompanySelector = ({
           parentRef={parentRef}
           triggerRef={triggerRef}
           isOpen={shouldDisplayResults}
-          onOpenChange={() => {}}
+          onOpenChange={() => setShouldDisplayResults(false)}
         >
           {loading ? (
             <InlineLoader></InlineLoader>
