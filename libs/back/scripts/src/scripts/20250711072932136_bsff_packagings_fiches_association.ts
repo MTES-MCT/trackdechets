@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
-import { prisma } from "@td/prisma";
 import Queue, { JobOptions } from "bull";
+import { addBsffPackagingsFichesIntervention } from "back";
 
 // TODO: use logger
 
@@ -43,7 +43,7 @@ export type BsffWithFicheInterventionAndPackagings = Prisma.BsffGetPayload<{
  * à tous ses contenants.
  */
 const BATCH_SIZE = 10;
-export async function run() {
+export async function run(tx: Prisma.TransactionClient) {
   console.log(">> Run script to associate BSFF fiches to packagings!");
 
   // On cible les BSFF qui ont au moins 1 contenant et 1 fiche d'intervention
@@ -53,7 +53,7 @@ export async function run() {
     packagings: { some: {} }
   };
 
-  const count = await prisma.bsff.count({ where });
+  const count = await tx.bsff.count({ where });
   console.log(`Found ${count} BSFFs`);
 
   let finished = false;
@@ -62,7 +62,7 @@ export async function run() {
     let bsffs: BsffWithFicheInterventionAndPackagings[] = [];
     try {
       // Récupère les BSFF
-      bsffs = await prisma.bsff.findMany({
+      bsffs = await tx.bsff.findMany({
         take: BATCH_SIZE,
         skip: 1, // Skip le curseur
         ...(lastId
@@ -82,39 +82,10 @@ export async function run() {
       await Promise.all(
         bsffs.map(async bsff => {
           // Fix fiches & packagings
-          await Promise.all(
-            bsff.ficheInterventions.map(async fiche => {
-              await Promise.all(
-                bsff.packagings.map(async packaging => {
-                  // Peut échouer si le couple fiche / contenant existe déjà en DB
-                  try {
-                    await prisma.bsffPackagingToBsffFicheIntervention.create({
-                      data: {
-                        ficheInterventionId: fiche.id,
-                        packagingId: packaging.id
-                      }
-                    });
-
-                    console.log(
-                      `Done creating record for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}')`
-                    );
-                  } catch (error) {
-                    // Doublon. Ignore
-                    if (
-                      error instanceof Prisma.PrismaClientKnownRequestError &&
-                      error.code === "P2002"
-                    ) {
-                      // Skip
-                    } else {
-                      console.log(
-                        `Failed to create record for ficheInterventionId('${fiche.id}')/packagingId('${packaging.id}'): `,
-                        error
-                      );
-                    }
-                  }
-                })
-              );
-            })
+          await addBsffPackagingsFichesIntervention(
+            bsff.packagings,
+            bsff.ficheInterventions,
+            tx
           );
 
           // Re-index le BSFF
