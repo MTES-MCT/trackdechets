@@ -11,6 +11,8 @@ const ME = `
     me {
       id
       isAdmin
+      trackingConsent
+      trackingConsentUntil
       companies {
         siret
         userRole
@@ -30,6 +32,21 @@ describe("query me", () => {
     expect(data.me.id).toEqual(user.id);
     expect(data.me.isAdmin).toEqual(false);
   });
+  it.each([true, false])(
+    "should return tracking consent data (%p)",
+    async trackingConsentValue => {
+      const until = new Date();
+
+      const user = await userFactory({
+        trackingConsent: trackingConsentValue,
+        trackingConsentUntil: until
+      });
+      const { query } = makeClient(user);
+      const { data } = await query<Pick<Query, "me">>(ME);
+      expect(data.me.trackingConsent).toEqual(trackingConsentValue);
+      expect(data.me.trackingConsentUntil).toEqual(until.toISOString());
+    }
+  );
 
   it("should return user companies with role and permissions", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

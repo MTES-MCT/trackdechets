@@ -911,22 +911,25 @@ model BsddTransporter {
 }
 
 model User {
-  id                    String                  @id @default(cuid()) @db.VarChar(30)
-  email                 String                  @unique(map: "User.email_unique")
-  password              String
-  passwordVersion       Int?
-  name                  String
-  phone                 String?
-  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
-  updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
-  activatedAt           DateTime?               @db.Timestamptz(6)
-  firstAssociationDate  DateTime?               @db.Timestamptz(6)
-  isActive              Boolean?                @default(false)
-  isAdmin               Boolean                 @default(false)
-  governmentAccountId   String?                 @unique
-  governmentAccount     GovernmentAccount?      @relation(fields: [governmentAccountId], references: [id])
-  totpSeed              String?
-  totpActivatedAt       DateTime?               @db.Timestamptz(6)
+  id                   String             @id @default(cuid()) @db.VarChar(30)
+  email                String             @unique(map: "User.email_unique")
+  password             String
+  passwordVersion      Int?
+  name                 String
+  phone                String?
+  createdAt            DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(6)
+  activatedAt          DateTime?          @db.Timestamptz(6)
+  firstAssociationDate DateTime?          @db.Timestamptz(6)
+  isActive             Boolean?           @default(false)
+  isAdmin              Boolean            @default(false)
+  governmentAccountId  String?            @unique
+  governmentAccount    GovernmentAccount? @relation(fields: [governmentAccountId], references: [id])
+  totpSeed             String?
+  totpActivatedAt      DateTime?          @db.Timestamptz(6)
+  trackingConsent      Boolean            @default(false)
+  trackingConsentUntil DateTime?
+
   AccessToken           AccessToken[]
   applications          Application[]
   companyAssociations   CompanyAssociation[]
