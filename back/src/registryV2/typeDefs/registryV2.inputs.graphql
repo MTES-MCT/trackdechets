@@ -2914,6 +2914,15 @@ input IncomingTexsLineInput {
   - Exemple : FR, BE, DE, etc.
   """
   transporter5CompanyCountryCode: String
+
+  """
+  **Fichier d'analyse**
+
+  Identifiant du fichier d'analyse des terres excavées et sédiments ou déchets entrants.
+
+  Optionnel. Le fichier doit avoir été préalablement importé dans Trackdéchets via l'API d'import de fichier de fichier d'analyse (cf createTexsAnalysisFile).
+  """
+  texsAnalysisFileId: String
 }
 
 "Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux sortants"
@@ -4057,6 +4066,15 @@ input OutgoingTexsLineInput {
   Format code pays : 2 lettres en majuscules
   """
   transporter5CompanyCountryCode: String
+
+  """
+  **Fichier d'analyse**
+
+  Identifiant du fichier d'analyse des terres excavées et sédiments ou déchets entrants.
+
+  Optionnel. Le fichier doit avoir été préalablement importé dans Trackdéchets via l'API d'import de fichier de fichier d'analyse (cf createTexsAnalysisFile).
+  """
+  texsAnalysisFileId: String
 }
 
 "Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux sortants"

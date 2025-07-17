@@ -10,6 +10,7 @@ import { addToTransportedRegistry } from "./mutations/addToTransportedRegistry";
 import { addToManagedRegistry } from "./mutations/addToManagedRegistry";
 import { cancelRegistryV2Lines } from "./mutations/cancelRegistryV2Lines";
 import { getGenerateRegistryExhaustiveExport } from "./mutations/generateRegistryExhaustiveExport";
+import { createTexsAnalysisFile } from "./mutations/createTexsAnalysisFile";
 
 export const Mutation: MutationResolvers = {
   importFile: importFile as any,
@@ -32,5 +33,6 @@ export const Mutation: MutationResolvers = {
   }) as any,
   generateRegistryExhaustiveExportAsAdmin: getGenerateRegistryExhaustiveExport({
     asAdmin: true
-  }) as any
+  }) as any,
+  createTexsAnalysisFile
 };
