@@ -25,6 +25,7 @@ import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
 import { Labels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
+import { TexsAnalysisFile } from "../common/TexsAnalysisFile";
 
 export const outgoingTexsFormShape: FormShape = [
   {
@@ -137,6 +138,14 @@ export const outgoingTexsFormShape: FormShape = [
           weightValue: nonEmptyNumber,
           volume: optionalNumber,
           weightIsEstimate: booleanString
+        }
+      },
+      {
+        names: ["texsAnalysisFileId"],
+        shape: "custom",
+        Component: TexsAnalysisFile,
+        validation: {
+          texsAnalysisFileId: optionalString
         }
       },
       {
