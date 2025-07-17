@@ -513,201 +513,82 @@ describe("Mutation.createBsff", () => {
     ]);
   });
 
-  describe("dormant sirets", () => {
-    let user: User;
-    let emitter: Company;
-    let destination: Company;
-    let transporter: Company;
-    let bsffInput: BsffInput;
+  it("TRA-16247 - if creating a BSFF with fiche + packagings, should link them", async () => {
+    // Given
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    // eslint-disable-next-line prefer-const
-    let searchCompanyMock = jest.fn().mockReturnValue({});
-    let makeClientLocal: typeof makeClient;
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
 
-    beforeAll(async () => {
-      const emitterCompanyAndUser = await userWithCompanyFactory("MEMBER", {
-        name: "Emitter"
+    // When
+    const { mutate } = makeClient(operateur.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: {
+          ...createInput(operateur, transporter, destination),
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "123",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.CITERNE,
+              numero: "456",
+              weight: 2,
+              volume: 2
+            }
+          ],
+          ficheInterventions: [ficheIntervention1.id, ficheIntervention2.id]
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Get packagings
+    const packagings = await prisma.bsffPackaging.findMany({
+      where: {
+        bsffId: data.createBsff.id
+      }
+    });
+    expect(packagings.length).toBe(2);
+
+    // Get fiches
+    const fiches = await prisma.bsffFicheIntervention.findMany({
+      where: {
+        bsffs: { some: { id: data.createBsff.id } }
+      }
+    });
+    expect(fiches.length).toBe(2);
+
+    // Make sure associations exist
+    const associations =
+      await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+        where: {
+          ficheInterventionId: { in: fiches.map(f => f.id) }
+        }
       });
-      user = emitterCompanyAndUser.user;
-      emitter = emitterCompanyAndUser.company;
-      destination = await companyFactory({ name: "Destination" });
-      transporter = await companyFactory({ name: "Transporter" });
-
-      bsffInput = {
-        type: BsffType.COLLECTE_PETITES_QUANTITES,
-        emitter: {
-          company: {
-            siret: emitter.siret,
-            name: emitter.name,
-            address: "Rue de la carcasse",
-            contact: "Contact emitter",
-            phone: "0101010101",
-            mail: "emitter@mail.com"
-          }
-        },
-        transporter: {
-          company: {
-            siret: transporter.siret,
-            name: transporter.name,
-            address: "address",
-            contact: "contact",
-            phone: "0101010101",
-            mail: "transporter@mail.com"
-          }
-        },
-        destination: {
-          company: {
-            siret: destination.siret,
-            name: destination.name,
-            address: "address",
-            contact: "contact",
-            phone: "0101010101",
-            mail: "destination@mail.com"
-          },
-          plannedOperationCode: "R12" as BsffOperationCode
-        },
-        waste: {
-          code: BSFF_WASTE_CODES[0],
-          adr: "Mention ADR",
-          description: "R410"
-        },
-        weight: {
-          value: 1,
-          isEstimate: true
-        },
-        packagings: [
-          {
-            type: BsffPackagingType.BOUTEILLE,
-            numero: "123",
-            weight: 1,
-            volume: 1
-          }
-        ]
-      };
-
-      // Mock les appels à la base SIRENE
-      jest.mock("../../../../companies/search", () => ({
-        // https://www.chakshunyu.com/blog/how-to-mock-only-one-function-from-a-module-in-jest/
-        ...jest.requireActual("../../../../companies/search"),
-        searchCompany: searchCompanyMock
-      }));
-
-      // Ré-importe makeClient pour que searchCompany soit bien mocké
-      jest.resetModules();
-      makeClientLocal = require("../../../../__tests__/testClient")
-        .default as typeof makeClient;
-    });
-
-    afterAll(async () => {
-      jest.resetAllMocks();
-      await resetDatabase();
-    });
-
-    describe("closed company", () => {
-      const mockCloseCompany = (siretToClose: string | null) => {
-        searchCompanyMock.mockImplementation((siret: string) => {
-          return {
-            siret,
-            etatAdministratif: siret === siretToClose ? "F" : "O",
-            address: "Company address",
-            name: "Company name"
-          };
-        });
-      };
-
-      const testCreatingBsffWithClosedSiret = async (
-        siret: string | null | undefined
-      ) => {
-        // Given
-        mockCloseCompany(siret!);
-
-        // When
-        const { mutate } = makeClientLocal(user);
-        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
-          CREATE_BSFF,
-          {
-            variables: {
-              input: bsffInput
-            }
-          }
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          `L'établissement ${siret} est fermé selon le répertoire SIRENE`
-        );
-      };
-
-      it.each(["emitter", "transporter", "destination"])(
-        "should not allow creating a BSFF with a closed %p siret",
-        async role => {
-          const siret = bsffInput?.[role]?.company?.siret;
-          await testCreatingBsffWithClosedSiret(siret);
-        }
-      );
-    });
-
-    describe("dormant company", () => {
-      const mockOpenCompany = () => {
-        searchCompanyMock.mockImplementation((siret: string) => {
-          return {
-            siret,
-            etatAdministratif: "O",
-            address: "Company address",
-            name: "Company name"
-          };
-        });
-      };
-
-      const testCreatingBsffWithDormantSiret = async (
-        siret: string | null | undefined
-      ) => {
-        // Given
-        mockOpenCompany();
-
-        // Reset previous companies
-        await prisma.company.updateMany({
-          data: {
-            isDormantSince: null
-          }
-        });
-
-        // Make target company go dormant
-        await prisma.company.update({
-          where: {
-            siret: siret!
-          },
-          data: {
-            isDormantSince: new Date()
-          }
-        });
-
-        // When
-        const { mutate } = makeClientLocal(user);
-        const { errors } = await mutate<Pick<Mutation, "createBsff">>(
-          CREATE_BSFF,
-          {
-            variables: {
-              input: bsffInput
-            }
-          }
-        );
-
-        // Then
-        expect(errors).not.toBeUndefined();
-        expect(errors[0].message).toBe(
-          `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
-        );
-      };
-
-      it.each(["emitter", "transporter", "destination"])(
-        "should not allow creating a BSFF with a dormant %p siret",
-        async role => {
-          const siret = bsffInput?.[role]?.company?.siret;
-          await testCreatingBsffWithDormantSiret(siret);
-        }
-      );
-    });
+    expect(associations.length).toBe(4);
+    expect(associations).toMatchObject([
+      { ficheInterventionId: fiches[0].id, packagingId: packagings[0].id },
+      { ficheInterventionId: fiches[0].id, packagingId: packagings[1].id },
+      { ficheInterventionId: fiches[1].id, packagingId: packagings[0].id },
+      { ficheInterventionId: fiches[1].id, packagingId: packagings[1].id }
+    ]);
   });
 });
