@@ -1,10 +1,19 @@
 import { gql, useQuery } from "@apollo/client";
 import { Query } from "@td/codegen-ui";
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useMemo, useCallback } from "react";
 
 type AuthContextType = {
   isAuthenticated: boolean;
-  user: { id: string; email: string; isAdmin?: boolean | null } | undefined;
+  user:
+    | {
+        id: string;
+        email: string;
+        isAdmin?: boolean | null;
+        trackingConsent: boolean;
+        trackingConsentUntil?: string | null;
+      }
+    | undefined;
+  refreshUser: () => Promise<void>;
 };
 
 export const IS_AUTHENTICATED = gql`
@@ -19,6 +28,8 @@ export const GET_ME = gql`
       id
       email
       isAdmin
+      trackingConsent
+      trackingConsentUntil
     }
   }
 `;
@@ -31,11 +42,12 @@ export function useAuth() {
     throw new Error("useAuth must be used within an AuthProvider");
   }
 
-  const { isAuthenticated, user } = context;
+  const { isAuthenticated, user, refreshUser } = context;
 
   return {
     isAuthenticated,
-    user
+    user,
+    refreshUser
   };
 }
 
@@ -44,10 +56,13 @@ export function AuthProvider({ children }: React.PropsWithChildren<{}>) {
     IS_AUTHENTICATED,
     { fetchPolicy: "network-only" }
   );
-  const { data: meData } = useQuery<Pick<Query, "me">>(GET_ME, {
-    fetchPolicy: "network-only",
-    skip: !authData?.isAuthenticated
-  });
+  const { data: meData, refetch: refetchMe } = useQuery<Pick<Query, "me">>(
+    GET_ME,
+    {
+      fetchPolicy: "network-only",
+      skip: !authData?.isAuthenticated
+    }
+  );
 
   const isAuthenticated: boolean = useMemo(() => {
     return authData?.isAuthenticated ?? false;
@@ -56,9 +71,13 @@ export function AuthProvider({ children }: React.PropsWithChildren<{}>) {
   const user = useMemo(() => {
     return meData?.me ?? undefined;
   }, [meData]);
-
+  const refreshUser = useCallback(async () => {
+    if (isAuthenticated) {
+      await refetchMe();
+    }
+  }, [refetchMe, isAuthenticated]);
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
