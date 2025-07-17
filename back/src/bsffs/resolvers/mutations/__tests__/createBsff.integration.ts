@@ -504,4 +504,83 @@ describe("Mutation.createBsff", () => {
       })
     ]);
   });
+
+  it("TRA-16247 - if creating a BSFF with fiche + packagings, should link them", async () => {
+    // Given
+    const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention1 = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+    const ficheIntervention2 = await createFicheIntervention({
+      operateur,
+      detenteur
+    });
+
+    // When
+    const { mutate } = makeClient(operateur.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: {
+          ...createInput(operateur, transporter, destination),
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "123",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.CITERNE,
+              numero: "456",
+              weight: 2,
+              volume: 2
+            }
+          ],
+          ficheInterventions: [ficheIntervention1.id, ficheIntervention2.id]
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Get packagings
+    const packagings = await prisma.bsffPackaging.findMany({
+      where: {
+        bsffId: data.createBsff.id
+      }
+    });
+    expect(packagings.length).toBe(2);
+
+    // Get fiches
+    const fiches = await prisma.bsffFicheIntervention.findMany({
+      where: {
+        bsffs: { some: { id: data.createBsff.id } }
+      }
+    });
+    expect(fiches.length).toBe(2);
+
+    // Make sure associations exist
+    const associations =
+      await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+        where: {
+          ficheInterventionId: { in: fiches.map(f => f.id) }
+        }
+      });
+    expect(associations.length).toBe(4);
+    expect(associations).toMatchObject([
+      { ficheInterventionId: fiches[0].id, packagingId: packagings[0].id },
+      { ficheInterventionId: fiches[0].id, packagingId: packagings[1].id },
+      { ficheInterventionId: fiches[1].id, packagingId: packagings[0].id },
+      { ficheInterventionId: fiches[1].id, packagingId: packagings[1].id }
+    ]);
+  });
 });

@@ -36,6 +36,7 @@ import {
 import { graphQlInputToZodBsff } from "./validation/bsff/helpers";
 import { parseBsffAsync } from "./validation/bsff";
 import { PrismaTransaction } from "../common/repository/types";
+import { logger } from "@td/logger";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -218,6 +219,77 @@ export async function updateDetenteurCompanySirets(
     }
   });
 }
+
+export const removeBsffPackagingsFichesIntervention = async (
+  packagings: BsffPackaging[],
+  fiches: PrismaBsffFicheIntervention[],
+  transaction: PrismaTransaction
+) => {
+  // Associe chaque fiche d'intervention à chaque packaging
+  await Promise.all(
+    fiches.map(async fiche => {
+      await Promise.all(
+        packagings.map(async packaging => {
+          // Peut échouer si le couple fiche / contenant existe déjà en DB
+          try {
+            await transaction.bsffPackagingToBsffFicheIntervention.deleteMany({
+              where: {
+                ficheInterventionId: fiche.id,
+                packagingId: packaging.id
+              }
+            });
+          } catch (error) {
+            logger.error(
+              `Failed to delete record for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+              error
+            );
+          }
+        })
+      );
+    })
+  );
+};
+
+/**
+ * TRA-16247: Pour les BSFF legacy, on associe chaque fiche d'intervention
+ * d'un BSFF à tous les contenants dudit BSFF
+ */
+export const addBsffPackagingsFichesIntervention = async (
+  packagings: BsffPackaging[],
+  fiches: PrismaBsffFicheIntervention[],
+  transaction: PrismaTransaction
+) => {
+  // Associe chaque fiche d'intervention à chaque packaging
+  await Promise.all(
+    fiches.map(async fiche => {
+      await Promise.all(
+        packagings.map(async packaging => {
+          // Peut échouer si le couple fiche / contenant existe déjà en DB
+          try {
+            await transaction.bsffPackagingToBsffFicheIntervention.create({
+              data: {
+                ficheIntervention: { connect: fiche },
+                packaging: { connect: packaging }
+              }
+            });
+          } catch (error) {
+            if (
+              error instanceof Prisma.PrismaClientKnownRequestError &&
+              error.code === "P2002"
+            ) {
+              // Doublon. Ignore
+            } else {
+              logger.error(
+                `Failed to create record for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+                error
+              );
+            }
+          }
+        })
+      );
+    })
+  );
+};
 
 export async function createBsff(
   user: Express.User,

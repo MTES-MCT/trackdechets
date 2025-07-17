@@ -3,7 +3,8 @@ import {
   BsffType,
   BsffStatus,
   BsffPackagingType,
-  Prisma
+  Prisma,
+  BsffFicheIntervention
 } from "@prisma/client";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -15,14 +16,16 @@ import type {
   MutationUpdateBsffArgs,
   QueryBsffArgs,
   Query,
-  MutationUpdateBsffPackagingArgs
+  MutationUpdateBsffPackagingArgs,
+  MutationCreateBsffArgs
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,
   siretify,
   userWithCompanyFactory,
-  transporterReceiptFactory
+  transporterReceiptFactory,
+  UserWithCompany
 } from "../../../../__tests__/factories";
 import { associateUserToCompany } from "../../../../users/database";
 import makeClient from "../../../../__tests__/testClient";
@@ -48,6 +51,15 @@ import {
   getTransportersSync
 } from "../../../database";
 import { UPDATE_BSFF_PACKAGING } from "./updateBsffPackaging.integration";
+
+const CREATE_BSFF = gql`
+  mutation CreateBsff($input: BsffInput!) {
+    createBsff(input: $input) {
+      ...FullBsff
+    }
+  }
+  ${fullBsff}
+`;
 
 export const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -3293,5 +3305,224 @@ describe("Mutation.updateBsff", () => {
 
     // Then
     expect(errors).toBeUndefined();
+  });
+
+  describe("TRA-16247 - Link fiches & packagings", () => {
+    let operateur: UserWithCompany;
+    let detenteur: UserWithCompany;
+    let ficheIntervention: BsffFicheIntervention;
+
+    const createBsff = async () => {
+      operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+      ficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: operateur.company.name,
+                siret: operateur.company.siret,
+                address: operateur.company.address,
+                contact: operateur.user.name,
+                mail: operateur.user.email,
+                phone: operateur.company.contactPhone
+              }
+            },
+            transporter: {
+              company: {
+                name: transporter.company.name,
+                siret: transporter.company.siret,
+                address: transporter.company.address,
+                contact: transporter.user.name,
+                mail: transporter.user.email,
+                phone: transporter.company.contactPhone
+              }
+            },
+            destination: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email,
+                phone: destination.company.contactPhone
+              },
+              plannedOperationCode: "R12" as BsffOperationCode
+            },
+            waste: {
+              code: BSFF_WASTE_CODES[0],
+              adr: "Mention ADR",
+              description: "R410"
+            },
+            weight: {
+              value: 1,
+              isEstimate: true
+            },
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1
+              },
+              {
+                type: BsffPackagingType.CITERNE,
+                numero: "456",
+                weight: 2,
+                volume: 2
+              }
+            ],
+            ficheInterventions: [ficheIntervention.id]
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      return data.createBsff;
+    };
+
+    it("if a user adds a BSFF's fiche, it should update the links to packagings", async () => {
+      // Given
+      const bsff = await createBsff();
+      const newficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      const initialPackagings = await prisma.bsffPackaging.findMany({
+        where: { bsffId: bsff.id }
+      });
+      const initialAssociations =
+        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+          where: {
+            packagingId: { in: initialPackagings.map(p => p.id) }
+          }
+        });
+      // 1 fiche, 2 packagings
+      expect(initialAssociations?.length).toBe(2);
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            emitter: {
+              company: {
+                name: "New Name"
+              }
+            },
+            ficheInterventions: [newficheIntervention.id]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const packagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.updateBsff.id
+        }
+      });
+      expect(packagings.length).toBe(2);
+
+      // Get fiches
+      const fiches = await prisma.bsffFicheIntervention.findMany({
+        where: {
+          bsffs: { some: { id: data.updateBsff.id } }
+        }
+      });
+      expect(fiches.length).toBe(1);
+
+      // Make sure new associations exist
+      const associations =
+        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+          where: {
+            ficheInterventionId: { in: fiches.map(f => f.id) }
+          }
+        });
+      expect(associations.length).toBe(2);
+      expect(associations).toMatchObject([
+        { ficheInterventionId: fiches[0].id, packagingId: packagings[0].id },
+        { ficheInterventionId: fiches[0].id, packagingId: packagings[1].id }
+      ]);
+
+      // Make sure old assocations have been deleted
+      const oldAssociations =
+        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+          where: {
+            id: { in: initialAssociations.map(i => i.id) }
+          }
+        });
+      expect(oldAssociations.length).toBe(0);
+    });
+
+    it("if a user removes a BSFF's fiche, it should remove the links to packagings", async () => {
+      // Given
+      const bsff = await createBsff();
+
+      const initialPackagings = await prisma.bsffPackaging.findMany({
+        where: { bsffId: bsff.id }
+      });
+      const initialAssociations =
+        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+          where: {
+            packagingId: { in: initialPackagings.map(p => p.id) }
+          }
+        });
+      // 1 fiche, 2 packagings
+      expect(initialAssociations?.length).toBe(2);
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            emitter: {
+              company: {
+                name: "New Name"
+              }
+            },
+            ficheInterventions: []
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Make sure old assocations have been deleted
+      const oldAssociations =
+        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
+          where: {
+            id: { in: initialAssociations.map(i => i.id) }
+          }
+        });
+      expect(oldAssociations.length).toBe(0);
+    });
   });
 });
