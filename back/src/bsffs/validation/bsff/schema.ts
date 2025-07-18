@@ -89,7 +89,8 @@ const rawBsffPackagingSchema = z.object({
     .min(1, "Conditionnements : le numéro d'identification est requis"),
   previousPackagings: z.string().array().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
-  operationSignatureDate: z.coerce.date().nullish()
+  operationSignatureDate: z.coerce.date().nullish(),
+  ficheInterventions: z.array(z.string()).nullish()
 });
 
 const rawBsffSchema = z.object({

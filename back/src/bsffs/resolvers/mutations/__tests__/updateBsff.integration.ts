@@ -3311,6 +3311,7 @@ describe("Mutation.updateBsff", () => {
     let operateur: UserWithCompany;
     let detenteur: UserWithCompany;
     let ficheIntervention: BsffFicheIntervention;
+    let ficheInterventionPackage1: BsffFicheIntervention;
 
     const createBsff = async () => {
       operateur = await userWithCompanyFactory(UserRole.ADMIN);
@@ -3319,6 +3320,10 @@ describe("Mutation.updateBsff", () => {
       const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
       ficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      ficheInterventionPackage1 = await createFicheIntervention({
         operateur,
         detenteur
       });
@@ -3377,7 +3382,8 @@ describe("Mutation.updateBsff", () => {
                 type: BsffPackagingType.BOUTEILLE,
                 numero: "123",
                 weight: 1,
-                volume: 1
+                volume: 1,
+                ficheInterventions: [ficheInterventionPackage1.id]
               },
               {
                 type: BsffPackagingType.CITERNE,
@@ -3396,7 +3402,7 @@ describe("Mutation.updateBsff", () => {
       return data.createBsff;
     };
 
-    it("if a user adds a BSFF's fiche, it should update the links to packagings", async () => {
+    it("if a user updates a BSFF's fiche, it should update the links to packagings", async () => {
       // Given
       const bsff = await createBsff();
       const newficheIntervention = await createFicheIntervention({
@@ -3405,16 +3411,27 @@ describe("Mutation.updateBsff", () => {
       });
 
       const initialPackagings = await prisma.bsffPackaging.findMany({
-        where: { bsffId: bsff.id }
+        where: { bsffId: bsff.id },
+        include: {
+          ficheInterventions: true
+        }
       });
-      const initialAssociations =
-        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
-          where: {
-            packagingId: { in: initialPackagings.map(p => p.id) }
-          }
-        });
-      // 1 fiche, 2 packagings
-      expect(initialAssociations?.length).toBe(2);
+      // Make sure fiche is linked to packagings
+      const initialPackaging1 = initialPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const initialPackaging2 = initialPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(initialPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
+      ]);
 
       // When
       const { mutate } = makeClient(operateur.user);
@@ -3439,42 +3456,116 @@ describe("Mutation.updateBsff", () => {
       expect(errors).toBeUndefined();
 
       // Get packagings
-      const packagings = await prisma.bsffPackaging.findMany({
+      const updatedPackagings = await prisma.bsffPackaging.findMany({
         where: {
           bsffId: data.updateBsff.id
+        },
+        include: {
+          ficheInterventions: true
         }
       });
-      expect(packagings.length).toBe(2);
+      expect(updatedPackagings.length).toBe(2);
 
-      // Get fiches
-      const fiches = await prisma.bsffFicheIntervention.findMany({
-        where: {
-          bsffs: { some: { id: data.updateBsff.id } }
+      // Make sure new fiche only is linked to packagings
+      const updatedPackaging1 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const updatedPackaging2 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(updatedPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheInterventionPackage1.id },
+        { id: newficheIntervention.id }
+      ]);
+      expect(updatedPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(updatedPackaging2?.ficheInterventions).toMatchObject([
+        { id: newficheIntervention.id }
+      ]);
+    });
+
+    it("if a user adds a BSFF's fiche, it should update the links to packagings", async () => {
+      // Given
+      const bsff = await createBsff();
+      const newficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      const initialPackagings = await prisma.bsffPackaging.findMany({
+        where: { bsffId: bsff.id },
+        include: {
+          ficheInterventions: true
         }
       });
-      expect(fiches.length).toBe(1);
-
-      // Make sure new associations exist
-      const associations =
-        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
-          where: {
-            ficheInterventionId: { in: fiches.map(f => f.id) }
-          }
-        });
-      expect(associations.length).toBe(2);
-      expect(associations).toMatchObject([
-        { ficheInterventionId: fiches[0].id, packagingId: packagings[0].id },
-        { ficheInterventionId: fiches[0].id, packagingId: packagings[1].id }
+      // Make sure fiche is linked to packagings
+      const initialPackaging1 = initialPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const initialPackaging2 = initialPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(initialPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
       ]);
 
-      // Make sure old assocations have been deleted
-      const oldAssociations =
-        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
-          where: {
-            id: { in: initialAssociations.map(i => i.id) }
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            emitter: {
+              company: {
+                name: "New Name"
+              }
+            },
+            ficheInterventions: [ficheIntervention.id, newficheIntervention.id]
           }
-        });
-      expect(oldAssociations.length).toBe(0);
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const updatedPackagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.updateBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(updatedPackagings.length).toBe(2);
+
+      // Make sure new fiche only is linked to packagings
+      const updatedPackaging1 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const updatedPackaging2 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(updatedPackaging1?.ficheInterventions?.length).toBe(3);
+      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id },
+        { id: newficheIntervention.id }
+      ]);
+      expect(updatedPackaging2?.ficheInterventions?.length).toBe(2);
+      expect(updatedPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: newficheIntervention.id }
+      ]);
     });
 
     it("if a user removes a BSFF's fiche, it should remove the links to packagings", async () => {
@@ -3482,20 +3573,30 @@ describe("Mutation.updateBsff", () => {
       const bsff = await createBsff();
 
       const initialPackagings = await prisma.bsffPackaging.findMany({
-        where: { bsffId: bsff.id }
+        where: { bsffId: bsff.id },
+        include: { ficheInterventions: true }
       });
-      const initialAssociations =
-        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
-          where: {
-            packagingId: { in: initialPackagings.map(p => p.id) }
-          }
-        });
-      // 1 fiche, 2 packagings
-      expect(initialAssociations?.length).toBe(2);
+
+      // Make sure fiche is linked to packagings
+      const initialPackaging1 = initialPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const initialPackaging2 = initialPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(initialPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
+      ]);
 
       // When
       const { mutate } = makeClient(operateur.user);
-      const { errors } = await mutate<
+      const { errors, data } = await mutate<
         Pick<Mutation, "updateBsff">,
         MutationUpdateBsffArgs
       >(UPDATE_BSFF, {
@@ -3515,14 +3616,122 @@ describe("Mutation.updateBsff", () => {
       // Then
       expect(errors).toBeUndefined();
 
-      // Make sure old assocations have been deleted
-      const oldAssociations =
-        await prisma.bsffPackagingToBsffFicheIntervention.findMany({
-          where: {
-            id: { in: initialAssociations.map(i => i.id) }
+      // Get packagings
+      const updatedPackagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.updateBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(updatedPackagings.length).toBe(2);
+
+      // Make sure fiche is no longer linked
+      const updatedPackaging1 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const updatedPackaging2 = updatedPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+
+      expect(updatedPackaging1?.ficheInterventions?.length).toBe(1);
+      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(updatedPackaging2?.ficheInterventions?.length).toBe(0);
+    });
+
+    it("a user can update packagings, and fiches should follow", async () => {
+      // Given
+      const bsff = await createBsff();
+
+      const initialPackagings = await prisma.bsffPackaging.findMany({
+        where: { bsffId: bsff.id },
+        include: { ficheInterventions: true }
+      });
+
+      // Make sure fiche is linked to packagings
+      const initialPackaging1 = initialPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const initialPackaging2 = initialPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(initialPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
+      ]);
+
+      const newficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            packagings: [
+              {
+                type: BsffPackagingType.AUTRE,
+                other: "Tupperware",
+                numero: "789",
+                weight: 9,
+                volume: 9
+              },
+              {
+                type: BsffPackagingType.CONTENEUR,
+                numero: "101112",
+                weight: 8,
+                volume: 8,
+                ficheInterventions: [newficheIntervention.id]
+              }
+            ]
           }
-        });
-      expect(oldAssociations.length).toBe(0);
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      // Get packagings
+      const newPackagings = await prisma.bsffPackaging.findMany({
+        where: {
+          bsffId: data.updateBsff.id
+        },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      expect(newPackagings.length).toBe(2);
+
+      const updatedPackaging1 = newPackagings.find(
+        p => p.type === BsffPackagingType.AUTRE
+      );
+      const updatedPackaging2 = newPackagings.find(
+        p => p.type === BsffPackagingType.CONTENEUR
+      );
+
+      expect(updatedPackaging1?.ficheInterventions?.length).toBe(1);
+      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
+      ]);
+      expect(updatedPackaging2?.ficheInterventions?.length).toBe(2);
+      expect(updatedPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: newficheIntervention.id }
+      ]);
     });
   });
 });

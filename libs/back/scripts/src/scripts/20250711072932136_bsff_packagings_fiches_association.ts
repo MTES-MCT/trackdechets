@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import Queue, { JobOptions } from "bull";
 import { addBsffPackagingsFichesIntervention } from "back";
+import { prisma } from "@td/prisma";
 
 // TODO: use logger
 
@@ -113,3 +114,4 @@ export async function run(tx: Prisma.TransactionClient) {
 
   console.log(">> Terminé!");
 }
+run(prisma);
