@@ -12,6 +12,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Changement de la validation de présence d'entreprise de travaux BSDA [PR 4302](https://github.com/MTES-MCT/trackdechets/pull/4302)
 - Traduction du message d'erreur de date de validité de récépissé [PR 4303](https://github.com/MTES-MCT/trackdechets/pull/4303)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un sélecteur de parcelles interactif sur les formulaires RNDTS [PR 4319](https://github.com/MTES-MCT/trackdechets/pull/4319)
+
 # [2025.07.1] 01/07/2025
 
 #### :nail_care: Améliorations

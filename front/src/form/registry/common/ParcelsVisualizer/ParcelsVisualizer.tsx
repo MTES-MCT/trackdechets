@@ -429,7 +429,9 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                           severity: "warning",
                           field: null
                         });
+                        return;
                       }
+                      setClientError(null);
                     }}
                   >
                     Afficher sur la carte
