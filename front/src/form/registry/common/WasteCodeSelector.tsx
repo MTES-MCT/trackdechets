@@ -1,6 +1,7 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
 import clsx from "clsx";
 import React, { useMemo, useRef, useState } from "react";
@@ -24,6 +25,7 @@ type Props = {
   whiteList?: string[];
   blackList?: string[];
   displayDescription?: boolean;
+  multiple?: boolean;
 };
 
 export function WasteCodeSelector({
@@ -34,7 +36,8 @@ export function WasteCodeSelector({
   disabled,
   whiteList,
   blackList,
-  displayDescription = true
+  displayDescription = true,
+  multiple = false
 }: Props) {
   if (!name) {
     console.error('WasteCodeSelector: "name" prop is required');
@@ -60,8 +63,15 @@ export function WasteCodeSelector({
     }
   };
 
+  const currentValue = methods.watch(name);
+
   function onSelect(code: string) {
-    if (name) {
+    if (multiple) {
+      const newValues = currentValue.includes(code)
+        ? currentValue.filter((c: string) => c !== code)
+        : [...currentValue, code];
+      methods.setValue(name, newValues);
+    } else {
       methods.setValue(name, code);
       setShowSearch(false);
     }
@@ -101,13 +111,29 @@ export function WasteCodeSelector({
                   ></span>
                 </div>
               ) : (
-                <button
-                  onClick={() => onSelect(node.code)}
-                  type="button"
-                  className="tw-text-left"
-                >
-                  {node.code} - {node.description}
-                </button>
+                <div className="tw-flex tw-items-center tw-gap-2">
+                  {multiple ? (
+                    <Checkbox
+                      options={[
+                        {
+                          label: `${node.code} - ${node.description}`,
+                          nativeInputProps: {
+                            checked: (currentValue || []).includes(node.code),
+                            onChange: () => onSelect(node.code)
+                          }
+                        }
+                      ]}
+                    />
+                  ) : (
+                    <button
+                      onClick={() => onSelect(node.code)}
+                      type="button"
+                      className="tw-text-left"
+                    >
+                      {node.code} - {node.description}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
             {node.children.length > 0 &&
@@ -119,18 +145,30 @@ export function WasteCodeSelector({
     );
   }
 
-  const description = ALL_WASTES.find(
-    waste => waste.code === methods.getValues(name)
-  )?.description;
+  const description = multiple
+    ? null
+    : ALL_WASTES.find(waste => waste.code === currentValue)?.description;
 
   const searchFields = (
     <>
-      <div className="fr-col-4 fr-col-md-4">
+      <div className={multiple ? "fr-col-12" : "fr-col-4 fr-col-md-4"}>
         <Input
           label={label ?? "Code déchet"}
+          iconId={
+            multiple
+              ? showSearch
+                ? "fr-icon-arrow-up-s-line"
+                : "fr-icon-arrow-down-s-line"
+              : undefined
+          }
           nativeInputProps={{
+            onClick: () => multiple && setShowSearch(!showSearch),
             type: "text",
-            ...methods.register(name)
+            ...(!multiple && { ...methods.register(name) }),
+            value: multiple
+              ? (currentValue || []).join(", ")
+              : currentValue || "",
+            readOnly: multiple
           }}
           disabled={disabled}
           state={
@@ -145,26 +183,28 @@ export function WasteCodeSelector({
           )}
         />
       </div>
-      <div className="fr-col-2" style={{ paddingTop: "44px" }}>
-        <div
-          className={clsx({
-            "fr-mb-9v": !!(isArrayField
-              ? errors?.[splitName[0]]?.[splitName[1]]?.value
-              : errors?.[name])
-          })}
-        >
-          <Button
-            onClick={() => setShowSearch(!showSearch)}
-            priority="secondary"
-            type="button"
-            ref={triggerRef}
-            disabled={disabled}
+      {!multiple && (
+        <div className="fr-col-2" style={{ paddingTop: "44px" }}>
+          <div
+            className={clsx({
+              "fr-mb-9v": !!(isArrayField
+                ? errors?.[splitName[0]]?.[splitName[1]]?.value
+                : errors?.[name])
+            })}
           >
-            Recherche
-          </Button>
+            <Button
+              onClick={() => setShowSearch(!showSearch)}
+              priority="secondary"
+              type="button"
+              ref={triggerRef}
+              disabled={disabled}
+            >
+              Recherche
+            </Button>
+          </div>
         </div>
-      </div>
-      {displayDescription && description && (
+      )}
+      {displayDescription && !multiple && description && (
         <div className="fr-col-12">
           <Alert description={capitalize(description)} severity="info" small />
         </div>
@@ -178,7 +218,7 @@ export function WasteCodeSelector({
         searchFields
       ) : (
         <div
-          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
+          className="fr-col-12 fr-grid-row fr-grid-row--bottom"
           style={{
             alignItems: "flex-start"
           }}
