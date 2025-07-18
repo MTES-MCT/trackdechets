@@ -21,6 +21,8 @@ import { sirenifyQueue } from "./producers/sirenify";
 import { administrativeTransferQueue } from "./producers/administrativeTransfer";
 import { updateAppendix2Queue } from "./producers/updateAppendix2";
 import { registryImportQueue } from "./producers/registryImport";
+import { registryExportQueue } from "./producers/registryExport";
+import { registryExhaustiveExportQueue } from "./producers/registryExhaustiveExport";
 
 export const serverAdapter = new ExpressAdapter();
 export const bullBoardPath = `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`;
@@ -42,7 +44,9 @@ createBullBoard({
     new BullAdapter(gericoQueue),
     new BullAdapter(administrativeTransferQueue),
     new BullAdapter(updateAppendix2Queue),
-    new BullAdapter(registryImportQueue)
+    new BullAdapter(registryImportQueue),
+    new BullAdapter(registryExportQueue),
+    new BullAdapter(registryExhaustiveExportQueue)
   ],
   serverAdapter: serverAdapter
 });
