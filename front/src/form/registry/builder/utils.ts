@@ -67,3 +67,8 @@ export const handleServerError = (
     });
   }
 };
+
+// Helper function to transform arrays of strings to arrays of value objects for field arrays
+export const transformToFieldArrayObjects = (
+  array?: string[] | null
+): { value: string }[] => array?.map(item => ({ value: item })) ?? [];

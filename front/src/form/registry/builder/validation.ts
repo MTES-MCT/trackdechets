@@ -43,3 +43,7 @@ export const booleanString = z
 export const filteredArray = z
   .array(z.string())
   .transform(arr => arr.filter(Boolean));
+
+export const fieldArray = z
+  .array(z.object({ value: optionalString }))
+  .transform(arr => arr.map(({ value }) => value));
