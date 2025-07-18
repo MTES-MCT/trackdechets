@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'une bannière de consentement au suivi, d'une interface de gestion dans les prefs utilisateur et d'un script de suivi Matomo [PR 4318](https://github.com/MTES-MCT/trackdechets/pull/4318)
+- Ajout d'un sélecteur de parcelles interactif sur les formulaires RNDTS [PR 4319](https://github.com/MTES-MCT/trackdechets/pull/4319)
 
 # [2025.07.1] 01/07/2025
 
@@ -2705,7 +2706,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
   - Les champs `nextDestinationDetails` & `nextDestinationProcessingOperation` disparaissent
   - Ils sont remplacés par `nextDestination`, constitué de `processingOperation` et `company`
 - Amélioration de la gestion des actions sur les bordereaux depuis l'interface Trackdéchets: on ne peut faire des actions que pour le SIRET actif dans le sélecteur. [PR #164](https://github.com/MTES-MCT/trackdechets/pull/164)
-- Modification du mode de téléchargement des fichiers (bsd pdf et registre): les routes `/pdf` et `/export` sont remplacées respectivement par les requêtes GraphQL suivantes: `Query { formPdf }` et `Query { formsRegister }`. Chaque endpoint renvoie un jeton de téléchargement qui permet ensuite de faire une requête sur `/download?token=...`. Le token a une durée de vie de 10s. [PR #144](https://github.com/MTES-MCT/trackdechets/pull/144)
+- Modification du mode de téléchargement des fichiers (bsd pdf et registre): les routes `/pdf` et `/export` sont remplacées respectivement par les requêtes GraphQL suivantes: `Query { formPdf }` et `Query { formsRegister }`. Chaque endpoint renvoie un jeton de t��léchargement qui permet ensuite de faire une requête sur `/download?token=...`. Le token a une durée de vie de 10s. [PR #144](https://github.com/MTES-MCT/trackdechets/pull/144)
 - Refonte de l'authentification. Les tokens générés pour s'authentifier à l'API sont stockés en base et deviennent révocables par l'utilisateur. Ils ont désormais une longueur de 40 caractères alphanumériques (les anciens tokens avaient une longueur de 155 caractères et pouvaient contenir des caractères de ponctuation). Les anciens tokens restent cependant valides. L'UI Trackdéchets utilise désormais un stockage en session. [PR #151](https://github.com/MTES-MCT/trackdechets/pull/151)
 - Modification du format des numéros de téléphone dans Mon Compte. Il est désormais possible d'ajouter des numéros en 09 xx xx xx xx [PR #74](https://github.com/MTES-MCT/trackdechets/pull/174).
 
