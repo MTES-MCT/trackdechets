@@ -232,15 +232,17 @@ export const removeBsffPackagingsFichesIntervention = async (
         packagings.map(async packaging => {
           // Peut échouer si le couple fiche / contenant existe déjà en DB
           try {
-            await transaction.bsffPackagingToBsffFicheIntervention.deleteMany({
+            await transaction.bsffPackaging.update({
               where: {
-                ficheInterventionId: fiche.id,
-                packagingId: packaging.id
+                id: packaging.id
+              },
+              data: {
+                ficheInterventions: { disconnect: { id: fiche.id } }
               }
             });
           } catch (error) {
             logger.error(
-              `Failed to delete record for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+              `Failed to delete relation for fiche '${fiche.id}' / packaging '${packaging.id}': `,
               error
             );
           }
@@ -266,24 +268,19 @@ export const addBsffPackagingsFichesIntervention = async (
         packagings.map(async packaging => {
           // Peut échouer si le couple fiche / contenant existe déjà en DB
           try {
-            await transaction.bsffPackagingToBsffFicheIntervention.create({
+            await transaction.bsffPackaging.update({
+              where: {
+                id: packaging.id
+              },
               data: {
-                ficheIntervention: { connect: fiche },
-                packaging: { connect: packaging }
+                ficheInterventions: { connect: { id: fiche.id } }
               }
             });
           } catch (error) {
-            if (
-              error instanceof Prisma.PrismaClientKnownRequestError &&
-              error.code === "P2002"
-            ) {
-              // Doublon. Ignore
-            } else {
-              logger.error(
-                `Failed to create record for fiche '${fiche.id}' / packaging '${packaging.id}': `,
-                error
-              );
-            }
+            logger.error(
+              `Failed to create relation for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+              error
+            );
           }
         })
       );
@@ -356,9 +353,19 @@ export async function createBsff(
       ? {
           packagings: {
             create: packagings.map(packaging => {
-              const { id, previousPackagings, ...packagingData } = packaging;
+              const {
+                id,
+                previousPackagings,
+                ficheInterventions,
+                ...packagingData
+              } = packaging;
               return {
                 ...packagingData,
+                ficheInterventions: {
+                  connect: (ficheInterventions ?? []).map(id => ({
+                    id
+                  }))
+                },
                 previousPackagings: {
                   connect: (previousPackagings ?? []).map(id => ({ id }))
                 }
@@ -416,7 +423,13 @@ export function getPackagingCreateInput(
           }
         }
       ]
-    : bsff.packagings?.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
+    : bsff.packagings?.map(p => {
+        const { ficheInterventions, ...packagingWithoutFicheInterventions } = p;
+        return {
+          ...packagingWithoutFicheInterventions,
+          emissionNumero: p.numero
+        };
+      }) ?? [];
 }
 
 export async function getTransporters(
