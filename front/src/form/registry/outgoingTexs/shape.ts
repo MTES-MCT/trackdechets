@@ -25,7 +25,7 @@ import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
 import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
-import { ParcelsVisualizer } from "../common/ParcelsVisualizer";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 
 export const outgoingTexsFormShape: FormShape = [
   {

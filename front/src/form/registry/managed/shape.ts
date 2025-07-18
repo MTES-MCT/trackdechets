@@ -19,7 +19,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-import { ParcelsVisualizer } from "../common/ParcelsVisualizer";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 import { Operation } from "../common/Operation";
 import { Labels, InfoLabels } from "../common/Labels";
 
