@@ -18,7 +18,8 @@ import { FormTransporter } from "../builder/types";
 import {
   handleServerError,
   isoDateToHtmlDate,
-  schemaFromShape
+  schemaFromShape,
+  transformToFieldArrayObjects
 } from "../builder/utils";
 import {
   ADD_TO_MANAGED_REGISTRY,
@@ -28,8 +29,22 @@ import { managedFormShape } from "./shape";
 
 type Props = { onClose: () => void };
 
-type FormValues = ManagedLineInput & {
+type FormValues = Omit<
+  ManagedLineInput,
+  | "parcelInseeCodes"
+  | "parcelNumbers"
+  | "parcelCoordinates"
+  | "destinationParcelInseeCodes"
+  | "destinationParcelNumbers"
+  | "destinationParcelCoordinates"
+> & {
   transporter: FormTransporter[];
+  parcelInseeCodes: { value: string }[];
+  parcelNumbers: { value: string }[];
+  parcelCoordinates: { value: string }[];
+  destinationParcelInseeCodes: { value: string }[];
+  destinationParcelNumbers: { value: string }[];
+  destinationParcelCoordinates: { value: string }[];
 };
 
 const DEFAULT_VALUES: Partial<FormValues> = {
@@ -48,10 +63,43 @@ const DEFAULT_VALUES: Partial<FormValues> = {
   transporter: []
 };
 
+const getInitialDisabledFields = (values: {
+  isUpcycled?: boolean | null;
+  isDirectSupply?: boolean | null;
+  wasteCode?: string | null;
+  operationCode?: string | null;
+}): string[] => {
+  const disabled: string[] = [];
+
+  // If isUpcycled is false or null, disable destinationParcelInseeCodes
+  if (!values.isUpcycled) {
+    disabled.push("destinationParcelInseeCodes");
+  }
+
+  // If isDirectSupply is true, disable transporter
+  if (values.isDirectSupply) {
+    disabled.push("transporter");
+  }
+
+  // If wasteCode contains "*", disable wasteIsDangerous
+  if (values.wasteCode && values.wasteCode.includes("*")) {
+    disabled.push("wasteIsDangerous");
+  }
+
+  // If operationCode starts with "D", disable isUpcycled
+  if (values.operationCode && values.operationCode.startsWith("D")) {
+    disabled.push("isUpcycled");
+  }
+
+  return disabled;
+};
+
 export function RegistryManagedForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
+  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
+    getInitialDisabledFields(DEFAULT_VALUES)
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -106,7 +154,7 @@ export function RegistryManagedForm({ onClose }: Props) {
             }
           );
           // Set the form values with the transformed data
-          methods.reset({
+          const resetValues = {
             ...DEFAULT_VALUES,
             ...definedIncominTexsProps,
             managingStartDate: isoDateToHtmlDate(
@@ -115,10 +163,34 @@ export function RegistryManagedForm({ onClose }: Props) {
             managingEndDate: isoDateToHtmlDate(
               definedIncominTexsProps.managingEndDate
             ),
+            parcelInseeCodes: transformToFieldArrayObjects(
+              definedIncominTexsProps.parcelInseeCodes
+            ),
+            parcelNumbers: transformToFieldArrayObjects(
+              definedIncominTexsProps.parcelNumbers
+            ),
+            parcelCoordinates: transformToFieldArrayObjects(
+              definedIncominTexsProps.parcelCoordinates
+            ),
+            destinationParcelInseeCodes: transformToFieldArrayObjects(
+              definedIncominTexsProps.destinationParcelInseeCodes
+            ),
+            destinationParcelNumbers: transformToFieldArrayObjects(
+              definedIncominTexsProps.destinationParcelNumbers
+            ),
+            destinationParcelCoordinates: transformToFieldArrayObjects(
+              definedIncominTexsProps.destinationParcelCoordinates
+            ),
             reason: RegistryLineReason.Edit,
             transporter: transporters
-          });
-          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
+          };
+          methods.reset(resetValues);
+          const initialDisabled = getInitialDisabledFields(resetValues);
+          setDisabledFieldNames([
+            ...initialDisabled,
+            "publicId",
+            "reportForCompanySiret"
+          ]);
         }
       },
       onError: error => {
@@ -135,9 +207,7 @@ export function RegistryManagedForm({ onClose }: Props) {
       );
     } else {
       setDisabledFieldNames(prev => [...prev, "destinationParcelInseeCodes"]);
-      methods.setValue("destinationParcelInseeCodes", []);
-      methods.setValue("destinationParcelNumbers", []);
-      methods.setValue("destinationParcelCoordinates", []);
+      // the ParcelsVisualizer handles the cleanup of destinationParcel infos
     }
   }, [isUpcycled, methods]);
 
@@ -169,6 +239,7 @@ export function RegistryManagedForm({ onClose }: Props) {
   useEffect(() => {
     if (operationCode && operationCode.startsWith("D")) {
       setDisabledFieldNames(prev => [...prev, "isUpcycled"]);
+      methods.setValue("isUpcycled", false);
     } else {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "isUpcycled")

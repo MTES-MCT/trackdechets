@@ -9,7 +9,8 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray
+  filteredArray,
+  fieldArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -18,7 +19,7 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-import { Parcels } from "../common/Parcels";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 import { Operation } from "../common/Operation";
 import { Labels } from "../common/Labels";
 export const managedFormShape: FormShape = [
@@ -195,16 +196,16 @@ export const managedFormShape: FormShape = [
         ]
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "parcel",
           title: "Parcelles (optionnel)"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: filteredArray,
-          parcelInseeCodes: filteredArray,
-          parcelCoordinates: filteredArray
+          parcelNumbers: fieldArray,
+          parcelInseeCodes: fieldArray,
+          parcelCoordinates: fieldArray
         },
         shape: "custom"
       },
@@ -437,7 +438,7 @@ export const managedFormShape: FormShape = [
         }
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "destinationParcel",
           title: "Parcelles de destination si valorisation"
@@ -448,9 +449,9 @@ export const managedFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          destinationParcelNumbers: filteredArray,
-          destinationParcelInseeCodes: filteredArray,
-          destinationParcelCoordinates: filteredArray
+          destinationParcelNumbers: fieldArray,
+          destinationParcelInseeCodes: fieldArray,
+          destinationParcelCoordinates: fieldArray
         },
         shape: "custom"
       }

@@ -24,7 +24,8 @@ import { handleMutationResponse } from "../builder/handler";
 import {
   handleServerError,
   isoDateToHtmlDate,
-  schemaFromShape
+  schemaFromShape,
+  transformToFieldArrayObjects
 } from "../builder/utils";
 import { ADD_TO_SSD_REGISTRY, GET_SSD_REGISTRY_LOOKUP } from "../queries";
 import { ssdFormShape } from "./shape";
@@ -76,25 +77,17 @@ export function RegistrySsdForm({ onClose }: Props) {
             Object.entries(data.registryLookup.ssd).filter(
               ([_, v]) => v != null
             )
-          );
+          ) as SsdLineInput;
 
           methods.reset({
             ...DEFAULT_VALUES,
             ...definedSsdProps,
-            secondaryWasteCodes:
-              (
-                definedSsdProps.secondaryWasteCodes as
-                  | string[]
-                  | undefined
-                  | null
-              )?.map(code => ({ value: code })) ?? [],
-            secondaryWasteDescriptions:
-              (
-                definedSsdProps.secondaryWasteDescriptions as
-                  | string[]
-                  | undefined
-                  | null
-              )?.map(description => ({ value: description })) ?? [],
+            secondaryWasteCodes: transformToFieldArrayObjects(
+              definedSsdProps.secondaryWasteCodes
+            ),
+            secondaryWasteDescriptions: transformToFieldArrayObjects(
+              definedSsdProps.secondaryWasteDescriptions
+            ),
             processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
             processingEndDate: isoDateToHtmlDate(
               definedSsdProps.processingEndDate
