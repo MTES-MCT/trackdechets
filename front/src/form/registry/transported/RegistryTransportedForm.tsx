@@ -28,19 +28,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 type Props = { onClose: () => void };
 
+const DEFAULT_VALUES: Partial<TransportedLineInput> = {
+  reportForTransportIsWaste: false,
+  reportForRecepisseIsExempted: false,
+  reportForTransportPlates: [],
+  wastePop: false,
+  weightIsEstimate: true,
+  wasteIsDangerous: false
+};
+
+const getInitialDisabledFields = (values: {
+  reportForTransportIsWaste?: boolean | null;
+  wasteCode?: string | null;
+}): string[] => {
+  const disabled: string[] = [];
+
+  // If reportForTransportIsWaste is false, disable wasteCode
+  if (!values.reportForTransportIsWaste) {
+    disabled.push("wasteCode");
+  }
+
+  // If wasteCode contains "*", disable wasteIsDangerous
+  if (values.wasteCode && values.wasteCode.includes("*")) {
+    disabled.push("wasteIsDangerous");
+  }
+  return disabled;
+};
 export function RegistryTransportedForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
-
-  const DEFAULT_VALUES: Partial<TransportedLineInput> = {
-    reportForTransportIsWaste: false,
-    reportForRecepisseIsExempted: false,
-    reportForTransportPlates: [],
-    wastePop: false,
-    weightIsEstimate: true,
-    wasteIsDangerous: false
-  };
+  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
+    getInitialDisabledFields(DEFAULT_VALUES)
+  );
 
   const methods = useForm<TransportedLineInput>({
     defaultValues: {
@@ -69,7 +88,7 @@ export function RegistryTransportedForm({ onClose }: Props) {
           ) as TransportedLineInput;
 
           // Set the form values with the transformed data
-          methods.reset({
+          const resetValues = {
             ...DEFAULT_VALUES,
             ...definedTransportedProps,
             collectionDate: isoDateToHtmlDate(
@@ -79,8 +98,14 @@ export function RegistryTransportedForm({ onClose }: Props) {
               definedTransportedProps.unloadingDate
             ),
             reason: RegistryLineReason.Edit
-          });
-          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
+          };
+          methods.reset(resetValues);
+          const initialDisabled = getInitialDisabledFields(resetValues);
+          setDisabledFieldNames([
+            ...initialDisabled,
+            "publicId",
+            "reportForCompanySiret"
+          ]);
         }
       },
       onError: error => {

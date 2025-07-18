@@ -1,4 +1,3 @@
-import { z } from "zod";
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
   ADMINISTRATIVE_ACT_EXPLANATIONS,
@@ -16,7 +15,8 @@ import {
   optionalString,
   nonEmptyNumber,
   optionalNumber,
-  booleanString
+  booleanString,
+  fieldArray
 } from "../builder/validation";
 import { Operation } from "../common/Operation";
 import { Labels, InfoLabels } from "../common/Labels";
@@ -95,12 +95,8 @@ export const ssdFormShape: FormShape = [
         shape: "custom",
         names: ["secondaryWasteCodes", "secondaryWasteDescriptions"],
         validation: {
-          secondaryWasteCodes: z
-            .array(z.object({ value: optionalString }))
-            .transform(arr => arr.map(({ value }) => value)),
-          secondaryWasteDescriptions: z
-            .array(z.object({ value: optionalString }))
-            .transform(arr => arr.map(({ value }) => value))
+          secondaryWasteCodes: fieldArray,
+          secondaryWasteDescriptions: fieldArray
         }
       },
       {

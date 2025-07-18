@@ -42,10 +42,31 @@ const DEFAULT_VALUES: Partial<FormValues> = {
   initialEmitterMunicipalitiesInseeCodes: [],
   transporter: []
 };
+
+const getInitialDisabledFields = (values: {
+  isDirectSupply?: boolean | null;
+  wasteCode?: string | null;
+}): string[] => {
+  const disabled: string[] = [];
+
+  // If isDirectSupply is true, disable transporter
+  if (values.isDirectSupply) {
+    disabled.push("transporter");
+  }
+
+  // If wasteCode contains "*", disable wasteIsDangerous
+  if (values.wasteCode && values.wasteCode.includes("*")) {
+    disabled.push("wasteIsDangerous");
+  }
+  return disabled;
+};
+
 export function RegistryOutgoingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
-  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
+  const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
+    getInitialDisabledFields(DEFAULT_VALUES)
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -100,7 +121,7 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
             }
           );
           // Set the form values with the transformed data
-          methods.reset({
+          const resetValues = {
             ...DEFAULT_VALUES,
             ...definedOutgoingWasteProps,
             dispatchDate: isoDateToHtmlDate(
@@ -108,8 +129,14 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
             ),
             reason: RegistryLineReason.Edit,
             transporter: transporters
-          });
-          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
+          };
+          methods.reset(resetValues);
+          const initialDisabled = getInitialDisabledFields(resetValues);
+          setDisabledFieldNames([
+            ...initialDisabled,
+            "publicId",
+            "reportForCompanySiret"
+          ]);
         }
       },
       onError: error => {

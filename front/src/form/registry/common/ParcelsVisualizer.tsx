@@ -16,7 +16,7 @@ import clsx from "clsx";
 import { Tag } from "@codegouvfr/react-dsfr/Tag";
 import { debounce } from "../../../common/helper";
 
-import { Feature, View, Map, getUid } from "ol";
+import { Feature, View, Map, getUid, MapBrowserEvent } from "ol";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import { Style, Icon, Stroke, Fill } from "ol/style";
@@ -116,14 +116,6 @@ const createMap = (): {
       parcelLayer
     ],
     view: getView(fromLonLat([2.1752, 46.4983]), 3.5)
-  });
-
-  map.on("moveend", () => {
-    const view = map.getView();
-    const center = view.getCenter();
-    const zoom = view.getZoom();
-    console.log("center", center);
-    console.log("zoom", zoom);
   });
 
   return { map, markerLayerId, parcelLayerId };
@@ -370,6 +362,68 @@ const displayParcel = async (
   return false;
 };
 
+/**
+ * Custom tag content component with text and dismissible cross
+ */
+const TagContent = ({
+  text,
+  onDismiss,
+  onTagClick,
+  disabled
+}: {
+  text: string;
+  onDismiss: () => void;
+  onTagClick?: () => void;
+  disabled?: boolean;
+}) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      width: "100%",
+      gap: "4px"
+    }}
+  >
+    <span
+      onClick={onTagClick}
+      style={{
+        flex: 1,
+        cursor: onTagClick ? "pointer" : "default"
+      }}
+    >
+      {text}
+    </span>
+    {!disabled && (
+      <button
+        type="button"
+        onClick={e => {
+          e.stopPropagation();
+          onDismiss();
+        }}
+        style={{
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          minWidth: "16px",
+          height: "16px",
+          marginRight: "-0.25rem"
+        }}
+        aria-label="Supprimer"
+      >
+        <span
+          className="fr-icon--sm fr-icon-close-line"
+          style={{ fontSize: "12px" }}
+          aria-hidden="true"
+        />
+      </button>
+    )}
+  </div>
+);
+
 export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const { errors } = methods.formState;
   const [clientError, setClientError] = useState<{
@@ -377,67 +431,6 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     severity: AlertProps.Severity;
     field: "inseeCode" | "parcelNumber" | "coordinates" | null;
   } | null>(null);
-
-  /**
-   * Custom tag content component with text and dismissible cross
-   */
-  const TagContent = ({
-    text,
-    onDismiss,
-    onTagClick
-  }: {
-    text: string;
-    onDismiss: () => void;
-    onTagClick?: () => void;
-  }) => (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
-        gap: "4px"
-      }}
-    >
-      <span
-        onClick={onTagClick}
-        style={{
-          flex: 1,
-          cursor: onTagClick ? "pointer" : "default"
-        }}
-      >
-        {text}
-      </span>
-      {!disabled && (
-        <button
-          type="button"
-          onClick={e => {
-            e.stopPropagation();
-            onDismiss();
-          }}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minWidth: "16px",
-            height: "16px",
-            marginRight: "-0.25rem"
-          }}
-          aria-label="Supprimer"
-        >
-          <span
-            className="fr-icon--sm fr-icon-close-line"
-            style={{ fontSize: "12px" }}
-            aria-hidden="true"
-          />
-        </button>
-      )}
-    </div>
-  );
-
   const [mode, setMode] = useState<Mode>(Mode.CODE);
   const [map, setMap] = useState<Map | null>(null);
   const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
@@ -447,8 +440,6 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const [coordinates, setCoordinates] = useState<string>("");
   const [parcelNumber, setParcelNumber] = useState<string>("");
   const [inseeCode, setInseeCode] = useState<string>("");
-  // const [selectedAddress, setSelectedAddress] =
-  //   useState<AddressSuggestion | null>(null);
   const [addressesSuggestions, setAddressesSuggestions] = useState<
     AddressSuggestion[]
   >([]);
@@ -512,9 +503,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   const inseeCodeErrors = errors?.[`${prefix}InseeCodes`];
   const numberErrors = errors?.[`${prefix}Numbers`];
   const coordinatesErrors = errors?.[`${prefix}Coordinates`];
-  console.log("errors", errors);
   const backendErrors = useMemo(() => {
-    console.log("in memo");
     // this looks dumb, but poor typing prevents us from simply enumerating the errors as an array
     const errs: FieldError[] = [];
     inseeCodeValues.forEach((_, index) => {
@@ -522,12 +511,8 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         errs.push(inseeCodeErrors?.[index]);
       }
     });
-    console.log("numberValues", numberValues);
     numberValues.forEach((_, index) => {
-      console.log("number error index", index);
-      console.log("number error", numberErrors?.[index]);
       if (numberErrors?.[index]) {
-        console.log("number error", numberErrors?.[index]);
         errs.push(numberErrors?.[index]);
       }
     });
@@ -537,23 +522,50 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
       }
     });
     return errs;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     inseeCodeErrors,
     numberErrors,
     coordinatesErrors,
     inseeCodeValues,
     numberValues,
-    coordinatesValues,
-    prefix
+    coordinatesValues
   ]);
-  console.log("backendErrors", backendErrors);
+
+  const deleteParcel = useCallback(
+    (mode: Mode, index: number) => {
+      if (mode === Mode.CODE) {
+        const featureId = inseeCodeValues[index]?.featureId;
+        if (featureId) {
+          removeParcelFromMap(featureId, map, parcelLayerId);
+        }
+        removeInseeCode(index);
+        removeNumber(index);
+      }
+      if (mode === Mode.GPS) {
+        const featureId = coordinatesValues[index]?.featureId;
+        if (featureId) {
+          removePointFromMap(featureId, map, markerLayerId);
+        }
+        removeCoordinate(index);
+      }
+    },
+    [
+      inseeCodeValues,
+      coordinatesValues,
+      map,
+      parcelLayerId,
+      markerLayerId,
+      removeInseeCode,
+      removeNumber,
+      removeCoordinate
+    ]
+  );
+
   useEffect(() => {
     Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
       callbackSuffix: "",
       onSuccess: async () => {
-        console.log("onSuccess");
         let map: Map;
         let markerLayerId: string;
         let parcelLayerId: string;
@@ -631,7 +643,10 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   }, []);
 
   useEffect(() => {
-    const handler = e => {
+    const handler = (e: MapBrowserEvent<MouseEvent>) => {
+      if (disabled) {
+        return;
+      }
       const lonLat = toLonLat(e.coordinate);
       exploitCoordinates({ lat: lonLat[1], lng: lonLat[0] });
     };
@@ -643,7 +658,18 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
         map.un("singleclick", handler);
       }
     };
-  }, [map, exploitCoordinates]);
+  }, [map, exploitCoordinates, disabled]);
+
+  useEffect(() => {
+    if (disabled) {
+      inseeCodeValues.forEach((_, index) => {
+        deleteParcel(Mode.CODE, index);
+      });
+      coordinatesValues.forEach((_, index) => {
+        deleteParcel(Mode.GPS, index);
+      });
+    }
+  }, [disabled, inseeCodeValues, coordinatesValues, deleteParcel]);
 
   const setSelectedAddress = (address: AddressSuggestion) => {
     if (map) {
@@ -679,24 +705,6 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
       }, 500),
     [setAddressesSuggestions, setShowSearch]
   );
-
-  function deleteParcel(mode: Mode, index: number) {
-    if (mode === Mode.CODE) {
-      const featureId = inseeCodeValues[index]?.featureId;
-      if (featureId) {
-        removeParcelFromMap(featureId, map, parcelLayerId);
-      }
-      removeInseeCode(index);
-      removeNumber(index);
-    }
-    if (mode === Mode.GPS) {
-      const featureId = coordinatesValues[index]?.featureId;
-      if (featureId) {
-        removePointFromMap(featureId, map, markerLayerId);
-      }
-      removeCoordinate(index);
-    }
-  }
 
   const tags = useMemo((): { value: string; mode: Mode; index: number }[] => {
     const numberFields = inseeCodeValues.map((field, index) => {
@@ -752,6 +760,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                 label="Adresse complète"
                 className="fr-mt-1w fr-mb-1w"
                 ref={addressInputRef}
+                disabled={disabled}
                 nativeInputProps={{
                   value: searchString,
                   type: "search",
@@ -827,6 +836,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                       label="Commune"
                       className="fr-mb-1w"
                       hintText="Code INSEE"
+                      disabled={disabled}
                       state={
                         clientError?.field === "inseeCode" ? "error" : undefined
                       }
@@ -851,6 +861,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                       label="Numéro de parcelle"
                       className="fr-mb-1w"
                       hintText={`Préfixe-Section-Numéro`}
+                      disabled={disabled}
                       state={
                         clientError?.field === "parcelNumber"
                           ? "error"
@@ -871,6 +882,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
+                    disabled={disabled}
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
@@ -907,6 +919,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
+                    disabled={disabled}
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
@@ -957,6 +970,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                     label="Coordonnées GPS"
                     className="fr-mb-1w"
                     hintText="Format: un point pour les décimales"
+                    disabled={disabled}
                     state={
                       clientError?.field === "coordinates" ? "error" : undefined
                     }
@@ -974,6 +988,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
+                    disabled={disabled}
                     onClick={() => {
                       if (!coordinates) {
                         setClientError({
@@ -1000,6 +1015,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                   <Button
                     type="button"
                     priority="secondary"
+                    disabled={disabled}
                     onClick={() => {
                       const lonLat = lonLatFromCoordinatesString(coordinates);
                       if (lonLat) {
@@ -1082,6 +1098,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                       >
                         <TagContent
                           text={parcel.value}
+                          disabled={disabled}
                           onDismiss={() =>
                             deleteParcel(parcel.mode, parcel.index)
                           }
@@ -1100,7 +1117,6 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
                             }
                           }}
                         />
-                        {/* {parcel.value} */}
                       </Tag>
                     </div>
                   ))}
