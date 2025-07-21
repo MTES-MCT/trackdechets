@@ -9,7 +9,6 @@ import {
   getReadonlyBsffRepository
 } from "../repository";
 import { BsffWithTransportersInclude } from "../types";
-import { prisma } from "@td/prisma";
 
 export const BsffPackaging: BsffPackagingResolvers = {
   bsff: async packaging => {
