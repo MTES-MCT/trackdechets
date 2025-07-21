@@ -6,8 +6,14 @@ type Props = {
   password: string;
 };
 
-const MIN_LENGTH = 10;
+const MIN_LENGTH = 12;
 const MIN_SCORE = 3;
+const CHAR_CLASSES_REGEX = {
+  lower: /[a-z]/,
+  upper: /[A-Z]/,
+  number: /[0-9]/,
+  special: /[^a-zA-Z0-9]/
+};
 
 type PasswordHintResult = {
   title: string;
@@ -21,6 +27,14 @@ export const getPasswordHint = (password: string): PasswordHintResult => {
       hintType: "error",
       message: `Votre mot de passe est trop court (${password.length} caractères), la longueur minimale est de ${MIN_LENGTH} caractères`
     };
+  if (!Object.values(CHAR_CLASSES_REGEX).every(regex => regex.test(password))) {
+    return {
+      title: "Insuffisant",
+      hintType: "error",
+      message:
+        "Votre mot de passe ne contient pas tous les types de caractères requis: une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial"
+    };
+  }
   const { score } = zxcvbn(password);
   return score >= MIN_SCORE
     ? {
@@ -56,6 +70,9 @@ export const PassWordHints = () => (
     </p>
     <p className="fr-text--md fr-mb-1w">
       - contenir {MIN_LENGTH} caractères minimum
+      <br />
+      - contenir une lettre minuscule, une lettre majuscule, un chiffre et un
+      caractère spécial
       <br />
       - avoir une complexité suffisante
       <br />
