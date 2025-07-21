@@ -116,7 +116,7 @@ export const testSignupPasswordPolicy = async (page: Page) => {
   await fillSignupInfo(page, {
     username: "Username",
     email: "user@mail.com",
-    password: "aaaaaaaaaaa"
+    password: "aaaaaaaaaaaaa"
   });
   await expect(
     page.getByRole("heading", { name: "Insuffisant" })
