@@ -1,3 +1,5 @@
+import { logger } from "@td/logger";
+
 /**
  * Formats a date like "8 juillet 2024 à 17:49"
  */
@@ -45,6 +47,7 @@ export function getSafeReturnTo(returnTo: string, base: string) {
     }
     return "/";
   } catch (_) {
+    logger.error("Invalid returnTo URL. Ignoring it.", { returnTo, base });
     return "/";
   }
 }
