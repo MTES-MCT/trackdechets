@@ -607,6 +607,13 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   previousPackagings: {
     sealed: { from: packagingSealedFromEmissionExceptForEmitter }
   }
+  ,
+  ficheInterventions: {
+    sealed: {
+      from: "EMISSION"
+    },
+    readableFieldName: "Les fiches d'intervention associées au contenant"
+  }
 };
 
 export const getRequiredAndSealedFieldPaths = async (
