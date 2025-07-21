@@ -254,7 +254,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterRecepisseDepartment: {
@@ -264,7 +264,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterRecepisseValidityLimit: {
@@ -274,7 +274,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterTransportMode: {
