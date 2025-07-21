@@ -267,8 +267,6 @@ export function toIncomingWaste(
 ): Required<IncomingWaste> {
   const { __typename, ...genericWaste } = toGenericWaste(bsdasri);
 
-  console.log("bsdasri", bsdasri);
-
   return {
     // Make sure all possible keys are in the exported sheet so that no column is missing
     ...emptyIncomingWaste,
