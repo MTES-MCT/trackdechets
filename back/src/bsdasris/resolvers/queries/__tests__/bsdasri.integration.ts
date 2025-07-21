@@ -186,6 +186,7 @@ describe("Query.Bsdasri", () => {
         }
       },
       destination: {
+        cap: null,
         company: {
           name: dasri.destinationCompanyName,
           orgId: dasri.destinationCompanySiret,

@@ -1268,6 +1268,7 @@ model Bsdasri {
   destinationCompanyPhone                     String?
   destinationCompanyMail                      String?
   destinationCustomInfo                       String?
+  destinationCap                              String?
   destinationWastePackagings                  Json                    @default("[]")
   destinationReceptionAcceptationStatus       WasteAcceptationStatus?
   destinationReceptionWasteRefusalReason      String?

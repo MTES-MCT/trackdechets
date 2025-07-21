@@ -474,13 +474,16 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
     readableFieldName: "L'adresse e-mail du destinataire",
     path: ["destination", "company", "mail"]
   },
+  destinationCap: {
+    sealed: { from: "RECEPTION" },
+    readableFieldName: "Le CAP du destinataire",
+    path: ["destination", "cap"]
+  },
   destinationCustomInfo: {
     sealed: { from: "OPERATION" },
-
     readableFieldName: "Les infos du destinataire",
     path: ["destination", "customInfo"]
   },
-
   destinationWastePackagings: {
     sealed: { from: "RECEPTION" },
     required: { from: "RECEPTION" },
