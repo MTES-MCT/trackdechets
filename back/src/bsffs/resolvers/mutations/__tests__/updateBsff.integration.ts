@@ -3732,6 +3732,24 @@ describe("Mutation.updateBsff", () => {
         { id: ficheIntervention.id },
         { id: newficheIntervention.id }
       ]);
+
+      // Initial packagings should have been deleted
+      const updatedInitialPackagings = await prisma.bsffPackaging.findMany({
+        where: {
+          id: { in: initialPackagings.map(i => i.id) }
+        }
+      });
+      expect(updatedInitialPackagings.length).toBe(0);
+
+      // Link to fiches should have been deleted as well
+      const fiches = await prisma.bsffFicheIntervention.findMany({
+        where: {
+          packagings: {
+            some: { id: { in: initialPackagings.map(i => i.id) } }
+          }
+        }
+      });
+      expect(fiches.length).toBe(0);
     });
 
     it("fiches should be returned in packaging", async () => {
