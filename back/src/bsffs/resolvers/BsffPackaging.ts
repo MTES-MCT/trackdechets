@@ -1,10 +1,15 @@
 import type { BsffPackagingResolvers } from "@td/codegen-back";
-import { expandBsffFromDB } from "../converter";
 import {
+  expandBsffFromDB,
+  expandFicheInterventionBsffFromDB
+} from "../converter";
+import {
+  getReadonlyBsffFicheInterventionRepository,
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
 import { BsffWithTransportersInclude } from "../types";
+import { prisma } from "@td/prisma";
 
 export const BsffPackaging: BsffPackagingResolvers = {
   bsff: async packaging => {
@@ -83,5 +88,18 @@ export const BsffPackaging: BsffPackagingResolvers = {
           packagings: []
         };
       });
+  },
+  ficheInterventions: async packaging => {
+    const { findMany } = getReadonlyBsffFicheInterventionRepository();
+
+    const fiches = await findMany({
+      where: {
+        packagings: { some: { id: packaging.id } }
+      }
+    });
+
+    if (!fiches?.length) return [];
+
+    return fiches.map(f => expandFicheInterventionBsffFromDB(f));
   }
 };
