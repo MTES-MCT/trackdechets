@@ -3733,5 +3733,92 @@ describe("Mutation.updateBsff", () => {
         { id: newficheIntervention.id }
       ]);
     });
+
+    it("fiches should be returned in packaging", async () => {
+      // Given
+      const bsff = await createBsff();
+      const newficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      const initialPackagings = await prisma.bsffPackaging.findMany({
+        where: { bsffId: bsff.id },
+        include: {
+          ficheInterventions: true
+        }
+      });
+      // Make sure fiche is linked to packagings
+      const initialPackaging1 = initialPackagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const initialPackaging2 = initialPackagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+      expect(initialPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(initialPackaging1?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id },
+        { id: ficheInterventionPackage1.id }
+      ]);
+      expect(initialPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(initialPackaging2?.ficheInterventions).toMatchObject([
+        { id: ficheIntervention.id }
+      ]);
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsff">,
+        MutationUpdateBsffArgs
+      >(UPDATE_BSFF, {
+        variables: {
+          id: bsff.id,
+          input: {
+            emitter: {
+              company: {
+                name: "New Name"
+              }
+            },
+            ficheInterventions: [newficheIntervention.id]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      console.log("data.updateBsff", JSON.stringify(data.updateBsff, null, 4));
+
+      // Make sure full fiches info is returned in query
+      const updatedPackaging1 = data.updateBsff.packagings.find(
+        p => p.type === BsffPackagingType.BOUTEILLE
+      );
+      const updatedPackaging2 = data.updateBsff.packagings.find(
+        p => p.type === BsffPackagingType.CITERNE
+      );
+
+      expect(updatedPackaging1?.ficheInterventions?.length).toBe(2);
+      expect(updatedPackaging1?.ficheInterventions).toMatchObject([
+        {
+          id: ficheInterventionPackage1.id,
+          numero: ficheInterventionPackage1.numero,
+          weight: ficheInterventionPackage1.weight.toNumber()
+        },
+        {
+          id: newficheIntervention.id,
+          numero: newficheIntervention.numero,
+          weight: newficheIntervention.weight.toNumber()
+        }
+      ]);
+
+      expect(updatedPackaging2?.ficheInterventions?.length).toBe(1);
+      expect(updatedPackaging2?.ficheInterventions).toMatchObject([
+        {
+          id: newficheIntervention.id,
+          numero: newficheIntervention.numero,
+          weight: newficheIntervention.weight.toNumber()
+        }
+      ]);
+    });
   });
 });

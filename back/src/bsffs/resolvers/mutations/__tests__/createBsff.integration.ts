@@ -796,5 +796,69 @@ describe("Mutation.createBsff", () => {
         { id: bsffFicheIntervention.id }
       ]);
     });
+
+    it("fiches should be returned in packaging", async () => {
+      // Given
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsffFicheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+      const packagingFicheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur
+      });
+
+      // When
+      const { mutate } = makeClient(operateur.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsff">,
+        MutationCreateBsffArgs
+      >(CREATE_BSFF, {
+        variables: {
+          input: {
+            ...createInput(operateur, transporter, destination),
+            packagings: [
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                numero: "123",
+                weight: 1,
+                volume: 1,
+                ficheInterventions: [packagingFicheIntervention.id]
+              }
+            ],
+            ficheInterventions: [bsffFicheIntervention.id]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const newBsff = data.createBsff;
+
+      expect(newBsff.packagings.length).toBe(1);
+
+      const newPackaging = newBsff.packagings[0];
+      expect(newPackaging.ficheInterventions.length).toBe(2);
+
+      const fiche1 = newPackaging.ficheInterventions.find(
+        f => f.id === packagingFicheIntervention.id
+      );
+      const fiche2 = newPackaging.ficheInterventions.find(
+        f => f.id === bsffFicheIntervention.id
+      );
+      expect(fiche1?.id).toBe(packagingFicheIntervention.id);
+      expect(fiche1?.numero).toBe(packagingFicheIntervention.numero);
+      expect(fiche1?.weight).toBe(packagingFicheIntervention.weight.toNumber());
+
+      expect(fiche2?.id).toBe(bsffFicheIntervention.id);
+      expect(fiche2?.numero).toBe(bsffFicheIntervention.numero);
+      expect(fiche2?.weight).toBe(bsffFicheIntervention.weight.toNumber());
+    });
   });
 });
