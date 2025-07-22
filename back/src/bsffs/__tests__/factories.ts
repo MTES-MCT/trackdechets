@@ -128,7 +128,9 @@ export async function createBsff(
     };
   }
   const include = {
-    packagings: { include: { previousPackagings: true } },
+    packagings: {
+      include: { previousPackagings: true, ficheInterventions: true }
+    },
     transporters: true,
     ficheInterventions: true
   };

@@ -69,19 +69,20 @@ const getOrgIdByRole = bsff => {
     },
     {}
   );
-  const detenteurSiretByRole = bsff.ficheInterventions.reduce(
-    (sirets, ficheIntervention) => {
-      if (ficheIntervention.detenteurCompanySiret) {
-        const nbOfKeys = Object.keys(sirets).length;
-        return {
-          ...sirets,
-          [`detenteur${nbOfKeys + 1}`]: ficheIntervention.detenteurCompanySiret
-        };
-      }
-      return sirets;
-    },
-    {}
-  );
+
+  // Get all fiches, from BSFF and from packagings
+  const fiches = getAllBsffFicheInterventions(bsff);
+
+  const detenteurSiretByRole = fiches.reduce((sirets, ficheIntervention) => {
+    if (ficheIntervention.detenteurCompanySiret) {
+      const nbOfKeys = Object.keys(sirets).length;
+      return {
+        ...sirets,
+        [`detenteur${nbOfKeys + 1}`]: ficheIntervention.detenteurCompanySiret
+      };
+    }
+    return sirets;
+  }, {});
   const orgIdByRole = {
     emitter: bsff.emitterCompanySiret,
     destination: bsff.destinationCompanySiret,
@@ -244,6 +245,30 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
   const transporter = getFirstTransporterSync(bsff);
 
   const tabs = getOrgIdsByTab(bsff);
+  const allFiches = getAllBsffFicheInterventions(bsff);
+
+  const companyNamesUnique = new Set(
+    [
+      bsff.emitterCompanyName,
+      ...bsff.transporters.map(t => t.transporterCompanyName),
+      bsff.destinationCompanyName,
+      // Fiches from the BSFF AND from the packagings
+      ...allFiches.map(fiche => fiche.detenteurCompanyName)
+    ].filter(Boolean)
+  );
+
+  const companyOrgIdsUnique = new Set(
+    [
+      bsff.emitterCompanySiret,
+      ...bsff.transporters.flatMap(t => [
+        t.transporterCompanySiret,
+        t.transporterCompanyVatNumber
+      ]),
+      bsff.destinationCompanySiret,
+      // Fiches from the BSFF AND from the packagings
+      ...allFiches.map(fiche => fiche.detenteurCompanySiret)
+    ].filter(Boolean)
+  );
 
   const bsd = {
     type: BsdType.BSFF,
@@ -364,6 +389,17 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
 
   return bsd;
 }
+
+export const getAllBsffFicheInterventions = (
+  bsff: BsffWithPackagings & BsffWithFicheInterventions
+) => {
+  const fiches = [...bsff.ficheInterventions];
+  bsff.packagings.forEach(p =>
+    p.ficheInterventions.forEach(f => fiches.push(f))
+  );
+
+  return fiches;
+};
 
 export async function indexBsff(
   bsff: BsffForElastic,
