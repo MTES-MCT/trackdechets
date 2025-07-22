@@ -9,7 +9,11 @@ export type BsffWithTransporters = Prisma.BsffGetPayload<{
 }>;
 
 export const BsffWithPackagingsInclude = {
-  packagings: true
+  packagings: {
+      include: {
+        ficheInterventions: true
+      }
+    }
 } satisfies Prisma.BsffInclude;
 
 export type BsffWithPackagings = Prisma.BsffGetPayload<{
