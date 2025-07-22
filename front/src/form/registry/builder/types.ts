@@ -14,6 +14,7 @@ export type FormShapeField =
       type: string;
       title?: string;
       label: string | React.ReactNode;
+      infoLabel?: string;
       required?: boolean;
       validation: Record<string, z.ZodType>;
       defaultOption?: string;
