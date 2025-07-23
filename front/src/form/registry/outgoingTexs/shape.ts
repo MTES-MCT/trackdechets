@@ -376,7 +376,8 @@ export const outgoingTexsFormShape: FormShape = [
         Component: ParcelsVisualizer,
         props: {
           prefix: "destinationParcel",
-          title: "Parcelles de destination si valorisation"
+          title: "Parcelles de destination si valorisation",
+          hideIfDisabled: true
         },
         names: [
           "destinationParcelInseeCodes",

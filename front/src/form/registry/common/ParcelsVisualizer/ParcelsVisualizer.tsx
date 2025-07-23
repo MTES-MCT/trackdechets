@@ -41,6 +41,7 @@ type Props = {
   prefix: string;
   methods: UseFormReturn<any>;
   disabled?: boolean;
+  hideIfDisabled?: boolean;
   title?: string;
 };
 
@@ -49,7 +50,13 @@ enum Mode {
   GPS = "GPS"
 }
 
-export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
+export function ParcelsVisualizer({
+  methods,
+  disabled,
+  hideIfDisabled = false,
+  prefix,
+  title
+}: Props) {
   const { errors } = methods.formState;
   const [clientError, setClientError] = useState<{
     text: string;
@@ -181,6 +188,9 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
   );
 
   useEffect(() => {
+    if (disabled && hideIfDisabled) {
+      return;
+    }
     Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
       callbackSuffix: "",
@@ -259,7 +269,7 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [disabled, hideIfDisabled]);
 
   useEffect(() => {
     const handler = (e: MapBrowserEvent<MouseEvent>) => {
@@ -313,6 +323,10 @@ export function ParcelsVisualizer({ methods, disabled, prefix, title }: Props) {
     });
     return [...numberFields, ...coordinatesFields];
   }, [inseeCodeValues, numberValues, coordinatesValues]);
+
+  if (hideIfDisabled && disabled) {
+    return null;
+  }
 
   return (
     <div className="fr-col">
