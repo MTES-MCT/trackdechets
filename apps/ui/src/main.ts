@@ -48,7 +48,7 @@ app.use(
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         mediaSrc: ["'self'", "data:"],
-        requireTrustedTypesFor: ["'script'", "style"]
+        requireTrustedTypesFor: ["'script'"]
       }
     }
   })

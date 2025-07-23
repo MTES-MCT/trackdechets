@@ -255,7 +255,7 @@ app.use(
         connectSrc: [process.env.API_HOST],
         formAction: ["'self'"],
         upgradeInsecureRequests: NODE_ENV === "production" ? [] : null,
-        requireTrustedTypesFor: ["'script'", "style"]
+        requireTrustedTypesFor: ["'script'"]
       }
     },
     xXssProtection: false
