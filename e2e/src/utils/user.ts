@@ -118,7 +118,7 @@ export const testSignupPasswordPolicy = async (page: Page) => {
   await fillSignupInfo(page, {
     username: "Username",
     email: "user@mail.com",
-    password: "aaaaaaaaaaa"
+    password: "aaaaaaaaaaaaa"
   });
   await expect(
     page.getByRole("heading", { name: "Insuffisant" })
@@ -366,7 +366,7 @@ export const testPasswordUpdate = async (
   });
   await expect(
     page.getByText(
-      "Votre mot de passe est trop court (9 caractères), la longueur minimale est de 10 caractères"
+      "Votre mot de passe est trop court (9 caractères), la longueur minimale est de 12 caractères"
     )
   ).toBeVisible();
 
@@ -375,5 +375,5 @@ export const testPasswordUpdate = async (
     oldPassword,
     newPassword
   });
-  await testAccountInfo(page, { password: "**********" });
+  await testAccountInfo(page, { password: "************" });
 };

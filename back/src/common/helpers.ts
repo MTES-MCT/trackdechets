@@ -1,3 +1,5 @@
+import { logger } from "@td/logger";
+
 /**
  * Formats a date like "8 juillet 2024 à 17:49"
  */
@@ -36,3 +38,16 @@ export const areDefined = (...obj: any[]) => {
   if (obj.some(o => !isDefined(o))) return false;
   return true;
 };
+
+export function getSafeReturnTo(returnTo: string, base: string) {
+  try {
+    const url = new URL(`${base}${returnTo}`);
+    if (url.origin === new URL(base).origin) {
+      return returnTo;
+    }
+    return "/";
+  } catch (_) {
+    logger.error("Invalid returnTo URL. Ignoring it.", { returnTo, base });
+    return "/";
+  }
+}
