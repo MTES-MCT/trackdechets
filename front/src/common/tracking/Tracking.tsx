@@ -53,7 +53,12 @@ export function MatomoTracker() {
         window.location.reload();
       }
     }
-  }, [trackingConsentUntil, trackingConsent]);
+  }, [
+    trackingConsentUntil,
+    trackingConsent,
+    VITE_MATOMO_TRACKER_SITE_ID,
+    VITE_MATOMO_TRACKER_URL
+  ]);
 
   return null;
 }
