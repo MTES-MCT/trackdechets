@@ -72,17 +72,17 @@ describe("Mutation.signup", () => {
   it("should return the same result if email already exist", async () => {
     const alreadyExistingUser = await userFactory();
 
-    const { data, errors } = await mutate(SIGNUP, {
+    const { data } = await mutate(SIGNUP, {
       variables: {
         userInfos: {
           email: alreadyExistingUser.email,
-          password: "newUserPassword&",
+          password: viablePassword,
           name: alreadyExistingUser.name,
           phone: alreadyExistingUser.phone
         }
       }
     });
-    console.log(errors);
+
     expect(data.signup).toEqual(true);
   });
 
