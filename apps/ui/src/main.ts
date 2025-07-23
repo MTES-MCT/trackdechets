@@ -21,7 +21,8 @@ const CONNECT_SRC = [
   "https://openmaptiles.geo.data.gouv.fr",
   "https://openmaptiles.data.gouv.fr",
   "https://openmaptiles.github.io",
-  "https://s3.fr-par.scw.cloud"
+  "https://s3.fr-par.scw.cloud",
+  "https://stats.beta.gouv.fr"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
