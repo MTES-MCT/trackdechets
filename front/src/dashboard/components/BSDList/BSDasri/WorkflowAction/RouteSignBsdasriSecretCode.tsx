@@ -32,7 +32,7 @@ import {
 import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
 import routes from "../../../../../Apps/routes";
-import { removeSections } from "./PartialForms";
+import { removeBsdasriSectionsBeforeSignature } from "./PartialForms";
 import {
   SIGN_BSDASRI_EMISSION_WITH_SECRET_CODE,
   UPDATE_BSDASRI
@@ -120,7 +120,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
             variables: {
               id: id,
               input: {
-                ...removeSections(rest, BsdasriSignatureType.Emission)
+                ...removeBsdasriSectionsBeforeSignature(
+                  rest,
+                  BsdasriSignatureType.Emission
+                )
               }
             }
           });
