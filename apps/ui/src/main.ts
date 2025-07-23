@@ -47,8 +47,7 @@ app.use(
         imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
-        mediaSrc: ["'self'", "data:"],
-        requireTrustedTypesFor: ["'script'"]
+        mediaSrc: ["'self'", "data:"]
       }
     }
   })
