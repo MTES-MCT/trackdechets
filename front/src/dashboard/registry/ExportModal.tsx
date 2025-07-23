@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./MyExports.module.scss";
 
 import {
@@ -125,6 +125,11 @@ export function ExportModal() {
   const registryType = type === "registryV2" ? watch("registryType") : null;
   const startDate = watch("startDate");
   const wasteTypes = watch("wasteTypes");
+
+  useEffect(() => {
+    // When wasteTypes changes, we need to reset the wasteCodes field
+    setValue("wasteCodes", []);
+  }, [wasteTypes, setValue]);
 
   return (
     <Modal
