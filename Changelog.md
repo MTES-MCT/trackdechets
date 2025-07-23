@@ -17,6 +17,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Modification de signup/signin pour éviter l'énumération [PR 4306](https://github.com/MTES-MCT/trackdechets/pull/4306)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'une bannière de consentement au suivi, d'une interface de gestion dans les prefs utilisateur et d'un script de suivi Matomo [PR 4318](https://github.com/MTES-MCT/trackdechets/pull/4318)
+
 # [2025.07.1] 01/07/2025
 
 #### :nail_care: Améliorations

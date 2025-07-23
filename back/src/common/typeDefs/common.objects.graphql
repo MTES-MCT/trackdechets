@@ -42,4 +42,8 @@ type User {
 
   "Liste des fonctionnalités optionelles activées"
   featureFlags: [String!]!
+
+  trackingConsent: Boolean!
+
+  trackingConsentUntil: DateTime
 }

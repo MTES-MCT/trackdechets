@@ -9,11 +9,12 @@ import sandboxIcon from "./assets/code-sandbox.svg";
 import downtimeIcon from "./assets/code-downtime.svg";
 import PageTitle from "../PageTitle/PageTitle";
 import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
-
+import { ConsentBanner } from "../ConsentBanner/ConsentBanner";
 interface AuthProps {
   v2banner?: JSX.Element;
   isAuthenticated?: boolean;
 }
+
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
   import.meta.env;
 
@@ -102,6 +103,7 @@ export default function Layout({
       {isAuthenticated ? <Header /> : <UnauthenticatedHeader />}
       <Outlet />
       <PageTitle />
+      <ConsentBanner />
     </>
   );
 }
