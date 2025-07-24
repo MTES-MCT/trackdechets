@@ -54,7 +54,10 @@ export async function getBsffForBuildPdf({
     include: {
       ...BsffWithTransportersInclude,
       // includes only packagings in the dependency graph of the BSFF
-      packagings: { where: { id: { in: previousPackagings.map(p => p.id) } } }
+      packagings: {
+        where: { id: { in: previousPackagings.map(p => p.id) } },
+        include: { ficheInterventions: true }
+      }
     }
   });
 
