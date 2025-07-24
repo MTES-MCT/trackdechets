@@ -1088,7 +1088,8 @@ describe("Mutation.signBsff", () => {
           data: { acceptationWasteCode: null }
         });
 
-        const { id, previousPackagings, ...packagingData } = bsff.packagings[0];
+        const { id, previousPackagings, ficheInterventions, ...packagingData } =
+          bsff.packagings[0];
         await prisma.bsffPackaging.create({
           data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
         });
