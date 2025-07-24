@@ -1,0 +1,118 @@
+.controls {
+  input[type="radio"]:not(.fr-radio-group input):checked {
+    opacity: 0;
+  }
+}
+
+.or {
+  font-size: 0.875rem;
+  // color: var(--text-mention-grey);
+  font-weight: 600;
+}
+
+.gpsButtons {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.map {
+  height: 430px;
+  width: 100%;
+  :global(.leaflet-control-zoom) {
+    a {
+      background-image: none;
+    }
+  }
+  :global(.leaflet-control-attribution) {
+    display: none;
+  }
+  :global(.leaflet-zoom-anim) {
+    transition-timing-function: linear;
+    transition-duration: 100ms;
+  }
+  :global(.leaflet-zoom-animated) {
+    transition-timing-function: linear;
+    transition-duration: 10ms;
+  }
+}
+
+.searchBar {
+  position: relative;
+
+  // Hide the native webkit search cancel button
+  input::-webkit-search-cancel-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+
+  // Custom cancel button container
+  .customCancelButton {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mention-grey);
+
+    // Make the icon 16x16 instead of default 24x24
+    span::before {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    &:hover {
+      color: var(--text-default-grey);
+      background: transparent !important;
+    }
+
+    &:focus {
+      background: transparent !important;
+    }
+
+    &:active {
+      background: transparent !important;
+    }
+  }
+
+  // Add right padding to input to make room for the cancel button
+  input[type="search"] {
+    padding-right: 40px;
+  }
+}
+
+.tag {
+  :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
+    background-color: var(--background-action-high-blue-france);
+    --idle: transparent;
+    --hover: var(--background-action-high-blue-france-hover);
+    --active: var(--background-action-high-blue-france-active);
+  }
+}
+
+.errorTag {
+  :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
+    background-color: var(--error-425-625);
+    --hover: var(--error-425-625-hover);
+    --active: var(--error-425-625-active);
+  }
+}
+
+.parcelNumber {
+  :global(.fr-hint-text) {
+    white-space: pre-line;
+  }
+}
+
+.controlledInput {
+  :global(.fr-messages-group) {
+    display: none;
+  }
+}

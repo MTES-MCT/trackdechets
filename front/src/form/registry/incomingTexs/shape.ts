@@ -8,6 +8,7 @@ import { FormShape } from "../builder/types";
 import {
   booleanString,
   filteredArray,
+  fieldArray,
   nonEmptyNumber,
   nonEmptyString,
   optionalNumber,
@@ -16,7 +17,7 @@ import {
 import { Address } from "../common/Address";
 import { CompanySelector } from "../common/CompanySelector";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-import { Parcels } from "../common/Parcels";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 import { ReportFor } from "../common/ReportFor";
 import { TransporterSelector } from "../common/TransporterSelector/TransporterSelector";
 import { WasteCodeSelector } from "../common/WasteCodeSelector";
@@ -188,16 +189,16 @@ export const incomingTexsFormShape: FormShape = [
         ]
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "parcel",
           title: "Parcelles d'origine"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: filteredArray,
-          parcelInseeCodes: filteredArray,
-          parcelCoordinates: filteredArray
+          parcelNumbers: fieldArray,
+          parcelInseeCodes: fieldArray,
+          parcelCoordinates: fieldArray
         },
         shape: "custom"
       },
@@ -406,10 +407,11 @@ export const incomingTexsFormShape: FormShape = [
         }
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "destinationParcel",
-          title: "Parcelles de destination si valorisation"
+          title: "Parcelles de destination si valorisation",
+          hideIfDisabled: true
         },
         names: [
           "destinationParcelInseeCodes",
@@ -417,9 +419,9 @@ export const incomingTexsFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          destinationParcelNumbers: filteredArray,
-          destinationParcelInseeCodes: filteredArray,
-          destinationParcelCoordinates: filteredArray
+          destinationParcelNumbers: fieldArray,
+          destinationParcelInseeCodes: fieldArray,
+          destinationParcelCoordinates: fieldArray
         },
         shape: "custom"
       }

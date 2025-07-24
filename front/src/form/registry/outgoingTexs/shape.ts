@@ -9,7 +9,8 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray
+  filteredArray,
+  fieldArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -21,10 +22,10 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
 import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 
 export const outgoingTexsFormShape: FormShape = [
   {
@@ -189,16 +190,16 @@ export const outgoingTexsFormShape: FormShape = [
         ]
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "parcel",
           title: "Parcelles d'origine"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: filteredArray,
-          parcelInseeCodes: filteredArray,
-          parcelCoordinates: filteredArray
+          parcelNumbers: fieldArray,
+          parcelInseeCodes: fieldArray,
+          parcelCoordinates: fieldArray
         },
         shape: "custom"
       },
@@ -372,10 +373,11 @@ export const outgoingTexsFormShape: FormShape = [
         }
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "destinationParcel",
-          title: "Parcelles de destination si valorisation"
+          title: "Parcelles de destination si valorisation",
+          hideIfDisabled: true
         },
         names: [
           "destinationParcelInseeCodes",
@@ -383,9 +385,9 @@ export const outgoingTexsFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          destinationParcelNumbers: filteredArray,
-          destinationParcelInseeCodes: filteredArray,
-          destinationParcelCoordinates: filteredArray
+          destinationParcelNumbers: fieldArray,
+          destinationParcelInseeCodes: fieldArray,
+          destinationParcelCoordinates: fieldArray
         },
         shape: "custom"
       }
