@@ -186,7 +186,7 @@ export function WasteCodeSelector({
         />
       </div>
       {!multiple && (
-        <div className="fr-col-2" style={{ paddingTop: "44px" }}>
+        <div className="fr-col-2" style={{ paddingTop: "40px" }}>
           <div
             className={clsx({
               "fr-mb-9v": !!(isArrayField
@@ -220,7 +220,7 @@ export function WasteCodeSelector({
         searchFields
       ) : (
         <div
-          className="fr-col-12 fr-grid-row fr-grid-row--bottom"
+          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom"
           style={{
             alignItems: "flex-start"
           }}
