@@ -1622,6 +1622,8 @@ model BsffFicheIntervention {
 
   bsffs Bsff[] @relation("BsffToBsffFicheIntervention")
 
+  packagings BsffPackaging[]  
+
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
 }
@@ -1675,6 +1677,8 @@ model BsffPackaging {
   // Relation vers les infos de traçabilité finales
   finalOperations                    BsffPackagingFinalOperation[] @relation("FinalOperationToInitialBsffPackaging")
   FinalOperationToFinalBsffPackaging BsffPackagingFinalOperation[] @relation("FinalOperationToFinalBsffPackaging")
+
+  ficheInterventions BsffFicheIntervention[]
 
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")

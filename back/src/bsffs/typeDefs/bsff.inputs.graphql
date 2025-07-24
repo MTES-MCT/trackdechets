@@ -221,6 +221,8 @@ input BsffPackagingInput {
   numero: String!
   "Poids en kilogrammes"
   weight: Float!
+  "Fiches d'intervention associées"
+  ficheInterventions: [ID!]
 }
 
 input UpdateBsffPackagingInput {

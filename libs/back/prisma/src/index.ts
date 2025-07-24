@@ -13,7 +13,9 @@ export const prisma = new PrismaClient({
   datasources: {
     db: { url: getDbUrlWithSchema(DATABASE_URL) }
   },
-  log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
+  // TODO: rétablir
+  log: []
+  // log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
 });
 
 if (NODE_ENV === "production") {

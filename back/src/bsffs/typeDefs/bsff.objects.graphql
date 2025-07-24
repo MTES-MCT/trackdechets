@@ -191,6 +191,8 @@ type BsffPackaging {
   nextBsffs: [Bsff!]!
   "Liste de tous les BSFF précédents"
   previousBsffs: [InitialBsff!]!
+  "List des fiches d'intervention liées au contenant"
+  ficheInterventions: [BsffFicheIntervention!]!
 }
 
 type BsffWaste {

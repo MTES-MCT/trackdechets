@@ -36,6 +36,7 @@ import {
 import { graphQlInputToZodBsff } from "./validation/bsff/helpers";
 import { parseBsffAsync } from "./validation/bsff";
 import { PrismaTransaction } from "../common/repository/types";
+import { logger } from "@td/logger";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -45,7 +46,7 @@ export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
       ...BsffWithTransportersInclude,
       ...BsffWithFicheInterventionInclude,
       packagings: {
-        include: { previousPackagings: true },
+        include: { previousPackagings: true, ficheInterventions: true },
         orderBy: { numero: "asc" }
       }
     }
@@ -219,6 +220,74 @@ export async function updateDetenteurCompanySirets(
   });
 }
 
+export const removeBsffPackagingsFichesIntervention = async (
+  packagings: BsffPackaging[],
+  fiches: PrismaBsffFicheIntervention[],
+  transaction: PrismaTransaction
+) => {
+  // Associe chaque fiche d'intervention à chaque packaging
+  await Promise.all(
+    fiches.map(async fiche => {
+      await Promise.all(
+        packagings.map(async packaging => {
+          // Peut échouer si le couple fiche / contenant existe déjà en DB
+          try {
+            await transaction.bsffPackaging.update({
+              where: {
+                id: packaging.id
+              },
+              data: {
+                ficheInterventions: { disconnect: { id: fiche.id } }
+              }
+            });
+          } catch (error) {
+            logger.error(
+              `Failed to delete relation for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+              error
+            );
+          }
+        })
+      );
+    })
+  );
+};
+
+/**
+ * TRA-16247: Pour les BSFF legacy, on associe chaque fiche d'intervention
+ * d'un BSFF à tous les contenants dudit BSFF
+ */
+export const addBsffPackagingsFichesIntervention = async (
+  packagings: BsffPackaging[],
+  fiches: PrismaBsffFicheIntervention[],
+  transaction: PrismaTransaction
+) => {
+  // Associe chaque fiche d'intervention à chaque packaging
+  await Promise.all(
+    fiches.map(async fiche => {
+      await Promise.all(
+        packagings.map(async packaging => {
+          // Peut échouer si le couple fiche / contenant existe déjà en DB
+          try {
+            await transaction.bsffPackaging.update({
+              where: {
+                id: packaging.id
+              },
+              data: {
+                ficheInterventions: { connect: { id: fiche.id } }
+              }
+            });
+          } catch (error) {
+            logger.error(
+              `Failed to create relation for fiche '${fiche.id}' / packaging '${packaging.id}': `,
+              error
+            );
+          }
+        })
+      );
+    })
+  );
+};
+
 export async function createBsff(
   user: Express.User,
   input: BsffInput,
@@ -284,9 +353,19 @@ export async function createBsff(
       ? {
           packagings: {
             create: packagings.map(packaging => {
-              const { id, previousPackagings, ...packagingData } = packaging;
+              const {
+                id,
+                previousPackagings,
+                ficheInterventions,
+                ...packagingData
+              } = packaging;
               return {
                 ...packagingData,
+                ficheInterventions: {
+                  connect: (ficheInterventions ?? []).map(id => ({
+                    id
+                  }))
+                },
                 previousPackagings: {
                   connect: (previousPackagings ?? []).map(id => ({ id }))
                 }
@@ -344,7 +423,13 @@ export function getPackagingCreateInput(
           }
         }
       ]
-    : bsff.packagings?.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
+    : bsff.packagings?.map(p => {
+        const { ficheInterventions, ...packagingWithoutFicheInterventions } = p;
+        return {
+          ...packagingWithoutFicheInterventions,
+          emissionNumero: p.numero
+        };
+      }) ?? [];
 }
 
 export async function getTransporters(

@@ -11,7 +11,11 @@ export type BsffWithTransporters = Prisma.BsffGetPayload<{
 
 export const BsffWithPackagingsInclude = Prisma.validator<Prisma.BsffInclude>()(
   {
-    packagings: true
+    packagings: {
+      include: {
+        ficheInterventions: true
+      }
+    }
   }
 );
 

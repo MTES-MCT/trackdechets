@@ -364,7 +364,8 @@ export function expandBsffPackagingFromDB(
     // the following fields will be resolved in BsddPackaging resolver
     nextBsffs: [],
     previousBsffs: [],
-    bsff: null as any
+    bsff: null as any,
+    ficheInterventions: []
   };
 }
 
