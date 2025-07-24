@@ -34,16 +34,3 @@ export const GET_DETAIL_DASRI_WITH_METADATA = gql`
   }
   ${fullDasriFragment}
 `;
-
-export const GET_DASRI_METADATA = gql`
-  query Bsdasri($id: ID!) {
-    bsdasri(id: $id) {
-      metadata {
-        errors {
-          message
-          requiredFor
-        }
-      }
-    }
-  }
-`;

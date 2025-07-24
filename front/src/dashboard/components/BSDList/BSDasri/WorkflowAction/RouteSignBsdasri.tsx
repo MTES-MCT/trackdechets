@@ -36,7 +36,7 @@ import {
   SynthesisTransportSignatureForm,
   ReceptionSignatureForm,
   OperationSignatureForm,
-  removeSections
+  removeBsdasriSectionsBeforeSignature
 } from "./PartialForms";
 import routes from "../../../../../Apps/routes";
 
@@ -192,7 +192,7 @@ export function RouteSignBsdasri({
             variables: {
               id: id,
               input: {
-                ...removeSections(rest, UIsignatureType)
+                ...removeBsdasriSectionsBeforeSignature(rest, UIsignatureType)
               }
             }
           });
