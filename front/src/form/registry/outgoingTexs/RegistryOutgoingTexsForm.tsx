@@ -114,7 +114,10 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
               definedOutgoingTexsProps.dispatchDate
             ),
             reason: RegistryLineReason.Edit,
-            transporter: transporters
+            transporter: transporters,
+            texsAnalysisFileId:
+              data.registryLookup.outgoingTexs.texsAnalysisFiles?.[0]?.id ||
+              null
           });
           setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
         }

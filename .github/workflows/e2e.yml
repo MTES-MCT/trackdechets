@@ -40,6 +40,7 @@ jobs:
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_ERRORS_BUCKET"
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_IMPORTS_BUCKET"
           docker exec trackdechets-minio-1 mc mb myminio/"$S3_REGISTRY_EXPORTS_BUCKET"
+          docker exec trackdechets-minio-1 mc mb myminio/"$S3_TEXS_ANALYSIS_BUCKET"
       - name: Start TD applications
         run: |
           npx nx run api:serve >> /tmp/td-api.log &
@@ -171,6 +172,7 @@ env:
   S3_REGISTRY_ERRORS_BUCKET: registry-errors-integration
   S3_REGISTRY_IMPORTS_BUCKET: registry-imports-integration
   S3_REGISTRY_EXPORTS_BUCKET: registry-exports-integration
+  S3_TEXS_ANALYSIS_BUCKET: registry-texs-analysis-integration
   S3_REGISTRY_MODELS_BUCKET: registry-models-integration
   S3_REGISTRY_EXHAUSTIVE_EXPORTS_BUCKET: registry-exhaustive-exports-integration
 
