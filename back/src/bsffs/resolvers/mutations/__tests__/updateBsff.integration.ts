@@ -3805,8 +3805,6 @@ describe("Mutation.updateBsff", () => {
       // Then
       expect(errors).toBeUndefined();
 
-      console.log("data.updateBsff", JSON.stringify(data.updateBsff, null, 4));
-
       // Make sure full fiches info is returned in query
       const updatedPackaging1 = data.updateBsff.packagings.find(
         p => p.type === BsffPackagingType.BOUTEILLE
