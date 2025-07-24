@@ -352,23 +352,8 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
     nonPendingLatestRevisionRequestUpdatedAt: undefined,
 
     // ALL actors from the BSFF, for quick search
-    companyNames: [
-      bsff.emitterCompanyName,
-      ...bsff.transporters.map(t => t.transporterCompanyName),
-      bsff.destinationCompanyName,
-      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanyName)
-    ]
-      .filter(Boolean)
-      .join(" "),
-    companyOrgIds: [
-      bsff.emitterCompanySiret,
-      ...bsff.transporters.flatMap(t => [
-        t.transporterCompanySiret,
-        t.transporterCompanyVatNumber
-      ]),
-      bsff.destinationCompanySiret,
-      ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
-    ].filter(Boolean),
+    companyNames: Array.from(companyNamesUnique).join(" "),
+    companyOrgIds: Array.from(companyOrgIdsUnique),
     // Contacts
     destinationCompanyContact: bsff.destinationCompanyContact ?? "",
     destinationCompanyPhone: bsff.destinationCompanyPhone ?? "",
