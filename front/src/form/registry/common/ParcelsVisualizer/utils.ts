@@ -304,7 +304,6 @@ export const displayCoordinates = (
   map: Map | null
 ): boolean => {
   const lonLat = lonLatFromCoordinatesString(coordinates);
-  console.log("lonLat", lonLat);
   if (lonLat) {
     if (map) {
       map.setView(getView(lonLat, 11));

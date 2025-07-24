@@ -39,8 +39,7 @@ export function AddressInput({ disabled, onAddressSelected }: Props) {
             return;
           }
           setAddressesSuggestions([]);
-        } catch (error) {
-          console.error(error);
+        } catch {
           setAddressesSuggestions([]);
         }
       }, 500),

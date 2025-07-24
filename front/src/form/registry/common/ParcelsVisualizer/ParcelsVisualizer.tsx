@@ -203,8 +203,7 @@ export function ParcelsVisualizer({
           map = res.map;
           markerLayerId = res.markerLayerId;
           parcelLayerId = res.parcelLayerId;
-        } catch (e) {
-          console.error(e);
+        } catch {
           setClientError({
             text: "Erreur lors de la création de la carte",
             severity: "error",
@@ -558,7 +557,6 @@ export function ParcelsVisualizer({
                           map,
                           markerLayerId
                         );
-                        console.log("res", res);
                         if (!res) {
                           setClientError({
                             text: "Impossible d'ajouter le point, etes vous sûr que les coordonnées GPS sont correctes ?",
