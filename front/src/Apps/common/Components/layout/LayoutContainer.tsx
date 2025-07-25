@@ -48,7 +48,7 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
-  "Aidez-nous à améliorer Trackdéchets, nous avons besoin de votre avis :"
+  "Merci d'anticiper dès à présent vos congés d'été en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres)."
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -85,10 +85,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Je donne mon avis",
-                    href: "https://tally.so/r/np9ZXV"
+                    title: "Voir la FAQ",
+                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
                   }}
-                  persistedSurveyName="td-20250603"
+                  persistedSurveyName="td-20250729"
                 />
               }
             />
