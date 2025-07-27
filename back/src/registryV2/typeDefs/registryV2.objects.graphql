@@ -186,3 +186,10 @@ type RegistryLookupEdge {
   cursor: String!
   node: RegistryLookup!
 }
+
+type RegistryTexsAnalysisFile {
+  id: ID!
+  createdAt: DateTime!
+  s3FileKey: String!
+  originalFileName: String!
+}

@@ -111,4 +111,9 @@ type Mutation {
     "plage de dates à exporter, une date de début est obligatoire"
     dateRange: DateFilter!
   ): RegistryExhaustiveExport!
+
+  createTexsAnalysisFile(
+    "Clé du fichier d'analyse des terres excavées et sédiments ou déchets entrants"
+    s3FileKey: String!
+  ): RegistryTexsAnalysisFile!
 }

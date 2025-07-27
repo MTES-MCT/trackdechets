@@ -119,4 +119,9 @@ type Query {
   Permet de récupérer un export exhaustif en particulier
   """
   registryExhaustiveExport(id: ID!): RegistryExhaustiveExport!
+
+  "Renvoie un lien permettant de téléverser un fichier d'analyse au format PDF"
+  registryUploadTexsAnalysisSignedUrl(fileName: String!): SignedUrlResponse!
+  "Renvoie un lien permettant de télécharger un fichier d'analyse"
+  registryDownloadTexsAnalysisSignedUrl(fileId: String!): SignedUrlResponse!
 }

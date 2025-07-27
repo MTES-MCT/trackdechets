@@ -180,7 +180,10 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
               definedOutgoingTexsProps.destinationParcelCoordinates
             ),
             reason: RegistryLineReason.Edit,
-            transporter: transporters
+            transporter: transporters,
+            texsAnalysisFileId:
+              data.registryLookup.outgoingTexs.texsAnalysisFiles?.[0]?.id ||
+              null
           };
 
           methods.reset(resetValues);

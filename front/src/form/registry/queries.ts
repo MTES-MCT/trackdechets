@@ -405,6 +405,11 @@ export const GET_INCOMING_TEXS_REGISTRY_LOOKUP = gql`
         transporter5CompanyPostalCode
         transporter5CompanyCity
         transporter5CompanyCountryCode
+
+        texsAnalysisFiles {
+          id
+          originalFileName
+        }
       }
     }
   }
@@ -542,6 +547,11 @@ export const GET_OUTGOING_TEXS_REGISTRY_LOOKUP = gql`
         transporter5CompanyPostalCode
         transporter5CompanyCity
         transporter5CompanyCountryCode
+
+        texsAnalysisFiles {
+          id
+          originalFileName
+        }
       }
     }
   }
