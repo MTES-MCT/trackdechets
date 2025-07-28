@@ -14,7 +14,7 @@ interface BSDPreviewHeaderProps {
   wasteType: BsdType;
   children: React.ReactNode;
 }
-const BSVHUPreviewHeader = ({
+const BSDPreviewHeader = ({
   bsdStatus,
   title,
   wasteType,
@@ -40,4 +40,4 @@ const BSVHUPreviewHeader = ({
   );
 };
 
-export default BSVHUPreviewHeader;
+export default BSDPreviewHeader;

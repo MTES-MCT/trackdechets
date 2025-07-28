@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 import { formatDate, formatDateTime } from "../../../common/datetime";
 import { isForeignVat } from "@td/constants";
@@ -14,6 +14,7 @@ import {
   BsvhuTrader
 } from "@td/codegen-ui";
 import { isDefined } from "../../../common/helper";
+import Tooltip from "../../common/Components/Tooltip/Tooltip";
 
 export const PreviewContainer = ({ children }) => {
   return <div className="fr-container--fluid">{children}</div>;
@@ -29,24 +30,22 @@ export const PreviewContainerRow = ({
   children: ReactNode;
 }) => {
   return (
-    <>
+    <div
+      className={`${separator ? "fr-mt-1w fr-pt-2w" : ""}`}
+      style={
+        separator
+          ? {
+              borderTop:
+                "1px solid var(--light-border-open-blue-france, #E3E3FD)"
+            }
+          : {}
+      }
+    >
       {!!title && <h3 className="fr-h4">{title}</h3>}
-      <div
-        className={`fr-grid-row fr-grid-row--gutters ${
-          separator ? "fr-mt-2w" : ""
-        }`}
-        style={
-          separator
-            ? {
-                borderTop:
-                  "1px solid var(--light-border-open-blue-france, #E3E3FD)"
-              }
-            : {}
-        }
-      >
+      <div className={`fr-grid-row fr-grid-row--gutters fr-mb-1w`}>
         {children}
       </div>
-    </>
+    </div>
   );
 };
 
@@ -80,15 +79,20 @@ const nbsp = "\u00A0";
 export const PreviewTextRow = ({
   label,
   value,
+  tooltip = null,
   units = null
 }: {
   label: string;
   value: string | number | ReactNode | undefined | null;
+  tooltip?: string | undefined | null;
   units?: string | undefined | null;
 }) => {
   return (
     <div className="fr-mb-1w">
-      <div>{label}</div>
+      <div>
+        {label}
+        {tooltip ? <Tooltip title={tooltip} /> : null}
+      </div>
       <div className="fr-text--bold" data-testid={toCamelCaseVarName(label)}>
         {!!value ? (!!units ? `${value}${nbsp}${units}` : value) : "-"}
       </div>
@@ -107,6 +111,71 @@ export const PreviewDateTimeRow = ({ value, label }) => {
 export const PreviewBooleanRow = ({ value, label }) => {
   const displayedValue = isDefined(value) ? (value ? "Oui" : "Non") : null;
   return <PreviewTextRow label={label} value={displayedValue} />;
+};
+
+export const PreviewExpandableRow = ({ values, label }) => {
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+  /* eslint-disable jsx-a11y/anchor-is-valid */
+
+  const DEFAULT_DISPLAY_NBR = 10;
+
+  if (!values || !values.length) {
+    return <PreviewTextRow label={label} value={null} />;
+  }
+
+  if (values.length <= DEFAULT_DISPLAY_NBR) {
+    return <PreviewTextRow label={label} value={<>{values.join(", ")}</>} />;
+  }
+
+  if (isExpanded) {
+    return (
+      <PreviewTextRow
+        label={label}
+        value={
+          <>
+            {values.join(", ")}
+            <br />
+            <a
+              className="fr-link force-underline-link"
+              href="#"
+              onClick={e => {
+                setIsExpanded(false);
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+            >
+              Voir moins...
+            </a>
+          </>
+        }
+      />
+    );
+  }
+
+  return (
+    <PreviewTextRow
+      label={label}
+      value={
+        <>
+          {values.slice(0, DEFAULT_DISPLAY_NBR).join(", ")}{" "}
+          <i>et {values.length - DEFAULT_DISPLAY_NBR} autre(s)</i>
+          <br />
+          <a
+            className="fr-link force-underline-link"
+            href="#"
+            onClick={e => {
+              setIsExpanded(true);
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            Voir plus...
+          </a>
+        </>
+      }
+    />
+  );
 };
 
 export const PreviewTransporterReceiptDetails = ({
@@ -147,14 +216,18 @@ export const PreviewTransporterReceiptDetails = ({
 };
 
 export const PreviewCompanyContact = ({
-  company
+  company,
+  omitContact = false
 }: {
   company?: FormCompany | BsvhuCompanyInput | null;
+  omitContact?: boolean;
 }) => {
   return (
     company && (
       <>
-        <PreviewTextRow label="Contact" value={company?.contact} />
+        {!omitContact && (
+          <PreviewTextRow label="Contact" value={company?.contact} />
+        )}
 
         <PreviewTextRow label="Téléphone" value={company?.phone} />
 
