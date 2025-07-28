@@ -1,5 +1,10 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus, WasteAcceptationStatus } from "@td/codegen-ui";
+import {
+  Bsda,
+  BsvhuStatus,
+  OperationMode,
+  WasteAcceptationStatus
+} from "@td/codegen-ui";
 import {
   PreviewContainer,
   PreviewContainerRow,
@@ -9,14 +14,15 @@ import {
   PreviewCompanyContact
 } from "../BSDPreviewComponents";
 import { getVerboseAcceptationStatus } from "../BSDPreviewUtils";
+import { getOperationModeLabel } from "../../../common/operationModes";
 
-interface BSVHUPreviewDestinationProps {
-  bsd: Bsvhu;
+interface BSDAPreviewDestinationProps {
+  bsd: Bsda;
 }
-const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
+const BSDAPreviewDestination = ({ bsd }: BSDAPreviewDestinationProps) => {
   return (
     <PreviewContainer>
-      <PreviewContainerRow title={"Installation de destination"}>
+      <PreviewContainerRow title={"Destinataire"}>
         <PreviewContainerCol gridWidth={3}>
           <PreviewTextRow
             label="Raison sociale"
@@ -36,16 +42,11 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
 
         <PreviewContainerCol gridWidth={3}>
           <PreviewCompanyContact company={bsd.destination?.company} />
-
-          <PreviewTextRow
-            label="Numéro d'agrément"
-            value={bsd.destination?.agrementNumber}
-          />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={3}>
           <PreviewTextRow
-            label="Statut de l'acceptation"
+            label="Refus"
             value={getVerboseAcceptationStatus(
               bsd.destination?.reception?.acceptationStatus
             )}
@@ -58,12 +59,14 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
           />
 
           <PreviewTextRow
+            label="Poids refusé net"
+            value={bsd.destination?.reception?.refusedWeight}
+            units="tonne(s)"
+          />
+
+          <PreviewTextRow
             label="Poids traité net"
-            value={
-              bsd.status === BsvhuStatus.Processed
-                ? bsd.destination?.reception?.weight
-                : ""
-            }
+            value={bsd.destination?.reception?.acceptedWeight}
             units="tonne(s)"
           />
 
@@ -71,6 +74,15 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
             label="Opération réalisée"
             value={bsd.destination?.operation?.code}
           />
+
+          <PreviewTextRow
+            label="Mode de traitement réalisé"
+            value={getOperationModeLabel(
+              bsd.destination?.operation?.mode as OperationMode
+            )}
+          />
+
+          <PreviewTextRow label="CAP" value={bsd.destination?.cap} />
         </PreviewContainerCol>
 
         <PreviewContainerCol gridWidth={3} highlight>
@@ -101,14 +113,50 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
         </PreviewContainerCol>
       </PreviewContainerRow>
 
-      {/* <PreviewContainerRow separator>
-        <PreviewContainerCol gridWidth={3}> */}
-      {/* TODO */}
-      {/* <PreviewTextRow label="Champ libre" value={bsd.customId} />
-        </PreviewContainerCol>
-      </PreviewContainerRow> */}
+      {bsd.destination?.operation?.nextDestination && (
+        <PreviewContainerRow title={"Exutoire final"} separator>
+          <PreviewContainerCol gridWidth={3}>
+            <PreviewTextRow
+              label="Raison sociale"
+              value={bsd.destination?.operation?.nextDestination.company?.name}
+            />
+
+            <PreviewTextRow
+              label="Siret"
+              value={bsd.destination?.operation?.nextDestination.company?.siret}
+            />
+
+            <PreviewTextRow
+              label="Adresse"
+              value={
+                bsd.destination?.operation?.nextDestination.company?.address
+              }
+            />
+          </PreviewContainerCol>
+
+          <PreviewContainerCol gridWidth={3}>
+            <PreviewCompanyContact
+              company={bsd.destination?.operation.nextDestination.company}
+            />
+          </PreviewContainerCol>
+
+          <PreviewContainerCol gridWidth={3}>
+            <PreviewTextRow
+              label="Traitement ultérieur prévu"
+              value={
+                bsd.destination.operation.nextDestination.plannedOperationCode
+              }
+            />
+
+            <PreviewTextRow
+              label="CAP"
+              value={bsd.destination?.operation.nextDestination.cap}
+            />
+          </PreviewContainerCol>
+        </PreviewContainerRow>
+      )}
     </PreviewContainer>
   );
 };
 
-export default BSVHUPreviewDestination;
+export default BSDAPreviewDestination;
