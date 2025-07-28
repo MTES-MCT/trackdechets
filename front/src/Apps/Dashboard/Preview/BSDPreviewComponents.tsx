@@ -11,7 +11,8 @@ import {
   FormCompany,
   BsvhuCompanyInput,
   BsvhuBroker,
-  BsvhuTrader
+  BsvhuTrader,
+  BsdaBroker
 } from "@td/codegen-ui";
 import { isDefined } from "../../../common/helper";
 import Tooltip from "../../common/Components/Tooltip/Tooltip";
@@ -241,7 +242,7 @@ export const PreviewActor = ({
   actor,
   title
 }: {
-  actor: BsvhuBroker | BsvhuTrader | null;
+  actor: BsdaBroker | BsvhuBroker | BsvhuTrader | null;
   title: string;
 }) => {
   return (
