@@ -5,7 +5,7 @@ import BSDDetailContent from "../../dashboard/detail/bsdd/BSDDetailContent";
 import { BsffDetailContent } from "../../dashboard/detail/bsff/BsffDetailContent";
 import BspaohDetailContent from "../../dashboard/detail/bspaoh/BspaohDetailContent";
 import BSVHUPreviewContent from "../../Apps/Dashboard/Preview/BSVHU/BSVHUPreviewContent";
-import { BSDAPreviewContent } from "../../Apps/Dashboard/Preview/BSDA/BSDAPreviewContent";
+import BSDAPreviewContent from "../../Apps/Dashboard/Preview/BSDA/BSDAPreviewContent";
 import {
   QueryFormArgs,
   Query,
@@ -112,7 +112,7 @@ export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
   }
 
   if (isBsda && !!bsdaData) {
-    return <BSDAPreviewContent form={bsdaData.bsda.id} />;
+    return <BSDAPreviewContent bsdId={bsdaData.bsda.id} />;
   }
   if (isBsdd && !!bsddData) {
     return <BSDDetailContent form={bsddData.form} />;

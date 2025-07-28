@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Bsda,
-  BsvhuStatus,
-  OperationMode,
-  WasteAcceptationStatus
-} from "@td/codegen-ui";
+import { Bsda, OperationMode, WasteAcceptationStatus } from "@td/codegen-ui";
 import {
   PreviewContainer,
   PreviewContainerRow,
