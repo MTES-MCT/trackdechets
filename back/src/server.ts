@@ -254,11 +254,21 @@ app.use(
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["'self'"],
-        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
+        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null,
+        requireTrustedTypesFor: ["'script'"]
       }
-    }
+    },
+    xXssProtection: false
   })
 );
+
+app.use((_, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "accelerometer=(), geolocation=(), fullscreen=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=()"
+  );
+  next();
+});
 
 /**
  * parse application/x-www-form-urlencoded
@@ -294,11 +304,13 @@ export const sess: session.SessionOptions = {
   secret: SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
+  rolling: true, // reset the cookie maxAge on every request
   cookie: {
     secure: false,
     httpOnly: true,
+    sameSite: "lax",
     domain: SESSION_COOKIE_HOST || UI_HOST,
-    maxAge: 24 * 3600 * 1000
+    maxAge: 4 * 3600 * 1000
   }
 };
 

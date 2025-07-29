@@ -5,21 +5,35 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.07.2] 29/07/2025
+
+#### :nail_care: Améliorations
+
+- Changement de la validation de présence d'entreprise de travaux BSDA [PR 4302](https://github.com/MTES-MCT/trackdechets/pull/4302)
+- Traduction du message d'erreur de date de validité de récépissé [PR 4303](https://github.com/MTES-MCT/trackdechets/pull/4303)
+- Changements divers sur formulaires de déclaration [PR 4310](https://github.com/MTES-MCT/trackdechets/pull/4310)
+
+#### :bug: Corrections de bugs
+
+- Modification de signup/signin pour éviter l'énumération [PR 4306](https://github.com/MTES-MCT/trackdechets/pull/4306)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'une bannière de consentement au suivi, d'une interface de gestion dans les prefs utilisateur et d'un script de suivi Matomo [PR 4318](https://github.com/MTES-MCT/trackdechets/pull/4318)
+- Ajout d'un sélecteur de parcelles interactif sur les formulaires RNDTS [PR 4319](https://github.com/MTES-MCT/trackdechets/pull/4319)
+
 # [2025.07.1] 01/07/2025
 
 #### :nail_care: Améliorations
 
 - Amélioration du sélecteur de pays pour la saisie de déclarations RNDTS [PR 4242](https://github.com/MTES-MCT/trackdechets/pull/4242)
+- Ajout d'un icône éco-organisme sur le composant de groupement de dasris [PR 4235](https://github.com/MTES-MCT/trackdechets/pull/4235/)
+- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un mode lecture seule à l'interface d'édition des déclarations RNDTS (IHM) [PR 4234](https://github.com/MTES-MCT/trackdechets/pull/4234)
 - Ajout des rôles courtiers, négociant et intermédiaire sur le Bsadri [PR 4264](https://github.com/MTES-MCT/trackdechets/pull/4264)
-
-#### :nail_care: Améliorations
-
-- Ajout d'un icône éco-organisme sur le composant de groupement de dasris [PR 4235](https://github.com/MTES-MCT/trackdechets/pull/4235/)
-- Diverses améliorations d'affichage sur la modification des déclarations RNDTS [PR 4240](https://github.com/MTES-MCT/trackdechets/pull/4240)
 
 #### :bug: Corrections de bugs
 
@@ -2692,7 +2706,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
   - Les champs `nextDestinationDetails` & `nextDestinationProcessingOperation` disparaissent
   - Ils sont remplacés par `nextDestination`, constitué de `processingOperation` et `company`
 - Amélioration de la gestion des actions sur les bordereaux depuis l'interface Trackdéchets: on ne peut faire des actions que pour le SIRET actif dans le sélecteur. [PR #164](https://github.com/MTES-MCT/trackdechets/pull/164)
-- Modification du mode de téléchargement des fichiers (bsd pdf et registre): les routes `/pdf` et `/export` sont remplacées respectivement par les requêtes GraphQL suivantes: `Query { formPdf }` et `Query { formsRegister }`. Chaque endpoint renvoie un jeton de téléchargement qui permet ensuite de faire une requête sur `/download?token=...`. Le token a une durée de vie de 10s. [PR #144](https://github.com/MTES-MCT/trackdechets/pull/144)
+- Modification du mode de téléchargement des fichiers (bsd pdf et registre): les routes `/pdf` et `/export` sont remplacées respectivement par les requêtes GraphQL suivantes: `Query { formPdf }` et `Query { formsRegister }`. Chaque endpoint renvoie un jeton de t��léchargement qui permet ensuite de faire une requête sur `/download?token=...`. Le token a une durée de vie de 10s. [PR #144](https://github.com/MTES-MCT/trackdechets/pull/144)
 - Refonte de l'authentification. Les tokens générés pour s'authentifier à l'API sont stockés en base et deviennent révocables par l'utilisateur. Ils ont désormais une longueur de 40 caractères alphanumériques (les anciens tokens avaient une longueur de 155 caractères et pouvaient contenir des caractères de ponctuation). Les anciens tokens restent cependant valides. L'UI Trackdéchets utilise désormais un stockage en session. [PR #151](https://github.com/MTES-MCT/trackdechets/pull/151)
 - Modification du format des numéros de téléphone dans Mon Compte. Il est désormais possible d'ajouter des numéros en 09 xx xx xx xx [PR #74](https://github.com/MTES-MCT/trackdechets/pull/174).
 

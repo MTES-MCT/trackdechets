@@ -9,7 +9,8 @@ import {
   nonEmptyNumber,
   booleanString,
   optionalString,
-  filteredArray
+  filteredArray,
+  fieldArray
 } from "../builder/validation";
 import { CompanySelector } from "../common/CompanySelector";
 import { Address } from "../common/Address";
@@ -21,10 +22,11 @@ import { TransporterSelector } from "../common/TransporterSelector/TransporterSe
 import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
-import { Parcels } from "../common/Parcels";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
+import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
+import { TexsAnalysisFile } from "../common/TexsAnalysisFile";
 
 export const outgoingTexsFormShape: FormShape = [
   {
@@ -36,6 +38,7 @@ export const outgoingTexsFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -63,10 +66,13 @@ export const outgoingTexsFormShape: FormShape = [
     fields: [
       {
         Component: WasteCodeSelector,
-        props: { name: "wasteCode", whiteList: INCOMING_TEXS_WASTE_CODES },
+        props: {
+          name: "wasteCode",
+          whiteList: INCOMING_TEXS_WASTE_CODES,
+          required: false
+        },
         shape: "custom",
         names: ["wasteCode"],
-        required: false,
         validation: {
           wasteCode: optionalString
         },
@@ -75,8 +81,7 @@ export const outgoingTexsFormShape: FormShape = [
       {
         name: "wasteDescription",
         shape: "generic",
-        label:
-          "Dénomination usuelle des terres excavées et sédiments ou des déchets",
+        label: Labels.wasteDescriptionTexs,
         required: true,
         validation: {
           wasteDescription: nonEmptyString
@@ -88,6 +93,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -140,6 +146,14 @@ export const outgoingTexsFormShape: FormShape = [
         }
       },
       {
+        names: ["texsAnalysisFileId"],
+        shape: "custom",
+        Component: TexsAnalysisFile,
+        validation: {
+          texsAnalysisFileId: optionalString
+        }
+      },
+      {
         name: "wasteDap",
         shape: "generic",
         label: Labels.wasteDap,
@@ -185,16 +199,16 @@ export const outgoingTexsFormShape: FormShape = [
         ]
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "parcel",
           title: "Parcelles d'origine"
         },
         names: ["parcelNumbers", "parcelInseeCodes", "parcelCoordinates"],
         validation: {
-          parcelNumbers: filteredArray,
-          parcelInseeCodes: filteredArray,
-          parcelCoordinates: filteredArray
+          parcelNumbers: fieldArray,
+          parcelInseeCodes: fieldArray,
+          parcelCoordinates: fieldArray
         },
         shape: "custom"
       },
@@ -202,6 +216,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "sisIdentifier",
         shape: "generic",
         label: Labels.sisIdentifier,
+        infoLabel: InfoLabels.sisIdentifier,
         validation: {
           sisIdentifier: optionalString
         },
@@ -338,7 +353,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -349,7 +364,7 @@ export const outgoingTexsFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },
@@ -367,10 +382,11 @@ export const outgoingTexsFormShape: FormShape = [
         }
       },
       {
-        Component: Parcels,
+        Component: ParcelsVisualizer,
         props: {
           prefix: "destinationParcel",
-          title: "Parcelles de destination si valorisation"
+          title: "Parcelles de destination si valorisation",
+          hideIfDisabled: true
         },
         names: [
           "destinationParcelInseeCodes",
@@ -378,9 +394,9 @@ export const outgoingTexsFormShape: FormShape = [
           "destinationParcelCoordinates"
         ],
         validation: {
-          destinationParcelNumbers: filteredArray,
-          destinationParcelInseeCodes: filteredArray,
-          destinationParcelCoordinates: filteredArray
+          destinationParcelNumbers: fieldArray,
+          destinationParcelInseeCodes: fieldArray,
+          destinationParcelCoordinates: fieldArray
         },
         shape: "custom"
       }

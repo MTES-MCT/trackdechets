@@ -129,6 +129,7 @@ export const schema = z.object({
   S3_REGISTRY_IMPORTS_BUCKET: z.string(),
   S3_REGISTRY_EXPORTS_BUCKET: z.string(),
   S3_REGISTRY_EXHAUSTIVE_EXPORTS_BUCKET: z.string(),
+  S3_TEXS_ANALYSIS_BUCKET: z.string(),
   // -------
   // S3 for empty bsds templates
   S3_BSD_TEMPLATES_ACCESS_KEY_ID: z.string().optional(),

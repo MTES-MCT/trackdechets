@@ -34,3 +34,7 @@ export const validationAccountPasswordSchema = z.object({
   oldPassword: z.string().min(3, "Champ requis"),
   newPassword: z.string()
 });
+
+export const validationAccountTrackingConsentSchema = z.object({
+  trackingConsent: z.boolean()
+});

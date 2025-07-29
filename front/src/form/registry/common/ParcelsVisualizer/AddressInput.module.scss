@@ -1,0 +1,48 @@
+.searchBar {
+  position: relative;
+
+  // Hide the native webkit search cancel button
+  input::-webkit-search-cancel-button {
+    display: none;
+    -webkit-appearance: none;
+  }
+
+  // Custom cancel button container
+  .customCancelButton {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    background: transparent !important;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mention-grey);
+
+    // Make the icon 16x16 instead of default 24x24
+    span::before {
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    &:hover {
+      color: var(--text-default-grey);
+      background: transparent !important;
+    }
+
+    &:focus {
+      background: transparent !important;
+    }
+
+    &:active {
+      background: transparent !important;
+    }
+  }
+
+  // Add right padding to input to make room for the cancel button
+  input[type="search"] {
+    padding-right: 40px;
+  }
+}

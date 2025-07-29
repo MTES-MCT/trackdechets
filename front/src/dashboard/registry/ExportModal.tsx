@@ -1,30 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./MyExports.module.scss";
 
 import {
   DeclarationType,
   RegistryExportFormat,
-  RegistryV2ExportWasteType,
-  RegistryV2ExportType
+  RegistryV2ExportType,
+  RegistryV2ExportWasteType
 } from "@td/codegen-ui";
 
-import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
-import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
-import { format, getYear, startOfYear, endOfYear, subYears } from "date-fns";
-import { Modal } from "../../common/components";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
-import { InlineError } from "../../Apps/common/Components/Error/Error";
-import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
+import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
+import { INCOMING_TEXS_WASTE_CODES } from "@td/constants";
 import classNames from "classnames";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
-import { WasteCodeSwitcher } from "./WasteCodeSwitcher";
-import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
-import Alert from "@codegouvfr/react-dsfr/Alert";
-import { getDeclarationTypeWording, getRegistryTypeWording } from "./MyExports";
-import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
+import { endOfYear, format, getYear, startOfYear, subYears } from "date-fns";
+import { FieldError, FieldErrorsImpl, Merge } from "react-hook-form";
 import CompanySelectorWrapper from "../../Apps/common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import { InlineError } from "../../Apps/common/Components/Error/Error";
+import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
+import { datetimeToYYYYMMDD } from "../../Apps/Dashboard/Validation/BSPaoh/paohUtils";
+import { Modal } from "../../common/components";
+import { WasteCodeSelector } from "../../form/registry/common/WasteCodeSelector";
+import { getDeclarationTypeWording, getRegistryTypeWording } from "./MyExports";
+import { RegistryCompanySwitcher } from "./RegistryCompanySwitcher";
+import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
 
 const displayError = (
   error: FieldError | Merge<FieldError, FieldErrorsImpl<any>> | undefined
@@ -123,6 +124,13 @@ export function ExportModal() {
   const isDelegation = type === "registryV2" ? watch("isDelegation") : false;
   const registryType = type === "registryV2" ? watch("registryType") : null;
   const startDate = watch("startDate");
+  const wasteTypes = watch("wasteTypes");
+
+  useEffect(() => {
+    // When wasteTypes changes, we need to reset the wasteCodes field
+    setValue("wasteCodes", []);
+  }, [wasteTypes, setValue]);
+
   return (
     <Modal
       title="Exporter"
@@ -326,15 +334,27 @@ export function ExportModal() {
                   ]}
                 />
               </div>
-              <div className="fr-mb-8v">
-                <WasteCodeSwitcher
-                  id={"wasteCodeSwitcher"}
-                  onSelectChange={wasteCodes => {
-                    setValue(
-                      "wasteCodes",
-                      wasteCodes.map(({ code }) => code)
-                    );
-                  }}
+              <div className="fr-container--fluid fr-mb-8v">
+                <WasteCodeSelector
+                  label="Codes déchets"
+                  name="wasteCodes"
+                  methods={methods}
+                  multiple
+                  whiteList={
+                    !wasteTypes.some(type =>
+                      [
+                        RegistryV2ExportWasteType.Dd,
+                        RegistryV2ExportWasteType.Dnd
+                      ].includes(type)
+                    )
+                      ? [...INCOMING_TEXS_WASTE_CODES]
+                      : undefined
+                  }
+                  blackList={
+                    !wasteTypes.includes(RegistryV2ExportWasteType.Texs)
+                      ? [...INCOMING_TEXS_WASTE_CODES]
+                      : undefined
+                  }
                 />
               </div>
             </>

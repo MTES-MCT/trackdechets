@@ -3,7 +3,7 @@ type Mutation {
   USAGE INTERNE
   Permet de créer un nouvel utilisateur
   """
-  signup(userInfos: SignupInput!): User!
+  signup(userInfos: SignupInput!): Boolean!
 
   """
   USAGE INTERNE
@@ -32,8 +32,10 @@ type Mutation {
   """
   USAGE INTERNE
   Met à jour les informations de l'utilisateur
+
+  Quand trackingConsent est passé, la valeur de trackingConsentUntil est modifiée à 180 jours dans le futur
   """
-  editProfile(name: String, phone: String): User!
+  editProfile(name: String, phone: String, trackingConsent: Boolean): User!
 
   """
   USAGE INTERNE

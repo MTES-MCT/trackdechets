@@ -361,3 +361,18 @@ export const checkRequiredFields: (
     }
   };
 };
+
+export const validateCap: Refinement<ParsedZodBsdasri> = (
+  bsdasri,
+  { addIssue }
+) => {
+  // No destination CAP for synthesis DASRI
+  if (bsdasri.synthesizing?.length && isDefined(bsdasri.destinationCap)) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["destinationCap"],
+      message:
+        "Vous ne pouvez pas renseigner le CAP de la destination sur les DASRI de synthèse."
+    });
+  }
+};

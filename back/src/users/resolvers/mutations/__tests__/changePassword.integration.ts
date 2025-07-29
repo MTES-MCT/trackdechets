@@ -38,7 +38,7 @@ describe("mutation changePassword", () => {
     await storeUserSessionsId(user.id, sessionId2);
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const newPassword = "trackdechets#";
+    const newPassword = "Trackdechets1#";
     const { data } = await mutate<Pick<Mutation, "changePassword">>(
       CHANGE_PASSWORD,
       {
@@ -102,7 +102,7 @@ describe("mutation changePassword", () => {
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const oldPassword = "pass";
-    const newPassword = "new-pass-123$";
+    const newPassword = "New-pass-123$";
 
     // create a few redis sessions entries
     const sessionId1 = `xyz123`;

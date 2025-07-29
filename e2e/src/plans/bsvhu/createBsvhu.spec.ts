@@ -15,6 +15,7 @@ import {
   verifyOverviewData,
   deleteBsvhu
 } from "../../utils/bsvhu";
+import { addDays } from "date-fns";
 
 test.describe.serial("Cahier de recette de création des BSVHU", async () => {
   // User credentials
@@ -32,7 +33,9 @@ test.describe.serial("Cahier de recette de création des BSVHU", async () => {
     user = await seedUser({
       name: USER_NAME,
       email: USER_EMAIL,
-      password: USER_PASSWORD
+      password: USER_PASSWORD,
+      trackingConsent: false,
+      trackingConsentUntil: addDays(new Date(), 180) // do not display consent banner
     });
   });
 

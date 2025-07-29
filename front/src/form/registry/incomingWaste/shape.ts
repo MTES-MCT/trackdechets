@@ -22,7 +22,7 @@ import { RegistryCompanyType } from "@td/codegen-ui";
 import { TransportMode } from "@td/codegen-ui";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { Operation } from "../common/Operation";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
 
 export const incomingWasteFormShape: FormShape = [
@@ -35,6 +35,7 @@ export const incomingWasteFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -86,6 +87,7 @@ export const incomingWasteFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -131,6 +133,7 @@ export const incomingWasteFormShape: FormShape = [
         name: "weighingHour",
         shape: "generic",
         label: Labels.weighingHour,
+        infoLabel: InfoLabels.weighingHour,
         required: false,
         validation: {
           weighingHour: optionalString
@@ -159,7 +162,9 @@ export const incomingWasteFormShape: FormShape = [
         props: {
           prefix: "initialEmitter",
           label: "producteur initial",
-          required: false
+          required: true,
+          infoText:
+            "À renseigner sauf en cas de rupture de traçabilité spécialement autorisée par l'administration"
         },
         validation: {
           initialEmitterCompanyType: optionalString,
@@ -358,7 +363,7 @@ export const incomingWasteFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },

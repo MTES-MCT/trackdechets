@@ -256,7 +256,7 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
     destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
     destinationCompanyAddress: bsdasri.destinationCompanyAddress ?? "",
     destinationCustomInfo: bsdasri.destinationCustomInfo ?? "",
-    destinationCap: "",
+    destinationCap: bsdasri.destinationCap ?? "",
 
     brokerCompanyName: bsdasri.brokerCompanyName ?? "",
     brokerCompanySiret: bsdasri.brokerCompanySiret ?? "",

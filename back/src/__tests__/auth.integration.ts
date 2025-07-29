@@ -7,6 +7,7 @@ import { app, sess } from "../server";
 import { getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";
 import { TOTP } from "totp-generator";
+import { clearUserLoginNeedsCaptcha } from "../common/redis/captcha";
 
 const { UI_HOST } = process.env;
 
@@ -16,11 +17,13 @@ const loginError = getLoginError("Some User");
 const cookieRegExp = new RegExp(
   `${sess.name}=(.+); Domain=${
     sess.cookie!.domain
-  }; Path=/; Expires=.+; HttpOnly`
+  }; Path=/; Expires=.+; HttpOnly; SameSite=Lax`
 );
 
 describe("POST /login", () => {
-  afterEach(() => resetDatabase());
+  beforeEach(() => clearUserLoginNeedsCaptcha("user_1@td.io"));
+
+  afterEach(async () => resetDatabase());
 
   it("create a persistent session if login form is valid", async () => {
     const user = await userFactory();
@@ -40,7 +43,7 @@ describe("POST /login", () => {
     expect(login.status).toBe(302);
     expect(login.header.location).toBe(`http://${UI_HOST}/`);
 
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
 
     // should persist user across requests
     const res = await request
@@ -122,6 +125,26 @@ describe("POST /login", () => {
     );
   });
 
+  it("should not authenticate a user whose email has not been validated with the wrong password", async () => {
+    const user = await userFactory({ isActive: false });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=invalid`);
+
+    // should not set a session cookie
+    expect(login.header["set-cookie"]).toBeUndefined();
+
+    // should redirect to /login with error message
+    expect(login.status).toBe(302);
+    const redirect = login.header.location;
+    expect(redirect).toContain(`http://${UI_HOST}/login`);
+    expect(redirect).toContain(
+      queryString.escape(loginError.INVALID_USER_OR_PASSWORD.code)
+    );
+  });
+
   it(`should not take into account a session cookie
       from a different environment on the same subdomain`, async () => {
     // We had a bug in the sandbox environment where the cookie from production
@@ -157,7 +180,7 @@ describe("POST /login", () => {
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
 
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
 
     // send both cookies
     const res = await r
@@ -195,8 +218,11 @@ describe("POST /login", () => {
       .send(`email=${user.email.toUpperCase()}`)
       .send(`password=invalidPwd`);
 
-    // should not set a session cookie
-    expect(login.header["set-cookie"]).toBeUndefined();
+    // should not set a new session cookie
+    // but as sessions are rolling, we should keep the previous one
+    const sessionCookie = nonAdminLogin.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+    expect(login.header["set-cookie"][0]).toContain(cookieValue);
 
     // should redirect to /login with error message
     expect(login.status).toBe(302);
@@ -230,7 +256,7 @@ describe("Second factor", () => {
     expect(login.status).toBe(302);
     expect(login.header.location).toBe(`http://${UI_HOST}/second-factor`);
 
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
 
     // the user is not authenticated yet
     const res = await request
@@ -256,7 +282,7 @@ describe("Second factor", () => {
     expect(login.header["set-cookie"]).toHaveLength(1);
 
     const sessionCookie = login.header["set-cookie"][0];
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
 
     const { otp } = TOTP.generate(totpSeed);
     const secondFactor = await request
@@ -270,7 +296,7 @@ describe("Second factor", () => {
     expect(secondFactor.header.location).toBe(`http://${UI_HOST}/`);
 
     const otpSessionCookie = secondFactor.header["set-cookie"][0];
-    const otpCookieValue2 = otpSessionCookie.match(cookieRegExp)[1];
+    const otpCookieValue2 = otpSessionCookie.match(cookieRegExp)?.[1];
 
     // should persist user across requests
     const res = await request
@@ -296,7 +322,7 @@ describe("Second factor", () => {
     expect(login.header["set-cookie"]).toHaveLength(1);
 
     const sessionCookie = login.header["set-cookie"][0];
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
 
     const secondFactor = await request
       .post("/otp")
@@ -309,7 +335,8 @@ describe("Second factor", () => {
     expect(secondFactor.header.location).toBe(
       `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
     );
-    expect(secondFactor.header["set-cookie"]).toBeUndefined();
+    // rolling session cookie should be kept
+    expect(secondFactor.header["set-cookie"][0]).toContain(cookieValue);
 
     // the user is not authenticated yet
     const res = await request

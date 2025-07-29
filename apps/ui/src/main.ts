@@ -21,7 +21,9 @@ const CONNECT_SRC = [
   "https://openmaptiles.geo.data.gouv.fr",
   "https://openmaptiles.data.gouv.fr",
   "https://openmaptiles.github.io",
-  "https://s3.fr-par.scw.cloud"
+  "https://s3.fr-par.scw.cloud",
+  "https://stats.beta.gouv.fr",
+  "https://data.geopf.fr"
 ];
 
 const WORKER_SRC = ["blob:"]; // needed for MapBox
@@ -51,6 +53,14 @@ app.use(
     }
   })
 );
+
+app.use((_, res, next) => {
+  res.setHeader(
+    "Permissions-Policy",
+    "accelerometer=(), geolocation=(), fullscreen=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=()"
+  );
+  next();
+});
 
 const directory = path.join(__dirname, "../../../../../front");
 app.use(express.static(directory));

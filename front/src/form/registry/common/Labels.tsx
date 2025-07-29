@@ -52,11 +52,13 @@ export const Labels = {
   collectionDate: "Date d'enlèvement",
   unloadingDate: "Date de déchargement",
   wasteDescription: "Dénomination usuelle du déchet",
+  wasteDescriptionTexs:
+    "Dénomination usuelle des terres excavées et sédiments ou des déchets",
   wasteCodeBale: "Code déchet Bâle",
   wasteDap: "DAP",
   weighingHour: "Heure de pesée",
   ttdImportNumber: "Numéro de notification ou de déclaration d'import",
-  movementNumber: "Numéro de mouvement",
+  movementNumber: "Numéro de mouvement GISTRID",
   isDirectSupply: "Approvisionnement direct (pipeline, convoyeur)",
   sisIdentifier: "Identifiant SIS du terrain",
   isUpcycled: "Terres valorisées",
@@ -65,4 +67,15 @@ export const Labels = {
   administrativeActReference: "Référence de l'acte administratif",
   brokerRecepisseNumber: "Numéro de récépissé",
   traderRecepisseNumber: "Numéro de récépissé"
+};
+
+export const InfoLabels = {
+  publicId:
+    "Identifie la déclaration de manière unique dans votre établissement (exemple : un code pesée)",
+  wasteCodeBale:
+    "Code déchet mentionné aux annexes VIII et IX de la Convention de Bâle à renseigner dans le cas d'un transfert transfrontalier",
+  weighingHour:
+    "À renseigner pour les installations soumises à contrôle par vidéo",
+  sisIdentifier:
+    "À renseigner lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
 };

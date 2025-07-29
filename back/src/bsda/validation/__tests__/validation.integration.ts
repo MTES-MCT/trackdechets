@@ -513,15 +513,15 @@ describe("BSDA parsing", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message:
-              "Le numéro de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le numéro de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets."
           }),
           expect.objectContaining({
             message:
-              "Le département de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "Le département de récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets."
           }),
           expect.objectContaining({
             message:
-              "La date de validité du récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets"
+              "La date de validité du récépissé du transporteur n° 1 est obligatoire. L'établissement doit renseigner son récépissé dans Trackdéchets."
           })
         ]);
       }

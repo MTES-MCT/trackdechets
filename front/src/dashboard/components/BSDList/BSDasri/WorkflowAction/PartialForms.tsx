@@ -302,12 +302,16 @@ export function OperationSignatureForm() {
   );
 }
 
-export const removeSections = (input, signatureType: SignatureType) => {
+export const removeBsdasriSectionsBeforeSignature = (
+  input,
+  signatureType: SignatureType
+) => {
   const emitterKey = "emitter";
   const wasteKey = "waste";
   const ecoOrganismeKey = "ecoOrganisme";
   const transporterKey = "transporter";
   const destinationKey = "destination";
+  const intermediariesKey = "intermediaries";
   const receptionKey = "reception";
   const operationKey = "operation";
   const wholeCompanyKey = "company";
@@ -331,7 +335,9 @@ export const removeSections = (input, signatureType: SignatureType) => {
     groupingKey,
     synthesizingKey,
     synthesizedInKey,
-    transporterTransportVolumeKey
+    transporterTransportVolumeKey,
+
+    intermediariesKey
   ];
   const mapping = {
     [BsdasriSignatureType.Emission]: [

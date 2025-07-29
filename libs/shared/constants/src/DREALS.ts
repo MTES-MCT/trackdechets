@@ -51,7 +51,7 @@ export const Dreals = [
     DrealRegion: "DREAL Occitanie",
     name: "UID-31-09 (Unité Inter-Départementale Haute-Garonne-Ariège)",
     Dept: "09",
-    email: "uid-31-09.dreal-occitanie@developpement-durable.gouv.fr"
+    email: "trackdechet.dreal-occitanie@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Grand Est",
@@ -201,7 +201,7 @@ export const Dreals = [
     DrealRegion: "DREAL Occitanie",
     name: "UID-31-09 (Unité Inter-Départementale Haute-Garonne-Ariège)",
     Dept: "31",
-    email: "uid-31-09.dreal-occitanie@developpement-durable.gouv.fr"
+    email: "trackdechet.dreal-occitanie@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Occitanie",

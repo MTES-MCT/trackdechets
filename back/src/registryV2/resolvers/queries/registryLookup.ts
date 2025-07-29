@@ -62,9 +62,9 @@ export async function registryLookup(
     include: {
       registrySsd: true,
       registryIncomingWaste: true,
-      registryIncomingTexs: true,
+      registryIncomingTexs: { include: { texsAnalysisFiles: true } },
       registryOutgoingWaste: true,
-      registryOutgoingTexs: true,
+      registryOutgoingTexs: { include: { texsAnalysisFiles: true } },
       registryTransported: true,
       registryManaged: true
     }

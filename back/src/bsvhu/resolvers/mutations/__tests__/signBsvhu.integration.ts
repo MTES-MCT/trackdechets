@@ -350,7 +350,9 @@ describe("Mutation.Vhu.sign", () => {
       );
       expect(data.signBsvhu.emitter!.emission!.signature!.date).toBe(date);
     });
+  });
 
+  describe("TRANSPORT", () => {
     it("should require emitter signature if the emitter is on TD and situation is not irregular", async () => {
       const emitterCompany = await companyFactory();
       const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -584,6 +586,38 @@ describe("Mutation.Vhu.sign", () => {
         user.name
       );
       expect(data.signBsvhu.transporter!.transport!.signature!.date).toBe(date);
+    });
+
+    it("should not allow signing transport if transport mode is undefined", async () => {
+      // Given
+      const emitterCompany = await companyFactory();
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["TRANSPORTER"]
+      });
+
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          emitterCompanySiret: emitterCompany.siret,
+          transporterCompanySiret: company.siret,
+          transporterRecepisseIsExempted: true,
+          transporterTransportMode: null,
+          status: "SIGNED_BY_PRODUCER"
+        }
+      });
+
+      // When
+      const date = new Date().toISOString();
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+        variables: {
+          id: bsvhu.id,
+          input: { type: "TRANSPORT", author: user.name, date }
+        }
+      });
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de transport est un champ requis."
+      );
     });
   });
 

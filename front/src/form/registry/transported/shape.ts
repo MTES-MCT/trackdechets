@@ -17,8 +17,9 @@ import { TRANSPORT_MODES } from "../common/TransporterSelector/TransporterForm";
 import { TransporterTags } from "../common/TransporterTags";
 import { EcoOrganismes } from "../common/EcoOrganismes";
 import { type RegistryCompanyInfos } from "../../../dashboard/registry/RegistryCompanySwitcher";
-import { Labels } from "../common/Labels";
+import { Labels, InfoLabels } from "../common/Labels";
 import { OptionalCompanySelector } from "../common/OptionalCompanySelector";
+
 export const transportedFormShape: FormShape = [
   {
     tabId: "declaration",
@@ -29,6 +30,7 @@ export const transportedFormShape: FormShape = [
         shape: "generic",
         type: "text",
         label: Labels.publicId,
+        infoLabel: InfoLabels.publicId,
         required: true,
         validation: {
           publicId: nonEmptyString
@@ -103,6 +105,7 @@ export const transportedFormShape: FormShape = [
         name: "wasteCodeBale",
         shape: "generic",
         label: Labels.wasteCodeBale,
+        infoLabel: InfoLabels.wasteCodeBale,
         validation: {
           wasteCodeBale: optionalString
         },
@@ -232,7 +235,7 @@ export const transportedFormShape: FormShape = [
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
         label: Labels.gistridNumber,
-        required: false,
+        required: true,
         validation: {
           gistridNumber: optionalString
         },
@@ -243,7 +246,7 @@ export const transportedFormShape: FormShape = [
         name: "movementNumber",
         shape: "generic",
         label: Labels.movementNumber,
-        required: false,
+        required: true,
         validation: {
           movementNumber: optionalString
         },
@@ -448,7 +451,9 @@ export const transportedFormShape: FormShape = [
         Component: TransporterTags,
         props: {
           label: "Immatriculations",
-          prefix: "reportForTransport"
+          prefix: "reportForTransport",
+          infoText:
+            "Renseigner au moins une plaque d'immatriculation si le mode de transport est Route"
         },
         validation: {
           reportForTransportPlates: filteredArray

@@ -4,12 +4,23 @@ import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth/auth";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
+import { gql } from "@apollo/client";
+import { addDays } from "date-fns";
 
 const EDIT_PROFILE = `
   mutation EditProfile($name: String, $phone: String){
     editProfile(name: $name, phone: $phone){
       name
       phone
+    }
+  }
+`;
+
+export const UPDATE_TRACKING_CONSENT = gql`
+  mutation UpdateTrackingConsent($trackingConsent: Boolean!) {
+    editProfile(trackingConsent: $trackingConsent) {
+      id
+      trackingConsent
     }
   }
 `;
@@ -123,4 +134,29 @@ describe("mutation editProfile", () => {
       })
     ]);
   });
+
+  it.each([true, false])(
+    "should set trackingConsent to %p and update trackingConsentUntil",
+    async trackingConsentValue => {
+      const user = await userFactory({
+        trackingConsent: !trackingConsentValue
+      });
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+      expect(user.trackingConsent).toEqual(!trackingConsentValue);
+
+      await mutate(UPDATE_TRACKING_CONSENT, {
+        variables: { trackingConsent: trackingConsentValue }
+      });
+      const updatedUser = await prisma.user.findUniqueOrThrow({
+        where: { id: user.id }
+      });
+
+      expect(updatedUser.trackingConsent).toEqual(trackingConsentValue);
+      // trackingConsentUntil is set to 180 days in the future
+      expect(updatedUser.trackingConsentUntil! > addDays(new Date(), 179)).toBe(
+        true
+      );
+    }
+  );
 });

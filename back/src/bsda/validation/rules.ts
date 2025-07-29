@@ -254,7 +254,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterRecepisseDepartment: {
@@ -264,7 +264,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterRecepisseValidityLimit: {
@@ -274,7 +274,7 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       from: transporterSignature,
       when: requireTransporterRecepisse,
       customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+        "L'établissement doit renseigner son récépissé dans Trackdéchets."
     }
   },
   transporterTransportMode: {
@@ -637,7 +637,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   workerIsDisabled: {
     readableFieldName: "La présence d'une entreprise de travaux",
-    sealed: { from: "EMISSION" },
+    sealed: { from: sealedFromEmissionExceptForEmitter },
     required: {
       from: "EMISSION",
       // il s'agit d'une collecte sur un chantier et workerIsDisabled est à true

@@ -111,6 +111,7 @@ export const fullBsdasriFragment = gql`
       }
     }
     destination {
+      cap
       company {
         ...CompanyFragment
       }

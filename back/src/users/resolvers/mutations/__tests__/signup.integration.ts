@@ -7,7 +7,7 @@ import { renderMail, onSignup } from "@td/mail";
 import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
 
-const viablePassword = "trackdechets#";
+const viablePassword = "Trackdechets1#";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -15,11 +15,7 @@ jest.mock("../../../../mailer/mailing");
 
 const SIGNUP = `
   mutation SignUp($userInfos: SignupInput!) {
-    signup(userInfos: $userInfos) {
-      email
-      name
-      phone
-    }
+    signup(userInfos: $userInfos)
   }
 `;
 
@@ -53,7 +49,7 @@ describe("Mutation.signup", () => {
       }
     });
 
-    expect(data.signup).toEqual(user);
+    expect(data.signup).toEqual(true);
 
     const newUser = await prisma.user.findUniqueOrThrow({
       where: { email: user.email }
@@ -73,36 +69,21 @@ describe("Mutation.signup", () => {
     );
   });
 
-  it("should throw BAD_USER_INPUT if email already exist", async () => {
+  it("should return the same result if email already exist", async () => {
     const alreadyExistingUser = await userFactory();
 
-    const { errors } = await mutate(SIGNUP, {
+    const { data } = await mutate(SIGNUP, {
       variables: {
         userInfos: {
           email: alreadyExistingUser.email,
-          password: "newUserPassword",
+          password: viablePassword,
           name: alreadyExistingUser.name,
           phone: alreadyExistingUser.phone
         }
       }
     });
-    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
-  });
 
-  it("should throw BAD_USER_INPUT if email already exist regarldess of the email casing", async () => {
-    const alreadyExistingUser = await userFactory();
-
-    const { errors } = await mutate(SIGNUP, {
-      variables: {
-        userInfos: {
-          email: alreadyExistingUser.email.toUpperCase(),
-          password: "newUserPassword",
-          name: alreadyExistingUser.name,
-          phone: alreadyExistingUser.phone
-        }
-      }
-    });
-    expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
+    expect(data.signup).toEqual(true);
   });
 
   it("should throw BAD_USER_INPUT if email is not valid", async () => {
@@ -166,7 +147,7 @@ describe("Mutation.signup", () => {
     expect(errors[0].extensions?.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
-  it("should throw BAD_USER_INPUT if password is to long", async () => {
+  it("should throw BAD_USER_INPUT if password is too long", async () => {
     const user = {
       email: "bademail",
       name: "New User",

@@ -955,6 +955,11 @@ type IncomingTexsLine {
   Code pays du transporteur n°5
   """
   transporter5CompanyCountryCode: String
+
+  """
+  Fichiers d'analyse des terres excavées et sédiments
+  """
+  texsAnalysisFiles: [RegistryTexsAnalysisFile!]
 }
 
 "Contenu d'une ligne pour l'import de terres excavées et sédiments, dangereux et non dangereux sortants"
@@ -1391,6 +1396,11 @@ type OutgoingTexsLine {
   Pays du transporteur n°5
   """
   transporter5CompanyCountryCode: String
+
+  """
+  Fichiers d'analyse des terres excavées et sédiments
+  """
+  texsAnalysisFiles: [RegistryTexsAnalysisFile!]
 }
 
 "Contenu d'une ligne pour l'import de déchets dangereux ou non dangereux sortants"

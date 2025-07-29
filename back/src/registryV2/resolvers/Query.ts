@@ -12,6 +12,8 @@ import { registryLookups } from "./queries/registryLookups";
 import { registryExhaustiveExportDownloadSignedUrl } from "./queries/registryExhaustiveExportDownloadSignedUrl";
 import { getRegistryExhaustiveExports } from "./queries/registryExhaustiveExports";
 import { registryExhaustiveExport } from "./queries/registryExhaustiveExport";
+import { registryUploadTexsAnalysisSignedUrl } from "./queries/registryUploadTexsAnalysisSignedUrl";
+import { registryDownloadTexsAnalysisSignedUrl } from "./queries/registryDownloadTexsAnalysisSignedUrl";
 
 export const Query: QueryResolvers = {
   registryUploadSignedUrl,
@@ -32,5 +34,7 @@ export const Query: QueryResolvers = {
   registryExhaustiveExport: registryExhaustiveExport as any,
   registryChangeAggregates: registryChangeAggregates as any,
   registryLookup,
-  registryLookups
+  registryLookups,
+  registryUploadTexsAnalysisSignedUrl,
+  registryDownloadTexsAnalysisSignedUrl
 };

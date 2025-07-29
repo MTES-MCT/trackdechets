@@ -120,7 +120,12 @@ export default function AccountFormChangePassword() {
                 !formState.isDirty
                   ? [
                       {
-                        message: "contenir 10 caractères minimum",
+                        message: "contenir 12 caractères minimum",
+                        severity: "info"
+                      },
+                      {
+                        message:
+                          "contenir une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial",
                         severity: "info"
                       },
                       {

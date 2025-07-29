@@ -216,7 +216,7 @@ export function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     bsdSubType: getBsdasriSubType(bsdasri),
     status: bsdasri.status,
     customId: null,
-    destinationCap: null,
+    destinationCap: bsdasri.destinationCap,
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,

@@ -1,0 +1,43 @@
+.tag {
+  :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
+    background-color: var(--background-action-high-blue-france);
+    --idle: transparent;
+    --hover: var(--background-action-high-blue-france-hover);
+    --active: var(--background-action-high-blue-france-active);
+  }
+}
+
+.errorTag {
+  :global(.fr-tag) {
+    color: var(--text-inverted-blue-france);
+    background-color: var(--error-425-625);
+    --hover: var(--error-425-625-hover);
+    --active: var(--error-425-625-active);
+  }
+}
+
+.tagContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 4px;
+}
+
+.tagText {
+  flex: 1;
+  cursor: pointer;
+}
+
+.tagButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  margin-right: -0.25rem;
+}
