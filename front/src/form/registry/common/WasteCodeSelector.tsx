@@ -231,7 +231,7 @@ export function WasteCodeSelector({
       )}
       <ComboBox
         parentRef={containerRef ?? comboboxRef}
-        triggerRef={triggerRef}
+        triggerRef={multiple ? comboboxRef : triggerRef}
         isOpen={showSearch}
         onOpenChange={setComboboxOpen}
       >
