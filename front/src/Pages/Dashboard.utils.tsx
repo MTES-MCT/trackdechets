@@ -18,38 +18,24 @@ import {
 } from "../Apps/common/wordings/dashboard/wordingsDashboard";
 import { BsdWhere, OrderType, QueryBsdsArgs } from "@td/codegen-ui";
 import { filterList, filterPredicates } from "../Apps/Dashboard/dashboardUtils";
+import { BsdCurrentTab } from "../Apps/common/types/commonTypes";
 
-export type Tabs = {
-  isActTab;
-  isDraftTab;
-  isFollowTab;
-  isArchivesTab;
-  isToCollectTab;
-  isCollectedTab;
-  isAllBsdsTab;
-  isPendingRevisionForTab;
-  isEmittedRevisionForTab;
-  isReceivedRevisionForTab;
-  isReviewedRevisionForTab;
-  isReturnTab;
-};
-
-export const getRoutePredicate = (props: Tabs & { siret }) => {
-  const {
-    siret,
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isToCollectTab,
-    isCollectedTab,
-    isAllBsdsTab,
-    isPendingRevisionForTab,
-    isEmittedRevisionForTab,
-    isReceivedRevisionForTab,
-    isReviewedRevisionForTab,
-    isReturnTab
-  } = props;
+export const getRoutePredicate = (
+  bsdCurrentTab: BsdCurrentTab,
+  siret: string
+) => {
+  const isActTab = bsdCurrentTab === "actTab";
+  const isDraftTab = bsdCurrentTab === "draftTab";
+  const isFollowTab = bsdCurrentTab === "followTab";
+  const isArchivesTab = bsdCurrentTab === "archivesTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+  const isCollectedTab = bsdCurrentTab === "collectedTab";
+  const isAllBsdsTab = bsdCurrentTab === "allBsdsTab";
+  const isPendingRevisionForTab = bsdCurrentTab === "pendingRevisionForTab";
+  const isEmittedRevisionForTab = bsdCurrentTab === "emittedRevisionForTab";
+  const isReceivedRevisionForTab = bsdCurrentTab === "receivedRevisionForTab";
+  const isReviewedRevisionForTab = bsdCurrentTab === "reviewedRevisionForTab";
+  const isReturnTab = bsdCurrentTab === "returnTab";
 
   if (isActTab) {
     return {
@@ -116,18 +102,18 @@ export const getRoutePredicate = (props: Tabs & { siret }) => {
   }
 };
 
-export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
-  const {
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
-    isPendingRevisionForTab,
-    isEmittedRevisionForTab,
-    isReceivedRevisionForTab,
-    isReviewedRevisionForTab,
-    isReturnTab
-  } = tabs;
+export const getBlankslateTitle = (
+  bsdCurrentTab: BsdCurrentTab
+): string | undefined => {
+  const isActTab = bsdCurrentTab === "actTab";
+  const isDraftTab = bsdCurrentTab === "draftTab";
+  const isFollowTab = bsdCurrentTab === "followTab";
+  const isArchivesTab = bsdCurrentTab === "archivesTab";
+  const isPendingRevisionForTab = bsdCurrentTab === "pendingRevisionForTab";
+  const isEmittedRevisionForTab = bsdCurrentTab === "emittedRevisionForTab";
+  const isReceivedRevisionForTab = bsdCurrentTab === "receivedRevisionForTab";
+  const isReviewedRevisionForTab = bsdCurrentTab === "reviewedRevisionForTab";
+  const isReturnTab = bsdCurrentTab === "returnTab";
 
   if (isActTab) {
     return blankstate_action_title;
@@ -155,17 +141,17 @@ export const getBlankslateTitle = (tabs: Tabs): string | undefined => {
   return blankstate_default_title;
 };
 
-export const getBlankslateDescription = ({
-  isActTab,
-  isDraftTab,
-  isFollowTab,
-  isArchivesTab,
-  isPendingRevisionForTab,
-  isEmittedRevisionForTab,
-  isReceivedRevisionForTab,
-  isReviewedRevisionForTab,
-  isReturnTab
-}: Tabs) => {
+export const getBlankslateDescription = (bsdCurrentTab: BsdCurrentTab) => {
+  const isActTab = bsdCurrentTab === "actTab";
+  const isDraftTab = bsdCurrentTab === "draftTab";
+  const isFollowTab = bsdCurrentTab === "followTab";
+  const isArchivesTab = bsdCurrentTab === "archivesTab";
+  const isPendingRevisionForTab = bsdCurrentTab === "pendingRevisionForTab";
+  const isEmittedRevisionForTab = bsdCurrentTab === "emittedRevisionForTab";
+  const isReceivedRevisionForTab = bsdCurrentTab === "receivedRevisionForTab";
+  const isReviewedRevisionForTab = bsdCurrentTab === "reviewedRevisionForTab";
+  const isReturnTab = bsdCurrentTab === "returnTab";
+
   if (isActTab) {
     return blankstate_action_desc;
   }
