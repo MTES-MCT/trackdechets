@@ -235,6 +235,7 @@ export const transportedFormShape: FormShape = [
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
         label: Labels.gistridNumber,
+        infoLabel: InfoLabels.gistrid,
         required: true,
         validation: {
           gistridNumber: optionalString

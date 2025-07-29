@@ -304,6 +304,7 @@ export const outgoingWasteFormShape: FormShape = [
         name: "gistridNumber",
         shape: "generic",
         label: Labels.gistridNumber,
+        infoLabel: InfoLabels.gistrid,
         required: true,
         validation: {
           gistridNumber: optionalString
