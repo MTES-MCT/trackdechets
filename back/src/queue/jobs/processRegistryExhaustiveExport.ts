@@ -40,8 +40,7 @@ const streamLookup = (
   query: estypes.QueryContainer,
   addEncounteredSirets: (sirets: string[]) => void
 ): Readable => {
-  let cursorId: string | null = null;
-  let cursorDate: number | null = null;
+  let cursor: estypes.Hit<BsdElastic>["sort"] | undefined = undefined;
   return new Readable({
     objectMode: true,
     highWaterMark: LOOKUP_PAGE_SIZE * 2,
@@ -69,7 +68,7 @@ const streamLookup = (
               updatedAt: "ASC",
               id: "ASC"
             },
-            search_after: cursorDate ? [cursorDate, cursorId] : undefined
+            search_after: cursor
           }
         });
         const searchHits = body.hits as estypes.HitsMetadata<BsdElastic>;
@@ -77,13 +76,15 @@ const streamLookup = (
         const bsds = await toPrismaBsds(
           hits.map(hit => hit._source).filter(Boolean)
         );
+
         for (const hit of hits) {
+          cursor = hit.sort;
           if (!hit._source) {
             continue;
           }
           const { type, id, isAllWasteFor } = hit._source;
-          cursorDate = hit._source.updatedAt;
-          cursorId = hit._source.id;
+          // Track the last hit that was actually processed
+
           addEncounteredSirets(isAllWasteFor as string[]);
           const waste = bsds[type].find(waste => waste.id === id);
           const mapped = toWaste("ALL", undefined, {
@@ -93,6 +94,7 @@ const streamLookup = (
             this.push(mapped);
           }
         }
+
         if (searchHits.hits.length <= LOOKUP_PAGE_SIZE) {
           this.push(null);
           return;
