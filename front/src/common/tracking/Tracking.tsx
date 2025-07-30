@@ -5,8 +5,16 @@ declare global {
   interface Window {
     _mtm?: Array<Record<string, any>>;
     _matomoLoaded?: boolean;
+    matomoHeatmapSessionRecordingAsyncInit?: (args: any) => void;
+    Matomo: any;
   }
 }
+
+window.matomoHeatmapSessionRecordingAsyncInit = function (_: any) {
+  if (window?.Matomo) {
+    window.Matomo.HeatmapSessionRecording.enable();
+  }
+};
 
 export function MatomoTracker() {
   const { VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL } = import.meta
