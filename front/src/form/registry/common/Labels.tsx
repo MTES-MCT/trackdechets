@@ -77,5 +77,6 @@ export const InfoLabels = {
   weighingHour:
     "À renseigner pour les installations soumises à contrôle par vidéo",
   sisIdentifier:
-    "À renseigner lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
+    "À renseigner lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6",
+  gistrid: "Doit être renseigné dans le cadre d'un transfert transfrontalier"
 };

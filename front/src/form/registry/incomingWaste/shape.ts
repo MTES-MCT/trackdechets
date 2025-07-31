@@ -352,7 +352,8 @@ export const incomingWasteFormShape: FormShape = [
         name: "ttdImportNumber",
         shape: "generic",
         label: Labels.ttdImportNumber,
-        required: false,
+        infoLabel: InfoLabels.gistrid,
+        required: true,
         validation: {
           ttdImportNumber: optionalString
         },
