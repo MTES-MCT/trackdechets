@@ -11,6 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { fullBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
+import { prisma } from "@td/prisma";
 
 const CREATE_DRAFT_DASRI = gql`
   ${fullBsdasriFragment}
@@ -204,6 +205,11 @@ describe("Mutation.createDraftBsdasri", () => {
     expect(data.createDraftBsdasri.trader!.company).toMatchObject(
       input.trader.company
     );
+
+    const created = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.createDraftBsdasri.id }
+    });
+    expect(created.canAccessDraftOrgIds).toEqual([trader.siret]);
   });
 
   it("won't create a draft dasri (trader) if company has not expected profile", async () => {
@@ -293,6 +299,11 @@ describe("Mutation.createDraftBsdasri", () => {
     expect(data.createDraftBsdasri.broker!.company).toMatchObject(
       input.broker.company
     );
+
+    const created = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.createDraftBsdasri.id }
+    });
+    expect(created.canAccessDraftOrgIds).toEqual([broker.siret]);
   });
 
   it("won't create a draft dasri (broker) if company has not expected profile", async () => {
