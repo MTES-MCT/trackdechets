@@ -5,7 +5,8 @@ export default function NonScrollableInput(props: InputProps) {
   const preventScientificNotation = (
     event: React.KeyboardEvent<HTMLInputElement>
   ) => {
-    if (["e", "E"].includes(event.key)) {
+    const inputType = event.currentTarget.type;
+    if (inputType === "number" && ["e", "E"].includes(event.key)) {
       event.preventDefault();
     }
   };
