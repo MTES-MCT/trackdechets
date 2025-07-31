@@ -111,7 +111,6 @@ describe("Mutation.duplicateBsdasri", () => {
         ...readyToTakeOverData(transporter),
         ...traderData(trader),
         ...brokerData(broker)
-        // ...intermediaryData()
       }
     });
 
@@ -195,6 +194,70 @@ describe("Mutation.duplicateBsdasri", () => {
     expect(data.duplicateBsdasri.status).toBe("INITIAL");
     expect(data.duplicateBsdasri.isDraft).toBe(true);
     expect(data.duplicateBsdasri.isDuplicateOf).toBe(dasri.id);
+  });
+
+  it("should duplicate a draft dasri and allow trader access", async () => {
+    const company = await companyFactory();
+    const { user, company: trader } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...traderData(trader)
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+
+    expect(data.duplicateBsdasri.status).toBe("INITIAL");
+    expect(data.duplicateBsdasri.isDraft).toBe(true);
+    expect(data.duplicateBsdasri.isDuplicateOf).toBe(dasri.id);
+
+    const created = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+    expect(created.canAccessDraftOrgIds).toEqual([trader.siret]);
+  });
+
+  it("should duplicate a draft dasri and allow broker access", async () => {
+    const company = await companyFactory();
+    const { user, company: broker } = await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...brokerData(broker)
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+
+    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
+      DUPLICATE_DASRI,
+      {
+        variables: {
+          id: dasri.id
+        }
+      }
+    );
+
+    expect(data.duplicateBsdasri.status).toBe("INITIAL");
+    expect(data.duplicateBsdasri.isDraft).toBe(true);
+    expect(data.duplicateBsdasri.isDuplicateOf).toBe(dasri.id);
+
+    const created = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: data.duplicateBsdasri.id }
+    });
+    expect(created.canAccessDraftOrgIds).toEqual([broker.siret]);
   });
 
   test("duplicated BSDASRI should have the updated data when company info changes", async () => {

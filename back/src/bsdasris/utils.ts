@@ -18,12 +18,15 @@ export const getCanAccessDraftOrgIds = async (
       bsdasri.emitterCompanySiret,
       ...[bsdasri.transporterCompanySiret, bsdasri.transporterCompanyVatNumber],
       bsdasri.ecoOrganismeSiret,
-      bsdasri.destinationCompanySiret
+      bsdasri.destinationCompanySiret,
+      bsdasri.traderCompanySiret,
+      bsdasri.brokerCompanySiret
     ].filter(Boolean);
     const userOrgIdsInForm = userOrgIds.filter(orgId =>
       bsdasriOrgIds.includes(orgId)
     );
     canAccessDraftOrgIds.push(...userOrgIdsInForm);
   }
+
   return canAccessDraftOrgIds;
 };
