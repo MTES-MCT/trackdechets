@@ -25,7 +25,6 @@ import { RouteBsdasriRequestRevision } from "./Components//RevisionRequestList/b
 import { RouteBsddRequestRevision } from "./Components//RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import {
   RouteBSDasrisView,
-  RouteBSDasView,
   RouteBSDDsView,
   RouteBsffsView,
   RouteBspaohsView
@@ -170,7 +169,7 @@ function DashboardRoutes() {
 
           <Route
             path={toRelative(routes.dashboard.bsdas.view)}
-            element={<RouteBSDasView />}
+            element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsda} />}
           />
 
           <Route
@@ -454,16 +453,7 @@ function DashboardRoutes() {
 
             <Route
               path={toRelative(routes.dashboard.bsdas.view)}
-              element={
-                <Modal
-                  onClose={goBack}
-                  ariaLabel="Aperçu du bordereau"
-                  isOpen
-                  size={overviewModalSize}
-                >
-                  <RouteBSDasView />
-                </Modal>
-              }
+              element={<BSDPreviewContainer bsdTypeName={BsdTypename.Bsda} />}
             />
             <Route
               path={toRelative(routes.dashboard.bspaohs.view)}
