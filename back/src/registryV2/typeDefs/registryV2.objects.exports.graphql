@@ -320,6 +320,9 @@ type IncomingWasteV2 {
 
   wasteDap: String
 
+  "Présence ou non de fichiers d'analyse texs"
+  texsAnalysisFiles: Boolean
+
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
   "Le nom usuel de l'établissement vers lequel le déchet est expédié"
@@ -689,6 +692,9 @@ type OutgoingWasteV2 {
   destinationCap: String
 
   wasteDap: String
+
+  "Présence ou non de fichiers d'analyse texs"
+  texsAnalysisFiles: Boolean
 
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String

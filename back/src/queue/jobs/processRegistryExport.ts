@@ -1,6 +1,10 @@
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
-import { getUploadWithWritableStream } from "@td/registry";
+import {
+  getUploadWithWritableStream,
+  RegistryV2IncomingTexsInclude,
+  RegistryV2OutgoingTexsInclude
+} from "@td/registry";
 import { Job } from "bull";
 import * as Excel from "exceljs";
 
@@ -60,9 +64,13 @@ const streamLookup = (
           include: {
             registrySsd: true,
             registryIncomingWaste: true,
-            registryIncomingTexs: true,
+            registryIncomingTexs: {
+              include: RegistryV2IncomingTexsInclude
+            },
             registryOutgoingWaste: true,
-            registryOutgoingTexs: true,
+            registryOutgoingTexs: {
+              include: RegistryV2OutgoingTexsInclude
+            },
             registryTransported: true,
             registryManaged: true,
             bsdd: {
