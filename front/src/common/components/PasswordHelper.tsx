@@ -11,7 +11,7 @@ type Props = {
   password: string;
 };
 
-const MIN_LENGTH = 12;
+export const MIN_LENGTH = 12;
 const MIN_SCORE = 3;
 const CHAR_CLASSES_REGEX = {
   lower: /[a-z]/,
