@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.08.1] 26/07/2025
+
+#### :nail_care: Améliorations
+
+- Changement des règles de scellées BSVHU [PR 4341](https://github.com/MTES-MCT/trackdechets/pull/4341)
+
 # [2025.07.2] 29/07/2025
 
 #### :nail_care: Améliorations
