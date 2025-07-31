@@ -1,6 +1,7 @@
 import * as React from "react";
 import path from "path";
 
+const { ENV_NAME } = process.env;
 const ASSETS_PATH = path.join(__dirname, "..", "assets");
 
 export const CSS_PATHS = [
@@ -24,7 +25,7 @@ export function Document({ title, children }: DocumentProps) {
           <link key={index} rel="stylesheet" href={path.basename(cssPath)} />
         ))}
       </head>
-      <body>{children}</body>
+      <body className={ENV_NAME ?? ""}>{children}</body>
     </html>
   );
 }
