@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
-// import {
-//   adjacencyGraphs,
-//   dictionary as commonDictionary
-// } from "@zxcvbn-ts/language-common";
-// import { dictionary } from "@zxcvbn-ts/language-fr";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type Props = {
@@ -25,14 +20,6 @@ export type PasswordHintResult = {
   message: string;
   hintType: "error" | "success";
 };
-
-// zxcvbnOptions.setOptions({
-//   graphs: adjacencyGraphs,
-//   dictionary: {
-//     ...commonDictionary,
-//     ...dictionary
-//   }
-// });
 
 const loadOptions = async () => {
   const { adjacencyGraphs, dictionary: commonDictionary } = await import(

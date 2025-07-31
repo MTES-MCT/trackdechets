@@ -39,9 +39,7 @@ const PasswordField = ({ password }: { password: string }) => {
 
   useEffect(() => {
     if (password) {
-      console.log("password", password);
       getPasswordHint(password).then(hint => {
-        console.log("hint", hint);
         setPasswordHint(hint);
       });
     } else {
