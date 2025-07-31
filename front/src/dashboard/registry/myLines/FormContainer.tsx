@@ -9,7 +9,7 @@ import { RegistrySsdForm } from "../../../form/registry/ssd/RegistrySsdForm";
 import { RegistryTransportedForm } from "../../../form/registry/transported/RegistryTransportedForm";
 import { RegistryManagedForm } from "../../../form/registry/managed/RegistryManagedForm";
 
-export function FormContainer({
+export default function FormContainer({
   onClose,
   type
 }: {

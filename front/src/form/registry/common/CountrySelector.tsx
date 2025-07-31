@@ -1,22 +1,17 @@
 import React, { useRef, useState } from "react";
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
-import countries from "world-countries";
+import countries from "../../../common/countries.json";
 import { Controller, type UseFormReturn } from "react-hook-form";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { formatError } from "../builder/error";
 
-const sortedCountries = countries
-  .sort((a, b) => {
-    // France first
-    if (a.cca2 === "FR") return -1;
-    if (b.cca2 === "FR") return 1;
+const sortedCountries = countries.sort((a, b) => {
+  // France first
+  if (a.code === "FR") return -1;
+  if (b.code === "FR") return 1;
 
-    return a.translations.fra.common.localeCompare(b.translations.fra.common);
-  })
-  .map(country => ({
-    label: country.translations.fra.common,
-    code: country.cca2
-  }));
+  return a.label.localeCompare(b.label);
+});
 
 type Props = {
   prefix: string;
@@ -65,8 +60,7 @@ export function CountrySelector({ methods, prefix }: Props) {
             }
             nativeInputProps={{
               type: "text",
-              value: countries.find(c => c.cca2 === field.value)?.translations
-                .fra.common,
+              value: countries.find(c => c.code === field.value)?.label,
               readOnly: true,
               onClick: () => {
                 setShowSearch(true);

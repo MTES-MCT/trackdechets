@@ -29,7 +29,7 @@ export default function Signup() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
   const [cguValue, setCguValue] = useState(false);
-
+  const [validPasswordValue, setValidPasswordValue] = useState(false);
   const [signup] = useMutation<Pick<Mutation, "signup">, MutationSignupArgs>(
     SIGNUP
   );
@@ -68,14 +68,18 @@ export default function Signup() {
   };
 
   useEffect(() => {
-    const { hintType } = getPasswordHint(passwordValue);
-    const validPasswordValue = hintType !== "error" && !!passwordValue;
+    getPasswordHint(passwordValue).then(({ hintType }) => {
+      const validPasswordValue = hintType !== "error" && !!passwordValue;
+      setValidPasswordValue(validPasswordValue);
+    });
+  }, [passwordValue]);
 
+  useEffect(() => {
     const formFilled =
       !!nameValue && !!emailValue && validPasswordValue && !!cguValue;
 
     setSubmittable(formFilled);
-  }, [nameValue, emailValue, passwordValue, cguValue]);
+  }, [nameValue, emailValue, validPasswordValue, cguValue]);
 
   const alert =
     errorMessage.length > 0 ? (

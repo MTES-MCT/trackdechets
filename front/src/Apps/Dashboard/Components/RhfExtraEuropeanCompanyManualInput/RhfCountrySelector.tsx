@@ -1,6 +1,6 @@
 import React from "react";
 import Select from "@codegouvfr/react-dsfr/Select";
-import countries from "world-countries";
+import countries from "../../../../common/countries.json";
 import { useFormContext } from "react-hook-form";
 
 interface RhfCountrySelectorProps {
@@ -16,7 +16,7 @@ export default function RhfCountrySelector(props: RhfCountrySelectorProps) {
   const { label, fieldName, errorObject, cca2sToExclude = [] } = props;
 
   const options = countries.filter(
-    country => !cca2sToExclude.includes(country.cca2)
+    country => !cca2sToExclude.includes(country.code)
   );
 
   return (
@@ -27,8 +27,8 @@ export default function RhfCountrySelector(props: RhfCountrySelectorProps) {
       stateRelatedMessage={errorObject?.message}
     >
       {options.map(country => (
-        <option value={country.cca2} key={country.cca2}>
-          {country.translations.fra.common}
+        <option value={country.code} key={country.code}>
+          {country.label}
         </option>
       ))}
     </Select>

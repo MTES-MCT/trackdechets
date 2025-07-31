@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import countries from "world-countries";
+import countries from "../countries.json";
 import { isOmi, isVat } from "@td/constants";
 
 /**
@@ -27,7 +27,7 @@ export const companySchema = yup.object().shape({
   country: yup
     .string()
     .oneOf([
-      ...countries.map(country => country.cca2),
+      ...countries.map(country => country.code),
 
       // .oneOf() has a weird behavior with .nullable(), see:
       // https://github.com/jquense/yup/issues/104

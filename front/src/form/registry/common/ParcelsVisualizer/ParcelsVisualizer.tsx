@@ -7,7 +7,7 @@ import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import { FieldError, useFieldArray, type UseFormReturn } from "react-hook-form";
 import clsx from "clsx";
 
-import { Services } from "geoportal-extensions-openlayers";
+import Gp from "geoportal-access-lib";
 import { Map, MapBrowserEvent } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
@@ -191,7 +191,7 @@ export function ParcelsVisualizer({
     if (disabled && hideIfDisabled) {
       return;
     }
-    Services.getConfig({
+    Gp.Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
       callbackSuffix: "",
       onSuccess: async () => {
