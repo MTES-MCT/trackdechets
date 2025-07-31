@@ -15,7 +15,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        inlineDynamicImports: true // FIXME: Disable code splitting until we find a better solution
+        // inlineDynamicImports: true // uncomment to disable code splitting
       }
     }
   },

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FiltersProps } from "./filtersTypes";
 import QuickFilters from "./QuickFilters";
 import AdvancedFilters from "./AdvancedFilters";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 
 import "./filters.scss";
 import {

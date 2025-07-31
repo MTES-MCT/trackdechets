@@ -1,12 +1,12 @@
-import React from "react";
-import zxcvbn from "zxcvbn";
+import React, { useState, useEffect } from "react";
+import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 
 type Props = {
   password: string;
 };
 
-const MIN_LENGTH = 12;
+export const MIN_LENGTH = 12;
 const MIN_SCORE = 3;
 const CHAR_CLASSES_REGEX = {
   lower: /[a-z]/,
@@ -15,12 +15,30 @@ const CHAR_CLASSES_REGEX = {
   special: /[^a-zA-Z0-9]/
 };
 
-type PasswordHintResult = {
+export type PasswordHintResult = {
   title: string;
   message: string;
   hintType: "error" | "success";
 };
-export const getPasswordHint = (password: string): PasswordHintResult => {
+
+const loadOptions = async () => {
+  const { adjacencyGraphs, dictionary: commonDictionary } = await import(
+    "@zxcvbn-ts/language-common"
+  );
+  const { dictionary } = await import("@zxcvbn-ts/language-fr");
+
+  return {
+    graphs: adjacencyGraphs,
+    dictionary: {
+      ...commonDictionary,
+      ...dictionary
+    }
+  };
+};
+
+export const getPasswordHint = async (
+  password: string
+): Promise<PasswordHintResult> => {
   if (password.length < MIN_LENGTH)
     return {
       title: "Trop court",
@@ -35,6 +53,8 @@ export const getPasswordHint = (password: string): PasswordHintResult => {
         "Votre mot de passe ne contient pas tous les types de caractères requis: une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial"
     };
   }
+  const options = await loadOptions();
+  zxcvbnOptions.setOptions(options);
   const { score } = zxcvbn(password);
   return score >= MIN_SCORE
     ? {
@@ -58,9 +78,20 @@ export default function PasswordHelper({ password }: Props) {
   );
 }
 export function PasswordMeter({ password }: Props) {
-  if (!password) return <span />;
-  const { title, hintType, message } = getPasswordHint(password);
-  return <Alert title={title} description={message} severity={hintType} />;
+  const [hint, setHint] = useState<PasswordHintResult | null>(null);
+  useEffect(() => {
+    getPasswordHint(password).then(result => {
+      setHint(result);
+    });
+  }, [password]);
+  if (!password || !hint) return <span />;
+  return (
+    <Alert
+      title={hint.title}
+      description={hint.message}
+      severity={hint.hintType}
+    />
+  );
 }
 
 export const PassWordHints = () => (
