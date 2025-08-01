@@ -25,11 +25,17 @@ export { lookupUtils as ssdLookupUtils } from "./ssd/registry";
 
 export { lookupUtils as incomingWasteLookupUtils } from "./incomingWaste/registry";
 
-export { lookupUtils as incomingTexsLookupUtils } from "./incomingTexs/registry";
+export {
+  lookupUtils as incomingTexsLookupUtils,
+  RegistryV2IncomingTexsInclude
+} from "./incomingTexs/registry";
 
 export { lookupUtils as outgoingWasteLookupUtils } from "./outgoingWaste/registry";
 
-export { lookupUtils as outgoingTexsLookupUtils } from "./outgoingTexs/registry";
+export {
+  lookupUtils as outgoingTexsLookupUtils,
+  RegistryV2OutgoingTexsInclude
+} from "./outgoingTexs/registry";
 
 export { lookupUtils as transportedLookupUtils } from "./transported/registry";
 
