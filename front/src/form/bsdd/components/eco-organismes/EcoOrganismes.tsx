@@ -77,6 +77,13 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                   .
                 </p>
               </div>
+              <div className="fr-alert fr-alert--warning fr-mt-2w fr-mb-2w">
+                <p>
+                  À compter du <b>1er août 2025</b>, les éco-organismes COREPILE
+                  et ECOSYSTEM fusionnent. Il ne sera donc plus possible de
+                  viser COREPILE à partir de cette date.
+                </p>
+              </div>
               <SearchInput
                 id="eco-search"
                 placeholder="Filtrer les éco-organismes par nom..."

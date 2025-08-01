@@ -227,7 +227,8 @@ export const incomingTexsFormShape: FormShape = [
         shape: "generic",
         title: "Transfert transfrontalier de déchets",
         label: Labels.ttdImportNumber,
-        required: false,
+        infoLabel: InfoLabels.gistrid,
+        required: true,
         validation: {
           ttdImportNumber: optionalString
         },

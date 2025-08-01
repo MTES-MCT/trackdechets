@@ -417,7 +417,7 @@ export function ParcelsVisualizer({
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
-                          text: "Impossible d'afficher la parcelle, veuillez renseigner le code INSEE",
+                          text: "Affichage de la parcelle impossible : veuillez renseigner le code INSEE",
                           severity: "error",
                           field: "inseeCode"
                         });
@@ -425,7 +425,7 @@ export function ParcelsVisualizer({
                       }
                       if (!parcelNumber) {
                         setClientError({
-                          text: "Impossible d'afficher la parcelle, veuillez renseigner le numéro de parcelle",
+                          text: "Affichage de la parcelle impossible : veuillez renseigner le numéro de parcelle",
                           severity: "error",
                           field: "parcelNumber"
                         });
@@ -438,7 +438,7 @@ export function ParcelsVisualizer({
                       );
                       if (!res) {
                         setClientError({
-                          text: "Impossible d'afficher la parcelle, etes vous sûr que le numéro de parcelle est correct ?",
+                          text: "Affichage de la parcelle impossible : les informations renseignées semblent incorrectes",
                           severity: "warning",
                           field: null
                         });
@@ -456,7 +456,7 @@ export function ParcelsVisualizer({
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
-                          text: "Impossible d'afficher la parcelle, veuillez renseigner le code INSEE",
+                          text: "Ajout de la parcelle impossible : veuillez renseigner le code INSEE",
                           severity: "error",
                           field: "inseeCode"
                         });
@@ -464,7 +464,7 @@ export function ParcelsVisualizer({
                       }
                       if (!parcelNumber) {
                         setClientError({
-                          text: "Impossible d'afficher la parcelle, veuillez renseigner le numéro de parcelle",
+                          text: "Ajout de la parcelle impossible : veuillez renseigner le numéro de parcelle",
                           severity: "error",
                           field: "parcelNumber"
                         });
@@ -485,7 +485,7 @@ export function ParcelsVisualizer({
                         setClientError(null);
                       } else {
                         setClientError({
-                          text: "Impossible d'ajouter la parcelle, etes vous sûr que le numéro de parcelle est correct ?",
+                          text: "Ajout de la parcelle impossible : les informations renseignées semblent incorrectes",
                           severity: "warning",
                           field: null
                         });
@@ -525,7 +525,7 @@ export function ParcelsVisualizer({
                     onClick={() => {
                       if (!coordinates) {
                         setClientError({
-                          text: "Impossible d'afficher le point, veuillez renseigner les coordonnées GPS",
+                          text: "Affichage du point impossible : veuillez renseigner les coordonnées GPS",
                           severity: "error",
                           field: "coordinates"
                         });
@@ -534,7 +534,7 @@ export function ParcelsVisualizer({
                       const res = displayCoordinates(coordinates, map);
                       if (!res) {
                         setClientError({
-                          text: "Impossible d'afficher le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                          text: "Affichage du point impossible : les informations renseignées semblent incorrectes",
                           severity: "warning",
                           field: null
                         });
@@ -550,6 +550,14 @@ export function ParcelsVisualizer({
                     priority="secondary"
                     disabled={disabled}
                     onClick={() => {
+                      if (!coordinates) {
+                        setClientError({
+                          text: "Ajout du point impossible : veuillez renseigner les coordonnées GPS",
+                          severity: "error",
+                          field: "coordinates"
+                        });
+                        return;
+                      }
                       const lonLat = lonLatFromCoordinatesString(coordinates);
                       if (lonLat) {
                         const res = addPointToMap(
@@ -559,7 +567,7 @@ export function ParcelsVisualizer({
                         );
                         if (!res) {
                           setClientError({
-                            text: "Impossible d'ajouter le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                            text: "Ajout du point impossible : les informations renseignées semblent incorrectes",
                             severity: "warning",
                             field: null
                           });
@@ -572,7 +580,7 @@ export function ParcelsVisualizer({
                         setClientError(null);
                       } else {
                         setClientError({
-                          text: "Impossible d'ajouter le point, etes vous sûr que les coordonnées GPS sont correctes ?",
+                          text: "Ajout du point impossible : les informations renseignées semblent incorrectes",
                           severity: "warning",
                           field: null
                         });

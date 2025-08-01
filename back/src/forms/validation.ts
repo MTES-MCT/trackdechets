@@ -616,6 +616,13 @@ export const ecoOrganismeSchema = yup.object().shape({
   ecoOrganismeSiret: siret
     .label("Éco-organisme")
     .test(
+      "corepile-deprecated",
+      "COREPILE a fusionné avec ECOSYTEM. Il n'est plus possible de viser COREPILE comme éco-organisme sur un bordereau, vous devez désormais viser le SIRET d'ECOSYSTEM (83033936200022)",
+      async value => {
+        return value !== "42248908800068";
+      }
+    )
+    .test(
       "is-known-eco-organisme",
       "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
       ecoOrganismeSiret =>
