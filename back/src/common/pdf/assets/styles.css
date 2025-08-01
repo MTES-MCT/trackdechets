@@ -16,7 +16,47 @@ body {
   color: var(--color-black);
   font-size: 1rem;
   line-height: 1.4;
+  position: relative;
 }
+body:before {
+  content: "";
+  position: fixed;
+  inset: -60px 0 0 -60px;
+  font-size: 120px;
+  font-weight: bold;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  opacity: 0.1;
+  transform: rotate(-45deg);
+}
+body.sandbox:before {
+  content: "SANDBOX";
+}
+body.recette:before {
+  content: "RECETTE";
+}
+body.local:before {
+  content: "LOCAL";
+}
+body.sandbox:after,
+body.recette:after,
+body.local:after {
+  content: "Bordereau test";
+}
+body:after {
+  content: "";
+  position: fixed;
+  inset: 60px 0 0 60px;
+  font-size: 60px;
+  font-weight: bold;
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  opacity: 0.1;
+  transform: rotate(-45deg);
+}
+
 h1,
 h2,
 h3,
