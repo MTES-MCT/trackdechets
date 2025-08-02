@@ -118,5 +118,5 @@ export function dateFilterToElasticFilter(
   fieldName: keyof BsdElastic,
   dateFilter: DateFilter
 ): estypes.QueryContainer {
-  return toElasticDateQuery(fieldName, dateFilter) ?? {};
+  return toElasticDateQuery(fieldName, dateFilter, false) ?? {};
 }

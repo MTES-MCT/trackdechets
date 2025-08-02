@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useState } from "react";
 import { useMutation } from "@apollo/client";
-import { format, startOfYear } from "date-fns";
+import { format, startOfYear, endOfDay, startOfDay } from "date-fns";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 
@@ -77,28 +77,6 @@ const getDefaultValues = (asAdmin: boolean) => ({
   format: RegistryExportFormat.Csv
 });
 
-const getUTCStartOfDay = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return new Date(
-    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-  ).toISOString();
-};
-
-const getUTCEndOfDay = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return new Date(
-    Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      23,
-      59,
-      59,
-      999
-    )
-  ).toISOString();
-};
-
 export const RegistryExhaustiveExportModalProvider: React.FC<{
   children: React.ReactNode;
   asAdmin?: boolean;
@@ -150,8 +128,10 @@ export const RegistryExhaustiveExportModalProvider: React.FC<{
       const { companyOrgId, format, startDate, endDate } = input;
       const siret = companyOrgId === "all" ? null : companyOrgId;
       // push the dates to the extremities of days so we include the days entered in the inputs
-      const startOfDayStartDate = getUTCStartOfDay(startDate);
-      const endOfDayEndDate = endDate ? getUTCEndOfDay(endDate) : null;
+      const startOfDayStartDate = startOfDay(new Date(startDate)).toISOString();
+      const endOfDayEndDate = endDate
+        ? endOfDay(new Date(endDate)).toISOString()
+        : null;
 
       await generateExport({
         variables: {
