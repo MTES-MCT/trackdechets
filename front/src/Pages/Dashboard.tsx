@@ -25,10 +25,7 @@ import {
   load_more_bsds
 } from "../Apps/common/wordings/dashboard/wordingsDashboard";
 import Filters from "../Apps/common/Components/Filters/Filters";
-import {
-  dropdownCreateLinks,
-  getBsdCurrentTab
-} from "../Apps/Dashboard/dashboardUtils";
+import { dropdownCreateLinks } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/common/Components/DropdownMenu/DropdownMenu";
 import { usePermissions } from "../common/contexts/PermissionsContext";
 import { UserPermission } from "@td/codegen-ui";
@@ -36,8 +33,7 @@ import {
   filtersToQueryBsdsArgs,
   getBlankslateDescription,
   getBlankslateTitle,
-  getRoutePredicate,
-  Tabs
+  getRoutePredicate
 } from "./Dashboard.utils";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import { NotificationError } from "../Apps/common/Components/Error/Error";
@@ -45,6 +41,8 @@ import throttle from "lodash/throttle";
 
 import "./dashboard.scss";
 import { useMyCompany } from "../Apps/common/hooks/useMyCompany";
+import { BsdCurrentTab } from "../Apps/common/types/commonTypes";
+import { isEqual } from "lodash";
 
 const DashboardPage = () => {
   const { siret } = useParams<{ siret: string | undefined }>();
@@ -71,7 +69,6 @@ const DashboardPage = () => {
   const isToCollectTab = !!useMatch(routes.dashboard.transport.toCollect);
   const isCollectedTab = !!useMatch(routes.dashboard.transport.collected);
   const isReturnTab = !!useMatch(routes.dashboard.transport.return);
-  const isAllBsdsTab = !!useMatch(routes.dashboard.bsds.index);
   const location = useLocation();
   const prevPathname = useRef(location.pathname);
 
@@ -93,66 +90,59 @@ const DashboardPage = () => {
     errorPolicy: "all"
   });
 
-  const tabs: Tabs = useMemo(
-    () => ({
-      isActTab,
-      isDraftTab,
-      isFollowTab,
-      isArchivesTab,
-      isToCollectTab,
-      isCollectedTab,
-      isAllBsdsTab,
-      isPendingRevisionForTab,
-      isEmittedRevisionForTab,
-      isReceivedRevisionForTab,
-      isReviewedRevisionForTab,
-      isReturnTab
-    }),
-    [
-      isActTab,
-      isAllBsdsTab,
-      isArchivesTab,
-      isCollectedTab,
-      isDraftTab,
-      isFollowTab,
-      isToCollectTab,
-      isPendingRevisionForTab,
-      isEmittedRevisionForTab,
-      isReceivedRevisionForTab,
-      isReviewedRevisionForTab,
-      isReturnTab
-    ]
-  );
+  const bsdCurrentTab: BsdCurrentTab = useMemo(() => {
+    if (isActTab) return "actTab";
+    if (isDraftTab) return "draftTab";
+    if (isFollowTab) return "followTab";
+    if (isArchivesTab) return "archivesTab";
+    if (isPendingRevisionForTab) return "pendingRevisionForTab";
+    if (isEmittedRevisionForTab) return "emittedRevisionForTab";
+    if (isReceivedRevisionForTab) return "receivedRevisionForTab";
+    if (isReviewedRevisionForTab) return "reviewedRevisionForTab";
+    if (isToCollectTab) return "toCollectTab";
+    if (isCollectedTab) return "collectedTab";
+    if (isReturnTab) return "returnTab";
+    // default tab
+    return "allBsdsTab";
+  }, [
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    isPendingRevisionForTab,
+    isEmittedRevisionForTab,
+    isReceivedRevisionForTab,
+    isReviewedRevisionForTab,
+    isToCollectTab,
+    isCollectedTab,
+    isReturnTab
+  ]);
+
+  const finalFetchBsdsVariables = useMemo(() => {
+    const routePredicate = getRoutePredicate(bsdCurrentTab, siret!);
+
+    const whereClause = routePredicate
+      ? {
+          ...routePredicate,
+          _and: bsdsVariables?.where?._and ?? []
+        }
+      : bsdsVariables.where;
+
+    return {
+      ...bsdsVariables,
+      where: whereClause
+    };
+  }, [bsdCurrentTab, siret, bsdsVariables]);
 
   // Fetches the BSDs, building up the query. Query includes:
   // - Current company SIRET
   // - Current active tab
   // - Current filters
-  const fetchBsds = useCallback(
-    (newSiret, newVariables, newTabs) => {
-      if (!newSiret) return;
-      const variables = { ...newVariables };
+  const fetchBsds = useCallback(() => {
+    if (!siret) return;
 
-      const routePredicate = getRoutePredicate({
-        ...newTabs,
-        siret: newSiret
-      });
-
-      if (routePredicate) {
-        if (newVariables?.where?._and?.length) {
-          variables.where = {
-            ...routePredicate,
-            _and: [...newVariables.where._and]
-          };
-        } else {
-          variables.where = { ...routePredicate };
-        }
-      }
-
-      lazyFetchBsds({ variables });
-    },
-    [lazyFetchBsds]
-  );
+    lazyFetchBsds({ variables: finalFetchBsdsVariables });
+  }, [siret, finalFetchBsdsVariables, lazyFetchBsds]);
 
   const throttledFetchBsds = useMemo(
     () => throttle(fetchBsds, 500),
@@ -169,21 +159,31 @@ const DashboardPage = () => {
 
   // Be notified if someone else modifies bsds
   useNotifier(siret!, () => {
-    throttledFetchBsds(siret, bsdsVariables, tabs);
+    throttledFetchBsds();
   });
 
-  useEffect(() => {
-    // Flush throttle dès que la route change
-    if (prevPathname.current !== location.pathname) {
-      throttledFetchBsds.flush();
-      prevPathname.current = location.pathname;
-    }
-  }, [location.pathname, throttledFetchBsds]);
-
+  const prevVariablesRef = useRef(finalFetchBsdsVariables);
   useEffect(() => {
     if (!siret) return;
-    throttledFetchBsds(siret, bsdsVariables, tabs);
-  }, [bsdsVariables, siret, tabs, throttledFetchBsds]);
+
+    const hasPathnameChanged = prevPathname.current !== location.pathname;
+    const hasVariablesChanged = !isEqual(
+      finalFetchBsdsVariables,
+      prevVariablesRef.current
+    );
+    const shouldFetch = hasPathnameChanged || hasVariablesChanged;
+
+    if (shouldFetch) {
+      // Flush throttle dès que la route change
+      if (hasPathnameChanged) {
+        throttledFetchBsds.flush();
+      }
+
+      throttledFetchBsds();
+      prevPathname.current = location.pathname;
+      prevVariablesRef.current = finalFetchBsdsVariables;
+    }
+  }, [siret, location.pathname, finalFetchBsdsVariables, throttledFetchBsds]);
 
   useEffect(() => {
     if (error) {
@@ -230,7 +230,6 @@ const DashboardPage = () => {
   const bsdsTotalCount = data?.bsds.totalCount;
   const hasNextPage = data?.bsds.pageInfo.hasNextPage;
   const isLoadingBsds = loading;
-  const bsdCurrentTab = useMemo(() => getBsdCurrentTab(tabs), [tabs]);
 
   return (
     <div role="feed" aria-busy={isLoadingBsds}>
@@ -266,11 +265,13 @@ const DashboardPage = () => {
       {!error && !Boolean(bsdsTotalCount) && !isLoadingBsds && (
         <div className="dashboard-page__blankstate">
           <Blankslate>
-            {getBlankslateTitle(tabs) && (
-              <BlankslateTitle>{getBlankslateTitle(tabs)}</BlankslateTitle>
+            {getBlankslateTitle(bsdCurrentTab) && (
+              <BlankslateTitle>
+                {getBlankslateTitle(bsdCurrentTab)}
+              </BlankslateTitle>
             )}
             <BlankslateDescription>
-              {getBlankslateDescription(tabs)}
+              {getBlankslateDescription(bsdCurrentTab)}
             </BlankslateDescription>
           </Blankslate>
         </div>
