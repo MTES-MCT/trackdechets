@@ -376,8 +376,20 @@ export const validationBsdaSchema = z.object({
     .object({
       cap: z.string().nullish(),
       reception: z.object({
-        weight: z.coerce.number().nonnegative().nullish(),
-        refusedWeight: z.coerce.number().nonnegative().nullish()
+        weight: z.coerce
+          .number({
+            invalid_type_error: "Le poids doit être un nombre.",
+            required_error: "Le poids est requis."
+          })
+          .nonnegative()
+          .nullish(),
+        refusedWeight: z.coerce
+          .number({
+            invalid_type_error: "Le poids doit être un nombre.",
+            required_error: "Le poids est requis."
+          })
+          .nonnegative()
+          .nullish()
       }),
       operation: z.object({
         code: z.string().nullish(),
