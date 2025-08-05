@@ -38,7 +38,7 @@ const formData: Partial<Form> = {
   emitterWorkSiteName: "",
   emitterWorkSiteAddress: "",
   emitterWorkSiteCity: "",
-  emitterWorkSiteinseeCode: "",
+  emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
   emitterCompanyName: "A company 2",
   emitterCompanySiret: siret1,
@@ -65,7 +65,7 @@ const formData: Partial<Form> = {
   ],
   wasteDetailsQuantity: new Decimal(1.5),
   wasteDetailsQuantityType: "REAL",
-  wasteDetailsConsistence: "SOLID",
+  wasteDetailsConsistence: ["SOLID"],
   wasteDetailsPop: false
 };
 
@@ -1717,7 +1717,7 @@ describe("draftFormSchema", () => {
       emitterWorkSiteName: "",
       emitterWorkSiteAddress: "",
       emitterWorkSiteCity: "",
-      emitterWorkSiteinseeCode: "",
+      emitterWorkSitePostalCode: "",
       emitterWorkSiteInfos: "",
       emitterCompanyName: "A company 2",
       emitterCompanyContact: "Emetteur",
@@ -1731,9 +1731,9 @@ describe("draftFormSchema", () => {
         { type: "FUT", other: null, quantity: 1 },
         { type: "GRV", other: null, quantity: 1 }
       ],
-      wasteDetailsQuantity: 1.5,
+      wasteDetailsQuantity: new Decimal("1.5"),
       wasteDetailsQuantityType: "REAL",
-      wasteDetailsConsistence: "SOLID",
+      wasteDetailsConsistence: ["SOLID"],
       wasteDetailsPop: false
     };
     const isValid = await draftFormSchema.isValid(partialForm);
