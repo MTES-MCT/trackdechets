@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Consistence, Form, Maybe, QuantityType } from "@td/codegen-ui";
+import { Form, QuantityType } from "@td/codegen-ui";
 import {
   DataList,
   DataListDescription,
@@ -13,6 +13,7 @@ import {
 import { isDefined } from "../../../../common/helper";
 import { getFormWasteDetailsADRMention } from "@td/constants";
 import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
+import { getConsistenceLabel } from "../../../common/consistenceLabel";
 
 interface FormWasteSummaryProps {
   form: Form;
@@ -59,22 +60,6 @@ export function FormWasteSummary({ form }: FormWasteSummaryProps) {
     </DataList>
   );
 }
-
-const getConsistenceLabel = (consistence: Maybe<Consistence> | undefined) => {
-  switch (consistence) {
-    case Consistence.Liquid:
-      return "Liquide";
-    case Consistence.Solid:
-      return "Solide";
-    case Consistence.Doughy:
-      return "Pâteux";
-    case Consistence.Gaseous:
-      return "Gaseux";
-
-    default:
-      return "Non soumis";
-  }
-};
 
 const getWasteQuantityAndIsEstimated = (
   form

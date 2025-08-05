@@ -490,7 +490,7 @@ model Form {
   wasteDetailsNonRoadRegulationMention  String?
   wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
-  wasteDetailsConsistence               Consistence?
+  wasteDetailsConsistence               Consistence[]
   wasteDetailsPackagingInfos            Json                       @default("[]")
   wasteDetailsPop                       Boolean                    @default(false)
   wasteDetailsSampleNumber              String?
