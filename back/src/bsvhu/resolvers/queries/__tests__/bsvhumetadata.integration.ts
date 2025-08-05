@@ -115,7 +115,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(24);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(19);
   });
 
   it("should return TRANSPORTER signed bsvhu sealed fields", async () => {
