@@ -28,6 +28,7 @@ import {
   bsddPackagingTypes,
   emptyBsddPackaging
 } from "../../Apps/Forms/Components/PackagingList/helpers";
+import { Consistence } from "@td/codegen-ui";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -221,36 +222,51 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <fieldset>
-          <legend>Consistance</legend>
-          <div className="tw-flex">
-            <Field
-              name="wasteDetails.consistence"
-              id="SOLID"
-              label="Solide"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="LIQUID"
-              label="Liquide"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="GASEOUS"
-              label="Gazeux"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="DOUGHY"
-              label="Pâteux"
-              component={RadioButton}
-              disabled={disabled}
-            />
+          <h4 className="fr-h4 fr-mt-0 fr-mb-1w">Consistance</h4>
+          <div className="fr-text--xs fr-mb-1w">
+            Sélectionnez une ou plusieurs consistances.
+          </div>
+          <div className="tw-flex tw-flex-row tw-gap-4">
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistence"
+                value={Consistence.Solid}
+                className="td-checkbox"
+              />
+              Solide
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistence"
+                value={Consistence.Liquid}
+                className="td-checkbox"
+              />
+              Liquide
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistence"
+                value={Consistence.Gaseous}
+                className="td-checkbox"
+              />
+              Gazeux
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistence"
+                value={Consistence.Doughy}
+                className="td-checkbox"
+              />
+              Pâteux
+            </label>
           </div>
         </fieldset>
 
@@ -270,7 +286,7 @@ export default function WasteInfo({ disabled }) {
 
       {values.emitter?.type !== "APPENDIX1" && (
         <>
-          <h4 className="form__section-heading">Quantité en tonnes</h4>
+          <h4 className="fr-h4 fr-mt-2w fr-mb-1w">Quantité en tonnes</h4>
           <div className="form__row">
             <label>
               <Field

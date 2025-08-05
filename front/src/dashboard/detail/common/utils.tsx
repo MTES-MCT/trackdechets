@@ -6,6 +6,7 @@ import {
   QuantityType
 } from "@td/codegen-ui";
 
+// only works for single consistence, do not use with BSDD
 export const getVerboseConsistence = (
   consistence: Consistence | null | undefined | ""
 ): string => {

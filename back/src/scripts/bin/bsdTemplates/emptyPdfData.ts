@@ -305,7 +305,7 @@ export const emptyBsdd = {
   wasteDetailsOnuCode: "",
   wasteDetailsQuantity: 1,
   wasteDetailsQuantityType: "ESTIMATED",
-  wasteDetailsConsistence: "LIQUID",
+  wasteDetailsConsistence: ["LIQUID"],
   wasteDetailsPackagingInfos: [{ type: "GRV", other: null, quantity: 1 }],
   wasteDetailsPop: false,
   wasteDetailsSampleNumber: null,
