@@ -40,7 +40,7 @@ export const incomingWasteFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -70,7 +70,7 @@ export const incomingWasteFormShape: FormShape = [
         validation: {
           wasteCode: nonEmptyString
         },
-        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+        style: { parentClassName: "fr-grid-row--bottom" }
       },
       {
         name: "wasteDescription",
@@ -81,7 +81,7 @@ export const incomingWasteFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-10 fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -92,7 +92,7 @@ export const incomingWasteFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10 fr-col-md-4" }
       },
       {
         name: "wastePop",
@@ -127,7 +127,7 @@ export const incomingWasteFormShape: FormShape = [
           receptionDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-8 fr-col-md-4" }
       },
       {
         name: "weighingHour",
@@ -139,7 +139,7 @@ export const incomingWasteFormShape: FormShape = [
           weighingHour: optionalString
         },
         type: "time",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-8 fr-col-md-4" }
       },
       {
         Component: WeightSelector,
@@ -358,7 +358,7 @@ export const incomingWasteFormShape: FormShape = [
           ttdImportNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "movementNumber",
@@ -369,7 +369,7 @@ export const incomingWasteFormShape: FormShape = [
           movementNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       }
     ]
   },

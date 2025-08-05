@@ -80,7 +80,7 @@ export function TransporterForm({
   return (
     <div className="fr-container fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-8 fr-mb-2w">
+        <div className="fr-col-12 fr-col-md-8 fr-mb-2w">
           <Select
             label={`Type de transporteur`}
             nativeSelectProps={{
@@ -244,7 +244,7 @@ export function TransporterForm({
       {(components.orgId || components.name || components.address) && (
         <div className="fr-grid-row fr-grid-row--gutters fr-mb-2w">
           {components.orgId && (
-            <div className="fr-col-8">
+            <div className="fr-col-md-8">
               <Input
                 label={
                   companyType === "PERSONNE_PHYSIQUE"
@@ -263,7 +263,7 @@ export function TransporterForm({
             </div>
           )}
           {components.name && (
-            <div className="fr-col-8">
+            <div className="fr-col-md-8">
               <Input
                 label="Raison sociale"
                 nativeInputProps={{

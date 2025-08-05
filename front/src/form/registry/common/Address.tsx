@@ -57,7 +57,7 @@ export function InlineAddress({
   return (
     <>
       {nameEnabled && (
-        <div className="fr-col-8">
+        <div className="fr-col-12 fr-col-md-8">
           <Input
             label="Nom"
             nativeInputProps={{
@@ -72,7 +72,7 @@ export function InlineAddress({
           />
         </div>
       )}
-      <div className="fr-col-8">
+      <div className="fr-col-md-8">
         <Input
           label="Adresse (n° de voie et voie, complément, lieu-dit etc.)"
           nativeInputProps={{
@@ -86,7 +86,7 @@ export function InlineAddress({
           )}
         />
       </div>
-      <div className="fr-col-4">
+      <div className="fr-col-md-4">
         <NonScrollableInput
           label="Code postal"
           nativeInputProps={{
@@ -100,7 +100,7 @@ export function InlineAddress({
           )}
         />
       </div>
-      <div className="fr-col-8">
+      <div className="fr-col-10 fr-col-md-8">
         <Input
           label="Commune"
           nativeInputProps={{
@@ -112,7 +112,7 @@ export function InlineAddress({
           stateRelatedMessage={formatError(deepErrors?.[`${finalPrefix}City`])}
         />
       </div>
-      <div className="fr-col-4">
+      <div className="fr-col-md-4">
         <CountrySelector methods={methods} prefix={prefix} />
       </div>
     </>

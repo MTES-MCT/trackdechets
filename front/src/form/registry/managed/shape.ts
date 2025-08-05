@@ -38,7 +38,7 @@ export const managedFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -79,7 +79,7 @@ export const managedFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -90,7 +90,7 @@ export const managedFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "wastePop",
@@ -128,7 +128,7 @@ export const managedFormShape: FormShape = [
               managingStartDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-md-4" }
           },
           {
             name: "managingEndDate",
@@ -139,7 +139,7 @@ export const managedFormShape: FormShape = [
               managingEndDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-md-4" }
           }
         ]
       },
@@ -161,7 +161,7 @@ export const managedFormShape: FormShape = [
           wasteDap: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       }
     ]
   },
@@ -221,7 +221,7 @@ export const managedFormShape: FormShape = [
           sisIdentifier: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       }
     ]
   },
@@ -380,7 +380,7 @@ export const managedFormShape: FormShape = [
           gistridNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "movementNumber",
@@ -391,7 +391,7 @@ export const managedFormShape: FormShape = [
           movementNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       }
     ]
   },

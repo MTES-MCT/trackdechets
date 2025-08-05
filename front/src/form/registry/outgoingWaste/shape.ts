@@ -40,7 +40,7 @@ export const outgoingWasteFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -81,7 +81,7 @@ export const outgoingWasteFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -92,7 +92,7 @@ export const outgoingWasteFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "wastePop",
@@ -178,7 +178,7 @@ export const outgoingWasteFormShape: FormShape = [
           dispatchDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-10 fr-col-md-4" }
       },
       {
         Component: Address,
@@ -310,7 +310,7 @@ export const outgoingWasteFormShape: FormShape = [
           gistridNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "movementNumber",
@@ -321,7 +321,7 @@ export const outgoingWasteFormShape: FormShape = [
           movementNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       }
     ]
   },

@@ -43,7 +43,7 @@ export const outgoingTexsFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -87,7 +87,7 @@ export const outgoingTexsFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -98,7 +98,7 @@ export const outgoingTexsFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "wastePop",
@@ -133,7 +133,7 @@ export const outgoingTexsFormShape: FormShape = [
           dispatchDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         Component: WeightSelector,
@@ -161,7 +161,7 @@ export const outgoingTexsFormShape: FormShape = [
           wasteDap: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       }
     ]
   },
@@ -221,7 +221,7 @@ export const outgoingTexsFormShape: FormShape = [
           sisIdentifier: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       }
     ]
   },
@@ -359,7 +359,7 @@ export const outgoingTexsFormShape: FormShape = [
           gistridNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "movementNumber",
@@ -370,7 +370,7 @@ export const outgoingTexsFormShape: FormShape = [
           movementNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "isUpcycled",

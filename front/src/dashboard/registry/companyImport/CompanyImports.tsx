@@ -10,7 +10,10 @@ export function CompanyImports() {
   return (
     <>
       <div>
-        <RegistryCompanySwitcher onCompanySelect={v => setSiret(v)} />
+        <RegistryCompanySwitcher
+          onCompanySelect={v => setSiret(v)}
+          wrapperClassName="fr-col-12 fr-col-md-6"
+        />
       </div>
 
       <div className="fr-mt-4w">

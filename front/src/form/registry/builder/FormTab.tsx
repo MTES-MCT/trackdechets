@@ -33,13 +33,13 @@ export function FormTab({ fields, methods }: Props) {
       return (
         <>
           {field.title && (
-            <div className="fr-col-12 fr-mt-2w">
+            <div className="fr-col-md-12 fr-mt-2w">
               <h5 className="fr-h5">{field.title}</h5>
             </div>
           )}
           {["text", "number", "date", "time"].includes(field.type) && (
             <div
-              className={field.style?.className ?? "fr-col-12"}
+              className={field.style?.className ?? "fr-col-md-12"}
               key={field.name}
             >
               <NonScrollableInput
@@ -82,7 +82,7 @@ export function FormTab({ fields, methods }: Props) {
 
           {field.type === "select" && (
             <div
-              className={field.style?.className ?? "fr-col-12"}
+              className={field.style?.className ?? "fr-col-md-12"}
               key={field.name}
             >
               <Select
@@ -120,7 +120,7 @@ export function FormTab({ fields, methods }: Props) {
 
           {field.type === "checkbox" && (
             <div
-              className={field.style?.className ?? "fr-col-12"}
+              className={field.style?.className ?? "fr-col-md-12"}
               key={field.name}
             >
               <Controller
@@ -183,7 +183,11 @@ export function FormTab({ fields, methods }: Props) {
           <div className="fr-mb-2w" key={index}>
             <div
               className={clsx(
-                "fr-grid-row fr-grid-row--gutters",
+                {
+                  "fr-grid-row fr-grid-row--gutters fr-grid-row--bottom":
+                    //@ts-ignore
+                    !field?.isWasteSelector
+                },
                 field.style?.parentClassName
               )}
             >
