@@ -8,6 +8,9 @@ export const schema = z.object({
     .refine(val => val === "Europe/Paris"),
   NODE_ENV: z.enum(["test", "production", "dev", "development"]),
   // -------
+  // Environment
+  ENV_NAME: z.string(),
+  // -------
   // Dbs
   REDIS_URL: z.string(),
   MONGO_URL: z.string(),
@@ -76,7 +79,6 @@ export const schema = z.object({
   // -------
   // Sentry
   SENTRY_DSN: z.string().optional(),
-  SENTRY_ENVIRONMENT: z.string().optional(),
   // -------
   // Gotenberg
   GOTENBERG_URL: z.string(),
@@ -166,7 +168,7 @@ export const schema = z.object({
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {
-  if (val.SENTRY_DSN && !val.SENTRY_ENVIRONMENT) {
+  if (val.SENTRY_DSN && !val.ENV_NAME) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: `You must provide a Sentry environment when a Sentry DSN is provided.`
