@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Résolution d'un problème de dates sur l'export exhaustif [PR 4344](https://github.com/MTES-MCT/trackdechets/pull/4344)
+- Ajout du chemin manquant sur erreur d'import registre [PR 4347](https://github.com/MTES-MCT/trackdechets/pull/4347)
 
 # [2025.07.2] 29/07/2025
 
