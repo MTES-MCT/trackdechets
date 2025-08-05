@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import gql from "graphql-tag";
 import { useQuery } from "@apollo/client";
 import {
+  Consistence,
   Form,
   PackagingInfo,
   Query,
@@ -27,6 +28,7 @@ const APPENDIX2_FORMS = gql`
         code
         name
         quantity
+        consistence
         packagingInfos {
           type
           other
@@ -84,6 +86,12 @@ function Appendix2MultiSelectWrapper({
     [setFieldValue]
   );
 
+  const updateConsistence = useCallback(
+    (consistence: Consistence[]) =>
+      setFieldValue("wasteDetails.consistence", consistence),
+    [setFieldValue]
+  );
+
   if (loading) {
     return <Loader />;
   }
@@ -105,6 +113,7 @@ function Appendix2MultiSelectWrapper({
         appendixForms={data.appendixForms}
         updateTotalQuantity={updateTotalQuantity}
         updatePackagings={updatePackagings}
+        updateConsistence={updateConsistence}
       />
     );
   }
