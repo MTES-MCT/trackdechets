@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Résolution d'un problème de dates sur l'export exhaustif [PR 4344](https://github.com/MTES-MCT/trackdechets/pull/4344)
 - Ajout du chemin manquant sur erreur d'import registre [PR 4347](https://github.com/MTES-MCT/trackdechets/pull/4347)
+- Résolution d'une erreur à la récupération d'une BsdaRevisionRequest fraîchemnt supprimée [PR 4351](https://github.com/MTES-MCT/trackdechets/pull/4351)
 
 # [2025.07.2] 29/07/2025
 
