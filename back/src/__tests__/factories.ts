@@ -352,7 +352,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   },
   wasteAcceptationStatus: null,
   wasteDetailsCode: "05 01 04*",
-  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsConsistence: ["SOLID"] as Consistence[],
   wasteDetailsIsDangerous: true,
   wasteDetailsName: "Divers",
   wasteDetailsOnuCode: "2003",
@@ -387,7 +387,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsQuantity: 1,
-  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsConsistence: ["SOLID"] as Consistence[],
   wasteDetailsQuantityType: "ESTIMATED",
   transporters: {
     create: { ...bsddTransporterData, number: 1 }

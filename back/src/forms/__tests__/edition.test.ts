@@ -78,13 +78,15 @@ describe("edition", () => {
       numberOfPackages: 1,
       quantity: 1,
       quantityType: "REAL",
-      consistence: "SOLID",
+      consistence: ["SOLID"],
       pop: false,
       isDangerous: true,
       parcelNumbers: [],
       analysisReferences: [],
       landIdentifiers: [],
-      sampleNumber: ""
+      sampleNumber: "",
+      isSubjectToADR: false,
+      nonRoadRegulationMention: ""
     };
 
     const trader: Required<TraderInput> = {
@@ -128,7 +130,8 @@ describe("edition", () => {
       ecoOrganisme,
       temporaryStorageDetail,
       intermediaries: [],
-      transporters: []
+      transporters: [],
+      isDirectSupply: false
     };
     const flatInput = flattenFormInput(input);
     for (const key of Object.keys(flatInput)) {

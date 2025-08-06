@@ -971,9 +971,15 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
     wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
-    wasteDetailsConsistence: yup
-      .mixed<Consistence>()
-      .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
+    wasteDetailsConsistence: (isDraft
+      ? yup
+          .array()
+          .of(yup.mixed<Consistence>().oneOf(Object.values(Consistence)))
+          .nullable()
+      : yup
+          .array()
+          .of(yup.mixed<Consistence>().oneOf(Object.values(Consistence)))
+          .min(1, "Au moins une consistance doit être sélectionnée")) as any,
     wasteDetailsPackagingInfos: yup
       .array()
       .of(packagingInfoFn({ isDraft }) as any)

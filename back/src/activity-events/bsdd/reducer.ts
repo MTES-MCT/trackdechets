@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Consistence, Form, Prisma } from "@prisma/client";
 import { BsddEvent } from "./types";
 import { Decimal } from "decimal.js";
 
@@ -17,6 +17,7 @@ export function bsddReducer(
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
+        wasteDetailsConsistence,
         intermediaries,
         recipientsSirets,
         transportersSirets,
@@ -52,6 +53,11 @@ export function bsddReducer(
                 wasteDetailsLandIdentifiers as string[]
             }
           : {}),
+        ...(wasteDetailsConsistence
+          ? {
+              wasteDetailsConsistence: wasteDetailsConsistence as Consistence[]
+            }
+          : {}),
         ...dateConverter({}, bsdd),
         ...decimalConverter({}, bsdd)
       };
@@ -67,6 +73,7 @@ export function bsddReducer(
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
+        wasteDetailsConsistence,
         intermediaries,
         recipientsSirets,
         transportersSirets,
@@ -100,6 +107,11 @@ export function bsddReducer(
           ? {
               wasteDetailsLandIdentifiers:
                 wasteDetailsLandIdentifiers as string[]
+            }
+          : {}),
+        ...(wasteDetailsConsistence
+          ? {
+              wasteDetailsConsistence: wasteDetailsConsistence as Consistence[]
             }
           : {}),
         ...dateConverter(currentState, event.data.content as any),

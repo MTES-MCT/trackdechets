@@ -541,7 +541,7 @@ describe("sirenifyFormCreateInput", () => {
       wasteDetailsAnalysisReferences: [],
       wasteDetailsLandIdentifiers: [],
       wasteDetailsName: "",
-      wasteDetailsConsistence: "SOLID",
+      wasteDetailsConsistence: ["SOLID"],
       wasteDetailsSampleNumber: "",
       traderCompanyName: trader.company.name,
       traderCompanySiret: trader.company.siret,

@@ -41,7 +41,6 @@ import {
 import routes from "../../../Apps/routes";
 
 import {
-  getVerboseConsistence,
   getVerboseAcceptationStatus,
   getVerboseQuantityType
 } from "../common/utils";
@@ -79,6 +78,7 @@ import { isDefined } from "../../../common/helper";
 import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../Apps/common/utils/citerneBsddSummary";
 import { useMyCompany } from "../../../Apps/common/hooks/useMyCompany";
+import { getConsistenceLabel } from "../../../Apps/common/consistenceLabel";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -813,7 +813,7 @@ export default function BSDDetailContent({
                 />
               )}
               <dt>Consistance</dt>{" "}
-              <dd>{getVerboseConsistence(form.wasteDetails?.consistence)}</dd>
+              <dd>{getConsistenceLabel(form.wasteDetails?.consistence)}</dd>
               <DetailRow
                 value={form.wasteDetails?.parcelNumbers
                   ?.map(
