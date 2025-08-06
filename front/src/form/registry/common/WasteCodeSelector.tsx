@@ -231,11 +231,6 @@ export function WasteCodeSelector({
           </div>
         </div>
       )}
-      {displayDescription && !multiple && description && (
-        <div className="fr-col-md-12">
-          <Alert description={capitalize(description)} severity="info" small />
-        </div>
-      )}
     </>
   );
 
@@ -288,6 +283,11 @@ export function WasteCodeSelector({
           </div>
         )}
       </ComboBox>
+      {displayDescription && !multiple && description && (
+        <div className="fr-col-12">
+          <Alert description={capitalize(description)} severity="info" small />
+        </div>
+      )}
     </>
   );
 }
