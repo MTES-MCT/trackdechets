@@ -19,10 +19,12 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   content: parent => {
     return expandBsdaRevisionRequestContent(parent as any);
   },
-  authoringCompany: async parent => {
-    const authoringCompany = await prisma.bsdaRevisionRequest
-      .findUnique({ where: { id: parent.id } })
-      .authoringCompany();
+  authoringCompany: async (
+    parent: BsdaRevisionRequest & PrismaBsdaRevisionRequest
+  ) => {
+    const authoringCompany = await prisma.company.findUnique({
+      where: { id: parent.authoringCompanyId }
+    });
 
     if (!authoringCompany) {
       throw new Error(
