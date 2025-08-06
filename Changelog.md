@@ -21,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la colonne Fichier d'analyse chimique à l'export registre [PR 4342](https://github.com/MTES-MCT/trackdechets/pull/4342)
+- Permettre de sélectionner jusqu'à 4 consistances sur un BSDD [PR 4349](https://github.com/MTES-MCT/trackdechets/pull/4349)
 
 # [2025.07.2] 29/07/2025
 
