@@ -56,21 +56,54 @@ export function FormBuilder({
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
   const reason = methods.watch("reason");
+
   const scrollToTop = () => {
     const element = document.getElementById("formBuilder");
     if (element) {
       element.scroll({ top: 0 });
     }
   };
+
+  const scrollTabIntoView = (tabs, prevTabId, tabId) => {
+    const prevTabIndex = tabs.findIndex(tab => tab.tabId === prevTabId);
+    const tabIndex = tabs.findIndex(tab => tab.tabId === tabId);
+
+    const maxTabIndex = tabs.length - 1;
+    const forwardMoveIndex =
+      tabIndex + 1 > maxTabIndex ? maxTabIndex : tabIndex + 1;
+    const backwardMoveIndex = tabIndex - 1 < 0 ? 0 : tabIndex - 1;
+
+    // we want to scroll to the tab + or - 1 depending on the direction of the change
+    const futureTabIndex =
+      tabIndex > prevTabIndex ? forwardMoveIndex : backwardMoveIndex;
+
+    const tabElements = document
+      .getElementById("formBuilder")
+      ?.querySelectorAll("[class^='fr-tabs__tab']");
+    if (tabElements && tabElements[futureTabIndex]) {
+      const elementToScroll = tabElements[futureTabIndex].parentElement;
+
+      elementToScroll?.scrollIntoView({
+        behavior: "smooth",
+        inline: "nearest"
+      });
+    }
+  };
+
   const onTabChange = (tabId: string) => {
+    scrollTabIntoView(shapeWithState, selectedTabId, tabId);
     setSelectedTabId(tabId);
     scrollToTop();
   };
   const onPrevTab = () => {
-    setSelectedTabId(getPrevTab(tabIds, selectedTabId));
+    const prevTabId = getPrevTab(tabIds, selectedTabId);
+    scrollTabIntoView(shapeWithState, selectedTabId, prevTabId);
+    setSelectedTabId(prevTabId);
     scrollToTop();
   };
   const onNextTab = () => {
+    const nextTabId = getNextTab(tabIds, selectedTabId);
+    scrollTabIntoView(shapeWithState, selectedTabId, nextTabId);
     setSelectedTabId(getNextTab(tabIds, selectedTabId));
     scrollToTop();
   };
