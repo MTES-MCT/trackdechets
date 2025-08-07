@@ -15,10 +15,11 @@ interface BSDAPreviewEmitterProps {
 }
 const BSDAPreviewEmitter = ({ bsd }: BSDAPreviewEmitterProps) => {
   const hasPickupSite = !!bsd.emitter?.pickupSite;
+  const isPrivateIndividual = !!bsd.emitter?.isPrivateIndividual;
 
   return (
     <PreviewContainer>
-      {bsd.emitter?.isPrivateIndividual && (
+      {isPrivateIndividual && (
         <Alert
           description="Le MOA ou le détenteur est un particulier"
           severity="info"
@@ -29,7 +30,7 @@ const BSDAPreviewEmitter = ({ bsd }: BSDAPreviewEmitterProps) => {
 
       <PreviewContainerRow>
         <PreviewContainerCol gridWidth={3}>
-          {bsd.emitter?.isPrivateIndividual ? (
+          {isPrivateIndividual ? (
             <PreviewTextRow
               label="Nom et prénom"
               value={bsd.emitter?.company?.name}
@@ -57,7 +58,7 @@ const BSDAPreviewEmitter = ({ bsd }: BSDAPreviewEmitterProps) => {
         <PreviewContainerCol gridWidth={6}>
           <PreviewCompanyContact
             company={bsd.emitter?.company}
-            omitContact={!!bsd.emitter?.isPrivateIndividual}
+            omitContact={isPrivateIndividual}
           />
         </PreviewContainerCol>
 
@@ -74,7 +75,13 @@ const BSDAPreviewEmitter = ({ bsd }: BSDAPreviewEmitterProps) => {
 
           <PreviewTextRow
             label="Signature de l'émetteur"
-            value={!bsd.emitter?.company?.siret ? "Oui" : "Non"}
+            value={
+              isPrivateIndividual
+                ? "Non"
+                : bsd.emitter?.emission?.signature?.date
+                ? "Oui"
+                : "-"
+            }
           />
         </PreviewContainerCol>
       </PreviewContainerRow>
