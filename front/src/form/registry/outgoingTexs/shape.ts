@@ -133,7 +133,7 @@ export const outgoingTexsFormShape: FormShape = [
           dispatchDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-md-4" }
+        style: { className: "fr-col-8 fr-col-md-4" }
       },
       {
         Component: WeightSelector,

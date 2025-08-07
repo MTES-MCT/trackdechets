@@ -178,7 +178,7 @@ export const outgoingWasteFormShape: FormShape = [
           dispatchDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-10 fr-col-md-4" }
+        style: { className: "fr-col-8 fr-col-md-4" }
       },
       {
         Component: Address,

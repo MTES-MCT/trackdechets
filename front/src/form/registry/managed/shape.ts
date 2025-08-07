@@ -79,7 +79,7 @@ export const managedFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-md-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -128,7 +128,7 @@ export const managedFormShape: FormShape = [
               managingStartDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-md-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           },
           {
             name: "managingEndDate",
@@ -139,7 +139,7 @@ export const managedFormShape: FormShape = [
               managingEndDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-md-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           }
         ]
       },

@@ -81,7 +81,7 @@ export const incomingWasteFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10 fr-col-md-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -92,7 +92,7 @@ export const incomingWasteFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10 fr-col-md-4" }
+        style: { className: "fr-col-12 fr-col-md-4" }
       },
       {
         name: "wastePop",

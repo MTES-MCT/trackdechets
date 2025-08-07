@@ -148,7 +148,7 @@ export const transportedFormShape: FormShape = [
               collectionDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-md-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           },
           {
             name: "unloadingDate",
@@ -159,7 +159,7 @@ export const transportedFormShape: FormShape = [
               unloadingDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-md-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           }
         ]
       },
@@ -435,7 +435,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportAdr: optionalString
         },
         type: "text",
-        style: { className: "fr-col-md-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         name: "reportForTransportOtherTmdCode",
@@ -446,7 +446,7 @@ export const transportedFormShape: FormShape = [
           reportForTransportOtherTmdCode: optionalString
         },
         type: "text",
-        style: { className: "fr-col-md-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         Component: TransporterTags,

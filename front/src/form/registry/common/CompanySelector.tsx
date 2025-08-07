@@ -80,7 +80,7 @@ export function CompanySelector({
   return (
     <div className="fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-md-8 fr-mb-2w">
+        <div className="fr-col-12 fr-col-md-8 fr-mb-2w">
           <Select
             label={`${capitalize(label)}${required ? "" : " (optionnel)"}`}
             nativeSelectProps={{
@@ -130,7 +130,7 @@ export function CompanySelector({
         components.address) && (
         <div className="fr-grid-row fr-grid-row--gutters">
           {components.orgId && (
-            <div className="fr-col-md-8">
+            <div className="fr-col-12 fr-col-md-8">
               <Input
                 label={
                   companyType === "PERSONNE_PHYSIQUE"
