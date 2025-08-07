@@ -15,8 +15,24 @@ import { toCamelCaseVarName } from "../../../Apps/utils/utils";
 import { isDefined } from "../../../common/helper";
 import { QUANTITY_NON_RENSEIGNE } from "../../../Apps/common/wordings/dashboard/wordingsDashboard";
 import Tooltip from "../../../Apps/common/Components/Tooltip/Tooltip";
+import { FormCompany } from "@td/codegen-ui";
 import { transportModeLabels } from "../../constants";
-import { Company } from "../bsda/BsdaDetailContent";
+
+type CompanyProps = {
+  company?: FormCompany | null;
+  label: string;
+};
+export const Company = ({ company, label }: CompanyProps) => (
+  <>
+    <dt>{label}</dt> <dd>{company?.name}</dd>
+    <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
+    <dt>Adresse</dt> <dd>{company?.address}</dd>
+    <dt>Tél</dt> <dd>{company?.phone}</dd>
+    <dt>Mél</dt> <dd>{company?.mail}</dd>
+    <dt>Contact</dt> <dd>{company?.contact}</dd>
+  </>
+);
 
 const nbsp = "\u00A0";
 export const DetailRow = ({
