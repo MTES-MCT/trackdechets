@@ -282,7 +282,7 @@ export function MyLines() {
           </div>
         )}
         <div className="fr-grid-row fr-grid-row--bottom fr-mb-4w">
-          <div className="fr-col-7">
+          <div className="fr-col-md-7">
             <RegistryCompanySwitcher
               wrapperClassName={""}
               onCompanySelect={v => setSiret(v)}
@@ -291,7 +291,7 @@ export function MyLines() {
         </div>
 
         <div className="fr-grid-row fr-grid-row--bottom fr-mb-2w">
-          <div className="fr-col-7">
+          <div className="fr-col-md-7 fr-mr-3w">
             <Select
               label="Type de déclaration"
               nativeSelectProps={{
@@ -325,7 +325,7 @@ export function MyLines() {
               </option>
             </Select>
           </div>
-          <div className="fr-col-3 fr-ml-3w">
+          <div className="fr-col-md-3 fr-mt-2w">
             <Input
               label="Numéro unique"
               nativeInputProps={{

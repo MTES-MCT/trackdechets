@@ -1,0 +1,26 @@
+@import "../../../scss/Breakpoints.scss";
+
+.search-btn-lbl {
+  @include tablet {
+    left: 65% !important;
+    margin-left: 25px;
+  }
+  @include desktop {
+    margin-left: -5px;
+  }
+}
+
+.search-btn {
+  @include tablet {
+    left: 35% !important;
+    margin-left: -5px;
+  }
+}
+
+.label-opt {
+  @include desktop {
+    .fr-label {
+      width: 300px;
+    }
+  }
+}

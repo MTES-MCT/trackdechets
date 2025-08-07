@@ -86,7 +86,7 @@ export function TexsAnalysisFile({ methods, disabled }: Props) {
 
       {fileId ? (
         <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-4">
+          <div className="fr-col-md-4">
             <Download
               details="PDF"
               label={displayName}
@@ -96,7 +96,7 @@ export function TexsAnalysisFile({ methods, disabled }: Props) {
               }}
             />
           </div>
-          <div className="fr-col-4">
+          <div className="fr-col-md-4">
             <Button
               onClick={() => methods.setValue("texsAnalysisFileId", null)}
               priority="secondary"
@@ -109,7 +109,7 @@ export function TexsAnalysisFile({ methods, disabled }: Props) {
       ) : (
         <>
           <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12 fr-mb-2w">
+            <div className="fr-col-md-12 fr-mb-2w">
               <Upload
                 label="Fichier d'analyse (optionnel)"
                 hint="Fichier PDF des analyses"
@@ -178,7 +178,7 @@ export function TexsAnalysisFile({ methods, disabled }: Props) {
           </div>
 
           <div className="fr-grid-row fr-grid-row--gutters">
-            <div className="fr-col-12 fr-mb-2w">
+            <div className="fr-col-md-12 fr-mb-2w">
               <Alert
                 description="Joindre un PDF ou renseigner le n° DAP, si les analyses sont disponibles."
                 severity="info"

@@ -125,7 +125,7 @@ export function InlineOperation({
         }
       >
         <div className={"fr-grid-row fr-grid-row--gutters"}>
-          <div className={"fr-col-4"} key={"operationCode"}>
+          <div className={"fr-col-md-4"} key={"operationCode"}>
             <Select
               label={
                 isPlannedOperation
@@ -150,7 +150,7 @@ export function InlineOperation({
               ))}
             </Select>
           </div>
-          <div className={"fr-col-4"}>
+          <div className={"fr-col-md-4"} style={{ width: "100%" }}>
             <Select
               label={
                 isPlannedOperation
@@ -215,7 +215,7 @@ export function InlineOperation({
       )}
       {showNextOperationCode && (
         <div className={"fr-grid-row fr-grid-row--gutters"}>
-          <div className={"fr-col-4"} key={"nextOperationCode"}>
+          <div className={"fr-col-md-4"} key={"nextOperationCode"}>
             <Select
               label={"Code de traitement ultérieur prévu"}
               nativeSelectProps={{

@@ -85,7 +85,7 @@ export function OptionalCompanySelector({
       )}
       {isCompanyEnabled && companyStatusDiffusion === "P" && (
         <div className="fr-grid-row fr-grid-row--gutters">
-          <div className="fr-col-8">
+          <div className="fr-col-md-8">
             <Input
               label="Raison sociale"
               nativeInputProps={{
@@ -111,7 +111,7 @@ export function OptionalCompanySelector({
       )}
       {recepisseName && isCompanyEnabled && (
         <div className={"fr-grid-row fr-grid-row--gutters fr-mb-2w"}>
-          <div className={"fr-col-8"}>
+          <div className={"fr-col-md-8"}>
             <Input
               label={"Numéro de récépissé"}
               disabled={disabled}

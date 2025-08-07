@@ -7,6 +7,8 @@ import { formatError } from "../builder/error";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { ALL_WASTES } from "@td/constants";
 import { capitalize } from "../../../common/helper";
+import { useMedia } from "../../../common/use-media";
+import { MEDIA_QUERIES } from "../../../common/config";
 
 type Props = {
   name: string;
@@ -51,6 +53,8 @@ export function SecondaryWasteCodes({ methods }: Props) {
   }, [codeFields, addLine]);
 
   const { errors } = methods.formState;
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
   return (
     <div className="fr-col">
       {codeFields.map(({ id }, index) => {
@@ -61,56 +65,82 @@ export function SecondaryWasteCodes({ methods }: Props) {
         )?.description;
         return (
           <div
-            className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom tw-relative"
-            style={{
-              alignItems: "flex-start"
-            }}
+            className="fr-grid-row fr-grid-row--gutters fr-grid-row--top fr-mt-2w"
             ref={containerRef}
             key={index}
           >
-            <WasteCodeSelector
-              methods={methods}
-              key={id}
-              name={`secondaryWasteCodes.${index}.value`}
-              label="Code déchet secondaire (optionnel)"
-              containerRef={containerRef}
-              displayDescription={false}
-            />
-            <div className="fr-col-4">
-              <Input
-                label="Dénomination secondaire"
-                key={descriptionFields[index].id}
-                nativeInputProps={{
-                  type: "text",
-                  ...methods.register(
-                    `secondaryWasteDescriptions.${index}.value`
-                  )
-                }}
-                state={errors?.secondaryWasteDescriptions?.[index] && "error"}
-                stateRelatedMessage={formatError(
-                  errors?.secondaryWasteDescriptions?.[index]?.value
-                )}
+            <div
+              className={
+                !isMobile
+                  ? "fr-grid-row fr-grid-row--gutters fr-grid-row--top"
+                  : ""
+              }
+              style={
+                isMobile
+                  ? {
+                      position: "relative",
+                      padding: "0 .5rem",
+                      width: "100%"
+                    }
+                  : { padding: ".5rem" }
+              }
+            >
+              <WasteCodeSelector
+                methods={methods}
+                key={id}
+                name={`secondaryWasteCodes.${index}.value`}
+                label="Code déchet secondaire (optionnel)"
+                containerRef={containerRef}
+                displayDescription={false}
               />
             </div>
-
-            <div className="fr-col-2" style={{ paddingTop: "36px" }}>
-              <Button
-                className="fr-mr-1w"
-                nativeButtonProps={{ type: "button" }}
-                iconId="fr-icon-add-line"
-                onClick={addLine}
-                title="Label button"
-              />
-              <Button
-                className="fr-mt-1w"
-                nativeButtonProps={{ type: "button" }}
-                iconId="fr-icon-delete-line"
-                onClick={() => removeLine(index)}
-                title="Label button"
-              />
+            <div
+              className="fr-grid-row fr-grid-row--bottom fr-mt-2w"
+              style={
+                isMobile
+                  ? {
+                      padding: " .5rem",
+                      width: "100%"
+                    }
+                  : { width: "45%" }
+              }
+            >
+              <div className="fr-col-7 fr-col-md-8">
+                <Input
+                  label="Dénomination secondaire"
+                  key={descriptionFields[index].id}
+                  nativeInputProps={{
+                    type: "text",
+                    ...methods.register(
+                      `secondaryWasteDescriptions.${index}.value`
+                    )
+                  }}
+                  state={errors?.secondaryWasteDescriptions?.[index] && "error"}
+                  stateRelatedMessage={formatError(
+                    errors?.secondaryWasteDescriptions?.[index]?.value
+                  )}
+                />
+              </div>
+              <div className="fr-col-md-4">
+                <Button
+                  className="fr-ml-4w"
+                  nativeButtonProps={{ type: "button" }}
+                  iconId="fr-icon-add-line"
+                  onClick={addLine}
+                  title="Label button"
+                />
+                <Button
+                  className="fr-mt-1w"
+                  style={{ marginLeft: "3px" }}
+                  nativeButtonProps={{ type: "button" }}
+                  iconId="fr-icon-delete-line"
+                  onClick={() => removeLine(index)}
+                  title="Label button"
+                />
+              </div>
             </div>
             {description && (
-              <div className="fr-col-12">
+              <div className="fr-col-md-12">
                 <Alert
                   description={capitalize(description)}
                   severity="info"
@@ -123,7 +153,7 @@ export function SecondaryWasteCodes({ methods }: Props) {
       })}
       {errors?.secondaryWasteCodes &&
         !Array.isArray(errors?.secondaryWasteCodes) && (
-          <div className="fr-col-12 fr-mt-2w">
+          <div className="fr-col-md-12 fr-mt-2w">
             <Alert
               description={formatError(errors.secondaryWasteCodes)}
               severity="error"
