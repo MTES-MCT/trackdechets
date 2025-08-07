@@ -112,6 +112,8 @@ jobs:
 
 
 env:
+  ENV_NAME: local
+
   # API
   API_HOST: api.trackdechets.local
   API_PORT: 4000
