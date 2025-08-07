@@ -514,6 +514,12 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   },
   previousPackagings: {
     sealed: { from: "EMISSION" }
+  },
+  ficheInterventions: {
+    sealed: {
+      from: "EMISSION"
+    },
+    readableFieldName: "Les fiches d'intervention associées au contenant"
   }
 };
 

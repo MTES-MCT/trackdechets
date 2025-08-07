@@ -525,7 +525,8 @@ describe("Mutation.createDraftBsff", () => {
         }
       );
 
-      const { id, previousPackagings, ...packagingData } = bsff.packagings[0];
+      const { id, previousPackagings, ficheInterventions, ...packagingData } =
+        bsff.packagings[0];
       await prisma.bsffPackaging.create({
         data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
       });
@@ -533,7 +534,9 @@ describe("Mutation.createDraftBsff", () => {
       bsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: {
-          packagings: { include: { previousPackagings: true } },
+          packagings: {
+            include: { previousPackagings: true, ficheInterventions: true }
+          },
           transporters: true,
           ficheInterventions: true
         }
@@ -978,7 +981,11 @@ describe("Mutation.createDraftBsff", () => {
       const operateurCompany1 = await companyFactory();
       const operateurCompany2 = await companyFactory();
       for (const company of [operateurCompany1, operateurCompany2]) {
-        await associateUserToCompany(operateurUser.id, company.siret, "MEMBER");
+        await associateUserToCompany(
+          operateurUser.id,
+          company.siret ?? "",
+          "MEMBER"
+        );
       }
       const ficheIntervention = await createFicheIntervention({
         operateur: { user: operateurUser, company: operateurCompany1 },
