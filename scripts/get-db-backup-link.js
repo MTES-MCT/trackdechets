@@ -11,7 +11,7 @@ const SCALINGO_API_URL = "api.osc-secnum-fr1.scalingo.com";
 const SCALINGO_DB_API_URL = "db-api.osc-secnum-fr1.scalingo.com";
 const APP_NAME = {
   sandbox: "trackdechets-sandbox-api",
-  production: "trackdechets-api"
+  production: "trackdechets-production-api"
 };
 
 async function run() {
