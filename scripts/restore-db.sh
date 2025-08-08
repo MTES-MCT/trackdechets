@@ -24,7 +24,7 @@ if [ "$downloadBackup" != "${downloadBackup#[Yy]}" ]; then
     backupTarName="db_backup.tar.gz"
     backupTarPath="$BASEDIR/$backupTarName"
 
-    node ./get-db-backup-link.js | xargs wget -O "$backupTarPath"
+    node ./get-db-backup-link.js sandbox | xargs wget -O "$backupTarPath"
     tar xvf "$backupTarPath"
     for name in *pgsql
     do
