@@ -9,9 +9,24 @@ const fs = require("fs");
 
 const SCALINGO_API_URL = "api.osc-secnum-fr1.scalingo.com";
 const SCALINGO_DB_API_URL = "db-api.osc-secnum-fr1.scalingo.com";
-const APP_NAME = "trackdechets-sandbox-api";
+const APP_NAME = {
+  sandbox: "trackdechets-sandbox-api",
+  production: "trackdechets-api"
+};
 
 async function run() {
+  // Get environment parameter from command line
+  const environment = process.argv[2];
+
+  if (!environment || !["sandbox", "production"].includes(environment)) {
+    console.error("Usage: node get-db-backup-link.js <sandbox|production>");
+    process.exit(1);
+  }
+
+  const appName = APP_NAME[environment];
+  // Optional: log to stderr so it doesn't interfere with the URL output
+  // console.error(`Getting backup for ${environment} environment: ${appName}`);
+
   const { SCALINGO_TOKEN } = await loadEnv();
 
   if (!SCALINGO_TOKEN) {
@@ -20,20 +35,21 @@ async function run() {
 
   const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
 
-  const { addons } = await listAddons(bearerToken);
+  const { addons } = await listAddons(bearerToken, appName);
 
   const postgres = addons.find(
     addon => addon.addon_provider.id === "postgresql"
   );
 
-  const addonToken = (await getAddonToken(bearerToken, postgres.id)).addon
-    .token;
+  const addonToken = (await getAddonToken(bearerToken, postgres.id, appName))
+    .addon.token;
 
   const { database_backups } = await listBackups(postgres.id, addonToken);
 
-  const sortedBackups = database_backups.sort((a, b) =>
-    b.created_at.localeCompare(a.created_at)
-  );
+  const sortedBackups = database_backups
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .filter(backup => backup.status === "done");
+
   const { download_url } = await getBackupDownloadLink(
     postgres,
     sortedBackups[0],
@@ -57,11 +73,11 @@ function getBearerToken(scalingoToken) {
   return fetch(options);
 }
 
-function listAddons(bearerToken) {
+function listAddons(bearerToken, appName) {
   const options = {
     hostname: SCALINGO_API_URL,
     port: 443,
-    path: `/v1/apps/${APP_NAME}/addons`,
+    path: `/v1/apps/${appName}/addons`,
     method: "GET",
     headers: {
       Authorization: `Bearer ${bearerToken}`
@@ -71,11 +87,11 @@ function listAddons(bearerToken) {
   return fetch(options);
 }
 
-function getAddonToken(bearerToken, addonId) {
+function getAddonToken(bearerToken, addonId, appName) {
   const options = {
     hostname: SCALINGO_API_URL,
     port: 443,
-    path: `/v1/apps/${APP_NAME}/addons/${addonId}/token`,
+    path: `/v1/apps/${appName}/addons/${addonId}/token`,
     method: "POST",
     headers: {
       Authorization: `Bearer ${bearerToken}`
