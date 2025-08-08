@@ -85,9 +85,13 @@ rm $backupTarPath
 echo "${bold}→ Recreating DB ${green}prisma${reset}"
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS prisma;"
 sudo -u postgres psql -c "CREATE DATABASE prisma;"
-# Grant database privileges to trackdechets_user
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE prisma TO trackdechets_user;"
 echo "${bold}→ Restoring dump${reset}"
 echo "the progress bar is not representative of the whole process, don't panic if it keeps going after it reaches 100%"
-pv "/root/backup/$backupName" | pg_restore -h localhost -U trackdechets_user -d prisma -w --no-owner --no-privileges --clean --if-exists
+pv "/root/backup/$backupName" | sudo -u postgres pg_restore -d prisma --no-owner --no-privileges --clean --if-exists
 rm "/root/backup/$backupName"
+
+echo "${bold}${green}→ Database restore complete! You can now run:${reset}"
+echo "${bold}${green}cd /root/trackdechets${reset}"
+echo "${bold}${green}npx prisma migrate dev${reset}"
+echo "${bold}${green}# or${reset}"
+echo "${bold}${green}npx nx run @td/scripts:migrate${reset}"
