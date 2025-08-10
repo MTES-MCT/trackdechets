@@ -4,6 +4,11 @@
 imageid="ubuntu_noble"
 sandbox_volume_size="40GB"
 prod_volume_size="400GB"
+sandbox_instance_size="DEV1-L"
+prod_instance_size="DEV1-L"
+sandbox_volume_snapshot_id="3b722897-4168-4506-8f5f-58122808827e"
+production_volume_snapshot_id_full="c7b9d22c-1a01-4b18-b6be-4f92002001ea"
+production_volume_snapshot_id_empty="32d527a7-b567-4948-9b9d-58c7e16006d0"
 project_id=$(grep "SCALEWAY_RESTORE_PROJECT_ID=" ../../.env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 
 bold=$(tput bold)
@@ -14,7 +19,7 @@ red=$(tput setaf 9)
 # 1. Create the instance
 
 echo "${bold}→ Do you want to create a sandbox or prod testing instance, or delete an existing one?${reset}"
-options=("Sandbox" "Production" "Delete" "Cancel")
+options=("Sandbox" "Production (full db, backup from 07/08/25)" "Production (empty)" "Delete" "Cancel")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -22,12 +27,24 @@ do
             echo "Creating sandbox instance..."
             instance_type="sandbox"
             volume_size=$sandbox_volume_size
+            instance_size=$sandbox_instance_size
+            volume_snapshot_id=$sandbox_volume_snapshot_id
             break
             ;;
-        "Production")
+        "Production (full db, backup from 07/08/25)")
             echo "Creating production instance..."
             instance_type="production"
             volume_size=$prod_volume_size
+            instance_size=$prod_instance_size
+            volume_snapshot_id=$production_volume_snapshot_id_full
+            break
+            ;;
+        "Production (empty)")
+            echo "Creating production instance..."
+            instance_type="production"
+            volume_size=$prod_volume_size
+            instance_size=$prod_instance_size
+            volume_snapshot_id=$production_volume_snapshot_id_empty
             break
             ;;
         "Delete")
@@ -106,7 +123,7 @@ if [ "$instance_type" == "delete" ]; then
 fi
 
 
-output=$(scw instance server create type=DEV1-L image=$imageid zone=fr-par-1 name=td-restore root-volume=block:$volume_size)
+output=$(scw instance server create type=$instance_size image=$imageid zone=fr-par-1 name=td-restore root-volume=block:$volume_snapshot_id)
 
 # Extract both values
 instance_id=$(echo "$output" | grep "^ID" | awk '{print $2}')
@@ -121,4 +138,6 @@ scw instance server wait $instance_id
 echo "${bold}→ Server ready, SSH into it${reset}"
 
 echo "${bold}→ SSH into it${reset}"
+echo "if you get a fingerprint error, run this : ssh-keygen -R $ip_address"
 echo "ssh root@$ip_address"
+echo "${bold}${red}→ Remember to delete the instance after you're done${reset}"
