@@ -183,6 +183,4 @@ const transformedManagedSchema = z.object({
   reportForCompanyName: z.coerce.string().default("")
 });
 
-export const managedSchema = inputManagedSchema.merge(
-  transformedManagedSchema
-);
+export const managedSchema = inputManagedSchema.merge(transformedManagedSchema);
