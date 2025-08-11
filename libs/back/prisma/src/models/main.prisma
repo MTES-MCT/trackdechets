@@ -1,13 +1,3 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["metrics", "prismaSchemaFolder"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 enum CompanyType {
   PRODUCER
   COLLECTOR
