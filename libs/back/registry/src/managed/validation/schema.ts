@@ -170,11 +170,12 @@ const inputManagedSchema = z.object({
   transporter5CompanyAddress: actorAddressSchema.nullish(),
   transporter5CompanyPostalCode: actorPostalCodeSchema.nullish(),
   transporter5CompanyCity: actorCitySchema.nullish(),
-  transporter5CompanyCountryCode: actorCountryCodeSchema.nullish()
+  transporter5CompanyCountryCode: actorCountryCodeSchema.nullish(),
+  texsAnalysisFileId: z.string().nullish()
 });
 
 // Props added through transform
-const transformedManagedïSchema = z.object({
+const transformedManagedSchema = z.object({
   id: z.string().optional(),
   reportForCompanyAddress: z.string().default(""),
   reportForCompanyCity: z.string().default(""),
@@ -183,5 +184,5 @@ const transformedManagedïSchema = z.object({
 });
 
 export const managedSchema = inputManagedSchema.merge(
-  transformedManagedïSchema
+  transformedManagedSchema
 );

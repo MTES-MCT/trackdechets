@@ -22,6 +22,7 @@ import { EcoOrganismes } from "../common/EcoOrganismes";
 import { ParcelsVisualizer } from "../common/ParcelsVisualizer/ParcelsVisualizer";
 import { Operation } from "../common/Operation";
 import { Labels, InfoLabels } from "../common/Labels";
+import { TexsAnalysisFile } from "../common/TexsAnalysisFile";
 
 export const managedFormShape: FormShape = [
   {
@@ -151,6 +152,14 @@ export const managedFormShape: FormShape = [
           weightValue: nonEmptyNumber,
           volume: optionalNumber,
           weightIsEstimate: booleanString
+        }
+      },
+      {
+        names: ["texsAnalysisFileId"],
+        shape: "custom",
+        Component: TexsAnalysisFile,
+        validation: {
+          texsAnalysisFileId: optionalString
         }
       },
       {

@@ -2655,4 +2655,9 @@ type ManagedLine {
   Pays du transporteur n°5
   """
   transporter5CompanyCountryCode: String
+
+   """
+  Fichiers d'analyse des terres excavées et sédiments
+  """
+  texsAnalysisFiles: [RegistryTexsAnalysisFile!]
 }
