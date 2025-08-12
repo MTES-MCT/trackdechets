@@ -61,7 +61,7 @@ describe("cancelAdministrativeTransfer", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: expect.stringContaining(
-          `An operation failed because it depends on one or more records that were required but not found. Expected a record, found none.`
+          `An operation failed because it depends on one or more records that were required but not found. No record was found for a query.`
         )
       })
     ]);
