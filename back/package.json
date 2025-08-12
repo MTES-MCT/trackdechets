@@ -15,6 +15,6 @@
     "reindex-deleted-orphan-appendix1": "tsx --tsconfig tsconfig.lib.json ./src/scripts/bin/reindexDeletedOrphanAppendix1.ts"
   },
   "engines": {
-    "node": "^20"
+    "node": "^22"
   }
 }
