@@ -27,7 +27,10 @@ import {
   siretSchema,
   getOperationModeSchema
 } from "../../shared/schemas";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES, INCOMING_WASTE_WASTE_CODES } from "@td/constants";
+import {
+  INCOMING_WASTE_PROCESSING_OPERATIONS_CODES,
+  INCOMING_WASTE_WASTE_CODES
+} from "@td/constants";
 
 export type ParsedZodInputIncomingWasteItem = z.output<
   typeof inputIncomingWasteSchema
