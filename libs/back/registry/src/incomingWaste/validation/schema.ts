@@ -27,7 +27,7 @@ import {
   siretSchema,
   getOperationModeSchema
 } from "../../shared/schemas";
-import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES } from "@td/constants";
+import { INCOMING_WASTE_PROCESSING_OPERATIONS_CODES, INCOMING_WASTE_WASTE_CODES } from "@td/constants";
 
 export type ParsedZodInputIncomingWasteItem = z.output<
   typeof inputIncomingWasteSchema
@@ -39,7 +39,7 @@ const inputIncomingWasteSchema = z.object({
   publicId: publicIdSchema,
   reportAsCompanySiret: reportAsCompanySiretSchema,
   reportForCompanySiret: siretSchema,
-  wasteCode: getWasteCodeSchema(),
+  wasteCode: getWasteCodeSchema(INCOMING_WASTE_WASTE_CODES),
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
