@@ -147,7 +147,7 @@ describe("flattenFormInput", () => {
       wasteDetailsPackagingInfos: Prisma.JsonNull,
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null,
-      wasteDetailsConsistence: null,
+      wasteDetailsConsistence: [],
       wasteDetailsPop: false,
       wasteDetailsIsDangerous: false,
       wasteDetailsAnalysisReferences: [],
@@ -168,7 +168,7 @@ describe("flattenFormInput", () => {
     const flattened = flattenFormInput({ wasteDetails: null });
     expect(flattened).toEqual({
       wasteDetailsCode: null,
-      wasteDetailsConsistence: null,
+      wasteDetailsConsistence: [],
       wasteDetailsName: null,
       wasteDetailsOnuCode: null,
       wasteDetailsIsSubjectToADR: null,
