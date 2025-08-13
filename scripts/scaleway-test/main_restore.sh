@@ -135,9 +135,10 @@ echo "  IP: $ip_address"
 
 scw instance server wait $instance_id
 
-echo "${bold}→ Server ready, SSH into it${reset}"
+echo "${bold}→ Server ready${reset}"
 
 echo "${bold}→ SSH into it${reset}"
 echo "if you get a fingerprint error, run this : ssh-keygen -R $ip_address"
 echo "ssh root@$ip_address"
+echo "if you want to run an SSH tunnel to the database for a local client, run ssh -L 5433:127.0.0.1:5432 -N root@$ip_address"
 echo "${bold}${red}→ Remember to delete the instance after you're done${reset}"

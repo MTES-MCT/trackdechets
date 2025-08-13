@@ -35,7 +35,7 @@ npm i
 
 cd /root/
 
-echo "${bold}→ Do you want to test a sandbox or production deployment ?${reset}"
+echo "${bold}→ Do you want to test a sandbox or production deployment ? This will drop and re-create the database, so Cancel if you're using an already full snapshot.${reset}"
 options=("Sandbox" "Production" "Cancel")
 select opt in "${options[@]}"
 do
