@@ -648,7 +648,7 @@ export function ParcelsVisualizer({
               </div>
             )}
           </div>
-          <div className="fr-col-md-6">
+          <div className="fr-col-12 fr-col-md-6">
             <div id="parcels-map" className={styles.map}></div>
           </div>
         </div>
