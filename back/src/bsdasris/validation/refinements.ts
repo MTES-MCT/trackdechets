@@ -125,7 +125,7 @@ export const validateRecipientIsCollectorForGroupingCodes: (
           fatal: true,
           path: ["destination", "operation", "code"],
           message:
-            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement"
+            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement ou installations de collecte (Rubrique 2710)"
         });
       }
     }

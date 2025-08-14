@@ -356,15 +356,15 @@ describe("Mutation.createDraftBsdasri", () => {
     ["R12", undefined],
     ["D13", undefined]
   ])(
-    "should disallow R12 & D13 for non waste processor destination ",
+    "should disallow R12 & D13 for non collector or waste center destinations",
     async (code, mode) => {
-      // both R12 & D13 operation codes require the destination to be a COLLECTOR
+      // both R12 & D13 operation codes require the destination to be a COLLECTOR or WASTE_CENTER
 
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const destinationCompany = await companyFactory({
         companyTypes: {
-          set: [CompanyType.WASTE_CENTER]
+          set: [CompanyType.WASTEPROCESSOR]
         }
       });
       const { mutate } = makeClient(user);
@@ -406,14 +406,54 @@ describe("Mutation.createDraftBsdasri", () => {
   it.each([
     ["R12", undefined],
     ["D13", undefined]
-  ])("should allow R12 & D13 for waste processor ", async (code, mode) => {
-    // both R12 & D13 operation codes require the destination to be a COLLECTOR
+  ])("should allow R12 & D13 for collector", async (code, mode) => {
+    // both R12 & D13 operation codes require the destination to be a COLLECTOR or WASTE_CENTER
 
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const destinationCompany = await companyFactory({
       companyTypes: {
         set: [CompanyType.COLLECTOR]
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createDraftBsdasri">>(
+      CREATE_DRAFT_DASRI,
+      {
+        variables: {
+          input: {
+            emitter: {
+              company: {
+                siret: company.siret
+              }
+            },
+            destination: {
+              company: {
+                siret: destinationCompany.siret
+              },
+              operation: {
+                code,
+                mode
+              }
+            }
+          }
+        }
+      }
+    );
+
+    expect(data.createDraftBsdasri.isDraft).toBe(true);
+  });
+  it.each([
+    ["R12", undefined],
+    ["D13", undefined]
+  ])("should allow R12 & D13 for waste center", async (code, mode) => {
+    // both R12 & D13 operation codes require the destination to be a COLLECTOR or WASTE_CENTER
+
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const destinationCompany = await companyFactory({
+      companyTypes: {
+        set: [CompanyType.WASTE_CENTER]
       }
     });
     const { mutate } = makeClient(user);
