@@ -5649,6 +5649,10 @@ export const INCOMING_TEXS_WASTE_CODES: WasteCodeEnum = [
   "20 02 02"
 ];
 
+export const INCOMING_WASTE_WASTE_CODES = BSDD_WASTE_CODES_ENUM.filter(
+  code => !INCOMING_TEXS_WASTE_CODES.includes(code)
+) as unknown as WasteCodeEnum;
+
 function flatten(wastes: readonly WasteNode[]): WasteNode[] {
   return wastes
     .reduce(

@@ -1,3 +1,4 @@
+import { INCOMING_WASTE_WASTE_CODES } from "@td/constants";
 import { z } from "zod";
 import {
   reasonSchema,
@@ -51,7 +52,7 @@ const inputOutgoingWasteSchema = z.object({
   reportForPickupSiteCity: actorCitySchema.nullish(),
   reportForPickupSiteCountryCode: actorCountryCodeSchema.nullish(),
   wasteDescription: wasteDescriptionSchema,
-  wasteCode: getWasteCodeSchema(),
+  wasteCode: getWasteCodeSchema(INCOMING_WASTE_WASTE_CODES),
   wastePop: booleanSchema,
   wasteIsDangerous: booleanSchema.nullish(),
   wasteCodeBale: wasteCodeBaleSchema,
