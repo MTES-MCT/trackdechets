@@ -395,7 +395,7 @@ describe("Mutation.createDraftBsdasri", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement",
+            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement ou installations de collecte (Rubrique 2710)",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
