@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.08.1] 26/08/2025
 
+#### :nail_care: Améliorations
+
+- Autorisation pour les établissements Rubrique 2710 de sélectionner un code de traitement D13 ou R12 [PR 4359](https://github.com/MTES-MCT/trackdechets/pull/4359)
+
 #### :bug: Corrections de bugs
 
 - Résolution d'un problème de dates sur l'export exhaustif [PR 4344](https://github.com/MTES-MCT/trackdechets/pull/4344)
