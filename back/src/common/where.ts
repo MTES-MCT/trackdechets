@@ -371,7 +371,8 @@ export function toElasticStringListQuery(
 
 export function toElasticDateQuery(
   fieldName: string,
-  dateFilter: DateFilter | null | undefined
+  dateFilter: DateFilter | null | undefined,
+  rounding = true
 ): estypes.QueryContainer | undefined {
   if (!dateFilter) {
     return undefined;
@@ -405,16 +406,32 @@ export function toElasticDateQuery(
     range: {
       [fieldName]: {
         ...(dateFilter._gt
-          ? { gt: `${new Date(dateFilter._gt).getTime()}||/d` }
+          ? {
+              gt: `${new Date(dateFilter._gt).getTime()}${
+                rounding ? "||/d" : ""
+              }`
+            }
           : {}),
         ...(dateFilter._gte
-          ? { gte: `${new Date(dateFilter._gte).getTime()}||/d` }
+          ? {
+              gte: `${new Date(dateFilter._gte).getTime()}${
+                rounding ? "||/d" : ""
+              }`
+            }
           : {}),
         ...(dateFilter._lt
-          ? { lt: `${new Date(dateFilter._lt).getTime()}||/d` }
+          ? {
+              lt: `${new Date(dateFilter._lt).getTime()}${
+                rounding ? "||/d" : ""
+              }`
+            }
           : {}),
         ...(dateFilter._lte
-          ? { lte: `${new Date(dateFilter._lte).getTime()}||/d` }
+          ? {
+              lte: `${new Date(dateFilter._lte).getTime()}${
+                rounding ? "||/d" : ""
+              }`
+            }
           : {})
       }
     }
