@@ -10,7 +10,7 @@ import { getRegistryNameFromImportType } from "../../../dashboard/registry/share
 import { getTabsWithState } from "./error";
 import "./FormBuilder.scss";
 import { FormTab } from "./FormTab";
-import type { FormShape } from "./types";
+import type { FormShape, FormShapeWithState } from "./types";
 
 type Props = {
   registryType: RegistryImportType;
@@ -64,7 +64,11 @@ export function FormBuilder({
     }
   };
 
-  const scrollTabIntoView = (tabs, prevTabId, tabId) => {
+  const scrollTabIntoView = (
+    tabs: FormShapeWithState,
+    prevTabId: string,
+    tabId: string
+  ) => {
     const prevTabIndex = tabs.findIndex(tab => tab.tabId === prevTabId);
     const tabIndex = tabs.findIndex(tab => tab.tabId === tabId);
 
@@ -85,7 +89,8 @@ export function FormBuilder({
 
       elementToScroll?.scrollIntoView({
         behavior: "smooth",
-        inline: "nearest"
+        inline: "nearest",
+        block: "nearest"
       });
     }
   };
