@@ -816,7 +816,8 @@ model RegistryManaged {
     transporter5CompanyCity                String?
     transporter5CompanyCountryCode         String?
 
-    registryLookups RegistryLookup[]
+    registryLookups   RegistryLookup[]
+    texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
@@ -1031,6 +1032,8 @@ model RegistryTexsAnalysisFile {
     registryIncomingTexs   RegistryIncomingTexs? @relation(fields: [registryIncomingTexsId], references: [id])
     registryOutgoingTexsId String?
     registryOutgoingTexs   RegistryOutgoingTexs? @relation(fields: [registryOutgoingTexsId], references: [id])
+    registryManagedId      String?
+    registryManaged        RegistryManaged?      @relation(fields: [registryManagedId], references: [id])
 
     createdById String
     createdBy   User   @relation(fields: [createdById], references: [id])

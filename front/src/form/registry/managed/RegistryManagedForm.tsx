@@ -182,7 +182,10 @@ export function RegistryManagedForm({ onClose }: Props) {
               definedIncominTexsProps.destinationParcelCoordinates
             ),
             reason: RegistryLineReason.Edit,
-            transporter: transporters
+            transporter: transporters,
+            texsAnalysisFileId:
+              data.registryLookup.managedWaste.texsAnalysisFiles?.[0]?.id ||
+              null
           };
           methods.reset(resetValues);
           const initialDisabled = getInitialDisabledFields(resetValues);
