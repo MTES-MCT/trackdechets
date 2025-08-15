@@ -3,6 +3,7 @@ import { prisma } from "@td/prisma";
 import {
   getUploadWithWritableStream,
   RegistryV2IncomingTexsInclude,
+  RegistryV2ManagedInclude,
   RegistryV2OutgoingTexsInclude
 } from "@td/registry";
 import { Job } from "bull";
@@ -72,7 +73,9 @@ const streamLookup = (
               include: RegistryV2OutgoingTexsInclude
             },
             registryTransported: true,
-            registryManaged: true,
+            registryManaged: {
+              include: RegistryV2ManagedInclude
+            },
             bsdd: {
               include: RegistryV2BsddInclude
             },

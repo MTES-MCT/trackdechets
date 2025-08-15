@@ -39,4 +39,7 @@ export {
 
 export { lookupUtils as transportedLookupUtils } from "./transported/registry";
 
-export { lookupUtils as managedLookupUtils } from "./managed/registry";
+export {
+  lookupUtils as managedLookupUtils,
+  RegistryV2ManagedInclude
+} from "./managed/registry";

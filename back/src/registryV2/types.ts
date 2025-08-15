@@ -730,6 +730,7 @@ export const emptyManagedWasteV2: Omit<
   nonRoadRegulationMention: null,
   destinationCap: null,
   wasteDap: null,
+  texsAnalysisFiles: null,
   destinationCompanySiret: null,
   destinationCompanyName: null,
   destinationCompanyGivenName: null,

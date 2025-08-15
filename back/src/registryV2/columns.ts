@@ -1276,6 +1276,10 @@ export const EXPORT_COLUMNS: {
     nonRoadRegulationMention: { label: "Mention RID, ADN, IMDG" },
     destinationCap: { label: "CAP" },
     wasteDap: { label: "DAP" },
+    texsAnalysisFiles: {
+      label: "Fichier d'analyse chimique",
+      format: formatBoolean
+    },
     destinationCompanySiret: { label: "Destination - N° d'identification" },
     destinationCompanyName: { label: "Destination - Raison sociale" },
     destinationCompanyGivenName: { label: "Destination - Nom usuel" },

@@ -1449,6 +1449,9 @@ type ManagedWasteV2 {
 
   wasteDap: String
 
+  "Présence ou non de fichiers d'analyse texs"
+  texsAnalysisFiles: Boolean
+
   "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
