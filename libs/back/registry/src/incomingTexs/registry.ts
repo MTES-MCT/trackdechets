@@ -3,8 +3,7 @@ import {
   PrismaClient,
   RegistryExportDeclarationType,
   RegistryExportType,
-  RegistryExportWasteType,
-  RegistryIncomingTexs
+  RegistryExportWasteType
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import {
@@ -16,8 +15,17 @@ import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
+export const RegistryV2IncomingTexsInclude =
+  Prisma.validator<Prisma.RegistryIncomingTexsInclude>()({
+    texsAnalysisFiles: true
+  });
+
+export type RegistryV2IncomingTexs = Prisma.RegistryIncomingTexsGetPayload<{
+  include: typeof RegistryV2IncomingTexsInclude;
+}>;
+
 export const toIncomingWaste = (
-  incomingTexs: RegistryIncomingTexs
+  incomingTexs: RegistryV2IncomingTexs
 ): IncomingWasteV2 => {
   return {
     id: incomingTexs.id,
@@ -158,6 +166,7 @@ export const toIncomingWaste = (
     nonRoadRegulationMention: null,
     destinationCap: null,
     wasteDap: incomingTexs.wasteDap,
+    texsAnalysisFiles: !!incomingTexs.texsAnalysisFiles?.length,
     destinationCompanyName: incomingTexs.reportForCompanyName,
     destinationCompanyGivenName: null,
     destinationCompanySiret: incomingTexs.reportForCompanySiret,

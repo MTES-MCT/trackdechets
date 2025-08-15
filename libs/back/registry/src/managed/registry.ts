@@ -29,8 +29,17 @@ const getWasteIsDangerous = (
   );
 };
 
+export const RegistryV2ManagedInclude =
+  Prisma.validator<Prisma.RegistryManagedInclude>()({
+    texsAnalysisFiles: true
+  });
+
+export type RegistryV2Managed = Prisma.RegistryManagedGetPayload<{
+  include: typeof RegistryV2ManagedInclude;
+}>;
+
 export const toManagedWaste = (
-  managedWaste: RegistryManaged
+  managedWaste: RegistryV2Managed
 ): ManagedWasteV2 => {
   return {
     id: managedWaste.id,
@@ -186,6 +195,7 @@ export const toManagedWaste = (
     nonRoadRegulationMention: null,
     destinationCap: null,
     wasteDap: managedWaste.wasteDap,
+    texsAnalysisFiles: !!managedWaste.texsAnalysisFiles?.length,
 
     destinationCompanySiret: managedWaste.destinationCompanyOrgId,
     destinationCompanyName: managedWaste.destinationCompanyName,
