@@ -1,5 +1,5 @@
 import { DocumentNode } from "graphql";
-import { ApolloError, DataProxy } from "@apollo/client";
+import { ApolloError, DataProxy, Unmasked } from "@apollo/client";
 import { getCountries, isValidPhoneNumber } from "libphonenumber-js";
 import Decimal from "decimal.js";
 
@@ -12,7 +12,7 @@ export function updateApolloCache<T>(
     query,
     getNewData,
     variables = {}
-  }: { query: DocumentNode; getNewData: (d: T) => T; variables: any }
+  }: { query: DocumentNode; getNewData: (d: Unmasked<T>) => T; variables: any }
 ) {
   try {
     const existingData = store.readQuery<T>({

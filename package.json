@@ -289,7 +289,7 @@
     "jest-environment-node": "^30.0.5",
     "jest-transform-stub": "^2.0.0",
     "jsdom": "~26.1.0",
-    "mermaid": "10.6.1",
+    "mermaid": "11.9.0",
     "node-mocks-http": "^1.11.0",
     "nx": "20.0.3",
     "patch-package": "^8.0.0",
