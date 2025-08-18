@@ -139,8 +139,7 @@ describe("Mutation.Vhu.publish", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité\n" +
-          "Le type de numéro d'identification est un champ requis.",
+          "identificationType : Le type d'identification est obligatoire quand le conditionnement est en unité",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
