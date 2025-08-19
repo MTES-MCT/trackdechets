@@ -127,11 +127,16 @@ function getFileType(mimeType: string | undefined) {
     return undefined;
   }
 
-  if (allowedCsvMimeTypes.includes(mimeType)) {
+  // Handle corrupted Content-Type from S3 that may include multipart/form-data
+  // e.g., "text/csv,multipart/form-data; boundary=..."
+  // Extract the first MIME type before any comma
+  const cleanMimeType = mimeType.split(",")[0].trim();
+
+  if (allowedCsvMimeTypes.includes(cleanMimeType)) {
     return "CSV";
   }
 
-  if (allowedExcelMimeTypes.includes(mimeType)) {
+  if (allowedExcelMimeTypes.includes(cleanMimeType)) {
     return "XLSX";
   }
 
