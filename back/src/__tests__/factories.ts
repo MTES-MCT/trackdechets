@@ -96,7 +96,6 @@ export const companyFactory = async (
           "PRODUCER",
           "TRANSPORTER",
           "WASTEPROCESSOR",
-          "WORKER",
           "WASTE_VEHICLES",
           "TRADER",
           "BROKER"
