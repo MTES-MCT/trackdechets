@@ -11,33 +11,13 @@ describe("{ mutation { deleteworkerCertification } }", () => {
   it("should delete a worker certification", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    const certification = {
-      hasSubSectionFour: true,
-      hasSubSectionThree: true,
-      certificationNumber: "AAA",
-      validityLimit: new Date().toISOString(),
-      organisation: "AFNOR Certification"
-    };
-    const createdCertification = await prisma.workerCertification.create({
-      data: certification
-    });
-
-    await prisma.company.update({
-      data: {
-        workerCertification: {
-          connect: { id: createdCertification.id }
-        }
-      },
-      where: { id: company.id }
-    });
-
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const mutation = `
       mutation {
         deleteWorkerCertification(
           input: {
-            id: "${createdCertification.id}"
+            id: "${company.workerCertificationId}"
           }
         ){
           id
@@ -45,10 +25,15 @@ describe("{ mutation { deleteworkerCertification } }", () => {
       }
     `;
 
+    expect(company.workerCertificationId).not.toBeNull();
+
     const { data } = await mutate<Pick<Mutation, "deleteWorkerCertification">>(
       mutation
     );
-    expect(data.deleteWorkerCertification.id).toEqual(createdCertification.id);
+
+    expect(data.deleteWorkerCertification.id).toEqual(
+      company.workerCertificationId
+    );
 
     expect(await prisma.workerCertification.count()).toEqual(0);
   });
