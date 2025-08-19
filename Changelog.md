@@ -17,6 +17,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du chemin manquant sur erreur d'import registre [PR 4347](https://github.com/MTES-MCT/trackdechets/pull/4347)
 - Résolution d'une erreur à la récupération d'une BsdaRevisionRequest fraîchemnt supprimée [PR 4351](https://github.com/MTES-MCT/trackdechets/pull/4351)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la colonne Fichier d'analyse chimique à l'export registre [PR 4342](https://github.com/MTES-MCT/trackdechets/pull/4342)
+
 # [2025.07.2] 29/07/2025
 
 #### :nail_care: Améliorations
