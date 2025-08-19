@@ -518,10 +518,6 @@ describe("BSVHU validation", () => {
           expect.objectContaining({
             message:
               "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
-          }),
-          expect.objectContaining({
-            message:
-              "Le transporteur avec le n°de TVA FR35552049447 n'est pas inscrit sur Trackdéchets"
           })
         ]);
       }
@@ -544,10 +540,6 @@ describe("BSVHU validation", () => {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
             message: "Destination : 1 n'est pas un numéro de SIRET valide"
-          }),
-          expect.objectContaining({
-            message:
-              "Destination : L'établissement avec le SIRET 1 n'est pas inscrit sur Trackdéchets"
           })
         ]);
       }

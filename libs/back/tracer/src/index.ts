@@ -10,7 +10,7 @@ import { HttpInstrumentation } from "@opentelemetry/instrumentation-http";
 import { IORedisInstrumentation } from "@opentelemetry/instrumentation-ioredis";
 import { MongoDBInstrumentation } from "@opentelemetry/instrumentation-mongodb";
 import { WinstonInstrumentation } from "@opentelemetry/instrumentation-winston";
-import { Resource } from "@opentelemetry/resources";
+import { resourceFromAttributes } from "@opentelemetry/resources";
 import { BatchLogRecordProcessor } from "@opentelemetry/sdk-logs";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { NodeSDK } from "@opentelemetry/sdk-node";
@@ -18,8 +18,8 @@ import {
   SEMRESATTRS_CLOUD_REGION,
   SEMRESATTRS_CONTAINER_NAME,
   SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_VERSION
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION
 } from "@opentelemetry/semantic-conventions";
 import { PrismaInstrumentation } from "@prisma/instrumentation";
 import { ElasticsearchInstrumentation } from "opentelemetry-instrumentation-elasticsearch";
@@ -29,9 +29,9 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
   const serviceName = getAppRootFolderName();
 
   const sdk = new NodeSDK({
-    resource: new Resource({
-      [SEMRESATTRS_SERVICE_NAME]: serviceName || "trackdechets",
-      [SEMRESATTRS_SERVICE_VERSION]: "1.0.0",
+    resource: resourceFromAttributes({
+      [ATTR_SERVICE_NAME]: serviceName || "trackdechets",
+      [ATTR_SERVICE_VERSION]: "1.0.0",
       [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]:
         process.env.OTEL_ENVIRONMENT || "development",
       [SEMRESATTRS_CLOUD_REGION]: process.env.REGION_NAME,

@@ -207,6 +207,7 @@ export function ComboBox({
     <Portal>
       <div
         ref={targetRef as React.RefObject<HTMLDivElement>}
+        data-live-announcer /* React aria adds an inert prop otherwise */
         style={{
           position: "absolute",
           backgroundColor: "white",
