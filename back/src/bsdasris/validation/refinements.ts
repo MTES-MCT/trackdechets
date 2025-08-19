@@ -25,7 +25,7 @@ import { isDefined } from "../../common/helpers";
 
 import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 import { prisma } from "@td/prisma";
-import { isCollector } from "../../companies/validation";
+import { isCollector, isWasteCenter } from "../../companies/validation";
 
 export const validateDestinationOperationCode: (
   validationContext: BsdasriValidationContext
@@ -116,13 +116,16 @@ export const validateRecipientIsCollectorForGroupingCodes: (
         }
       });
 
-      if (!destinationCompany || !isCollector(destinationCompany)) {
+      if (
+        !destinationCompany ||
+        (!isCollector(destinationCompany) && !isWasteCenter(destinationCompany))
+      ) {
         addIssue({
           code: z.ZodIssueCode.custom,
           fatal: true,
           path: ["destination", "operation", "code"],
           message:
-            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement"
+            "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement ou installations de collecte (Rubrique 2710)"
         });
       }
     }
