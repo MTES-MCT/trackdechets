@@ -225,42 +225,53 @@ app.use(
   })
 );
 
-app.use(
+// Shared CSP directives for all routes
+const baseCSPDirectives = {
+  defaultSrc: ["'none'"],
+  baseUri: ["'self'"],
+  fontSrc: ["'self'", "https:", "data:"],
+  frameAncestors: ["'self'"],
+  imgSrc: ["'self'"],
+  objectSrc: ["'none'"],
+  scriptSrc: [
+    "'self'",
+    "'sha256-KDSP72yw7Yss7rIt6vgkQo/ROHXYTHPTj3fdIW/CTn8='",
+    "'sha256-+QRKXpw524uxogTf+STlJuwKYh5pW7ad4QNYEb6HCeQ='",
+    "'sha256-FC1QdPlDgsjmWJtkJfO6Tt7pKFza/bZuwKtw25R/7m4='",
+    "'sha256-/KjN0AtQm74p7exR84hK/woqhc2pYBdNQamcxHOkiDA='"
+  ],
+  scriptSrcAttr: ["'none'"],
+  styleSrc: [
+    "'self'",
+    "https:",
+    "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='",
+    "'sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE='",
+    "'sha256-LFhQK3cog1BLYeE/LUUJthR1mUCLSLwgkyqlF+epuq8='"
+  ],
+  connectSrc: [process.env.API_HOST],
+  formAction: ["'self'"],
+  upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
+};
+
+// Conditional CSP middleware - only changes requireTrustedTypesFor for Bull board
+app.use((req, res, next) => {
+  const isBullBoardPath = req.path.startsWith(
+    `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`
+  );
+
   helmet({
     hsts: false, // Auto injected by Scalingo
-    // Because of the GraphQL playground we have to override the default
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'none'"],
-        baseUri: ["'self'"],
-        fontSrc: ["'self'", "https:", "data:"],
-        frameAncestors: ["'self'"],
-        imgSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        scriptSrc: [
-          "'self'",
-          "'sha256-KDSP72yw7Yss7rIt6vgkQo/ROHXYTHPTj3fdIW/CTn8='",
-          "'sha256-+QRKXpw524uxogTf+STlJuwKYh5pW7ad4QNYEb6HCeQ='",
-          "'sha256-FC1QdPlDgsjmWJtkJfO6Tt7pKFza/bZuwKtw25R/7m4='",
-          "'sha256-/KjN0AtQm74p7exR84hK/woqhc2pYBdNQamcxHOkiDA='"
-        ],
-        scriptSrcAttr: ["'none'"],
-        styleSrc: [
-          "'self'",
-          "https:",
-          "'sha256-dihQy2mHNADQqxc3xhWK7pH1w4GVvEow7gKjxdWvTgE='",
-          "'sha256-wTzfn13a+pLMB5rMeysPPR1hO7x0SwSeQI+cnw7VdbE='",
-          "'sha256-LFhQK3cog1BLYeE/LUUJthR1mUCLSLwgkyqlF+epuq8='"
-        ],
-        connectSrc: [process.env.API_HOST],
-        formAction: ["'self'"],
-        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null,
-        requireTrustedTypesFor: ["'script'"]
+        ...baseCSPDirectives,
+        // Conditionally disable Trusted Types for Bull board admin dashboard
+        // This is secure because Bull board is admin-only and token-protected
+        ...(isBullBoardPath ? {} : { requireTrustedTypesFor: ["'script'"] })
       }
     },
     xXssProtection: false
-  })
-);
+  })(req, res, next);
+});
 
 app.use((_, res, next) => {
   res.setHeader(
