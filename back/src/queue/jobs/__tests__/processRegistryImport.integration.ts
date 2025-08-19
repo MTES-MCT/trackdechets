@@ -691,15 +691,23 @@ describe("Process registry import job", () => {
       // This should properly detect the file type despite the corrupted Content-Type
       // Note: This test will fail later during Excel parsing due to invalid content,
       // but the file type detection should work correctly
-      await expect(
-        processRegistryImportJob({
-          data: {
-            importId: registryImport.id,
-            importType: registryImport.type,
-            s3FileKey: registryImport.s3FileKey
-          }
-        } as Job<RegistryImportJobArgs>)
-      ).rejects.not.toThrow(/Unknown file type/);
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(0);
     });
   });
 });
