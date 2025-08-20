@@ -43,7 +43,7 @@ const BSDAPreviewEmitter = ({ bsd }: BSDAPreviewEmitterProps) => {
               />
 
               <PreviewTextRow
-                label="Siret"
+                label="SIRET"
                 value={bsd.emitter?.company?.siret}
               />
             </>

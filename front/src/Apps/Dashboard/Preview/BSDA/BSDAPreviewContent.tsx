@@ -101,7 +101,10 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
       ? [
           {
             tabId: "associes",
-            label: "BSDA(s) associé(s)",
+            label:
+              initialBsdas?.length > 1
+                ? `BSDAs associés (${initialBsdas?.length})`
+                : "BSDA associé",
             iconId: "fr-icon-arrow-right-line" as FrIconClassName
           }
         ]
@@ -127,12 +130,20 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
     [bsd]
   );
 
+  const capitalize = word => {
+    if (!word) {
+      return "";
+    }
+    return word.at(0)?.toUpperCase() + word.slice(1);
+  };
+
   return (
     <>
       {!loading && bsd && (
         <>
           <BSDPreviewHeader
             title={bsd.id}
+            bsdType={bsd?.type as BsdaType}
             bsdStatus={bsd.status as TBsdStatusCode}
             wasteType={BsdType.Bsda}
           >
@@ -147,7 +158,7 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
                 <PreviewTextRow
                   label="Consistance"
-                  value={bsd.waste?.consistence}
+                  value={capitalize(bsd.waste?.consistence?.toLowerCase())}
                 />
 
                 <PreviewDateRow label="Dernière action" value={bsd.updatedAt} />

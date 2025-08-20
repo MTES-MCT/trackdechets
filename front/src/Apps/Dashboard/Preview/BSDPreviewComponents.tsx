@@ -92,7 +92,7 @@ export const PreviewTextRow = ({
     <div className="fr-mb-1w">
       <div>
         {label}
-        {tooltip ? <Tooltip title={tooltip} /> : null}
+        {tooltip ? <Tooltip title={tooltip} className="fr-ml-1v" /> : null}
       </div>
       <div className="fr-text--bold" data-testid={toCamelCaseVarName(label)}>
         {!!value ? (!!units ? `${value}${nbsp}${units}` : value) : "-"}

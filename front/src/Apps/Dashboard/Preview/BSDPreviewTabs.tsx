@@ -45,16 +45,8 @@ const BSDPreviewTabs = ({
   const isPrevStepDisabled = selectedTabId === firstTabId;
   const isNextStepDisabled = selectedTabId === lastTabId;
 
-  const scrollToTop = () => {
-    const element = document.getElementsByClassName("fr-modal__body")[0];
-    if (element) {
-      element.scroll({ top: 0 });
-    }
-  };
-
   const onTabChange = tabId => {
     setSelectedTabId(tabId);
-    scrollToTop();
   };
 
   return (
@@ -86,7 +78,6 @@ const BSDPreviewTabs = ({
               <Button
                 onClick={() => {
                   setSelectedTabId(getPrevTab(tabIds, selectedTabId));
-                  scrollToTop();
                 }}
                 priority="tertiary"
                 disabled={isPrevStepDisabled}
@@ -98,7 +89,6 @@ const BSDPreviewTabs = ({
               <Button
                 onClick={() => {
                   setSelectedTabId(getNextTab(tabIds, selectedTabId));
-                  scrollToTop();
                 }}
                 priority="tertiary"
                 disabled={isNextStepDisabled}

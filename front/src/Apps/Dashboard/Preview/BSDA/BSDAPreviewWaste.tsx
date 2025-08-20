@@ -43,7 +43,7 @@ const BSDAPreviewWaste = ({ bsd }: BSDAPreviewWasteProps) => {
         </PreviewContainerCol>
       </PreviewContainerRow>
 
-      <PreviewContainerRow title={"Opérations"} separator>
+      <PreviewContainerRow title={"Opérations à la destination"} separator>
         <PreviewContainerCol gridWidth={4}>
           <PreviewTextRow
             label="Opération prévue"
@@ -67,7 +67,7 @@ const BSDAPreviewWaste = ({ bsd }: BSDAPreviewWasteProps) => {
       </PreviewContainerRow>
 
       <PreviewContainerRow title={"Conditionnement"} separator>
-        <PreviewContainerCol gridWidth={4}>
+        <PreviewContainerCol gridWidth={10}>
           <PreviewTextRow label="Conditionnement" value={conditionnement} />
         </PreviewContainerCol>
       </PreviewContainerRow>

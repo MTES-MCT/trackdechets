@@ -25,7 +25,7 @@ const BSDAPreviewDestination = ({ bsd }: BSDAPreviewDestinationProps) => {
           />
 
           <PreviewTextRow
-            label="Siret"
+            label="SIRET"
             value={bsd.destination?.company?.siret}
           />
 
@@ -117,7 +117,7 @@ const BSDAPreviewDestination = ({ bsd }: BSDAPreviewDestinationProps) => {
             />
 
             <PreviewTextRow
-              label="Siret"
+              label="SIRET"
               value={bsd.destination?.operation?.nextDestination.company?.siret}
             />
 

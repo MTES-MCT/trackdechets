@@ -29,7 +29,7 @@ const BSVHUPreviewTransport = ({ bsd }: BSVHUPreviewTransportProps) => {
           />
 
           <PreviewTextRow
-            label={!isForeignCompany ? "Siret" : "TVA intracommunautaire"}
+            label={!isForeignCompany ? "SIRET" : "TVA intracommunautaire"}
             value={
               !isForeignCompany
                 ? bsd.transporter?.company?.siret

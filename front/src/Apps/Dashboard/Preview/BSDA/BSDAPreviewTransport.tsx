@@ -40,7 +40,7 @@ const BSDAPreviewTransport = ({ bsd }: BSDAPreviewTransportProps) => {
 
             <PreviewTextRow
               label={
-                !isForeignCompany(idx) ? "Siret" : "TVA intracommunautaire"
+                !isForeignCompany(idx) ? "SIRET" : "TVA intracommunautaire"
               }
               value={
                 !isForeignCompany(idx)
