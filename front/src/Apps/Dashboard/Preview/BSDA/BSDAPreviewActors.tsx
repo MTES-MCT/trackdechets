@@ -32,7 +32,7 @@ const BSDAPreviewActors = ({ bsd }: BSDAPreviewActorsProps) => {
               value={bsd.ecoOrganisme?.name}
             />
 
-            <PreviewTextRow label="Siret" value={bsd.ecoOrganisme?.siret} />
+            <PreviewTextRow label="SIRET" value={bsd.ecoOrganisme?.siret} />
           </PreviewContainerCol>
         </PreviewContainerRow>
       )}

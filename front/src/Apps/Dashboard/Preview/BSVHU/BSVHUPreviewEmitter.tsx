@@ -34,7 +34,7 @@ const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
             value={isIrregularSituation ? "-" : bsd.emitter?.company?.name}
           />
 
-          <PreviewTextRow label="Siret" value={bsd.emitter?.company?.siret} />
+          <PreviewTextRow label="SIRET" value={bsd.emitter?.company?.siret} />
 
           {isIrregularSituation && (
             <PreviewTextRow

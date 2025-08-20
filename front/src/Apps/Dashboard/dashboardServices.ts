@@ -1315,6 +1315,8 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.REEXPEDITION;
     case BsdaType.Collection_2710:
       return WorkflowDisplayType.Collection_2710;
+    case BsdaType.OtherCollections:
+      return WorkflowDisplayType.OtherCollections;
 
     case BsdasriType.Grouping:
       return WorkflowDisplayType.GRP;

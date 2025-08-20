@@ -23,7 +23,7 @@ const BSDAPreviewWorker = ({ bsd }: BSDAPreviewWorkerProps) => {
             value={bsd.worker?.company?.name}
           />
 
-          <PreviewTextRow label="Siret" value={bsd.worker?.company?.siret} />
+          <PreviewTextRow label="SIRET" value={bsd.worker?.company?.siret} />
 
           <PreviewTextRow
             label="Adresse"
