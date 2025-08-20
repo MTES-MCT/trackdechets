@@ -1,3 +1,5 @@
+@import "../../../scss/Breakpoints.scss";
+
 .registryFormBuilder {
   .tabError {
     background-color: var(--light-background-contrast-error, #ffe9e9);
@@ -50,6 +52,9 @@
       var(--border-default-grey),
       var(--border-default-grey)
     );
+    @include xs-phone {
+      margin-bottom: 50px;
+    }
     .error-container {
       display: flex;
       flex-direction: column;
