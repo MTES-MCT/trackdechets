@@ -226,7 +226,7 @@ export const fillInGenericCompanyInfo = async (
   // Select the role
   for (const role of company.roles) {
     await page
-      .getByTestId("company-type-label")
+      .getByTestId(`company-type-label-${role}`)
       .getByText(role, { exact: true })
       .click();
   }
@@ -263,7 +263,7 @@ export const fillInAmianteCertification = async (
 ) => {
   // Certifications inputs should appear
   const certificationsDiv = page
-    .getByText("Entreprise de travaux amiante")
+    .getByTestId("company-type-label-Entreprise de travaux amiante")
     .locator("../../../../../../..");
   await expect(certificationsDiv).toBeVisible();
 
