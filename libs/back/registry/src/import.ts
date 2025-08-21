@@ -1,7 +1,7 @@
 import { logger } from "@td/logger";
 import { PassThrough, pipeline, Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
-
+import v8 from "v8";
 import {
   getSumOfChanges,
   incrementLocalChangesForCompany,
@@ -45,10 +45,6 @@ function cleanFormulaObjects(
   return cleaned;
 }
 
-function sleep(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 export async function processStream({
   importId,
   importType,
@@ -87,10 +83,9 @@ export async function processStream({
   // const ERROR_RATE_CHECK_INTERVAL = 200; // Check error rate interval in lines
   const MAX_ERRORS_PER_LINE = 10;
   const MEMORY_CHECK_LINE_INTERVAL = 200; // Check memory interval in lines
-  const MAX_HEAP_USAGE_MB = 500; // Maximum heap usage in MB
-  const THROTTLING_HEAP_USAGE_MB = 300; // Maximum heap usage in MB
-  let processedLines = 0;
+  const MAX_HEAP_USAGE_MB = v8.getHeapStatistics().heap_size_limit; // bytes
 
+  let processedLines = 0;
   const errorStream =
     fileType === "CSV"
       ? getCsvErrorStream(options)
@@ -122,32 +117,29 @@ export async function processStream({
     for await (const { rawLine, result } of parsedLinesStream) {
       processedLines++;
 
-      // Memory-based throttling to prevent spikes by controlling stream backpressure
-      const memUsage = process.memoryUsage();
-      const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
-      if (heapUsedMB > THROTTLING_HEAP_USAGE_MB) {
-        await sleep(200);
-      }
       // Monitor memory usage to prevent crashes (using already calculated values for efficiency)
       if (processedLines % MEMORY_CHECK_LINE_INTERVAL === 0) {
-        const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
+        const availableHeap = v8.getHeapStatistics().total_available_size; // bytes
+        const consumedHeapPortion =
+          (MAX_HEAP_USAGE_MB - availableHeap) / MAX_HEAP_USAGE_MB;
+        const heapUsedMB = Math.round(
+          (MAX_HEAP_USAGE_MB - availableHeap) / 1024 / 1024
+        );
 
-        logger.info(`Import ${importId} memory usage`, {
-          heapUsedMB,
-          heapTotalMB,
-          processedLines,
-          globalErrorNumber
-        });
+        // logger.info(`Import ${importId} memory usage`, {
+        //   heapUsedMB,
+        //   processedLines,
+        //   globalErrorNumber
+        // });
 
         // Terminate if memory usage is too high
-        if (heapUsedMB > MAX_HEAP_USAGE_MB) {
+        if (consumedHeapPortion > 0.9) {
           const terminationMessage = `Import terminé prématurément: utilisation mémoire excessive. Le fichier est trop volumineux ou contient trop d'erreurs.`;
           errorStream.write({ errors: terminationMessage });
           logger.error(
             `Import ${importId} terminated due to high memory usage`,
             {
               heapUsedMB,
-              heapTotalMB,
               processedLines,
               globalErrorNumber
             }
