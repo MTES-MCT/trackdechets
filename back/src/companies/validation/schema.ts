@@ -14,6 +14,7 @@ import {
   checkEcoOrganisme,
   checkForeignTransporter,
   checkRecepisses,
+  checkWorkerSubsection,
   checkSubTypes
 } from "./refinements";
 import { isValidWebsite } from "@td/constants";
@@ -89,7 +90,8 @@ export const companySchema = rawCompanySchema
   .superRefine(checkForeignTransporter)
   .superRefine(checkEcoOrganisme)
   .superRefine(checkSubTypes)
-  .superRefine(checkRecepisses);
+  .superRefine(checkRecepisses)
+  .superRefine(checkWorkerSubsection);
 
 const rawBulkUpdateCompanySchema = rawCompanySchema.pick({
   companyTypes: true,

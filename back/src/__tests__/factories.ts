@@ -87,6 +87,16 @@ export const companyFactory = async (
   const companyIndex = (await prisma.company.count()) + 1;
 
   const siret = opts.siret ?? siretify(companyIndex);
+
+  let workerCertification;
+  if (!opts.companyTypes) {
+    workerCertification = await prisma.workerCertification.create({
+      data: {
+        hasSubSectionFour: true
+      }
+    });
+  }
+
   return prisma.company.create({
     data: {
       orgId: opts.vatNumber ?? siret,
@@ -112,6 +122,9 @@ export const companyFactory = async (
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
       verificationStatus: "VERIFIED",
+      workerCertification: workerCertification
+        ? { connect: { id: workerCertification.id } }
+        : undefined,
       ...opts
     }
   });

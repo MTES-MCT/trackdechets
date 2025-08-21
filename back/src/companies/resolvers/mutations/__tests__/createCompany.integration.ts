@@ -123,13 +123,24 @@ describe("Mutation.createCompany", () => {
   ])("should create company and userAssociation", async companyType => {
     const user = await userFactory();
     const orgId = siretify(7);
+
+    let workerCertification;
+    if (companyType === "WORKER") {
+      workerCertification = await prisma.workerCertification.create({
+        data: {
+          hasSubSectionFour: true
+        }
+      });
+    }
+
     const companyInput = {
       siret: orgId,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: [companyType],
-      website: "https://trackdechets.beta.gouv.fr"
+      website: "https://trackdechets.beta.gouv.fr",
+      workerCertificationId: workerCertification?.id
     };
 
     (searchCompany as jest.Mock).mockResolvedValueOnce({
@@ -1095,11 +1106,22 @@ describe("Mutation.createCompany", () => {
       if (type === "TRANSPORTER" || type === "CREMATORIUM") {
         continue;
       }
+
+      let workerCertification;
+      if (type === "WORKER") {
+        workerCertification = await prisma.workerCertification.create({
+          data: {
+            hasSubSectionFour: true
+          }
+        });
+      }
+
       const companyInput = {
         vatNumber: "RO17579668",
         companyName: "Acme in EU",
         address: "Transporter street",
-        companyTypes: [type]
+        companyTypes: [type],
+        workerCertificationId: workerCertification?.id
       };
 
       const { mutate } = makeClient({ ...user, auth: AuthType.Session });
