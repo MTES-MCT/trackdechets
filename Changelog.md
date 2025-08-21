@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Autorisation pour les établissements Rubrique 2710 de sélectionner un code de traitement D13 ou R12 [PR 4359](https://github.com/MTES-MCT/trackdechets/pull/4359)
+- Autorisation pour les établissements Rubrique 2710 d'être émetteur sur BSDASRI de regroupement [PR 4376](https://github.com/MTES-MCT/trackdechets/pull/4376)
 - Changement des règles de scellées BSVHU [PR 4341](https://github.com/MTES-MCT/trackdechets/pull/4341)
 
 #### :bug: Corrections de bugs
