@@ -43,3 +43,5 @@ export {
   lookupUtils as managedLookupUtils,
   RegistryV2ManagedInclude
 } from "./managed/registry";
+
+export { earlyFailImport } from "./database";
