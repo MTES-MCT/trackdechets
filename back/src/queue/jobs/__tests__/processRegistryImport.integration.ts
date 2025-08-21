@@ -122,7 +122,7 @@ describe("Process registry import job", () => {
         } as Job<RegistryImportJobArgs>);
       } catch (err) {
         expect(err.message).toBe(
-          `Unknown file type for file "${fileKey}", import "1". Received content type "application/octet-stream".`
+          `Unknown file type for file "${fileKey}", import "${registryImport.id}". Received content type "application/octet-stream".`
         );
       }
     });
