@@ -66,7 +66,7 @@ export async function registryLookup(
       registryOutgoingWaste: true,
       registryOutgoingTexs: { include: { texsAnalysisFiles: true } },
       registryTransported: true,
-      registryManaged: true
+      registryManaged: { include: { texsAnalysisFiles: true } }
     }
   });
 
