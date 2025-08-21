@@ -79,8 +79,6 @@ export async function processStream({
   let globalErrorNumber = 0;
 
   // Prevent memory exhaustion by limiting total errors processed
-  // const MAX_TOTAL_ERRORS = 10000; // Maximum number of errors to process
-  // const ERROR_RATE_CHECK_INTERVAL = 200; // Check error rate interval in lines
   const MAX_ERRORS_PER_LINE = 10;
   const MEMORY_CHECK_LINE_INTERVAL = 200; // Check memory interval in lines
   const MAX_HEAP_USAGE_MB = v8.getHeapStatistics().heap_size_limit; // bytes
