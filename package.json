@@ -158,6 +158,7 @@
     "react-aria": "3.25.0",
     "react-datepicker": "^4.25.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.0.0",
     "react-hot-toast": "2.4.1",
     "react-multi-select-component": "^4.3.4",
     "react-qr-code": "^2.0.18",
