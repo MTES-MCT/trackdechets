@@ -45,49 +45,6 @@ function cleanFormulaObjects(
   return cleaned;
 }
 
-// /**
-//  * Wrapper that limits the number of validation errors to prevent memory exhaustion
-//  * when processing malformed files with excessive errors per line
-//  */
-// function createMemoryEfficientValidator(
-//   originalValidator: (
-//     line: unknown
-//   ) => Promise<SafeParseReturnType<unknown, ParsedLine>>,
-//   maxErrorsPerLine = 10
-// ) {
-//   return async (
-//     line: unknown
-//   ): Promise<SafeParseReturnType<unknown, ParsedLine>> => {
-//     const result = await originalValidator(line);
-
-//     // If validation failed and there are too many errors, limit them to prevent memory exhaustion
-//     if (!result.success && result.error.issues.length > maxErrorsPerLine) {
-//       const limitedError = new ZodError([
-//         ...result.error.issues.slice(0, maxErrorsPerLine)
-//       ]);
-//       const truncatedCount = result.error.issues.length - maxErrorsPerLine;
-
-//       // Add a summary error for the truncated issues
-//       limitedError.addIssue({
-//         code: "custom" as any,
-//         path: ["__truncated__"],
-//         message: `... et ${truncatedCount} autres erreurs`
-//       });
-
-//       // Clear the original issues array to free memory
-//       result.error.issues.length = 0;
-
-//       // Return a new result with limited error
-//       return {
-//         success: false,
-//         error: limitedError
-//       };
-//     }
-
-//     return result;
-//   };
-// }
-
 function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -117,18 +74,8 @@ export async function processStream({
     `Processing import ${importId}. File type ${fileType}, import ${importType}`,
     { importId, importType, fileType }
   );
-  const originalOptions = importOptions[importType];
+  const options = importOptions[importType];
 
-  // Wrap the validator to limit memory consumption from excessive validation errors
-  // This prevents memory exhaustion when processing malformed files with formulas
-  // by truncating Zod validation errors at the source (max 10 errors per line)
-  const options = {
-    ...originalOptions
-    // safeParseAsync: createMemoryEfficientValidator(
-    //   originalOptions.safeParseAsync,
-    //   10
-    // )
-  };
   const changesByCompany = new Map<
     string,
     { [reportAsSiret: string]: RegistryChanges }
