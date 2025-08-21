@@ -1,8 +1,8 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { AdminRequestValidationMethod } from "@td/codegen-ui";
+import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 const ADMINS_WARNED_ALERT =
   "Les administrateurs même inactifs sont prévenus de la demande.";
@@ -74,7 +74,7 @@ export const CompanyCreateAdminRequestModalStep3 = ({
       </div>
 
       <div>
-        <Checkbox
+        <SingleCheckbox
           style={{ fontWeight: "bold" }}
           options={[
             {

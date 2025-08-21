@@ -1,11 +1,10 @@
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
-
 import React, { useEffect, useReducer } from "react";
 
 import {
   getVerbosePackagingType,
   getVerboseConsistence
 } from "../../paohUtils";
+import SingleCheckbox from "../../../../../common/Components/SingleCheckbox/SingleCheckbox";
 const SET_ACCEPTATION = "set_acceptation";
 const SET_ACCEPTATIONS = "set_acceptations";
 
@@ -88,7 +87,7 @@ export const PackagingAcceptationWidget = ({
             <th>Consistance</th>
             <th>Codes d'id.</th>
             <th>
-              <Checkbox
+              <SingleCheckbox
                 options={[
                   {
                     label: "",
@@ -123,7 +122,7 @@ export const PackagingAcceptationWidget = ({
               <td>{getVerboseConsistence(p.consistence)}</td>
               <td>{p.identificationCodes.join(",")}</td>
               <td>
-                <Checkbox
+                <SingleCheckbox
                   options={[
                     {
                       label: "",

@@ -33,12 +33,11 @@ import {
   isValidWebsite
 } from "@td/constants";
 import { CREATE_WORKER_CERTIFICATION } from "../../Account/fields/forms/AccountFormCompanyWorkerCertification";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-
+import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
 import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 import FormikCompanyTypeForm, {
   FormikCompanyTypeValues
@@ -769,7 +768,7 @@ export default function AccountCompanyAdd() {
                       <Field name="isAllowed">
                         {({ field }) => {
                           return (
-                            <Checkbox
+                            <SingleCheckbox
                               state={
                                 errors.isAllowed && touched.isAllowed
                                   ? "error"

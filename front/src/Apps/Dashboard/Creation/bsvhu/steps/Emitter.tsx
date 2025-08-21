@@ -10,8 +10,8 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { clearCompanyError, setFieldError } from "../../utils";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
+import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -124,7 +124,7 @@ const EmitterBsvhu = ({ errors }) => {
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
-        <Checkbox
+        <SingleCheckbox
           options={[
             {
               label: "Installation en situation irrégulière",
@@ -210,7 +210,7 @@ const EmitterBsvhu = ({ errors }) => {
 
         {emitter.irregularSituation && (
           <>
-            <Checkbox
+            <SingleCheckbox
               options={[
                 {
                   label: "L'installation n'a pas de numéro SIRET",

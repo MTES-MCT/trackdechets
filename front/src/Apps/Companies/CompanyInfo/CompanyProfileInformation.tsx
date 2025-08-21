@@ -7,7 +7,7 @@ import {
   WASTE_PROCESSOR_TYPE_OPTIONS,
   formatDateViewDisplay
 } from "../common/utils";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
@@ -47,7 +47,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
         return (
           companyType.isChecked && (
             <li key={companyType.value}>
-              <Checkbox
+              <SingleCheckbox
                 options={[
                   {
                     label: companyType.label,
@@ -275,7 +275,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                       );
                     if (wasteProcessorFound) {
                       return (
-                        <Checkbox
+                        <SingleCheckbox
                           key={wasteProcessorFound.value}
                           options={[
                             {
@@ -301,7 +301,7 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                     );
                     if (collectorFound) {
                       return (
-                        <Checkbox
+                        <SingleCheckbox
                           key={collectorFound.value}
                           options={[
                             {
