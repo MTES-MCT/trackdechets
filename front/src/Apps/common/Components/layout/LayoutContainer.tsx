@@ -31,7 +31,7 @@ import WasteTree from "../search/WasteTree";
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
-  "Merci d'anticiper dès à présent vos congés d'été en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres)."
+  `Le profil "Entreprise de travaux amiante" a été retiré pour les établissements n'ayant pas complété les compétences requises (SS3 et/ou SS4). Il peut être ajouté à nouveau à tout moment depuis l'onglet Mes établissements.`
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -68,10 +68,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Voir la FAQ",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/amiante/entreprises-de-travaux-maitres-doeuvre"
                   }}
-                  persistedSurveyName="td-20250729"
+                  persistedSurveyName="td-20250826"
                 />
               }
             />
