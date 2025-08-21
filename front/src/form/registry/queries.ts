@@ -781,6 +781,11 @@ export const GET_MANAGED_REGISTRY_LOOKUP = gql`
         transporter5CompanyPostalCode
         transporter5CompanyCity
         transporter5CompanyCountryCode
+
+        texsAnalysisFiles {
+          id
+          originalFileName
+        }
       }
     }
   }
