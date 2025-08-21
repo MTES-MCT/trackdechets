@@ -73,7 +73,6 @@ const schema = z
           ),
           weight: z.coerce.number().nonnegative().nullish(),
           refusedWeight: z.coerce.number().nonnegative().nullish(),
-          acceptedWeight: z.coerce.number().nonnegative().nullish(),
           refusalReason: z.string().nullish(),
           date: z.coerce
             .date({
@@ -436,20 +435,11 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                           label="Poids total net en tonnes"
                           disabled
                           className="fr-col-12"
-                          state={
-                            formState.errors?.destination?.reception
-                              ?.acceptedWeight && "error"
-                          }
-                          stateRelatedMessage={
-                            (formState.errors?.destination?.reception
-                              ?.acceptedWeight?.message as string) ?? ""
-                          }
                           nativeInputProps={{
                             value: acceptedWeight,
                             inputMode: "decimal",
                             step: "0.000001",
-                            type: "number",
-                            ...register("destination.reception.acceptedWeight")
+                            type: "number"
                           }}
                         />
                         <p
