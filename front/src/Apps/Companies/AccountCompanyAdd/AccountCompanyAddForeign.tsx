@@ -17,8 +17,8 @@ import { isSiret, isVat } from "@td/constants";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { CREATE_COMPANY } from "../common/queries";
+import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
 
 interface Values extends FormikValues {
   vatNumber: string;
@@ -318,7 +318,7 @@ export default function AccountCompanyAddForeign() {
                   <Field name="isAllowed">
                     {({ field }) => {
                       return (
-                        <Checkbox
+                        <SingleCheckbox
                           state={
                             errors.isAllowed && touched.isAllowed
                               ? "error"

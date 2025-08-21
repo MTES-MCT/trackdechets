@@ -1,4 +1,3 @@
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/SelectNext";
 import React from "react";
@@ -9,6 +8,7 @@ import {
 } from "./CompanyTypeForm";
 import Tooltip from "../../../../common/Components/Tooltip/Tooltip";
 import { WORKER_AGREMENT_ORGANISATION_OPTIONS } from "../../utils";
+import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type WorkerCategoryFormProps = {
   inputValues: Pick<CompanyTypeInputValues, "workerCertification">;
@@ -25,7 +25,7 @@ const WorkerCertificationForm = ({
     <div style={{ paddingTop: "4px" }}>
       <div>
         <div>
-          <Checkbox
+          <SingleCheckbox
             options={[
               {
                 label: "Travaux relevant de la sous-section 4",
@@ -39,7 +39,7 @@ const WorkerCertificationForm = ({
       </div>
       <div>
         <div>
-          <Checkbox
+          <SingleCheckbox
             options={[
               {
                 label: (

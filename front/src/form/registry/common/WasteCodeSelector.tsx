@@ -1,7 +1,6 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
 import clsx from "clsx";
 import React, { useMemo, useRef, useState } from "react";
@@ -11,6 +10,7 @@ import { capitalize } from "../../../common/helper";
 import { formatError } from "../builder/error";
 import { useMedia } from "../../../common/use-media";
 import { MEDIA_QUERIES } from "../../../common/config";
+import SingleCheckbox from "../../../Apps/common/Components/SingleCheckbox/SingleCheckbox";
 import "./WasteCodeSelector.scss";
 
 type WasteCode = {
@@ -118,7 +118,7 @@ export function WasteCodeSelector({
               ) : (
                 <div className="tw-flex tw-items-center tw-gap-2">
                   {multiple ? (
-                    <Checkbox
+                    <SingleCheckbox
                       options={[
                         {
                           label: `${node.code} - ${node.description}`,

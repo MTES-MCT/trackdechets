@@ -12,8 +12,8 @@ import routes from "../Apps/routes";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
+import SingleCheckbox from "../Apps/common/Components/SingleCheckbox/SingleCheckbox";
 import styles from "./Login.module.scss";
 
 import { SENDER_EMAIL } from "../common/config";
@@ -154,7 +154,7 @@ export default function Signup() {
         </div>
         <div className="fr-grid-row fr-mb-2w">
           <div className={`fr-col ${styles.resetFlexCol}`}>
-            <Checkbox
+            <SingleCheckbox
               options={[
                 {
                   label: "Je certifie avoir lu les conditions générales",

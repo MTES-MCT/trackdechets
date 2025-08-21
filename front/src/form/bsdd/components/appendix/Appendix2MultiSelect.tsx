@@ -16,11 +16,11 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { mergePackagings } from "../../../../common/packagings";
+import SingleCheckbox from "../../../../Apps/common/Components/SingleCheckbox/SingleCheckbox";
 
 type Appendix2MultiSelectProps = {
   // Résultat de la query `appendixForms` executé
@@ -249,7 +249,7 @@ export default function Appendix2MultiSelect({
     const rows = rowsData.map(
       ({ form, checked, quantityAccepted, quantityLeft, quantityGrouped }) => {
         return [
-          <Checkbox
+          <SingleCheckbox
             options={[
               {
                 label: "",
@@ -357,7 +357,7 @@ export default function Appendix2MultiSelect({
 
     // En tête du tableau
     const headers = [
-      <Checkbox
+      <SingleCheckbox
         options={[
           {
             label: "",
