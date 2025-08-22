@@ -44,6 +44,15 @@ export async function endImport({
   return importResult;
 }
 
+export async function earlyFailImport(importId: string) {
+  const importResult = await prisma.registryImport.update({
+    where: { id: importId },
+    data: { status: "FAILED" }
+  });
+
+  return importResult;
+}
+
 export function updateImportStats({
   importId,
   stats

@@ -65,20 +65,45 @@ describe("Process registry import job", () => {
   describe("processRegistryImportJob", () => {
     it("should fail if the file key isnt valid", async () => {
       expect.assertions(1);
-
+      const fileKey = "invalid";
+      const user = await userFactory({});
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "no-data.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
       try {
         await processRegistryImportJob({
-          data: { importId: "1", importType: "SSD", s3FileKey: "invalid" }
+          data: {
+            importId: registryImport.id,
+            importType: "SSD",
+            s3FileKey: fileKey
+          }
         } as Job<RegistryImportJobArgs>);
       } catch (err) {
-        expect(err.message).toBe('Unknown file "invalid", import "1".');
+        expect(err.message).toBe(
+          `Unknown file "${fileKey}", import "${registryImport.id}".`
+        );
       }
     });
 
     it("should fail if the file doesnt have the right MIME type", async () => {
       expect.assertions(1);
       const fileKey = "test-file";
-
+      const user = await userFactory({});
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "no-data.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
       const { s3Stream, upload } = getUploadWithWritableStream({
         bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
         key: fileKey
@@ -89,11 +114,15 @@ describe("Process registry import job", () => {
 
       try {
         await processRegistryImportJob({
-          data: { importId: "1", importType: "SSD", s3FileKey: fileKey }
+          data: {
+            importId: registryImport.id,
+            importType: "SSD",
+            s3FileKey: fileKey
+          }
         } as Job<RegistryImportJobArgs>);
       } catch (err) {
         expect(err.message).toBe(
-          `Unknown file type for file "${fileKey}", import "1". Received content type "application/octet-stream".`
+          `Unknown file type for file "${fileKey}", import "${registryImport.id}". Received content type "application/octet-stream".`
         );
       }
     });
