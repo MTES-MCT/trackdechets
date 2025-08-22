@@ -11,10 +11,15 @@ echo "You can then run npx prisma migrate dev to test your migrations, or npx nx
 
 echo "${bold}→ Checking disk space${reset}"
 lsblk -o NAME,MOUNTPOINT,SIZE,FSUSED,FSAVAIL,FSUSE%
-
+echo ""
+echo ""
+echo "Resetting repository"
 cd /root/trackdechets/
+git add .
 git reset --hard
-
+git fetch
+echo ""
+echo ""
 # Get current branch name
 current_branch=$(git branch --show-current)
 echo "${bold}→ Current branch: ${green}$current_branch${reset}"
@@ -34,8 +39,10 @@ echo "${bold}→ Installing dependencies${reset}"
 npm i
 
 cd /root/
-
-echo "${bold}→ Do you want to test a sandbox or production deployment ? This will drop and re-create the database, so Cancel if you're using an already full snapshot.${reset}"
+echo ""
+echo ""
+echo "${bold}→ Do you want to restore a sandbox or production database ?"
+echo "${red}This will drop and re-create the database, so Cancel if you're using an already populated database.${reset}"
 options=("Sandbox" "Production" "Cancel")
 select opt in "${options[@]}"
 do
@@ -52,6 +59,11 @@ do
             ;;
         "Cancel")
             echo "Cancelled."
+            echo "${bold}${green}→ You probably already have a database, so you can now run:${reset}"
+            echo "${bold}${green}cd /root/trackdechets${reset}"
+            echo "${bold}${green}npx prisma migrate dev${reset}"
+            echo "${bold}${green}# or${reset}"
+            echo "${bold}${green}npx nx run @td/scripts:migrate${reset}"
             exit 0
             ;;
         *) echo "Invalid option $REPLY";;
@@ -89,7 +101,8 @@ echo "${bold}→ Restoring dump${reset}"
 echo "the progress bar is not representative of the whole process, don't panic if it keeps going after it reaches 100%"
 pv "/root/backup/$backupName" | sudo -u postgres pg_restore -d prisma --no-owner --no-privileges --clean --if-exists
 rm "/root/backup/$backupName"
-
+echo ""
+echo ""
 echo "${bold}${green}→ Database restore complete! You can now run:${reset}"
 echo "${bold}${green}cd /root/trackdechets${reset}"
 echo "${bold}${green}npx prisma migrate dev${reset}"

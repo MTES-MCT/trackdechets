@@ -6,9 +6,9 @@ sandbox_volume_size="40GB"
 prod_volume_size="400GB"
 sandbox_instance_size="DEV1-L"
 prod_instance_size="DEV1-L"
-sandbox_volume_snapshot_id="3b722897-4168-4506-8f5f-58122808827e"
-production_volume_snapshot_id_full="c7b9d22c-1a01-4b18-b6be-4f92002001ea"
-production_volume_snapshot_id_empty="32d527a7-b567-4948-9b9d-58c7e16006d0"
+sandbox_volume_snapshot_id="2bf194d5-a7dc-48c7-89fb-10ed76a2d1e1"
+production_volume_snapshot_id_full="e217babc-74ca-403c-b9a3-661278d952eb"
+production_volume_snapshot_id_empty="6dce8bb8-4827-4153-b71d-6186bd64d3f2"
 project_id=$(grep "SCALEWAY_RESTORE_PROJECT_ID=" ../../.env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 
 bold=$(tput bold)
