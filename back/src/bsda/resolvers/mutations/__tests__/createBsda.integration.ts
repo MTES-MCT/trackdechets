@@ -1135,6 +1135,90 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toBeDefined();
   });
 
+  it("should auto fill the worker certification infos if they are present on its profile", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const worker = await companyFactory();
+    await prisma.workerCertification.create({
+      data: {
+        Company: { connect: { id: worker.id } },
+        certificationNumber: "1234",
+        hasSubSectionFour: true,
+        hasSubSectionThree: true,
+        validityLimit: new Date().toISOString() as any,
+        organisation: "Test Certification"
+      }
+    });
+
+    const input: BsdaInput = {
+      type: "OTHER_COLLECTIONS",
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: worker.siret,
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    const createdBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: data.createBsda.id }
+    });
+    expect(createdBsda.workerCertificationHasSubSectionFour).toBe(true);
+    expect(createdBsda.workerCertificationHasSubSectionThree).toBe(true);
+    expect(createdBsda.workerCertificationCertificationNumber).toBe("1234");
+    expect(createdBsda.workerCertificationValidityLimit).toBeDefined();
+    expect(createdBsda.workerCertificationOrganisation).toBe(
+      "Test Certification"
+    );
+  });
+
   it("should allow creating the bsda with intermediaries", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: intermediaryCompany } = await userWithCompanyFactory(

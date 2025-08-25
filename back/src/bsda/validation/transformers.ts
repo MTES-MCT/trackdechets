@@ -14,7 +14,7 @@ export const runTransformers = async (
   bsda: ParsedZodBsda,
   context: BsdaValidationContext
 ): Promise<ParsedZodBsda> => {
-  const transformers = [sirenifyBsda, recipifyBsda];
+  const transformers = [sirenifyBsda, recipifyBsda, fillWorkerCertification];
   const sealedFields = await getSealedFields(bsda, context);
   for (const transformer of transformers) {
     bsda = await transformer(bsda, sealedFields);
@@ -51,6 +51,38 @@ export const fillWasteConsistenceWhenForwarding: ZodBsdaTransformer =
 
 export const updateTransporterRecepisse: ZodBsdaTransporterTransformer =
   async bsdaTransporter => recipifyTransporter(bsdaTransporter);
+
+export async function fillWorkerCertification(
+  bsda: ParsedZodBsda,
+  sealedFields: string[]
+): Promise<ParsedZodBsda> {
+  if (
+    sealedFields.includes("workerCompanySiret") ||
+    bsda.workerIsDisabled ||
+    !bsda.workerCompanySiret
+  ) {
+    return bsda;
+  }
+
+  const company = await prisma.company.findFirst({
+    where: { siret: bsda.workerCompanySiret },
+    include: { workerCertification: true }
+  });
+
+  const certification = company?.workerCertification;
+
+  if (certification) {
+    bsda.workerCertificationHasSubSectionFour = certification.hasSubSectionFour;
+    bsda.workerCertificationHasSubSectionThree =
+      certification.hasSubSectionThree;
+    bsda.workerCertificationCertificationNumber =
+      certification.certificationNumber;
+    bsda.workerCertificationValidityLimit = certification.validityLimit;
+    bsda.workerCertificationOrganisation = certification.organisation as any;
+  }
+
+  return bsda;
+}
 
 export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
   bsda => {
