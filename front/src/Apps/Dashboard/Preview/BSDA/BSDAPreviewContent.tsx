@@ -23,6 +23,7 @@ import {
 import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsddSummary";
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
+import BSDAPreviewNextBsda from "./BSDAPreviewNextBsda";
 
 interface BSDAPreviewContentProps {
   bsdId: string;
@@ -88,6 +89,15 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
       label: "Destinataire",
       iconId: "fr-icon-arrow-right-line" as FrIconClassName
     },
+    ...(bsd?.forwardedIn?.id || bsd?.groupedIn?.id
+      ? [
+          {
+            tabId: "bsdaSuite",
+            label: "BSDA suite",
+            iconId: "fr-icon-arrow-right-line" as FrIconClassName
+          }
+        ]
+      : []),
     ...(actorsPresent
       ? [
           {
@@ -118,6 +128,7 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
       entreprise: <BSDAPreviewWorker bsd={bsd} />,
       transport: <BSDAPreviewTransport bsd={bsd} />,
       destination: <BSDAPreviewDestination bsd={bsd} />,
+      bsdaSuite: <BSDAPreviewNextBsda bsd={bsd} />,
       acteurs: <BSDAPreviewActors bsd={bsd} />,
       associes: <BSDAPreviewAssociatedBsdas bsd={bsd} />
     }),
