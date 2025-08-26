@@ -84,34 +84,25 @@ export class WasteConsistenceMigration {
     const isFirstBatch = startId === this.startFromId;
     const operator = isFirstBatch ? ">=" : ">";
 
-    // Single UPDATE query that processes the next batch of records directly
-    // This avoids the expensive SELECT + UPDATE pattern
-    const result = await prisma.$queryRaw<
-      { updated_count: number; max_id: string | null }[]
-    >`
-      WITH updated_records AS (
-        UPDATE "Form" 
-        SET "wasteDetailsConsistence_new" = ARRAY["wasteDetailsConsistence"::"Consistence"]
-        WHERE id IN (
-          SELECT id 
-          FROM "Form" 
-          WHERE id ${Prisma.raw(operator)} ${startId}
-          AND "wasteDetailsConsistence" IS NOT NULL 
-          AND "wasteDetailsConsistence_new" IS NULL
-          ORDER BY id ASC 
-          LIMIT ${this.batchSize}
-        )
-        RETURNING id
+    // UPDATE with subquery to handle ORDER BY and LIMIT
+    const result = await prisma.$queryRaw<{ id: string }[]>`
+      UPDATE "Form" 
+      SET "wasteDetailsConsistence_new" = ARRAY["wasteDetailsConsistence"::"Consistence"]
+      WHERE id IN (
+        SELECT id 
+        FROM "Form" 
+        WHERE id ${Prisma.raw(operator)} ${startId}
+        AND "wasteDetailsConsistence" IS NOT NULL 
+        AND "wasteDetailsConsistence_new" IS NULL
+        ORDER BY id ASC 
+        LIMIT ${this.batchSize}
       )
-      SELECT 
-        COUNT(*)::int AS updated_count,
-        MAX(id) AS max_id
-      FROM updated_records
+      RETURNING id
     `;
 
-    const batchResult = result[0];
-    const updatedCount = batchResult.updated_count || 0;
-    const lastProcessedId = batchResult.max_id || startId;
+    const updatedCount = result.length;
+    const lastProcessedId =
+      result.length > 0 ? result[result.length - 1].id : startId;
 
     return {
       updated: updatedCount,
