@@ -80,48 +80,41 @@ export class WasteConsistenceMigration {
   private async processBatch(
     startId: string
   ): Promise<{ updated: number; lastProcessedId: string }> {
-    // Find records that need migration using raw query for the new column check
-    // Use >= for first batch (startFromId), > for subsequent batches to handle non-sequential IDs
+    // Use >= for first batch (startFromId), > for subsequent batches
     const isFirstBatch = startId === this.startFromId;
     const operator = isFirstBatch ? ">=" : ">";
 
-    const formsToUpdate = await prisma.$queryRaw<
-      { id: string; wasteDetailsConsistence: string }[]
+    // Single UPDATE query that processes the next batch of records directly
+    // This avoids the expensive SELECT + UPDATE pattern
+    const result = await prisma.$queryRaw<
+      { updated_count: number; max_id: string | null }[]
     >`
-      SELECT id, "wasteDetailsConsistence" 
-      FROM "Form" 
-      WHERE id ${Prisma.raw(operator)} ${startId}
-      AND "wasteDetailsConsistence" IS NOT NULL 
-      AND "wasteDetailsConsistence_new" IS NULL
-      ORDER BY id ASC 
-      LIMIT ${this.batchSize}
+      WITH updated_records AS (
+        UPDATE "Form" 
+        SET "wasteDetailsConsistence_new" = ARRAY["wasteDetailsConsistence"::"Consistence"]
+        WHERE id IN (
+          SELECT id 
+          FROM "Form" 
+          WHERE id ${Prisma.raw(operator)} ${startId}
+          AND "wasteDetailsConsistence" IS NOT NULL 
+          AND "wasteDetailsConsistence_new" IS NULL
+          ORDER BY id ASC 
+          LIMIT ${this.batchSize}
+        )
+        RETURNING id
+      )
+      SELECT 
+        COUNT(*)::int AS updated_count,
+        MAX(id) AS max_id
+      FROM updated_records
     `;
 
-    if (formsToUpdate.length === 0) {
-      return { updated: 0, lastProcessedId: startId };
-    }
-
-    // Update all records in a single query using unnest arrays
-    const ids = formsToUpdate.map(form => form.id);
-    const consistences = formsToUpdate.map(
-      form => form.wasteDetailsConsistence
-    );
-
-    await prisma.$executeRaw`
-      UPDATE "Form" 
-      SET "wasteDetailsConsistence_new" = ARRAY[consistence_data.consistence::"Consistence"]
-      FROM (
-        SELECT 
-          unnest(${ids}::text[]) AS id,
-          unnest(${consistences}::"Consistence"[]) AS consistence
-      ) AS consistence_data
-      WHERE "Form".id = consistence_data.id
-    `;
-
-    const lastProcessedId = formsToUpdate[formsToUpdate.length - 1].id;
+    const batchResult = result[0];
+    const updatedCount = batchResult.updated_count || 0;
+    const lastProcessedId = batchResult.max_id || startId;
 
     return {
-      updated: formsToUpdate.length,
+      updated: updatedCount,
       lastProcessedId
     };
   }
