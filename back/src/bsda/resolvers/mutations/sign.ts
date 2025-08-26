@@ -265,7 +265,12 @@ async function signReception(
   const updateInput: Prisma.BsdaUpdateInput = {
     destinationReceptionSignatureAuthor: input.author,
     destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // on autorise l'installation de destination à signer même si le ou les
+    // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+    // premier transporteur ait finalement décidé d'aller directement à destination.
+    // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+    transporters: { deleteMany: { transporterTransportSignatureDate: null } }
   };
 
   // Le déchet a été refusé: envoi d'un email
