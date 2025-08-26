@@ -1,67 +1,87 @@
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { Prisma } from "@prisma/client";
+import { addDays, format, parseISO, isAfter } from "date-fns";
 
 export class WasteConsistenceMigration {
   // CONFIGURATION: Edit these values as needed
-  private batchSize = 5000;
-  private delayMs = 2000; // 2 seconds between batches
+  private delayMs = 1000; // Milliseconds between date ranges
+  private daysPerRange = 7; // Process records in 7-day chunks (1 week)
 
-  // TO RESUME: Set this to the "Last ID" from the last log message
-  // Example: If last log showed "Last ID: 123456", set this to "123456"
-  private startFromId = "1";
+  // Date range configuration
+  private startDate = "2020-11-29"; // Start processing from this date
+  private endDate = "2025-08-28"; // Stop processing at this date
+
+  // TO RESUME: Set this to the "Last Date Range" from the last log message
+  // Example: If last log showed "Date Range: 2024-01-15 to 2024-01-22", set this to "2024-01-15"
+  private startFromDate: string | null = null; // "2024-01-15"
 
   async run() {
     logger.info("=== WASTE CONSISTENCE MIGRATION ===");
     logger.info("Converting scalar wasteDetailsConsistence to arrays");
+    logger.info(
+      `Processing in ${this.daysPerRange}-day chunks with ${this.delayMs}ms delay between ranges`
+    );
 
     // Check if new column exists
     await this.ensureColumnExists();
 
-    logger.info(`Starting migration from ID: ${this.startFromId}`);
-    logger.info(`Batch size: ${this.batchSize}, Delay: ${this.delayMs}ms`);
+    const startMsg = this.startFromDate
+      ? `Resuming from date: ${this.startFromDate}`
+      : `Starting migration from: ${this.startDate}`;
+    logger.info(startMsg);
+    logger.info(`End date: ${this.endDate}`);
+    logger.info(
+      `Date range size: ${this.daysPerRange} days, Delay: ${this.delayMs}ms`
+    );
 
-    let currentId: string = this.startFromId;
-    let batchNumber = 0;
+    let currentDate = this.startFromDate
+      ? parseISO(this.startFromDate)
+      : parseISO(this.startDate);
+    const endDateParsed = parseISO(this.endDate);
     let totalUpdated = 0;
+    let rangeNumber = 0;
 
-    // eslint-disable-next-line no-constant-condition
-    while (true) {
-      batchNumber++;
+    while (!isAfter(currentDate, endDateParsed)) {
+      rangeNumber++;
 
-      // Process one batch
-      const result = await this.processBatch(currentId);
+      // Calculate end of current range (add days)
+      const rangeEnd = addDays(currentDate, this.daysPerRange);
 
-      if (result.updated === 0) {
-        logger.info("No more records to process. Migration complete!");
-        break;
-      }
+      // Don't go past the overall end date
+      const actualRangeEnd = isAfter(rangeEnd, endDateParsed)
+        ? endDateParsed
+        : rangeEnd;
 
-      totalUpdated += result.updated;
-      currentId = result.lastProcessedId;
+      const rangeStart = format(currentDate, "yyyy-MM-dd");
+      const rangeEndStr = format(actualRangeEnd, "yyyy-MM-dd");
 
       logger.info(
-        `Batch ${batchNumber}: Updated ${result.updated} records ` +
-          `(Total: ${totalUpdated}, Last ID: ${result.lastProcessedId})`
+        `\n--- Processing Range ${rangeNumber}: ${rangeStart} to ${rangeEndStr} ---`
       );
 
-      // Add delay between batches to reduce database load
+      // Process all records in this date range at once
+      const rangeUpdated = await this.processDateRange(
+        currentDate,
+        actualRangeEnd
+      );
+      totalUpdated += rangeUpdated;
+
+      logger.info(
+        `Range ${rangeNumber} completed: ${rangeUpdated} records updated`
+      );
+
+      // Move to next range
+      currentDate = addDays(actualRangeEnd, 7); // Start next range the day after
+
+      // Add delay between ranges
       if (this.delayMs > 0) {
         await this.sleep(this.delayMs);
-      }
-
-      // Safety check for runaway migrations
-      if (batchNumber > 100000) {
-        logger.warn("Processed 100,000 batches. Stopping as safety measure.");
-        logger.info(
-          `To continue, edit startFromId to "${currentId}" and restart the script`
-        );
-        break;
       }
     }
 
     logger.info(
-      `Migration completed! Updated ${totalUpdated} records in ${batchNumber} batches.`
+      `\nMigration completed! Updated ${totalUpdated} records in ${rangeNumber} date ranges.`
     );
   }
 
@@ -77,37 +97,20 @@ export class WasteConsistenceMigration {
     }
   }
 
-  private async processBatch(
-    startId: string
-  ): Promise<{ updated: number; lastProcessedId: string }> {
-    // Use >= for first batch (startFromId), > for subsequent batches
-    const isFirstBatch = startId === this.startFromId;
-    const operator = isFirstBatch ? ">=" : ">";
-
-    // UPDATE with subquery to handle ORDER BY and LIMIT
+  private async processDateRange(
+    startDate: Date,
+    endDate: Date
+  ): Promise<number> {
+    // Update all records within this date range at once
     const result = await prisma.$queryRaw<{ id: string }[]>`
-      UPDATE "Form" 
-      SET "wasteDetailsConsistence_new" = ARRAY["wasteDetailsConsistence"::"Consistence"]
-      WHERE id IN (
-        SELECT id 
-        FROM "Form" 
-        WHERE id ${Prisma.raw(operator)} ${startId}
-        AND "wasteDetailsConsistence" IS NOT NULL 
-        AND "wasteDetailsConsistence_new" IS NULL
-        ORDER BY id ASC 
-        LIMIT ${this.batchSize}
-      )
-      RETURNING id
+      UPDATE "Form" f
+      SET "wasteDetailsConsistence_new" = ARRAY[f."wasteDetailsConsistence"::"Consistence"]
+      WHERE f."wasteDetailsConsistence" IS NOT NULL 
+      AND f."updatedAt" BETWEEN ${startDate}::date AND ${endDate}::date
+      RETURNING f.id
     `;
 
-    const updatedCount = result.length;
-    const lastProcessedId =
-      result.length > 0 ? result[result.length - 1].id : startId;
-
-    return {
-      updated: updatedCount,
-      lastProcessedId
-    };
+    return result.length;
   }
 
   private sleep(ms: number): Promise<void> {
