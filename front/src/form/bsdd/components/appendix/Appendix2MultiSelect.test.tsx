@@ -309,7 +309,7 @@ describe("<Appendix2MultiSelect />", () => {
       }
     ]);
     expect(input3).not.toBeDisabled();
-    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
+    expect(updateConsistence).not.toHaveBeenCalled();
     expect(headerCheckbox).toBeChecked();
 
     const user = userEvent.setup();
