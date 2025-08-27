@@ -37,7 +37,7 @@ import {
 import { getEmptyReturnADRLabel } from "../../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../../helpers/citerneNotWashedOutReason";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
-import Decimal from "decimal.js";
+import { displayWasteQuantity } from "../../../common/pdf/utils";
 
 type GroupeInBsd = {
   readableId: string;
@@ -70,14 +70,6 @@ function ReceiptFields({
     </p>
   );
 }
-
-const displayWasteQuantity = (quantity, units = "tonne(s)") => {
-  if (isDefined(quantity)) {
-    return `${new Decimal(quantity).toDecimalPlaces(6).toNumber()} ${units}`;
-  }
-
-  return "Non renseignée";
-};
 
 type QuantityFieldsProps = {
   isSubjectToADR?: boolean | null;

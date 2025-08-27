@@ -104,7 +104,6 @@ export interface BsdElastic {
   isReturnFor: string[];
   sirets: string[];
 
-  isAllWasteFor: string[];
   isExhaustiveWasteFor: string[];
 
   // Révisions
@@ -300,7 +299,6 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isReturnFor: stringField,
   sirets: stringField,
 
-  isAllWasteFor: stringField,
   isExhaustiveWasteFor: stringField,
   isPendingRevisionFor: stringField,
   isEmittedRevisionFor: stringField,
@@ -349,7 +347,7 @@ export const index: BsdIndexationConfig = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v1.1.4",
+  mappings_version: "v1.1.5",
   mappings: {
     properties
   },
