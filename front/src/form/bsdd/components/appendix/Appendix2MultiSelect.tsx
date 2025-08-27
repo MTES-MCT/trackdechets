@@ -34,7 +34,7 @@ type Appendix2MultiSelectProps = {
   updatePackagings: (packagings: PackagingInfoInput[]) => void;
   // callback permettant de mettre à jour la consistance du bordereau
   // en fonction des annexes 2 sélectionnées
-  updateConsistence: (consistence: Consistence[]) => void;
+  updateConsistence: (consistence: Consistence) => void;
 };
 
 // Limite le nombre de bordereaux que l'on peut afficher dans le tableau
@@ -193,13 +193,14 @@ export default function Appendix2MultiSelect({
         })
       )
     );
-    updateConsistence([
+    const uniqueConsistence = [
       ...new Set(
-        currentlyAnnexedForms.flatMap(
-          ({ form }) => form.wasteDetails?.consistence ?? []
-        )
+        currentlyAnnexedForms.map(({ form }) => form.wasteDetails?.consistence)
       )
-    ]);
+    ].filter(Boolean);
+    if (uniqueConsistence.length === 1) {
+      updateConsistence(uniqueConsistence[0]!);
+    }
   }, [
     currentlyAnnexedForms,
     updateTotalQuantity,
