@@ -24,6 +24,20 @@
 
 .td-dsfr-modal-bsd-form {
   width: 100%;
+
+  .fr-modal__body {
+    max-height: none !important;
+    height: 98vh !important;
+
+    @include desktop {
+      height: 90vh !important;
+    }
+  }
+
+  .fr-tabs {
+    min-height: 700px;
+  }
+
   @include lg-desktop {
     max-width: 1099px;
   }
