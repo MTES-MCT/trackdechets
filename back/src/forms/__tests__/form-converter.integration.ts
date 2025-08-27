@@ -137,7 +137,7 @@ describe("expandFormFromDb", () => {
         numberOfPackages: 1,
         quantity: 22.5,
         quantityType: form.wasteDetailsQuantityType,
-        consistence: form.wasteDetailsConsistence,
+        consistence: form.wasteDetailsConsistence[0],
         pop: false,
         isDangerous: true,
         analysisReferences: [],
