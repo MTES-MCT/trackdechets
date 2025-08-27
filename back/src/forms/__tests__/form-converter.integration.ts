@@ -238,7 +238,7 @@ describe("expandFormFromDb", () => {
         numberOfPackages: 1,
         quantity: 1,
         quantityType: "ESTIMATED",
-        consistence: ["SOLID"],
+        consistence: "SOLID",
         pop: false,
         isDangerous: forwardedIn!.wasteDetailsIsDangerous
       },
