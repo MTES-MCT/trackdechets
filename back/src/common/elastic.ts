@@ -104,10 +104,6 @@ export interface BsdElastic {
   isReturnFor: string[];
   sirets: string[];
 
-  isIncomingWasteFor: string[];
-  isOutgoingWasteFor: string[];
-  isTransportedWasteFor: string[];
-  isManagedWasteFor: string[];
   isAllWasteFor: string[];
   isExhaustiveWasteFor: string[];
 
@@ -304,10 +300,6 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   isReturnFor: stringField,
   sirets: stringField,
 
-  isIncomingWasteFor: stringField,
-  isOutgoingWasteFor: stringField,
-  isTransportedWasteFor: stringField,
-  isManagedWasteFor: stringField,
   isAllWasteFor: stringField,
   isExhaustiveWasteFor: stringField,
   isPendingRevisionFor: stringField,

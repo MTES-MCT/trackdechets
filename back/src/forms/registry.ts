@@ -1,5 +1,3 @@
-import { getTransporterCompanyOrgId } from "@td/constants";
-import { BsdElastic } from "../common/elastic";
 import type {
   AllWaste,
   IncomingWaste,
@@ -9,7 +7,6 @@ import type {
 } from "@td/codegen-back";
 import {
   GenericWaste,
-  RegistryFields,
   emptyAllWaste,
   emptyIncomingWaste,
   emptyManagedWaste,
@@ -17,7 +14,6 @@ import {
   emptyTransportedWaste
 } from "../registry/types";
 import { Bsdd } from "./types";
-import { FormForElastic } from "./elastic";
 import { formToBsdd } from "./compat";
 import { getBsddSubType } from "../common/subTypes";
 import { splitAddress } from "../common/addresses";
@@ -213,66 +209,6 @@ const getIntermediariesData = (bsdd: ReturnType<typeof formToBsdd>) => ({
   intermediary3CompanyName: bsdd.intermediaries?.[2]?.name ?? null,
   intermediary3CompanySiret: bsdd.intermediaries?.[2]?.siret ?? null
 });
-
-export function getRegistryFields(
-  form: FormForElastic
-): Pick<BsdElastic, RegistryFields> {
-  const registryFields: Record<RegistryFields, string[]> = {
-    isIncomingWasteFor: [],
-    isOutgoingWasteFor: [],
-    isTransportedWasteFor: [],
-    isManagedWasteFor: [],
-    isAllWasteFor: []
-  };
-
-  if (form.receivedAt) {
-    if (form.recipientCompanySiret) {
-      registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-    }
-  }
-
-  if (form.sentAt) {
-    registryFields.isAllWasteFor = [
-      form.recipientCompanySiret,
-      form.emitterCompanySiret,
-      form.ecoOrganismeSiret,
-      form.traderCompanySiret,
-      form.brokerCompanySiret
-    ].filter(Boolean);
-
-    registryFields.isOutgoingWasteFor = [
-      form.emitterCompanySiret,
-      form.ecoOrganismeSiret
-    ].filter(Boolean);
-
-    registryFields.isManagedWasteFor = [
-      form.traderCompanySiret,
-      form.brokerCompanySiret
-    ].filter(Boolean);
-
-    if (form.intermediaries?.length) {
-      for (const intermediary of form.intermediaries) {
-        const intermediaryOrgId = intermediary.siret ?? intermediary.vatNumber;
-        if (intermediaryOrgId) {
-          registryFields.isManagedWasteFor.push(intermediaryOrgId);
-          registryFields.isAllWasteFor.push(intermediaryOrgId);
-        }
-      }
-    }
-  }
-
-  for (const transporter of form.transporters ?? []) {
-    if (transporter.takenOverAt) {
-      const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
-      if (transporterCompanyOrgId) {
-        registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
-        registryFields.isAllWasteFor.push(transporterCompanyOrgId);
-      }
-    }
-  }
-
-  return registryFields;
-}
 
 /**
  * Return finalOperations

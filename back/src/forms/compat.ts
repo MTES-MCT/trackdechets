@@ -10,7 +10,6 @@ import type {
   ParcelNumber
 } from "@td/codegen-back";
 import { Bsdd } from "./types";
-import { RegistryForm } from "../registry/elastic";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
 import { getFormADRMention } from "@td/constants";
 import { RegistryV2Bsdd } from "../registryV2/types";
@@ -22,7 +21,7 @@ import { RegistryV2Bsdd } from "../registryV2/types";
  */
 export function simpleFormToBsdd(
   form: Omit<
-    RegistryForm,
+    RegistryV2Bsdd,
     | "grouping"
     | "forwarding"
     | "finalOperations"
@@ -276,13 +275,13 @@ export function simpleFormToBsdd(
   };
 }
 
-export function formToBsdd(form: RegistryForm): Bsdd & {
+export function formToBsdd(form: RegistryV2Bsdd): Bsdd & {
   grouping: Bsdd[];
 } & {
   forwardedIn: (Bsdd & { grouping: Bsdd[] }) | null;
 } & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
-} & Pick<RegistryForm, "finalOperations"> & {
+} & Pick<RegistryV2Bsdd, "finalOperations"> & {
     intermediaries: IntermediaryFormAssociation[] | null;
   } {
   let grouping: Bsdd[] = [];
