@@ -107,6 +107,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
       code: bsda.wasteCode,
       name: bsda.wasteMaterialName, // TODO To remove - keeps support for `name` for now
       consistence: bsda.wasteConsistence,
+      consistenceDescription: bsda.wasteConsistenceDescription,
       familyCode: bsda.wasteFamilyCode,
       materialName: bsda.wasteMaterialName,
       sealNumbers: bsda.wasteSealNumbers,
@@ -593,6 +594,7 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteMaterialName:
       chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
+    wasteConsistenceDescription: chain(waste, w => w.consistenceDescription),
     wasteSealNumbers: undefinedOrDefault(
       chain(waste, w => w.sealNumbers),
       []

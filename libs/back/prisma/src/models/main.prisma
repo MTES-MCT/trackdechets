@@ -1709,6 +1709,7 @@ model Bsda {
   wasteFamilyCode               String?
   wasteMaterialName             String?
   wasteConsistence              BsdaConsistence?
+  wasteConsistenceDescription   String?
   wasteSealNumbers              String[]
   wasteIsSubjectToADR           Boolean?
   wasteAdr                      String?
@@ -2328,6 +2329,7 @@ enum BsdaType {
 enum BsdaConsistence {
   SOLIDE
   PULVERULENT
+  PATEUX
   OTHER
 }
 
