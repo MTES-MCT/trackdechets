@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunktrackdechets=self.webpackChunktrackdechets||[]).push([[2498],{92498:(e,c,t)=>{t.d(c,{createArchitectureServices:()=>r.S});var r=t(73009);t(58198)}}]);
