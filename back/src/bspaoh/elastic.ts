@@ -18,7 +18,6 @@ import { BspaohIncludes } from "./types";
 import { getBspaohSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
-import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export const BspaohForElasticInclude = {
   ...BspaohIncludes
