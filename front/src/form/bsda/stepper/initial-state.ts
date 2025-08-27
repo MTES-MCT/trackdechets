@@ -69,6 +69,7 @@ export function getInitialState(bsda?: Bsda | null): BsdaFormikValues {
       familyCode: bsda?.waste?.familyCode ?? "",
       materialName: bsda?.waste?.materialName ?? "",
       consistence: bsda?.waste?.consistence ?? BsdaConsistence.Solide,
+      consistenceDescription: bsda?.waste?.consistenceDescription ?? "",
       sealNumbers: bsda?.waste?.sealNumbers ?? [],
       adr: bsda?.waste?.adr ?? "",
       nonRoadRegulationMention: bsda?.waste?.nonRoadRegulationMention ?? "",
