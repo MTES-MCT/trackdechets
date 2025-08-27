@@ -713,7 +713,7 @@ input WasteDetailsInput {
   quantityType: QuantityType
 
   "Consistance"
-  consistence: [Consistence!]
+  consistence: Consistence
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean

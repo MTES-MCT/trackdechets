@@ -31,7 +31,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: ["SOLID"],
+      consistence: "SOLID",
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -71,7 +71,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: ["LIQUID"],
+      consistence: "LIQUID",
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -287,7 +287,8 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
-    expect(updateConsistence).toHaveBeenCalledWith(["SOLID"]);
+    expect(updateConsistence).toHaveBeenCalledWith("SOLID");
+    updateConsistence.mockClear();
 
     fireEvent.click(checkbox3);
     await waitFor(() => expect(checkbox3).toBeChecked());
@@ -309,7 +310,7 @@ describe("<Appendix2MultiSelect />", () => {
       }
     ]);
     expect(input3).not.toBeDisabled();
-    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
+    expect(updateConsistence).not.toHaveBeenCalled();
     expect(headerCheckbox).toBeChecked();
 
     const user = userEvent.setup();
@@ -334,6 +335,7 @@ describe("<Appendix2MultiSelect />", () => {
     expect(
       within(row2[7]).getByText("La quantité doit être un nombre supérieur à 0")
     ).toBeInTheDocument();
+    updateConsistence.mockClear();
 
     // La checkbox du header permet de tout déselectionner
     fireEvent.click(headerCheckbox);
@@ -345,7 +347,7 @@ describe("<Appendix2MultiSelect />", () => {
 
     expect(updateTotalQuantity).toHaveBeenCalledWith(0);
     expect(updatePackagings).toHaveBeenCalledWith([]);
-    expect(updateConsistence).toHaveBeenCalledWith([]);
+    expect(updateConsistence).not.toHaveBeenCalled();
 
     // Les inputs sont tous disabled et leurs valeurs est reset à
     // la quantité restante disponible
@@ -357,6 +359,7 @@ describe("<Appendix2MultiSelect />", () => {
 
     expect(input3).toBeDisabled();
     expect(input3).toHaveValue(1);
+    updateConsistence.mockClear();
 
     // Si l'on clique à nouveau sur la checkbox du header, tous les
     // bordereaux sont sélectionnés
@@ -383,7 +386,7 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
-    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
+    expect(updateConsistence).not.toHaveBeenCalled();
 
     const readableIfFilter = screen.getByLabelText("Numéro de bordereau");
     expect(readableIfFilter).toBeInTheDocument();

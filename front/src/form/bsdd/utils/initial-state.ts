@@ -191,7 +191,7 @@ export function getInitialState(f?: Form | null): FormFormikValues {
         : [emptyBsddPackaging],
       quantity: f?.wasteDetails?.quantity ?? null,
       quantityType: f?.wasteDetails?.quantityType ?? QuantityType.Estimated,
-      consistence: f?.wasteDetails?.consistence ?? [Consistence.Solid],
+      consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,
       pop: f?.wasteDetails?.pop ?? false,
       isDangerous: f?.wasteDetails?.isDangerous ?? false,
       parcelNumbers: f?.wasteDetails?.parcelNumbers ?? [],

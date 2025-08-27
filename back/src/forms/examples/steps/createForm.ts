@@ -171,7 +171,7 @@ export function createAppendix1Form(
             isSubjectToADR: false,
             onuCode: null,
             name: "Huiles",
-            consistence: ["LIQUID"]
+            consistence: "LIQUID"
           }
         }
       };
