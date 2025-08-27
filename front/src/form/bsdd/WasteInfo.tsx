@@ -229,8 +229,8 @@ export default function WasteInfo({ disabled }) {
           <div className="tw-flex tw-flex-row tw-gap-4">
             <Field
               name="wasteDetails.consistence"
-              id="SOLID"
-              label={Consistence.Solid}
+              id={Consistence.Solid}
+              label="Solide"
               component={RadioButton}
               disabled={disabled}
             />
@@ -243,15 +243,15 @@ export default function WasteInfo({ disabled }) {
             />
             <Field
               name="wasteDetails.consistence"
-              id="GASEOUS"
-              label={Consistence.Gaseous}
+              id={Consistence.Gaseous}
+              label="Gazeux"
               component={RadioButton}
               disabled={disabled}
             />
             <Field
               name="wasteDetails.consistence"
-              id="DOUGHY"
-              label={Consistence.Doughy}
+              id={Consistence.Doughy}
+              label="Pâteux"
               component={RadioButton}
               disabled={disabled}
             />
