@@ -218,8 +218,9 @@ export const formSchema = object().shape({
       /(REAL|ESTIMATED)/,
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
-    consistence: array().of(
-      mixed<Consistence>().oneOf(Object.values(Consistence))
+    consistence: string().oneOf(
+      Object.values(Consistence),
+      "La consistance du déchet doit être précisée"
     )
   }),
   temporaryStorageDetail: object()
