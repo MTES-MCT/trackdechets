@@ -24,7 +24,6 @@ import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { subMonths } from "date-fns";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import RhfOperationModeSelect from "../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import Select from "@codegouvfr/react-dsfr/Select";
@@ -32,6 +31,7 @@ import { toCompanyInput } from "../bsff/SignBsffPackagingForm";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput/RhfExtraEuropeanCompanyManualInput";
 import CompanyContactInfo from "../../../../Apps/Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
+import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -390,7 +390,7 @@ function SignOperationModal({
         {isGroupement && noTraceability !== null && (
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-12 fr-pb-0">
-              <Checkbox
+              <SingleCheckbox
                 options={[
                   {
                     label:
@@ -459,7 +459,7 @@ function SignOperationModal({
             </div>
             <div className="fr-grid-row fr-grid-row--gutters">
               <div className="fr-col-12">
-                <Checkbox
+                <SingleCheckbox
                   options={[
                     {
                       label: "L'entreprise est située hors UE",

@@ -1,5 +1,5 @@
 import React from "react";
-import { Bsvhu, BsvhuStatus } from "@td/codegen-ui";
+import { Bsvhu, BsvhuStatus, WasteAcceptationStatus } from "@td/codegen-ui";
 import {
   PreviewContainer,
   PreviewContainerRow,
@@ -24,7 +24,7 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
           />
 
           <PreviewTextRow
-            label="Siret"
+            label="SIRET"
             value={bsd.destination?.company?.siret}
           />
 
@@ -75,7 +75,12 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
 
         <PreviewContainerCol gridWidth={3} highlight>
           <PreviewDateRow
-            label="Reçu et accepté le"
+            label={
+              bsd.destination?.reception?.acceptationStatus ===
+              WasteAcceptationStatus.Refused
+                ? "Reçu et refusé le"
+                : "Reçu et accepté le"
+            }
             value={bsd.destination?.reception?.date}
           />
 

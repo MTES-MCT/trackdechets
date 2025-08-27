@@ -36,7 +36,7 @@ export const ssdFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -66,7 +66,9 @@ export const ssdFormShape: FormShape = [
         validation: {
           wasteCode: nonEmptyString
         },
-        style: { parentClassName: "fr-grid-row--bottom tw-relative" }
+        style: { parentClassName: "fr-grid-row--bottom tw-relative" },
+        //@ts-ignore
+        isWasteSelector: true
       },
       {
         name: "wasteDescription",
@@ -77,7 +79,7 @@ export const ssdFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -88,7 +90,7 @@ export const ssdFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         Component: SecondaryWasteCodes,
@@ -109,7 +111,7 @@ export const ssdFormShape: FormShape = [
         validation: {
           administrativeActReference: nonEmptyString
         },
-        style: { className: "fr-col-4" },
+        style: { className: "fr-col-md-4" },
         choices: ADMINISTRATIVE_ACT_REFERENCES.map(reference => ({
           label: reference,
           value: reference
@@ -136,7 +138,7 @@ export const ssdFormShape: FormShape = [
           product: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-12 fr-col-md-10" }
       },
       {
         Component: WeightSelector,
@@ -160,7 +162,7 @@ export const ssdFormShape: FormShape = [
               processingDate: nonEmptyString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           },
           {
             name: "processingEndDate",
@@ -170,7 +172,7 @@ export const ssdFormShape: FormShape = [
               processingEndDate: optionalString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           }
         ]
       },
@@ -235,7 +237,7 @@ export const ssdFormShape: FormShape = [
               useDate: optionalString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           },
           {
             name: "dispatchDate",
@@ -246,7 +248,7 @@ export const ssdFormShape: FormShape = [
               dispatchDate: optionalString
             },
             type: "date",
-            style: { className: "fr-col-4" }
+            style: { className: "fr-col-8 fr-col-md-4" }
           }
         ],
         infoText:

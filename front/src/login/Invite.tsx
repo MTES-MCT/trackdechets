@@ -206,11 +206,11 @@ export default function Invite() {
             .required("Le mot de passe est un champ requis")
             .test({
               name: "is-valid-password",
-              test: value => {
+              test: async value => {
                 if (!value) {
                   return false;
                 }
-                const { hintType } = getPasswordHint(value);
+                const { hintType } = await getPasswordHint(value);
                 if (hintType === "error") {
                   return false;
                 }

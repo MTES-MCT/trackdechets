@@ -1,5 +1,5 @@
 import React from "react";
-import { BsdType } from "@td/codegen-ui";
+import { BsdaType, BsdType } from "@td/codegen-ui";
 import { PreviewContainer, PreviewContainerRow } from "./BSDPreviewComponents";
 import Badge from "../Components/Badge/Badge";
 import { TBsdStatusCode } from "../../common/types/bsdTypes";
@@ -7,17 +7,21 @@ import {
   displayIconWaste,
   displayIconWasteAlternative
 } from "../Components/WasteDetails/WasteDetails";
+import "./BSDPreviewHeader.scss";
+import { getWorkflowLabel } from "../dashboardServices";
 
 interface BSDPreviewHeaderProps {
   bsdStatus: TBsdStatusCode;
   title: string;
   wasteType: BsdType;
+  bsdType?: BsdaType;
   children: React.ReactNode;
 }
-const BSVHUPreviewHeader = ({
+const BSDPreviewHeader = ({
   bsdStatus,
   title,
   wasteType,
+  bsdType,
   children
 }: BSDPreviewHeaderProps) => {
   return (
@@ -31,7 +35,9 @@ const BSVHUPreviewHeader = ({
             {displayIconWasteAlternative(wasteType)}
           </span>
         </div>
-        <h2 className="fr-h3 fr-mb-0 fr-ml-2w fr-mr-2w">{title}</h2>
+        <h2 className="fr-h3 fr-mb-0 fr-ml-2w fr-mr-2w">
+          {title} {bsdType && `- ${getWorkflowLabel(bsdType)}`}
+        </h2>
         <Badge status={bsdStatus} />
       </div>
 
@@ -40,4 +46,4 @@ const BSVHUPreviewHeader = ({
   );
 };
 
-export default BSVHUPreviewHeader;
+export default BSDPreviewHeader;

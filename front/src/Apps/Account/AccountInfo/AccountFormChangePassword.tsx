@@ -2,13 +2,16 @@ import { gql, useMutation } from "@apollo/client";
 import PasswordInput from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mutation, MutationChangePasswordArgs } from "@td/codegen-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import { DsfrNotificationError } from "../../common/Components/Error/Error";
 import { validationAccountPasswordSchema } from "../accountSchema";
 import AccountInfoActionBar from "./AccountInfoActionBar";
-import { getPasswordHint } from "../../../common/components/PasswordHelper";
+import {
+  getPasswordHint,
+  PasswordHintResult
+} from "../../../common/components/PasswordHelper";
 
 const CHANGE_PASSWORD = gql`
   mutation ChangePassword($oldPassword: String!, $newPassword: String!) {
@@ -19,6 +22,7 @@ const CHANGE_PASSWORD = gql`
 `;
 
 export default function AccountFormChangePassword() {
+  const [hint, setHint] = useState<PasswordHintResult | null>(null);
   const [changePassword, { loading, error }] = useMutation<
     Pick<Mutation, "changePassword">,
     MutationChangePasswordArgs
@@ -54,6 +58,12 @@ export default function AccountFormChangePassword() {
   };
 
   const passwordNewValue = watch("newPassword");
+
+  useEffect(() => {
+    getPasswordHint(passwordNewValue).then(result => {
+      setHint(result);
+    });
+  }, [passwordNewValue]);
 
   return (
     <>
@@ -133,16 +143,15 @@ export default function AccountFormChangePassword() {
                         severity: "info"
                       }
                     ]
-                  : [
+                  : hint
+                  ? [
                       {
-                        message: getPasswordHint(passwordNewValue).message,
+                        message: hint.message,
                         severity:
-                          getPasswordHint(passwordNewValue).hintType ===
-                          "success"
-                            ? "valid"
-                            : "error"
+                          hint.hintType === "success" ? "valid" : "error"
                       }
                     ]
+                  : []
               }
             />
           </div>

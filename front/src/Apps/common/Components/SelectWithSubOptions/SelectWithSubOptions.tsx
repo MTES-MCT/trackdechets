@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./selectWithSubOptions.scss";
 import {
   getLabel,
@@ -7,6 +6,7 @@ import {
   onSelectChange
 } from "./SelectWithSubOptions.utils";
 import { Option } from "../Select/Select";
+import SingleCheckbox from "../SingleCheckbox/SingleCheckbox";
 
 interface SelectWithSubOptions {
   selected: Option[];
@@ -23,11 +23,14 @@ const SelectWithSubOptions = ({
   const ref = useRef<React.ElementRef<"div"> | null>(null);
 
   // Close select if user clicks elsewhere in the page
-  const handleClickInPage = (e: MouseEvent) => {
-    if (ref.current && !ref.current.contains(e.target as Node)) {
-      if (isOpen) setIsOpen(false);
-    }
-  };
+  const handleClickInPage = useCallback(
+    (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        if (isOpen) setIsOpen(false);
+      }
+    },
+    [isOpen, ref]
+  );
   useEffect(() => {
     if (isOpen) {
       window.addEventListener("click", handleClickInPage);
@@ -52,8 +55,8 @@ const SelectWithSubOptions = ({
         return (
           <div className="fr-grid-row--gutters" key={optionPath}>
             <div>
-              <Checkbox
-                className={`optionCheckbox fr-ml-${ml * 8}v`}
+              <SingleCheckbox
+                className={`fr-ml-${ml * 8}v`}
                 options={[
                   {
                     label: option.label,

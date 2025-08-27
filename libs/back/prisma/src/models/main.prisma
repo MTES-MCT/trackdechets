@@ -1,13 +1,3 @@
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["metrics", "prismaSchemaFolder"]
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 enum CompanyType {
   PRODUCER
   COLLECTOR
@@ -490,7 +480,7 @@ model Form {
   wasteDetailsNonRoadRegulationMention  String?
   wasteDetailsQuantity                  Decimal?                   @db.Decimal(65, 30)
   wasteDetailsQuantityType              QuantityType?
-  wasteDetailsConsistence               Consistence?
+  wasteDetailsConsistence               Consistence[]
   wasteDetailsPackagingInfos            Json                       @default("[]")
   wasteDetailsPop                       Boolean                    @default(false)
   wasteDetailsSampleNumber              String?

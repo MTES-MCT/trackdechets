@@ -42,7 +42,7 @@ export const incomingTexsFormShape: FormShape = [
         validation: {
           publicId: nonEmptyString
         },
-        style: { className: "fr-col-8" }
+        style: { className: "fr-col-md-8" }
       },
       {
         Component: ReportFor,
@@ -86,7 +86,7 @@ export const incomingTexsFormShape: FormShape = [
           wasteDescription: nonEmptyString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "wasteCodeBale",
@@ -97,7 +97,7 @@ export const incomingTexsFormShape: FormShape = [
           wasteCodeBale: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "wastePop",
@@ -132,7 +132,7 @@ export const incomingTexsFormShape: FormShape = [
           receptionDate: nonEmptyString
         },
         type: "date",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-8 fr-col-md-4" }
       },
       {
         Component: WeightSelector,
@@ -160,7 +160,7 @@ export const incomingTexsFormShape: FormShape = [
           wasteDap: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       }
     ]
   },
@@ -220,7 +220,7 @@ export const incomingTexsFormShape: FormShape = [
           sisIdentifier: optionalString
         },
         type: "text",
-        style: { className: "fr-col-4" }
+        style: { className: "fr-col-md-4" }
       },
       {
         name: "ttdImportNumber",
@@ -233,7 +233,7 @@ export const incomingTexsFormShape: FormShape = [
           ttdImportNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       },
       {
         name: "movementNumber",
@@ -244,7 +244,7 @@ export const incomingTexsFormShape: FormShape = [
           movementNumber: optionalString
         },
         type: "text",
-        style: { className: "fr-col-10" }
+        style: { className: "fr-col-md-10" }
       }
     ]
   },

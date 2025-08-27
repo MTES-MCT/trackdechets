@@ -12,7 +12,7 @@ import { packagingTypeLabels } from "../../Forms/Components/PackagingList/helper
 // 7 colis : 2 Fûts de 50 litres (n° cont1, cont2), 5 GRVs de 1 litre (n° GRV1, GRV2, GRV3)
 export function getPackagingInfosSummary<
   P extends PackagingInfo | BsdaPackaging
->(packagingInfos: P[]) {
+>(packagingInfos: P[], hideDetails?: boolean) {
   const total = packagingInfos.reduce(
     (acc, packagingInfo) => acc + packagingInfo.quantity,
     0
@@ -53,7 +53,7 @@ export function getPackagingInfosSummary<
         summary += ` de ${volumeValue} ${volumeUnit}`;
       }
 
-      if (packagingInfo.identificationNumbers?.length) {
+      if (!hideDetails && packagingInfo.identificationNumbers?.length) {
         summary += ` (n° ${packagingInfo.identificationNumbers.join(", ")})`;
       }
 

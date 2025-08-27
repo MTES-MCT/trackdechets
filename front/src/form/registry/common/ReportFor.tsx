@@ -69,13 +69,13 @@ export function ReportFor({
 
   return (
     <div className="fr-col">
-      <div className="fr-grid-row fr-grid-row--gutters">
+      <div>
         <Controller
           name="reportForCompanySiret"
           control={methods.control}
           render={({ field }) => (
             <RegistryCompanySwitcher
-              wrapperClassName="fr-col-8"
+              wrapperClassName="fr-col-md-8"
               label={reportForLabel}
               defaultSiret={field.value}
               disabled={disabled}
@@ -88,7 +88,7 @@ export function ReportFor({
           )}
         />
         {errors?.reportForCompanySiret && (
-          <div className="fr-col-12">
+          <div className="fr-col-md-12">
             <Alert
               description={formatError(errors.reportForCompanySiret)}
               severity="error"
@@ -98,11 +98,11 @@ export function ReportFor({
         )}
         {isDelegation ? (
           registryDelegationsLoading ? (
-            <div className="fr-col-8">
+            <div className="fr-col-md-8">
               <InlineLoader size={32} />
             </div>
           ) : registryDelegationsData?.registryDelegations.edges.length ? (
-            <div className="fr-col-8">
+            <div className="fr-col-md-8">
               {registryDelegationsData.registryDelegations.edges.length ===
               1 ? (
                 <p className={styles.delegationHint}>

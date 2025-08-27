@@ -1,4 +1,4 @@
-import { olExtended } from "geoportal-extensions-openlayers";
+import LayerWMS from "geoportal-extensions-openlayers/src/OpenLayers/Layers/LayerWMS";
 import { Feature, View, Map, getUid } from "ol";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
@@ -52,19 +52,19 @@ export const createMap = (): {
     target: "parcels-map",
     maxTilesLoading: 5,
     layers: [
-      new olExtended.layer.GeoportalWMS({
+      new LayerWMS({
         layer: "ORTHOIMAGERY.ORTHOPHOTOS",
         olParams: {
           maxZoom: 19
         }
       }),
-      new olExtended.layer.GeoportalWMS({
+      new LayerWMS({
         layer: "CADASTRALPARCELS.PARCELLAIRE_EXPRESS",
         olParams: {
           maxZoom: 19
         }
       }),
-      new olExtended.layer.GeoportalWMS({
+      new LayerWMS({
         layer: "TRANSPORTNETWORKS.ROADS",
         olParams: {
           opacity: 0.7,

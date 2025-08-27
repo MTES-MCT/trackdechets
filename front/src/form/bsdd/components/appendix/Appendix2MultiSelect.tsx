@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Consistence,
   Form,
   InitialForm,
   InitialFormFraction,
@@ -15,11 +16,11 @@ import Table from "@codegouvfr/react-dsfr/Table";
 import Input from "@codegouvfr/react-dsfr/Input";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import NonScrollableInput from "../../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
 import Accordion from "@codegouvfr/react-dsfr/Accordion";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { mergePackagings } from "../../../../common/packagings";
+import SingleCheckbox from "../../../../Apps/common/Components/SingleCheckbox/SingleCheckbox";
 
 type Appendix2MultiSelectProps = {
   // Résultat de la query `appendixForms` executé
@@ -31,6 +32,9 @@ type Appendix2MultiSelectProps = {
   // callback permettant de mettre à jour la liste de contenants
   // du bordereau en fonction des annexes 2 sélectionnées
   updatePackagings: (packagings: PackagingInfoInput[]) => void;
+  // callback permettant de mettre à jour la consistance du bordereau
+  // en fonction des annexes 2 sélectionnées
+  updateConsistence: (consistence: Consistence[]) => void;
 };
 
 // Limite le nombre de bordereaux que l'on peut afficher dans le tableau
@@ -52,7 +56,8 @@ const MAX_APPENDIX_2_COUNT_USE_EFFECT = 100;
 export default function Appendix2MultiSelect({
   appendixForms,
   updateTotalQuantity,
-  updatePackagings
+  updatePackagings,
+  updateConsistence
 }: Appendix2MultiSelectProps) {
   const { values, setFieldValue, getFieldMeta } = useFormikContext<Form>();
   const meta = getFieldMeta<InitialFormFraction[]>("grouping");
@@ -188,7 +193,19 @@ export default function Appendix2MultiSelect({
         })
       )
     );
-  }, [currentlyAnnexedForms, updateTotalQuantity, updatePackagings]);
+    updateConsistence([
+      ...new Set(
+        currentlyAnnexedForms.flatMap(
+          ({ form }) => form.wasteDetails?.consistence ?? []
+        )
+      )
+    ]);
+  }, [
+    currentlyAnnexedForms,
+    updateTotalQuantity,
+    updatePackagings,
+    updateConsistence
+  ]);
 
   // Auto-complète la quantité totale à partir des annexes 2 sélectionnées
   useEffect(() => {
@@ -232,7 +249,7 @@ export default function Appendix2MultiSelect({
     const rows = rowsData.map(
       ({ form, checked, quantityAccepted, quantityLeft, quantityGrouped }) => {
         return [
-          <Checkbox
+          <SingleCheckbox
             options={[
               {
                 label: "",
@@ -340,7 +357,7 @@ export default function Appendix2MultiSelect({
 
     // En tête du tableau
     const headers = [
-      <Checkbox
+      <SingleCheckbox
         options={[
           {
             label: "",
@@ -442,8 +459,8 @@ export default function Appendix2MultiSelect({
               calculateTotalQuantityAndPackagings();
             }}
           >
-            Calculer la quantité totale et le conditionnement à partir de la
-            liste des annexes 2
+            Calculer la quantité totale, le conditionnement et la consistance à
+            partir de la liste des annexes 2
           </Button>
         )}
       </>

@@ -1,7 +1,7 @@
 import { logger } from "@td/logger";
 import { PassThrough, pipeline, Readable, Writable } from "node:stream";
 import { SafeParseReturnType } from "zod";
-
+import v8 from "v8";
 import {
   getSumOfChanges,
   incrementLocalChangesForCompany,
@@ -24,6 +24,26 @@ import {
   RegistryImportHeaderError
 } from "./transformers";
 import { Utf8ValidationError, Utf8ValidatorTransform } from "./utf8Transformer";
+
+/**
+ * Cleans formula objects and raw formula strings from rawLine data to prevent memory exhaustion
+ */
+function cleanFormulaObjects(
+  rawLine: Record<string, unknown>
+): Record<string, unknown> {
+  const cleaned: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(rawLine)) {
+    if (value && typeof value === "object" && "formula" in value) {
+      // Case 1: Formula object - extract just the result
+      const formulaObj = value as { formula: unknown; result: unknown };
+      cleaned[key] = formulaObj.result ?? "[FORMULE]";
+    } else {
+      // Keep the value as-is
+      cleaned[key] = value;
+    }
+  }
+  return cleaned;
+}
 
 export async function processStream({
   importId,
@@ -48,22 +68,29 @@ export async function processStream({
 }) {
   logger.info(
     `Processing import ${importId}. File type ${fileType}, import ${importType}`,
-    { importId, importType, inputStream, fileType }
+    { importId, importType, fileType }
   );
   const options = importOptions[importType];
+
   const changesByCompany = new Map<
     string,
     { [reportAsSiret: string]: RegistryChanges }
   >();
   let globalErrorNumber = 0;
 
+  // Prevent memory exhaustion by limiting total errors processed
+  const MAX_ERRORS_PER_LINE = 10;
+  const MEMORY_CHECK_LINE_INTERVAL = 200; // Check memory interval in lines
+  const MAX_HEAP_USAGE_MB = v8.getHeapStatistics().heap_size_limit; // bytes
+
+  let processedLines = 0;
   const errorStream =
     fileType === "CSV"
       ? getCsvErrorStream(options)
       : getXlsxErrorStream(options);
   errorStream.pipe(outputErrorStream);
 
-  // Only apply utf8 validation on CSV files
+  // Only apply utf8 validation on CSV files with reduced buffer size
   const utf8Validator =
     fileType === "CSV" ? new Utf8ValidatorTransform() : new PassThrough();
 
@@ -86,6 +113,39 @@ export async function processStream({
     });
 
     for await (const { rawLine, result } of parsedLinesStream) {
+      processedLines++;
+
+      // Monitor memory usage to prevent crashes (using already calculated values for efficiency)
+      if (processedLines % MEMORY_CHECK_LINE_INTERVAL === 0) {
+        const availableHeap = v8.getHeapStatistics().total_available_size; // bytes
+        const consumedHeapPortion =
+          (MAX_HEAP_USAGE_MB - availableHeap) / MAX_HEAP_USAGE_MB;
+        const heapUsedMB = Math.round(
+          (MAX_HEAP_USAGE_MB - availableHeap) / 1024 / 1024
+        );
+
+        // logger.info(`Import ${importId} memory usage`, {
+        //   heapUsedMB,
+        //   processedLines,
+        //   globalErrorNumber
+        // });
+
+        // Terminate if memory usage is too high
+        if (consumedHeapPortion > 0.9) {
+          const terminationMessage = `Import terminé prématurément: utilisation mémoire excessive. Le fichier est trop volumineux ou contient trop d'erreurs.`;
+          errorStream.write({ errors: terminationMessage });
+          logger.error(
+            `Import ${importId} terminated due to high memory usage`,
+            {
+              heapUsedMB,
+              processedLines,
+              globalErrorNumber
+            }
+          );
+          break;
+        }
+      }
+
       if (!result.success) {
         globalErrorNumber++;
 
@@ -97,16 +157,30 @@ export async function processStream({
           },
           {}
         );
+        const limitedIssues = result.error.issues.slice(0, MAX_ERRORS_PER_LINE);
+        const hasMoreErrors = result.error.issues.length > MAX_ERRORS_PER_LINE;
 
-        const errors = result.error.issues
-          .sort((a, b) => orderMap[a.path[0]] - orderMap[b.path[0]])
-          .map(issue => {
-            const columnName = options.headers[issue.path[0]] ?? issue.path[0];
-            return `${columnName} : ${issue.message}`;
-          })
-          .join("\n");
-
-        errorStream.write({ errors, ...rawLine });
+        const errors =
+          limitedIssues
+            .sort((a, b) => orderMap[a.path[0]] - orderMap[b.path[0]])
+            .map(issue => {
+              // Handle the special truncation message
+              if (issue.path[0] === "__truncated__") {
+                return issue.message;
+              }
+              const columnName =
+                options.headers[issue.path[0]] ?? issue.path[0];
+              return `${columnName} : ${issue.message}`;
+            })
+            .join("\n") +
+          (hasMoreErrors
+            ? `\n... et ${
+                result.error.issues.length - MAX_ERRORS_PER_LINE
+              } autres erreurs`
+            : "");
+        // Clean up formula objects and raw formula strings to prevent memory exhaustion
+        const cleanedRawLine = cleanFormulaObjects(rawLine);
+        errorStream.write({ errors, ...cleanedRawLine });
         continue;
       }
 
@@ -125,7 +199,10 @@ export async function processStream({
         // dont increment their RegistryChangeAggregate
         globalErrorNumber++;
 
-        errorStream.write({ errors: UNAUTHORIZED_ERROR, ...rawLine });
+        errorStream.write({
+          errors: UNAUTHORIZED_ERROR,
+          ...cleanFormulaObjects(rawLine)
+        });
         continue;
       }
 
@@ -139,7 +216,10 @@ export async function processStream({
       ) {
         globalErrorNumber++;
 
-        errorStream.write({ errors: PERMISSION_ERROR, ...rawLine });
+        errorStream.write({
+          errors: PERMISSION_ERROR,
+          ...cleanFormulaObjects(rawLine)
+        });
         continue;
       }
 

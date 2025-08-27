@@ -31,6 +31,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
+      consistence: ["SOLID"],
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -70,6 +71,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
+      consistence: ["LIQUID"],
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -157,6 +159,7 @@ const grouping = [
 describe("<Appendix2MultiSelect />", () => {
   const updateTotalQuantity = jest.fn();
   const updatePackagings = jest.fn();
+  const updateConsistence = jest.fn();
 
   const component = (
     // Bordereaux candidats au regroupement obtenu à partir
@@ -170,6 +173,7 @@ describe("<Appendix2MultiSelect />", () => {
         appendixForms={appendixForms}
         updateTotalQuantity={updateTotalQuantity}
         updatePackagings={updatePackagings}
+        updateConsistence={updateConsistence}
       />
     </Formik>
   );
@@ -283,6 +287,7 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID"]);
 
     fireEvent.click(checkbox3);
     await waitFor(() => expect(checkbox3).toBeChecked());
@@ -304,7 +309,7 @@ describe("<Appendix2MultiSelect />", () => {
       }
     ]);
     expect(input3).not.toBeDisabled();
-
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
     expect(headerCheckbox).toBeChecked();
 
     const user = userEvent.setup();
@@ -340,6 +345,7 @@ describe("<Appendix2MultiSelect />", () => {
 
     expect(updateTotalQuantity).toHaveBeenCalledWith(0);
     expect(updatePackagings).toHaveBeenCalledWith([]);
+    expect(updateConsistence).toHaveBeenCalledWith([]);
 
     // Les inputs sont tous disabled et leurs valeurs est reset à
     // la quantité restante disponible
@@ -377,6 +383,7 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
 
     const readableIfFilter = screen.getByLabelText("Numéro de bordereau");
     expect(readableIfFilter).toBeInTheDocument();

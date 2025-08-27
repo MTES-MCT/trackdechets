@@ -57,7 +57,6 @@ import {
   IconBSPaohThin
 } from "../common/Components/Icons/Icons";
 import { getOperationCodesFromSearchString } from "./dashboardServices";
-import { BsdCurrentTab } from "../common/types/commonTypes";
 import { BsdSubType, BsdType, BsdWhere, OrderBy } from "@td/codegen-ui";
 import { getOptionsFromValues } from "../common/Components/SelectWithSubOptions/SelectWithSubOptions.utils";
 
@@ -638,54 +637,4 @@ export const getRevisionPath = bsd => {
     default:
       break;
   }
-};
-
-export const getBsdCurrentTab = ({
-  isDraftTab,
-  isActTab,
-  isFollowTab,
-  isArchivesTab,
-  isToCollectTab,
-  isCollectedTab,
-  isReturnTab,
-  isPendingRevisionForTab,
-  isEmittedRevisionForTab,
-  isReceivedRevisionForTab,
-  isReviewedRevisionForTab
-}): BsdCurrentTab => {
-  if (isDraftTab) {
-    return "draftTab";
-  }
-  if (isActTab) {
-    return "actTab";
-  }
-  if (isFollowTab) {
-    return "followTab";
-  }
-  if (isArchivesTab) {
-    return "archivesTab";
-  }
-  if (isToCollectTab) {
-    return "toCollectTab";
-  }
-  if (isCollectedTab) {
-    return "collectedTab";
-  }
-  if (isReturnTab) {
-    return "returnTab";
-  }
-  if (isPendingRevisionForTab) {
-    return "pendingRevisionForTab";
-  }
-  if (isEmittedRevisionForTab) {
-    return "emittedRevisionForTab";
-  }
-  if (isReceivedRevisionForTab) {
-    return "receivedRevisionForTab";
-  }
-  if (isReviewedRevisionForTab) {
-    return "reviewedRevisionForTab";
-  }
-  // default tab
-  return "allBsdsTab";
 };

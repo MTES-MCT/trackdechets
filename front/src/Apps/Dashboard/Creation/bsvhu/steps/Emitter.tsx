@@ -10,8 +10,8 @@ import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactIn
 import DisabledParagraphStep from "../../DisabledParagraphStep";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { clearCompanyError, setFieldError } from "../../utils";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
+import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 const EmitterBsvhu = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
@@ -38,69 +38,53 @@ const EmitterBsvhu = ({ errors }) => {
   useEffect(() => {
     const actor = "emitter";
     if (errors?.length) {
-      if (!emitter?.company?.siret && !emitter?.noSiret) {
-        setFieldError(
-          errors,
-          `${actor}.company.siret`,
-          formState.errors?.[actor]?.["company"]?.siret,
-          setError
-        );
-      }
-      if (!emitter?.company?.name) {
-        setFieldError(
-          errors,
-          `${actor}.company.name`,
-          formState.errors?.[actor]?.["company"]?.name,
-          setError
-        );
-      }
-      if (!emitter?.company?.contact) {
-        setFieldError(
-          errors,
-          `${actor}.company.contact`,
-          formState.errors?.[actor]?.["company"]?.contact,
-          setError
-        );
-      }
-
-      if (!emitter?.company?.address) {
-        setFieldError(
-          errors,
-          `${actor}.company.address`,
-          formState.errors?.[actor]?.["company"]?.address,
-          setError
-        );
-      }
-      if (!emitter?.company?.phone) {
-        setFieldError(
-          errors,
-          `${actor}.company.phone`,
-          formState.errors?.[actor]?.["company"]?.phone,
-          setError
-        );
-      }
-      if (!emitter?.company?.mail) {
-        setFieldError(
-          errors,
-          `${actor}.company.mail`,
-          formState.errors?.[actor]?.["company"]?.mail,
-          setError
-        );
-      }
-      if (!emitter?.company?.vatNumber) {
-        setFieldError(
-          errors,
-          `${actor}.company.vatNumber`,
-          formState.errors?.[actor]?.["company"]?.vatNumber,
-          setError
-        );
-      }
+      setFieldError(
+        errors,
+        `${actor}.company.siret`,
+        formState.errors?.[actor]?.["company"]?.siret,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.name`,
+        formState.errors?.[actor]?.["company"]?.name,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.contact`,
+        formState.errors?.[actor]?.["company"]?.contact,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.address`,
+        formState.errors?.[actor]?.["company"]?.address,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.phone`,
+        formState.errors?.[actor]?.["company"]?.phone,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.mail`,
+        formState.errors?.[actor]?.["company"]?.mail,
+        setError
+      );
+      setFieldError(
+        errors,
+        `${actor}.company.vatNumber`,
+        formState.errors?.[actor]?.["company"]?.vatNumber,
+        setError
+      );
     }
   }, [
     errors,
     errors?.length,
-    formState.errors,
-    formState.errors?.length,
+    formState,
     setError,
     emitter?.company?.siret,
     emitter?.company?.orgId
@@ -140,7 +124,7 @@ const EmitterBsvhu = ({ errors }) => {
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
       <div className="fr-col-md-10 fr-mt-4w">
-        <Checkbox
+        <SingleCheckbox
           options={[
             {
               label: "Installation en situation irrégulière",
@@ -226,7 +210,7 @@ const EmitterBsvhu = ({ errors }) => {
 
         {emitter.irregularSituation && (
           <>
-            <Checkbox
+            <SingleCheckbox
               options={[
                 {
                   label: "L'installation n'a pas de numéro SIRET",

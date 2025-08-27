@@ -7626,4 +7626,13 @@ input ManagedLineInput {
   - 2 lettres majuscules uniquement
   """
   transporter5CompanyCountryCode: String
+
+  """
+  **Fichier d'analyse**
+
+  Identifiant du fichier d'analyse des terres excavées et sédiments ou déchets entrants.
+
+  Optionnel. Le fichier doit avoir été préalablement importé dans Trackdéchets via l'API d'import de fichier de fichier d'analyse (cf createTexsAnalysisFile).
+  """
+  texsAnalysisFileId: String
 }

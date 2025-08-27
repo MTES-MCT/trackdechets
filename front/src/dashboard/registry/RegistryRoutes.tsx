@@ -5,7 +5,7 @@ import {
   useLocation,
   useNavigate
 } from "react-router-dom";
-import React, { useCallback } from "react";
+import React, { lazy, Suspense, useCallback } from "react";
 
 import RegistryMenu from "./RegistryMenu";
 import { useMedia } from "../../common/use-media";
@@ -15,13 +15,15 @@ import routes, { getRelativeRoute } from "../../Apps/routes";
 import { MyExports } from "./MyExports";
 import { MyImports } from "./MyImports";
 import { MyLines } from "./myLines/MyLines";
-import { FormContainer } from "./myLines/FormContainer";
 import "../../Apps/Dashboard/dashboard.scss";
 import { RegistryImportType } from "@td/codegen-ui";
 import { RegistryV2ExportProvider } from "./RegistryV2ExportContext";
 import { RegistryExhaustiveExportProvider } from "./RegistryExhaustiveExportContext";
 import { RegistryV2ExportModalProvider } from "./RegistryV2ExportModalContext";
 import { RegistryExhaustiveExportModalProvider } from "./RegistryExhaustiveExportModalContext";
+import { Loader } from "../../Apps/common/Components";
+
+const FormContainer = lazy(() => import("./myLines/FormContainer"));
 
 const toRelative = route => {
   return getRelativeRoute(routes.registry_new.index, route);
@@ -110,71 +112,73 @@ export default function RegistryRoutes() {
         </Routes>
 
         {backgroundLocation && (
-          <Routes location={location}>
-            <Route
-              path={toRelative(routes.registry_new.form.ssd)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.Ssd}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.incomingTexs)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.IncomingTexs}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.outgoingTexs)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.OutgoingTexs}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.incomingWaste)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.IncomingWaste}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.outgoingWaste)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.OutgoingWaste}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.transported)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.Transported}
-                />
-              }
-            />
-            <Route
-              path={toRelative(routes.registry_new.form.managed)}
-              element={
-                <FormContainer
-                  onClose={handleClose}
-                  type={RegistryImportType.Managed}
-                />
-              }
-            />
-          </Routes>
+          <Suspense fallback={<Loader />}>
+            <Routes location={location}>
+              <Route
+                path={toRelative(routes.registry_new.form.ssd)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.Ssd}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.incomingTexs)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.IncomingTexs}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.outgoingTexs)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.OutgoingTexs}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.incomingWaste)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.IncomingWaste}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.outgoingWaste)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.OutgoingWaste}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.transported)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.Transported}
+                  />
+                }
+              />
+              <Route
+                path={toRelative(routes.registry_new.form.managed)}
+                element={
+                  <FormContainer
+                    onClose={handleClose}
+                    type={RegistryImportType.Managed}
+                  />
+                }
+              />
+            </Routes>
+          </Suspense>
         )}
       </div>
     </div>

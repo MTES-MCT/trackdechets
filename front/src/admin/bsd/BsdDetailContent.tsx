@@ -1,11 +1,11 @@
 import { Bsd } from "@td/codegen-ui";
 import React from "react";
-import BsdaDetailContent from "../../dashboard/detail/bsda/BsdaDetailContent";
 import BsdasriDetailContent from "../../dashboard/detail/bsdasri/BsdasriDetailContent";
 import BSDDetailContent from "../../dashboard/detail/bsdd/BSDDetailContent";
 import { BsffDetailContent } from "../../dashboard/detail/bsff/BsffDetailContent";
 import BspaohDetailContent from "../../dashboard/detail/bspaoh/BspaohDetailContent";
 import BSVHUPreviewContent from "../../Apps/Dashboard/Preview/BSVHU/BSVHUPreviewContent";
+import BSDAPreviewContent from "../../Apps/Dashboard/Preview/BSDA/BSDAPreviewContent";
 import {
   QueryFormArgs,
   Query,
@@ -112,7 +112,7 @@ export function BsdDetailContent({ bsd }: { bsd: Bsd }) {
   }
 
   if (isBsda && !!bsdaData) {
-    return <BsdaDetailContent form={bsdaData.bsda} />;
+    return <BSDAPreviewContent bsdId={bsdaData.bsda.id} />;
   }
   if (isBsdd && !!bsddData) {
     return <BSDDetailContent form={bsddData.form} />;

@@ -343,6 +343,16 @@ const writeToFile = (bsd, table) => {
   const relativePath = `../apps/doc/docs/reference/validation/${bsd.toLowerCase()}.md`;
   const outputPath = path.join(__dirname, relativePath);
   try {
+    if (
+      !fs.existsSync(
+        path.join(__dirname, "../apps/doc/docs/reference/validation/")
+      )
+    ) {
+      fs.mkdirSync(
+        path.join(__dirname, "../apps/doc/docs/reference/validation/"),
+        { recursive: true }
+      );
+    }
     // Write the string to a file
     fs.writeFileSync(outputPath, table, "utf-8");
     console.log(`Data written to ${outputPath}`);

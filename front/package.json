@@ -6,7 +6,7 @@
     "supportedBrowsers": "echo \"// eslint-disable-next-line\nmodule.exports = $(browserslist-useragent-regexp --allowHigherVersions);\" > src/supportedBrowsers.js"
   },
   "engines": {
-    "node": "^20"
+    "node": "^22"
   },
   "overrides": {
     "jsdom": {

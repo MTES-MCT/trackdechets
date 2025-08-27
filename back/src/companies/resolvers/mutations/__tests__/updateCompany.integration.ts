@@ -1081,6 +1081,31 @@ describe("mutation updateCompany", () => {
     });
   });
 
+  it("should return an error when trying to set WORKER type without proper certification", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      companyTypes: [CompanyType.PRODUCER]
+    });
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables: {
+          id: company.id,
+          companyTypes: [CompanyType.WORKER]
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de sélectionner le type Entreprise de travaux amiante si au moins une sous section n'est pas sélectionnée"
+      })
+    ]);
+  });
+
   describe("splitted address", () => {
     it("should update company's splitted address (FR)", async () => {
       // Given

@@ -16,12 +16,12 @@ import { isSiret, isVat } from "@td/constants";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 import { CREATE_COMPANY_HOOK_OPTIONS } from "./AccountCompanyAdd";
 import { CREATE_COMPANY } from "../common/queries";
 import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
+import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
 
 interface Values extends FormikValues {
   siret?: string | null;
@@ -261,7 +261,7 @@ export default function AccountCompanyAddProducer() {
                   <Field name="isAllowed">
                     {({ field }) => {
                       return (
-                        <Checkbox
+                        <SingleCheckbox
                           state={
                             errors.isAllowed && touched.isAllowed
                               ? "error"

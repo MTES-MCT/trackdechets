@@ -1,7 +1,6 @@
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
-import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 import { ALL_WASTES, ALL_WASTES_TREE } from "@td/constants";
 import clsx from "clsx";
 import React, { useMemo, useRef, useState } from "react";
@@ -9,6 +8,10 @@ import type { UseFormReturn } from "react-hook-form";
 import { ComboBox } from "../../../Apps/common/Components/Combobox/Combobox";
 import { capitalize } from "../../../common/helper";
 import { formatError } from "../builder/error";
+import { useMedia } from "../../../common/use-media";
+import { MEDIA_QUERIES } from "../../../common/config";
+import SingleCheckbox from "../../../Apps/common/Components/SingleCheckbox/SingleCheckbox";
+import "./WasteCodeSelector.scss";
 
 type WasteCode = {
   code: string;
@@ -115,7 +118,7 @@ export function WasteCodeSelector({
               ) : (
                 <div className="tw-flex tw-items-center tw-gap-2">
                   {multiple ? (
-                    <Checkbox
+                    <SingleCheckbox
                       options={[
                         {
                           label: `${node.code} - ${node.description}`,
@@ -151,9 +154,19 @@ export function WasteCodeSelector({
     ? null
     : ALL_WASTES.find(waste => waste.code === currentValue)?.description;
 
+  const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
+
   const searchFields = (
     <>
-      <div className={multiple ? "fr-col-12" : "fr-col-4 fr-col-md-4"}>
+      <div
+        className={
+          multiple
+            ? "fr-col-md-12"
+            : `fr-col-7 ${
+                label ? "fr-col-md-8 label-opt fr-mt-1w" : "fr-col-md-4"
+              }`
+        }
+      >
         <Input
           label={`${label ?? "Code déchet"}${!required ? " (optionnel)" : ""}`}
           iconId={
@@ -186,7 +199,19 @@ export function WasteCodeSelector({
         />
       </div>
       {!multiple && (
-        <div className="fr-col-2" style={{ paddingTop: "40px" }}>
+        <div
+          className={`fr-col-md-2 ${label ? "search-btn-lbl" : "search-btn"}`}
+          style={
+            isMobile
+              ? {
+                  display: "block",
+                  position: "absolute",
+                  left: "60%",
+                  bottom: "0px"
+                }
+              : { paddingTop: label ? "50px" : "44px" }
+          }
+        >
           <div
             className={clsx({
               "fr-mb-9v": !!(isArrayField
@@ -206,11 +231,6 @@ export function WasteCodeSelector({
           </div>
         </div>
       )}
-      {displayDescription && !multiple && description && (
-        <div className="fr-col-12">
-          <Alert description={capitalize(description)} severity="info" small />
-        </div>
-      )}
     </>
   );
 
@@ -220,13 +240,20 @@ export function WasteCodeSelector({
         searchFields
       ) : (
         <div
-          className="fr-col-12 fr-grid-row fr-grid-row--gutters fr-grid-row--bottom"
-          style={{
-            alignItems: "flex-start"
-          }}
           ref={comboboxRef}
+          className="fr-col-md-12"
+          style={{
+            width: "100%"
+          }}
         >
-          {searchFields}
+          <div
+            className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom"
+            style={{
+              position: "relative"
+            }}
+          >
+            {searchFields}
+          </div>
         </div>
       )}
       <ComboBox
@@ -256,6 +283,11 @@ export function WasteCodeSelector({
           </div>
         )}
       </ComboBox>
+      {displayDescription && !multiple && description && (
+        <div className="fr-col-12">
+          <Alert description={capitalize(description)} severity="info" small />
+        </div>
+      )}
     </>
   );
 }

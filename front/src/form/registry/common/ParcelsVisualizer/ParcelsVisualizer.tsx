@@ -7,7 +7,7 @@ import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import { FieldError, useFieldArray, type UseFormReturn } from "react-hook-form";
 import clsx from "clsx";
 
-import { Services } from "geoportal-extensions-openlayers";
+import Gp from "geoportal-access-lib";
 import { Map, MapBrowserEvent } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
@@ -191,7 +191,7 @@ export function ParcelsVisualizer({
     if (disabled && hideIfDisabled) {
       return;
     }
-    Services.getConfig({
+    Gp.Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
       callbackSuffix: "",
       onSuccess: async () => {
@@ -333,7 +333,7 @@ export function ParcelsVisualizer({
 
       <div className="fr-mb-2w">
         <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
-          <div className={clsx(styles.controls, "fr-col-6")}>
+          <div className={clsx(styles.controls, "fr-col-md-6")}>
             <SegmentedControl
               hideLegend
               segments={[
@@ -362,7 +362,7 @@ export function ParcelsVisualizer({
             {mode === Mode.CODE ? (
               <div className="fr-mt-1w">
                 <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-                  <div className={clsx("fr-col-6", styles.controlledInput)}>
+                  <div className={clsx("fr-col-md-6", styles.controlledInput)}>
                     <Input
                       label="Commune"
                       className="fr-mb-1w"
@@ -383,7 +383,7 @@ export function ParcelsVisualizer({
                   </div>
                   <div
                     className={clsx(
-                      "fr-col-6",
+                      "fr-col-md-6",
                       styles.parcelNumber,
                       styles.controlledInput
                     )}
@@ -498,7 +498,7 @@ export function ParcelsVisualizer({
               </div>
             ) : (
               <div className="fr-mt-1w">
-                <div className={clsx("fr-col-12", styles.controlledInput)}>
+                <div className={clsx("fr-col-md-12", styles.controlledInput)}>
                   <Input
                     label="Coordonnées GPS"
                     className="fr-mb-1w"
@@ -648,7 +648,7 @@ export function ParcelsVisualizer({
               </div>
             )}
           </div>
-          <div className="fr-col-6">
+          <div className="fr-col-12 fr-col-md-6">
             <div id="parcels-map" className={styles.map}></div>
           </div>
         </div>

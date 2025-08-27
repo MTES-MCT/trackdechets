@@ -33,7 +33,7 @@ const BSVHUPreviewActors = ({ bsd }: BSVHUPreviewActorsProps) => {
               value={bsd.ecoOrganisme?.name}
             />
 
-            <PreviewTextRow label="Siret" value={bsd.ecoOrganisme?.siret} />
+            <PreviewTextRow label="SIRET" value={bsd.ecoOrganisme?.siret} />
           </PreviewContainerCol>
         </PreviewContainerRow>
       )}
@@ -50,7 +50,7 @@ const BSVHUPreviewActors = ({ bsd }: BSVHUPreviewActorsProps) => {
           <PreviewContainerCol gridWidth={4}>
             <PreviewTextRow label="Raison sociale" value={intermediary.name} />
 
-            <PreviewTextRow label="Siret" value={intermediary.siret} />
+            <PreviewTextRow label="SIRET" value={intermediary.siret} />
 
             <PreviewTextRow label="Adresse" value={intermediary.address} />
           </PreviewContainerCol>

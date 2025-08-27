@@ -11,8 +11,13 @@ import { Formik, Form, Field } from "formik";
 import RedErrorMessage from "../common/components/RedErrorMessage";
 import routes from "../Apps/routes";
 import PasswordInput from "@codegouvfr/react-dsfr/blocks/PasswordInput";
-import zxcvbn from "zxcvbn";
+import {
+  getPasswordHint,
+  PasswordHintResult,
+  MIN_LENGTH
+} from "../common/components/PasswordHelper";
 import Button from "@codegouvfr/react-dsfr/Button";
+import { useState, useEffect } from "react";
 
 const PASSWORD_RESET_REQUEST = gql`
   query PasswordResetRequest($hash: String!) {
@@ -26,10 +31,57 @@ const RESET_PASSWORD = gql`
   }
 `;
 
-export default function PasswordReset() {
-  const MIN_LENGTH = 10;
-  const MIN_SCORE = 3;
+// Separate component to handle password validation with hooks
+const PasswordField = ({ password }: { password: string }) => {
+  const [passwordHint, setPasswordHint] = useState<PasswordHintResult | null>(
+    null
+  );
 
+  useEffect(() => {
+    if (password) {
+      getPasswordHint(password).then(hint => {
+        setPasswordHint(hint);
+      });
+    } else {
+      setPasswordHint(null);
+    }
+  }, [password]);
+
+  return (
+    <Field name="password">
+      {({ field }) => {
+        return (
+          <PasswordInput
+            nativeInputProps={{ ...field }}
+            label="Mot de passe"
+            className="fr-mb-2w"
+            messages={[
+              {
+                message: `contenir ${MIN_LENGTH} caractères minimum`,
+                severity: !password
+                  ? "info"
+                  : password.length < MIN_LENGTH
+                  ? "error"
+                  : "valid"
+              },
+              {
+                message:
+                  "avoir une complexité suffisante. Nous vous recommandons d'utiliser une phrase de passe (plusieurs mots accolés) ou un gestionnaire de mots de passe",
+                severity: !password
+                  ? "info"
+                  : passwordHint?.hintType === "success"
+                  ? "valid"
+                  : "error"
+              }
+            ]}
+          />
+        );
+      }}
+    </Field>
+  );
+};
+
+export default function PasswordReset() {
   // parse qs and get rid of extra parameters
   const location = useLocation();
   const { hash: qsHash } = queryString.parse(location.search);
@@ -99,66 +151,37 @@ export default function PasswordReset() {
           .catch(_ => setSubmitting(false));
       }}
     >
-      {({ isSubmitting, values }) => (
-        <section className="section section-white">
-          <div className="container-narrow">
-            <Form>
-              <h3 className="fr-h3 fr-mb-2w">Modifier le mot de passe</h3>
-              <p className="fr-text fr-mb-4w">
-                Veuillez entrer votre nouveau mot de passe pour le mettre à
-                jour.
-              </p>
-              <div>
-                {!!mutationError && (
-                  <NotificationError apolloError={mutationError} />
-                )}
-                <div className="form__row">
-                  <Field name="password">
-                    {({ field }) => {
-                      const { score } = zxcvbn(values.password);
-                      return (
-                        <PasswordInput
-                          nativeInputProps={{ ...field }}
-                          label="Mot de passe"
-                          className="fr-mb-2w"
-                          messages={[
-                            {
-                              message: `contenir ${MIN_LENGTH} caractères minimum`,
-                              severity: !values.password
-                                ? "info"
-                                : values.password.length < MIN_LENGTH
-                                ? "error"
-                                : "valid"
-                            },
-                            {
-                              message:
-                                "avoir une complexité suffisante. Nous vous recommandons d'utiliser une phrase de passe (plusieurs mots accolés) ou un gestionnaire de mots de passe",
-                              severity: !values.password
-                                ? "info"
-                                : score >= MIN_SCORE
-                                ? "valid"
-                                : "error"
-                            }
-                          ]}
-                        />
-                      );
-                    }}
-                  </Field>
-
-                  <RedErrorMessage name="password" />
+      {({ isSubmitting, values }) => {
+        return (
+          <section className="section section-white">
+            <div className="container-narrow">
+              <Form>
+                <h3 className="fr-h3 fr-mb-2w">Modifier le mot de passe</h3>
+                <p className="fr-text fr-mb-4w">
+                  Veuillez entrer votre nouveau mot de passe pour le mettre à
+                  jour.
+                </p>
+                <div>
+                  {!!mutationError && (
+                    <NotificationError apolloError={mutationError} />
+                  )}
+                  <div className="form__row">
+                    <PasswordField password={values.password} />
+                    <RedErrorMessage name="password" />
+                  </div>
                 </div>
-              </div>
-              <Button
-                priority="primary"
-                disabled={isSubmitting}
-                className="fr-mt-4w"
-              >
-                Modifier
-              </Button>
-            </Form>
-          </div>
-        </section>
-      )}
+                <Button
+                  priority="primary"
+                  disabled={isSubmitting}
+                  className="fr-mt-4w"
+                >
+                  Modifier
+                </Button>
+              </Form>
+            </div>
+          </section>
+        );
+      }}
     </Formik>
   );
 }

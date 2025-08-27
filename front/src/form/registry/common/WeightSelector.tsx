@@ -16,7 +16,7 @@ export function WeightSelector({ methods, disabled }: Props) {
   return (
     <div className="fr-col">
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-4">
+        <div className="fr-col-md-4">
           <NonScrollableInput
             label="Poids en tonnes"
             state={errors?.weightValue ? "error" : "info"}
@@ -35,7 +35,7 @@ export function WeightSelector({ methods, disabled }: Props) {
             disabled={disabled}
           />
         </div>
-        <div className="fr-col-4">
+        <div className="fr-col-md-4">
           <Controller
             control={methods.control}
             name={"weightIsEstimate"}
@@ -74,7 +74,7 @@ export function WeightSelector({ methods, disabled }: Props) {
         </div>
       </div>
       <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-4">
+        <div className="fr-col-md-4">
           <NonScrollableInput
             label="Volume en M3 (optionnel)"
             nativeInputProps={{

@@ -36,7 +36,7 @@ export function TransporterTags({
     <div className="fr-col">
       <div className="fr-mb-2w">
         <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-          <div className="fr-col-6">
+          <div className="fr-col-md-6">
             <TagsInput
               label={label}
               maxTags={maxTags}

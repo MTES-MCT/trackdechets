@@ -176,3 +176,31 @@ export const checkRecepisses: Refinement<ParsedZodCompany> = (
     });
   }
 };
+
+export const checkWorkerSubsection: Refinement<ParsedZodCompany> = async (
+  company,
+  { addIssue }
+) => {
+  const { companyTypes, workerCertificationId } = company;
+
+  if (!companyTypes.includes(CompanyType.WORKER)) {
+    return;
+  }
+
+  const certification = workerCertificationId
+    ? await prisma.workerCertification.findUnique({
+        where: { id: workerCertificationId }
+      })
+    : null;
+
+  if (
+    !certification ||
+    (!certification.hasSubSectionFour && !certification.hasSubSectionThree)
+  ) {
+    addIssue({
+      code: "custom",
+      message:
+        "Impossible de sélectionner le type Entreprise de travaux amiante si au moins une sous section n'est pas sélectionnée"
+    });
+  }
+};

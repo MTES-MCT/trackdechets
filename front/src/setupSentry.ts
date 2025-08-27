@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/browser";
 if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN as string,
-    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT as string,
+    environment: import.meta.env.VITE_ENV_NAME as string,
     ...(import.meta.env.VITE_SENTRY_USE_TUNNEL === "true"
       ? { tunnel: "/sentry" }
       : {}),

@@ -1,5 +1,4 @@
 import React, { ReactNode } from "react";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import Tooltip from "../../../../common/Components/Tooltip/Tooltip";
 import { AllCompanyType, CompanySubTypeOption } from "../../utils";
 import Highlight from "@codegouvfr/react-dsfr/Highlight";
@@ -9,6 +8,7 @@ import {
   CompanyTypeInputProps,
   CompanyTypeInputValues
 } from "./CompanyTypeForm";
+import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type CompanyTypeCheckboxProps = {
   label: string;
@@ -51,7 +51,7 @@ const CompanyTypeCheckbox = ({
 
   const labelWithHelp = (
     <>
-      <span data-testid="company-type-label">{label}</span>{" "}
+      <span data-testid={`company-type-label-${label}`}>{label}</span>{" "}
       <Tooltip className="fr-ml-1w" title={helpText} />
     </>
   );
@@ -60,7 +60,7 @@ const CompanyTypeCheckbox = ({
     <div key={value}>
       <div>
         <div>
-          <Checkbox
+          <SingleCheckbox
             options={[
               {
                 label: labelWithHelp,

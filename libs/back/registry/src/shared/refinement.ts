@@ -241,7 +241,8 @@ export function refineActorInfos<T>({
           context.addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Le numéro d'identification doit contenir le nom et prénom pour une personne physique"
+              "Le numéro d'identification doit contenir le nom et prénom pour une personne physique",
+            path: [orgIdKey]
           });
         }
         break;

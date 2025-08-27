@@ -87,6 +87,16 @@ export const companyFactory = async (
   const companyIndex = (await prisma.company.count()) + 1;
 
   const siret = opts.siret ?? siretify(companyIndex);
+
+  let workerCertification;
+  if (!opts.companyTypes) {
+    workerCertification = await prisma.workerCertification.create({
+      data: {
+        hasSubSectionFour: true
+      }
+    });
+  }
+
   return prisma.company.create({
     data: {
       orgId: opts.vatNumber ?? siret,
@@ -112,6 +122,9 @@ export const companyFactory = async (
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
       verificationStatus: "VERIFIED",
+      workerCertification: workerCertification
+        ? { connect: { id: workerCertification.id } }
+        : undefined,
       ...opts
     }
   });
@@ -352,7 +365,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   },
   wasteAcceptationStatus: null,
   wasteDetailsCode: "05 01 04*",
-  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsConsistence: ["SOLID"] as Consistence[],
   wasteDetailsIsDangerous: true,
   wasteDetailsName: "Divers",
   wasteDetailsOnuCode: "2003",
@@ -387,7 +400,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsQuantity: 1,
-  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsConsistence: ["SOLID"] as Consistence[],
   wasteDetailsQuantityType: "ESTIMATED",
   transporters: {
     create: { ...bsddTransporterData, number: 1 }

@@ -1,69 +1,35 @@
 import { gql, useQuery } from "@apollo/client";
-import { useMemo } from "react";
-import { Query, QueryBsdsArgs } from "@td/codegen-ui";
 
-const NOTIFICATION_QUERY = gql`
-  query GetBsds($where: BsdWhere) {
-    bsds(first: 1, where: $where) {
+const GET_ALL_NOTIFICATIONS = gql`
+  query GetAllNotifications($orgId: [String!]) {
+    action: bsds(where: { isForActionFor: $orgId }) {
+      totalCount
+    }
+    transport: bsds(where: { isToCollectFor: $orgId }) {
+      totalCount
+    }
+    emittedRevision: bsds(where: { isEmittedRevisionFor: $orgId }) {
+      totalCount
+    }
+    receivedRevision: bsds(where: { isReceivedRevisionFor: $orgId }) {
       totalCount
     }
   }
 `;
 
 export function useNotificationQueries(orgId: string) {
-  const queryAction = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isForActionFor: [orgId] } } }
-  );
-
-  const queryTransport = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
-    NOTIFICATION_QUERY,
-    { variables: { where: { isToCollectFor: [orgId] } } }
-  );
-
-  const queryIsEmittedRevisionFor = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isEmittedRevisionFor: [orgId] } }
+  const { data, loading, refetch } = useQuery(GET_ALL_NOTIFICATIONS, {
+    variables: { orgId: [orgId] }
   });
 
-  const queryIsReceivedRevisionFor = useQuery<
-    Pick<Query, "bsds">,
-    QueryBsdsArgs
-  >(NOTIFICATION_QUERY, {
-    variables: { where: { isReceivedRevisionFor: [orgId] } }
-  });
-
-  const loading =
-    queryAction.loading ||
-    queryTransport.loading ||
-    queryIsEmittedRevisionFor.loading ||
-    queryIsReceivedRevisionFor.loading;
-
-  const data = useMemo(
-    () => ({
-      actionCount: queryAction.data?.bsds.totalCount ?? 0,
-      transportCount: queryTransport.data?.bsds.totalCount ?? 0,
-      isEmittedRevisionForCount:
-        queryIsEmittedRevisionFor.data?.bsds.totalCount ?? 0,
-      isReceivedRevisionForCount:
-        queryIsReceivedRevisionFor.data?.bsds.totalCount ?? 0
-    }),
-    [
-      queryAction.data?.bsds.totalCount,
-      queryTransport.data?.bsds.totalCount,
-      queryIsEmittedRevisionFor.data?.bsds.totalCount,
-      queryIsReceivedRevisionFor.data?.bsds.totalCount
-    ]
-  );
-
-  const refetchAll = () => {
-    queryAction.refetch();
-    queryTransport.refetch();
-    queryIsEmittedRevisionFor.refetch();
-    queryIsReceivedRevisionFor.refetch();
+  return {
+    loading,
+    data: {
+      actionCount: data?.action.totalCount ?? 0,
+      transportCount: data?.transport.totalCount ?? 0,
+      isEmittedRevisionForCount: data?.emittedRevision.totalCount ?? 0,
+      isReceivedRevisionForCount: data?.receivedRevision.totalCount ?? 0
+    },
+    refetchAll: refetch
   };
-
-  return { loading, data, refetchAll };
 }

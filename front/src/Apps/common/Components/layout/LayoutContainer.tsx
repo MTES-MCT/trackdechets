@@ -11,44 +11,27 @@ import SecondFactor from "../../../../login/SecondFactor";
 import SurveyBanner from "../SurveyBanner/SurveyBanner";
 import { RequireAuth, Redirect } from "../../../utils/routerUtils";
 import { Oauth2Dialog } from "../../../../oauth/AuthDialog";
+import Admin from "../../../../admin/Admin";
+import DashboardRoutes from "../../../Dashboard/DashboardRoutes";
+import CompaniesRoutes from "../../../Companies/CompaniesRoutes";
+import RegistryRoutes from "../../../../dashboard/registry/RegistryRoutes";
+import Account from "../../../Account/Account";
+import FormContainer from "../../../../form/bsdd/FormContainer";
+import BsffFormContainer from "../../../../form/bsff/FormContainer";
+import BsdasriFormContainer from "../../../../form/bsdasri/FormContainer";
+import BsdaFormContainer from "../../../../form/bsda/FormContainer";
+import WasteSelector from "../../../../login/WasteSelector";
+import Invite from "../../../../login/Invite";
+import UserActivation from "../../../../login/UserActivation";
+import PasswordResetRequest from "../../../../login/PasswordResetRequest";
+import PasswordReset from "../../../../login/PasswordReset";
+import Signup from "../../../../login/Signup";
+import WasteTree from "../search/WasteTree";
 
-const Admin = lazy(() => import("../../../../admin/Admin"));
-const DashboardRoutes = lazy(
-  () => import("../../../Dashboard/DashboardRoutes")
-);
-const CompaniesRoutes = lazy(
-  () => import("../../../Companies/CompaniesRoutes")
-);
-const RegistryRoutes = lazy(
-  () => import("../../../../dashboard/registry/RegistryRoutes")
-);
-const Account = lazy(() => import("../../../Account/Account"));
-const FormContainer = lazy(() => import("../../../../form/bsdd/FormContainer"));
-
-const BsffFormContainer = lazy(
-  () => import("../../../../form/bsff/FormContainer")
-);
-const BsdasriFormContainer = lazy(
-  () => import("../../../../form/bsdasri/FormContainer")
-);
-const BsdaFormContainer = lazy(
-  () => import("../../../../form/bsda/FormContainer")
-);
-
-const WasteSelector = lazy(() => import("../../../../login/WasteSelector"));
-
-const Invite = lazy(() => import("../../../../login/Invite"));
-const UserActivation = lazy(() => import("../../../../login/UserActivation"));
-const PasswordResetRequest = lazy(
-  () => import("../../../../login/PasswordResetRequest")
-);
-const PasswordReset = lazy(() => import("../../../../login/PasswordReset"));
-const Signup = lazy(() => import("../../../../login/Signup"));
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
-const WasteTree = lazy(() => import("../search/WasteTree"));
 
 const BANNER_MESSAGES = [
-  "Merci d'anticiper dès à présent vos congés d'été en vous assurant que vos collaborateurs possèdent un accès aux établissements nécessaires sur Trackdéchets (Mes établissements > Membres)."
+  `Le profil "Entreprise de travaux amiante" a été retiré pour les établissements n'ayant pas complété les compétences requises (SS3 et/ou SS4). Il peut être ajouté à nouveau à tout moment depuis l'onglet Mes établissements.`
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -85,10 +68,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Voir la FAQ",
-                    href: "https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/inviter-des-personnes-a-rejoindre-mon-etablissement#les-responsabilites-des-administrateurs-trackdechets"
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/amiante/entreprises-de-travaux-maitres-doeuvre"
                   }}
-                  persistedSurveyName="td-20250729"
+                  persistedSurveyName="td-20250826"
                 />
               }
             />

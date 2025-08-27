@@ -35,7 +35,6 @@ import NonScrollableInput from "../../../common/Components/NonScrollableInput/No
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import Decimal from "decimal.js";
 import { OPERATION } from "../../../../form/bsff/utils/constants";
-import Checkbox from "@codegouvfr/react-dsfr/Checkbox";
 import RhfOperationModeSelect from "../../../common/Components/OperationModeSelect/RhfOperationModeSelect";
 import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
 import { useParams } from "react-router-dom";
@@ -43,6 +42,7 @@ import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/
 import { subMonths } from "date-fns";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
 
 type SignBsffPackagingFormProps = {
   packaging: BsffPackaging & { bsff: Bsff };
@@ -658,7 +658,7 @@ function SignBsffPackagingForm({
               {isGroupement && (
                 <div className="fr-grid-row fr-grid-row--gutters">
                   <div className="fr-col-12">
-                    <Checkbox
+                    <SingleCheckbox
                       options={[
                         {
                           label: (

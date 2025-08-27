@@ -35,12 +35,12 @@ export function InlineInseeCodes({ methods, disabled, prefix }: Props) {
   return (
     <>
       {inseeCodeFields.map((field, index) => (
-        <div key={field.id} className="fr-col-8">
+        <div key={field.id} className="fr-col-md-8">
           <p className="fr-mb-2v tw-text-lg tw-font-bold">
             Commune n°{index + 1}
           </p>
           <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-            <div className="fr-col-5">
+            <div className="fr-col-md-5">
               <Input
                 label="Code INSEE"
                 nativeInputProps={{
@@ -57,7 +57,7 @@ export function InlineInseeCodes({ methods, disabled, prefix }: Props) {
                 }
               />
             </div>
-            <div className="fr-col-4">
+            <div className="fr-col-md-4">
               <Button
                 type="button"
                 className="fr-mt-2v"
@@ -72,7 +72,7 @@ export function InlineInseeCodes({ methods, disabled, prefix }: Props) {
         </div>
       ))}
 
-      <div className="fr-col-8">
+      <div className="fr-col-md-8">
         <Button
           type="button"
           className="fr-mt-2v"

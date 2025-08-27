@@ -9,9 +9,32 @@ const fs = require("fs");
 
 const SCALINGO_API_URL = "api.osc-secnum-fr1.scalingo.com";
 const SCALINGO_DB_API_URL = "db-api.osc-secnum-fr1.scalingo.com";
-const APP_NAME = "trackdechets-sandbox-api";
+const SCALINGO_BASE_API_URL = "api.osc-fr1.scalingo.com";
+const SCALINGO_BASE_DB_API_URL = "db-api.osc-fr1.scalingo.com";
+const APP_NAME = {
+  recette: "trackdechets-recette-api",
+  sandbox: "trackdechets-sandbox-api",
+  production: "trackdechets-production-api"
+};
 
 async function run() {
+  // Get environment parameter from command line
+  const environment = process.argv[2];
+
+  if (
+    !environment ||
+    !["recette", "sandbox", "production"].includes(environment)
+  ) {
+    console.error(
+      "Usage: node get-db-backup-link.js <recette|sandbox|production>"
+    );
+    process.exit(1);
+  }
+
+  const appName = APP_NAME[environment];
+  // Optional: log to stderr so it doesn't interfere with the URL output
+  // console.error(`Getting backup for ${environment} environment: ${appName}`);
+
   const { SCALINGO_TOKEN } = await loadEnv();
 
   if (!SCALINGO_TOKEN) {
@@ -20,24 +43,31 @@ async function run() {
 
   const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
 
-  const { addons } = await listAddons(bearerToken);
+  const { addons } = await listAddons(bearerToken, environment);
 
   const postgres = addons.find(
     addon => addon.addon_provider.id === "postgresql"
   );
 
-  const addonToken = (await getAddonToken(bearerToken, postgres.id)).addon
-    .token;
+  const addonToken = (
+    await getAddonToken(bearerToken, postgres.id, environment)
+  ).addon.token;
 
-  const { database_backups } = await listBackups(postgres.id, addonToken);
-
-  const sortedBackups = database_backups.sort((a, b) =>
-    b.created_at.localeCompare(a.created_at)
+  const { database_backups } = await listBackups(
+    postgres.id,
+    addonToken,
+    environment
   );
+
+  const sortedBackups = database_backups
+    .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    .filter(backup => backup.status === "done");
+
   const { download_url } = await getBackupDownloadLink(
     postgres,
     sortedBackups[0],
-    addonToken
+    addonToken,
+    environment
   );
   console.log(download_url);
 }
@@ -57,11 +87,15 @@ function getBearerToken(scalingoToken) {
   return fetch(options);
 }
 
-function listAddons(bearerToken) {
+function listAddons(bearerToken, environment) {
+  const appName = APP_NAME[environment];
+  const hostname =
+    environment === "recette" ? SCALINGO_BASE_API_URL : SCALINGO_API_URL;
+
   const options = {
-    hostname: SCALINGO_API_URL,
+    hostname,
     port: 443,
-    path: `/v1/apps/${APP_NAME}/addons`,
+    path: `/v1/apps/${appName}/addons`,
     method: "GET",
     headers: {
       Authorization: `Bearer ${bearerToken}`
@@ -71,11 +105,15 @@ function listAddons(bearerToken) {
   return fetch(options);
 }
 
-function getAddonToken(bearerToken, addonId) {
+function getAddonToken(bearerToken, addonId, environment) {
+  const appName = APP_NAME[environment];
+  const hostname =
+    environment === "recette" ? SCALINGO_BASE_API_URL : SCALINGO_API_URL;
+
   const options = {
-    hostname: SCALINGO_API_URL,
+    hostname,
     port: 443,
-    path: `/v1/apps/${APP_NAME}/addons/${addonId}/token`,
+    path: `/v1/apps/${appName}/addons/${addonId}/token`,
     method: "POST",
     headers: {
       Authorization: `Bearer ${bearerToken}`
@@ -85,9 +123,12 @@ function getAddonToken(bearerToken, addonId) {
   return fetch(options);
 }
 
-function listBackups(addonId, addonToken) {
+function listBackups(addonId, addonToken, environment) {
+  const hostname =
+    environment === "recette" ? SCALINGO_BASE_DB_API_URL : SCALINGO_DB_API_URL;
+
   const options = {
-    hostname: SCALINGO_DB_API_URL,
+    hostname,
     port: 443,
     path: `/api/databases/${addonId}/backups`,
     method: "GET",
@@ -99,9 +140,12 @@ function listBackups(addonId, addonToken) {
   return fetch(options);
 }
 
-function getBackupDownloadLink(postgres, backup, addonToken) {
+function getBackupDownloadLink(postgres, backup, addonToken, environment) {
+  const hostname =
+    environment === "recette" ? SCALINGO_BASE_DB_API_URL : SCALINGO_DB_API_URL;
+
   const options = {
-    hostname: SCALINGO_DB_API_URL,
+    hostname,
     port: 443,
     path: `/api/databases/${postgres.id}/backups/${backup.id}/archive`,
     method: "GET",

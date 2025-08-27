@@ -341,6 +341,7 @@ export const FullBsdaFragment = gql`
       isDraft
       waste {
         code
+        materialName
       }
       destination {
         cap
@@ -359,9 +360,15 @@ export const FullBsdaFragment = gql`
       isDraft
       waste {
         code
+        materialName
       }
       destination {
         cap
+        operation {
+          nextDestination {
+            cap
+          }
+        }
       }
     }
     intermediaries {
