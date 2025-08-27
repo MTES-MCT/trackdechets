@@ -20,7 +20,6 @@ import {
 } from "./types";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
-import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export const BsvhuForElasticInclude = {
   ...BsvhuWithIntermediariesInclude

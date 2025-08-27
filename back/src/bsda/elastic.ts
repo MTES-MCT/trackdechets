@@ -38,7 +38,6 @@ import { getBsdaSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
 import { BsdaPackaging } from "@td/codegen-back";
-import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsdaForElastic = Bsda &
   BsdaWithTransporters &

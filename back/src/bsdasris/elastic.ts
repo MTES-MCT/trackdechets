@@ -32,7 +32,6 @@ import {
 import { getBsdasriSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
-import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsdasriForElastic = Bsdasri &
   BsdasriWithGrouping &

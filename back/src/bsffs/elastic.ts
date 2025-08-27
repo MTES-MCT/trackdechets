@@ -28,7 +28,6 @@ import {
 import { getBsffSubType } from "../common/subTypes";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
-import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export type BsffForElastic = Bsff &
   BsffWithPackagings &
