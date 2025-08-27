@@ -31,7 +31,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: ["SOLID"],
+      consistence: "SOLID",
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -71,7 +71,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: ["LIQUID"],
+      consistence: "LIQUID",
       packagingInfos: [
         {
           __typename: "PackagingInfo",
