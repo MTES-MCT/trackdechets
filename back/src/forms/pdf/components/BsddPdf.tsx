@@ -24,7 +24,6 @@ import { getOperationModeLabel } from "../../../common/operationModes";
 import { FormCompanyDetails } from "../../../common/pdf/components/FormCompanyDetails";
 import { isFrenchCompany } from "../../../companies/validation";
 import { bsddWasteQuantities } from "../../helpers/bsddWasteQuantities";
-import { displayWasteQuantity } from "../../../registry/utils";
 import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
 import {
   Consistence,
@@ -38,6 +37,7 @@ import {
 import { getEmptyReturnADRLabel } from "../../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../../helpers/citerneNotWashedOutReason";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
+import Decimal from "decimal.js";
 
 type GroupeInBsd = {
   readableId: string;
@@ -70,6 +70,14 @@ function ReceiptFields({
     </p>
   );
 }
+
+const displayWasteQuantity = (quantity, units = "tonne(s)") => {
+  if (isDefined(quantity)) {
+    return `${new Decimal(quantity).toDecimalPlaces(6).toNumber()} ${units}`;
+  }
+
+  return "Non renseignée";
+};
 
 type QuantityFieldsProps = {
   isSubjectToADR?: boolean | null;

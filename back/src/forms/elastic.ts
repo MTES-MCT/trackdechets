@@ -15,7 +15,6 @@ import {
   FormWithAppendix1GroupingInfoInclude
 } from "./types";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import {
   getSiretsByTab,
@@ -192,7 +191,6 @@ export function toBsdElastic(form: FormForElastic): BsdElastic {
     nonPendingLatestRevisionRequestUpdatedAt:
       getNonPendingLatestRevisionRequestUpdatedAt(form.bsddRevisionRequests),
     sirets: Object.values(siretsByTab).flat(),
-    ...getRegistryFields(form),
     ...getElasticExhaustiveRegistryFields(form),
     intermediaries: form.intermediaries,
     rawBsd: form,

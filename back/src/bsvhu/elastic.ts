@@ -11,7 +11,6 @@ import {
 } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { getBsvhuSubType } from "../common/subTypes";
 import { getAddress } from "./converter";
@@ -21,6 +20,7 @@ import {
 } from "./types";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import { getElasticExhaustiveRegistryFields } from "./registryV2";
 
 export const BsvhuForElasticInclude = {
   ...BsvhuWithIntermediariesInclude
@@ -275,7 +275,6 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     isReviewedRevisionFor: [] as string[],
     ...getBsvhuReturnOrgIds(bsvhu),
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsvhu),
     ...getElasticExhaustiveRegistryFields(bsvhu),
     rawBsd: bsvhu,
     revisionRequests: [],
