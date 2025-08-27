@@ -126,7 +126,9 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: undefinedOrDefault(
-      chain(input.wasteDetails, w => (w.consistence ? [w.consistence] : null)),
+      chain(input.wasteDetails, w =>
+        w.consistence ? [w.consistence] : undefined
+      ),
       []
     ),
     wasteDetailsPop: undefinedOrDefault(
