@@ -718,7 +718,7 @@ export function expandFormFromDb(
         ? processDecimal(form.wasteDetailsQuantity).toNumber()
         : null,
       quantityType: form.wasteDetailsQuantityType,
-      consistence: form.wasteDetailsConsistence,
+      consistence: form.wasteDetailsConsistence?.[0],
       pop: form.wasteDetailsPop,
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
@@ -907,7 +907,7 @@ export function expandFormFromDb(
               ? processDecimal(forwardedIn.wasteDetailsQuantity).toNumber()
               : null,
             quantityType: forwardedIn.wasteDetailsQuantityType,
-            consistence: forwardedIn.wasteDetailsConsistence,
+            consistence: forwardedIn.wasteDetailsConsistence?.[0],
             pop: forwardedIn.wasteDetailsPop,
             isDangerous: forwardedIn.wasteDetailsIsDangerous
           }),
