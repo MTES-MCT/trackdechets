@@ -390,6 +390,13 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
                     }
                   },
                   {
+                    label: "Pâteux",
+                    nativeInputProps: {
+                      ...register("waste.consistence"),
+                      value: BsdaConsistence.Pateux
+                    }
+                  },
+                  {
                     label: "Autre",
                     nativeInputProps: {
                       ...register("waste.consistence"),
