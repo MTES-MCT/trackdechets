@@ -8,6 +8,8 @@ on:
 jobs:
   push-to-gitlab:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - name: Checkout the repository

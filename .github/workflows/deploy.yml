@@ -13,6 +13,8 @@ on:
 jobs:
   sentry-release-production:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v3
         with:
@@ -38,6 +40,8 @@ jobs:
 
   doc:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
