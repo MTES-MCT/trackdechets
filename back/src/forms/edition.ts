@@ -173,7 +173,23 @@ export async function checkEditionRules(
   if (form.status === Status.SIGNED_BY_PRODUCER) {
     // L'emetteur ou l'éco-organisme (s'il signé à la place de l'émetteur)
     // peuvent encore modifier tous les champs tant qu'aucune autre signature
-    // n'a eu lieu
+    // n'a eu lieu, à l'exception des données de l'émetteur
+
+    const updatedFields = await getUpdatedFields(form, input);
+    const exceptionFields = [
+      "emitterCompanySiret",
+      "emitterCompanyName",
+      "emitterCompanyAddress"
+    ];
+    for (const field of exceptionFields) {
+      if (updatedFields.includes(field)) {
+        sealedFieldErrors.push(field);
+      }
+    }
+
+    if (sealedFieldErrors?.length > 0) {
+      throw new SealedFieldError([...new Set(sealedFieldErrors)]);
+    }
 
     const userSirets = Object.keys(await getUserRoles(user.id));
 

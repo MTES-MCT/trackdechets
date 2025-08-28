@@ -18,7 +18,8 @@ import {
   userFactory,
   userWithCompanyFactory,
   transporterReceiptFactory,
-  ecoOrganismeFactory
+  ecoOrganismeFactory,
+  companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
@@ -5501,6 +5502,107 @@ describe("Mutation.updateForm", () => {
     expect(updateEvent).toBeDefined();
     expect(updateEvent?.data?.["content"]?.["wasteDetailsCode"]).toBe(
       "08 01 11*"
+    );
+  });
+
+  describe("[TRA-16553] It should not be possible to update emitter after form is EMITTED", () => {
+    it.each([Status.DRAFT, Status.SEALED])(
+      "should be possible to update emitter if status = %p",
+      async status => {
+        // Given
+        const { user, company: emitterCompany1 } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const emitterCompany2 = await companyAssociatedToExistingUserFactory(
+          user,
+          "MEMBER"
+        );
+
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            emittedAt: new Date(),
+            takenOverAt: new Date(),
+            emitterCompanySiret: emitterCompany1.siret,
+            status
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const updateFormInput = {
+          id: form.id,
+          emitter: {
+            company: {
+              siret: emitterCompany2.siret,
+              name: emitterCompany2.name,
+              address: emitterCompany2.address
+            }
+          }
+        };
+        const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+          UPDATE_FORM,
+          {
+            variables: { updateFormInput }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+      }
+    );
+
+    it.each([Status.SENT, Status.SIGNED_BY_PRODUCER])(
+      "should NOT be possible to update emitter if status = %p",
+      async status => {
+        // Given
+        const { user, company: emitterCompany1 } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const emitterCompany2 = await companyAssociatedToExistingUserFactory(
+          user,
+          "MEMBER"
+        );
+
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            emittedAt: new Date(),
+            takenOverAt: new Date(),
+            emitterCompanySiret: emitterCompany1.siret,
+            status
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const updateFormInput = {
+          id: form.id,
+          emitter: {
+            company: {
+              siret: emitterCompany2.siret,
+              name: emitterCompany2.name,
+              address: emitterCompany2.address
+            }
+          }
+        };
+        const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+          UPDATE_FORM,
+          {
+            variables: { updateFormInput }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        // Order of variables always changes, so split the expect
+        expect(errors[0].message).toContain(
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés"
+        );
+        expect(errors[0].message).toContain("emitterCompanySiret");
+        expect(errors[0].message).toContain("emitterCompanyName");
+        expect(errors[0].message).toContain("emitterCompanyAddress");
+      }
     );
   });
 });
