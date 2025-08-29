@@ -173,11 +173,15 @@ export async function checkEditionRules(
   if (form.status === Status.SIGNED_BY_PRODUCER) {
     // L'emetteur ou l'éco-organisme (s'il signé à la place de l'émetteur)
     // peuvent encore modifier tous les champs tant qu'aucune autre signature
-    // n'a eu lieu, à l'exception des données de l'émetteur
+    // n'a eu lieu, **à l'exception des données de l'émetteur**
 
     const updatedFields = await getUpdatedFields(form, input);
     const exceptionFields = [
+      "emitterType",
+      "emitterIsPrivateIndividual",
+      "emitterIsForeignShip",
       "emitterCompanySiret",
+      "emitterCompanyOmiNumber",
       "emitterCompanyName",
       "emitterCompanyAddress"
     ];

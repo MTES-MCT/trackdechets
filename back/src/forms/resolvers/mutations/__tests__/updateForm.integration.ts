@@ -5521,8 +5521,6 @@ describe("Mutation.updateForm", () => {
         const form = await formFactory({
           ownerId: user.id,
           opt: {
-            emittedAt: new Date(),
-            takenOverAt: new Date(),
             emitterCompanySiret: emitterCompany1.siret,
             status
           }
@@ -5568,7 +5566,6 @@ describe("Mutation.updateForm", () => {
           ownerId: user.id,
           opt: {
             emittedAt: new Date(),
-            takenOverAt: new Date(),
             emitterCompanySiret: emitterCompany1.siret,
             status
           }
