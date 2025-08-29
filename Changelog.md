@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.09.1] 23/09/2025
+
+#### :boom: Breaking Change
+
+- Suppression du code et des queries liées aux anciens exports de registres [PR 4393](https://github.com/MTES-MCT/trackdechets/pull/4393)
+
 # [2025.08.1] 26/08/2025
 
 #### :nail_care: Améliorations

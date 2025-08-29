@@ -7,7 +7,6 @@ import {
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import {
   getIntermediaryCompanyOrgId,
@@ -297,7 +296,6 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
       ),
 
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsdasri),
     ...getElasticExhaustiveRegistryFields(bsdasri),
     rawBsd: bsdasri,
 

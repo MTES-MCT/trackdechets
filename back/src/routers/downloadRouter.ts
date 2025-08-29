@@ -7,8 +7,6 @@ import { bspaohPdfDownloadHandler } from "../bspaoh/resolvers/queries/bspaohPdf"
 import { companyDigestPdfDownloadHandler } from "../companydigest/resolvers/queries/companyDigestPdf";
 import { redisClient } from "../common/redis";
 import { formPdfDownloadHandler } from "../forms/resolvers/queries/formPdf";
-import { wastesRegistryCsvDownloadHandler } from "../registry/resolvers/queries/wastesRegistryCsv";
-import { wastesRegistryXlsDownloadHandler } from "../registry/resolvers/queries/wastesRegistryXls";
 import type {
   Query,
   QueryBsdaPdfArgs,
@@ -16,9 +14,7 @@ import type {
   QueryBsffPdfArgs,
   QueryBspaohPdfArgs,
   QueryBsvhuPdfArgs,
-  QueryFormPdfArgs,
-  QueryWastesRegistryCsvArgs,
-  QueryWastesRegistryXlsArgs
+  QueryFormPdfArgs
 } from "@td/codegen-back";
 import {
   MyCompaniesCsvArgs,
@@ -39,8 +35,6 @@ type DownloadHandlerName = keyof Pick<
   | "bsffPdf"
   | "bsvhuPdf"
   | "bspaohPdf"
-  | "wastesRegistryCsv"
-  | "wastesRegistryXls"
   | "myCompaniesCsv"
   | "myCompaniesXls"
   | "companyDigestPdf"
@@ -54,8 +48,6 @@ type DownloadHandlerParams =
   | QueryBsffPdfArgs
   | QueryBsvhuPdfArgs
   | QueryBspaohPdfArgs
-  | QueryWastesRegistryCsvArgs
-  | QueryWastesRegistryXlsArgs
   | MyCompaniesCsvArgs
   | MyCompaniesXlsArgs;
 
@@ -89,8 +81,6 @@ const downloadHandlers: DownloadHandlers = [
   bsvhuPdfDownloadHandler,
   bspaohPdfDownloadHandler,
   companyDigestPdfDownloadHandler,
-  wastesRegistryCsvDownloadHandler,
-  wastesRegistryXlsDownloadHandler,
   myCompaniesCsvDownloadHandler,
   myCompaniesXlsDownloadHandler
 ].reduce((acc, { name, handler }) => {

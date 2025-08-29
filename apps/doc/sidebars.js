@@ -28,8 +28,7 @@ const referenceDefs = [
   { id: "bsvhu", label: "VHU" },
 
   { id: "user-company", label: "Utilisateurs et Établissements" },
-  { id: "registre", label: "Registre (legacy)" },
-  { id: "registreV2", label: "RNDTS & exports" },
+  { id: "registreV2", label: "RNDTS & Exports Registre" },
   { id: "webhooks", label: "Webhooks" },
 ];
 

@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { isDefined } from "../common/helpers";
+import { isDefined } from "../helpers";
 
 export const displayWasteQuantity = (quantity, units = "tonne(s)") => {
   if (isDefined(quantity)) {

@@ -8,7 +8,6 @@ import {
 } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
-import { getRegistryFields } from "./registry";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { buildAddress } from "../companies/sirene/utils";
@@ -234,7 +233,6 @@ export function toBsdElastic(bspaoh: BspaohForElastic): BsdElastic {
     isReviewedRevisionFor: [] as string[],
     ...getBspaohReturnOrgIds(bspaoh),
     sirets: distinct(Object.values(where).flat()),
-    ...getRegistryFields(bspaoh),
     ...getElasticExhaustiveRegistryFields(bspaoh),
     rawBsd: bspaoh,
     revisionRequests: [],
