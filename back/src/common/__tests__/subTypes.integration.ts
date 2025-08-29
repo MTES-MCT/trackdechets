@@ -3,12 +3,6 @@ import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import {
-  RegistryBsdaInclude,
-  RegistryBsdasriInclude,
-  RegistryBsffInclude,
-  RegistryFormInclude
-} from "../../registry/elastic";
-import {
   getBsdasriSubType,
   getBsdaSubType,
   getBsddSubType,
@@ -22,6 +16,12 @@ import {
 } from "../../__tests__/factories";
 import { formToBsdd } from "../../forms/compat";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
+import {
+  RegistryV2BsdaInclude,
+  RegistryV2BsddInclude,
+  RegistryV2BsffInclude,
+  RegistryV2BsdasriInclude
+} from "../../registryV2/types";
 
 describe("getBsdaSubType", () => {
   afterAll(resetDatabase);
@@ -31,7 +31,7 @@ describe("getBsdaSubType", () => {
     const bsda = await bsdaFactory({ opt: { type: "OTHER_COLLECTIONS" } });
     const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id },
-      include: RegistryBsdaInclude
+      include: RegistryV2BsdaInclude
     });
 
     // Then (ES)
@@ -49,7 +49,7 @@ describe("getBsdaSubType", () => {
       // When
       const bsdaForRegistry = await prisma.bsda.findUniqueOrThrow({
         where: { id: bsda.id },
-        include: RegistryBsdaInclude
+        include: RegistryV2BsdaInclude
       });
 
       // Then (ES)
@@ -75,7 +75,7 @@ describe("getBsffSubType", () => {
     const bsff = await createBsff({}, { data: { type } });
     const bsffForRegistry = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
-      include: RegistryBsffInclude
+      include: RegistryV2BsffInclude
     });
 
     // Then (ES)
@@ -98,7 +98,7 @@ describe("getBsddSubType", () => {
     });
     const bsddForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     // Then (ES)
@@ -117,7 +117,7 @@ describe("getBsddSubType", () => {
     });
     const bsddForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     // Then (ES)
@@ -136,7 +136,7 @@ describe("getBsddSubType", () => {
     });
     const bsddForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     // Then (ES)
@@ -154,11 +154,11 @@ describe("getBsddSubType", () => {
     });
     const bsddForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
     const bsddSuiteForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.forwardedInId! },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     // Then (ES)
@@ -180,7 +180,7 @@ describe("getBsddSubType", () => {
     });
     const bsddForRegistry = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     // Then (ES)
@@ -203,7 +203,7 @@ describe("getBsdasriSubType", () => {
     const bsdasri = await bsdasriFactory({ opt: { type } });
     const bsdasriForRegistry = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: bsdasri.id },
-      include: RegistryBsdasriInclude
+      include: RegistryV2BsdasriInclude
     });
 
     // Then (ES)

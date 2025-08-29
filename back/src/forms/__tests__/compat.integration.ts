@@ -6,7 +6,7 @@ import {
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { RegistryFormInclude } from "../../registry/elastic";
+import { RegistryV2BsddInclude } from "../../registryV2/types";
 import { formToBsdd } from "../compat";
 import { Decimal } from "@prisma/client/runtime/library";
 import { PackagingInfo } from "@td/codegen-back";
@@ -51,7 +51,7 @@ describe("simpleFormToBsdd", () => {
 
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
@@ -328,7 +328,7 @@ describe("simpleFormToBsdd", () => {
     });
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
     const bsdd = formToBsdd(fullForm);
     expect(bsdd).toMatchObject({
@@ -377,7 +377,7 @@ describe("simpleFormToBsdd", () => {
 
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
@@ -413,7 +413,7 @@ describe("simpleFormToBsdd", () => {
 
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
@@ -442,7 +442,7 @@ describe("simpleFormToBsdd", () => {
     const fullForwardedInForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.forwardedInId! },
       include: {
-        ...RegistryFormInclude
+        ...RegistryV2BsddInclude
       }
     });
 
@@ -878,7 +878,7 @@ describe("simpleFormToBsdd", () => {
     // When
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
@@ -904,7 +904,7 @@ describe("simpleFormToBsdd", () => {
     // When
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
@@ -929,7 +929,7 @@ describe("simpleFormToBsdd", () => {
     // When
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
-      include: RegistryFormInclude
+      include: RegistryV2BsddInclude
     });
 
     const bsdd = formToBsdd(fullForm);
