@@ -2359,6 +2359,43 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.status).toBe("RECEIVED");
     });
 
+    it("new status should be REFUSED for COLLECTION_2710 is waste is refused", async () => {
+      // Given
+      const bsda = await bsdaFactory({
+        opt: {
+          type: "COLLECTION_2710",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionRefusalReason: "Pas bon",
+          workerCompanyName: null,
+          workerCompanySiret: null
+        },
+        transporterOpt: {
+          transporterCompanyName: null,
+          transporterCompanySiret: null
+        }
+      });
+
+      // il n'y a pas de transporteur sur les bordereaux de collecte
+      // en déchetterie
+      await prisma.bsda.update({
+        where: { id: bsda.id },
+        data: { transporters: { deleteMany: {} } }
+      });
+
+      // When
+      const { errors, data } = await signBsda(
+        destinationUser,
+        bsda.id,
+        "RECEPTION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.status).toBe("REFUSED");
+    });
+
     it("should send a mail if waste is REFUSED", async () => {
       // Given
       const bsda = await createBsda();
@@ -2551,9 +2588,6 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(sendMail as jest.Mock).not.toHaveBeenCalled();
     });
-
-    // TODO: si opération, pas de mail si réception
-    // TODO: si opération, mail si pas de réception
 
     it("should not be able to sign reception after transport if quantityReceived = 0", async () => {
       // Given
