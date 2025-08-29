@@ -12,6 +12,10 @@ module.exports = {
   favicon: "img/trackdechets.png",
   organizationName: "MTES-MCT",
   projectName: "trackdechets",
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: {
+    mermaid: true,
+  },
   themeConfig: {
     prism: {
       additionalLanguages: ['bash', 'python', 'http', 'json'],

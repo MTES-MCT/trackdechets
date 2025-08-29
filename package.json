@@ -42,6 +42,7 @@
     "@codegouvfr/react-dsfr": "^1.26.0",
     "@docusaurus/core": "^3.8.1",
     "@docusaurus/preset-classic": "^3.8.1",
+    "@docusaurus/theme-mermaid": "^3.8.1",
     "@elastic/elasticsearch": "7.13.0",
     "@fast-csv/format": "^4.3.5",
     "@graphql-tools/load-files": "^6.6.1",
