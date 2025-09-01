@@ -191,38 +191,37 @@ export async function checkEditionRules(
       }
     }
 
-    if (sealedFieldErrors?.length > 0) {
-      throw new SealedFieldError([...new Set(sealedFieldErrors)]);
-    }
+    if (!sealedFieldErrors.length) {
+      const userSirets = Object.keys(await getUserRoles(user.id));
 
-    const userSirets = Object.keys(await getUserRoles(user.id));
+      const isEmitter =
+        form.emitterCompanySiret &&
+        userSirets.includes(form.emitterCompanySiret);
 
-    const isEmitter =
-      form.emitterCompanySiret && userSirets.includes(form.emitterCompanySiret);
-
-    if (!form.emittedByEcoOrganisme && isEmitter) {
-      // L'émetteur du bordereau peut modifier tous les champs tant qu'il
-      // est le seul à avoir signé
-      return true;
-    }
-
-    const isEcoOrganisme =
-      form.ecoOrganismeSiret && userSirets.includes(form.ecoOrganismeSiret);
-
-    if (form.emittedByEcoOrganisme && isEcoOrganisme) {
-      // L'éco-organisme peut modifier tous les champs du bordereau
-      // tant qu'il est le seul à avoir signé
-      return true;
-    }
-
-    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      const isTransporter =
-        form.transporters[0]?.transporterCompanySiret &&
-        userSirets.includes(form.transporters[0].transporterCompanySiret);
-
-      if (isTransporter) {
-        // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+      if (!form.emittedByEcoOrganisme && isEmitter) {
+        // L'émetteur du bordereau peut modifier tous les champs tant qu'il
+        // est le seul à avoir signé
         return true;
+      }
+
+      const isEcoOrganisme =
+        form.ecoOrganismeSiret && userSirets.includes(form.ecoOrganismeSiret);
+
+      if (form.emittedByEcoOrganisme && isEcoOrganisme) {
+        // L'éco-organisme peut modifier tous les champs du bordereau
+        // tant qu'il est le seul à avoir signé
+        return true;
+      }
+
+      if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+        const isTransporter =
+          form.transporters[0]?.transporterCompanySiret &&
+          userSirets.includes(form.transporters[0].transporterCompanySiret);
+
+        if (isTransporter) {
+          // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+          return true;
+        }
       }
     }
   }
