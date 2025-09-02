@@ -170,7 +170,7 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
     }
   }, [operationCode, setValue]);
 
-  const onSubmit = async data => {
+  const onSubmit = async (data: ZodBsvhuOperation) => {
     const { author, date, ...update } = data;
     await updateBsvhu({
       variables: {
@@ -220,30 +220,22 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             }
           >
             <option value="">Sélectionnez une valeur...</option>
-            {!dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-              WasteVehiclesType.Broyeur
-            ) && (
-              <option value="R 4">
-                R 4 - Recyclage ou récupération des métaux et des composés
-                métalliques
-              </option>
-            )}
+
+            <option value="R 4">
+              R 4 - Recyclage ou récupération des métaux et des composés
+              métalliques
+            </option>
+
             {(dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
               WasteVehiclesType.Broyeur
             ) ||
               dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
                 WasteVehiclesType.Demolisseur
               )) && (
-              <>
-                <option value="R 4">
-                  R 4 - Recyclage ou récupération des métaux et des composés
-                  métalliques
-                </option>
-                <option value="R 12">
-                  R 12 - Échange de déchets en vue de les soumettre à l'une des
-                  opérations numérotées R1 à R11
-                </option>
-              </>
+              <option value="R 12">
+                R 12 - Échange de déchets en vue de les soumettre à l'une des
+                opérations numérotées R1 à R11
+              </option>
             )}
           </Select>
 
