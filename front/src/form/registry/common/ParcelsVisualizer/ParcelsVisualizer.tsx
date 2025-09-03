@@ -264,7 +264,7 @@ export function ParcelsVisualizer({
         }
         if (!isEmptyExtent(globalExtent)) {
           map.getView().fit(globalExtent, {
-            maxZoom: onlyCoordinates ? 7.9 : 9,
+            maxZoom: onlyCoordinates ? 7.5 : 9,
             padding: [50, 50, 50, 50]
           });
         }
