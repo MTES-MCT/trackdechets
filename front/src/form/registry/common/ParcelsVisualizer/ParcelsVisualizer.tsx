@@ -198,6 +198,7 @@ export function ParcelsVisualizer({
         let map: Map;
         let markerLayerId: string;
         let parcelLayerId: string;
+        let onlyCoordinates = true;
         try {
           const res = createMap();
           map = res.map;
@@ -217,6 +218,7 @@ export function ParcelsVisualizer({
         setParcelLayerId(parcelLayerId);
         let globalExtent = createEmptyExtent();
         if (inseeCodeValues.length > 0) {
+          onlyCoordinates = false;
           for (let i = 0; i < inseeCodeValues.length; i++) {
             const inseeCode = inseeCodeValues[i];
             const number = numberValues[i];
@@ -262,6 +264,7 @@ export function ParcelsVisualizer({
         }
         if (!isEmptyExtent(globalExtent)) {
           map.getView().fit(globalExtent, {
+            maxZoom: onlyCoordinates ? 7.9 : 9,
             padding: [50, 50, 50, 50]
           });
         }
