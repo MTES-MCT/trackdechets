@@ -221,11 +221,6 @@ const WasteBsvhu = ({
           label="Détail des identifications"
           fieldName="identification.numbers"
         />
-        {formState.errors.identification?.numbers?.message && (
-          <p className="fr-text fr-error-text">
-            {formState.errors.identification?.numbers?.message}
-          </p>
-        )}
       </div>
 
       <h4 className="fr-h4">Quantité remise</h4>
