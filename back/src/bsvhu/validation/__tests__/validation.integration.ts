@@ -911,7 +911,7 @@ describe("BSVHU validation", () => {
       } catch (err) {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
-            message: "Les numéros d'identification est un champ requis."
+            message: "Le détail des identifications est un champ requis."
           })
         ]);
       }

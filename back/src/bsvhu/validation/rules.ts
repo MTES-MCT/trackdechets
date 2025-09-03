@@ -434,7 +434,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
         return (bsvhu.createdAt || new Date()).getTime() >= v20241001.getTime();
       }
     },
-    readableFieldName: "Les numéros d'identification",
+    readableFieldName: "Le détail des identifications",
     path: ["identification", "numbers"]
   },
   identificationType: {
