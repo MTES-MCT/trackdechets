@@ -5,6 +5,8 @@ on: pull_request
 jobs:
   back:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Tests e2e
     steps:
       # Hosts
