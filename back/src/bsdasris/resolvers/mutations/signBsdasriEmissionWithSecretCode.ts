@@ -4,10 +4,12 @@ import type {
   BsdasriSignatureType
 } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsdasriOrNotFound } from "../../database";
+import { getFullBsdasriOrNotFound } from "../../database";
 import { getAuthorizedOrgIds, signEmission } from "./signBsdasri";
 import { checkCanSignFor } from "../../../permissions";
 import { expandBsdasriFromDB } from "../../converter";
+import { parseBsdasriAsync } from "../../validation";
+import { prismaToZodBsdasri } from "../../validation/helpers";
 
 const signBsdasriEmissionWithSecretCode: MutationResolvers["signBsdasriEmissionWithSecretCode"] =
   async (
@@ -16,9 +18,12 @@ const signBsdasriEmissionWithSecretCode: MutationResolvers["signBsdasriEmissionW
     context
   ) => {
     const user = checkIsAuthenticated(context);
-    const existingBsdasri = await getBsdasriOrNotFound({
-      id,
-      includeAssociated: true
+    const existingBsdasri = await getFullBsdasriOrNotFound(id, {
+      include: {
+        grouping: true,
+        synthesizing: true,
+        intermediaries: true
+      }
     });
 
     const signatureType: BsdasriSignatureType = "EMISSION";
@@ -35,6 +40,17 @@ const signBsdasriEmissionWithSecretCode: MutationResolvers["signBsdasriEmissionW
       signatureType,
       authorizedSirets,
       input.securityCode
+    );
+
+    const zodBsdasri = prismaToZodBsdasri(existingBsdasri);
+
+    // Check that all necessary fields are filled
+    await parseBsdasriAsync(
+      { ...zodBsdasri },
+      {
+        user,
+        currentSignatureType: signatureType
+      }
     );
 
     const signedBsdasri = await signEmission(user, existingBsdasri, {
