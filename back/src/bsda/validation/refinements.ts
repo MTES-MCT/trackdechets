@@ -218,8 +218,12 @@ export const checkRequiredFields: (
 
     let checkableTransporters = bsda.transporters ?? [];
 
-    if (validationContext.currentSignatureType === "OPERATION") {
-      // Cas spécial permettant à l'installation de destination de valider l'opération
+    if (
+      ["OPERATION", "RECEPTION"].includes(
+        validationContext.currentSignatureType ?? ""
+      )
+    ) {
+      // Cas spécial permettant à l'installation de destination de valider la réception ou l'opération
       // même si tous les transporteurs multi-modaux n'ont pas signé.
       checkableTransporters = checkableTransporters.filter(t =>
         Boolean(t.transporterTransportSignatureDate)
