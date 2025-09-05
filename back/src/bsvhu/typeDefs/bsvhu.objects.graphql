@@ -99,6 +99,8 @@ type BsvhuEmitter {
   company: FormCompany
   "Déclaration générale de l'émetteur du bordereau"
   emission: BsvhuEmission
+  "Indique si l'émetteur est inscrit sur TD ou non"
+  notOnTD: Boolean!
 }
 
 type BsvhuEmission {

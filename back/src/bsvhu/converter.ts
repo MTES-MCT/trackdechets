@@ -65,6 +65,7 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
       agrementNumber: bsvhu.emitterAgrementNumber,
       irregularSituation: bsvhu.emitterIrregularSituation ?? false,
       noSiret: bsvhu.emitterNoSiret ?? false,
+      notOnTD: bsvhu.emitterNotOnTD ?? false,
       company: nullIfNoValues<FormCompany>({
         name: bsvhu.emitterCompanyName,
         siret: bsvhu.emitterCompanySiret,
