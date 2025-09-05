@@ -1476,7 +1476,11 @@ export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
 };
 
 export const canReviewBsdasri = (bsd: BsdDisplay, siret: string) => {
-  if (bsd.type !== BsdType.Bsdasri || bsd.status === BsdStatusCode.Initial) {
+  if (
+    bsd.type !== BsdType.Bsdasri ||
+    bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.Refused
+  ) {
     return false;
   }
 
