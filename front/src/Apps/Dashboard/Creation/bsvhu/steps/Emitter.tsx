@@ -114,9 +114,10 @@ const EmitterBsvhu = ({ errors }) => {
   };
 
   const onNoSiretClick = () => {
-    if (!!emitter.company) {
+    if (emitter.company.siret) {
       setValue("emitter.company", {});
       setValue("emitter.agrementNumber", null);
+      setValue("emitter.company.siret", null);
     }
   };
 
