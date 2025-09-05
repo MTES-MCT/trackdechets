@@ -15,7 +15,7 @@ export const getConsistenceLabel = (
     case Consistence.Doughy:
       return "Pâteux";
     case Consistence.Gaseous:
-      return "Gaseux";
+      return "Gazeux";
     default:
       return "";
   }
