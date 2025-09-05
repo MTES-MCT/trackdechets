@@ -383,10 +383,17 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
                     }
                   },
                   {
-                    label: "Pulvérulents",
+                    label: "Pulvérulent",
                     nativeInputProps: {
                       ...register("waste.consistence"),
                       value: BsdaConsistence.Pulverulent
+                    }
+                  },
+                  {
+                    label: "Pâteux",
+                    nativeInputProps: {
+                      ...register("waste.consistence"),
+                      value: BsdaConsistence.Pateux
                     }
                   },
                   {

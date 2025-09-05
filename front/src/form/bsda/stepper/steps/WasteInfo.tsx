@@ -69,6 +69,8 @@ export function WasteInfo({ disabled }) {
 export function WasteInfoWorker({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
   const isDechetterie = values?.type === "COLLECTION_2710";
+  const isOtherConsistence =
+    values?.waste?.consistence === BsdaConsistence.Other;
 
   return (
     <>
@@ -208,11 +210,26 @@ export function WasteInfoWorker({ disabled }) {
             disabled={disabled}
           >
             <option value={BsdaConsistence.Solide}>Solide</option>
-            <option value={BsdaConsistence.Pulverulent}>Pulvérulents</option>
+            <option value={BsdaConsistence.Pulverulent}>Pulvérulent</option>
+            <option value={BsdaConsistence.Pateux}>Pâteux</option>
             <option value={BsdaConsistence.Other}>Autre</option>
           </Field>
         </label>
       </div>
+
+      {isOtherConsistence && (
+        <div className="form__row">
+          <label>
+            Détail de la consistance
+            <Field
+              disabled={disabled}
+              type="text"
+              name="waste.consistenceDescription"
+              className="td-input"
+            />
+          </label>
+        </div>
+      )}
 
       <h4 className="form__section-heading">Quantité</h4>
       <div className="form__row">

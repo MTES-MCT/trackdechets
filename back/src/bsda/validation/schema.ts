@@ -146,6 +146,7 @@ export const rawBsdaSchema = z.object({
   wasteFamilyCode: z.string().nullish(),
   wasteMaterialName: z.string().nullish(),
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
+  wasteConsistenceDescription: z.string().nullish(),
   wasteSealNumbers: z.array(z.string()).default([]),
   wasteIsSubjectToADR: z.boolean().nullish(),
   wasteAdr: z
