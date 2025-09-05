@@ -48,7 +48,7 @@ processors:
         - 'resource.attributes["service.name"] == "nginx"'
         - 'resource.attributes["service.name"] == "metabase"'
         - 'resource.attributes["service.name"] == "trackdechets-api"'
-        - 'resource.attributes["service.name"] == "api" and log.attributes["request_timing"] == "start"'
+        - 'resource.attributes["service.name"] == "api" and attributes["request_timing"] == "start"'
 
 connectors:
   datadog/connector:
