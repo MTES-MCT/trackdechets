@@ -4,6 +4,7 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BsvhuInput,
+  FavoriteType,
   Mutation,
   MutationSignBsvhuArgs,
   MutationUpdateBsvhuArgs,
@@ -35,6 +36,8 @@ import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../common/queries/company/
 import { useParams } from "react-router-dom";
 import { SignatureTimestamp } from "../BSPaoh/WorkflowAction/components/Signature";
 import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
+import CompanySelectorWrapper from "../../../common/Components/CompanySelectorWrapper/CompanySelectorWrapper";
+import CompanyContactInfo from "../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 
 const schema = z.object({
   author: z
@@ -78,9 +81,20 @@ const schema = z.object({
             "REUTILISATION",
             "VALORISATION_ENERGETIQUE"
           ])
+          .nullish(),
+        nextDestination: z
+          .object({
+            company: z.object({
+              orgId: z.string().nullish(),
+              name: z.string().nullish(),
+              contact: z.string().nullish(),
+              phone: z.string().nullish(),
+              mail: z.string().nullish(),
+              address: z.string().nullish()
+            })
+          })
           .nullish()
       })
-      .nullish()
       .nullish(),
     reception: z
       .object({
@@ -161,6 +175,9 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   }, []);
 
   const operationCode = watch("destination.operation.code");
+  const orgIdNextDestination = watch(
+    "destination.operation.nextDestination.company.orgId"
+  );
 
   useEffect(() => {
     if (operationCode === "R 4") {
@@ -204,8 +221,26 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
+            WasteVehiclesType.Demolisseur
+          ) && (
+            <>
+              <h5 className="fr-h5 fr-mb-2w">
+                Numéro de registre de police entrant
+              </h5>
+              <div className="fr-col-md-12 fr-mb-4w">
+                <IdentificationNumber
+                  title="Codes d'identification utilisés par l'établissement"
+                  disabled={false}
+                  name="destination.reception.identification.numbers"
+                  infoMessage={`Vous avez  complété % numéros sur ${bsvhu.identification?.numbers?.length} VHU acceptés`}
+                />
+              </div>
+            </>
+          )}
+
           <Select
-            label="Traitement d'élimination / valorisation réalisée (code D/R)"
+            label="Opération d'élimination / valorisation réalisée (code D/R)"
             className="fr-col-12 fr-mt-1w"
             nativeSelectProps={{
               ...register("destination.operation.code")
@@ -251,29 +286,52 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
             Code de traitement prévu : {bsvhu.destination?.plannedOperationCode}
           </p>
 
+          {operationCode === "R 12" && (
+            <div className="fr-col-md-10 fr-mt-4w">
+              <h4 className="fr-h4 fr-mt-2w">
+                Installation de broyage prévisionelle (optionnelle)
+              </h4>
+              <CompanySelectorWrapper
+                orgId={siret}
+                favoriteType={FavoriteType.Destination}
+                selectedCompanyOrgId={orgIdNextDestination}
+                onCompanySelected={company => {
+                  if (company) {
+                    const name = `destination.operation.nextDestination.company`;
+                    setValue(`${name}.orgId`, company.orgId);
+                    setValue(`${name}.name`, company.name);
+                    setValue(`${name}.address`, company.address);
+                    setValue(
+                      `${name}.contact`,
+                      bsvhu.destination?.operation?.nextDestination?.company
+                        ?.contact || company.contact
+                    );
+                    setValue(
+                      `${name}.phone`,
+                      bsvhu.destination?.operation?.nextDestination?.company
+                        ?.phone || company.contactPhone
+                    );
+
+                    setValue(
+                      `${name}.mail`,
+                      bsvhu.destination?.operation?.nextDestination?.company
+                        ?.mail || company.contactEmail
+                    );
+                  }
+                }}
+              />
+              <CompanyContactInfo
+                fieldName={`destination.operation.nextDestination.company`}
+                key={orgIdNextDestination}
+              />
+            </div>
+          )}
+
           <RhfOperationModeSelect
             operationCode={operationCode}
             path={"destination.operation.mode"}
             addedDsfrClass="fr-text--bold"
           />
-
-          {dataCompany?.companyPrivateInfos?.wasteVehiclesTypes?.includes(
-            WasteVehiclesType.Demolisseur
-          ) && (
-            <>
-              <h5 className="fr-h5 fr-mb-2w">
-                Numéro de registre de police entrant
-              </h5>
-              <div className="fr-col-md-12 fr-mb-4w">
-                <IdentificationNumber
-                  title="Codes d'identification utilisés par l'établissement"
-                  disabled={false}
-                  name="destination.reception.identification.numbers"
-                  infoMessage={`Vous avez  complété % numéros sur ${bsvhu.identification?.numbers?.length} VHU acceptés`}
-                />
-              </div>
-            </>
-          )}
 
           <p className="fr-text fr-mb-2w">
             En qualité de <strong>destinataire du déchet</strong>, j'atteste que
