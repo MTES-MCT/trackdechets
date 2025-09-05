@@ -12,7 +12,11 @@ interface Props {
 }
 
 export function BsdaJourneySummary({ bsda }: Props) {
-  const signedByEmitter = Boolean(bsda.emitter?.emission?.signature?.date);
+  const signedByEmitter =
+    Boolean(bsda.emitter?.emission?.signature?.date) ||
+    (bsda.emitter?.isPrivateIndividual &&
+      !bsda.isDraft &&
+      bsda.status !== "INITIAL");
   const workerIsDisabled = bsda.worker?.isDisabled;
   const signedByWorker = Boolean(bsda.worker?.work?.signature?.date);
 
