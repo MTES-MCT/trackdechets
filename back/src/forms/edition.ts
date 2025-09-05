@@ -173,36 +173,55 @@ export async function checkEditionRules(
   if (form.status === Status.SIGNED_BY_PRODUCER) {
     // L'emetteur ou l'éco-organisme (s'il signé à la place de l'émetteur)
     // peuvent encore modifier tous les champs tant qu'aucune autre signature
-    // n'a eu lieu
+    // n'a eu lieu, **à l'exception des données de l'émetteur**
 
-    const userSirets = Object.keys(await getUserRoles(user.id));
-
-    const isEmitter =
-      form.emitterCompanySiret && userSirets.includes(form.emitterCompanySiret);
-
-    if (!form.emittedByEcoOrganisme && isEmitter) {
-      // L'émetteur du bordereau peut modifier tous les champs tant qu'il
-      // est le seul à avoir signé
-      return true;
+    const updatedFields = await getUpdatedFields(form, input);
+    const exceptionFields = [
+      "emitterType",
+      "emitterIsPrivateIndividual",
+      "emitterIsForeignShip",
+      "emitterCompanySiret",
+      "emitterCompanyOmiNumber",
+      "emitterCompanyName",
+      "emitterCompanyAddress"
+    ];
+    for (const field of exceptionFields) {
+      if (updatedFields.includes(field)) {
+        sealedFieldErrors.push(field);
+      }
     }
 
-    const isEcoOrganisme =
-      form.ecoOrganismeSiret && userSirets.includes(form.ecoOrganismeSiret);
+    if (!sealedFieldErrors.length) {
+      const userSirets = Object.keys(await getUserRoles(user.id));
 
-    if (form.emittedByEcoOrganisme && isEcoOrganisme) {
-      // L'éco-organisme peut modifier tous les champs du bordereau
-      // tant qu'il est le seul à avoir signé
-      return true;
-    }
+      const isEmitter =
+        form.emitterCompanySiret &&
+        userSirets.includes(form.emitterCompanySiret);
 
-    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      const isTransporter =
-        form.transporters[0]?.transporterCompanySiret &&
-        userSirets.includes(form.transporters[0].transporterCompanySiret);
-
-      if (isTransporter) {
-        // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+      if (!form.emittedByEcoOrganisme && isEmitter) {
+        // L'émetteur du bordereau peut modifier tous les champs tant qu'il
+        // est le seul à avoir signé
         return true;
+      }
+
+      const isEcoOrganisme =
+        form.ecoOrganismeSiret && userSirets.includes(form.ecoOrganismeSiret);
+
+      if (form.emittedByEcoOrganisme && isEcoOrganisme) {
+        // L'éco-organisme peut modifier tous les champs du bordereau
+        // tant qu'il est le seul à avoir signé
+        return true;
+      }
+
+      if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+        const isTransporter =
+          form.transporters[0]?.transporterCompanySiret &&
+          userSirets.includes(form.transporters[0].transporterCompanySiret);
+
+        if (isTransporter) {
+          // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
+          return true;
+        }
       }
     }
   }
