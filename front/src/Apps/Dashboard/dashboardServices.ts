@@ -500,6 +500,20 @@ export const getIsNonDraftLabel = (
   const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
+  // Si l'utilisateur est un chauffeur, il doit pouvoir signer un VHU
+  // en situation irrégulière (pas de siret émetteur)
+  const isTransporter = isSameSiretTransporter(currentSiret, bsd);
+  if (
+    isBsvhu(bsd.type) &&
+    isToCollectTab &&
+    isTransporter &&
+    permissions.includes(UserPermission.BsdCanSignTransport) &&
+    bsd.emitter?.irregularSituation &&
+    bsd.emitter?.noSiret
+  ) {
+    return SIGNER;
+  }
+
   if (
     isBsda(bsd.type) &&
     isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
