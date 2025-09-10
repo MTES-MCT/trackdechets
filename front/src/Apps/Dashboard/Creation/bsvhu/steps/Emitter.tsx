@@ -118,6 +118,11 @@ const EmitterBsvhu = ({ errors }) => {
       setValue("emitter.company", {});
       setValue("emitter.agrementNumber", null);
       setValue("emitter.company.siret", null);
+      setValue("emitter.company.name", "");
+      setValue("emitter.company.contact", "");
+      setValue("emitter.company.phone", "");
+      setValue("emitter.company.mail", "");
+      setValue("emitter.company.address", "");
     }
   };
 
