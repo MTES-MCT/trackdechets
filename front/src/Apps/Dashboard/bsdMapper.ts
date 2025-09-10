@@ -11,7 +11,8 @@ import {
   FormStatus,
   Transporter,
   BsdaTransporter,
-  BsffTransporter
+  BsffTransporter,
+  BsvhuStatus
 } from "@td/codegen-ui";
 
 import {
@@ -372,7 +373,9 @@ export const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     transporterCustomInfo: transporter?.customInfo,
     transporterNumberPlate: transporter?.transport?.plates,
     updatedAt: bsvhu["bsvhuUpdatedAt"],
-    ecoOrganisme: bsvhu.ecoOrganisme
+    ecoOrganisme: bsvhu.ecoOrganisme,
+    bsdWorkflowType:
+      statusCode === BsvhuStatus.Initial ? BsdasriType.Simple : null // currently there is no specific type on VHU
   };
 
   return bsvhuFormatted;
