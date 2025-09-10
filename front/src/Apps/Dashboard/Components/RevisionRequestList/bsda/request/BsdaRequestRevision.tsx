@@ -472,7 +472,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialBsdaReview.emitter?.pickupSite?.name}
               >
                 <Input
-                  label="Nom du site d'enlèvement"
+                  label="Nom de chantier ou de collecte"
                   className="fr-col-8"
                   nativeInputProps={{
                     ...register("emitter.pickupSite.name")
