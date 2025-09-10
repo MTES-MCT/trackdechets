@@ -57,6 +57,10 @@ const reviewFragment = gql`
           mode
         }
       }
+      ecoOrganisme {
+        name
+        siret
+      }
     }
     authoringCompany {
       orgId
