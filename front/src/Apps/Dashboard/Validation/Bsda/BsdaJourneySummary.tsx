@@ -12,11 +12,14 @@ interface Props {
 }
 
 export function BsdaJourneySummary({ bsda }: Props) {
+  const isDechetterie = bsda?.type === "COLLECTION_2710";
+
   const signedByEmitter =
     Boolean(bsda.emitter?.emission?.signature?.date) ||
     (bsda.emitter?.isPrivateIndividual &&
       !bsda.isDraft &&
-      bsda.status !== "INITIAL");
+      bsda.status !== "INITIAL") ||
+    isDechetterie;
   const workerIsDisabled = bsda.worker?.isDisabled;
   const signedByWorker = Boolean(bsda.worker?.work?.signature?.date);
 
