@@ -85,7 +85,7 @@ const CompanyMembersRequestsList = ({
                         <thead>
                           <tr>
                             <th scope="col">Nom</th>
-                            <th scope="col">Email</th>
+                            <th scope="col">Courriel</th>
                             <th scope="col">Action</th>
                           </tr>
                         </thead>

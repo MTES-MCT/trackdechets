@@ -7,7 +7,7 @@ const locale = {
   },
   string: {
     url: "URL invalide",
-    email: "Email invalide"
+    email: "Courriel invalide"
   }
 };
 

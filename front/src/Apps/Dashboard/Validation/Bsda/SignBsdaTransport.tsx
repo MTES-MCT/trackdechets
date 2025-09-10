@@ -269,7 +269,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                 </div>
                 <div className="fr-col-12 fr-col-md-6">
                   <Input
-                    label="Mail"
+                    label="Courriel"
                     nativeInputProps={{
                       value: bsda.transporter?.company?.mail ?? "",
                       ...register("company.mail")

@@ -259,7 +259,7 @@ export default function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail (optionnel)
+              Courriel (optionnel)
               <Field
                 type="text"
                 name="emitter.company.mail"
@@ -322,7 +322,7 @@ export default function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail (optionnel)
+              Courriel (optionnel)
               <Field
                 type="text"
                 name="emitter.company.mail"

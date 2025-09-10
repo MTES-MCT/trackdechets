@@ -606,7 +606,7 @@ export default function CompanySelector({
         </div>
         <div className="form__row">
           <label>
-            Mail {optionalMail ? "(optionnel)" : null}
+            Courriel {optionalMail ? "(optionnel)" : null}
             <Field
               type="email"
               name={`${field.name}.mail`}

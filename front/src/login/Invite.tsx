@@ -199,7 +199,10 @@ export default function Invite() {
           password: ""
         }}
         validationSchema={yup.object().shape({
-          email: yup.string().email().required("L'email est un champ requis"),
+          email: yup
+            .string()
+            .email()
+            .required("Le courriel est un champ requis"),
           name: yup.string().required("Le nom est un champ requis"),
           password: yup
             .string()
@@ -259,7 +262,7 @@ export default function Invite() {
                   {({ field }) => {
                     return (
                       <Input
-                        label="Email"
+                        label="Courriel"
                         nativeInputProps={{
                           required: true,
                           readOnly: true,
