@@ -117,6 +117,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
 
   const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
+    console.log(content);
     const cleanedContent = removeEmptyKeys(
       checkIfInitialObjectValueChanged(content)
     );
@@ -464,6 +465,20 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 />
               </RhfReviewableField>
 
+              <RhfReviewableField
+                title="Nom de chantier ou de collecte"
+                value={bsda.emitter?.pickupSite?.name}
+                path="emitter.pickupSite"
+                defaultValue={initialBsdaReview.emitter?.pickupSite?.name}
+              >
+                <Input
+                  label="Nom du site d'enlèvement"
+                  className="fr-col-8"
+                  nativeInputProps={{
+                    ...register("emitter.pickupSite.name")
+                  }}
+                />
+              </RhfReviewableField>
               <RhfReviewableField
                 title="Adresse de chantier ou de collecte"
                 value={[
