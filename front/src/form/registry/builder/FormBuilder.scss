@@ -1,6 +1,56 @@
 @import "../../../scss/Breakpoints.scss";
 
 .registryFormBuilder {
+  &__tabs {
+    min-height: 98vh;
+
+    @media only screen and (min-width: 1025px) {
+      width: 100%;
+      overflow: hidden;
+      overflow-y: scroll;
+      min-height: auto;
+      max-height: 420px;
+
+      &--height {
+        max-height: 400px;
+      }
+    }
+  }
+
+  &__error {
+    padding-bottom: 15px;
+  }
+
+  &__footer {
+    position: sticky;
+    background: #fff;
+    bottom: 0;
+    display: flex;
+    padding-bottom: 5px;
+
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+    background-image: linear-gradient(
+      0deg,
+      var(--border-default-grey),
+      var(--border-default-grey)
+    );
+
+    @media only screen and (min-width: 1025px) {
+      background: none;
+      position: absolute;
+      flex-direction: row;
+      padding-bottom: 30px;
+      width: 94%;
+    }
+    gap: 10px;
+    justify-content: space-between;
+    button {
+      margin: 2px;
+    }
+  }
+
   .tabError {
     background-color: var(--light-background-contrast-error, #ffe9e9);
     &[aria-selected="true"]:not(:disabled) {
@@ -35,34 +85,5 @@
         #fb8f8f
       );
     }
-  }
-
-  .fr-btns-group > div {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-  }
-  .fr-modal__footer {
-    padding: 2rem 0;
-    background-position: 0 0;
-    background-repeat: no-repeat;
-    background-size: 100% 1px;
-    background-image: linear-gradient(
-      0deg,
-      var(--border-default-grey),
-      var(--border-default-grey)
-    );
-    @include xs-phone {
-      margin-bottom: 50px;
-    }
-    .error-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      // gap: 16px;
-    }
-  }
-  .fr-tabs {
-    box-shadow: none;
   }
 }

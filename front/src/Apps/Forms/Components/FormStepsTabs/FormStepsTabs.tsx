@@ -65,63 +65,71 @@ const FormStepsTabs = ({
         tabs={tabList}
         onTabChange={onTabChange}
       >
-        {children}
+        <div
+          className={
+            !!genericErrorMessage?.[0]?.message
+              ? "formSteps__tabs formSteps__tabs--height"
+              : "formSteps__tabs"
+          }
+        >
+          {children}
+        </div>
       </Tabs>
       <br />
-      <div className="fr-modal__footer">
-        <div className="error-container">
-          {!!genericErrorMessage?.[0]?.message && (
-            <div ref={ref as React.RefObject<HTMLDivElement>} tabIndex={-1}>
-              <Alert
-                description={genericErrorMessage?.[0]?.message}
-                severity="error"
-                title=""
-              />
-            </div>
+
+      {!!genericErrorMessage?.[0]?.message && (
+        <div
+          ref={ref as React.RefObject<HTMLDivElement>}
+          tabIndex={-1}
+          className="formSteps__error"
+        >
+          <Alert
+            description={genericErrorMessage?.[0]?.message}
+            severity="error"
+            title=""
+          />
+        </div>
+      )}
+
+      <div className="formSteps__footer">
+        <div>
+          <Button
+            onClick={onPrevTab}
+            priority="tertiary"
+            disabled={isPrevStepDisabled}
+            type="button"
+          >
+            Précédent
+          </Button>
+
+          <Button
+            onClick={onNextTab}
+            priority="tertiary"
+            disabled={isNextStepDisabled}
+            type="button"
+          >
+            Suivant
+          </Button>
+        </div>
+
+        <div>
+          <Button priority="secondary" type="button" onClick={onCancel}>
+            Annuler
+          </Button>
+
+          {draftCtaLabel && (
+            <Button
+              priority="secondary"
+              id="id_save_draft"
+              nativeButtonProps={{ "data-testid": "draftBtn" }}
+            >
+              {draftCtaLabel}
+            </Button>
           )}
-          <div className="fr-btns-group fr-btns-group--inline">
-            <div>
-              <div>
-                <Button
-                  onClick={onPrevTab}
-                  priority="tertiary"
-                  disabled={isPrevStepDisabled}
-                  type="button"
-                >
-                  Précédent
-                </Button>
 
-                <Button
-                  onClick={onNextTab}
-                  priority="tertiary"
-                  disabled={isNextStepDisabled}
-                  type="button"
-                >
-                  Suivant
-                </Button>
-              </div>
-
-              <div>
-                <Button priority="secondary" type="button" onClick={onCancel}>
-                  Annuler
-                </Button>
-
-                {draftCtaLabel && (
-                  <Button
-                    priority="secondary"
-                    id="id_save_draft"
-                    nativeButtonProps={{ "data-testid": "draftBtn" }}
-                  >
-                    {draftCtaLabel}
-                  </Button>
-                )}
-
-                <Button id="id_save" priority="primary">
-                  {mainCtaLabel}
-                </Button>
-              </div>
-            </div>
-          </div>
+          <Button id="id_save" priority="primary">
+            {mainCtaLabel}
+          </Button>
         </div>
       </div>
     </form>

@@ -82,7 +82,7 @@ export function SecondaryWasteCodes({ methods }: Props) {
                       padding: "0 .5rem",
                       width: "100%"
                     }
-                  : { padding: ".5rem" }
+                  : { padding: ".8rem" }
               }
             >
               <WasteCodeSelector
