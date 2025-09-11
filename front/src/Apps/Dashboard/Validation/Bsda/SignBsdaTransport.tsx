@@ -120,7 +120,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   const TODAY = useMemo(() => new Date(), []);
 
   const signingTransporter = useMemo(
-    () => data?.bsda?.transporters?.find(t => !t.transport?.signature?.date),
+    () => data?.bsda?.transporters?.find(t => !t.transport?.signature),
     [data?.bsda]
   );
 
