@@ -28,6 +28,7 @@ const WasteBsvhu = ({
   const containsElectricOrHybridVehicles = watch(
     "containsElectricOrHybridVehicles"
   );
+  const wasteCode = watch("wasteCode");
 
   const sealedFields = useContext(SealedFieldsContext);
 
@@ -64,6 +65,13 @@ const WasteBsvhu = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
+
+  useEffect(() => {
+    setValue(
+      "destination.plannedOperationCode",
+      wasteCode === "16 01 06" ? "R 4" : "R 12"
+    );
+  }, [setValue, wasteCode]);
 
   const identificationTypeOptions = [
     {
