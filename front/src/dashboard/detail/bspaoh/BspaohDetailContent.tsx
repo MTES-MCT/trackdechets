@@ -62,7 +62,7 @@ type CompanyProps = {
 const Company = ({ company, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
-    <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>SIRET</dt> <dd>{company?.siret}</dd>
     <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>

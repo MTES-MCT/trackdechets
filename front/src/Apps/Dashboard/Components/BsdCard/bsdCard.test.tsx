@@ -554,7 +554,7 @@ describe("Bsd card primary action label", () => {
       bsffTransporter: { company: { siret: "53230142100128" } }
     };
 
-    test("Bsvhu same siret", async () => {
+    test("Bsvhu same SIRET", async () => {
       const onValidate = functionMock;
       const permMock = {
         request: { query: PERMISSIONS_INFOS },
@@ -620,7 +620,7 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsvhu same siret (status processed)", async () => {
+    test("Bsvhu same SIRET (status processed)", async () => {
       const permMock = {
         request: { query: PERMISSIONS_INFOS },
         result: {
@@ -669,7 +669,7 @@ describe("Bsd card primary action label", () => {
       expect(queryByTestId("bsd-update-btn")).toBeFalsy();
     });
 
-    test("Bsvhu different siret", async () => {
+    test("Bsvhu different SIRET", async () => {
       const permMock = {
         request: { query: PERMISSIONS_INFOS },
         result: {
@@ -717,7 +717,7 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsff same siret", async () => {
+    test("Bsff same SIRET", async () => {
       const permMock = {
         request: { query: PERMISSIONS_INFOS },
         result: {
@@ -787,7 +787,7 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsff different siret", async () => {
+    test("Bsff different SIRET", async () => {
       const permMock = {
         request: { query: PERMISSIONS_INFOS },
         result: {
@@ -851,7 +851,7 @@ describe("Bsd card primary action label", () => {
       expect(await screen.findByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsda same siret", async () => {
+    test("Bsda same SIRET", async () => {
       const bsda = {
         id: "BSDA-20220706-NAS1E8MET",
         bsdaType: "RESHIPMENT",

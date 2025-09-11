@@ -251,7 +251,7 @@ export const PreviewActor = ({
         <PreviewContainerCol gridWidth={4}>
           <PreviewTextRow label="Raison sociale" value={actor?.company?.name} />
 
-          <PreviewTextRow label="Siret" value={actor?.company?.siret} />
+          <PreviewTextRow label="SIRET" value={actor?.company?.siret} />
 
           <PreviewTextRow label="Adresse" value={actor?.company?.address} />
         </PreviewContainerCol>

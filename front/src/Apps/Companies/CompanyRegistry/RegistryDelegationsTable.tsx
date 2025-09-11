@@ -111,7 +111,7 @@ export const RegistryDelegationsTable = ({ as, company }: Props) => {
                   <th className="fr-py-4v table-col" scope="col">
                     Établissement
                   </th>
-                  <th scope="col">Siret</th>
+                  <th scope="col">SIRET</th>
                   <th scope="col">Objet</th>
                   <th scope="col">Début</th>
                   <th scope="col">Fin</th>

@@ -126,7 +126,7 @@ const TempStorage = ({ form }) => {
       <div className={styles.detailColumns}>
         <div className={styles.detailGrid}>
           <DetailRow value={form?.recipient?.company?.name} label="Nom" />
-          <DetailRow value={form?.recipient?.company?.siret} label="Siret" />
+          <DetailRow value={form?.recipient?.company?.siret} label="SIRET" />
           <DetailRow
             value={temporaryStorageDetail?.wasteDetails?.code}
             label="Code déchet"
@@ -194,7 +194,7 @@ const TempStorage = ({ form }) => {
           <dt>Destination suivante</dt>
           <dd>{temporaryStorageDetail?.destination?.company?.name}</dd>
 
-          <dt>Siret</dt>
+          <dt>SIRET</dt>
           <dd>{temporaryStorageDetail?.destination?.company?.siret}</dd>
 
           <dt>Adresse</dt>
@@ -221,7 +221,7 @@ const TempStorage = ({ form }) => {
                   temporaryStorageDetail?.transporter?.company?.orgId,
                   import.meta.env.VITE_ALLOW_TEST_COMPANY
                 )
-                  ? "Siret"
+                  ? "SIRET"
                   : "Numéro de TVA"
               }
             />
@@ -257,7 +257,7 @@ const Trader = ({ trader }) => (
       <dt>Négociant</dt>
       <dd>{trader.company?.name}</dd>
 
-      <dt>Siret</dt>
+      <dt>SIRET</dt>
       <dd>{trader.company?.siret}</dd>
 
       <dt>Adresse</dt>
@@ -285,7 +285,7 @@ const Broker = ({ broker }) => (
       <dt>Courtier</dt>
       <dd>{broker.company?.name}</dd>
 
-      <dt>Siret</dt>
+      <dt>SIRET</dt>
       <dd>{broker.company?.siret}</dd>
 
       <dt>Adresse</dt>
@@ -314,7 +314,7 @@ const Intermediary = ({ intermediary }) => (
       <dt>Établissement intermédiaire</dt>
       <dd>{intermediary?.name}</dd>
 
-      <dt>Siret</dt>
+      <dt>SIRET</dt>
       <dd>{intermediary?.siret}</dd>
 
       <dt>Numéro de TVA</dt>
@@ -340,7 +340,7 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
     <dt>EcoOrganisme</dt>
     <dd>{ecoOrganisme?.name}</dd>
 
-    <dt>Siret</dt>
+    <dt>SIRET</dt>
     <dd>{ecoOrganisme?.siret}</dd>
   </div>
 );
