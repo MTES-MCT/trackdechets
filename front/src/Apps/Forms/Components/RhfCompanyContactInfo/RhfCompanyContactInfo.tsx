@@ -71,7 +71,7 @@ export default function CompanyContactInfo({
         </div>
         <div className="fr-col-12 fr-col-md-6">
           <Input
-            label="Mail"
+            label="Courriel"
             disabled={disabled}
             state={errorObject?.mail && "error"}
             stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}

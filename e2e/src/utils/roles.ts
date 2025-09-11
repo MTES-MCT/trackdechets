@@ -138,7 +138,7 @@ export const visitInvitationLinkAsNonRegisteredUser = async (
   goTo(page, `/invite?hash=${encodeURIComponent(hash)}`);
 
   // Email field should already be filled
-  await expectInputValue(page, "Email", email);
+  await expectInputValue(page, "Courriel", email);
 };
 
 /**

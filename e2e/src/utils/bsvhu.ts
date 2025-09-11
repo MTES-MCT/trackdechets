@@ -62,7 +62,7 @@ const fillEmitterTab = async (page: Page, emitter) => {
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", emitter.contact);
   await expectInputValue(page, "Téléphone", emitter.contactPhone);
-  await expectInputValue(page, "Mail", emitter.contactEmail);
+  await expectInputValue(page, "Courriel", emitter.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément démolisseur",
@@ -159,7 +159,7 @@ export const fillTransporterTab = async (page: Page, transporter) => {
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", transporter.contact);
   await expectInputValue(page, "Téléphone", transporter.contactPhone);
-  await expectInputValue(page, "Mail", transporter.contactEmail);
+  await expectInputValue(page, "Courriel", transporter.contactEmail);
 
   // Not exempt of recepisse
   await expect(
@@ -226,7 +226,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", destination.contact);
   await expectInputValue(page, "Téléphone", destination.contactPhone);
-  await expectInputValue(page, "Mail", destination.contactEmail);
+  await expectInputValue(page, "Courriel", destination.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément",
@@ -239,7 +239,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   // Company info should not change except agrement
   await expectInputValue(page, "Personne à contacter", destination.contact);
   await expectInputValue(page, "Téléphone", destination.contactPhone);
-  await expectInputValue(page, "Mail", destination.contactEmail);
+  await expectInputValue(page, "Courriel", destination.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément",
@@ -268,7 +268,10 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
     .inputValue();
   expect(contactPhoneValue).toEqual(broyeur.contactPhone);
 
-  const contactMailValue = await page.getByLabel("Mail").nth(1).inputValue();
+  const contactMailValue = await page
+    .getByLabel("Courriel")
+    .nth(1)
+    .inputValue();
   expect(contactMailValue).toEqual(broyeur.contactEmail);
 
   // Fill destination agrement

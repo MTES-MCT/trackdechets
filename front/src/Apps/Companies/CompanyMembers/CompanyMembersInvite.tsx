@@ -76,14 +76,14 @@ const CompanyMembersInvite = ({ company }: CompanyMembersInviteProps) => {
         <h3 className="fr-h4">Inviter une personne</h3>
         <form onSubmit={handleSubmit(updateCompanyMembers)}>
           <Input
-            label="Email"
+            label="Courriel"
             nativeInputProps={{
               type: "email",
               ...register("email", { required: true }),
               ...{ "data-testid": "company-members-email" }
             }}
             state={formState.errors.email ? "error" : "default"}
-            stateRelatedMessage="Email invalide"
+            stateRelatedMessage="Courriel invalide"
           />
 
           <Select

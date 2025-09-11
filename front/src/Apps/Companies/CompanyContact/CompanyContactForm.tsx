@@ -90,14 +90,14 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
               stateRelatedMessage="Ce champ est obligatoire"
             />
             <Input
-              label="Email"
+              label="Courriel"
               nativeInputProps={{
                 type: "email",
                 ...register("contactEmail", { required: true }),
                 ...{ "data-testid": "company-contact-email" }
               }}
               state={formState.errors.contactEmail ? "error" : "default"}
-              stateRelatedMessage="Email invalide"
+              stateRelatedMessage="Courriel invalide"
             />
             <Input
               label="Téléphone"
@@ -127,7 +127,7 @@ const CompanyContactForm = ({ company }: ContactFormProps) => {
               {company.contact || "-"}
             </p>
 
-            <p className="companyFormWrapper__title-field">Email</p>
+            <p className="companyFormWrapper__title-field">Courriel</p>
             <p className="companyFormWrapper__value-field">
               {company.contactEmail || "-"}
             </p>

@@ -213,7 +213,7 @@ function AuthDialog({
             >
               <li>
                 <b>
-                  Accéder en lecture à votre nom, email et aux établissements
+                  Accéder en lecture à votre nom, courriel et aux établissements
                   dont vous êtes membres.
                 </b>
               </li>

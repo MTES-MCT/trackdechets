@@ -183,7 +183,7 @@ export function Destination({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail
+              Courriel
               <Field
                 type="text"
                 name="destination.company.mail"

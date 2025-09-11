@@ -212,7 +212,7 @@ function CurrentCompanyWidget({ disabled = false }) {
         </div>
         <div className="form__row">
           <label>
-            Mail
+            Courriel
             <Field
               type="email"
               name={`transporter.company.mail`}

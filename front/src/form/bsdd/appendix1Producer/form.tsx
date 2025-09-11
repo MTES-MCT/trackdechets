@@ -145,7 +145,7 @@ export function Appendix1ProducerForm({
                 </div>
                 <div className="form__row">
                   <label>
-                    Mail (optionnel)
+                    Courriel (optionnel)
                     <Field
                       type="text"
                       name="emitter.company.mail"
