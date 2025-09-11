@@ -372,7 +372,9 @@ export const submitAndVerifyGenericInfo = async (
     await expect(
       contactDiv.getByText(`Prénom et nom${contact.name}`)
     ).toBeVisible();
-    await expect(contactDiv.getByText(`Email${contact.email}`)).toBeVisible();
+    await expect(
+      contactDiv.getByText(`Courriel${contact.email}`)
+    ).toBeVisible();
     await expect(
       contactDiv.getByText(`Téléphone${contact.phone}`)
     ).toBeVisible();
@@ -604,7 +606,7 @@ export const updateCompanyContactInfo = async (
   // Test with invalid email. Should fail
   await companyDiv.getByTestId("company-contact-email").fill("user@mail");
   await companyDiv.getByTestId("company-contact-submit").nth(1).click();
-  await expect(companyDiv.getByText("Email invalide")).toBeVisible();
+  await expect(companyDiv.getByText("Courriel invalide")).toBeVisible();
   // Fill in correct email
   await companyDiv.getByTestId("company-contact-email").fill(contact.email);
 
@@ -630,7 +632,7 @@ export const updateCompanyContactInfo = async (
   await expect(
     companyDiv.getByText(`Prénom et nom${contact.name}`)
   ).toBeVisible();
-  await expect(companyDiv.getByText(`Email${contact.email}`)).toBeVisible();
+  await expect(companyDiv.getByText(`Courriel${contact.email}`)).toBeVisible();
   await expect(companyDiv.getByText(`Téléphone${contact.phone}`)).toBeVisible();
   await expect(
     companyDiv.getByText(`Site web${contact.website}`)
