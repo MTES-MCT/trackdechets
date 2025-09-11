@@ -117,7 +117,6 @@ export function BsdaRequestRevision({ bsda }: Props) {
 
   const onSubmitForm = async (data: ValidationSchema) => {
     const { comment, ...content } = data;
-    console.log(content);
     const cleanedContent = removeEmptyKeys(
       checkIfInitialObjectValueChanged(content)
     );

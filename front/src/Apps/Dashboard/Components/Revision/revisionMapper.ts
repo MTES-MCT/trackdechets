@@ -124,26 +124,28 @@ export const mapRevision = (
     details: [
       {
         dataName: DataNameEnum.ADRESS_COLLECT,
-        dataOldValue: review?.[bsdName]?.emitter?.pickupSite?.address ||
-        review?.[bsdName]?.emitter?.pickupSite?.postalCode ||
-        review?.[bsdName]?.emitter?.pickupSite?.city ||
-        review?.[bsdName]?.emitter?.pickupSite?.infos
-          ? `${review?.[bsdName]?.emitter?.pickupSite?.address}, ${
-              review?.[bsdName]?.emitter?.pickupSite?.postalCode
-            } ${review?.[bsdName]?.emitter?.pickupSite?.city} ${
-              review?.[bsdName]?.emitter?.pickupSite?.infos ?? ""
-            }`
-          : "Non renseigné",
-        dataNewValue: review?.content?.emitter?.pickupSite?.address ||
-        review?.content?.emitter?.pickupSite?.postalCode ||
-        review?.content?.emitter?.pickupSite?.city ||
-        review?.content?.emitter?.pickupSite?.infos
-          ? `${review?.content?.emitter?.pickupSite?.address}, ${
-              review?.content?.emitter?.pickupSite?.postalCode
-            } ${review?.content?.emitter?.pickupSite?.city} ${
-              review?.content?.emitter?.pickupSite?.infos ?? ""
-            }`
-          : ""
+        dataOldValue:
+          review?.[bsdName]?.emitter?.pickupSite?.address ||
+          review?.[bsdName]?.emitter?.pickupSite?.postalCode ||
+          review?.[bsdName]?.emitter?.pickupSite?.city ||
+          review?.[bsdName]?.emitter?.pickupSite?.infos
+            ? `${review?.[bsdName]?.emitter?.pickupSite?.address}, ${
+                review?.[bsdName]?.emitter?.pickupSite?.postalCode
+              } ${review?.[bsdName]?.emitter?.pickupSite?.city} ${
+                review?.[bsdName]?.emitter?.pickupSite?.infos ?? ""
+              }`
+            : "Non renseigné",
+        dataNewValue:
+          review?.content?.emitter?.pickupSite?.address ||
+          review?.content?.emitter?.pickupSite?.postalCode ||
+          review?.content?.emitter?.pickupSite?.city ||
+          review?.content?.emitter?.pickupSite?.infos
+            ? `${review?.content?.emitter?.pickupSite?.address}, ${
+                review?.content?.emitter?.pickupSite?.postalCode
+              } ${review?.content?.emitter?.pickupSite?.city} ${
+                review?.content?.emitter?.pickupSite?.infos ?? ""
+              }`
+            : ""
       },
       {
         dataName: DataNameEnum.NAME_COLLECT,
