@@ -131,7 +131,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
       plates: signingTransporter?.transport?.plates ?? [],
       takenOverAt: signingTransporter?.transport?.takenOverAt
         ? datetimeToYYYYMMDD(new Date(signingTransporter.transport.takenOverAt))
-        : new Date().toISOString()
+        : datetimeToYYYYMMDD(TODAY)
     },
     signature: {
       author: "",
@@ -161,7 +161,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
           ? datetimeToYYYYMMDD(
               new Date(signingTransporter.transport.takenOverAt)
             )
-          : new Date().toISOString()
+          : datetimeToYYYYMMDD(TODAY)
       },
       signature: {
         author: "",
