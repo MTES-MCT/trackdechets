@@ -300,7 +300,7 @@ function Company({ company, label }: CompanyProps) {
   return (
     <>
       <dt>{label}</dt> <dd>{company?.name}</dd>
-      <dt>Siret</dt> <dd>{company?.siret}</dd>
+      <dt>SIRET</dt> <dd>{company?.siret}</dd>
       <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
       <dt>Adresse</dt> <dd>{company?.address}</dd>
       <dt>Tél</dt> <dd>{company?.phone}</dd>
@@ -471,7 +471,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
             value={ficheIntervention.detenteur?.company?.name}
           />
           <DetailRow
-            label="N°SIRET"
+            label="N° SIRET"
             value={ficheIntervention.detenteur?.company?.siret}
           />
           <DetailRow

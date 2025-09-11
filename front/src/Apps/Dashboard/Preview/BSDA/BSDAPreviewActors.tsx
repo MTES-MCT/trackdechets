@@ -47,7 +47,7 @@ const BSDAPreviewActors = ({ bsd }: BSDAPreviewActorsProps) => {
           <PreviewContainerCol gridWidth={4}>
             <PreviewTextRow label="Raison sociale" value={intermediary.name} />
 
-            <PreviewTextRow label="Siret" value={intermediary.siret} />
+            <PreviewTextRow label="SIRET" value={intermediary.siret} />
 
             <PreviewTextRow label="Adresse" value={intermediary.address} />
           </PreviewContainerCol>

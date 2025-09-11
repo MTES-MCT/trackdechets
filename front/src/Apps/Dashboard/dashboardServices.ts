@@ -406,7 +406,7 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
 
 const isIrregularSituation = bsd => bsd.emitter?.irregularSituation;
 
-// emitter is irregular and has no siret, transporter signature is needed
+// emitter is irregular and has no SIRET, transporter signature is needed
 const canIrregularSituationSignWithNoSiret = (
   bsd: BsdDisplay,
   currentSiret: string
@@ -421,7 +421,7 @@ const canIrregularSituationSignWithNoSiret = (
   );
 };
 
-// emitter is irregular and has registered siret, he can sign
+// emitter is irregular and has registered SIRET, he can sign
 const canIrregularSituationSignWithSiretRegistered = (
   bsd: BsdDisplay,
   currentSiret: string,
@@ -438,7 +438,7 @@ const canIrregularSituationSignWithSiretRegistered = (
   );
 };
 
-// emitter is irregular and has no registered siret, transporter signature is needed
+// emitter is irregular and has no registered SIRET, transporter signature is needed
 const canIrregularSituationSignWithSiretNotRegistered = (
   bsd: BsdDisplay,
   currentSiret: string,

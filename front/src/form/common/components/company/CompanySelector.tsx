@@ -158,7 +158,7 @@ export default function CompanySelector({
   );
 
   /**
-   * SearchCompanies can search by name, vat or siret.
+   * SearchCompanies can search by name, vat or SIRET.
    */
   const [
     searchCompaniesQuery,
