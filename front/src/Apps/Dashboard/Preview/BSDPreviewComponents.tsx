@@ -89,7 +89,7 @@ export const PreviewTextRow = ({
   units?: string | undefined | null;
 }) => {
   return (
-    <div className="fr-mb-1w">
+    <div className="fr-mb-1w" style={{ whiteSpace: "pre-wrap" }}>
       <div>
         {label}
         {tooltip ? <Tooltip title={tooltip} className="fr-ml-1v" /> : null}
