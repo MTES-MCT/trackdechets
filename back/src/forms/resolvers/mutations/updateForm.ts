@@ -235,10 +235,9 @@ const updateFormResolver = async (
   }
 
   // Delete temporaryStorageDetail
-  if (
-    forwardedIn &&
-    (!isOrWillBeTempStorage || temporaryStorageDetail === null)
-  ) {
+  const shouldDeleteTempStorage =
+    forwardedIn && (!isOrWillBeTempStorage || temporaryStorageDetail === null);
+  if (shouldDeleteTempStorage) {
     // Soft delete!
     formUpdateInput.forwardedIn = { disconnect: true };
   }
@@ -387,10 +386,7 @@ const updateFormResolver = async (
     // The form.update unlinks the form from its forwardedIn
     // but we still need to soft delete it
     // We explicitely dont use { delete: true } to avoid a hard delete
-    if (
-      forwardedIn &&
-      (!isOrWillBeTempStorage || temporaryStorageDetail === null)
-    ) {
+    if (shouldDeleteTempStorage) {
       await deleteForm({ id: forwardedIn.id });
     }
 
