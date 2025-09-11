@@ -239,7 +239,8 @@ const updateFormResolver = async (
     forwardedIn &&
     (!isOrWillBeTempStorage || temporaryStorageDetail === null)
   ) {
-    formUpdateInput.forwardedIn = { delete: true };
+    // Soft delete!
+    formUpdateInput.forwardedIn = { disconnect: true };
   }
 
   if (temporaryStorageDetail) {
@@ -356,10 +357,12 @@ const updateFormResolver = async (
     : null;
 
   const updatedForm = await runInTransaction(async transaction => {
-    const { update, setAppendix1, setAppendix2 } = getFormRepository(
-      user,
-      transaction
-    );
+    const {
+      update,
+      delete: deleteForm,
+      setAppendix1,
+      setAppendix2
+    } = getFormRepository(user, transaction);
     const updatedForm = await update({ id }, formUpdateInput);
 
     if (updatedForm.emitterType === EmitterType.APPENDIX1) {
@@ -380,6 +383,17 @@ const updateFormResolver = async (
         currentAppendix2Forms: existingAppendixForms
       });
     }
+
+    // The form.update unlinks the form from its forwardedIn
+    // but we still need to soft delete it
+    // We explicitely dont use { delete: true } to avoid a hard delete
+    if (
+      forwardedIn &&
+      (!isOrWillBeTempStorage || temporaryStorageDetail === null)
+    ) {
+      await deleteForm({ id: forwardedIn.id });
+    }
+
     return updatedForm;
   });
 
