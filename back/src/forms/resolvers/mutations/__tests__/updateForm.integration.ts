@@ -2446,12 +2446,14 @@ describe("Mutation.updateForm", () => {
   });
 
   it("should remove a temporary storage", async () => {
+    // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
     // recipient needs appropriate profiles and subprofiles
     const destination = await companyFactory({
       companyTypes: [CompanyType.WASTEPROCESSOR],
       wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
+    const bsdSuiteReadableId = getReadableId();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -2460,7 +2462,7 @@ describe("Mutation.updateForm", () => {
         recipientCompanySiret: destination.siret,
         forwardedIn: {
           create: {
-            readableId: getReadableId(),
+            readableId: bsdSuiteReadableId,
             ownerId: user.id,
             recipientCap: "CAP"
           }
@@ -2468,6 +2470,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // When
     const updateFormInput = {
       id: form.id,
       temporaryStorageDetail: null
@@ -2479,7 +2482,81 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // Then
     expect(data.updateForm.temporaryStorageDetail).toBeNull();
+
+    const bsd = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(bsd.forwardedInId).toBe(null);
+
+    const bsdSuite = await prisma.form.findFirst({
+      where: { readableId: bsdSuiteReadableId }
+    });
+    expect(bsdSuite).not.toBeNull();
+    expect(bsdSuite?.isDeleted).toBe(true);
+  });
+
+  it("should remove a temporary storage, even if BSD was created by transporter", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const { user: transporterUser, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["TRANSPORTER"]
+      });
+    const bsdSuiteReadableId = getReadableId();
+    const form = await formFactory({
+      ownerId: transporterUser.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        forwardedIn: {
+          create: {
+            readableId: bsdSuiteReadableId,
+            ownerId: user.id,
+            recipientCap: "CAP"
+          }
+        },
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    // When
+    const updateFormInput = {
+      id: form.id,
+      temporaryStorageDetail: null
+    };
+    const { mutate } = makeClient(transporterUser);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    // Then
+    expect(data.updateForm.temporaryStorageDetail).toBeNull();
+
+    const bsd = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(bsd.forwardedInId).toBe(null);
+
+    const bsdSuite = await prisma.form.findFirst({
+      where: { readableId: bsdSuiteReadableId }
+    });
+    expect(bsdSuite).not.toBeNull();
+    expect(bsdSuite?.isDeleted).toBe(true);
   });
 
   it("should add a recipient", async () => {
