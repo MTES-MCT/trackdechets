@@ -10,9 +10,13 @@ import { packagingTypeLabels } from "../../Forms/Components/PackagingList/helper
 
 // Renvoie un résumé des conditionnements de la forme suivante :
 // 7 colis : 2 Fûts de 50 litres (n° cont1, cont2), 5 GRVs de 1 litre (n° GRV1, GRV2, GRV3)
+// expanded a besoin que l'élément ait le style whiteSpace: "pre-wrap" pour gérer les sauts de ligne
 export function getPackagingInfosSummary<
   P extends PackagingInfo | BsdaPackaging
->(packagingInfos: P[], hideDetails?: boolean) {
+>(
+  packagingInfos: P[],
+  options?: { hideDetails?: boolean; expanded?: boolean }
+) {
   const total = packagingInfos.reduce(
     (acc, packagingInfo) => acc + packagingInfo.quantity,
     0
@@ -36,7 +40,9 @@ export function getPackagingInfosSummary<
               .join(" ")
           : packagingTypeLabels[packagingInfo.type];
 
-      let summary = `${packagingInfo.quantity} ${pluralize(
+      let summary = !!options?.expanded ? "- " : "";
+
+      summary += `${packagingInfo.quantity} ${pluralize(
         name,
         packagingInfo.quantity
       )}`;
@@ -53,13 +59,18 @@ export function getPackagingInfosSummary<
         summary += ` de ${volumeValue} ${volumeUnit}`;
       }
 
-      if (!hideDetails && packagingInfo.identificationNumbers?.length) {
+      if (
+        !options?.hideDetails &&
+        packagingInfo.identificationNumbers?.length
+      ) {
         summary += ` (n° ${packagingInfo.identificationNumbers.join(", ")})`;
       }
 
       return summary;
     })
-    .join(", ");
+    .join(!!options?.expanded ? "\n" : ", ");
 
-  return `${total} colis : ${packages}`;
+  return !!options?.expanded
+    ? `${total} colis :\n${packages}`
+    : `${total} colis : ${packages}`;
 }

@@ -143,7 +143,9 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
   const conditionnement = useMemo(
     () =>
-      bsd?.packagings ? getPackagingInfosSummary(bsd.packagings, true) : "",
+      bsd?.packagings
+        ? getPackagingInfosSummary(bsd.packagings, { hideDetails: true })
+        : "",
     [bsd]
   );
 
