@@ -67,6 +67,13 @@ type Bsvhu {
   destination: BsvhuDestination
   "Transporteur"
   transporter: BsvhuTransporter
+
+  """
+  Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'achemniment direct.
+  Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
+  """
+  transporters: [BsvhuTransporter!]!
+
   """
   Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
   mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.
@@ -114,14 +121,16 @@ type BsvhuEcoOrganisme {
 }
 
 type BsvhuTransporter {
+  "Identifiant du transporteur"
+  id: ID!
   "Coordonnées de l'entreprise de transport"
   company: FormCompany
   "Récépissé transporteur"
   recepisse: BsvhuRecepisse
-  "Champ libre"
-  customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransport
+  "Champ libre"
+  customInfo: String
 }
 
 type BsvhuTransport {
@@ -131,6 +140,7 @@ type BsvhuTransport {
   plates: [String!]
   "Date de prise en charge"
   takenOverAt: DateTime
+  "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
   signature: Signature
 }
 
