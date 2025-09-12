@@ -377,8 +377,15 @@ export const verifyOverviewData = async (
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
 
   const modalContent = page.getByRole("tabpanel");
-  const expectValue = async (testId, value) => {
-    const content = await modalContent.getByTestId(testId).textContent();
+  const expectValue = async (
+    testId: string,
+    value: any,
+    wrapperName?: string
+  ) => {
+    const parent = !!wrapperName
+      ? modalContent.getByText(wrapperName).locator("..")
+      : modalContent;
+    const content = await parent.getByTestId(testId).textContent();
     await expect(content).toEqual(value);
   };
 
@@ -409,14 +416,16 @@ export const verifyOverviewData = async (
   );
 
   // Destination
+  const destinationName = "Installation de destination";
   await page.getByRole("tab", { name: "Destinataire" }).click();
-  await expectValue("siret", destination.orgId);
-  await expectValue("contact", destination.contact);
-  await expectValue("telephone", destination.contactPhone);
-  await expectValue("courriel", destination.contactEmail);
+  await expectValue("siret", destination.orgId, destinationName);
+  await expectValue("contact", destination.contact, destinationName);
+  await expectValue("telephone", destination.contactPhone, destinationName);
+  await expectValue("courriel", destination.contactEmail, destinationName);
   await expectValue(
     "numero_dagrement",
-    destination.vhuAgrementDemolisseur.agrementNumber
+    destination.vhuAgrementDemolisseur.agrementNumber,
+    destinationName
   );
 
   // Close the modal
