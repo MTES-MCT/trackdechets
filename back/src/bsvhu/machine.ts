@@ -35,6 +35,7 @@ export const machine = Machine<never, Event>(
       },
       [BsvhuStatus.SENT]: {
         on: {
+          TRANSPORT: { target: BsvhuStatus.SENT }, // multi-modal
           RECEPTION: [
             {
               target: BsvhuStatus.REFUSED,
