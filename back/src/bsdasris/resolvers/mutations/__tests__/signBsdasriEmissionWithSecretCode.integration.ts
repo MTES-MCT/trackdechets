@@ -14,6 +14,7 @@ import {
 import { prisma } from "@td/prisma";
 import type { Mutation } from "@td/codegen-back";
 import { SIGN_DASRI_WITH_CODE } from "./signUtils";
+import { ZodBsdasriPackagingEnum } from "../../../validation/schema";
 
 describe("Mutation.signBsdasri emission with secret code", () => {
   afterEach(resetDatabase);
@@ -100,5 +101,87 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       true
     );
     expect(readyTotakeOverDasri.emittedByEcoOrganisme).toEqual(false);
+  });
+
+  it.each([undefined, []])(
+    "should fail if emitterWastePackagings is not defined",
+    async emitterWastePackagings => {
+      // Given
+      const { company } = await userWithCompanyFactory("MEMBER");
+      const destination = await companyFactory();
+      const { user: transporter, company: transporterCompany } =
+        await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(company),
+          ...readyToPublishData(destination),
+          status: BsdasriStatus.INITIAL,
+          transporterCompanySiret: transporterCompany.siret,
+          emitterWastePackagings
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(transporter);
+      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+        SIGN_DASRI_WITH_CODE,
+        {
+          variables: {
+            id: dasri.id,
+            input: {
+              author: "Marcel",
+              securityCode: 1234
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le conditionnement de l'émetteur est un champ requis."
+      );
+    }
+  );
+
+  it("should succeed if emitterWastePackagings is defined", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const { user: transporter, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        status: BsdasriStatus.INITIAL,
+        transporterCompanySiret: transporterCompany.siret,
+        emitterWastePackagings: [
+          {
+            type: "BOITE_CARTON" as ZodBsdasriPackagingEnum,
+            volume: 22,
+            quantity: 3
+          }
+        ]
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(transporter);
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+      SIGN_DASRI_WITH_CODE,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            author: "Marcel",
+            securityCode: 1234
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
   });
 });
