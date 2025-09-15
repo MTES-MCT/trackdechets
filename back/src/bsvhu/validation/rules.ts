@@ -350,7 +350,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyName: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -361,7 +361,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyAddress: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -372,7 +372,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyContact: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -383,7 +383,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyPhone: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -394,7 +394,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyMail: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
