@@ -89,7 +89,7 @@ export const PreviewTextRow = ({
   units?: string | undefined | null;
 }) => {
   return (
-    <div className="fr-mb-1w">
+    <div className="fr-mb-1w" style={{ whiteSpace: "pre-wrap" }}>
       <div>
         {label}
         {tooltip ? <Tooltip title={tooltip} className="fr-ml-1v" /> : null}
@@ -251,7 +251,7 @@ export const PreviewActor = ({
         <PreviewContainerCol gridWidth={4}>
           <PreviewTextRow label="Raison sociale" value={actor?.company?.name} />
 
-          <PreviewTextRow label="Siret" value={actor?.company?.siret} />
+          <PreviewTextRow label="SIRET" value={actor?.company?.siret} />
 
           <PreviewTextRow label="Adresse" value={actor?.company?.address} />
         </PreviewContainerCol>

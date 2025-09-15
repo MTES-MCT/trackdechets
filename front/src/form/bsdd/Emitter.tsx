@@ -23,7 +23,7 @@ export default function Emitter({ disabled }) {
 
   const { values, handleChange, setFieldValue, initialValues } = ctx;
 
-  const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
+  const hasInitialGrouping = !!initialValues?.grouping?.length; // SIRET is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
   const isGrouping = [EmitterType.Appendix2, EmitterType.Appendix1].some(
     type => values.emitter?.type === type

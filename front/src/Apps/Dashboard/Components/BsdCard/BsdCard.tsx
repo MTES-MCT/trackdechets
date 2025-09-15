@@ -532,7 +532,10 @@ function BsdCard({
                 {isMobile && <div className="bsd-card-border" />}
 
                 <Actors
-                  emitterName={bsdDisplay.emitter?.company?.name!}
+                  emitterName={
+                    bsdDisplay.emitter?.company?.name! ||
+                    bsdDisplay.emitter?.company?.omiNumber!
+                  }
                   transporterName={transporterName}
                   destinationName={bsdDisplay.destination?.company?.name!}
                   workerCompanyName={bsdDisplay?.worker?.company?.name?.toString()}

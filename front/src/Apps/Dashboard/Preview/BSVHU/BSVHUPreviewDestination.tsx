@@ -101,12 +101,36 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
         </PreviewContainerCol>
       </PreviewContainerRow>
 
-      {/* <PreviewContainerRow separator>
-        <PreviewContainerCol gridWidth={3}> */}
-      {/* TODO */}
-      {/* <PreviewTextRow label="Champ libre" value={bsd.customId} />
-        </PreviewContainerCol>
-      </PreviewContainerRow> */}
+      {bsd.destination?.operation?.nextDestination && (
+        <PreviewContainerRow title={"Installation de broyage prévisionnelle"}>
+          <PreviewContainerCol gridWidth={3}>
+            <PreviewTextRow
+              label="Raison sociale"
+              value={bsd.destination?.operation?.nextDestination?.company?.name}
+            />
+
+            <PreviewTextRow
+              label="SIRET"
+              value={
+                bsd.destination?.operation?.nextDestination?.company?.siret
+              }
+            />
+
+            <PreviewTextRow
+              label="Adresse"
+              value={
+                bsd.destination?.operation?.nextDestination?.company?.address
+              }
+            />
+          </PreviewContainerCol>
+
+          <PreviewContainerCol gridWidth={3}>
+            <PreviewCompanyContact
+              company={bsd.destination?.operation?.nextDestination?.company}
+            />
+          </PreviewContainerCol>
+        </PreviewContainerRow>
+      )}
     </PreviewContainer>
   );
 };

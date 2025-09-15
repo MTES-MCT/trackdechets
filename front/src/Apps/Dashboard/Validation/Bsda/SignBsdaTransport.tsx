@@ -120,7 +120,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
   const TODAY = useMemo(() => new Date(), []);
 
   const signingTransporter = useMemo(
-    () => data?.bsda?.transporters?.find(t => !t.transport?.signature?.date),
+    () => data?.bsda?.transporters?.find(t => !t.transport?.signature),
     [data?.bsda]
   );
 
@@ -131,7 +131,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
       plates: signingTransporter?.transport?.plates ?? [],
       takenOverAt: signingTransporter?.transport?.takenOverAt
         ? datetimeToYYYYMMDD(new Date(signingTransporter.transport.takenOverAt))
-        : new Date().toISOString()
+        : datetimeToYYYYMMDD(TODAY)
     },
     signature: {
       author: "",
@@ -161,7 +161,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
           ? datetimeToYYYYMMDD(
               new Date(signingTransporter.transport.takenOverAt)
             )
-          : new Date().toISOString()
+          : datetimeToYYYYMMDD(TODAY)
       },
       signature: {
         author: "",

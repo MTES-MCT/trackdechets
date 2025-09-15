@@ -48,14 +48,14 @@ const COMPANIES_EXHAUSTIVE = gql`
 const validationSchema = z.object({
   siret: z
     .string({
-      required_error: "Le siret est requis"
+      required_error: "Le SIRET est requis"
     })
     .transform(value => value.replace(/\s+/g, ""))
     .pipe(
       z
         .string()
-        .min(14, { message: "Le siret doit faire 14 caractères" })
-        .max(14, { message: "Le siret doit faire 14 caractères" })
+        .min(14, { message: "Le SIRET doit faire 14 caractères" })
+        .max(14, { message: "Le SIRET doit faire 14 caractères" })
     )
 });
 

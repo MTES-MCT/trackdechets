@@ -39,7 +39,7 @@ describe("ActBsdaValidation", () => {
     bsdaStatus: "INITIAL"
   } as unknown as Bsda;
 
-  it("renders Initial modal same destination siret", async () => {
+  it("renders Initial modal same destination SIRET", async () => {
     const currentSiret = "12345678901234";
     const initialCollection2710Bsda = {
       ...bsd,
@@ -61,7 +61,7 @@ describe("ActBsdaValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
   });
 
-  it("renders Initial modal same transporter siret", async () => {
+  it("renders Initial modal same transporter SIRET", async () => {
     const currentSiret = "12345678901234";
     const initialBsdaSameTransporter = {
       ...bsd,
@@ -84,7 +84,7 @@ describe("ActBsdaValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
   });
 
-  it("renders Initial modal same worker siret", async () => {
+  it("renders Initial modal same worker SIRET", async () => {
     const currentSiret = "12345678901234";
     const initialBsdaSameWorker = {
       ...bsd,
@@ -106,7 +106,7 @@ describe("ActBsdaValidation", () => {
     expect(await screen.getByTestId("loader")).toBeInTheDocument();
   });
 
-  it("renders Initial modal same emitter siret", async () => {
+  it("renders Initial modal same emitter SIRET", async () => {
     const currentSiret = "12345678901234";
     const initialBsdaSameEmitter = {
       ...bsd,

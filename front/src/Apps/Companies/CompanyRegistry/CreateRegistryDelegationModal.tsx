@@ -33,7 +33,7 @@ const getSchema = () =>
         .refine(
           check =>
             isSiret(check, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"),
-          "Siret non valide"
+          "SIRET non valide"
         ),
       startDate: z.coerce
         .date({
