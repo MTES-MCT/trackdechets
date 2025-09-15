@@ -146,7 +146,7 @@ describe("Mutation.createWebhookSetting", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "L'url doit être en https",
+        message: "URL de webhook non sécurisée ou invalide",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
