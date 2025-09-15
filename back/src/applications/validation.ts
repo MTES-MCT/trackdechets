@@ -14,7 +14,7 @@ export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
           .required()
           .test(
             "secure-redirect-uri",
-            "URL de redirection non sécurisée",
+            "URL de redirection non sécurisée ou invalide",
             validateSecureUri
           )
       )

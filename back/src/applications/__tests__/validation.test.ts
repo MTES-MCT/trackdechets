@@ -27,7 +27,7 @@ describe("applicationSchema", () => {
         redirectUris: ["ceci n'est pas une URL"]
       });
     await expect(shouldThrow()).rejects.toThrowError(
-      "URL de redirection non sécurisée"
+      "URL de redirection non sécurisée ou invalide"
     );
   });
 });
