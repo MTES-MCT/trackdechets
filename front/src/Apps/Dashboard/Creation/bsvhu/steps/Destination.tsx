@@ -1,7 +1,12 @@
 import Input from "@codegouvfr/react-dsfr/Input";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
+import {
+  CompanySearchResult,
+  FavoriteType,
+  CompanyType,
+  WasteVehiclesType
+} from "@td/codegen-ui";
 import React, { useEffect, useMemo, useState, useContext } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
@@ -27,7 +32,7 @@ const DestinationBsvhu = ({ errors }) => {
 
   useEffect(() => {
     if (isDangerousWasteCode) {
-      setValue("destination.type", "DEMOLISSEUR");
+      setValue("destination.type", WasteVehiclesType.Demolisseur);
     }
   }, [isDangerousWasteCode, setValue]);
 
@@ -91,10 +96,13 @@ const DestinationBsvhu = ({ errors }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
 
-  const updateAgrementNumber = (destination, type?) => {
-    const destinationType = type || destination?.type;
+  const updateAgrementNumber = (
+    destination: CompanySearchResult | null,
+    type?: WasteVehiclesType
+  ) => {
+    const destinationType = type || destination?.wasteVehiclesTypes;
     const agrementNumber =
-      destinationType === "BROYEUR"
+      destinationType === WasteVehiclesType.Broyeur
         ? destination?.vhuAgrementBroyeur?.agrementNumber
         : destination?.vhuAgrementDemolisseur?.agrementNumber;
 
@@ -105,7 +113,7 @@ const DestinationBsvhu = ({ errors }) => {
     }
   };
 
-  const onChangeDestinationType = type => {
+  const onChangeDestinationType = (type: WasteVehiclesType) => {
     setValue("destination.type", type);
     updateAgrementNumber(selectedDestination, type);
   };
@@ -128,16 +136,6 @@ const DestinationBsvhu = ({ errors }) => {
   const orgId = useMemo(
     () => destination?.company?.orgId ?? destination?.company?.siret ?? null,
     [destination?.company?.orgId, destination?.company?.siret]
-  );
-  const orgIdNextDestination = useMemo(
-    () =>
-      destination?.operation?.nextDestination.company.orgId ??
-      destination?.operation?.nextDestination?.company.siret ??
-      null,
-    [
-      destination?.operation?.nextDestination.company.orgId,
-      destination?.operation?.nextDestination.company.siret
-    ]
   );
 
   const selectedCompanyError = (company?: CompanySearchResult) => {
@@ -177,16 +175,18 @@ const DestinationBsvhu = ({ errors }) => {
               label: "Broyeur agréé",
               nativeInputProps: {
                 ...register("destination.type"),
-                onChange: () => onChangeDestinationType("BROYEUR"),
-                value: "BROYEUR"
+                onChange: () =>
+                  onChangeDestinationType(WasteVehiclesType.Broyeur),
+                value: WasteVehiclesType.Broyeur
               }
             },
             {
               label: "Démolisseur agréé",
               nativeInputProps: {
                 ...register("destination.type"),
-                onChange: () => onChangeDestinationType("DEMOLISSEUR"),
-                value: "DEMOLISSEUR"
+                onChange: () =>
+                  onChangeDestinationType(WasteVehiclesType.Demolisseur),
+                value: WasteVehiclesType.Demolisseur
               }
             }
           ]}
@@ -281,54 +281,6 @@ const DestinationBsvhu = ({ errors }) => {
           </option>
         </Select>
       </div>
-      {destination?.type === "DEMOLISSEUR" && (
-        <div className="fr-col-md-10 fr-mt-4w">
-          <h4 className="fr-h4 fr-mt-2w">
-            Installation de broyage prévisionelle
-          </h4>
-          <CompanySelectorWrapper
-            orgId={siret}
-            favoriteType={FavoriteType.Destination}
-            disabled={sealedFields.includes(
-              `${actor}.operation.nextDestination.company.siret`
-            )}
-            selectedCompanyOrgId={orgIdNextDestination}
-            onCompanySelected={company => {
-              if (company) {
-                const name = `${actor}.operation.nextDestination.company`;
-                setValue(`${name}.orgId`, company.orgId);
-                setValue(`${name}.siret`, company.siret);
-                setValue(`${name}.name`, company.name);
-                setValue(`${name}.vatNumber`, company.vatNumber);
-                setValue(`${name}.address`, company.address);
-                setValue(
-                  `${name}.contact`,
-                  destination?.operation?.nextDestinationcompany?.contact ||
-                    company.contact
-                );
-                setValue(
-                  `${name}.phone`,
-                  destination?.operation?.nextDestinationcompany
-                    ?.contactPhone || company.contactPhone
-                );
-
-                setValue(
-                  `${name}.mail`,
-                  destination?.operation?.nextDestinationcompany
-                    ?.contactEmail || company.contactEmail
-                );
-              }
-            }}
-          />
-          <CompanyContactInfo
-            fieldName={`${actor}.operation.nextDestination.company`}
-            disabled={sealedFields.includes(
-              `${actor}.operation.nextDestination.company.siret`
-            )}
-            key={orgIdNextDestination}
-          />
-        </div>
-      )}
     </>
   );
 };

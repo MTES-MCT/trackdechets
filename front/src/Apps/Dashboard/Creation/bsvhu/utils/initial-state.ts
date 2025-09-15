@@ -1,6 +1,10 @@
 /* eslint-disable import/no-anonymous-default-export */
 
-import { BsvhuCompanyInput, TransportMode } from "@td/codegen-ui";
+import {
+  BsvhuCompanyInput,
+  TransportMode,
+  WasteVehiclesType
+} from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (company?: BsvhuCompanyInput | null) => {
@@ -35,7 +39,7 @@ export default {
     noSiret: false
   },
   destination: {
-    type: "BROYEUR",
+    type: WasteVehiclesType.Broyeur,
     company: getInitialCompany(),
     agrementNumber: "",
     plannedOperationCode: "R 4",
@@ -52,8 +56,7 @@ export default {
     operation: {
       date: null,
       code: "",
-      mode: null,
-      nextDestination: { company: getInitialCompany() }
+      mode: null
     }
   },
   packaging: "UNITE",

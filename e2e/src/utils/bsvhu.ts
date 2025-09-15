@@ -185,12 +185,9 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await expect(page.getByLabel("Broyeur agréé")).toBeDisabled();
   await expect(page.getByLabel("Démolisseur agréé")).toBeChecked();
 
-  // Both destinations should be asked for
+  // Destination should be asked for
   await expect(
     page.getByRole("heading", { name: "Installation de destination" })
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
   ).toBeVisible();
 
   // Change waste code then come back
@@ -215,12 +212,8 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   // Select company
   await page.getByLabel("N°SIRET ou raison sociale").fill(destination.orgId);
 
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
-  ).not.toBeVisible();
-
   // Transporter should be selected automatically
-  const portal = await page.locator("#portal-root");
+  const portal = page.locator("#portal-root");
   await portal.getByText(`${destination.name} - ${destination.orgId}`).click();
 
   // Make sure auto-filled info matches company
@@ -245,34 +238,6 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
     "Numéro d'agrément",
     destination.vhuAgrementDemolisseur.agrementNumber
   );
-
-  // Broyeur should be visible. Let's pick one
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
-  ).toBeVisible();
-
-  // Select company
-  await page.getByLabel("N°SIRET ou raison sociale").nth(1).fill(broyeur.orgId);
-
-  await portal.getByText(`${broyeur.name} - ${broyeur.orgId}`).click();
-
-  const contactValue = await page
-    .getByLabel("Personne à contacter")
-    .nth(1)
-    .inputValue();
-  expect(contactValue).toEqual(broyeur.contact);
-
-  const contactPhoneValue = await page
-    .getByLabel("Téléphone")
-    .nth(1)
-    .inputValue();
-  expect(contactPhoneValue).toEqual(broyeur.contactPhone);
-
-  const contactMailValue = await page
-    .getByLabel("Courriel")
-    .nth(1)
-    .inputValue();
-  expect(contactMailValue).toEqual(broyeur.contactEmail);
 
   // Fill destination agrement
   await page
