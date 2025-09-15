@@ -12,6 +12,13 @@ import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { getDefaultNotifications } from "../../../notifications";
+import {
+  genUserRolesCacheKey,
+  getUserSessions
+} from "../../../../common/redis/users";
+import { app } from "../../../../server";
+import { logIn } from "../../../../__tests__/auth.helper";
+import { getUserRoles } from "../../../../permissions/permissions";
 
 const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){
@@ -304,5 +311,53 @@ describe("mutation changeUserRole", () => {
         })
       })
     ]);
+  });
+
+  test("cached role should be updated", async () => {
+    // Given
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+    const notifications = getDefaultNotifications(UserRole.ADMIN);
+    const userToModify = await userFactory({
+      companyAssociations: {
+        create: {
+          company: { connect: { id: company.id } },
+          role: UserRole.ADMIN,
+          ...notifications
+        }
+      }
+    });
+
+    // Cached role should be ADMIN
+    const userRolesBefore = await getUserRoles(userToModify.id);
+    expect(userRolesBefore[company.orgId]).toBe(UserRole.ADMIN);
+
+    // When
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+    const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
+      CHANGE_USER_ROLE,
+      {
+        variables: {
+          userId: userToModify.id,
+          orgId: company.orgId,
+          role: UserRole.MEMBER
+        }
+      }
+    );
+
+    // Then
+    expect(data.changeUserRole.email).toEqual(userToModify.email);
+    expect(data.changeUserRole.role).toEqual(UserRole.MEMBER);
+    const companyAssociations = await prisma.user
+      .findUniqueOrThrow({ where: { id: userToModify.id } })
+      .companyAssociations();
+    expect(companyAssociations).toHaveLength(1);
+    expect(companyAssociations[0].role).toEqual(UserRole.MEMBER);
+    expect(companyAssociations[0]).toMatchObject(
+      getDefaultNotifications(companyAssociations[0].role)
+    );
+
+    // Cached role should have been updated
+    const userRolesAfter = await getUserRoles(userToModify.id);
+    expect(userRolesAfter[company.orgId]).toBe(UserRole.MEMBER);
   });
 });

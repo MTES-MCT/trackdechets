@@ -26,6 +26,7 @@ import {
   updateUserAccountHash
 } from "../../database";
 import { getDefaultNotifications } from "../../notifications";
+import { deleteCachedUserRoles } from "../../../common/redis/users";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,
@@ -70,6 +71,10 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
         `L'utilisateur n'est pas membre de l'entreprise`
       );
     }
+
+    // clear cache
+    await deleteCachedUserRoles(args.userId);
+
     return userAssociationToCompanyMember(
       updatedAssociation,
       company.orgId,
