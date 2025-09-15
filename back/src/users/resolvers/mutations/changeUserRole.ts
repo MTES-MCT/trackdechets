@@ -72,15 +72,17 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
       );
     }
 
-    // clear cache
-    await deleteCachedUserRoles(args.userId);
-
-    return userAssociationToCompanyMember(
+    const assocationToComp = await userAssociationToCompanyMember(
       updatedAssociation,
       company.orgId,
       user.id,
       isTDAdmin
     );
+
+    // Clear cache
+    await deleteCachedUserRoles(args.userId);
+
+    return assocationToComp;
   }
 
   const userAccountHash = await prisma.userAccountHash.findUnique({
