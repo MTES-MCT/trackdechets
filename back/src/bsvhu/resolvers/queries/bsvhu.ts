@@ -12,7 +12,11 @@ export default async function bsvhu(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsvhu = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id, {
+    include: {
+      transporters: true
+    }
+  });
 
   await checkCanRead(user, bsvhu);
 

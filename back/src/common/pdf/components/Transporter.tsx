@@ -1,12 +1,16 @@
 import React from "react";
-import type { BsdaTransporter, BsffTransporter } from "@td/codegen-back";
+import type {
+  BsdaTransporter,
+  BsffTransporter,
+  BsvhuTransporter
+} from "@td/codegen-back";
 import { TRANSPORT_MODE_LABELS, formatDate } from "../../../common/pdf";
 import { Signature } from "../../../common/pdf/components/Signature";
 import { Recepisse } from "./Recepisse";
 import { CompanyContact, CompanyDescription } from "./Company";
 
 type TransporterProps = {
-  transporter: BsdaTransporter | BsffTransporter;
+  transporter: BsdaTransporter | BsffTransporter | BsvhuTransporter;
   frameNumber: number;
 };
 

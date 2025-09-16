@@ -1,8 +1,10 @@
+import { CompanyInput } from "@td/codegen-back";
 import {
   nextBuildSirenify,
   NextCompanyInputAccessor
 } from "../../companies/sirenify";
-import { ParsedZodBsvhu } from "./schema";
+import { ParsedZodBsvhu, ParsedZodBsvhuTransporter } from "./schema";
+import { ZodBsvhuTransporterTransformer } from "./types";
 
 const sirenifyBsvhuAccessors = (
   bsvhu: ParsedZodBsvhu,
@@ -46,14 +48,6 @@ const sirenifyBsvhuAccessors = (
     }
   },
   {
-    siret: bsvhu?.transporterCompanySiret,
-    skip: sealedFields.includes("transporterCompanySiret"),
-    setter: (input, companyInput) => {
-      input.transporterCompanyName = companyInput.name;
-      input.transporterCompanyAddress = companyInput.address;
-    }
-  },
-  {
     siret: bsvhu?.ecoOrganismeSiret,
     skip: sealedFields.includes("ecoOrganismeSiret"),
     setter: (input, companyInput) => {
@@ -93,9 +87,45 @@ const sirenifyBsvhuAccessors = (
           }
         }
       } as NextCompanyInputAccessor<ParsedZodBsvhu>)
+  ),
+  ...(bsvhu.transporters ?? []).map(
+    (_, idx) =>
+      ({
+        siret: bsvhu.transporters![idx].transporterCompanySiret,
+        skip:
+          bsvhu.transporters![idx].transporterTransportSignatureDate != null,
+        setter: (input, companyInput) => {
+          const transporter = input.transporters![idx];
+          if (companyInput.name) {
+            transporter!.transporterCompanyName = companyInput.name;
+          }
+          if (companyInput.address) {
+            transporter!.transporterCompanyAddress = companyInput.address;
+          }
+        }
+      } as NextCompanyInputAccessor<ParsedZodBsvhu>)
   )
 ];
 
 export const sirenifyBsvhu = nextBuildSirenify<ParsedZodBsvhu>(
   sirenifyBsvhuAccessors
 );
+
+const sirenifyBsvhuTransporterAccessors = (
+  bsvhuTransporter: ParsedZodBsvhuTransporter
+) => [
+  {
+    siret: bsvhuTransporter.transporterCompanySiret,
+    setter: (input: ParsedZodBsvhuTransporter, companyInput: CompanyInput) => {
+      input.transporterCompanyName = companyInput.name;
+      input.transporterCompanyAddress = companyInput.address;
+    },
+    skip: false
+  }
+];
+
+export const sirenifyBsvhuTransporter: ZodBsvhuTransporterTransformer =
+  bsvhuTransporter =>
+    nextBuildSirenify<ParsedZodBsvhuTransporter>(
+      sirenifyBsvhuTransporterAccessors
+    )(bsvhuTransporter, []);

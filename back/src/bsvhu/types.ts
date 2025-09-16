@@ -1,4 +1,6 @@
 import { Prisma } from "@prisma/client";
+import { SignatureTypeInput } from "@td/codegen-back";
+import { MultiModalSignatureType } from "../common/types";
 
 export const BsvhuWithIntermediariesInclude =
   Prisma.validator<Prisma.BsvhuInclude>()({
@@ -17,3 +19,7 @@ export const BsvhuWithTransportersInclude =
 export type BsvhuWithTransporters = Prisma.BsvhuGetPayload<{
   include: typeof BsvhuWithTransportersInclude;
 }>;
+
+export type AllBsvhuSignatureType =
+  | SignatureTypeInput
+  | MultiModalSignatureType;
