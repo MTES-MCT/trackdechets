@@ -51,17 +51,21 @@ const apiCallProcessor = async ({
       return;
     }
   } catch (err) {
-    logger.error(
-      `Webhook error : ${err.message} - ${err.code} (${endpointUri})`
-    );
+    logger.error(`Webhook error : `, {
+      message: err.message,
+      code: err.code,
+      endpointUri
+    });
     if (err.response) {
-      logger.error(
-        `Webhook error - Status :${err.response.status} - Data: ${err.response.data} (${endpointUri})`
-      );
+      logger.error(`Webhook error : `, {
+        status: err.response.status,
+        data: err.response.data,
+        endpointUri
+      });
     } else if (err.request) {
-      logger.error(`Webhook error : ${err.request} (${endpointUri})`);
+      logger.error(`Webhook error :`, { request: err.request, endpointUri });
     } else {
-      logger.error(`Webhook error : ${err.message} (${endpointUri})`);
+      logger.error(`Webhook error :`, { message: err.message, endpointUri });
     }
   }
 
