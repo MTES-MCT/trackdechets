@@ -1,11 +1,16 @@
 import { Refinement, RefinementCtx, z } from "zod";
 import { BsvhuValidationContext } from "./types";
-import { ParsedZodBsvhu, ZodBsvhu } from "./schema";
+import { ParsedZodBsvhu, ZodBsvhu, ZodBsvhuTransporter } from "./schema";
 import {
   bsvhuEditionRules,
   BsvhuEditableFields,
   isBsvhuFieldRequired,
-  EditionRulePath
+  EditionRulePath,
+  getSealedFields,
+  EditionRule,
+  bsvhuTransporterEditionRules,
+  BsvhuTransporterEditableFields,
+  isBsvhuTransporterFieldRequired
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { isArray } from "../../common/dataTypes";
@@ -26,7 +31,6 @@ import {
   isTraderRefinement,
   isTransporterRefinement
 } from "../../common/validation/zod/refinement";
-import { EditionRule } from "./rules";
 import { CompanyRole } from "../../common/validation/zod/schema";
 import { MAX_WEIGHT_BY_ROAD_TONNES } from "../../common/validation";
 
@@ -39,10 +43,13 @@ const v2024072 = new Date("2024-07-30");
  * Ce refinement permet de vérifier que les établissements présents sur le
  * BSVHU sont bien inscrits sur Trackdéchets avec le bon profil
  */
-export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
-  bsvhu,
-  zodContext
+export const checkCompanies = async (
+  bsvhu: ParsedZodBsvhu,
+  zodContext: RefinementCtx,
+  bsvhuValidationContext: BsvhuValidationContext
 ) => {
+  const sealedFields = await getSealedFields(bsvhu, bsvhuValidationContext);
+
   await isEmitterRefinement(
     bsvhu.emitterCompanySiret,
     BsdType.BSVHU,
@@ -60,18 +67,24 @@ export const checkCompanies: Refinement<ParsedZodBsvhu> = async (
     "BROYEUR",
     CompanyRole.DestinationOperationNextDestination
   );
-  await isTransporterRefinement(
-    {
-      siret: bsvhu.transporterCompanySiret,
-      transporterRecepisseIsExempted:
-        bsvhu.transporterRecepisseIsExempted ?? false
-    },
-    zodContext
-  );
-  await isRegisteredVatNumberRefinement(
-    bsvhu.transporterCompanyVatNumber,
-    zodContext
-  );
+  for (const transporter of bsvhu.transporters ?? []) {
+    await isTransporterRefinement(
+      {
+        siret: transporter.transporterCompanySiret,
+        transporterRecepisseIsExempted:
+          transporter.transporterRecepisseIsExempted ?? false
+      },
+      zodContext,
+      // Transporters are sealed when all transporters have signed
+      // If one of the transporters has already signed, we should not block if he is dormant
+      transporter.transporterTransportSignatureDate == null ||
+        !sealedFields.includes("transporters")
+    );
+    await isRegisteredVatNumberRefinement(
+      transporter.transporterCompanyVatNumber,
+      zodContext
+    );
+  }
   await isEcoOrganismeRefinement(
     bsvhu.ecoOrganismeSiret,
     BsdType.BSVHU,
@@ -224,7 +237,7 @@ export const checkPackagingAndIdentificationType: Refinement<ParsedZodBsvhu> = (
   }
 };
 
-type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
+type CheckFieldIsDefinedArgs<T extends ZodBsvhu | ZodBsvhuTransporter> = {
   resource: T;
   field: string;
   rule: EditionRule<T>;
@@ -234,7 +247,7 @@ type CheckFieldIsDefinedArgs<T extends ZodBsvhu> = {
   errorMsg?: (fieldDescription: string) => string;
 };
 
-function checkFieldIsDefined<T extends ZodBsvhu>(
+function checkFieldIsDefined<T extends ZodBsvhu | ZodBsvhuTransporter>(
   args: CheckFieldIsDefinedArgs<T>
 ) {
   const { resource, field, rule, ctx, readableFieldName, path, errorMsg } =
@@ -264,7 +277,7 @@ const MAX_WEIGHT_BY_ROAD_KG = MAX_WEIGHT_BY_ROAD_TONNES * 1000;
 export const checkTransportModeAndWeightRefinement = (
   createdAt: Date | null | undefined,
   weightValue: number | null | undefined,
-  transportMode: TransportMode | null | undefined,
+  hasRoadTransportMode: boolean,
   weightFieldPath: string[],
   ctx: RefinementCtx
 ) => {
@@ -277,7 +290,7 @@ export const checkTransportModeAndWeightRefinement = (
   }
   // max weight (50000t is handled on raw zod schema)
 
-  if (weightValue > MAX_WEIGHT_BY_ROAD_KG && transportMode === "ROAD") {
+  if (weightValue > MAX_WEIGHT_BY_ROAD_KG && hasRoadTransportMode) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: weightFieldPath,
@@ -295,7 +308,9 @@ export const checkTransportModeAndWeight: Refinement<ParsedZodBsvhu> = (
     bsvhu.createdAt,
     bsvhu.weightValue,
 
-    bsvhu.transporterTransportMode,
+    !!bsvhu.transporters?.some(
+      t => t.transporterTransportMode === TransportMode.ROAD
+    ),
     ["weight", "value"],
     zodContext
   );
@@ -308,7 +323,9 @@ export const checkTransportModeAndReceptionWeight: Refinement<
     bsvhu.createdAt,
     bsvhu.destinationReceptionWeight,
 
-    bsvhu.transporterTransportMode,
+    !!bsvhu.transporters?.some(
+      t => t.transporterTransportMode === TransportMode.ROAD
+    ),
     ["destination", "reception", "weight"],
     zodContext
   );
@@ -346,5 +363,35 @@ export const checkRequiredFields: (
         }
       }
     }
+
+    (bsvhu.transporters ?? []).forEach((transporter, idx) => {
+      for (const bsvhuTransporterField of Object.keys(
+        bsvhuTransporterEditionRules
+      )) {
+        const { required, readableFieldName } =
+          bsvhuTransporterEditionRules[
+            bsvhuTransporterField as keyof BsvhuTransporterEditableFields
+          ];
+
+        if (required) {
+          const isRequired = isBsvhuTransporterFieldRequired(
+            required,
+            { ...transporter, number: idx + 1 },
+            signaturesToCheck
+          );
+          if (isRequired) {
+            checkFieldIsDefined({
+              resource: transporter,
+              field: bsvhuTransporterField,
+              rule: required,
+              readableFieldName,
+              ctx: zodContext,
+              errorMsg: fieldDescription =>
+                `${fieldDescription} n° ${idx + 1} est obligatoire.`
+            });
+          }
+        }
+      }
+    });
   };
 };

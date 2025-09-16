@@ -19,15 +19,26 @@ function toPrismaBsvhuWhereInput(where: BsvhuWhere): Prisma.BsvhuWhereInput {
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date
     ),
-    transporterCompanySiret: toPrismaStringFilter(
-      where.transporter?.company?.siret
-    ),
-    transporterTransportSignatureDate: toPrismaDateFilter(
-      where.transporter?.transport?.signature?.date
-    ),
-    transporterTransportPlates: toPrismaStringNullableListFilter(
-      where.transporter?.transport?.plates
-    ),
+    ...(where.transporter
+      ? {
+          transporters: {
+            some: {
+              transporterCompanySiret: toPrismaStringFilter(
+                where.transporter?.company?.siret
+              ),
+              transporterCompanyVatNumber: toPrismaStringFilter(
+                where.transporter?.company?.vatNumber
+              ),
+              transporterTransportSignatureDate: toPrismaDateFilter(
+                where.transporter?.transport?.signature?.date
+              ),
+              transporterTransportPlates: toPrismaStringNullableListFilter(
+                where.transporter?.transport?.plates
+              )
+            }
+          }
+        }
+      : {}),
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret
     ),

@@ -1,6 +1,10 @@
-import { ZodBsvhu } from "./schema";
+import { ZodBsvhu, ZodBsvhuTransporter } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import type { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
+import type {
+  BsvhuInput,
+  BsvhuTransporterInput,
+  SignatureTypeInput
+} from "@td/codegen-back";
 import { User, WasteAcceptationStatus, TransportMode } from "@prisma/client";
 
 import { isForeignVat } from "@td/constants";
@@ -14,6 +18,7 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { Leaves } from "../../types";
 import { v20250101, v20241001 } from "./refinements";
+import { AllBsvhuSignatureType } from "../types";
 
 // Liste des champs éditables sur l'objet Bsvhu
 export type BsvhuEditableFields = Required<
@@ -34,11 +39,22 @@ export type BsvhuEditableFields = Required<
     | "destinationReceptionSignatureDate"
     | "destinationReceptionSignatureAuthor"
     | "intermediariesOrgIds"
+    | "transportersOrgIds"
   >
 >;
 
-type RuleContext<T extends ZodBsvhu> = {
-  // BSVHU persisté en base - avant modification
+// Liste des champs éditables sur l'objet BsffTransporter
+export type BsvhuTransporterEditableFields = Required<
+  Omit<
+    ZodBsvhuTransporter,
+    | "number"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportSignatureDate"
+  >
+>;
+
+type RuleContext<T extends ZodBsvhu | ZodBsvhuTransporter> = {
+  // BSVHU ou BsvhuTransporter persisté en base - avant modification
   persisted: T;
   // Liste des "rôles" que l'utilisateur a sur le Bsvhu (ex: émetteur, transporteur, etc).
   // Permet de conditionner un check a un rôle. Ex: "Ce champ est modifiable mais uniquement par l'émetteur"
@@ -47,29 +63,34 @@ type RuleContext<T extends ZodBsvhu> = {
 
 // Fonction permettant de définir une signature de champ requis ou
 // verrouilage de champ à partir des données du Bsvhu et du contexte
-type GetBsvhuSignatureTypeFn<T extends ZodBsvhu> = (
+type GetBsvhuSignatureTypeFn<T extends ZodBsvhu | ZodBsvhuTransporter> = (
   bsvhu: T,
   ruleContext?: RuleContext<T>
-) => SignatureTypeInput | undefined;
+) => AllBsvhuSignatureType | undefined;
 
 export type EditionRulePath = Leaves<BsvhuInput, 5>;
+
+export type TransporterEditionRulePath = Leaves<BsvhuTransporterInput, 5>;
 
 // Règle d'édition qui permet de définir à partir de quelle signature
 // un champ est verrouillé / requis avec une config contenant un paramètre
 // optionnel `when`
-export type EditionRule<T extends ZodBsvhu> = {
+export type EditionRule<T extends ZodBsvhu | ZodBsvhuTransporter> = {
   // Signature à partir de laquelle le champ est requis ou fonction
   // permettant de calculer cette signature
-  from: SignatureTypeInput | GetBsvhuSignatureTypeFn<T>;
+  from: AllBsvhuSignatureType | GetBsvhuSignatureTypeFn<T>;
   // Condition supplémentaire à vérifier pour que le champ soit requis.
   when?: (
     bsvhu: T,
-    currentSignatureType: SignatureTypeInput | undefined
+    currentSignatureType: AllBsvhuSignatureType | undefined
   ) => boolean;
   customErrorMessage?: string;
 };
 
-export type EditionRules<T extends ZodBsvhu, E extends BsvhuEditableFields> = {
+export type EditionRules<
+  T extends ZodBsvhu | ZodBsvhuTransporter,
+  E extends BsvhuEditableFields | BsvhuTransporterEditableFields
+> = {
   [Key in keyof E]: {
     // At what signature the field is sealed, and under which circumstances
     sealed: EditionRule<T>;
@@ -77,11 +98,25 @@ export type EditionRules<T extends ZodBsvhu, E extends BsvhuEditableFields> = {
     required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
     // a path to return in the errors to help the front display the error in context
-    path?: EditionRulePath;
+    path?: T extends ZodBsvhu ? EditionRulePath : TransporterEditionRulePath;
   };
 };
 
 type BsvhuEditionRules = EditionRules<ZodBsvhu, BsvhuEditableFields>;
+
+type BsvhuTransporterEditionRules = EditionRules<
+  ZodBsvhuTransporter,
+  BsvhuTransporterEditableFields
+>;
+
+function transporterSignature(
+  transporter: ZodBsvhuTransporter
+): AllBsvhuSignatureType {
+  if (transporter.number && transporter.number > 1) {
+    return `TRANSPORT_${transporter.number}` as AllBsvhuSignatureType;
+  }
+  return "TRANSPORT";
+}
 
 /**
  * Régle de verrouillage des champs définie à partir d'une fonction.
@@ -96,6 +131,160 @@ const sealedFromEmissionExceptForEmitter: GetBsvhuSignatureTypeFn<ZodBsvhu> = (
   const { isEmitter } = context!.userFunctions;
   return isEmitter ? "TRANSPORT" : "EMISSION";
 };
+
+export const bsvhuTransporterEditionRules: BsvhuTransporterEditionRules = {
+  createdAt: {
+    sealed: { from: transporterSignature }
+  },
+  id: {
+    readableFieldName: "Le transporteur",
+    sealed: { from: transporterSignature }
+  },
+  bsvhuId: {
+    readableFieldName: "Le BSVHU associé au transporteur",
+    sealed: { from: transporterSignature }
+  },
+  transporterCompanySiret: {
+    readableFieldName: "Le N°SIRET du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: transporter => !transporter.transporterCompanyVatNumber
+    },
+    path: ["company", "siret"]
+  },
+  transporterCompanyVatNumber: {
+    readableFieldName: "le N° de TVA du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: transporter => !transporter.transporterCompanySiret
+    },
+    path: ["company", "vatNumber"]
+  },
+  transporterCompanyName: {
+    readableFieldName: "La raison sociale du transporteur",
+    sealed: {
+      from: transporterSignature
+    },
+    required: { from: transporterSignature },
+    path: ["company", "name"]
+  },
+  transporterCompanyAddress: {
+    readableFieldName: "L'adresse du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["company", "address"]
+  },
+  transporterCompanyContact: {
+    readableFieldName: "La personne à contacter du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["company", "contact"]
+  },
+  transporterCompanyPhone: {
+    readableFieldName: "Le N° de téléphone du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["company", "phone"]
+  },
+  transporterCompanyMail: {
+    readableFieldName: "L'adresse e-mail du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["company", "mail"]
+  },
+  transporterRecepisseNumber: {
+    readableFieldName: "Le numéro de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    },
+    path: ["recepisse", "number"]
+  },
+  transporterRecepisseIsExempted: {
+    readableFieldName: "L'exemption de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["recepisse", "isExempted"]
+  },
+  transporterRecepisseDepartment: {
+    readableFieldName: "Le département de récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    },
+    path: ["recepisse", "department"]
+  },
+  transporterRecepisseValidityLimit: {
+    readableFieldName: "La date de validité du récépissé du transporteur",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature,
+      when: requireTransporterRecepisse,
+      customErrorMessage:
+        "L'établissement doit renseigner son récépissé dans Trackdéchets"
+    },
+    path: ["recepisse", "validityLimit"]
+  },
+  transporterCustomInfo: {
+    readableFieldName: "Le champ libre du transporteur",
+    sealed: { from: transporterSignature },
+    path: ["customInfo"]
+  },
+  transporterTransportMode: {
+    readableFieldName: "Le mode de transport",
+    sealed: { from: transporterSignature },
+    required: {
+      from: transporterSignature
+    },
+    path: ["transport", "mode"]
+  },
+  transporterTransportPlates: {
+    readableFieldName: "l'immatriculation du transporteur",
+    sealed: { from: transporterSignature },
+    path: ["transport", "plates"],
+    required: {
+      from: transporterSignature,
+      // le transport est routier et le BSVHU a été créé après la MàJ 2025.01.1
+      when: transporter => {
+        return (
+          transporter.transporterTransportMode === "ROAD" &&
+          (transporter.createdAt || new Date()).getTime() >= v20250101.getTime()
+        );
+      }
+    }
+  },
+  transporterTransportTakenOverAt: {
+    readableFieldName: "La date d'enlèvement",
+    sealed: { from: transporterSignature },
+    path: ["transport", "takenOverAt"]
+  }
+};
+
+function requireTransporterRecepisse(transporter: ZodBsvhuTransporter) {
+  return (
+    !transporter.transporterRecepisseIsExempted &&
+    transporter.transporterTransportMode === TransportMode.ROAD &&
+    !isForeignVat(transporter.transporterCompanyVatNumber)
+  );
+}
 
 /**
  * DOCUMENTATION AUTOMATIQUE
@@ -465,137 +654,16 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     readableFieldName: "Le champ pour indiquer si le poids est estimé",
     path: ["weight", "isEstimate"]
   },
-  transporterCompanySiret: {
-    readableFieldName: "le SIRET du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      // le transporteur n'a pas de numéro de TVA renseigné
-      when: bsvhu => !bsvhu.transporterCompanyVatNumber
-    },
-    path: ["transporter", "company", "siret"]
-  },
-  transporterCompanyVatNumber: {
-    readableFieldName: "Le N° de TVA du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      // le transporteur n'a pas de SIRET renseigné
-      when: bsvhu => !bsvhu.transporterCompanySiret
-    },
-    path: ["transporter", "company", "vatNumber"]
-  },
-  transporterCompanyName: {
-    readableFieldName: "Le nom du transporteur",
+  transporters: {
+    readableFieldName: "La liste des transporteurs",
     sealed: {
-      from: "TRANSPORT"
+      from: "TRANSPORT_5"
     },
-    required: { from: "TRANSPORT" },
-    path: ["transporter", "company", "name"]
-  },
-  transporterCompanyAddress: {
-    readableFieldName: "L'adresse du transporteur",
-    sealed: {
-      from: "TRANSPORT"
-    },
-    required: { from: "TRANSPORT" },
-    path: ["transporter", "company", "address"]
-  },
-  transporterCompanyContact: {
-    readableFieldName: "Le nom de contact du transporteur",
-    sealed: {
-      from: "TRANSPORT"
-    },
-    required: { from: "TRANSPORT" },
-    path: ["transporter", "company", "contact"]
-  },
-  transporterCompanyPhone: {
-    readableFieldName: "Le téléphone du transporteur",
-    sealed: {
-      from: "TRANSPORT"
-    },
-    required: { from: "TRANSPORT" },
-    path: ["transporter", "company", "phone"]
-  },
-  transporterCompanyMail: {
-    readableFieldName: "L'email du transporteur",
-    sealed: {
-      from: "TRANSPORT"
-    },
-    required: { from: "TRANSPORT" },
-    path: ["transporter", "company", "mail"]
-  },
-  transporterRecepisseNumber: {
-    readableFieldName: "le numéro de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
     required: {
-      from: "TRANSPORT",
-      // le transporteur est FR et non exempt de récépissé
-      when: requireTransporterRecepisse,
-      customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    path: ["transporter", "recepisse", "number"]
-  },
-  transporterRecepisseDepartment: {
-    readableFieldName: "le département de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: requireTransporterRecepisse,
-      customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    path: ["transporter", "recepisse", "department"]
-  },
-  transporterRecepisseValidityLimit: {
-    readableFieldName: "la date de validité du récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    required: {
-      from: "TRANSPORT",
-      when: requireTransporterRecepisse,
-      customErrorMessage:
-        "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    },
-    path: ["transporter", "recepisse", "validityLimit"]
-  },
-  transporterTransportTakenOverAt: {
-    readableFieldName: "la date d'enlèvement du transporteur",
-    sealed: { from: "TRANSPORT" },
-    path: ["transporter", "transport", "takenOverAt"]
-  },
-  transporterRecepisseIsExempted: {
-    readableFieldName: "l'exemption de récépissé du transporteur",
-    sealed: { from: "TRANSPORT" },
-    path: ["transporter", "recepisse", "isExempted"]
-  },
-  transporterTransportMode: {
-    readableFieldName: "le mode de transport",
-    sealed: { from: "TRANSPORT" },
-    required: {
+      // jamais si c'est une collection 2710, EMISSION si l'émetteur est un particulier et il n'y a pas d'entreprise de travaux, TRANSPORT sinon
       from: "TRANSPORT"
     },
-    path: ["transporter", "transport", "mode"]
-  },
-  transporterTransportPlates: {
-    readableFieldName: "l'immatriculation du transporteur",
-    sealed: { from: "TRANSPORT" },
-    path: ["transporter", "transport", "plates"],
-    required: {
-      from: "TRANSPORT",
-      // le transport est routier et le BSVHU a été créé après la MàJ 2025.01.1
-      when: bsvhu => {
-        return (
-          bsvhu.transporterTransportMode === "ROAD" &&
-          (bsvhu.createdAt || new Date()).getTime() >= v20250101.getTime()
-        );
-      }
-    }
-  },
-  transporterCustomInfo: {
-    readableFieldName:
-      "les champs d'informations complémentaires du transporteur",
-    sealed: { from: "TRANSPORT" }
+    path: ["transporters"]
   },
   ecoOrganismeName: {
     readableFieldName: "le nom de l'éco-organisme",
@@ -813,14 +881,6 @@ export const getRequiredAndSealedFieldPaths = async (
   };
 };
 
-function requireTransporterRecepisse(bsvhu: ZodBsvhu) {
-  return (
-    !bsvhu.transporterRecepisseIsExempted &&
-    bsvhu.transporterTransportMode === TransportMode.ROAD &&
-    !isForeignVat(bsvhu.transporterCompanyVatNumber)
-  );
-}
-
 function isRefusedOrPartiallyRefused(bsvhu: ZodBsvhu) {
   return (
     !!bsvhu.destinationReceptionAcceptationStatus &&
@@ -896,6 +956,80 @@ export async function checkBsvhuSealedFields(
     }
   }
 
+  if (updatedFields.includes("transporters")) {
+    // Une modification a eu lieu dans le tableau des transporteurs. Il peut s'agir :
+    // Cas 1 : d'une modification des identifiants des transporteurs visés via le champ BsvhuInput.transporters
+    // Cas 2 : d'une modification du premier transporteur via le champ BsvhuInput.transporter
+
+    const persistedTransporters = persisted.transporters ?? [];
+    const updatedTransporters = bsvhu.transporters ?? [];
+
+    // Vérification du cas 1
+    persistedTransporters.forEach((persistedTransporter, idx) => {
+      const updatedTransporter = updatedTransporters[idx];
+      if (persistedTransporter.id !== updatedTransporter?.id) {
+        const rule = bsvhuTransporterEditionRules.id;
+        const isSealed = isBsvhuTransporterFieldSealed(
+          rule.sealed,
+          { ...updatedTransporter, number: idx + 1 },
+          signaturesToCheck
+        );
+
+        if (isSealed) {
+          sealedFieldErrors.push(
+            `Le transporteur n°${
+              idx + 1
+            } a déjà signé le BSVHU, il ne peut pas être supprimé ou modifié`
+          );
+        }
+      }
+    });
+
+    // Vérification du cas n°2
+    const firstPersistedTransporter = persistedTransporters[0];
+    const firstUpdatedTransporter = updatedTransporters[0];
+
+    if (
+      firstPersistedTransporter &&
+      firstUpdatedTransporter &&
+      firstPersistedTransporter.id === firstUpdatedTransporter.id
+    ) {
+      const transporterUpdatedFields = getUpdatedFields(
+        persistedTransporters[0],
+        updatedTransporters[0]
+      );
+
+      for (const transporterUpdatedField of transporterUpdatedFields) {
+        const rule =
+          bsvhuTransporterEditionRules[
+            transporterUpdatedField as keyof BsvhuTransporterEditableFields
+          ];
+
+        if (rule) {
+          const isSealed = isBsvhuTransporterFieldSealed(
+            rule.sealed,
+            { ...updatedTransporters[0], number: 1 },
+            signaturesToCheck,
+            {
+              persisted: { ...persistedTransporters[0], number: 1 },
+              userFunctions
+            }
+          );
+
+          const fieldDescription = rule.readableFieldName
+            ? capitalize(rule.readableFieldName)
+            : `Le champ ${transporterUpdatedField}`;
+
+          if (isSealed) {
+            sealedFieldErrors.push(
+              `${fieldDescription} n°1 a été verrouillé via signature et ne peut pas être modifié.`
+            );
+          }
+        }
+      }
+    }
+  }
+
   if (sealedFieldErrors?.length > 0) {
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
@@ -940,12 +1074,12 @@ export async function getSealedFields(
 // Fonction utilitaire générique permettant d'appliquer une règle
 // de verrouillage de champ ou de champ requis
 // définie soit à partir d'une fonction soit à partir d'une config
-function isRuleApplied<T extends ZodBsvhu>(
+function isRuleApplied<T extends ZodBsvhu | ZodBsvhuTransporter>(
   rule: EditionRule<T>,
   resource: T,
-  signatures: SignatureTypeInput[],
+  signatures: AllBsvhuSignatureType[],
   context?: RuleContext<T>,
-  currentSignatureType?: SignatureTypeInput | undefined
+  currentSignatureType?: AllBsvhuSignatureType | undefined
 ) {
   const from =
     typeof rule.from === "function" ? rule.from(resource, context) : rule.from;
@@ -961,17 +1095,26 @@ function isRuleApplied<T extends ZodBsvhu>(
 function isBsvhuFieldSealed(
   rule: EditionRule<ZodBsvhu>,
   bsvhu: ZodBsvhu,
-  signatures: SignatureTypeInput[],
+  signatures: AllBsvhuSignatureType[],
   context?: RuleContext<ZodBsvhu>
 ) {
   return isRuleApplied(rule, bsvhu, signatures, context);
 }
 
+function isBsvhuTransporterFieldSealed(
+  rule: EditionRule<ZodBsvhuTransporter>,
+  bsvhuTransporter: ZodBsvhuTransporter,
+  signatures: AllBsvhuSignatureType[],
+  context?: RuleContext<ZodBsvhuTransporter>
+) {
+  return isRuleApplied(rule, bsvhuTransporter, signatures, context);
+}
+
 export function isBsvhuFieldRequired(
   rule: EditionRule<ZodBsvhu>,
   bsvhu: ZodBsvhu,
-  signatures: SignatureTypeInput[],
-  currentSignatureType: SignatureTypeInput | undefined
+  signatures: AllBsvhuSignatureType[],
+  currentSignatureType: AllBsvhuSignatureType | undefined
 ) {
   return isRuleApplied(
     rule,
@@ -980,4 +1123,12 @@ export function isBsvhuFieldRequired(
     undefined,
     currentSignatureType
   );
+}
+
+export function isBsvhuTransporterFieldRequired(
+  rule: EditionRule<ZodBsvhuTransporter>,
+  bsvhuTransporter: ZodBsvhuTransporter,
+  signatures: AllBsvhuSignatureType[]
+) {
+  return isRuleApplied(rule, bsvhuTransporter, signatures);
 }
