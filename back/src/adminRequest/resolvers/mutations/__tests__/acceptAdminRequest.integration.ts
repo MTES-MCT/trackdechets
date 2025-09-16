@@ -654,6 +654,41 @@ describe("Mutation acceptAdminRequest", () => {
     expect(companyAssociation?.role).toBe(UserRole.ADMIN);
   });
 
+  it("only admin can approve the request", async () => {
+    // Given
+    const { company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const member = await userInCompany(UserRole.MEMBER, company.id);
+    const requestAuthor = await userFactory();
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(member);
+    const { errors } = await mutate<Pick<Mutation, "acceptAdminRequest">>(
+      ACCEPT_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            adminRequestId: adminRequest.id
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  });
+
   it("if user belongs to company, should be promoted to admin", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
