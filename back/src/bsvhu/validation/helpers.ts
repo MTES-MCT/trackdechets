@@ -1,12 +1,18 @@
 import { User } from "@prisma/client";
-import type { BsvhuInput, SignatureTypeInput } from "@td/codegen-back";
+import type { BsvhuInput } from "@td/codegen-back";
 import { BSVHU_SIGNATURES_HIERARCHY } from "./constants";
-import { ZodBsvhu, ZodOperationEnum, ZodWasteCodeEnum } from "./schema";
+import {
+  ZodBsvhu,
+  ZodBsvhuTransporter,
+  ZodOperationEnum,
+  ZodWasteCodeEnum
+} from "./schema";
 import { BsvhuUserFunctions, PrismaBsvhuForParsing } from "./types";
 import { getUserCompanies } from "../../users/database";
 import { flattenVhuInput } from "../converter";
 import { safeInput } from "../../common/converter";
 import { objectDiff } from "../../forms/workflow/diff";
+import { AllBsvhuSignatureType } from "../types";
 
 /**
  * Cette fonction permet de convertir les données d'input GraphQL
@@ -79,7 +85,7 @@ export function prismaToZodBsvhu(bsvhu: PrismaBsvhuForParsing): ZodBsvhu {
   };
 }
 
-export function getUpdatedFields<T extends ZodBsvhu>(
+export function getUpdatedFields<T extends ZodBsvhu | ZodBsvhuTransporter>(
   val: T,
   update: T
 ): string[] {
@@ -102,6 +108,7 @@ export async function getBsvhuUserFunctions(
 ): Promise<BsvhuUserFunctions> {
   const companies = user ? await getUserCompanies(user.id) : [];
   const orgIds = companies.map(c => c.orgId);
+  const transporters = bsvhu.transporters ?? [];
   return {
     isEmitter:
       bsvhu.emitterCompanySiret != null &&
@@ -109,11 +116,13 @@ export async function getBsvhuUserFunctions(
     isDestination:
       bsvhu.destinationCompanySiret != null &&
       orgIds.includes(bsvhu.destinationCompanySiret),
-    isTransporter:
-      (bsvhu.transporterCompanySiret != null &&
-        orgIds.includes(bsvhu.transporterCompanySiret)) ||
-      (bsvhu.transporterCompanyVatNumber != null &&
-        orgIds.includes(bsvhu.transporterCompanyVatNumber)),
+    isTransporter: transporters.some(
+      transporter =>
+        (transporter.transporterCompanySiret != null &&
+          orgIds.includes(transporter.transporterCompanySiret)) ||
+        (transporter.transporterCompanyVatNumber != null &&
+          orgIds.includes(transporter.transporterCompanyVatNumber))
+    ),
     isEcoOrganisme:
       bsvhu.ecoOrganismeSiret != null &&
       orgIds.includes(bsvhu.ecoOrganismeSiret),
@@ -130,8 +139,8 @@ export async function getBsvhuUserFunctions(
  * Gets all the signatures prior to the target signature in the signature hierarchy.
  */
 export function getSignatureAncestors(
-  targetSignature: SignatureTypeInput | undefined | null
-): SignatureTypeInput[] {
+  targetSignature: AllBsvhuSignatureType | undefined | null
+): AllBsvhuSignatureType[] {
   if (!targetSignature) return [];
 
   const parent = Object.entries(BSVHU_SIGNATURES_HIERARCHY).find(
@@ -140,13 +149,13 @@ export function getSignatureAncestors(
 
   return [
     targetSignature,
-    ...getSignatureAncestors(parent as SignatureTypeInput)
+    ...getSignatureAncestors(parent as AllBsvhuSignatureType)
   ];
 }
 
 export function getNextSignatureType(
-  currentSignature: SignatureTypeInput | undefined | null
-): SignatureTypeInput | undefined {
+  currentSignature: AllBsvhuSignatureType | undefined | null
+): AllBsvhuSignatureType | undefined {
   if (!currentSignature) {
     return "EMISSION";
   }
@@ -162,14 +171,14 @@ export function getNextSignatureType(
  */
 export function getCurrentSignatureType(
   bsvhu: ZodBsvhu
-): SignatureTypeInput | undefined {
+): AllBsvhuSignatureType | undefined {
   /**
    * Fonction interne récursive qui parcourt la hiérarchie des signatures et
    * renvoie les signatures présentes sur le bordereau
    */
   function getSignatures(
-    current: SignatureTypeInput,
-    acc: SignatureTypeInput[]
+    current: AllBsvhuSignatureType,
+    acc: AllBsvhuSignatureType[]
   ) {
     const signature = BSVHU_SIGNATURES_HIERARCHY[current];
     const hasCurrentSignature = signature.isSigned(bsvhu);

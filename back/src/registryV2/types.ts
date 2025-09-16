@@ -112,7 +112,8 @@ export type RegistryV2Bspaoh = Prisma.BspaohGetPayload<{
 
 // BSVHU
 export const RegistryV2BsvhuInclude = Prisma.validator<Prisma.BsvhuInclude>()({
-  intermediaries: true
+  intermediaries: true,
+  transporters: true
 });
 
 export type RegistryV2Bsvhu = Prisma.BsvhuGetPayload<{
