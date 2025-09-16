@@ -44,7 +44,7 @@ const apiCallProcessor = async ({
     // Customer server endpoint are supposed to return HTTP 200 each time a request si amde
     if (res.status !== 200) {
       // valid enpoint response, exit
-      logger.error(
+      logger.info(
         `Webhook invalid return status (${res.status}) (${endpointUri})`
       );
     } else {
