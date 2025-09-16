@@ -7,13 +7,13 @@ input WasteRegistryWhere {
   bsdType: BsdTypeFilter
   "Filtre sur le code déchet"
   wasteCode: StringFilter
-  "Filtre sur le n° SIRET de l'émetteur"
+  "Filtre sur le SIRET de l'émetteur"
   emitterCompanySiret: StringFilter
-  "Filtre sur le n° SIRET du transporteur"
+  "Filtre sur le SIRET du transporteur"
   transporterCompanySiret: StringFilter
   "Filtre sur la date de prise en charge du déchet par le transporteur"
   transporterTakenOverAt: DateFilter
-  "Filtre sur le n° SIRET de l'installation de destination"
+  "Filtre sur le SIRET de l'installation de destination"
   destinationCompanySiret: StringFilter
   "Filtre sur la date de réception sur l'installation de destination"
   destinationReceptionDate: DateFilter

@@ -61,7 +61,7 @@ query {
 
 Des variables peuvent également être ajoutées sur certaines *queries*.
 
-Exemple avec une requête d'information entreprise en passant un numéro siret en variable :
+Exemple avec une requête d'information entreprise en passant un siret en variable :
 
 ```graphql
 query {

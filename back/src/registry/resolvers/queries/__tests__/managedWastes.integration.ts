@@ -158,7 +158,7 @@ describe("Managed wastes registry", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
-        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${broker.company.siret}`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${broker.company.siret}`
       })
     );
   });
@@ -309,7 +309,7 @@ describe("Managed wastes registry", () => {
       data: null,
       errors: [
         expect.objectContaining({
-          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${trader.company.siret}`
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${trader.company.siret}`
         })
       ]
     });
@@ -343,7 +343,7 @@ describe("Managed wastes registry", () => {
       data: null,
       errors: [
         expect.objectContaining({
-          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${trader.company.siret}`
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${trader.company.siret}`
         })
       ]
     });

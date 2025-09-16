@@ -149,7 +149,7 @@ describe("Mutation.updateBsdaTransporter", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Transporteur : 123 n'est pas un numéro de SIRET valide"
+        message: "Transporteur : 123 n'est pas un SIRET valide"
       })
     ]);
   });

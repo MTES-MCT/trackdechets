@@ -346,14 +346,14 @@ export default function CompanySelector({
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,
-            "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et pas par son numéro de TVA"
+            "Vous devez identifier un établissement français par son SIRET (14 chiffres) et pas par son numéro de TVA"
           );
         }
         if (!allowForeignCompanies) {
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,
-            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais seulement par nom ou numéro de SIRET"
+            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais seulement par nom ou SIRET"
           );
         }
       }
@@ -426,7 +426,7 @@ export default function CompanySelector({
         <div className="tw-flex tw-justify-between">
           <div className="tw-w-3/4 tw-flex tw-flex-col tw-justify-between">
             <label htmlFor={`siret-${uniqId}`}>
-              Nom ou numéro de SIRET de l'établissement
+              Nom ou SIRET de l'établissement
               {allowForeignCompanies ? (
                 <small className="tw-block">
                   ou numéro de TVA intracommunautaire pour les entreprises

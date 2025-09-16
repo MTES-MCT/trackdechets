@@ -178,7 +178,7 @@ describe("query { wastesRegistryCsv }", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${someCompany.siret}`
+      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${someCompany.siret}`
     );
   });
 
@@ -216,7 +216,7 @@ describe("query { wastesRegistryCsv }", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${someCompany.siret}`
+      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${someCompany.siret}`
     );
   });
 

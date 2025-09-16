@@ -217,7 +217,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "Émetteur : 1 n'est pas un numéro de SIRET valide"
+        "Émetteur : 1 n'est pas un SIRET valide"
       );
     });
 
@@ -234,7 +234,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "Transporteur : 1 n'est pas un numéro de SIRET valide"
+        "Transporteur : 1 n'est pas un SIRET valide"
       );
     });
 
@@ -366,7 +366,7 @@ describe("BSPAOH validation", () => {
       }
 
       expect(result.error.issues[0].message).toBe(
-        "Destination : 1 n'est pas un numéro de SIRET valide"
+        "Destination : 1 n'est pas un SIRET valide"
       );
     });
 

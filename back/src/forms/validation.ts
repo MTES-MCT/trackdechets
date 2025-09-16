@@ -1102,7 +1102,7 @@ const wasteDetailsSchemaFn = (
  * Condition that can be enforced on specific transporter fields to ensure the field is
  * present before the transporter sign the Form.
  * The orgId of the transporter signing the form is passed down to the validation context
- * during the signature validation process and is compared to the n°SIRET or vat number
+ * during the signature validation process and is compared to the SIRET or vat number
  * of the transporter under validation.
  */
 const requiredWhenTransporterSign: (
@@ -1200,9 +1200,9 @@ export const transporterSchemaFn: FactorySchemaOf<
           `Transporteur: ${MISSING_COMPANY_NAME}`
         )
       ),
-    // We do not need to check for the presence of either a n°SIRET or VAT number
+    // We do not need to check for the presence of either a SIRET or VAT number
     // because bsdd transporter data is only validated before a specific transporter sign.
-    // It guarantees that the BSDD transporter data has matched against either the n°SIRET
+    // It guarantees that the BSDD transporter data has matched against either the SIRET
     // or VAT number.
     transporterCompanySiret: siret
       .label("Transporteur")
@@ -2178,7 +2178,7 @@ export async function checkCanBeSealed(form: PrismaForm) {
 }
 
 /**
- * Check that the n°SIRET appearing on the forwardedIn form match existing
+ * Check that the SIRET appearing on the forwardedIn form match existing
  * companies registered in Trackdechets and that their profile
  * is consistent with the role they play on the form
  * (producer, trader, destination, etc)
@@ -2262,7 +2262,7 @@ export async function validateAppendix2Groupement(
 
   if (!form.emitterCompanySiret) {
     throw new UserInputError(
-      "Vous devez renseigner le numéro SIRET de l'établissement de tri, transit, regroupement émettrice du BSDD de regroupement"
+      "Vous devez renseigner le SIRET de l'établissement de tri, transit, regroupement émettrice du BSDD de regroupement"
     );
   }
 
@@ -2405,7 +2405,7 @@ export async function validateAppendix1Groupement(
 ) {
   if (!form.emitterCompanySiret) {
     throw new UserInputError(
-      "Vous devez renseigner le numéro SIRET de l'établissement de collecte du BSDD de tournée dédiée"
+      "Vous devez renseigner le SIRET de l'établissement de collecte du BSDD de tournée dédiée"
     );
   }
 

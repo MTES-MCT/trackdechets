@@ -190,9 +190,7 @@ export const generateSiretAndInitiateCompanyCreation = async (
   ).toBeVisible();
 
   // Generate a fake SIRET
-  await page
-    .getByRole("button", { name: "Obtenir un n° SIRET factice" })
-    .click();
+  await page.getByRole("button", { name: "Obtenir un SIRET factice" }).click();
   // Catch the siret value
   const siretInput = page.locator("[name=siret]");
   await expect(siretInput).not.toBeEmpty(); // Wait for the input to be filled
@@ -346,9 +344,7 @@ export const submitAndVerifyGenericInfo = async (
 
   // Company info
   await expect(
-    companyDiv.getByText(
-      `Numéro de SIRET ou n° de TVA intra-communautaire${siret}`
-    )
+    companyDiv.getByText(`SIRET ou n° de TVA intra-communautaire${siret}`)
   ).toBeVisible();
   const rolesDiv = companyDiv.getByTestId("company-types");
   await expect(rolesDiv).toBeVisible();
@@ -572,7 +568,7 @@ export const addAutomaticSignaturePartner = async (
   const signatureDiv = await companyDiv
     .getByText("Signature automatique (annexe 1)")
     .locator("..");
-  await signatureDiv.getByLabel("N°SIRET ou raison sociale").fill(partnerSiret);
+  await signatureDiv.getByLabel("SIRET ou raison sociale").fill(partnerSiret);
 
   // Partner company should pop in the results
   const portal = await page.locator("#portal-root");

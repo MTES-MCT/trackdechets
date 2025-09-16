@@ -50,7 +50,7 @@ describe("publishBsff", () => {
           "L'ADR est un champ requis.\n" +
           "La quantité totale est un champ requis.\n" +
           "La raison sociale de l'installation de destination est un champ requis.\n" +
-          "Le N°SIRET de l'installation de destination est un champ requis.\n" +
+          "Le SIRET de l'installation de destination est un champ requis.\n" +
           "L'adresse de l'installation de destination est un champ requis.\n" +
           "La personne à contacter de l'installation de destination est un champ requis.\n" +
           "Le N° de téléphone de l'installation de destination est un champ requis.\n" +

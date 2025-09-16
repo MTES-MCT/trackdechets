@@ -7,7 +7,7 @@ import { useField } from "formik";
 
 type FormikBrokerProps = {
   bsdType: BsdType;
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
 };

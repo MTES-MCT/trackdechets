@@ -3,7 +3,7 @@ title: Profils établissements
 ---
 
 
-Un **profil établissement** est une description de l'activité principale d'un établissement. Lors de l'inscription, il est nécessaire de sélectionner un ou plusieurs types de profils après avoir fourni son numéro SIRET (ou son numéro de TVA intracommunautaire pour les transporteurs étrangers). Ces profils détermineront les droits de l'établissement au sein de Trackdéchets, notamment en ce qui concerne les types de bordereaux qu'il peut gérer et les modalités de gestion. 
+Un **profil établissement** est une description de l'activité principale d'un établissement. Lors de l'inscription, il est nécessaire de sélectionner un ou plusieurs types de profils après avoir fourni son SIRET (ou son numéro de TVA intracommunautaire pour les transporteurs étrangers). Ces profils détermineront les droits de l'établissement au sein de Trackdéchets, notamment en ce qui concerne les types de bordereaux qu'il peut gérer et les modalités de gestion. 
 
 À noter que : 
 

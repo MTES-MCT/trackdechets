@@ -122,7 +122,7 @@ const CompanyIdentificationForm = ({
             </div>
           )}
           <p className="companyFormWrapper__title-field">
-            Numéro de SIRET ou n° de TVA intra-communautaire
+            SIRET ou n° de TVA intra-communautaire
           </p>
           <p className="companyFormWrapper__value-field">
             {getSiretOrVatNumber()}

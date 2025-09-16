@@ -7,7 +7,7 @@ import { isClosedCompany } from "@td/constants";
 
 /**
  * Recherche et renvoie les données diffusables
- * sur une entreprise pour un numéro de SIRET ou de TVA
+ * sur une entreprise pour un SIRET ou de TVA
  * Fusionnant les infos des bases Trackdéchets et S3IC
  * si elles existent
  * @param siretOrVat
@@ -17,7 +17,7 @@ export async function getCompanyInfos(
 ): Promise<CompanyPublic> {
   if (!siretOrVat) {
     throw new UserInputError(
-      "Paramètre absent. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
+      "Paramètre absent. Un SIRET ou de TVA intracommunautaire valide est requis",
       {
         invalidArgs: ["clue"]
       }
@@ -68,7 +68,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
 ) => {
   if (!args.siret && !args.clue) {
     throw new UserInputError(
-      "Paramètre siret et clue absents. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
+      "Paramètre siret et clue absents. Un SIRET ou de TVA intracommunautaire valide est requis",
       {
         invalidArgs: ["clue", "siret"]
       }
