@@ -412,12 +412,12 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
   isDraft
 }) =>
   yup.object({
-    emitterPickupSite: yup.string().nullable(),
-    emitterWorkSiteAddress: yup.string().nullable(),
-    emitterWorkSiteCity: yup.string().nullable(),
-    emitterWorkSiteInfos: yup.string().nullable(),
-    emitterWorkSiteName: yup.string().nullable(),
-    emitterWorkSitePostalCode: yup.string().nullable(),
+    emitterPickupSite: yup.string().max(250).nullable(),
+    emitterWorkSiteAddress: yup.string().max(250).nullable(),
+    emitterWorkSiteCity: yup.string().max(100).nullable(),
+    emitterWorkSiteInfos: yup.string().max(500).nullable(),
+    emitterWorkSiteName: yup.string().max(250).nullable(),
+    emitterWorkSitePostalCode: yup.string().max(20).nullable(),
     emitterType: yup
       .mixed<EmitterType>()
       .when("ecoOrganismeSiret", {
@@ -452,6 +452,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       }),
     emitterCompanyName: yup
       .string()
+      .max(250)
       .ensure()
       .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
@@ -484,6 +485,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       }),
     emitterCompanyAddress: yup
       .string()
+      .max(250)
       .ensure()
       .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
@@ -491,6 +493,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
     emitterCompanyContact: yup
       .string()
+      .max(250)
       .ensure()
       .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
@@ -514,6 +517,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_CONTACT}`),
     emitterCompanyPhone: yup
       .string()
+      .max(20)
       .ensure()
       .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
@@ -526,6 +530,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
     emitterCompanyMail: yup
       .string()
+      .max(250)
       .email()
       .ensure()
       .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
@@ -539,6 +544,7 @@ const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`),
     emitterCompanyOmiNumber: yup
       .string()
+      .max(250)
       .nullable()
       .notRequired()
       .test(
@@ -634,7 +640,7 @@ export const ecoOrganismeSchema = yup.object().shape({
               .then(el => el != null)
           : true
     ),
-  ecoOrganismeName: yup.string().notRequired().nullable()
+  ecoOrganismeName: yup.string().max(250).notRequired().nullable()
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
@@ -645,6 +651,7 @@ export const recipientSchemaFn: FactorySchemaOf<
   yup.object({
     recipientCap: yup
       .string()
+      .max(250)
       .nullable()
       .test(
         "required-when-dangerous",
@@ -665,6 +672,7 @@ export const recipientSchemaFn: FactorySchemaOf<
     recipientIsTempStorage: yup.boolean().nullable(),
     recipientProcessingOperation: yup
       .string()
+      .max(250)
       .label("Opération d’élimination / valorisation")
       .ensure()
       .when("recipientIsTempStorage", {
@@ -692,6 +700,7 @@ export const recipientSchemaFn: FactorySchemaOf<
       }),
     recipientCompanyName: yup
       .string()
+      .max(250)
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
     recipientCompanySiret: siret
@@ -702,18 +711,22 @@ export const recipientSchemaFn: FactorySchemaOf<
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()
+      .max(250)
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
     recipientCompanyContact: yup
       .string()
+      .max(250)
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_CONTACT}`),
     recipientCompanyPhone: yup
       .string()
+      .max(20)
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_PHONE}`),
     recipientCompanyMail: yup
       .string()
+      .max(250)
       .email()
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
@@ -733,6 +746,7 @@ export const packagingInfoFn = ({
       .required("Le type de conditionnement doit être précisé."),
     other: yup
       .string()
+      .max(250)
       .when("type", (type, schema) =>
         type === "AUTRE"
           ? schema.requiredIf(
@@ -772,9 +786,10 @@ export const packagingInfoFn = ({
 
 const parcelCommonInfos = yup
   .object({
-    city: yup.string().required("Parcelle: la ville est obligatoire"),
+    city: yup.string().max(250).required("Parcelle: la ville est obligatoire"),
     inseeCode: yup
       .string()
+      .max(250)
       .required("Parcelle: le code INSEE de la commune est obligatoire")
   })
   .test(
@@ -888,6 +903,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
       .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsName: yup
       .string()
+      .max(250)
       .requiredIf(!isDraft, "L'appellation du déchet est obligatoire."),
     wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
@@ -902,6 +918,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
     wasteDetailsIsSubjectToADR: yup.boolean().nullable(),
     wasteDetailsOnuCode: yup
       .string()
+      .max(250)
       .nullable()
       // Empty values (or spaces) to null
       .transform(value =>
@@ -967,10 +984,12 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
 
         return true;
       }),
-    wasteDetailsNonRoadRegulationMention: yup.string().nullable(),
+    wasteDetailsNonRoadRegulationMention: yup.string().max(250).nullable(),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
-    wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
-    wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
+    wasteDetailsAnalysisReferences: yup
+      .array()
+      .of(yup.string().max(250)) as any,
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string().max(250)) as any,
     wasteDetailsConsistence: (isDraft
       ? yup
           .array()
@@ -997,7 +1016,7 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
 > = ({ isDraft }) =>
   baseWasteDetailsSchemaFn({ isDraft }).concat(
     yup.object({
-      wasteDetailsName: yup.string().nullable(),
+      wasteDetailsName: yup.string().max(250).nullable(),
       wasteDetailsCode: yup
         .string()
         .requiredIf(!isDraft, "Le code déchet est obligatoire")
@@ -1155,9 +1174,10 @@ export const transporterSchemaFn: FactorySchemaOf<
   Transporter
 > = context =>
   yup.object({
-    transporterCustomInfo: yup.string().nullable(),
+    transporterCustomInfo: yup.string().max(250).nullable(),
     transporterNumberPlate: yup
       .string()
+      .max(250)
       .nullable()
       .test((transporterNumberPlate, ctx) => {
         const {
@@ -1192,6 +1212,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       }),
     transporterCompanyName: yup
       .string()
+      .max(250)
       .ensure()
       .when(
         ["transporterCompanySiret", "transporterCompanyVatNumber"],
@@ -1213,6 +1234,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       .test(vatNumberTests.isRegisteredTransporter),
     transporterCompanyAddress: yup
       .string()
+      .max(250)
       .ensure()
       .when(
         ["transporterCompanySiret", "transporterCompanyVatNumber"],
@@ -1223,6 +1245,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterCompanyContact: yup
       .string()
+      .max(250)
       .ensure()
       .when(
         ["transporterCompanySiret", "transporterCompanyVatNumber"],
@@ -1233,6 +1256,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterCompanyPhone: yup
       .string()
+      .max(20)
       .ensure()
       .when(
         ["transporterCompanySiret", "transporterCompanyVatNumber"],
@@ -1243,6 +1267,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterCompanyMail: yup
       .string()
+      .max(250)
       .email()
       .ensure()
       .when(
@@ -1255,6 +1280,7 @@ export const transporterSchemaFn: FactorySchemaOf<
     transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
     transporterReceipt: yup
       .string()
+      .max(250)
       .when(
         [
           "transporterIsExemptedOfReceipt",
@@ -1276,6 +1302,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterDepartment: yup
       .string()
+      .max(250)
       .when(
         [
           "transporterIsExemptedOfReceipt",
@@ -1297,6 +1324,7 @@ export const transporterSchemaFn: FactorySchemaOf<
       ),
     transporterValidityLimit: yup
       .string()
+      .max(250)
       .when(
         [
           "transporterIsExemptedOfReceipt",
@@ -1349,40 +1377,53 @@ export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
     traderCompanySiret: siret
       .label("Négociant")
       .test(siretTests.isRegistered("TRADER")),
-    traderCompanyName: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_NAME}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    traderCompanyAddress: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_ADDRESS}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    traderCompanyContact: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_CONTACT}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    traderCompanyPhone: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_PHONE}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
+    traderCompanyName: yup
+      .string()
+      .max(250)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_NAME}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderCompanyAddress: yup
+      .string()
+      .max(250)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_ADDRESS}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderCompanyContact: yup
+      .string()
+      .max(250)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_CONTACT}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderCompanyPhone: yup
+      .string()
+      .max(20)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_PHONE}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
     traderCompanyMail: yup
       .string()
+      .max(250)
       .email()
       .when("traderCompanySiret", {
         is: siret => !!siret,
@@ -1392,22 +1433,28 @@ export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
             .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_EMAIL}`),
         otherwise: schema => schema.notRequired().nullable()
       }),
-    traderReceipt: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, "Négociant: Numéro de récepissé obligatoire"),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    traderDepartment: yup.string().when("traderCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, "Négociant : Département obligatoire"),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
+    traderReceipt: yup
+      .string()
+      .max(250)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, "Négociant: Numéro de récepissé obligatoire"),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderDepartment: yup
+      .string()
+      .max(250)
+      .when("traderCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, "Négociant : Département obligatoire"),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
     traderValidityLimit: yup.date().when("traderCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -1423,62 +1470,83 @@ export const brokerSchemaFn: FactorySchemaOf<FormValidationContext, Broker> = ({
     brokerCompanySiret: siret
       .label("Courtier")
       .test(siretTests.isRegistered("BROKER")),
-    brokerCompanyName: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_NAME}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerCompanyAddress: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_ADDRESS}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerCompanyContact: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_CONTACT}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerCompanyPhone: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_PHONE}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerCompanyMail: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_EMAIL}`),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerReceipt: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, "Courtier : Numéro de récepissé obligatoire"),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
-    brokerDepartment: yup.string().when("brokerCompanySiret", {
-      is: siret => !!siret,
-      then: schema =>
-        schema
-          .ensure()
-          .requiredIf(!isDraft, "Courtier : Département obligatoire"),
-      otherwise: schema => schema.notRequired().nullable()
-    }),
+    brokerCompanyName: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_NAME}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerCompanyAddress: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_ADDRESS}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerCompanyContact: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_CONTACT}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerCompanyPhone: yup
+      .string()
+      .max(20)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_PHONE}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerCompanyMail: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_EMAIL}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerReceipt: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, "Courtier : Numéro de récepissé obligatoire"),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    brokerDepartment: yup
+      .string()
+      .max(250)
+      .when("brokerCompanySiret", {
+        is: siret => !!siret,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, "Courtier : Département obligatoire"),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
     brokerValidityLimit: yup.date().when("brokerCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -1494,6 +1562,7 @@ export const signingInfoSchema: yup.SchemaOf<SigningInfo> = yup.object({
   sentAt: yup.date().required(),
   sentBy: yup
     .string()
+    .max(250)
     .ensure()
     .required("Le nom de l'émetteur du bordereau est obligatoire")
 });
@@ -1503,6 +1572,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   isAccepted: yup.boolean(),
   receivedBy: yup
     .string()
+    .max(250)
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
   receivedAt: yup.date().required(),
@@ -1527,6 +1597,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     ),
   wasteRefusalReason: yup
     .string()
+    .max(250)
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
@@ -1547,6 +1618,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
   signedAt: yup.date().nullable(),
   signedBy: yup
     .string()
+    .max(250)
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
   quantityReceived: weight(WeightUnits.Tonne)
@@ -1560,6 +1632,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()
+    .max(250)
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
@@ -1711,6 +1784,7 @@ const withNextDestination = (required: boolean) =>
         ),
       nextDestinationCompanyName: yup
         .string()
+        .max(250)
         .ensure()
         .requiredIf(
           required,
@@ -1754,6 +1828,7 @@ const withNextDestination = (required: boolean) =>
       ),
       nextDestinationCompanyAddress: yup
         .string()
+        .max(250)
         .ensure()
         .requiredIf(
           required,
@@ -1761,6 +1836,7 @@ const withNextDestination = (required: boolean) =>
         ),
       nextDestinationCompanyCountry: yup
         .string()
+        .max(250)
         .ensure()
         .oneOf(
           ["", ...countries.map(country => country.cca2)],
@@ -1790,6 +1866,7 @@ const withNextDestination = (required: boolean) =>
         }),
       nextDestinationCompanyContact: yup
         .string()
+        .max(250)
         .ensure()
         .requiredIf(
           required,
@@ -1797,6 +1874,7 @@ const withNextDestination = (required: boolean) =>
         ),
       nextDestinationCompanyPhone: yup
         .string()
+        .max(20)
         .ensure()
         .requiredIf(
           required,
@@ -1804,15 +1882,17 @@ const withNextDestination = (required: boolean) =>
         ),
       nextDestinationCompanyMail: yup
         .string()
+        .max(250)
         .email()
         .ensure()
         .requiredIf(
           required,
           `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
         ),
-      nextDestinationCompanyExtraEuropeanId: yup.string().nullable(),
+      nextDestinationCompanyExtraEuropeanId: yup.string().max(250).nullable(),
       nextDestinationNotificationNumber: yup
         .string()
+        .max(250)
         .when(
           [
             "wasteDetailsCode",
@@ -1946,6 +2026,7 @@ const processedInfoSchemaFn: (
   const base = yup.object({
     processedBy: yup
       .string()
+      .max(250)
       .ensure()
       .required("Vous devez saisir un responsable de traitement."),
     processedAt: yup.date().required(),
@@ -1990,7 +2071,7 @@ const processedInfoSchemaFn: (
           return true;
         }
       ),
-    processingOperationDescription: yup.string().nullable()
+    processingOperationDescription: yup.string().max(250).nullable()
   });
 
   if (
