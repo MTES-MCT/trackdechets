@@ -11,7 +11,7 @@ export const AnonymousCompanyCreationSuccess = () => {
           L'établissement a été ajouté à notre répertoire privé, vous pouvez dès
           à présent procéder à sa création sur Trackdéchets. Pour ce faire,
           rendez-vous sur l'onglet Mes établissements &gt; Créer un
-          établissement, et saisissez son numéro de SIRET.
+          établissement, et saisissez son SIRET.
         </span>
       }
     />

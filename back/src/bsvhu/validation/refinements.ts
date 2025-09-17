@@ -158,7 +158,7 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
       code: z.ZodIssueCode.custom,
       path: ["emitter", "irregularSituation"],
       message:
-        "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un numéro de SIRET si il n'est pas en situation irrégulière"
+        "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un SIRET si il n'est pas en situation irrégulière"
     });
   }
 };

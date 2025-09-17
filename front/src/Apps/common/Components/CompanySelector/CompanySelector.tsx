@@ -99,7 +99,7 @@ const CompanySelector = ({
       >
         <div className="fr-col-12 fr-col-md-8">
           <Input
-            label="N°SIRET ou raison sociale"
+            label="SIRET ou raison sociale"
             hintText={searchHint}
             disabled={disabled}
             nativeInputProps={{

@@ -8,7 +8,7 @@ type Props = {
 export function CompanyDescription({ company }: Props) {
   return (
     <p>
-      N° SIRET : {company?.siret}
+      SIRET : {company?.siret}
       <br />
       {!!company?.vatNumber && (
         <>

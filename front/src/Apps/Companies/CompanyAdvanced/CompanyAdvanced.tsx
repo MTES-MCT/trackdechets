@@ -176,8 +176,8 @@ const CompanyAdvanced = ({ company }: AdvancedProps) => {
         </p>
 
         <b>
-          Pour supprimer l'établissement, saisissez son numéro de SIRET ou N° de
-          TVA intracommunautaire
+          Pour supprimer l'établissement, saisissez son SIRET ou N° de TVA
+          intracommunautaire
         </b>
         <br />
         <br />

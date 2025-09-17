@@ -60,7 +60,7 @@ type Mutation {
 
   """
   Mutation permettant de créer un nouveau BSFF à l'état de brouillon.
-  Les seuls champs requis sont le type du BSFF et le n°SIRET de l'émetteur, du transporteur ou du destinataire.
+  Les seuls champs requis sont le type du BSFF et le SIRET de l'émetteur, du transporteur ou du destinataire.
   """
   createDraftBsff(input: BsffInput!): Bsff!
 

@@ -137,9 +137,7 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "siret: siret n'est pas un numéro de SIRET valide"
-    );
+    expect(errors[0].message).toBe("siret: siret n'est pas un SIRET valide");
   });
 
   it("should throw if siret and PDF's siret are different", async () => {

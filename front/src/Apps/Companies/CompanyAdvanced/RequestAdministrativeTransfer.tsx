@@ -200,8 +200,8 @@ export function RequestAdministrativeTranfer({ company }: Props) {
             {[selectedCompany?.name, selectedCompany?.siret].join(" - ")} ?
           </p>
           <p className="tw-font-bold tw-mb-4">
-            Pour confirmer le transfert saisissez le numéro de SIRET de
-            l'établissement de départ
+            Pour confirmer le transfert saisissez le SIRET de l'établissement de
+            départ
           </p>
 
           <Input

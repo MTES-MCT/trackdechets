@@ -112,9 +112,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
               <p className="mb-3">
                 N° Agrément : {bsvhu?.emitter?.agrementNumber}
               </p>
-              <p className="mb-3">
-                N° SIRET : {bsvhu?.emitter?.company?.siret}
-              </p>
+              <p className="mb-3">SIRET : {bsvhu?.emitter?.company?.siret}</p>
               <p className="mb-3">
                 NOM (Raison sociale) : {bsvhu?.emitter?.company?.name}
               </p>
@@ -170,7 +168,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
                 N° Agrément : {bsvhu?.destination?.agrementNumber}
               </p>
               <p className="mb-3">
-                N° SIRET : {bsvhu?.destination?.company?.siret}
+                SIRET : {bsvhu?.destination?.company?.siret}
               </p>
               <p className="mb-3">
                 NOM (Raison sociale) : {bsvhu?.destination?.company?.name}
@@ -384,7 +382,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             <div>
               {/* <p className="mb-3">N° Agrément : {bsvhu.transporter.agrementNumber}</p> */}
               <p className="mb-3">
-                N° SIRET : {bsvhu?.transporter?.company?.siret}
+                SIRET : {bsvhu?.transporter?.company?.siret}
               </p>
               <p className="mb-3">
                 N° TVA intracommunautaire (le cas échéant) :{" "}
@@ -477,7 +475,7 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
                 N° Agrément : {bsvhu?.destination?.agrementNumber}
               </p>
               <p className="mb-3">
-                N° SIRET : {bsvhu?.destination?.company?.siret}
+                SIRET : {bsvhu?.destination?.company?.siret}
               </p>
               <p className="mb-3">
                 NOM (Raison sociale) : {bsvhu?.destination?.company?.name}

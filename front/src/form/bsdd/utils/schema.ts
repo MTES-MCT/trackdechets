@@ -113,7 +113,7 @@ export const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
   object().shape({
     siret: string()
-      .required("Intermédiaires: le N° SIRET est obligatoire")
+      .required("Intermédiaires: le SIRET est obligatoire")
       .test(
         "is-siret",
         "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",

@@ -193,7 +193,7 @@ describe("Mutation.publishBsdasri", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le N° SIRET du destinataire est un champ requis.",
+        message: "Le SIRET du destinataire est un champ requis.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

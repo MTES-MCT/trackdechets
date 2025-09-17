@@ -130,7 +130,7 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
     required: { from: transporterSignature }
   },
   transporterCompanySiret: {
-    readableFieldName: "Le N°SIRET du transporteur",
+    readableFieldName: "Le SIRET du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature,
@@ -282,7 +282,7 @@ export const bsffEditionRules: BsffEditionRules = {
   emitterCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N°SIRET de l'émetteur"
+    readableFieldName: "Le SIRET de l'émetteur"
   },
   emitterCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -368,7 +368,7 @@ export const bsffEditionRules: BsffEditionRules = {
   destinationCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N°SIRET de l'installation de destination"
+    readableFieldName: "Le SIRET de l'installation de destination"
   },
   destinationCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },

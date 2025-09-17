@@ -19,14 +19,14 @@ type Query {
   """
   Effectue une recherche floue sur la base SIRENE et enrichie
   avec des informations provenant de Trackdéchets
-  Si vous envoyez un numéro de SIRET ou de TVA la recherche renverra un seul item
+  Si vous envoyez un SIRET ou de TVA la recherche renverra un seul item
   idendique à celui de la requête companyInfos (ignorant alors le champ department).
   """
   searchCompanies(
     """
     Champ utilisé pour faire une recherche floue
     sur le nom de l'établissement, ex: 'Boulangerie Dupont',
-    ou sur le numéro de SIRET ou TVA intracommunautaire
+    ou sur le SIRET ou TVA intracommunautaire
     """
     clue: String!
     "(Optionnel) Filtre les résultats par numéro de département français"

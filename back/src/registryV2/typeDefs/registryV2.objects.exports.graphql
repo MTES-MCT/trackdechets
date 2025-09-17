@@ -78,7 +78,7 @@ type IncomingWasteV2 {
 
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  "Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
   "L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyAddress: String
@@ -99,7 +99,7 @@ type IncomingWasteV2 {
   emitterCompanyName: String
   "Le nom usuel de l'établissement expéditeur des déchets"
   emitterCompanyGivenName: String
-  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  "Le SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
   emitterCompanyAddress: String
@@ -125,7 +125,7 @@ type IncomingWasteV2 {
 
   "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
-  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
   "L'adresse de l'entreprise de travaux (amiante uniquement)"
   workerCompanyAddress: String
@@ -162,7 +162,7 @@ type IncomingWasteV2 {
   """
   ecoOrganismeName: String
   """
-  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
   """
@@ -170,7 +170,7 @@ type IncomingWasteV2 {
 
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String
-  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  "Le SIRET du négociant si le déchet est géré par un négociant"
   traderCompanySiret: String
   "Le numéro de récépissé du négociant mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un négociant"
   traderRecepisseNumber: String
@@ -179,7 +179,7 @@ type IncomingWasteV2 {
 
   "La raison sociale du courtier si le déchet est géré par un courtier"
   brokerCompanyName: String
-  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  "Le SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
   "Le numéro de récépissé du courtier mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un courtier"
   brokerRecepisseNumber: String
@@ -191,7 +191,7 @@ type IncomingWasteV2 {
   transporter1CompanyName: String
   "Le nom usuel du transporteur"
   transporter1CompanyGivenName: String
-  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  "Le SIRET du transporteur ou numéro de TVA le cas échéant"
   transporter1CompanySiret: String
   "L'adresse du transporteur"
   transporter1CompanyAddress: String
@@ -214,7 +214,7 @@ type IncomingWasteV2 {
   transporter2CompanyName: String
   "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyGivenName: String
-  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
@@ -237,7 +237,7 @@ type IncomingWasteV2 {
   transporter3CompanyName: String
   "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyGivenName: String
-  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
@@ -260,7 +260,7 @@ type IncomingWasteV2 {
   transporter4CompanyName: String
   "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyGivenName: String
-  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
@@ -283,7 +283,7 @@ type IncomingWasteV2 {
   transporter5CompanyName: String
   "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyGivenName: String
-  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
@@ -327,7 +327,7 @@ type IncomingWasteV2 {
   destinationCompanyName: String
   "Le nom usuel de l'établissement vers lequel le déchet est expédié"
   destinationCompanyGivenName: String
-  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  "Le SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "L'adresse de l'établissement vers lequel le déchet est expédié"
   destinationCompanyAddress: String
@@ -447,7 +447,7 @@ type OutgoingWasteV2 {
   weightIsEstimate: Boolean
   volume: Float
 
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  "Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
@@ -466,7 +466,7 @@ type OutgoingWasteV2 {
   emitterCompanyIrregularSituation: Boolean
   "Type d'émetteur"
   emitterCompanyType: String
-  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  "Le SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
@@ -494,7 +494,7 @@ type OutgoingWasteV2 {
   "Le pays de prise en charge"
   emitterPickupsiteCountry: String
 
-  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
   "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
@@ -527,7 +527,7 @@ type OutgoingWasteV2 {
   sisIdentifiers: [String]
 
   """
-  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
   """
@@ -539,7 +539,7 @@ type OutgoingWasteV2 {
   """
   ecoOrganismeName: String
 
-  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  "Le SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
   "La raison sociale du courtier si le déchet est géré par un courtier"
   brokerCompanyName: String
@@ -548,7 +548,7 @@ type OutgoingWasteV2 {
   "L'adresse email du contact du courtier"
   brokerCompanyMail: String
 
-  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  "Le SIRET du négociant si le déchet est géré par un négociant"
   traderCompanySiret: String
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String
@@ -560,7 +560,7 @@ type OutgoingWasteV2 {
   "Approvisionnement direct (pipeline, convoyeur)"
   isDirectSupply: Boolean
 
-  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  "Le SIRET du transporteur ou numéro de TVA le cas échéant"
   transporter1CompanySiret: String
   "La raison sociale du transporteur"
   transporter1CompanyName: String
@@ -587,7 +587,7 @@ type OutgoingWasteV2 {
   transporter2CompanyName: String
   "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyGivenName: String
-  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
@@ -610,7 +610,7 @@ type OutgoingWasteV2 {
   transporter3CompanyName: String
   "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyGivenName: String
-  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
@@ -633,7 +633,7 @@ type OutgoingWasteV2 {
   transporter4CompanyName: String
   "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyGivenName: String
-  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
@@ -656,7 +656,7 @@ type OutgoingWasteV2 {
   transporter5CompanyName: String
   "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyGivenName: String
-  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
@@ -696,7 +696,7 @@ type OutgoingWasteV2 {
   "Présence ou non de fichiers d'analyse texs"
   texsAnalysisFiles: Boolean
 
-  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  "Le SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
@@ -855,7 +855,7 @@ type TransportedWasteV2 {
 
   "Indique si l'émetteur est en situation irrégulière"
   emitterCompanyIrregularSituation: Boolean
-  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  "Le SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
@@ -883,7 +883,7 @@ type TransportedWasteV2 {
   "Le pays de prise en charge"
   emitterPickupsiteCountry: String
 
-  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
   "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
@@ -897,7 +897,7 @@ type TransportedWasteV2 {
   workerCompanyCountry: String
 
   """
-  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
   """
@@ -909,7 +909,7 @@ type TransportedWasteV2 {
   """
   ecoOrganismeName: String
 
-  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  "Le SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
   "La raison sociale du courtier si le déchet est géré par un courtier"
   brokerCompanyName: String
@@ -918,7 +918,7 @@ type TransportedWasteV2 {
   "L'adresse email du contact du courtier"
   brokerCompanyMail: String
 
-  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  "Le SIRET du négociant si le déchet est géré par un négociant"
   traderCompanySiret: String
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String
@@ -927,7 +927,7 @@ type TransportedWasteV2 {
   "L'adresse email du contact du négociant"
   traderCompanyMail: String
 
-  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  "Le SIRET du transporteur ou numéro de TVA le cas échéant"
   transporter1CompanySiret: String
   "La raison sociale du transporteur"
   transporter1CompanyName: String
@@ -956,7 +956,7 @@ type TransportedWasteV2 {
   transporter2CompanyName: String
   "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyGivenName: String
-  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
@@ -981,7 +981,7 @@ type TransportedWasteV2 {
   transporter3CompanyName: String
   "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyGivenName: String
-  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
@@ -1006,7 +1006,7 @@ type TransportedWasteV2 {
   transporter4CompanyName: String
   "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyGivenName: String
-  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
@@ -1031,7 +1031,7 @@ type TransportedWasteV2 {
   transporter5CompanyName: String
   "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyGivenName: String
-  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
@@ -1068,7 +1068,7 @@ type TransportedWasteV2 {
   "N° de CAP (Certificat d'acceptation préalable)"
   destinationCap: String
 
-  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  "Le SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
@@ -1126,7 +1126,7 @@ type ManagedWasteV2 {
   reportAsSiret: String
 
   """
-  Le numéro SIRET de l'établissement qui a géré le déchet
+  Le SIRET de l'établissement qui a géré le déchet
   """
   reportForSiret: String
 
@@ -1190,7 +1190,7 @@ type ManagedWasteV2 {
   managingStartDate: DateTime
   managingEndDate: DateTime
 
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  "Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
@@ -1209,7 +1209,7 @@ type ManagedWasteV2 {
   emitterCompanyIrregularSituation: Boolean
   "Type d'émetteur"
   emitterCompanyType: String
-  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  "Le SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
@@ -1250,7 +1250,7 @@ type ManagedWasteV2 {
   "Le pays de l'entreprise de tri/transit/regroupement"
   tempStorerCompanyCountryCode: String
 
-  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
   "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
@@ -1283,7 +1283,7 @@ type ManagedWasteV2 {
   sisIdentifiers: [String]
 
   """
-  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
   """
@@ -1295,7 +1295,7 @@ type ManagedWasteV2 {
   """
   ecoOrganismeName: String
 
-  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  "Le SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
   "La raison sociale du courtier si le déchet est géré par un courtier"
   brokerCompanyName: String
@@ -1304,7 +1304,7 @@ type ManagedWasteV2 {
   "L'adresse email du contact du courtier"
   brokerCompanyMail: String
 
-  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  "Le SIRET du négociant si le déchet est géré par un négociant"
   traderCompanySiret: String
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String
@@ -1316,7 +1316,7 @@ type ManagedWasteV2 {
   "Approvisionnement direct (pipeline, convoyeur)"
   isDirectSupply: Boolean
 
-  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  "Le SIRET du transporteur ou numéro de TVA le cas échéant"
   transporter1CompanySiret: String
   "La raison sociale du transporteur"
   transporter1CompanyName: String
@@ -1343,7 +1343,7 @@ type ManagedWasteV2 {
   transporter2CompanyName: String
   "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyGivenName: String
-  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
@@ -1366,7 +1366,7 @@ type ManagedWasteV2 {
   transporter3CompanyName: String
   "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyGivenName: String
-  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
@@ -1389,7 +1389,7 @@ type ManagedWasteV2 {
   transporter4CompanyName: String
   "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyGivenName: String
-  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
@@ -1412,7 +1412,7 @@ type ManagedWasteV2 {
   transporter5CompanyName: String
   "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyGivenName: String
-  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
@@ -1452,7 +1452,7 @@ type ManagedWasteV2 {
   "Présence ou non de fichiers d'analyse texs"
   texsAnalysisFiles: Boolean
 
-  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  "Le SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String
@@ -1589,7 +1589,7 @@ type AllWasteV2 {
   "Est-ce que la quantité de déchet est estimée ?"
   weightIsEstimate: Boolean
 
-  "Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
+  "Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanySiret: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
   initialEmitterCompanyName: String
@@ -1606,7 +1606,7 @@ type AllWasteV2 {
   emitterCompanyIrregularSituation: Boolean
   "Type d'émetteur"
   emitterCompanyType: String
-  "Le numéro SIRET de l'établissement expéditeur des déchets"
+  "Le SIRET de l'établissement expéditeur des déchets"
   emitterCompanySiret: String
   "La raison sociale de l'établissement expéditeur des déchets"
   emitterCompanyName: String
@@ -1634,7 +1634,7 @@ type AllWasteV2 {
   "Le pays de prise en charge"
   emitterPickupsiteCountry: String
 
-  "Le numéro SIRET de l'entreprise de travaux (amiante uniquement)"
+  "Le SIRET de l'entreprise de travaux (amiante uniquement)"
   workerCompanySiret: String
   "La raison sociale de l'entreprise de travaux (amiante uniquement)"
   workerCompanyName: String
@@ -1667,7 +1667,7 @@ type AllWasteV2 {
   sisIdentifiers: [String]
 
   """
-  Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+  Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
   le cadre d'une filière à responsabilité élargie du producteur définie à l'article L. 541-10-1 du code de l'environnement
   https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006834455&dateTexte=&categorieLien=cid
   """
@@ -1679,7 +1679,7 @@ type AllWasteV2 {
   """
   ecoOrganismeName: String
 
-  "Le N°SIRET du courtier si le déchet est géré par un courtier"
+  "Le SIRET du courtier si le déchet est géré par un courtier"
   brokerCompanySiret: String
   "La raison sociale du courtier si le déchet est géré par un courtier"
   brokerCompanyName: String
@@ -1688,7 +1688,7 @@ type AllWasteV2 {
   "L'adresse email du contact du courtier"
   brokerCompanyMail: String
 
-  "Le N°SIRET du négociant si le déchet est géré par un négociant"
+  "Le SIRET du négociant si le déchet est géré par un négociant"
   traderCompanySiret: String
   "La raison sociale du négociant si le déchet est géré par un négociant"
   traderCompanyName: String
@@ -1697,15 +1697,15 @@ type AllWasteV2 {
   "L'adresse email du contact du négociant"
   traderCompanyMail: String
 
-  "Le N°SIRET de l'intermédiaire n°1"
+  "Le SIRET de l'intermédiaire n°1"
   intermediary1CompanySiret: String
   "La raison sociale de l'intermédiaire n°1"
   intermediary1CompanyName: String
-  "Le N°SIRET de l'intermédiaire n°2"
+  "Le SIRET de l'intermédiaire n°2"
   intermediary2CompanySiret: String
   "La raison sociale de l'intermédiaire n°2"
   intermediary2CompanyName: String
-  "Le N°SIRET de l'intermédiaire n°3"
+  "Le SIRET de l'intermédiaire n°3"
   intermediary3CompanySiret: String
   "La raison sociale de l'intermédiaire n°3"
   intermediary3CompanyName: String
@@ -1713,7 +1713,7 @@ type AllWasteV2 {
   "Approvisionnement direct (pipeline, convoyeur)"
   isDirectSupply: Boolean
 
-  "Le N°SIRET du transporteur ou numéro de TVA le cas échéant"
+  "Le SIRET du transporteur ou numéro de TVA le cas échéant"
   transporter1CompanySiret: String
   "La raison sociale du transporteur"
   transporter1CompanyName: String
@@ -1744,7 +1744,7 @@ type AllWasteV2 {
   transporter2CompanyName: String
   "Le nom usuel du transporteur n°2 (en cas de transport multimodal)"
   transporter2CompanyGivenName: String
-  "Le N°SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°2 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter2CompanySiret: String
   "L'adresse du transporteur n°2 (en cas de transport multi-modal)"
   transporter2CompanyAddress: String
@@ -1771,7 +1771,7 @@ type AllWasteV2 {
   transporter3CompanyName: String
   "Le nom usuel du transporteur n°3 (en cas de transport multimodal)"
   transporter3CompanyGivenName: String
-  "Le N°SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°3 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter3CompanySiret: String
   "L'adresse du transporteur n°3 (en cas de transport multi-modal)"
   transporter3CompanyAddress: String
@@ -1798,7 +1798,7 @@ type AllWasteV2 {
   transporter4CompanyName: String
   "Le nom usuel du transporteur n°4 (en cas de transport multimodal)"
   transporter4CompanyGivenName: String
-  "Le N°SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°4 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter4CompanySiret: String
   "L'adresse du transporteur n°4 (en cas de transport multi-modal)"
   transporter4CompanyAddress: String
@@ -1825,7 +1825,7 @@ type AllWasteV2 {
   transporter5CompanyName: String
   "Le nom usuel du transporteur n°5 (en cas de transport multimodal)"
   transporter5CompanyGivenName: String
-  "Le N°SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
+  "Le SIRET du transporteur n°5 ou numéro de TVA le cas échéant (en cas de transport multimodal)"
   transporter5CompanySiret: String
   "L'adresse du transporteur n°5 (en cas de transport multi-modal)"
   transporter5CompanyAddress: String
@@ -1866,7 +1866,7 @@ type AllWasteV2 {
 
   wasteDap: String
 
-  "Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+  "Le SIRET de l'établissement vers lequel le déchet est expédié"
   destinationCompanySiret: String
   "La raison sociale de l'établissement vers lequel le déchet est expédié"
   destinationCompanyName: String

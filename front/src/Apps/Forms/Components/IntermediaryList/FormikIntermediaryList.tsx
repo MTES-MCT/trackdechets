@@ -9,7 +9,7 @@ import CompanySelectorWrapper, {
 import CompanyContactInfo from "../CompanyContactInfo/CompanyContactInfo";
 
 type FormikIntermediaryListProps = {
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled: boolean;
 };
