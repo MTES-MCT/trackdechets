@@ -1362,6 +1362,9 @@ export const getWorkflowLabel = (
     case EmitterType.Producer:
       return WorkflowDisplayType.Initial;
 
+    case EmitterType.Other:
+      return WorkflowDisplayType.Initial;
+
     default:
       return WorkflowDisplayType.DEFAULT;
   }
