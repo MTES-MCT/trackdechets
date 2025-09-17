@@ -51,11 +51,11 @@ const clickOnVhuSecondaryMenuButton = async (
  */
 const fillEmitterTab = async (page: Page, emitter) => {
   // First, make sure input is empty
-  await page.getByLabel("N°SIRET ou raison sociale").click();
+  await page.getByLabel("SIRET ou raison sociale").click();
   await expect(page.getByText("Aucune entreprise sélectionnée")).toBeVisible();
 
   // Then, fill siret and select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(emitter.orgId);
+  await page.getByLabel("SIRET ou raison sociale").fill(emitter.orgId);
   const portal = await page.locator("#portal-root");
   await portal.getByText(`${emitter.name} - ${emitter.orgId}`).click();
 
@@ -148,11 +148,11 @@ export const fillWasteTab = async (page: Page) => {
  * Fill third tab info, "Transporteur du déchet"
  */
 export const fillTransporterTab = async (page: Page, transporter) => {
-  await page.getByLabel("N°SIRET ou raison sociale").click();
+  await page.getByLabel("SIRET ou raison sociale").click();
   await expect(page.getByText("Aucune entreprise sélectionnée")).toBeVisible();
 
   // Then, fill siret and select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(transporter.orgId);
+  await page.getByLabel("SIRET ou raison sociale").fill(transporter.orgId);
   const portal = await page.locator("#portal-root");
   await portal.getByText(`${transporter.name} - ${transporter.orgId}`).click();
 
@@ -210,7 +210,7 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page.getByText("Broyeur agréé").click();
 
   // Select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(destination.orgId);
+  await page.getByLabel("SIRET ou raison sociale").fill(destination.orgId);
 
   // Transporter should be selected automatically
   const portal = page.locator("#portal-root");

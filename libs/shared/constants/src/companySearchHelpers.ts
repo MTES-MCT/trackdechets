@@ -111,7 +111,7 @@ export const cleanClue = (clue: string): string =>
   clue ? clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase() : "";
 
 /**
- * Validateur de numéro de SIRETs
+ * Validateur de SIRETs
  * @param clue string to validate
  * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
  * @returns true if the clue is a valid SIRET

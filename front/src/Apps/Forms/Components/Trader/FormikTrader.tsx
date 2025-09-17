@@ -7,7 +7,7 @@ import useTrader from "./useTrader";
 
 type FormikTraderProps = {
   bsdType: BsdType;
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
 };

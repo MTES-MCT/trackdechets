@@ -136,7 +136,7 @@ export const USER_ROLES_CACHE_KEY = "UserRoles";
 
 /**
  * Retrieves roles of a user in the different companies to which
- * he or she belongs. The companies are identified by their n°SIRET
+ * he or she belongs. The companies are identified by their SIRET
  * or VAT number. Exemple :
  *
  * {

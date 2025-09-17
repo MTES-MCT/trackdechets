@@ -54,7 +54,7 @@ export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
     .string({
       required_error: `${
         expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
-      }le N° SIRET est obligatoire`
+      }le SIRET est obligatoire`
     })
     .refine(
       value => {
@@ -67,7 +67,7 @@ export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
         path: pathFromCompanyRole(expectedCompanyRole),
         message: `${
           expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
-        }${val} n'est pas un numéro de SIRET valide`
+        }${val} n'est pas un SIRET valide`
       })
     );
 export const vatNumberSchema = z.string().refine(

@@ -471,7 +471,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
             value={ficheIntervention.detenteur?.company?.name}
           />
           <DetailRow
-            label="N° SIRET"
+            label="SIRET"
             value={ficheIntervention.detenteur?.company?.siret}
           />
           <DetailRow

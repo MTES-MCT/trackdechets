@@ -162,7 +162,7 @@ export const siret = yup
   .nullable() // makes sure `null` does not throw a type error
   .test(
     "is-siret",
-    "${path}: ${originalValue} n'est pas un numéro de SIRET valide",
+    "${path}: ${originalValue} n'est pas un SIRET valide",
     value => !value || isSiret(value)
   );
 
@@ -204,7 +204,7 @@ export const siretConditions: SiretConditions = {
         .notRequired()
         .test(
           "is-null-or-undefined-when-is-foreign-ship",
-          "Émetteur : vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger",
+          "Émetteur : vous ne pouvez pas enregistrer un SIRET en cas d'émetteur navire étranger",
           value => !value
         );
     }
@@ -219,7 +219,7 @@ export const siretConditions: SiretConditions = {
         .notRequired()
         .test(
           "is-null-or-undefined-when-is-private-individual",
-          "${path} : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier",
+          "${path} : vous ne pouvez pas renseigner de SIRET lorsque l'émetteur ou le détenteur est un particulier",
           value => !value
         );
     }
@@ -495,7 +495,7 @@ export const vatNumberTests: VatNumberTests = {
 export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: siret
     .label("Intermédiaires")
-    .required("Intermédiaires : le N° SIRET est obligatoire"),
+    .required("Intermédiaires : le SIRET est obligatoire"),
   contact: yup
     .string()
     .required(

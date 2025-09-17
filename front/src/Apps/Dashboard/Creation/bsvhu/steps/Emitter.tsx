@@ -219,7 +219,7 @@ const EmitterBsvhu = ({ errors }) => {
             <SingleCheckbox
               options={[
                 {
-                  label: "L'installation n'a pas de numéro SIRET",
+                  label: "L'installation n'a pas de SIRET",
                   nativeInputProps: {
                     ...register("emitter.noSiret"),
                     onClick: onNoSiretClick

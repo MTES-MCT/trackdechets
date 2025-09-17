@@ -91,7 +91,7 @@ export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
 export const MISSING_COMPANY_VAT =
   "Le numéro de TVA de l'entreprise est obligatoire";
 export const MISSING_COMPANY_SIRET_OR_VAT =
-  "Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire";
+  "Le SIRET ou le numéro de TVA intracommunautaire est obligatoire";
 export const MISSING_COMPANY_ADDRESS =
   "L'adresse de l'entreprise est obligatoire";
 export const MISSING_COMPANY_CONTACT =
