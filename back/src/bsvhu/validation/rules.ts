@@ -125,7 +125,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   emitterNoSiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "La présence ou absence de N° SIRET de l'émetteur",
+    readableFieldName: "La présence ou absence de SIRET de l'émetteur",
     path: ["emitter", "noSiret"]
   },
   emitterCompanyName: {
@@ -141,7 +141,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       // il y a un SIRET émetteur
       when: bsvhu => !bsvhu.emitterNoSiret
     },
-    readableFieldName: "Le N° SIRET de l'émetteur",
+    readableFieldName: "Le SIRET de l'émetteur",
     path: ["emitter", "company", "siret"]
   },
   emitterCompanyAddress: {
@@ -243,7 +243,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationCompanySiret: {
     sealed: { from: "TRANSPORT" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° SIRET du destinataire",
+    readableFieldName: "Le SIRET du destinataire",
     path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
@@ -333,7 +333,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   },
   destinationOperationNextDestinationCompanySiret: {
     sealed: { from: "OPERATION" },
-    readableFieldName: "Le N° SIRET de l'exutoire",
+    readableFieldName: "Le SIRET de l'exutoire",
     path: ["destination", "operation", "nextDestination", "company", "siret"]
   },
   destinationOperationNextDestinationCompanyVatNumber: {
@@ -350,7 +350,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyName: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -361,7 +361,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyAddress: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -372,7 +372,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyContact: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -383,7 +383,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyPhone: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -394,7 +394,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
   destinationOperationNextDestinationCompanyMail: {
     sealed: { from: "OPERATION" },
     required: {
-      from: "EMISSION",
+      from: "OPERATION",
       // il y a un SIRET d'exutoire
       when: bsvhu =>
         Boolean(bsvhu.destinationOperationNextDestinationCompanySiret)
@@ -466,7 +466,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     path: ["weight", "isEstimate"]
   },
   transporterCompanySiret: {
-    readableFieldName: "le N° SIRET du transporteur",
+    readableFieldName: "le SIRET du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",

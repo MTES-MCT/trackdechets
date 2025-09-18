@@ -51,7 +51,7 @@ Le principe de zod est de créer un schéma qui contient des règles de validati
 
 La déclaration d'un schéma Zod pour un type de bordereau donnée se fait en composant plusieurs étapes :
 
-- Déclaration d'un schéma de validation "statique" permettant de définir les types de chaque champ et des règles de validation simples (ex: un email doit ressembler à un email, un N°SIRET doit faire 14 caractères, il peut y avoir au maximum 2 plaques d'immatriculations) ainsi que des valeurs par défaut.
+- Déclaration d'un schéma de validation "statique" permettant de définir les types de chaque champ et des règles de validation simples (ex: un email doit ressembler à un email, un SIRET doit faire 14 caractères, il peut y avoir au maximum 2 plaques d'immatriculations) ainsi que des valeurs par défaut.
 - Déclaration de règles de validation plus complexes (via la méthode `superRefine`) faisant intervenir plusieurs champs ou des appels asynchrones à la base de données (ex: la raison du refus doit être renseignée si le déchet est refusé, la date de l'opération doit être postérieure à la date de l'acceptation, les identifiants des bordereaux à regrouper doivent correspondre à des bordereaux en attente de regroupement, etc).
 - Déclaration de `transformers` permettant de modifier les données (ex: auto-compléter les récépissés transporteurs à partir de la base de données, auto-compléter le nom et l'adresse à partir de la base SIRENE, etc).
 

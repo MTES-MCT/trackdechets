@@ -112,7 +112,7 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
             <PreviewTextRow
               label="SIRET"
               value={
-                bsd.destination?.operation?.nextDestination?.company?.siret
+                bsd.destination?.operation?.nextDestination?.company?.orgId
               }
             />
 

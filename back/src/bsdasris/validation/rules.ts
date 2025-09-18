@@ -137,7 +137,7 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
     required: {
       from: "EMISSION"
     },
-    readableFieldName: "Le N° SIRET de l'émetteur",
+    readableFieldName: "Le SIRET de l'émetteur",
     path: ["emitter", "company", "siret"]
   },
 
@@ -241,7 +241,7 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   // transporter
 
   transporterCompanySiret: {
-    readableFieldName: "le N° SIRET du transporteur",
+    readableFieldName: "le SIRET du transporteur",
     sealed: { from: "TRANSPORT" },
     required: {
       from: "TRANSPORT",
@@ -448,7 +448,7 @@ export const bsdasriEditionRules: BsdasriEditionRules = {
   destinationCompanySiret: {
     sealed: { from: "RECEPTION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° SIRET du destinataire",
+    readableFieldName: "Le SIRET du destinataire",
     path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {

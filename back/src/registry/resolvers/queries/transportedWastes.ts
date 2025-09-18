@@ -27,7 +27,7 @@ const transportedWastesResolver: QueryResolvers["transportedWastes"] = async (
         user,
         [siret].filter(Boolean),
         Permission.RegistryCanRead,
-        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${siret}`
       );
     }
   }

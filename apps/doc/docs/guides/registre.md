@@ -45,7 +45,7 @@ query {
         emitterPickupsiteAddress
         #La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs
         initialEmitterCompanyName
-        #Le numéro SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs
+        #Le SIRET du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs
         initialEmitterCompanySiret
         #L'adresse du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs
         initialEmitterCompanyAddress
@@ -54,24 +54,24 @@ query {
         #la raison sociale de l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
         #le cadre d'une filière à responsabilité élargie du producteur
         ecoOrganismeName
-        #Le N°SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
+        #Le SIREN l'éco-organisme si le déchet est pris en charge par un éco-organisme mis en place dans
         #le cadre d'une filière à responsabilité élargie du producteur
         ecoOrganismeSiren
         #La raison sociale du négociant si le déchet est géré par un négociant
         traderCompanyName
-        #Le N°SIRET du négociant si le déchet est géré par un négociant
+        #Le SIRET du négociant si le déchet est géré par un négociant
         traderCompanySiret
         #Le numéro de récépissé du négociant mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un négociant
         traderRecepisseNumber
         #La raison sociale du courtier si le déchet est géré par un courtier
         brokerCompanyName
-        #Le N°SIRET du courtier si le déchet est géré par un courtier"
+        #Le SIRET du courtier si le déchet est géré par un courtier"
         brokerCompanySiret
         #Le numéro de récépissé du courtier mentionné à l'article R. 541-56 du code de l'environnement si le déchet est géré par un courtier
         brokerRecepisseNumber
         #La raison sociale du transporteur
         transporterCompanyName
-        #Le N°SIRET du transporteur
+        #Le SIRET du transporteur
         transporterCompanySiret
         #Le numéro de récépissé du trasnporteur mentionné à l'article R. 541-53 du code de l'environnement
         transporterRecepisseNumber
@@ -79,7 +79,7 @@ query {
         transporterCompanyAddress
         #La raison sociale de l'établissement vers lequel le déchet est expédié
         destinationCompanyName
-        #Le N°SIRET de l'établissement vers lequel le déchet est expédié"
+        #Le SIRET de l'établissement vers lequel le déchet est expédié"
         destinationCompanySiret
         #L'adresse de l'établissement vers lequel le déchet est expédié"
         destinationCompanyAddress
@@ -129,6 +129,3 @@ Vous recevrez en réponse un lien de téléchargement à utiliser pour télécha
 ```
 
 Ce lien n'est valide que 10 secondes, il est donc nécessaire d'enchainer dans votre code client l'appel à la query GraphQL `wastesRegistryCsv` `wastesRegistryXls` puis une requête `GET` classique sur le lien de téléchargement.
-
-
-

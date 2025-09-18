@@ -102,7 +102,7 @@ describe("ficheInterventionSchema", () => {
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Détenteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
+      "Détenteur : vous ne pouvez pas renseigner de SIRET lorsque l'émetteur ou le détenteur est un particulier"
     );
   });
 });

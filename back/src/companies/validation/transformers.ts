@@ -9,7 +9,7 @@ export const setCompanyOrgId = (
   if (!orgId) {
     ctx.addIssue({
       code: "custom",
-      message: "Un n°SIRET ou n°TVA (hors France) doit être précisé"
+      message: "Un SIRET ou n°TVA (hors France) doit être précisé"
     });
   }
   return { ...company, orgId: orgId! };

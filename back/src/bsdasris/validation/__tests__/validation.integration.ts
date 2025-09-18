@@ -130,7 +130,7 @@ describe("validation > parseBsdasri", () => {
       }
     });
 
-    it("should throw when N°SIRETs are invalid", () => {
+    it("should throw when SIRETs are invalid", () => {
       const invalidZodBsdasri: ZodBsdasri = {
         ...bsdasri,
         emitterCompanySiret: "foo1",
@@ -144,22 +144,22 @@ describe("validation > parseBsdasri", () => {
         expect(e.errors).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
-              message: "Émetteur : foo1 n'est pas un numéro de SIRET valide"
+              message: "Émetteur : foo1 n'est pas un SIRET valide"
             }),
 
             expect.objectContaining({
-              message: "Destination : foo2 n'est pas un numéro de SIRET valide"
+              message: "Destination : foo2 n'est pas un SIRET valide"
             }),
 
             expect.objectContaining({
-              message: "Transporteur : foo3 n'est pas un numéro de SIRET valide"
+              message: "Transporteur : foo3 n'est pas un SIRET valide"
             })
           ])
         );
       }
     });
 
-    it("should parse correctly when n°SIRETs are valid", () => {
+    it("should parse correctly when SIRETs are valid", () => {
       const zodBsdasri: ZodBsdasri = {
         ...bsdasri,
         emitterCompanySiret: siretify(),
@@ -285,7 +285,7 @@ describe("validation > parseBsdasri", () => {
         expect(e.errors).toEqual(
           expect.arrayContaining([
             expect.objectContaining({
-              message: "Destination : 1 n'est pas un numéro de SIRET valide"
+              message: "Destination : 1 n'est pas un SIRET valide"
             })
           ])
         );

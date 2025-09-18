@@ -29,7 +29,7 @@ export async function checkWastesRegistryDownloadPermissions(
         userRoles,
         [siret].filter(Boolean),
         Permission.RegistryCanRead,
-        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${siret}`
       );
     }
   }

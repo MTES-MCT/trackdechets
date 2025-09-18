@@ -308,7 +308,7 @@ describe("BSDA parsing", () => {
           currentSignatureType: "TRANSPORT"
         });
 
-      expect(parseFn).toThrow("1 n'est pas un numéro de SIRET valide");
+      expect(parseFn).toThrow("1 n'est pas un SIRET valide");
     });
 
     test("when transporter siret is not valid", () => {
@@ -327,7 +327,7 @@ describe("BSDA parsing", () => {
           currentSignatureType: "TRANSPORT"
         });
 
-      expect(parseFn).toThrow("1 n'est pas un numéro de SIRET valide");
+      expect(parseFn).toThrow("1 n'est pas un SIRET valide");
     });
 
     test("when transporter VAT number is FR", () => {
@@ -438,7 +438,7 @@ describe("BSDA parsing", () => {
 
       const parseFn = () => parseBsda(data, context);
 
-      expect(parseFn).toThrow("1 n'est pas un numéro de SIRET valide");
+      expect(parseFn).toThrow("1 n'est pas un SIRET valide");
     });
 
     test("when destination is not registered in Trackdéchets", async () => {

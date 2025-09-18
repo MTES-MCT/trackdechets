@@ -33,7 +33,7 @@ interface CompanySelectorWrapperProps {
   // Permet de valider que l'établissement sélectionné satisfait certains
   // critères (ex : inscrit sur Trackdéchets avec un profil spécifique)
   selectedCompanyError?: (company?: CompanySearchResult) => string | null;
-  // Numéro SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
+  // SIRET ou VAT de l'établissement courant (utile pour le calcul des favoris)
   orgId?: string;
   disabled?: boolean;
 }

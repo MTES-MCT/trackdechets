@@ -491,7 +491,7 @@ describe("TransporterForm", () => {
           bsdType
         })
       );
-      const searchInput = screen.getByLabelText("N°SIRET ou raison sociale", {
+      const searchInput = screen.getByLabelText("SIRET ou raison sociale", {
         exact: false
       });
 
@@ -693,7 +693,7 @@ describe("TransporterForm", () => {
           bsdType
         })
       );
-      const searchInput = screen.getByLabelText("N°SIRET ou raison sociale", {
+      const searchInput = screen.getByLabelText("SIRET ou raison sociale", {
         exact: false
       });
 

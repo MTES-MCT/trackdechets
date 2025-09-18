@@ -173,14 +173,24 @@
 
       @font-face {
         font-family: "Marianne-td";
-        src: url("https://github.com/MTES-MCT/trackdechets-website/raw/master/src/components/assets/Marianne-Regular.woff2")
+        src: url("https://td-storage.s3.fr-par.scw.cloud/Marianne/Marianne-Regular.woff2")
             format("woff2"),
-          url("https://github.com/MTES-MCT/trackdechets-website/raw/master/src/components/assets/Marianne-Regular.woff")
+          url("https://td-storage.s3.fr-par.scw.cloud/Marianne/Marianne-Regular.woff")
             format("woff");
+        font-weight: 400;
+        font-style: normal;
+      }
+      /* Bold */
+      @font-face {
+        font-family: "Marianne-td";
+        src: url("https://td-storage.s3.fr-par.scw.cloud/Marianne/Marianne-Bold.woff2")
+          format("woff2");
+        font-weight: 700;
+        font-style: normal;
       }
 
       .content {
-        margin-top: 100px;
+        margin-top: 70px;
         font-size: 14px;
       }
 
@@ -290,7 +300,6 @@
             <br />
 
             <p>À l’attention de {{ user_name }},</p>
-            <br />
 
             <p>Madame, Monsieur,</p>
             <p>
@@ -301,7 +310,6 @@
               ou indisponibles, nous souhaitons nous assurer de la légitimité de
               votre démarche.
             </p>
-            <br />
 
             <p><b>Code de vérification</b></p>
             <p class="code-verification">{{ code }}</p>
