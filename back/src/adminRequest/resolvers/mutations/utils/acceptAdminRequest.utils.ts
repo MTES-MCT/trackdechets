@@ -82,13 +82,26 @@ export const checkCanAcceptAdminRequest = async (
     return true;
   }
 
+  // Company admins can accept any request
+  if (companyAssociation?.role === UserRole.ADMIN) {
+    return true;
+  }
+
   // Make sure user is designated collaborator
   if (
     adminRequest.validationMethod ===
       AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL &&
-    !user.isAdmin &&
-    companyAssociation?.role !== UserRole.ADMIN &&
     user.id !== adminRequest.collaboratorId
+  ) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à effectuer cette action."
+    );
+  }
+
+  // Must be approved by admins only
+  if (
+    adminRequest.validationMethod ===
+    AdminRequestValidationMethod.REQUEST_ADMIN_APPROVAL
   ) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à effectuer cette action."
@@ -98,8 +111,7 @@ export const checkCanAcceptAdminRequest = async (
   // Only admins can accept a request in the initial time period
   if (
     adminRequest.adminOnlyEndDate &&
-    new Date().getTime() < new Date(adminRequest.adminOnlyEndDate).getTime() &&
-    (!companyAssociation || companyAssociation?.role !== UserRole.ADMIN)
+    new Date().getTime() < new Date(adminRequest.adminOnlyEndDate).getTime()
   ) {
     throw new ForbiddenError(
       "Seuls les administrateurs de l'établissement peuvent approuver la demande à ce stade."
@@ -130,7 +142,6 @@ export const checkCanAcceptAdminRequest = async (
   // Acceptation by mail: code must be correct, 3 attempts max
   // Company admins can validate with the code though
   if (
-    (!companyAssociation || companyAssociation.role !== UserRole.ADMIN) &&
     adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL &&
     adminRequestInput.code !== adminRequest.code
   ) {
