@@ -252,7 +252,6 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                 <Input
                   label="Personne à contacter"
                   nativeInputProps={{
-                    value: bsda.transporter?.company?.contact ?? "",
                     ...register("company.contact")
                   }}
                 />
@@ -262,7 +261,6 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                   <Input
                     label="Téléphone"
                     nativeInputProps={{
-                      value: bsda.transporter?.company?.phone ?? "",
                       ...register("company.phone")
                     }}
                   />
@@ -271,7 +269,6 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
                   <Input
                     label="Courriel"
                     nativeInputProps={{
-                      value: bsda.transporter?.company?.mail ?? "",
                       ...register("company.mail")
                     }}
                   />
