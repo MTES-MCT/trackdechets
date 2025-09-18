@@ -815,6 +815,10 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     readableFieldName: "La consistance"
   },
+  wasteConsistenceDescription: {
+    sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    readableFieldName: "La description de la consistance"
+  },
   wasteSealNumbers: {
     readableFieldName: "Le(s) numéro(s) de scellés",
     sealed: { from: "WORK" }

@@ -162,6 +162,8 @@ type BsdaWaste {
   materialName: String
   "Consistence"
   consistence: BsdaConsistence
+  "Détail de la consistance, dans le cas où la consistance est 'AUTRE'"
+  consistenceDescription: String
   "Numéros de scellés"
   sealNumbers: [String!]
   "Si le déchet est soumis à l'ADR ou non"
