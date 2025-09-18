@@ -2359,6 +2359,90 @@ describe("Mutation.Bsda.sign", () => {
       expect(data.signBsda.status).toBe("RECEIVED");
     });
 
+    it("should be able to sign reception after transport even if transporter 2 hasn't signed yet", async () => {
+      // Given
+      const emitter = await userWithCompanyFactory("ADMIN");
+      const transporter1 = await userWithCompanyFactory("ADMIN");
+      const transporter2 = await userWithCompanyFactory("ADMIN");
+      await transporterReceiptFactory({
+        company: transporter1.company,
+        number: "rec-1"
+      });
+
+      // Crée un BSDA avec la signature du premier transporteur
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitter.company.siret,
+          emitterCompanyName: emitter.company.name,
+          emitterEmissionSignatureDate: new Date("2018-12-11T00:00:00.000Z"),
+          destinationCompanySiret: destinationCompany.siret,
+          destinationOperationDate: null
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter1.company.siret,
+          transporterTransportSignatureDate: new Date(
+            "2018-12-12T00:00:00.000Z"
+          )
+        }
+      });
+
+      // Ajoute un second transporteur qui n'a pas encore signé
+      await bsdaTransporterFactory({
+        bsdaId: bsda.id,
+        opts: {
+          transporterCompanySiret: transporter2.company.siret,
+          transporterTransportSignatureDate: null,
+          transporterTransportPlates: []
+        }
+      });
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateBsda(
+        destinationUser,
+        bsda.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              weight: 20,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors, data } = await signBsda(
+        destinationUser,
+        bsda.id,
+        "RECEPTION"
+      );
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.destination?.reception?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsda.destination?.reception?.signature?.date).toBe(
+        SIGNATURE_DATE
+      );
+      expect(data.signBsda.status).toBe("RECEIVED");
+
+      const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: { transporters: true }
+      });
+
+      // le second transporteur qui n'a pas signé ne doit plus apparaitre sur le bordereau
+      expect(updatedBsda.transporters).toHaveLength(1);
+      expect(updatedBsda.transporters[0].transporterCompanySiret).toEqual(
+        transporter1.company.siret
+      );
+    });
+
     it("new status should be REFUSED for COLLECTION_2710 is waste is refused", async () => {
       // Given
       const bsda = await bsdaFactory({
