@@ -12,12 +12,6 @@ import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@prisma/client";
 import { getDefaultNotifications } from "../../../notifications";
-import {
-  genUserRolesCacheKey,
-  getUserSessions
-} from "../../../../common/redis/users";
-import { app } from "../../../../server";
-import { logIn } from "../../../../__tests__/auth.helper";
 import { getUserRoles } from "../../../../permissions/permissions";
 
 const CHANGE_USER_ROLE = `
