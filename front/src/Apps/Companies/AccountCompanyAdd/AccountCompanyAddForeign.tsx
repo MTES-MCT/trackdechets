@@ -91,7 +91,7 @@ const localizedStrings = {
     companyName: "Nom de l'entreprise",
     address: "Adresse",
     contact: "Nom du responsable",
-    contactEmail: "Mail de la personne responsable",
+    contactEmail: "Courriel de la personne responsable",
     contactPhone: {
       label: "Téléphone",
       hint: "Exemple : +3212234567"

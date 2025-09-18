@@ -58,7 +58,7 @@ type CompanyProps = {
 const Company = ({ company, cap, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
-    <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>SIRET</dt> <dd>{company?.siret}</dd>
     <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
@@ -315,7 +315,7 @@ const Trader = ({ trader }) => (
       <dt>Négociant</dt>
       <dd>{trader.company?.name}</dd>
 
-      <dt>Siret</dt>
+      <dt>SIRET</dt>
       <dd>{trader.company?.siret}</dd>
 
       <dt>Adresse</dt>
@@ -346,7 +346,7 @@ const Broker = ({ broker }) => (
       <dt>Courtier</dt>
       <dd>{broker.company?.name}</dd>
 
-      <dt>Siret</dt>
+      <dt>SIRET</dt>
       <dd>{broker.company?.siret}</dd>
 
       <dt>Adresse</dt>
@@ -380,7 +380,7 @@ const Intermediaries = ({ intermediaries }) => (
           <dt>Établissement intermédiaire</dt>
           <dd>{intermediary?.name}</dd>
 
-          <dt>Siret</dt>
+          <dt>SIRET</dt>
           <dd>{intermediary?.siret}</dd>
 
           <dt>Numéro de TVA</dt>

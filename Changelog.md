@@ -5,11 +5,18 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.09.1] 23/09/2025
+
+#### :bug: Corrections de bugs
+
+- Suppression du message d'erreur en double sur les numéros d'identification dans le formulaire BSVHU [PR 4400](https://github.com/MTES-MCT/trackdechets/pull/4400)
+
 # [2025.08.1] 26/08/2025
 
 #### :nail_care: Améliorations
 
 - Autorisation pour les établissements Rubrique 2710 de sélectionner un code de traitement D13 ou R12 [PR 4359](https://github.com/MTES-MCT/trackdechets/pull/4359)
+- Autorisation pour les établissements Rubrique 2710 d'être émetteur sur BSDASRI de regroupement [PR 4376](https://github.com/MTES-MCT/trackdechets/pull/4376)
 - Changement des règles de scellées BSVHU [PR 4341](https://github.com/MTES-MCT/trackdechets/pull/4341)
 
 #### :bug: Corrections de bugs

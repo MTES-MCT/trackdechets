@@ -18,12 +18,12 @@ import { RedErrorMessage } from "../../common/components";
 import { getInitialCompany } from "../../Apps/common/data/initialState";
 import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
 
-export default function Emitter({ disabled }) {
+export default function Emitter({ disabled, form }) {
   const ctx = useFormikContext<Form>();
 
   const { values, handleChange, setFieldValue, initialValues } = ctx;
 
-  const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
+  const hasInitialGrouping = !!initialValues?.grouping?.length; // SIRET is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
   const isGrouping = [EmitterType.Appendix2, EmitterType.Appendix1].some(
     type => values.emitter?.type === type
@@ -31,6 +31,8 @@ export default function Emitter({ disabled }) {
 
   const isForeignShipOrPrivateIndividual =
     values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual;
+
+  const isFormSignedByEmitter = !!form?.emittedAt;
 
   const lockEmitterProducer =
     disabled || hasInitialGrouping || isForeignShipOrPrivateIndividual;
@@ -109,7 +111,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterProducer}
+            disabled={lockEmitterProducer || isFormSignedByEmitter}
           />
           <Field
             name="emitter.type"
@@ -117,7 +119,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["OTHER"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterProducer}
+            disabled={lockEmitterProducer || isFormSignedByEmitter}
           />
           <Field
             name="emitter.type"
@@ -125,7 +127,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["APPENDIX2"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterProducer}
+            disabled={lockEmitterProducer || isFormSignedByEmitter}
           />
 
           <Field
@@ -149,7 +151,9 @@ export default function Emitter({ disabled }) {
             }
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterProducer || lockAppendix1}
+            disabled={
+              lockEmitterProducer || lockAppendix1 || isFormSignedByEmitter
+            }
           />
         </fieldset>
         {hasEcoOrganisme &&
@@ -194,7 +198,7 @@ export default function Emitter({ disabled }) {
         <div className="form__row">
           <label>
             <Field
-              disabled={disabled}
+              disabled={disabled || isFormSignedByEmitter}
               type="checkbox"
               name="emitter.isPrivateIndividual"
               className="td-checkbox"
@@ -208,7 +212,7 @@ export default function Emitter({ disabled }) {
           </label>
           <label>
             <Field
-              disabled={disabled}
+              disabled={disabled || isFormSignedByEmitter}
               type="checkbox"
               name="emitter.isForeignShip"
               className="td-checkbox"
@@ -231,7 +235,7 @@ export default function Emitter({ disabled }) {
                 type="text"
                 name="emitter.company.name"
                 className="td-input"
-                disabled={disabled}
+                disabled={disabled || isFormSignedByEmitter}
               />
             </label>
           </div>
@@ -242,7 +246,7 @@ export default function Emitter({ disabled }) {
                 type="text"
                 name="emitter.company.address"
                 className="td-input"
-                disabled={disabled}
+                disabled={disabled || isFormSignedByEmitter}
               />
             </label>
           </div>
@@ -259,7 +263,7 @@ export default function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail (optionnel)
+              Courriel (optionnel)
               <Field
                 type="text"
                 name="emitter.company.mail"
@@ -280,7 +284,7 @@ export default function Emitter({ disabled }) {
                 name="emitter.company.omiNumber"
                 placeholder="OMI1234567"
                 className="td-input"
-                disabled={disabled}
+                disabled={disabled || isFormSignedByEmitter}
                 validate={omiNumberValidator}
               />
               <RedErrorMessage name="emitter.company.omiNumber" />
@@ -305,7 +309,7 @@ export default function Emitter({ disabled }) {
                 type="text"
                 name="emitter.company.address"
                 className="td-input"
-                disabled={disabled}
+                disabled={disabled || isFormSignedByEmitter}
               />
             </label>
           </div>
@@ -322,7 +326,7 @@ export default function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail (optionnel)
+              Courriel (optionnel)
               <Field
                 type="text"
                 name="emitter.company.mail"

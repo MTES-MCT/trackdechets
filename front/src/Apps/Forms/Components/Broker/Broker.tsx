@@ -9,7 +9,7 @@ import Recepisse from "../../../Dashboard/Components/Recepisse/Recepisse";
 import { CommonBrokerInput } from "./types";
 
 type FormikBrokerProps = {
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
   // Set les données vers le store Formik ou Rhf en fonctionde l'implémentation

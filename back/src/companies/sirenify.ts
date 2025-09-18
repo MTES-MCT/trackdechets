@@ -35,7 +35,7 @@ export function canBypassSirenify(user: Express.User) {
 /**
  * Generic sirenify function type. It takes a BSD input type T
  * and sets `name` and `address` data  from SIRENE database when a
- * correspondance is found on the n°SIRET, overriding user provided data.
+ * correspondance is found on the SIRET, overriding user provided data.
  */
 type SirenifyFn<T> = (input: T, user: Express.User) => Promise<T>;
 

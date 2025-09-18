@@ -78,7 +78,7 @@ describe("edition", () => {
       numberOfPackages: 1,
       quantity: 1,
       quantityType: "REAL",
-      consistence: ["SOLID"],
+      consistence: "SOLID",
       pop: false,
       isDangerous: true,
       parcelNumbers: [],

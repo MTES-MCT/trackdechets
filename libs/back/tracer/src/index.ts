@@ -15,15 +15,17 @@ import { BatchLogRecordProcessor } from "@opentelemetry/sdk-logs";
 import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import {
-  SEMRESATTRS_CLOUD_REGION,
-  SEMRESATTRS_CONTAINER_NAME,
-  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
   ATTR_SERVICE_NAME,
   ATTR_SERVICE_VERSION
 } from "@opentelemetry/semantic-conventions";
 import { PrismaInstrumentation } from "@prisma/instrumentation";
 import { ElasticsearchInstrumentation } from "opentelemetry-instrumentation-elasticsearch";
 import { getAppRootFolderName } from "./utils";
+
+// Incubating attributes
+const ATTR_CLOUD_REGION = "cloud.region";
+const ATTR_CONTAINER_NAME = "container.name";
+const ATTR_DEPLOYMENT_ENVIRONMENT = "deployment.environment";
 
 if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
   const serviceName = getAppRootFolderName();
@@ -32,10 +34,10 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
     resource: resourceFromAttributes({
       [ATTR_SERVICE_NAME]: serviceName || "trackdechets",
       [ATTR_SERVICE_VERSION]: "1.0.0",
-      [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]:
+      [ATTR_DEPLOYMENT_ENVIRONMENT]:
         process.env.OTEL_ENVIRONMENT || "development",
-      [SEMRESATTRS_CLOUD_REGION]: process.env.REGION_NAME,
-      [SEMRESATTRS_CONTAINER_NAME]: process.env.APP
+      [ATTR_CLOUD_REGION]: process.env.REGION_NAME,
+      [ATTR_CONTAINER_NAME]: process.env.APP
     }),
     logRecordProcessor: new BatchLogRecordProcessor(new OTLPLogExporter()),
     traceExporter: new OTLPTraceExporter(),

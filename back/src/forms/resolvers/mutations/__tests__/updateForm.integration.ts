@@ -18,7 +18,8 @@ import {
   userFactory,
   userWithCompanyFactory,
   transporterReceiptFactory,
-  ecoOrganismeFactory
+  ecoOrganismeFactory,
+  companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
@@ -2446,12 +2447,14 @@ describe("Mutation.updateForm", () => {
   });
 
   it("should remove a temporary storage", async () => {
+    // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
     // recipient needs appropriate profiles and subprofiles
     const destination = await companyFactory({
       companyTypes: [CompanyType.WASTEPROCESSOR],
       wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
     });
+    const bsdSuiteReadableId = getReadableId();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -2460,7 +2463,7 @@ describe("Mutation.updateForm", () => {
         recipientCompanySiret: destination.siret,
         forwardedIn: {
           create: {
-            readableId: getReadableId(),
+            readableId: bsdSuiteReadableId,
             ownerId: user.id,
             recipientCap: "CAP"
           }
@@ -2468,6 +2471,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // When
     const updateFormInput = {
       id: form.id,
       temporaryStorageDetail: null
@@ -2479,7 +2483,81 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    // Then
     expect(data.updateForm.temporaryStorageDetail).toBeNull();
+
+    const bsd = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(bsd.forwardedInId).toBe(null);
+
+    const bsdSuite = await prisma.form.findFirst({
+      where: { readableId: bsdSuiteReadableId }
+    });
+    expect(bsdSuite).not.toBeNull();
+    expect(bsdSuite?.isDeleted).toBe(true);
+  });
+
+  it("should remove a temporary storage, even if BSD was created by transporter", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+    const { user: transporterUser, company: transporterCompany } =
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["TRANSPORTER"]
+      });
+    const bsdSuiteReadableId = getReadableId();
+    const form = await formFactory({
+      ownerId: transporterUser.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        forwardedIn: {
+          create: {
+            readableId: bsdSuiteReadableId,
+            ownerId: user.id,
+            recipientCap: "CAP"
+          }
+        },
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
+      }
+    });
+
+    // When
+    const updateFormInput = {
+      id: form.id,
+      temporaryStorageDetail: null
+    };
+    const { mutate } = makeClient(transporterUser);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    // Then
+    expect(data.updateForm.temporaryStorageDetail).toBeNull();
+
+    const bsd = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(bsd.forwardedInId).toBe(null);
+
+    const bsdSuite = await prisma.form.findFirst({
+      where: { readableId: bsdSuiteReadableId }
+    });
+    expect(bsdSuite).not.toBeNull();
+    expect(bsdSuite?.isDeleted).toBe(true);
   });
 
   it("should add a recipient", async () => {
@@ -4155,7 +4233,7 @@ describe("Mutation.updateForm", () => {
         variables: {
           updateFormInput: {
             id: form.id,
-            wasteDetails: { consistence: ["SOLID"] }
+            wasteDetails: { consistence: "SOLID" }
           }
         }
       });
@@ -5501,6 +5579,104 @@ describe("Mutation.updateForm", () => {
     expect(updateEvent).toBeDefined();
     expect(updateEvent?.data?.["content"]?.["wasteDetailsCode"]).toBe(
       "08 01 11*"
+    );
+  });
+
+  describe("[TRA-16553] It should not be possible to update emitter after form is EMITTED", () => {
+    it.each([Status.DRAFT, Status.SEALED])(
+      "should be possible to update emitter if status = %p",
+      async status => {
+        // Given
+        const { user, company: emitterCompany1 } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const emitterCompany2 = await companyAssociatedToExistingUserFactory(
+          user,
+          "MEMBER"
+        );
+
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            emitterCompanySiret: emitterCompany1.siret,
+            status
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const updateFormInput = {
+          id: form.id,
+          emitter: {
+            company: {
+              siret: emitterCompany2.siret,
+              name: emitterCompany2.name,
+              address: emitterCompany2.address
+            }
+          }
+        };
+        const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+          UPDATE_FORM,
+          {
+            variables: { updateFormInput }
+          }
+        );
+
+        // Then
+        expect(errors).toBeUndefined();
+      }
+    );
+
+    it.each([Status.SENT, Status.SIGNED_BY_PRODUCER])(
+      "should NOT be possible to update emitter if status = %p",
+      async status => {
+        // Given
+        const { user, company: emitterCompany1 } = await userWithCompanyFactory(
+          "MEMBER"
+        );
+        const emitterCompany2 = await companyAssociatedToExistingUserFactory(
+          user,
+          "MEMBER"
+        );
+
+        const form = await formFactory({
+          ownerId: user.id,
+          opt: {
+            emittedAt: new Date(),
+            emitterCompanySiret: emitterCompany1.siret,
+            status
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const updateFormInput = {
+          id: form.id,
+          emitter: {
+            company: {
+              siret: emitterCompany2.siret,
+              name: emitterCompany2.name,
+              address: emitterCompany2.address
+            }
+          }
+        };
+        const { errors } = await mutate<Pick<Mutation, "updateForm">>(
+          UPDATE_FORM,
+          {
+            variables: { updateFormInput }
+          }
+        );
+
+        // Then
+        expect(errors).not.toBeUndefined();
+        // Order of variables always changes, so split the expect
+        expect(errors[0].message).toContain(
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés"
+        );
+        expect(errors[0].message).toContain("emitterCompanySiret");
+        expect(errors[0].message).toContain("emitterCompanyName");
+        expect(errors[0].message).toContain("emitterCompanyAddress");
+      }
     );
   });
 });

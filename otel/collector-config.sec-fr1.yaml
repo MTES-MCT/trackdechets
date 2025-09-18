@@ -40,6 +40,16 @@ processors:
       - key: db.statement
         action: delete
 
+  filter/log:
+    error_mode: ignore
+    logs:
+      log_record:
+        - 'resource.attributes["service.name"] == "nodejs"'
+        - 'resource.attributes["service.name"] == "nginx"'
+        - 'resource.attributes["service.name"] == "metabase"'
+        - 'resource.attributes["service.name"] == "trackdechets-api"'
+        - 'resource.attributes["service.name"] == "api" and attributes["request_timing"] == "start"'
+
 connectors:
   datadog/connector:
     traces:
@@ -82,5 +92,5 @@ service:
       exporters: [datadog/exporter]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch/datadog_generic]
+      processors: [memory_limiter, filter/log, batch/datadog_generic]
       exporters: [datadog/exporter]

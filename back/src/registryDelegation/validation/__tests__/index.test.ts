@@ -82,7 +82,7 @@ describe("index", () => {
         // Then
         expect(error.errors[0]).toMatchObject({
           path: ["delegatorOrgId"],
-          message: "NOT-A-SIRET n'est pas un numéro de SIRET valide"
+          message: "NOT-A-SIRET n'est pas un SIRET valide"
         });
       }
     });
@@ -102,7 +102,7 @@ describe("index", () => {
         // Then
         expect(error.errors[0]).toMatchObject({
           path: ["delegateOrgId"],
-          message: "NOT-A-SIRET n'est pas un numéro de SIRET valide"
+          message: "NOT-A-SIRET n'est pas un SIRET valide"
         });
       }
     });

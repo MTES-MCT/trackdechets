@@ -197,7 +197,7 @@ export default function CompanyInfo() {
 
                 {company.contactEmail && (
                   <p className="fr-pb-2w">
-                    Email : <strong>{company.contactEmail}</strong>
+                    Courriel : <strong>{company.contactEmail}</strong>
                   </p>
                 )}
 

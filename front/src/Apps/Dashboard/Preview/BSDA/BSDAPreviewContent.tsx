@@ -1,6 +1,12 @@
 import React, { useMemo } from "react";
 import { useQuery } from "@apollo/client";
-import { BsdaType, BsdType, Query, QueryBsdaArgs } from "@td/codegen-ui";
+import {
+  BsdaConsistence,
+  BsdaType,
+  BsdType,
+  Query,
+  QueryBsdaArgs
+} from "@td/codegen-ui";
 import { GET_BSDA } from "../../../common/queries/bsda/queries";
 import { Loader } from "../../../common/Components";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
@@ -23,6 +29,7 @@ import {
 import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsddSummary";
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
+import BSDAPreviewNextBsda from "./BSDAPreviewNextBsda";
 
 interface BSDAPreviewContentProps {
   bsdId: string;
@@ -88,6 +95,15 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
       label: "Destinataire",
       iconId: "fr-icon-arrow-right-line" as FrIconClassName
     },
+    ...(bsd?.forwardedIn?.id || bsd?.groupedIn?.id
+      ? [
+          {
+            tabId: "bsdaSuite",
+            label: "BSDA suite",
+            iconId: "fr-icon-arrow-right-line" as FrIconClassName
+          }
+        ]
+      : []),
     ...(actorsPresent
       ? [
           {
@@ -118,6 +134,7 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
       entreprise: <BSDAPreviewWorker bsd={bsd} />,
       transport: <BSDAPreviewTransport bsd={bsd} />,
       destination: <BSDAPreviewDestination bsd={bsd} />,
+      bsdaSuite: <BSDAPreviewNextBsda bsd={bsd} />,
       acteurs: <BSDAPreviewActors bsd={bsd} />,
       associes: <BSDAPreviewAssociatedBsdas bsd={bsd} />
     }),
@@ -126,15 +143,26 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
   const conditionnement = useMemo(
     () =>
-      bsd?.packagings ? getPackagingInfosSummary(bsd.packagings, true) : "",
+      bsd?.packagings
+        ? getPackagingInfosSummary(bsd.packagings, { hideDetails: true })
+        : "",
     [bsd]
   );
 
-  const capitalize = word => {
-    if (!word) {
-      return "";
+  const getWasteConsistenceLabel = (consistence: BsdaConsistence) => {
+    switch (consistence) {
+      case BsdaConsistence.Solide:
+        return "Solide";
+
+      case BsdaConsistence.Other:
+        return "Autre";
+
+      case BsdaConsistence.Pulverulent:
+        return "Pulvérulent";
+
+      default:
+        return "";
     }
-    return word.at(0)?.toUpperCase() + word.slice(1);
   };
 
   return (
@@ -158,7 +186,9 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
                 <PreviewTextRow
                   label="Consistance"
-                  value={capitalize(bsd.waste?.consistence?.toLowerCase())}
+                  value={getWasteConsistenceLabel(
+                    bsd.waste?.consistence as BsdaConsistence
+                  )}
                 />
 
                 <PreviewDateRow label="Dernière action" value={bsd.updatedAt} />

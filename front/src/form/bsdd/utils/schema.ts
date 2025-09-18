@@ -113,7 +113,7 @@ export const packagingInfo: SchemaOf<Omit<PackagingInfoInput, "__typename">> =
 const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
   object().shape({
     siret: string()
-      .required("Intermédiaires: le N° SIRET est obligatoire")
+      .required("Intermédiaires: le SIRET est obligatoire")
       .test(
         "is-siret",
         "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
@@ -218,8 +218,9 @@ export const formSchema = object().shape({
       /(REAL|ESTIMATED)/,
       "Le type de quantité (réelle ou estimée) doit être précisé"
     ),
-    consistence: array().of(
-      mixed<Consistence>().oneOf(Object.values(Consistence))
+    consistence: string().oneOf(
+      Object.values(Consistence),
+      "La consistance du déchet doit être précisée"
     )
   }),
   temporaryStorageDetail: object()

@@ -14,7 +14,10 @@ interface BSDAPreviewWasteProps {
 }
 const BSDAPreviewWaste = ({ bsd }: BSDAPreviewWasteProps) => {
   const conditionnement = useMemo(
-    () => (bsd?.packagings ? getPackagingInfosSummary(bsd.packagings) : ""),
+    () =>
+      bsd?.packagings
+        ? getPackagingInfosSummary(bsd.packagings, { expanded: true })
+        : "",
     [bsd]
   );
 
@@ -67,7 +70,7 @@ const BSDAPreviewWaste = ({ bsd }: BSDAPreviewWasteProps) => {
       </PreviewContainerRow>
 
       <PreviewContainerRow title={"Conditionnement"} separator>
-        <PreviewContainerCol gridWidth={10}>
+        <PreviewContainerCol gridWidth={12}>
           <PreviewTextRow label="Conditionnement" value={conditionnement} />
         </PreviewContainerCol>
       </PreviewContainerRow>

@@ -253,7 +253,7 @@ describe("Transported wastes registry", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
-        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter2.company.siret}`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${transporter2.company.siret}`
       })
     );
   });
@@ -442,7 +442,7 @@ describe("Transported wastes registry", () => {
       data: null,
       errors: [
         expect.objectContaining({
-          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter.company.siret}`
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${transporter.company.siret}`
         })
       ]
     });
@@ -476,7 +476,7 @@ describe("Transported wastes registry", () => {
       data: null,
       errors: [
         expect.objectContaining({
-          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter.company.siret}`
+          message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le SIRET ${transporter.company.siret}`
         })
       ]
     });

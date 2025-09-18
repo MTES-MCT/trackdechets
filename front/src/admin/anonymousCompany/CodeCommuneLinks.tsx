@@ -2,7 +2,7 @@ import * as React from "react";
 import { extractPostalCodeFromAddress } from "../../Apps/utils/utils";
 import styles from "./AnonymousCompany.module.scss";
 
-export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+export const MISSING_COMPANY_SIRET = "Le SIRET de l'entreprise est obligatoire";
 
 const openDataSoftUrl = (postalCode: string): string => {
   return `https://public.opendatasoft.com/explore/dataset/correspondance-code-insee-code-postal/table/?flg=fr-fr&q=${postalCode}`;

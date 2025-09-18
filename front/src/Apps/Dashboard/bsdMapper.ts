@@ -372,7 +372,8 @@ export const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     transporterCustomInfo: transporter?.customInfo,
     transporterNumberPlate: transporter?.transport?.plates,
     updatedAt: bsvhu["bsvhuUpdatedAt"],
-    ecoOrganisme: bsvhu.ecoOrganisme
+    ecoOrganisme: bsvhu.ecoOrganisme,
+    bsdWorkflowType: BsdasriType.Simple // currently there is no specific type on VHU
   };
 
   return bsvhuFormatted;

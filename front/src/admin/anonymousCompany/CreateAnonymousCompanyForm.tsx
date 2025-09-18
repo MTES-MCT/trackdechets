@@ -15,7 +15,7 @@ import Button from "@codegouvfr/react-dsfr/Button";
 import { CodeCommuneLinks } from "./CodeCommuneLinks";
 import { isFRVat, isSiret, isVat, nafCodes } from "@td/constants";
 
-export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
+export const MISSING_COMPANY_SIRET = "Le SIRET de l'entreprise est obligatoire";
 
 const CREATE_ANONYMOUS_COMPANY = gql`
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
@@ -60,7 +60,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       })
       .test(
         "is-siret",
-        "n°SIRET invalide",
+        "SIRET invalide",
         value =>
           !value ||
           isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")

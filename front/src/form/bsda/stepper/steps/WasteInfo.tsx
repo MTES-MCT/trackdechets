@@ -208,7 +208,7 @@ export function WasteInfoWorker({ disabled }) {
             disabled={disabled}
           >
             <option value={BsdaConsistence.Solide}>Solide</option>
-            <option value={BsdaConsistence.Pulverulent}>Pulvérulents</option>
+            <option value={BsdaConsistence.Pulverulent}>Pulvérulent</option>
             <option value={BsdaConsistence.Other}>Autre</option>
           </Field>
         </label>

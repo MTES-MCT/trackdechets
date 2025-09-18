@@ -123,7 +123,7 @@ export default function AccountInfo({ me }: Props) {
               </p>
             </div>
             <div className="fr-col-8">
-              <p className="fr-text--bold">Email</p>
+              <p className="fr-text--bold">Courriel</p>
               <p className="fr-text fr-mb-2w" data-testid="email">
                 {me.email}
               </p>
@@ -158,7 +158,7 @@ export default function AccountInfo({ me }: Props) {
           </div>
           <div className="fr-col-md-8 fr-mb-2w">
             <Input
-              label="Email"
+              label="Courriel"
               disabled
               nativeInputProps={{
                 ...register("email")

@@ -87,7 +87,7 @@ function Appendix2MultiSelectWrapper({
   );
 
   const updateConsistence = useCallback(
-    (consistence: Consistence[]) =>
+    (consistence: Consistence) =>
       setFieldValue("wasteDetails.consistence", consistence),
     [setFieldValue]
   );

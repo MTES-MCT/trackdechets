@@ -913,7 +913,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un numéro de SIRET valide\n` +
+          `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un SIRET valide\n` +
           `Destination ultérieure prévue : l'établissement avec le SIRET ${nextDestinationSiret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
@@ -1035,7 +1035,7 @@ describe("mutation.markAsProcessed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un numéro de SIRET valide`,
+        message: `Destination ultérieure prévue: ${nextDestinationSiret} n'est pas un SIRET valide`,
 
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT

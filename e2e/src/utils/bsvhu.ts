@@ -51,18 +51,18 @@ const clickOnVhuSecondaryMenuButton = async (
  */
 const fillEmitterTab = async (page: Page, emitter) => {
   // First, make sure input is empty
-  await page.getByLabel("N°SIRET ou raison sociale").click();
+  await page.getByLabel("SIRET ou raison sociale").click();
   await expect(page.getByText("Aucune entreprise sélectionnée")).toBeVisible();
 
   // Then, fill siret and select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(emitter.orgId);
+  await page.getByLabel("SIRET ou raison sociale").fill(emitter.orgId);
   const portal = await page.locator("#portal-root");
   await portal.getByText(`${emitter.name} - ${emitter.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", emitter.contact);
   await expectInputValue(page, "Téléphone", emitter.contactPhone);
-  await expectInputValue(page, "Mail", emitter.contactEmail);
+  await expectInputValue(page, "Courriel", emitter.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément démolisseur",
@@ -148,18 +148,18 @@ export const fillWasteTab = async (page: Page) => {
  * Fill third tab info, "Transporteur du déchet"
  */
 export const fillTransporterTab = async (page: Page, transporter) => {
-  await page.getByLabel("N°SIRET ou raison sociale").click();
+  await page.getByLabel("SIRET ou raison sociale").click();
   await expect(page.getByText("Aucune entreprise sélectionnée")).toBeVisible();
 
   // Then, fill siret and select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(transporter.orgId);
+  await page.getByLabel("SIRET ou raison sociale").fill(transporter.orgId);
   const portal = await page.locator("#portal-root");
   await portal.getByText(`${transporter.name} - ${transporter.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", transporter.contact);
   await expectInputValue(page, "Téléphone", transporter.contactPhone);
-  await expectInputValue(page, "Mail", transporter.contactEmail);
+  await expectInputValue(page, "Courriel", transporter.contactEmail);
 
   // Not exempt of recepisse
   await expect(
@@ -185,12 +185,9 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await expect(page.getByLabel("Broyeur agréé")).toBeDisabled();
   await expect(page.getByLabel("Démolisseur agréé")).toBeChecked();
 
-  // Both destinations should be asked for
+  // Destination should be asked for
   await expect(
     page.getByRole("heading", { name: "Installation de destination" })
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
   ).toBeVisible();
 
   // Change waste code then come back
@@ -213,20 +210,16 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   await page.getByText("Broyeur agréé").click();
 
   // Select company
-  await page.getByLabel("N°SIRET ou raison sociale").fill(destination.orgId);
-
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
-  ).not.toBeVisible();
+  await page.getByLabel("SIRET ou raison sociale").fill(destination.orgId);
 
   // Transporter should be selected automatically
-  const portal = await page.locator("#portal-root");
+  const portal = page.locator("#portal-root");
   await portal.getByText(`${destination.name} - ${destination.orgId}`).click();
 
   // Make sure auto-filled info matches company
   await expectInputValue(page, "Personne à contacter", destination.contact);
   await expectInputValue(page, "Téléphone", destination.contactPhone);
-  await expectInputValue(page, "Mail", destination.contactEmail);
+  await expectInputValue(page, "Courriel", destination.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément",
@@ -239,37 +232,12 @@ const fillDestinationTab = async (page: Page, destination, broyeur) => {
   // Company info should not change except agrement
   await expectInputValue(page, "Personne à contacter", destination.contact);
   await expectInputValue(page, "Téléphone", destination.contactPhone);
-  await expectInputValue(page, "Mail", destination.contactEmail);
+  await expectInputValue(page, "Courriel", destination.contactEmail);
   await expectInputValue(
     page,
     "Numéro d'agrément",
     destination.vhuAgrementDemolisseur.agrementNumber
   );
-
-  // Broyeur should be visible. Let's pick one
-  await expect(
-    page.getByRole("heading", { name: "Installation de broyage prévisionelle" })
-  ).toBeVisible();
-
-  // Select company
-  await page.getByLabel("N°SIRET ou raison sociale").nth(1).fill(broyeur.orgId);
-
-  await portal.getByText(`${broyeur.name} - ${broyeur.orgId}`).click();
-
-  const contactValue = await page
-    .getByLabel("Personne à contacter")
-    .nth(1)
-    .inputValue();
-  expect(contactValue).toEqual(broyeur.contact);
-
-  const contactPhoneValue = await page
-    .getByLabel("Téléphone")
-    .nth(1)
-    .inputValue();
-  expect(contactPhoneValue).toEqual(broyeur.contactPhone);
-
-  const contactMailValue = await page.getByLabel("Mail").nth(1).inputValue();
-  expect(contactMailValue).toEqual(broyeur.contactEmail);
 
   // Fill destination agrement
   await page
@@ -374,8 +342,15 @@ export const verifyOverviewData = async (
   await vhuDiv.getByRole("button").getByText("Aperçu").click();
 
   const modalContent = page.getByRole("tabpanel");
-  const expectValue = async (testId, value) => {
-    const content = await modalContent.getByTestId(testId).textContent();
+  const expectValue = async (
+    testId: string,
+    value: any,
+    wrapperName?: string
+  ) => {
+    const parent = !!wrapperName
+      ? modalContent.getByText(wrapperName).locator("..")
+      : modalContent;
+    const content = await parent.getByTestId(testId).textContent();
     await expect(content).toEqual(value);
   };
 
@@ -406,14 +381,16 @@ export const verifyOverviewData = async (
   );
 
   // Destination
+  const destinationName = "Installation de destination";
   await page.getByRole("tab", { name: "Destinataire" }).click();
-  await expectValue("siret", destination.orgId);
-  await expectValue("contact", destination.contact);
-  await expectValue("telephone", destination.contactPhone);
-  await expectValue("courriel", destination.contactEmail);
+  await expectValue("siret", destination.orgId, destinationName);
+  await expectValue("contact", destination.contact, destinationName);
+  await expectValue("telephone", destination.contactPhone, destinationName);
+  await expectValue("courriel", destination.contactEmail, destinationName);
   await expectValue(
     "numero_dagrement",
-    destination.vhuAgrementDemolisseur.agrementNumber
+    destination.vhuAgrementDemolisseur.agrementNumber,
+    destinationName
   );
 
   // Close the modal

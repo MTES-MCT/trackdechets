@@ -92,7 +92,14 @@ export function Modal({
                 clickOutsideDeactivates: e => {
                   return portal != null && portal.contains(e.target as Node);
                 },
-                preventScroll: true
+                preventScroll: true,
+                // Fix for focus-trap error when modal content has no focusable elements
+                delayInitialFocus: true,
+                fallbackFocus: () => {
+                  const closeButton =
+                    document.querySelector("#close-btn-modal");
+                  return closeButton as HTMLElement;
+                }
               }}
             >
               <div className="fr-grid-row fr-grid-row--center">
@@ -100,6 +107,7 @@ export function Modal({
                   <div className="fr-modal__body">
                     <div className="fr-modal__header close-btn-override">
                       <button
+                        id="close-btn-modal"
                         type="button"
                         className="fr-btn--close fr-btn"
                         onClick={state.close}

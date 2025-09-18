@@ -31,12 +31,14 @@ const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
         <PreviewContainerCol gridWidth={3}>
           <PreviewTextRow
             label="Raison sociale"
-            value={isIrregularSituation ? "-" : bsd.emitter?.company?.name}
+            value={
+              bsd.emitter?.company?.siret ? bsd.emitter?.company?.name : "-"
+            }
           />
 
           <PreviewTextRow label="SIRET" value={bsd.emitter?.company?.siret} />
 
-          {isIrregularSituation && (
+          {isIrregularSituation && !bsd.emitter?.company?.siret && (
             <PreviewTextRow
               label="Nom ou identification de l'installation"
               value={bsd.emitter?.company?.name}

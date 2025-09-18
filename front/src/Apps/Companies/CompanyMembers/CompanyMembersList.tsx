@@ -219,7 +219,7 @@ const CompanyMembersList = ({
               <thead>
                 <tr>
                   <th scope="col">Nom</th>
-                  <th scope="col">Email</th>
+                  <th scope="col">Courriel</th>
                   <th scope="col">Rôle</th>
                   <th scope="col">Statut</th>
                   {isAdmin && <th scope="col">Actions</th>}
@@ -262,7 +262,7 @@ const CompanyMembersList = ({
                         ? "Invitation en attente"
                         : user.isActive
                         ? "Utilisateur actif"
-                        : "Email non confirmé"}
+                        : "Courriel non confirmé"}
                     </td>
                     {isAdmin && (
                       <td>

@@ -107,7 +107,7 @@ export default function CompanyMembersRequestModal({
                 <thead>
                   <tr>
                     <th scope="col">Nom</th>
-                    <th scope="col">Email</th>
+                    <th scope="col">Courriel</th>
                     <th scope="col">Rôle</th>
                   </tr>
                 </thead>

@@ -8,6 +8,7 @@ import {
   BsdasriPackagingSchema,
   ZodBsdasriPackagingEnum
 } from "../../validation/schema";
+import { isCollector, isWasteCenter } from "../../../companies/validation";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
@@ -140,7 +141,10 @@ export const emitterIsAllowedToGroup = async (
   const emitterCompany = await prisma.company.findUnique({
     where: { siret: emitterSiret }
   });
-  if (!emitterCompany?.companyTypes.includes("COLLECTOR")) {
+  if (
+    !emitterCompany ||
+    (!isCollector(emitterCompany) && !isWasteCenter(emitterCompany))
+  ) {
     throw new UserInputError(
       `Le siret de l'émetteur n'est pas autorisé à regrouper des dasris`
     );

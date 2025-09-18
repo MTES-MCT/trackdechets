@@ -336,7 +336,7 @@ describe("sealedFormSchema", () => {
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
-        "Émetteur: 123 n'est pas un numéro de SIRET valide"
+        "Émetteur: 123 n'est pas un SIRET valide"
       );
     });
 
@@ -351,7 +351,7 @@ describe("sealedFormSchema", () => {
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
-        "Transporteur: 123 n'est pas un numéro de SIRET valide"
+        "Transporteur: 123 n'est pas un SIRET valide"
       );
     });
 
@@ -446,7 +446,7 @@ describe("sealedFormSchema", () => {
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
-        "Destinataire: 123 n'est pas un numéro de SIRET valide"
+        "Destinataire: 123 n'est pas un SIRET valide"
       );
     });
 
@@ -499,7 +499,7 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
 
       await expect(validateFn()).rejects.toThrow(
-        "Émetteur : vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger"
+        "Émetteur : vous ne pouvez pas enregistrer un SIRET en cas d'émetteur navire étranger"
       );
 
       const isValid = await sealedFormSchema.isValid(partialForm);
@@ -551,7 +551,7 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
 
       await expect(validateFn()).rejects.toThrow(
-        "Émetteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
+        "Émetteur : vous ne pouvez pas renseigner de SIRET lorsque l'émetteur ou le détenteur est un particulier"
       );
     });
 
@@ -1500,7 +1500,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Émetteur: this is not a siret n'est pas un numéro de SIRET valide"
+      "Émetteur: this is not a siret n'est pas un SIRET valide"
     );
   });
 

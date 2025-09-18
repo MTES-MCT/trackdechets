@@ -311,7 +311,7 @@ function DashboardRoutes() {
                   onClose={goBack}
                   ariaLabel="Publier un dasri"
                   isOpen
-                  size="L"
+                  size="M"
                 >
                   <RoutePublishBsdasri />
                 </Modal>

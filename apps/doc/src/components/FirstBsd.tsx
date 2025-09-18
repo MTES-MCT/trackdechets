@@ -20,7 +20,7 @@ const FirstBsd = () => {
         <p>
           Variables à ajouter dans l'onglet "Query Variables" du playground en
           remplaçant SIRET_PRODUCTEUR, SIRET_TRAITEUR et SIRET_TRANSPORTEUR. Au
-          moins un de ces n°SIRET doit correspondre à un établissement dont vous
+          moins un de ces SIRET doit correspondre à un établissement dont vous
           faites partie.
         </p>
         <CodeBlock className="language-json">{firstBsdd.variables}</CodeBlock>

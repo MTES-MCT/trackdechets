@@ -17,11 +17,7 @@ import routes from "../../../../../Apps/routes";
 import { useParams, useNavigate, generatePath, Link } from "react-router-dom";
 import { GET_DETAIL_DASRI_WITH_METADATA } from "../../../../../Apps/common/queries";
 import { TOAST_DURATION } from "../../../../../common/config";
-
-import EmptyDetail from "../../../../detail/common/EmptyDetailView";
 import toast from "react-hot-toast";
-
-import { BdasriSummary } from "../Summary/BsdasriSummary";
 
 const PUBLISH_BSDASRI = gql`
   mutation PublishBsdasri($id: ID!) {
@@ -35,16 +31,16 @@ export function RoutePublishBsdasri() {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const navigate = useNavigate();
 
-  const { error, data, loading } = useQuery<
-    Pick<Query, "bsdasri">,
-    QueryBsdasriArgs
-  >(GET_DETAIL_DASRI_WITH_METADATA, {
-    variables: {
-      id: formId!
-    },
+  const { error, loading } = useQuery<Pick<Query, "bsdasri">, QueryBsdasriArgs>(
+    GET_DETAIL_DASRI_WITH_METADATA,
+    {
+      variables: {
+        id: formId!
+      },
 
-    fetchPolicy: "no-cache"
-  });
+      fetchPolicy: "no-cache"
+    }
+  );
 
   const [publishBsdasri, { loading: mutationLoading, error: publishError }] =
     useMutation<Pick<Mutation, "publishBsdasri">, MutationPublishBsdasriArgs>(
@@ -69,30 +65,20 @@ export function RoutePublishBsdasri() {
   if (loading) {
     return <Loader />;
   }
-  if (data == null) {
-    return <EmptyDetail />;
-  }
-  const { bsdasri } = data;
 
   return (
     <div>
       <h2 className="td-modal-title">Publier le bordereau</h2>
-      <BdasriSummary bsdasri={bsdasri} />
-
       <p>
-        Cette action aura pour effet de démarrer le cycle de vie du bordereau en
-        le faisant apparaître dans l'onglet "À collecter" du tableau de bord
-        transporteur. Le bordereau pourra toujours être modifié ou supprimé
-        depuis l'onglet "Suivi".
-      </p>
-      <p className="tw-mt-1">
-        Le statut du bordereau passera de "brouillon" à "initial".
-        <br />
-        Une fois publié, le bordereau sera prêt pour l'enlèvement.
+        En le publiant, le bordereau passera dans l'onglet{" "}
+        <strong>« Pour action »</strong> du tableau de bord de l'émetteur ainsi
+        que dans l'onglet <strong>« Suivis »</strong> des acteurs visés. Son
+        cycle de vie commencera. Vous pourrez encore le modifier ou le supprimer
+        tant qu'aucune signature n'aura été apposée.
       </p>
       <div className="td-modal-actions">
         <button
-          className="btn btn--outline-primary"
+          className="fr-btn fr-btn--secondary"
           onClick={() => {
             navigate(-1);
           }}
@@ -100,7 +86,7 @@ export function RoutePublishBsdasri() {
           Annuler
         </button>
         <button
-          className="btn btn--primary"
+          className="fr-btn fr-btn--primary"
           disabled={mutationLoading}
           onClick={() =>
             publishBsdasri({
@@ -130,7 +116,7 @@ export function RoutePublishBsdasri() {
               siret,
               id: formId
             })}
-            className="btn btn--primary"
+            className="fr-btn fr-btn--primary"
           >
             Mettre le bordereau à jour pour le publier
           </Link>

@@ -114,7 +114,7 @@ export function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail
+              Courriel
               <Field
                 type="text"
                 name="emitter.company.mail"

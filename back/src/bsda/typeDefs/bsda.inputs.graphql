@@ -422,7 +422,7 @@ input BsdaSignatureInput {
 input CreateBsdaRevisionRequestInput {
   "Identifiant du bordereau à réviser"
   bsdaId: ID!
-  "Numéro SIRET du demandeur"
+  "SIRET du demandeur"
   authoringCompanySiret: String!
   "Contenu de la révision"
   content: BsdaRevisionRequestContentInput!

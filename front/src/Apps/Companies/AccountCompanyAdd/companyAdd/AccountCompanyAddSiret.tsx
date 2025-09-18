@@ -184,7 +184,7 @@ export default function AccountCompanyAddSiret({
                 if (isValidVat && isFRVat(values.siret)) {
                   return {
                     siret:
-                      "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA"
+                      "Vous devez identifier un établissement français par son SIRET (14 chiffres) et non son numéro de TVA"
                   };
                 }
               } else {
@@ -229,7 +229,7 @@ export default function AccountCompanyAddSiret({
                 if (isValidVat && isFRVat(values.siret)) {
                   return {
                     siret:
-                      "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA"
+                      "Vous devez identifier un établissement français par son SIRET (14 chiffres) et non son numéro de TVA"
                   };
                 }
               }
@@ -284,7 +284,7 @@ export default function AccountCompanyAddSiret({
                       type="button"
                       priority="tertiary"
                       disabled={loading || isDisabled}
-                      title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
+                      title="Génère un SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
                       onClick={() =>
                         createTestCompany().then(response => {
                           setFieldValue(
@@ -294,7 +294,7 @@ export default function AccountCompanyAddSiret({
                         })
                       }
                     >
-                      Obtenir un n° SIRET factice
+                      Obtenir un SIRET factice
                     </Button>
                   )}
 

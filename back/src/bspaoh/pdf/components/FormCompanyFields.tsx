@@ -34,7 +34,7 @@ export function FormCompanyFields({
         </p>
       )}
       <p>
-        N° SIRET : {company?.siret}
+        SIRET : {company?.siret}
         <br />
         {!!company?.vatNumber && (
           <>
