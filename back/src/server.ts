@@ -348,10 +348,6 @@ app.use(impersonateMiddleware);
 
 app.get("/ping", (_, res) => res.send("Pong!"));
 
-app.get("/ip", (req, res) => {
-  return res.send(`IP: ${req.ip} | XFF: ${req.get("X-Forwarded-For")}`);
-});
-
 app.get("/captcha", (_, res) => captchaGen(res));
 
 app.get("/captcha-audio/:tokenId", (req, res) => {
