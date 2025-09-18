@@ -18,7 +18,6 @@ const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
 
   // Uniquement pour les situations irrégulières
   const getIsSignedByEmitterLabel = (bsd: Bsvhu) => {
-    console.log("bsd.emitter?.notOnTD", bsd.emitter?.notOnTD);
     const isPublished = bsd.emitter?.emission?.signature?.date;
 
     // Situation régulière
