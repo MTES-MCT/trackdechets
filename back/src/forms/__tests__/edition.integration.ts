@@ -122,66 +122,75 @@ describe("checkEditionRules", () => {
       },
       ecoOrganisme: { siret: "new siret", name: "new name" }
     };
-    const checkFn = () => checkEditionRules(fullForm, input, destination.user);
-    await expect(checkFn).rejects.toThrow(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : " +
-        "customId, " +
-        "emitterType, " +
-        "emitterPickupSite, " +
-        "emitterWorkSiteName, " +
-        "emitterWorkSiteAddress, " +
-        "emitterWorkSiteCity, " +
-        "emitterWorkSitePostalCode, " +
-        "emitterIsPrivateIndividual, " +
-        "emitterIsForeignShip, " +
-        "emitterCompanyName, " +
-        "emitterCompanySiret, " +
-        "emitterCompanyAddress, " +
-        "emitterCompanyContact, " +
-        "emitterCompanyPhone, " +
-        "emitterCompanyMail, " +
-        "emitterCompanyOmiNumber, " +
-        "recipientCap, " +
-        "recipientProcessingOperation, " +
-        "recipientIsTempStorage, " +
-        "recipientCompanyName, " +
-        "recipientCompanySiret, " +
-        "recipientCompanyAddress, " +
-        "recipientCompanyContact, " +
-        "recipientCompanyPhone, " +
-        "recipientCompanyMail, " +
-        "wasteDetailsCode, " +
-        "wasteDetailsOnuCode, " +
-        "wasteDetailsPackagingInfos, " +
-        "wasteDetailsQuantity, " +
-        "wasteDetailsName, " +
-        "wasteDetailsConsistence, " +
-        "wasteDetailsPop, " +
-        "wasteDetailsIsDangerous, " +
-        "wasteDetailsParcelNumbers, " +
-        "wasteDetailsAnalysisReferences, " +
-        "wasteDetailsLandIdentifiers, " +
-        "traderCompanyName, " +
-        "traderCompanySiret, " +
-        "traderCompanyAddress, " +
-        "traderCompanyContact, " +
-        "traderCompanyPhone, " +
-        "traderCompanyMail, " +
-        "traderReceipt, " +
-        "traderDepartment, " +
-        "traderValidityLimit, " +
-        "brokerCompanyName, " +
-        "brokerCompanySiret, " +
-        "brokerCompanyAddress, " +
-        "brokerCompanyContact, " +
-        "brokerCompanyPhone, " +
-        "brokerCompanyMail, " +
-        "brokerReceipt, " +
-        "brokerDepartment, " +
-        "brokerValidityLimit, " +
-        "ecoOrganismeName, " +
+
+    expect.assertions(57);
+    try {
+      await checkEditionRules(fullForm, input, destination.user);
+    } catch (error) {
+      expect(error.message).toContain(
+        "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés"
+      );
+      [
+        "customId, ",
+        "emitterType, ",
+        "emitterPickupSite, ",
+        "emitterWorkSiteName, ",
+        "emitterWorkSiteAddress, ",
+        "emitterWorkSiteCity, ",
+        "emitterWorkSitePostalCode, ",
+        "emitterIsPrivateIndividual, ",
+        "emitterIsForeignShip, ",
+        "emitterCompanyName, ",
+        "emitterCompanySiret, ",
+        "emitterCompanyAddress, ",
+        "emitterCompanyContact, ",
+        "emitterCompanyPhone, ",
+        "emitterCompanyMail, ",
+        "emitterCompanyOmiNumber, ",
+        "recipientCap, ",
+        "recipientProcessingOperation, ",
+        "recipientIsTempStorage, ",
+        "recipientCompanyName, ",
+        "recipientCompanySiret, ",
+        "recipientCompanyAddress, ",
+        "recipientCompanyContact, ",
+        "recipientCompanyPhone, ",
+        "recipientCompanyMail, ",
+        "wasteDetailsCode, ",
+        "wasteDetailsOnuCode, ",
+        "wasteDetailsPackagingInfos, ",
+        "wasteDetailsQuantity, ",
+        "wasteDetailsName, ",
+        "wasteDetailsConsistence, ",
+        "wasteDetailsPop, ",
+        "wasteDetailsIsDangerous, ",
+        "wasteDetailsParcelNumbers, ",
+        "wasteDetailsAnalysisReferences, ",
+        "wasteDetailsLandIdentifiers, ",
+        "traderCompanyName, ",
+        "traderCompanySiret, ",
+        "traderCompanyAddress, ",
+        "traderCompanyContact, ",
+        "traderCompanyPhone, ",
+        "traderCompanyMail, ",
+        "traderReceipt, ",
+        "traderDepartment, ",
+        "traderValidityLimit, ",
+        "brokerCompanyName, ",
+        "brokerCompanySiret, ",
+        "brokerCompanyAddress, ",
+        "brokerCompanyContact, ",
+        "brokerCompanyPhone, ",
+        "brokerCompanyMail, ",
+        "brokerReceipt, ",
+        "brokerDepartment, ",
+        "brokerValidityLimit, ",
+        "ecoOrganismeName, ",
         "ecoOrganismeSiret"
-    );
+      ].forEach(field => {
+        expect(error.message).toContain(field);
+      });
+    }
   });
 
   it("should be possible to re-send same data when a field is sealed by emitter signature", async () => {
