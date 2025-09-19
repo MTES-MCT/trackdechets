@@ -187,6 +187,30 @@ export const incomingWasteFormShape: FormShape = [
           "initialEmitterCompanyCountryCode",
           "initialEmitterMunicipalitiesInseeCodes"
         ]
+      },
+      {
+        name: "ttdImportNumber",
+        shape: "generic",
+        title: "Transfert transfrontalier de déchets",
+        label: Labels.ttdImportNumber,
+        infoLabel: InfoLabels.gistrid,
+        required: true,
+        validation: {
+          ttdImportNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-md-10" }
+      },
+      {
+        name: "movementNumber",
+        shape: "generic",
+        label: Labels.movementNumber,
+        required: true,
+        validation: {
+          movementNumber: optionalString
+        },
+        type: "text",
+        style: { className: "fr-col-md-10" }
       }
     ]
   },
@@ -347,29 +371,6 @@ export const incomingWasteFormShape: FormShape = [
           nextOperationCode: optionalString
         },
         shape: "custom"
-      },
-      {
-        name: "ttdImportNumber",
-        shape: "generic",
-        label: Labels.ttdImportNumber,
-        infoLabel: InfoLabels.gistrid,
-        required: true,
-        validation: {
-          ttdImportNumber: optionalString
-        },
-        type: "text",
-        style: { className: "fr-col-md-10" }
-      },
-      {
-        name: "movementNumber",
-        shape: "generic",
-        label: Labels.movementNumber,
-        required: true,
-        validation: {
-          movementNumber: optionalString
-        },
-        type: "text",
-        style: { className: "fr-col-md-10" }
       }
     ]
   },

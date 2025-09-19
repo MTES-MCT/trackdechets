@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.09.1] 23/09/2025
 
+#### :nail_care: Améliorations
+
+- Déplacement des champs de transfert transfrontalier sur IHM Registre DND entrant [PR 4403](https://github.com/MTES-MCT/trackdechets/pull/4403)
+
 #### :bug: Corrections de bugs
 
 - Suppression du message d'erreur en double sur les numéros d'identification dans le formulaire BSVHU [PR 4400](https://github.com/MTES-MCT/trackdechets/pull/4400)
