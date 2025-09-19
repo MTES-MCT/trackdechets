@@ -172,7 +172,6 @@ export async function processRegistryExhaustiveExportJob(
     upload = streamInfos.upload;
     const outputStream = streamInfos.s3Stream;
 
-    // TODO craft elastic query from params
     // query on registryExport.sirets & dateRange
     const query: {
       bool: estypes.BoolQuery & {

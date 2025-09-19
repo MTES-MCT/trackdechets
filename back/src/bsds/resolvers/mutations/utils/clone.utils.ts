@@ -56,7 +56,7 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     | "grouping"
     | "rowNumber"
     // Done manually
-    // TODO(registry): clone associated registryLookup
+    // TODO(silto): clone associated registryLookup
     | "finalOperations"
     | "registryLookups"
   > = {
