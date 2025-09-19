@@ -108,19 +108,29 @@ describe("validateSecureUri", () => {
       }
     });
 
-    it("rejects loopback IP addresses", () => {
+    it("rejects loopback IP addresses (127.0.0.0/8)", () => {
       expect(validateSecureUri("https://127.0.0.1/webhook/endpoint")).toBe(
         false
       );
       expect(validateSecureUri("https://127.0.0.1:8080/webhook")).toBe(false);
-      // 127.1.0.1 is not in the standard loopback range, so it's currently allowed
-      expect(validateSecureUri("https://127.1.0.1/webhook")).toBe(true);
+      expect(validateSecureUri("https://127.255.255.255/webhook")).toBe(false);
+      expect(validateSecureUri("https://127.1.2.3/webhook")).toBe(false);
+      expect(validateSecureUri("https://127.0.0.255/webhook")).toBe(false);
+      // Just outside the range should be allowed
+      expect(validateSecureUri("https://128.0.0.1/webhook")).toBe(true);
     });
 
     it("rejects IPv6 loopback addresses", () => {
-      // IPv6 loopback (::1) is handled by hostname check, not IP parsing
-      // The current implementation may not properly parse IPv6 URLs
       expect(validateSecureUri("https://[::1]/webhook/endpoint")).toBe(false);
+      expect(validateSecureUri("https://::1/webhook/endpoint")).toBe(false);
+    });
+
+    it("rejects IPv6 link-local addresses (fe80::/10)", () => {
+      expect(validateSecureUri("https://[fe80::1]/webhook")).toBe(false);
+      expect(validateSecureUri("https://fe80::1/webhook")).toBe(false);
+      expect(validateSecureUri("https://[fe80:abcd::1234]/webhook")).toBe(
+        false
+      );
     });
 
     it("rejects private IP ranges (10.x.x.x)", () => {

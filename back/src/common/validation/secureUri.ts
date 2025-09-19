@@ -8,7 +8,8 @@
  *    - 172.16.0.0/12 (Class B private)
  *    - 192.168.0.0/16 (Class C private)
  *    - 169.254.0.0/16 (Link-local addresses)
- * 3. Blocks loopback addresses (127.0.0.1, ::1)
+ * 3. Blocks loopback addresses (127.0.0.0/8, ::1)
+ * 4. Blocks IPv6 link-local addresses (fe80::/10)
  *
  * This prevents SSRF attacks and other security vulnerabilities.
  */
@@ -27,17 +28,18 @@ export const validateSecureUri = (uri: string): boolean => {
 
     // Block localhost variations in production
     if (process.env.NODE_ENV === "production") {
-      if (
-        hostname === "localhost" ||
-        hostname === "127.0.0.1" ||
-        hostname === "[::1]"
-      ) {
+      if (hostname === "localhost") {
         return false;
       }
     }
 
-    // Always block loopback IPs (except localhost hostname in dev)
-    if (hostname === "127.0.0.1" || hostname === "[::1]") {
+    // Block all 127.0.0.0/8 (IPv4 loopback)
+    const ipv4LoopbackRegex = /^127\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
+    if (ipv4LoopbackRegex.test(hostname)) {
+      return false;
+    }
+    // Block IPv6 loopback (::1), with or without brackets
+    if (hostname === "[::1]" || hostname === "::1") {
       return false;
     }
 
@@ -58,8 +60,19 @@ export const validateSecureUri = (uri: string): boolean => {
       }
     }
 
+    // Block IPv6 link-local addresses (fe80::/10)
+    // hostname for IPv6 is in brackets, e.g. [fe80::1]
+    if (hostname.startsWith("[fe80") || hostname.startsWith("fe80")) {
+      return false;
+    }
+
     // Block IPv6 private ranges
-    if (hostname.startsWith("[fc") || hostname.startsWith("[fd")) {
+    if (
+      hostname.startsWith("[fc") ||
+      hostname.startsWith("[fd") ||
+      hostname.startsWith("fc") ||
+      hostname.startsWith("fd")
+    ) {
       return false; // Unique local addresses (FC00::/7)
     }
 
