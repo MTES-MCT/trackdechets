@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Suppression du message d'erreur en double sur les numéros d'identification dans le formulaire BSVHU [PR 4400](https://github.com/MTES-MCT/trackdechets/pull/4400)
+- Amélioration du zoom de la carte des parcelles pour éviter la confusion [PR 4401](https://github.com/MTES-MCT/trackdechets/pull/4401)
 
 #### :boom: Breaking Change
 
