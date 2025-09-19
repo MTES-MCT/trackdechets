@@ -226,12 +226,12 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
           <FormProvider {...methods}>
             <form
               onSubmit={handleSubmit(async data => {
-                const { transport, signature } = data;
+                const { company, transport, signature } = data;
                 await updateBsdaTransporter({
                   variables: {
                     id: signingTransporter.id,
                     //@ts-ignore
-                    input: { transport: transport }
+                    input: { transport: transport, company: company }
                   }
                 });
                 await signBsda({
