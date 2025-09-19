@@ -9,6 +9,9 @@ import { expandBsffFromDB } from "../../../bsffs/converter";
 import { expandBspaohFromDb } from "../../../bspaoh/converter";
 import { expandFormFromDb } from "../../../forms/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
+import { BsvhuWithTransportersInclude } from "../../../bsvhu/types";
+import { BsdaWithTransportersInclude } from "../../../bsda/types";
+import { BsffWithTransportersInclude } from "../../../bsffs/types";
 
 export async function bsdResolver(
   _,
@@ -21,7 +24,7 @@ export async function bsdResolver(
   if (id.startsWith("BSDA-")) {
     const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id },
-      include: { transporters: true }
+      include: BsdaWithTransportersInclude
     });
     return expandBsdaFromDb(bsda);
   }
@@ -36,14 +39,15 @@ export async function bsdResolver(
   if (id.startsWith("FF-")) {
     const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id },
-      include: { transporters: true }
+      include: BsffWithTransportersInclude
     });
     return expandBsffFromDB(bsff);
   }
 
   if (id.startsWith("VHU-")) {
     const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id }
+      where: { id },
+      include: BsvhuWithTransportersInclude
     });
     return expandVhuFormFromDb(bsvhu);
   }

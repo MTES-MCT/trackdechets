@@ -1,10 +1,6 @@
 import { ZodBsvhu, ZodBsvhuTransporter } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
-import type {
-  BsvhuInput,
-  BsvhuTransporterInput,
-  SignatureTypeInput
-} from "@td/codegen-back";
+import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
 import { User, WasteAcceptationStatus, TransportMode } from "@prisma/client";
 
 import { isForeignVat } from "@td/constants";
@@ -856,7 +852,7 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
 
 export const getRequiredAndSealedFieldPaths = async (
   bsvhu: ZodBsvhu,
-  currentSignatures: SignatureTypeInput[],
+  currentSignatures: AllBsvhuSignatureType[],
   user: User | undefined
 ): Promise<{
   sealed: string[][];
@@ -891,7 +887,10 @@ function isRefusedOrPartiallyRefused(bsvhu: ZodBsvhu) {
   );
 }
 
-function isReceptionSignatureStep(_, currentSignatureType: SignatureTypeInput) {
+function isReceptionSignatureStep(
+  _,
+  currentSignatureType: AllBsvhuSignatureType
+) {
   return currentSignatureType === "RECEPTION";
 }
 
