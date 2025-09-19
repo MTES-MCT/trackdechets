@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Suppression du message d'erreur en double sur les numéros d'identification dans le formulaire BSVHU [PR 4400](https://github.com/MTES-MCT/trackdechets/pull/4400)
 
+#### :boom: Breaking Change
+
+- Suppression du code et des queries liées aux anciens exports de registres [PR 4442](https://github.com/MTES-MCT/trackdechets/pull/4442)
+
 # [2025.08.1] 26/08/2025
 
 #### :nail_care: Améliorations

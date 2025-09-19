@@ -18,7 +18,7 @@ import Transporter from "../../../common/pdf/components/Transporter";
 import { getBsdaWasteADRMention, pluralize } from "@td/constants";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
 import { bsdaWasteQuantities } from "../../utils";
-import { displayWasteQuantity } from "../../../registry/utils";
+import { displayWasteQuantity } from "../../../common/pdf/utils";
 
 type Props = {
   bsda: Bsda;
