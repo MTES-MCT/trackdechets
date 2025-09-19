@@ -198,6 +198,9 @@ export function ParcelsVisualizer({
         let map: Map;
         let markerLayerId: string;
         let parcelLayerId: string;
+        // ths flag is used to change how we fit the map, depending if there are only coordinates
+        // or if there are also parcels. Zooming too much when there are only coordinates can lead to
+        // confusing maps or even issues (whhite map) when the coordinate is outside France.
         let onlyCoordinates = true;
         try {
           const res = createMap();
