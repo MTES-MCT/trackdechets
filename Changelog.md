@@ -25,6 +25,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Affichage des bonnes informations de contact dans la modale de signature transporteur du BSVHU en cas de multimodal [PR 4422](https://github.com/MTES-MCT/trackdechets/pull/4422)
 - Affichage du conditionnement sur l'aperçu du BSDA [PR 4420](https://github.com/MTES-MCT/trackdechets/pull/4420)
 - Correction des codes de traitement affichés à la signature du traitement d'un BSVHU [PR 4398](https://github.com/MTES-MCT/trackdechets/pull/4398)
+- ETQ utilisateur je ne peux plus modifier l'émetteur d'un BSDD une fois signé par l'émetteur [PR 4390](https://github.com/MTES-MCT/trackdechets/pull/4390)
+- Correction de l'affichage du statut de signature émetteur dans l'Aperçu des BSVHU [PR 4396](https://github.com/MTES-MCT/trackdechets/pull/4396)
+- Le BSDA de collecte en déchetterie passe au statut Refusé à la signature de la réception si le déchet est refusé [PR 4394](https://github.com/MTES-MCT/trackdechets/pull/4394)
+- ETQ destination je peux signer la réception d'un BSDA même si tous les transporteurs n'ont pas signé [PR 4381](https://github.com/MTES-MCT/trackdechets/pull/4381)
+- Ajout de validation sur la mutation `signBsdasriEmissionWithSecretCode` [PR 4391](https://github.com/MTES-MCT/trackdechets/pull/4391)
+- ETQ chauffeur, je peux signer un BSVHU avec émetteur en situation irrégulière et sans SIRET [PR 4413](https://github.com/MTES-MCT/trackdechets/pull/4413)
+- Correction des PDFs qui avaient systématiquement une page blanche inutile à la fin [PR 4410](https://github.com/MTES-MCT/trackdechets/pull/4410)
 
 #### :boom: Breaking Change
 
