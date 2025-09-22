@@ -129,7 +129,14 @@ export default function CompanyDetails() {
   }
 
   const companies = data?.myCompanies?.edges.map(({ node }) => node);
-  const company = companies && companies[0];
+  let company = companies && companies[0];
+
+  // TRA-17156: l'utilisateur peut avoir mis le siret d'une entreprise dans le
+  // nom usuel d'une autre. Si c'est le cas, on retourne en priorité l'entreprise
+  // dont le siret (pas le nom usuel) correspond au siret dans l'URL.
+  if (companies && companies?.length > 1) {
+    company = companies.find(c => c.siret === siret) ?? companies[0];
+  }
 
   if (!company) {
     return <Navigate to={{ pathname: routes.companies.index }} />;
