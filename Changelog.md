@@ -33,14 +33,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - ETQ chauffeur, je peux signer un BSVHU avec émetteur en situation irrégulière et sans SIRET [PR 4413](https://github.com/MTES-MCT/trackdechets/pull/4413)
 - Correction des PDFs qui avaient systématiquement une page blanche inutile à la fin [PR 4410](https://github.com/MTES-MCT/trackdechets/pull/4410)
 
-#### :lock: Sécurité
-
-- Retrait de l'endpoint /ip inutilisé avec une faille de sécurité potentielle [PR 4427](https://github.com/MTES-MCT/trackdechets/pull/4427)
-- Sécurisation des URLs des Webhooks et des application OAuth [PR 4428](https://github.com/MTES-MCT/trackdechets/pull/4428)
-- Mise à jour du rôle utilisateur en cache lors d'un changement par l'admin [PR 4429](https://github.com/MTES-MCT/trackdechets/pull/4429)
-- Seul un administrateur peut accepter une demande de droits admins destinée aux administrateurs [PR 4431](https://github.com/MTES-MCT/trackdechets/pull/4431)
-- Un membre non-administrateur d'une entreprise ne peut pas refuser une demande de droits d'admin [PR 4412](https://github.com/MTES-MCT/trackdechets/pull/4412)
-
 #### :boom: Breaking Change
 
 - Suppression du code et des queries liées aux anciens exports de registres [PR 4442](https://github.com/MTES-MCT/trackdechets/pull/4442)
