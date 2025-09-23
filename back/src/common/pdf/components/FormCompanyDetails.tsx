@@ -28,7 +28,7 @@ export function FormCompanyDetails({
       <p>
         {isFrenchCompany({ company, isForeignShip, isPrivateIndividual }) && (
           <div>
-            N° SIRET : {company?.siret}
+            SIRET : {company?.siret}
             <br />
           </div>
         )}

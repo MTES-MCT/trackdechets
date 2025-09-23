@@ -406,7 +406,7 @@ export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
 
 const isIrregularSituation = bsd => bsd.emitter?.irregularSituation;
 
-// emitter is irregular and has no siret, transporter signature is needed
+// emitter is irregular and has no SIRET, transporter signature is needed
 const canIrregularSituationSignWithNoSiret = (
   bsd: BsdDisplay,
   currentSiret: string
@@ -421,7 +421,7 @@ const canIrregularSituationSignWithNoSiret = (
   );
 };
 
-// emitter is irregular and has registered siret, he can sign
+// emitter is irregular and has registered SIRET, he can sign
 const canIrregularSituationSignWithSiretRegistered = (
   bsd: BsdDisplay,
   currentSiret: string,
@@ -438,7 +438,7 @@ const canIrregularSituationSignWithSiretRegistered = (
   );
 };
 
-// emitter is irregular and has no registered siret, transporter signature is needed
+// emitter is irregular and has no registered SIRET, transporter signature is needed
 const canIrregularSituationSignWithSiretNotRegistered = (
   bsd: BsdDisplay,
   currentSiret: string,
@@ -499,6 +499,20 @@ export const getIsNonDraftLabel = (
   const isActTab = bsdCurrentTab === "actTab" || bsdCurrentTab === "allBsdsTab";
   const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
+
+  // Si l'utilisateur est un chauffeur, il doit pouvoir signer un VHU
+  // en situation irrégulière (pas de siret émetteur)
+  const isTransporter = isSameSiretTransporter(currentSiret, bsd);
+  if (
+    isBsvhu(bsd.type) &&
+    isToCollectTab &&
+    isTransporter &&
+    permissions.includes(UserPermission.BsdCanSignTransport) &&
+    bsd.emitter?.irregularSituation &&
+    bsd.emitter?.noSiret
+  ) {
+    return SIGNER;
+  }
 
   if (
     isBsda(bsd.type) &&
@@ -1316,12 +1330,14 @@ export const getWorkflowLabel = (
     case BsdaType.Collection_2710:
       return WorkflowDisplayType.Collection_2710;
     case BsdaType.OtherCollections:
-      return WorkflowDisplayType.OtherCollections;
+      return WorkflowDisplayType.Initial;
 
     case BsdasriType.Grouping:
       return WorkflowDisplayType.GRP;
     case BsdasriType.Synthesis:
       return WorkflowDisplayType.SYNTH;
+    case BsdasriType.Simple:
+      return WorkflowDisplayType.Initial;
 
     case BsffType.Groupement:
       return WorkflowDisplayType.REGROUPEMENT;
@@ -1329,6 +1345,10 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.REEXPEDITION;
     case BsffType.Reconditionnement:
       return WorkflowDisplayType.RECONDITIONNEMENT;
+
+    case BsffType.CollectePetitesQuantites:
+    case BsffType.TracerFluide:
+      return WorkflowDisplayType.Initial;
 
     case EmitterType.Appendix2:
       return WorkflowDisplayType.ANNEXE_2;
@@ -1338,6 +1358,12 @@ export const getWorkflowLabel = (
 
     case EmitterType.Appendix1Producer:
       return WorkflowDisplayType.ANNEXE_1;
+
+    case EmitterType.Producer:
+      return WorkflowDisplayType.Initial;
+
+    case EmitterType.Other:
+      return WorkflowDisplayType.Initial;
 
     default:
       return WorkflowDisplayType.DEFAULT;
@@ -1476,7 +1502,11 @@ export const canReviewBsda = (bsd: BsdDisplay, siret: string) => {
 };
 
 export const canReviewBsdasri = (bsd: BsdDisplay, siret: string) => {
-  if (bsd.type !== BsdType.Bsdasri || bsd.status === BsdStatusCode.Initial) {
+  if (
+    bsd.type !== BsdType.Bsdasri ||
+    bsd.status === BsdStatusCode.Initial ||
+    bsd.status === BsdStatusCode.Refused
+  ) {
     return false;
   }
 

@@ -16,6 +16,30 @@ interface BSVHUPreviewEmitterProps {
 const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
   const isIrregularSituation = bsd.emitter?.irregularSituation;
 
+  // Uniquement pour les situations irrégulières
+  const getIsSignedByEmitterLabel = (bsd: Bsvhu) => {
+    const isPublished = bsd.emitter?.emission?.signature?.date;
+
+    // Situation régulière
+    if (!isIrregularSituation) {
+      return isPublished ? "Oui" : null;
+    }
+
+    // L'émetteur est un SIRET en situation irrégulière inscrit sur Trackdéchets
+    if (bsd.emitter?.noSiret) {
+      return "Non";
+    }
+
+    // Non inscrit sur TD
+    if (bsd.emitter?.notOnTD) {
+      return "Non";
+    }
+    // Inscrit sur TD
+    else {
+      return isPublished ? "Oui" : null;
+    }
+  };
+
   return (
     <PreviewContainer>
       {isIrregularSituation && (
@@ -31,12 +55,14 @@ const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
         <PreviewContainerCol gridWidth={3}>
           <PreviewTextRow
             label="Raison sociale"
-            value={isIrregularSituation ? "-" : bsd.emitter?.company?.name}
+            value={
+              bsd.emitter?.company?.siret ? bsd.emitter?.company?.name : "-"
+            }
           />
 
           <PreviewTextRow label="SIRET" value={bsd.emitter?.company?.siret} />
 
-          {isIrregularSituation && (
+          {isIrregularSituation && !bsd.emitter?.company?.siret && (
             <PreviewTextRow
               label="Nom ou identification de l'installation"
               value={bsd.emitter?.company?.name}
@@ -69,16 +95,10 @@ const BSVHUPreviewEmitter = ({ bsd }: BSVHUPreviewEmitterProps) => {
             value={bsd.emitter?.emission?.signature?.date}
           />
 
-          {isIrregularSituation && (
-            <PreviewTextRow
-              label="Signature de l'émetteur"
-              value={
-                bsd.emitter?.noSiret || !bsd.emitter?.company?.siret
-                  ? "Oui"
-                  : "Non"
-              }
-            />
-          )}
+          <PreviewTextRow
+            label="Signature de l'émetteur"
+            value={getIsSignedByEmitterLabel(bsd)}
+          />
         </PreviewContainerCol>
       </PreviewContainerRow>
     </PreviewContainer>

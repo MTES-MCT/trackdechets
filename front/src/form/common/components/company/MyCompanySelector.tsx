@@ -188,7 +188,7 @@ export default function MyCompanySelector({
         </div>
         <div className="form__row">
           <label>
-            Mail
+            Courriel
             <Field
               type="email"
               name={`${fieldName}.mail`}

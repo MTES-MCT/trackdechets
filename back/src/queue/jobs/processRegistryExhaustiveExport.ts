@@ -82,10 +82,10 @@ const streamLookup = (
           if (!hit._source) {
             continue;
           }
-          const { type, id, isAllWasteFor } = hit._source;
+          const { type, id, isExhaustiveWasteFor } = hit._source;
           // Track the last hit that was actually processed
 
-          addEncounteredSirets(isAllWasteFor as string[]);
+          addEncounteredSirets(isExhaustiveWasteFor as string[]);
           const waste = bsds[type].find(waste => waste.id === id);
           const mapped = toWaste("ALL", undefined, {
             [type]: waste

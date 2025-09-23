@@ -236,6 +236,7 @@ export const FullBsdaFragment = gql`
       familyCode
       materialName
       consistence
+      consistenceDescription
       sealNumbers
       isSubjectToADR
       adr

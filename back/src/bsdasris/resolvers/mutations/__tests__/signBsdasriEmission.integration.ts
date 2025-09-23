@@ -14,6 +14,7 @@ import {
 } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import type { Mutation } from "@td/codegen-back";
+import { ZodBsdasriPackagingEnum } from "../../../validation/schema";
 
 describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);
@@ -170,5 +171,72 @@ describe("Mutation.signBsdasri emission", () => {
         })
       })
     ]);
+  });
+
+  it.each([undefined, []])(
+    "should fail if emitterWastePackagings is not defined",
+    async emitterWastePackagings => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const destination = await companyFactory();
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(company),
+          ...readyToPublishData(destination),
+          status: BsdasriStatus.INITIAL,
+          emitterWastePackagings
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user); // emitter
+      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+        SIGN_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: { type: "EMISSION", author: "Marcel" }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le conditionnement de l'émetteur est un champ requis."
+      );
+    }
+  );
+
+  it("should succeed if emitterWastePackagings is defined", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        ...readyToPublishData(destination),
+        status: BsdasriStatus.INITIAL,
+        emitterWastePackagings: [
+          {
+            type: "BOITE_CARTON" as ZodBsdasriPackagingEnum,
+            volume: 22,
+            quantity: 3
+          }
+        ]
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user); // emitter
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "EMISSION", author: "Marcel" }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
   });
 });

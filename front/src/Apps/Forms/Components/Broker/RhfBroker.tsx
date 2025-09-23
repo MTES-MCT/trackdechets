@@ -7,7 +7,7 @@ import { BsdType } from "@td/codegen-ui";
 
 type RhfBrokerProps = {
   bsdType: BsdType;
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
   // Permet d'afficher ou non le switch "Présence d'un courtier"

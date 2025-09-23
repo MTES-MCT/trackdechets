@@ -32,6 +32,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={Emitter}
                   title="Émetteur du déchet"
+                  form={form}
                   disabled={disabledAfterEmission}
                 />
                 <StepContainer

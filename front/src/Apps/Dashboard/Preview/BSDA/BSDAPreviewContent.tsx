@@ -1,6 +1,12 @@
 import React, { useMemo } from "react";
 import { useQuery } from "@apollo/client";
-import { BsdaType, BsdType, Query, QueryBsdaArgs } from "@td/codegen-ui";
+import {
+  BsdaConsistence,
+  BsdaType,
+  BsdType,
+  Query,
+  QueryBsdaArgs
+} from "@td/codegen-ui";
 import { GET_BSDA } from "../../../common/queries/bsda/queries";
 import { Loader } from "../../../common/Components";
 import { FrIconClassName, RiIconClassName } from "@codegouvfr/react-dsfr";
@@ -137,15 +143,26 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
   const conditionnement = useMemo(
     () =>
-      bsd?.packagings ? getPackagingInfosSummary(bsd.packagings, true) : "",
+      bsd?.packagings
+        ? getPackagingInfosSummary(bsd.packagings, { hideDetails: true })
+        : "",
     [bsd]
   );
 
-  const capitalize = word => {
-    if (!word) {
-      return "";
+  const getWasteConsistenceLabel = (consistence: BsdaConsistence) => {
+    switch (consistence) {
+      case BsdaConsistence.Solide:
+        return "Solide";
+
+      case BsdaConsistence.Other:
+        return "Autre";
+
+      case BsdaConsistence.Pulverulent:
+        return "Pulvérulent";
+
+      default:
+        return "";
     }
-    return word.at(0)?.toUpperCase() + word.slice(1);
   };
 
   return (
@@ -169,7 +186,9 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
                 <PreviewTextRow
                   label="Consistance"
-                  value={capitalize(bsd.waste?.consistence?.toLowerCase())}
+                  value={getWasteConsistenceLabel(
+                    bsd.waste?.consistence as BsdaConsistence
+                  )}
                 />
 
                 <PreviewDateRow label="Dernière action" value={bsd.updatedAt} />

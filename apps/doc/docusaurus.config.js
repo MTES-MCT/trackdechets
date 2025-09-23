@@ -12,6 +12,10 @@ module.exports = {
   favicon: "img/trackdechets.png",
   organizationName: "MTES-MCT",
   projectName: "trackdechets",
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: {
+    mermaid: true,
+  },
   themeConfig: {
     prism: {
       additionalLanguages: ['bash', 'python', 'http', 'json'],
@@ -172,14 +176,6 @@ module.exports = {
         schema: "../../back/src/{scalars,common,bsds,bspaoh}/typeDefs/*.graphql",
         routeBasePath: "/reference/api-reference/bspaoh",
       },
-    ],
-    [
-      "docusaurus-graphql-plugin",
-      {
-        id: "registry",
-        schema: "../../back/src/{scalars,common,users,companies,registry}/typeDefs/*.graphql",
-        routeBasePath: "/reference/api-reference/registre"
-      }
     ],
     [
       "docusaurus-graphql-plugin",

@@ -54,6 +54,10 @@
       }
       .actor-name {
         text-transform: lowercase;
+
+        p:first-letter {
+          text-transform: capitalize;
+        }
       }
       .actor-name:first-letter {
         text-transform: capitalize;

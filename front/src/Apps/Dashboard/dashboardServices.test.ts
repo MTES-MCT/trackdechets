@@ -77,13 +77,13 @@ describe("dashboardServices", () => {
       }
     } as BsdDisplay;
 
-    it('should return true if bsd.type is "bsda", bsd.bsdWorkflowType is "2710", and currentSiret matches the destination siret', () => {
+    it('should return true if bsd.type is "bsda", bsd.bsdWorkflowType is "2710", and currentSiret matches the destination SIRET', () => {
       const currentSiret = "11111111111111";
       const result = isBsdaSign(bsd, currentSiret);
       expect(result).toBe(true);
     });
 
-    it('should return true if bsd.type is "bsda", bsd.emitter.isPrivateIndividual is true, bsd.worker.isDisabled is true, and currentSiret matches the transporter siret', () => {
+    it('should return true if bsd.type is "bsda", bsd.emitter.isPrivateIndividual is true, bsd.worker.isDisabled is true, and currentSiret matches the transporter SIRET', () => {
       const currentSiret = "22222222222222";
       bsd!.transporter!.company!.siret = currentSiret;
       const result = isBsdaSign(bsd, currentSiret);
@@ -112,7 +112,7 @@ describe("dashboardServices", () => {
       emitter: { company: { siret: "11111111111111" } }
     } as BsdDisplay;
 
-    it('should return true if bsd.type is "bsvhu" and currentSiret matches the emitter siret', () => {
+    it('should return true if bsd.type is "bsvhu" and currentSiret matches the emitter SIRET', () => {
       const currentSiret = "11111111111111";
       const result = isBsvhuSign(bsd, currentSiret);
       expect(result).toBe(true);
@@ -125,7 +125,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(false);
     });
 
-    it('should return false if bsd.type is "bsvhu", but currentSiret does not match the emitter siret', () => {
+    it('should return false if bsd.type is "bsvhu", but currentSiret does not match the emitter SIRET', () => {
       bsd.type = BsdType.Bsvhu;
       const currentSiret = "22222222222222";
       const result = isBsvhuSign(bsd, currentSiret);
@@ -140,7 +140,7 @@ describe("dashboardServices", () => {
     } as BsdDisplay;
     const bsdCurrentTab: BsdCurrentTab = "draftTab";
 
-    it('should return true if bsd.type is "bsff", bsdCurrentTab is not "actTab", and currentSiret matches the emitter siret', () => {
+    it('should return true if bsd.type is "bsff", bsdCurrentTab is not "actTab", and currentSiret matches the emitter SIRET', () => {
       const currentSiret = "11111111111111";
       const result = isBsffSign(bsd, currentSiret, bsdCurrentTab);
       expect(result).toBe(true);
@@ -160,7 +160,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(false);
     });
 
-    it('should return false if bsd.type is "bsff", bsdCurrentTab is not "actTab", but currentSiret does not match the emitter siret', () => {
+    it('should return false if bsd.type is "bsff", bsdCurrentTab is not "actTab", but currentSiret does not match the emitter SIRET', () => {
       bsd.type = BsdType.Bsff;
       const currentSiret = "22222222222222";
       const result = isBsffSign(bsd, currentSiret, bsdCurrentTab);
@@ -246,7 +246,7 @@ describe("dashboardServices", () => {
   describe("getIsNonDraftLabel", () => {
     let bsdCurrentTab: BsdCurrentTab = "actTab";
 
-    it("should return the correct label for Bsda with same transporter siret and private individual and worker disabled", () => {
+    it("should return the correct label for Bsda with same transporter SIRET and private individual and worker disabled", () => {
       const currentSiret = "987654321";
       const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
@@ -267,7 +267,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(SIGNER);
     });
 
-    it("should return the correct label for Bsda Collection_2710 and same siret destination", () => {
+    it("should return the correct label for Bsda Collection_2710 and same SIRET destination", () => {
       const currentSiret = "987654321";
       const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
       const bsd: BsdDisplay = {
@@ -341,7 +341,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(SIGNER);
     });
 
-    it("should return the correct label for bsdasri in collect tab and same emitter siret and is transporter", () => {
+    it("should return the correct label for bsdasri in collect tab and same emitter SIRET and is transporter", () => {
       bsdCurrentTab = "toCollectTab";
       const currentSiret = "987654321";
       const permissions: UserPermission[] = [
@@ -527,7 +527,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return VALIDER_ENTREPOSAGE_PROVISOIRE for BSDD with temp storage in actTab and same destination siret", () => {
+    it("should return VALIDER_ENTREPOSAGE_PROVISOIRE for BSDD with temp storage in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
@@ -549,7 +549,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_ENTREPOSAGE_PROVISOIRE);
     });
 
-    it("should return VALIDER_RECEPTION for BSDD in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSDD in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
@@ -571,7 +571,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return VALIDER_RECEPTION for BSDASRI in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSDASRI in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
@@ -593,7 +593,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return VALIDER_RECEPTION for BSFF in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSFF in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
@@ -615,7 +615,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return VALIDER_RECEPTION for BSDA in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSDA in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
@@ -637,7 +637,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return VALIDER_RECEPTION for BSVHU in actTab and same destination siret", () => {
+    it("should return VALIDER_RECEPTION for BSVHU in actTab and same destination SIRET", () => {
       const currentSiret = "123456789";
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
@@ -670,7 +670,7 @@ describe("dashboardServices", () => {
     const permissions: UserPermission[] = [
       UserPermission.BsdCanSignAcceptation
     ];
-    it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage destination', () => {
+    it('should return the correct label when bsd type is "Bsdd" and SIRET is same as temporary storage destination', () => {
       const currentSiret = "1234567890";
 
       const result = getResentBtnLabel(
@@ -683,7 +683,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return an empty string when siret is not same as temporary storage destination", () => {
+    it("should return an empty string when SIRET is not same as temporary storage destination", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.destination!.company!.siret = "132456378399";
       const result = getResentBtnLabel(
@@ -738,7 +738,7 @@ describe("dashboardServices", () => {
       }
     } as BsdDisplay;
     const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
-    it('should return the correct label when bsd type is "Bsdd" and siret is same as temporary storage transporter', () => {
+    it('should return the correct label when bsd type is "Bsdd" and SIRET is same as temporary storage transporter', () => {
       const currentSiret = "1234567890";
 
       const result = getResealedBtnLabel(currentSiret, bsd, permissions);
@@ -746,7 +746,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNER);
     });
 
-    it("should return an empty string when siret is not same as temporary storage transporter", () => {
+    it("should return an empty string when SIRET is not same as temporary storage transporter", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.transporter!.company!.siret = "132456378399";
       bsd.destination!.company!.siret = "132456378399";
@@ -770,7 +770,7 @@ describe("dashboardServices", () => {
     const permissions: UserPermission[] = [
       UserPermission.BsdCanSignAcceptation
     ];
-    it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
+    it('should return the correct label when bsd type is "Bsdd" and SIRET is same as destination', () => {
       const currentSiret = "1234567890";
 
       const result = getTempStoredBtnLabel(currentSiret, bsd, permissions);
@@ -778,7 +778,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE);
     });
 
-    it("should return an empty string when siret is not same as destination", () => {
+    it("should return an empty string when SIRET is not same as destination", () => {
       const currentSiret = "1234567890";
       bsd.destination!.company!.siret = "132456378399";
       const result = getTempStoredBtnLabel(currentSiret, bsd, permissions);
@@ -809,7 +809,7 @@ describe("dashboardServices", () => {
       UserPermission.BsdCanSignOperation,
       UserPermission.BsdCanUpdate
     ];
-    it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
+    it('should return the correct label when bsd type is "Bsdd" and SIRET is same as destination', () => {
       const currentSiret = "1234567890";
       const result = getTempStorerAcceptedBtnLabel(
         currentSiret,
@@ -831,7 +831,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(completer_bsd_suite);
     });
 
-    it("should return an empty string when siret is not same as destination", () => {
+    it("should return an empty string when SIRET is not same as destination", () => {
       const currentSiret = "1234567890";
       bsd.destination!.company!.siret = "132456378399";
       const result = getTempStorerAcceptedBtnLabel(
@@ -862,7 +862,7 @@ describe("dashboardServices", () => {
       }
     } as BsdDisplay;
     const permissions: UserPermission[] = [UserPermission.BsdCanSignEmission];
-    it('should return the correct label when bsd type is "Bsdd" and siret is same as transporter', () => {
+    it('should return the correct label when bsd type is "Bsdd" and SIRET is same as transporter', () => {
       const currentSiret = "1234567890";
 
       const result = getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
@@ -870,7 +870,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNER);
     });
 
-    it("should return an empty string when siret is not same as temporary transporter", () => {
+    it("should return an empty string when SIRET is not same as temporary transporter", () => {
       const currentSiret = "1234567890";
       bsd.temporaryStorageDetail!.transporter!.company!.siret = "132456378399";
       const result = getSignTempStorerBtnLabel(currentSiret, bsd, permissions);
@@ -906,7 +906,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return VALIDER_ACCEPTATION for bsdd type with same siret temporary storage destination", () => {
+    it("should return VALIDER_ACCEPTATION for bsdd type with same SIRET temporary storage destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
       ];
@@ -925,7 +925,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_ACCEPTATION);
     });
 
-    it("should return VALIDER_ACCEPTATION for bsdd type with same siret destination", () => {
+    it("should return VALIDER_ACCEPTATION for bsdd type with same SIRET destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignAcceptation
       ];
@@ -967,7 +967,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
-    it("should return SIGNATURE_ACCEPTATION_CONTENANT for bsff type with actTab and same siret destination", () => {
+    it("should return SIGNATURE_ACCEPTATION_CONTENANT for bsff type with actTab and same SIRET destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
       ];
@@ -984,7 +984,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNATURE_ACCEPTATION_CONTENANT);
     });
 
-    it("should return VALIDER_TRAITEMENT for bsdasri type with actTab and same siret destination", () => {
+    it("should return VALIDER_TRAITEMENT for bsdasri type with actTab and same SIRET destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
       ];
@@ -1189,7 +1189,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual("");
     });
 
-    it("should return SIGNER when currentSiret is same as worker company siret", () => {
+    it("should return SIGNER when currentSiret is same as worker company SIRET", () => {
       const permissions: UserPermission[] = [UserPermission.BsdCanSignWork];
       const result = getSignByProducerBtnLabel(
         "currentSiret",
@@ -1262,7 +1262,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(true);
     });
 
-    it("should return true for BSFF in draft mode with current siret matching transporter siret", () => {
+    it("should return true for BSFF in draft mode with current siret matching transporter SIRET", () => {
       const bsd = {
         type: BsdType.Bsff,
         isDraft: true,
@@ -1614,7 +1614,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(false);
     });
 
-    it("should return false if currentSiret does not match destination siret", () => {
+    it("should return false if currentSiret does not match destination SIRET", () => {
       const result = canMakeCorrection(
         { ...bsd, destination: { company: { siret: "987654321" } } },
         currentSiret
@@ -1864,7 +1864,7 @@ describe("dashboardServices", () => {
       ecoOrganisme: { siret: "1" }
     } as BsdDisplay;
 
-    it("returns true if can Skip Emission and is Same Siret Transporter", () => {
+    it("returns true if can Skip Emission and is Same SIRET Transporter", () => {
       const result = isSignTransportCanSkipEmission(
         currentSiret,
         bsd,
@@ -1890,7 +1890,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(false);
     });
 
-    it("returns false if not is Same Siret Transporter", () => {
+    it("returns false if not is Same SIRET Transporter", () => {
       const result = isSignTransportCanSkipEmission(
         currentSiret,
         {
@@ -1947,7 +1947,7 @@ describe("dashboardServices", () => {
       }
     } as BsdDisplay;
 
-    it("should return false if testing for a wrong siret", () => {
+    it("should return false if testing for a wrong SIRET", () => {
       const currentSiret = "555555555";
       const result = isSiretActorForBsd(bsda, currentSiret, [
         { type: ActorType.Transporter }
@@ -2021,7 +2021,7 @@ describe("dashboardServices", () => {
       expect(result).toBe(true);
     });
 
-    it("should return false if testing for Broker with wrong siret, strict", () => {
+    it("should return false if testing for Broker with wrong SIRET, strict", () => {
       const currentSiret = "6";
       const result = isSiretActorForBsd(bsd, currentSiret, [
         { type: ActorType.Broker }

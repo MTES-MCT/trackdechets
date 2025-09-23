@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import { Prisma } from "@prisma/client";
+import { validateSecureUri } from "../common/validation/secureUri";
 
 type WebhookSettingCreateInput = Pick<
   Prisma.WebhookSettingCreateInput,
@@ -14,12 +15,11 @@ const webhookSettingUpdateSchema: yup.SchemaOf<WebhookSettingUpdateInput> =
   yup.object({
     endpointUri: yup
       .string()
-      .url()
       .max(300)
       .test(
-        "webhook-url-https",
-        "L'url doit être en https",
-        value => value === undefined || value.startsWith("https://")
+        "secure-webhook-uri",
+        "URL de webhook non sécurisée ou invalide",
+        value => value === undefined || validateSecureUri(value)
       ),
     token: yup.string().notRequired().min(20).max(100),
     activated: yup.boolean()
@@ -30,11 +30,12 @@ const webhookSettingCreateSchema: yup.SchemaOf<WebhookSettingCreateInput> =
     companyId: yup.string().required("L'id de l'établissement est requis'"),
     endpointUri: yup
       .string()
-      .url()
       .max(300)
       .required("L'url de notification du webhook est requise")
-      .test("webhook-url-https", "L'url doit être en https", (value: string) =>
-        value.startsWith("https://")
+      .test(
+        "secure-webhook-uri",
+        "URL de webhook non sécurisée ou invalide",
+        validateSecureUri
       ),
     token: yup.string().required().min(20).max(100) as any,
     activated: yup.boolean()

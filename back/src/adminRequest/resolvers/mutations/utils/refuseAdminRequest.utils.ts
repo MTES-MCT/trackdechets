@@ -71,6 +71,19 @@ export const checkCanRefuseAdminRequest = async (
       "Vous n'êtes pas autorisé à effectuer cette action."
     );
   }
+
+  // A company admin can always refuse a request
+  if (companyAssociation.role === UserRole.ADMIN) {
+    return true;
+  }
+
+  // User must be targeted by the request
+  if (
+    user.id !== adminRequest.userId &&
+    user.id !== adminRequest.collaboratorId
+  ) {
+    throw new UserInputError(`Demande non valide.`);
+  }
 };
 
 export const sendEmailToCompanyAdmins = async (

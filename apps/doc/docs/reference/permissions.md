@@ -3,7 +3,7 @@ title: Rôles utilisateurs
 ---
 
 
-Un rôle utilisateur correspond à un ensemble de droits attribués à un utilisateur (identifié par son adresse e-mail) sur un établisement (identifié par son n°SIRET ou son N°TVA intracommunautaire). Ce rôle détermine ce que l'utilisateur peut ou ne peut pas faire au sein de Trackdéchets pour un établissement donné. À noter que : 
+Un rôle utilisateur correspond à un ensemble de droits attribués à un utilisateur (identifié par son adresse e-mail) sur un établisement (identifié par son SIRET ou son N°TVA intracommunautaire). Ce rôle détermine ce que l'utilisateur peut ou ne peut pas faire au sein de Trackdéchets pour un établissement donné. À noter que : 
 
 - Un établissement peut avoir **N utilisateurs** qui lui sont rattachés sur Trackdéchets. 
 - Un utilisateur peut être rattaché à **N établissements** et consulter leurs données séparément. 

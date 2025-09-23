@@ -129,7 +129,7 @@ export default function CompanyDetails() {
   }
 
   const companies = data?.myCompanies?.edges.map(({ node }) => node);
-  const company = companies && companies[0];
+  const company = companies ? companies.find(c => c.siret === siret) : null;
 
   if (!company) {
     return <Navigate to={{ pathname: routes.companies.index }} />;

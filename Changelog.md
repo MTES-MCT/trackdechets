@@ -5,6 +5,38 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.09.1] 23/09/2025
+
+#### :nail_care: Améliorations
+
+- Déplacement des champs de transfert transfrontalier sur IHM Registre DND entrant [PR 4403](https://github.com/MTES-MCT/trackdechets/pull/4403)
+- Retrait les champs de l'installation de broyage prévisionnelle à création du BSVHU [PR 4404](https://github.com/MTES-MCT/trackdechets/pull/4404)
+- Ajout des champs de l'installation de broyage prévisionnelle à la signature du traitement sur le BSVHU [PR 4407](https://github.com/MTES-MCT/trackdechets/pull/4407)
+- Ajout de l'installation de broyage prévisionnelle sur l'aperçu du BSVHU [PR 4426](https://github.com/MTES-MCT/trackdechets/pull/4426)
+
+#### :bug: Corrections de bugs
+
+- Suppression du message d'erreur en double sur les numéros d'identification dans le formulaire BSVHU [PR 4400](https://github.com/MTES-MCT/trackdechets/pull/4400)
+- Amélioration du zoom de la carte des parcelles pour éviter la confusion [PR 4401](https://github.com/MTES-MCT/trackdechets/pull/4401)
+- Remonter correctement la Raison sociale du producteur en situation irrégulière sur l'aperçu du BSDVHU [PR 4424](https://github.com/MTES-MCT/trackdechets/pull/4424)
+- Afficher par défaut le code de traitement R12 lorsque c'est le code déchet avec \* qui a été sélectionné sur le BSVHU [PR 4425](https://github.com/MTES-MCT/trackdechets/pull/4425)
+- Utilisation de "SIRET" au lieu de ses variantes (siret, n°siret, etc.) [PR 4423](https://github.com/MTES-MCT/trackdechets/pull/4423)
+- Compléter automatiquement le champ date avec la date d'aujourd'hui sur la modale de signature transporteur sur le BSDA [PR 4421](https://github.com/MTES-MCT/trackdechets/pull/4421)
+- Affichage des bonnes informations de contact dans la modale de signature transporteur du BSVHU en cas de multimodal [PR 4422](https://github.com/MTES-MCT/trackdechets/pull/4422)
+- Affichage du conditionnement sur l'aperçu du BSDA [PR 4420](https://github.com/MTES-MCT/trackdechets/pull/4420)
+- Correction des codes de traitement affichés à la signature du traitement d'un BSVHU [PR 4398](https://github.com/MTES-MCT/trackdechets/pull/4398)
+- ETQ utilisateur je ne peux plus modifier l'émetteur d'un BSDD une fois signé par l'émetteur [PR 4390](https://github.com/MTES-MCT/trackdechets/pull/4390)
+- Correction de l'affichage du statut de signature émetteur dans l'Aperçu des BSVHU [PR 4396](https://github.com/MTES-MCT/trackdechets/pull/4396)
+- Le BSDA de collecte en déchetterie passe au statut Refusé à la signature de la réception si le déchet est refusé [PR 4394](https://github.com/MTES-MCT/trackdechets/pull/4394)
+- ETQ destination je peux signer la réception d'un BSDA même si tous les transporteurs n'ont pas signé [PR 4381](https://github.com/MTES-MCT/trackdechets/pull/4381)
+- Ajout de validation sur la mutation `signBsdasriEmissionWithSecretCode` [PR 4391](https://github.com/MTES-MCT/trackdechets/pull/4391)
+- ETQ chauffeur, je peux signer un BSVHU avec émetteur en situation irrégulière et sans SIRET [PR 4413](https://github.com/MTES-MCT/trackdechets/pull/4413)
+- Correction des PDFs qui avaient systématiquement une page blanche inutile à la fin [PR 4410](https://github.com/MTES-MCT/trackdechets/pull/4410)
+
+#### :boom: Breaking Change
+
+- Suppression du code et des queries liées aux anciens exports de registres [PR 4442](https://github.com/MTES-MCT/trackdechets/pull/4442)
+
 # [2025.08.1] 26/08/2025
 
 #### :nail_care: Améliorations

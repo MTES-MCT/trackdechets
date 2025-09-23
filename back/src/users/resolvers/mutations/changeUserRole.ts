@@ -26,6 +26,7 @@ import {
   updateUserAccountHash
 } from "../../database";
 import { getDefaultNotifications } from "../../notifications";
+import { deleteCachedUserRoles } from "../../../common/redis/users";
 
 const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
   parent,
@@ -70,12 +71,18 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
         `L'utilisateur n'est pas membre de l'entreprise`
       );
     }
-    return userAssociationToCompanyMember(
+
+    const assocationToComp = await userAssociationToCompanyMember(
       updatedAssociation,
       company.orgId,
       user.id,
       isTDAdmin
     );
+
+    // Clear cache
+    await deleteCachedUserRoles(args.userId);
+
+    return assocationToComp;
   }
 
   const userAccountHash = await prisma.userAccountHash.findUnique({

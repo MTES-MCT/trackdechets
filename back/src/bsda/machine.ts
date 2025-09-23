@@ -42,6 +42,10 @@ export const machine = createMachine<Record<string, never>, Event>(
               cond: "isCollectedBy2710AndGroupingOrReshipmentOperation"
             },
             {
+              target: BsdaStatus.REFUSED,
+              cond: "isCollectedBy2710AndRefused"
+            },
+            {
               target: BsdaStatus.RECEIVED,
               cond: "isCollectedBy2710"
             }
@@ -137,6 +141,10 @@ export const machine = createMachine<Record<string, never>, Event>(
         ),
       isCollectedBy2710: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
+      isCollectedBy2710AndRefused: (_, event) =>
+        event.bsda?.type === BsdaType.COLLECTION_2710 &&
+        event.bsda?.destinationReceptionAcceptationStatus ===
+          BsdaStatus.REFUSED,
       isCollectedBy2710AndGroupingOrReshipmentOperation: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710 &&
         !!event.bsda?.destinationOperationCode &&

@@ -114,9 +114,15 @@ const EmitterBsvhu = ({ errors }) => {
   };
 
   const onNoSiretClick = () => {
-    if (!!emitter.company) {
+    if (emitter.company.siret) {
       setValue("emitter.company", {});
       setValue("emitter.agrementNumber", null);
+      setValue("emitter.company.siret", null);
+      setValue("emitter.company.name", "");
+      setValue("emitter.company.contact", "");
+      setValue("emitter.company.phone", "");
+      setValue("emitter.company.mail", "");
+      setValue("emitter.company.address", "");
     }
   };
 
@@ -213,7 +219,7 @@ const EmitterBsvhu = ({ errors }) => {
             <SingleCheckbox
               options={[
                 {
-                  label: "L'installation n'a pas de numéro SIRET",
+                  label: "L'installation n'a pas de SIRET",
                   nativeInputProps: {
                     ...register("emitter.noSiret"),
                     onClick: onNoSiretClick

@@ -136,7 +136,7 @@ export function BulkProfileUpdateAdmin() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="fr-grid-row fr-grid-row--bottom">
               <Input
-                label="Email de l'administrateur des établissement (demandeur)"
+                label="Courriel de l'administrateur des établissement (demandeur)"
                 hintText="Pour valider les permissisons du demandeur"
                 className="fr-col-8  fr-mb-5v"
                 nativeInputProps={{

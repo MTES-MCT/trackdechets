@@ -6,11 +6,13 @@ import {
   companyFactory,
   userFactory,
   userWithCompanyFactory,
-  adminFactory
+  adminFactory,
+  userInCompany
 } from "../../../../__tests__/factories";
 import {
   AdminRequestStatus,
-  AdminRequestValidationMethod
+  AdminRequestValidationMethod,
+  UserRole
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
@@ -204,9 +206,9 @@ describe("Mutation refuseAdminRequest", () => {
     expect(errors[0].message).toEqual(`Cette demande a expiré.`);
   });
 
-  it("should refuse pending request", async () => {
+  it("company admin can refuse pending request", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory();
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const requestAuthor = await userFactory();
 
     const adminRequest = await prisma.adminRequest.create({
@@ -239,6 +241,119 @@ describe("Mutation refuseAdminRequest", () => {
     });
 
     expect(updatedAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+  });
+
+  it("company admin can refuse pending request even if it targeted a colleague", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const requestAuthor = await userFactory();
+    const user2 = await userInCompany(UserRole.MEMBER, company.id);
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user2.id
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "refuseAdminRequest">>(
+      REFUSE_ADMIN_REQUEST,
+      {
+        variables: {
+          adminRequestId: adminRequest.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.refuseAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+
+    const updatedAdminRequest = await prisma.adminRequest.findUniqueOrThrow({
+      where: { id: adminRequest.id }
+    });
+
+    expect(updatedAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+  });
+
+  it("targeted colleague can refuse pending request", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const requestAuthor = await userFactory();
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: requestAuthor.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: user.id
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<Pick<Mutation, "refuseAdminRequest">>(
+      REFUSE_ADMIN_REQUEST,
+      {
+        variables: {
+          adminRequestId: adminRequest.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.refuseAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+
+    const updatedAdminRequest = await prisma.adminRequest.findUniqueOrThrow({
+      where: { id: adminRequest.id }
+    });
+
+    expect(updatedAdminRequest.status).toBe(AdminRequestStatus.REFUSED);
+  });
+
+  it("a non-admin, non-targeted member of the company cannot refuse the request", async () => {
+    // Given
+    const { user: user1, company } = await userWithCompanyFactory(
+      UserRole.MEMBER
+    );
+
+    // In company but not admin, and not targeted as colleague
+    const user2 = await userInCompany(UserRole.MEMBER, company.id);
+
+    const adminRequest = await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod: AdminRequestValidationMethod.SEND_MAIL
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user2);
+    const { errors } = await mutate<Pick<Mutation, "refuseAdminRequest">>(
+      REFUSE_ADMIN_REQUEST,
+      {
+        variables: {
+          adminRequestId: adminRequest.id
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(`Demande non valide.`);
   });
 
   it("Trackdéchets admin can refuse a pending request", async () => {

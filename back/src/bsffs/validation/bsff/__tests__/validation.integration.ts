@@ -103,7 +103,7 @@ describe("validation > parseBsff", () => {
       expect(parsed).toBeDefined();
     });
 
-    it("should throw when N°SIRETs are invalid", () => {
+    it("should throw when SIRETs are invalid", () => {
       const zodBsff: ZodBsff = {
         emitterCompanySiret: "foo1",
         destinationCompanySiret: "foo2",
@@ -115,19 +115,19 @@ describe("validation > parseBsff", () => {
       } catch (e) {
         expect(e.errors).toEqual([
           expect.objectContaining({
-            message: "Émetteur : foo1 n'est pas un numéro de SIRET valide"
+            message: "Émetteur : foo1 n'est pas un SIRET valide"
           }),
           expect.objectContaining({
-            message: "Destination : foo2 n'est pas un numéro de SIRET valide"
+            message: "Destination : foo2 n'est pas un SIRET valide"
           }),
           expect.objectContaining({
-            message: "Transporteur : foo3 n'est pas un numéro de SIRET valide"
+            message: "Transporteur : foo3 n'est pas un SIRET valide"
           })
         ]);
       }
     });
 
-    it("should parse correctly when n°SIRETs are valid", () => {
+    it("should parse correctly when SIRETs are valid", () => {
       const zodBsff: ZodBsff = {
         emitterCompanySiret: siretify(),
         destinationCompanySiret: siretify(),
@@ -692,7 +692,7 @@ describe("validation > parseBsff", () => {
             message: "La raison sociale de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
-            message: "Le N°SIRET de l'émetteur est un champ requis."
+            message: "Le SIRET de l'émetteur est un champ requis."
           }),
           expect.objectContaining({
             message: "L'adresse de l'émetteur est un champ requis."
@@ -725,7 +725,7 @@ describe("validation > parseBsff", () => {
           }),
           expect.objectContaining({
             message:
-              "Le N°SIRET de l'installation de destination est un champ requis."
+              "Le SIRET de l'installation de destination est un champ requis."
           }),
           expect.objectContaining({
             message:
@@ -863,7 +863,7 @@ describe("validation > parseBsff", () => {
             message: "La raison sociale du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
-            message: "Le N°SIRET du transporteur n° 1 est obligatoire."
+            message: "Le SIRET du transporteur n° 1 est obligatoire."
           }),
           expect.objectContaining({
             message: "L'adresse du transporteur n° 1 est obligatoire."

@@ -30,12 +30,12 @@ const CREATE_BSFF_FICHE_INTERVENTION = gql`
 const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
   address: yup.string().required("L'adresse de l'établissement est requis"),
   contact: yup.string().required("Le contact de l'établissement est requis"),
-  mail: yup.string().required("L'email de contact est requis"),
+  mail: yup.string().required("Le courriel de contact est requis"),
   name: yup.string().required("Le nom de l'établissement est requis"),
   phone: yup
     .string()
     .required("Le numéro de téléphone de l'établissement est requis"),
-  siret: yup.string().required("Le numéro SIRET de l'établissement est requis"),
+  siret: yup.string().required("Le SIRET de l'établissement est requis"),
   vatNumber: yup.string().nullable(),
   country: yup.string().notRequired().nullable(),
   omiNumber: yup.string().nullable(),
@@ -270,7 +270,7 @@ function PrivateIndividual() {
       </div>
       <div className="form__row">
         <label>
-          Mail (optionnel)
+          Courriel (optionnel)
           <Field
             type="text"
             name="detenteur.company.mail"

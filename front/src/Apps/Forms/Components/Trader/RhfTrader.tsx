@@ -5,7 +5,7 @@ import Trader from "./Trader";
 import { TraderInput } from "@td/codegen-ui";
 
 type RhfTraderProps = {
-  // N°SIRET de l'établissement courant
+  // SIRET de l'établissement courant
   siret?: string;
   disabled?: boolean;
   // Permet d'afficher ou non le switch "Présence d'un négociant"

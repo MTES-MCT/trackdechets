@@ -1,5 +1,6 @@
 import * as yup from "yup";
 import type { CreateApplicationInput } from "@td/codegen-back";
+import { validateSecureUri } from "../common/validation/secureUri";
 
 export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
   yup.object({
@@ -10,8 +11,12 @@ export const applicationSchema: yup.SchemaOf<CreateApplicationInput> =
       .of(
         yup
           .string()
-          .matches(/^https?:\/\//i, "URL invalide")
           .required()
+          .test(
+            "secure-redirect-uri",
+            "URL de redirection non sécurisée ou invalide",
+            validateSecureUri
+          )
       )
       .required()
       .min(1, "Vous devez préciser au moins une URL de redirection")

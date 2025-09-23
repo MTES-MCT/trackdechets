@@ -147,7 +147,7 @@ export function BsdAdmin() {
       </form>
     ]) ?? [];
 
-  const resultsHeaders = ["Email", "Rôle", "Action"];
+  const resultsHeaders = ["Courriel", "Rôle", "Action"];
   const resultsData =
     dataImpersonate?.companyPrivateInfos.users?.map(infos => [
       infos.email,

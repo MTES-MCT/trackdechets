@@ -3,7 +3,7 @@ import Cleave from "cleave.js/react";
 import styles from "./AutoFormattingCompanyInfosInput.module.scss";
 
 /**
- * Cleave component to format typed sirets on the fly (eg. 333 330 581 00012)
+ * Cleave component to format typed SIRETs on the fly (eg. 333 330 581 00012)
  */
 export default function AutoFormattingCompanyInfosInput({
   field,

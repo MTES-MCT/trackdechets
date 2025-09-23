@@ -366,7 +366,7 @@ describe("BSVHU validation", () => {
       } catch (err) {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
-            message: "Émetteur : 1 n'est pas un numéro de SIRET valide"
+            message: "Émetteur : 1 n'est pas un SIRET valide"
           })
         ]);
       }
@@ -388,7 +388,7 @@ describe("BSVHU validation", () => {
       } catch (err) {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
-            message: "Transporteur : 1 n'est pas un numéro de SIRET valide"
+            message: "Transporteur : 1 n'est pas un SIRET valide"
           })
         ]);
       }
@@ -539,7 +539,7 @@ describe("BSVHU validation", () => {
       } catch (err) {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
-            message: "Destination : 1 n'est pas un numéro de SIRET valide"
+            message: "Destination : 1 n'est pas un SIRET valide"
           })
         ]);
       }
@@ -911,7 +911,7 @@ describe("BSVHU validation", () => {
       } catch (err) {
         expect((err as ZodError).issues).toEqual([
           expect.objectContaining({
-            message: "Les numéros d'identification est un champ requis."
+            message: "Le détail des identifications est un champ requis."
           })
         ]);
       }

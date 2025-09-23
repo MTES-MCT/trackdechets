@@ -73,7 +73,7 @@ export default function CompanyContactInfo({
           <Field name={`${fieldName}.mail`}>
             {({ field }) => (
               <Input
-                label="Mail"
+                label="Courriel"
                 state={mailError && mailTouched ? "error" : "default"}
                 stateRelatedMessage={mailError}
                 nativeInputProps={{ ...field, type: "email" }}

@@ -9,6 +9,8 @@ concurrency:
 jobs:
   back:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     name: Integration tests (chunk ${{ matrix.shard }}/${{ strategy.job-total }})
     strategy:
       fail-fast: false

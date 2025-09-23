@@ -159,7 +159,7 @@ describe("Mutation.updateFormTransporter", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Transporteur: 123 n'est pas un numéro de SIRET valide\n" +
+          "Transporteur: 123 n'est pas un SIRET valide\n" +
           "Transporteur : l'établissement avec le SIRET 123 n'est pas inscrit sur Trackdéchets"
       })
     ]);

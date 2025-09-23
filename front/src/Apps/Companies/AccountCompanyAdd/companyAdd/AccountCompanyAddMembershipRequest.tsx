@@ -38,7 +38,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
     return (
       <div className="notification notification--success tw-mt-1">
         <p>
-          Demande de rattachement envoyée. Vous recevrez un email de
+          Demande de rattachement envoyée. Vous recevrez un courriel de
           confirmation lorsque votre demande sera validée. <br />
           {displayUnredactedEmailAddresses(data.sendMembershipRequest.sentTo)}
         </p>

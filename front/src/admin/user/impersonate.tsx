@@ -32,7 +32,7 @@ export function Impersonate() {
     Pick<Query, "companyPrivateInfos">
   >(COMPANY_PRIVATE_INFOS);
 
-  const tableHeaders = ["Email", "Rôle", "Action"];
+  const tableHeaders = ["Courriel", "Rôle", "Action"];
   const tableData =
     data?.companyPrivateInfos.users?.map(infos => [
       infos.email,
@@ -60,12 +60,12 @@ export function Impersonate() {
   return (
     <div>
       <div>
-        <h3 className="fr-sr-only">Impersonation par email</h3>
+        <h3 className="fr-sr-only">Impersonation par courriel</h3>
         <form action={`${VITE_API_ENDPOINT}/impersonate`} method="post">
           <div className="fr-grid-row fr-grid-row--bottom">
             <div className="fr-col-8">
               <Input
-                label="Impersonation par email"
+                label="Impersonation par courriel"
                 nativeInputProps={{
                   required: true,
                   name: "email"
