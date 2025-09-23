@@ -30,6 +30,7 @@ import {
 export enum DataNameEnum {
   ADRESS_COLLECT = "Adresse de collecte",
   WASTE_CODE = "Code déchet",
+  NAME_COLLECT = "Nom de chantier",
   POP = "Pop",
   WASTE_DESC = "Description déchet",
   SEALED_NUMBER = "Numéros de scellés",
@@ -123,19 +124,36 @@ export const mapRevision = (
     details: [
       {
         dataName: DataNameEnum.ADRESS_COLLECT,
-        dataOldValue: review?.[bsdName]?.emitter?.pickupSite
-          ? `${review?.[bsdName]?.emitter?.pickupSite?.address}, ${
-              review?.[bsdName]?.emitter?.pickupSite?.postalCode
-            } ${review?.[bsdName]?.emitter?.pickupSite?.city} ${
-              review?.[bsdName]?.emitter?.pickupSite?.infos ?? ""
-            }`
+        dataOldValue:
+          review?.[bsdName]?.emitter?.pickupSite?.address ||
+          review?.[bsdName]?.emitter?.pickupSite?.postalCode ||
+          review?.[bsdName]?.emitter?.pickupSite?.city ||
+          review?.[bsdName]?.emitter?.pickupSite?.infos
+            ? `${review?.[bsdName]?.emitter?.pickupSite?.address}, ${
+                review?.[bsdName]?.emitter?.pickupSite?.postalCode
+              } ${review?.[bsdName]?.emitter?.pickupSite?.city} ${
+                review?.[bsdName]?.emitter?.pickupSite?.infos ?? ""
+              }`
+            : "Non renseigné",
+        dataNewValue:
+          review?.content?.emitter?.pickupSite?.address ||
+          review?.content?.emitter?.pickupSite?.postalCode ||
+          review?.content?.emitter?.pickupSite?.city ||
+          review?.content?.emitter?.pickupSite?.infos
+            ? `${review?.content?.emitter?.pickupSite?.address}, ${
+                review?.content?.emitter?.pickupSite?.postalCode
+              } ${review?.content?.emitter?.pickupSite?.city} ${
+                review?.content?.emitter?.pickupSite?.infos ?? ""
+              }`
+            : ""
+      },
+      {
+        dataName: DataNameEnum.NAME_COLLECT,
+        dataOldValue: review?.[bsdName]?.emitter?.pickupSite.name
+          ? `${review?.[bsdName]?.emitter?.pickupSite?.name}`
           : "Non renseigné",
-        dataNewValue: review?.content?.emitter?.pickupSite
-          ? `${review?.content?.emitter?.pickupSite?.address}, ${
-              review?.content?.emitter?.pickupSite?.postalCode
-            } ${review?.content?.emitter?.pickupSite?.city} ${
-              review?.content?.emitter?.pickupSite?.infos ?? ""
-            }`
+        dataNewValue: review?.content?.emitter?.pickupSite?.name
+          ? `${review?.content?.emitter?.pickupSite?.name}`
           : ""
       },
       {

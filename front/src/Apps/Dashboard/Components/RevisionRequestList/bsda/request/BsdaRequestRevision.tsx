@@ -465,6 +465,20 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </RhfReviewableField>
 
               <RhfReviewableField
+                title="Nom de chantier ou de collecte"
+                value={bsda.emitter?.pickupSite?.name}
+                path="emitter.pickupSite"
+                defaultValue={initialBsdaReview.emitter?.pickupSite?.name}
+              >
+                <Input
+                  label="Nom de chantier ou de collecte"
+                  className="fr-col-8"
+                  nativeInputProps={{
+                    ...register("emitter.pickupSite.name")
+                  }}
+                />
+              </RhfReviewableField>
+              <RhfReviewableField
                 title="Adresse de chantier ou de collecte"
                 value={[
                   bsda.emitter?.pickupSite?.address,
