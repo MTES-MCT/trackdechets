@@ -78,7 +78,10 @@ export async function fillWorkerCertification(
     bsda.workerCertificationCertificationNumber =
       certification.certificationNumber;
     bsda.workerCertificationValidityLimit = certification.validityLimit;
-    bsda.workerCertificationOrganisation = certification.organisation as any;
+    bsda.workerCertificationOrganisation =
+      certification.organisation !== ""
+        ? (certification.organisation as any)
+        : null;
   }
 
   return bsda;
