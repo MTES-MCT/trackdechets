@@ -27,6 +27,14 @@
   display: flex;
   align-items: center;
 
+  &__text {
+    display: inline-block;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
   &__TempStorage {
     &:before {
       display: inline-block;
@@ -67,6 +75,7 @@
       width: 24px;
       height: 25px;
       vertical-align: middle;
+      flex-shrink: 0;
     }
     max-width: 200px;
     text-overflow: ellipsis;
