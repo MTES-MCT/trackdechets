@@ -918,7 +918,7 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
     wasteDetailsIsSubjectToADR: yup.boolean().nullable(),
     wasteDetailsOnuCode: yup
       .string()
-      .max(250)
+      .max(750)
       .nullable()
       // Empty values (or spaces) to null
       .transform(value =>
