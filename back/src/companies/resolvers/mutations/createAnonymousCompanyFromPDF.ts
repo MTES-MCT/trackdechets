@@ -30,8 +30,6 @@ const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousC
 
     const { siret, pdf } = input;
 
-    console.log("pdf", pdf.length);
-
     // Run verifications & extract data from PDF
     const data = await validateAndExtractSireneDataFromPDFInBase64(pdf);
 
