@@ -139,14 +139,11 @@ describe("getDelegationNotifiableUsers", () => {
     });
 
     // When
-    const { delegateUsers, delegatorUsers } =
-      await getDelegationNotifiableUsers(delegation);
+    const users = await getDelegationNotifiableUsers(delegation);
 
     // Then
     expect(
-      [...delegateUsers, ...delegatorUsers]
-        .map(user => user.id)
-        .sort((a, b) => a.localeCompare(b))
+      users.map(user => user.id).sort((a, b) => a.localeCompare(b))
     ).toEqual([
       delegatorAdmin.id,
       delegatorAdmin3.id,
@@ -174,12 +171,9 @@ describe("getDelegationNotifiableUsers", () => {
     });
 
     // When
-    const { delegateUsers, delegatorUsers } =
-      await getDelegationNotifiableUsers(delegation);
+    const users = await getDelegationNotifiableUsers(delegation);
 
     // Then
-    expect(
-      [...delegateUsers, ...delegatorUsers].map(user => user.id)
-    ).toHaveLength(0);
+    expect(users.map(user => user.id)).toHaveLength(0);
   });
 });
