@@ -585,34 +585,48 @@ export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
 
   if (!expiringDelegations.length) return [];
 
-  const payloads: Mail[] = await Promise.all(
-    expiringDelegations
-      .map(async delegation => {
-        const users = await getDelegationNotifiableUsers(delegation);
+  const payloads: Mail[] = [];
+  await Promise.all(
+    expiringDelegations.map(async delegation => {
+      const { delegateUsers, delegatorUsers } =
+        await getDelegationNotifiableUsers(delegation);
 
-        if (!users.length) return undefined;
+      if (!delegateUsers.length && !delegatorUsers.length) return undefined;
 
-        const variables = {
-          startDate: toddMMYYYY(delegation.startDate),
-          endDate: toddMMYYYY(delegation.endDate!),
-          delegator: delegation.delegator,
-          delegate: delegation.delegate
-        };
+      const variables = {
+        startDate: toddMMYYYY(delegation.startDate),
+        endDate: toddMMYYYY(delegation.endDate!),
+        delegator: delegation.delegator,
+        delegate: delegation.delegate
+      };
 
-        const payload = renderMail(expiringRegistryDelegationWarning, {
+      // Add payload for delegate company
+      if (delegateUsers.length) {
+        const delegatePayload = renderMail(expiringRegistryDelegationWarning, {
           variables,
-          to: users.map(user => ({
+          to: delegateUsers.map(user => ({
             email: user.email,
             name: user.name
           }))
         });
+        payloads.push(delegatePayload);
+      }
 
-        return payload;
-      })
-      .filter(Boolean) as unknown as Mail[]
+      // Add payload for delegator company
+      if (delegatorUsers.length) {
+        const delegatorPayload = renderMail(expiringRegistryDelegationWarning, {
+          variables,
+          to: delegatorUsers.map(user => ({
+            email: user.email,
+            name: user.name
+          }))
+        });
+        payloads.push(delegatorPayload);
+      }
+    })
   );
 
-  return payloads;
+  return payloads.filter(Boolean) as unknown as Mail[];
 };
 
 /**
