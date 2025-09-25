@@ -5,7 +5,7 @@ import { ParsedCreateRegistryDelegationInput } from "../../../validation";
 import { renderMail, registryDelegationCreation } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
 import { toddMMYYYY } from "../../../../utils";
-import { Contact, getDelegationNotifiableUsers } from "../../utils";
+import { getDelegationNotifiableUsers } from "../../utils";
 
 export const createDelegation = async (
   user: Express.User,
