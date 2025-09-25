@@ -78,23 +78,26 @@ export const sendRegistryDelegationCreationEmail = async (
   // Noone subscribed to notifications
   if (!users.length) return;
 
+  const variables = {
+    startDate: toddMMYYYY(delegation.startDate),
+    endDate: delegation.endDate ? toddMMYYYY(delegation.endDate) : undefined,
+    delegator,
+    delegate
+  };
+
   // Prepare mail template
   const payload = renderMail(registryDelegationCreation, {
-    variables: {
-      startDate: toddMMYYYY(delegation.startDate),
-      endDate: delegation.endDate ? toddMMYYYY(delegation.endDate) : undefined,
-      delegator,
-      delegate
-    },
-    messageVersions: [
-      {
-        to: users.map(user => ({
+    variables,
+    messageVersions: users.map(user => ({
+      to: [
+        {
           email: user.email,
           name: user.name
-        }))
-      }
-    ]
+        }
+      ]
+    }))
   });
 
+  // Send
   await sendMail(payload);
 };
