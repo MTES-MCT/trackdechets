@@ -35,20 +35,18 @@ const apiCallProcessor = async ({
   payload: { action: string; id: string; token: string };
 }) => {
   const { action, id, token } = payload;
-  logger.info(`Sending webhook request to ${endpointUri}`);
+  logger.info(`Sending webhook request to ${endpointUri}`, { action });
 
   try {
     const clearToken = aesDecrypt(token);
     // we send the payload as an array, maybe we'll group webhooks by recipients in the future
     const res = await axiosPost(endpointUri, action, id, clearToken);
-    // Customer server endpoint are supposed to return HTTP 200 each time a request si amde
+    // Customer server endpoint are supposed to return HTTP 200 each time a request is made
     if (res.status !== 200) {
-      // valid enpoint response, exit
       logger.warn(
-        `Webhook invalid return status (${res.status}) (${endpointUri})`
+        `Webhook invalid return status (${res.status}) (${endpointUri})`,
+        { status: res.status }
       );
-    } else {
-      return;
     }
   } catch (err) {
     logger.error(`Webhook error : `, {
@@ -67,13 +65,13 @@ const apiCallProcessor = async ({
     } else {
       logger.error(`Webhook error :`, { message: err.message, endpointUri });
     }
-  }
 
-  await handleWebhookFail(orgId, endpointUri);
-  // throw to trigger bull retry mechanism
-  throw new WebhookRequestError(
-    `Webhook request fail for orgId ${orgId} and endpoint ${endpointUri}`
-  );
+    await handleWebhookFail(orgId, endpointUri);
+    // throw to trigger bull retry mechanism
+    throw new WebhookRequestError(
+      `Webhook request fail for orgId ${orgId} and endpoint ${endpointUri}`
+    );
+  }
 };
 
 export async function sendHookJob(job: Job<WebhookQueueItem>) {
