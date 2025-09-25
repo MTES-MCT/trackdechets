@@ -134,15 +134,17 @@ export const getRegistryDelegationsExpiringInDays = async (days: number) => {
  * For a given delegation, return all users that are subscribed
  * to registry notifications
  */
+export interface Contact {
+  id: string;
+  email: string;
+  name: string;
+}
 export const getDelegationNotifiableUsers = async (
   delegation: RegistryDelegation
-): Promise<
-  {
-    id: string;
-    email: string;
-    name: string;
-  }[]
-> => {
+): Promise<{
+  delegateUsers: Contact[];
+  delegatorUsers: Contact[];
+}> => {
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
       companyId: { in: [delegation.delegatorId, delegation.delegateId] },
@@ -159,5 +161,12 @@ export const getDelegationNotifiableUsers = async (
     }
   });
 
-  return companyAssociations.map(companyAssociation => companyAssociation.user);
+  return {
+    delegateUsers: companyAssociations
+      .filter(ca => ca.companyId === delegation.delegateId)
+      .map(ca => ca.user),
+    delegatorUsers: companyAssociations
+      .filter(ca => ca.companyId === delegation.delegatorId)
+      .map(ca => ca.user)
+  };
 };

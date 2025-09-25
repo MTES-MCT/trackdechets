@@ -230,7 +230,7 @@ describe("mutation createRegistryDelegation", () => {
       jest.mock("../../../../mailer/mailing");
       (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
 
-      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+      expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2);
 
       // Registry email
       expect(sendMail as jest.Mock).toHaveBeenCalledWith(
@@ -244,8 +244,23 @@ describe("mutation createRegistryDelegation", () => {
             {
               to: expect.arrayContaining([
                 { email: delegatorAdmin.email, name: delegatorAdmin.name },
-                { email: delegateAdmin.email, name: delegateAdmin.name },
                 { email: delegatorMember.email, name: delegatorMember.name }
+              ])
+            }
+          ]
+        })
+      );
+      expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+        renderMail(registryDelegationCreation, {
+          variables: {
+            startDate: toddMMYYYY(delegation!.startDate!),
+            delegator,
+            delegate
+          },
+          messageVersions: [
+            {
+              to: expect.arrayContaining([
+                { email: delegateAdmin.email, name: delegateAdmin.name }
               ])
             }
           ]

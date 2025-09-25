@@ -5,7 +5,7 @@ import { ParsedCreateRegistryDelegationInput } from "../../../validation";
 import { renderMail, registryDelegationCreation } from "@td/mail";
 import { sendMail } from "../../../../mailer/mailing";
 import { toddMMYYYY } from "../../../../utils";
-import { getDelegationNotifiableUsers } from "../../utils";
+import { Contact, getDelegationNotifiableUsers } from "../../utils";
 
 export const createDelegation = async (
   user: Express.User,
@@ -73,28 +73,40 @@ export const sendRegistryDelegationCreationEmail = async (
   delegate: Company
 ) => {
   // Find notifiable users from both delegator & delegate companies
-  const users = await getDelegationNotifiableUsers(delegation);
+  const { delegateUsers, delegatorUsers } = await getDelegationNotifiableUsers(
+    delegation
+  );
 
   // Noone subscribed to notifications
-  if (!users.length) return;
+  if (!delegateUsers.length && !delegatorUsers.length) return;
 
-  // Prepare mail template
-  const payload = renderMail(registryDelegationCreation, {
-    variables: {
-      startDate: toddMMYYYY(delegation.startDate),
-      endDate: delegation.endDate ? toddMMYYYY(delegation.endDate) : undefined,
-      delegator,
-      delegate
-    },
-    messageVersions: [
-      {
-        to: users.map(user => ({
-          email: user.email,
-          name: user.name
-        }))
-      }
-    ]
-  });
+  const variables = {
+    startDate: toddMMYYYY(delegation.startDate),
+    endDate: delegation.endDate ? toddMMYYYY(delegation.endDate) : undefined,
+    delegator,
+    delegate
+  };
 
-  await sendMail(payload);
+  const sendMailTo = async (users: Contact[]) => {
+    if (users.length) {
+      // Prepare mail template
+      const payload = renderMail(registryDelegationCreation, {
+        variables,
+        messageVersions: [
+          {
+            to: users.map(user => ({
+              email: user.email,
+              name: user.name
+            }))
+          }
+        ]
+      });
+
+      // Send
+      await sendMail(payload);
+    }
+  };
+
+  // Send separate emails to delegator & delegate companies
+  await Promise.all([sendMailTo(delegatorUsers), sendMailTo(delegateUsers)]);
 };
