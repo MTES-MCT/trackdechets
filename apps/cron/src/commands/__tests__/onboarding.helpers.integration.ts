@@ -2106,26 +2106,27 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
     const mails = await getExpiringRegistryDelegationWarningMailPayloads();
 
     // Then
-    expect(mails.length).toBe(2);
-
-    const checkMail = (
-      mail,
-      delegation,
-      to,
-      delegatorCompany,
-      delegateCompany
-    ) => {
-      const expectedBody = `<p>
+    expect(mails.length).toBe(1);
+    expect(mails[0].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser.email, name: delegateUser.name }
+    ]);
+    expect(mails[0].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser.email, name: delegatorUser.name }
+    ]);
+    expect(mails[0].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany.orgId} et l'établissement ${delegateCompany.orgId}`
+    );
+    expect(mails[0].body).toBe(`<p>
   La plateforme Trackdéchets vous informe que la délégation accordée par
   l'établissement ${delegatorCompany.name} (${
-        delegatorCompany.orgId
-      }) à l'établissement
+      delegatorCompany.orgId
+    }) à l'établissement
   ${delegateCompany.name} (${
-        delegateCompany.orgId
-      }), effective depuis le ${toddMMYYYY(delegation.startDate).replace(
-        /\//g,
-        "&#x2F;"
-      )},
+      delegateCompany.orgId
+    }), effective depuis le ${toddMMYYYY(delegation.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
   arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
     delegation.endDate!
   ).replace(/\//g, "&#x2F;")}.
@@ -2140,39 +2141,7 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
     article de notre FAQ </a
   >.
 </p>
-`;
-      const expectedSubject = `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany.orgId} et l'établissement ${delegateCompany.orgId}`;
-
-      expect(mail.to).toMatchObject([{ email: to.email, name: to.name }]);
-      expect(mail.subject).toBe(expectedSubject);
-      expect(mail.body).toBe(expectedBody);
-    };
-
-    // Mail to delegateUser
-    const mailToDelegator = mails.find(m =>
-      m.to?.some(t => t.email === delegatorUser.email)
-    );
-    expect(mailToDelegator).toBeDefined();
-    checkMail(
-      mailToDelegator,
-      delegation,
-      delegatorUser,
-      delegatorCompany,
-      delegateCompany
-    );
-
-    // Mail to delegateUser
-    const mailToDelegate = mails.find(m =>
-      m.to?.some(t => t.email === delegateUser.email)
-    );
-    expect(mailToDelegate).toBeDefined();
-    checkMail(
-      mailToDelegate,
-      delegation,
-      delegateUser,
-      delegatorCompany,
-      delegateCompany
-    );
+`);
   });
 
   it("should send a warning email to expired delegation's involved users - multiple delegations involved", async () => {
@@ -2203,28 +2172,31 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
     const mails = await getExpiringRegistryDelegationWarningMailPayloads();
 
     // Then
-    expect(mails.length).toBe(4);
+    expect(mails.length).toBe(2);
 
-    const checkMail = (
-      mail,
-      delegation,
-      to,
-      delegatorCompany,
-      delegateCompany
-    ) => {
-      const expectedBody = `<p>
+    // Mail 1
+    expect(mails[0].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser1.email, name: delegateUser1.name }
+    ]);
+    expect(mails[0].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser1.email, name: delegatorUser1.name }
+    ]);
+    expect(mails[0].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany1.orgId} et l'établissement ${delegateCompany1.orgId}`
+    );
+    expect(mails[0].body).toBe(`<p>
   La plateforme Trackdéchets vous informe que la délégation accordée par
-  l'établissement ${delegatorCompany.name} (${
-        delegatorCompany.orgId
-      }) à l'établissement
-  ${delegateCompany.name} (${
-        delegateCompany.orgId
-      }), effective depuis le ${toddMMYYYY(delegation.startDate).replace(
-        /\//g,
-        "&#x2F;"
-      )},
+  l'établissement ${delegatorCompany1.name} (${
+      delegatorCompany1.orgId
+    }) à l'établissement
+  ${delegateCompany1.name} (${
+      delegateCompany1.orgId
+    }), effective depuis le ${toddMMYYYY(delegation1.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
   arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
-    delegation.endDate!
+    delegation1.endDate!
   ).replace(/\//g, "&#x2F;")}.
 </p>
 
@@ -2237,73 +2209,44 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
     article de notre FAQ </a
   >.
 </p>
-`;
-      const expectedSubject = `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany.orgId} et l'établissement ${delegateCompany.orgId}`;
+`);
 
-      expect(mail.to).toMatchObject([{ email: to.email, name: to.name }]);
-      expect(mail.subject).toBe(expectedSubject);
-      expect(mail.body).toBe(expectedBody);
-    };
+    // Mail 2
+    expect(mails[1].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser2.email, name: delegateUser2.name }
+    ]);
+    expect(mails[1].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser2.email, name: delegatorUser2.name }
+    ]);
+    expect(mails[1].subject).toBe(
+      `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany2.orgId} et l'établissement ${delegateCompany2.orgId}`
+    );
+    expect(mails[1].body).toBe(`<p>
+  La plateforme Trackdéchets vous informe que la délégation accordée par
+  l'établissement ${delegatorCompany2.name} (${
+      delegatorCompany2.orgId
+    }) à l'établissement
+  ${delegateCompany2.name} (${
+      delegateCompany2.orgId
+    }), effective depuis le ${toddMMYYYY(delegation2.startDate).replace(
+      /\//g,
+      "&#x2F;"
+    )},
+  arrivera à expiration dans 7 jours, soit le ${toddMMYYYY(
+    delegation2.endDate!
+  ).replace(/\//g, "&#x2F;")}.
+</p>
 
-    // Mails can be in any order
-
-    // Delegation 1
-    const mailDelegation1ToDelegate = mails.find(
-      mail =>
-        mail.subject.includes(delegatorCompany1.orgId) &&
-        mail.to?.some(to => to.email === delegateUser1.email)
-    );
-    expect(mailDelegation1ToDelegate).toBeDefined();
-    checkMail(
-      mailDelegation1ToDelegate,
-      delegation1,
-      delegateUser1,
-      delegatorCompany1,
-      delegateCompany1
-    );
-
-    const mailDelegation1ToDelegator = mails.find(
-      mail =>
-        mail.subject.includes(delegatorCompany1.orgId) &&
-        mail.to?.some(to => to.email === delegatorUser1.email)
-    );
-    expect(mailDelegation1ToDelegator).toBeDefined();
-    checkMail(
-      mailDelegation1ToDelegator,
-      delegation1,
-      delegatorUser1,
-      delegatorCompany1,
-      delegateCompany1
-    );
-
-    // Delegation 2
-    const mailDelegation2ToDelegate = mails.find(
-      mail =>
-        mail.subject.includes(delegatorCompany2.orgId) &&
-        mail.to?.some(to => to.email === delegateUser2.email)
-    );
-    expect(mailDelegation2ToDelegate).toBeDefined();
-    checkMail(
-      mailDelegation2ToDelegate,
-      delegation2,
-      delegateUser2,
-      delegatorCompany2,
-      delegateCompany2
-    );
-
-    const mailDelegation2ToDelegator = mails.find(
-      mail =>
-        mail.subject.includes(delegatorCompany2.orgId) &&
-        mail.to?.some(to => to.email === delegatorUser2.email)
-    );
-    expect(mailDelegation2ToDelegator).toBeDefined();
-    checkMail(
-      mailDelegation2ToDelegator,
-      delegation2,
-      delegatorUser2,
-      delegatorCompany2,
-      delegateCompany2
-    );
+<p>
+  Pour en savoir plus sur les délégations et découvrir comment prolonger cette
+  période, nous vous invitons à consulter cet
+  <a
+    href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte/modifier-les-informations-de-son-compte#visualiser-lensemble-des-collaborateurs-ayant-acces-a-mon-etablissement"
+  >
+    article de notre FAQ </a
+  >.
+</p>
+`);
   });
 });
 

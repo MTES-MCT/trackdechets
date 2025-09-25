@@ -73,12 +73,10 @@ export const sendRegistryDelegationCreationEmail = async (
   delegate: Company
 ) => {
   // Find notifiable users from both delegator & delegate companies
-  const { delegateUsers, delegatorUsers } = await getDelegationNotifiableUsers(
-    delegation
-  );
+  const users = await getDelegationNotifiableUsers(delegation);
 
   // Noone subscribed to notifications
-  if (!delegateUsers.length && !delegatorUsers.length) return;
+  if (!users.length) return;
 
   const variables = {
     startDate: toddMMYYYY(delegation.startDate),
@@ -87,26 +85,19 @@ export const sendRegistryDelegationCreationEmail = async (
     delegate
   };
 
-  const sendMailTo = async (users: Contact[]) => {
-    if (users.length) {
-      // Prepare mail template
-      const payload = renderMail(registryDelegationCreation, {
-        variables,
-        messageVersions: [
-          {
-            to: users.map(user => ({
-              email: user.email,
-              name: user.name
-            }))
-          }
-        ]
-      });
+  // Prepare mail template
+  const payload = renderMail(registryDelegationCreation, {
+    variables,
+    messageVersions: users.map(user => ({
+      to: [
+        {
+          email: user.email,
+          name: user.name
+        }
+      ]
+    }))
+  });
 
-      // Send
-      await sendMail(payload);
-    }
-  };
-
-  // Send separate emails to delegator & delegate companies
-  await Promise.all([sendMailTo(delegatorUsers), sendMailTo(delegateUsers)]);
+  // Send
+  await sendMail(payload);
 };

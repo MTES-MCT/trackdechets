@@ -585,48 +585,38 @@ export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
 
   if (!expiringDelegations.length) return [];
 
-  const payloads: Mail[] = [];
-  await Promise.all(
-    expiringDelegations.map(async delegation => {
-      const { delegateUsers, delegatorUsers } =
-        await getDelegationNotifiableUsers(delegation);
+  const payloads: Mail[] = await Promise.all(
+    expiringDelegations
+      .map(async delegation => {
+        const users = await getDelegationNotifiableUsers(delegation);
 
-      if (!delegateUsers.length && !delegatorUsers.length) return undefined;
+        if (!users.length) return undefined;
 
-      const variables = {
-        startDate: toddMMYYYY(delegation.startDate),
-        endDate: toddMMYYYY(delegation.endDate!),
-        delegator: delegation.delegator,
-        delegate: delegation.delegate
-      };
+        const variables = {
+          startDate: toddMMYYYY(delegation.startDate),
+          endDate: toddMMYYYY(delegation.endDate!),
+          delegator: delegation.delegator,
+          delegate: delegation.delegate
+        };
 
-      // Add payload for delegate company
-      if (delegateUsers.length) {
-        const delegatePayload = renderMail(expiringRegistryDelegationWarning, {
+        const payload = renderMail(expiringRegistryDelegationWarning, {
           variables,
-          to: delegateUsers.map(user => ({
-            email: user.email,
-            name: user.name
+          messageVersions: users.map(user => ({
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
           }))
         });
-        payloads.push(delegatePayload);
-      }
 
-      // Add payload for delegator company
-      if (delegatorUsers.length) {
-        const delegatorPayload = renderMail(expiringRegistryDelegationWarning, {
-          variables,
-          to: delegatorUsers.map(user => ({
-            email: user.email,
-            name: user.name
-          }))
-        });
-        payloads.push(delegatorPayload);
-      }
-    })
+        return payload;
+      })
+      .filter(Boolean) as unknown as Mail[]
   );
 
-  return payloads.filter(Boolean) as unknown as Mail[];
+  return payloads;
 };
 
 /**
