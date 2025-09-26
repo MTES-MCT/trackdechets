@@ -49,21 +49,21 @@ const apiCallProcessor = async ({
       );
     }
   } catch (err) {
-    logger.error(`Webhook error : `, {
-      message: err.message,
-      code: err.code,
-      endpointUri
-    });
-    if (err.response) {
+    if (axios.isAxiosError(err)) {
       logger.error(`Webhook error : `, {
-        status: err.response.status,
-        data: err.response.data,
-        endpointUri
+        endpointUri,
+        action,
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        ...(!err.response ? { request: err.request } : {})
       });
-    } else if (err.request) {
-      logger.error(`Webhook error :`, { request: err.request, endpointUri });
     } else {
-      logger.error(`Webhook error :`, { message: err.message, endpointUri });
+      logger.error(`Unexpected webhook error: ${err}`, {
+        err,
+        endpointUri,
+        action
+      });
     }
 
     await handleWebhookFail(orgId, endpointUri);
