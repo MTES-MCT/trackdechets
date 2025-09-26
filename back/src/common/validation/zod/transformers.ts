@@ -8,7 +8,6 @@ import {
   ParsedZodBsff,
   ParsedZodBsffTransporter
 } from "../../../bsffs/validation/bsff/schema";
-import { ParsedZodBsvhu } from "../../../bsvhu/validation/schema";
 
 export async function recipifyTransporter(
   transporter: ParsedZodBsdaTransporter | ParsedZodBsffTransporter
@@ -58,50 +57,6 @@ export async function updateTransportersRecepisse<
       transporters.map(t => recipifyTransporter(t))
     );
     return { ...bsd, transporters: recipifedTransporters };
-  }
-  return bsd;
-}
-
-export async function recipifyBsdTransporter<Bsd extends ParsedZodBsvhu>(
-  bsd: Bsd
-): Promise<Bsd> {
-  // Évite de modifier les données transporteur après
-  // la signature de celui-ci
-  if (bsd.transporterTransportSignatureDate) {
-    return bsd;
-  }
-  const orgId = getTransporterCompanyOrgId({
-    transporterCompanySiret: bsd.transporterCompanySiret ?? null,
-    transporterCompanyVatNumber: bsd.transporterCompanyVatNumber ?? null
-  });
-  if (orgId && !bsd.transporterRecepisseIsExempted) {
-    try {
-      const transporterReceipt = await prisma.company
-        .findUnique({
-          where: {
-            orgId
-          }
-        })
-        .transporterReceipt();
-
-      return {
-        ...bsd,
-        transporterRecepisseNumber: transporterReceipt?.receiptNumber ?? null,
-        transporterRecepisseValidityLimit:
-          transporterReceipt?.validityLimit ?? null,
-        transporterRecepisseDepartment: transporterReceipt?.department ?? null
-      };
-    } catch (_) {
-      // do nothing
-    }
-  }
-  if (bsd.transporterRecepisseIsExempted) {
-    return {
-      ...bsd,
-      transporterRecepisseNumber: null,
-      transporterRecepisseValidityLimit: null,
-      transporterRecepisseDepartment: null
-    };
   }
   return bsd;
 }

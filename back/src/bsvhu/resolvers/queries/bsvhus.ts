@@ -25,8 +25,7 @@ export default async function bsvhus(
   const mask = {
     OR: [
       { emitterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanySiret: { in: orgIdsWithListPermission } },
-      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { transportersOrgIds: { hasSome: orgIdsWithListPermission } },
       { destinationCompanySiret: { in: orgIdsWithListPermission } },
       { brokerCompanySiret: { in: orgIdsWithListPermission } },
       { traderCompanySiret: { in: orgIdsWithListPermission } },
@@ -61,7 +60,8 @@ export default async function bsvhus(
     findMany: prismaPaginationArgs =>
       bsvhuRepository.findMany(where, {
         ...prismaPaginationArgs,
-        orderBy: { rowNumber: "desc" }
+        orderBy: { rowNumber: "desc" },
+        include: { transporters: true }
       }),
     formatNode: expandVhuFormFromDb,
     ...gqlPaginationArgs

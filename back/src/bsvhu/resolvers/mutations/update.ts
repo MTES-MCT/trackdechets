@@ -1,11 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationUpdateBsvhuArgs } from "@td/codegen-back";
+import { Prisma } from "@prisma/client";
 import { GraphQLContext } from "../../../types";
 import {
   companyToIntermediaryInput,
   expandVhuFormFromDb
 } from "../../converter";
-import { getBsvhuOrNotFound } from "../../database";
+import { getBsvhuOrNotFound, getFirstTransporterSync } from "../../database";
 import { mergeInputAndParseBsvhuAsync } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanUpdate } from "../../permissions";
@@ -45,6 +46,37 @@ export default async function edit(
       }
     : undefined;
 
+  const existingFirstTransporter = getFirstTransporterSync(existingBsvhu);
+
+  let transporters:
+    | Prisma.BsvhuTransporterUpdateManyWithoutBsvhuNestedInput
+    | undefined = undefined;
+
+  if (updatedFields.includes("transporters")) {
+    if (input.transporter) {
+      if (existingFirstTransporter) {
+        // on met à jour le premier transporteur existant
+        const { id, number, bsvhuId, createdAt, ...data } =
+          parsedBsvhu.transporters![0];
+        transporters = { update: { where: { id: id! }, data } };
+      } else {
+        // on crée le premier transporteur
+        const { id, bsvhuId, createdAt, ...data } =
+          parsedBsvhu.transporters![0];
+        transporters = { create: { ...data, number: 1 } };
+      }
+    } else {
+      // Cas où l'update est fait via `BsvhuInput.transporters`. On déconnecte tous les transporteurs qui étaient
+      // précédement associés et on connecte les nouveaux transporteurs de la table `BsvhuTransporter`
+      // avec ce bordereau. La fonction `update` du repository s'assure que la numérotation des
+      // transporteurs correspond à l'ordre du tableau d'identifiants.
+      transporters = {
+        set: [],
+        connect: parsedBsvhu.transporters!.map(t => ({ id: t.id! }))
+      };
+    }
+  }
+
   const { update } = getBsvhuRepository(user);
   const { createdAt, ...bsvhu } = parsedBsvhu;
 
@@ -52,7 +84,8 @@ export default async function edit(
     { id },
     {
       ...bsvhu,
-      intermediaries
+      intermediaries,
+      transporters
     }
   );
 

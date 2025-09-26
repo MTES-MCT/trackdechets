@@ -4,6 +4,7 @@ import { getBsvhuOrNotFound } from "../../database";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuRepository } from "../../repository";
 import { checkCanDelete } from "../../permissions";
+import { BsvhuWithTransportersInclude } from "../../types";
 
 /**
  *
@@ -16,7 +17,9 @@ const deleteBsvhuResolver: MutationResolvers["deleteBsvhu"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const bsvhu = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuWithTransportersInclude
+  });
   // user must belong to the vhu, and status must be INITIAL
 
   await checkCanDelete(user, bsvhu);

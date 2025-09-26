@@ -9,7 +9,9 @@ import {
   ParsedZodBsvhu,
   ZodBsvhu,
   contextualBsvhuSchema,
-  contextualBsvhuSchemaAsync
+  contextualBsvhuSchemaAsync,
+  ZodBsvhuTransporter,
+  transformedBsvhuTransporterSchema
 } from "./schema";
 import { BsvhuValidationContext, PrismaBsvhuForParsing } from "./types";
 
@@ -28,7 +30,7 @@ export async function mergeInputAndParseBsvhuAsync(
   context: BsvhuValidationContext
 ) {
   const zodPersisted = prismaToZodBsvhu(persisted);
-  const zodInput = graphQlInputToZodBsvhu(input);
+  const zodInput = await graphQlInputToZodBsvhu(input);
 
   const bsvhu: ZodBsvhu = {
     ...zodPersisted,
@@ -62,6 +64,26 @@ export async function mergeInputAndParseBsvhuAsync(
     !zodInput.emitterCompanyAddress
   ) {
     bsvhu.emitterCompanyAddress = null;
+  }
+
+  // La fusion des transporteurs est un peu plus compliquée à cause de l'utilisation
+  // possible du champ `BsvhuInput.transporter (rétro-comptabilité avec l'API
+  // BSVHU pré multi-modal)
+  if (input.transporter === null) {
+    // On supprime le premier transporteur en gardant les suivants (s'ils existent)
+    bsvhu.transporters = (zodPersisted.transporters ?? []).slice(1);
+  } else if (
+    input.transporter &&
+    zodPersisted.transporters &&
+    zodPersisted.transporters.length > 0
+  ) {
+    // On modifie les données du 1er transporteur
+    bsvhu.transporters = zodPersisted.transporters.map((t, idx) => {
+      if (idx === 0) {
+        return { ...t, ...bsvhu.transporters![0] };
+      }
+      return t;
+    });
   }
 
   // Calcule la signature courante à partir des données si elle n'est
@@ -110,4 +132,12 @@ export function parseBsvhu(
 ): ParsedZodBsvhu {
   const schema = contextualBsvhuSchema(context);
   return schema.parse(bsvhu);
+}
+
+/**
+ * Fonction permettant de valider et parser un BsvhuTransporter dans les
+ * mutations `createBsvhuTransporter` et `updateBsvhuTransporter`
+ */
+export function parseBsvhuTransporterAsync(transporter: ZodBsvhuTransporter) {
+  return transformedBsvhuTransporterSchema.parseAsync(transporter);
 }

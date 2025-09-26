@@ -215,8 +215,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -258,8 +263,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -301,9 +311,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
           status: "SIGNED_BY_PRODUCER",
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -362,9 +376,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -396,9 +414,16 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true,
+              transporterTransportPlates: [],
+              transporterTransportMode: "ROAD"
+            }
+          }
         }
       });
 
@@ -412,7 +437,8 @@ describe("Mutation.Vhu.sign", () => {
       });
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "L'immatriculation du transporteur est un champ requis.",
+          message:
+            "L'immatriculation du transporteur n° 1 est un champ requis.",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
@@ -430,9 +456,14 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           createdAt: new Date("2024-12-26:00:00.000Z"), // before v20250101
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -464,10 +495,15 @@ describe("Mutation.Vhu.sign", () => {
         const bsvhu = await bsvhuFactory({
           opt: {
             emitterCompanySiret: emitterCompany.siret,
-            transporterCompanySiret: company.siret,
-            transporterRecepisseIsExempted: true,
-            transporterTransportMode: mode,
-            status: "SIGNED_BY_PRODUCER"
+            status: "SIGNED_BY_PRODUCER",
+            transporters: {
+              create: {
+                number: 1,
+                transporterCompanySiret: company.siret,
+                transporterRecepisseIsExempted: true,
+                transporterTransportMode: mode
+              }
+            }
           }
         });
 
@@ -503,9 +539,13 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           emitterIrregularSituation: true,
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -537,9 +577,13 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           emitterIrregularSituation: true,
           emitterCompanySiret: siretify(45345),
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -567,9 +611,13 @@ describe("Mutation.Vhu.sign", () => {
           emitterIrregularSituation: true,
           emitterNoSiret: true,
           emitterCompanySiret: null,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -598,10 +646,15 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportMode: null,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true,
+              transporterTransportMode: null
+            }
+          }
         }
       });
 
@@ -616,7 +669,7 @@ describe("Mutation.Vhu.sign", () => {
       });
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le mode de transport est un champ requis."
+        "Le mode de transport n° 1 est un champ requis."
       );
     });
   });
@@ -691,9 +744,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -741,9 +798,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -792,9 +853,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -854,13 +919,17 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: null, // Missing param
           destinationReceptionWeight: null, // Missing param
-          destinationReceptionDate: null // Missing param
+          destinationReceptionDate: null, // Missing param
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -883,9 +952,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -938,9 +1011,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -989,9 +1066,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Missing reception data!
           destinationReceptionAcceptationStatus: null, // Missing param
           destinationReceptionWeight: null, // Missing param
@@ -1021,9 +1102,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "RECEIVED",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -1048,9 +1133,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "PROCESSED",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -1079,11 +1168,19 @@ describe("Mutation.Vhu.sign", () => {
           status: "INITIAL",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportPlates: ["XY-23-TR"],
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
-          destinationReceptionDate: new Date()
+          destinationReceptionDate: new Date(),
+          transporters: {
+            create: {
+              number: 1,
+              transporterRecepisseIsExempted: true,
+              transporterRecepisseNumber: null,
+              transporterRecepisseValidityLimit: null,
+              transporterRecepisseDepartment: null
+            }
+          }
         }
       });
 
@@ -1104,8 +1201,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,
@@ -1128,9 +1230,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "RECEIVED", // Reception is signed!
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Reception data
           destinationReceptionAcceptationStatus: "ACCEPTED",
           destinationReceptionWeight: 20,

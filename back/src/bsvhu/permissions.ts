@@ -1,6 +1,10 @@
-import { Bsvhu, BsvhuStatus, User } from "@prisma/client";
-import type { BsvhuInput } from "@td/codegen-back";
+import { Bsvhu, BsvhuStatus, BsvhuTransporter, User } from "@prisma/client";
+import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
+import { BsvhuWithTransporters } from "./types";
+import { prisma } from "@td/prisma";
+import { getFirstTransporterSync } from "./database";
+import { flattenVhuTransporterInput } from "./converter";
 
 /**
  * Retrieves organisations allowed to read a BSVHU
@@ -11,12 +15,11 @@ function readers(bsvhu: Bsvhu): string[] {
     : [
         bsvhu.emitterCompanySiret,
         bsvhu.destinationCompanySiret,
-        bsvhu.transporterCompanySiret,
-        bsvhu.transporterCompanyVatNumber,
         bsvhu.ecoOrganismeSiret,
         bsvhu.brokerCompanySiret,
         bsvhu.traderCompanySiret,
-        ...bsvhu.intermediariesOrgIds
+        ...bsvhu.intermediariesOrgIds,
+        ...bsvhu.transportersOrgIds
       ].filter(Boolean);
 }
 
@@ -26,7 +29,10 @@ function readers(bsvhu: Bsvhu): string[] {
  * parameter to pre-compute the form contributors after the update, hence verifying
  * a user is not removing his own company from the BSVHU
  */
-function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
+async function contributors(
+  bsvhu: BsvhuWithTransporters,
+  input?: BsvhuInput
+): Promise<string[]> {
   if (bsvhu.isDraft) {
     return [...bsvhu.canAccessDraftOrgIds];
   }
@@ -44,6 +50,11 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
     i.vatNumber
   ]);
 
+  let transporters: Pick<
+    BsvhuTransporter,
+    "transporterCompanySiret" | "transporterCompanyVatNumber"
+  >[] = bsvhu.transporters;
+
   const emitterCompanySiret =
     updateEmitterCompanySiret !== undefined
       ? updateEmitterCompanySiret
@@ -53,16 +64,6 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
     updateDestinationCompanySiret !== undefined
       ? updateDestinationCompanySiret
       : bsvhu.destinationCompanySiret;
-
-  const transporterCompanySiret =
-    updateTransporterCompanySiret !== undefined
-      ? updateTransporterCompanySiret
-      : bsvhu.transporterCompanySiret;
-
-  const transporterCompanyVatNumber =
-    updateTransporterCompanyVatNumber !== undefined
-      ? updateTransporterCompanyVatNumber
-      : bsvhu.transporterCompanyVatNumber;
 
   const ecoOrganismeCompanySiret =
     updateEcoOrganismeCompanySiret !== undefined
@@ -84,30 +85,92 @@ function contributors(bsvhu: Bsvhu, input?: BsvhuInput): string[] {
       ? updateIntermediaries
       : bsvhu.intermediariesOrgIds;
 
+  if (input?.transporters) {
+    // on prend en compte la nouvelle liste de tranporteurs fournit
+    transporters = await prisma.bsvhuTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+  } else if (input?.transporter) {
+    const firstTransporter = getFirstTransporterSync(bsvhu);
+    if (!firstTransporter) {
+      transporters = [
+        {
+          transporterCompanySiret: input?.transporter?.company?.siret ?? null,
+          transporterCompanyVatNumber:
+            input?.transporter?.company?.vatNumber ?? null
+        }
+      ];
+    } else {
+      // on met à jour le transporteur 1 s'il existe ou on l'ajoute à la liste s'il n'existe pas
+      const transporterCompanySiret =
+        updateTransporterCompanySiret !== undefined
+          ? updateTransporterCompanySiret
+          : firstTransporter.transporterCompanySiret;
+      const transporterCompanyVatNumber =
+        updateTransporterCompanyVatNumber !== undefined
+          ? updateTransporterCompanyVatNumber
+          : firstTransporter.transporterCompanyVatNumber;
+
+      const updatedFirstTransporter = {
+        ...firstTransporter,
+        transporterCompanySiret,
+        transporterCompanyVatNumber
+      };
+
+      transporters = [updatedFirstTransporter, ...transporters.slice(1)];
+    }
+  }
+
+  const transportersOrgIds = transporters
+    .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+    .filter(Boolean);
+
   return [
     emitterCompanySiret,
     destinationCompanySiret,
-    transporterCompanySiret,
-    transporterCompanyVatNumber,
     ecoOrganismeCompanySiret,
     brokerCompanySiret,
     traderCompanySiret,
-    ...intermediariesOrgIds
+    ...intermediariesOrgIds,
+    ...transportersOrgIds
   ].filter(Boolean);
 }
 
 /**
  * Retrieves organisations allowed to create a BSVHU of the given payload
  */
-function creators(input: BsvhuInput) {
+async function creators(input: BsvhuInput) {
+  let transporters: Pick<
+    BsvhuTransporter,
+    "transporterCompanySiret" | "transporterCompanyVatNumber"
+  >[] = [];
+
+  if (input?.transporters) {
+    // on prend en compte la nouvelle liste de tranporteurs fournit
+    transporters = await prisma.bsvhuTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+  } else if (input?.transporter) {
+    transporters = [
+      {
+        transporterCompanySiret: input?.transporter?.company?.siret ?? null,
+        transporterCompanyVatNumber:
+          input?.transporter?.company?.vatNumber ?? null
+      }
+    ];
+  }
+
+  const transportersOrgIds = transporters
+    .flatMap(t => [t.transporterCompanySiret, t.transporterCompanyVatNumber])
+    .filter(Boolean);
+
   return [
     input.emitter?.company?.siret,
     input.ecoOrganisme?.siret,
-    input.transporter?.company?.siret,
-    input.transporter?.company?.vatNumber,
     input.destination?.company?.siret,
     input.broker?.company?.siret,
-    input.trader?.company?.siret
+    input.trader?.company?.siret,
+    ...transportersOrgIds
   ].filter(Boolean);
 }
 
@@ -126,7 +189,7 @@ export async function checkCanRead(user: User, bsvhu: Bsvhu) {
 }
 
 export async function checkCanCreate(user: User, bsvhuInput: BsvhuInput) {
-  const authorizedOrgIds = creators(bsvhuInput);
+  const authorizedOrgIds = await creators(bsvhuInput);
 
   return checkUserPermissions(
     user,
@@ -138,10 +201,10 @@ export async function checkCanCreate(user: User, bsvhuInput: BsvhuInput) {
 
 export async function checkCanUpdate(
   user: User,
-  bsvhu: Bsvhu,
+  bsvhu: BsvhuWithTransporters,
   input?: BsvhuInput
 ) {
-  const authorizedOrgIds = contributors(bsvhu);
+  const authorizedOrgIds = await contributors(bsvhu);
 
   await checkUserPermissions(
     user,
@@ -150,7 +213,7 @@ export async function checkCanUpdate(
     "Votre établissement doit être visé sur le bordereau"
   );
   if (input) {
-    const authorizedOrgIdsAfterUpdate = contributors(bsvhu, input);
+    const authorizedOrgIdsAfterUpdate = await contributors(bsvhu, input);
 
     return checkUserPermissions(
       user,
@@ -162,10 +225,50 @@ export async function checkCanUpdate(
   return true;
 }
 
-export async function checkCanDelete(user: User, bsvhu: Bsvhu) {
+export async function checkCanUpdateBsvhuTransporter(
+  user: User,
+  bsvhu: BsvhuWithTransporters,
+  transporterId: string,
+  input: BsvhuTransporterInput
+) {
+  const authorizedOrgIds = await contributors(bsvhu);
+
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    "Vous n'êtes pas autorisé à modifier ce transporteur BSVHU"
+  );
+
+  if (input) {
+    const futureTransporters = bsvhu.transporters.map(transporter => {
+      if (transporter.id === transporterId) {
+        return {
+          ...transporter,
+          ...flattenVhuTransporterInput(input)
+        };
+      }
+      return transporter;
+    });
+
+    const futureContributors = await contributors({
+      ...bsvhu,
+      transporters: futureTransporters
+    });
+
+    return checkUserPermissions(
+      user,
+      futureContributors,
+      Permission.BsdCanUpdate,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
+}
+
+export async function checkCanDelete(user: User, bsvhu: BsvhuWithTransporters) {
   const authorizedOrgIds =
     bsvhu.status === BsvhuStatus.INITIAL
-      ? contributors(bsvhu)
+      ? await contributors(bsvhu)
       : bsvhu.status === BsvhuStatus.SIGNED_BY_PRODUCER &&
         bsvhu.emitterCompanySiret
       ? [bsvhu.emitterCompanySiret]
@@ -183,8 +286,11 @@ export async function checkCanDelete(user: User, bsvhu: Bsvhu) {
   );
 }
 
-export async function checkCanDuplicate(user: User, bsvhu: Bsvhu) {
-  const authorizedOrgIds = contributors(bsvhu);
+export async function checkCanDuplicate(
+  user: User,
+  bsvhu: BsvhuWithTransporters
+) {
+  const authorizedOrgIds = await contributors(bsvhu);
 
   return checkUserPermissions(
     user,

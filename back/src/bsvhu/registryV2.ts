@@ -31,10 +31,66 @@ import {
 } from "@td/registry";
 import { logger } from "@td/logger";
 import { BsvhuForElastic } from "./elastic";
+import { getFirstTransporterSync, getTransportersSync } from "./database";
+import { getTransporterCompanyOrgId } from "@td/constants";
 
 export const toIncomingWasteV2 = (
   bsvhu: RegistryV2Bsvhu
 ): Omit<Required<IncomingWasteV2>, "__typename"> => {
+  const transporters = getTransportersSync(bsvhu);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+
+  const {
+    street: transporter1CompanyAddress,
+    postalCode: transporter1CompanyPostalCode,
+    city: transporter1CompanyCity,
+    country: transporter1CompanyCountry
+  } = splitAddress(
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
   const {
     street: emitterCompanyAddress,
     postalCode: emitterCompanyPostalCode,
@@ -50,21 +106,12 @@ export const toIncomingWasteV2 = (
         country: "FR"
       }
     : splitAddress(bsvhu.emitterCompanyAddress);
-
-  const {
-    street: transporter1CompanyAddress,
-    postalCode: transporter1CompanyPostalCode,
-    city: transporter1CompanyCity,
-    country: transporter1CompanyCountry
-  } = splitAddress(
-    bsvhu.transporterCompanyAddress,
-    bsvhu.transporterCompanyVatNumber
-  );
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
     city: destinationCompanyCity
   } = splitAddress(bsvhu.destinationCompanyAddress);
+
   return {
     ...emptyIncomingWasteV2,
     id: bsvhu.id,
@@ -74,7 +121,7 @@ export const toIncomingWasteV2 = (
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.updatedAt,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     weighingHour: null,
     destinationOperationDate: bsvhu.destinationOperationDate,
@@ -117,18 +164,18 @@ export const toIncomingWasteV2 = (
     brokerCompanyMail: bsvhu.brokerCompanyMail,
     brokerRecepisseNumber: bsvhu.brokerRecepisseNumber,
     isDirectSupply: false,
-    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanyName: transporter?.transporterCompanyName,
     transporter1CompanyGivenName: null,
-    transporter1CompanySiret:
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
     transporter1CompanyAddress,
     transporter1CompanyPostalCode,
     transporter1CompanyCity,
     transporter1CompanyCountry,
-    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporter1TransportMode: null,
-    transporter1CompanyMail: bsvhu.transporterCompanyMail,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
     wasteAdr: null,
     nonRoadRegulationMention: null,
     destinationCap: null,
@@ -158,13 +205,66 @@ export const toIncomingWasteV2 = (
     destinationOperationModes: bsvhu.destinationOperationMode
       ? [bsvhu.destinationOperationMode]
       : null,
-    destinationOperationNoTraceability: false
+    destinationOperationNoTraceability: false,
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: null,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail
   };
 };
 
 export const toOutgoingWasteV2 = (
   bsvhu: RegistryV2Bsvhu
 ): Omit<Required<OutgoingWasteV2>, "__typename"> => {
+  const transporters = getTransportersSync(bsvhu);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+
   const {
     street: emitterCompanyAddress,
     postalCode: emitterCompanyPostalCode,
@@ -187,9 +287,50 @@ export const toOutgoingWasteV2 = (
     city: transporter1CompanyCity,
     country: transporter1CompanyCountry
   } = splitAddress(
-    bsvhu.transporterCompanyAddress,
-    bsvhu.transporterCompanyVatNumber
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
   );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
@@ -205,7 +346,7 @@ export const toOutgoingWasteV2 = (
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.updatedAt,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     destinationOperationDate: bsvhu.destinationOperationDate,
     bsdType: "BSVHU",
     bsdSubType: getBsvhuSubType(bsvhu),
@@ -271,18 +412,18 @@ export const toOutgoingWasteV2 = (
     traderCompanyMail: bsvhu.traderCompanyMail,
     traderRecepisseNumber: bsvhu.traderRecepisseNumber,
     isDirectSupply: false,
-    transporter1CompanySiret:
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
-    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanyAddress,
     transporter1CompanyPostalCode,
     transporter1CompanyCity,
     transporter1CompanyCountry,
-    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporter1TransportMode: null,
-    transporter1CompanyMail: bsvhu.transporterCompanyMail,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
     wasteAdr: null,
     nonRoadRegulationMention: null,
     destinationCap: null,
@@ -335,13 +476,83 @@ export const toOutgoingWasteV2 = (
     isUpcycled: null,
     destinationParcelInseeCodes: null,
     destinationParcelNumbers: null,
-    destinationParcelCoordinates: null
+    destinationParcelCoordinates: null,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail
   };
 };
 
 export const toTransportedWasteV2 = (
-  bsvhu: RegistryV2Bsvhu
-): Omit<Required<TransportedWasteV2>, "__typename"> => {
+  bsvhu: RegistryV2Bsvhu,
+  targetSiret: string
+): Omit<Required<TransportedWasteV2>, "__typename"> | null => {
+  const transporters = getTransportersSync(bsvhu);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
+  const targetTransporter = transporters.find(
+    t => getTransporterCompanyOrgId(t) === targetSiret
+  );
+  const transporterTakenOverAt =
+    targetTransporter?.transporterTransportTakenOverAt ??
+    targetTransporter?.transporterTransportSignatureDate ?? // in case takenOverAt is null, failover to signature date
+    transporter?.transporterTransportTakenOverAt ?? // in case we don't find the target transporter, failover to the first transporter
+    transporter?.transporterTransportSignatureDate;
+
+  // there should always be a transporter on this type of export, but since
+  // the type doesn't know it, and we could get a weird DB state, we check that we have a date
+  if (!transporterTakenOverAt) {
+    return null;
+  }
   const {
     street: emitterCompanyAddress,
     postalCode: emitterCompanyPostalCode,
@@ -364,8 +575,48 @@ export const toTransportedWasteV2 = (
     city: transporter1CompanyCity,
     country: transporter1CompanyCountry
   } = splitAddress(
-    bsvhu.transporterCompanyAddress,
-    bsvhu.transporterCompanyVatNumber
+    transporter.transporterCompanyAddress,
+    transporter.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
   );
 
   const {
@@ -384,9 +635,7 @@ export const toTransportedWasteV2 = (
     reportAsSiret: null,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.updatedAt,
-    transporterTakenOverAt:
-      bsvhu.transporterTransportTakenOverAt ??
-      bsvhu.transporterTransportSignatureDate,
+    transporterTakenOverAt,
     unloadingDate: null,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     bsdType: "BSVHU",
@@ -446,19 +695,75 @@ export const toTransportedWasteV2 = (
     traderRecepisseNumber: bsvhu.traderRecepisseNumber,
     traderCompanyMail: bsvhu.traderCompanyMail,
 
-    transporter1CompanySiret:
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
-    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName,
     transporter1CompanyGivenName: null,
     transporter1CompanyAddress,
     transporter1CompanyPostalCode,
     transporter1CompanyCity,
     transporter1CompanyCountry,
-    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporter1TransportMode: null,
-    transporter1CompanyMail: bsvhu.transporterCompanyMail,
-    transporter1TransportPlates: bsvhu.transporterTransportPlates,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
+    transporter1TransportPlates: transporter?.transporterTransportPlates,
+
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter2TransportPlates: transporter2?.transporterTransportPlates,
+
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter3TransportPlates: transporter3?.transporterTransportPlates,
+
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter4TransportPlates: transporter4?.transporterTransportPlates,
+
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
+    transporter5TransportPlates: transporter5?.transporterTransportPlates,
 
     wasteAdr: null,
     nonRoadRegulationMention: null,
@@ -499,6 +804,10 @@ export const toManagedWasteV2 = (
   bsvhu: RegistryV2Bsvhu,
   targetSiret: string
 ): Omit<Required<ManagedWasteV2>, "__typename"> => {
+  const transporters = getTransportersSync(bsvhu);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
   const {
     street: emitterCompanyAddress,
     postalCode: emitterCompanyPostalCode,
@@ -521,9 +830,50 @@ export const toManagedWasteV2 = (
     city: transporter1CompanyCity,
     country: transporter1CompanyCountry
   } = splitAddress(
-    bsvhu.transporterCompanyAddress,
-    bsvhu.transporterCompanyVatNumber
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
   );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
@@ -540,7 +890,7 @@ export const toManagedWasteV2 = (
     reportForSiret: targetSiret,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.updatedAt,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     destinationOperationDate: bsvhu.destinationOperationDate,
     bsdType: "BSVHU",
     bsdSubType: getBsvhuSubType(bsvhu),
@@ -614,18 +964,66 @@ export const toManagedWasteV2 = (
     traderCompanyMail: bsvhu.traderCompanyMail,
     traderRecepisseNumber: bsvhu.traderRecepisseNumber,
     isDirectSupply: false,
-    transporter1CompanySiret:
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
-    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName ?? null,
     transporter1CompanyGivenName: null,
     transporter1CompanyAddress,
     transporter1CompanyPostalCode,
     transporter1CompanyCity,
     transporter1CompanyCountry,
-    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporter1TransportMode: null,
-    transporter1CompanyMail: bsvhu.transporterCompanyMail,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
     wasteAdr: null,
     nonRoadRegulationMention: null,
     destinationCap: null,
@@ -679,6 +1077,10 @@ export const toManagedWasteV2 = (
 export const toAllWasteV2 = (
   bsvhu: RegistryV2Bsvhu
 ): Omit<Required<AllWasteV2>, "__typename"> => {
+  const transporters = getTransportersSync(bsvhu);
+
+  const [transporter, transporter2, transporter3, transporter4, transporter5] =
+    transporters;
   const {
     street: emitterCompanyAddress,
     postalCode: emitterCompanyPostalCode,
@@ -701,9 +1103,50 @@ export const toAllWasteV2 = (
     city: transporter1CompanyCity,
     country: transporter1CompanyCountry
   } = splitAddress(
-    bsvhu.transporterCompanyAddress,
-    bsvhu.transporterCompanyVatNumber
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
   );
+
+  const {
+    street: transporter2CompanyAddress,
+    postalCode: transporter2CompanyPostalCode,
+    city: transporter2CompanyCity,
+    country: transporter2CompanyCountry
+  } = splitAddress(
+    transporter2?.transporterCompanyAddress,
+    transporter2?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter3CompanyAddress,
+    postalCode: transporter3CompanyPostalCode,
+    city: transporter3CompanyCity,
+    country: transporter3CompanyCountry
+  } = splitAddress(
+    transporter3?.transporterCompanyAddress,
+    transporter3?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter4CompanyAddress,
+    postalCode: transporter4CompanyPostalCode,
+    city: transporter4CompanyCity,
+    country: transporter4CompanyCountry
+  } = splitAddress(
+    transporter4?.transporterCompanyAddress,
+    transporter4?.transporterCompanyVatNumber
+  );
+
+  const {
+    street: transporter5CompanyAddress,
+    postalCode: transporter5CompanyPostalCode,
+    city: transporter5CompanyCity,
+    country: transporter5CompanyCountry
+  } = splitAddress(
+    transporter5?.transporterCompanyAddress,
+    transporter5?.transporterCompanyVatNumber
+  );
+
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
@@ -716,7 +1159,7 @@ export const toAllWasteV2 = (
     bsdId: bsvhu.id,
     createdAt: bsvhu.createdAt,
     updatedAt: bsvhu.updatedAt,
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt,
+    transporterTakenOverAt: transporter?.transporterTransportTakenOverAt,
     destinationReceptionDate: bsvhu.destinationReceptionDate,
     destinationOperationDate: bsvhu.destinationOperationDate,
     bsdType: "BSVHU",
@@ -786,20 +1229,76 @@ export const toAllWasteV2 = (
     intermediary3CompanySiret: bsvhu.intermediaries?.[2]?.siret,
     intermediary3CompanyName: bsvhu.intermediaries?.[2]?.name,
     isDirectSupply: false,
-    transporter1CompanySiret:
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber,
-    transporter1CompanyName: bsvhu.transporterCompanyName,
+    transporter1CompanySiret: getTransporterCompanyOrgId(transporter),
+    transporter1CompanyName: transporter?.transporterCompanyName ?? null,
     transporter1CompanyGivenName: null,
     transporter1CompanyAddress,
     transporter1CompanyPostalCode,
     transporter1CompanyCity,
     transporter1CompanyCountry,
-    transporter1RecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporter1RecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporter1TransportMode: null,
+    transporter1RecepisseIsExempted:
+      transporter?.transporterRecepisseIsExempted,
+    transporter1RecepisseNumber: transporter?.transporterRecepisseNumber,
+    transporter1TransportMode: transporter?.transporterTransportMode,
     transporter1UnloadingDate: null,
-    transporter1TransportPlates: bsvhu.transporterTransportPlates,
-    transporter1CompanyMail: bsvhu.transporterCompanyMail,
+    transporter1TransportPlates: transporter?.transporterTransportPlates,
+    transporter1CompanyMail: transporter?.transporterCompanyMail,
+    transporter2CompanySiret: getTransporterCompanyOrgId(transporter2),
+    transporter2CompanyName: transporter2?.transporterCompanyName,
+    transporter2CompanyGivenName: null,
+    transporter2CompanyAddress,
+    transporter2CompanyPostalCode,
+    transporter2CompanyCity,
+    transporter2CompanyCountry,
+    transporter2RecepisseIsExempted:
+      transporter2?.transporterRecepisseIsExempted,
+    transporter2RecepisseNumber: transporter2?.transporterRecepisseNumber,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
+    transporter2UnloadingDate: null,
+    transporter2TransportPlates: transporter2?.transporterTransportPlates,
+    transporter2CompanyMail: transporter2?.transporterCompanyMail,
+    transporter3CompanySiret: getTransporterCompanyOrgId(transporter3),
+    transporter3CompanyName: transporter3?.transporterCompanyName,
+    transporter3CompanyGivenName: null,
+    transporter3CompanyAddress,
+    transporter3CompanyPostalCode,
+    transporter3CompanyCity,
+    transporter3CompanyCountry,
+    transporter3RecepisseIsExempted:
+      transporter3?.transporterRecepisseIsExempted,
+    transporter3RecepisseNumber: transporter3?.transporterRecepisseNumber,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
+    transporter3UnloadingDate: null,
+    transporter3TransportPlates: transporter3?.transporterTransportPlates,
+    transporter3CompanyMail: transporter3?.transporterCompanyMail,
+    transporter4CompanySiret: getTransporterCompanyOrgId(transporter4),
+    transporter4CompanyName: transporter4?.transporterCompanyName,
+    transporter4CompanyGivenName: null,
+    transporter4CompanyAddress,
+    transporter4CompanyPostalCode,
+    transporter4CompanyCity,
+    transporter4CompanyCountry,
+    transporter4RecepisseIsExempted:
+      transporter4?.transporterRecepisseIsExempted,
+    transporter4RecepisseNumber: transporter4?.transporterRecepisseNumber,
+    transporter4TransportMode: transporter4?.transporterTransportMode,
+    transporter4UnloadingDate: null,
+    transporter4TransportPlates: transporter4?.transporterTransportPlates,
+    transporter4CompanyMail: transporter4?.transporterCompanyMail,
+    transporter5CompanySiret: getTransporterCompanyOrgId(transporter5),
+    transporter5CompanyName: transporter5?.transporterCompanyName,
+    transporter5CompanyGivenName: null,
+    transporter5CompanyAddress,
+    transporter5CompanyPostalCode,
+    transporter5CompanyCity,
+    transporter5CompanyCountry,
+    transporter5RecepisseIsExempted:
+      transporter5?.transporterRecepisseIsExempted,
+    transporter5RecepisseNumber: transporter5?.transporterRecepisseNumber,
+    transporter5TransportMode: transporter5?.transporterTransportMode,
+    transporter5UnloadingDate: null,
+    transporter5TransportPlates: transporter5?.transporterTransportPlates,
+    transporter5CompanyMail: transporter5?.transporterCompanyMail,
     wasteAdr: null,
     nonRoadRegulationMention: null,
     destinationCap: null,
@@ -872,6 +1371,14 @@ export const getElasticExhaustiveRegistryFields = (bsvhu: BsvhuForElastic) => {
         }
       }
     }
+    for (const transporter of bsvhu.transporters ?? []) {
+      if (transporter.transporterTransportSignatureDate) {
+        const transporterCompanyOrgId = getTransporterCompanyOrgId(transporter);
+        if (transporterCompanyOrgId) {
+          registryFields.isExhaustiveWasteFor.push(transporterCompanyOrgId);
+        }
+      }
+    }
   }
   return registryFields;
 };
@@ -891,6 +1398,16 @@ const minimalBsvhuForLookupSelect = {
   brokerCompanySiret: true,
   traderCompanySiret: true,
   wasteCode: true,
+  transporters: {
+    select: {
+      id: true,
+      number: true,
+      transporterCompanySiret: true,
+      transporterCompanyVatNumber: true,
+      transporterTransportTakenOverAt: true,
+      transporterTransportSignatureDate: true
+    }
+  },
   intermediaries: {
     select: {
       siret: true,
@@ -907,6 +1424,8 @@ const bsvhuToLookupCreateInputs = (
   bsvhu: MinimalBsvhuForLookup
 ): Prisma.RegistryLookupUncheckedCreateInput[] => {
   const res: Prisma.RegistryLookupUncheckedCreateInput[] = [];
+  const transporter = getFirstTransporterSync(bsvhu);
+
   if (
     bsvhu.destinationOperationSignatureDate &&
     bsvhu.destinationCompanySiret
@@ -927,7 +1446,7 @@ const bsvhuToLookupCreateInputs = (
       bsvhuId: bsvhu.id
     });
   }
-  if (bsvhu.transporterTransportSignatureDate) {
+  if (transporter?.transporterTransportSignatureDate) {
     const outgoingSirets = new Set([
       bsvhu.emitterCompanySiret,
       bsvhu.ecoOrganismeSiret
@@ -945,32 +1464,13 @@ const bsvhuToLookupCreateInputs = (
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
-          bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!,
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!,
           bsvhu.createdAt
         ),
         bsvhuId: bsvhu.id
       });
     });
-    const transporterCompanyOrgId =
-      bsvhu.transporterCompanySiret ?? bsvhu.transporterCompanyVatNumber;
-    if (transporterCompanyOrgId) {
-      res.push({
-        id: bsvhu.id,
-        readableId: bsvhu.id,
-        siret: transporterCompanyOrgId,
-        exportRegistryType: RegistryExportType.TRANSPORTED,
-        declarationType: RegistryExportDeclarationType.BSD,
-        wasteType: RegistryExportWasteType.DD,
-        wasteCode: bsvhu.wasteCode,
-        ...generateDateInfos(
-          bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!,
-          bsvhu.createdAt
-        ),
-        bsvhuId: bsvhu.id
-      });
-    }
     const managedSirets = new Set([
       bsvhu.brokerCompanySiret,
       bsvhu.traderCompanySiret
@@ -1002,6 +1502,35 @@ const bsvhuToLookupCreateInputs = (
       });
     });
   }
+  const transporterSirets = {};
+  bsvhu.transporters?.forEach(transporter => {
+    const transporterSiret = getTransporterCompanyOrgId(transporter);
+    if (!transporter.transporterTransportSignatureDate || !transporterSiret) {
+      return;
+    }
+    // we don't want to add the same transporter twice, the lookup index would have a conflict
+    // + it's not really supposed to happen on real use cases
+    // + the mapping would show the takenOver date of the first one anyways
+    if (transporterSirets[transporterSiret]) {
+      return;
+    }
+    transporterSirets[transporterSiret] = true;
+    res.push({
+      id: bsvhu.id,
+      readableId: bsvhu.id,
+      siret: transporterSiret,
+      exportRegistryType: RegistryExportType.TRANSPORTED,
+      declarationType: RegistryExportDeclarationType.BSD,
+      wasteType: RegistryExportWasteType.DD,
+      wasteCode: bsvhu.wasteCode,
+      ...generateDateInfos(
+        transporter.transporterTransportTakenOverAt ??
+          transporter.transporterTransportSignatureDate!,
+        bsvhu.createdAt
+      ),
+      bsvhuId: bsvhu.id
+    });
+  });
   return res;
 };
 
