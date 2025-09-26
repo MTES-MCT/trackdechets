@@ -222,7 +222,7 @@ describe("sendHook", () => {
 
       (axios.post as jest.Mock<any>).mockImplementation(url => {
         if (url === "https://company1.fr/endpoint1")
-          return Promise.resolve({ status: 404 });
+          return Promise.reject({ status: 404 });
         return Promise.resolve({ status: 200 });
       });
 
@@ -292,7 +292,7 @@ describe("sendHook", () => {
 
       (axios.post as jest.Mock<any>).mockImplementation(url => {
         if (url.startsWith("https://company1.fr"))
-          return Promise.resolve({ status: 404 });
+          return Promise.reject({ status: 404 });
         return Promise.resolve({ status: 200 });
       });
 
