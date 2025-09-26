@@ -237,7 +237,7 @@ export async function checkCanUpdateBsvhuTransporter(
     user,
     authorizedOrgIds,
     Permission.BsdCanUpdate,
-    "Vous n'êtes pas autorisé à modifier ce transporteur BSDA"
+    "Vous n'êtes pas autorisé à modifier ce transporteur BSVHU"
   );
 
   if (input) {

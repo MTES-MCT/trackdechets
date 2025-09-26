@@ -872,6 +872,37 @@ export const getRequiredAndSealedFieldPaths = async (
       }
     }
   }
+  const transporters = bsvhu.transporters ?? [];
+  for (let i = 0; i < transporters.length; i++) {
+    const bsvhuTransporter = transporters[i];
+    for (const bsvhuTransporterField of Object.keys(
+      bsvhuTransporterEditionRules
+    )) {
+      const { sealed: bsvhuTransporterSealed, path: bsvhuTransporterPath } =
+        bsvhuTransporterEditionRules[
+          bsvhuTransporterField as keyof BsvhuTransporterEditableFields
+        ];
+      if (bsvhuTransporterSealed && bsvhuTransporterPath) {
+        const isSealed = isBsvhuTransporterFieldSealed(
+          bsvhuTransporterSealed,
+          bsvhuTransporter,
+          currentSignatures
+        );
+        if (isSealed) {
+          if (i === 0) {
+            // backward compatibility for single transporter UI
+            sealedFields.push(
+              ["transporter"].concat(bsvhuTransporterPath ?? [])
+            );
+          }
+          sealedFields.push(
+            ["transporters", `${i + 1}`].concat(bsvhuTransporterPath ?? [])
+          );
+        }
+      }
+    }
+  }
+
   return {
     sealed: sealedFields
   };

@@ -33,7 +33,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
 
   await checkCanCreate(user, input);
 
-  const zodBsvhu = graphQlInputToZodBsvhu(input);
+  const zodBsvhu = await graphQlInputToZodBsvhu(input);
   const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
     { ...zodBsvhu, isDraft, createdAt: new Date() },
     {
@@ -53,7 +53,6 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   let transporters:
     | Prisma.BsvhuTransporterCreateNestedManyWithoutBsvhuInput
     | undefined = undefined;
-
   if (input.transporter) {
     transporters = {
       createMany: {

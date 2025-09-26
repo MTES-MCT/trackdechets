@@ -15,13 +15,10 @@ describe("edition rules", () => {
       opt: { status: "INITIAL" }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        emitter: { company: { name: "ACME" } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      emitter: { company: { name: "ACME" } }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(expect.arrayContaining(["emitterCompanyName"]));
   });
 
@@ -33,13 +30,10 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checkfn = checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        emitter: { company: { name: "ACME" } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      emitter: { company: { name: "ACME" } }
+    });
+    const checkfn = checkBsvhuSealedFields(bsvhu, input, {});
     await expect(checkfn).rejects.toThrow(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : La raison sociale de l'émetteur"
     );
@@ -55,13 +49,12 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        emitter: { company: { name: "ACME" } }
-      }),
-      { user: emitter.user }
-    );
+    const input = await graphQlInputToZodBsvhu({
+      emitter: { company: { name: "ACME" } }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {
+      user: emitter.user
+    });
     expect(checked).toEqual(expect.arrayContaining(["emitterCompanyName"]));
   });
 
@@ -73,13 +66,10 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        emitter: { company: { siret: bsvhu.emitterCompanySiret } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      emitter: { company: { siret: bsvhu.emitterCompanySiret } }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(expect.arrayContaining([]));
   });
 
@@ -91,13 +81,10 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        transporter: { transport: { takenOverAt: new Date() } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      transporter: { transport: { takenOverAt: new Date() } }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(
       expect.arrayContaining(["transporterTransportTakenOverAt"])
     );
@@ -112,17 +99,14 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checkfn = checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        transporter: {
-          transport: {
-            takenOverAt: new Date()
-          }
+    const input = await graphQlInputToZodBsvhu({
+      transporter: {
+        transport: {
+          takenOverAt: new Date()
         }
-      }),
-      {}
-    );
+      }
+    });
+    const checkfn = checkBsvhuSealedFields(bsvhu, input, {});
     await expect(checkfn).rejects.toThrow(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : La date d'enlèvement du transporteur"
     );
@@ -137,13 +121,12 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        transporter: { company: { siret: bsvhu.transporterCompanySiret } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      transporter: {
+        company: { siret: bsvhu.transporters?.[0].transporterCompanySiret }
+      }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(expect.arrayContaining([]));
   });
 
@@ -156,13 +139,10 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checked = await checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        destination: { reception: { date: new Date("2021-01-01") } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      destination: { reception: { date: new Date("2021-01-01") } }
+    });
+    const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(
       expect.arrayContaining(["destinationReceptionDate"])
     );
@@ -178,13 +158,10 @@ describe("edition rules", () => {
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
-    const checkfn = checkBsvhuSealedFields(
-      bsvhu,
-      graphQlInputToZodBsvhu({
-        destination: { operation: { date: new Date("2021-01-01") } }
-      }),
-      {}
-    );
+    const input = await graphQlInputToZodBsvhu({
+      destination: { operation: { date: new Date("2021-01-01") } }
+    });
+    const checkfn = checkBsvhuSealedFields(bsvhu, input, {});
     await expect(checkfn).rejects.toThrow(
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : La date de l'opération"
     );

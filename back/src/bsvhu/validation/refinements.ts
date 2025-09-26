@@ -387,7 +387,7 @@ export const checkRequiredFields: (
               readableFieldName,
               ctx: zodContext,
               errorMsg: fieldDescription =>
-                `${fieldDescription} n° ${idx + 1} est obligatoire.`
+                `${fieldDescription} n° ${idx + 1} est un champ requis.`
             });
           }
         }
