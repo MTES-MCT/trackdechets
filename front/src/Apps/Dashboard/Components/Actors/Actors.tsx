@@ -15,7 +15,7 @@ function Actors({
   destinationName,
   workerCompanyName
 }: ActorsProps) {
-  const split = label => {
+  const split = (label: string) => {
     const maxVisible = 20;
     const maxSubstract = 9;
     return label.length > maxVisible
