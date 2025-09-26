@@ -52,6 +52,7 @@ const NON_CLONED_KEYS = [
   "bsdaId",
   "bsffId",
   "bspaohId",
+  "bsvhuId",
   "finalBsdaId",
   "initialBsdaId",
   "finalBsdasriId",

@@ -1028,6 +1028,7 @@ export async function checkBsvhuSealedFields(
         persistedTransporters[0],
         updatedTransporters[0]
       );
+      console.log("transporterUpdatedFields", transporterUpdatedFields);
 
       for (const transporterUpdatedField of transporterUpdatedFields) {
         const rule =

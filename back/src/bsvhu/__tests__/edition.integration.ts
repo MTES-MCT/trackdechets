@@ -85,9 +85,7 @@ describe("edition rules", () => {
       transporter: { transport: { takenOverAt: new Date() } }
     });
     const checked = await checkBsvhuSealedFields(bsvhu, input, {});
-    expect(checked).toEqual(
-      expect.arrayContaining(["transporterTransportTakenOverAt"])
-    );
+    expect(checked).toEqual(expect.arrayContaining(["transporters"]));
   });
 
   it("should not be possible to update a field sealed by transporter signature", async () => {
@@ -95,7 +93,9 @@ describe("edition rules", () => {
       opt: {
         status: "SENT",
         emitterEmissionSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
+        transporters: {
+          create: { transporterTransportSignatureDate: new Date(), number: 1 }
+        }
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
@@ -108,7 +108,7 @@ describe("edition rules", () => {
     });
     const checkfn = checkBsvhuSealedFields(bsvhu, input, {});
     await expect(checkfn).rejects.toThrow(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : La date d'enlèvement du transporteur"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le transporteur n°1 a déjà signé le BSVHU, il ne peut pas être supprimé ou modifié"
     );
   });
 
@@ -117,7 +117,9 @@ describe("edition rules", () => {
       opt: {
         status: "SENT",
         emitterEmissionSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
+        transporters: {
+          create: { transporterTransportSignatureDate: new Date(), number: 1 }
+        }
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
@@ -125,6 +127,14 @@ describe("edition rules", () => {
       transporter: {
         company: { siret: bsvhu.transporters?.[0].transporterCompanySiret }
       }
+    });
+    // emulate what happens in mergeInputAndParseBsvhuAsync
+    // without this checkBsvhuSealedFields can't compare the old transporter infos with the new
+    input.transporters = bsvhu.transporters?.map((t, idx) => {
+      if (idx === 0) {
+        return { ...t, ...input.transporters![0] };
+      }
+      return t;
     });
     const checked = await checkBsvhuSealedFields(bsvhu, input, {});
     expect(checked).toEqual(expect.arrayContaining([]));
@@ -135,7 +145,9 @@ describe("edition rules", () => {
       opt: {
         status: "SENT",
         emitterEmissionSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
+        transporters: {
+          create: { transporterTransportSignatureDate: new Date(), number: 1 }
+        }
       }
     });
     const bsvhu = prismaToZodBsvhu(prismaBsvhu);
@@ -153,7 +165,9 @@ describe("edition rules", () => {
       opt: {
         status: "PROCESSED",
         emitterEmissionSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date(),
+        transporters: {
+          create: { transporterTransportSignatureDate: new Date(), number: 1 }
+        },
         destinationOperationSignatureDate: new Date()
       }
     });
