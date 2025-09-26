@@ -10,7 +10,7 @@ describe("getWhere", () => {
   test("if emitter publishes VHU > transporter should see it in 'follow' tab", async () => {
     // Given
     const bsvhu = await bsvhuFactory({});
-    const transporterSiret = bsvhu.transporterCompanySiret;
+    const transporterSiret = bsvhu.transporters[0].transporterCompanySiret;
 
     // When
     const where = getWhere(bsvhu);
@@ -55,10 +55,15 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         customId: "my custom id",
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
-        transporterCompanyName: transporter.name,
-        transporterCompanySiret: transporter.siret,
-        transporterCompanyVatNumber: transporter.vatNumber,
-        transporterTransportPlates: ["XY-87-IU"],
+        transporters: {
+          create: {
+            transporterCompanyName: transporter.name,
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyVatNumber: transporter.vatNumber,
+            transporterTransportPlates: ["XY-87-IU"],
+            number: 1
+          }
+        },
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
         ecoOrganismeName: ecoOrganisme.name,
@@ -139,8 +144,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
           opt: {
             emitterCompanyName: emitter.name,
             emitterCompanySiret: emitter.siret,
-            transporterCompanyName: transporter.name,
-            transporterCompanySiret: transporter.siret,
+            transporters: {
+              create: {
+                transporterCompanySiret: transporter.siret,
+                transporterCompanyName: transporter.name,
+                number: 1
+              }
+            },
             destinationReceptionDate: new Date(),
             destinationReceptionAcceptationStatus
           }
@@ -161,8 +171,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: new Date(),
           status: BsvhuStatus.REFUSED
         }
@@ -182,8 +197,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: new Date(),
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
         }
@@ -203,8 +223,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: xDaysAgo(new Date(), 10),
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED
         }
