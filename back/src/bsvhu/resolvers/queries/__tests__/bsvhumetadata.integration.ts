@@ -105,7 +105,12 @@ describe("Query.Bsvhu", () => {
         status: BsvhuStatus.SIGNED_BY_PRODUCER,
         emitterCompanySiret: emitterCompany.siret,
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: transporterCompany.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            number: 1
+          }
+        }
       }
     });
 
@@ -128,8 +133,13 @@ describe("Query.Bsvhu", () => {
         status: BsvhuStatus.SENT,
         emitterCompanySiret: emitterCompany.siret,
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: transporterCompany.siret,
-        transporterTransportSignatureDate: new Date()
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            transporterTransportSignatureDate: new Date(),
+            number: 1
+          }
+        }
       }
     });
 
@@ -139,7 +149,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(38);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(54);
   });
 
   it("should return OPERATION signed bsvhu sealed fields", async () => {
@@ -151,7 +161,12 @@ describe("Query.Bsvhu", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date(),
         destinationOperationSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
+        transporters: {
+          create: {
+            transporterTransportSignatureDate: new Date(),
+            number: 1
+          }
+        }
       }
     });
 
@@ -161,6 +176,7 @@ describe("Query.Bsvhu", () => {
       variables: { id: bsd.id }
     });
 
-    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(81);
+    console.log(data.bsvhu.metadata?.fields?.sealed);
+    expect(data.bsvhu.metadata?.fields?.sealed?.length).toBe(98);
   });
 });

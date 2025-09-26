@@ -30,7 +30,7 @@ export async function mergeInputAndParseBsvhuAsync(
   context: BsvhuValidationContext
 ) {
   const zodPersisted = prismaToZodBsvhu(persisted);
-  const zodInput = graphQlInputToZodBsvhu(input);
+  const zodInput = await graphQlInputToZodBsvhu(input);
 
   const bsvhu: ZodBsvhu = {
     ...zodPersisted,

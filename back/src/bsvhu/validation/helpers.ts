@@ -1,5 +1,7 @@
 import { User } from "@prisma/client";
-import type { BsvhuInput } from "@td/codegen-back";
+import { prisma } from "@td/prisma";
+
+import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
 import { BSVHU_SIGNATURES_HIERARCHY } from "./constants";
 import {
   ZodBsvhu,
@@ -9,10 +11,62 @@ import {
 } from "./schema";
 import { BsvhuUserFunctions, PrismaBsvhuForParsing } from "./types";
 import { getUserCompanies } from "../../users/database";
-import { flattenVhuInput } from "../converter";
+import { flattenVhuInput, flattenVhuTransporterInput } from "../converter";
 import { safeInput } from "../../common/converter";
 import { objectDiff } from "../../forms/workflow/diff";
 import { AllBsvhuSignatureType } from "../types";
+import { UserInputError } from "../../common/errors";
+
+export function graphqlInputToZodBsvhuTransporter(
+  input: BsvhuTransporterInput
+): ZodBsvhuTransporter {
+  return flattenVhuTransporterInput(input);
+}
+
+export async function getZodTransporters(
+  input: BsvhuInput
+): Promise<ZodBsvhuTransporter[] | undefined> {
+  if (input.transporter !== undefined && input.transporters) {
+    throw new UserInputError(
+      "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
+    );
+  }
+  if (input.transporter) {
+    // Couche de compatibilité avec l'API BSVHU "pré multi-modal"
+    // Les données de `input.transporter` correspondent au premier
+    // transporteur.
+    return [graphqlInputToZodBsvhuTransporter(input.transporter)];
+  } else if (
+    input.transporter === null ||
+    (input.transporters && input.transporters.length === 0)
+  ) {
+    return [];
+  } else if (input.transporters && input.transporters.length) {
+    const dbTransporters = await prisma.bsvhuTransporter.findMany({
+      where: { id: { in: input.transporters } }
+    });
+    // Vérifie que tous les identifiants correspondent bien à un transporteur BSVHU en base
+    const unknownTransporters = input.transporters.filter(
+      id => !dbTransporters.map(t => t.id).includes(id)
+    );
+    if (unknownTransporters.length > 0) {
+      throw new UserInputError(
+        `Aucun transporteur ne possède le ou les identifiants suivants : ${unknownTransporters.join(
+          ", "
+        )}`
+      );
+    }
+
+    // garde le même ordre
+    return input.transporters.map(transporterId => {
+      const { createdAt, updatedAt, number, ...transporterData } =
+        dbTransporters.find(t => t.id === transporterId)!;
+      return transporterData;
+    });
+  }
+
+  return undefined;
+}
 
 /**
  * Cette fonction permet de convertir les données d'input GraphQL
@@ -20,7 +74,9 @@ import { AllBsvhuSignatureType } from "../types";
  * typés en string côté GraphQL mais en enum côté Zod ce qui nous oblige
  * à faire un casting de type.
  */
-export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
+export async function graphQlInputToZodBsvhu(
+  input: BsvhuInput
+): Promise<ZodBsvhu> {
   const { ...bsvhuInput } = input;
 
   const {
@@ -31,12 +87,15 @@ export function graphQlInputToZodBsvhu(input: BsvhuInput): ZodBsvhu {
     ...flatBsvhuInput
   } = flattenVhuInput(bsvhuInput);
 
+  const transporters = await getZodTransporters(input);
+
   return safeInput({
     ...flatBsvhuInput,
     destinationPlannedOperationCode:
       destinationPlannedOperationCode as ZodOperationEnum,
     destinationOperationCode: destinationOperationCode as ZodOperationEnum,
     wasteCode: wasteCode as ZodWasteCodeEnum,
+    transporters,
     intermediaries: intermediaries?.map(i =>
       safeInput({
         // FIXME : Les règles d'édition (fichier rules.ts) ne permettent

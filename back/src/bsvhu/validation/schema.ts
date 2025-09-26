@@ -237,7 +237,6 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
-  // TODO(silto): check usefulness of this refinement
   .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
