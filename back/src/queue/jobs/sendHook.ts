@@ -40,14 +40,7 @@ const apiCallProcessor = async ({
   try {
     const clearToken = aesDecrypt(token);
     // we send the payload as an array, maybe we'll group webhooks by recipients in the future
-    const res = await axiosPost(endpointUri, action, id, clearToken);
-    // Customer server endpoint are supposed to return HTTP 200 each time a request is made
-    if (res.status !== 200) {
-      logger.warn(
-        `Webhook invalid return status (${res.status}) (${endpointUri})`,
-        { status: res.status }
-      );
-    }
+    await axiosPost(endpointUri, action, id, clearToken);
   } catch (err) {
     if (axios.isAxiosError(err)) {
       logger.error(`Webhook error : `, {
