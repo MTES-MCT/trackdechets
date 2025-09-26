@@ -31,7 +31,11 @@ describe("Bsvhu where builder", () => {
     expect(dbFilter).toEqual({
       emitterCompanySiret: { equals: "emitter" },
       destinationCompanySiret: { equals: "destination" },
-      transporterCompanySiret: { equals: "transporter" },
+      transporters: {
+        some: {
+          transporterCompanySiret: { equals: "transporter" }
+        }
+      },
       brokerCompanySiret: { equals: "broker" },
       traderCompanySiret: { equals: "trader" }
     });

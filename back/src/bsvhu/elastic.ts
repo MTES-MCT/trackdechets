@@ -462,7 +462,10 @@ function getBsvhuReturnOrgIds(bsvhu: BsvhuForElastic): {
   if (belongsToIsReturnForTab(bsvhu)) {
     const lastTransporter = getLastTransporterSync(bsvhu);
     return {
-      isReturnFor: [lastTransporter?.transporterCompanySiret].filter(Boolean)
+      isReturnFor: [
+        lastTransporter?.transporterCompanySiret,
+        lastTransporter?.transporterCompanyVatNumber
+      ].filter(Boolean)
     };
   }
 
