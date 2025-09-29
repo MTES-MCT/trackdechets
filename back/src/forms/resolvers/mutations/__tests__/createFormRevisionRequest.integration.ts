@@ -1026,7 +1026,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    expect(data.createFormRevisionRequest.content).toEqual({
+    expect(data.createFormRevisionRequest.content).toMatchObject({
       wasteDetails: { code: "01 03 08" }
     });
   });

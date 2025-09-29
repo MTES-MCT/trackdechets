@@ -778,7 +778,7 @@ describe("BSDA parsing", () => {
 
   describe("Operation modes", () => {
     test.each([
-      ["R 5", "REUTILISATION"],
+      ["R 5", "RECYCLAGE"],
       ["R 13", undefined],
       ["D 9", undefined]
     ])(
@@ -798,27 +798,7 @@ describe("BSDA parsing", () => {
     );
 
     test.each([
-      ["R 5", "REUTILISATION"],
-      ["R 13", undefined],
-      ["D 9", undefined]
-    ])(
-      "should work if operation code & mode are compatible (code: %p, mode: %p)",
-      (code, mode: OperationMode) => {
-        const data: ZodBsda = {
-          ...bsda,
-          destinationOperationCode: code as ZodOperationEnum,
-          destinationOperationMode: mode
-        };
-
-        const parsed = parseBsda(data, {
-          currentSignatureType: "TRANSPORT"
-        });
-        expect(parsed).toBeDefined();
-      }
-    );
-
-    test.each([
-      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
+      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are RECYCLAGE or AUTRES_VALORISATIONS
       ["R 13", "VALORISATION_ENERGETIQUE"], // R 13 has no associated mode,
       ["D 9", "VALORISATION_ENERGETIQUE"] // D 9 has no associated mode,
     ])(
