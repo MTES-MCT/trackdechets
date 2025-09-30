@@ -36,6 +36,10 @@ const CREATE_BSDA_REVISION_REQUEST = `
             weight
             refusedWeight
           }
+          operation {
+            code
+            mode
+          }
         }
       }
       authoringCompany {
@@ -634,7 +638,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           content: {
             destination: {
               operation: {
-                code: "D 9",
+                code: "D 15",
                 mode: "ELIMINATION"
               }
             }
@@ -723,45 +727,40 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(errors).toBeUndefined();
   });
 
-  it.each(["D 9", "D 15"])(
-    "should succeed if operation code has no corresponding mode  code: %p",
-    async code => {
-      const { company: recipientCompany } = await userWithCompanyFactory(
-        "ADMIN"
-      );
-      const { user, company } = await userWithCompanyFactory("ADMIN");
-      const bsda = await bsdaFactory({
-        opt: {
-          emitterCompanySiret: company.siret,
-          destinationCompanySiret: recipientCompany.siret,
-          status: "SENT"
-        }
-      });
+  it("should succeed if operation code has no corresponding mode code: %p", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        status: "SENT"
+      }
+    });
 
-      const { mutate } = makeClient(user);
-      const { errors } = await mutate<
-        Pick<Mutation, "createBsdaRevisionRequest">,
-        MutationCreateBsdaRevisionRequestArgs
-      >(CREATE_BSDA_REVISION_REQUEST, {
-        variables: {
-          input: {
-            bsdaId: bsda.id,
-            content: {
-              destination: {
-                operation: {
-                  code
-                }
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {
+            destination: {
+              operation: {
+                code: "D 15"
               }
-            },
-            comment: "A comment",
-            authoringCompanySiret: company.siret!
-          }
+            }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
         }
-      });
+      }
+    });
 
-      expect(errors).toBeUndefined();
-    }
-  );
+    expect(errors).toBeUndefined();
+  });
 
   it("should fail if all fields are empty", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
@@ -2060,4 +2059,47 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       );
     });
   });
+
+  it.each(["D 9", "D 9 F"])(
+    "should allow creating a revision with code %",
+    async code => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "SENT"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: { operation: { code, mode: "ELIMINATION" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.code
+      ).toBe("D 9 F");
+    }
+  );
 });

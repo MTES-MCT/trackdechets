@@ -51,6 +51,7 @@ import {
   validateTransporterPlates
 } from "../../common/validation/zod/refinement";
 import { isDefinedStrict } from "../../common/helpers";
+import { trim } from "../../common/strings";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -67,7 +68,16 @@ const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
 
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
-const ZodOperationEnum = z.enum(OPERATIONS).nullish();
+const ZodOperationEnum = z
+  .enum(["D 9", ...OPERATIONS])
+  .transform(v => {
+    // We continue to tolerate "D 9" as input for legacy reasons but convert it to "D 9 F"
+    if (v && trim(v) === "D9") {
+      return "D 9 F";
+    }
+    return v as (typeof OPERATIONS)[number];
+  })
+  .nullish();
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 

@@ -262,12 +262,20 @@ async function getFlatContent(
     );
   }
 
-  await schema
+  const parsed = await schema
     // For the refused weight, we need the bsda previous state
     .superRefine((flatContent, ctx) =>
       checkDestinationReceptionRefusedWeight({ ...bsda, ...flatContent }, ctx)
     )
     .parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
+
+  // Careful. We cast the old operation code D9 to D9F
+  if (parsed.destinationOperationCode) {
+    return {
+      ...flatContent,
+      destinationOperationCode: parsed.destinationOperationCode
+    };
+  }
 
   return flatContent;
 }

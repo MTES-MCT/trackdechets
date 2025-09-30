@@ -2219,6 +2219,51 @@ describe("Mutation.Bsda.sign", () => {
         updatedBsda.transporters[0].transporterTransportSignatureDate
       ).toBeDefined();
     });
+
+    it("can sign with operation code D9F", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "D 9 F",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id }
+      });
+      expect(updatedBsda.status).toBe("PROCESSED");
+      expect(updatedBsda.destinationOperationCode).toBe("D 9 F");
+    });
   });
 
   // New signature step "RECEPTION".
@@ -3397,7 +3442,7 @@ describe("Mutation.Bsda.sign", () => {
       return { user, bsda, destinationUser };
     };
 
-    it.each(["R 5", "D 5", "D 9"])(
+    it.each(["R 5", "D 5", "D 9 F"])(
       "temp storage cannot use final operation code %p",
       async operationCode => {
         // Given
@@ -3470,7 +3515,7 @@ describe("Mutation.Bsda.sign", () => {
       }
     );
 
-    it.each(["R 5", "D 5", "D 9"])(
+    it.each(["R 5", "D 5", "D 9 F"])(
       "destination on regular BSDA can use final operation code %p",
       async operationCode => {
         // Given

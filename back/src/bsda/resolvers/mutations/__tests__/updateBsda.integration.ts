@@ -75,6 +75,10 @@ export const UPDATE_BSDA = gql`
           acceptedWeight
           acceptationStatus
         }
+        operation {
+          code
+        }
+        plannedOperationCode
       }
       intermediaries {
         siret
@@ -3436,5 +3440,81 @@ describe("Mutation.updateBsda", () => {
         "Le poids refusé a été verrouillé via signature et ne peut pas être modifié"
       );
     });
+  });
+
+  describe("TRA-16000 - Code D9 becomes D9F", () => {
+    it.each(["D 9 F", "D 9"])(
+      "should allow user to update destinationOperationCode with code %p",
+      async destinationOperationCode => {
+        // Given
+        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+        const bsda = await bsdaFactory({
+          opt: {
+            emitterCompanySiret: company.siret
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { data, errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                operation: {
+                  code: destinationOperationCode
+                }
+              }
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.updateBsda.id).toBeTruthy();
+        expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
+      }
+    );
+
+    it.each([
+      "D 9 F",
+      // Legacy. Will be cast to D9F
+      "D 9"
+    ])(
+      "should allow user to update plannedOperationCode with code %p",
+      async plannedOperationCode => {
+        // Given
+        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+        const bsda = await bsdaFactory({
+          opt: {
+            emitterCompanySiret: company.siret
+          }
+        });
+
+        // When
+        const { mutate } = makeClient(user);
+        const { data, errors } = await mutate<
+          Pick<Mutation, "updateBsda">,
+          MutationUpdateBsdaArgs
+        >(UPDATE_BSDA, {
+          variables: {
+            id: bsda.id,
+            input: {
+              destination: {
+                plannedOperationCode
+              }
+            }
+          }
+        });
+
+        // Then
+        expect(errors).toBeUndefined();
+        expect(data.updateBsda.id).toBeTruthy();
+        expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
+      }
+    );
   });
 });
