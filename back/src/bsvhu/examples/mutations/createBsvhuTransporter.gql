@@ -1,0 +1,5 @@
+mutation CreateBsvhuTransporter($input: BsvhuTransporterInput!) {
+  createBsvhuTransporter(input: $input) {
+    id
+  }
+}

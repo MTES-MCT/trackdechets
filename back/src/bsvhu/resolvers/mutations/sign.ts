@@ -42,6 +42,7 @@ export default async function sign(
   });
 
   const signatureType = getBsvhuSignatureType(input.type, bsvhu);
+  console.log(`Signature type: ${signatureType}`);
   const authorizedOrgIds = getAuthorizedOrgIds(bsvhu, signatureType);
 
   // To sign a form for a company, you must either:
@@ -62,7 +63,9 @@ export default async function sign(
     currentSignatureType: signatureType
   });
 
-  const sign = signatures[signatureType];
+  const sign =
+    signatures[input.type === "TRANSPORT" ? "TRANSPORT" : signatureType];
+
   const signedBsvhu = await sign(user, bsvhu, {
     ...input,
     date: new Date(input.date ?? Date.now())
@@ -237,7 +240,12 @@ async function signReception(
   const updateInput: Prisma.BsvhuUpdateInput = {
     destinationReceptionSignatureAuthor: input.author,
     destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // on autorise l'installation de destination à signer même si le ou les
+    // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+    // premier transporteur ait finalement décidé d'aller directement à destination.
+    // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+    transporters: { deleteMany: { transporterTransportSignatureDate: null } }
   };
 
   return updateBsvhu(user, bsvhu, updateInput);
@@ -290,7 +298,7 @@ export async function getNextStatus(
   });
 
   // This transition is not possible
-  if (!nextState.changed) {
+  if (nextState.transitions.length === 0) {
     throw new InvalidSignatureError();
   }
 

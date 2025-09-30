@@ -365,13 +365,24 @@ export const checkRequiredFields: (
     }
 
     (bsvhu.transporters ?? []).forEach((transporter, idx) => {
+      if (
+        ["OPERATION", "RECEPTION"].includes(
+          validationContext.currentSignatureType ?? ""
+        ) &&
+        !transporter.transporterTransportSignatureDate
+      ) {
+        return;
+      }
       for (const bsvhuTransporterField of Object.keys(
         bsvhuTransporterEditionRules
       )) {
-        const { required, readableFieldName } =
-          bsvhuTransporterEditionRules[
-            bsvhuTransporterField as keyof BsvhuTransporterEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsvhuTransporterPath
+        } = bsvhuTransporterEditionRules[
+          bsvhuTransporterField as keyof BsvhuTransporterEditableFields
+        ];
 
         if (required) {
           const isRequired = isBsvhuTransporterFieldRequired(
@@ -385,6 +396,9 @@ export const checkRequiredFields: (
               field: bsvhuTransporterField,
               rule: required,
               readableFieldName,
+              path: ["transporters", `${idx + 1}`].concat(
+                bsvhuTransporterPath ?? []
+              ) as EditionRulePath,
               ctx: zodContext,
               errorMsg: fieldDescription =>
                 `${fieldDescription} n° ${idx + 1} est un champ requis.`

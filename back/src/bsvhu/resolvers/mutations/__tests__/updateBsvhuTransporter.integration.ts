@@ -226,7 +226,7 @@ describe("Mutation.updateBsvhuTransporter", () => {
     ]);
   });
 
-  it("should not allow a user not part of a BSDA to update an associated transporter", async () => {
+  it("should not allow a user not part of a BSVHU to update an associated transporter", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
     const bsvhu = await bsvhuFactory({

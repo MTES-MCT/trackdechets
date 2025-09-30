@@ -156,12 +156,10 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
               createMany: {
                 data: [
                   {
-                    ...bsvhuTransporterData(transporter1.siret!, 1),
-                    transporterCompanyVatNumber: transporter1.vatNumber!
+                    ...bsvhuTransporterData(transporter1.siret!, 1)
                   },
                   {
-                    ...bsvhuTransporterData(lastTransporter.siret!, 2),
-                    transporterCompanyVatNumber: lastTransporter.vatNumber!
+                    ...bsvhuTransporterData(lastTransporter.siret!, 2)
                   }
                 ]
               }

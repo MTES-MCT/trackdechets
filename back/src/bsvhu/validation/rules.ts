@@ -64,7 +64,18 @@ type GetBsvhuSignatureTypeFn<T extends ZodBsvhu | ZodBsvhuTransporter> = (
   ruleContext?: RuleContext<T>
 ) => AllBsvhuSignatureType | undefined;
 
-export type EditionRulePath = Leaves<BsvhuInput, 5>;
+export type EditionRulePath = Leaves<
+  BsvhuInput & {
+    transporters: {
+      1: BsvhuTransporterInput;
+      2: BsvhuTransporterInput;
+      3: BsvhuTransporterInput;
+      4: BsvhuTransporterInput;
+      5: BsvhuTransporterInput;
+    };
+  },
+  5
+>;
 
 export type TransporterEditionRulePath = Leaves<BsvhuTransporterInput, 5>;
 
@@ -855,9 +866,9 @@ export const getRequiredAndSealedFieldPaths = async (
   currentSignatures: AllBsvhuSignatureType[],
   user: User | undefined
 ): Promise<{
-  sealed: string[][];
+  sealed: EditionRulePath[];
 }> => {
-  const sealedFields: string[][] = [];
+  const sealedFields: EditionRulePath[] = [];
   const userFunctions = await getBsvhuUserFunctions(user, bsvhu);
   for (const bsvhuField of Object.keys(bsvhuEditionRules)) {
     const { sealed, path } =
@@ -892,11 +903,13 @@ export const getRequiredAndSealedFieldPaths = async (
           if (i === 0) {
             // backward compatibility for single transporter UI
             sealedFields.push(
-              ["transporter"].concat(bsvhuTransporterPath ?? [])
+              ["transporter"].concat(bsvhuTransporterPath) as EditionRulePath
             );
           }
           sealedFields.push(
-            ["transporters", `${i + 1}`].concat(bsvhuTransporterPath ?? [])
+            ["transporters", `${i + 1}`].concat(
+              bsvhuTransporterPath
+            ) as EditionRulePath
           );
         }
       }
@@ -1028,7 +1041,6 @@ export async function checkBsvhuSealedFields(
         persistedTransporters[0],
         updatedTransporters[0]
       );
-      console.log("transporterUpdatedFields", transporterUpdatedFields);
 
       for (const transporterUpdatedField of transporterUpdatedFields) {
         const rule =
