@@ -81,7 +81,7 @@ describe("validation > parseBsffPackaging", () => {
     // .superRefine et qui vérifient la cohérence des champs entre eux.
 
     it.each([
-      ["R5", "REUTILISATION"],
+      ["R5", "RECYCLAGE"],
       ["R13", undefined]
     ])(
       "should parse correctly if operation code & mode are compatible (code: %p, mode: %p)",

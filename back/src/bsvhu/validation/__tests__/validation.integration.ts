@@ -1065,7 +1065,7 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         destinationOperationCode: "R 4",
-        destinationOperationMode: "REUTILISATION",
+        destinationOperationMode: "RECYCLAGE",
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationOperationDate: new Date(),

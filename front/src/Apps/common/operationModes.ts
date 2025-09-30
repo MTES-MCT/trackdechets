@@ -25,39 +25,23 @@ export const CODES_AND_EXPECTED_OPERATION_MODES = {
   // Opérations de valorisation
   R0: [OperationMode.Reutilisation],
   R1: [OperationMode.ValorisationEnergetique],
-  R2: [
-    OperationMode.Reutilisation,
-    OperationMode.Recyclage,
-    OperationMode.AutresValorisations
-  ],
-  R3: [
-    OperationMode.Reutilisation,
-    OperationMode.Recyclage,
-    OperationMode.AutresValorisations
-  ],
-  R4: [
-    OperationMode.Reutilisation,
-    OperationMode.Recyclage,
-    OperationMode.AutresValorisations
-  ],
-  R5: [
-    OperationMode.Reutilisation,
-    OperationMode.Recyclage,
-    OperationMode.AutresValorisations
-  ],
-  R6: [OperationMode.Recyclage, OperationMode.AutresValorisations],
-  R7: [OperationMode.Recyclage, OperationMode.AutresValorisations],
-  R8: [OperationMode.Recyclage, OperationMode.AutresValorisations],
+  R2: [OperationMode.Reutilisation, OperationMode.Recyclage],
+  R3: [OperationMode.Recyclage, OperationMode.AutresValorisations],
+  R4: [OperationMode.Recyclage],
+  R5: [OperationMode.Recyclage, OperationMode.AutresValorisations],
+  R6: [OperationMode.Recyclage],
+  R7: [OperationMode.Reutilisation],
+  R8: [OperationMode.Recyclage],
   R9: [
     OperationMode.Reutilisation,
     OperationMode.Recyclage,
-    OperationMode.AutresValorisations
+    OperationMode.ValorisationEnergetique
   ],
-  R10: [OperationMode.AutresValorisations],
+  R10: [OperationMode.Recyclage],
   R11: [
-    OperationMode.Reutilisation,
     OperationMode.Recyclage,
-    OperationMode.AutresValorisations
+    OperationMode.AutresValorisations,
+    OperationMode.ValorisationEnergetique
   ],
   R12: [],
   R13: []

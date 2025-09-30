@@ -463,13 +463,26 @@ const getContentToValidate = (
       );
   }
 
-  return {
+  const content = {
     ...flatContent,
     quantityReceived,
     quantityRefused,
     temporaryStorageTemporaryStorerQuantityReceived,
     temporaryStorageTemporaryStorerQuantityRefused
   };
+
+  // To validate the operation mode & code association, we need both
+  if (
+    isDefined(flatContent.processingOperationDone) ||
+    isDefined(flatContent.destinationOperationMode)
+  ) {
+    content.processingOperationDone =
+      flatContent.processingOperationDone ?? bsdd.processingOperationDone;
+    content.destinationOperationMode =
+      flatContent.destinationOperationMode ?? bsdd.destinationOperationMode;
+  }
+
+  return content;
 };
 
 async function getApproversSirets(
