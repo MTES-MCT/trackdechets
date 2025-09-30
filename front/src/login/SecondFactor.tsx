@@ -9,12 +9,20 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import styles from "./Login.module.scss";
 
-function getErrorMessage(errorCode: string) {
+const round5 = (x: string) => {
+  // round to the next 5 multiple, eg. 3.1 -> 5, 7.8 -> 10
+  return Math.ceil(parseFloat(x) / 5) * 5;
+};
+
+function getErrorMessage(errorCode: string, lockout?: string) {
   if (errorCode === "INVALID_TOTP") {
-    return "Le code d'authentification est invalide";
+    return `Le code d'authentification est invalide. Merci d'attendre ${lockout} secondes avant de faire un nouvel essai.`;
   }
   if (errorCode === "MISSING_TOTP") {
     return "Le code d'authentification est manquant";
+  }
+  if (errorCode == "TOTP_LOCKOUT") {
+    return `Merci dattendre ${lockout} secondes avant de faire un nouvel essai.`;
   }
 
   return "Erreur serveur";
@@ -31,16 +39,16 @@ export default function SecondFactor() {
   const { VITE_API_ENDPOINT } = import.meta.env;
 
   if (queries.errorCode || queries.returnTo) {
-    const { errorCode, returnTo, username } = queries;
+    const { errorCode, returnTo, username, lockout = 0 } = queries;
     const state = {
-      ...(queries.errorCode ? { errorCode, username } : {}),
+      ...(queries.errorCode ? { errorCode, username, lockout } : {}),
       ...(!!returnTo ? { returnTo } : {})
     };
 
     return <Navigate to={{ pathname: routes.secondFactor }} state={state} />;
   }
-  const { errorCode } = queries;
-  const { returnTo } = location.state || {};
+  // const { errorCode } = queries;
+  const { returnTo, errorCode, lockout } = location.state || {};
 
   const code = Array.isArray(errorCode) ? errorCode[0] : errorCode;
 
@@ -48,7 +56,7 @@ export default function SecondFactor() {
     <div className="fr-grid-row fr-mb-2w">
       <Alert
         title="Erreur"
-        description={getErrorMessage(code)}
+        description={getErrorMessage(code, lockout)}
         severity="error"
       />
     </div>

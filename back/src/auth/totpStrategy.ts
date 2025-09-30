@@ -4,6 +4,43 @@ import { TOTP } from "totp-generator";
 import { prisma } from "@td/prisma";
 import { sanitizeEmail } from "../utils";
 import { User } from "@prisma/client";
+import { addSeconds } from "date-fns";
+
+const TOTP_LOCK_FACTOR = 5;
+
+const increaseLock = async (user?: User) => {
+  if (!user) {
+    return null;
+  }
+  if (user.totpLockedUntil && user.totpLockedUntil > new Date()) {
+    // ignore if user tries before lock expiration
+    return null;
+  }
+  const totpFails = user.totpFails + 1;
+  const totpLockedUntil = addSeconds(new Date(), totpFails * TOTP_LOCK_FACTOR);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { totpFails, totpLockedUntil }
+  });
+  return totpLockedUntil;
+};
+
+const resetLock = async (user: User) => {
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { totpFails: 0, totpLockedUntil: null }
+  });
+};
+
+const round5 = (x: number) => {
+  // round to the next 5 multiple, eg. 3.1 -> 5, 7.8 -> 10
+  return Math.ceil(x / 5) * 5;
+};
+
+const getLockout = (totpLockedUntil?: Date | null): number => {
+  if (!totpLockedUntil) return 0;
+  return round5((totpLockedUntil.getTime() - new Date().getTime()) / 1000);
+};
 
 /**
  * Custom Authentication Strategy for Passport.js
@@ -17,11 +54,18 @@ export class TotpStrategy extends PassportStrategy {
    * This is the core method that Passport will call
    * when using this strategy
    *
+   *  Lockout logic:
+   *  - each time a wrong totp is submitted,
+   *      - the `totpFails` count is increased
+   *      - the `totpLockedUntil` is set to `totpFails` * 5 s  in the future
+   *      - the lockout params is returned alongside the error code, allowing the UI to handle the response querytsring and inform the user
+   *  - during lockout period, totp submission are ignored
+   *  - once lockout expired, successful totp submission resets `totpFails` and `totpLockedUntil`
+   *
    * @param req - The request object
    */
   async authenticate(req: Request): Promise<void> {
     // Extract credentials from request
-    // This is where your custom authentication logic goes
     const { totp } = req.body;
     const userEmail = req.session?.preloggedUser?.userEmail;
     const expire = req.session?.preloggedUser?.expire;
@@ -29,11 +73,14 @@ export class TotpStrategy extends PassportStrategy {
     if (!expire || !userEmail) {
       return this.fail({ code: "TOTP_TIMEOUT_OR_MISSING_SESSION" }, 401);
     }
+    const user = await prisma.user.findUnique({
+      where: { email: sanitizeEmail(userEmail) }
+    });
 
     if (new Date(expire) < new Date()) {
       // prelogging expired, user will be redirected to login
       delete req.session.preloggedUser;
-
+      await resetLock(user!);
       return this.fail({ code: "TOTP_TIMEOUT_OR_MISSING_SESSION" }, 401);
     }
 
@@ -41,16 +88,21 @@ export class TotpStrategy extends PassportStrategy {
       return this.fail({ code: "MISSING_TOTP" }, 401);
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: sanitizeEmail(userEmail) }
-    });
-    // Call verify function to validate the totp
+    if (user?.totpLockedUntil && user.totpLockedUntil > new Date()) {
+      const lockout = getLockout(user.totpLockedUntil);
+      return this.fail({ code: `TOTP_LOCKOUT`, lockout }, 401);
+    }
 
+    // Call verify function to validate the totp
     try {
       const verifiedUser = await this.verifyTotp(totp, user);
       if (!verifiedUser) {
-        return this.fail({ code: "INVALID_TOTP" }, 401);
+        // increase lockout time (fail * TOTP_LOCK_FACTOR seconds)
+        const totpLockedUntil = await increaseLock(user!);
+        const lockout = getLockout(totpLockedUntil);
+        return this.fail({ code: "INVALID_TOTP", lockout }, 401);
       }
+      await resetLock(user!);
       this.success(verifiedUser);
     } catch (err) {
       this.error(err);
