@@ -4,7 +4,7 @@ import {
   WasteProcessorType,
   WasteVehiclesType,
   CollectorType
-} from "@prisma/client";
+} from "@td/prisma";
 import * as yup from "yup";
 import { prisma } from "@td/prisma";
 import { CompanyRow } from "./types";

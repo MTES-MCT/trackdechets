@@ -1,4 +1,4 @@
-import { Grant } from "@prisma/client";
+import { Grant } from "@td/prisma";
 import { isExpired } from "../oauth/utils";
 
 describe("isExpired", () => {

@@ -5,7 +5,7 @@ import { expandBspaohFromDb } from "../../converter";
 import { parseBspaohInContext } from "../../validation";
 
 import { checkCanUpdate } from "../../permissions";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 import { ForbiddenError } from "../../../common/errors";
 
 import { prepareBspaohForParsing } from "./utils";

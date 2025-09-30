@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriStatus, User } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, User } from "@td/prisma";
 import type { BsdasriInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { ForbiddenError, UserInputError } from "../common/errors";

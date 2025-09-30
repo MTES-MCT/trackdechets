@@ -1,6 +1,6 @@
 import { Job } from "bull";
 import { GericoQueueItem } from "../producers/gerico";
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 import { initSentry } from "../../common/sentry";
 import gericoBackend from "../../common/post/backends/gerico";
 import { prisma } from "@td/prisma";

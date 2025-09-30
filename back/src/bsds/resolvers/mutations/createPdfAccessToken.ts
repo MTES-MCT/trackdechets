@@ -22,7 +22,7 @@ import {
   BsdaStatus,
   BspaohStatus,
   Status
-} from "@prisma/client";
+} from "@td/prisma";
 import { ROAD_CONTROL_SLUG } from "@td/constants";
 import { checkCanRead as checkCanReadForm } from "../../../forms/permissions";
 import { checkCanRead as checkCanReadBsdasri } from "../../../bsdasris/permissions";

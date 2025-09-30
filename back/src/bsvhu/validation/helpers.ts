@@ -1,6 +1,4 @@
-import { User } from "@prisma/client";
-import { prisma } from "@td/prisma";
-
+import { User, prisma } from "@td/prisma";
 import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
 import { BSVHU_SIGNATURES_HIERARCHY } from "./constants";
 import {

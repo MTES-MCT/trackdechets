@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export async function run(tx: Prisma.TransactionClient) {
   // We get all existing automations

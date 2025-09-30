@@ -1,4 +1,4 @@
-import { EmitterType, Prisma, Status } from "@prisma/client";
+import { EmitterType, Prisma, Status } from "@td/prisma";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";

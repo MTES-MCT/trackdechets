@@ -1,6 +1,6 @@
 import gql from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { prisma } from "@td/prisma";

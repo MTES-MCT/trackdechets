@@ -5,7 +5,7 @@ import {
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   IncomingWasteV2,

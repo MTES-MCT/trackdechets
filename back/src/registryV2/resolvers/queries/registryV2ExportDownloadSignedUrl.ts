@@ -5,7 +5,7 @@ import type { QueryRegistryV2ExportDownloadSignedUrlArgs } from "@td/codegen-bac
 import { GraphQLContext } from "../../../types";
 import { ForbiddenError } from "../../../common/errors";
 import { getRegistryFileName } from "../../filename";
-import { RegistryExportFormat } from "@prisma/client";
+import { RegistryExportFormat } from "@td/prisma";
 
 export async function registryV2ExportDownloadSignedUrl(
   _,

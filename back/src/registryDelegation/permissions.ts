@@ -1,4 +1,4 @@
-import { Company, RegistryDelegation, User } from "@prisma/client";
+import { Company, RegistryDelegation, User } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { ForbiddenError } from "../common/errors";
 import { can, Permission } from "../permissions";

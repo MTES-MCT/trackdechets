@@ -11,7 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { OperationMode, Status } from "@prisma/client";
+import { OperationMode, Status } from "@td/prisma";
 import type { Mutation, MutationMarkAsProcessedArgs } from "@td/codegen-back";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { ErrorCode } from "../../../../common/errors";

@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { generateUniqueTestSiret, randomNbrChain } from "back";
-import { CompanyType, Prisma, WasteVehiclesType } from "@prisma/client";
+import { CompanyType, Prisma, WasteVehiclesType } from "@td/prisma";
 
 interface VhuAgrement {
   agrementNumber: string;

@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User } from "@td/prisma";
 import { ParsedZodBsvhu, ParsedZodBsvhuTransporter } from "./schema";
 import { RefinementCtx } from "zod";
 import { AllBsvhuSignatureType } from "../types";
@@ -31,10 +31,10 @@ export type ZodBsvhuTransporterTransformer = (
   bsvhuTransporter: ParsedZodBsvhuTransporter
 ) => ParsedZodBsvhuTransporter | Promise<ParsedZodBsvhuTransporter>;
 
-export const BsvhuForParsingInclude = Prisma.validator<Prisma.BsvhuInclude>()({
+export const BsvhuForParsingInclude = {
   intermediaries: true,
   transporters: true
-});
+} satisfies Prisma.BsvhuInclude;
 
 export type PrismaBsvhuForParsing = Prisma.BsvhuGetPayload<{
   include: typeof BsvhuForParsingInclude;

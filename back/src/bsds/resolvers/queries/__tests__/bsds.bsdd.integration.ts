@@ -4,7 +4,7 @@ import {
   UserRole,
   WasteProcessorType,
   CompanyType
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   Query,
   QueryBsdsArgs,

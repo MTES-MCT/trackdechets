@@ -32,7 +32,7 @@ import {
 } from "../../../../bsffs/__tests__/factories";
 import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { bspaohFactory } from "../../../../bspaoh/__tests__/factories";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 
 const CLONE_BSD = gql`
   mutation cloneBsd($id: String!) {

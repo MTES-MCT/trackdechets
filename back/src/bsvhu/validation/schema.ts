@@ -36,7 +36,7 @@ import {
   BsvhuPackaging,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   fillIntermediariesOrgIds,
   runTransformers,

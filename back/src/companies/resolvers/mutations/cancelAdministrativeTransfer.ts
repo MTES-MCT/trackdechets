@@ -8,7 +8,7 @@ import {
   UserInputError
 } from "../../../common/errors";
 import { companyEventTypes } from "../../types";
-import { AdministrativeTransferStatus } from "@prisma/client";
+import { AdministrativeTransferStatus } from "@td/prisma";
 
 export const cancelAdministrativeTransfer: MutationResolvers["cancelAdministrativeTransfer"] =
   async (_, { id }, context) => {

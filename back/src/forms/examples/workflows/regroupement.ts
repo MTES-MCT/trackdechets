@@ -5,7 +5,7 @@ import { markAsReceived } from "../steps/markAsReceived";
 import { markAsAwaitingGroup } from "../steps/markAsProcessed";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title:

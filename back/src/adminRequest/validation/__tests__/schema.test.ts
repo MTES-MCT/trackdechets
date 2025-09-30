@@ -1,4 +1,4 @@
-import { AdminRequestValidationMethod } from "@prisma/client";
+import { AdminRequestValidationMethod } from "@td/prisma";
 import {
   acceptAdminRequestInputSchema,
   createAdminRequestInputSchema

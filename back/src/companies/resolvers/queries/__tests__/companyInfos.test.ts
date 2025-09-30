@@ -15,6 +15,7 @@ jest.mock("../../../vat", () => ({
 
 const companyMock = jest.fn();
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     company: { findUnique: jest.fn((...args) => companyMock(...args)) },
     anonymousCompany: { findUnique: jest.fn(() => null) }

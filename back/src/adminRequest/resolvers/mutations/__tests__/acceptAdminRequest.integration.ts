@@ -13,7 +13,7 @@ import {
   AdminRequestStatus,
   AdminRequestValidationMethod,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";

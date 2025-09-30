@@ -2,7 +2,7 @@ import { ApiResponse } from "@elastic/elasticsearch";
 import { UpdateByQueryResponse } from "@elastic/elasticsearch/api/types";
 import { xDaysAgo } from "../utils";
 import { BsdElastic, client, index } from "./elastic";
-import { RevisionRequestStatus } from "@prisma/client";
+import { RevisionRequestStatus } from "@td/prisma";
 import { logger } from "@td/logger";
 import { addMonths } from "date-fns";
 

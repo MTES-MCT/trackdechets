@@ -1,5 +1,5 @@
 import { OperationHookJobArgs } from "../queue/jobs/operationHook";
-import { BsdType, Bsda, Prisma } from "@prisma/client";
+import { BsdType, Bsda, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { enqueueOperationHookJob } from "../queue/producers/operationHook";
 import { isFinalOperationCode } from "../common/operationCodes";

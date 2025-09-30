@@ -1,6 +1,7 @@
 import { cachedGet, generateKey } from "../redis";
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     foo: null
   }

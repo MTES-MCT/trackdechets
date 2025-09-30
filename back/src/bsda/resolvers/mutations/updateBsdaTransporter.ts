@@ -1,4 +1,4 @@
-import { BsdaTransporter, Prisma } from "@prisma/client";
+import { BsdaTransporter, Prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { prisma } from "@td/prisma";

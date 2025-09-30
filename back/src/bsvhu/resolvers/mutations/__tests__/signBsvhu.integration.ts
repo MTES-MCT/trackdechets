@@ -19,7 +19,7 @@ import {
   transporterReceiptFactory
 } from "../../../../__tests__/factories";
 import { prisma } from "@td/prisma";
-import { TransportMode, User } from "@prisma/client";
+import { TransportMode, User } from "@td/prisma";
 import gql from "graphql-tag";
 
 const SIGN_VHU = gql`

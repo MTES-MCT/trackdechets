@@ -1,4 +1,4 @@
-import { CiterneNotWashedOutReason } from "@prisma/client";
+import { CiterneNotWashedOutReason } from "@td/prisma";
 
 const LABELS = {
   EXEMPTED: "Exemptions de rinçage (citerne dédiée)",

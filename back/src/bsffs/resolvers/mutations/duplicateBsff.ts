@@ -4,7 +4,7 @@ import { expandBsffFromDB } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
 import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BsffStatus, Prisma } from "@prisma/client";
+import { BsffStatus, Prisma } from "@td/prisma";
 import { getBsffRepository } from "../../repository";
 import { prisma } from "@td/prisma";
 import {

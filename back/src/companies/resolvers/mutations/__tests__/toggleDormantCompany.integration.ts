@@ -5,7 +5,7 @@ import type {
 } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 const TOGGLE_DORMANT_COMPANY = `

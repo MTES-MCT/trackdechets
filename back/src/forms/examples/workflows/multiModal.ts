@@ -8,7 +8,7 @@ import { markAsProcessed } from "../steps/markAsProcessed";
 import { Workflow } from "../../../common/workflow";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: "Transport multi-modal",

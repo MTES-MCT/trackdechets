@@ -1,4 +1,4 @@
-import { AdminRequest, Company, User } from "@prisma/client";
+import { AdminRequest, Company, User } from "@td/prisma";
 import type { AdminRequestCompany, AdminRequestUser } from "@td/codegen-back";
 
 // Revolvers don't provide some of the fields, because they are computed

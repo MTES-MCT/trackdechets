@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
-import { CompanyType, WasteProcessorType } from "@prisma/client";
+import { Prisma } from "@td/prisma";
+import { CompanyType, WasteProcessorType } from "@td/prisma";
 
 /**
  *

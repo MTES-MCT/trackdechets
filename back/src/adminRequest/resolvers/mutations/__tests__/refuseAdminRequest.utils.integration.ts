@@ -1,7 +1,4 @@
-import {
-  AdminRequestStatus,
-  AdminRequestValidationMethod
-} from "@prisma/client";
+import { AdminRequestStatus, AdminRequestValidationMethod } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { addDays } from "date-fns";

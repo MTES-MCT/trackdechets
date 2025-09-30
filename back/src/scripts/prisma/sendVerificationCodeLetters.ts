@@ -1,8 +1,8 @@
-import { CompanyVerificationStatus } from "@prisma/client";
+import { CompanyVerificationStatus } from "@td/prisma";
 import { sendVerificationCodeLetter } from "../../common/post";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import { prisma } from "@td/prisma";
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 
 const { VERIFY_COMPANY } = process.env;
 

@@ -4,7 +4,7 @@ import {
   BsffPackagingType,
   BsffStatus,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma as prismaClient } from "@td/prisma";
 import { RepositoryFnDeps } from "../common/repository/types";
 import type { BsffPackagingInput } from "@td/codegen-back";

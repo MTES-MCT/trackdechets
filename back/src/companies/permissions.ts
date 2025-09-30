@@ -4,7 +4,7 @@ import {
   BrokerReceipt,
   WorkerCertification,
   TransporterReceipt
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import type { VhuAgrement } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";

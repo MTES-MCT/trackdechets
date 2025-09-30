@@ -18,7 +18,7 @@ import {
   UserRole,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   onboardingFirstStep,
   renderMail,

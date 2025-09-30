@@ -1,6 +1,6 @@
 import { z } from "zod";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
-import { BsffPackagingType, BsffType } from "@prisma/client";
+import { BsffPackagingType, BsffType } from "@td/prisma";
 
 import { BSFF_WASTE_CODES } from "@td/constants";
 import { BSFF_OPERATION_CODES } from "../../constants";

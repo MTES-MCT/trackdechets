@@ -4,7 +4,7 @@ import {
   BsdaType,
   Prisma,
   RevisionRequestStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";

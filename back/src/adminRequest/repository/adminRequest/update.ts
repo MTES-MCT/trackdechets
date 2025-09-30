@@ -1,4 +1,4 @@
-import { Prisma, AdminRequest } from "@prisma/client";
+import { Prisma, AdminRequest } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

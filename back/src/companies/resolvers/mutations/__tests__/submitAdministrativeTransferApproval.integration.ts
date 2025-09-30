@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { AdministrativeTransferStatus, UserRole } from "@prisma/client";
+import { AdministrativeTransferStatus, UserRole } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 const SUBMIT_ADMINISTRATIVE_TRANSFER_APPROVAL = `

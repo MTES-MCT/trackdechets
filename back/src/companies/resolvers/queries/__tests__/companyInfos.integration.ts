@@ -1,4 +1,4 @@
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";

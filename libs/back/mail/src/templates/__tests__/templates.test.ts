@@ -1,4 +1,4 @@
-import { BsddTransporter, Form, Prisma } from "@prisma/client";
+import { BsddTransporter, Form, Prisma } from "@td/prisma";
 import {
   onSignup,
   inviteUserToJoin,

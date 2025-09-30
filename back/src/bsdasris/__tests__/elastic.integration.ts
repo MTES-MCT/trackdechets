@@ -7,7 +7,7 @@ import {
 import { getBsdasriForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bsdasriFactory } from "./factories";
-import { BsdasriStatus, Company, WasteAcceptationStatus } from "@prisma/client";
+import { BsdasriStatus, Company, WasteAcceptationStatus } from "@td/prisma";
 import { xDaysAgo } from "../../utils";
 
 import { prisma } from "@td/prisma";

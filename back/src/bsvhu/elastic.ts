@@ -2,9 +2,9 @@ import {
   BsvhuStatus,
   Bsvhu,
   BsdType,
-  WasteAcceptationStatus,
-  BsvhuTransporter
-} from "@prisma/client";
+  BsvhuTransporter,
+  WasteAcceptationStatus
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   getIntermediaryCompanyOrgId,

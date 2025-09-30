@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { Bspaoh, BspaohTransporter } from "@prisma/client";
+import { Bspaoh, BspaohTransporter } from "@td/prisma";
 import { BspaohNotFound } from "./errors";
 import { UserInputError } from "../common/errors";
 import { PrismaBspaohWithTransporters } from "./types";

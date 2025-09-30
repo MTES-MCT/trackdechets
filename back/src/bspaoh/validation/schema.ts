@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { isCrematoriumRefinement } from "./dynamicRefinements";
 import { BSPAOH_WASTE_CODES, BSPAOH_WASTE_TYPES } from "@td/constants";

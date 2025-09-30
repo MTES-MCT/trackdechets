@@ -15,7 +15,7 @@ import {
   User,
   UserRole,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   Mutation,
   MutationMarkAsTempStorerAcceptedArgs

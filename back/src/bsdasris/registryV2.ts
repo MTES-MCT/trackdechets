@@ -12,7 +12,7 @@ import {
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   emptyIncomingWasteV2,
   emptyOutgoingWasteV2,

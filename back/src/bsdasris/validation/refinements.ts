@@ -10,7 +10,7 @@ import {
 import { isArray } from "../../common/dataTypes";
 import { capitalize } from "../../common/strings";
 import { EditionRule, EditionRulePath } from "./rules";
-import { BsdType, WasteAcceptationStatus, BsdasriType } from "@prisma/client";
+import { BsdType, WasteAcceptationStatus, BsdasriType } from "@td/prisma";
 import {
   destinationOperationModeRefinement,
   isDestinationRefinement,

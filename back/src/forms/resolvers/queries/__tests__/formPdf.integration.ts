@@ -4,7 +4,7 @@ import {
   userWithAccessTokenFactory,
   formFactory
 } from "../../../../__tests__/factories";
-import { GovernmentPermission } from "@prisma/client";
+import { GovernmentPermission } from "@td/prisma";
 
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";

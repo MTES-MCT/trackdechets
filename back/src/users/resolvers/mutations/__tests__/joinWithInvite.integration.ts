@@ -4,7 +4,7 @@ import { companyFactory } from "../../../../__tests__/factories";
 import { getUserCompanies } from "../../../database";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
 
 const JOIN_WITH_INVITE = `

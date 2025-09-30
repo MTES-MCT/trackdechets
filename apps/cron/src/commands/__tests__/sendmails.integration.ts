@@ -1,6 +1,6 @@
 import axios from "axios";
 import { resetDatabase } from "libs/back/tests-integration";
-import { CompanyType, MembershipRequestStatus } from "@prisma/client";
+import { CompanyType, MembershipRequestStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   companyFactory,

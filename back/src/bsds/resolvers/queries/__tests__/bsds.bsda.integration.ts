@@ -1,4 +1,4 @@
-import { BsdaConsistence, Company, User, UserRole } from "@prisma/client";
+import { BsdaConsistence, Company, User, UserRole } from "@td/prisma";
 import {
   refreshElasticSearch,
   resetDatabase

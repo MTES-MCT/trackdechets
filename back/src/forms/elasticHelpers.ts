@@ -3,7 +3,7 @@ import {
   EmitterType,
   Status,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { BsdElastic } from "../common/elastic";
 import { FullForm } from "./types";
 

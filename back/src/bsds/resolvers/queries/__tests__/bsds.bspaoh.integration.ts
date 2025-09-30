@@ -1,9 +1,4 @@
-import {
-  Company,
-  User,
-  UserRole,
-  WasteAcceptationStatus
-} from "@prisma/client";
+import { Company, User, UserRole, WasteAcceptationStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import type {
   Query,

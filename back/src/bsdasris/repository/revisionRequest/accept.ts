@@ -3,7 +3,7 @@ import {
   BsdasriStatus,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { removeEmpty } from "../../../common/converter";
 import {
   LogMetadata,

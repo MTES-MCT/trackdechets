@@ -12,7 +12,7 @@ import {
   RegistryExportWasteType,
   Prisma,
   Status
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   emptyIncomingWasteV2,
   emptyManagedWasteV2,

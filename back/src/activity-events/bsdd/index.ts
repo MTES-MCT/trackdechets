@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { aggregateStream, getStream } from "..";
 import { AppDataloaders } from "../../types";
 import { bsddReducer } from "./reducer";

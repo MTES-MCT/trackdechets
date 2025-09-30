@@ -15,7 +15,7 @@ import {
   QuantityType,
   Status,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";

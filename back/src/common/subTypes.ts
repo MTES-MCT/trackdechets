@@ -1,4 +1,4 @@
-import { BsdasriType, BsdaType, BsffType, EmitterType } from "@prisma/client";
+import { BsdasriType, BsdaType, BsffType, EmitterType } from "@td/prisma";
 import type { BsdSubType } from "@td/codegen-back";
 
 // !!! WARNING !!!

@@ -4,7 +4,7 @@ import type { BspaohSignatureType } from "@td/codegen-back";
 import { BspaohValidationContext } from "./index";
 import { ZodBspaoh, ZodFullBspaoh } from "./schema";
 import { distinct } from "../../common/arrays";
-import { CompanyVerificationStatus } from "@prisma/client";
+import { CompanyVerificationStatus } from "@td/prisma";
 import { hasCremationProfile } from "../../companies/validation";
 import {
   isTransporterRefinement,

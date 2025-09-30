@@ -14,13 +14,7 @@ import {
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import {
-  EmitterType,
-  Form,
-  Prisma,
-  QuantityType,
-  Status
-} from "@prisma/client";
+import { EmitterType, Form, Prisma, QuantityType, Status } from "@td/prisma";
 import { getFormRepository } from "../../repository";
 import { sirenifyResealedFormInput } from "../../sirenify";
 import { prismaJsonNoNull } from "../../../common/converter";

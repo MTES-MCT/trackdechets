@@ -1,4 +1,4 @@
-import { GovernmentPermission } from "@prisma/client";
+import { GovernmentPermission } from "@td/prisma";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -14,7 +14,7 @@ import {
   siretify,
   bsddTransporterData
 } from "../../../../__tests__/factories";
-import { Status, WasteAcceptationStatus } from "@prisma/client";
+import { Status, WasteAcceptationStatus } from "@td/prisma";
 import { getFormForElastic, indexForm } from "../../../../forms/elastic";
 
 import { faker } from "@faker-js/faker";

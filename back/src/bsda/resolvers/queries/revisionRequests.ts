@@ -8,7 +8,7 @@ import type {
 } from "@td/codegen-back";
 import { getReadonlyBsdaRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { toPrismaStringFilter } from "../../../common/where";
 

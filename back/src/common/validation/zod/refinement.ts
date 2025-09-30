@@ -11,7 +11,7 @@ import {
   isWasteVehicles
 } from "../../../companies/validation";
 import { prisma } from "@td/prisma";
-import { BsdType, Company, CompanyVerificationStatus } from "@prisma/client";
+import { BsdType, Company, CompanyVerificationStatus } from "@td/prisma";
 import { getOperationModesFromOperationCode } from "../../operationModes";
 import { CompanyRole, pathFromCompanyRole } from "./schema";
 import { v20250201 } from "../../validation";

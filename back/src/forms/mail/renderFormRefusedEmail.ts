@@ -1,4 +1,4 @@
-import { BsddTransporter, Form } from "@prisma/client";
+import { BsddTransporter, Form } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { generateBsddPdfToBase64 } from "../pdf";
 import {

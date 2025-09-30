@@ -1,4 +1,4 @@
-import { RevisionRequestStatus } from "@prisma/client";
+import { RevisionRequestStatus } from "@td/prisma";
 import { resetDatabase } from "../../../../../../integration-tests/helper";
 import type {
   Mutation,

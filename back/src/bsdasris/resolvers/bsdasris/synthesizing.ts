@@ -1,6 +1,6 @@
 import type { BsdasriResolvers } from "@td/codegen-back";
 
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 import { expandSynthesizingDasri } from "../../converter";
 import { isSessionUser } from "../../../auth/auth";
 import { getReadonlyBsdasriRepository } from "../../repository";

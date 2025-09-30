@@ -11,7 +11,7 @@ import {
   RegistryExportDeclarationType,
   RegistryExportWasteType,
   Prisma
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   getBsdaWasteADRMention,
   getTransporterCompanyOrgId

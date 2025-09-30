@@ -5,7 +5,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStored } from "../../permissions";
 import { EventType } from "../../workflow/types";
 import { getAndExpandFormFromDb } from "../../converter";
-import { Prisma, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, WasteAcceptationStatus } from "@td/prisma";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";

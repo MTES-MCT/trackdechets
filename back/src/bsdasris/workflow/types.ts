@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import type { BsdasriSignatureType } from "@td/codegen-back";
 
 // Xstate event

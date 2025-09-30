@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import { operationHook } from "../operationHook";
-import { Status } from "@prisma/client";
+import { Status } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   formWithTempStorageFactory,

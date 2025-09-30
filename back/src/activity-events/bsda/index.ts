@@ -1,4 +1,4 @@
-import { Bsda } from "@prisma/client";
+import { Bsda } from "@td/prisma";
 import { AppDataloaders } from "../../types";
 import { aggregateStream } from "../aggregator";
 import { getStream } from "../data";

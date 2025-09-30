@@ -7,6 +7,7 @@ const updateUserMock = jest.fn();
 const deleteManyMock = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: {
       findUnique: jest.fn((...args) => userMock(...args)),

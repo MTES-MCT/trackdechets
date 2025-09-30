@@ -2,7 +2,7 @@ import { flattenFormInput } from "../converter";
 import { nullIfNoValues, safeInput, chain } from "../../common/converter";
 import type { FormInput, WasteDetailsInput } from "@td/codegen-back";
 import { siretify } from "../../__tests__/factories";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 test("nullIfNoValues", () => {
   let obj: any = { a: null, b: null };

@@ -5,9 +5,9 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   RegistrySsd
-} from "@prisma/client";
+} from "@td/prisma";
 import type { SsdWasteV2 } from "@td/codegen-back";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
+import { ITXClientDenyList } from "@td/prisma/runtime/library";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,

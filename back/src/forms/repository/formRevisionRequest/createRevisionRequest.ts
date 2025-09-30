@@ -1,4 +1,4 @@
-import { BsddRevisionRequest, Prisma } from "@prisma/client";
+import { BsddRevisionRequest, Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

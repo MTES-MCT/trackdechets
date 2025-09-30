@@ -3,7 +3,7 @@ import {
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { z } from "zod";
 import { BSDA_WASTE_CODES } from "@td/constants";
 import {

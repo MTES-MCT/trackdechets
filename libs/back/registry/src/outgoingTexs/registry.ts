@@ -4,21 +4,19 @@ import {
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,
   generateDateInfos,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { OutgoingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
-export const RegistryV2OutgoingTexsInclude =
-  Prisma.validator<Prisma.RegistryOutgoingTexsInclude>()({
-    texsAnalysisFiles: true
-  });
+export const RegistryV2OutgoingTexsInclude = {
+  texsAnalysisFiles: true
+} as Prisma.RegistryOutgoingTexsInclude;
 
 export type RegistryV2OutgoingTexs = Prisma.RegistryOutgoingTexsGetPayload<{
   include: typeof RegistryV2OutgoingTexsInclude;
@@ -265,7 +263,7 @@ const registryToLookupCreateInput = (
 export const updateRegistryLookup = async (
   registryOutgoingTexs: MinimalRegistryForLookup,
   oldRegistryOutgoingTexsId: string | null,
-  tx: Omit<PrismaClient, ITXClientDenyList>
+  tx: PrismaClient
 ): Promise<void> => {
   if (oldRegistryOutgoingTexsId) {
     await tx.registryLookup.upsert({

@@ -2,7 +2,7 @@ import {
   CompanyVerificationStatus,
   TransportMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import * as yup from "yup";
 import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {

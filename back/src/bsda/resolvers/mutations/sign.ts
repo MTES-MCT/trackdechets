@@ -4,7 +4,7 @@ import {
   BsdaType,
   Prisma,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterReceipt } from "../../../companies/recipify";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";

@@ -16,7 +16,7 @@ import {
   processRegistryExportJob,
   RegistryExportJobArgs
 } from "../processRegistryExport";
-import { RegistryExportFormat, RegistryExportStatus } from "@prisma/client";
+import { RegistryExportFormat, RegistryExportStatus } from "@td/prisma";
 import { parse as csvParse } from "@fast-csv/parse";
 import * as Excel from "exceljs";
 import { Readable } from "stream";

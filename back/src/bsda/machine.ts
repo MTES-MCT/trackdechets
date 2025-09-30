@@ -1,4 +1,4 @@
-import { Bsda, BsdaType, BsdaStatus } from "@prisma/client";
+import { Bsda, BsdaType, BsdaStatus } from "@td/prisma";
 import { createMachine } from "xstate";
 import type { BsdaSignatureType } from "@td/codegen-back";
 import { PARTIAL_OPERATIONS } from "./validation/constants";

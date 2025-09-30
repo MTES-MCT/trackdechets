@@ -5,7 +5,7 @@ import {
   Prisma,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";
@@ -137,10 +137,9 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export const BspaohWithTransportersInclude =
-  Prisma.validator<Prisma.BspaohInclude>()({
-    transporters: true
-  });
+export const BspaohWithTransportersInclude = {
+  transporters: true
+} satisfies Prisma.BspaohInclude;
 export type BspaohWithTransporters = Prisma.BspaohGetPayload<{
   include: typeof BspaohWithTransportersInclude;
 }>;

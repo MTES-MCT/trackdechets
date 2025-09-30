@@ -5,14 +5,13 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   RegistryTransported
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,
   generateDateInfos,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { TransportedWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
@@ -181,7 +180,7 @@ const registryToLookupCreateInput = (
 export const updateRegistryLookup = async (
   registryTransported: MinimalRegistryForLookup,
   oldRegistryTransportedId: string | null,
-  tx: Omit<PrismaClient, ITXClientDenyList>
+  tx: PrismaClient
 ): Promise<void> => {
   if (oldRegistryTransportedId) {
     await tx.registryLookup.upsert({

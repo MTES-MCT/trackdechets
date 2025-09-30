@@ -1,28 +1,24 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
-export const BsffWithTransportersInclude =
-  Prisma.validator<Prisma.BsffInclude>()({
-    transporters: true
-  });
+export const BsffWithTransportersInclude = {
+  transporters: true
+} satisfies Prisma.BsffInclude;
 
 export type BsffWithTransporters = Prisma.BsffGetPayload<{
   include: typeof BsffWithTransportersInclude;
 }>;
 
-export const BsffWithPackagingsInclude = Prisma.validator<Prisma.BsffInclude>()(
-  {
-    packagings: true
-  }
-);
+export const BsffWithPackagingsInclude = {
+  packagings: true
+} satisfies Prisma.BsffInclude;
 
 export type BsffWithPackagings = Prisma.BsffGetPayload<{
   include: typeof BsffWithPackagingsInclude;
 }>;
 
-export const BsffWithFicheInterventionInclude =
-  Prisma.validator<Prisma.BsffInclude>()({
-    ficheInterventions: true
-  });
+export const BsffWithFicheInterventionInclude = {
+  ficheInterventions: true
+} satisfies Prisma.BsffInclude;
 
 export type BsffWithFicheInterventions = Prisma.BsffGetPayload<{
   include: typeof BsffWithFicheInterventionInclude;

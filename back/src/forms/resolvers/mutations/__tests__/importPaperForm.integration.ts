@@ -8,7 +8,7 @@ import {
   WasteAcceptationStatus,
   CompanyType,
   WasteProcessorType
-} from "@prisma/client";
+} from "@td/prisma";
 import { format } from "date-fns";
 import { prisma } from "@td/prisma";
 import {

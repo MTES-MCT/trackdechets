@@ -1,4 +1,4 @@
-import { Bsff } from "@prisma/client";
+import { Bsff } from "@td/prisma";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import * as QRCode from "qrcode";

@@ -5,14 +5,13 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   RegistryManaged
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,
   generateDateInfos,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { ManagedWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 
@@ -29,10 +28,9 @@ const getWasteIsDangerous = (
   );
 };
 
-export const RegistryV2ManagedInclude =
-  Prisma.validator<Prisma.RegistryManagedInclude>()({
-    texsAnalysisFiles: true
-  });
+export const RegistryV2ManagedInclude = {
+  texsAnalysisFiles: true
+} satisfies Prisma.RegistryManagedInclude;
 
 export type RegistryV2Managed = Prisma.RegistryManagedGetPayload<{
   include: typeof RegistryV2ManagedInclude;
@@ -278,7 +276,7 @@ const registryToLookupCreateInput = (
 export const updateRegistryLookup = async (
   registryManagedWaste: MinimalRegistryForLookup,
   oldRegistryManagedWasteId: string | null,
-  tx: Omit<PrismaClient, ITXClientDenyList>
+  tx: PrismaClient
 ): Promise<void> => {
   if (oldRegistryManagedWasteId) {
     await tx.registryLookup.upsert({

@@ -1,4 +1,4 @@
-import { BsffPackaging } from "@prisma/client";
+import { BsffPackaging } from "@td/prisma";
 import {
   ZodBsffPackaging,
   contextualBsffPackagingSchema,

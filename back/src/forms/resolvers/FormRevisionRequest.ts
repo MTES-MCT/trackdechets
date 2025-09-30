@@ -8,7 +8,7 @@ import {
   expandFormFromDb,
   expandableFormIncludes
 } from "../converter";
-import { BsddRevisionRequest } from "@prisma/client";
+import { BsddRevisionRequest } from "@td/prisma";
 import { removeEmptyKeys } from "../../common/converter";
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {

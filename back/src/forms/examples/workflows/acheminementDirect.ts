@@ -5,7 +5,7 @@ import { markAsReceived } from "../steps/markAsReceived";
 import { markAsProcessed } from "../steps/markAsProcessed";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 const workflow: Workflow = {
   title: "Acheminement direct du producteur à l'installation de traitement",
   description: `Les informations du BSDD sont remplies par le producteur du déchet.

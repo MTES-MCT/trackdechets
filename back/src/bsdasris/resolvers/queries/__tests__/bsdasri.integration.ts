@@ -15,7 +15,7 @@ import {
 import type { Query } from "@td/codegen-back";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "graphql-tag";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 
 const GET_BSDASRI = gql`
   ${fullGroupingBsdasriFragment}

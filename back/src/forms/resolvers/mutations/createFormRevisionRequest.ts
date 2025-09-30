@@ -7,7 +7,7 @@ import {
   RevisionRequestStatus,
   Status,
   User
-} from "@prisma/client";
+} from "@td/prisma";
 import * as yup from "yup";
 import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
