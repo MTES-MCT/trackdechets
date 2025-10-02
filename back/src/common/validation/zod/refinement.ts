@@ -434,7 +434,11 @@ export const validateMultiTransporterPlates = (bsd, ctx: z.RefinementCtx) => {
   }
 };
 
-export const isSafeSSTI = (str: string, ctx: z.RefinementCtx) => {
+export const isSafeSSTI = (
+  str: string | null | undefined,
+  ctx: z.RefinementCtx
+) => {
+  if (!str) return;
   if (SSTI_CHARS.some(char => str.includes(char))) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
