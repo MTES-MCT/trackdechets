@@ -759,7 +759,7 @@ describe("Mutation.Bsda.createDraft", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode: "D 9",
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destination.siret,
             name: destination.name,

@@ -514,7 +514,7 @@ describe("Mutation.updateBsdasri", () => {
   );
 
   it.each([
-    ["D9", null],
+    ["D9F", "ELIMINATION"],
     ["D10", "ELIMINATION"],
     ["R1", "VALORISATION_ENERGETIQUE"]
   ])(
