@@ -1,0 +1,5 @@
+mutation UpdateBsvhuTransporter($id: ID!, $input: BsvhuTransporterInput!) {
+  updateBsvhuTransporter(id: $id, input: $input) {
+    id
+  }
+}

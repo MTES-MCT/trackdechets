@@ -58,6 +58,16 @@ function transporterInput(siret: string) {
   };
 }
 
+function transporterNSignatureUpdateInput() {
+  return {
+    transport: {
+      mode: "ROAD",
+      plates: ["abc21cde"],
+      takenOverAt: new Date().toISOString() as any
+    }
+  };
+}
+
 function broyeurCompanyInput(siret: string) {
   return {
     siret,
@@ -95,6 +105,7 @@ export default {
   wasteDetailsInput,
   transporterCompanyInput,
   transporterInput,
+  transporterNSignatureUpdateInput,
   receiptInput,
   broyeurCompanyInput,
   broyeurInput,

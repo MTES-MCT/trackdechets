@@ -1092,24 +1092,32 @@ model Bsvhu {
   quantity                                            Int?
   weightValue                                         Float?
   weightIsEstimate                                    Boolean?
-  transporterCompanyName                              String?
-  transporterCompanySiret                             String?                  @db.VarChar(17)
-  transporterCompanyAddress                           String?
-  transporterCompanyContact                           String?
-  transporterCompanyPhone                             String?
-  transporterCompanyMail                              String?
-  transporterRecepisseNumber                          String?
-  transporterRecepisseDepartment                      String?
-  transporterRecepisseValidityLimit                   DateTime?                @db.Timestamptz(6)
-  transporterCompanyVatNumber                         String?                  @db.VarChar(50)
-  transporterTransportSignatureAuthor                 String?
-  transporterTransportSignatureDate                   DateTime?                @db.Timestamptz(6)
-  transporterTransportTakenOverAt                     DateTime?                @db.Timestamptz(6)
-  transporterCustomInfo                               String?
-  transporterTransportMode                            TransportMode?           @default(ROAD)
-  transporterTransportPlates                          String[]
-  transporterRecepisseIsExempted                      Boolean?
-  containsElectricOrHybridVehicles                    Boolean?
+
+  // Date de signature du premier transporteur
+  // Cette valeur est dupliquée entre le modèle Bsvhu et BsvhuTransporter[0]
+  // pour optimiser certains calculs
+  transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
+
+  // legacy, à supprimer prochaine MEP
+  transporterCompanyName              String?
+  transporterCompanySiret             String?        @db.VarChar(17)
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
+  transporterCompanyVatNumber         String?        @db.VarChar(50)
+  transporterTransportSignatureAuthor String?
+  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
+  transporterCustomInfo               String?
+  transporterTransportMode            TransportMode? @default(ROAD)
+  transporterTransportPlates          String[]
+  transporterRecepisseIsExempted      Boolean?
+  // end legacy
+
+  containsElectricOrHybridVehicles Boolean?
 
   ecoOrganismeName  String?
   ecoOrganismeSiret String?
@@ -1136,9 +1144,11 @@ model Bsvhu {
 
   intermediaries  IntermediaryBsvhuAssociation[]
   registryLookups RegistryLookup[]
+  transporters    BsvhuTransporter[]
 
   // Denormalized fields, storing sirets to speed up queries and avoid expensive joins
   intermediariesOrgIds String[] @default([])
+  transportersOrgIds   String[] @default([])
   canAccessDraftOrgIds String[] @default([])
 
   // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
@@ -1151,10 +1161,42 @@ model Bsvhu {
   @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
   @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
   @@index([intermediariesOrgIds], map: "_BsvhuIntermediariesOrgIdsIdx", type: Gin)
+  @@index([transportersOrgIds], map: "_BsvhuTransportersOrgIdsIdx", type: Gin)
   @@index([canAccessDraftOrgIds], map: "_BsvhuCanAccessDraftOrgIdsIdx", type: Gin)
   @@index([status], map: "_BsvhuStatusIdx")
   @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
   @@index([customId], map: "_BsvhuCustomIdIdx")
+}
+
+model BsvhuTransporter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  number    Int
+  bsvhu     Bsvhu?   @relation(fields: [bsvhuId], references: [id], onDelete: Cascade)
+  bsvhuId   String?
+
+  transporterCompanySiret             String?
+  transporterCompanyName              String?
+  transporterCompanyVatNumber         String?
+  transporterCompanyAddress           String?
+  transporterCompanyContact           String?
+  transporterCompanyPhone             String?
+  transporterCompanyMail              String?
+  transporterCustomInfo               String?
+  transporterRecepisseIsExempted      Boolean?
+  transporterRecepisseNumber          String?
+  transporterRecepisseDepartment      String?
+  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
+  transporterTransportMode            TransportMode? @default(ROAD)
+  transporterTransportPlates          String[]
+  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
+  transporterTransportSignatureAuthor String?
+  transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
+
+  @@index([bsvhuId], map: "_BsvhuTransporterIdIdx")
+  @@index([transporterCompanySiret], map: "_BsvhuTransporterSiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterVatNumberIdx")
 }
 
 model RegistryDelegation {

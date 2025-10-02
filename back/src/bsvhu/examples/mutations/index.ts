@@ -8,5 +8,7 @@ function loadMutation(name) {
 export default {
   createBsvhu: loadMutation("createBsvhu"),
   updateBsvhu: loadMutation("updateBsvhu"),
-  signBsvhu: loadMutation("signBsvhu")
+  signBsvhu: loadMutation("signBsvhu"),
+  createBsvhuTransporter: loadMutation("createBsvhuTransporter"),
+  updateBsvhuTransporter: loadMutation("updateBsvhuTransporter")
 };

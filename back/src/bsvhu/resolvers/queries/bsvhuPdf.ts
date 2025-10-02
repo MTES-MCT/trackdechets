@@ -12,7 +12,11 @@ import { checkCanRead } from "../../permissions";
 export const bsvhuPdfDownloadHandler: DownloadHandler<QueryBsvhuPdfArgs> = {
   name: "bsvhuPdf",
   handler: async (_, res, { id }) => {
-    const bsvhu = await getBsvhuOrNotFound(id);
+    const bsvhu = await getBsvhuOrNotFound(id, {
+      include: {
+        transporters: true
+      }
+    });
     const readableStream = await buildPdf(bsvhu);
     readableStream.pipe(createPDFResponse(res, bsvhu.id));
   }

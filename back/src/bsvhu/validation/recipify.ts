@@ -11,29 +11,37 @@ const recipifyBsvhuAccessors = (
   // Tranformations should not be run on sealed fields
   sealedFields: string[]
 ): RecipifyInputAccessor<ParsedZodBsvhu>[] => [
-  {
-    role: CompanyRole.Transporter,
-    skip: sealedFields.includes("transporterRecepisseNumber"),
-    orgIdGetter: () => {
-      const orgId = getTransporterCompanyOrgId({
-        transporterCompanySiret: bsd.transporterCompanySiret ?? null,
-        transporterCompanyVatNumber: bsd.transporterCompanyVatNumber ?? null
-      });
-      return orgId ?? null;
-    },
-    setter: async (bsvhu: ParsedZodBsvhu, receipt) => {
-      if (bsvhu.transporterRecepisseIsExempted) {
-        bsvhu.transporterRecepisseNumber = null;
-        bsvhu.transporterRecepisseValidityLimit = null;
-        bsvhu.transporterRecepisseDepartment = null;
-      } else {
-        bsvhu.transporterRecepisseNumber = receipt?.receiptNumber ?? null;
-        bsvhu.transporterRecepisseValidityLimit =
-          receipt?.validityLimit ?? null;
-        bsvhu.transporterRecepisseDepartment = receipt?.department ?? null;
-      }
-    }
-  },
+  ...(bsd.transporters ?? []).map(
+    (_, idx) =>
+      ({
+        role: CompanyRole.Transporter,
+        skip: !!bsd.transporters![idx].transporterTransportSignatureDate,
+        orgIdGetter: () => {
+          const orgId = getTransporterCompanyOrgId({
+            transporterCompanySiret:
+              bsd.transporters![idx].transporterCompanySiret ?? null,
+            transporterCompanyVatNumber:
+              bsd.transporters![idx].transporterCompanyVatNumber ?? null
+          });
+          return orgId ?? null;
+        },
+        setter: async (bsvhu: ParsedZodBsvhu, receipt) => {
+          const transporter = bsvhu.transporters![idx];
+          if (transporter.transporterRecepisseIsExempted) {
+            transporter.transporterRecepisseNumber = null;
+            transporter.transporterRecepisseValidityLimit = null;
+            transporter.transporterRecepisseDepartment = null;
+          } else {
+            transporter.transporterRecepisseNumber =
+              receipt?.receiptNumber ?? null;
+            transporter.transporterRecepisseValidityLimit =
+              receipt?.validityLimit ?? null;
+            transporter.transporterRecepisseDepartment =
+              receipt?.department ?? null;
+          }
+        }
+      } as RecipifyInputAccessor<ParsedZodBsvhu>)
+  ),
   {
     role: CompanyRole.Broker,
     skip: sealedFields.includes("brokerRecepisseNumber"),

@@ -2,7 +2,7 @@ import type { CompanyInput, BsdasriRecepisseInput } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import {
   Bsdasri,
-  Bsvhu,
+  BsvhuTransporter,
   BspaohTransporter,
   BsdaTransporter,
   BsffTransporter
@@ -110,7 +110,7 @@ export interface BsdTransporterReceiptPart {
 export async function getTransporterReceipt(
   existingBsd:
     | Bsdasri
-    | Bsvhu
+    | BsvhuTransporter
     | BsdaTransporter
     | BsffTransporter
     | BspaohTransporter

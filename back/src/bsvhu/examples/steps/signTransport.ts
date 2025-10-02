@@ -3,7 +3,7 @@ import { WorkflowStep } from "../../../common/workflow";
 
 export function signTransport(company: string): WorkflowStep {
   return {
-    description: `Le producteur procède ensuite à la signature`,
+    description: `Le transporteur procède ensuite à la signature`,
     mutation: mutations.signBsvhu,
     variables: ({ bsd }) => ({
       id: bsd.id,

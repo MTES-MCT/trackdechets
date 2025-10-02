@@ -58,6 +58,7 @@ export default function plugin(): Plugin<any> {
         },
         bsvhu: {
           vhuVersBroyeur: parseWorkflow(bsvhuWorkflows.vhuVersBroyeur),
+          multiModal: parseWorkflow(bsvhuWorkflows.multiModal),
         },
         bsff: {
           collecteFluidesParOperateur: parseWorkflow(

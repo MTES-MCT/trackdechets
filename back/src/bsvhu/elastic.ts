@@ -2,7 +2,8 @@ import {
   BsvhuStatus,
   Bsvhu,
   BsdType,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  BsvhuTransporter
 } from "@prisma/client";
 import { prisma } from "@td/prisma";
 import {
@@ -16,20 +17,33 @@ import { getBsvhuSubType } from "../common/subTypes";
 import { getAddress } from "./converter";
 import {
   BsvhuWithIntermediaries,
-  BsvhuWithIntermediariesInclude
+  BsvhuWithIntermediariesInclude,
+  BsvhuWithTransporters,
+  BsvhuWithTransportersInclude
 } from "./types";
 import { isDefined } from "../common/helpers";
 import { xDaysAgo } from "../utils";
+import {
+  getFirstTransporterSync,
+  getNextTransporterSync,
+  getTransportersSync,
+  getLastTransporterSync
+} from "./database";
+
+export type BsvhuForElastic = Bsvhu &
+  BsvhuWithIntermediaries &
+  BsvhuWithTransporters;
 
 export const BsvhuForElasticInclude = {
-  ...BsvhuWithIntermediariesInclude
+  ...BsvhuWithIntermediariesInclude,
+  ...BsvhuWithTransportersInclude
 };
 
 export async function getBsvhuForElastic(
-  bsda: Pick<Bsvhu, "id">
+  bsvhu: Pick<Bsvhu, "id">
 ): Promise<BsvhuForElastic> {
   return prisma.bsvhu.findUniqueOrThrow({
-    where: { id: bsda.id },
+    where: { id: bsvhu.id },
     include: BsvhuForElasticInclude
   });
 }
@@ -38,13 +52,24 @@ type ElasticSirets = {
   emitterCompanySiret: string | null | undefined;
   ecoOrganismeSiret: string | null | undefined;
   destinationCompanySiret: string | null | undefined;
-  transporterCompanySiret: string | null | undefined;
   brokerCompanySiret: string | null | undefined;
   traderCompanySiret: string | null | undefined;
   intermediarySiret1?: string | null | undefined;
   intermediarySiret2?: string | null | undefined;
   intermediarySiret3?: string | null | undefined;
+  transporter1CompanyOrgId?: string | null | undefined;
+  transporter2CompanyOrgId?: string | null | undefined;
+  transporter3CompanyOrgId?: string | null | undefined;
+  transporter4CompanyOrgId?: string | null | undefined;
+  transporter5CompanyOrgId?: string | null | undefined;
 };
+
+// génère une clé permettant d'identifier les transporteurs de façon
+// unique dans un mapping
+function transporterCompanyOrgIdKey(transporter: BsvhuTransporter) {
+  return `transporter${transporter.number}CompanyOrgId`;
+}
+
 const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
   const intermediarySirets = bsvhu.intermediaries.reduce(
     (sirets, intermediary) => {
@@ -61,14 +86,30 @@ const getBsvhuSirets = (bsvhu: BsvhuForElastic): ElasticSirets => {
     {}
   );
 
+  // build a mapping that looks like
+  // { transporter1CompanyOrgId: "SIRET1", transporter2CompanyOrgId: "SIRET2"}
+  const transporterOrgIds = (bsvhu.transporters ?? []).reduce(
+    (acc, transporter: BsvhuTransporter) => {
+      const orgId = getTransporterCompanyOrgId(transporter);
+      if (orgId) {
+        return {
+          ...acc,
+          [transporterCompanyOrgIdKey(transporter)]: orgId
+        };
+      }
+      return acc;
+    },
+    {}
+  );
+
   const bsvhuSirets: ElasticSirets = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     ecoOrganismeSiret: bsvhu.ecoOrganismeSiret,
     brokerCompanySiret: bsvhu.brokerCompanySiret,
     traderCompanySiret: bsvhu.traderCompanySiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(bsvhu),
-    ...intermediarySirets
+    ...intermediarySirets,
+    ...transporterOrgIds
   };
 
   // Drafts only appear in the dashboard for companies the bsvhu owner belongs to
@@ -108,6 +149,7 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
     isToCollectFor: [],
     isCollectedFor: []
   };
+  const firstTransporter = getFirstTransporterSync(bsvhu);
 
   const formSirets = getBsvhuSirets(bsvhu);
 
@@ -136,24 +178,99 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
         // so if the account is created after the BSVHU, it will still appear in the
         // emitter's dashboard.
         setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
-        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        if (firstTransporter) {
+          setTab(
+            siretsFilters,
+            transporterCompanyOrgIdKey(firstTransporter),
+            "isToCollectFor"
+          );
+        }
       } else if (bsvhu.emitterNoSiret) {
-        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        if (firstTransporter) {
+          setTab(
+            siretsFilters,
+            transporterCompanyOrgIdKey(firstTransporter),
+            "isToCollectFor"
+          );
+        }
       } else {
         setTab(siretsFilters, "emitterCompanySiret", "isForActionFor");
-        setTab(siretsFilters, "transporterCompanySiret", "isFollowFor");
+        if (firstTransporter) {
+          setTab(
+            siretsFilters,
+            transporterCompanyOrgIdKey(firstTransporter),
+            "isFollowFor"
+          );
+        }
       }
       break;
     }
 
     case BsvhuStatus.SIGNED_BY_PRODUCER: {
-      setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+      if (firstTransporter) {
+        setTab(
+          siretsFilters,
+          transporterCompanyOrgIdKey(firstTransporter),
+          "isToCollectFor"
+        );
+      }
       break;
     }
 
     case BsvhuStatus.SENT: {
-      setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
-      setTab(siretsFilters, "transporterCompanySiret", "isCollectedFor");
+      // setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
+
+      // ETQ destination, je souhaite avoir la possibilité de signer la réception
+      // même si l'ensemble des transporteurs visés dans le bordereau n'ont pas pris en charge le déchet,
+      // pouvoir gérer au mieux la réception, et éviter le cas où le bordereau serait bloqué en absence
+      // d'un des transporteurs. On fait une exception à la règle dans le cas où l'installation de destination
+      // est également le transporteur N+1.
+
+      const nextTransporter = getNextTransporterSync(bsvhu);
+      if (
+        !nextTransporter ||
+        nextTransporter.transporterCompanySiret !==
+          bsvhu.destinationCompanySiret
+      ) {
+        setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
+      }
+
+      const transporters = getTransportersSync(bsvhu);
+
+      transporters.forEach((transporter, idx) => {
+        if (transporter.transporterTransportSignatureDate) {
+          // `handedOver` permet de savoir si le transporteur
+          // N+1 a également pris en charge le déchet, si c'est le
+          // cas le bordereau ne doit pas apparaitre dans l'onglet "Collecté"
+          // du transporteur N
+          const handedOver = transporters.find(
+            t =>
+              t.number > transporter.number &&
+              t.transporterTransportSignatureDate
+          );
+
+          if (!handedOver) {
+            setTab(
+              siretsFilters,
+              transporterCompanyOrgIdKey(transporter),
+              "isCollectedFor"
+            );
+          }
+        } else if (
+          // le bordereau est "à collecter" soit par le premier transporteur
+          // (géré dans case SIGNED_BY_PRODUCER) soit par le transporteur N+1 dès lors que
+          // le transporteur N a signé.
+          idx > 0 &&
+          bsvhu.transporters[idx - 1].transporterTransportSignatureDate
+        ) {
+          setTab(
+            siretsFilters,
+            transporterCompanyOrgIdKey(transporter),
+            "isToCollectFor"
+          );
+        }
+      });
+
       break;
     }
 
@@ -182,13 +299,13 @@ export function getWhere(bsvhu: BsvhuForElastic): Pick<BsdElastic, WhereKeys> {
   return where;
 }
 
-export type BsvhuForElastic = Bsvhu & BsvhuWithIntermediaries;
-
 /**
  * Convert a bsvhu from the bsvhu table to Elastic Search's BSD model.
  */
 export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
   const where = getWhere(bsvhu);
+
+  const transporter = getFirstTransporterSync(bsvhu);
 
   return {
     type: BsdType.BSVHU,
@@ -222,13 +339,13 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     workerCompanySiret: "",
     workerCompanyAddress: "",
 
-    transporterCompanyName: bsvhu.transporterCompanyName ?? "",
-    transporterCompanySiret: bsvhu.transporterCompanySiret ?? "",
-    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber ?? "",
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress ?? "",
-    transporterCustomInfo: bsvhu.transporterCustomInfo ?? "",
+    transporterCompanyName: transporter?.transporterCompanyName ?? "",
+    transporterCompanySiret: transporter?.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: transporter?.transporterCompanyVatNumber ?? "",
+    transporterCompanyAddress: transporter?.transporterCompanyAddress ?? "",
+    transporterCustomInfo: transporter?.transporterCustomInfo ?? "",
     transporterTransportPlates:
-      bsvhu.transporterTransportPlates.map(transportPlateFilter) ?? [],
+      transporter?.transporterTransportPlates.map(transportPlateFilter) ?? [],
 
     destinationCompanyName: bsvhu.destinationCompanyName ?? "",
     destinationCompanySiret: bsvhu.destinationCompanySiret ?? "",
@@ -262,7 +379,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     emitterEmissionDate: bsvhu.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: undefined,
     transporterTransportTakenOverAt:
-      bsvhu.transporterTransportTakenOverAt?.getTime(),
+      transporter?.transporterTransportTakenOverAt?.getTime(),
     destinationReceptionDate: bsvhu.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsvhu.destinationReceptionDate?.getTime(),
     destinationAcceptationWeight: bsvhu.destinationReceptionWeight,
@@ -283,7 +400,7 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
     // ALL actors from the BSVHU, for quick search
     companyNames: [
       bsvhu.emitterCompanyName,
-      bsvhu.transporterCompanyName,
+      bsvhu.transporters.map(transporter => transporter.transporterCompanyName),
       bsvhu.destinationCompanyName,
       bsvhu.ecoOrganismeName,
       bsvhu.brokerCompanyName,
@@ -294,8 +411,10 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       .join(" "),
     companyOrgIds: [
       bsvhu.emitterCompanySiret,
-      bsvhu.transporterCompanySiret,
-      bsvhu.transporterCompanyVatNumber,
+      ...bsvhu.transporters.flatMap(transporter => [
+        transporter.transporterCompanySiret,
+        transporter.transporterCompanyVatNumber
+      ]),
       bsvhu.destinationCompanySiret,
       bsvhu.ecoOrganismeSiret,
       bsvhu.brokerCompanySiret,
@@ -341,8 +460,12 @@ function getBsvhuReturnOrgIds(bsvhu: BsvhuForElastic): {
 } {
   // Return tab
   if (belongsToIsReturnForTab(bsvhu)) {
+    const lastTransporter = getLastTransporterSync(bsvhu);
     return {
-      isReturnFor: [bsvhu.transporterCompanySiret].filter(Boolean)
+      isReturnFor: [
+        lastTransporter?.transporterCompanySiret,
+        lastTransporter?.transporterCompanyVatNumber
+      ].filter(Boolean)
     };
   }
 

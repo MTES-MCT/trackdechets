@@ -27,3 +27,21 @@ export function createBsvhu(
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
   };
 }
+
+export function createBsvhuWithTransporters(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createBsvhu(company),
+    description: `Création du BSVHU avec des transporteurs`,
+    variables: ({ producteur, bsvhuTransporters, broyeur }) => ({
+      input: {
+        emitter: fixtures.emitterInput(producteur.siret),
+        ...fixtures.wasteDetailsInput,
+        transporters: bsvhuTransporters,
+        destination: fixtures.broyeurInput(broyeur.siret)
+      }
+    })
+  };
+}

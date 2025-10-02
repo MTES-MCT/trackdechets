@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.10.1] 21/10/2025
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du transport multi-modal sur le BSVHU [PR 4458](https://github.com/MTES-MCT/trackdechets/pull/4458)
+
 # [2025.09.1] 23/09/2025
 
 #### :nail_care: Améliorations

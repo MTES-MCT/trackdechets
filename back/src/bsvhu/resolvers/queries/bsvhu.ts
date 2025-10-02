@@ -4,6 +4,7 @@ import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { checkCanRead } from "../../permissions";
+import { BsvhuWithTransportersInclude } from "../../types";
 
 export default async function bsvhu(
   _,
@@ -12,7 +13,9 @@ export default async function bsvhu(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsvhu = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id, {
+    include: BsvhuWithTransportersInclude
+  });
 
   await checkCanRead(user, bsvhu);
 

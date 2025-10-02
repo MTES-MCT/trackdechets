@@ -25,14 +25,17 @@ import type {
   CompanyInput,
   BsvhuEcoOrganisme,
   BsvhuBroker,
-  BsvhuTrader
+  BsvhuTrader,
+  BsvhuTransporterInput
 } from "@td/codegen-back";
 import {
   Prisma,
-  Bsvhu as PrismaVhuForm,
+  BsvhuTransporter as PrismaBsvhuTransporter,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "@td/constants";
+import { BsvhuWithTransporters } from "./types";
+import { getFirstTransporterSync } from "./database";
 
 export const getAddress = ({
   address,
@@ -51,7 +54,11 @@ export const getAddress = ({
   return address ?? null;
 };
 
-export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
+export function expandVhuFormFromDb(
+  bsvhu: BsvhuWithTransporters
+): GraphqlVhuForm {
+  const transporter = getFirstTransporterSync(bsvhu);
+
   return {
     id: bsvhu.id,
     customId: bsvhu.customId,
@@ -146,34 +153,10 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
         })
       })
     }),
-    transporter: nullIfNoValues<BsvhuTransporter>({
-      company: nullIfNoValues<FormCompany>({
-        name: bsvhu.transporterCompanyName,
-        orgId: getTransporterCompanyOrgId(bsvhu),
-        siret: bsvhu.transporterCompanySiret,
-        address: bsvhu.transporterCompanyAddress,
-        contact: bsvhu.transporterCompanyContact,
-        phone: bsvhu.transporterCompanyPhone,
-        mail: bsvhu.transporterCompanyMail,
-        vatNumber: bsvhu.transporterCompanyVatNumber
-      }),
-      customInfo: bsvhu.transporterCustomInfo,
-      recepisse: nullIfNoValues<BsvhuRecepisse>({
-        number: bsvhu.transporterRecepisseNumber,
-        department: bsvhu.transporterRecepisseDepartment,
-        validityLimit: processDate(bsvhu.transporterRecepisseValidityLimit),
-        isExempted: bsvhu.transporterRecepisseIsExempted
-      }),
-      transport: nullIfNoValues<BsvhuTransport>({
-        mode: bsvhu.transporterTransportMode,
-        plates: bsvhu.transporterTransportPlates,
-        signature: nullIfNoValues<Signature>({
-          author: bsvhu.transporterTransportSignatureAuthor,
-          date: processDate(bsvhu.transporterTransportSignatureDate)
-        }),
-        takenOverAt: processDate(bsvhu.transporterTransportTakenOverAt)
-      })
-    }),
+    transporter: transporter ? expandTransporterFromDb(transporter) : null,
+    transporters: (bsvhu.transporters ?? [])
+      .map(t => expandTransporterFromDb(t))
+      .filter(Boolean),
     ecoOrganisme: nullIfNoValues<BsvhuEcoOrganisme>({
       name: bsvhu.ecoOrganismeName,
       siret: bsvhu.ecoOrganismeSiret
@@ -212,11 +195,44 @@ export function expandVhuFormFromDb(bsvhu: PrismaVhuForm): GraphqlVhuForm {
   };
 }
 
+export function expandTransporterFromDb(
+  transporter: PrismaBsvhuTransporter
+): BsvhuTransporter | null {
+  return nullIfNoValues<BsvhuTransporter>({
+    id: transporter.id,
+    company: nullIfNoValues<FormCompany>({
+      name: transporter.transporterCompanyName,
+      orgId: getTransporterCompanyOrgId(transporter),
+      siret: transporter.transporterCompanySiret,
+      address: transporter.transporterCompanyAddress,
+      contact: transporter.transporterCompanyContact,
+      phone: transporter.transporterCompanyPhone,
+      mail: transporter.transporterCompanyMail,
+      vatNumber: transporter.transporterCompanyVatNumber
+    }),
+    customInfo: transporter.transporterCustomInfo,
+    recepisse: nullIfNoValues<BsvhuRecepisse>({
+      number: transporter.transporterRecepisseNumber,
+      department: transporter.transporterRecepisseDepartment,
+      validityLimit: processDate(transporter.transporterRecepisseValidityLimit),
+      isExempted: transporter.transporterRecepisseIsExempted
+    }),
+    transport: nullIfNoValues<BsvhuTransport>({
+      mode: transporter.transporterTransportMode,
+      plates: transporter.transporterTransportPlates,
+      signature: nullIfNoValues<Signature>({
+        author: transporter.transporterTransportSignatureAuthor,
+        date: processDate(transporter.transporterTransportSignatureDate)
+      }),
+      takenOverAt: processDate(transporter.transporterTransportTakenOverAt)
+    })
+  });
+}
+
 export function flattenVhuInput(formInput: BsvhuInput) {
   return safeInput({
     ...flattenVhuEmitterInput(formInput),
     ...flattenVhuDestinationInput(formInput),
-    ...flattenVhuTransporterInput(formInput),
     ...flattenVhuEcoOrganismeInput(formInput),
     ...flattenVhuBrokerInput(formInput),
     ...flattenVhuTraderInput(formInput),
@@ -357,10 +373,8 @@ function flattenVhuDestinationInput({
   };
 }
 
-function flattenVhuTransporterInput({
-  transporter
-}: Pick<BsvhuInput, "transporter">) {
-  return {
+export function flattenVhuTransporterInput(transporter: BsvhuTransporterInput) {
+  return safeInput({
     transporterCompanyName: chain(transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -396,7 +410,7 @@ function flattenVhuTransporterInput({
       chain(t.recepisse, r => r.isExempted)
     ),
     ...flattenTransporterTransportInput(transporter)
-  };
+  });
 }
 
 function flattenVhuEcoOrganismeInput({

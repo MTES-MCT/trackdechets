@@ -122,6 +122,13 @@ input BsvhuInput {
   destination: BsvhuDestinationInput
   "Détails sur le transporteur"
   transporter: BsvhuTransporterInput
+  """
+  Liste des différents transporteurs, dans l'ordre de prise en charge du déchet.
+  Contient un seul identifiant en cas d'acheminement direct. Peut contenir au maximum
+  5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+  supprimés à l'aide des mutations createBsvhuTransporter, updateBsvhuTransporter, deleteBsvhuTransporter.
+  """
+  transporters: [ID!]
 
   "Courtier"
   broker: BsvhuBrokerInput
