@@ -1,9 +1,10 @@
-import { getSignedUrlForUpload } from "@td/registry";
+import { getSignedUrlForUpload, validateAndGetContentType } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryRegistryUploadSignedUrlArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
+import { ForbiddenError } from "../../../common/errors";
 
 export async function registryUploadSignedUrl(
   _,
@@ -20,12 +21,20 @@ export async function registryUploadSignedUrl(
   );
 
   const fileKey = [Date.now(), user.id, fileName].join("_");
+  // Validate file type and get content type
+  const contentType = validateAndGetContentType(fileName);
+  if (!contentType) {
+    throw new ForbiddenError(
+      `Type de fichier non autorisé. Seuls les fichiers CSV (.csv) et Excel (.xlsx/.xls) sont acceptés.`
+    );
+  }
 
   const { url, fields } = await getSignedUrlForUpload({
     bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET!,
     key: fileKey,
     metadata: { filename: fileName },
-    tags: { temp: "true", userId: user.id }
+    tags: { temp: "true", userId: user.id },
+    contentType
   });
 
   return { fileKey, signedUrl: url, fields };
