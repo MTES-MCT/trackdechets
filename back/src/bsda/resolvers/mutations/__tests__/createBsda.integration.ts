@@ -2634,7 +2634,7 @@ describe("Mutation.Bsda.create", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+      const { errors } = await mutate<Pick<Mutation, "createBsda">>(
         CREATE_BSDA,
         {
           variables: {
