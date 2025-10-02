@@ -96,7 +96,13 @@ oauth2server.exchange(
       );
       return done(err);
     }
-
+    if (grant.used) {
+      const err = new TokenError(
+        tokenErrorMessages.grant_expired,
+        "invalid_grant"
+      );
+      return done(err);
+    }
     const clearToken = getUid(40);
 
     await prisma.accessToken.create({
@@ -109,6 +115,11 @@ oauth2server.exchange(
         },
         token: hashToken(clearToken)
       }
+    });
+
+    await prisma.grant.update({
+      where: { id: grant.id },
+      data: { used: true }
     });
 
     // Add custom params

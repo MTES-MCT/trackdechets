@@ -748,6 +748,7 @@ model Grant {
   updatedAt     DateTime    @updatedAt @db.Timestamptz(6)
   code          String      @unique(map: "Grant.code._UNIQUE")
   expires       Int
+  used          Boolean     @default(false) // Flag to prevent auth code reuse on oauth workflow
   redirectUri   String
   scope         String[]    @default([])
   nonce         String?
