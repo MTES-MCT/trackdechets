@@ -20,6 +20,7 @@ import {
   ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
   ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
 } from "../messages";
+import { SSTI_CHARS } from "@td/constants";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -430,5 +431,14 @@ export const validateMultiTransporterPlates = (bsd, ctx: z.RefinementCtx) => {
 
   for (const [index, transporter] of (bsd.transporters ?? []).entries()) {
     validateTransporterPlates(transporter, ctx, index);
+  }
+};
+
+export const isSafeSSTI = (str: string, ctx: z.RefinementCtx) => {
+  if (SSTI_CHARS.some(char => str.includes(char))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`
+    });
   }
 };
