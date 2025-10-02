@@ -42,7 +42,6 @@ export default async function sign(
   });
 
   const signatureType = getBsvhuSignatureType(input.type, bsvhu);
-  console.log(`Signature type: ${signatureType}`);
   const authorizedOrgIds = getAuthorizedOrgIds(bsvhu, signatureType);
 
   // To sign a form for a company, you must either:

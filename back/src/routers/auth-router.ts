@@ -69,12 +69,14 @@ authRouter.post("/otp", (req, res, next) => {
     if (!user) {
       const queries = {
         ...{
-          errorCode: info.code
+          errorCode: info.code,
+          ...(info?.lockout ? { lockout: info.lockout } : {})
         },
         ...(req.body.returnTo
           ? { returnTo: getSafeReturnTo(req.body.returnTo, UI_BASE_URL) }
           : {})
       };
+
       if (info.code === "TOTP_TIMEOUT_OR_MISSING_SESSION") {
         return res.redirect(
           `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
