@@ -1,4 +1,4 @@
-enum DasriProcessingOperationType {
+export enum DasriProcessingOperationType {
   Incineration = "INCINERATION",
   IncinerationValorisation = "INCINERATIONVALORISATION",
   Pretraitement = "PRETRAITEMENT",
@@ -26,7 +26,7 @@ export const DASRI_WASTE_CODES_MAPPING = DASRI_WASTE_CODES.reduce(
 export const DASRI_PROCESSING_OPERATIONS = [
   {
     type: DasriProcessingOperationType.Pretraitement,
-    code: "D9",
+    code: "D9F",
     description: "Prétraitement par désinfection  - Banaliseur"
   },
   {

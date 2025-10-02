@@ -22,6 +22,9 @@ const CREATE_BSDASRI_REVISION_REQUEST = `
       }
       content {
         waste { code }
+        destination  {
+          operation { code, mode }
+        }
       }
       authoringCompany {
         siret
@@ -1077,4 +1080,124 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
       expect(errors).toBeUndefined();
     }
   );
+
+  it.only("should no longer allow code D9", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "PROCESSED",
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: { destination: { operation: { code: "D9" } } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // When
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "La valeur « D9 » n'existe pas dans les options : 'D9F' | 'D10' | 'R1'"
+    );
+  });
+
+  it.only("should allow code D9F", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "PROCESSED",
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: {
+            destination: { operation: { code: "D9F", mode: "ELIMINATION" } }
+          },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // When
+    expect(errors).toBeUndefined();
+    expect(
+      data.createBsdasriRevisionRequest.content.destination?.operation?.code
+    ).toBe("D9F");
+    expect(
+      data.createBsdasriRevisionRequest.content.destination?.operation?.mode
+    ).toBe("ELIMINATION");
+  });
+
+  it("should not allow code D9F if mode is not compatible", async () => {
+    // Given
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "PROCESSED",
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdasriRevisionRequest">,
+      MutationCreateBsdasriRevisionRequestArgs
+    >(CREATE_BSDASRI_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdasriId: bsdasri.id,
+          content: { destination: { operation: { code: "D9F" } } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret!
+        }
+      }
+    });
+
+    // When
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe("Vous devez préciser un mode de traitement");
+  });
 });

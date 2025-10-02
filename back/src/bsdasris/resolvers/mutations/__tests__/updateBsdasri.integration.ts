@@ -1202,79 +1202,6 @@ describe("Mutation.updateBsdasri", () => {
     expect(updatedDasri.destinationOperationCode).toEqual("D10");
   });
 
-  it("should not allow code D9 and mode ELIMINATION", async () => {
-    // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(company),
-        ...readyToPublishData(company),
-        ...readyToTakeOverData(company),
-        ...readyToReceiveData(),
-        status: BsdasriStatus.RECEIVED,
-        emitterCompanySiret: company.siret,
-        destinationReceptionSignatureAuthor: user.name,
-        receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString()
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const input = {
-      destination: {
-        operation: { code: "D9", mode: "ELIMINATION" }
-      }
-    };
-    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
-      UPDATE_DASRI,
-      {
-        variables: { id: dasri.id, input }
-      }
-    );
-
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
-    );
-  });
-
-  it("should allow code D9 and no mode", async () => {
-    // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(company),
-        ...readyToPublishData(company),
-        ...readyToTakeOverData(company),
-        ...readyToReceiveData(),
-        status: BsdasriStatus.RECEIVED,
-        emitterCompanySiret: company.siret,
-        destinationReceptionSignatureAuthor: user.name,
-        receptionSignatory: { connect: { id: user.id } },
-        destinationReceptionSignatureDate: new Date().toISOString()
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const input = {
-      destination: {
-        operation: { code: "D9" }
-      }
-    };
-    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
-      UPDATE_DASRI,
-      {
-        variables: { id: dasri.id, input }
-      }
-    );
-
-    // Then
-    expect(errors).toBeUndefined();
-  });
-
   it("should allow updating neither code nor mode", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -1382,5 +1309,108 @@ describe("Mutation.updateBsdasri", () => {
         "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : Le CAP du destinataire"
       );
     });
+  });
+
+  it("should be possible to update dasri with code D9F", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      userId: user.id,
+      opt: {
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "D10",
+        destinationOperationMode: "ELIMINATION",
+        emitterCompanySiret: company.siret,
+        ...readyToPublishData(company)
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            destination: { operation: { code: "D9F" } }
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.updateBsdasri.destination?.operation?.code).toBe("D9F");
+  });
+
+  it("should no longer be possible to update dasri with code D9", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      userId: user.id,
+      opt: {
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "D10",
+        destinationOperationMode: "ELIMINATION",
+        emitterCompanySiret: company.siret,
+        ...readyToPublishData(company)
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            destination: { operation: { code: "D9" } }
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+    );
+  });
+
+  it("should not allow updating to D9F if mode is not compatible", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const dasri = await bsdasriFactory({
+      userId: user.id,
+      opt: {
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "R1",
+        destinationOperationMode: "VALORISATION_ENERGETIQUE",
+        emitterCompanySiret: company.siret,
+        ...readyToPublishData(company)
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: {
+          id: dasri.id,
+          input: {
+            destination: { operation: { code: "D9F" } }
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+    );
   });
 });

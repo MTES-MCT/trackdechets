@@ -111,58 +111,6 @@ describe("Mutation.signBsdasri operation", () => {
     expect(receivedDasri.finalOperations).toHaveLength(1);
   });
 
-  it("should accept D9 code without destinationOperationMode", async () => {
-    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
-    const { company: transporterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const { user: recipient, company: destinationCompany } =
-      await userWithCompanyFactory("MEMBER");
-
-    // no destinationOperationMode when code is D9
-    const readyToProcessDataForD9 = {
-      destinationOperationCode: "D9",
-
-      destinationReceptionWasteWeightValue: 70,
-      destinationOperationDate: new Date()
-    };
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(emitterCompany),
-        ...readyToPublishData(destinationCompany),
-        ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(),
-        ...readyToProcessDataForD9,
-        status: BsdasriStatus.RECEIVED
-      }
-    });
-    const { mutate } = makeClient(recipient); // recipient
-
-    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
-      variables: {
-        id: dasri.id,
-        input: { type: "OPERATION", author: "Martine" }
-      }
-    });
-
-    // we can't wait for global:drained event as no operationHook job should be queued
-    // however we check the queue is empty
-    const jobsCount = await operationHooksQueue.getJobCounts();
-    expect(jobsCount?.active + jobsCount?.waiting).toEqual(0);
-
-    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: dasri.id },
-      include: { finalOperations: true }
-    });
-    expect(receivedDasri.status).toEqual("PROCESSED");
-    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
-      "Martine"
-    );
-    expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
-    expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
-    expect(receivedDasri.finalOperations).toHaveLength(0);
-  });
-
   it("should put operation signature on a dasri and set status to AWAITING_GROUP", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
@@ -296,5 +244,84 @@ describe("Mutation.signBsdasri operation", () => {
     );
     expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
     expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
+  });
+
+  it("should be able to sign dasri with operation code D9F", async () => {
+    // Given
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        ...readyToReceiveData(),
+        ...readyToProcessData,
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "D9F",
+        destinationOperationMode: "ELIMINATION"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(recipient); // recipient
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "OPERATION", author: "Martine" }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: { finalOperations: true }
+    });
+    expect(receivedDasri.status).toEqual("PROCESSED");
+    expect(receivedDasri.destinationOperationCode).toBe("D9F");
+  });
+
+  it("should no longer be able to sign dasri with operation code D9", async () => {
+    // Given
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        ...readyToReceiveData(),
+        ...readyToProcessData,
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "D9",
+        destinationOperationMode: "ELIMINATION"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(recipient); // recipient
+    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "OPERATION", author: "Martine" }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+    );
   });
 });
