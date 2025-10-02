@@ -16,7 +16,11 @@ import {
 } from "../../common/validation/zod/schema";
 
 import { BsdasriValidationContext } from "./types";
-import { runTransformers, fillIntermediariesOrgIds } from "./transformers";
+import {
+  runTransformers,
+  fillIntermediariesOrgIds,
+  fixOperationModeForD9F
+} from "./transformers";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import {
@@ -39,7 +43,6 @@ import {
   intermediariesRefinement,
   intermediarySchema
 } from "../../common/validation/intermediaries";
-import { fixOperationModeForD9F } from "../../bsda/validation/transformers";
 
 const ZodBsdasriWasteCodeEnum = z.enum(DASRI_WASTE_CODES_VALUES).nullish();
 
