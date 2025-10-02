@@ -39,6 +39,7 @@ import {
   intermediariesRefinement,
   intermediarySchema
 } from "../../common/validation/intermediaries";
+import { fixOperationModeForD9F } from "../../bsda/validation/transformers";
 
 const ZodBsdasriWasteCodeEnum = z.enum(DASRI_WASTE_CODES_VALUES).nullish();
 
@@ -299,7 +300,7 @@ export const contextualBsdasriSchemaAsync = (
   return transformedBsdasriSyncSchema
     .superRefine(checkCompanies)
     .transform((bsdasri: ParsedZodBsdasri) => runTransformers(bsdasri, context))
-
+    .transform(fixOperationModeForD9F)
     .superRefine(validateSynthesisTransporterAcceptation(context))
     .superRefine(validateSynthesisDestinationAcceptation(context))
     .superRefine(validateRecipientIsCollectorForGroupingCodes(context))

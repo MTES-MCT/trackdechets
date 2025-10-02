@@ -25,6 +25,7 @@ import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
+import { fixOperationModeForD9F } from "../../../validation/transformers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -269,12 +270,9 @@ async function getFlatContent(
     )
     .parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
 
-  // Careful. We cast the old operation code D9 to D9F
-  if (parsed.destinationOperationCode) {
-    return {
-      ...flatContent,
-      destinationOperationCode: parsed.destinationOperationCode
-    };
+  if (parsed.destinationOperationCode || parsed.destinationOperationMode) {
+    flatContent.destinationOperationCode = parsed.destinationOperationCode;
+    flatContent.destinationOperationMode = parsed.destinationOperationMode;
   }
 
   return flatContent;
@@ -309,6 +307,7 @@ const schema = rawBsdaSchema
     emitterPickupSiteInfos: true
   })
   .extend({ isCanceled: z.boolean().nullish() })
+  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {

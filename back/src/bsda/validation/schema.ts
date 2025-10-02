@@ -37,7 +37,8 @@ import {
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
   updateTransporterRecepisse,
-  runTransformers
+  runTransformers,
+  fixOperationModeForD9F
 } from "./transformers";
 import { sirenifyBsdaTransporter } from "./sirenify";
 import {
@@ -301,7 +302,8 @@ const transformedSyncSchema = refinedSchema
   // FIXME le calcul du champ dénormalisé `intermediariesOrgIds`
   // devrait se faire dans le repository pour s'assurer que les données restent synchro
   .transform(fillIntermediariesOrgIds)
-  .transform(emptyWorkerCertificationWhenWorkerIsDisabled);
+  .transform(emptyWorkerCertificationWhenWorkerIsDisabled)
+  .transform(fixOperationModeForD9F);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

@@ -2099,6 +2099,9 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       expect(
         data.createBsdaRevisionRequest.content?.destination?.operation?.code
       ).toBe("D 9 F");
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.mode
+      ).toBe("ELIMINATION");
     });
 
     it("should no longer allow creating a revision with destinationOperationCode D9", async () => {
@@ -2138,6 +2141,92 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       expect(errors[0].message).toBe(
         "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
       );
+    });
+
+    it("if code is D9F, should automatically set mode to ELIMINATION", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "SENT"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: { operation: { code: "D 9 F" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.code
+      ).toBe("D 9 F");
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.mode
+      ).toBe("ELIMINATION");
+    });
+
+    it("if code is not D9F, can pick another mode", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "SENT"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: { operation: { code: "R 5", mode: "RECYCLAGE" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.code
+      ).toBe("R 5");
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.mode
+      ).toBe("RECYCLAGE");
     });
   });
 });

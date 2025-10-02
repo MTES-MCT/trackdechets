@@ -1130,7 +1130,7 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
       ).toBe("ELIMINATION");
     });
 
-    it("should not allow code D9F if mode is not compatible", async () => {
+    it("if using code D9F, should auto-set mode to ELIMINATION", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -1148,7 +1148,51 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: { operation: { code: "D9F" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // When
+      expect(errors).toBeUndefined();
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D9F");
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.mode
+      ).toBe("ELIMINATION");
+    });
+
+    it("should overwrite mode if code is D9F", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "R1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
         Pick<Mutation, "createBsdasriRevisionRequest">,
         MutationCreateBsdasriRevisionRequestArgs
       >(CREATE_BSDASRI_REVISION_REQUEST, {
@@ -1163,10 +1207,13 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
       });
 
       // When
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Vous devez préciser un mode de traitement"
-      );
+      expect(errors).toBeUndefined();
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D9F");
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.mode
+      ).toBe("ELIMINATION");
     });
   });
 });
