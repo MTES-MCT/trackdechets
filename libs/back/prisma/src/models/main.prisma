@@ -918,6 +918,8 @@ model User {
   governmentAccount    GovernmentAccount? @relation(fields: [governmentAccountId], references: [id])
   totpSeed             String?
   totpActivatedAt      DateTime?          @db.Timestamptz(6)
+  totpFails            Int                @default(0)
+  totpLockedUntil      DateTime?
   trackingConsent      Boolean            @default(false)
   trackingConsentUntil DateTime?
 
