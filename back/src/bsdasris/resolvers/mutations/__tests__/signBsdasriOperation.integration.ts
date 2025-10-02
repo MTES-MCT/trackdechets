@@ -246,82 +246,94 @@ describe("Mutation.signBsdasri operation", () => {
     expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
   });
 
-  it("should be able to sign dasri with operation code D9F", async () => {
-    // Given
-    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
-    const { company: transporterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const { user: recipient, company: destinationCompany } =
-      await userWithCompanyFactory("MEMBER");
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should be able to sign dasri with operation code D9F", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { company: transporterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user: recipient, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER");
 
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(emitterCompany),
-        ...readyToPublishData(destinationCompany),
-        ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(),
-        ...readyToProcessData,
-        status: BsdasriStatus.RECEIVED,
-        destinationOperationCode: "D9F",
-        destinationOperationMode: "ELIMINATION"
-      }
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+          ...readyToReceiveData(),
+          ...readyToProcessData,
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "D9F",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(recipient); // recipient
+      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+        SIGN_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: { type: "OPERATION", author: "Martine" }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
+        where: { id: dasri.id },
+        include: { finalOperations: true }
+      });
+      expect(receivedDasri.status).toEqual("PROCESSED");
+      expect(receivedDasri.destinationOperationCode).toBe("D9F");
     });
 
-    // When
-    const { mutate } = makeClient(recipient); // recipient
-    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
-      variables: {
-        id: dasri.id,
-        input: { type: "OPERATION", author: "Martine" }
-      }
+    it("should no longer be able to sign dasri with operation code D9", async () => {
+      // Given
+      const { company: emitterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { company: transporterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user: recipient, company: destinationCompany } =
+        await userWithCompanyFactory("MEMBER");
+
+      const dasri = await bsdasriFactory({
+        opt: {
+          ...initialData(emitterCompany),
+          ...readyToPublishData(destinationCompany),
+          ...readyToTakeOverData(transporterCompany),
+          ...readyToReceiveData(),
+          ...readyToProcessData,
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "D9",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(recipient); // recipient
+      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
+        SIGN_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: { type: "OPERATION", author: "Martine" }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+      );
     });
-
-    // Then
-    expect(errors).toBeUndefined();
-    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: dasri.id },
-      include: { finalOperations: true }
-    });
-    expect(receivedDasri.status).toEqual("PROCESSED");
-    expect(receivedDasri.destinationOperationCode).toBe("D9F");
-  });
-
-  it("should no longer be able to sign dasri with operation code D9", async () => {
-    // Given
-    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
-    const { company: transporterCompany } = await userWithCompanyFactory(
-      "MEMBER"
-    );
-    const { user: recipient, company: destinationCompany } =
-      await userWithCompanyFactory("MEMBER");
-
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(emitterCompany),
-        ...readyToPublishData(destinationCompany),
-        ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(),
-        ...readyToProcessData,
-        status: BsdasriStatus.RECEIVED,
-        destinationOperationCode: "D9",
-        destinationOperationMode: "ELIMINATION"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(recipient); // recipient
-    const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
-      variables: {
-        id: dasri.id,
-        input: { type: "OPERATION", author: "Martine" }
-      }
-    });
-
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
-    );
   });
 });

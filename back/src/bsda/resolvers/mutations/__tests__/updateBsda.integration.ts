@@ -3442,79 +3442,135 @@ describe("Mutation.updateBsda", () => {
     });
   });
 
-  describe("TRA-16000 - Code D9 becomes D9F", () => {
-    it.each(["D 9 F", "D 9"])(
-      "should allow user to update destinationOperationCode with code %p",
-      async destinationOperationCode => {
-        // Given
-        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
-        const bsda = await bsdaFactory({
-          opt: {
-            emitterCompanySiret: company.siret
-          }
-        });
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should allow user to update destinationOperationCode with code D9F", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
 
-        // When
-        const { mutate } = makeClient(user);
-        const { data, errors } = await mutate<
-          Pick<Mutation, "updateBsda">,
-          MutationUpdateBsdaArgs
-        >(UPDATE_BSDA, {
-          variables: {
-            id: bsda.id,
-            input: {
-              destination: {
-                operation: {
-                  code: destinationOperationCode
-                }
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              operation: {
+                code: "D 9 F"
               }
             }
           }
-        });
+        }
+      });
 
-        // Then
-        expect(errors).toBeUndefined();
-        expect(data.updateBsda.id).toBeTruthy();
-        expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
-      }
-    );
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.updateBsda.id).toBeTruthy();
+      expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
+    });
 
-    it.each([
-      "D 9 F",
-      // Legacy. Will be cast to D9F
-      "D 9"
-    ])(
-      "should allow user to update plannedOperationCode with code %p",
-      async plannedOperationCode => {
-        // Given
-        const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
-        const bsda = await bsdaFactory({
-          opt: {
-            emitterCompanySiret: company.siret
-          }
-        });
+    it("should no longer allow user to update destinationOperationCode with code D9", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
 
-        // When
-        const { mutate } = makeClient(user);
-        const { data, errors } = await mutate<
-          Pick<Mutation, "updateBsda">,
-          MutationUpdateBsdaArgs
-        >(UPDATE_BSDA, {
-          variables: {
-            id: bsda.id,
-            input: {
-              destination: {
-                plannedOperationCode
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              operation: {
+                code: "D 9"
               }
             }
           }
-        });
+        }
+      });
 
-        // Then
-        expect(errors).toBeUndefined();
-        expect(data.updateBsda.id).toBeTruthy();
-        expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
-      }
-    );
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
+    });
+
+    it("should allow user to update plannedOperationCode with code D9F", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              plannedOperationCode: "D 9 F"
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.updateBsda.id).toBeTruthy();
+      expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
+    });
+
+    it("should no longer allow user to update plannedOperationCode with code D9", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              plannedOperationCode: "D 9"
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
+    });
   });
 });

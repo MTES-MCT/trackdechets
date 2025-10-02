@@ -2495,13 +2495,8 @@ describe("Mutation.Bsda.create", () => {
     });
   });
 
-  it.each([
-    "D 9 F",
-    // We keep D9 for backward compatibility and convert it to D9F
-    "D 9"
-  ])(
-    "should allow creating a form with plannedOperationCode %p",
-    async plannedOperationCode => {
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should allow creating a form with plannedOperationCode D9F", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const { company: destinationCompany } = await userWithCompanyFactory(
@@ -2549,7 +2544,7 @@ describe("Mutation.Bsda.create", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode,
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destinationCompany.siret,
             name: "destination",
@@ -2575,6 +2570,84 @@ describe("Mutation.Bsda.create", () => {
       // Then
       expect(errors).toBeUndefined();
       expect(data.createBsda?.destination?.plannedOperationCode).toBe("D 9 F");
-    }
-  );
+    });
+
+    it("should no longer allow operation code D9", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const transporter = await companyFactory();
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "ADR",
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: ["1", "2"]
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
+    });
+  });
 });

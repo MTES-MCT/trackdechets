@@ -271,7 +271,7 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
       }
     });
 
-    expect(data.createBsdasriRevisionRequest.content).toEqual({
+    expect(data.createBsdasriRevisionRequest.content).toMatchObject({
       waste: { code: "18 02 02*" }
     });
   });
@@ -612,41 +612,6 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
               operation: {
                 code: "D10",
                 mode: "ELIMINATION"
-              }
-            }
-          },
-          comment: "A comment",
-          authoringCompanySiret: company.siret!
-        }
-      }
-    });
-
-    expect(errors).toBeUndefined();
-  });
-
-  it("should succeed if operation code has no corresponding mode", async () => {
-    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const bsdasri = await bsdasriFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        destinationCompanySiret: recipientCompany.siret,
-        status: "PROCESSED"
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "createBsdasriRevisionRequest">,
-      MutationCreateBsdasriRevisionRequestArgs
-    >(CREATE_BSDASRI_REVISION_REQUEST, {
-      variables: {
-        input: {
-          bsdasriId: bsdasri.id,
-          content: {
-            destination: {
-              operation: {
-                code: "D9"
               }
             }
           },
@@ -1081,123 +1046,127 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
     }
   );
 
-  it.only("should no longer allow code D9", async () => {
-    // Given
-    const { company: destinationCompany } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const bsdasri = await bsdasriFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        destinationCompanySiret: destinationCompany.siret,
-        status: "PROCESSED",
-        destinationOperationCode: "R1",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "createBsdasriRevisionRequest">,
-      MutationCreateBsdasriRevisionRequestArgs
-    >(CREATE_BSDASRI_REVISION_REQUEST, {
-      variables: {
-        input: {
-          bsdasriId: bsdasri.id,
-          content: { destination: { operation: { code: "D9" } } },
-          comment: "A comment",
-          authoringCompanySiret: company.siret!
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should no longer allow code D9", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "R1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE"
         }
-      }
-    });
+      });
 
-    // When
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "La valeur « D9 » n'existe pas dans les options : 'D9F' | 'D10' | 'R1'"
-    );
-  });
-
-  it.only("should allow code D9F", async () => {
-    // Given
-    const { company: destinationCompany } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const bsdasri = await bsdasriFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        destinationCompanySiret: destinationCompany.siret,
-        status: "PROCESSED",
-        destinationOperationCode: "R1",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createBsdasriRevisionRequest">,
-      MutationCreateBsdasriRevisionRequestArgs
-    >(CREATE_BSDASRI_REVISION_REQUEST, {
-      variables: {
-        input: {
-          bsdasriId: bsdasri.id,
-          content: {
-            destination: { operation: { code: "D9F", mode: "ELIMINATION" } }
-          },
-          comment: "A comment",
-          authoringCompanySiret: company.siret!
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { destination: { operation: { code: "D9" } } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
         }
-      }
+      });
+
+      // When
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D9 » n'existe pas dans les options : 'D9F' | 'D10' | 'R1'"
+      );
     });
 
-    // When
-    expect(errors).toBeUndefined();
-    expect(
-      data.createBsdasriRevisionRequest.content.destination?.operation?.code
-    ).toBe("D9F");
-    expect(
-      data.createBsdasriRevisionRequest.content.destination?.operation?.mode
-    ).toBe("ELIMINATION");
-  });
-
-  it("should not allow code D9F if mode is not compatible", async () => {
-    // Given
-    const { company: destinationCompany } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const bsdasri = await bsdasriFactory({
-      opt: {
-        emitterCompanySiret: company.siret,
-        destinationCompanySiret: destinationCompany.siret,
-        status: "PROCESSED",
-        destinationOperationCode: "R1",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE"
-      }
-    });
-
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "createBsdasriRevisionRequest">,
-      MutationCreateBsdasriRevisionRequestArgs
-    >(CREATE_BSDASRI_REVISION_REQUEST, {
-      variables: {
-        input: {
-          bsdasriId: bsdasri.id,
-          content: { destination: { operation: { code: "D9F" } } },
-          comment: "A comment",
-          authoringCompanySiret: company.siret!
+    it("should allow code D9F", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "R1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE"
         }
-      }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: { operation: { code: "D9F", mode: "ELIMINATION" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // When
+      expect(errors).toBeUndefined();
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D9F");
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.mode
+      ).toBe("ELIMINATION");
     });
 
-    // When
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe("Vous devez préciser un mode de traitement");
+    it("should not allow code D9F if mode is not compatible", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "R1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: { destination: { operation: { code: "D9F" } } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // When
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous devez préciser un mode de traitement"
+      );
+    });
   });
 });

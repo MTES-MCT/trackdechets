@@ -1311,106 +1311,108 @@ describe("Mutation.updateBsdasri", () => {
     });
   });
 
-  it("should be possible to update dasri with code D9F", async () => {
-    // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
-      userId: user.id,
-      opt: {
-        status: BsdasriStatus.RECEIVED,
-        destinationOperationCode: "D10",
-        destinationOperationMode: "ELIMINATION",
-        emitterCompanySiret: company.siret,
-        ...readyToPublishData(company)
-      }
-    });
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should be possible to update dasri with code D9F", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        userId: user.id,
+        opt: {
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION",
+          emitterCompanySiret: company.siret,
+          ...readyToPublishData(company)
+        }
+      });
 
-    // When
-    const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
-      UPDATE_DASRI,
-      {
-        variables: {
-          id: dasri.id,
-          input: {
-            destination: { operation: { code: "D9F" } }
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: {
+              destination: { operation: { code: "D9F" } }
+            }
           }
         }
-      }
-    );
+      );
 
-    // Then
-    expect(errors).toBeUndefined();
-    expect(data.updateBsdasri.destination?.operation?.code).toBe("D9F");
-  });
-
-  it("should no longer be possible to update dasri with code D9", async () => {
-    // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
-      userId: user.id,
-      opt: {
-        status: BsdasriStatus.RECEIVED,
-        destinationOperationCode: "D10",
-        destinationOperationMode: "ELIMINATION",
-        emitterCompanySiret: company.siret,
-        ...readyToPublishData(company)
-      }
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.updateBsdasri.destination?.operation?.code).toBe("D9F");
     });
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
-      UPDATE_DASRI,
-      {
-        variables: {
-          id: dasri.id,
-          input: {
-            destination: { operation: { code: "D9" } }
+    it("should no longer be possible to update dasri with code D9", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        userId: user.id,
+        opt: {
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION",
+          emitterCompanySiret: company.siret,
+          ...readyToPublishData(company)
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: {
+              destination: { operation: { code: "D9" } }
+            }
           }
         }
-      }
-    );
+      );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
-    );
-  });
-
-  it("should not allow updating to D9F if mode is not compatible", async () => {
-    // Given
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
-      userId: user.id,
-      opt: {
-        status: BsdasriStatus.RECEIVED,
-        destinationOperationCode: "R1",
-        destinationOperationMode: "VALORISATION_ENERGETIQUE",
-        emitterCompanySiret: company.siret,
-        ...readyToPublishData(company)
-      }
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
+      );
     });
 
-    // When
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
-      UPDATE_DASRI,
-      {
-        variables: {
-          id: dasri.id,
-          input: {
-            destination: { operation: { code: "D9F" } }
+    it("should not allow updating to D9F if mode is not compatible", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        userId: user.id,
+        opt: {
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "R1",
+          destinationOperationMode: "VALORISATION_ENERGETIQUE",
+          emitterCompanySiret: company.siret,
+          ...readyToPublishData(company)
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: {
+              destination: { operation: { code: "D9F" } }
+            }
           }
         }
-      }
-    );
+      );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
-    );
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      );
+    });
   });
 });

@@ -2060,9 +2060,8 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
   });
 
-  it.each(["D 9", "D 9 F"])(
-    "should allow creating a revision with code %",
-    async code => {
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should allow creating a revision with destinationOperationCode D9F", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -2086,7 +2085,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           input: {
             bsdaId: bsda.id,
             content: {
-              destination: { operation: { code, mode: "ELIMINATION" } }
+              destination: { operation: { code: "D 9 F", mode: "ELIMINATION" } }
             },
             comment: "A comment",
             authoringCompanySiret: company.siret!
@@ -2100,6 +2099,45 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       expect(
         data.createBsdaRevisionRequest.content?.destination?.operation?.code
       ).toBe("D 9 F");
-    }
-  );
+    });
+
+    it("should no longer allow creating a revision with destinationOperationCode D9", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "SENT"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: { operation: { code: "D 9" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
+    });
+  });
 });
