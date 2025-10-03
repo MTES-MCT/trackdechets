@@ -127,7 +127,9 @@ describe("Mutation.signBsdasri operation", () => {
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
-        status: BsdasriStatus.RECEIVED
+        status: BsdasriStatus.RECEIVED,
+        destinationOperationCode: "D9F",
+        destinationOperationMode: "ELIMINATION"
       }
     });
 
