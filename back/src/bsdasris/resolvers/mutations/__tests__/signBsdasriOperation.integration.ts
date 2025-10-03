@@ -111,6 +111,48 @@ describe("Mutation.signBsdasri operation", () => {
     expect(receivedDasri.finalOperations).toHaveLength(1);
   });
 
+  it("should create final operation with code D9F", async () => {
+    // Given
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER");
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
+        ...readyToTakeOverData(transporterCompany),
+        ...readyToReceiveData(),
+        ...readyToProcessData,
+        status: BsdasriStatus.RECEIVED
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(recipient); // recipient
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "OPERATION", author: "Martine" }
+      }
+    });
+
+    await new Promise(resolve => {
+      operationHooksQueue.once("global:drained", () => resolve(true));
+    });
+
+    // Then
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id },
+      include: { finalOperations: true }
+    });
+    expect(receivedDasri.finalOperations).toHaveLength(1);
+    expect(receivedDasri.finalOperations[0].operationCode).toEqual("D9F");
+  });
+
   it("should put operation signature on a dasri and set status to AWAITING_GROUP", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
