@@ -76,6 +76,9 @@ export const UPDATE_BSDA = gql`
           acceptationStatus
         }
         operation {
+          nextDestination {
+            plannedOperationCode
+          }
           code
           mode
         }
@@ -3676,6 +3679,44 @@ describe("Mutation.updateBsda", () => {
       expect(errors[0].message).toBe(
         "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
       );
+    });
+
+    it("should allow user to update destinationOperationNextDestinationPlannedOperationCode with code D9F", async () => {
+      // Given
+      const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "updateBsda">,
+        MutationUpdateBsdaArgs
+      >(UPDATE_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            destination: {
+              operation: {
+                nextDestination: {
+                  plannedOperationCode: "D 9 F"
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.updateBsda.id).toBeTruthy();
+      expect(
+        data.updateBsda.destination?.operation?.nextDestination
+          ?.plannedOperationCode
+      ).toBe("D 9 F");
     });
   });
 });
