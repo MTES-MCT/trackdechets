@@ -1,6 +1,8 @@
 import { prisma } from "@td/prisma";
 import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
 
+// Estimated count in production: 0
+
 // Fine-tune the batch size here
 const BATCH_SIZE = 100;
 

@@ -1,6 +1,10 @@
 import { prisma } from "@td/prisma";
 import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
 
+// Estimated count for destinationPlannedOperationCode in production: 5 292
+// Estimated count for destinationOperationCode in production: 162
+// Estimated count for destinationOperationNextDestinationPlannedOperationCode in production: 1 624
+
 // Fine-tune the batch size here
 const BATCH_SIZE = 100;
 
