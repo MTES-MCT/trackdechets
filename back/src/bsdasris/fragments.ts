@@ -137,6 +137,7 @@ export const fullBsdasriFragment = gql`
       operation {
         date
         code
+        mode
         signature {
           author
           date

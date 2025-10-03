@@ -780,7 +780,7 @@ describe("BSDA parsing", () => {
     test.each([
       ["R 5", "REUTILISATION"],
       ["R 13", undefined],
-      ["D 9", undefined]
+      ["D 9 F", undefined]
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
       (code, mode: OperationMode) => {
@@ -800,7 +800,7 @@ describe("BSDA parsing", () => {
     test.each([
       ["R 5", "REUTILISATION"],
       ["R 13", undefined],
-      ["D 9", undefined]
+      ["D 9 F", undefined]
     ])(
       "should work if operation code & mode are compatible (code: %p, mode: %p)",
       (code, mode: OperationMode) => {
@@ -820,7 +820,7 @@ describe("BSDA parsing", () => {
     test.each([
       ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are REUTILISATION or RECYCLAGE
       ["R 13", "VALORISATION_ENERGETIQUE"], // R 13 has no associated mode,
-      ["D 9", "VALORISATION_ENERGETIQUE"] // D 9 has no associated mode,
+      ["D 9 F", "VALORISATION_ENERGETIQUE"] // Correct modes is ELIMINATION,
     ])(
       "should fail if operation mode is not compatible with operation code (code: %p, mode: %p)",
       (code, mode: OperationMode) => {

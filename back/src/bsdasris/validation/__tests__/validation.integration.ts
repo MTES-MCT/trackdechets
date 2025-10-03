@@ -829,7 +829,7 @@ describe("validation > parseBsdasri", () => {
   });
 
   test.each([
-    ["D9", undefined],
+    ["D9F", OperationMode.ELIMINATION],
     ["D10", OperationMode.ELIMINATION],
     ["R1", OperationMode.VALORISATION_ENERGETIQUE],
     ["D13", undefined],
@@ -866,7 +866,7 @@ describe("validation > parseBsdasri", () => {
   });
 
   test.each([
-    ["D9", OperationMode.VALORISATION_ENERGETIQUE], // No mode is expected
+    ["D9F", OperationMode.VALORISATION_ENERGETIQUE], // Correct mode is ELIMINATION
     ["D10", OperationMode.VALORISATION_ENERGETIQUE], // Correct mode is ELIMINATION
     ["R1", OperationMode.ELIMINATION], //  Correct mode is VALORISATION_ENERGETIQUE
     ["D13", OperationMode.VALORISATION_ENERGETIQUE], //  No mode is expected

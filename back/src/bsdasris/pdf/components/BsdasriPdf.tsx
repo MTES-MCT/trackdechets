@@ -479,7 +479,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
                 checked={bsdasri?.destination?.operation?.code === "D9"}
                 readOnly
               />{" "}
-              Prétraitement par désinfection (D9) - Banaliseur
+              Prétraitement par désinfection (D9F) - Banaliseur
             </p>
             <p>
               <input

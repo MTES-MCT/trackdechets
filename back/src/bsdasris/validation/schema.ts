@@ -16,7 +16,11 @@ import {
 } from "../../common/validation/zod/schema";
 
 import { BsdasriValidationContext } from "./types";
-import { runTransformers, fillIntermediariesOrgIds } from "./transformers";
+import {
+  runTransformers,
+  fillIntermediariesOrgIds,
+  fixOperationModeForD9F
+} from "./transformers";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
 import {
@@ -299,7 +303,7 @@ export const contextualBsdasriSchemaAsync = (
   return transformedBsdasriSyncSchema
     .superRefine(checkCompanies)
     .transform((bsdasri: ParsedZodBsdasri) => runTransformers(bsdasri, context))
-
+    .transform(fixOperationModeForD9F)
     .superRefine(validateSynthesisTransporterAcceptation(context))
     .superRefine(validateSynthesisDestinationAcceptation(context))
     .superRefine(validateRecipientIsCollectorForGroupingCodes(context))

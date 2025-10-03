@@ -52,7 +52,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
             weight: { isEstimate: true, value: 1.2 }
             destination: {
                 cap: "A cap"
-                plannedOperationCode: "D 9"
+                plannedOperationCode: "D 9 F"
                 company: {
                     siret: "${exutoireCompany.siret}"
                     name: "destination"
@@ -161,7 +161,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               weight: { isEstimate: true, value: 1.2 }
               destination: {
                   cap: "A cap"
-                  plannedOperationCode: "D 9"
+                  plannedOperationCode: "D 9 F"
                   company: {
                       siret: "${destinationCompany.siret}"
                       name: "destination"
@@ -332,7 +332,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                 }
                 destination: {
                     cap: "A cap"
-                    plannedOperationCode: "D 9"
+                    plannedOperationCode: "D 9 F"
                     company: {
                         siret: "${destinationCompany.siret}",
                         name: "destination"

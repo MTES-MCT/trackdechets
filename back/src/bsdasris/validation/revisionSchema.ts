@@ -8,10 +8,11 @@ import {
 
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { capitalize } from "../../common/strings";
+import { fixOperationModeForD9F } from "./transformers";
 
 // Dasri still uses yup for main validation but migration to zod is on its way
 const ZodWasteCodeEnum = z.enum(["18 01 03*", "18 02 02*"]).nullish();
-const ZodOperationEnum = z.enum(["D9", "D10", "R1"]).nullish();
+const ZodOperationEnum = z.enum(["D9F", "D10", "R1"]).nullish();
 
 const ZodBsdasriPackagingEnum = z.enum([
   "BOITE_CARTON",
@@ -58,6 +59,7 @@ export const revisionSchema = z
     emitterPickupSitePostalCode: z.string().nullish(),
     emitterPickupSiteInfos: z.string().nullish()
   })
+  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
