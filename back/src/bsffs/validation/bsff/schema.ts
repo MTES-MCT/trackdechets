@@ -66,14 +66,14 @@ export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
 const rawBsffTransporterSchema = z
   .object({
-    bsffId: z.string().nullish()
+    bsffId: z.string().max(50).nullish()
   })
   .merge(rawTransporterSchema);
 
 const rawBsffPackagingSchema = z.object({
-  id: z.string().nullish(),
+  id: z.string().max(50).nullish(),
   type: z.nativeEnum(BsffPackagingType),
-  other: z.string().nullish(),
+  other: z.string().max(150).nullish(),
   volume: z
     .number()
     .nonnegative("Conditionnements : le volume doit être supérieur à 0")
@@ -81,19 +81,19 @@ const rawBsffPackagingSchema = z.object({
   weight: weightSchema(WeightUnits.Kilogramme).nonnegative(
     "Conditionnements : le poids doit être supérieur à 0"
   ),
-  emissionNumero: z.string(),
+  emissionNumero: z.string().max(150),
   numero: z
     .string({
       required_error: "Conditionnements : le numéro d'identification est requis"
-    })
+    }).max(150)
     .min(1, "Conditionnements : le numéro d'identification est requis"),
-  previousPackagings: z.string().array().nullish(),
+  previousPackagings: z.string().max(150).array().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationSignatureDate: z.coerce.date().nullish()
 });
 
 const rawBsffSchema = z.object({
-  id: z.string().default(() => getReadableId(ReadableIdPrefix.FF)),
+  id: z.string().max(50).default(() => getReadableId(ReadableIdPrefix.FF)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSFF.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
@@ -106,17 +106,17 @@ const rawBsffSchema = z.object({
     .nativeEnum(BsffType)
     .nullish()
     .transform(t => t ?? BsffType.COLLECTE_PETITES_QUANTITES),
-  emitterCompanyName: z.string().nullish(),
+  emitterCompanyName: z.string().max(150).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().nullish(),
-  emitterCompanyContact: z.string().nullish(),
-  emitterCompanyPhone: z.string().nullish(),
-  emitterCompanyMail: z.string().email("E-mail émetteur invalide").nullish(),
-  emitterCustomInfo: z.string().nullish(),
-  emitterEmissionSignatureAuthor: z.string().nullish(),
+  emitterCompanyAddress: z.string().max(150).nullish(),
+  emitterCompanyContact: z.string().max(150).nullish(),
+  emitterCompanyPhone: z.string().max(150).nullish(),
+  emitterCompanyMail: z.string().max(150).email("E-mail émetteur invalide").nullish(),
+  emitterCustomInfo: z.string().max(150).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
-  wasteAdr: z.string().nullish(),
+  wasteAdr: z.string().max(450).nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
@@ -124,34 +124,34 @@ const rawBsffSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  wasteDescription: z.string().nullish(),
+  wasteDescription: z.string().max(150).nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
-  destinationCompanyName: z.string().nullish(),
+  destinationCompanyName: z.string().max(150).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
-  destinationCompanyAddress: z.string().nullish(),
-  destinationCompanyContact: z.string().nullish(),
-  destinationCompanyPhone: z.string().nullish(),
+  destinationCompanyAddress: z.string().max(150).nullish(),
+  destinationCompanyContact: z.string().max(150).nullish(),
+  destinationCompanyPhone: z.string().max(150).nullish(),
   destinationCompanyMail: z
-    .string()
+    .string().max(150)
     .email("E-mail destinataire invalide")
     .nullish(),
-  destinationCustomInfo: z.string().nullish(),
-  destinationCap: z.string().nullish(),
+  destinationCustomInfo: z.string().max(150).nullish(),
+  destinationCap: z.string().max(150).nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
-  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(150).nullish(),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
   destinationPlannedOperationCode: ZodOperationEnum,
-  detenteurCompanySirets: z.array(z.string()).optional(),
-  transportersOrgIds: z.array(z.string()).optional(),
+  detenteurCompanySirets: z.array(z.string().max(150)).optional(),
+  transportersOrgIds: z.array(z.string().max(150)).optional(),
   transporters: z
     .array(rawBsffTransporterSchema)
     .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
     .optional(),
   packagings: z.array(rawBsffPackagingSchema).nullish(),
-  ficheInterventions: z.string().array().nullish(),
-  forwarding: z.array(z.string()).nullish(),
-  repackaging: z.array(z.string()).nullish(),
-  grouping: z.array(z.string()).nullish()
+  ficheInterventions: z.string().max(150).array().nullish(),
+  forwarding: z.array(z.string().max(150)).nullish(),
+  repackaging: z.array(z.string().max(150)).nullish(),
+  grouping: z.array(z.string().max(150)).nullish()
 });
 
 // Type inféré par Zod - avant parsing
