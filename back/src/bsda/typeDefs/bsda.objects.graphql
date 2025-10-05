@@ -221,6 +221,8 @@ type BsdaReception {
   date: DateTime
   "Poids présenté"
   weight: Float
+  "Indique si le poids présenté est une estimation (possible uniquement pour les conteneur-bags dans un TTR)"
+  weightIsEstimate: Boolean
   "Poids refusé (optionnel)"
   refusedWeight: Float
   "Poids accepté (déduit des poids réceptionnés & refusés)"

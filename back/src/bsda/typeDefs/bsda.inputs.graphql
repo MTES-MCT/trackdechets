@@ -260,6 +260,9 @@ input BsdaReceptionInput {
   """
   weight: Float
 
+  "Indique si le poids présenté est une estimation (possible uniquement pour les conteneur-bags dans un TTR)"
+  weightIsEstimate: Boolean
+
   """
   Quantité refusée (optionnelle)
   Si définie:
