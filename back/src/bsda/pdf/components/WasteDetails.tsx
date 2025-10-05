@@ -21,7 +21,10 @@ export function WasteDetails({ waste, weight }: Props) {
   return (
     <>
       <p>
-        Consistance : {waste?.consistence ? CONSISTANCE[waste.consistence] : ""}
+        Consistance : {waste?.consistence ? CONSISTANCE[waste.consistence] : ""}{" "}
+        {waste?.consistenceDescription
+          ? ` (${waste.consistenceDescription})`
+          : ""}
         <br />
         Quantité en tonnes : {weight?.value} <br />
         {/* intentional strict equality for empy templates */}
