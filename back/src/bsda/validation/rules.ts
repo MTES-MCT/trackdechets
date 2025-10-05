@@ -545,6 +545,10 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: { from: "RECEPTION" },
     path: ["destination", "reception", "weight"]
   },
+  destinationReceptionWeightIsEstimate: {
+    readableFieldName: "Le caractère estimatif du poids du déchet",
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
+  },
   destinationReceptionRefusedWeight: {
     readableFieldName: "Le poids refusé",
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
