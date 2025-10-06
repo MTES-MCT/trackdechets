@@ -1,6 +1,13 @@
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { format } from "date-fns";
+import { sendVerificationCodeLetter } from "..";
+import axios from "axios";
+import { searchCompany } from "../../../companies/search";
+
+// Mock dependencies at the top
+jest.mock("axios");
+jest.mock("../../../companies/search");
 
 const sireneInfoMock = {
   addressVoie: "40 boulevard Voltaire",
@@ -14,8 +21,9 @@ describe("send verificationEmail", () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
     process.env = { ...OLD_ENV };
+    (searchCompany as jest.Mock).mockResolvedValue(sireneInfoMock);
+    (axios.post as jest.Mock).mockImplementation(() => Promise.resolve({}));
   });
 
   afterAll(() => {
@@ -27,18 +35,9 @@ describe("send verificationEmail", () => {
 
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
-    // mock search and axios
-    const { searchCompany } = require("../../../companies/search");
-    const { post } = require("axios");
-    jest.mock("../../../companies/search");
-    (searchCompany as jest.Mock).mockResolvedValue(sireneInfoMock);
-    jest.mock("axios");
-    (post as jest.Mock).mockImplementation(() => Promise.resolve({}));
-
-    const sendVerificationCodeLetter = require("..").sendVerificationCodeLetter;
     await sendVerificationCodeLetter(company);
-    expect(post as jest.Mock).toHaveBeenCalledTimes(1);
-    const call = (post as jest.Mock).mock.calls[0];
+    expect(axios.post as jest.Mock).toHaveBeenCalledTimes(1);
+    const call = (axios.post as jest.Mock).mock.calls[0];
     expect(call[0]).toEqual("https://api.MySendingBox.fr/letters");
     expect(call[1]).toEqual(
       expect.objectContaining({
