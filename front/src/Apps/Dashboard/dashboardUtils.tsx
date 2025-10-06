@@ -577,6 +577,7 @@ export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
+    state: { background: location },
     icon: <IconBSDa />
   },
   {
