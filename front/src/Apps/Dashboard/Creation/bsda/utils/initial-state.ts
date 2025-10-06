@@ -1,4 +1,4 @@
-import { BsdaEmitterInput } from "@td/codegen-ui";
+import { BsdaEmitterInput, BsdaType } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
@@ -37,10 +37,7 @@ export default {
       }
     }
   },
-  ecoOrganisme: {
-    name: "",
-    siret: ""
-  },
+  ecoOrganisme: null,
   waste: {
     code: "",
     familyCode: "",
@@ -116,5 +113,6 @@ export default {
   forwarding: null,
   intermediaries: [getInitialCompany()],
   intermediariesOrgIds: [],
-  transportersOrgIds: []
+  transportersOrgIds: [],
+  type: BsdaType.OtherCollections
 };
