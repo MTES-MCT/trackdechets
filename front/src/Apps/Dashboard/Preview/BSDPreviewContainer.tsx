@@ -22,7 +22,7 @@ const BSDPreviewContainer = ({ bsdTypeName }: BSDPreviewContainerProps) => {
       ariaLabel="Annuler la modification"
       closeLabel="Annuler"
       isOpen
-      size="XL"
+      size="TD_SIZE"
       hasFooter={true}
     >
       {formContent[bsdTypeName]}
