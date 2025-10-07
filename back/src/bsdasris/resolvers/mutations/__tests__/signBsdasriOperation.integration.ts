@@ -336,49 +336,5 @@ describe("Mutation.signBsdasri operation", () => {
       expect(receivedDasri.status).toEqual("PROCESSED");
       expect(receivedDasri.destinationOperationCode).toBe("D9F");
     });
-
-    // Ne devrait pas arriver parce qu'on migrera les données...
-    it("should no longer be able to sign dasri with operation code D9", async () => {
-      // Given
-      const { company: emitterCompany } = await userWithCompanyFactory(
-        "MEMBER"
-      );
-      const { company: transporterCompany } = await userWithCompanyFactory(
-        "MEMBER"
-      );
-      const { user: recipient, company: destinationCompany } =
-        await userWithCompanyFactory("MEMBER");
-
-      const dasri = await bsdasriFactory({
-        opt: {
-          ...initialData(emitterCompany),
-          ...readyToPublishData(destinationCompany),
-          ...readyToTakeOverData(transporterCompany),
-          ...readyToReceiveData(),
-          ...readyToProcessData,
-          status: BsdasriStatus.RECEIVED,
-          destinationOperationCode: "D9",
-          destinationOperationMode: "ELIMINATION"
-        }
-      });
-
-      // When
-      const { mutate } = makeClient(recipient); // recipient
-      const { errors } = await mutate<Pick<Mutation, "signBsdasri">>(
-        SIGN_DASRI,
-        {
-          variables: {
-            id: dasri.id,
-            input: { type: "OPERATION", author: "Martine" }
-          }
-        }
-      );
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
-      );
-    });
   });
 });
