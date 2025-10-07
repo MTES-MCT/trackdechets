@@ -17,7 +17,8 @@ import {
   Status,
   WasteAcceptationStatus,
   CompanyType,
-  WasteProcessorType
+  WasteProcessorType,
+  OperationMode
 } from "@prisma/client";
 import {
   CANCELLABLE_BSDD_STATUSES,
@@ -38,6 +39,7 @@ const CREATE_FORM_REVISION_REQUEST = `
       }
       content {
         wasteDetails { code }
+        destinationOperationMode
       }
       authoringCompany {
         orgId
@@ -1024,7 +1026,7 @@ describe("Mutation.createFormRevisionRequest", () => {
       }
     });
 
-    expect(data.createFormRevisionRequest.content).toEqual({
+    expect(data.createFormRevisionRequest.content).toMatchObject({
       wasteDetails: { code: "01 03 08" }
     });
   });
@@ -2961,5 +2963,211 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(errors[0].message).toBe(
       "Révision impossible, certains champs saisis ne sont pas modifiables"
     );
+  });
+
+  describe("TRA-16669 - New operation modes", () => {
+    it("one can create a revision request on a BSDD with invalid operation modes", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.PROCESSED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "13 01 12*",
+          processingOperationDone: "R 2",
+          destinationOperationMode: OperationMode.AUTRES_VALORISATIONS // Mode plus autorisé
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { wasteDetails: { code: "01 03 08" } },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        company.siret
+      );
+      expect(data.createFormRevisionRequest?.content?.wasteDetails?.code).toBe(
+        "01 03 08"
+      );
+    });
+
+    it("one can fix an invalid operation mode with a new, valid one", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.PROCESSED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "13 01 12*",
+          processingOperationDone: "R 2",
+          destinationOperationMode: OperationMode.AUTRES_VALORISATIONS // Mode plus autorisé
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { destinationOperationMode: OperationMode.REUTILISATION },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
+        company.siret
+      );
+      expect(
+        data.createFormRevisionRequest?.content?.destinationOperationMode
+      ).toBe(OperationMode.REUTILISATION);
+    });
+
+    it("one cannot create a revision request with an invalid operation mode", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.PROCESSED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "13 01 12*",
+          processingOperationDone: "R 2",
+          destinationOperationMode: OperationMode.REUTILISATION
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              destinationOperationMode: OperationMode.AUTRES_VALORISATIONS
+            }, // Mode plus autorisé
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      );
+    });
+
+    it("one cannot change the operation code to a new one that doesn't match the old operation mode", async () => {
+      // Given
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN",
+
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.PROCESSED,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret,
+          wasteDetailsCode: "13 01 12*",
+          processingOperationDone: "R 2",
+          destinationOperationMode: OperationMode.REUTILISATION // Valide avec R2
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: {
+              processingOperationDone: "R 1" // Pas valide avec REUTILISATION!
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      );
+    });
   });
 });
