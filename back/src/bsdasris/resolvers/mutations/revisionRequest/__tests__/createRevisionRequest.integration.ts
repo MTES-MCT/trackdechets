@@ -1047,7 +1047,7 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
   );
 
   describe("TRA-16750 - Code D9 becomes D9F", () => {
-    it("should no longer allow code D9", async () => {
+    it("should allow code D9 and cast it to D9F (tolerance)", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -1065,7 +1065,7 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { errors, data } = await mutate<
         Pick<Mutation, "createBsdasriRevisionRequest">,
         MutationCreateBsdasriRevisionRequestArgs
       >(CREATE_BSDASRI_REVISION_REQUEST, {
@@ -1080,10 +1080,10 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
       });
 
       // When
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "La valeur « D9 » n'existe pas dans les options : 'D9F' | 'D10' | 'R1'"
-      );
+      expect(errors).toBeUndefined();
+      expect(
+        data.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D9F");
     });
 
     it("should allow code D9F", async () => {

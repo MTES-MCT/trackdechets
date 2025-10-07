@@ -2104,7 +2104,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       ).toBe("ELIMINATION");
     });
 
-    it("should no longer allow creating a revision with destinationOperationCode D9", async () => {
+    it("should allow creating a revision with destinationOperationCode D9, auto-cast to D9F (tolerance)", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -2120,7 +2120,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { errors, data } = await mutate<
         Pick<Mutation, "createBsdaRevisionRequest">,
         MutationCreateBsdaRevisionRequestArgs
       >(CREATE_BSDA_REVISION_REQUEST, {
@@ -2137,10 +2137,10 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       });
 
       // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
-      );
+      expect(errors).toBeUndefined();
+      expect(
+        data.createBsdaRevisionRequest.content?.destination?.operation?.code
+      ).toBe("D 9 F");
     });
 
     it("if code is D9F, should automatically set mode to ELIMINATION", async () => {

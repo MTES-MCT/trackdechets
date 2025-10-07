@@ -337,6 +337,7 @@ describe("Mutation.signBsdasri operation", () => {
       expect(receivedDasri.destinationOperationCode).toBe("D9F");
     });
 
+    // Ne devrait pas arriver parce qu'on migrera les données...
     it("should no longer be able to sign dasri with operation code D9", async () => {
       // Given
       const { company: emitterCompany } = await userWithCompanyFactory(

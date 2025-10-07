@@ -1345,7 +1345,7 @@ describe("Mutation.updateBsdasri", () => {
       expect(data.updateBsdasri.destination?.operation?.code).toBe("D9F");
     });
 
-    it("should no longer be possible to update dasri with code D9", async () => {
+    it("should be possible to update dasri with code D9, cast to D9F (tolerance)", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const dasri = await bsdasriFactory({
@@ -1361,7 +1361,7 @@ describe("Mutation.updateBsdasri", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      const { errors, data } = await mutate<Pick<Mutation, "updateBsdasri">>(
         UPDATE_DASRI,
         {
           variables: {
@@ -1374,10 +1374,8 @@ describe("Mutation.updateBsdasri", () => {
       );
 
       // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée"
-      );
+      expect(errors).toBeUndefined();
+      expect(data.updateBsdasri.destination?.operation?.code).toBe("D9F");
     });
 
     it("should not allow updating to D9F if mode is not compatible", async () => {
@@ -1415,7 +1413,7 @@ describe("Mutation.updateBsdasri", () => {
       );
     });
 
-    it("if pdating with code D9F, should auto set mode to ELIMINATION", async () => {
+    it("if updating with code D9F, should auto set mode to ELIMINATION", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const dasri = await bsdasriFactory({

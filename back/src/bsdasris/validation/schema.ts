@@ -49,7 +49,7 @@ const ZodBsdasriWasteCodeEnum = z.enum(DASRI_WASTE_CODES_VALUES).nullish();
 export type ZodBsdasriWasteCodeEnum = z.infer<typeof ZodBsdasriWasteCodeEnum>;
 
 export const ZodOperationEnum = z
-  .enum(DASRI_ALL_OPERATIONS_CODES, {
+  .enum([...DASRI_ALL_OPERATIONS_CODES, "D9"], {
     errorMap: (issue, ctx) => {
       if (issue.code === z.ZodIssueCode.invalid_enum_value) {
         return {
@@ -59,6 +59,14 @@ export const ZodOperationEnum = z
       }
       return { message: ctx.defaultError };
     }
+  })
+  .transform(val => {
+    if (!val) return val;
+
+    if (val === "D9") {
+      return "D9F";
+    }
+    return val as (typeof DASRI_ALL_OPERATIONS_CODES)[number];
   })
   .nullish();
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;

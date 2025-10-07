@@ -3584,7 +3584,7 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.operation?.mode).toBe("RECYCLAGE");
     });
 
-    it("should no longer allow user to update destinationOperationCode with code D9", async () => {
+    it("can still use code D9, auto-cast to D9F (tolerance)", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
@@ -3595,7 +3595,7 @@ describe("Mutation.updateBsda", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { errors, data } = await mutate<
         Pick<Mutation, "updateBsda">,
         MutationUpdateBsdaArgs
       >(UPDATE_BSDA, {
@@ -3612,10 +3612,10 @@ describe("Mutation.updateBsda", () => {
       });
 
       // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
-      );
+      expect(errors).toBeUndefined();
+      expect(data.updateBsda.id).toBeTruthy();
+      expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
+      expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
     });
 
     it("should allow user to update plannedOperationCode with code D9F", async () => {
@@ -3649,7 +3649,7 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
     });
 
-    it("should no longer allow user to update plannedOperationCode with code D9", async () => {
+    it("should allow user to update plannedOperationCode with code D9, auto-case to D9F (tolerance)", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
@@ -3660,7 +3660,7 @@ describe("Mutation.updateBsda", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors } = await mutate<
+      const { errors, data } = await mutate<
         Pick<Mutation, "updateBsda">,
         MutationUpdateBsdaArgs
       >(UPDATE_BSDA, {
@@ -3675,10 +3675,9 @@ describe("Mutation.updateBsda", () => {
       });
 
       // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
-      );
+      expect(errors).toBeUndefined();
+      expect(data.updateBsda.id).toBeTruthy();
+      expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
     });
 
     it("should allow user to update destinationOperationNextDestinationPlannedOperationCode with code D9F", async () => {

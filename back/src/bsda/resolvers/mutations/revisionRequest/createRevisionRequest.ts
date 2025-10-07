@@ -25,7 +25,10 @@ import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
-import { fixOperationModeForD9F } from "../../../validation/transformers";
+import {
+  castD9toD9F,
+  fixOperationModeForD9F
+} from "../../../validation/transformers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -307,6 +310,7 @@ const schema = rawBsdaSchema
     emitterPickupSiteInfos: true
   })
   .extend({ isCanceled: z.boolean().nullish() })
+  .transform(castD9toD9F)
   .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;

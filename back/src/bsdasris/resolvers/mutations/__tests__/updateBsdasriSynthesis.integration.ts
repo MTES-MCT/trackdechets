@@ -514,12 +514,13 @@ describe("Mutation.updateBsdasri", () => {
   );
 
   it.each([
-    ["D9F", "ELIMINATION"],
-    ["D10", "ELIMINATION"],
-    ["R1", "VALORISATION_ENERGETIQUE"]
+    ["D9", "ELIMINATION", "D9F"], // tolerance on code D9
+    ["D9F", "ELIMINATION", "D9F"],
+    ["D10", "ELIMINATION", "D10"],
+    ["R1", "VALORISATION_ENERGETIQUE", "R1"]
   ])(
     "should allow %p operation code on synthesis dasri",
-    async (operationCode, operationMode) => {
+    async (operationCode, operationMode, expectedOperationCode) => {
       const { company: emitterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -576,7 +577,9 @@ describe("Mutation.updateBsdasri", () => {
       const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
         where: { id: dasri.id }
       });
-      expect(updatedDasri.destinationOperationCode).toEqual(operationCode);
+      expect(updatedDasri.destinationOperationCode).toEqual(
+        expectedOperationCode
+      );
       expect(updatedDasri.destinationOperationMode).toEqual(operationMode);
     }
   );
