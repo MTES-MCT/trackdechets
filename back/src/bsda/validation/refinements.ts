@@ -7,7 +7,8 @@ import {
   isBsdaTransporterFieldRequired,
   BsdaEditableFields,
   BsdaTransporterEditableFields,
-  getSealedFields
+  getSealedFields,
+  EditionRulePath
 } from "./rules";
 import { getSignatureAncestors } from "./helpers";
 import { Decimal } from "decimal.js";
@@ -52,6 +53,7 @@ export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["destination", "operation", "date"] as EditionRulePath,
       message: `La date d'opération doit être postérieure à la date de réception`
     });
   }
@@ -73,6 +75,7 @@ export const checkOperationMode: Refinement<ParsedZodBsda> = (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["destination", "operation", "mode"] as EditionRulePath,
         message:
           "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
       });
@@ -87,6 +90,7 @@ export const checkNoEmitterWhenPrivateIndividual: Refinement<ParsedZodBsda> = (
   if (bsda.emitterIsPrivateIndividual && bsda.emitterCompanySiret) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["emitter", "company", "siret"] as EditionRulePath,
       message: `L'émetteur est un particulier, impossible de saisir un SIRET émetteur`
     });
   }
@@ -102,6 +106,7 @@ export const checkNoWorkerWhenWorkerIsDisabled: Refinement<ParsedZodBsda> = (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["worker", "company", "siret"] as EditionRulePath,
       message: `Il n'y a pas d'entreprise de travaux, impossible de saisir le SIRET ou le nom de l'entreprise de travaux.`
     });
   }
@@ -119,6 +124,11 @@ export const checkWorkerSubSectionThree: Refinement<ParsedZodBsda> = (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: [
+        "worker",
+        "certification",
+        "certificationNumber"
+      ] as EditionRulePath,
       message: `Il n'y a pas de certification sous-section 3 amiante déclarée. Impossible de remplir les champs de la sous-section 3.`
     });
   }
@@ -135,6 +145,7 @@ export const checkNoTransporterWhenCollection2710: Refinement<ParsedZodBsda> = (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["transporters"] as EditionRulePath,
       message: `Impossible de saisir un transporteur pour un bordereau de collecte en déchetterie.`
     });
   }
@@ -150,6 +161,7 @@ export const checkNoWorkerWhenCollection2710: Refinement<ParsedZodBsda> = (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["worker", "company", "siret"] as EditionRulePath,
       message: `Impossible de saisir une entreprise de travaux pour un bordereau de collecte en déchetterie.`
     });
   }
@@ -165,6 +177,7 @@ export const checkNoBothGroupingAndForwarding: Refinement<ParsedZodBsda> = (
   if ([isForwarding, isGrouping].filter(b => b).length > 1) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["forwarding"] as EditionRulePath,
       message:
         "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
     });
@@ -181,7 +194,7 @@ export const checkRequiredFields: (
 
   return (bsda, { addIssue }) => {
     for (const bsdaField of Object.keys(bsdaEditionRules)) {
-      const { required, readableFieldName } =
+      const { required, readableFieldName, path } =
         bsdaEditionRules[bsdaField as keyof BsdaEditableFields];
 
       if (required) {
@@ -203,7 +216,7 @@ export const checkRequiredFields: (
 
             addIssue({
               code: z.ZodIssueCode.custom,
-              path: [bsdaField],
+              path: path ?? [bsdaField],
               message: [
                 `${fieldDescription} est obligatoire.`,
                 required.customErrorMessage
@@ -216,28 +229,25 @@ export const checkRequiredFields: (
       }
     }
 
-    let checkableTransporters = bsda.transporters ?? [];
-
-    if (
-      ["OPERATION", "RECEPTION"].includes(
-        validationContext.currentSignatureType ?? ""
-      )
-    ) {
-      // Cas spécial permettant à l'installation de destination de valider la réception ou l'opération
-      // même si tous les transporteurs multi-modaux n'ont pas signé.
-      checkableTransporters = checkableTransporters.filter(t =>
-        Boolean(t.transporterTransportSignatureDate)
-      );
-    }
-
-    checkableTransporters.forEach((transporter, idx) => {
+    (bsda.transporters ?? []).forEach((transporter, idx) => {
+      if (
+        ["OPERATION", "RECEPTION"].includes(
+          validationContext.currentSignatureType ?? ""
+        ) &&
+        !transporter.transporterTransportSignatureDate
+      ) {
+        return;
+      }
       for (const bsdaTransporterField of Object.keys(
         bsdaTransporterEditionRules
       )) {
-        const { required, readableFieldName } =
-          bsdaTransporterEditionRules[
-            bsdaTransporterField as keyof BsdaTransporterEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsdaTransporterPath
+        } = bsdaTransporterEditionRules[
+          bsdaTransporterField as keyof BsdaTransporterEditableFields
+        ];
 
         if (required) {
           const isRequired = isBsdaTransporterFieldRequired(
@@ -254,10 +264,12 @@ export const checkRequiredFields: (
               const fieldDescription = readableFieldName
                 ? capitalize(readableFieldName)
                 : `Le champ ${bsdaTransporterField}`;
-
+              const path = ["transporters", `${idx + 1}`].concat(
+                bsdaTransporterPath ?? []
+              ) as EditionRulePath;
               addIssue({
                 code: z.ZodIssueCode.custom,
-                path: [`transporters[${idx}]${bsdaTransporterField}`],
+                path: path ?? [`transporters[${idx}]${bsdaTransporterField}`],
                 message: [
                   `${fieldDescription} n° ${idx + 1} est obligatoire.`,
                   required.customErrorMessage
@@ -287,6 +299,7 @@ async function checkEmitterIsNotEcoOrganisme(
   if (ecoOrganisme) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["emitter", "company", "siret"] as EditionRulePath,
       message: `"L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",`
     });
   }
@@ -411,6 +424,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
   if (previousBsdas.length === 0) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["forwarding"] as EditionRulePath,
       message:
         "Un bordereau de groupement ou de réexpédition doit obligatoirement être associé à au moins un bordereau.",
       fatal: true
@@ -430,6 +444,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["forwarding"] as EditionRulePath,
       message: `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`,
       fatal: true
     });
@@ -442,6 +457,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
   if (!nextDestinations.every(siret => siret === nextDestinations[0])) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["forwarding"] as EditionRulePath,
       message: `Certains des bordereaux à associer ont des exutoires différents. Ils ne peuvent pas être groupés ensemble.`,
       fatal: true
     });
@@ -458,6 +474,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["forwarding"] as EditionRulePath,
       message: `Certains des bordereaux à associer ne sont pas en possession du même établissement.`,
       fatal: true
     });
@@ -475,6 +492,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["grouping"] as EditionRulePath,
       message: `Tous les bordereaux groupés doivent avoir le même code déchet que le bordereau de groupement.`,
       fatal: true
     });
@@ -485,6 +503,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
     if (previousBsda.status === BsdaStatus.PROCESSED) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["forwarding"] as EditionRulePath,
         message: `Le bordereau n°${previousBsda.id} a déjà reçu son traitement final.`,
         fatal: true
       });
@@ -494,6 +513,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
     if (previousBsda.status !== BsdaStatus.AWAITING_CHILD) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["forwarding"] as EditionRulePath,
         message: `Le bordereau n°${previousBsda.id} n'a pas toutes les signatures requises.`,
         fatal: true
       });
@@ -509,6 +529,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["forwarding"] as EditionRulePath,
         message: `Le bordereau n°${previousBsda.id} a déjà été réexpédié ou groupé.`,
         fatal: true
       });
@@ -522,6 +543,7 @@ export const validatePreviousBsdas: Refinement<ParsedZodBsda> = async (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["forwarding"] as EditionRulePath,
         message: `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`,
         fatal: true
       });
@@ -564,6 +586,13 @@ export const validateDestination: (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: [
+          "destination",
+          "operation",
+          "nextDestination",
+          "company",
+          "siret"
+        ] as EditionRulePath,
         message: `Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale.`,
         fatal: true
       });
@@ -578,6 +607,13 @@ export const validateDestination: (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: [
+          "destination",
+          "operation",
+          "nextDestination",
+          "company",
+          "siret"
+        ] as EditionRulePath,
         message: `Impossible de retirer un intermédiaire d'entreposage provisoire sans indiquer la destination finale prévue initialement comme destination.`,
         fatal: true
       });
@@ -590,13 +626,22 @@ export const checkTransporters: Refinement<ParsedZodBsda> = (
   { addIssue }
 ) => {
   if (bsda.id) {
-    const alreadyPartOfAnotherBsda = bsda.transporters?.find(
+    const alreadyPartOfAnotherBsdaIndex = bsda.transporters?.findIndex(
       t => Boolean(t.bsdaId) && t.bsdaId !== bsda.id
     );
-    if (alreadyPartOfAnotherBsda) {
+    if (
+      alreadyPartOfAnotherBsdaIndex !== undefined &&
+      alreadyPartOfAnotherBsdaIndex !== -1
+    ) {
       addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Le transporteur BSDA ${alreadyPartOfAnotherBsda.id} est déjà associé à un autre BSDA`
+        path: [
+          "transporters",
+          `${alreadyPartOfAnotherBsdaIndex + 1}`,
+          "company",
+          "siret"
+        ] as any as EditionRulePath,
+        message: `Le transporteur BSDA ${bsda.transporters?.[alreadyPartOfAnotherBsdaIndex]?.id} est déjà associé à un autre BSDA`
       });
     }
   }
@@ -616,6 +661,7 @@ export async function isWorkerRefinement(
   if (company && !isWorker(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
+      path: ["worker", "company", "siret"] as EditionRulePath,
       message:
         `L'entreprise de travaux saisie sur le bordereau (SIRET: ${siret}) n'est pas inscrite sur Trackdéchets` +
         ` en tant qu'entreprise de travaux. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
@@ -646,6 +692,7 @@ export const validateDestinationReceptionWeight: (
     ) {
       addIssue({
         code: z.ZodIssueCode.custom,
+        path: ["destination", "reception", "weight"] as EditionRulePath,
         message: `Le poids du déchet reçu doit être renseigné et non nul.`,
         fatal: true
       });
@@ -669,6 +716,7 @@ export const wasteAdrRefinement: (
       if (wasteIsSubjectToADR === true && !isDefined(wasteAdr)) {
         addIssue({
           code: z.ZodIssueCode.custom,
+          path: ["waste", "adr"] as EditionRulePath,
           message: `Le déchet est soumis à l'ADR. Vous devez préciser la mention correspondante.`,
           fatal: true
         });
@@ -676,6 +724,7 @@ export const wasteAdrRefinement: (
       } else if (wasteIsSubjectToADR === false && isDefined(wasteAdr)) {
         addIssue({
           code: z.ZodIssueCode.custom,
+          path: ["waste", "adr"] as EditionRulePath,
           message: `Le déchet n'est pas soumis à l'ADR. Vous ne pouvez pas préciser de mention ADR.`,
           fatal: true
         });
@@ -689,7 +738,7 @@ export const checkDestinationReceptionRefusedWeight = (
   bsd,
   ctx: z.RefinementCtx
 ) => {
-  const path = ["destination", "reception", "refusedWeight"];
+  const path = ["destination", "reception", "refusedWeight"] as EditionRulePath;
 
   const {
     destinationReceptionWeight,
@@ -800,7 +849,7 @@ export const validateReceptionOperationCode: (
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Vous ne pouvez pas renseigner un code de traitement final",
-        path: ["destination", "operation", "code"]
+        path: ["destination", "operation", "code"] as EditionRulePath
       });
     }
 
