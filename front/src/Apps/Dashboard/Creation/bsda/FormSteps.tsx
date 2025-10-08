@@ -18,6 +18,7 @@ import {
 } from "../utils";
 import { rawBsdaSchema, ZodBsda } from "./schema";
 import initialState from "./utils/initial-state";
+import Worker from "./steps/Worker";
 
 interface Props {
   bsdId?: string;
@@ -86,7 +87,14 @@ const BsdaFormSteps = ({
             error => error.tabId === TabId.emitter
           )}
         />
-      ), //TODO
+      ), //FIXME
+      worker: (
+        <Worker
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.worker
+          )}
+        />
+      ), //FIXME
       transporter: <p>TODO</p>,
       destination: <p>TODO</p>,
       other: <p>TODO</p>

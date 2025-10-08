@@ -23,6 +23,7 @@ export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
 export enum TabId {
   waste = "waste",
   emitter = "emitter",
+  worker = "worker",
   transporter = "transporter",
   destination = "destination",
   none = "none",
@@ -67,6 +68,11 @@ export const getTabs = (
       tabId: TabId.emitter,
       label: "Producteur",
       iconId: getTabClassName(errorTabIds, "emitter")
+    },
+    {
+      tabId: TabId.worker,
+      label: "Entreprise de travaux",
+      iconId: getTabClassName(errorTabIds, "worker")
     },
     {
       tabId: TabId.transporter,
