@@ -2,6 +2,8 @@ import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import Queue, { JobOptions } from "bull";
 
+// TRA-16750: Migration des codes D9 vers D9F dans les BSDA & BSDASRI
+
 // Estimated count in production: 0
 
 // Fine-tune the batch size here

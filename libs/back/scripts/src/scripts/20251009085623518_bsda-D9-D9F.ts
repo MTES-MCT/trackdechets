@@ -2,6 +2,8 @@ import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import Queue, { JobOptions } from "bull";
 
+// TRA-16750: Migration des codes D9 vers D9F dans les BSDA & BSDASRI
+
 // Estimated count for destinationPlannedOperationCode in production: 5 292
 // Estimated count for destinationOperationCode in production: 162
 // Estimated count for destinationOperationNextDestinationPlannedOperationCode in production: 1 624
