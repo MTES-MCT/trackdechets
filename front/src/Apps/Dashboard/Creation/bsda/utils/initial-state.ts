@@ -1,4 +1,4 @@
-import { BsdaEmitterInput, BsdaType } from "@td/codegen-ui";
+import { BsdaEmitterInput, BsdaType, TransportMode } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
@@ -108,7 +108,14 @@ export default {
       }
     }
   },
-  transporters: [],
+  transporters: [
+    {
+      transport: {
+        mode: TransportMode.Road,
+        plates: []
+      }
+    }
+  ],
   grouping: [],
   forwarding: null,
   intermediaries: [getInitialCompany()],
