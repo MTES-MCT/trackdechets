@@ -24,6 +24,23 @@ export const registryS3Client = new S3Client({
 const SIGNED_URL_EXPIRES_IN = 60 * 10; // 10 minutes
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 
+// Allowed file types for registry imports
+const ALLOWED_FILE_TYPES = {
+  ".csv": "text/csv",
+  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ".xls": "application/vnd.ms-excel"
+} as const;
+
+export function validateAndGetContentType(fileName: string): string | null {
+  const extension = fileName.toLowerCase().substring(fileName.lastIndexOf("."));
+
+  if (!ALLOWED_FILE_TYPES[extension as keyof typeof ALLOWED_FILE_TYPES]) {
+    return null;
+  }
+
+  return ALLOWED_FILE_TYPES[extension as keyof typeof ALLOWED_FILE_TYPES];
+}
+
 export function getUploadWithWritableStream({
   bucketName,
   key,
@@ -86,12 +103,14 @@ export async function getSignedUrlForUpload({
   bucketName,
   key,
   metadata,
-  tags
+  tags,
+  contentType
 }: {
   bucketName: string;
   key: string;
   metadata?: Record<string, string>;
   tags?: Record<string, string>;
+  contentType: string;
 }) {
   const metadataFields = metadata
     ? Object.entries(metadata).map(([key, value]) => ({
@@ -105,20 +124,21 @@ export async function getSignedUrlForUpload({
   };
 
   // We use a presigned post as it supports POST policy conditions
-  // that allow us to limit the file size
+  // that allow us to limit the file size and content type
   const { url, fields } = await createPresignedPost(registryS3Client, {
     Bucket: bucketName,
     Key: key,
     Expires: SIGNED_URL_EXPIRES_IN,
     Conditions: [
       ["content-length-range", 0, MAX_FILE_SIZE],
-      ["starts-with", "$Content-Type", ""],
+      ["eq", "$Content-Type", contentType],
       ...metadataFields,
       taggingField
     ],
     Fields: {
       ...metadataFields.reduce((acc, field) => ({ ...acc, ...field }), {}),
-      ...taggingField
+      ...taggingField,
+      "Content-Type": contentType
     }
   });
   return { url, fields };
