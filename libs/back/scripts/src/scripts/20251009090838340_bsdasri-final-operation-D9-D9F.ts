@@ -105,7 +105,7 @@ async function migrateBsdasriFinalOperationCode() {
       await Promise.allSettled(
         bsdasriIdsToReindex.map(async bsdasriId => {
           try {
-            await enqueueUpdatedBsdToIndex(bsdasriId);
+            // await enqueueUpdatedBsdToIndex(bsdasriId);
           } catch (_) {
             throw new Error(`Could not enqueue BSD ${bsdasriId}`);
           }

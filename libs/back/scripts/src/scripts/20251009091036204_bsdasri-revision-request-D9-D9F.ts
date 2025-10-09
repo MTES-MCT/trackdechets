@@ -96,7 +96,7 @@ export async function run() {
       await Promise.allSettled(
         bsdasriIds.map(async bsdasriId => {
           try {
-            await enqueueUpdatedBsdToIndex(bsdasriId);
+            // await enqueueUpdatedBsdToIndex(bsdasriId);
           } catch (_) {
             throw new Error(`Could not enqueue BSD ${bsdasriId}`);
           }

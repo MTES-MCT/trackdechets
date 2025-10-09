@@ -99,7 +99,7 @@ async function migrateBsdaRevisionRequestOperationCode() {
       await Promise.allSettled(
         bsdaIds.map(async bsdaId => {
           try {
-            await enqueueUpdatedBsdToIndex(bsdaId);
+            // await enqueueUpdatedBsdToIndex(bsdaId);
           } catch (_) {
             throw new Error(`Could not enqueue BSD ${bsdaId}`);
           }
