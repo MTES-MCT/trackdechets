@@ -1,10 +1,31 @@
 import { prisma } from "@td/prisma";
-import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
+import { logger } from "@td/logger";
+import Queue, { JobOptions } from "bull";
 
 // Estimated count in production: 371 447
 
 // Fine-tune the batch size here
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 1000;
+
+const { REDIS_URL, NODE_ENV } = process.env;
+const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
+
+const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "fixed", delay: 100 },
+    removeOnComplete: 10_000,
+    timeout: 10000
+  }
+});
+
+async function enqueueUpdatedBsdToIndex(
+  bsdId: string,
+  options?: JobOptions
+): Promise<void> {
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
+  await indexQueue.add("index_updated", bsdId, options);
+}
 
 const formatTime = milliseconds => {
   const seconds = Math.floor((milliseconds / 1000) % 60);
@@ -18,12 +39,8 @@ const formatTime = milliseconds => {
   ].join(":");
 };
 
-const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/bsdasri-D9-D9F.ts
-
-(async function () {
-  console.log(
+export async function run() {
+  logger.info(
     ">> Lancement du script de mise à jour des BSDASRI: code D9 devient D9F, avec mode = ELIMINATION"
   );
 
@@ -36,9 +53,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
     where: { destinationOperationCode: "D9" }
   });
 
-  console.log(`Total de ${bsdasrisTotal} BSDASRI à mettre à jour.`);
-  console.log("Lancement du script dans 5 secondes...");
-  await pause(5000);
+  logger.info(`Total de ${bsdasrisTotal} BSDASRI à mettre à jour.`);
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -76,23 +91,23 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
       await Promise.allSettled(
         bsdIds.map(async bsdId => {
           try {
-            await reindex(bsdId, success => success);
+            await enqueueUpdatedBsdToIndex(bsdId);
           } catch (_) {
-            throw new Error(bsdId);
+            throw new Error(`Could not enqueue BSD ${bsdId}`);
           }
         })
       );
     } catch (e) {
       errors++;
 
-      console.log(`/!\\ Erreur for batch ${bsdIds.join(", ")}: ${e.message}`);
+      logger.info(`/!\\ Erreur for batch ${bsdIds.join(", ")}: ${e.message}`);
     }
 
     updatedBsdasris += bsdIds.length;
     // Don't increment skip here - we'll keep querying the same position since records get filtered out
 
     const loopDuration = new Date().getTime() - startDate.getTime();
-    console.log(
+    logger.info(
       `${updatedBsdasris} bsdasris mis à jour (${Math.round(
         (updatedBsdasris / bsdasrisTotal) * 100
       )}%) en ${formatTime(loopDuration)} (temps total estimé: ${formatTime(
@@ -103,11 +118,11 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  console.log(
+  logger.info(
     `${updatedBsdasris} bsdasris mis à jour, ${errors} erreurs (${Math.round(
       (errors / updatedBsdasris) * 100
     )}%) en ${formatTime(duration)}!`
   );
 
-  console.log("Terminé!");
-})().then(() => process.exit());
+  logger.info("Terminé!");
+}

@@ -1,10 +1,31 @@
 import { prisma } from "@td/prisma";
-import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
+import { logger } from "@td/logger";
+import Queue, { JobOptions } from "bull";
 
 // Estimated count in production: 0
 
 // Fine-tune the batch size here
 const BATCH_SIZE = 100;
+
+const { REDIS_URL, NODE_ENV } = process.env;
+const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
+
+const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "fixed", delay: 100 },
+    removeOnComplete: 10_000,
+    timeout: 10000
+  }
+});
+
+async function enqueueUpdatedBsdToIndex(
+  bsdId: string,
+  options?: JobOptions
+): Promise<void> {
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
+  await indexQueue.add("index_updated", bsdId, options);
+}
 
 const formatTime = milliseconds => {
   const seconds = Math.floor((milliseconds / 1000) % 60);
@@ -18,12 +39,8 @@ const formatTime = milliseconds => {
   ].join(":");
 };
 
-const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/bsda-final-operation-D9-D9F.ts
-
 async function migrateBsdaFinalOperationCode() {
-  console.log(
+  logger.info(
     "\n=== Migration BsdaFinalOperation operationCode: D 9 → D 9 F ==="
   );
 
@@ -34,14 +51,12 @@ async function migrateBsdaFinalOperationCode() {
     where: { operationCode: "D 9" }
   });
 
-  console.log(
+  logger.info(
     `Total de ${finalOperationsTotal} BsdaFinalOperation à mettre à jour pour operationCode.`
   );
-  console.log("Lancement du script dans 5 secondes...");
-  await pause(5000);
 
   if (finalOperationsTotal === 0) {
-    console.log("Aucun BsdaFinalOperation à mettre à jour pour operationCode.");
+    logger.info("Aucun BsdaFinalOperation à mettre à jour pour operationCode.");
     return { updated: 0, errors: 0 };
   }
 
@@ -87,20 +102,20 @@ async function migrateBsdaFinalOperationCode() {
       await Promise.allSettled(
         bsdaIdsToReindex.map(async bsdaId => {
           try {
-            await reindex(bsdaId, success => success);
+            await enqueueUpdatedBsdToIndex(bsdaId);
           } catch (_) {
-            throw new Error(bsdaId);
+            throw new Error(`Could not enqueue BSD ${bsdaId}`);
           }
         })
       );
 
       updatedFinalOperations += finalOperations.length;
-      console.log(
+      logger.info(
         `operationCode: ${updatedFinalOperations}/${finalOperationsTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      console.log(
+      logger.info(
         `/!\\ Erreur operationCode batch ${finalOperationIds.join(", ")}: ${
           e.message
         }`
@@ -111,8 +126,8 @@ async function migrateBsdaFinalOperationCode() {
   return { updated: updatedFinalOperations, errors };
 }
 
-(async function () {
-  console.log(
+export async function run() {
+  logger.info(
     ">> Lancement du script de mise à jour des BsdaFinalOperation: code D 9 devient D 9 F"
   );
 
@@ -123,15 +138,15 @@ async function migrateBsdaFinalOperationCode() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  console.log("\n=== RÉSUMÉ FINAL ===");
-  console.log(
+  logger.info("\n=== RÉSUMÉ FINAL ===");
+  logger.info(
     `BsdaFinalOperation operationCode: ${finalOperationResults.updated} mis à jour, ${finalOperationResults.errors} erreurs`
   );
-  console.log(
+  logger.info(
     `TOTAL: ${finalOperationResults.updated} final operations mis à jour, ${
       finalOperationResults.errors
     } erreurs en ${formatTime(duration)}!`
   );
 
-  console.log("Terminé!");
-})().then(() => process.exit());
+  logger.info("Terminé!");
+}

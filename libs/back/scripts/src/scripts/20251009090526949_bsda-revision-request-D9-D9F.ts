@@ -1,10 +1,31 @@
 import { prisma } from "@td/prisma";
-import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
+import { logger } from "@td/logger";
+import Queue, { JobOptions } from "bull";
 
 // Estimated count in production: 12
 
 // Fine-tune the batch size here
 const BATCH_SIZE = 100;
+
+const { REDIS_URL, NODE_ENV } = process.env;
+const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
+
+const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "fixed", delay: 100 },
+    removeOnComplete: 10_000,
+    timeout: 10000
+  }
+});
+
+async function enqueueUpdatedBsdToIndex(
+  bsdId: string,
+  options?: JobOptions
+): Promise<void> {
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
+  await indexQueue.add("index_updated", bsdId, options);
+}
 
 const formatTime = milliseconds => {
   const seconds = Math.floor((milliseconds / 1000) % 60);
@@ -18,12 +39,8 @@ const formatTime = milliseconds => {
   ].join(":");
 };
 
-const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-// Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/bsda-revision-request-D9-D9F.ts
-
 async function migrateBsdaRevisionRequestOperationCode() {
-  console.log(
+  logger.info(
     "\n=== Migration BsdaRevisionRequest destinationOperationCode: D 9 → D 9 F + mode ELIMINATION ==="
   );
 
@@ -34,14 +51,12 @@ async function migrateBsdaRevisionRequestOperationCode() {
     where: { destinationOperationCode: "D 9" }
   });
 
-  console.log(
+  logger.info(
     `Total de ${revisionRequestsTotal} BsdaRevisionRequest à mettre à jour pour destinationOperationCode.`
   );
-  console.log("Lancement du script dans 5 secondes...");
-  await pause(5000);
 
   if (revisionRequestsTotal === 0) {
-    console.log(
+    logger.info(
       "Aucun BsdaRevisionRequest à mettre à jour pour destinationOperationCode."
     );
     return { updated: 0, errors: 0 };
@@ -83,20 +98,20 @@ async function migrateBsdaRevisionRequestOperationCode() {
       await Promise.allSettled(
         bsdaIds.map(async bsdaId => {
           try {
-            await reindex(bsdaId, success => success);
+            await enqueueUpdatedBsdToIndex(bsdaId);
           } catch (_) {
-            throw new Error(bsdaId);
+            throw new Error(`Could not enqueue BSD ${bsdaId}`);
           }
         })
       );
 
       updatedRevisionRequests += revisionRequests.length;
-      console.log(
+      logger.info(
         `destinationOperationCode: ${updatedRevisionRequests}/${revisionRequestsTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      console.log(
+      logger.info(
         `/!\\ Erreur destinationOperationCode batch ${revisionRequestIds.join(
           ", "
         )}: ${e.message}`
@@ -107,8 +122,8 @@ async function migrateBsdaRevisionRequestOperationCode() {
   return { updated: updatedRevisionRequests, errors };
 }
 
-(async function () {
-  console.log(
+export async function run() {
+  logger.info(
     ">> Lancement du script de mise à jour des BsdaRevisionRequest: code D 9 devient D 9 F + mode ELIMINATION"
   );
 
@@ -119,15 +134,15 @@ async function migrateBsdaRevisionRequestOperationCode() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  console.log("\n=== RÉSUMÉ FINAL ===");
-  console.log(
+  logger.info("\n=== RÉSUMÉ FINAL ===");
+  logger.info(
     `BsdaRevisionRequest destinationOperationCode: ${revisionResults.updated} mis à jour, ${revisionResults.errors} erreurs`
   );
-  console.log(
+  logger.info(
     `TOTAL: ${revisionResults.updated} revision requests mis à jour, ${
       revisionResults.errors
     } erreurs en ${formatTime(duration)}!`
   );
 
-  console.log("Terminé!");
-})().then(() => process.exit());
+  logger.info("Terminé!");
+}
