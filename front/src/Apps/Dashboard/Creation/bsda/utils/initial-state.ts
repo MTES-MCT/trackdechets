@@ -113,7 +113,9 @@ export default {
       transport: {
         mode: TransportMode.Road,
         plates: []
-      }
+      },
+      recepisse: { isExempted: false },
+      company: getInitialCompany()
     }
   ],
   grouping: [],

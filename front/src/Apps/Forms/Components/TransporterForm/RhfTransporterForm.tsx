@@ -90,6 +90,20 @@ export function RhfTransporterForm<T extends AnyTransporterInput>({
             setValue(`${actor}.company.name`, company.name);
             setValue(`${actor}.company.vatNumber`, company.vatNumber);
             setValue(`${actor}.company.address`, company.address);
+
+            setValue(
+              `${actor}.recepisse.number`,
+              company.transporterReceipt?.receiptNumber
+            );
+            setValue(
+              `${actor}.recepisse.department`,
+              company.transporterReceipt?.department
+            );
+
+            setValue(
+              `${actor}.recepisse.validityLimit`,
+              company.transporterReceipt?.validityLimit
+            );
           }
         }}
       />
