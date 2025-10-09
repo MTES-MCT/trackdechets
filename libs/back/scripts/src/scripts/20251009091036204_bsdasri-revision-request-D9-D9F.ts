@@ -25,7 +25,6 @@ async function enqueueUpdatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index_updated", bsdId, options);
 }
 
@@ -42,7 +41,7 @@ const formatTime = milliseconds => {
 };
 
 export async function run() {
-  logger.info(
+  console.log(
     ">> Lancement du script de mise à jour des BsdasriRevisionRequest: code D9 devient D9F, avec mode = ELIMINATION"
   );
 
@@ -55,7 +54,7 @@ export async function run() {
     where: { destinationOperationCode: "D9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${revisionRequestsTotal} révisions DASRI à mettre à jour.`
   );
 
@@ -106,7 +105,7 @@ export async function run() {
     } catch (e) {
       errors++;
 
-      logger.info(
+      console.log(
         `/!\\ Erreur for batch ${revisionRequestIds.join(", ")}: ${e.message}`
       );
     }
@@ -114,7 +113,7 @@ export async function run() {
     updatedRevisionRequests += revisionRequests.length;
 
     const loopDuration = new Date().getTime() - startDate.getTime();
-    logger.info(
+    console.log(
       `${updatedRevisionRequests} revision requests mis à jour (${Math.round(
         (updatedRevisionRequests / revisionRequestsTotal) * 100
       )}%) en ${formatTime(loopDuration)} (temps total estimé: ${formatTime(
@@ -125,11 +124,11 @@ export async function run() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  logger.info(
+  console.log(
     `${updatedRevisionRequests} revision requests mis à jour, ${errors} erreurs (${Math.round(
       (errors / updatedRevisionRequests) * 100
     )}%) en ${formatTime(duration)}!`
   );
 
-  logger.info("Terminé!");
+  console.log("Terminé!");
 }

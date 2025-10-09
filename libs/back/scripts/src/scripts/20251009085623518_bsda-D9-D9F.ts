@@ -27,7 +27,6 @@ async function enqueueUpdatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index_updated", bsdId, options);
 }
 
@@ -44,7 +43,7 @@ const formatTime = milliseconds => {
 };
 
 async function migratePlannedOperationCode() {
-  logger.info(
+  console.log(
     "\n=== Migration destinationPlannedOperationCode: D 9 → D 9 F ==="
   );
 
@@ -55,12 +54,12 @@ async function migratePlannedOperationCode() {
     where: { destinationPlannedOperationCode: "D 9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${bsdasTotal} BSDA à mettre à jour pour destinationPlannedOperationCode.`
   );
 
   if (bsdasTotal === 0) {
-    logger.info(
+    console.log(
       "Aucun BSDA à mettre à jour pour destinationPlannedOperationCode."
     );
     return { updated: 0, errors: 0 };
@@ -106,12 +105,12 @@ async function migratePlannedOperationCode() {
       );
 
       updatedBsdas += bsdIds.length;
-      logger.info(
+      console.log(
         `destinationPlannedOperationCode: ${updatedBsdas}/${bsdasTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      logger.info(
+      console.log(
         `/!\\ Erreur destinationPlannedOperationCode batch ${bsdIds.join(
           ", "
         )}: ${e.message}`
@@ -123,7 +122,7 @@ async function migratePlannedOperationCode() {
 }
 
 async function migrateOperationCode() {
-  logger.info(
+  console.log(
     "\n=== Migration destinationOperationCode: D 9 → D 9 F + mode ELIMINATION ==="
   );
 
@@ -134,12 +133,12 @@ async function migrateOperationCode() {
     where: { destinationOperationCode: "D 9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${bsdasTotal} BSDA à mettre à jour pour destinationOperationCode.`
   );
 
   if (bsdasTotal === 0) {
-    logger.info("Aucun BSDA à mettre à jour pour destinationOperationCode.");
+    console.log("Aucun BSDA à mettre à jour pour destinationOperationCode.");
     return { updated: 0, errors: 0 };
   }
 
@@ -184,12 +183,12 @@ async function migrateOperationCode() {
       );
 
       updatedBsdas += bsdIds.length;
-      logger.info(
+      console.log(
         `destinationOperationCode: ${updatedBsdas}/${bsdasTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      logger.info(
+      console.log(
         `/!\\ Erreur destinationOperationCode batch ${bsdIds.join(", ")}: ${
           e.message
         }`
@@ -201,7 +200,7 @@ async function migrateOperationCode() {
 }
 
 async function migrateNextDestinationPlannedOperationCode() {
-  logger.info(
+  console.log(
     "\n=== Migration destinationOperationNextDestinationPlannedOperationCode: D 9 → D 9 F ==="
   );
 
@@ -212,12 +211,12 @@ async function migrateNextDestinationPlannedOperationCode() {
     where: { destinationOperationNextDestinationPlannedOperationCode: "D 9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${bsdasTotal} BSDA à mettre à jour pour destinationOperationNextDestinationPlannedOperationCode.`
   );
 
   if (bsdasTotal === 0) {
-    logger.info(
+    console.log(
       "Aucun BSDA à mettre à jour pour destinationOperationNextDestinationPlannedOperationCode."
     );
     return { updated: 0, errors: 0 };
@@ -263,12 +262,12 @@ async function migrateNextDestinationPlannedOperationCode() {
       );
 
       updatedBsdas += bsdIds.length;
-      logger.info(
+      console.log(
         `destinationOperationNextDestinationPlannedOperationCode: ${updatedBsdas}/${bsdasTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      logger.info(
+      console.log(
         `/!\\ Erreur destinationOperationNextDestinationPlannedOperationCode batch ${bsdIds.join(
           ", "
         )}: ${e.message}`
@@ -280,7 +279,7 @@ async function migrateNextDestinationPlannedOperationCode() {
 }
 
 export async function run() {
-  logger.info(
+  console.log(
     ">> Lancement du script de mise à jour des BSDA: codes D 9 deviennent D 9 F"
   );
 
@@ -302,21 +301,21 @@ export async function run() {
     operationResults.errors +
     nextDestinationResults.errors;
 
-  logger.info("\n=== RÉSUMÉ FINAL ===");
-  logger.info(
+  console.log("\n=== RÉSUMÉ FINAL ===");
+  console.log(
     `destinationPlannedOperationCode: ${plannedResults.updated} mis à jour, ${plannedResults.errors} erreurs`
   );
-  logger.info(
+  console.log(
     `destinationOperationCode: ${operationResults.updated} mis à jour, ${operationResults.errors} erreurs`
   );
-  logger.info(
+  console.log(
     `destinationOperationNextDestinationPlannedOperationCode: ${nextDestinationResults.updated} mis à jour, ${nextDestinationResults.errors} erreurs`
   );
-  logger.info(
+  console.log(
     `TOTAL: ${totalUpdated} bsdas mis à jour, ${totalErrors} erreurs en ${formatTime(
       duration
     )}!`
   );
 
-  logger.info("Terminé!");
+  console.log("Terminé!");
 }

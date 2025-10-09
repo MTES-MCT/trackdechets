@@ -25,7 +25,6 @@ async function enqueueUpdatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index_updated", bsdId, options);
 }
 
@@ -42,7 +41,7 @@ const formatTime = milliseconds => {
 };
 
 async function migrateBsdasriFinalOperationCode() {
-  logger.info(
+  console.log(
     "\n=== Migration BsdasriFinalOperation operationCode: D9 → D9F ==="
   );
 
@@ -53,12 +52,12 @@ async function migrateBsdasriFinalOperationCode() {
     where: { operationCode: "D9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${finalOperationsTotal} BsdasriFinalOperation à mettre à jour pour operationCode.`
   );
 
   if (finalOperationsTotal === 0) {
-    logger.info(
+    console.log(
       "Aucun BsdasriFinalOperation à mettre à jour pour operationCode."
     );
     return { updated: 0, errors: 0 };
@@ -114,12 +113,12 @@ async function migrateBsdasriFinalOperationCode() {
       );
 
       updatedFinalOperations += finalOperations.length;
-      logger.info(
+      console.log(
         `operationCode: ${updatedFinalOperations}/${finalOperationsTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      logger.info(
+      console.log(
         `/!\\ Erreur operationCode batch ${finalOperationIds.join(", ")}: ${
           e.message
         }`
@@ -131,7 +130,7 @@ async function migrateBsdasriFinalOperationCode() {
 }
 
 export async function run() {
-  logger.info(
+  console.log(
     ">> Lancement du script de mise à jour des BsdasriFinalOperation: code D9 devient D9F"
   );
 
@@ -142,15 +141,15 @@ export async function run() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  logger.info("\n=== RÉSUMÉ FINAL ===");
-  logger.info(
+  console.log("\n=== RÉSUMÉ FINAL ===");
+  console.log(
     `BsdasriFinalOperation operationCode: ${finalOperationResults.updated} mis à jour, ${finalOperationResults.errors} erreurs`
   );
-  logger.info(
+  console.log(
     `TOTAL: ${finalOperationResults.updated} final operations mis à jour, ${
       finalOperationResults.errors
     } erreurs en ${formatTime(duration)}!`
   );
 
-  logger.info("Terminé!");
+  console.log("Terminé!");
 }

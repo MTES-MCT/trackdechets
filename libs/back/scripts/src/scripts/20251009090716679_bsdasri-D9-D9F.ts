@@ -25,7 +25,6 @@ async function enqueueUpdatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index_updated", bsdId, options);
 }
 
@@ -42,7 +41,7 @@ const formatTime = milliseconds => {
 };
 
 export async function run() {
-  logger.info(
+  console.log(
     ">> Lancement du script de mise à jour des BSDASRI: code D9 devient D9F, avec mode = ELIMINATION"
   );
 
@@ -55,7 +54,7 @@ export async function run() {
     where: { destinationOperationCode: "D9" }
   });
 
-  logger.info(`Total de ${bsdasrisTotal} BSDASRI à mettre à jour.`);
+  console.log(`Total de ${bsdasrisTotal} BSDASRI à mettre à jour.`);
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
@@ -102,14 +101,14 @@ export async function run() {
     } catch (e) {
       errors++;
 
-      logger.info(`/!\\ Erreur for batch ${bsdIds.join(", ")}: ${e.message}`);
+      console.log(`/!\\ Erreur for batch ${bsdIds.join(", ")}: ${e.message}`);
     }
 
     updatedBsdasris += bsdIds.length;
     // Don't increment skip here - we'll keep querying the same position since records get filtered out
 
     const loopDuration = new Date().getTime() - startDate.getTime();
-    logger.info(
+    console.log(
       `${updatedBsdasris} bsdasris mis à jour (${Math.round(
         (updatedBsdasris / bsdasrisTotal) * 100
       )}%) en ${formatTime(loopDuration)} (temps total estimé: ${formatTime(
@@ -120,11 +119,11 @@ export async function run() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  logger.info(
+  console.log(
     `${updatedBsdasris} bsdasris mis à jour, ${errors} erreurs (${Math.round(
       (errors / updatedBsdasris) * 100
     )}%) en ${formatTime(duration)}!`
   );
 
-  logger.info("Terminé!");
+  console.log("Terminé!");
 }

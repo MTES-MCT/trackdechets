@@ -25,7 +25,6 @@ async function enqueueUpdatedBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index_updated", bsdId, options);
 }
 
@@ -42,7 +41,7 @@ const formatTime = milliseconds => {
 };
 
 async function migrateBsdaRevisionRequestOperationCode() {
-  logger.info(
+  console.log(
     "\n=== Migration BsdaRevisionRequest destinationOperationCode: D 9 → D 9 F + mode ELIMINATION ==="
   );
 
@@ -53,12 +52,12 @@ async function migrateBsdaRevisionRequestOperationCode() {
     where: { destinationOperationCode: "D 9" }
   });
 
-  logger.info(
+  console.log(
     `Total de ${revisionRequestsTotal} BsdaRevisionRequest à mettre à jour pour destinationOperationCode.`
   );
 
   if (revisionRequestsTotal === 0) {
-    logger.info(
+    console.log(
       "Aucun BsdaRevisionRequest à mettre à jour pour destinationOperationCode."
     );
     return { updated: 0, errors: 0 };
@@ -108,12 +107,12 @@ async function migrateBsdaRevisionRequestOperationCode() {
       );
 
       updatedRevisionRequests += revisionRequests.length;
-      logger.info(
+      console.log(
         `destinationOperationCode: ${updatedRevisionRequests}/${revisionRequestsTotal} mis à jour`
       );
     } catch (e) {
       errors++;
-      logger.info(
+      console.log(
         `/!\\ Erreur destinationOperationCode batch ${revisionRequestIds.join(
           ", "
         )}: ${e.message}`
@@ -125,7 +124,7 @@ async function migrateBsdaRevisionRequestOperationCode() {
 }
 
 export async function run() {
-  logger.info(
+  console.log(
     ">> Lancement du script de mise à jour des BsdaRevisionRequest: code D 9 devient D 9 F + mode ELIMINATION"
   );
 
@@ -136,15 +135,15 @@ export async function run() {
 
   const duration = new Date().getTime() - startDate.getTime();
 
-  logger.info("\n=== RÉSUMÉ FINAL ===");
-  logger.info(
+  console.log("\n=== RÉSUMÉ FINAL ===");
+  console.log(
     `BsdaRevisionRequest destinationOperationCode: ${revisionResults.updated} mis à jour, ${revisionResults.errors} erreurs`
   );
-  logger.info(
+  console.log(
     `TOTAL: ${revisionResults.updated} revision requests mis à jour, ${
       revisionResults.errors
     } erreurs en ${formatTime(duration)}!`
   );
 
-  logger.info("Terminé!");
+  console.log("Terminé!");
 }
