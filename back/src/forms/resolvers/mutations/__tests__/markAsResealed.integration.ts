@@ -216,6 +216,93 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.forwardedIn!.status).toEqual("SEALED");
   });
 
+  test("can convert a simple old form without wasteDetailsIsSubjectToADR to a form with temporary storage", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+    const transporter = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const form = await formFactory({
+      ownerId: owner.id,
+      opt: {
+        createdAt: new Date("2020-01-01"),
+        wasteDetailsIsSubjectToADR: null, // legacy form
+        status: "ACCEPTED",
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      }
+    });
+
+    await mutate<Pick<Mutation, "markAsResealed">, MutationMarkAsResealedArgs>(
+      MARK_AS_RESEALED,
+      {
+        variables: {
+          id: form.id,
+          resealedInfos: {
+            destination: {
+              company: {
+                siret: destination.siret,
+                name: destination.name,
+                address: destination.address,
+                contact: "Mr Destination",
+                mail: destination.contactEmail,
+                phone: destination.contactPhone
+              },
+              cap: "CAP 2",
+              processingOperation: "R 1"
+            },
+            transporter: {
+              company: {
+                siret: transporter.siret,
+                name: transporter.name,
+                address: transporter.address,
+                contact: "Mr transporter",
+                mail: transporter.contactEmail,
+                phone: transporter.contactPhone
+              },
+              isExemptedOfReceipt: true
+            }
+          }
+        }
+      }
+    );
+
+    const resealedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: {
+        forwardedIn: { include: { transporters: true } },
+        transporters: true
+      }
+    });
+    const forwardedInTransporter = getFirstTransporterSync(
+      resealedForm.forwardedIn!
+    );
+    expect(resealedForm.status).toEqual("RESEALED");
+    expect(resealedForm.forwardedIn!.emitterCompanySiret).toEqual(
+      collector.siret
+    );
+    expect(resealedForm.forwardedIn!.recipientCompanySiret).toEqual(
+      destination.siret
+    );
+    expect(forwardedInTransporter!.transporterCompanySiret).toEqual(
+      transporter.siret
+    );
+
+    expect(resealedForm.forwardedIn!.readableId).toEqual(
+      `${form.readableId}-suite`
+    );
+    expect(resealedForm.forwardedIn!.status).toEqual("SEALED");
+  });
+
   test("it should fail if temporary storage detail is incomplete", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
