@@ -3,14 +3,18 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { BsdElastic } from "../../common/elastic";
 import { getWhere, toBsdElastic } from "../elastic";
-import { bsvhuFactory, toIntermediaryCompany } from "./factories.vhu";
+import {
+  bsvhuFactory,
+  bsvhuTransporterData,
+  toIntermediaryCompany
+} from "./factories.vhu";
 import { xDaysAgo } from "../../utils";
 
 describe("getWhere", () => {
   test("if emitter publishes VHU > transporter should see it in 'follow' tab", async () => {
     // Given
     const bsvhu = await bsvhuFactory({});
-    const transporterSiret = bsvhu.transporterCompanySiret;
+    const transporterSiret = bsvhu.transporters[0].transporterCompanySiret;
 
     // When
     const where = getWhere(bsvhu);
@@ -25,7 +29,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   afterEach(resetDatabase);
 
   let emitter: Company;
-  let transporter: Company;
+  let transporter1: Company;
+  let transporter2: Company;
   let destination: Company;
   let bsvhu: any;
   let elasticBsvhu: BsdElastic;
@@ -38,9 +43,12 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   beforeAll(async () => {
     // Given
     emitter = await companyFactory({ name: "Emitter" });
-    transporter = await companyFactory({
-      name: "Transporter",
-      vatNumber: "VAT Transporter"
+    transporter1 = await companyFactory({
+      name: "Transporter 1"
+    });
+    transporter2 = await companyFactory({
+      name: "Transporter 2",
+      vatNumber: "VAT Transporter 2"
     });
     destination = await companyFactory({
       name: "Destination"
@@ -55,10 +63,22 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         customId: "my custom id",
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
-        transporterCompanyName: transporter.name,
-        transporterCompanySiret: transporter.siret,
-        transporterCompanyVatNumber: transporter.vatNumber,
-        transporterTransportPlates: ["XY-87-IU"],
+        transporters: {
+          createMany: {
+            data: [
+              {
+                ...bsvhuTransporterData(transporter1.siret!, 1),
+                transporterCompanyName: transporter1.name!,
+                transporterTransportPlates: ["XY-87-IU"]
+              },
+              {
+                ...bsvhuTransporterData(transporter2.siret!, 2),
+                transporterCompanyVatNumber: transporter2.vatNumber!,
+                transporterCompanyName: transporter2.name!
+              }
+            ]
+          }
+        },
         destinationCompanyName: destination.name,
         destinationCompanySiret: destination.siret,
         ecoOrganismeName: ecoOrganisme.name,
@@ -90,7 +110,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   test("companyNames > should contain the names of ALL BSVHU companies", async () => {
     // Then
     expect(elasticBsvhu.companyNames).toContain(emitter.name);
-    expect(elasticBsvhu.companyNames).toContain(transporter.name);
+    expect(elasticBsvhu.companyNames).toContain(transporter1.name);
+    expect(elasticBsvhu.companyNames).toContain(transporter2.name);
     expect(elasticBsvhu.companyNames).toContain(destination.name);
     expect(elasticBsvhu.companyNames).toContain(intermediary1.name);
     expect(elasticBsvhu.companyNames).toContain(intermediary2.name);
@@ -102,7 +123,8 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
   test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
     // Then
     expect(elasticBsvhu.companyOrgIds).toContain(emitter.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(transporter.vatNumber);
+    expect(elasticBsvhu.companyOrgIds).toContain(transporter1.siret);
+    expect(elasticBsvhu.companyOrgIds).toContain(transporter2.vatNumber);
     expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
     expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
@@ -111,17 +133,6 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
     expect(elasticBsvhu.companyOrgIds).toContain(trader.siret);
   });
 
-  test("companyOrgIds > should contain the orgIds of ALL BSVHU companies", async () => {
-    // Then
-    expect(elasticBsvhu.companyOrgIds).toContain(emitter.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(transporter.vatNumber);
-    expect(elasticBsvhu.companyOrgIds).toContain(destination.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(intermediary1.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(intermediary2.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(ecoOrganisme.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(broker.siret);
-    expect(elasticBsvhu.companyOrgIds).toContain(trader.siret);
-  });
   test("plates should be indexed", async () => {
     // Then
     expect(elasticBsvhu.transporterTransportPlates).toEqual(["XY87IU"]);
@@ -134,13 +145,25 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       "waste acceptation status is %p > bsvhu should belong to tab",
       async destinationReceptionAcceptationStatus => {
         // Given
-        const transporter = await companyFactory();
+        const lastTransporter = await companyFactory({
+          name: "Last Transporter"
+        });
         const bsvhu = await bsvhuFactory({
           opt: {
             emitterCompanyName: emitter.name,
             emitterCompanySiret: emitter.siret,
-            transporterCompanyName: transporter.name,
-            transporterCompanySiret: transporter.siret,
+            transporters: {
+              createMany: {
+                data: [
+                  {
+                    ...bsvhuTransporterData(transporter1.siret!, 1)
+                  },
+                  {
+                    ...bsvhuTransporterData(lastTransporter.siret!, 2)
+                  }
+                ]
+              }
+            },
             destinationReceptionDate: new Date(),
             destinationReceptionAcceptationStatus
           }
@@ -150,7 +173,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         const { isReturnFor } = toBsdElastic(bsvhu);
 
         // Then
-        expect(isReturnFor).toContain(transporter.siret);
+        expect(isReturnFor).toContain(lastTransporter.siret);
       }
     );
 
@@ -161,8 +184,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: new Date(),
           status: BsvhuStatus.REFUSED
         }
@@ -182,8 +210,13 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: new Date(),
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
         }
@@ -196,15 +229,20 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       expect(isReturnFor).toStrictEqual([]);
     });
 
-    it("bsda has been received too long ago > should not belong to tab", async () => {
+    it("bsvhu has been received too long ago > should not belong to tab", async () => {
       // Given
       const transporter = await companyFactory();
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanyName: emitter.name,
           emitterCompanySiret: emitter.siret,
-          transporterCompanyName: transporter.name,
-          transporterCompanySiret: transporter.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: transporter.siret,
+              transporterCompanyName: transporter.name,
+              number: 1
+            }
+          },
           destinationReceptionDate: xDaysAgo(new Date(), 10),
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED
         }

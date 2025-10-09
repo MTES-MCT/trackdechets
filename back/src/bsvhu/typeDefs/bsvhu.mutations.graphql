@@ -123,4 +123,22 @@ type Mutation {
   Supprime un BSVHU
   """
   deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu!
+
+  """
+  Crée un transporteur BSVHU
+  """
+  createBsvhuTransporter(input: BsvhuTransporterInput!): BsvhuTransporter
+
+  """
+  Modifie un transporteur BSVHU
+  """
+  updateBsvhuTransporter(
+    id: ID!
+    input: BsvhuTransporterInput!
+  ): BsvhuTransporter
+
+  """
+  Supprime un transporteur BSVHU
+  """
+  deleteBsvhuTransporter("Identifiant du transporteur" id: ID!): ID!
 }

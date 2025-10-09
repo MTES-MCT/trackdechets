@@ -15,10 +15,14 @@ import {
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
-import { validateTransporterPlates } from "../../common/validation/zod/refinement";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
   foreignVatNumberSchema,
+  rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
 import {
@@ -33,9 +37,12 @@ import {
   OperationMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
-import { TransportMode } from "@prisma/client";
-import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../../common/validation/messages";
+import {
+  fillIntermediariesOrgIds,
+  runTransformers,
+  updateTransporterRecepisse
+} from "./transformers";
+import { sirenifyBsvhuTransporter } from "./sirenify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -72,6 +79,13 @@ export const ZodOperationEnum = z
   .nullish();
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
+
+const rawBsvhuTransporterSchema = z
+  .object({
+    createdAt: z.date().nullish(),
+    bsvhuId: z.string().nullish()
+  })
+  .merge(rawTransporterSchema);
 
 const rawBsvhuSchema = z.object({
   id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
@@ -169,36 +183,11 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyMail: z
-    .string()
-    .email("E-mail transporteur invalide")
-    .nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema(
-    CompanyRole.Transporter
-  ).nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterRecepisseIsExempted: z
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
 
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
-
-  transporterTransportPlates: z
-    .array(z.string())
-    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
-    .default([]),
+  transporters: z
+    .array(rawBsvhuTransporterSchema)
+    .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
+    .optional(),
 
   ecoOrganismeName: z.string().nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
@@ -225,6 +214,7 @@ const rawBsvhuSchema = z.object({
     .nullish()
     .superRefine(intermediariesRefinement),
   intermediariesOrgIds: z.array(z.string()).optional(),
+  transportersOrgIds: z.array(z.string()).optional(),
   containsElectricOrHybridVehicles: z.boolean().nullish()
 });
 
@@ -247,7 +237,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
-  .superRefine(validateTransporterPlates);
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -272,7 +262,9 @@ export const contextualBsvhuSchema = (context: BsvhuValidationContext) => {
  */
 export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
   return transformedBsvhuSyncSchema
-    .superRefine(checkCompanies)
+    .superRefine((bsvhu, zodContext) =>
+      checkCompanies(bsvhu, zodContext, context)
+    )
     .transform((bsvhu: ParsedZodBsvhu) => runTransformers(bsvhu, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
@@ -280,3 +272,17 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
       checkRequiredFields(context)
     );
 };
+
+export type ZodBsvhuTransporter = z.input<typeof rawBsvhuTransporterSchema>;
+
+export type ParsedZodBsvhuTransporter = z.output<
+  typeof rawBsvhuTransporterSchema
+>;
+
+const refinedBsvhuTransporter = rawBsvhuTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsvhuTransporterSchema = refinedBsvhuTransporter
+  .transform(updateTransporterRecepisse)
+  .transform(sirenifyBsvhuTransporter);

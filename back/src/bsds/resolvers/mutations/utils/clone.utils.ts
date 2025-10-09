@@ -55,8 +55,6 @@ export const cloneBsda = async (user: Express.User, id: string) => {
     | "groupedIn"
     | "grouping"
     | "rowNumber"
-    // Done manually
-    // TODO(registry): clone associated registryLookup
     | "finalOperations"
     | "registryLookups"
   > = {
@@ -568,7 +566,8 @@ export const cloneBsff = async (user: Express.User, id: string) => {
 };
 
 export const bsvhuInclude = {
-  intermediaries: true
+  intermediaries: true,
+  transporters: true
 };
 
 export const cloneBsvhu = async (user: Express.User, id: string) => {
@@ -586,7 +585,24 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
   const newBsvhuCreateInput: Omit<
     Required<Prisma.BsvhuCreateInput>,
     // Ignored for the time being
-    "rowNumber" | "registryLookups"
+    | "transporterCompanyName"
+    | "transporterCompanySiret"
+    | "transporterCompanyAddress"
+    | "transporterCompanyContact"
+    | "transporterCompanyPhone"
+    | "transporterCompanyMail"
+    | "transporterRecepisseNumber"
+    | "transporterRecepisseDepartment"
+    | "transporterRecepisseValidityLimit"
+    | "transporterCompanyVatNumber"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportTakenOverAt"
+    | "transporterCustomInfo"
+    | "transporterTransportMode"
+    | "transporterTransportPlates"
+    | "transporterRecepisseIsExempted"
+    | "rowNumber"
+    | "registryLookups"
   > = {
     id: getReadableId(ReadableIdPrefix.VHU),
     createdAt: bsvhu.createdAt,
@@ -660,29 +676,23 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
       : {},
     intermediariesOrgIds: bsvhu.intermediariesOrgIds,
     canAccessDraftOrgIds: bsvhu.canAccessDraftOrgIds,
+    transporters: bsvhu.transporters.length
+      ? {
+          createMany: {
+            data: bsvhu.transporters!.map((t, idx) => {
+              const { id, createdAt, bsvhuId, ...data } = t;
+              return { ...data, number: idx + 1 };
+            })
+          }
+        }
+      : {},
+    transportersOrgIds: bsvhu.transportersOrgIds,
     isDeleted: bsvhu.isDeleted,
     isDraft: bsvhu.isDraft,
     packaging: bsvhu.packaging,
     quantity: bsvhu.quantity,
     status: bsvhu.status,
-    transporterCompanyAddress: bsvhu.transporterCompanyAddress,
-    transporterCompanyContact: bsvhu.transporterCompanyContact,
-    transporterCompanyMail: bsvhu.transporterCompanyMail,
-    transporterCompanyName: bsvhu.transporterCompanyName,
-    transporterCompanyPhone: bsvhu.transporterCompanyPhone,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber,
-    transporterCustomInfo: bsvhu.transporterCustomInfo,
-    transporterRecepisseDepartment: bsvhu.transporterRecepisseDepartment,
-    transporterRecepisseIsExempted: bsvhu.transporterRecepisseIsExempted,
-    transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
-    transporterRecepisseValidityLimit: bsvhu.transporterRecepisseValidityLimit,
-    transporterTransportMode: bsvhu.transporterTransportMode,
-    transporterTransportPlates: bsvhu.transporterTransportPlates,
-    transporterTransportSignatureAuthor:
-      bsvhu.transporterTransportSignatureAuthor,
     transporterTransportSignatureDate: bsvhu.transporterTransportSignatureDate,
-    transporterTransportTakenOverAt: bsvhu.transporterTransportTakenOverAt,
     brokerCompanyName: bsvhu.brokerCompanyName,
     brokerCompanySiret: bsvhu.brokerCompanySiret,
     brokerCompanyAddress: bsvhu.brokerCompanyAddress,

@@ -1,5 +1,5 @@
 import { getUserCompanies } from "../users/database";
-import { BsvhuWithIntermediaries } from "./types";
+import { BsvhuWithIntermediaries, BsvhuWithTransporters } from "./types";
 
 export function getWasteDescription(wasteCode: string | null) {
   return wasteCode === "16 01 06"
@@ -10,7 +10,7 @@ export function getWasteDescription(wasteCode: string | null) {
 }
 
 export const getCanAccessDraftOrgIds = async (
-  bsvhu: BsvhuWithIntermediaries,
+  bsvhu: BsvhuWithIntermediaries & BsvhuWithTransporters,
   userId: string
 ): Promise<string[]> => {
   const intermediariesOrgIds: string[] = bsvhu.intermediaries
@@ -18,18 +18,22 @@ export const getCanAccessDraftOrgIds = async (
         .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
         .filter(Boolean)
     : [];
-
+  const transportersOrgIds: string[] = bsvhu.transporters
+    ? bsvhu.transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean)
+    : [];
   const canAccessDraftOrgIds: string[] = [];
   if (bsvhu.isDraft) {
     const userCompanies = await getUserCompanies(userId);
     const userOrgIds = userCompanies.map(company => company.orgId);
     const bsvhuOrgIds = [
       ...intermediariesOrgIds,
+      ...transportersOrgIds,
       bsvhu.emitterCompanySiret,
-      ...[
-        bsvhu.transporterCompanySiret,
-        bsvhu.transporterCompanyVatNumber
-      ].filter(Boolean),
       bsvhu.ecoOrganismeSiret,
       bsvhu.destinationCompanySiret,
       bsvhu.traderCompanySiret,

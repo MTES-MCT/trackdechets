@@ -10,6 +10,9 @@ import signBsvhu from "./mutations/sign";
 import duplicateBsvhu from "./mutations/duplicate";
 import publishBsvhu from "./mutations/publish";
 import deleteBsvhu from "./mutations/delete";
+import createBsvhuTransporter from "./mutations/createBsvhuTransporter";
+import updateBsvhuTransporter from "./mutations/updateBsvhuTransporter";
+import deleteBsvhuTransporter from "./mutations/deleteBsvhuTransporter";
 
 import BsvhuMetadata from "./BsvhuMetadata";
 import Bsvhu from "./Bsvhu";
@@ -26,7 +29,10 @@ const Mutation: MutationResolvers = {
   signBsvhu,
   duplicateBsvhu,
   publishBsvhu,
-  deleteBsvhu
+  deleteBsvhu,
+  createBsvhuTransporter,
+  updateBsvhuTransporter,
+  deleteBsvhuTransporter
 };
 
 export default { Query, Mutation, BsvhuMetadata, Bsvhu };
