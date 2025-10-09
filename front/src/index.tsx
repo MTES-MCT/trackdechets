@@ -3,7 +3,6 @@ import "react-app-polyfill/stable";
 
 // setup sentry just after polyfills to be able to capture all exceptions
 import "./setupSentry";
-import "./setupPlausible";
 
 import * as React from "react";
 import { createRoot, hydrateRoot } from "react-dom/client";
