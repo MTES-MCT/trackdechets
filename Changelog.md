@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2025.10.1] 21/10/2025
 
+#### :nail_care: Améliorations
+
+- Modifier automatiquement le statut des imports qui sont restés En attente au statut Refusé [PR 4473](https://github.com/MTES-MCT/trackdechets/pull/4473)
+
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout du transport multi-modal sur le BSVHU [PR 4458](https://github.com/MTES-MCT/trackdechets/pull/4458)
