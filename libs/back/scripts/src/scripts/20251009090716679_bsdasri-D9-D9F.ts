@@ -62,7 +62,7 @@ export async function run() {
     const bsdasris = await prisma.bsdasri.findMany({
       take: BATCH_SIZE,
       orderBy: {
-        createdAt: "asc" // Chronological order ensures consistent processing
+        rowNumber: "asc" // Chronological order ensures consistent processing
       },
       where: {
         destinationOperationCode: "D9"
