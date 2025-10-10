@@ -1,5 +1,4 @@
 import { prisma } from "@td/prisma";
-import { logger } from "@td/logger";
 import Queue, { JobOptions } from "bull";
 
 // TRA-16750: Migration des codes D9 vers D9F dans les BSDA & BSDASRI
@@ -105,7 +104,7 @@ async function migrateBsdasriFinalOperationCode() {
       await Promise.allSettled(
         bsdasriIdsToReindex.map(async bsdasriId => {
           try {
-            // await enqueueUpdatedBsdToIndex(bsdasriId);
+            await enqueueUpdatedBsdToIndex(bsdasriId);
           } catch (_) {
             throw new Error(`Could not enqueue BSD ${bsdasriId}`);
           }
