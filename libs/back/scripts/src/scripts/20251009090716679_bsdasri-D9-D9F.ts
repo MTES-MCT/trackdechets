@@ -47,6 +47,7 @@ export async function run() {
 
   let updatedBsdasris = 0;
   let errors = 0;
+  let lastProcessedRowNumber = 0;
 
   const startDate = new Date();
 
@@ -56,19 +57,25 @@ export async function run() {
 
   console.log(`Total de ${bsdasrisTotal} BSDASRI à mettre à jour.`);
 
+  // Phase 1: Cursor-based processing for performance
+  console.log("Phase 1: Traitement par curseur...");
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    // Always query from the beginning since updated records are filtered out
+    // Use cursor to continue from where we left off - much faster!
     const bsdasris = await prisma.bsdasri.findMany({
       take: BATCH_SIZE,
       orderBy: {
-        rowNumber: "asc" // Chronological order ensures consistent processing
+        rowNumber: "asc"
       },
       where: {
-        destinationOperationCode: "D9"
+        destinationOperationCode: "D9",
+        rowNumber: {
+          gt: lastProcessedRowNumber // Continue from last processed row
+        }
       },
       select: {
-        id: true
+        id: true,
+        rowNumber: true
       }
     });
 
@@ -98,6 +105,9 @@ export async function run() {
           }
         })
       );
+
+      // Update cursor to continue from the last processed row
+      lastProcessedRowNumber = Math.max(...bsdasris.map(b => b.rowNumber));
     } catch (e) {
       errors++;
 
@@ -105,7 +115,6 @@ export async function run() {
     }
 
     updatedBsdasris += bsdIds.length;
-    // Don't increment skip here - we'll keep querying the same position since records get filtered out
 
     const loopDuration = new Date().getTime() - startDate.getTime();
     console.log(
@@ -117,13 +126,83 @@ export async function run() {
     );
   }
 
+  // Phase 2: Final verification to catch any records that might have been missed or updated during execution
+  console.log("\nPhase 2: Vérification finale...");
+  let remainingCount = await prisma.bsdasri.count({
+    where: { destinationOperationCode: "D9" }
+  });
+
+  if (remainingCount > 0) {
+    console.log(
+      `⚠️  ${remainingCount} BSDASRI avec D9 trouvés lors de la vérification finale. Traitement...`
+    );
+
+    // Process remaining records using the original method (slower but comprehensive)
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const remainingBsdasris = await prisma.bsdasri.findMany({
+        take: BATCH_SIZE,
+        orderBy: { rowNumber: "asc" },
+        where: { destinationOperationCode: "D9" },
+        select: { id: true }
+      });
+
+      if (remainingBsdasris.length === 0) {
+        break;
+      }
+
+      const remainingIds = remainingBsdasris.map(b => b.id);
+
+      try {
+        await prisma.bsdasri.updateMany({
+          where: { id: { in: remainingIds } },
+          data: {
+            destinationOperationCode: "D9F",
+            destinationOperationMode: "ELIMINATION"
+          }
+        });
+
+        await Promise.allSettled(
+          remainingIds.map(async bsdId => {
+            try {
+              // await enqueueUpdatedBsdToIndex(bsdId);
+            } catch (_) {
+              console.log(`Erreur re-indexation finale: ${bsdId}`);
+            }
+          })
+        );
+
+        updatedBsdasris += remainingIds.length;
+        console.log(`Vérification finale: +${remainingIds.length} traités`);
+      } catch (e) {
+        errors++;
+        console.log(`/!\\ Erreur vérification finale: ${e.message}`);
+      }
+    }
+
+    // Final count check
+    remainingCount = await prisma.bsdasri.count({
+      where: { destinationOperationCode: "D9" }
+    });
+  }
+
   const duration = new Date().getTime() - startDate.getTime();
 
+  console.log(`\n=== RÉSUMÉ FINAL ===`);
   console.log(
-    `${updatedBsdasris} bsdasris mis à jour, ${errors} erreurs (${Math.round(
-      (errors / updatedBsdasris) * 100
-    )}%) en ${formatTime(duration)}!`
+    `✅ ${updatedBsdasris} bsdasris mis à jour, ${errors} erreurs en ${formatTime(
+      duration
+    )}`
+  );
+  console.log(
+    `🔍 Vérification finale: ${remainingCount} records avec D9 restants`
   );
 
-  console.log("Terminé!");
+  if (remainingCount === 0) {
+    console.log("🎉 Migration terminée avec succès!");
+  } else {
+    console.log(
+      `⚠️  ${remainingCount} records nécessitent une attention manuelle`
+    );
+  }
 }
