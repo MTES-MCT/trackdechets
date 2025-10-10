@@ -30,6 +30,7 @@ import { getPackagingInfosSummary } from "../../../common/utils/packagingsBsddSu
 import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
 import BSDAPreviewNextBsda from "./BSDAPreviewNextBsda";
+import { getWasteConsistenceLabel } from "./utils";
 
 interface BSDAPreviewContentProps {
   bsdId: string;
@@ -149,22 +150,6 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
     [bsd]
   );
 
-  const getWasteConsistenceLabel = (consistence: BsdaConsistence) => {
-    switch (consistence) {
-      case BsdaConsistence.Solide:
-        return "Solide";
-
-      case BsdaConsistence.Other:
-        return "Autre";
-
-      case BsdaConsistence.Pulverulent:
-        return "Pulvérulent";
-
-      default:
-        return "";
-    }
-  };
-
   return (
     <>
       {!loading && bsd && (
@@ -187,7 +172,8 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
                 <PreviewTextRow
                   label="Consistance"
                   value={getWasteConsistenceLabel(
-                    bsd.waste?.consistence as BsdaConsistence
+                    bsd.waste?.consistence as BsdaConsistence,
+                    bsd.waste?.consistenceDescription
                   )}
                 />
 

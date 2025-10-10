@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsda } from "@td/codegen-ui";
+import { Bsda, BsdaConsistence } from "@td/codegen-ui";
 import {
   DsfrDataList,
   DsfrDataListDescription,
@@ -10,6 +10,7 @@ import { PACKAGINGS_NAMES } from "../../../../form/bsda/components/packagings/Pa
 import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
 import ExpandableList from "../../../../dashboard/detail/bsda/ExpandableList";
 import { isDefined } from "../../../../common/helper";
+import { getWasteConsistenceLabel } from "../../Preview/BSDA/utils";
 
 interface Props {
   bsda: Bsda;
@@ -37,7 +38,10 @@ export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
       <DsfrDataListItem>
         <DsfrDataListTerm>Consistance</DsfrDataListTerm>
         <DsfrDataListDescription>
-          {bsda.waste?.consistence?.toLowerCase()}
+          {getWasteConsistenceLabel(
+            bsda.waste?.consistence as BsdaConsistence,
+            bsda.waste?.consistenceDescription
+          )}
         </DsfrDataListDescription>
       </DsfrDataListItem>
       {!bsda.destination?.reception?.weight && (
