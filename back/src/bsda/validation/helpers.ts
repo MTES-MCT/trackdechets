@@ -187,24 +187,6 @@ export function getUpdatedFields<T extends ZodBsda | ZodBsdaTransporter>(
   return Object.keys(diff);
 }
 
-/**
- * Gets all the signatures prior to the target signature in the signature hierarchy.
- */
-export function getSignatureAncestors(
-  targetSignature: AllBsdaSignatureType | undefined | null
-): AllBsdaSignatureType[] {
-  if (!targetSignature) return [];
-
-  const parent = Object.entries(SIGNATURES_HIERARCHY).find(
-    ([_, details]) => details.next === targetSignature
-  )?.[0];
-
-  return [
-    targetSignature,
-    ...getSignatureAncestors(parent as AllBsdaSignatureType)
-  ];
-}
-
 export type BsdaUserFunctions = {
   isEcoOrganisme: boolean;
   isBroker: boolean;
@@ -277,5 +259,36 @@ export function getCurrentSignatureType(
     return signatures[0];
   }
 
+  return undefined;
+}
+
+/**
+ * Gets all the signatures prior to the target signature in the signature hierarchy.
+ */
+export function getSignatureAncestors(
+  targetSignature: AllBsdaSignatureType | undefined | null
+): AllBsdaSignatureType[] {
+  if (!targetSignature) return [];
+
+  const parent = Object.entries(SIGNATURES_HIERARCHY).find(
+    ([_, details]) => details.next === targetSignature
+  )?.[0];
+
+  return [
+    targetSignature,
+    ...getSignatureAncestors(parent as AllBsdaSignatureType)
+  ];
+}
+
+export function getNextSignatureType(
+  currentSignature: AllBsdaSignatureType | undefined | null
+): AllBsdaSignatureType | undefined {
+  if (!currentSignature) {
+    return "EMISSION";
+  }
+  const signature = SIGNATURES_HIERARCHY[currentSignature];
+  if (signature.next) {
+    return signature.next;
+  }
   return undefined;
 }

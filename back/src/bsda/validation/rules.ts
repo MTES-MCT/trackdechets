@@ -1,6 +1,7 @@
 import {
   BsdaType,
   TransportMode,
+  User,
   WasteAcceptationStatus
 } from "@prisma/client";
 import { ParsedZodBsda, ZodBsda, ZodBsdaTransporter } from "./schema";
@@ -18,7 +19,12 @@ import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
 import { AllBsdaSignatureType } from "../types";
 import { v20250201 } from "../../common/validation";
-import { BsdaSignatureType } from "@td/codegen-back";
+import {
+  BsdaInput,
+  BsdaSignatureType,
+  BsdaTransporterInput
+} from "@td/codegen-back";
+import { Leaves } from "../../types";
 
 // Liste des champs éditables sur l'objet Bsda
 export type BsdaEditableFields = Required<
@@ -68,6 +74,21 @@ type GetBsdaSignatureTypeFn<T extends ZodBsda | ZodBsdaTransporter> = (
   ruleContext?: RuleContext<T>
 ) => AllBsdaSignatureType | undefined;
 
+export type EditionRulePath = Leaves<
+  BsdaInput & {
+    transporters: {
+      1: BsdaTransporterInput;
+      2: BsdaTransporterInput;
+      3: BsdaTransporterInput;
+      4: BsdaTransporterInput;
+      5: BsdaTransporterInput;
+    };
+  },
+  5
+>;
+
+export type TransporterEditionRulePath = Leaves<BsdaTransporterInput, 5>;
+
 // Règle d'édition qui permet de définir à partir de quelle signature
 // un champ est verrouillé / requis avec une config contenant un paramètre
 // optionnel `when`
@@ -93,6 +114,8 @@ export type EditionRules<
     // At what signature the field is required, and under which circumstances. If absent, field is never required
     required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
+    // a path to return in the errors to help the front display the error in context
+    path?: T extends ZodBsda ? EditionRulePath : TransporterEditionRulePath;
   };
 };
 
@@ -189,7 +212,8 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
     sealed: {
       from: transporterSignature
     },
-    required: { from: transporterSignature }
+    required: { from: transporterSignature },
+    path: ["company", "name"]
   },
   transporterCompanySiret: {
     readableFieldName: "Le SIRET du transporteur",
@@ -197,35 +221,40 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: transporter => !transporter.transporterCompanyVatNumber
-    }
+    },
+    path: ["company", "siret"]
   },
   transporterCompanyAddress: {
     readableFieldName: "L'adresse du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "address"]
   },
   transporterCompanyContact: {
     readableFieldName: "Le nom de contact du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "contact"]
   },
   transporterCompanyPhone: {
     readableFieldName: "Le téléphone du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "phone"]
   },
   transporterCompanyMail: {
     readableFieldName: "L'email du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "mail"]
   },
   transporterCompanyVatNumber: {
     readableFieldName: "Le numéro de TVA du transporteur",
@@ -233,19 +262,22 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: transporter => !transporter.transporterCompanySiret
-    }
+    },
+    path: ["company", "vatNumber"]
   },
   transporterCustomInfo: {
     readableFieldName:
       "Les champs d'informations complémentaires du transporteur",
-    sealed: { from: transporterSignature }
+    sealed: { from: transporterSignature },
+    path: ["customInfo"]
   },
   transporterRecepisseIsExempted: {
     readableFieldName: "L'exemption de récépissé du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["recepisse", "isExempted"]
   },
   transporterRecepisseNumber: {
     readableFieldName: "Le numéro de récépissé du transporteur",
@@ -255,7 +287,8 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets."
-    }
+    },
+    path: ["recepisse", "number"]
   },
   transporterRecepisseDepartment: {
     readableFieldName: "Le département de récépissé du transporteur",
@@ -265,7 +298,8 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets."
-    }
+    },
+    path: ["recepisse", "department"]
   },
   transporterRecepisseValidityLimit: {
     readableFieldName: "La date de validité du récépissé du transporteur",
@@ -275,14 +309,16 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets."
-    }
+    },
+    path: ["recepisse", "validityLimit"]
   },
   transporterTransportMode: {
     readableFieldName: "Le mode de transport",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["transport", "mode"]
   },
   transporterTransportPlates: {
     readableFieldName: "L'immatriculation du transporteur",
@@ -290,11 +326,13 @@ export const bsdaTransporterEditionRules: BsdaTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: bsda => bsda.transporterTransportMode === "ROAD"
-    }
+    },
+    path: ["transport", "plates"]
   },
   transporterTransportTakenOverAt: {
     readableFieldName: "La date d'enlèvement du transporteur",
-    sealed: { from: transporterSignature }
+    sealed: { from: transporterSignature },
+    path: ["transport", "takenOverAt"]
   }
 };
 
@@ -302,17 +340,20 @@ export const bsdaEditionRules: BsdaEditionRules = {
   type: {
     readableFieldName: "Le type de bordereau",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["type"]
   },
   emitterIsPrivateIndividual: {
     readableFieldName: "Le fait que le détenteur soit un particulier",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "isPrivateIndividual"]
   },
   emitterCompanyName: {
     readableFieldName: "Le nom de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "name"]
   },
   emitterCompanySiret: {
     readableFieldName: "Le SIRET de l'entreprise émettrice",
@@ -321,12 +362,14 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // l'émetteur n'est pas un particulier
       when: bsda => !bsda.emitterIsPrivateIndividual
-    }
+    },
+    path: ["emitter", "company", "siret"]
   },
   emitterCompanyAddress: {
     readableFieldName: "L'adresse de l'entreprise émettrice",
     sealed: { from: "EMISSION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["emitter", "company", "address"]
   },
   emitterCompanyContact: {
     readableFieldName: "Le nom de contact de l'entreprise émettrice",
@@ -338,7 +381,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // l'émetteur n'est pas un particulier
       when: bsda => !bsda.emitterIsPrivateIndividual
-    }
+    },
+    path: ["emitter", "company", "contact"]
   },
   emitterCompanyPhone: {
     readableFieldName: "Le téléphone de l'entreprise émettrice",
@@ -349,7 +393,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // l'émetteur n'est pas un particulier
       when: bsda => !bsda.emitterIsPrivateIndividual
-    }
+    },
+    path: ["emitter", "company", "phone"]
   },
   emitterCompanyMail: {
     readableFieldName: "L'email de l'entreprise émettrice",
@@ -360,44 +405,51 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // l'émetteur n'est pas un particulier
       when: bsda => !bsda.emitterIsPrivateIndividual
-    }
+    },
+    path: ["emitter", "company", "mail"]
   },
   emitterCustomInfo: {
     readableFieldName:
       "Les champs d'informations complémentaires de l'entreprise émettrice",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "customInfo"]
   },
   emitterPickupSiteName: {
     readableFieldName: "Le nom de l'adresse de chantier ou de collecte",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "pickupSite", "name"]
   },
   emitterPickupSiteAddress: {
     readableFieldName: "L'adresse de collecte ou de chantier",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "pickupSite", "address"]
   },
   emitterPickupSiteCity: {
     readableFieldName: "La ville de l'adresse de collecte ou de chantier",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "pickupSite", "city"]
   },
   emitterPickupSitePostalCode: {
     readableFieldName: "Le code postal de l'adresse de collecte ou de chantier",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "pickupSite", "postalCode"]
   },
   emitterPickupSiteInfos: {
     readableFieldName: "Les informations de l'adresse de collecte",
     sealed: {
       from: sealedFromEmissionExceptForEmitter
-    }
+    },
+    path: ["emitter", "pickupSite", "infos"]
   },
   ecoOrganismeName: {
     readableFieldName: "Le nom de l'éco-organisme",
@@ -406,11 +458,13 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "TRANSPORT",
       // il y a un SIRET d'éco-organisme
       when: bsda => !!bsda.ecoOrganismeSiret
-    }
+    },
+    path: ["ecoOrganisme", "name"]
   },
   ecoOrganismeSiret: {
     readableFieldName: "Le SIRET de l'éco-organisme",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["ecoOrganisme", "siret"]
   },
   destinationCompanyName: {
     readableFieldName: "Le nom de l'entreprise de destination",
@@ -418,41 +472,48 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // EMISSION ou WORK si émetteur ou TRANSPORT lors de l'ajout/suppression d'entreposage provisoire
       from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
     readableFieldName: "Le SIRET de l'entreprise de destination",
     sealed: {
       from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
     readableFieldName: "L'adresse de l'entreprise de destination",
     sealed: {
       from: sealedFromEmissionExceptAddOrRemoveNextDestination
     },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "address"]
   },
   destinationCompanyContact: {
     readableFieldName: "Le nom de contact de l'entreprise de destination",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "contact"]
   },
   destinationCompanyPhone: {
     readableFieldName: "Le téléphone de l'entreprise de destination",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "phone"]
   },
   destinationCompanyMail: {
     readableFieldName: "L'email de l'entreprise de destination",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "company", "mail"]
   },
   destinationCustomInfo: {
     readableFieldName:
       "Les champs d'informations complémentaires de l'entreprise de destination",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "customInfo"]
   },
   destinationCap: {
     readableFieldName: "Le CAP du destinataire",
@@ -463,31 +524,37 @@ export const bsdaEditionRules: BsdaEditionRules = {
       when: bsda =>
         bsda.type !== BsdaType.COLLECTION_2710 &&
         !Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "cap"]
   },
   destinationPlannedOperationCode: {
     readableFieldName: "Le code d'opération prévu",
     sealed: { from: sealedFromEmissionExceptAddOrRemoveNextDestination },
-    required: { from: "EMISSION" }
+    required: { from: "EMISSION" },
+    path: ["destination", "plannedOperationCode"]
   },
   destinationReceptionDate: {
     readableFieldName: "La date de réception",
     required: { from: "RECEPTION", when: isReceptionSignatureStep },
-    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    path: ["destination", "reception", "date"]
   },
   destinationReceptionWeight: {
     readableFieldName: "Le poids du déchet",
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
-    required: { from: "RECEPTION" }
+    required: { from: "RECEPTION" },
+    path: ["destination", "reception", "weight"]
   },
   destinationReceptionRefusedWeight: {
     readableFieldName: "Le poids refusé",
-    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed },
+    path: ["destination", "reception", "refusedWeight"]
   },
   destinationReceptionAcceptationStatus: {
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
     required: { from: "RECEPTION" },
-    readableFieldName: "L'acceptation du déchet"
+    readableFieldName: "L'acceptation du déchet",
+    path: ["destination", "reception", "acceptationStatus"]
   },
   destinationReceptionRefusalReason: {
     readableFieldName: "La raison du refus du déchet",
@@ -496,7 +563,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "RECEPTION",
       // le déchet est refusé ou partiellement refusé
       when: isRefusedOrPartiallyRefused
-    }
+    },
+    path: ["destination", "reception", "refusalReason"]
   },
   destinationOperationCode: {
     readableFieldName: "Le code d'opération réalisé",
@@ -505,7 +573,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "OPERATION",
       // le déchet n'est pas refusé
       when: isNotRefused
-    }
+    },
+    path: ["destination", "operation", "code"]
   },
   destinationOperationMode: {
     readableFieldName: "Le mode de traitement",
@@ -524,28 +593,40 @@ export const bsdaEditionRules: BsdaEditionRules = {
         }
         return false;
       }
-    }
+    },
+    path: ["destination", "operation", "mode"]
   },
   destinationOperationDescription: {
     readableFieldName: "La description de l'opération réalisée",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "operation", "description"]
   },
   destinationOperationDate: {
     readableFieldName: "La date de l'opération",
     sealed: { from: "OPERATION" },
-    required: { from: "OPERATION", when: isNotRefused }
+    required: { from: "OPERATION", when: isNotRefused },
+    path: ["destination", "operation", "date"]
   },
   destinationOperationNextDestinationCompanyName: {
     readableFieldName: "Le nom de l'exutoire",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "operation", "nextDestination", "company", "name"]
   },
   destinationOperationNextDestinationCompanySiret: {
     readableFieldName: "Le SIRET de l'exutoire",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["destination", "operation", "nextDestination", "company", "siret"]
   },
   destinationOperationNextDestinationCompanyVatNumber: {
     readableFieldName: "Le numéro de TVA de l'exutoire",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: [
+      "destination",
+      "operation",
+      "nextDestination",
+      "company",
+      "vatNumber"
+    ]
   },
   destinationOperationNextDestinationCompanyAddress: {
     readableFieldName: "L'adresse de l'exutoire",
@@ -555,7 +636,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "operation", "nextDestination", "company", "address"]
   },
   destinationOperationNextDestinationCompanyContact: {
     readableFieldName: "Le nom de contact de l'exutoire",
@@ -565,7 +647,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "operation", "nextDestination", "company", "contact"]
   },
   destinationOperationNextDestinationCompanyPhone: {
     readableFieldName: "Le téléphone de l'exutoire",
@@ -575,7 +658,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "operation", "nextDestination", "company", "phone"]
   },
   destinationOperationNextDestinationCompanyMail: {
     readableFieldName: "L'email de l'exutoire",
@@ -585,7 +669,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "operation", "nextDestination", "company", "mail"]
   },
   destinationOperationNextDestinationCap: {
     readableFieldName: "Le CAP de l'exutoire",
@@ -595,7 +680,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: ["destination", "operation", "nextDestination", "cap"]
   },
   destinationOperationNextDestinationPlannedOperationCode: {
     readableFieldName: "Le code d'opération de l'exutoire",
@@ -605,7 +691,13 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un SIRET d'exutoire
       when: bsda =>
         Boolean(bsda.destinationOperationNextDestinationCompanySiret)
-    }
+    },
+    path: [
+      "destination",
+      "operation",
+      "nextDestination",
+      "plannedOperationCode"
+    ]
   },
   transporters: {
     readableFieldName: "La liste des transporteurs",
@@ -633,7 +725,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       customErrorMessage:
         // FIXME ce message ne s'applique que pour un des cas
         "Si l'émetteur est un particulier et qu'aucune entreprise de travaux n'a été visée, l'ajout d'un transporteur est obligatoire."
-    }
+    },
+    path: ["transporters"]
   },
   workerIsDisabled: {
     readableFieldName: "La présence d'une entreprise de travaux",
@@ -642,7 +735,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // il s'agit d'une collecte sur un chantier et workerIsDisabled est à true
       when: hasWorker
-    }
+    },
+    path: ["worker", "isDisabled"]
   },
   workerCompanyName: {
     readableFieldName: "Le nom de l'entreprise de travaux",
@@ -652,7 +746,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "name"]
   },
   workerCompanySiret: {
     readableFieldName: "Le SIRET de l'entreprise de travaux",
@@ -662,7 +757,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "siret"]
   },
   workerCompanyAddress: {
     readableFieldName: "L'adresse de l'entreprise de travaux",
@@ -672,7 +768,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "address"]
   },
   workerCompanyContact: {
     readableFieldName: "Le nom de contact de l'entreprise de travaux",
@@ -680,7 +777,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "contact"]
   },
   workerCompanyPhone: {
     readableFieldName: "Le téléphone de l'entreprise de travaux",
@@ -688,7 +786,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "phone"]
   },
   workerCompanyMail: {
     readableFieldName: "L'email de l'entreprise de travaux",
@@ -696,18 +795,22 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: {
       from: "EMISSION",
       when: hasWorker
-    }
+    },
+    path: ["worker", "company", "mail"]
   },
   workerWorkHasEmitterPaperSignature: {
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["worker", "work", "hasEmitterPaperSignature"]
   },
   workerCertificationHasSubSectionFour: {
     readableFieldName: "Travaux relevant de la sous-section 4",
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["worker", "certification", "hasSubSectionFour"]
   },
   workerCertificationHasSubSectionThree: {
     readableFieldName: "Travaux relevant de la sous-section 3",
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["worker", "certification", "hasSubSectionThree"]
   },
   workerCertificationCertificationNumber: {
     readableFieldName: "Le numéro de certification de l'entreprise de travaux",
@@ -716,7 +819,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "WORK",
       // il s'agit de travaux relevant de la sous-section 3
       when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
-    }
+    },
+    path: ["worker", "certification", "certificationNumber"]
   },
   workerCertificationValidityLimit: {
     readableFieldName:
@@ -726,7 +830,8 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "WORK",
       // il s'agit de travaux relevant de la sous-section 3
       when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
-    }
+    },
+    path: ["worker", "certification", "validityLimit"]
   },
   workerCertificationOrganisation: {
     readableFieldName:
@@ -736,31 +841,38 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "WORK",
       // il s'agit de travaux relevant de la sous-section 3
       when: bsda => Boolean(bsda.workerCertificationHasSubSectionThree)
-    }
+    },
+    path: ["worker", "certification", "organisation"]
   },
   brokerCompanyName: {
     readableFieldName: "Le nom du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "name"]
   },
   brokerCompanySiret: {
     readableFieldName: "Le SIRET du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "siret"]
   },
   brokerCompanyAddress: {
     readableFieldName: "L'adresse du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "address"]
   },
   brokerCompanyContact: {
     readableFieldName: "Le nom de contact du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "contact"]
   },
   brokerCompanyPhone: {
     readableFieldName: "Le téléphone du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "phone"]
   },
   brokerCompanyMail: {
     readableFieldName: "Le mail du courtier",
-    sealed: { from: "OPERATION" }
+    sealed: { from: "OPERATION" },
+    path: ["broker", "company", "mail"]
   },
   brokerRecepisseNumber: {
     readableFieldName: "Le numéro de récépissé du courtier",
@@ -769,33 +881,43 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: "EMISSION",
       // un courtier est désigné sur le bordereau
       when: requireBrokerRecepisse
-    }
+    },
+    path: ["broker", "recepisse", "number"]
   },
   brokerRecepisseDepartment: {
     readableFieldName: "Le département du récépissé du courtier",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION", when: requireBrokerRecepisse }
+    required: { from: "EMISSION", when: requireBrokerRecepisse },
+    path: ["broker", "recepisse", "department"]
   },
   brokerRecepisseValidityLimit: {
     readableFieldName: "La date de validité du récépissé du courtier",
     sealed: { from: "OPERATION" },
-    required: { from: "EMISSION", when: requireBrokerRecepisse }
+    required: { from: "EMISSION", when: requireBrokerRecepisse },
+    path: ["broker", "recepisse", "validityLimit"]
   },
   wasteCode: {
     sealed: {
       from: sealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
-    readableFieldName: "Le code déchet"
+    readableFieldName: "Le code déchet",
+    path: ["waste", "code"]
   },
   wasteIsSubjectToADR: {
     readableFieldName: "Si le déchet est soumis à l'ADR ou non",
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["waste", "isSubjectToADR"]
   },
-  wasteAdr: { readableFieldName: "La mention ADR", sealed: { from: "WORK" } },
+  wasteAdr: {
+    readableFieldName: "La mention ADR",
+    sealed: { from: "WORK" },
+    path: ["waste", "adr"]
+  },
   wasteNonRoadRegulationMention: {
     readableFieldName: "La mention RID, ADN, IMDG",
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["waste", "nonRoadRegulationMention"]
   },
   wasteFamilyCode: {
     sealed: {
@@ -803,54 +925,124 @@ export const bsdaEditionRules: BsdaEditionRules = {
       from: fromWorkOrEmissionWhenThereIsNoWorker
     },
     required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    readableFieldName: "Le code famille"
+    readableFieldName: "Le code famille",
+    path: ["waste", "familyCode"]
   },
   wasteMaterialName: {
     readableFieldName: "Le nom de matériau",
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    path: ["waste", "materialName"]
   },
   wasteConsistence: {
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    readableFieldName: "La consistance"
+    readableFieldName: "La consistance",
+    path: ["waste", "consistence"]
   },
   wasteConsistenceDescription: {
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    readableFieldName: "La description de la consistance"
+    readableFieldName: "La description de la consistance",
+    path: ["waste", "consistenceDescription"]
   },
   wasteSealNumbers: {
     readableFieldName: "Le(s) numéro(s) de scellés",
-    sealed: { from: "WORK" }
+    sealed: { from: "WORK" },
+    path: ["waste", "sealNumbers"]
   },
   wastePop: {
     readableFieldName: "Le champ sur les polluants organiques persistants",
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    path: ["waste", "pop"]
   },
   packagings: {
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
     required: {
       from: fromWorkOrEmissionWhenThereIsNoWorker
     },
-    readableFieldName: "Le conditionnement"
+    readableFieldName: "Le conditionnement",
+    path: ["packagings"]
   },
   weightIsEstimate: {
     readableFieldName: "Le champ pour indiquer si le poids est estimé",
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    path: ["weight", "isEstimate"]
   },
   weightValue: {
     readableFieldName: "Le poids",
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
-    required: { from: fromWorkOrEmissionWhenThereIsNoWorker }
+    required: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    path: ["weight", "value"]
   },
-  grouping: { sealed: { from: "EMISSION" } },
-  forwarding: { sealed: { from: "EMISSION" } },
+  grouping: { sealed: { from: "EMISSION" }, path: ["grouping"] },
+  forwarding: { sealed: { from: "EMISSION" }, path: ["forwarding"] },
   intermediaries: {
     readableFieldName: "Les intermédiaires",
-    sealed: { from: "TRANSPORT" }
+    sealed: { from: "TRANSPORT" },
+    path: ["intermediaries"]
   }
+};
+
+export const getRequiredAndSealedFieldPaths = async (
+  bsda: ZodBsda,
+  currentSignatures: AllBsdaSignatureType[],
+  user: User | undefined
+): Promise<{
+  sealed: EditionRulePath[];
+}> => {
+  const sealedFields: EditionRulePath[] = [];
+  const userFunctions = await getBsdaUserFunctions(user, bsda);
+  for (const bsdaField of Object.keys(bsdaEditionRules)) {
+    const { sealed, path } =
+      bsdaEditionRules[bsdaField as keyof BsdaEditableFields];
+    if (path && sealed) {
+      const isSealed = isBsdaFieldSealed(sealed, bsda, currentSignatures, {
+        persisted: bsda,
+        userFunctions
+      });
+      if (isSealed) {
+        sealedFields.push(path);
+      }
+    }
+  }
+  const transporters = bsda.transporters ?? [];
+  for (let i = 0; i < transporters.length; i++) {
+    const bsdaTransporter = transporters[i];
+    for (const bsdaTransporterField of Object.keys(
+      bsdaTransporterEditionRules
+    )) {
+      const { sealed: bsdaTransporterSealed, path: bsdaTransporterPath } =
+        bsdaTransporterEditionRules[
+          bsdaTransporterField as keyof BsdaTransporterEditableFields
+        ];
+      if (bsdaTransporterSealed && bsdaTransporterPath) {
+        const isSealed = isBsdaTransporterFieldSealed(
+          bsdaTransporterSealed,
+          bsdaTransporter,
+          currentSignatures
+        );
+        if (isSealed) {
+          if (i === 0) {
+            // backward compatibility for single transporter UI
+            sealedFields.push(
+              ["transporter"].concat(bsdaTransporterPath) as EditionRulePath
+            );
+          }
+          sealedFields.push(
+            ["transporters", `${i + 1}`].concat(
+              bsdaTransporterPath
+            ) as EditionRulePath
+          );
+        }
+      }
+    }
+  }
+
+  return {
+    sealed: sealedFields
+  };
 };
 
 function hasWorker(bsda: ZodBsda) {

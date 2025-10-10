@@ -286,7 +286,7 @@ export function expandBsdaFromElastic(bsda: BsdaForElastic): GraphqlBsda {
     forwardedIn,
     metadata: {
       latestRevision: computeLatestRevision(bsda.bsdaRevisionRequests) as any
-    }
+    } as any // Typing as any because some properties are loaded in sub resolvers. Hence the type is not complete.
   };
 }
 

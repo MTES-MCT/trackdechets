@@ -16,11 +16,17 @@ export enum CompanyRole {
   DestinationOperationNextDestination = "Éxutoire final"
 }
 
-export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
+export const pathFromCompanyRole = (
+  companyRole?: CompanyRole,
+  index?: number
+): string[] => {
   switch (companyRole) {
     case CompanyRole.Emitter:
       return ["emitter", "company", "siret"];
     case CompanyRole.Transporter:
+      if (index) {
+        return ["transporters", `${index + 1}`, "company", "siret"];
+      }
       return ["transporter", "company", "siret"];
     case CompanyRole.Destination:
       return ["destination", "company", "siret"];
