@@ -19,6 +19,7 @@ model RegistryImport {
     associations RegistryImportAssociation[]
 
     @@index([createdById], map: "_RegistryImportCreatedByIdIdx")
+    @@index([createdAt], map: "_RegistryImportCreatedAtIdx")
 }
 
 model RegistryImportAssociation {
@@ -882,6 +883,7 @@ model RegistryExport {
     createdBy User @relation(fields: [createdById], references: [id])
 
     @@index([createdById], map: "_RegistryExportCreatedByIdIdx")
+    @@index([createdAt], map: "_RegistryExportCreatedAtIdx")
     @@index([sirets], map: "_RegistryExportSiretsIdx", type: Gin)
 }
 
@@ -907,6 +909,7 @@ model RegistryExhaustiveExport {
     createdBy User @relation(fields: [createdById], references: [id])
 
     @@index([createdById], map: "_RegistryExhaustiveExportCreatedByIdIdx")
+    @@index([createdAt], map: "_RegistryExhaustiveExportCreatedAtIdx")
     @@index([sirets], map: "_RegistryExhaustiveExportSiretsIdx", type: Gin)
 }
 
