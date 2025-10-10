@@ -1511,6 +1511,68 @@ describe("Mutation.Bsda.sign", () => {
       expect(signedBsda.finalOperations).toHaveLength(1);
     });
 
+    it("TRA-16750 - should set final operation with code D9F", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "D 9 F",
+          destinationOperationMode: "ELIMINATION"
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      expect(data.signBsda.id).toBeTruthy();
+
+      await new Promise(resolve => {
+        operationHooksQueue.once("global:drained", () => resolve(true));
+      });
+
+      const signedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id },
+        include: { finalOperations: true }
+      });
+
+      // final operation should be set
+      expect(signedBsda.finalOperations).toHaveLength(1);
+      expect(signedBsda.finalOperations[0].operationCode).toBe("D 9 F");
+    });
+
     it.each([
       WasteAcceptationStatus.ACCEPTED,
       WasteAcceptationStatus.PARTIALLY_REFUSED
@@ -2218,6 +2280,51 @@ describe("Mutation.Bsda.sign", () => {
       expect(
         updatedBsda.transporters[0].transporterTransportSignatureDate
       ).toBeDefined();
+    });
+
+    it("can sign with operation code D9F", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "D 9 F",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      // No mails
+      const { sendMail } = require("../../../../mailer/mailing");
+      jest.mock("../../../../mailer/mailing");
+      (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+      const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id }
+      });
+      expect(updatedBsda.status).toBe("PROCESSED");
+      expect(updatedBsda.destinationOperationCode).toBe("D 9 F");
     });
   });
 
@@ -3397,7 +3504,7 @@ describe("Mutation.Bsda.sign", () => {
       return { user, bsda, destinationUser };
     };
 
-    it.each(["R 5", "D 5", "D 9"])(
+    it.each(["R 5", "D 5", "D 9 F"])(
       "temp storage cannot use final operation code %p",
       async operationCode => {
         // Given
@@ -3470,7 +3577,7 @@ describe("Mutation.Bsda.sign", () => {
       }
     );
 
-    it.each(["R 5", "D 5", "D 9"])(
+    it.each(["R 5", "D 5", "D 9 F"])(
       "destination on regular BSDA can use final operation code %p",
       async operationCode => {
         // Given

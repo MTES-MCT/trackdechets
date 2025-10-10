@@ -24,6 +24,7 @@ const CREATE_BSDA = gql`
         company {
           siret
         }
+        plannedOperationCode
       }
       emitter {
         company {
@@ -155,7 +156,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -231,7 +232,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -299,7 +300,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -371,7 +372,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -452,7 +453,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -537,7 +538,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -623,7 +624,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -707,7 +708,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -806,7 +807,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: company.siret,
           name: company.name,
@@ -866,7 +867,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: company.siret,
           name: company.name,
@@ -935,7 +936,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: company.siret,
           name: company.name,
@@ -987,7 +988,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: company.siret,
           name: company.name,
@@ -1041,7 +1042,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: company.siret,
           name: company.name,
@@ -1113,7 +1114,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1188,7 +1189,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1265,7 +1266,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1342,7 +1343,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1435,7 +1436,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1534,7 +1535,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -1623,7 +1624,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destination.siret,
           name: "destination",
@@ -1714,7 +1715,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destination.siret,
           name: "destination",
@@ -1974,7 +1975,7 @@ describe("Mutation.Bsda.create", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode: "D 9",
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destination.siret,
             name: destination.name,
@@ -2210,7 +2211,7 @@ describe("Mutation.Bsda.create", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode: "D 9",
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destinationCompany.siret,
             name: "destination",
@@ -2293,7 +2294,7 @@ describe("Mutation.Bsda.create", () => {
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",
-        plannedOperationCode: "D 9",
+        plannedOperationCode: "D 9 F",
         company: {
           siret: destinationCompany.siret,
           name: "destination",
@@ -2372,7 +2373,7 @@ describe("Mutation.Bsda.create", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode: "D 9",
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destinationCompany.siret,
             name: "destination",
@@ -2457,7 +2458,7 @@ describe("Mutation.Bsda.create", () => {
         weight: { isEstimate: true, value: 1.2 },
         destination: {
           cap: "A cap",
-          plannedOperationCode: "D 9",
+          plannedOperationCode: "D 9 F",
           company: {
             siret: destinationCompany.siret,
             name: "destination",
@@ -2491,6 +2492,160 @@ describe("Mutation.Bsda.create", () => {
 
       expect(bsda.wasteAdr).toMatch("MENTION ADR");
       expect(bsda.wasteNonRoadRegulationMention).toBeNull();
+    });
+  });
+
+  describe("TRA-16750 - Code D9 becomes D9F", () => {
+    it("should allow creating a form with plannedOperationCode D9F", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const transporter = await companyFactory();
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "ADR",
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: ["1", "2"]
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9 F",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsda?.destination?.plannedOperationCode).toBe("D 9 F");
+    });
+
+    it("should cast plannedOperationCode D9 to D9F (tolerance)", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const transporter = await companyFactory();
+      const worker = await companyFactory();
+
+      const input: BsdaInput = {
+        type: "OTHER_COLLECTIONS",
+        emitter: {
+          isPrivateIndividual: false,
+          company: {
+            siret: company.siret,
+            name: "The crusher",
+            address: "Rue de la carcasse",
+            contact: "Centre amiante",
+            phone: "0101010101",
+            mail: "emitter@mail.com"
+          }
+        },
+        worker: {
+          company: {
+            siret: worker.siret,
+            name: "worker",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        },
+        transporter: {
+          company: { siret: transporter.siret }
+        },
+        waste: {
+          code: "06 07 01*",
+          adr: "ADR",
+          pop: true,
+          consistence: "SOLIDE",
+          familyCode: "Code famille",
+          materialName: "A material",
+          sealNumbers: ["1", "2"]
+        },
+        packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+        weight: { isEstimate: true, value: 1.2 },
+        destination: {
+          cap: "A cap",
+          plannedOperationCode: "D 9",
+          company: {
+            siret: destinationCompany.siret,
+            name: "destination",
+            address: "address",
+            contact: "contactEmail",
+            phone: "contactPhone",
+            mail: "contactEmail@mail.com"
+          }
+        }
+      };
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+        CREATE_BSDA,
+        {
+          variables: {
+            input
+          }
+        }
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.createBsda?.destination?.plannedOperationCode).toBe("D 9 F");
     });
   });
 });

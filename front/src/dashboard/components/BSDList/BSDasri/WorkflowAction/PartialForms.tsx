@@ -243,8 +243,8 @@ export function OperationSignatureForm() {
         >
           <option value="">-----</option>
 
-          <option value="D9">
-            D9 - Prétraitement par désinfection - Banaliseur
+          <option value="D9F">
+            D9F - Prétraitement par désinfection - Banaliseur
           </option>
           <option value="D10">D10 - Incinération</option>
           <option value="R1">

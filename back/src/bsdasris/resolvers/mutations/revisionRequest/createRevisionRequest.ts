@@ -213,7 +213,15 @@ async function getFlatContent(
       "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
     );
   }
-  revisionSchema.parse(flatContent); // Validate but don't parse as we want to keep empty fields empty
+  const parsed = revisionSchema.parse(flatContent); // Validate but don't parse as we want to keep empty fields empty
+
+  if (
+    flatContent.destinationOperationCode ||
+    flatContent.destinationOperationMode
+  ) {
+    flatContent.destinationOperationCode = parsed.destinationOperationCode;
+    flatContent.destinationOperationMode = parsed.destinationOperationMode;
+  }
 
   checkRevisionRules(fields, bsdasri);
 

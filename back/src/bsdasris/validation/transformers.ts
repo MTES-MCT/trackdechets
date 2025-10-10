@@ -1,3 +1,5 @@
+import { OperationMode } from "@prisma/client";
+import { trim } from "../../common/strings";
 import { recipifyBsdasri } from "./recipify";
 import { getSealedFields } from "./rules";
 import { ParsedZodBsdasri } from "./schema";
@@ -56,4 +58,19 @@ export const emptyRecepisseWhenNoActor = (
   }
 
   return bsdasri;
+};
+
+// TRA-16750: pour aider les intégrateurs, on auto-complète
+// le mode d'opération à "Élimination" si l'opération est
+// "D 9 F" et que le mode n'est pas fourni.
+export const fixOperationModeForD9F = obj => {
+  if (
+    obj.destinationOperationCode &&
+    trim(obj.destinationOperationCode) === "D9F"
+  ) {
+    if (!obj.destinationOperationMode) {
+      obj.destinationOperationMode = OperationMode.ELIMINATION;
+    }
+  }
+  return obj;
 };
