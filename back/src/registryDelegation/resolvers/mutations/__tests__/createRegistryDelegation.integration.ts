@@ -243,9 +243,17 @@ describe("mutation createRegistryDelegation", () => {
           messageVersions: [
             {
               to: expect.arrayContaining([
-                { email: delegatorAdmin.email, name: delegatorAdmin.name },
-                { email: delegateAdmin.email, name: delegateAdmin.name },
+                { email: delegatorAdmin.email, name: delegatorAdmin.name }
+              ])
+            },
+            {
+              to: expect.arrayContaining([
                 { email: delegatorMember.email, name: delegatorMember.name }
+              ])
+            },
+            {
+              to: expect.arrayContaining([
+                { email: delegateAdmin.email, name: delegateAdmin.name }
               ])
             }
           ]

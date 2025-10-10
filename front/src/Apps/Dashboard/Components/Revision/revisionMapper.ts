@@ -149,8 +149,8 @@ export const mapRevision = (
       },
       {
         dataName: DataNameEnum.NAME_COLLECT,
-        dataOldValue: review?.[bsdName]?.emitter?.pickupSite.name
-          ? `${review?.[bsdName]?.emitter?.pickupSite?.name}`
+        dataOldValue: review?.[bsdName]?.emitter?.pickupSite?.name
+          ? `${review?.[bsdName].emitter.pickupSite.name}`
           : "Non renseigné",
         dataNewValue: review?.content?.emitter?.pickupSite?.name
           ? `${review?.content?.emitter?.pickupSite?.name}`

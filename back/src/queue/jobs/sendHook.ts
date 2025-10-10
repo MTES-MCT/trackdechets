@@ -35,45 +35,36 @@ const apiCallProcessor = async ({
   payload: { action: string; id: string; token: string };
 }) => {
   const { action, id, token } = payload;
-  logger.info(`Sending webhook request to ${endpointUri}`);
+  logger.info(`Sending webhook request to ${endpointUri}`, { action });
 
   try {
     const clearToken = aesDecrypt(token);
     // we send the payload as an array, maybe we'll group webhooks by recipients in the future
-    const res = await axiosPost(endpointUri, action, id, clearToken);
-    // Customer server endpoint are supposed to return HTTP 200 each time a request si amde
-    if (res.status !== 200) {
-      // valid enpoint response, exit
-      logger.warn(
-        `Webhook invalid return status (${res.status}) (${endpointUri})`
-      );
-    } else {
-      return;
-    }
+    await axiosPost(endpointUri, action, id, clearToken);
   } catch (err) {
-    logger.error(`Webhook error : `, {
-      message: err.message,
-      code: err.code,
-      endpointUri
-    });
-    if (err.response) {
+    if (axios.isAxiosError(err)) {
       logger.error(`Webhook error : `, {
-        status: err.response.status,
-        data: err.response.data,
-        endpointUri
+        endpointUri,
+        action,
+        message: err.message,
+        status: err.response?.status,
+        data: err.response?.data,
+        ...(!err.response ? { request: err.request } : {})
       });
-    } else if (err.request) {
-      logger.error(`Webhook error :`, { request: err.request, endpointUri });
     } else {
-      logger.error(`Webhook error :`, { message: err.message, endpointUri });
+      logger.error(`Unexpected webhook error: ${err}`, {
+        err,
+        endpointUri,
+        action
+      });
     }
-  }
 
-  await handleWebhookFail(orgId, endpointUri);
-  // throw to trigger bull retry mechanism
-  throw new WebhookRequestError(
-    `Webhook request fail for orgId ${orgId} and endpoint ${endpointUri}`
-  );
+    await handleWebhookFail(orgId, endpointUri);
+    // throw to trigger bull retry mechanism
+    throw new WebhookRequestError(
+      `Webhook request fail for orgId ${orgId} and endpoint ${endpointUri}`
+    );
+  }
 };
 
 export async function sendHookJob(job: Job<WebhookQueueItem>) {

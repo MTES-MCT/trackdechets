@@ -66,6 +66,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {
+    createdAt: form.createdAt, // usefull to exclude forms from new checks
     emitterType: EmitterType.PRODUCER,
     emittedByEcoOrganisme: false,
     emitterCompanySiret: form.recipientCompanySiret,

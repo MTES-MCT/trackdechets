@@ -2107,13 +2107,12 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
 
     // Then
     expect(mails.length).toBe(1);
-    const sortFn = (a, b) => a.email.localeCompare(b.email);
-    expect(mails[0].to?.sort(sortFn)).toMatchObject(
-      [
-        { email: delegatorUser.email, name: delegatorUser.name },
-        { email: delegateUser.email, name: delegateUser.name }
-      ].sort(sortFn)
-    );
+    expect(mails[0].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser.email, name: delegateUser.name }
+    ]);
+    expect(mails[0].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser.email, name: delegatorUser.name }
+    ]);
     expect(mails[0].subject).toBe(
       `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany.orgId} et l'établissement ${delegateCompany.orgId}`
     );
@@ -2174,15 +2173,14 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
 
     // Then
     expect(mails.length).toBe(2);
-    const sortFn = (a, b) => a.email.localeCompare(b.email);
 
     // Mail 1
-    expect(mails[0].to?.sort(sortFn)).toMatchObject(
-      [
-        { email: delegatorUser1.email, name: delegatorUser1.name },
-        { email: delegateUser1.email, name: delegateUser1.name }
-      ].sort(sortFn)
-    );
+    expect(mails[0].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser1.email, name: delegateUser1.name }
+    ]);
+    expect(mails[0].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser1.email, name: delegatorUser1.name }
+    ]);
     expect(mails[0].subject).toBe(
       `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany1.orgId} et l'établissement ${delegateCompany1.orgId}`
     );
@@ -2214,12 +2212,12 @@ describe("getExpiringRegistryDelegationWarningMailPayloads", () => {
 `);
 
     // Mail 2
-    expect(mails[1].to?.sort(sortFn)).toMatchObject(
-      [
-        { email: delegatorUser2.email, name: delegatorUser2.name },
-        { email: delegateUser2.email, name: delegateUser2.name }
-      ].sort(sortFn)
-    );
+    expect(mails[1].messageVersions?.[0].to).toMatchObject([
+      { email: delegateUser2.email, name: delegateUser2.name }
+    ]);
+    expect(mails[1].messageVersions?.[1].to).toMatchObject([
+      { email: delegatorUser2.email, name: delegatorUser2.name }
+    ]);
     expect(mails[1].subject).toBe(
       `Expiration prochaine de la délégation entre l'établissement ${delegatorCompany2.orgId} et l'établissement ${delegateCompany2.orgId}`
     );
