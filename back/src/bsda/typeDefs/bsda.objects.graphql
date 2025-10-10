@@ -361,7 +361,7 @@ type BsdaMetadata {
 
 type BsdaError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: BsdaSignatureType!
 }
 
