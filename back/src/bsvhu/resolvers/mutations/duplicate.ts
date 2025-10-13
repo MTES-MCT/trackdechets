@@ -71,9 +71,6 @@ async function getDuplicateData(
     id,
     emitterEmissionSignatureAuthor,
     emitterEmissionSignatureDate,
-    transporterTransportSignatureAuthor,
-    transporterTransportSignatureDate,
-    transporterTransportPlates,
     destinationReceptionQuantity,
     destinationReceptionWeight,
     destinationReceptionAcceptationStatus,
@@ -89,16 +86,23 @@ async function getDuplicateData(
     destinationReceptionSignatureAuthor,
     destinationReceptionSignatureDate,
     intermediariesOrgIds,
+    transportersOrgIds,
     ...zodBsvhu
   } = prismaToZodBsvhu(bsvhu);
 
-  const { intermediaries, ...parsedBsvhu } = await parseBsvhuAsync(zodBsvhu, {
-    user
-  });
+  const { intermediaries, transporters, ...parsedBsvhu } =
+    await parseBsvhuAsync(zodBsvhu, {
+      user
+    });
 
-  const { emitter, transporter, destination, broker, trader } =
-    await getBsvhuCompanies(bsvhu);
-
+  const {
+    emitter,
+    destination,
+    broker,
+    trader,
+    transporters: transporterCompanies
+  } = await getBsvhuCompanies(bsvhu);
+  // TODO duplication de tous les transporteurs Attention BSDA ne duplique que le premier transporter
   let data: Prisma.BsvhuCreateInput = {
     ...parsedBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
@@ -117,13 +121,6 @@ async function getDuplicateData(
       destination?.contactPhone ?? parsedBsvhu.destinationCompanyPhone,
     destinationCompanyMail:
       destination?.contactEmail ?? parsedBsvhu.destinationCompanyMail,
-    transporterCompanyContact:
-      transporter?.contact ?? parsedBsvhu.transporterCompanyContact,
-    transporterCompanyPhone:
-      transporter?.contactPhone ?? parsedBsvhu.transporterCompanyPhone,
-    transporterCompanyMail:
-      transporter?.contactEmail ?? parsedBsvhu.transporterCompanyMail,
-    transporterCompanyVatNumber: parsedBsvhu.transporterCompanyVatNumber,
     // Broker company info
     brokerCompanyMail: broker?.contactEmail ?? bsvhu.brokerCompanyMail,
     brokerCompanyPhone: broker?.contactPhone ?? bsvhu.brokerCompanyPhone,
@@ -173,17 +170,78 @@ async function getDuplicateData(
       intermediariesOrgIds
     };
   }
+  if (transporters) {
+    data = {
+      ...data,
+      transportersOrgIds: transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean),
+      transporters: {
+        createMany: {
+          data: transporters
+            .sort((a, b) => (a.number ?? 1) - (b.number ?? 1))
+            .map((transporter, index) => {
+              const transporterCompany = transporterCompanies.find(
+                t =>
+                  t.orgId === transporter.transporterCompanySiret ||
+                  t.orgId === transporter.transporterCompanyVatNumber
+              );
+              const {
+                // transport values that should not be duplicated
+                id: transporterId,
+                createdAt,
+                bsvhuId: transporterBsvhuId,
+                transporterTransportPlates,
+                transporterTransportTakenOverAt,
+                transporterTransportSignatureAuthor,
+                transporterTransportSignatureDate,
+                transporterCustomInfo,
+                number,
+                // transporter values that should be duplicated
+                ...transporterData
+              } = transporter;
+              return {
+                ...transporterData,
+                number: index + 1,
+                // Transporter company info
+                transporterCompanyMail:
+                  transporterCompany?.contactEmail ??
+                  transporter.transporterCompanyMail,
+                transporterCompanyPhone:
+                  transporterCompany?.contactPhone ??
+                  transporter.transporterCompanyPhone,
+                transporterCompanyContact:
+                  transporterCompany?.contact ??
+                  transporter.transporterCompanyContact,
+                // Transporter recepisse
+                transporterRecepisseNumber:
+                  transporterCompany?.transporterReceipt?.receiptNumber ?? null,
+                transporterRecepisseValidityLimit:
+                  transporterCompany?.transporterReceipt?.validityLimit ?? null,
+                transporterRecepisseDepartment:
+                  transporterCompany?.transporterReceipt?.department ?? null
+              };
+            })
+        }
+      }
+    };
+  }
   return data;
 }
 
 async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
   const companiesOrgIds = [
     bsvhu.emitterCompanySiret,
-    bsvhu.transporterCompanySiret,
-    bsvhu.transporterCompanyVatNumber,
     bsvhu.destinationCompanySiret,
     bsvhu.brokerCompanySiret,
-    bsvhu.traderCompanySiret
+    bsvhu.traderCompanySiret,
+    ...bsvhu.transporters.flatMap(transporter => [
+      transporter.transporterCompanySiret,
+      transporter.transporterCompanyVatNumber
+    ])
   ].filter(Boolean);
 
   // Batch fetch all companies involved in the BSVHU
@@ -204,12 +262,6 @@ async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
     company => company.orgId === bsvhu.destinationCompanySiret
   );
 
-  const transporter = companies.find(
-    company =>
-      company.orgId === bsvhu.transporterCompanySiret ||
-      company.orgId === bsvhu.transporterCompanyVatNumber
-  );
-
   const broker = companies.find(
     company => company.orgId === bsvhu.brokerCompanySiret
   );
@@ -218,5 +270,13 @@ async function getBsvhuCompanies(bsvhu: PrismaBsvhuForParsing) {
     company => company.orgId === bsvhu.traderCompanySiret
   );
 
-  return { emitter, destination, transporter, broker, trader };
+  const transporters = companies.filter(company =>
+    bsvhu.transporters.some(
+      transporter =>
+        transporter.transporterCompanySiret === company.orgId ||
+        transporter.transporterCompanyVatNumber === company.orgId
+    )
+  );
+
+  return { emitter, destination, broker, trader, transporters };
 }

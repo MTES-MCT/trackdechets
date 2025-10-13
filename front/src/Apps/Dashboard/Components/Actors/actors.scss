@@ -28,13 +28,12 @@
 
     &--second {
       flex-shrink: 0;
+
+      text-transform: lowercase;
     }
   }
-  &__label:first-letter {
-    text-transform: capitalize;
-  }
 
-  &__label:first-letter {
+  &__label--first::first-letter {
     text-transform: capitalize;
   }
 

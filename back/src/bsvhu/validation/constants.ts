@@ -1,10 +1,17 @@
-import type { SignatureTypeInput } from "@td/codegen-back";
 import { ZodBsvhu } from "./schema";
+import { AllBsvhuSignatureType } from "../types";
+
+function transporterNHasSigned(bsvhu: ZodBsvhu, n: number) {
+  if (bsvhu.transporters && bsvhu.transporters.length > n - 1) {
+    return !!bsvhu.transporters[n - 1].transporterTransportSignatureDate;
+  }
+  return false;
+}
 
 export const BSVHU_SIGNATURES_HIERARCHY: {
-  [key in SignatureTypeInput]: {
+  [key in AllBsvhuSignatureType]: {
     isSigned: (bsvhu: ZodBsvhu) => boolean;
-    next?: SignatureTypeInput;
+    next?: AllBsvhuSignatureType;
   };
 } = {
   EMISSION: {
@@ -12,7 +19,23 @@ export const BSVHU_SIGNATURES_HIERARCHY: {
     next: "TRANSPORT"
   },
   TRANSPORT: {
-    isSigned: bsvhu => Boolean(bsvhu.transporterTransportSignatureDate),
+    isSigned: bsvhu => transporterNHasSigned(bsvhu, 1),
+    next: "TRANSPORT_2"
+  },
+  TRANSPORT_2: {
+    isSigned: bsvhu => transporterNHasSigned(bsvhu, 2),
+    next: "TRANSPORT_3"
+  },
+  TRANSPORT_3: {
+    isSigned: bsvhu => transporterNHasSigned(bsvhu, 3),
+    next: "TRANSPORT_4"
+  },
+  TRANSPORT_4: {
+    isSigned: bsvhu => transporterNHasSigned(bsvhu, 4),
+    next: "TRANSPORT_5"
+  },
+  TRANSPORT_5: {
+    isSigned: bsvhu => transporterNHasSigned(bsvhu, 5),
     next: "RECEPTION"
   },
   RECEPTION: {

@@ -54,20 +54,33 @@ export const bsvhuFactory = async ({
         contactPhone: bsvhuObject.emitterCompanyPhone ?? undefined,
         contactEmail: bsvhuObject.emitterCompanyMail ?? undefined
       });
+  const { transporters, ...optWithoutTransporters } = opt;
   const created = await prisma.bsvhu.create({
     data: {
       ...bsvhuObject,
-      transporterCompanySiret: transporterCompany.siret,
+      transporters: {
+        ...(opt.transporters?.createMany
+          ? { createMany: opt.transporters?.createMany }
+          : {
+              create: {
+                ...bsvhuObject.transporters!.create!,
+                transporterCompanySiret: transporterCompany.siret,
+                transporterCompanyVatNumber: transporterCompany.vatNumber,
+                ...opt.transporters?.create
+              }
+            })
+      },
       destinationCompanySiret: destinationCompany.siret,
       destinationOperationNextDestinationCompanySiret:
         nextDestinationCompany.siret,
       ecoOrganismeSiret: ecoOrganisme.siret,
       brokerCompanySiret: brokerCompany.siret,
       traderCompanySiret: traderCompany.siret,
-      ...opt
+      ...optWithoutTransporters
     },
     include: {
-      intermediaries: true
+      intermediaries: true,
+      transporters: true
     }
   });
   const intermediariesOrgIds: string[] = created.intermediaries
@@ -75,7 +88,14 @@ export const bsvhuFactory = async ({
         .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
         .filter(Boolean)
     : [];
-
+  const transportersOrgIds: string[] = created.transporters
+    ? created.transporters
+        .flatMap(t => [
+          t.transporterCompanySiret,
+          t.transporterCompanyVatNumber
+        ])
+        .filter(Boolean)
+    : [];
   // For drafts, only the owner's sirets that appear on the bsd have access
   const canAccessDraftOrgIds = await getCanAccessDraftOrgIds(
     created,
@@ -86,11 +106,32 @@ export const bsvhuFactory = async ({
     where: { id: created.id },
     data: {
       ...(canAccessDraftOrgIds.length ? { canAccessDraftOrgIds } : {}),
-      ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {})
+      ...(intermediariesOrgIds.length ? { intermediariesOrgIds } : {}),
+      ...(transportersOrgIds.length ? { transportersOrgIds } : {})
     },
     include: BsvhuForElasticInclude
   });
 };
+
+export const bsvhuTransporterData = (
+  siret: string,
+  number: number
+): Prisma.BsvhuTransporterCreateInput & {
+  transporterRecepisseValidityLimit: Date;
+  transporterTransportPlates: string[];
+} => ({
+  transporterCompanyName: "Transport facile",
+  transporterCompanySiret: siret,
+  transporterCompanyAddress: "12 route du Transporter, Transporter City",
+  transporterCompanyContact: "Henri Transport",
+  transporterCompanyPhone: "06 06 06 06 06",
+  transporterCompanyMail: "transporter@td.io",
+  transporterRecepisseNumber: "a receipt",
+  transporterRecepisseDepartment: "83",
+  transporterRecepisseValidityLimit: new Date("2019-11-27T00:00:00.000Z"),
+  transporterTransportPlates: ["XY-23-TR"],
+  number
+});
 
 const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   id: getReadableId(ReadableIdPrefix.VHU),
@@ -127,16 +168,6 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   weightValue: 1.4,
   weightIsEstimate: true,
 
-  transporterCompanyName: "Transport facile",
-  transporterCompanySiret: siretify(4),
-  transporterCompanyAddress: "12 route du Transporter, Transporter City",
-  transporterCompanyContact: "Henri Transport",
-  transporterCompanyPhone: "06 06 06 06 06",
-  transporterCompanyMail: "transporter@td.io",
-  transporterRecepisseNumber: "a receipt",
-  transporterRecepisseDepartment: "83",
-  transporterRecepisseValidityLimit: "2019-11-27T00:00:00.000Z",
-
   destinationReceptionWeight: null,
   destinationReceptionAcceptationStatus: null,
   destinationReceptionRefusalReason: null,
@@ -162,7 +193,10 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   traderCompanyMail: "b.turner@tradingalright.com",
   traderRecepisseNumber: "receipt of the firm",
   traderRecepisseDepartment: "33",
-  traderRecepisseValidityLimit: "2026-11-28T00:00:00.000Z"
+  traderRecepisseValidityLimit: "2026-11-28T00:00:00.000Z",
+  transporters: {
+    create: bsvhuTransporterData(siretify(4), 1)
+  }
 });
 
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
@@ -171,3 +205,21 @@ export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
   address: company.address,
   contact
 });
+
+export const bsvhuTransporterFactory = async ({
+  bsvhuId,
+  opts
+}: {
+  bsvhuId: string;
+  opts: Omit<Prisma.BsvhuTransporterCreateWithoutBsvhuInput, "number">;
+}) => {
+  const count = await prisma.bsvhuTransporter.count({ where: { bsvhuId } });
+  return prisma.bsvhuTransporter.create({
+    data: {
+      bsvhu: { connect: { id: bsvhuId } },
+      ...bsvhuTransporterData,
+      number: count + 1,
+      ...opts
+    }
+  });
+};

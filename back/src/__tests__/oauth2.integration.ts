@@ -267,6 +267,12 @@ describe("/oauth2/token", () => {
       email: user.email,
       name: user.name
     });
+
+    // check grant `used`field is updated
+    const updatedGrant = await prisma.grant.findUnique({
+      where: { id: grant.id }
+    });
+    expect(updatedGrant?.used).toBe(true);
   });
 
   it("should return 403 if authorization code is invalid", async () => {
@@ -364,6 +370,39 @@ describe("/oauth2/token", () => {
         application: { connect: { id: application.id } },
         expires: 0,
         redirectUri: application.redirectUris[0]
+      }
+    });
+
+    const res = await request
+      .post("/oauth2/token")
+      .send("grant_type=authorization_code")
+      .send(`code=${grant.code}`)
+      .send(`client_id=${application.id}`)
+      .send(`redirect_uri=${application.redirectUris[0]}`)
+      .send(`client_secret=${application.clientSecret}`);
+
+    expect(res.status).toEqual(403);
+    expect(res.body.error).toEqual("invalid_grant");
+    expect(res.body.error_description).toEqual(
+      tokenErrorMessages.grant_expired
+    );
+  });
+
+  it("should return 403 if grant has been used", async () => {
+    const application = await applicationFactory();
+
+    const user = await userFactory();
+
+    const code = getUid(16);
+
+    const grant = await prisma.grant.create({
+      data: {
+        user: { connect: { id: user.id } },
+        code,
+        application: { connect: { id: application.id } },
+        expires: 600,
+        redirectUri: application.redirectUris[0],
+        used: true
       }
     });
 

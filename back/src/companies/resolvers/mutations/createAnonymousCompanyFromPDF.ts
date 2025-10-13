@@ -12,10 +12,12 @@ import { base64, siret } from "../../../common/validation";
 import { UserInputError } from "../../../common/errors";
 import { libelleFromCodeNaf } from "../../sirene/utils";
 
+const ONE_MB = 1024 * 1024;
+
 const anonymousCompanyInputSchema: yup.SchemaOf<CreateAnonymousCompanyFromPdfInput> =
   yup.object({
     siret: siret.required(),
-    pdf: base64.required()
+    pdf: base64.max(3 * ONE_MB).required()
   });
 
 const createAnonymousCompanyFromPDFResolver: MutationResolvers["createAnonymousCompanyFromPDF"] =

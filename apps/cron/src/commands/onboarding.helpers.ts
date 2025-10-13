@@ -601,9 +601,13 @@ export const getExpiringRegistryDelegationWarningMailPayloads = async () => {
 
         const payload = renderMail(expiringRegistryDelegationWarning, {
           variables,
-          to: users.map(user => ({
-            email: user.email,
-            name: user.name
+          messageVersions: users.map(user => ({
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
           }))
         });
 

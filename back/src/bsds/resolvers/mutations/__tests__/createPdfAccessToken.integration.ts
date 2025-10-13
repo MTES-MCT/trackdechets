@@ -458,7 +458,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const user = await userFactory();
     const vhu = await bsvhuFactory({
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret, number: 1 }
+        },
         status: BsvhuStatus.SENT
       }
     });
@@ -485,7 +487,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const vhu = await bsvhuFactory({
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret, number: 1 }
+        },
         status: BsvhuStatus.PROCESSED
       }
     });
@@ -514,7 +518,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const vhu = await bsvhuFactory({
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret, number: 1 }
+        },
         status: BsvhuStatus.SENT
       }
     });

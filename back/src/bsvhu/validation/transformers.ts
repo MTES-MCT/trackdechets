@@ -1,8 +1,13 @@
+import { recipifyTransporter } from "../../common/validation/zod/transformers";
 import { recipifyBsvhu } from "./recipify";
 import { getSealedFields } from "./rules";
 import { ParsedZodBsvhu } from "./schema";
 import { sirenifyBsvhu } from "./sirenify";
-import { BsvhuValidationContext, ZodBsvhuTransformer } from "./types";
+import {
+  BsvhuValidationContext,
+  ZodBsvhuTransformer,
+  ZodBsvhuTransporterTransformer
+} from "./types";
 
 export const runTransformers = async (
   bsvhu: ParsedZodBsvhu,
@@ -26,3 +31,6 @@ export const fillIntermediariesOrgIds: ZodBsvhuTransformer = bsvhu => {
 
   return bsvhu;
 };
+
+export const updateTransporterRecepisse: ZodBsvhuTransporterTransformer =
+  async bsvhuTransporter => recipifyTransporter(bsvhuTransporter);

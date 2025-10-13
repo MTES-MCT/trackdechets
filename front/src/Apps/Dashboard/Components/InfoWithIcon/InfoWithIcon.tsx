@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { InfoIconCode, InfoWithIconProps } from "./infoWithIconTypes";
 import { getLabelValue } from "./infoWithIconUtils";
 import "./infoWithIcon.scss";
+import Tooltip from "../../../common/Components/Tooltip/Tooltip";
 
 function InfoWithIcon({
   labelCode,
@@ -40,11 +41,22 @@ function InfoWithIcon({
   };
 
   const customInfo = editableInfos?.customInfo || "-";
+  const title: string = !hasEditableInfos
+    ? !info
+      ? labelValue
+      : `${labelValue} ${info}`
+    : labelCode === InfoIconCode.CustomInfo
+    ? (customInfo as string)
+    : formatTranporterPlates(editableInfos?.transporterNumberPlate);
+
   return !hasEditableInfos ? (
-    <p className={`label-icon label-icon__${labelCode}`}>
-      <span className="fr-sr-only">{displayAlternativeText()}</span>
-      {!info ? labelValue : `${labelValue} ${info}`}
-    </p>
+    <Tooltip title={title}>
+      <p className={`label-icon label-icon__${labelCode}`}>
+        <span className="fr-sr-only">{displayAlternativeText()}</span>
+
+        <span className={`label-icon__text`}>{title}</span>
+      </p>
+    </Tooltip>
   ) : (
     <button
       className="label-icon-editable"
@@ -53,14 +65,14 @@ function InfoWithIcon({
       disabled={isDisabled}
       title={labelValue}
     >
-      <p className={`label-icon label-icon__${labelCode}`}>
-        <span className="fr-sr-only">
-          Modifier le champ libre et l'immatriculation
-        </span>
-        {labelCode === InfoIconCode.CustomInfo
-          ? customInfo
-          : formatTranporterPlates(editableInfos?.transporterNumberPlate)}
-      </p>
+      <Tooltip title={title}>
+        <p className={`label-icon label-icon__${labelCode}`}>
+          <span className="fr-sr-only">
+            Modifier le champ libre et l'immatriculation
+          </span>
+          <span className={`label-icon__text`}>{title}</span>
+        </p>
+      </Tooltip>
       {labelCode === InfoIconCode.TransporterNumberPlate && !isDisabled && (
         <>
           <span className="fr-sr-only">

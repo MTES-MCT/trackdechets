@@ -127,8 +127,7 @@ describe("Query.Bsvhus", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        customId: "some custom ID",
-        transporterTransportPlates: ["FD-87-98"]
+        customId: "some custom ID"
       }
     });
 
@@ -149,19 +148,19 @@ describe("Query.Bsvhus", () => {
       },
       transporter: {
         company: {
-          siret: bsvhu.transporterCompanySiret,
-          name: bsvhu.transporterCompanyName,
-          address: bsvhu.transporterCompanyAddress,
-          contact: bsvhu.transporterCompanyContact,
-          mail: bsvhu.transporterCompanyMail,
-          phone: bsvhu.transporterCompanyPhone,
+          siret: bsvhu.transporters[0].transporterCompanySiret,
+          name: bsvhu.transporters[0].transporterCompanyName,
+          address: bsvhu.transporters[0].transporterCompanyAddress,
+          contact: bsvhu.transporters[0].transporterCompanyContact,
+          mail: bsvhu.transporters[0].transporterCompanyMail,
+          phone: bsvhu.transporters[0].transporterCompanyPhone,
           vatNumber: null
         },
         transport: {
-          mode: "ROAD",
-          plates: ["FD-87-98"]
+          mode: bsvhu.transporters[0].transporterTransportMode,
+          plates: bsvhu.transporters[0].transporterTransportPlates
         },
-        recepisse: { number: bsvhu.transporterRecepisseNumber }
+        recepisse: { number: bsvhu.transporters[0].transporterRecepisseNumber }
       },
 
       broker: {
@@ -315,7 +314,15 @@ describe("Query.Bsvhus", () => {
     await bsvhuFactory({ opt });
     await bsvhuFactory({ opt });
     const vhu = await bsvhuFactory({
-      opt: { ...opt, transporterTransportPlates: ["XY-23-TT"] }
+      opt: {
+        ...opt,
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportPlates: ["XY-23-TT"]
+          }
+        }
+      }
     });
 
     // And 1 on recipient company

@@ -1,4 +1,3 @@
-import { getTransporterReceipt } from "../../companies/recipify";
 import type {
   BsvhuError,
   BsvhuMetadataFields,
@@ -22,12 +21,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     context
   ): Promise<BsvhuError[]> => {
     const bsvhu = await context.dataloaders.bsvhus.load(metadata.id);
-    // import transporterReceipt that will be completed after transporter signature
-    const transporterReceipt = await getTransporterReceipt(bsvhu);
-    const zodBsvhu = prismaToZodBsvhu({
-      ...bsvhu,
-      ...transporterReceipt
-    });
+    const zodBsvhu = prismaToZodBsvhu(bsvhu);
     const currentSignature = getCurrentSignatureType(zodBsvhu);
     const nextSignature = getNextSignatureType(currentSignature);
 
@@ -54,13 +48,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     context
   ): Promise<BsvhuMetadataFields> => {
     const bsvhu = await context.dataloaders.bsvhus.load(metadata.id);
-
-    // import transporterReceipt that will be completed after transporter signature
-    const transporterReceipt = await getTransporterReceipt(bsvhu);
-    const zodBsvhu = prismaToZodBsvhu({
-      ...bsvhu,
-      ...transporterReceipt
-    });
+    const zodBsvhu = prismaToZodBsvhu(bsvhu);
     const currentSignature = getCurrentSignatureType(zodBsvhu);
     const currentSignatureAncestors = getSignatureAncestors(currentSignature);
     return getRequiredAndSealedFieldPaths(

@@ -1,15 +1,19 @@
-import { Bsvhu, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 import { bsvhuEventTypes } from "./eventTypes";
+import {
+  BsvhuWithTransporters,
+  BsvhuWithTransportersInclude
+} from "../../types";
 
 export type DeleteBsvhuFn = (
   where: Prisma.BsvhuWhereUniqueInput,
   logMetadata?: LogMetadata
-) => Promise<Bsvhu>;
+) => Promise<BsvhuWithTransporters>;
 
 export function buildDeleteBsvhu(deps: RepositoryFnDeps): DeleteBsvhuFn {
   return async (where, logMetadata) => {
@@ -18,7 +22,8 @@ export function buildDeleteBsvhu(deps: RepositoryFnDeps): DeleteBsvhuFn {
       where,
       data: {
         isDeleted: true
-      }
+      },
+      include: BsvhuWithTransportersInclude
     });
 
     await prisma.event.create({
