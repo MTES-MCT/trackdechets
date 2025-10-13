@@ -68,8 +68,35 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     workerCertificationId,
     vhuAgrementBroyeurId,
     vhuAgrementDemolisseurId,
-    ecoOrganismeAgreements
+    ecoOrganismeAgreements,
+    ecoOrganismesPartners
   } = await parseCompanyAsync(zodCompany);
+
+  // On vérifie que les éco-organismes déclarés existent bien
+  if (ecoOrganismesPartners && ecoOrganismesPartners.length > 0) {
+    const ecoOrganismes = await prisma.ecoOrganisme.findMany({
+      where: {
+        siret: {
+          in: ecoOrganismesPartners
+        }
+      },
+      select: {
+        siret: true
+      }
+    });
+
+    const notFoundSirets = ecoOrganismesPartners.filter(
+      siret => !ecoOrganismes.map(e => e.siret).includes(siret)
+    );
+
+    if (notFoundSirets.length > 0) {
+      throw new Error(
+        `Les SIRETs suivants n'appartiennent pas à un éco-organisme : ${notFoundSirets.join(
+          ", "
+        )}`
+      );
+    }
+  }
 
   const data: Prisma.CompanyUpdateInput = {
     companyTypes,
@@ -84,7 +111,8 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     givenName,
     allowBsdasriTakeOverWithoutSignature,
     allowAppendix1SignatureAutomation,
-    ecoOrganismeAgreements
+    ecoOrganismeAgreements,
+    ecoOrganismesPartners: ecoOrganismesPartners ?? []
   };
 
   if (transporterReceiptId !== undefined) {

@@ -30,6 +30,7 @@ export interface RhfCompanyTypeFormField {
   traderReceipt?: Maybe<Omit<TraderReceipt, "id">>;
   vhuAgrementBroyeur?: Maybe<Omit<VhuAgrement, "id">>;
   vhuAgrementDemolisseur?: Maybe<Omit<VhuAgrement, "id">>;
+  vhuEcoOrganismes?: string[];
   collectorTypes: CollectorType[];
   wasteProcessorTypes: WasteProcessorType[];
   wasteVehiclesTypes: WasteVehiclesType[];
@@ -312,6 +313,7 @@ const RhfCompanyTypeForm = ({
           agrementNumber: register("vhuAgrementDemolisseur.agrementNumber"),
           department: register("vhuAgrementDemolisseur.department")
         },
+        vhuEcoOrganismes: register("vhuEcoOrganismes"),
         workerCertification: {
           hasSubSectionThree: register(
             "workerCertification.hasSubSectionThree"
@@ -375,6 +377,7 @@ const RhfCompanyTypeForm = ({
           validityLimit: errors.workerCertification?.validityLimit?.message,
           organisation: errors.workerCertification?.organisation?.message
         },
+        vhuEcoOrganismes: errors.vhuEcoOrganismes?.message,
         ecoOrganismeAgreements: ecoOrganismeAgreements.map((_, i) => {
           if (!!errors.ecoOrganismeAgreements) {
             return errors.ecoOrganismeAgreements[i]?.message ?? null;

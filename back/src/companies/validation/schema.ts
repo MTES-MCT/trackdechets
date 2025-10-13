@@ -72,6 +72,11 @@ const rawCompanySchema = z.object({
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
+  ecoOrganismesPartners: z
+    .array(siretSchema())
+    .transform(toSet)
+    .nullish()
+    .default([]),
   allowBsdasriTakeOverWithoutSignature: z
     .boolean()
     .nullish()

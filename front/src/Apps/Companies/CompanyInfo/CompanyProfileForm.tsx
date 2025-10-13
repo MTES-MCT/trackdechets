@@ -82,6 +82,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       ...company.workerCertification,
       validityLimit: formatDate(company.workerCertification?.validityLimit)
     },
+    vhuEcoOrganismes: company.vhuEcoOrganismes,
     collectorTypes: company.collectorTypes,
     wasteProcessorTypes: company.wasteProcessorTypes,
     wasteVehiclesTypes: company.wasteVehiclesTypes,

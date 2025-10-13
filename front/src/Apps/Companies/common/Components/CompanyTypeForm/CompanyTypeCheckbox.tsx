@@ -39,6 +39,7 @@ const CompanyTypeCheckbox = ({
   inputProps,
   inputErrors
 }: CompanyTypeCheckboxProps): React.JSX.Element => {
+  console.log("inputValues", inputValues);
   const companyTypeChecked = React.useMemo(() => {
     const fullValue = parentValue ? `${parentValue}.${value}` : value;
     return inputValues.companyTypes.includes(fullValue);
