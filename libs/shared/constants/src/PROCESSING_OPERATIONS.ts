@@ -328,8 +328,6 @@ export const FINAL_OPERATION_CODES = [
   // "D 15"
 ];
 
-export const BSDA_FINAL_OPERATION_CODES = [...FINAL_OPERATION_CODES, "D 9"];
-
 export const ALL_OPERATION_MODES: [string, ...string[]] = [
   "REUTILISATION",
   "RECYCLAGE",

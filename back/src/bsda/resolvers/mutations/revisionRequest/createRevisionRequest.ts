@@ -25,6 +25,10 @@ import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
+import {
+  castD9toD9F,
+  fixOperationModeForD9F
+} from "../../../validation/transformers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -262,12 +266,17 @@ async function getFlatContent(
     );
   }
 
-  await schema
+  const parsed = await schema
     // For the refused weight, we need the bsda previous state
     .superRefine((flatContent, ctx) =>
       checkDestinationReceptionRefusedWeight({ ...bsda, ...flatContent }, ctx)
     )
     .parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
+
+  if (parsed.destinationOperationCode || parsed.destinationOperationMode) {
+    flatContent.destinationOperationCode = parsed.destinationOperationCode;
+    flatContent.destinationOperationMode = parsed.destinationOperationMode;
+  }
 
   return flatContent;
 }
@@ -301,6 +310,8 @@ const schema = rawBsdaSchema
     emitterPickupSiteInfos: true
   })
   .extend({ isCanceled: z.boolean().nullish() })
+  .transform(castD9toD9F)
+  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {

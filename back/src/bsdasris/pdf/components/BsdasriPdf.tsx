@@ -471,15 +471,15 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
                 checked={bsdasri?.destination?.operation?.code === "D13"}
                 readOnly
               />{" "}
-              Groupement avant D9 ou D10 (D13) sur site relevant de la 2718
+              Groupement avant D9F ou D10 (D13) sur site relevant de la 2718
             </p>
             <p>
               <input
                 type="checkbox"
-                checked={bsdasri?.destination?.operation?.code === "D9"}
+                checked={bsdasri?.destination?.operation?.code === "D9F"}
                 readOnly
               />{" "}
-              Prétraitement par désinfection (D9) - Banaliseur
+              Prétraitement par désinfection (D9F) - Banaliseur
             </p>
             <p>
               <input
