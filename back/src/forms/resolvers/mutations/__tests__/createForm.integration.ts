@@ -10,7 +10,8 @@ import {
   userWithCompanyFactory,
   transporterReceiptFactory,
   ecoOrganismeFactory,
-  bsddTransporterData
+  bsddTransporterData,
+  userInCompany
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
@@ -26,7 +27,9 @@ import {
   UserRole,
   WasteAcceptationStatus,
   CompanyType,
-  WasteProcessorType
+  WasteProcessorType,
+  Company,
+  User
 } from "@prisma/client";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
@@ -3479,6 +3482,166 @@ describe("Mutation.createForm", () => {
         where: { id: appendix2_3.id }
       });
       expect(updatedAppendix2_3.quantityGrouped).toEqual(10);
+    });
+  });
+
+  describe.only("[TRA-16544] Certains éco-organismes peuvent créer des annexes 2", () => {
+    let emitter: User;
+    let emitterCompany: Company;
+    let initialDestination: User;
+    let initialDestinationCompany: Company;
+    let destination: User;
+    let destinationCompany: Company;
+    let ecoOrganisme: User;
+    let ecoOrganismeCompany: Company;
+    beforeEach(async () => {
+      const emitterUserAndCompany = await userWithCompanyFactory("ADMIN");
+      emitter = emitterUserAndCompany.user;
+      emitterCompany = emitterUserAndCompany.company;
+
+      const initialDestinationUserAndCompany = await userWithCompanyFactory(
+        "ADMIN",
+        {
+          companyTypes: [CompanyType.WASTEPROCESSOR],
+          wasteProcessorTypes: [
+            WasteProcessorType.DANGEROUS_WASTES_INCINERATION
+          ]
+        }
+      );
+      initialDestination = initialDestinationUserAndCompany.user;
+      initialDestinationCompany = initialDestinationUserAndCompany.company;
+
+      const destinationUserAndCompany = await userWithCompanyFactory("ADMIN", {
+        companyTypes: [CompanyType.WASTEPROCESSOR],
+        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+      });
+      destination = destinationUserAndCompany.user;
+      destinationCompany = destinationUserAndCompany.company;
+
+      // Eco-organisme
+      const eo = await ecoOrganismeFactory({
+        handle: { handleBsdd: true },
+        createAssociatedCompany: true
+      });
+      ecoOrganismeCompany = await prisma.company.findFirstOrThrow({
+        where: {
+          siret: eo.siret
+        }
+      });
+      ecoOrganisme = await userInCompany("MEMBER", ecoOrganismeCompany.id);
+    });
+
+    const createAppendix2 = async ({
+      userId,
+      emitterCompanySiret,
+      ecoOrganismeSiret,
+      recipientCompanySiret
+    }) => {
+      return formFactory({
+        ownerId: userId,
+        opt: {
+          status: "AWAITING_GROUP",
+          emitterCompanySiret,
+          // ecoOrganismeSiret,
+          recipientCompanySiret,
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 10,
+          quantityRefused: 0
+        }
+      });
+    };
+
+    it("l'éco-organisme devrait pouvoir créer une annexe 2", async () => {
+      // Given
+      const appendix2 = await createAppendix2({
+        userId: emitter.id,
+        emitterCompanySiret: emitterCompany.siret,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        recipientCompanySiret: initialDestinationCompany.siret
+      });
+
+      // When
+      const { mutate } = makeClient(ecoOrganisme);
+      const mutateFn = () =>
+        mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+          CREATE_FORM,
+          {
+            variables: {
+              createFormInput: {
+                emitter: {
+                  type: EmitterType.APPENDIX2,
+                  company: {
+                    siret: initialDestinationCompany.siret
+                  }
+                },
+                ecoOrganisme: {
+                  siret: ecoOrganismeCompany.siret!,
+                  name: ecoOrganismeCompany.name
+                },
+                recipient: {
+                  company: {
+                    siret: destinationCompany.siret
+                  }
+                },
+                grouping: [{ form: { id: appendix2.id }, quantity: 10 }]
+              }
+            }
+          }
+        );
+
+      const { errors } = await waitForJobsCompletion({
+        queue: updateAppendix2Queue,
+        fn: mutateFn,
+        expectedJobCount: 1
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
+
+      const updatedAppendix2 = await prisma.form.findFirstOrThrow({
+        where: { id: appendix2.id }
+      });
+      expect(updatedAppendix2.quantityGrouped).toEqual(10);
+    });
+
+    it("l'éco-organisme ne devrait pas pouvoir créer une annexe 2 s'il n'est pas mentionné dessus", async () => {
+      // Given
+      const appendix2 = await createAppendix2({
+        userId: emitter.id,
+        emitterCompanySiret: emitterCompany.siret,
+        ecoOrganismeSiret: ecoOrganismeCompany.siret,
+        recipientCompanySiret: initialDestinationCompany.siret
+      });
+
+      // When
+      const { mutate } = makeClient(ecoOrganisme);
+      const { errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: EmitterType.APPENDIX2,
+              company: {
+                siret: initialDestinationCompany.siret
+              }
+            },
+            recipient: {
+              company: {
+                siret: destinationCompany.siret
+              }
+            },
+            grouping: [{ form: { id: appendix2.id }, quantity: 10 }]
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+      );
     });
   });
 });
