@@ -1,7 +1,4 @@
-import {
-  BSDA_FINAL_OPERATION_CODES,
-  FINAL_OPERATION_CODES
-} from "@td/constants";
+import { FINAL_OPERATION_CODES } from "@td/constants";
 import { trim } from "./strings";
 
 export const TRIMMED_FINAL_OPERATION_CODES = FINAL_OPERATION_CODES.map(trim);
@@ -14,7 +11,7 @@ export const isFinalOperationCode = (operationCode: string | null): boolean => {
 };
 
 export const TRIMMED_BSDA_FINAL_OPERATION_CODES =
-  BSDA_FINAL_OPERATION_CODES.map(trim);
+  FINAL_OPERATION_CODES.map(trim);
 export const isBSDAFinalOperationCode = (
   operationCode: string | null
 ): boolean => {

@@ -2,7 +2,7 @@ export enum DasriProcessingOperationType {
   Incineration = "INCINERATION",
   IncinerationValorisation = "INCINERATIONVALORISATION",
   Pretraitement = "PRETRAITEMENT",
-  RegroupementPrealableD9D10 = "REGROUPEMENTPREALABLED9D10",
+  RegroupementPrealableD9FD10 = "RegroupementPrealableD9FD10",
   RegroupementPrealableR1 = "REGROUPEMENTPREALABLEDR1"
 }
 
@@ -43,10 +43,10 @@ export const DASRI_PROCESSING_OPERATIONS = [
 
 export const DASRI_GROUPING_OPERATIONS = [
   {
-    type: DasriProcessingOperationType.RegroupementPrealableD9D10,
+    type: DasriProcessingOperationType.RegroupementPrealableD9FD10,
     code: "D13",
     description:
-      "Groupement avant désinfection en D9 ou incinération en D10 sur un site relevant de la rubrique 2718"
+      "Groupement avant désinfection en D9F ou incinération en D10 sur un site relevant de la rubrique 2718"
   },
   {
     type: DasriProcessingOperationType.RegroupementPrealableR1,
