@@ -347,15 +347,21 @@ type BsdaBroker {
   recepisse: BsdaRecepisse
 }
 
+type BsdaMetadataFields {
+  "Liste des champs scellés"
+  sealed: [[String!]!]!
+}
+
 type BsdaMetadata {
-  errors: [BsdaError]
+  errors: [BsdaError!]!
   "EXPERIMENTAL, ne pas utiliser - Dernière révision du bordereau"
   latestRevision: BsdaRevisionRequest
+  fields: BsdaMetadataFields!
 }
 
 type BsdaError {
   message: String!
-  path: String!
+  path: [String!]!
   requiredFor: BsdaSignatureType!
 }
 

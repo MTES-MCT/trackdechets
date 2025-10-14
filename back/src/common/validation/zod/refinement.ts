@@ -26,10 +26,12 @@ const { VERIFY_COMPANY } = process.env;
 export async function isTransporterRefinement(
   {
     siret,
-    transporterRecepisseIsExempted
+    transporterRecepisseIsExempted,
+    index
   }: {
     siret: string | null | undefined;
     transporterRecepisseIsExempted: boolean;
+    index?: number;
   },
   ctx: RefinementCtx,
   checkIsNotDormant = true
@@ -46,7 +48,7 @@ export async function isTransporterRefinement(
   if (company && !isTransporter(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Transporter),
+      path: pathFromCompanyRole(CompanyRole.Transporter, index),
       message:
         `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
         ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
