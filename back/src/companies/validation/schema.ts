@@ -72,8 +72,8 @@ const rawCompanySchema = z.object({
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
-  ecoOrganismesPartners: z
-    .array(siretSchema())
+  ecoOrganismePartnersIds: z
+    .array(z.string())
     .transform(toSet)
     .nullish()
     .default([]),

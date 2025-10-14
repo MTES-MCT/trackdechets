@@ -82,7 +82,7 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
       ...company.workerCertification,
       validityLimit: formatDate(company.workerCertification?.validityLimit)
     },
-    vhuEcoOrganismes: company.vhuEcoOrganismes,
+    ecoOrganismePartnersIds: company.ecoOrganismePartnersIds,
     collectorTypes: company.collectorTypes,
     wasteProcessorTypes: company.wasteProcessorTypes,
     wasteVehiclesTypes: company.wasteVehiclesTypes,
@@ -628,6 +628,11 @@ const CompanyProfileForm = ({ company }: CompanyProfileFormProps) => {
         : [],
       wasteVehiclesTypes: data.companyTypes.includes(CompanyType.WasteVehicles)
         ? data.wasteVehiclesTypes
+        : [],
+      ecoOrganismePartnersIds: data.companyTypes.includes(
+        CompanyType.WasteVehicles
+      )
+        ? data.ecoOrganismePartnersIds
         : []
     };
 

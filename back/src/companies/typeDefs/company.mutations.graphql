@@ -47,8 +47,8 @@ type Mutation {
     allowBsdasriTakeOverWithoutSignature: Boolean
     "L'entreprise autorise la signature automatique de l'annexe 1 pour les entreprises saisies"
     allowAppendix1SignatureAutomation: Boolean
-    "Liste des SIRET des éco-organismes avec lesquels l'entreprise travaille"
-    ecoOrganismesPartners: [String!]
+    "Liste des éco-organismes avec lesquels l'entreprise travaille"
+    ecoOrganismePartnersIds: [String!]
   ): CompanyPrivate!
 
   """

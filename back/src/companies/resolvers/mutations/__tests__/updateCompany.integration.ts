@@ -46,7 +46,7 @@ const UPDATE_COMPANY = gql`
     $traderReceiptId: String
     $ecoOrganismeAgreements: [URL!]
     $allowBsdasriTakeOverWithoutSignature: Boolean
-    $ecoOrganismesPartners: [String!]
+    $ecoOrganismePartnersIds: [String!]
   ) {
     updateCompany(
       id: $id
@@ -63,14 +63,14 @@ const UPDATE_COMPANY = gql`
       traderReceiptId: $traderReceiptId
       ecoOrganismeAgreements: $ecoOrganismeAgreements
       allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
-      ecoOrganismesPartners: $ecoOrganismesPartners
+      ecoOrganismePartnersIds: $ecoOrganismePartnersIds
     ) {
       id
       name
       address
       naf
       libelleNaf
-      ecoOrganismesPartners
+      ecoOrganismePartnersIds
     }
   }
 `;
@@ -1237,7 +1237,7 @@ describe("mutation updateCompany", () => {
 
       const variables = {
         id: company.id,
-        ecoOrganismesPartners: [ecoOrganisme1.siret, ecoOrganisme2.siret]
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
       };
 
       // When
@@ -1250,18 +1250,18 @@ describe("mutation updateCompany", () => {
       );
       expect(data.updateCompany.id).toEqual(company.id);
       expect(errors).toBeUndefined();
-      expect(data.updateCompany.ecoOrganismesPartners).toStrictEqual([
-        ecoOrganisme1.siret,
-        ecoOrganisme2.siret
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id,
+        ecoOrganisme2.id
       ]);
 
       // Then
       const updatedCompany = await prisma.company.findUnique({
         where: { id: company.id }
       });
-      expect(updatedCompany?.ecoOrganismesPartners).toStrictEqual([
-        ecoOrganisme1.siret,
-        ecoOrganisme2.siret
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id,
+        ecoOrganisme2.id
       ]);
     });
 
@@ -1284,12 +1284,12 @@ describe("mutation updateCompany", () => {
 
       // Given
       const { user, company } = await userWithCompanyFactory("ADMIN", {
-        ecoOrganismesPartners: [ecoOrganisme1.siret, ecoOrganisme2.siret]
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
       });
 
       const variables = {
         id: company.id,
-        ecoOrganismesPartners: [ecoOrganisme1.siret] // remove ecoOrganisme2
+        ecoOrganismePartnersIds: [ecoOrganisme1.id] // remove ecoOrganisme2
       };
 
       // When
@@ -1302,16 +1302,16 @@ describe("mutation updateCompany", () => {
       );
       expect(data.updateCompany.id).toEqual(company.id);
       expect(errors).toBeUndefined();
-      expect(data.updateCompany.ecoOrganismesPartners).toStrictEqual([
-        ecoOrganisme1.siret
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id
       ]);
 
       // Then
       const updatedCompany = await prisma.company.findUnique({
         where: { id: company.id }
       });
-      expect(updatedCompany?.ecoOrganismesPartners).toStrictEqual([
-        ecoOrganisme1.siret
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id
       ]);
     });
 
@@ -1334,12 +1334,12 @@ describe("mutation updateCompany", () => {
 
       // Given
       const { user, company } = await userWithCompanyFactory("ADMIN", {
-        ecoOrganismesPartners: [ecoOrganisme1.siret, ecoOrganisme2.siret]
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
       });
 
       const variables = {
         id: company.id,
-        ecoOrganismesPartners: [] // remove all
+        ecoOrganismePartnersIds: [] // remove all
       };
 
       // When
@@ -1352,19 +1352,19 @@ describe("mutation updateCompany", () => {
       );
       expect(data.updateCompany.id).toEqual(company.id);
       expect(errors).toBeUndefined();
-      expect(data.updateCompany.ecoOrganismesPartners).toStrictEqual([]);
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([]);
 
       // Then
       const updatedCompany = await prisma.company.findUnique({
         where: { id: company.id }
       });
-      expect(updatedCompany?.ecoOrganismesPartners).toStrictEqual([]);
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([]);
     });
 
     it("should throw if eco-organisme partners are not eco-organismes", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("ADMIN", {
-        ecoOrganismesPartners: []
+        ecoOrganismePartnersIds: []
       });
 
       // Non eco-organisme
@@ -1383,9 +1383,9 @@ describe("mutation updateCompany", () => {
 
       const variables = {
         id: company.id,
-        ecoOrganismesPartners: [
-          nonEcoOrganismeCompany.siret,
-          ecoOrganisme.siret
+        ecoOrganismePartnersIds: [
+          nonEcoOrganismeCompany.id, // invalid
+          ecoOrganisme.id
         ]
       };
 
@@ -1401,7 +1401,7 @@ describe("mutation updateCompany", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        `Les SIRETs suivants n'appartiennent pas à un éco-organisme : ${nonEcoOrganismeCompany.siret}`
+        `Les IDs suivants n'appartiennent pas à un éco-organisme : ${nonEcoOrganismeCompany.id}`
       );
     });
   });

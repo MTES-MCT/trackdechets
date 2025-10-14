@@ -14,6 +14,7 @@ export type CompanyTypeInputValues = {
   workerCertification: {
     hasSubSectionThree: boolean;
   };
+  ecoOrganismePartnersIds: string[];
   ecoOrganismeAgreements: string[];
 };
 
@@ -51,6 +52,11 @@ export type CompanyTypeInputProps = {
       typeof WORKER_AGREMENT_ORGANISATION_OPTIONS
     >["nativeSelectProps"];
   };
+  ecoOrganismePartnersIds?: {
+    onChange: (values: string[]) => void;
+    value: string[];
+    nativeInputProps?: InputProps["nativeInputProps"];
+  };
   ecoOrganismeAgreements?: {
     value: (index: number) => InputProps["nativeInputProps"];
     push: (v: string) => void;
@@ -81,6 +87,7 @@ export type CompanyTypeInputErrors = {
   };
   vhuEcoOrganismes?: string[];
   ecoOrganismeAgreements?: (string | null)[];
+  ecoOrganismePartnersIds?: string;
 };
 
 type CompanyTypeFormProps = {

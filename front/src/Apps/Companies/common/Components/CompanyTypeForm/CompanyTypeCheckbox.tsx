@@ -9,6 +9,7 @@ import {
   CompanyTypeInputValues
 } from "./CompanyTypeForm";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
+import EcoOrganismesPartnersForm from "./EcoOrganismesPartnersForm";
 
 type CompanyTypeCheckboxProps = {
   label: string;
@@ -39,7 +40,6 @@ const CompanyTypeCheckbox = ({
   inputProps,
   inputErrors
 }: CompanyTypeCheckboxProps): React.JSX.Element => {
-  console.log("inputValues", inputValues);
   const companyTypeChecked = React.useMemo(() => {
     const fullValue = parentValue ? `${parentValue}.${value}` : value;
     return inputValues.companyTypes.includes(fullValue);
@@ -82,6 +82,14 @@ const CompanyTypeCheckbox = ({
       </div>
       {companyTypeChecked && (
         <CertificationForm
+          companyType={value}
+          inputProps={inputProps}
+          inputValues={inputValues}
+          inputErrors={inputErrors}
+        />
+      )}
+      {companyTypeChecked && (
+        <EcoOrganismesPartnersForm
           companyType={value}
           inputProps={inputProps}
           inputValues={inputValues}

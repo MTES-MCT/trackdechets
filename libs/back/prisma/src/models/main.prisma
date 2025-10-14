@@ -305,7 +305,7 @@ model Company {
   bsdasriRevisionRequests              BsdasriRevisionRequest[]
 
   // Eco organismes avec lesquels l'entreprise travaille
-  ecoOrganismesPartners                String[] @default([]) 
+  ecoOrganismePartnersIds                String[] @default([]) 
 
   givenSignatureAutomations       SignatureAutomation[]    @relation("SignatureAutomationFrom")
   receivedSignatureAutomations    SignatureAutomation[]    @relation("SignatureAutomationTo")
