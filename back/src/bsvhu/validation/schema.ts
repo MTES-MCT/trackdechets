@@ -10,7 +10,8 @@ import {
   checkEmitterSituation,
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
-  checkTransportModeAndReceptionWeight
+  checkTransportModeAndReceptionWeight,
+  checkNextDestinationCompany
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -149,16 +150,20 @@ const rawBsvhuSchema = z.object({
   destinationOperationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
   ).nullish(),
+  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
+  destinationOperationNextDestinationCompanyExtraEuropeanId: z
+    .string()
+    .nullish(),
   destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
+  destinationOperationNextDestinationCompanyCountry: z.string().nullish(),
   destinationOperationNextDestinationCompanyContact: z.string().nullish(),
   destinationOperationNextDestinationCompanyPhone: z.string().nullish(),
   destinationOperationNextDestinationCompanyMail: z
     .string()
     .email("E-mail destinataire suivant invalide")
     .nullish(),
-  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
-    CompanyRole.NextDestination
-  ).nullish(),
   destinationOperationSignatureAuthor: z.string().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationDate: z.coerce.date().nullish(),
@@ -234,6 +239,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
   .superRefine(checkEmitterSituation)
+  .superRefine(checkNextDestinationCompany)
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)

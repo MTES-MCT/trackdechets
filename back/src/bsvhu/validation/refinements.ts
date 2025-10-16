@@ -175,6 +175,29 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
     });
   }
 };
+
+export const checkNextDestinationCompany: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  { addIssue }
+) => {
+  if (
+    bsvhu.destinationOperationNextDestinationCompanySiret &&
+    bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [
+        "destination",
+        "operation",
+        "nextDestination",
+        "company",
+        "extraEuropeanId"
+      ],
+      message:
+        "destinationOperationNextDestinationCompanyExtraEuropeanId : L'établissement doit être visé soit avec un SIRET soit avec un identifiant extra-européen"
+    });
+  }
+};
 // Date de la MAJ 2024.10.1 qui rend obligatoire la complétion des numéros d'identification
 export const v20241001 = new Date("2024-10-23T00:00:00.000");
 
