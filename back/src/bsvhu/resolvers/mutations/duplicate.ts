@@ -102,7 +102,6 @@ async function getDuplicateData(
     trader,
     transporters: transporterCompanies
   } = await getBsvhuCompanies(bsvhu);
-  // TODO duplication de tous les transporteurs Attention BSDA ne duplique que le premier transporter
   let data: Prisma.BsvhuCreateInput = {
     ...parsedBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
