@@ -290,7 +290,6 @@ export function destinationOperationModeRefinement(
         !modes.includes(destinationOperationMode)) ||
       (!modes.length && destinationOperationMode)
     ) {
-      console.log("ERROR");
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: pathFromCompanyRole(CompanyRole.Destination),
