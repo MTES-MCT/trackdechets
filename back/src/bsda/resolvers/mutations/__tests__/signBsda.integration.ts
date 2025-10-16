@@ -2843,7 +2843,7 @@ describe("Mutation.Bsda.sign", () => {
             operation: {
               code: "R 5",
               date: new Date().toISOString() as any,
-              mode: "REUTILISATION"
+              mode: "RECYCLAGE"
             }
           }
         }
@@ -2878,7 +2878,7 @@ describe("Mutation.Bsda.sign", () => {
         // Operation data
         destinationOperationCode: "R 5",
         destinationOperationDate: new Date(),
-        destinationOperationMode: "REUTILISATION"
+        destinationOperationMode: "RECYCLAGE"
       });
 
       // When
@@ -2923,7 +2923,7 @@ describe("Mutation.Bsda.sign", () => {
         // Operation data
         destinationOperationCode: "R 5",
         destinationOperationDate: new Date(),
-        destinationOperationMode: "REUTILISATION"
+        destinationOperationMode: "RECYCLAGE"
       });
 
       // When

@@ -25,6 +25,7 @@ import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
+import { isDefined } from "../../../../common/helpers";
 import {
   castD9toD9F,
   fixOperationModeForD9F
@@ -266,12 +267,29 @@ async function getFlatContent(
     );
   }
 
+  const contentToValidate = { ...flatContent };
+
+  // If the user modifies either the operation code or the operation mode,
+  // we need to make sure both fields are present for the validation
+  if (
+    isDefined(flatContent.destinationOperationCode) ||
+    isDefined(flatContent.destinationOperationMode)
+  ) {
+    contentToValidate.destinationOperationCode =
+      flatContent.destinationOperationCode ?? bsda.destinationOperationCode;
+    contentToValidate.destinationOperationMode =
+      flatContent.destinationOperationMode ?? bsda.destinationOperationMode;
+  }
+
   const parsed = await schema
     // For the refused weight, we need the bsda previous state
-    .superRefine((flatContent, ctx) =>
-      checkDestinationReceptionRefusedWeight({ ...bsda, ...flatContent }, ctx)
+    .superRefine((contentToValidate, ctx) =>
+      checkDestinationReceptionRefusedWeight(
+        { ...bsda, ...contentToValidate },
+        ctx
+      )
     )
-    .parseAsync(flatContent); // Validate but don't parse as we want to keep empty fields empty
+    .parseAsync(contentToValidate); // Validate but don't parse as we want to keep empty fields empty
 
   if (parsed.destinationOperationCode || parsed.destinationOperationMode) {
     flatContent.destinationOperationCode = parsed.destinationOperationCode;
@@ -347,7 +365,7 @@ const schema = rawBsdaSchema
       "packagings",
       "destinationCap",
       "destinationOperationCode",
-      "destinationOperationMode",
+      // "destinationOperationMode",
       "destinationOperationDescription",
       "destinationReceptionWeight"
     ] as const;
