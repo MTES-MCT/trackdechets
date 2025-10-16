@@ -738,7 +738,8 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       opt: {
         emitterCompanySiret: company.siret,
         destinationCompanySiret: recipientCompany.siret,
-        status: "SENT"
+        status: "SENT",
+        destinationOperationMode: null
       }
     });
 
