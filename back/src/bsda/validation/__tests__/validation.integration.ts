@@ -798,7 +798,7 @@ describe("BSDA parsing", () => {
     );
 
     test.each([
-      ["R 5", "VALORISATION_ENERGETIQUE"], // Correct modes are RECYCLAGE or AUTRES_VALORISATIONS
+      ["R 5", "RECYCLAGE"],
       ["R 13", undefined],
       ["D 9 F", undefined]
     ])(
