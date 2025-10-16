@@ -46,7 +46,7 @@ const Worker = ({ errors }) => {
       worker?.certification.hasSubSectionFour);
 
   const updateWorkerState = useCallback(
-    workerSelected => {
+    (workerSelected: CompanySearchResult) => {
       if (workerSelected) {
         if (workerSelected?.workerCertification) {
           setValue(

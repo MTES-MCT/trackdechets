@@ -22,6 +22,7 @@ import Worker from "./steps/Worker";
 import TransporterBsda from "./steps/Transporter";
 import DestinationBsda from "./steps/Destination";
 import ActorsList from "./steps/ActorsList";
+import WasteBsda from "./steps/Waste";
 
 interface Props {
   bsdId?: string;
@@ -92,7 +93,13 @@ const BsdaFormSteps = ({
 
   const tabsContent = useMemo(
     () => ({
-      waste: <p>TODO</p>,
+      waste: (
+        <WasteBsda
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.emitter
+          )}
+        />
+      ),
       emitter: (
         <EmitterBsda
           errors={publishErrorMessages.filter(
