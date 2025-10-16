@@ -42,7 +42,6 @@ export type CompanyTypeInputProps = {
     agrementNumber?: InputProps["nativeInputProps"];
     department?: InputProps["nativeInputProps"];
   };
-  vhuEcoOrganismes?: InputProps["nativeInputProps"];
   workerCertification?: {
     hasSubSectionThree?: InputProps["nativeInputProps"];
     hasSubSectionFour?: InputProps["nativeInputProps"];
@@ -85,7 +84,6 @@ export type CompanyTypeInputErrors = {
     validityLimit?: string;
     organisation?: string;
   };
-  vhuEcoOrganismes?: string[];
   ecoOrganismeAgreements?: (string | null)[];
   ecoOrganismePartnersIds?: string;
 };

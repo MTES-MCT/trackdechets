@@ -33,6 +33,7 @@ export interface FormikCompanyTypeValues {
   wasteProcessorTypes: WasteProcessorType[];
   wasteVehiclesTypes: WasteVehiclesType[];
   ecoOrganismeAgreements: string[];
+  ecoOrganismePartnersIds: string[];
 }
 
 type FormikCompanyTypeFormProps = Pick<
@@ -60,6 +61,7 @@ const FormikCompanyTypeForm = ({
   const wasteProcessorTypes = values.wasteProcessorTypes;
   const wasteVehiclesTypes = values.wasteVehiclesTypes;
   const ecoOrganismeAgreements = values.ecoOrganismeAgreements;
+  const ecoOrganismePartnersIds = values.ecoOrganismePartnersIds;
 
   const isSubmitted = submitCount > 0;
 
@@ -183,7 +185,8 @@ const FormikCompanyTypeForm = ({
           hasSubSectionThree:
             values.workerCertification?.hasSubSectionThree ?? false
         },
-        ecoOrganismeAgreements
+        ecoOrganismeAgreements,
+        ecoOrganismePartnersIds
       }}
       handleToggle={handleToggle}
       inputProps={{
@@ -237,6 +240,12 @@ const FormikCompanyTypeForm = ({
               ecoOrganismeAgreements.filter((_, i) => i !== index)
             );
           }
+        },
+        ecoOrganismePartnersIds: {
+          onChange: (value: string[]) => {
+            setFieldValue("ecoOrganismePartnersIds", value);
+          },
+          value: ecoOrganismePartnersIds
         }
       }}
       inputErrors={{
@@ -299,7 +308,11 @@ const FormikCompanyTypeForm = ({
         ecoOrganismeAgreements:
           isSubmitted && touched?.ecoOrganismeAgreements
             ? ((errors?.ecoOrganismeAgreements ?? []) as string[])
-            : []
+            : [],
+        ecoOrganismePartnersIds:
+          isSubmitted && touched?.ecoOrganismePartnersIds
+            ? (errors.ecoOrganismePartnersIds as string)
+            : undefined
       }}
     />
   );

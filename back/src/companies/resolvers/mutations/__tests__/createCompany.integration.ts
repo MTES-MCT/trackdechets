@@ -5,8 +5,10 @@ import { ErrorCode } from "../../../../common/errors";
 import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   siretify,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
@@ -95,6 +97,7 @@ const CREATE_COMPANY = gql`
       }
       allowBsdasriTakeOverWithoutSignature
       verificationStatus
+      ecoOrganismePartnersIds
     }
   }
 `;
@@ -2237,5 +2240,66 @@ describe("Mutation.createCompany", () => {
       expect(company?.city).toBe("Marchin");
       expect(company?.country).toBe("BE");
     });
+  });
+
+  it("should create company and ecoOrganismePartnersIds", async () => {
+    // Given
+    const user = await userFactory();
+    const orgId = siretify(7);
+
+    // Eco-organisme
+    const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsvhu: true }
+    });
+
+    const companyInput = {
+      siret: orgId,
+      gerepId: "1234",
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      website: "https://trackdechets.beta.gouv.fr",
+      ecoOrganismePartnersIds: [ecoOrganisme.id]
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      siret: companyInput.siret,
+      gerepId: companyInput.gerepId,
+      name: companyInput.companyName,
+      companyTypes: companyInput.companyTypes,
+      allowBsdasriTakeOverWithoutSignature: false, // by default
+      ecoOrganismePartnersIds: [ecoOrganisme.id]
+    });
+
+    const newCompany = await prisma.company.findFirst({
+      where: {
+        siret: companyInput.siret
+      }
+    });
+    expect(newCompany).not.toBeUndefined();
+    expect(newCompany?.ecoOrganismePartnersIds).toEqual([ecoOrganisme.id]);
   });
 });

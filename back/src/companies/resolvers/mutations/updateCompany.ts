@@ -72,32 +72,6 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     ecoOrganismePartnersIds
   } = await parseCompanyAsync(zodCompany);
 
-  // On vérifie que les éco-organismes déclarés existent bien
-  if (ecoOrganismePartnersIds && ecoOrganismePartnersIds.length > 0) {
-    const ecoOrganismes = await prisma.ecoOrganisme.findMany({
-      where: {
-        id: {
-          in: ecoOrganismePartnersIds
-        }
-      },
-      select: {
-        id: true
-      }
-    });
-
-    const notFoundIds = ecoOrganismePartnersIds.filter(
-      id => !ecoOrganismes.map(e => e.id).includes(id)
-    );
-
-    if (notFoundIds.length > 0) {
-      throw new Error(
-        `Les IDs suivants n'appartiennent pas à un éco-organisme : ${notFoundIds.join(
-          ", "
-        )}`
-      );
-    }
-  }
-
   const data: Prisma.CompanyUpdateInput = {
     companyTypes,
     collectorTypes,
