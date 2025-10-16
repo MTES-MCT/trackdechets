@@ -235,8 +235,8 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
                 <option value="D 5">
                   D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
                 </option>
-                <option value="D 9">
-                  D 9 - Traitement chimique ou prétraitement (dont
+                <option value="D 9 F">
+                  D 9 F - Traitement chimique ou prétraitement (dont
                   vitrification)
                 </option>
               </>

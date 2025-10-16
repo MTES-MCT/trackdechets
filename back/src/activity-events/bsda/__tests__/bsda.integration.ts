@@ -97,7 +97,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           destination: {
-            plannedOperationCode: "D 9",
+            plannedOperationCode: "D 9 F",
             cap: "1234",
             company: {
               name: destinationCompany.name,
@@ -270,7 +270,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           destination: {
-            plannedOperationCode: "D 9",
+            plannedOperationCode: "D 9 F",
             cap: "1234",
             company: {
               name: company.name,
