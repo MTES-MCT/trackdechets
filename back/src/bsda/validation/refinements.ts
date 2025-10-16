@@ -63,7 +63,17 @@ export const checkOperationMode: Refinement<ParsedZodBsda> = (
   bsda,
   { addIssue }
 ) => {
-  const { destinationOperationCode, destinationOperationMode } = bsda;
+  const {
+    destinationOperationCode,
+    destinationOperationMode,
+    destinationOperationSignatureDate
+  } = bsda;
+
+  // Le BSDA a déjà été signé. On ne vérifie plus le mode pour ne pas casser les BSDs legacy
+  if (destinationOperationSignatureDate && destinationOperationCode) {
+    return;
+  }
+
   if (destinationOperationCode) {
     const modes = getOperationModesFromOperationCode(destinationOperationCode);
 

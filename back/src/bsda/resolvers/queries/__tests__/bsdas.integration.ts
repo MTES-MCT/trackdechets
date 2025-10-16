@@ -28,6 +28,9 @@ const GET_BSDAS = `
             }
           }
           metadata {
+            errors {
+              requiredFor
+            }
             latestRevision {
               authoringCompany {
                 siret
@@ -410,5 +413,28 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges[0].node.transporter?.company?.siret).toBe(
       bsda.transporters[0].transporterCompanySiret
     );
+  });
+
+  it("should return bsdas associated with the user company even if operation mode is illegal", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationOperationCode: "R 5",
+        destinationOperationMode: "REUTILISATION",
+        destinationOperationSignatureDate: new Date()
+      }
+    });
+
+    // When
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "bsdas">, QueryBsdasArgs>(
+      GET_BSDAS
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.bsdas.edges.length).toBe(1);
   });
 });

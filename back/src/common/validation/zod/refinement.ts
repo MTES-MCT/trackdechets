@@ -267,8 +267,14 @@ export async function isEmitterRefinement(
 export function destinationOperationModeRefinement(
   destinationOperationCode: string | null | undefined,
   destinationOperationMode: string | null | undefined,
+  destinationOperationSignatureDate: Date | null | undefined,
   ctx: RefinementCtx
 ) {
+  // Le BSD a déjà été signé. On ne vérifie plus le mode pour ne pas casser les BSDs legacy
+  if (destinationOperationSignatureDate && destinationOperationCode) {
+    return;
+  }
+
   if (destinationOperationCode) {
     const modes = getOperationModesFromOperationCode(destinationOperationCode);
 
@@ -284,6 +290,7 @@ export function destinationOperationModeRefinement(
         !modes.includes(destinationOperationMode)) ||
       (!modes.length && destinationOperationMode)
     ) {
+      console.log("ERROR");
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: pathFromCompanyRole(CompanyRole.Destination),
