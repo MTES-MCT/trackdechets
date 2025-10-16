@@ -42,6 +42,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking Change
 
 - Suppression du code et des queries liées aux anciens exports de registres [PR 4442](https://github.com/MTES-MCT/trackdechets/pull/4442)
+- Le code de traitement D9 n'existe plus (il faut désormais utiliser D9F) [PR 4464](https://github.com/MTES-MCT/trackdechets/pull/4464)
+- Révision de la correspondance entre codes et modes de traitement [PR 4459](https://github.com/MTES-MCT/trackdechets/pull/4459)
 
 # [2025.08.1] 26/08/2025
 
