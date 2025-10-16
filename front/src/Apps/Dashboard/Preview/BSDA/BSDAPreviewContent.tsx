@@ -31,6 +31,7 @@ import QRCodeIcon from "react-qr-code";
 import { TBsdStatusCode } from "../../../common/types/bsdTypes";
 import BSDAPreviewNextBsda from "./BSDAPreviewNextBsda";
 import { getWasteConsistenceLabel } from "./utils";
+import { capitalize } from "../../../../common/helper";
 
 interface BSDAPreviewContentProps {
   bsdId: string;
@@ -216,7 +217,7 @@ const BSDAPreviewContent = ({ bsdId }: BSDAPreviewContentProps) => {
 
                 <PreviewTextRow
                   label="Éco-organisme"
-                  value={bsd.ecoOrganisme?.name}
+                  value={capitalize(bsd.ecoOrganisme?.name)}
                 />
               </PreviewContainerCol>
 

@@ -60,7 +60,7 @@ import { NON_RENSEIGNE } from "../../../common/wordings/dashboard/wordingsDashbo
 
 import "./bsdCard.scss";
 import { getCurrentTransporterInfos } from "../../bsdMapper";
-import { isDefined } from "../../../../common/helper";
+import { capitalize, isDefined } from "../../../../common/helper";
 import { useCloneBsd } from "../Clone/useCloneBsd";
 import { copyToClipboard } from "../../../utils/utils";
 import Button from "@codegouvfr/react-dsfr/Button";
@@ -446,7 +446,7 @@ function BsdCard({
                   {bsdDisplay?.ecoOrganisme?.name && (
                     <InfoWithIcon
                       labelCode={InfoIconCode.EcoOrganism}
-                      info={bsdDisplay?.ecoOrganisme?.name}
+                      info={capitalize(bsdDisplay?.ecoOrganisme?.name)}
                     />
                   )}
                   {pickupSiteName && (

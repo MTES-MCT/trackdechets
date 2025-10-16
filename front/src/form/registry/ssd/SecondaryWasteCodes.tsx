@@ -142,7 +142,7 @@ export function SecondaryWasteCodes({ methods }: Props) {
             {description && (
               <div className="fr-col-md-12">
                 <Alert
-                  description={capitalize(description)}
+                  description={capitalize(description) as string}
                   severity="info"
                   small
                 />
