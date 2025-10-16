@@ -145,6 +145,9 @@ describe("Query.Bsvhus", () => {
 
     const expected = {
       id: bsvhu.id,
+      metadata: {
+        errors: []
+      },
       customId: "some custom ID",
       isDraft: false,
       destination: { company: { siret: bsvhu.destinationCompanySiret } },
@@ -363,7 +366,6 @@ describe("Query.Bsvhus", () => {
     const { data, errors } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
 
     // Then
-    console.log("edge 1", data.bsvhus.edges[0].node.metadata?.errors);
     expect(errors).toBeUndefined();
     expect(data.bsvhus.edges.length).toBe(1);
   });
