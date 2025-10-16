@@ -22,6 +22,7 @@ import {
 } from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
+  countryCodeSchema,
   foreignVatNumberSchema,
   rawTransporterSchema,
   siretSchema
@@ -171,10 +172,9 @@ const rawBsvhuSchema = z.object({
     .string()
     .max(150)
     .nullish(),
-  destinationOperationNextDestinationCompanyCountry: z
-    .string()
-    .max(150)
-    .nullish(),
+  destinationOperationNextDestinationCompanyCountry: countryCodeSchema(
+    CompanyRole.DestinationOperationNextDestination
+  ).nullish(),
   destinationOperationNextDestinationCompanyContact: z
     .string()
     .max(150)
