@@ -123,6 +123,7 @@ export const checkOperationMode: Refinement<ParsedZodBsvhu> = (
   destinationOperationModeRefinement(
     bsvhu.destinationOperationCode,
     bsvhu.destinationOperationMode,
+    bsvhu.destinationOperationSignatureDate,
     zodContext
   );
 };

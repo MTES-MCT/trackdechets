@@ -30,7 +30,14 @@ export const checkOperationMode: Refinement<ParsedZodBsffPackaging> = (
   { addIssue }
 ) => {
   // Vérifications sur la cohérence entre le code d'opération et le mode de traitement
-  const { operationCode, operationMode } = bsffPackaging;
+  const { operationCode, operationMode, operationSignatureDate } =
+    bsffPackaging;
+
+  // Le BSFF a déjà été signé. On ne vérifie plus le mode pour ne pas casser les BSFFs legacy
+  if (operationSignatureDate && operationCode) {
+    return;
+  }
+
   if (operationCode) {
     const modes = getOperationModesFromOperationCode(operationCode);
 

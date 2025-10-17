@@ -10,7 +10,7 @@ import {
   bsvhuFactory,
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
-import { UserRole } from "@prisma/client";
+import { OperationMode, UserRole } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSVHUS = `
@@ -24,6 +24,12 @@ const GET_BSVHUS = `
       }
       edges {
         node {
+          metadata {
+            errors {
+              message
+              requiredFor
+            }
+          }
           id
           customId
           isDraft
@@ -139,6 +145,9 @@ describe("Query.Bsvhus", () => {
 
     const expected = {
       id: bsvhu.id,
+      metadata: {
+        errors: []
+      },
       customId: "some custom ID",
       isDraft: false,
       destination: { company: { siret: bsvhu.destinationCompanySiret } },
@@ -339,5 +348,25 @@ describe("Query.Bsvhus", () => {
 
     expect(data.bsvhus.edges.length).toBe(1);
     expect(data.bsvhus.edges[0].node.id).toBe(vhu.id);
+  });
+
+  it("should get a list of bsvhus even if the operation mode is illegal", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const opt = {
+      emitterCompanySiret: company.siret,
+      destinationOperationCode: "R 4",
+      destinationOperationMode: OperationMode.REUTILISATION, // Illegal mode for R4
+      destinationOperationSignatureDate: new Date()
+    };
+    await bsvhuFactory({ opt });
+
+    // When
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.bsvhus.edges.length).toBe(1);
   });
 });
