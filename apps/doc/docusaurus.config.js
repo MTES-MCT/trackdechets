@@ -1,6 +1,25 @@
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 const path = require("path");
 
+// Module resolution override for @td packages.
+// Needed to build workflow examples that require /back code
+const Module = require("module");
+// Override module resolution BEFORE loading plugins
+const originalResolveFilename = Module._resolveFilename;
+Module._resolveFilename = function(request, parent) {
+  const mappings = {
+    "@td/prisma": path.resolve(__dirname, "plugin/build/libs/back/prisma/src/index.js"),
+    // Add other @td packages your workflows import
+  };
+  
+  if (mappings[request]) {
+    return originalResolveFilename.call(this, mappings[request], parent);
+  }
+  
+  return originalResolveFilename.apply(this, arguments);
+};
+
+
 module.exports = {
   title: "Documentation technique de l'API Trackdéchets",
   tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",

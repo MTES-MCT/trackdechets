@@ -13,6 +13,7 @@ import {
 } from "../lookup/utils";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
+import { ITXClientDenyList } from "@prisma/client/runtime/client";
 
 export const RegistryV2IncomingTexsInclude = {
   texsAnalysisFiles: true
@@ -234,7 +235,7 @@ const registryToLookupCreateInput = (
 export const updateRegistryLookup = async (
   registryIncomingTexs: MinimalRegistryForLookup,
   oldRegistryIncomingTexsId: string | null,
-  tx: PrismaClient
+  tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryIncomingTexsId) {
     await tx.registryLookup.upsert({

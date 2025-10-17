@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { v7 as uuidv7 } from "uuid";
-import { ITXClientDenyList } from "@td/prisma/runtime/library";
+import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import { clearLine, cursorTo } from "readline";
 import { performance } from "perf_hooks";
 

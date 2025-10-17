@@ -3,10 +3,6 @@ import { PrismaClient } from "./generated/prisma/client";
 
 const { DATABASE_URL } = process.env;
 
-if (!DATABASE_URL) {
-  throw new Error("DATABASE_URL is not defined");
-}
-
 const adapter = new PrismaPg(
   { connectionString: DATABASE_URL },
   { schema: "default$default" }

@@ -12,7 +12,7 @@ import {
   generateDateInfos,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
-import { ITXClientDenyList } from "@td/prisma/runtime/library";
+import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
 

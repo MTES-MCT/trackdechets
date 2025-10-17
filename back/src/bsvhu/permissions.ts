@@ -1,5 +1,5 @@
 import { Bsvhu, BsvhuStatus, BsvhuTransporter, User } from "@td/prisma";
-import type { BsvhuInput } from "@td/codegen-back";
+import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { BsvhuWithTransporters } from "./types";
 import { prisma } from "@td/prisma";

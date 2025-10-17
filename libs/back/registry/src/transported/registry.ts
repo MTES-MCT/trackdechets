@@ -14,6 +14,7 @@ import {
 } from "../lookup/utils";
 import type { TransportedWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
+import { ITXClientDenyList } from "@prisma/client/runtime/client";
 
 const getWasteIsDangerous = (
   transportedWaste: Pick<
@@ -180,7 +181,7 @@ const registryToLookupCreateInput = (
 export const updateRegistryLookup = async (
   registryTransported: MinimalRegistryForLookup,
   oldRegistryTransportedId: string | null,
-  tx: PrismaClient
+  tx: Omit<PrismaClient, ITXClientDenyList>
 ): Promise<void> => {
   if (oldRegistryTransportedId) {
     await tx.registryLookup.upsert({
