@@ -97,7 +97,8 @@ model RegistrySsd {
     registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistrySsdImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistrySsdPublicIdReportForSiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistrySsdPublicIdReportForSiretIsLatestUIdx")
 }
 
 model RegistryIncomingWaste {
@@ -219,7 +220,8 @@ model RegistryIncomingWaste {
     registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 model RegistryIncomingTexs {
@@ -350,7 +352,8 @@ model RegistryIncomingTexs {
     texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 model RegistryOutgoingTexs {
@@ -482,7 +485,8 @@ model RegistryOutgoingTexs {
     texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 model RegistryOutgoingWaste {
@@ -604,7 +608,8 @@ model RegistryOutgoingWaste {
     registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryOutgoingWasteImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 model RegistryTransported {
@@ -680,7 +685,8 @@ model RegistryTransported {
     registryLookups RegistryLookup[]
 
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryTransportedPublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 model RegistryManaged {
@@ -821,7 +827,8 @@ model RegistryManaged {
     texsAnalysisFiles RegistryTexsAnalysisFile[]
 
     @@index([importId], map: "_RegistryManagedImportIdIdx")
-    @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
+
+    @@unique([publicId, reportForCompanySiret, isLatest], map: "_RegistryManagedPublicIdReportForCompanySiretIsLatestUIdx")
 }
 
 enum RegistryExportType {
