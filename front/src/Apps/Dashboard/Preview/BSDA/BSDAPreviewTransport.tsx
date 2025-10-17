@@ -25,7 +25,7 @@ const BSDAPreviewTransport = ({ bsd }: BSDAPreviewTransportProps) => {
   const prefix = (index: number) => (isMultiModal ? `${index + 1} - ` : "");
 
   const isTransporterProvided =
-    bsd.transporters.length > 1 && !!bsd.transporters[0].company;
+    bsd.transporters.length >= 1 && !!bsd.transporters[0].company;
 
   return (
     <PreviewContainer>
