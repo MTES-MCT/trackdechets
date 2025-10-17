@@ -6,6 +6,7 @@ import { ZodBsvhu } from "../schema";
 import { BsvhuEcoOrganismeInput, Query } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import { useQuery, gql } from "@apollo/client";
+import { capitalize } from "../../../../../common/helper";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -98,7 +99,7 @@ const EcoOrganism = () => {
                   value={ecoOrg.siret}
                   defaultValue={ecoOrganisme?.siret || ""}
                 >
-                  {`${ecoOrg.siret} - ${ecoOrg.name}`}
+                  {`${ecoOrg.siret} - ${capitalize(ecoOrg.name)}`}
                 </option>
               );
             })}

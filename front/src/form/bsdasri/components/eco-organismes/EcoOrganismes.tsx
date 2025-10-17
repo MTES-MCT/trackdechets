@@ -10,6 +10,7 @@ import {
   BsdasriEcoOrganisme
 } from "@td/codegen-ui";
 import TdSwitch from "../../../../common/components/Switch";
+import { capitalize } from "../../../../common/helper";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -90,7 +91,8 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
                   }
                   results={data.ecoOrganismes.map(eo => ({
                     ...eo,
-                    orgId: eo.siret
+                    orgId: eo.siret,
+                    name: capitalize(eo.name) as string
                   }))}
                   selectedItem={
                     data.ecoOrganismes

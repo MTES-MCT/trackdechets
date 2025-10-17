@@ -6,6 +6,7 @@ import classNames from "classnames";
 import routes from "../../../../Apps/routes";
 import { generatePath } from "react-router-dom";
 import { IconTDCompany } from "../Icons/Icons";
+import { capitalize } from "../../../../common/helper";
 
 function highlight(text: string, highlight: string): ReactNode {
   if (highlight?.length > 0) {
@@ -38,7 +39,7 @@ const CompanySelectorItem = ({
   searchClue = "",
   postalCodeClue = ""
 }: CompanySelectorItemProps) => {
-  const name = company.name ?? "[Raison sociale inconnue]";
+  const name = capitalize(company.name ?? "") ?? "[Raison sociale inconnue]";
   const address = company.address ?? "[Adresse inconnue]";
   const countryCode = company.codePaysEtrangerEtablissement ?? "FR";
 
