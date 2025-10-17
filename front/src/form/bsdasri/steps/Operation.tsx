@@ -38,8 +38,8 @@ export default function Operation({ status, disabled = false }) {
           {values.type !== BsdasriType.Synthesis ? (
             <>
               <option value="D13">
-                D13 - Groupement avant désinfection en D9 ou incinération en D10
-                sur un site relevant de la rubrique 2718
+                D13 - Groupement avant désinfection en D9F ou incinération en
+                D10 sur un site relevant de la rubrique 2718
               </option>
               <option value="R12">
                 R12 - Groupement avant incinération en R1, sur un site relevant
