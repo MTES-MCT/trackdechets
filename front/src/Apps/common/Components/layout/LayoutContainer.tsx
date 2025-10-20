@@ -19,7 +19,6 @@ import Account from "../../../Account/Account";
 import FormContainer from "../../../../form/bsdd/FormContainer";
 import BsffFormContainer from "../../../../form/bsff/FormContainer";
 import BsdasriFormContainer from "../../../../form/bsdasri/FormContainer";
-import BsdaFormContainer from "../../../../form/bsda/FormContainer";
 import WasteSelector from "../../../../login/WasteSelector";
 import Invite from "../../../../login/Invite";
 import UserActivation from "../../../../login/UserActivation";
@@ -188,24 +187,6 @@ export default function LayoutContainer() {
             element={
               <RequireAuth>
                 <BsdasriFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsdas.create}
-            element={
-              <RequireAuth>
-                <BsdaFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsdas.edit}
-            element={
-              <RequireAuth>
-                <BsdaFormContainer />
               </RequireAuth>
             }
           />
