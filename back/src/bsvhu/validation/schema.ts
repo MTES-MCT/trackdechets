@@ -10,7 +10,8 @@ import {
   checkEmitterSituation,
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
-  checkTransportModeAndReceptionWeight
+  checkTransportModeAndReceptionWeight,
+  checkNextDestinationCompany
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
@@ -21,6 +22,7 @@ import {
 } from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
+  countryCodeSchema,
   foreignVatNumberSchema,
   rawTransporterSchema,
   siretSchema
@@ -159,10 +161,20 @@ const rawBsvhuSchema = z.object({
   destinationOperationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
   ).nullish(),
+  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
+    CompanyRole.NextDestination
+  ).nullish(),
+  destinationOperationNextDestinationCompanyExtraEuropeanId: z
+    .string()
+    .max(150)
+    .nullish(),
   destinationOperationNextDestinationCompanyAddress: z
     .string()
     .max(150)
     .nullish(),
+  destinationOperationNextDestinationCompanyCountry: countryCodeSchema(
+    CompanyRole.DestinationOperationNextDestination
+  ).nullish(),
   destinationOperationNextDestinationCompanyContact: z
     .string()
     .max(150)
@@ -176,9 +188,6 @@ const rawBsvhuSchema = z.object({
     .max(150)
     .email("E-mail destinataire suivant invalide")
     .nullish(),
-  destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
-    CompanyRole.NextDestination
-  ).nullish(),
   destinationOperationSignatureAuthor: z.string().max(150).nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationDate: z.coerce.date().nullish(),
@@ -254,6 +263,7 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
   .superRefine(checkEmitterSituation)
+  .superRefine(checkNextDestinationCompany)
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)

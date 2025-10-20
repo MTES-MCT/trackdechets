@@ -87,6 +87,7 @@ const schema = z.object({
             company: z.object({
               orgId: z.string().nullish(),
               siret: z.string().nullish(),
+              vatNumber: z.string().nullish(),
               name: z.string().nullish(),
               contact: z.string().nullish(),
               phone: z.string().nullish(),
@@ -288,11 +289,13 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
                 orgId={siret}
                 favoriteType={FavoriteType.Destination}
                 selectedCompanyOrgId={orgIdNextDestination}
+                allowForeignCompanies={true}
                 onCompanySelected={company => {
                   if (company) {
                     const name = `destination.operation.nextDestination.company`;
                     setValue(`${name}.orgId`, company.orgId);
                     setValue(`${name}.siret`, company.siret);
+                    setValue(`${name}.vatNumber`, company.vatNumber);
                     setValue(`${name}.name`, company.name);
                     setValue(`${name}.address`, company.address);
                     setValue(

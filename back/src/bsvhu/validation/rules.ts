@@ -543,6 +543,17 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
       "vatNumber"
     ]
   },
+  destinationOperationNextDestinationCompanyExtraEuropeanId: {
+    sealed: { from: "OPERATION" },
+    readableFieldName: "L'identifiant extra-européen de l'exutoire",
+    path: [
+      "destination",
+      "operation",
+      "nextDestination",
+      "company",
+      "extraEuropeanId"
+    ]
+  },
   destinationOperationNextDestinationCompanyName: {
     sealed: { from: "OPERATION" },
     required: {
@@ -564,6 +575,11 @@ export const bsvhuEditionRules: BsvhuEditionRules = {
     },
     readableFieldName: "L'adresse de l'exutoire",
     path: ["destination", "operation", "nextDestination", "company", "address"]
+  },
+  destinationOperationNextDestinationCompanyCountry: {
+    sealed: { from: "OPERATION" },
+    readableFieldName: "Le pays de l'exutoire",
+    path: ["destination", "operation", "nextDestination", "company", "country"]
   },
   destinationOperationNextDestinationCompanyContact: {
     sealed: { from: "OPERATION" },
