@@ -261,6 +261,11 @@ const EmitterBsda = ({ errors }) => {
                     };
                   }
 
+                  if (errors?.length) {
+                    // server errors
+                    clearCompanyError(emitter, "emitter", clearErrors);
+                  }
+
                   setValue("emitter", {
                     ...emitter,
                     company: {
