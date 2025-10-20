@@ -16,6 +16,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du transport multi-modal sur le BSVHU [PR 4458](https://github.com/MTES-MCT/trackdechets/pull/4458)
 - Ajout de la possibilité de viser une destination ultérieure à l'étranger sur le BSVHU [PR 4480](https://github.com/MTES-MCT/trackdechets/pull/4480)
 
+#### :bug: Corrections de bugs
+
+- Résolution de problèmes de sécurité mineurs [PR 4465](https://github.com/MTES-MCT/trackdechets/pull/4465)
+
 # [2025.09.1] 23/09/2025
 
 #### :nail_care: Améliorations
