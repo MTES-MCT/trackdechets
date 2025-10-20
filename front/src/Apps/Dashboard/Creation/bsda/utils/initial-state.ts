@@ -83,11 +83,7 @@ export default {
         author: null,
         date: null
       },
-      nextDestination: {
-        company: getInitialCompany(),
-        cap: null,
-        plannedOperationCode: null
-      }
+      nextDestination: null
     }
   },
   worker: {

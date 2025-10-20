@@ -1,7 +1,7 @@
 import { useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BsdType, Query, QueryBsdaArgs } from "@td/codegen-ui";
-import React, { useMemo, useState } from "react";
+import { Bsda, BsdType, Query, QueryBsdaArgs } from "@td/codegen-ui";
+import React, { useMemo, useState, createContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Loader } from "../../../common/Components";
 import FormStepsContent from "../FormStepsContent";
@@ -20,6 +20,7 @@ import { rawBsdaSchema, ZodBsda } from "./schema";
 import initialState from "./utils/initial-state";
 import Worker from "./steps/Worker";
 import TransporterBsda from "./steps/Transporter";
+import DestinationBsda from "./steps/Destination";
 
 interface Props {
   bsdId?: string;
@@ -29,6 +30,8 @@ interface Props {
     message: string;
   }[];
 }
+export const BsdaContext = createContext<Bsda | undefined>(undefined);
+
 const BsdaFormSteps = ({
   bsdId,
   publishErrorsFromRedirect
@@ -78,6 +81,13 @@ const BsdaFormSteps = ({
     () => getPublishErrorMessages(BsdType.Bsda, errorsFromPublishApi),
     [errorsFromPublishApi]
   );
+  const [bsdaContext, setBsdaContext] = useState<Bsda | undefined>();
+
+  useEffect(() => {
+    if (bsdaQuery.data?.bsda?.id) {
+      setBsdaContext(bsdaQuery.data.bsda);
+    }
+  }, [bsdaQuery.data?.bsda]);
 
   const tabsContent = useMemo(
     () => ({
@@ -96,8 +106,14 @@ const BsdaFormSteps = ({
           )}
         />
       ),
-      transporter: <TransporterBsda />, // FIXME
-      destination: <p>TODO</p>,
+      transporter: <TransporterBsda />,
+      destination: (
+        <DestinationBsda
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.destination
+          )}
+        />
+      ),
       other: <p>TODO</p>
     }),
     [publishErrorMessages]
@@ -108,7 +124,7 @@ const BsdaFormSteps = ({
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
 
   return (
-    <>
+    <BsdaContext.Provider value={bsdaContext}>
       <FormStepsContent
         bsdType={BsdType.Bsda}
         draftCtaLabel={draftCtaLabel}
@@ -125,7 +141,7 @@ const BsdaFormSteps = ({
         )}
       />
       {loading && <Loader />}
-    </>
+    </BsdaContext.Provider>
   );
 };
 

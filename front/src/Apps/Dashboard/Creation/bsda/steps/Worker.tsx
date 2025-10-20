@@ -244,6 +244,12 @@ const Worker = ({ errors }) => {
                     country: company.codePaysEtrangerEtablissement
                   };
                 }
+
+                if (errors?.length) {
+                  // server errors
+                  clearCompanyError(worker, "worker", clearErrors);
+                }
+
                 setValue("worker", {
                   ...worker,
                   company: {

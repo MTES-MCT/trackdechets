@@ -50,6 +50,16 @@ export type IconIdName =
   | FrIconClassName
   | RiIconClassName;
 
+const getDestinationTabLabel = (bsdType: SupportedBsdTypes) => {
+  if (bsdType === BsdType.Bspaoh) {
+    return "Crématorium";
+  } else if (bsdType === BsdType.Bsda) {
+    return "Destinataire";
+  } else {
+    return "Destination finale";
+  }
+};
+
 export const getTabs = (
   bsdType: SupportedBsdTypes,
   errorTabIds?: TabId[]
@@ -81,7 +91,7 @@ export const getTabs = (
     },
     {
       tabId: TabId.destination,
-      label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
+      label: getDestinationTabLabel(bsdType),
       iconId: getTabClassName(errorTabIds, "destination")
     }
   ];
