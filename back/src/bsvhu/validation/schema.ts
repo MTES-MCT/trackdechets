@@ -88,13 +88,16 @@ const rawBsvhuTransporterSchema = z
   .merge(rawTransporterSchema);
 
 const rawBsvhuSchema = z.object({
-  id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.VHU)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSFF.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
   // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
   // ancienne version du schéma.
-  customId: z.string().nullish(),
+  customId: z.string().max(150).nullish(),
   createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
@@ -112,54 +115,71 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterCompanyName: z.string().nullish(),
+  emitterCompanyName: z.string().max(150).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().nullish(),
-  emitterCompanyStreet: z.string().nullish(),
-  emitterCompanyCity: z.string().nullish(),
-  emitterCompanyPostalCode: z.string().nullish(),
-  emitterCompanyContact: z.string().nullish(),
-  emitterCompanyPhone: z.string().nullish(),
-  emitterCompanyMail: z.string().email("E-mail émetteur invalide").nullish(),
-  emitterCustomInfo: z.string().nullish(),
-  emitterEmissionSignatureAuthor: z.string().nullish(),
+  emitterCompanyAddress: z.string().max(150).nullish(),
+  emitterCompanyStreet: z.string().max(150).nullish(),
+  emitterCompanyCity: z.string().max(150).nullish(),
+  emitterCompanyPostalCode: z.string().max(150).nullish(),
+  emitterCompanyContact: z.string().max(150).nullish(),
+  emitterCompanyPhone: z.string().max(150).nullish(),
+  emitterCompanyMail: z
+    .string()
+    .max(150)
+    .email("E-mail émetteur invalide")
+    .nullish(),
+  emitterCustomInfo: z.string().max(150).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   destinationType: z.nativeEnum(BsvhuDestinationType).nullish(),
   destinationPlannedOperationCode: ZodOperationEnum,
   destinationAgrementNumber: z.string().max(100).nullish(),
-  destinationCompanyName: z.string().nullish(),
+  destinationCompanyName: z.string().max(150).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
-  destinationCompanyAddress: z.string().nullish(),
-  destinationCompanyContact: z.string().nullish(),
-  destinationCompanyPhone: z.string().nullish(),
+  destinationCompanyAddress: z.string().max(150).nullish(),
+  destinationCompanyContact: z.string().max(150).nullish(),
+  destinationCompanyPhone: z.string().max(150).nullish(),
   destinationCompanyMail: z
     .string()
+    .max(150)
     .email("E-mail destinataire invalide")
     .nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
-  destinationReceptionRefusalReason: z.string().nullish(),
-  destinationReceptionIdentificationNumbers: z.array(z.string()).optional(),
+  destinationReceptionRefusalReason: z.string().max(150).nullish(),
+  destinationReceptionIdentificationNumbers: z
+    .array(z.string().max(150))
+    .optional(),
   destinationReceptionIdentificationType: z
     .nativeEnum(BsvhuIdentificationType)
     .nullish(),
   destinationOperationCode: ZodOperationEnum,
-  destinationOperationNextDestinationCompanyName: z.string().nullish(),
+  destinationOperationNextDestinationCompanyName: z.string().max(150).nullish(),
   destinationOperationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
-  destinationOperationNextDestinationCompanyContact: z.string().nullish(),
-  destinationOperationNextDestinationCompanyPhone: z.string().nullish(),
+  destinationOperationNextDestinationCompanyAddress: z
+    .string()
+    .max(150)
+    .nullish(),
+  destinationOperationNextDestinationCompanyContact: z
+    .string()
+    .max(150)
+    .nullish(),
+  destinationOperationNextDestinationCompanyPhone: z
+    .string()
+    .max(150)
+    .nullish(),
   destinationOperationNextDestinationCompanyMail: z
     .string()
+    .max(150)
     .email("E-mail destinataire suivant invalide")
     .nullish(),
   destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  destinationOperationSignatureAuthor: z.string().nullish(),
+  destinationOperationSignatureAuthor: z.string().max(150).nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationDate: z.coerce.date().nullish(),
   destinationReceptionQuantity: z.number().nullish(),
@@ -167,13 +187,13 @@ const rawBsvhuSchema = z.object({
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
-  destinationCustomInfo: z.string().nullish(),
+  destinationCustomInfo: z.string().max(150).nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
-  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(150).nullish(),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
-  identificationNumbers: z.array(z.string()).optional(),
+  identificationNumbers: z.array(z.string().max(150)).optional(),
   identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(), // see refinements
   quantity: z.number().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
@@ -189,32 +209,32 @@ const rawBsvhuSchema = z.object({
     .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
     .optional(),
 
-  ecoOrganismeName: z.string().nullish(),
+  ecoOrganismeName: z.string().max(150).nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
-  brokerCompanyName: z.string().nullish(),
+  brokerCompanyName: z.string().max(150).nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
-  brokerCompanyAddress: z.string().nullish(),
-  brokerCompanyContact: z.string().nullish(),
-  brokerCompanyPhone: z.string().nullish(),
-  brokerCompanyMail: z.string().nullish(),
-  brokerRecepisseNumber: z.string().nullish(),
-  brokerRecepisseDepartment: z.string().nullish(),
+  brokerCompanyAddress: z.string().max(150).nullish(),
+  brokerCompanyContact: z.string().max(150).nullish(),
+  brokerCompanyPhone: z.string().max(150).nullish(),
+  brokerCompanyMail: z.string().max(150).nullish(),
+  brokerRecepisseNumber: z.string().max(150).nullish(),
+  brokerRecepisseDepartment: z.string().max(150).nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
-  traderCompanyName: z.string().nullish(),
+  traderCompanyName: z.string().max(150).nullish(),
   traderCompanySiret: siretSchema(CompanyRole.Trader).nullish(),
-  traderCompanyAddress: z.string().nullish(),
-  traderCompanyContact: z.string().nullish(),
-  traderCompanyPhone: z.string().nullish(),
+  traderCompanyAddress: z.string().max(150).nullish(),
+  traderCompanyContact: z.string().max(150).nullish(),
+  traderCompanyPhone: z.string().max(150).nullish(),
   traderCompanyMail: z.string().nullish(),
-  traderRecepisseNumber: z.string().nullish(),
-  traderRecepisseDepartment: z.string().nullish(),
+  traderRecepisseNumber: z.string().max(150).nullish(),
+  traderRecepisseDepartment: z.string().max(150).nullish(),
   traderRecepisseValidityLimit: z.coerce.date().nullish(),
   intermediaries: z
     .array(intermediarySchema)
     .nullish()
     .superRefine(intermediariesRefinement),
-  intermediariesOrgIds: z.array(z.string()).optional(),
-  transportersOrgIds: z.array(z.string()).optional(),
+  intermediariesOrgIds: z.array(z.string().max(150)).optional(),
+  transportersOrgIds: z.array(z.string().max(150)).optional(),
   containsElectricOrHybridVehicles: z.boolean().nullish()
 });
 

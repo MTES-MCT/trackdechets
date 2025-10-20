@@ -85,7 +85,7 @@ export type ZodBsdasriPackagingEnum = z.infer<typeof ZodBsdasriPackagingEnum>;
 export const bsdasriPackagingSchema = z
   .object({
     type: ZodBsdasriPackagingEnum.nullish(),
-    other: z.string().nullish(),
+    other: z.string().max(150).nullish(),
     quantity: z
       .number()
       .positive("La quantité doit être un nombre positif")
@@ -106,23 +106,30 @@ export type BsdasriPackagingSchema = z.input<typeof bsdasriPackagingSchema>;
  */
 export const rawBsdasriSchema = z.object({
   // Base fields
-  id: z.string().default(() => getReadableId(ReadableIdPrefix.DASRI)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.DASRI)),
   type: z.nativeEnum(BsdasriType).default(BsdasriType.SIMPLE),
   createdAt: z.date().nullish(),
   isDeleted: z.boolean().default(false),
   isDraft: z.boolean().default(false),
 
   // Emitter fields
-  emitterCompanyName: z.string().nullish(),
+  emitterCompanyName: z.string().max(150).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().nullish(),
-  emitterCompanyContact: z.string().nullish(),
-  emitterCompanyPhone: z.string().nullish(),
-  emitterCompanyMail: z.string().email("E-mail émetteur invalide").nullish(),
-  emitterPickupSiteName: z.string().nullish(),
-  emitterPickupSiteAddress: z.string().nullish(),
-  emitterPickupSiteCity: z.string().nullish(),
-  emitterPickupSitePostalCode: z.string().nullish(),
+  emitterCompanyAddress: z.string().max(150).nullish(),
+  emitterCompanyContact: z.string().max(150).nullish(),
+  emitterCompanyPhone: z.string().max(150).nullish(),
+  emitterCompanyMail: z
+    .string()
+    .max(150)
+    .email("E-mail émetteur invalide")
+    .nullish(),
+  emitterPickupSiteName: z.string().max(150).nullish(),
+  emitterPickupSiteAddress: z.string().max(150).nullish(),
+  emitterPickupSiteCity: z.string().max(150).nullish(),
+  emitterPickupSitePostalCode: z.string().max(150).nullish(),
   emitterPickupSiteInfos: z.string().nullish(),
   emitterWasteVolume: z.number().nullish(),
   emitterWastePackagings: z
@@ -133,35 +140,36 @@ export const rawBsdasriSchema = z.object({
 
   emitterWasteWeightValue: weightSchema(WeightUnits.Kilogramme).nullish(),
   emitterWasteWeightIsEstimate: z.boolean().nullish(),
-  emitterCustomInfo: z.string().nullish(),
-  emitterEmissionSignatureAuthor: z.string().nullish(),
+  emitterCustomInfo: z.string().max(150).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   isEmissionDirectTakenOver: z.boolean().nullish().default(false),
   isEmissionTakenOverWithSecretCode: z.boolean().nullish().default(false),
 
   // Waste fields
   wasteCode: ZodBsdasriWasteCodeEnum,
-  wasteAdr: z.string().nullish(),
+  wasteAdr: z.string().max(750).nullish(),
 
   // Transporter fields
-  transporterCompanyName: z.string().nullish(),
+  transporterCompanyName: z.string().max(150).nullish(),
   transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
+  transporterCompanyAddress: z.string().max(150).nullish(),
+  transporterCompanyPhone: z.string().max(150).nullish(),
+  transporterCompanyContact: z.string().max(150).nullish(),
   transporterCompanyMail: z
     .string()
+    .max(150)
     .email("E-mail transporteur invalide")
     .nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
+  transporterRecepisseNumber: z.string().max(150).nullish(),
+  transporterRecepisseDepartment: z.string().max(150).nullish(),
   transporterRecepisseValidityLimit: z.coerce.date().nullish(),
   transporterRecepisseIsExempted: z.boolean().nullish(),
   transporterAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish()
     .nullable(),
-  transporterWasteRefusalReason: z.string().nullish(),
+  transporterWasteRefusalReason: z.string().max(150).nullish(),
   transporterWasteRefusedWeightValue: weightSchema(
     WeightUnits.Kilogramme
   ).nullish(),
@@ -173,8 +181,8 @@ export const rawBsdasriSchema = z.object({
     .transform(val => (val == null ? [] : val)),
   transporterWasteWeightValue: weightSchema(WeightUnits.Kilogramme).nullish(),
   transporterWasteVolume: z.number().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportSignatureAuthor: z.string().nullish(),
+  transporterCustomInfo: z.string().max(150).nullish(),
+  transporterTransportSignatureAuthor: z.string().max(150).nullish(),
   transporterTransportSignatureDate: z.coerce.date().nullish(),
   handedOverToRecipientAt: z.coerce.date().nullish(),
   transporterTransportMode: z
@@ -183,7 +191,7 @@ export const rawBsdasriSchema = z.object({
     .default(TransportMode.ROAD),
   transporterWasteWeightIsEstimate: z.boolean().nullish(),
   transporterTransportPlates: z
-    .array(z.string())
+    .array(z.string().max(150))
     .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
     .default([]),
   transporterCompanyVatNumber: foreignVatNumberSchema(
@@ -191,17 +199,18 @@ export const rawBsdasriSchema = z.object({
   ).nullish(),
 
   // Destination fields
-  destinationCap: z.string().nullish(),
-  destinationCompanyName: z.string().nullish(),
+  destinationCap: z.string().max(150).nullish(),
+  destinationCompanyName: z.string().max(150).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
-  destinationCompanyAddress: z.string().nullish(),
-  destinationCompanyContact: z.string().nullish(),
-  destinationCompanyPhone: z.string().nullish(),
+  destinationCompanyAddress: z.string().max(150).nullish(),
+  destinationCompanyContact: z.string().max(150).nullish(),
+  destinationCompanyPhone: z.string().max(150).nullish(),
   destinationCompanyMail: z
     .string()
+    .max(150)
     .email("E-mail destinataire invalide")
     .nullish(),
-  destinationCustomInfo: z.string().nullish(),
+  destinationCustomInfo: z.string().max(150).nullish(),
   destinationWastePackagings: z
     .array(bsdasriPackagingSchema)
     .nullish()
@@ -210,7 +219,7 @@ export const rawBsdasriSchema = z.object({
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
-  destinationReceptionWasteRefusalReason: z.string().nullish(),
+  destinationReceptionWasteRefusalReason: z.string().max(150).nullish(),
   destinationReceptionWasteRefusedWeightValue: weightSchema(
     WeightUnits.Kilogramme
   ).nullish(),
@@ -221,37 +230,37 @@ export const rawBsdasriSchema = z.object({
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationOperationCode: ZodOperationEnum,
   destinationOperationDate: z.coerce.date().nullish(),
-  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(150).nullish(),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
-  destinationOperationSignatureAuthor: z.string().nullish(),
+  destinationOperationSignatureAuthor: z.string().max(150).nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
 
   // Eco-organisme fields
-  ecoOrganismeName: z.string().nullish(),
+  ecoOrganismeName: z.string().max(150).nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   emittedByEcoOrganisme: z.boolean().default(false),
 
   // broker
-  brokerCompanyName: z.string().nullish(),
+  brokerCompanyName: z.string().max(150).nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
-  brokerCompanyAddress: z.string().nullish(),
-  brokerCompanyContact: z.string().nullish(),
-  brokerCompanyPhone: z.string().nullish(),
-  brokerCompanyMail: z.string().nullish(),
-  brokerRecepisseNumber: z.string().nullish(),
-  brokerRecepisseDepartment: z.string().nullish(),
+  brokerCompanyAddress: z.string().max(150).nullish(),
+  brokerCompanyContact: z.string().max(150).nullish(),
+  brokerCompanyPhone: z.string().max(150).nullish(),
+  brokerCompanyMail: z.string().max(150).nullish(),
+  brokerRecepisseNumber: z.string().max(150).nullish(),
+  brokerRecepisseDepartment: z.string().max(150).nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
 
   // trader
-  traderCompanyName: z.string().nullish(),
+  traderCompanyName: z.string().max(150).nullish(),
   traderCompanySiret: siretSchema(CompanyRole.Trader).nullish(),
-  traderCompanyAddress: z.string().nullish(),
-  traderCompanyContact: z.string().nullish(),
-  traderCompanyPhone: z.string().nullish(),
-  traderCompanyMail: z.string().nullish(),
-  traderRecepisseNumber: z.string().nullish(),
-  traderRecepisseDepartment: z.string().nullish(),
+  traderCompanyAddress: z.string().max(150).nullish(),
+  traderCompanyContact: z.string().max(150).nullish(),
+  traderCompanyPhone: z.string().max(150).nullish(),
+  traderCompanyMail: z.string().max(150).nullish(),
+  traderRecepisseNumber: z.string().max(150).nullish(),
+  traderRecepisseDepartment: z.string().max(150).nullish(),
   traderRecepisseValidityLimit: z.coerce.date().nullish(),
 
   // intermediaries
@@ -259,14 +268,14 @@ export const rawBsdasriSchema = z.object({
     .array(intermediarySchema)
     .nullish()
     .superRefine(intermediariesRefinement), // max 3
-  intermediariesOrgIds: z.array(z.string()).optional(),
+  intermediariesOrgIds: z.array(z.string().max(50)).optional(),
 
   // Identification fields
-  identificationNumbers: z.array(z.string()).optional(),
+  identificationNumbers: z.array(z.string().max(150)).optional(),
 
   // Grouping/Synthesizing fields
-  grouping: z.array(z.string()).optional().nullish(),
-  synthesizing: z.array(z.string()).optional().nullish()
+  grouping: z.array(z.string().max(150)).optional().nullish(),
+  synthesizing: z.array(z.string().max(150)).optional().nullish()
 });
 
 // Type inféré par Zod - avant parsing
