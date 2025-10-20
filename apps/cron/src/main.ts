@@ -16,6 +16,7 @@ import {
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { cleanAppendix1 } from "./commands/appendix1.helpers";
+import { cleanPendingRegistry } from "./commands/registry.helpers";
 
 const { CRON_ONBOARDING_SCHEDULE, CRON_CLEANUP_IS_RETURN_TAB_SCHEDULE, TZ } =
   process.env;
@@ -25,6 +26,13 @@ let jobs: cron.CronJob[] = [
     cronTime: "30 0 * * *", // Every day at 00:30
     onTick: async () => {
       await cleanAppendix1();
+    },
+    timeZone: TZ
+  }),
+  new cron.CronJob({
+    cronTime: "45 0 * * *", // Every day at 00:45
+    onTick: async () => {
+      await cleanPendingRegistry();
     },
     timeZone: TZ
   })

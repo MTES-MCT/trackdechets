@@ -4,6 +4,7 @@ import React from "react";
 import CompanyResults from "../../../common/components/company/CompanyResults";
 import { Query, EcoOrganisme, Bsda, BsdaEcoOrganisme } from "@td/codegen-ui";
 import TdSwitch from "../../../../common/components/Switch";
+import { capitalize } from "../../../../common/helper";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -74,7 +75,8 @@ export default function BsdaEcoOrganismes(props: EcoOrganismesProps) {
                 }
                 results={data.ecoOrganismes.map(eo => ({
                   ...eo,
-                  orgId: eo.siret
+                  orgId: eo.siret,
+                  name: capitalize(eo.name) as string
                 }))}
                 selectedItem={
                   data.ecoOrganismes

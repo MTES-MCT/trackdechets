@@ -20,16 +20,19 @@ import {
   ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
   ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
 } from "../messages";
+import { SSTI_CHARS } from "@td/constants";
 
 const { VERIFY_COMPANY } = process.env;
 
 export async function isTransporterRefinement(
   {
     siret,
-    transporterRecepisseIsExempted
+    transporterRecepisseIsExempted,
+    index
   }: {
     siret: string | null | undefined;
     transporterRecepisseIsExempted: boolean;
+    index?: number;
   },
   ctx: RefinementCtx,
   checkIsNotDormant = true
@@ -46,7 +49,10 @@ export async function isTransporterRefinement(
   if (company && !isTransporter(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Transporter),
+      path: pathFromCompanyRole({
+        companyRole: CompanyRole.Transporter,
+        index
+      }),
       message:
         `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
         ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
@@ -69,7 +75,7 @@ export async function refineSiretAndGetCompany(
   if (company === null) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(companyRole),
+      path: pathFromCompanyRole({ companyRole }),
       message: `${
         companyRole ? `${companyRole} : ` : ""
       }L'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
@@ -79,7 +85,7 @@ export async function refineSiretAndGetCompany(
   if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(companyRole),
+      path: pathFromCompanyRole({ companyRole }),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -113,7 +119,7 @@ export async function refineAndGetEcoOrganisme(
     if (company?.isDormantSince) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.EcoOrganisme }),
         message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
       });
     }
@@ -133,14 +139,14 @@ export const isRegisteredVatNumberRefinement = async (
   if (company === null) {
     return ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Transporter),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Transporter }),
       message: `Le transporteur avec le n°de TVA ${vatNumber} n'est pas inscrit sur Trackdéchets`
     });
   }
   if (!isTransporter(company)) {
     return ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Transporter),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Transporter }),
       message:
         `Le transporteur saisi sur le bordereau (numéro de TVA: ${vatNumber}) n'est pas inscrit sur Trackdéchets` +
         ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
@@ -176,21 +182,21 @@ export async function isDestinationRefinement(
       if (!isWasteVehicles(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(bsdCompanyRole),
+          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
           message: `Cet établissement n'a pas le profil Installation de traitement de VHU.`
         });
       }
       if (role === "BROYEUR" && !isBroyeur(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(bsdCompanyRole),
+          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
           message: `Cet établissement n'a pas le sous-profil Broyeur.`
         });
       }
       if (role === "DEMOLISSEUR" && !isDemolisseur(company)) {
         return ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: pathFromCompanyRole(bsdCompanyRole),
+          path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
           message: `Cet établissement n'a pas le sous-profil Casse automobile / démolisseur.`
         });
       }
@@ -202,7 +208,7 @@ export async function isDestinationRefinement(
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(bsdCompanyRole),
+        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
         message:
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
           ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
@@ -221,7 +227,7 @@ export async function isDestinationRefinement(
 
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(bsdCompanyRole),
+        path: pathFromCompanyRole({ companyRole: bsdCompanyRole }),
         message:
           `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
           ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
@@ -256,7 +262,7 @@ export async function isEmitterRefinement(
   if (checkIsNotDormant && company?.isDormantSince) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Emitter),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Emitter }),
       message: `L'établissement avec le SIRET ${siret} est en sommeil sur Trackdéchets, il n'est pas possible de le mentionner sur un bordereau`
     });
   }
@@ -265,15 +271,21 @@ export async function isEmitterRefinement(
 export function destinationOperationModeRefinement(
   destinationOperationCode: string | null | undefined,
   destinationOperationMode: string | null | undefined,
+  destinationOperationSignatureDate: Date | null | undefined,
   ctx: RefinementCtx
 ) {
+  // Le BSD a déjà été signé. On ne vérifie plus le mode pour ne pas casser les BSDs legacy
+  if (destinationOperationSignatureDate && destinationOperationCode) {
+    return;
+  }
+
   if (destinationOperationCode) {
     const modes = getOperationModesFromOperationCode(destinationOperationCode);
 
     if (modes.length && !destinationOperationMode) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.Destination }),
         message: "Vous devez préciser un mode de traitement"
       });
     } else if (
@@ -284,7 +296,7 @@ export function destinationOperationModeRefinement(
     ) {
       return ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.Destination),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.Destination }),
         message:
           "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
       });
@@ -308,19 +320,19 @@ export async function isEcoOrganismeRefinement(
     if (bsdType === BsdType.BSDA && !ecoOrganisme.handleBsda) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.EcoOrganisme }),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDA`
       });
     } else if (bsdType === BsdType.BSVHU && !ecoOrganisme.handleBsvhu) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.EcoOrganisme }),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSVHU`
       });
     } else if (bsdType === BsdType.BSDASRI && !ecoOrganisme.handleBsdasri) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: pathFromCompanyRole(CompanyRole.EcoOrganisme),
+        path: pathFromCompanyRole({ companyRole: CompanyRole.EcoOrganisme }),
         message: `L'éco-organisme avec le SIRET ${siret} n'est pas autorisé à apparaitre sur un BSDASRI`
       });
     }
@@ -343,7 +355,7 @@ export async function isBrokerRefinement(
   if (company && !isBroker(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Broker),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Broker }),
       message: `Cet établissement n'a pas le profil Courtier.`
     });
   }
@@ -364,7 +376,7 @@ export async function isTraderRefinement(
   if (company && !isTrader(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Trader),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Trader }),
       message: `Cet établissement n'a pas le profil Négociant.`
     });
   }
@@ -419,5 +431,18 @@ export const validateMultiTransporterPlates = (bsd, ctx: z.RefinementCtx) => {
 
   for (const [index, transporter] of (bsd.transporters ?? []).entries()) {
     validateTransporterPlates(transporter, ctx, index);
+  }
+};
+
+export const isSafeSSTI = (
+  str: string | null | undefined,
+  ctx: z.RefinementCtx
+) => {
+  if (!str) return;
+  if (SSTI_CHARS.some(char => str.includes(char))) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`
+    });
   }
 };

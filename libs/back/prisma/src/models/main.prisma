@@ -921,6 +921,8 @@ model User {
   governmentAccount    GovernmentAccount? @relation(fields: [governmentAccountId], references: [id])
   totpSeed             String?
   totpActivatedAt      DateTime?          @db.Timestamptz(6)
+  totpFails            Int                @default(0)
+  totpLockedUntil      DateTime?
   trackingConsent      Boolean            @default(false)
   trackingConsentUntil DateTime?
 
@@ -1040,61 +1042,63 @@ model Bsvhu {
   status        BsvhuStatus @default(INITIAL)
   isDuplicateOf String?
 
-  emitterIrregularSituation                           Boolean?                 @default(false)
-  emitterNoSiret                                      Boolean?                 @default(false)
-  emitterNotOnTD                                      Boolean?                 @default(false)
-  emitterAgrementNumber                               String?                  @db.VarChar(100)
-  emitterCompanyName                                  String?
-  emitterCompanySiret                                 String?                  @db.VarChar(17)
-  emitterCompanyAddress                               String?
-  emitterCompanyStreet                                String?
-  emitterCompanyCity                                  String?
-  emitterCompanyPostalCode                            String?
-  emitterCompanyCountry                               String?
-  emitterCompanyContact                               String?
-  emitterCompanyPhone                                 String?
-  emitterCompanyMail                                  String?
-  emitterCustomInfo                                   String?
-  emitterEmissionSignatureAuthor                      String?
-  emitterEmissionSignatureDate                        DateTime?                @db.Timestamptz(6)
-  destinationType                                     BsvhuDestinationType?
-  destinationPlannedOperationCode                     String?                  @default("R 4") @db.VarChar(50)
-  destinationAgrementNumber                           String?                  @db.VarChar(100)
-  destinationCompanyName                              String?
-  destinationCompanySiret                             String?                  @db.VarChar(17)
-  destinationCompanyAddress                           String?
-  destinationCompanyContact                           String?
-  destinationCompanyPhone                             String?
-  destinationCompanyMail                              String?
-  destinationReceptionAcceptationStatus               WasteAcceptationStatus?
-  destinationReceptionRefusalReason                   String?
-  destinationReceptionIdentificationNumbers           String[]
-  destinationReceptionIdentificationType              BsvhuIdentificationType?
-  destinationOperationCode                            String?                  @db.VarChar(50)
-  destinationOperationNextDestinationCompanyName      String?
-  destinationOperationNextDestinationCompanySiret     String?                  @db.VarChar(17)
-  destinationOperationNextDestinationCompanyAddress   String?
-  destinationOperationNextDestinationCompanyContact   String?
-  destinationOperationNextDestinationCompanyPhone     String?
-  destinationOperationNextDestinationCompanyMail      String?
-  destinationOperationSignatureAuthor                 String?
-  destinationOperationSignatureDate                   DateTime?                @db.Timestamptz(6)
-  destinationOperationDate                            DateTime?                @db.Timestamptz(6)
-  destinationReceptionQuantity                        Int?
-  destinationReceptionWeight                          Float?
-  destinationReceptionDate                            DateTime?                @db.Timestamptz(6)
-  destinationOperationNextDestinationCompanyVatNumber String?
-  destinationCustomInfo                               String?
-  destinationOperationMode                            OperationMode?
-  destinationReceptionSignatureAuthor                 String?
-  destinationReceptionSignatureDate                   DateTime?                @db.Timestamptz(6)
-  wasteCode                                           String?                  @default("16 01 06") @db.VarChar(10)
-  packaging                                           BsvhuPackaging?
-  identificationNumbers                               String[]
-  identificationType                                  BsvhuIdentificationType?
-  quantity                                            Int?
-  weightValue                                         Float?
-  weightIsEstimate                                    Boolean?
+  emitterIrregularSituation                                 Boolean?                 @default(false)
+  emitterNoSiret                                            Boolean?                 @default(false)
+  emitterNotOnTD                                            Boolean?                 @default(false)
+  emitterAgrementNumber                                     String?                  @db.VarChar(100)
+  emitterCompanyName                                        String?
+  emitterCompanySiret                                       String?                  @db.VarChar(17)
+  emitterCompanyAddress                                     String?
+  emitterCompanyStreet                                      String?
+  emitterCompanyCity                                        String?
+  emitterCompanyPostalCode                                  String?
+  emitterCompanyCountry                                     String?
+  emitterCompanyContact                                     String?
+  emitterCompanyPhone                                       String?
+  emitterCompanyMail                                        String?
+  emitterCustomInfo                                         String?
+  emitterEmissionSignatureAuthor                            String?
+  emitterEmissionSignatureDate                              DateTime?                @db.Timestamptz(6)
+  destinationType                                           BsvhuDestinationType?
+  destinationPlannedOperationCode                           String?                  @default("R 4") @db.VarChar(50)
+  destinationAgrementNumber                                 String?                  @db.VarChar(100)
+  destinationCompanyName                                    String?
+  destinationCompanySiret                                   String?                  @db.VarChar(17)
+  destinationCompanyAddress                                 String?
+  destinationCompanyContact                                 String?
+  destinationCompanyPhone                                   String?
+  destinationCompanyMail                                    String?
+  destinationReceptionAcceptationStatus                     WasteAcceptationStatus?
+  destinationReceptionRefusalReason                         String?
+  destinationReceptionIdentificationNumbers                 String[]
+  destinationReceptionIdentificationType                    BsvhuIdentificationType?
+  destinationOperationCode                                  String?                  @db.VarChar(50)
+  destinationOperationNextDestinationCompanyName            String?
+  destinationOperationNextDestinationCompanySiret           String?                  @db.VarChar(17)
+  destinationOperationNextDestinationCompanyVatNumber       String?
+  destinationOperationNextDestinationCompanyExtraEuropeanId String?
+  destinationOperationNextDestinationCompanyAddress         String?
+  destinationOperationNextDestinationCompanyCountry         String?
+  destinationOperationNextDestinationCompanyContact         String?
+  destinationOperationNextDestinationCompanyPhone           String?
+  destinationOperationNextDestinationCompanyMail            String?
+  destinationOperationSignatureAuthor                       String?
+  destinationOperationSignatureDate                         DateTime?                @db.Timestamptz(6)
+  destinationOperationDate                                  DateTime?                @db.Timestamptz(6)
+  destinationReceptionQuantity                              Int?
+  destinationReceptionWeight                                Float?
+  destinationReceptionDate                                  DateTime?                @db.Timestamptz(6)
+  destinationCustomInfo                                     String?
+  destinationOperationMode                                  OperationMode?
+  destinationReceptionSignatureAuthor                       String?
+  destinationReceptionSignatureDate                         DateTime?                @db.Timestamptz(6)
+  wasteCode                                                 String?                  @default("16 01 06") @db.VarChar(10)
+  packaging                                                 BsvhuPackaging?
+  identificationNumbers                                     String[]
+  identificationType                                        BsvhuIdentificationType?
+  quantity                                                  Int?
+  weightValue                                               Float?
+  weightIsEstimate                                          Boolean?
 
   // Date de signature du premier transporteur
   // Cette valeur est dupliquée entre le modèle Bsvhu et BsvhuTransporter[0]

@@ -621,6 +621,8 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
     destinationOperationMode: bsvhu.destinationOperationMode,
     destinationOperationNextDestinationCompanyAddress:
       bsvhu.destinationOperationNextDestinationCompanyAddress,
+    destinationOperationNextDestinationCompanyCountry:
+      bsvhu.destinationOperationNextDestinationCompanyCountry,
     destinationOperationNextDestinationCompanyContact:
       bsvhu.destinationOperationNextDestinationCompanyContact,
     destinationOperationNextDestinationCompanyMail:
@@ -633,6 +635,8 @@ export const cloneBsvhu = async (user: Express.User, id: string) => {
       bsvhu.destinationOperationNextDestinationCompanySiret,
     destinationOperationNextDestinationCompanyVatNumber:
       bsvhu.destinationOperationNextDestinationCompanyVatNumber,
+    destinationOperationNextDestinationCompanyExtraEuropeanId:
+      bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId,
     destinationOperationSignatureAuthor:
       bsvhu.destinationOperationSignatureAuthor,
     destinationOperationSignatureDate: bsvhu.destinationOperationSignatureDate,

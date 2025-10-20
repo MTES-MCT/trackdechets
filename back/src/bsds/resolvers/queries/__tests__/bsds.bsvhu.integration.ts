@@ -520,7 +520,7 @@ describe("Query.bsds.vhus base workflow", () => {
           destinationReceptionAcceptationStatus:
             WasteAcceptationStatus.ACCEPTED,
           destinationOperationCode: "R 4",
-          destinationOperationMode: "REUTILISATION",
+          destinationOperationMode: "RECYCLAGE",
           destinationOperationDate: new Date()
         }
       });

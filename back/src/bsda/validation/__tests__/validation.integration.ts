@@ -778,7 +778,7 @@ describe("BSDA parsing", () => {
 
   describe("Operation modes", () => {
     test.each([
-      ["R 5", "REUTILISATION"],
+      ["R 5", "RECYCLAGE"],
       ["R 13", undefined],
       ["D 9 F", undefined]
     ])(
@@ -798,7 +798,7 @@ describe("BSDA parsing", () => {
     );
 
     test.each([
-      ["R 5", "REUTILISATION"],
+      ["R 5", "RECYCLAGE"],
       ["R 13", undefined],
       ["D 9 F", undefined]
     ])(

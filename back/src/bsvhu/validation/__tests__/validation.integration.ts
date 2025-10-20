@@ -690,6 +690,32 @@ describe("BSVHU validation", () => {
       }
     });
 
+    test("when both SIRET and extra European ID are provided", async () => {
+      const company = await companyFactory({
+        companyTypes: ["WASTE_VEHICLES"]
+      });
+      const data: ZodBsvhu = {
+        ...bsvhu,
+        destinationOperationNextDestinationCompanySiret: company.siret,
+        destinationOperationNextDestinationCompanyExtraEuropeanId: "ESA15022510"
+      };
+      expect.assertions(1);
+
+      try {
+        await parseBsvhuAsync(data, {
+          ...context,
+          currentSignatureType: "TRANSPORT"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "destinationOperationNextDestinationCompanyExtraEuropeanId : L'établissement doit être visé soit avec un SIRET soit avec un identifiant extra-européen"
+          })
+        ]);
+      }
+    });
+
     test("when transporter is french but recepisse fields are missing", async () => {
       const data: ZodBsvhu = {
         ...bsvhu,
@@ -1195,7 +1221,7 @@ describe("BSVHU validation", () => {
       const data: ZodBsvhu = {
         ...bsvhu,
         destinationOperationCode: "R 4",
-        destinationOperationMode: "REUTILISATION",
+        destinationOperationMode: "RECYCLAGE",
         destinationReceptionWeight: 10,
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationOperationDate: new Date()

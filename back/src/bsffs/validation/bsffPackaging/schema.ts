@@ -23,9 +23,10 @@ const rawBsffPackagingSchema = z.object({
     .string({
       required_error: "Le numéro de contenant ne peut pas être nul ou vide"
     })
+    .max(150)
     .optional(),
   acceptationDate: z.coerce.date().nullish(),
-  acceptationRefusalReason: z.string().nullish(),
+  acceptationRefusalReason: z.string().max(150).nullish(),
   acceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .refine(
@@ -40,8 +41,8 @@ const rawBsffPackagingSchema = z.object({
     )
     .nullish(),
   acceptationWasteCode: ZodWasteCodeEnum,
-  acceptationWasteDescription: z.string().nullish(),
-  acceptationSignatureAuthor: z.string().nullish(),
+  acceptationWasteDescription: z.string().max(150).nullish(),
+  acceptationSignatureAuthor: z.string().max(150).nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
   operationDate: z.coerce.date().nullish(),
   operationNoTraceability: z
@@ -50,26 +51,27 @@ const rawBsffPackagingSchema = z.object({
     .transform(v => Boolean(v)),
   operationCode: ZodOperationEnum,
   operationMode: z.nativeEnum(OperationMode).nullish(),
-  operationDescription: z.string().nullish(),
-  operationSignatureAuthor: z.string().nullish(),
+  operationDescription: z.string().max(150).nullish(),
+  operationSignatureAuthor: z.string().max(150).nullish(),
   operationSignatureDate: z.coerce.date().nullish(),
   operationNextDestinationPlannedOperationCode: ZodOperationEnum,
-  operationNextDestinationCap: z.string().nullish(),
-  operationNextDestinationCompanyName: z.string().nullish(),
+  operationNextDestinationCap: z.string().max(150).nullish(),
+  operationNextDestinationCompanyName: z.string().max(150).nullish(),
   operationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
   ).nullish(),
   operationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  operationNextDestinationCompanyAddress: z.string().nullish(),
-  operationNextDestinationCompanyContact: z.string().nullish(),
-  operationNextDestinationCompanyPhone: z.string().nullish(),
+  operationNextDestinationCompanyAddress: z.string().max(150).nullish(),
+  operationNextDestinationCompanyContact: z.string().max(150).nullish(),
+  operationNextDestinationCompanyPhone: z.string().max(150).nullish(),
   operationNextDestinationCompanyMail: z
     .string()
+    .max(150)
     .email("E-mail destination ultérieure invalide")
     .nullish(),
-  nextPackagingId: z.string().nullish()
+  nextPackagingId: z.string().max(150).nullish()
 });
 
 // Type inféré par Zod - avant parsing

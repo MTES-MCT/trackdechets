@@ -20,16 +20,19 @@ const RhfOperationModeSelect = ({
     [operationCode]
   );
   const fieldValue = watch(path);
+
+  useEffect(() => {
+    setValue(path, null);
+  }, [operationCode, setValue, path]);
+
   useEffect(() => {
     // No mode possible. Still, explicitely set to null
     if (!modes.length) {
       setValue(path, null);
     }
     // If the available modes change, and only ONE option is available,
-    // select it by default. Else, reset the selection
-    else if (modes.length > 1) {
-      setValue(path, fieldValue);
-    } else {
+    // select it by default
+    else if (!fieldValue && modes.length === 1) {
       setValue(path, modes[0]);
     }
   }, [modes, path, setValue, fieldValue]);

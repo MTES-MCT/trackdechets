@@ -123,6 +123,7 @@ export const checkOperationMode: Refinement<ParsedZodBsvhu> = (
   destinationOperationModeRefinement(
     bsvhu.destinationOperationCode,
     bsvhu.destinationOperationMode,
+    bsvhu.destinationOperationSignatureDate,
     zodContext
   );
 };
@@ -172,6 +173,29 @@ export const checkEmitterSituation: Refinement<ParsedZodBsvhu> = (
       path: ["emitter", "irregularSituation"],
       message:
         "emitterIrregularSituation : L'émetteur doit obligatoirement avoir un SIRET si il n'est pas en situation irrégulière"
+    });
+  }
+};
+
+export const checkNextDestinationCompany: Refinement<ParsedZodBsvhu> = (
+  bsvhu,
+  { addIssue }
+) => {
+  if (
+    bsvhu.destinationOperationNextDestinationCompanySiret &&
+    bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId
+  ) {
+    addIssue({
+      code: z.ZodIssueCode.custom,
+      path: [
+        "destination",
+        "operation",
+        "nextDestination",
+        "company",
+        "extraEuropeanId"
+      ],
+      message:
+        "destinationOperationNextDestinationCompanyExtraEuropeanId : L'établissement doit être visé soit avec un SIRET soit avec un identifiant extra-européen"
     });
   }
 };

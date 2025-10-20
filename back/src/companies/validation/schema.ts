@@ -19,6 +19,7 @@ import {
   checkEcoOrganismePartnersIds
 } from "./refinements";
 import { isValidWebsite } from "@td/constants";
+import { isSafeSSTI } from "../../common/validation/zod/refinement";
 
 function toSet(arr: any[]) {
   return arr ? [...new Set(arr)] : arr;
@@ -29,14 +30,14 @@ const rawCompanySchema = z.object({
   siret: siretSchema().nullish(),
   vatNumber: foreignVatNumberSchema().nullish(),
   orgId: z.string().nullish(),
-  name: z.string(),
+  name: z.string().superRefine(isSafeSSTI),
   address: z.string().nullish(),
-  gerepId: z.string().nullish(),
-  codeNaf: z.string().nullish(),
-  givenName: z.string().nullish(),
+  gerepId: z.string().nullish().superRefine(isSafeSSTI),
+  codeNaf: z.string().nullish().superRefine(isSafeSSTI),
+  givenName: z.string().nullish().superRefine(isSafeSSTI),
   contactEmail: z.string().email().nullish().or(z.literal("")), // accept empty strings
-  contactPhone: z.string().nullish(),
-  contact: z.string().nullish(),
+  contactPhone: z.string().nullish().superRefine(isSafeSSTI),
+  contact: z.string().nullish().superRefine(isSafeSSTI),
   website: z
     .string()
     .nullish()

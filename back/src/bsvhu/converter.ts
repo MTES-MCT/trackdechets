@@ -140,7 +140,12 @@ export function expandVhuFormFromDb(
           company: nullIfNoValues<FormCompany>({
             name: bsvhu.destinationOperationNextDestinationCompanyName,
             siret: bsvhu.destinationOperationNextDestinationCompanySiret,
+            vatNumber:
+              bsvhu.destinationOperationNextDestinationCompanyVatNumber,
+            extraEuropeanId:
+              bsvhu.destinationOperationNextDestinationCompanyExtraEuropeanId,
             address: bsvhu.destinationOperationNextDestinationCompanyAddress,
+            country: bsvhu.destinationOperationNextDestinationCompanyCountry,
             contact: bsvhu.destinationOperationNextDestinationCompanyContact,
             phone: bsvhu.destinationOperationNextDestinationCompanyPhone,
             mail: bsvhu.destinationOperationNextDestinationCompanyMail
@@ -345,9 +350,28 @@ function flattenVhuDestinationInput({
         chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
       )
     ),
+    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
+      )
+    ),
+    destinationOperationNextDestinationCompanyExtraEuropeanId: chain(
+      destination,
+      d =>
+        chain(d.operation, o =>
+          chain(o.nextDestination, nd =>
+            chain(nd.company, c => c.extraEuropeanId)
+          )
+        )
+    ),
     destinationOperationNextDestinationCompanyAddress: chain(destination, d =>
       chain(d.operation, o =>
         chain(o.nextDestination, nd => chain(nd.company, c => c.address))
+      )
+    ),
+    destinationOperationNextDestinationCompanyCountry: chain(destination, d =>
+      chain(d.operation, o =>
+        chain(o.nextDestination, nd => chain(nd.company, c => c.country))
       )
     ),
     destinationOperationNextDestinationCompanyContact: chain(destination, d =>
@@ -363,11 +387,6 @@ function flattenVhuDestinationInput({
     destinationOperationNextDestinationCompanyMail: chain(destination, d =>
       chain(d.operation, o =>
         chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
-      )
-    ),
-    destinationOperationNextDestinationCompanyVatNumber: chain(destination, d =>
-      chain(d.operation, o =>
-        chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
       )
     )
   };

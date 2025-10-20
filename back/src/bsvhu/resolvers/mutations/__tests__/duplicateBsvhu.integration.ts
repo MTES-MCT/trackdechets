@@ -252,6 +252,8 @@ describe("mutation.duplicateBsvhu", () => {
       destinationOperationNextDestinationCompanyPhone,
       destinationOperationNextDestinationCompanyMail,
       destinationOperationNextDestinationCompanyVatNumber,
+      destinationOperationNextDestinationCompanyExtraEuropeanId,
+      destinationOperationNextDestinationCompanyCountry,
       destinationCustomInfo,
       wasteCode,
       packaging,

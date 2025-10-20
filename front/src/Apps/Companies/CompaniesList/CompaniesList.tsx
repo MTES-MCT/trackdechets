@@ -15,6 +15,7 @@ import {
 } from "../common/hooks/useDownloadCompanies";
 import SearchableCompaniesList from "./SearchableCompaniesList";
 import gql from "graphql-tag";
+import { capitalize } from "../../../common/helper";
 
 export const userRole = (role: UserRole) => {
   let icon = "fr-icon-user-line";
@@ -62,7 +63,7 @@ export default function CompaniesList() {
     null
   );
 
-  const pluralize = count => (count > 1 ? "s" : "");
+  const pluralize = (count: number) => (count > 1 ? "s" : "");
 
   const onMyCompaniesQueryCompleted = (
     data: CompanyPrivateConnection,
@@ -92,7 +93,7 @@ export default function CompaniesList() {
           >
             <div data-testid="companies-list">
               <p className={`fr-text ${styles.name}`}>
-                {company.name}
+                {capitalize(company.name!)}
                 {company.givenName && ` - ${company.givenName}`}
               </p>
               <p className="fr-text">{company.orgId}</p>

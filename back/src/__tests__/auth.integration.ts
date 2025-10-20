@@ -8,6 +8,7 @@ import { getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";
 import { TOTP } from "totp-generator";
 import { clearUserLoginNeedsCaptcha } from "../common/redis/captcha";
+import { addSeconds } from "date-fns";
 
 const { UI_HOST } = process.env;
 
@@ -323,17 +324,21 @@ describe("Second factor", () => {
 
     const sessionCookie = login.header["set-cookie"][0];
     const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
-
+    const timestamp = new Date();
     const secondFactor = await request
       .post("/otp")
       .send(`totp=XYZ`) // wrong otp
       .send(`password=pass`)
       .set("Cookie", `${sess.name}=${cookieValue}`);
 
-    // should redirect to /
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    // should redirect
     expect(secondFactor.status).toBe(302);
     expect(secondFactor.header.location).toBe(
-      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP`
+      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP&lockout=${updatedUser?.totpLockedUntil?.getTime()}`
     );
     // rolling session cookie should be kept
     expect(secondFactor.header["set-cookie"][0]).toContain(cookieValue);
@@ -347,8 +352,137 @@ describe("Second factor", () => {
     expect(data).toEqual(null);
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
+
+    expect(updatedUser!.totpFails).toEqual(1);
+
+    // totpLockedUntil is incremented by 5s steps (5000ms)
+    expect(
+      updatedUser!.totpLockedUntil!.getTime() - timestamp.getTime() >= 5 * 1000
+    ).toBe(true);
+  });
+
+  it("should increase lockout when otp is wrong", async () => {
+    const totpSeed = "ABCD";
+    const user = await userFactory({
+      totpSeed,
+      totpActivatedAt: new Date(),
+      totpFails: 1,
+      totpLockedUntil: new Date()
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+    const timestamp = new Date();
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=XYZ`) // wrong otp
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+
+    expect(secondFactor.header.location).toBe(
+      `http://${UI_HOST}/second-factor?errorCode=INVALID_TOTP&lockout=${updatedUser?.totpLockedUntil?.getTime()}`
+    );
+
+    expect(updatedUser!.totpFails).toEqual(2); // updated fails count
+
+    // updated totpLockedUntil is incremented (2 * 5s)
+    expect(
+      updatedUser!.totpLockedUntil!.getTime() - timestamp.getTime() >=
+        2 * 5 * 1000
+    ).toBe(true);
+  });
+
+  it("should ignore totp during lockout", async () => {
+    const totpSeed = "ABCD";
+
+    const totpLockedUntil = addSeconds(new Date(), 5);
+    const user = await userFactory({
+      totpSeed,
+      totpActivatedAt: new Date(),
+      totpFails: 1,
+      totpLockedUntil
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+
+    const { otp } = TOTP.generate(totpSeed);
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=${otp}`) // wrong otp
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    expect(secondFactor.header.location).toBe(
+      `http://${UI_HOST}/second-factor?errorCode=TOTP_LOCKOUT&lockout=${totpLockedUntil.getTime()}` // matches totpLockedUntil 5 seconds
+    );
+  });
+
+  it("should reset lockout when totp is successfully submitted", async () => {
+    const totpSeed = "ABCD";
+
+    const user = await userFactory({
+      totpSeed,
+      totpActivatedAt: new Date(),
+      totpFails: 1,
+      totpLockedUntil: new Date() // lockout expired
+    });
+
+    const login = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    const sessionCookie = login.header["set-cookie"][0];
+    const cookieValue = sessionCookie.match(cookieRegExp)?.[1];
+
+    const { otp } = TOTP.generate(totpSeed);
+    const secondFactor = await request
+      .post("/otp")
+      .send(`totp=${otp}`) // wrong otp
+      .send(`password=pass`)
+      .set("Cookie", `${sess.name}=${cookieValue}`);
+
+    // should redirect to /
+    expect(secondFactor.status).toBe(302);
+    expect(secondFactor.header.location).toBe(`http://${UI_HOST}/`);
+    const otpSessionCookie = secondFactor.header["set-cookie"][0];
+    const otpCookieValue2 = otpSessionCookie.match(cookieRegExp)?.[1];
+
+    // user is fully logged
+    const res = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", `${sess.name}=${otpCookieValue2}`);
+
+    expect(res.body.data).toEqual({
+      me: { email: user.email }
+    });
+
+    const updatedUser = await prisma.user.findUnique({
+      where: { id: user.id }
+    });
+    expect(updatedUser!.totpFails).toEqual(0); // fails count is reset
+
+    // totpLockedUntil is reset
+    expect(updatedUser!.totpLockedUntil).toEqual(null);
   });
 });
+
 describe("POST /logout", () => {
   it("should change sessionID", async () => {
     const logout1 = await request.post("/logout");
