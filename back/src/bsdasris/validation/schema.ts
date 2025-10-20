@@ -106,7 +106,10 @@ export type BsdasriPackagingSchema = z.input<typeof bsdasriPackagingSchema>;
  */
 export const rawBsdasriSchema = z.object({
   // Base fields
-  id: z.string().max(50).default(() => getReadableId(ReadableIdPrefix.DASRI)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.DASRI)),
   type: z.nativeEnum(BsdasriType).default(BsdasriType.SIMPLE),
   createdAt: z.date().nullish(),
   isDeleted: z.boolean().default(false),
@@ -118,7 +121,11 @@ export const rawBsdasriSchema = z.object({
   emitterCompanyAddress: z.string().max(150).nullish(),
   emitterCompanyContact: z.string().max(150).nullish(),
   emitterCompanyPhone: z.string().max(150).nullish(),
-  emitterCompanyMail: z.string().max(150).email("E-mail émetteur invalide").nullish(),
+  emitterCompanyMail: z
+    .string()
+    .max(150)
+    .email("E-mail émetteur invalide")
+    .nullish(),
   emitterPickupSiteName: z.string().max(150).nullish(),
   emitterPickupSiteAddress: z.string().max(150).nullish(),
   emitterPickupSiteCity: z.string().max(150).nullish(),
@@ -141,7 +148,7 @@ export const rawBsdasriSchema = z.object({
 
   // Waste fields
   wasteCode: ZodBsdasriWasteCodeEnum,
-  wasteAdr: z.string().max(450).nullish(),
+  wasteAdr: z.string().max(750).nullish(),
 
   // Transporter fields
   transporterCompanyName: z.string().max(150).nullish(),
@@ -150,7 +157,8 @@ export const rawBsdasriSchema = z.object({
   transporterCompanyPhone: z.string().max(150).nullish(),
   transporterCompanyContact: z.string().max(150).nullish(),
   transporterCompanyMail: z
-    .string().max(150)
+    .string()
+    .max(150)
     .email("E-mail transporteur invalide")
     .nullish(),
   transporterRecepisseNumber: z.string().max(150).nullish(),
@@ -198,7 +206,8 @@ export const rawBsdasriSchema = z.object({
   destinationCompanyContact: z.string().max(150).nullish(),
   destinationCompanyPhone: z.string().max(150).nullish(),
   destinationCompanyMail: z
-    .string().max(150)
+    .string()
+    .max(150)
     .email("E-mail destinataire invalide")
     .nullish(),
   destinationCustomInfo: z.string().max(150).nullish(),

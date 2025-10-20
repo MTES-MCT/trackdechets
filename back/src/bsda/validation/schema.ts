@@ -122,7 +122,10 @@ const rawBsdaTransporterSchema = z
  * dont le calcul se fait sur un seul champ.
  */
 export const rawBsdaSchema = z.object({
-  id: z.string().max(50).default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.BSDA)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSDA.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
@@ -163,7 +166,7 @@ export const rawBsdaSchema = z.object({
   wasteIsSubjectToADR: z.boolean().nullish(),
   wasteAdr: z
     .string()
-    .max(400)
+    .max(750)
     .nullish()
     // Empty values (or spaces) to null
     .transform(value =>
@@ -229,12 +232,24 @@ export const rawBsdaSchema = z.object({
     CompanyRole.NextDestination
   ).nullish(),
   destinationOperationNextDestinationCompanyName: z.string().max(150).nullish(),
-  destinationOperationNextDestinationCompanyAddress: z.string().max(150).nullish(),
-  destinationOperationNextDestinationCompanyContact: z.string().max(150).nullish(),
-  destinationOperationNextDestinationCompanyPhone: z.string().max(150).nullish(),
+  destinationOperationNextDestinationCompanyAddress: z
+    .string()
+    .max(150)
+    .nullish(),
+  destinationOperationNextDestinationCompanyContact: z
+    .string()
+    .max(150)
+    .nullish(),
+  destinationOperationNextDestinationCompanyPhone: z
+    .string()
+    .max(150)
+    .nullish(),
   destinationOperationNextDestinationCompanyMail: z.string().max(150).nullish(),
   destinationOperationNextDestinationCap: z.string().max(150).nullish(),
-  destinationOperationNextDestinationPlannedOperationCode: z.string().max(150).nullish(),
+  destinationOperationNextDestinationPlannedOperationCode: z
+    .string()
+    .max(150)
+    .nullish(),
   workerIsDisabled: z
     .boolean()
     .default(false)

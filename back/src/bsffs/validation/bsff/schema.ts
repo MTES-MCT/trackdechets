@@ -85,7 +85,8 @@ const rawBsffPackagingSchema = z.object({
   numero: z
     .string({
       required_error: "Conditionnements : le numéro d'identification est requis"
-    }).max(150)
+    })
+    .max(150)
     .min(1, "Conditionnements : le numéro d'identification est requis"),
   previousPackagings: z.string().max(150).array().nullish(),
   acceptationSignatureDate: z.coerce.date().nullish(),
@@ -93,7 +94,10 @@ const rawBsffPackagingSchema = z.object({
 });
 
 const rawBsffSchema = z.object({
-  id: z.string().max(50).default(() => getReadableId(ReadableIdPrefix.FF)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.FF)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSFF.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
@@ -111,12 +115,16 @@ const rawBsffSchema = z.object({
   emitterCompanyAddress: z.string().max(150).nullish(),
   emitterCompanyContact: z.string().max(150).nullish(),
   emitterCompanyPhone: z.string().max(150).nullish(),
-  emitterCompanyMail: z.string().max(150).email("E-mail émetteur invalide").nullish(),
+  emitterCompanyMail: z
+    .string()
+    .max(150)
+    .email("E-mail émetteur invalide")
+    .nullish(),
   emitterCustomInfo: z.string().max(150).nullish(),
   emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
-  wasteAdr: z.string().max(450).nullish(),
+  wasteAdr: z.string().max(750).nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
@@ -132,7 +140,8 @@ const rawBsffSchema = z.object({
   destinationCompanyContact: z.string().max(150).nullish(),
   destinationCompanyPhone: z.string().max(150).nullish(),
   destinationCompanyMail: z
-    .string().max(150)
+    .string()
+    .max(150)
     .email("E-mail destinataire invalide")
     .nullish(),
   destinationCustomInfo: z.string().max(150).nullish(),

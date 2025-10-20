@@ -33,14 +33,17 @@ const bspaohPackagingAcceptationSchema = z.object({
 });
 
 const rawBspaohSchema = z.object({
-  id: z.string().max(50).default(() => getReadableId(ReadableIdPrefix.PAOH)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.PAOH)),
   status: z.string().max(150).default("INITIAL"),
   // waste
   wasteType: z.enum(BSPAOH_WASTE_TYPES).default("PAOH"),
   wasteCode: z
     .enum(BSPAOH_WASTE_CODES, { invalid_type_error: "Ce code déchet " })
     .nullish(),
-  wasteAdr: z.string().nullish(),
+  wasteAdr: z.string().max(750).nullish(),
   wastePackagings: z
     .array(bspaohPackagingSchema)
     .default([])
