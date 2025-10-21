@@ -89,7 +89,7 @@ async function runScripts() {
         }
       },
       {
-        timeout: 600_000
+        timeout: 6_000_000
       }
     );
   }

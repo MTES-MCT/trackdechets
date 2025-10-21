@@ -100,7 +100,7 @@ export async function run() {
               id: true
             }
           });
-          enqueueUpdatedBsdToIndex(bsvhu.id);
+          await enqueueUpdatedBsdToIndex(bsvhu.id);
         }
       } catch (error) {
         logger.error(`failed to handle ${bsvhu.id}`);
