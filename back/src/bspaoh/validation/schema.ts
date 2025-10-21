@@ -22,13 +22,13 @@ const bspaohPackagingSchema = z.object({
   containerNumber: z.string().max(50),
   quantity: z.number().positive().lte(1),
   identificationCodes: z
-    .array(z.string().max(150))
+    .array(z.string().max(250))
     .nonempty("Au moins un code est requis"),
   consistence: z.enum(["SOLIDE", "LIQUIDE"])
 });
 
 const bspaohPackagingAcceptationSchema = z.object({
-  id: z.string().max(150),
+  id: z.string().max(250),
   acceptation: z.enum(["PENDING", "ACCEPTED", "REFUSED"])
 });
 
@@ -37,7 +37,7 @@ const rawBspaohSchema = z.object({
     .string()
     .max(50)
     .default(() => getReadableId(ReadableIdPrefix.PAOH)),
-  status: z.string().max(150).default("INITIAL"),
+  status: z.string().max(250).default("INITIAL"),
   // waste
   wasteType: z.enum(BSPAOH_WASTE_TYPES).default("PAOH"),
   wasteCode: z
@@ -50,44 +50,44 @@ const rawBspaohSchema = z.object({
     .transform(val => val ?? []),
 
   // emitter
-  emitterCompanyName: z.string().max(150).nullish(),
+  emitterCompanyName: z.string().max(250).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().max(150).nullish(),
-  emitterCompanyContact: z.string().max(150).nullish(),
-  emitterCompanyPhone: z.string().max(150).nullish(),
-  emitterCompanyMail: z.string().max(150).nullish(),
-  emitterCustomInfo: z.string().max(150).nullish(),
+  emitterCompanyAddress: z.string().max(250).nullish(),
+  emitterCompanyContact: z.string().max(250).nullish(),
+  emitterCompanyPhone: z.string().max(250).nullish(),
+  emitterCompanyMail: z.string().max(250).nullish(),
+  emitterCustomInfo: z.string().max(250).nullish(),
   // pickup
-  emitterPickupSiteName: z.string().max(150).nullish(),
-  emitterPickupSiteAddress: z.string().max(150).nullish(),
-  emitterPickupSiteCity: z.string().max(150).nullish(),
-  emitterPickupSitePostalCode: z.string().max(150).nullish(),
-  emitterPickupSiteInfos: z.string().max(150).nullish(),
+  emitterPickupSiteName: z.string().max(250).nullish(),
+  emitterPickupSiteAddress: z.string().max(250).nullish(),
+  emitterPickupSiteCity: z.string().max(250).nullish(),
+  emitterPickupSitePostalCode: z.string().max(250).nullish(),
+  emitterPickupSiteInfos: z.string().max(250).nullish(),
 
   emitterWasteQuantityValue: z.number().nonnegative().nullish(),
   emitterWasteWeightValue: z.number().nonnegative().nullish(),
   emitterWasteWeightIsEstimate: z.boolean().nullish(),
 
   // emitter signature
-  emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
 
   // destination
-  destinationCompanyName: z.string().max(150).nullish(),
+  destinationCompanyName: z.string().max(250).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination)
     .nullish()
     .superRefine(isCrematoriumRefinement),
-  destinationCompanyAddress: z.string().max(150).nullish(),
-  destinationCompanyContact: z.string().max(150).nullish(),
-  destinationCompanyPhone: z.string().max(150).nullish(),
-  destinationCompanyMail: z.string().max(150).nullish(),
-  destinationCustomInfo: z.string().max(150).nullish(),
-  destinationCap: z.string().max(150).nullish(),
+  destinationCompanyAddress: z.string().max(250).nullish(),
+  destinationCompanyContact: z.string().max(250).nullish(),
+  destinationCompanyPhone: z.string().max(250).nullish(),
+  destinationCompanyMail: z.string().max(250).nullish(),
+  destinationCustomInfo: z.string().max(250).nullish(),
+  destinationCap: z.string().max(250).nullish(),
 
   // reception
 
   handedOverToDestinationSignatureDate: z.coerce.date().nullish(),
-  handedOverToDestinationSignatureAuthor: z.string().max(150).nullish(),
+  handedOverToDestinationSignatureAuthor: z.string().max(250).nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
 
   destinationReceptionWasteReceivedWeightValue: z
@@ -107,18 +107,18 @@ const rawBspaohSchema = z.object({
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
-  destinationReceptionWasteRefusalReason: z.string().max(150).nullish(),
+  destinationReceptionWasteRefusalReason: z.string().max(250).nullish(),
   destinationReceptionWastePackagingsAcceptation: z
     .array(bspaohPackagingAcceptationSchema)
     .default([])
     .transform(val => val ?? []),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
-  destinationReceptionSignatureAuthor: z.string().max(150).nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(250).nullish(),
 
   //operation
   destinationOperationCode: z.enum(BSPAOH_OPERATIONS).nullish(),
 
-  destinationOperationDescription: z.string().max(150).nullish(),
+  destinationOperationDescription: z.string().max(250).nullish(),
   destinationOperationDate: z.coerce
     .date()
     .nullish()
@@ -126,7 +126,7 @@ const rawBspaohSchema = z.object({
       message: "La date d'opération ne peut pas être dans le futur."
     }),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
-  destinationOperationSignatureAuthor: z.string().max(150).nullish()
+  destinationOperationSignatureAuthor: z.string().max(250).nullish()
 });
 
 export type ZodBspaoh = z.infer<typeof rawBspaohSchema>;
