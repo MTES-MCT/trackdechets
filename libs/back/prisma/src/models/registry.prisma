@@ -98,6 +98,7 @@ model RegistrySsd {
 
     @@index([importId], map: "_RegistrySsdImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistrySsdPublicIdReportForSiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryIncomingWaste {
@@ -220,6 +221,7 @@ model RegistryIncomingWaste {
 
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryIncomingTexs {
@@ -351,6 +353,7 @@ model RegistryIncomingTexs {
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryOutgoingTexs {
@@ -483,6 +486,7 @@ model RegistryOutgoingTexs {
 
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryOutgoingWaste {
@@ -605,6 +609,7 @@ model RegistryOutgoingWaste {
 
     @@index([importId], map: "_RegistryOutgoingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryTransported {
@@ -681,6 +686,7 @@ model RegistryTransported {
 
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryManaged {
@@ -822,6 +828,7 @@ model RegistryManaged {
 
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 enum RegistryExportType {
