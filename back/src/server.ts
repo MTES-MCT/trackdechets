@@ -69,6 +69,7 @@ const {
   MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV,
   TRUST_PROXY_HOPS,
+  ENV_NAME,
   GERICO_WEBHOOK_SLUG
 } = process.env;
 
@@ -121,7 +122,8 @@ export const server = new ApolloServer<GraphQLContext>({
 
     if (
       formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
-      NODE_ENV === "production"
+      NODE_ENV === "production" &&
+      ENV_NAME !== "recette"
     ) {
       // Do not leak error for internal server error in production
       const sentryId = (originalError as any).sentryId;
