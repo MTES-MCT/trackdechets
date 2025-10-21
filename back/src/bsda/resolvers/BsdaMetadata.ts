@@ -1,9 +1,18 @@
 import { ZodIssue } from "zod";
-import type { BsdaMetadata, BsdaMetadataResolvers } from "@td/codegen-back";
+import type {
+  BsdaMetadata,
+  BsdaMetadataFields,
+  BsdaMetadataResolvers
+} from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
 import { parseBsda } from "../validation";
-import { prismaToZodBsda } from "../validation/helpers";
+import {
+  getCurrentSignatureType,
+  getSignatureAncestors,
+  prismaToZodBsda
+} from "../validation/helpers";
+import { getRequiredAndSealedFieldPaths } from "../validation/rules";
 
 function getNextSignature(bsda) {
   if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
@@ -16,8 +25,9 @@ export const Metadata: BsdaMetadataResolvers = {
   errors: async (metadata: BsdaMetadata & { id: string }, _, context) => {
     const bsda = await context.dataloaders.bsdas.load(metadata.id);
 
-    const currentSignatureType = getNextSignature(bsda);
     const zodBsda = prismaToZodBsda(bsda);
+    const currentSignatureType = getNextSignature(bsda);
+
     try {
       parseBsda(zodBsda, {
         currentSignatureType
@@ -27,11 +37,26 @@ export const Metadata: BsdaMetadataResolvers = {
       return errors.issues?.map((e: ZodIssue) => {
         return {
           message: e.message,
-          path: `${e.path[0]}`, // e.path is an array, first element should be the path name
+          path: e.path,
           requiredFor: currentSignatureType
         };
       });
     }
+  },
+  fields: async (
+    metadata: BsdaMetadata & { id: string },
+    _,
+    context
+  ): Promise<BsdaMetadataFields> => {
+    const bsda = await context.dataloaders.bsdas.load(metadata.id);
+    const zodBsda = prismaToZodBsda(bsda);
+    const currentSignature = getCurrentSignatureType(zodBsda);
+    const currentSignatureAncestors = getSignatureAncestors(currentSignature);
+    return getRequiredAndSealedFieldPaths(
+      zodBsda,
+      currentSignatureAncestors,
+      context.user ?? undefined
+    );
   },
   latestRevision: async (metadata: BsdaMetadata & { id: string }) => {
     // When loaded from ES, this field is already populated

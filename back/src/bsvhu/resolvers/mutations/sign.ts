@@ -5,9 +5,15 @@ import type {
   MutationSignBsvhuArgs,
   SignatureTypeInput
 } from "@td/codegen-back";
+import { UserInputError } from "../../../common/errors";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
-import { getBsvhuOrNotFound } from "../../database";
+import {
+  getBsvhuOrNotFound,
+  getNextTransporterSync,
+  getNthTransporterSync,
+  getTransportersSync
+} from "../../database";
 import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
 import { parseBsvhuAsync } from "../../validation";
@@ -15,13 +21,14 @@ import { getBsvhuRepository } from "../../repository";
 import { checkCanSignFor } from "../../../permissions";
 import { runInTransaction } from "../../../common/repository/helper";
 import { InvalidTransition } from "../../../forms/errors";
-import {
-  BsdTransporterReceiptPart,
-  getTransporterReceipt
-} from "../../../companies/recipify";
+import { getTransporterReceipt } from "../../../companies/recipify";
 import { prismaToZodBsvhu } from "../../validation/helpers";
 import { prisma } from "@td/prisma";
-import { BsvhuForParsingInclude } from "../../validation/types";
+import {
+  BsvhuForParsingInclude,
+  PrismaBsvhuForParsing
+} from "../../validation/types";
+import { AllBsvhuSignatureType, BsvhuWithTransporters } from "../../types";
 
 export default async function sign(
   _,
@@ -33,33 +40,33 @@ export default async function sign(
   const bsvhu = await getBsvhuOrNotFound(id, {
     include: BsvhuForParsingInclude
   });
-  const authorizedOrgIds = getAuthorizedOrgIds(bsvhu, input.type);
+
+  const signatureType = getBsvhuSignatureType(input.type, bsvhu);
+  const authorizedOrgIds = getAuthorizedOrgIds(bsvhu, signatureType);
 
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkCanSignFor(user, input.type, authorizedOrgIds, input.securityCode);
-
-  let transporterReceipt = {};
-  if (input.type === "TRANSPORT") {
-    transporterReceipt = await getTransporterReceipt(bsvhu);
-  }
+  await checkCanSignFor<AllBsvhuSignatureType>(
+    user,
+    signatureType,
+    authorizedOrgIds,
+    input.securityCode
+  );
 
   const zodBsvhu = prismaToZodBsvhu(bsvhu);
 
   // Check that all necessary fields are filled
-  await parseBsvhuAsync(
-    { ...zodBsvhu, ...transporterReceipt },
-    {
-      user,
-      currentSignatureType: input.type
-    }
-  );
+  await parseBsvhuAsync(zodBsvhu, {
+    user,
+    currentSignatureType: signatureType
+  });
 
-  const sign = signatures[input.type];
+  const sign =
+    signatures[input.type === "TRANSPORT" ? "TRANSPORT" : signatureType];
+
   const signedBsvhu = await sign(user, bsvhu, {
     ...input,
-    ...transporterReceipt,
     date: new Date(input.date ?? Date.now())
   });
 
@@ -73,19 +80,39 @@ export default async function sign(
  * @returns a list of organisation identifiers
  */
 export function getAuthorizedOrgIds(
-  bsvhu: Bsvhu,
-  signatureType: SignatureTypeInput
+  bsvhu: PrismaBsvhuForParsing,
+  signatureType: AllBsvhuSignatureType
 ): string[] {
+  const transportNthAuthorizedOrgIds = (
+    bsvhu: PrismaBsvhuForParsing,
+    n: number
+  ) => {
+    const transporterN = getNthTransporterSync(bsvhu, n);
+    return [
+      transporterN?.transporterCompanySiret,
+      transporterN?.transporterCompanyVatNumber
+    ].filter(Boolean);
+  };
   const signatureTypeToFn: {
-    [Key in SignatureTypeInput]: (bsda: Bsvhu) => (string | null)[];
+    [Key in AllBsvhuSignatureType]: (
+      bsvhu: PrismaBsvhuForParsing
+    ) => (string | null)[];
   } = {
-    EMISSION: (bsvhu: Bsvhu) => [bsvhu.emitterCompanySiret],
-    TRANSPORT: (bsvhu: Bsvhu) => [
-      bsvhu.transporterCompanySiret,
-      bsvhu.transporterCompanyVatNumber
+    EMISSION: (bsvhu: PrismaBsvhuForParsing) => [bsvhu.emitterCompanySiret],
+    TRANSPORT: (bsvhu: PrismaBsvhuForParsing) =>
+      transportNthAuthorizedOrgIds(bsvhu, 1),
+    TRANSPORT_2: (bsvhu: PrismaBsvhuForParsing) =>
+      transportNthAuthorizedOrgIds(bsvhu, 2),
+    TRANSPORT_3: (bsvhu: PrismaBsvhuForParsing) =>
+      transportNthAuthorizedOrgIds(bsvhu, 3),
+    TRANSPORT_4: (bsvhu: PrismaBsvhuForParsing) =>
+      transportNthAuthorizedOrgIds(bsvhu, 4),
+    TRANSPORT_5: (bsvhu: PrismaBsvhuForParsing) =>
+      transportNthAuthorizedOrgIds(bsvhu, 5),
+    RECEPTION: (bsvhu: PrismaBsvhuForParsing) => [
+      bsvhu.destinationCompanySiret
     ],
-    RECEPTION: (bsvhu: Bsvhu) => [bsvhu.destinationCompanySiret],
-    OPERATION: (bsvhu: Bsvhu) => [bsvhu.destinationCompanySiret]
+    OPERATION: (bsvhu: PrismaBsvhuForParsing) => [bsvhu.destinationCompanySiret]
   };
 
   const getAuthorizedSiretsFn = signatureTypeToFn[signatureType];
@@ -98,9 +125,9 @@ const signatures: Record<
   SignatureTypeInput,
   (
     user: Express.User,
-    bsda: Bsvhu,
+    bsvhu: PrismaBsvhuForParsing,
     input: BsvhuSignatureInput
-  ) => Promise<Bsvhu>
+  ) => Promise<BsvhuWithTransporters>
 > = {
   EMISSION: signEmission,
   TRANSPORT: signTransport,
@@ -129,12 +156,22 @@ async function signEmission(
 
 async function signTransport(
   user: Express.User,
-  bsvhu: Bsvhu,
-  input: BsvhuSignatureInput & BsdTransporterReceiptPart
+  bsvhu: PrismaBsvhuForParsing,
+  input: BsvhuSignatureInput
 ) {
-  if (bsvhu.transporterTransportSignatureDate !== null) {
+  if (bsvhu.transporters.length === 0) {
+    throw new UserInputError(
+      "Aucun transporteur n'est renseigné sur ce BSVHU."
+    );
+  }
+
+  const transporter = getNextTransporterSync(bsvhu);
+
+  if (!transporter) {
     throw new AlreadySignedError();
   }
+  const transporterReceipt = await getTransporterReceipt(transporter);
+
   // le bsvhu n'a pas reçu de signature émetteur
   // Ce cas est possible en situation irrégulière,
   // si l'entreprise n'est pas sur TD ou si il n'y a pas de SIRET
@@ -157,17 +194,33 @@ async function signTransport(
     input.type,
     emitterCompanyNotOnTD
   );
+  const signatureDate = new Date(input.date ?? Date.now());
 
   const updateInput: Prisma.BsvhuUpdateInput = {
-    transporterTransportSignatureAuthor: input.author,
-    transporterTransportSignatureDate: new Date(input.date ?? Date.now()),
     status: nextStatus,
-    transporterRecepisseNumber: input.transporterRecepisseNumber ?? null,
-    transporterRecepisseDepartment:
-      input.transporterRecepisseDepartment ?? null,
-    transporterRecepisseValidityLimit:
-      input.transporterRecepisseValidityLimit ?? null
+    transporters: {
+      update: {
+        where: { id: transporter.id },
+        data: {
+          transporterTransportSignatureAuthor: input.author,
+          transporterTransportSignatureDate: signatureDate,
+          // auto-complete transporter receipt
+          transporterRecepisseDepartment:
+            transporterReceipt.transporterRecepisseDepartment,
+          transporterRecepisseNumber:
+            transporterReceipt.transporterRecepisseNumber,
+          transporterRecepisseValidityLimit:
+            transporterReceipt.transporterRecepisseValidityLimit
+        }
+      }
+    }
   };
+
+  if (transporter.number === 1) {
+    // champ dénormalisé permettant de stocker la date de la première signature
+    // transporteur sur le BSVHU
+    updateInput.transporterTransportSignatureDate = signatureDate;
+  }
 
   return updateBsvhu(user, bsvhu, updateInput);
 }
@@ -186,7 +239,12 @@ async function signReception(
   const updateInput: Prisma.BsvhuUpdateInput = {
     destinationReceptionSignatureAuthor: input.author,
     destinationReceptionSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // on autorise l'installation de destination à signer même si le ou les
+    // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+    // premier transporteur ait finalement décidé d'aller directement à destination.
+    // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+    transporters: { deleteMany: { transporterTransportSignatureDate: null } }
   };
 
   return updateBsvhu(user, bsvhu, updateInput);
@@ -206,7 +264,12 @@ async function signOperation(
   const updateInput: Prisma.BsvhuUpdateInput = {
     destinationOperationSignatureAuthor: input.author,
     destinationOperationSignatureDate: new Date(input.date ?? Date.now()),
-    status: nextStatus
+    status: nextStatus,
+    // on autorise l'installation de destination à signer même si le ou les
+    // derniers transporteurs multi-modaux n'ont pas signé dans le cas où le
+    // premier transporteur ait finalement décidé d'aller directement à destination.
+    // Dans ce cas on supprime les transporteurs multi-modaux qui n'ont pas signé.
+    transporters: { deleteMany: { transporterTransportSignatureDate: null } }
   };
 
   return updateBsvhu(user, bsvhu, updateInput);
@@ -234,7 +297,7 @@ export async function getNextStatus(
   });
 
   // This transition is not possible
-  if (!nextState.changed) {
+  if (nextState.transitions.length === 0) {
     throw new InvalidSignatureError();
   }
 
@@ -260,4 +323,38 @@ async function updateBsvhu(
     );
     return signBsda;
   });
+}
+
+/**
+ * Renvoie le numéro de la signature de transport en cas de signature d'un transporteur
+ * mulit-modal. Renvoie la signature GraphQL dans les autres cas
+ * @param signatureType
+ * @param bsda
+ * @returns
+ */
+function getBsvhuSignatureType(
+  signatureType: SignatureTypeInput,
+  bsvhu: BsvhuWithTransporters
+): AllBsvhuSignatureType {
+  if (signatureType === "TRANSPORT") {
+    if (bsvhu.transporters && bsvhu.transporters.length > 1) {
+      const transporters = getTransportersSync(bsvhu);
+      const nextTransporter = transporters.find(
+        t => !t.transporterTransportSignatureDate
+      );
+      if (!nextTransporter) {
+        throw new UserInputError(
+          "Impossible d'appliquer une signature TRANSPORT. Tous les transporteurs ont déjà signé"
+        );
+      }
+      const number = nextTransporter.number;
+      if (!number || number === 1) {
+        return "TRANSPORT";
+      }
+      return `TRANSPORT_${number}` as AllBsvhuSignatureType;
+    }
+    return "TRANSPORT";
+  }
+
+  return signatureType;
 }

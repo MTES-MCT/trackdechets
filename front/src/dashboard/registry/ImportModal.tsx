@@ -12,7 +12,7 @@ import {
   RegistryImportStatus,
   RegistryImportType
 } from "@td/codegen-ui";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, UseFormGetValues, UseFormRegister } from "react-hook-form";
 import { InlineLoader } from "../../Apps/common/Components/Loader/Loaders";
 import { Modal } from "../../common/components";
@@ -31,6 +31,7 @@ type StepProps = {
   goToNextStep: () => void;
   registryImportId: string | undefined;
   setRegistryImportId: (string) => void;
+  setHasError: (boolean) => void;
 };
 
 const steps = [
@@ -39,7 +40,11 @@ const steps = [
     component: Step1,
     buttons: ["CANCEL", "VALIDATE"]
   },
-  { title: "Téléversement en cours", component: Step2 },
+  {
+    title: "Téléversement en cours",
+    component: Step2,
+    errorButtons: ["RESTART"]
+  },
   { title: "Importation", component: Step3, buttons: ["CLOSE"] }
 ];
 
@@ -79,6 +84,7 @@ export function ImportModal({ isOpen, onClose }: Props) {
   const [registryImportId, setRegistryImportId] = useState<
     string | undefined
   >();
+  const [hasError, setHasError] = useState<boolean>(false);
   const {
     register,
     getValues,
@@ -118,6 +124,7 @@ export function ImportModal({ isOpen, onClose }: Props) {
               setCurrentStepIdx(currentStepIdx + 1);
             }
           }}
+          setHasError={setHasError}
           registryImportId={registryImportId}
           setRegistryImportId={setRegistryImportId}
         />
@@ -143,6 +150,18 @@ export function ImportModal({ isOpen, onClose }: Props) {
             Fermer
           </button>
         )}
+        {hasError &&
+          steps[currentStepIdx].errorButtons?.includes("RESTART") && (
+            <button
+              className="fr-btn fr-btn--secondary"
+              onClick={() => {
+                setHasError(false);
+                setCurrentStepIdx(0);
+              }}
+            >
+              Essayer avec un autre fichier
+            </button>
+          )}
       </div>
     </Modal>
   );
@@ -211,7 +230,12 @@ function Step1({ register }: StepProps) {
   );
 }
 
-function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
+function Step2({
+  getValues,
+  goToNextStep,
+  setRegistryImportId,
+  setHasError
+}: StepProps) {
   const [s3UploadError, setS3UploadError] = useState<string | null>(null);
 
   const { files, type } = getValues();
@@ -235,8 +259,9 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
       const { signedUrl, fields } = registryUploadSignedUrl;
 
       const form = new FormData();
+      // fields already contains the content type of the file curated by the backend
+      // and expected by S3
       Object.keys(fields).forEach(key => form.append(key, fields[key]));
-      form.append("Content-Type", getContentType(file));
       form.append("file", file);
 
       const uploadResponse = await fetch(signedUrl, {
@@ -268,16 +293,27 @@ function Step2({ getValues, goToNextStep, setRegistryImportId }: StepProps) {
     }
   });
 
+  useEffect(() => {
+    if (importFileError || s3UploadError || signedUrlError) {
+      setHasError(true);
+    }
+  }, [importFileError, s3UploadError, signedUrlError, setHasError]);
+
   return (
     <div>
-      <Alert
-        title="Envoi du fichier"
-        severity="info"
-        description="Veuillez patienter pendant que le fichier est téléversé vers Trackdéchets. L'import des déclarations débutera automatiquement à la suite."
-      />
-      <div className="tw-mt-6">
-        <InlineLoader />
-      </div>
+      {!signedUrlError && !importFileError && !s3UploadError && (
+        <>
+          <Alert
+            title="Envoi du fichier"
+            severity="info"
+            description="Veuillez patienter pendant que le fichier est téléversé vers Trackdéchets. L'import des déclarations débutera automatiquement à la suite."
+          />
+
+          <div className="tw-mt-6">
+            <InlineLoader />
+          </div>
+        </>
+      )}
       {signedUrlError && (
         <Alert
           title="Erreur lors de la récupération de l'URL de versement"
@@ -457,15 +493,4 @@ function Step3({ registryImportId }) {
       )}
     </div>
   );
-}
-
-function getContentType(file: File): string {
-  // file.type is not reliable for CSV files
-  // Some browsers may detect CSV files as application/vnd.ms-excel instead of text/csv because of Windows file type mappings.
-  const extension = file.name.split(".").pop()?.toLowerCase();
-  if (extension === "csv") {
-    return "text/csv";
-  }
-
-  return file.type;
 }

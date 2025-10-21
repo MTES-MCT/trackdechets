@@ -40,3 +40,23 @@ export function updateForeignTransporter(company: string): WorkflowStep {
     setContext: (ctx, data) => ({ ...ctx, bsd: data })
   };
 }
+
+export function updateTransporters(company: string): WorkflowStep {
+  return {
+    description: "Un transporteur est ajouté",
+    mutation: mutations.updateBsvhu,
+    variables: ({ bsd, updatedBsvhuTransporters }) => ({
+      id: bsd.id,
+      input: {
+        transporters: updatedBsvhuTransporters
+      }
+    }),
+    data: response => response.updateBsvhu,
+    company,
+    setContext: ctx => ({
+      ...ctx,
+      bsvhuTransporters: ctx.updatedBsvhuTransporters,
+      updatedBsvhuTransporters: undefined
+    })
+  };
+}

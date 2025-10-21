@@ -3,13 +3,13 @@ import {
   Document,
   formatDate,
   FormCompanyFields,
-  SignatureStamp,
-  TRANSPORT_MODE_LABELS
+  SignatureStamp
 } from "../../../common/pdf";
 import type { Bsvhu, OperationMode } from "@td/codegen-back";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
 import { Recepisse } from "../../../common/pdf/components/Recepisse";
+import Transporter from "../../../common/pdf/components/Transporter";
 
 const UNITE_IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
@@ -373,79 +373,9 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
         )}
         {/* End Broker informations */}
         {/* Transporter */}
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p className="mb-3">
-              <strong>9. Transporteur</strong>
-            </p>
-
-            <div>
-              {/* <p className="mb-3">N° Agrément : {bsvhu.transporter.agrementNumber}</p> */}
-              <p className="mb-3">
-                SIRET : {bsvhu?.transporter?.company?.siret}
-              </p>
-              <p className="mb-3">
-                N° TVA intracommunautaire (le cas échéant) :{" "}
-                {bsvhu?.transporter?.company?.vatNumber}
-              </p>
-              <p className="mb-3">
-                NOM (Raison sociale) : {bsvhu?.transporter?.company?.name}
-              </p>
-              <p className="mb-3">
-                Adresse : {bsvhu?.transporter?.company?.address}
-              </p>
-              <div className="Flex">
-                <p className="mb-3">
-                  Tel : {bsvhu?.transporter?.company?.phone}
-                </p>
-                <p className="mb-3 ml-12">
-                  Mail : {bsvhu?.transporter?.company?.mail}
-                </p>
-              </div>
-            </div>
-            <p className="mb-3">
-              Nom de la personne à contacter :{" "}
-              {bsvhu?.transporter?.company?.contact}
-            </p>
-          </div>
-
-          <div className="BoxCol">
-            {bsvhu?.transporter?.recepisse?.isExempted ? (
-              <p>
-                Le transporteur déclare être exempté de récépissé conformément
-                aux dispositions de l'article R.541-50 du code de
-                l'environnement.
-              </p>
-            ) : (
-              <Recepisse recepisse={bsvhu?.transporter?.recepisse} />
-            )}
-
-            <p className="mb-3">
-              Mode de transport:{" "}
-              {bsvhu?.transporter?.transport?.mode
-                ? TRANSPORT_MODE_LABELS[bsvhu?.transporter?.transport?.mode]
-                : ""}
-            </p>
-            <p className="mb-3">
-              Immatriculation(s) :{" "}
-              {bsvhu?.transporter?.transport?.plates?.join(", ")}
-            </p>
-            <p className="mb-3">
-              Date de prise en charge :{" "}
-              {formatDate(bsvhu?.transporter?.transport?.takenOverAt)}
-            </p>
-            <p className="mb-3">
-              Je soussigné : {bsvhu?.transporter?.transport?.signature?.author}
-            </p>
-            <p className="mb-3">
-              Certifie que les mentions dans le cadre 8 sont exactes et que
-              l’opération indiquée ci-dessus a été réalisée.
-            </p>
-            {!!bsvhu?.transporter?.transport?.signature?.author && (
-              <SignatureStamp />
-            )}
-          </div>
-        </div>
+        {bsvhu?.transporter && (
+          <Transporter transporter={bsvhu.transporter} frameNumber={9} />
+        )}
         {/* End Transporter */}
         {/* Destination */}
         <div className="BoxRow">
@@ -614,6 +544,22 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
           </strong>
         </p>
       </div>
+      {bsvhu?.transporters?.length > 1 && (
+        <div className="Page">
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>A REMPLIR EN CAS DE TRANSPORT MULTIMODAL</strong>
+              </p>
+            </div>
+          </div>
+          {bsvhu.transporters
+            .filter((_, idx) => idx > 0)
+            .map((t, idx) => (
+              <Transporter transporter={t} key={t.id} frameNumber={12 + idx} />
+            ))}
+        </div>
+      )}
     </Document>
   );
 }

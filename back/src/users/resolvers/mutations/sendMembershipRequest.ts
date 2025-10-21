@@ -18,6 +18,10 @@ import {
   getNotificationSubscribers,
   UserNotification
 } from "../../notifications";
+import { MembershipRequestStatus } from "@prisma/client";
+import { subHours } from "date-fns";
+
+const MAX_MEMBERSHIP_REQUESTS_PER_HOUR = 50;
 
 const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] =
   async (parent, { siret }, context) => {
@@ -50,6 +54,20 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
         : "";
       throw new UserInputError(
         `Une demande de rattachement a déjà été faite pour cet établissement.${adminEmailsText}`
+      );
+    }
+
+    const numberOfMembershipRequests = await prisma.membershipRequest.count({
+      where: {
+        userId: user.id,
+        status: { not: MembershipRequestStatus.ACCEPTED },
+        createdAt: { gt: subHours(new Date(), 1) }
+      }
+    });
+
+    if (numberOfMembershipRequests >= MAX_MEMBERSHIP_REQUESTS_PER_HOUR) {
+      throw new UserInputError(
+        "Vous avez atteint le nombre maximum de demandes de rattachements non acceptées par heure."
       );
     }
 

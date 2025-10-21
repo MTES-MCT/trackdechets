@@ -20,15 +20,17 @@ const OperationModeSelect = ({ operationCode, name }) => {
   );
 
   useEffect(() => {
+    setFieldValue(name, null);
+  }, [operationCode, setFieldValue, name]);
+
+  useEffect(() => {
     // No mode possible. Still, explicitely set to null
     if (!modes.length) {
       setFieldValue(name, null);
     }
     // If the available modes change, and only ONE option is available,
-    // select it by default. Else, reset the selection
-    else if (modes.length > 1) {
-      setFieldValue(name, modeValue);
-    } else {
+    // select it by default.
+    else if (!modeValue && modes.length === 1) {
       setFieldValue(name, modes[0]);
     }
   }, [modes, name, setFieldValue, modeValue]);

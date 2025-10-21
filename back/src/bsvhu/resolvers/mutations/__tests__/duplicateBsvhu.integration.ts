@@ -13,6 +13,7 @@ import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
 import { prisma } from "@td/prisma";
 import { searchCompany } from "../../../../companies/search";
+import { getFirstTransporterSync } from "../../../database";
 
 jest.mock("../../../../companies/search");
 
@@ -134,16 +135,21 @@ describe("mutation.duplicateBsvhu", () => {
         destinationCompanyContact: destination.contact,
         destinationCompanyPhone: destination.contactPhone,
         destinationCompanyMail: destination.contactEmail,
-        transporterCompanySiret: transporter.siret,
-        transporterCompanyName: transporter.name,
-        transporterCompanyAddress: transporter.address,
-        transporterCompanyContact: transporter.contact,
-        transporterCompanyPhone: transporter.contactPhone,
-        transporterCompanyMail: transporter.contactEmail,
-        transporterRecepisseIsExempted: false,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret,
+            transporterCompanyName: transporter.name,
+            transporterCompanyAddress: transporter.address,
+            transporterCompanyContact: transporter.contact,
+            transporterCompanyPhone: transporter.contactPhone,
+            transporterCompanyMail: transporter.contactEmail,
+            transporterRecepisseIsExempted: false,
+            transporterRecepisseNumber: transporterReceipt.receiptNumber,
+            transporterRecepisseDepartment: transporterReceipt.department,
+            transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+          }
+        },
         emitterEmissionSignatureDate: new Date(),
         emitterEmissionSignatureAuthor: "John",
         transporterTransportSignatureDate: new Date(),
@@ -210,8 +216,9 @@ describe("mutation.duplicateBsvhu", () => {
     expect(errors).toBeUndefined();
     const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: data.duplicateBsvhu.id },
-      include: { intermediaries: true }
+      include: { intermediaries: true, transporters: true }
     });
+    const duplicatedTransporter = getFirstTransporterSync(duplicatedBsvhu)!;
 
     const {
       emitterIrregularSituation,
@@ -245,6 +252,8 @@ describe("mutation.duplicateBsvhu", () => {
       destinationOperationNextDestinationCompanyPhone,
       destinationOperationNextDestinationCompanyMail,
       destinationOperationNextDestinationCompanyVatNumber,
+      destinationOperationNextDestinationCompanyExtraEuropeanId,
+      destinationOperationNextDestinationCompanyCountry,
       destinationCustomInfo,
       wasteCode,
       packaging,
@@ -253,20 +262,6 @@ describe("mutation.duplicateBsvhu", () => {
       quantity,
       weightValue,
       weightIsEstimate,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterRecepisseNumber,
-      transporterRecepisseDepartment,
-      transporterRecepisseValidityLimit,
-      transporterCompanyVatNumber,
-      transporterTransportTakenOverAt,
-      transporterCustomInfo,
-      transporterRecepisseIsExempted,
-      transporterTransportMode,
       ecoOrganismeSiret,
       ecoOrganismeName,
       brokerCompanyName,
@@ -288,9 +283,26 @@ describe("mutation.duplicateBsvhu", () => {
       traderRecepisseDepartment,
       traderRecepisseValidityLimit,
       containsElectricOrHybridVehicles,
+      transportersOrgIds,
       ...rest
     } = bsvhu;
+    const transporterFromBsvhu = getFirstTransporterSync(bsvhu)!;
 
+    const {
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode,
+      ...restTransporter
+    } = transporterFromBsvhu;
     const expectedSkipped = [
       "id",
       "customId",
@@ -303,9 +315,7 @@ describe("mutation.duplicateBsvhu", () => {
       "isDuplicateOf",
       "emitterEmissionSignatureAuthor",
       "emitterEmissionSignatureDate",
-      "transporterTransportSignatureAuthor",
       "transporterTransportSignatureDate",
-      "transporterTransportPlates",
       "destinationReceptionQuantity",
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
@@ -322,7 +332,39 @@ describe("mutation.duplicateBsvhu", () => {
       "destinationOperationSignatureDate",
       "intermediaries",
       "intermediariesOrgIds",
-      "canAccessDraftOrgIds"
+      "canAccessDraftOrgIds",
+      "transporters",
+
+      // temporary, we will remove those properties later, they are only here to avoid breaking the test
+      "transporterCompanyAddress",
+      "transporterCompanyContact",
+      "transporterCompanyMail",
+      "transporterCompanyName",
+      "transporterCompanyPhone",
+      "transporterCompanySiret",
+      "transporterCompanyVatNumber",
+      "transporterCustomInfo",
+      "transporterRecepisseDepartment",
+      "transporterRecepisseIsExempted",
+      "transporterRecepisseNumber",
+      "transporterRecepisseValidityLimit",
+      "transporterTransportMode",
+      "transporterTransportPlates",
+      "transporterTransportSignatureAuthor",
+      "transporterTransportTakenOverAt"
+    ];
+
+    const expectedSkippedTransporter = [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "bsvhuId",
+      "transporterTransportPlates",
+      "number",
+      "transporterTransportTakenOverAt",
+      "transporterTransportSignatureAuthor",
+      "transporterTransportSignatureDate",
+      "transporterCustomInfo"
     ];
 
     expect(duplicatedBsvhu.status).toEqual("INITIAL");
@@ -369,19 +411,6 @@ describe("mutation.duplicateBsvhu", () => {
       quantity,
       weightValue,
       weightIsEstimate,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterRecepisseNumber,
-      transporterRecepisseDepartment,
-      transporterRecepisseValidityLimit,
-      transporterCompanyVatNumber,
-      transporterTransportTakenOverAt,
-      transporterCustomInfo,
-      transporterRecepisseIsExempted,
       ecoOrganismeSiret,
       ecoOrganismeName,
       brokerCompanyName,
@@ -402,7 +431,24 @@ describe("mutation.duplicateBsvhu", () => {
       traderRecepisseNumber,
       traderRecepisseDepartment,
       traderRecepisseValidityLimit,
-      containsElectricOrHybridVehicles
+      containsElectricOrHybridVehicles,
+      transportersOrgIds
+    });
+
+    expect(duplicatedTransporter).toMatchObject({
+      number: 1,
+      transporterCompanySiret,
+      transporterCompanyName,
+      transporterCompanyVatNumber,
+      transporterCompanyAddress,
+      transporterCompanyContact,
+      transporterCompanyPhone,
+      transporterCompanyMail,
+      transporterRecepisseIsExempted,
+      transporterRecepisseNumber,
+      transporterRecepisseDepartment,
+      transporterRecepisseValidityLimit,
+      transporterTransportMode
     });
 
     // make sure this test breaks when a new field is added to the Bsvhu model
@@ -410,6 +456,10 @@ describe("mutation.duplicateBsvhu", () => {
     const sortFn = (a: string, b: string) => a.localeCompare(b);
     expect(Object.keys(rest).sort(sortFn)).toEqual(
       expectedSkipped.sort(sortFn)
+    );
+
+    expect(Object.keys(restTransporter).sort(sortFn)).toEqual(
+      expectedSkippedTransporter.sort(sortFn)
     );
 
     expect(duplicatedBsvhu.intermediaries[0].siret).toEqual(intermediary.siret);
@@ -424,13 +474,27 @@ describe("mutation.duplicateBsvhu", () => {
     expect(duplicatedBsvhu.destinationReceptionSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionSignatureDate).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionDate).toBeNull();
+    expect(duplicatedBsvhu.transportersOrgIds).toEqual([
+      transporterCompanySiret
+    ]);
+    expect(duplicatedTransporter.transporterTransportSignatureDate).toBeNull();
+    expect(
+      duplicatedTransporter.transporterTransportSignatureAuthor
+    ).toBeNull();
   });
 
   it("should duplicate without the transporter receipt when it was emptied", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const bsvhu = await bsvhuFactory({
-      opt: { transporterCompanySiret: company.siret }
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
+      }
     });
     const { mutate } = makeClient(user);
 
@@ -454,7 +518,14 @@ describe("mutation.duplicateBsvhu", () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const receipt = await transporterReceiptFactory({ company });
     const bsvhu = await bsvhuFactory({
-      opt: { transporterCompanySiret: company.siret }
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret,
+            number: 1
+          }
+        }
+      }
     });
     const { mutate } = makeClient(user);
 
@@ -467,15 +538,16 @@ describe("mutation.duplicateBsvhu", () => {
       }
     );
     const duplicateBsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: data.duplicateBsvhu.id }
+      where: { id: data.duplicateBsvhu.id },
+      include: { transporters: true }
     });
-    expect(duplicateBsvhu?.transporterRecepisseDepartment).toBe(
+    expect(duplicateBsvhu?.transporters[0].transporterRecepisseDepartment).toBe(
       receipt.department
     );
     expect(
-      duplicateBsvhu?.transporterRecepisseValidityLimit?.toISOString()
+      duplicateBsvhu?.transporters[0].transporterRecepisseValidityLimit?.toISOString()
     ).toBe(receipt.validityLimit.toISOString());
-    expect(duplicateBsvhu?.transporterRecepisseNumber).toBe(
+    expect(duplicateBsvhu?.transporters[0].transporterRecepisseNumber).toBe(
       receipt.receiptNumber
     );
   });
@@ -513,21 +585,26 @@ describe("mutation.duplicateBsvhu", () => {
         emitterCompanyContact: emitter.company.contact,
         emitterCompanyMail: emitter.company.contactEmail,
         emitterCompanyPhone: emitter.company.contactPhone,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyName: transporterCompany.name,
-        transporterCompanyAddress: transporterCompany.address,
-        transporterCompanyContact: transporterCompany.contact,
-        transporterCompanyMail: transporterCompany.contactEmail,
-        transporterCompanyPhone: transporterCompany.contactPhone,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
         destinationCompanySiret: destinationCompany.siret,
         destinationCompanyName: destinationCompany.name,
         destinationCompanyAddress: destinationCompany.address,
         destinationCompanyContact: destinationCompany.contact,
         destinationCompanyMail: destinationCompany.contactEmail,
-        destinationCompanyPhone: destinationCompany.contactPhone
+        destinationCompanyPhone: destinationCompany.contactPhone,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyName: transporterCompany.name,
+            transporterCompanyAddress: transporterCompany.address,
+            transporterCompanyContact: transporterCompany.contact,
+            transporterCompanyMail: transporterCompany.contactEmail,
+            transporterCompanyPhone: transporterCompany.contactPhone,
+            transporterRecepisseNumber: transporterReceipt.receiptNumber,
+            transporterRecepisseDepartment: transporterReceipt.department,
+            transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+            number: 1
+          }
+        }
       }
     });
 
@@ -604,7 +681,8 @@ describe("mutation.duplicateBsvhu", () => {
     );
 
     const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: data.duplicateBsvhu.id }
+      where: { id: data.duplicateBsvhu.id },
+      include: { transporters: true }
     });
     // SIRENE info takes over
     expect(duplicatedBsvhu.emitterCompanyName).toEqual("updated emitter name");
@@ -621,32 +699,32 @@ describe("mutation.duplicateBsvhu", () => {
     );
 
     // SIRENE info takes over
-    expect(duplicatedBsvhu.transporterCompanyName).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyName).toEqual(
       "updated transporter name"
     );
-    expect(duplicatedBsvhu.transporterCompanyAddress).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyAddress).toEqual(
       "updated transporter address"
     );
     // internal info
-    expect(duplicatedBsvhu.transporterCompanyContact).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
-    expect(duplicatedBsvhu.transporterCompanyMail).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyMail).toEqual(
       "UPDATED-TRANSPORTER-MAIL"
     );
-    expect(duplicatedBsvhu.transporterCompanyPhone).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
 
-    expect(duplicatedBsvhu.transporterRecepisseNumber).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterRecepisseNumber).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
     );
-    expect(duplicatedBsvhu.transporterRecepisseValidityLimit).toEqual(
-      FOUR_DAYS_AGO
-    );
-    expect(duplicatedBsvhu.transporterRecepisseDepartment).toEqual(
-      "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
-    );
+    expect(
+      duplicatedBsvhu.transporters[0].transporterRecepisseValidityLimit
+    ).toEqual(FOUR_DAYS_AGO);
+    expect(
+      duplicatedBsvhu.transporters[0].transporterRecepisseDepartment
+    ).toEqual("UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT");
     // SIRENE info takes over
     expect(duplicatedBsvhu.destinationCompanyName).toEqual(
       "updated destination name"
@@ -703,15 +781,20 @@ describe("mutation.duplicateBsvhu", () => {
         emitterCompanyContact: emitter.company.contact,
         emitterCompanyMail: emitter.company.contactEmail,
         emitterCompanyPhone: emitter.company.contactPhone,
-        transporterCompanySiret: transporterCompany.siret,
-        transporterCompanyName: transporterCompany.name,
-        transporterCompanyAddress: transporterCompany.address,
-        transporterCompanyContact: transporterCompany.contact,
-        transporterCompanyMail: transporterCompany.contactEmail,
-        transporterCompanyPhone: transporterCompany.contactPhone,
-        transporterRecepisseNumber: transporterReceipt.receiptNumber,
-        transporterRecepisseDepartment: transporterReceipt.department,
-        transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret,
+            transporterCompanyName: transporterCompany.name,
+            transporterCompanyAddress: transporterCompany.address,
+            transporterCompanyContact: transporterCompany.contact,
+            transporterCompanyMail: transporterCompany.contactEmail,
+            transporterCompanyPhone: transporterCompany.contactPhone,
+            transporterRecepisseNumber: transporterReceipt.receiptNumber,
+            transporterRecepisseDepartment: transporterReceipt.department,
+            transporterRecepisseValidityLimit: transporterReceipt.validityLimit,
+            number: 1
+          }
+        },
         destinationCompanySiret: destinationCompany.siret,
         destinationCompanyName: destinationCompany.name,
         destinationCompanyAddress: destinationCompany.address,
@@ -773,7 +856,8 @@ describe("mutation.duplicateBsvhu", () => {
     const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: data.duplicateBsvhu.id },
       include: {
-        intermediaries: true
+        intermediaries: true,
+        transporters: true
       }
     });
 
@@ -784,10 +868,10 @@ describe("mutation.duplicateBsvhu", () => {
     );
 
     // Transporter
-    expect(duplicatedBsvhu.transporterCompanyName).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyName).toEqual(
       "updated transporter name"
     );
-    expect(duplicatedBsvhu.transporterCompanyAddress).toEqual(
+    expect(duplicatedBsvhu.transporters[0].transporterCompanyAddress).toEqual(
       "updated transporter address"
     );
 

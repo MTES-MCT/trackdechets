@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type { BsvhuInput, MutationCreateBsvhuArgs } from "@td/codegen-back";
@@ -32,7 +33,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
 
   await checkCanCreate(user, input);
 
-  const zodBsvhu = graphQlInputToZodBsvhu(input);
+  const zodBsvhu = await graphQlInputToZodBsvhu(input);
   const { createdAt, ...parsedZodBsvhu } = await parseBsvhuAsync(
     { ...zodBsvhu, isDraft, createdAt: new Date() },
     {
@@ -49,13 +50,33 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
         }
       : undefined;
 
+  let transporters:
+    | Prisma.BsvhuTransporterCreateNestedManyWithoutBsvhuInput
+    | undefined = undefined;
+  if (input.transporter) {
+    transporters = {
+      createMany: {
+        // un seul transporteur dans le tableau normalement
+        data: parsedZodBsvhu.transporters!.map((t, idx) => {
+          const { id, bsvhuId, createdAt, ...data } = t;
+          return { ...data, number: idx + 1 };
+        })
+      }
+    };
+  } else if (input.transporters && input.transporters.length > 0) {
+    transporters = {
+      connect: parsedZodBsvhu.transporters!.map(t => ({ id: t.id! }))
+    };
+  }
+
   const bsvhuRepository = getBsvhuRepository(user);
 
   const newForm = await bsvhuRepository.create({
     ...parsedZodBsvhu,
     id: getReadableId(ReadableIdPrefix.VHU),
     isDraft,
-    intermediaries
+    intermediaries,
+    transporters
   });
 
   return expandVhuFormFromDb(newForm);

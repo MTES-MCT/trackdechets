@@ -10,7 +10,7 @@ import {
   bsvhuFactory,
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
-import { UserRole } from "@prisma/client";
+import { OperationMode, UserRole } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSVHUS = `
@@ -24,6 +24,12 @@ const GET_BSVHUS = `
       }
       edges {
         node {
+          metadata {
+            errors {
+              message
+              requiredFor
+            }
+          }
           id
           customId
           isDraft
@@ -127,8 +133,7 @@ describe("Query.Bsvhus", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        customId: "some custom ID",
-        transporterTransportPlates: ["FD-87-98"]
+        customId: "some custom ID"
       }
     });
 
@@ -140,6 +145,9 @@ describe("Query.Bsvhus", () => {
 
     const expected = {
       id: bsvhu.id,
+      metadata: {
+        errors: []
+      },
       customId: "some custom ID",
       isDraft: false,
       destination: { company: { siret: bsvhu.destinationCompanySiret } },
@@ -149,19 +157,19 @@ describe("Query.Bsvhus", () => {
       },
       transporter: {
         company: {
-          siret: bsvhu.transporterCompanySiret,
-          name: bsvhu.transporterCompanyName,
-          address: bsvhu.transporterCompanyAddress,
-          contact: bsvhu.transporterCompanyContact,
-          mail: bsvhu.transporterCompanyMail,
-          phone: bsvhu.transporterCompanyPhone,
+          siret: bsvhu.transporters[0].transporterCompanySiret,
+          name: bsvhu.transporters[0].transporterCompanyName,
+          address: bsvhu.transporters[0].transporterCompanyAddress,
+          contact: bsvhu.transporters[0].transporterCompanyContact,
+          mail: bsvhu.transporters[0].transporterCompanyMail,
+          phone: bsvhu.transporters[0].transporterCompanyPhone,
           vatNumber: null
         },
         transport: {
-          mode: "ROAD",
-          plates: ["FD-87-98"]
+          mode: bsvhu.transporters[0].transporterTransportMode,
+          plates: bsvhu.transporters[0].transporterTransportPlates
         },
-        recepisse: { number: bsvhu.transporterRecepisseNumber }
+        recepisse: { number: bsvhu.transporters[0].transporterRecepisseNumber }
       },
 
       broker: {
@@ -315,7 +323,15 @@ describe("Query.Bsvhus", () => {
     await bsvhuFactory({ opt });
     await bsvhuFactory({ opt });
     const vhu = await bsvhuFactory({
-      opt: { ...opt, transporterTransportPlates: ["XY-23-TT"] }
+      opt: {
+        ...opt,
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportPlates: ["XY-23-TT"]
+          }
+        }
+      }
     });
 
     // And 1 on recipient company
@@ -332,5 +348,25 @@ describe("Query.Bsvhus", () => {
 
     expect(data.bsvhus.edges.length).toBe(1);
     expect(data.bsvhus.edges[0].node.id).toBe(vhu.id);
+  });
+
+  it("should get a list of bsvhus even if the operation mode is illegal", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const opt = {
+      emitterCompanySiret: company.siret,
+      destinationOperationCode: "R 4",
+      destinationOperationMode: OperationMode.REUTILISATION, // Illegal mode for R4
+      destinationOperationSignatureDate: new Date()
+    };
+    await bsvhuFactory({ opt });
+
+    // When
+    const { query } = makeClient(user);
+    const { data, errors } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS);
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.bsvhus.edges.length).toBe(1);
   });
 });

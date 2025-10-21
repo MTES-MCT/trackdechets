@@ -7,6 +7,7 @@ import SearchInput from "../../../../common/components/SearchInput";
 import { Query, EcoOrganisme, Form } from "@td/codegen-ui";
 import TdSwitch from "../../../../common/components/Switch";
 import { getInitialEcoOrganisme } from "../../utils/initial-state";
+import { capitalize } from "../.../../../../../common/helper";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -97,7 +98,8 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                     )
                     .map(eo => ({
                       ...eo,
-                      orgId: eo.siret
+                      orgId: eo.siret,
+                      name: capitalize(eo.name) as string
                     }))}
                   selectedItem={
                     data.ecoOrganismes

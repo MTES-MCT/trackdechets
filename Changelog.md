@@ -5,6 +5,21 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2025.10.1] 21/10/2025
+
+#### :nail_care: Améliorations
+
+- Modifier automatiquement le statut des imports qui sont restés En attente au statut Refusé [PR 4473](https://github.com/MTES-MCT/trackdechets/pull/4473)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du transport multi-modal sur le BSVHU [PR 4458](https://github.com/MTES-MCT/trackdechets/pull/4458)
+- Ajout de la possibilité de viser une destination ultérieure à l'étranger sur le BSVHU [PR 4480](https://github.com/MTES-MCT/trackdechets/pull/4480)
+
+#### :bug: Corrections de bugs
+
+- Résolution de problèmes de sécurité mineurs [PR 4465](https://github.com/MTES-MCT/trackdechets/pull/4465)
+
 # [2025.09.1] 23/09/2025
 
 #### :nail_care: Améliorations
@@ -36,6 +51,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking Change
 
 - Suppression du code et des queries liées aux anciens exports de registres [PR 4442](https://github.com/MTES-MCT/trackdechets/pull/4442)
+- Le code de traitement D9 n'existe plus (il faut désormais utiliser D9F) [PR 4464](https://github.com/MTES-MCT/trackdechets/pull/4464)
+- Révision de la correspondance entre codes et modes de traitement [PR 4459](https://github.com/MTES-MCT/trackdechets/pull/4459)
 
 # [2025.08.1] 26/08/2025
 

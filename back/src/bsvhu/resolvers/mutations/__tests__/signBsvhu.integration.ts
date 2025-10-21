@@ -10,7 +10,10 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsvhuFactory } from "../../../__tests__/factories.vhu";
+import {
+  bsvhuFactory,
+  bsvhuTransporterData
+} from "../../../__tests__/factories.vhu";
 import {
   companyFactory,
   transporterReceiptFactory
@@ -42,6 +45,12 @@ const SIGN_VHU = gql`
       }
       destination {
         reception {
+          signature {
+            author
+            date
+          }
+        }
+        operation {
           signature {
             author
             date
@@ -215,8 +224,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -258,8 +272,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -301,9 +320,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: transporterCompany.siret,
           status: "SIGNED_BY_PRODUCER",
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
 
@@ -362,9 +385,13 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -396,9 +423,16 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true,
+              transporterTransportPlates: [],
+              transporterTransportMode: "ROAD"
+            }
+          }
         }
       });
 
@@ -412,7 +446,8 @@ describe("Mutation.Vhu.sign", () => {
       });
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "L'immatriculation du transporteur est un champ requis.",
+          message:
+            "L'immatriculation du transporteur n° 1 est un champ requis.",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
@@ -430,9 +465,14 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           createdAt: new Date("2024-12-26:00:00.000Z"), // before v20250101
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -464,10 +504,15 @@ describe("Mutation.Vhu.sign", () => {
         const bsvhu = await bsvhuFactory({
           opt: {
             emitterCompanySiret: emitterCompany.siret,
-            transporterCompanySiret: company.siret,
-            transporterRecepisseIsExempted: true,
-            transporterTransportMode: mode,
-            status: "SIGNED_BY_PRODUCER"
+            status: "SIGNED_BY_PRODUCER",
+            transporters: {
+              create: {
+                number: 1,
+                transporterCompanySiret: company.siret,
+                transporterRecepisseIsExempted: true,
+                transporterTransportMode: mode
+              }
+            }
           }
         });
 
@@ -503,9 +548,13 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           emitterIrregularSituation: true,
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -537,9 +586,13 @@ describe("Mutation.Vhu.sign", () => {
         opt: {
           emitterIrregularSituation: true,
           emitterCompanySiret: siretify(45345),
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -567,9 +620,13 @@ describe("Mutation.Vhu.sign", () => {
           emitterIrregularSituation: true,
           emitterNoSiret: true,
           emitterCompanySiret: null,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true
+            }
+          }
         }
       });
 
@@ -598,10 +655,15 @@ describe("Mutation.Vhu.sign", () => {
       const bsvhu = await bsvhuFactory({
         opt: {
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanySiret: company.siret,
-          transporterRecepisseIsExempted: true,
-          transporterTransportMode: null,
-          status: "SIGNED_BY_PRODUCER"
+          status: "SIGNED_BY_PRODUCER",
+          transporters: {
+            create: {
+              number: 1,
+              transporterCompanySiret: company.siret,
+              transporterRecepisseIsExempted: true,
+              transporterTransportMode: null
+            }
+          }
         }
       });
 
@@ -616,7 +678,7 @@ describe("Mutation.Vhu.sign", () => {
       });
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le mode de transport est un champ requis."
+        "Le mode de transport n° 1 est un champ requis."
       );
     });
   });
@@ -691,9 +753,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -734,6 +800,88 @@ describe("Mutation.Vhu.sign", () => {
       expect(data.signBsvhu.status).toBe("RECEIVED");
     });
 
+    it("should be able to sign reception after transport even if transporter 2 hasn't signed yet", async () => {
+      // Given
+      const transporterCompany1 = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
+      });
+      const transporterCompany2 = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
+      });
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  ...bsvhuTransporterData(transporterCompany1.siret!, 1),
+                  transporterTransportSignatureAuthor: "Transporter",
+                  transporterTransportSignatureDate: new Date()
+                },
+                {
+                  ...bsvhuTransporterData(transporterCompany2.siret!, 2),
+                  transporterTransportSignatureAuthor: null,
+                  transporterTransportSignatureDate: null
+                }
+              ]
+            }
+          }
+        }
+      });
+
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateVhu(
+        destinationUser,
+        bsvhu.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              weight: 20,
+              date: new Date().toISOString() as any
+            }
+          }
+        }
+      );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors, data } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "RECEPTION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsvhu.destination?.reception?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsvhu.destination?.reception?.signature?.date).toBe(
+        SIGNATURE_DATE
+      );
+      expect(data.signBsvhu.status).toBe("RECEIVED");
+
+      const updatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+        where: { id: bsvhu.id },
+        include: { transporters: true }
+      });
+      // le second transporteur qui n'a pas signé ne doit plus apparaitre sur le bordereau
+      expect(updatedBsvhu.transporters).toHaveLength(1);
+      expect(updatedBsvhu.transporters[0].transporterCompanySiret).toEqual(
+        transporterCompany1.siret
+      );
+      expect(
+        updatedBsvhu.transporters[0].transporterTransportSignatureDate
+      ).toBeDefined();
+    });
+
     it("if signing reception after transport with status = REFUSED > new BSD status should be REFUSED", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
@@ -741,9 +889,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -785,6 +937,272 @@ describe("Mutation.Vhu.sign", () => {
       expect(data.signBsvhu.status).toBe("REFUSED");
     });
 
+    it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          // Reception data
+          destinationReceptionAcceptationStatus: null, // Missing param
+          destinationReceptionWeight: null, // Missing param
+          destinationReceptionDate: null, // Missing param
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
+        }
+      });
+
+      // When
+      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le statut d'acceptation du destinataire est un champ requis.\n" +
+          "Le poids réel reçu est un champ requis.\n" +
+          "La date de réception est un champ requis."
+      );
+    });
+
+    it("should fail if VHU has already been received", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "RECEIVED",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 20,
+          destinationReceptionDate: new Date(),
+          destinationReceptionSignatureAuthor: destinationUser.name,
+          destinationReceptionSignatureDate: new Date()
+        }
+      });
+
+      // When
+      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Cette signature a déjà été apposée.");
+    });
+
+    it("should fail if VHU has already been processed", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "PROCESSED",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 20,
+          destinationReceptionDate: new Date(),
+          // Operation data
+          destinationOperationCode: "R 5",
+          destinationOperationDate: new Date(),
+          destinationOperationMode: "RECYCLAGE"
+        }
+      });
+
+      // When
+      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas apposer cette signature sur le bordereau."
+      );
+    });
+
+    it("should fail if VHU hasn't been sent yet", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "INITIAL",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 20,
+          destinationReceptionDate: new Date(),
+          transporters: {
+            create: {
+              number: 1,
+              transporterRecepisseIsExempted: true,
+              transporterRecepisseNumber: null,
+              transporterRecepisseValidityLimit: null,
+              transporterRecepisseDepartment: null
+            }
+          }
+        }
+      });
+
+      // When
+      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Vous ne pouvez pas apposer cette signature sur le bordereau."
+      );
+    });
+
+    it("should return an error if not signed by destination", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "SENT",
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 20,
+          destinationReceptionDate: null
+        }
+      });
+
+      // When
+      const { errors } = await signVhu(emitterUser, bsvhu.id, "RECEPTION"); // Signed by emitter!
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe("Vous ne pouvez pas signer ce bordereau");
+    });
+
+    it("can NOT override reception data once reception has been signed", async () => {
+      // Given
+      const bsvhu = await bsvhuFactory({
+        opt: {
+          status: "RECEIVED", // Reception is signed!
+          emitterCompanySiret: emitterCompany.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
+          // Reception data
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionWeight: 20,
+          destinationReceptionDate: null, // Not required!
+          destinationReceptionSignatureAuthor: destinationUser.name,
+          destinationReceptionSignatureDate: new Date()
+        }
+      });
+
+      // When: try to update reception data, but it's too late!
+      // Reception has been signed already!
+      const { errors } = await updateVhu(destinationUser, bsvhu.id, {
+        destination: {
+          reception: {
+            acceptationStatus: "PARTIALLY_REFUSED",
+            refusalReason: "Not enough weight",
+            weight: 20,
+            date: new Date().toISOString() as any
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Des champs ont été verrouillés via signature et ne peuvent" +
+          " plus être modifiés : Le statut d'acceptation du destinataire, La raison du refus par le " +
+          "destinataire, Le poids réel reçu, La date de réception"
+      );
+    });
+  });
+
+  describe("OPERATION", () => {
+    const SIGNATURE_DATE = new Date().toISOString();
+
+    let emitterCompany;
+    let destinationUser;
+    let destinationCompany;
+
+    beforeAll(async () => {
+      await resetDatabase();
+
+      // Emitter
+      const emitter = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["PRODUCER"]
+      });
+      emitterCompany = emitter.company;
+
+      // Destination
+      const destination = await userWithCompanyFactory("MEMBER", {
+        companyTypes: ["WASTE_VEHICLES"],
+        wasteVehiclesTypes: ["BROYEUR", "DEMOLISSEUR"]
+      });
+      destinationUser = destination.user;
+      destinationCompany = destination.company;
+    });
+
+    afterAll(resetDatabase);
+
+    const signVhu = async (
+      user: User,
+      bsvhuId: string,
+      signatureType: SignatureTypeInput
+    ) => {
+      const { mutate } = makeClient(user);
+      return mutate<Pick<Mutation, "signBsvhu">>(SIGN_VHU, {
+        variables: {
+          id: bsvhuId,
+          input: {
+            type: signatureType,
+            author: user.name,
+            date: SIGNATURE_DATE
+          }
+        }
+      });
+    };
+
+    const updateVhu = async (
+      user: User,
+      bsvhuId: string,
+      input: BsvhuInput
+    ) => {
+      const { mutate } = makeClient(user);
+      return mutate<Pick<Mutation, "updateBsvhu">>(UPDATE_VHU, {
+        variables: {
+          id: bsvhuId,
+          input
+        }
+      });
+    };
+
     it("should not be able to sign OPERATION if RECEPTION was REFUSED", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
@@ -792,9 +1210,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -846,36 +1268,6 @@ describe("Mutation.Vhu.sign", () => {
         "Vous ne pouvez pas apposer cette signature sur le bordereau."
       );
     });
-
-    it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
-      // Given
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "SENT",
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
-          // Reception data
-          destinationReceptionAcceptationStatus: null, // Missing param
-          destinationReceptionWeight: null, // Missing param
-          destinationReceptionDate: null // Missing param
-        }
-      });
-
-      // When
-      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Le statut d'acceptation du destinataire est un champ requis.\n" +
-          "Le poids réel reçu est un champ requis.\n" +
-          "La date de réception est un champ requis."
-      );
-    });
-
     it("should be able to sign operation after transport, skipping reception", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
@@ -883,9 +1275,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -906,7 +1302,7 @@ describe("Mutation.Vhu.sign", () => {
             operation: {
               code: "R 5",
               date: new Date().toISOString() as any,
-              mode: "REUTILISATION"
+              mode: "RECYCLAGE"
             }
           }
         }
@@ -938,9 +1334,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"]
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          }
         }
       });
 
@@ -981,7 +1381,6 @@ describe("Mutation.Vhu.sign", () => {
       );
       expect(data.signBsvhu.status).toBe("REFUSED");
     });
-
     it("should not be able to sign operation after transport, skipping reception, if missing reception params", async () => {
       // Given
       const bsvhu = await bsvhuFactory({
@@ -989,9 +1388,13 @@ describe("Mutation.Vhu.sign", () => {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
+          transporters: {
+            create: {
+              number: 1,
+              transporterTransportSignatureAuthor: "Transporter",
+              transporterTransportSignatureDate: new Date()
+            }
+          },
           // Missing reception data!
           destinationReceptionAcceptationStatus: null, // Missing param
           destinationReceptionWeight: null, // Missing param
@@ -999,7 +1402,7 @@ describe("Mutation.Vhu.sign", () => {
           // Operation data
           destinationOperationCode: "R 5",
           destinationOperationDate: new Date(),
-          destinationOperationMode: "REUTILISATION"
+          destinationOperationMode: "RECYCLAGE"
         }
       });
 
@@ -1013,153 +1416,91 @@ describe("Mutation.Vhu.sign", () => {
           "Le poids réel reçu est un champ requis."
       );
     });
-
-    it("should fail if VHU has already been received", async () => {
+    it("should be able to sign operation after transport even if transporter 2 hasn't signed yet", async () => {
       // Given
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "RECEIVED",
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 20,
-          destinationReceptionDate: new Date(),
-          destinationReceptionSignatureAuthor: destinationUser.name,
-          destinationReceptionSignatureDate: new Date()
-        }
+      const transporterCompany1 = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
       });
-
-      // When
-      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Cette signature a déjà été apposée.");
-    });
-
-    it("should fail if VHU has already been processed", async () => {
-      // Given
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "PROCESSED",
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 20,
-          destinationReceptionDate: new Date(),
-          // Operation data
-          destinationOperationCode: "R 5",
-          destinationOperationDate: new Date(),
-          destinationOperationMode: "REUTILISATION"
-        }
+      const transporterCompany2 = await companyFactory({
+        companyTypes: ["TRANSPORTER"]
       });
-
-      // When
-      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Vous ne pouvez pas apposer cette signature sur le bordereau."
-      );
-    });
-
-    it("should fail if VHU hasn't been sent yet", async () => {
-      // Given
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "INITIAL",
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportPlates: ["XY-23-TR"],
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 20,
-          destinationReceptionDate: new Date()
-        }
-      });
-
-      // When
-      const { errors } = await signVhu(destinationUser, bsvhu.id, "RECEPTION");
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Vous ne pouvez pas apposer cette signature sur le bordereau."
-      );
-    });
-
-    it("should return an error if not signed by destination", async () => {
-      // Given
       const bsvhu = await bsvhuFactory({
         opt: {
           status: "SENT",
           emitterCompanySiret: emitterCompany.siret,
           destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 20,
-          destinationReceptionDate: null
-        }
-      });
-
-      // When
-      const { errors } = await signVhu(emitterUser, bsvhu.id, "RECEPTION"); // Signed by emitter!
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe("Vous ne pouvez pas signer ce bordereau");
-    });
-
-    it("can NOT override reception data once reception has been signed", async () => {
-      // Given
-      const bsvhu = await bsvhuFactory({
-        opt: {
-          status: "RECEIVED", // Reception is signed!
-          emitterCompanySiret: emitterCompany.siret,
-          destinationCompanySiret: destinationCompany.siret,
-          transporterTransportSignatureAuthor: "Transporter",
-          transporterTransportSignatureDate: new Date(),
-          transporterTransportPlates: ["XY-23-TR"],
-          // Reception data
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 20,
-          destinationReceptionDate: null, // Not required!
-          destinationReceptionSignatureAuthor: destinationUser.name,
-          destinationReceptionSignatureDate: new Date()
-        }
-      });
-
-      // When: try to update reception data, but it's too late!
-      // Reception has been signed already!
-      const { errors } = await updateVhu(destinationUser, bsvhu.id, {
-        destination: {
-          reception: {
-            acceptationStatus: "PARTIALLY_REFUSED",
-            refusalReason: "Not enough weight",
-            weight: 20,
-            date: new Date().toISOString() as any
+          transporters: {
+            createMany: {
+              data: [
+                {
+                  ...bsvhuTransporterData(transporterCompany1.siret!, 1),
+                  transporterTransportSignatureAuthor: "Transporter",
+                  transporterTransportSignatureDate: new Date()
+                },
+                {
+                  ...bsvhuTransporterData(transporterCompany2.siret!, 2),
+                  transporterTransportSignatureAuthor: null,
+                  transporterTransportSignatureDate: null
+                }
+              ]
+            }
           }
         }
       });
 
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Des champs ont été verrouillés via signature et ne peuvent" +
-          " plus être modifiés : Le statut d'acceptation du destinataire, La raison du refus par le " +
-          "destinataire, Le poids réel reçu, La date de réception"
+      // When
+
+      // Step 1: update with required reception data
+      const { errors: updateErrors } = await updateVhu(
+        destinationUser,
+        bsvhu.id,
+        {
+          // Reception data
+          destination: {
+            reception: {
+              acceptationStatus: "ACCEPTED",
+              weight: 20,
+              date: new Date().toISOString() as any
+            },
+            operation: {
+              code: "R 5",
+              date: new Date().toISOString() as any,
+              mode: "RECYCLAGE"
+            }
+          }
+        }
       );
+      expect(updateErrors).toBeUndefined();
+
+      // Step 2: sign reception
+      const { errors, data } = await signVhu(
+        destinationUser,
+        bsvhu.id,
+        "OPERATION"
+      );
+
+      // Then
+      expect(errors).toBeUndefined();
+      expect(data.signBsvhu.destination?.operation?.signature?.author).toBe(
+        destinationUser.name
+      );
+      expect(data.signBsvhu.destination?.operation?.signature?.date).toBe(
+        SIGNATURE_DATE
+      );
+      expect(data.signBsvhu.status).toBe("PROCESSED");
+
+      const updatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+        where: { id: bsvhu.id },
+        include: { transporters: true }
+      });
+      // le second transporteur qui n'a pas signé ne doit plus apparaitre sur le bordereau
+      expect(updatedBsvhu.transporters).toHaveLength(1);
+      expect(updatedBsvhu.transporters[0].transporterCompanySiret).toEqual(
+        transporterCompany1.siret
+      );
+      expect(
+        updatedBsvhu.transporters[0].transporterTransportSignatureDate
+      ).toBeDefined();
     });
   });
 });

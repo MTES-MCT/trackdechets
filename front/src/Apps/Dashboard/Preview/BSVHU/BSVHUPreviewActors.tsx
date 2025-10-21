@@ -22,7 +22,7 @@ const BSVHUPreviewActors = ({ bsd }: BSVHUPreviewActorsProps) => {
   return (
     <PreviewContainer>
       {!actorsPresent && (
-        <div>Aucun autre acteur n'est mentionné sur le bordereau.</div>
+        <div>Aucun autre acteur n'est visé sur le bordereau.</div>
       )}
 
       {bsd.ecoOrganisme && (

@@ -192,8 +192,7 @@ describe("Query.Bsvhu", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         customId: "some custom ID",
-        emitterCompanySiret: company.siret,
-        transporterTransportPlates: ["SD-78-YT"]
+        emitterCompanySiret: company.siret
       }
     });
 
@@ -214,16 +213,19 @@ describe("Query.Bsvhu", () => {
       },
       transporter: {
         company: {
-          siret: bsvhu.transporterCompanySiret,
-          name: bsvhu.transporterCompanyName,
-          address: bsvhu.transporterCompanyAddress,
-          contact: bsvhu.transporterCompanyContact,
-          mail: bsvhu.transporterCompanyMail,
-          phone: bsvhu.transporterCompanyPhone,
+          siret: bsvhu.transporters[0].transporterCompanySiret,
+          name: bsvhu.transporters[0].transporterCompanyName,
+          address: bsvhu.transporters[0].transporterCompanyAddress,
+          contact: bsvhu.transporters[0].transporterCompanyContact,
+          mail: bsvhu.transporters[0].transporterCompanyMail,
+          phone: bsvhu.transporters[0].transporterCompanyPhone,
           vatNumber: null
         },
-        transport: { plates: ["SD-78-YT"], mode: "ROAD" },
-        recepisse: { number: bsvhu.transporterRecepisseNumber }
+        transport: {
+          plates: bsvhu.transporters[0].transporterTransportPlates,
+          mode: bsvhu.transporters[0].transporterTransportMode
+        },
+        recepisse: { number: bsvhu.transporters[0].transporterRecepisseNumber }
       },
       ecoOrganisme: {
         name: bsvhu.ecoOrganismeName,

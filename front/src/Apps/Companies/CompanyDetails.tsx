@@ -23,6 +23,7 @@ import CompanyDigestSheetForm from "./CompanyDigestSheet/CompanyDigestSheet";
 import { Tabs, TabsProps } from "@codegouvfr/react-dsfr/Tabs";
 import { FrIconClassName } from "@codegouvfr/react-dsfr";
 import { CompanyRegistry } from "./CompanyRegistry/CompanyRegistry";
+import { capitalize } from "../../common/helper";
 
 export type TabContentProps = {
   company: CompanyPrivate;
@@ -129,7 +130,7 @@ export default function CompanyDetails() {
   }
 
   const companies = data?.myCompanies?.edges.map(({ node }) => node);
-  const company = companies ? companies.find(c => c.siret === siret) : null;
+  const company = companies ? companies.find(c => c.orgId === siret) : null;
 
   if (!company) {
     return <Navigate to={{ pathname: routes.companies.index }} />;
@@ -145,7 +146,7 @@ export default function CompanyDetails() {
 
   return (
     <AccountContentWrapper
-      title={`${company.name}${
+      title={`${capitalize(company.name ?? "")}${
         company.givenName ? " - " + company.givenName : ""
       }`}
       showTitle

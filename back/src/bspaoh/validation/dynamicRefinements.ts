@@ -203,7 +203,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
   if (company && !hasCremationProfile(company)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Destination),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Destination }),
       message:
         `L'entreprise avec le SIRET "${siret}" n'est pas inscrite` +
         ` sur Trackdéchets en tant que crématorium. Cette installation ne peut` +
@@ -218,7 +218,7 @@ export async function isCrematoriumRefinement(siret: string, ctx) {
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: pathFromCompanyRole(CompanyRole.Destination),
+      path: pathFromCompanyRole({ companyRole: CompanyRole.Destination }),
       message:
         `Le compte de l'installation du crématorium` +
         ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`

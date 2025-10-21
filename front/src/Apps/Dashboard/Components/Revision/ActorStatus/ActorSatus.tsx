@@ -1,6 +1,7 @@
 import {
   BsdaRevisionRequestApproval,
   FormRevisionRequestApproval,
+  BsdasriRevisionRequestApproval,
   RevisionRequestApprovalStatus
 } from "@td/codegen-ui";
 import React from "react";
@@ -59,9 +60,19 @@ const ActorStatus = ({ review }: { review: ReviewInterface }) => {
           )}
 
           <p className="actor-name">
-            {approvals.map(approval => (
-              <p>{getActorName(review?.bsdContent, approval?.approverSiret)}</p>
-            ))}
+            {approvals.map(
+              (
+                approval:
+                  | BsdaRevisionRequestApproval
+                  | BsdasriRevisionRequestApproval
+                  | FormRevisionRequestApproval,
+                index: number
+              ) => (
+                <p key={index}>
+                  {getActorName(review?.bsdContent, approval?.approverSiret)}
+                </p>
+              )
+            )}
           </p>
         </div>
       ))}

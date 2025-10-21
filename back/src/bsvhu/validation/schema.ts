@@ -10,15 +10,21 @@ import {
   checkEmitterSituation,
   checkPackagingAndIdentificationType,
   checkTransportModeAndWeight,
-  checkTransportModeAndReceptionWeight
+  checkTransportModeAndReceptionWeight,
+  checkNextDestinationCompany
 } from "./refinements";
 import { BsvhuValidationContext } from "./types";
 import { weightSchema } from "../../common/validation/weight";
 import { WeightUnits } from "../../common/validation";
-import { validateTransporterPlates } from "../../common/validation/zod/refinement";
+import {
+  validateMultiTransporterPlates,
+  validateTransporterPlates
+} from "../../common/validation/zod/refinement";
 import {
   CompanyRole,
+  countryCodeSchema,
   foreignVatNumberSchema,
+  rawTransporterSchema,
   siretSchema
 } from "../../common/validation/zod/schema";
 import {
@@ -33,9 +39,12 @@ import {
   OperationMode,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { fillIntermediariesOrgIds, runTransformers } from "./transformers";
-import { TransportMode } from "@prisma/client";
-import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../../common/validation/messages";
+import {
+  fillIntermediariesOrgIds,
+  runTransformers,
+  updateTransporterRecepisse
+} from "./transformers";
+import { sirenifyBsvhuTransporter } from "./sirenify";
 
 export const ZodWasteCodeEnum = z
   .enum(BSVHU_WASTE_CODES, {
@@ -73,14 +82,24 @@ export const ZodOperationEnum = z
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
+const rawBsvhuTransporterSchema = z
+  .object({
+    createdAt: z.date().nullish(),
+    bsvhuId: z.string().nullish()
+  })
+  .merge(rawTransporterSchema);
+
 const rawBsvhuSchema = z.object({
-  id: z.string().default(() => getReadableId(ReadableIdPrefix.VHU)),
+  id: z
+    .string()
+    .max(50)
+    .default(() => getReadableId(ReadableIdPrefix.VHU)),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSFF.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
   // en cours de route des bordereaux qui ont déjà été publié sur la base d'une
   // ancienne version du schéma.
-  customId: z.string().nullish(),
+  customId: z.string().max(250).nullish(),
   createdAt: z.date().nullish(),
   isDraft: z.boolean().default(false),
   isDeleted: z.boolean().default(false),
@@ -98,54 +117,78 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterCompanyName: z.string().nullish(),
+  emitterCompanyName: z.string().max(250).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().nullish(),
-  emitterCompanyStreet: z.string().nullish(),
-  emitterCompanyCity: z.string().nullish(),
-  emitterCompanyPostalCode: z.string().nullish(),
-  emitterCompanyContact: z.string().nullish(),
-  emitterCompanyPhone: z.string().nullish(),
-  emitterCompanyMail: z.string().email("E-mail émetteur invalide").nullish(),
-  emitterCustomInfo: z.string().nullish(),
-  emitterEmissionSignatureAuthor: z.string().nullish(),
+  emitterCompanyAddress: z.string().max(250).nullish(),
+  emitterCompanyStreet: z.string().max(250).nullish(),
+  emitterCompanyCity: z.string().max(250).nullish(),
+  emitterCompanyPostalCode: z.string().max(250).nullish(),
+  emitterCompanyContact: z.string().max(250).nullish(),
+  emitterCompanyPhone: z.string().max(250).nullish(),
+  emitterCompanyMail: z
+    .string()
+    .max(250)
+    .email("E-mail émetteur invalide")
+    .nullish(),
+  emitterCustomInfo: z.string().max(250).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
   destinationType: z.nativeEnum(BsvhuDestinationType).nullish(),
   destinationPlannedOperationCode: ZodOperationEnum,
   destinationAgrementNumber: z.string().max(100).nullish(),
-  destinationCompanyName: z.string().nullish(),
+  destinationCompanyName: z.string().max(250).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
-  destinationCompanyAddress: z.string().nullish(),
-  destinationCompanyContact: z.string().nullish(),
-  destinationCompanyPhone: z.string().nullish(),
+  destinationCompanyAddress: z.string().max(250).nullish(),
+  destinationCompanyContact: z.string().max(250).nullish(),
+  destinationCompanyPhone: z.string().max(250).nullish(),
   destinationCompanyMail: z
     .string()
+    .max(250)
     .email("E-mail destinataire invalide")
     .nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
-  destinationReceptionRefusalReason: z.string().nullish(),
-  destinationReceptionIdentificationNumbers: z.array(z.string()).optional(),
+  destinationReceptionRefusalReason: z.string().max(250).nullish(),
+  destinationReceptionIdentificationNumbers: z
+    .array(z.string().max(250))
+    .optional(),
   destinationReceptionIdentificationType: z
     .nativeEnum(BsvhuIdentificationType)
     .nullish(),
   destinationOperationCode: ZodOperationEnum,
-  destinationOperationNextDestinationCompanyName: z.string().nullish(),
+  destinationOperationNextDestinationCompanyName: z.string().max(250).nullish(),
   destinationOperationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  destinationOperationNextDestinationCompanyAddress: z.string().nullish(),
-  destinationOperationNextDestinationCompanyContact: z.string().nullish(),
-  destinationOperationNextDestinationCompanyPhone: z.string().nullish(),
-  destinationOperationNextDestinationCompanyMail: z
-    .string()
-    .email("E-mail destinataire suivant invalide")
-    .nullish(),
   destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  destinationOperationSignatureAuthor: z.string().nullish(),
+  destinationOperationNextDestinationCompanyExtraEuropeanId: z
+    .string()
+    .max(250)
+    .nullish(),
+  destinationOperationNextDestinationCompanyAddress: z
+    .string()
+    .max(250)
+    .nullish(),
+  destinationOperationNextDestinationCompanyCountry: countryCodeSchema(
+    CompanyRole.DestinationOperationNextDestination
+  ).nullish(),
+  destinationOperationNextDestinationCompanyContact: z
+    .string()
+    .max(250)
+    .nullish(),
+  destinationOperationNextDestinationCompanyPhone: z
+    .string()
+    .max(250)
+    .nullish(),
+  destinationOperationNextDestinationCompanyMail: z
+    .string()
+    .max(250)
+    .email("E-mail destinataire suivant invalide")
+    .nullish(),
+  destinationOperationSignatureAuthor: z.string().max(250).nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationDate: z.coerce.date().nullish(),
   destinationReceptionQuantity: z.number().nullish(),
@@ -153,13 +196,13 @@ const rawBsvhuSchema = z.object({
     .nonnegative("Le poids doit être supérieur à 0")
     .nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
-  destinationCustomInfo: z.string().nullish(),
+  destinationCustomInfo: z.string().max(250).nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
-  destinationReceptionSignatureAuthor: z.string().nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(250).nullish(),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
   wasteCode: ZodWasteCodeEnum,
   packaging: z.nativeEnum(BsvhuPackaging).nullish(),
-  identificationNumbers: z.array(z.string()).optional(),
+  identificationNumbers: z.array(z.string().max(250)).optional(),
   identificationType: z.nativeEnum(BsvhuIdentificationType).nullish(), // see refinements
   quantity: z.number().nullish(),
   weightValue: weightSchema(WeightUnits.Kilogramme)
@@ -169,62 +212,38 @@ const rawBsvhuSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  transporterCompanyName: z.string().nullish(),
-  transporterCompanySiret: siretSchema(CompanyRole.Transporter).nullish(),
-  transporterCompanyAddress: z.string().nullish(),
-  transporterCompanyContact: z.string().nullish(),
-  transporterCompanyPhone: z.string().nullish(),
-  transporterCompanyMail: z
-    .string()
-    .email("E-mail transporteur invalide")
-    .nullish(),
-  transporterCompanyVatNumber: foreignVatNumberSchema(
-    CompanyRole.Transporter
-  ).nullish(),
-  transporterRecepisseNumber: z.string().nullish(),
-  transporterRecepisseDepartment: z.string().nullish(),
-  transporterRecepisseValidityLimit: z.coerce.date().nullish(),
-  transporterRecepisseIsExempted: z
-    .boolean()
-    .nullish()
-    .transform(v => Boolean(v)),
 
-  transporterTransportSignatureAuthor: z.string().nullish(),
-  transporterTransportSignatureDate: z.coerce.date().nullish(),
-  transporterTransportTakenOverAt: z.coerce.date().nullish(),
-  transporterCustomInfo: z.string().nullish(),
-  transporterTransportMode: z.nativeEnum(TransportMode).nullish(),
+  transporters: z
+    .array(rawBsvhuTransporterSchema)
+    .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
+    .optional(),
 
-  transporterTransportPlates: z
-    .array(z.string())
-    .max(2, ERROR_TRANSPORTER_PLATES_TOO_MANY)
-    .default([]),
-
-  ecoOrganismeName: z.string().nullish(),
+  ecoOrganismeName: z.string().max(250).nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
-  brokerCompanyName: z.string().nullish(),
+  brokerCompanyName: z.string().max(250).nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
-  brokerCompanyAddress: z.string().nullish(),
-  brokerCompanyContact: z.string().nullish(),
-  brokerCompanyPhone: z.string().nullish(),
-  brokerCompanyMail: z.string().nullish(),
-  brokerRecepisseNumber: z.string().nullish(),
-  brokerRecepisseDepartment: z.string().nullish(),
+  brokerCompanyAddress: z.string().max(250).nullish(),
+  brokerCompanyContact: z.string().max(250).nullish(),
+  brokerCompanyPhone: z.string().max(250).nullish(),
+  brokerCompanyMail: z.string().max(250).nullish(),
+  brokerRecepisseNumber: z.string().max(250).nullish(),
+  brokerRecepisseDepartment: z.string().max(250).nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
-  traderCompanyName: z.string().nullish(),
+  traderCompanyName: z.string().max(250).nullish(),
   traderCompanySiret: siretSchema(CompanyRole.Trader).nullish(),
-  traderCompanyAddress: z.string().nullish(),
-  traderCompanyContact: z.string().nullish(),
-  traderCompanyPhone: z.string().nullish(),
+  traderCompanyAddress: z.string().max(250).nullish(),
+  traderCompanyContact: z.string().max(250).nullish(),
+  traderCompanyPhone: z.string().max(250).nullish(),
   traderCompanyMail: z.string().nullish(),
-  traderRecepisseNumber: z.string().nullish(),
-  traderRecepisseDepartment: z.string().nullish(),
+  traderRecepisseNumber: z.string().max(250).nullish(),
+  traderRecepisseDepartment: z.string().max(250).nullish(),
   traderRecepisseValidityLimit: z.coerce.date().nullish(),
   intermediaries: z
     .array(intermediarySchema)
     .nullish()
     .superRefine(intermediariesRefinement),
-  intermediariesOrgIds: z.array(z.string()).optional(),
+  intermediariesOrgIds: z.array(z.string().max(250)).optional(),
+  transportersOrgIds: z.array(z.string().max(250)).optional(),
   containsElectricOrHybridVehicles: z.boolean().nullish()
 });
 
@@ -244,10 +263,11 @@ const refinedBsvhuSchema = rawBsvhuSchema
   .superRefine(checkReceptionWeight)
   .superRefine(checkOperationMode)
   .superRefine(checkEmitterSituation)
+  .superRefine(checkNextDestinationCompany)
   .superRefine(checkPackagingAndIdentificationType)
   .superRefine(checkTransportModeAndWeight)
   .superRefine(checkTransportModeAndReceptionWeight)
-  .superRefine(validateTransporterPlates);
+  .superRefine(validateMultiTransporterPlates);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`
@@ -272,7 +292,9 @@ export const contextualBsvhuSchema = (context: BsvhuValidationContext) => {
  */
 export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
   return transformedBsvhuSyncSchema
-    .superRefine(checkCompanies)
+    .superRefine((bsvhu, zodContext) =>
+      checkCompanies(bsvhu, zodContext, context)
+    )
     .transform((bsvhu: ParsedZodBsvhu) => runTransformers(bsvhu, context))
     .superRefine(
       // run le check sur les champs requis après les transformations
@@ -280,3 +302,17 @@ export const contextualBsvhuSchemaAsync = (context: BsvhuValidationContext) => {
       checkRequiredFields(context)
     );
 };
+
+export type ZodBsvhuTransporter = z.input<typeof rawBsvhuTransporterSchema>;
+
+export type ParsedZodBsvhuTransporter = z.output<
+  typeof rawBsvhuTransporterSchema
+>;
+
+const refinedBsvhuTransporter = rawBsvhuTransporterSchema.superRefine(
+  validateTransporterPlates
+);
+
+export const transformedBsvhuTransporterSchema = refinedBsvhuTransporter
+  .transform(updateTransporterRecepisse)
+  .transform(sirenifyBsvhuTransporter);

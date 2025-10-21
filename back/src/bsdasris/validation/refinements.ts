@@ -288,6 +288,7 @@ export const checkOperationMode: Refinement<ParsedZodBsdasri> = (
   destinationOperationModeRefinement(
     bsdasri.destinationOperationCode,
     bsdasri.destinationOperationMode,
+    bsdasri.destinationOperationSignatureDate,
     zodContext
   );
 };

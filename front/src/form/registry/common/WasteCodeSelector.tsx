@@ -285,7 +285,11 @@ export function WasteCodeSelector({
       </ComboBox>
       {displayDescription && !multiple && description && (
         <div className="fr-col-12">
-          <Alert description={capitalize(description)} severity="info" small />
+          <Alert
+            description={capitalize(description) as string}
+            severity="info"
+            small
+          />
         </div>
       )}
     </>

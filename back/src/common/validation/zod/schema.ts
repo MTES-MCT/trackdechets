@@ -2,6 +2,7 @@ import { z } from "zod";
 import { TransportMode } from "@prisma/client";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
 import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../messages";
+import countries from "world-countries";
 
 export enum CompanyRole {
   Emitter = "Émetteur",
@@ -16,34 +17,39 @@ export enum CompanyRole {
   DestinationOperationNextDestination = "Éxutoire final"
 }
 
-export const pathFromCompanyRole = (companyRole?: CompanyRole): string[] => {
+export const pathFromCompanyRole = ({
+  companyRole,
+  index,
+  field = "siret"
+}: {
+  companyRole?: CompanyRole;
+  index?: number;
+  field?: string;
+}): string[] => {
   switch (companyRole) {
     case CompanyRole.Emitter:
-      return ["emitter", "company", "siret"];
+      return ["emitter", "company", field];
     case CompanyRole.Transporter:
-      return ["transporter", "company", "siret"];
+      if (index) {
+        return ["transporters", `${index + 1}`, "company", field];
+      }
+      return ["transporter", "company", field];
     case CompanyRole.Destination:
-      return ["destination", "company", "siret"];
+      return ["destination", "company", field];
     case CompanyRole.EcoOrganisme:
-      return ["ecoOrganisme", "siret"];
+      return ["ecoOrganisme", field];
     case CompanyRole.Broker:
-      return ["broker", "company", "siret"];
+      return ["broker", "company", field];
     case CompanyRole.Trader:
-      return ["trader", "company", "siret"];
+      return ["trader", "company", field];
     case CompanyRole.Worker:
-      return ["worker", "company", "siret"];
+      return ["worker", "company", field];
     case CompanyRole.Intermediary:
-      return ["intermediaries", "company", "siret"];
+      return ["intermediaries", "company", field];
     case CompanyRole.NextDestination:
-      return ["nextDestination", "company", "siret"];
+      return ["nextDestination", "company", field];
     case CompanyRole.DestinationOperationNextDestination:
-      return [
-        "destination",
-        "operation",
-        "nextDestination",
-        "company",
-        "siret"
-      ];
+      return ["destination", "operation", "nextDestination", "company", field];
     default:
       return [];
   }
@@ -64,7 +70,7 @@ export const siretSchema = (expectedCompanyRole?: CompanyRole) =>
         return isSiret(value);
       },
       val => ({
-        path: pathFromCompanyRole(expectedCompanyRole),
+        path: pathFromCompanyRole({ companyRole: expectedCompanyRole }),
         message: `${
           expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
         }${val} n'est pas un SIRET valide`
@@ -86,10 +92,32 @@ export const foreignVatNumberSchema = (expectedCompanyRole?: CompanyRole) =>
       return isForeignVat(value);
     },
     {
-      path: pathFromCompanyRole(expectedCompanyRole),
+      path: pathFromCompanyRole({
+        companyRole: expectedCompanyRole,
+        field: "vatNumber"
+      }),
       message: `${
         expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
       }Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement`
+    }
+  );
+
+export const countryCodeSchema = (expectedCompanyRole?: CompanyRole) =>
+  z.string().refine(
+    value => {
+      if (!value) {
+        return true;
+      }
+      return countries.some(country => country.cca2 === value);
+    },
+    {
+      path: pathFromCompanyRole({
+        companyRole: expectedCompanyRole,
+        field: "country"
+      }),
+      message: `${
+        expectedCompanyRole ? `${expectedCompanyRole} : ` : ""
+      } : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu`
     }
   );
 
