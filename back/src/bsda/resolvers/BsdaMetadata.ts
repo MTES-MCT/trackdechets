@@ -9,22 +9,28 @@ import { computeLatestRevision } from "../converter";
 import { parseBsda } from "../validation";
 import {
   getCurrentSignatureType,
-  getNextSignatureType,
   getSignatureAncestors,
   prismaToZodBsda
 } from "../validation/helpers";
 import { getRequiredAndSealedFieldPaths } from "../validation/rules";
+
+function getNextSignature(bsda) {
+  if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
+  if (bsda.transporterTransportSignatureAuthor != null) return "TRANSPORT";
+  if (bsda.workerWorkSignatureAuthor != null) return "WORK";
+  return "EMISSION";
+}
 
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (metadata: BsdaMetadata & { id: string }, _, context) => {
     const bsda = await context.dataloaders.bsdas.load(metadata.id);
 
     const zodBsda = prismaToZodBsda(bsda);
-    const currentSignature = getCurrentSignatureType(zodBsda);
-    const nextSignature = getNextSignatureType(currentSignature);
+    const currentSignatureType = getNextSignature(bsda);
+
     try {
       parseBsda(zodBsda, {
-        currentSignatureType: nextSignature
+        currentSignatureType
       });
       return [];
     } catch (errors) {
@@ -32,7 +38,7 @@ export const Metadata: BsdaMetadataResolvers = {
         return {
           message: e.message,
           path: e.path,
-          requiredFor: nextSignature
+          requiredFor: currentSignatureType
         };
       });
     }
