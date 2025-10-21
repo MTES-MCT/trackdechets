@@ -151,13 +151,13 @@ describe("Schemas", () => {
   test("actorNameSchema", () => {
     expect(actorNameSchema.parse("Valid Name")).toBe("Valid Name");
     expect(() => actorNameSchema.parse("")).toThrow();
-    expect(() => actorNameSchema.parse("a".repeat(151))).toThrow();
+    expect(() => actorNameSchema.parse("a".repeat(251))).toThrow();
   });
 
   test("actorAddressSchema", () => {
     expect(actorAddressSchema.parse("Valid Address")).toBe("Valid Address");
     expect(() => actorAddressSchema.parse("")).toThrow();
-    expect(() => actorAddressSchema.parse("a".repeat(151))).toThrow();
+    expect(() => actorAddressSchema.parse("a".repeat(251))).toThrow();
   });
 
   test("actorCitySchema", () => {
