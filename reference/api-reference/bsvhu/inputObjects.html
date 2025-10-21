@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Input objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/inputObjects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Input objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="BsvhuBrokerInput"><meta data-rh="true" property="og:description" content="BsvhuBrokerInput"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/inputObjects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/inputObjects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/inputObjects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Input objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/inputObjects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.754463cb.js" defer="defer"></script>
-<script src="/assets/js/main.4934e3a5.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.4c0fb972.js" defer="defer"></script>
+<script src="/assets/js/main.c302c57d.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -100,7 +100,11 @@ objet un système d&#x27;information tierce</p></td></tr><tr><td><p>wasteCode<br
 <a href="inputObjects#bsvhuweightinput"><code>BsvhuWeightInput</code></a></p></td><td><p>Poids des VHUs en tonnes</p></td></tr><tr><td><p>containsElectricOrHybridVehicles<br>
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Comprend des véhicules éléctriques ou hybrides</p></td></tr><tr><td><p>destination<br>
 <a href="inputObjects#bsvhudestinationinput"><code>BsvhuDestinationInput</code></a></p></td><td><p>Détails sur la destination</p></td></tr><tr><td><p>transporter<br>
-<a href="inputObjects#bsvhutransporterinput"><code>BsvhuTransporterInput</code></a></p></td><td><p>Détails sur le transporteur</p></td></tr><tr><td><p>broker<br>
+<a href="inputObjects#bsvhutransporterinput"><code>BsvhuTransporterInput</code></a></p></td><td><p>Détails sur le transporteur</p></td></tr><tr><td><p>transporters<br>
+<a href="scalars#id"><code>[ID!]</code></a></p></td><td><p>Liste des différents transporteurs, dans l&#x27;ordre de prise en charge du déchet.
+Contient un seul identifiant en cas d&#x27;acheminement direct. Peut contenir au maximum
+5 identifiants en cas de transport multi-modal. Les transporteurs peuvent être crées, modifiés,
+supprimés à l&#x27;aide des mutations createBsvhuTransporter, updateBsvhuTransporter, deleteBsvhuTransporter.</p></td></tr><tr><td><p>broker<br>
 <a href="inputObjects#bsvhubrokerinput"><code>BsvhuBrokerInput</code></a></p></td><td><p>Courtier</p></td></tr><tr><td><p>trader<br>
 <a href="inputObjects#bsvhutraderinput"><code>BsvhuTraderInput</code></a></p></td><td><p>Négociant</p></td></tr><tr><td><p>intermediaries<br>
 <a href="inputObjects#companyinput"><code>[CompanyInput!]</code></a></p></td><td><p>Liste d&#x27;entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,

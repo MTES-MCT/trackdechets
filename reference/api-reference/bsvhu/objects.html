@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/objects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="Bsvhu"><meta data-rh="true" property="og:description" content="Bsvhu"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/objects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/objects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/objects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsvhu/objects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.754463cb.js" defer="defer"></script>
-<script src="/assets/js/main.4934e3a5.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.4c0fb972.js" defer="defer"></script>
+<script src="/assets/js/main.c302c57d.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -30,7 +30,9 @@ Est égal à <code>null</code> si le bordereau n&#x27;est pas issue d&#x27;une d
 <a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité de VHUs</p></td></tr><tr><td><p>weight<br>
 <a href="objects#bsvhuweight"><code>BsvhuWeight</code></a></p></td><td><p>Poids en tonnes</p></td></tr><tr><td><p>destination<br>
 <a href="objects#bsvhudestination"><code>BsvhuDestination</code></a></p></td><td><p>Destinataire du bordereau</p></td></tr><tr><td><p>transporter<br>
-<a href="objects#bsvhutransporter"><code>BsvhuTransporter</code></a></p></td><td><p>Transporteur</p></td></tr><tr><td><p>intermediaries<br>
+<a href="objects#bsvhutransporter"><code>BsvhuTransporter</code></a></p></td><td><p>Transporteur</p></td></tr><tr><td><p>transporters<br>
+<a href="objects#bsvhutransporter"><code>[BsvhuTransporter!]!</code></a></p></td><td><p>Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d&#x27;achemniment direct.
+Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal</p></td></tr><tr><td><p>intermediaries<br>
 <a href="objects#formcompany"><code>[FormCompany!]</code></a></p></td><td><p>Liste d&#x27;entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
 mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau, sans étape de signature.</p></td></tr><tr><td><p>ecoOrganisme<br>
 <a href="objects#bsvhuecoorganisme"><code>BsvhuEcoOrganisme</code></a></p></td><td><p>Eco-organisme</p></td></tr><tr><td><p>broker<br>
@@ -126,7 +128,7 @@ mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau,
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>date<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de présentation sur site</p></td></tr><tr><td><p>quantity<br>
 <a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité de VHUs reçue</p></td></tr><tr><td><p>weight<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>Poids r éel reçu en tonnes</p></td></tr><tr><td><p>acceptationStatus<br>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>Poids réel reçu en tonnes</p></td></tr><tr><td><p>acceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Lot accepté oui/non</p></td></tr><tr><td><p>refusalReason<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Motif de refus</p></td></tr><tr><td><p>identification<br>
 <a href="objects#bsvhuidentification"><code>BsvhuIdentification</code></a></p></td><td><p>Identification éventuelle des VHU à la reception (numéro de lots ou d&#x27;ordre)</p></td></tr><tr><td><p>signature<br>
@@ -142,14 +144,15 @@ mais pas à la responsabilité de la traçabilité. Il pourra lire ce bordereau,
 <a href="enums#transportmode"><code>TransportMode</code></a></p></td><td><p>Mode de transport</p></td></tr><tr><td><p>plates<br>
 <a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Plaque(s) d&#x27;immatriculation</p></td></tr><tr><td><p>takenOverAt<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de prise en charge</p></td></tr><tr><td><p>signature<br>
-<a href="objects#signature"><code>Signature</code></a></p></td><td></td></tr></tbody></table>
+<a href="objects#signature"><code>Signature</code></a></p></td><td><p>Signature du transporteur lors de l&#x27;enlèvement auprès de l&#x27;émetteur.</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsvhutransporter">BsvhuTransporter<a href="#bsvhutransporter" class="hash-link" aria-label="Direct link to BsvhuTransporter" title="Direct link to BsvhuTransporter">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Fields</strong></p>
-<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
+<table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>id<br>
+<a href="scalars#id"><code>ID!</code></a></p></td><td><p>Identifiant du transporteur</p></td></tr><tr><td><p>company<br>
 <a href="objects#formcompany"><code>FormCompany</code></a></p></td><td><p>Coordonnées de l&#x27;entreprise de transport</p></td></tr><tr><td><p>recepisse<br>
-<a href="objects#bsvhurecepisse"><code>BsvhuRecepisse</code></a></p></td><td><p>Récépissé transporteur</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr><tr><td><p>transport<br>
-<a href="objects#bsvhutransport"><code>BsvhuTransport</code></a></p></td><td><p>Informations liés au transport</p></td></tr></tbody></table>
+<a href="objects#bsvhurecepisse"><code>BsvhuRecepisse</code></a></p></td><td><p>Récépissé transporteur</p></td></tr><tr><td><p>transport<br>
+<a href="objects#bsvhutransport"><code>BsvhuTransport</code></a></p></td><td><p>Informations liés au transport</p></td></tr><tr><td><p>customInfo<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsvhuweight">BsvhuWeight<a href="#bsvhuweight" class="hash-link" aria-label="Direct link to BsvhuWeight" title="Direct link to BsvhuWeight">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Fields</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>value<br>
