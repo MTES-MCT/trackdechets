@@ -57,6 +57,8 @@ export const mergeCompanyToCompanySearchResult = (
   website: trackdechetsCompanyInfo?.website,
   ecoOrganismeAgreements:
     trackdechetsCompanyInfo?.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
+  ecoOrganismePartnersIds:
+    trackdechetsCompanyInfo?.ecoOrganismePartnersIds ?? [],
   allowBsdasriTakeOverWithoutSignature:
     trackdechetsCompanyInfo?.allowBsdasriTakeOverWithoutSignature,
   // specific data for CompanySearchResult
@@ -270,7 +272,8 @@ export const makeSearchCompanies =
         ...searchResult,
         orgId: searchResult.siret!,
         isRegistered: false,
-        isDormant: false
+        isDormant: false,
+        ecoOrganismePartnersIds: []
       };
     });
   };
