@@ -47,7 +47,7 @@ export default function configureYup() {
   yup.addMethod<yup.BaseSchema>(
     yup.string,
     "isSafeSSTI",
-    function safeSSSTIString() {
+    function safeSSTIString() {
       return this.test(
         "safe-ssti",
         `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`,

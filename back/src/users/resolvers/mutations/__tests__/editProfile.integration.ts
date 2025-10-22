@@ -127,7 +127,7 @@ describe("mutation editProfile", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Les caractères suivants sont interdits: { } % < > $ ' " =`,
+        message: `Les caractères suivants sont interdits: { } % < > $ " =`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

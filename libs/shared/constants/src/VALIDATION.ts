@@ -1,4 +1,4 @@
-export const SSTI_CHARS = ["{", "}", "%", "<", ">", "$", "'", `"`, "="];
+export const SSTI_CHARS = ["{", "}", "%", "<", ">", "$", `"`, "="]; // single quote removed
 
 export function isValidWebsite(s: string): boolean {
   try {
