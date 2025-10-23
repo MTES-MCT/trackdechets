@@ -71,7 +71,7 @@ const schema = z
               })
             }
           ),
-          weight: z.coerce.number().nonnegative().nullish(),
+          weight: z.coerce.number().positive().nullish(),
           refusedWeight: z.coerce.number().nonnegative().nullish(),
           refusalReason: z.string().nullish(),
           date: z.coerce

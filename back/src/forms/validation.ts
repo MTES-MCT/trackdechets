@@ -1627,6 +1627,21 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     .when(
       "wasteAcceptationStatus",
       weightConditions.bsddWasteAcceptationStatus as any
+    )
+    .test(
+      "not-defined-if-no-quantity-received",
+      "La quantité reçue ne peut être égale à zéro si le déchet a été totalement refusé (REFUSED)",
+      (quantityReceived, context) => {
+        const { wasteAcceptationStatus } = context.parent;
+        if (
+          quantityReceived === 0 &&
+          wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
+        ) {
+          return false;
+        }
+
+        return true;
+      }
     ),
   quantityRefused: quantityRefusedRequired,
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),

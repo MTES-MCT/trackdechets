@@ -355,8 +355,8 @@ describe("Test Form reception", () => {
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "REFUSED",
           wasteRefusalReason: "Lorem ipsum",
-          quantityReceived: 0,
-          quantityRefused: 0
+          quantityReceived: 5,
+          quantityRefused: 5
         }
       }
     });
@@ -368,7 +368,7 @@ describe("Test Form reception", () => {
     expect(frm.wasteAcceptationStatus).toBe("REFUSED");
     expect(frm.signedBy).toBe("Holden");
     expect(frm.wasteRefusalReason).toBe("Lorem ipsum");
-    expect(frm.quantityReceived?.toNumber()).toBe(0); // quantityReceived is set to 0
+    expect(frm.quantityReceived?.toNumber()).toBe(5);
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -1423,5 +1423,49 @@ describe("Test Form reception", () => {
         );
       });
     });
+  });
+
+  it("should throw if quantityReceived = 0 and wasteAcceptationsStatus = REFUSED", async () => {
+    // Given
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: {
+        status: "RECEIVED",
+        receivedBy: "Bill",
+        receivedAt: new Date("2019-01-17T10:22:00+0100")
+      }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    // When
+    const { mutate } = makeClient(recipient);
+    const { errors } = await mutate(MARK_AS_ACCEPTED, {
+      variables: {
+        id: form.id,
+        acceptedInfo: {
+          signedAt: "2019-01-17T10:22:00+0100",
+          signedBy: "Bill",
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Pas bon",
+          quantityReceived: 0,
+          quantityRefused: 0
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toBe(
+      "La quantité reçue ne peut être égale à zéro si le déchet a été totalement refusé (REFUSED)"
+    );
   });
 });
