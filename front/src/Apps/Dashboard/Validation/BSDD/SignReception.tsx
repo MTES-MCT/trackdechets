@@ -48,7 +48,7 @@ const getSchema = () =>
       ),
       wasteRefusalReason: z.coerce.string(),
 
-      receivedWeight: z.coerce.number().nonnegative().nullish(),
+      receivedWeight: z.coerce.number().positive().nullish(),
       refusedWeight: z.coerce.number().nonnegative().nullish(),
       acceptedWeight: z.coerce.number().nonnegative().nullish(),
 
