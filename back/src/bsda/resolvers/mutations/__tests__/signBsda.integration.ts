@@ -1635,7 +1635,8 @@ describe("Mutation.Bsda.sign", () => {
       }
     );
 
-    it("should forbid operation signature when weight is 0 ans status is %p", async () => {
+    it("should forbid operation signature when weight is 0 ans status is REFUSED", async () => {
+      // Given
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
       const transporterReceipt = await transporterReceiptFactory({
@@ -1665,8 +1666,9 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
+      // When
       const { mutate } = makeClient(user);
-      const { errors, data } = await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "signBsda">,
         MutationSignBsdaArgs
       >(SIGN_BSDA, {
@@ -1679,16 +1681,11 @@ describe("Mutation.Bsda.sign", () => {
         }
       });
 
-      expect(errors).toEqual(undefined);
-
-      expect(data.signBsda.id).toBeTruthy();
-      expect(data.signBsda.status).toBe(BsdaStatus.REFUSED);
-
-      const updateBsda = await prisma.bsda.findUniqueOrThrow({
-        where: { id: bsda.id }
-      });
-
-      expect(updateBsda.status).toBe("REFUSED");
+      // Then
+      expect(errors).not.toEqual(undefined);
+      expect(errors[0].message).toBe(
+        "Le poids du déchet reçu doit être renseigné et non nul."
+      );
     });
 
     it("should mark as AWAITING_CHILD if operation code implies it", async () => {
