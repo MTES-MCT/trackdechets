@@ -60,9 +60,6 @@ const EcoOrganism = () => {
     fetchPolicy: "no-cache"
   });
 
-  console.log("destinationCompany", destinationCompany);
-  console.log("emitterCompany", emitterCompany);
-
   // Fetch destination and emitter company info
   const destination = watch("destination");
   const emitter = watch("emitter");
