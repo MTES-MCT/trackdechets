@@ -94,7 +94,8 @@ describe("companyInfos with SIRET", () => {
       transporterReceipt: undefined,
       vatNumber: undefined,
       vhuAgrementBroyeur: undefined,
-      vhuAgrementDemolisseur: undefined
+      vhuAgrementDemolisseur: undefined,
+      ecoOrganismePartnersIds: []
     });
   });
 
@@ -138,7 +139,8 @@ describe("companyInfos with SIRET", () => {
       vatNumber: undefined,
       vhuAgrementBroyeur: undefined,
       vhuAgrementDemolisseur: undefined,
-      website: undefined
+      website: undefined,
+      ecoOrganismePartnersIds: []
     });
   });
 });
@@ -212,7 +214,8 @@ describe("companyInfos search with a VAT number", () => {
       traderReceipt: undefined,
       transporterReceipt: undefined,
       vhuAgrementBroyeur: undefined,
-      vhuAgrementDemolisseur: undefined
+      vhuAgrementDemolisseur: undefined,
+      ecoOrganismePartnersIds: []
     });
   });
 
@@ -257,7 +260,8 @@ describe("companyInfos search with a VAT number", () => {
       transporterReceipt: undefined,
       vhuAgrementBroyeur: undefined,
       vhuAgrementDemolisseur: undefined,
-      website: undefined
+      website: undefined,
+      ecoOrganismePartnersIds: []
     });
   });
 });

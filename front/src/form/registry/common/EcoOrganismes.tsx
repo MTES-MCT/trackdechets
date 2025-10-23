@@ -5,7 +5,7 @@ import React from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { OptionalCompanySelector } from "./OptionalCompanySelector";
 
-const GET_ECO_ORGANISMES = gql`
+export const GET_ECO_ORGANISMES = gql`
   query GetEcoOrganismes(
     $handleBsdd: Boolean
     $handleBsda: Boolean

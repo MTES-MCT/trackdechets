@@ -405,7 +405,8 @@ export default function AccountCompanyAdd() {
                 vhuAgrementBroyeur: null,
                 vhuAgrementDemolisseur: null,
                 workerCertification: null,
-                ecoOrganismeAgreements: []
+                ecoOrganismeAgreements: [],
+                ecoOrganismePartnersIds: []
               }}
               validate={values => {
                 const filledTransporterRecepisseFields = [

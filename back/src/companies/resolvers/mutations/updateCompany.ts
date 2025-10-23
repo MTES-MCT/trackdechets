@@ -68,7 +68,8 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     workerCertificationId,
     vhuAgrementBroyeurId,
     vhuAgrementDemolisseurId,
-    ecoOrganismeAgreements
+    ecoOrganismeAgreements,
+    ecoOrganismePartnersIds
   } = await parseCompanyAsync(zodCompany);
 
   const data: Prisma.CompanyUpdateInput = {
@@ -84,7 +85,8 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     givenName,
     allowBsdasriTakeOverWithoutSignature,
     allowAppendix1SignatureAutomation,
-    ecoOrganismeAgreements
+    ecoOrganismeAgreements,
+    ecoOrganismePartnersIds: ecoOrganismePartnersIds ?? []
   };
 
   if (transporterReceiptId !== undefined) {

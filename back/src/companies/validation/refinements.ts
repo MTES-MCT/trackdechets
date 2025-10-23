@@ -204,3 +204,36 @@ export const checkWorkerSubsection: Refinement<ParsedZodCompany> = async (
     });
   }
 };
+
+export const checkEcoOrganismePartnersIds: Refinement<
+  ParsedZodCompany
+> = async (company, { addIssue }) => {
+  const { ecoOrganismePartnersIds } = company;
+
+  // On vérifie que les éco-organismes déclarés existent bien
+  if (ecoOrganismePartnersIds && ecoOrganismePartnersIds.length > 0) {
+    const ecoOrganismes = await prisma.ecoOrganisme.findMany({
+      where: {
+        id: {
+          in: ecoOrganismePartnersIds
+        }
+      },
+      select: {
+        id: true
+      }
+    });
+
+    const notFoundIds = ecoOrganismePartnersIds.filter(
+      id => !ecoOrganismes.map(e => e.id).includes(id)
+    );
+
+    if (notFoundIds.length > 0) {
+      addIssue({
+        code: "custom",
+        message: `Les IDs suivants n'appartiennent pas à un éco-organisme : ${notFoundIds.join(
+          ", "
+        )}`
+      });
+    }
+  }
+};

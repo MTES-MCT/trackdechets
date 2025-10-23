@@ -329,6 +329,9 @@ input PrivateCompanyInput {
 
   "Site web"
   website: String
+
+  "Les éco-organismes avec lesquels l'entreprise travaille"
+  ecoOrganismePartnersIds: [String!]
 }
 
 input CompanyForVerificationWhere {

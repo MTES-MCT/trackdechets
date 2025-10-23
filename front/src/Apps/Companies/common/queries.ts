@@ -239,6 +239,7 @@ export const UPDATE_COMPANY_PROFILE = gql`
     $vhuAgrementBroyeurId: String
     $workerCertificationId: String
     $ecoOrganismeAgreements: [URL!]
+    $ecoOrganismePartnersIds: [String!]
   ) {
     updateCompany(
       id: $id
@@ -253,6 +254,7 @@ export const UPDATE_COMPANY_PROFILE = gql`
       vhuAgrementBroyeurId: $vhuAgrementBroyeurId
       workerCertificationId: $workerCertificationId
       ecoOrganismeAgreements: $ecoOrganismeAgreements
+      ecoOrganismePartnersIds: $ecoOrganismePartnersIds
     ) {
       id
       companyTypes
@@ -296,6 +298,7 @@ export const UPDATE_COMPANY_PROFILE = gql`
         organisation
       }
       ecoOrganismeAgreements
+      ecoOrganismePartnersIds
     }
   }
 `;

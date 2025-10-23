@@ -360,6 +360,7 @@ export const CompanyDetailsfragment = {
       featureFlags
       isDormantSince
       hasEnabledRegistryDndFromBsdSince
+      ecoOrganismePartnersIds
       receivedSignatureAutomations {
         from {
           siret

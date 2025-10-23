@@ -78,7 +78,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     ecoOrganismeAgreements,
     siret,
     vatNumber,
-    orgId
+    orgId,
+    ecoOrganismePartnersIds
   } = await parseCompanyAsync(zodCompany);
 
   const existingCompany = await prisma.company.findUnique({
@@ -152,7 +153,8 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     ),
     contact,
     contactEmail,
-    contactPhone
+    contactPhone,
+    ecoOrganismePartnersIds: ecoOrganismePartnersIds ?? []
   };
 
   if (!!transporterReceiptId) {
