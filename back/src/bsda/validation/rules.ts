@@ -3,7 +3,7 @@ import {
   TransportMode,
   User,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { ParsedZodBsda, ZodBsda, ZodBsdaTransporter } from "./schema";
 import { isForeignVat } from "@td/constants";
 import {

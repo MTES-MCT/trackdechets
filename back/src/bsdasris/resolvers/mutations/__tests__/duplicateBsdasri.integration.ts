@@ -14,7 +14,7 @@ import {
   brokerData
 } from "../../../__tests__/factories";
 import type { Mutation } from "@td/codegen-back";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
 

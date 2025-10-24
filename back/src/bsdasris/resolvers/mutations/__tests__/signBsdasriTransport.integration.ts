@@ -10,7 +10,7 @@ import {
   BsdasriType,
   TransportMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   bsdasriFactory,
   initialData,

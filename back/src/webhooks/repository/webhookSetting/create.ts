@@ -1,4 +1,4 @@
-import { WebhookSetting, Prisma } from "@prisma/client";
+import { WebhookSetting, Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

@@ -1,5 +1,5 @@
 import { redisClient } from "./redis";
-import { WebhookSetting } from "@prisma/client";
+import { WebhookSetting } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 export type WebhookInfo = { endpointUri: string; token: string };

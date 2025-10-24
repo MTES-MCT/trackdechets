@@ -1,4 +1,4 @@
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { getCompanySplittedAddress } from "../companyUtils";

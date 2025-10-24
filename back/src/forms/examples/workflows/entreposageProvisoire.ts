@@ -13,7 +13,7 @@ import {
   signTransportForm,
   signTransportFormAfterTempStorage
 } from "../steps/signTransportForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: "Entreposage provisoire",

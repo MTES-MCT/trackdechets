@@ -9,7 +9,7 @@ import {
   Company,
   CompanyAssociation,
   UserAccountHash
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   CompanyNotFound,
   TraderReceiptNotFound,

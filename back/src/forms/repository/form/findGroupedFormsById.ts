@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 import { FormWithForwardedIn } from "../../types";
 

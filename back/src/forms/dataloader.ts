@@ -1,4 +1,4 @@
-import { FormGroupement } from "@prisma/client";
+import { FormGroupement } from "@td/prisma";
 import DataLoader from "dataloader";
 import { prisma } from "@td/prisma";
 import { expandableFormIncludes } from "./converter";

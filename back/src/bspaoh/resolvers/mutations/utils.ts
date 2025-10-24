@@ -1,6 +1,6 @@
 import { getFirstTransporterSync } from "../../converter";
 import { PrismaBspaohWithTransporters, BspaohForParsing } from "../../types";
-import { BspaohTransporter as PrismaBspaohTransporter } from "@prisma/client";
+import { BspaohTransporter as PrismaBspaohTransporter } from "@td/prisma";
 
 const emptyTransporter = {
   id: null,

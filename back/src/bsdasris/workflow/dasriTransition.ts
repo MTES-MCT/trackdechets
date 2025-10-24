@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriStatus } from "@prisma/client";
+import { Bsdasri, BsdasriStatus } from "@td/prisma";
 import { BsdasriEvent } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../../forms/errors";

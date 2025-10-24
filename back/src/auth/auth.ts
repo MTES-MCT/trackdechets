@@ -3,7 +3,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   User as PrismaUser,
   User
-} from "@prisma/client";
+} from "@td/prisma";
 import { compare } from "bcrypt";
 import express from "express";
 import passport from "passport";

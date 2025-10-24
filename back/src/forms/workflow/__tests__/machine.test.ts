@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Status } from "@td/prisma";
 import machine from "../machine";
 import { EventType } from "../types";
 

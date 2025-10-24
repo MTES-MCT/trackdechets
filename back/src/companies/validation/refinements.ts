@@ -1,6 +1,6 @@
 import { Refinement } from "zod";
 import { ParsedZodCompany } from "./schema";
-import { CompanyType, WasteVehiclesType } from "@prisma/client";
+import { CompanyType, WasteVehiclesType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 export const checkForeignTransporter: Refinement<ParsedZodCompany> = (

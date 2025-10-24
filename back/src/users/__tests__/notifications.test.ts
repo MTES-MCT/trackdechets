@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../notifications";
 
 describe("getDefaultNotifications", () => {

@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import type { RegistryCompanyResolvers } from "@td/codegen-back";
 import { getUserRole, grants, toGraphQLPermission } from "../../permissions";
 import { GraphQLContext } from "../../types";

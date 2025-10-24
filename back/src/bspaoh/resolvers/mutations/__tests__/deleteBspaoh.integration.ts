@@ -5,7 +5,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
 import type { Mutation, MutationDeleteBspaohArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 
 const DELETE_BSPAOH = `
 mutation DeleteBspaoh($id: ID!){

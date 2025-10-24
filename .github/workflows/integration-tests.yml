@@ -78,6 +78,7 @@ env:
   OTEL_SDK_DISABLED: true
   TD_COMPANY_ELASTICSEARCH_INDEX: stocketablissement-production
   ALLOW_TEST_COMPANY: true
+  MY_SENDING_BOX_API_KEY: secret
 
   WEBHOOK_TOKEN_ENCRYPTION_KEY: abcdefgh12345678abcdefgh12345678
   GERICO_WEBHOOK_SLUG: secret-slug-lorem

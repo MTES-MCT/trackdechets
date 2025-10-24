@@ -6,7 +6,7 @@ import {
   WasteAcceptationStatus,
   TransportMode,
   BsdasriType
-} from "@prisma/client";
+} from "@td/prisma";
 
 import { DASRI_PROCESSING_OPERATIONS_CODES, isForeignVat } from "@td/constants";
 import {

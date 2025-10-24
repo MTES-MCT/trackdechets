@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient, Prisma } from "@td/prisma";
 
 type DataType<M extends keyof PrismaClient> = Prisma.Args<
   PrismaClient[M],

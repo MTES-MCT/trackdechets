@@ -1,6 +1,6 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import { prisma } from "@td/prisma";
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@td/prisma";
 import { enqueueBsdToDelete } from "../../src/queue/producers/elastic";
 
 @registerUpdater(

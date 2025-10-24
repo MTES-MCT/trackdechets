@@ -1,4 +1,4 @@
-import { Bsvhu, Prisma } from "@prisma/client";
+import { Bsvhu, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 type ChainableBsvhu = Pick<

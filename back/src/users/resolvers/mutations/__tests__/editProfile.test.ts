@@ -6,6 +6,7 @@ configureYup();
 const mockUpdateUser = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: { update: jest.fn((...args) => mockUpdateUser(...args)) }
   }

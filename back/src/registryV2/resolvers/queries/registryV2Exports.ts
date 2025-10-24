@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryRegistryV2ExportsArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export function getRegistryV2Exports({ asAdmin }: { asAdmin: boolean }) {
   return async (

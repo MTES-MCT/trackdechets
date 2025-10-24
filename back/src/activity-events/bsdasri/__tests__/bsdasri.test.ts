@@ -6,7 +6,7 @@ import {
   BsdasriUpdated,
   BsdasriSigned
 } from "../types";
-import { Bsdasri } from "@prisma/client";
+import { Bsdasri } from "@td/prisma";
 import { siretify } from "../../../__tests__/factories";
 
 describe("ActivityEvent.Bsdasri", () => {

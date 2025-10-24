@@ -4,13 +4,7 @@
 
 import { prisma } from "@td/prisma";
 
-import {
-  User,
-  UserRole,
-  Prisma,
-  Company,
-  UserAccountHash
-} from "@prisma/client";
+import { User, UserRole, Prisma, Company, UserAccountHash } from "@td/prisma";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserRoles } from "../common/redis/users";

@@ -4,7 +4,7 @@ import {
   BsdType,
   BsffTransporter,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getElasticExhaustiveRegistryFields } from "./registryV2";

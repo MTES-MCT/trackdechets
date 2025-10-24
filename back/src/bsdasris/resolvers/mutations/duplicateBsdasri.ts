@@ -1,10 +1,4 @@
-import {
-  Bsdasri,
-  BsdasriStatus,
-  BsdasriType,
-  Prisma,
-  User
-} from "@prisma/client";
+import { Bsdasri, BsdasriStatus, BsdasriType, Prisma, User } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type {

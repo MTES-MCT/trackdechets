@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { getFormRepository } from "../../../../forms/repository";

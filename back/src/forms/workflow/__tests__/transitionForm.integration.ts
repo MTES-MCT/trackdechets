@@ -1,4 +1,4 @@
-import { Prisma, Status } from "@prisma/client";
+import { Prisma, Status } from "@td/prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import transitionForm from "../transitionForm";

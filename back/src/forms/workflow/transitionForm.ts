@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Status } from "@td/prisma";
 import { InvalidTransition } from "../errors";
 import machine from "./machine";
 import { Event } from "./types";

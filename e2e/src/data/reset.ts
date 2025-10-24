@@ -11,7 +11,7 @@ import { prisma } from "@td/prisma";
 export async function truncateDatabase() {
   const dbSchemaName = "default$default";
   const tablenames: Array<{ tablename: string }> =
-    await prisma.$queryRaw`SELECT tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
+    await prisma.$queryRaw`SELECT tablename::text as tablename FROM pg_tables WHERE schemaname=${dbSchemaName};`;
 
   // Reset data
   await Promise.all(

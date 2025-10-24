@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindFirstFormFn = (

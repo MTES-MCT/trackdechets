@@ -2,7 +2,7 @@ import { Readable, ReadableOptions, Transform } from "stream";
 import { formatRow } from "./columns";
 import { getConnection } from "../../common/pagination";
 import { prisma } from "@td/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { UserInCompany } from "./types";
 
 export interface MyCompaniesReadersOptions extends ReadableOptions {
@@ -20,12 +20,11 @@ export interface MyCompaniesReaderArgs {
   chunk?: number;
 }
 
-export const CompanyWithUsersInclude =
-  Prisma.validator<Prisma.CompanyInclude>()({
-    companyAssociations: {
-      include: { user: { select: { email: true, name: true } } }
-    }
-  });
+export const CompanyWithUsersInclude = {
+  companyAssociations: {
+    include: { user: { select: { email: true, name: true } } }
+  }
+} satisfies Prisma.CompanyInclude;
 
 export type CompanyWithUsers = Prisma.CompanyGetPayload<{
   include: typeof CompanyWithUsersInclude;

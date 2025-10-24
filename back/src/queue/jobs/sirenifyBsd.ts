@@ -12,7 +12,7 @@ import {
   Form,
   IntermediaryFormAssociation,
   Prisma
-} from "@prisma/client";
+} from "@td/prisma";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { searchCompanyFailFast } from "../../companies/sirenify";

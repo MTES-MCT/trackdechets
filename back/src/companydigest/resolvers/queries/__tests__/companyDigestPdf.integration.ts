@@ -6,7 +6,7 @@ import { companyDigestFactory } from "../../../__tests__/factories.companydigest
 import { gql } from "graphql-tag";
 import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 
 const GET_COMPANY_DIGEST_PDF = gql`
   query CompanyDigestPdf($id: ID!) {

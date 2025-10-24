@@ -3,7 +3,7 @@ import {
   EcoOrganisme,
   OperationMode,
   TransportMode
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,
@@ -13,7 +13,7 @@ import {
 } from "../../../__tests__/factories";
 import { CompanySearchResult } from "@td/codegen-back";
 import { searchCompany } from "../../../companies/search";
-import { BsvhuIdentificationType } from "@prisma/client";
+import { BsvhuIdentificationType } from "@td/prisma";
 import {
   bsvhuFactory,
   bsvhuTransporterData,

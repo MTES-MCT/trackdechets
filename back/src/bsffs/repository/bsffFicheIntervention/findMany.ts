@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, Prisma } from "@prisma/client";
+import { BsffFicheIntervention, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindManyBsffFicheInterventionFn = (

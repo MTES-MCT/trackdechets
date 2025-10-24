@@ -1,4 +1,4 @@
-import { Bspaoh, BspaohStatus, Prisma } from "@prisma/client";
+import { Bspaoh, BspaohStatus, Prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type {

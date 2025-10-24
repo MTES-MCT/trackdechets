@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
+import { BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
 import type { CompanyInput } from "@td/codegen-back";

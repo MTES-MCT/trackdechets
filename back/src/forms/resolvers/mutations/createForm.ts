@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@td/prisma";
 import { isDangerous } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {

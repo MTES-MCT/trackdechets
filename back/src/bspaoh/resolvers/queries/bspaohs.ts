@@ -1,5 +1,5 @@
 import { expandBspaohFromDb } from "../../converter";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { applyMask } from "../../../common/where";

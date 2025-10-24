@@ -3,7 +3,7 @@ import {
   WasteProcessorType,
   CollectorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth/auth";
 import { TEST_COMPANY_PREFIX } from "@td/constants";

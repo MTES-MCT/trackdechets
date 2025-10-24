@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import { WasteAcceptationStatus } from "@td/prisma";
 import { gql } from "graphql-tag";
 import type {
   Mutation,

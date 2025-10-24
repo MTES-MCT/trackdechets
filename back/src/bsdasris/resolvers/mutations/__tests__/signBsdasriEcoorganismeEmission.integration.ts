@@ -6,7 +6,7 @@ import {
   ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdasriStatus } from "@prisma/client";
+import { BsdasriStatus } from "@td/prisma";
 import { SIGN_DASRI } from "./signUtils";
 import {
   bsdasriFactory,

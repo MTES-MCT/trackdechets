@@ -1,4 +1,4 @@
-import { BsdaStatus, Company, WasteAcceptationStatus } from "@prisma/client";
+import { BsdaStatus, Company, WasteAcceptationStatus } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import {

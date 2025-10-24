@@ -4,7 +4,7 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bspaohFactory } from "../../../__tests__/factories";
 import type { Mutation } from "@td/codegen-back";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 

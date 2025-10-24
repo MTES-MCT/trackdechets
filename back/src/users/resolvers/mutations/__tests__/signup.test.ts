@@ -14,6 +14,7 @@ const userInfos = {
 };
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: {
       create: jest.fn(() => Promise.resolve(userInfos)),

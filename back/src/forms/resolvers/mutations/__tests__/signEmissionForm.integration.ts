@@ -1,4 +1,4 @@
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationSignEmissionFormArgs } from "@td/codegen-back";
 import {

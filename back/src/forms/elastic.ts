@@ -1,4 +1,4 @@
-import { Form, OperationMode } from "@prisma/client";
+import { Form, OperationMode } from "@td/prisma";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import {
   FormWithForwardedInWithTransportersInclude,

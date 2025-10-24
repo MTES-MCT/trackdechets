@@ -1,4 +1,4 @@
-import { BsdasriRevisionRequest, Prisma } from "@prisma/client";
+import { BsdasriRevisionRequest, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindManyBsdasriRevisionRequestFn = (

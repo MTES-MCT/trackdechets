@@ -9,7 +9,7 @@ import { Workflow } from "../../../common/workflow";
 import { signEmissionForm } from "../steps/signEmissionForm";
 import { signTransportForm } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: "Transport multi-modal avec transporteurs étrangers",

@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaBsffPackagingWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { getBsffPackagingRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
 

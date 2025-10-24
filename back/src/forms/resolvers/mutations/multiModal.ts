@@ -13,7 +13,7 @@ import {
   flattenTransportSegmentInput,
   flattenTransporterInput
 } from "../../converter";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { getFormRepository } from "../../repository";
 import { prisma } from "@td/prisma";
 import { sirenifyTransportSegmentInput } from "../../sirenify";
@@ -45,13 +45,12 @@ const takeOverInfoSchema = yup.object<any>().shape({
   takenOverBy: yup.string().required("Le nom du responsable est obligatoire")
 });
 
-const formWithOwnerIdAndTransportSegments =
-  Prisma.validator<Prisma.FormDefaultArgs>()({
-    include: {
-      owner: { select: { id: true } },
-      transporters: { select: { transporterTransportMode: true } }
-    }
-  });
+const formWithOwnerIdAndTransportSegments = {
+  include: {
+    owner: { select: { id: true } },
+    transporters: { select: { transporterTransportMode: true } }
+  }
+} satisfies Prisma.FormDefaultArgs;
 type MultiModalForm = Prisma.FormGetPayload<
   typeof formWithOwnerIdAndTransportSegments
 >;

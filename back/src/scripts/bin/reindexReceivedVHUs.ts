@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
-import { BsvhuStatus } from "@prisma/client";
+import { BsvhuStatus } from "@td/prisma";
 
 // Environ 100 VHUs concernés en production
 // Commande: npx tsx --tsconfig back/tsconfig.lib.json back/src/scripts/bin/reindexReceivedVHUs.ts

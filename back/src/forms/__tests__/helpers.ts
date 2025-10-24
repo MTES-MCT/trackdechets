@@ -2,7 +2,7 @@ import { COMPANY_INFOS_CACHE_KEY } from "../../companies/sirene/cache";
 import { cachedGet } from "../../common/redis";
 
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
-import { CompanyType, Prisma } from "@prisma/client";
+import { CompanyType, Prisma } from "@td/prisma";
 
 export const storeRedisCompanyInfo = async ({
   company,

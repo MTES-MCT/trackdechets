@@ -1,4 +1,4 @@
-import { Bsdasri, Prisma, BsdasriType } from "@prisma/client";
+import { Bsdasri, Prisma, BsdasriType } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

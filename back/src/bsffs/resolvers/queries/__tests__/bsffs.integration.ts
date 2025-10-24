@@ -1,4 +1,4 @@
-import { BsffPackagingType, UserRole } from "@prisma/client";
+import { BsffPackagingType, UserRole } from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Query, QueryBsffsArgs } from "@td/codegen-back";

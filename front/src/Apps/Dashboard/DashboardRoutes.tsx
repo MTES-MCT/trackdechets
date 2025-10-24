@@ -49,7 +49,8 @@ function DashboardRoutes() {
   const { user } = useAuth();
   const { company: currentCompany, loading: loadingCompany } =
     useMyCompany(siret);
-  const { defaultOrgId, permissionsInfos } = usePermissions(siret);
+  const { defaultOrgId, permissionsInfos, loadingPermissions } =
+    usePermissions(siret);
 
   const navigate = useNavigate();
   const isMobile = useMedia(`(max-width: ${MEDIA_QUERIES.handHeld})`);
@@ -77,7 +78,7 @@ function DashboardRoutes() {
     );
   }, [navigate, siret]);
 
-  if (!user || loadingCompany) {
+  if (!user || loadingCompany || loadingPermissions) {
     return <Loader />;
   }
 

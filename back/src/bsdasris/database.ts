@@ -2,7 +2,7 @@ import { FullDbBsdasri } from "./types";
 import { BsdasriNotFound } from "./errors";
 import { getReadonlyBsdasriRepository } from "./repository";
 import { UserInputError } from "../common/errors";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 /**
  * Retrieves a dasri by id or throw a BsdasriNotFound error

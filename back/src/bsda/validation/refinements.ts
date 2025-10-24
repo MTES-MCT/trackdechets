@@ -22,7 +22,7 @@ import {
   Company,
   CompanyType,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { getReadonlyBsdaRepository } from "../repository";
 import { getOperationModesFromOperationCode } from "../../common/operationModes";

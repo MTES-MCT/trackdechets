@@ -1,4 +1,4 @@
-import { AuthType, EmitterType, Prisma, Status } from "@prisma/client";
+import { AuthType, EmitterType, Prisma, Status } from "@td/prisma";
 import { subDays, startOfDay } from "date-fns";
 import { deleteBsd } from "back";
 import { prisma } from "@td/prisma";

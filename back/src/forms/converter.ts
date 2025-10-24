@@ -4,7 +4,7 @@ import {
   BsddTransporter,
   TransportMode,
   IntermediaryFormAssociation
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   chain,
@@ -595,10 +595,10 @@ export function expandTransporterFromDb(
 /**
  * Prisma form with optional computed fields
  */
-export const expandableFormIncludes = Prisma.validator<Prisma.FormInclude>()({
+export const expandableFormIncludes = {
   forwardedIn: { include: { transporters: true } },
   transporters: true
-});
+} satisfies Prisma.FormInclude;
 export type PrismaFormWithForwardedInAndTransporters = Prisma.FormGetPayload<{
   include: typeof expandableFormIncludes;
 }>;

@@ -7,7 +7,7 @@ import {
   RegistryTransported,
   RegistrySsd,
   RegistryManaged
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   IncomingWasteV2,
   ManagedWasteV2,

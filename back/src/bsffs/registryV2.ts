@@ -14,7 +14,7 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {

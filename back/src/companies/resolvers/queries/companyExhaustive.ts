@@ -5,7 +5,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { prisma } from "@td/prisma";
 import { searchCompanyTD } from "../../sirene/trackdechets/client";
 import { searchCompanySirene } from "../../sirene/insee/client";
-import { AnonymousCompany, Company } from "@prisma/client";
+import { AnonymousCompany, Company } from "@td/prisma";
 import { SireneSearchResult } from "../../sirene/types";
 import { isSiret } from "@td/constants";
 import { UserInputError } from "../../../common/errors";

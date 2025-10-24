@@ -10,7 +10,7 @@ import {
 } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
-import { EmitterType, Prisma, Status } from "@prisma/client";
+import { EmitterType, Prisma, Status } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";
 import { FormWithForwardedInWithTransportersInclude } from "../../types";
 

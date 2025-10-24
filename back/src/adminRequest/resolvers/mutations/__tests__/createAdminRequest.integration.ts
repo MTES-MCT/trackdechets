@@ -9,10 +9,7 @@ import {
   userInCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import {
-  AdminRequestStatus,
-  AdminRequestValidationMethod
-} from "@prisma/client";
+import { AdminRequestStatus, AdminRequestValidationMethod } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { sendMail } from "../../../../mailer/mailing";
 import { cleanse } from "../../../../__tests__/utils";

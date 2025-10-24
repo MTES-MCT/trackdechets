@@ -2,11 +2,11 @@ import {
   Prisma,
   Bspaoh as PrismaBspaoh,
   BspaohTransporter as PrismaBspaohTransporter
-} from "@prisma/client";
+} from "@td/prisma";
 
-export const BspaohIncludes = Prisma.validator<Prisma.BspaohInclude>()({
+export const BspaohIncludes = {
   transporters: true
-});
+} satisfies Prisma.BspaohInclude;
 
 export type PrismaBspaohWithTransporters = Prisma.BspaohGetPayload<{
   include: typeof BspaohIncludes;

@@ -3,7 +3,7 @@ import {
   ZodBsffTransformer,
   ZodBsffTransporterTransformer
 } from "./types";
-import { BsffType } from "@prisma/client";
+import { BsffType } from "@td/prisma";
 import { checkPreviousPackagings } from "./refinements";
 import { recipifyTransporter } from "../../../common/validation/zod/transformers";
 import { ParsedZodBsff } from "./schema";

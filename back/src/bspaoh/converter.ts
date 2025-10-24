@@ -41,7 +41,7 @@ import {
   BspaohTransporter as PrismaBspaohTransporter,
   BspaohStatus,
   Bspaoh as PrismaBspaoh
-} from "@prisma/client";
+} from "@td/prisma";
 import { BspaohForElastic } from "./elastic";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { PrismaBspaohWithTransporters } from "./types";

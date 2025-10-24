@@ -1,4 +1,4 @@
-import { Bsda, BsdaStatus, BsdaTransporter, User } from "@prisma/client";
+import { Bsda, BsdaStatus, BsdaTransporter, User } from "@td/prisma";
 import type { BsdaInput, BsdaTransporterInput } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../permissions";
 import { getFirstTransporterSync, getPreviousBsdas } from "./database";

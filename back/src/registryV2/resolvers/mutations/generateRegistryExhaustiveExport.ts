@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { Prisma, RegistryExportStatus } from "@prisma/client";
+import { Prisma, RegistryExportStatus } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationGenerateRegistryExhaustiveExportArgs } from "@td/codegen-back";
 import {

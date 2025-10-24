@@ -1,4 +1,4 @@
-import { BsvhuTransporter, Prisma } from "@prisma/client";
+import { BsvhuTransporter, Prisma } from "@td/prisma";
 import { FormNotFound } from "../forms/errors";
 import { getReadonlyBsvhuRepository } from "./repository";
 import { UserInputError } from "../common/errors";

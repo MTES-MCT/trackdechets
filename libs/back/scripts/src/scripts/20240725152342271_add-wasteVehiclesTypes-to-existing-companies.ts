@@ -1,4 +1,4 @@
-import { CompanyType, Prisma, WasteVehiclesType } from "@prisma/client";
+import { CompanyType, Prisma, WasteVehiclesType } from "@td/prisma";
 
 /**
  * Set wasteVehiclesTypes based on provided agreements

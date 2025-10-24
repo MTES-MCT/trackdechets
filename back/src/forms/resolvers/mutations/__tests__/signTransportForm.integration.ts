@@ -1,9 +1,4 @@
-import {
-  CompanyType,
-  EmitterType,
-  Status,
-  TransportMode
-} from "@prisma/client";
+import { CompanyType, EmitterType, Status, TransportMode } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationSignTransportFormArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";

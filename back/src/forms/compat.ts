@@ -1,8 +1,4 @@
-import {
-  IntermediaryFormAssociation,
-  QuantityType,
-  Status
-} from "@prisma/client";
+import { IntermediaryFormAssociation, QuantityType, Status } from "@td/prisma";
 import type {
   AppendixFormInput,
   InitialFormFractionInput,

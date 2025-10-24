@@ -5,7 +5,7 @@ import {
   BsdasriRevisionRequest,
   MembershipRequestStatus,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { Mutation, MutationDeleteCompanyArgs } from "@td/codegen-back";
 import {

@@ -1,4 +1,4 @@
-import { Bsda } from "@prisma/client";
+import { Bsda } from "@td/prisma";
 import { getCompanyAdminUsers } from "../../companies/database";
 import { prisma } from "@td/prisma";
 import { buildPdfAsBase64 } from "../pdf/generator";

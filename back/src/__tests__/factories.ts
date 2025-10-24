@@ -2,6 +2,7 @@ import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
 import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
+  prisma,
   CompanyType,
   Consistence,
   EmitterType,
@@ -14,8 +15,7 @@ import {
   WasteProcessorType,
   CollectorType,
   TransportMode
-} from "@prisma/client";
-import { prisma } from "@td/prisma";
+} from "@td/prisma";
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";

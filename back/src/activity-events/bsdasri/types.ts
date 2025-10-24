@@ -1,4 +1,4 @@
-import { Prisma, BsdasriStatus } from "@prisma/client";
+import { Prisma, BsdasriStatus } from "@td/prisma";
 import { ActivityEvent } from "..";
 import { RevisionRequestContent } from "../../bsda/resolvers/mutations/revisionRequest/createRevisionRequest";
 

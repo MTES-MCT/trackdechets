@@ -3,7 +3,7 @@ import { CompanyDigestNotFound } from "./errors";
 import { UserInputError } from "../common/errors";
 import { prisma } from "@td/prisma";
 
-import { CompanyDigest } from "@prisma/client";
+import { CompanyDigest } from "@td/prisma";
 
 /**
  * Retrieves a companyDigest by id or throw a CompanyDigestNotFound error

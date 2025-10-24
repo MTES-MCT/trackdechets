@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { validateSecureUri } from "../common/validation/secureUri";
 
 type WebhookSettingCreateInput = Pick<

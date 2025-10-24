@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { Status as FormStatus } from "@prisma/client";
+import { Status as FormStatus } from "@td/prisma";
 import { getFirstTransporter } from "../../../database";
 
 jest.mock("axios", () => ({

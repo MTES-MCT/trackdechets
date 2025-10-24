@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Status } from "@td/prisma";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import { checkCanBeSealed } from "../../validation";
 import buildUpdateForm from "./update";

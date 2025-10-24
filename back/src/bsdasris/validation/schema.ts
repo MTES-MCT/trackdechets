@@ -4,7 +4,7 @@ import {
   BsdasriType,
   TransportMode,
   OperationMode
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   DASRI_ALL_OPERATIONS_CODES,
   DASRI_WASTE_CODES_VALUES

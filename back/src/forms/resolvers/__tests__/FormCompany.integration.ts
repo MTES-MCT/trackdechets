@@ -1,4 +1,4 @@
-import { CompanyType, Status, UserRole } from "@prisma/client";
+import { CompanyType, Status, UserRole } from "@td/prisma";
 import type { Query } from "@td/codegen-back";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {

@@ -20,7 +20,7 @@ import {
   RegistryExport,
   RegistryExportFormat,
   RegistryExportStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { toWaste } from "../../registryV2/converters";
 import { wasteFormatterV2 } from "../../registryV2/streams";
 import { EXPORT_COLUMNS } from "../../registryV2/columns";

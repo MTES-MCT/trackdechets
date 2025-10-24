@@ -1,4 +1,4 @@
-import { BsdaConsistence, BsdaType, Prisma } from "@prisma/client";
+import { BsdaConsistence, BsdaType, Prisma } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import {

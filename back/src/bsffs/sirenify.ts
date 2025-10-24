@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import buildSirenify, { nextBuildSirenify } from "../companies/sirenify";
 import type {
   BsffFicheInterventionInput,

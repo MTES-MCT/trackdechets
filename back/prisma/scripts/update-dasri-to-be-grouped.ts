@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
-import { BsdasriType, BsdasriStatus } from "@prisma/client";
+import { BsdasriType, BsdasriStatus } from "@td/prisma";
 import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Update groupable dasris to AWAITING_GROUP",

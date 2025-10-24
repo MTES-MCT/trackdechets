@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import configureYup from "../common/yup/configureYup";
 import {
   siret,

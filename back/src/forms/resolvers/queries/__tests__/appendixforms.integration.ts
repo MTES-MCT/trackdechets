@@ -11,7 +11,7 @@ import { gql } from "graphql-tag";
 import { prisma } from "@td/prisma";
 import { updateAppendix2Fn } from "../../../updateAppendix2";
 import { AuthType } from "../../../../auth/auth";
-import { CompanyType, WasteProcessorType } from "@prisma/client";
+import { CompanyType, WasteProcessorType } from "@td/prisma";
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
     appendixForms(siret: $siret) {

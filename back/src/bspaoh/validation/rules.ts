@@ -1,4 +1,4 @@
-import { Prisma, User, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, User, WasteAcceptationStatus } from "@td/prisma";
 import { RefinementCtx, z } from "zod";
 import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { capitalize } from "../../common/strings";

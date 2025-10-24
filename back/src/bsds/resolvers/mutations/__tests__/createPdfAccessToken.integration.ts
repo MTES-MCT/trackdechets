@@ -19,7 +19,7 @@ import {
   BsdasriStatus,
   BsffStatus,
   BsvhuStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { addMinutes } from "date-fns";
 
 const CREATE_PDF_TOKEN = `

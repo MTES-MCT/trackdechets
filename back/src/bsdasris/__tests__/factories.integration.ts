@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import { bsdasriFactory, initialData } from "./factories";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 import {
   companyFactory,
   userWithCompanyFactory

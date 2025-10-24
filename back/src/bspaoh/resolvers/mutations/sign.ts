@@ -3,7 +3,7 @@ import {
   BspaohStatus,
   Prisma,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { BspaohForParsing, PrismaBspaohWithTransporters } from "../../types";
 
 import {

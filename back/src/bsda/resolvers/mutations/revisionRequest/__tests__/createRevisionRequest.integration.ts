@@ -19,7 +19,7 @@ import {
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 const CREATE_BSDA_REVISION_REQUEST = `

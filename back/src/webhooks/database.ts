@@ -1,6 +1,6 @@
 import { WebhookSettingNotFound } from "./errors";
 import { getReadonlyWebhookSettingRepository } from "./repository";
-import { WebhookSetting } from "@prisma/client";
+import { WebhookSetting } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../common/errors";
 

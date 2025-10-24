@@ -1,7 +1,7 @@
 import { bsddReducer } from "../reducer";
 import { aggregateStream } from "../../aggregator";
 import { BsddCreated, BsddEvent, BsddUpdated, BsddSigned } from "../types";
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { siretify } from "../../../__tests__/factories";
 
 describe("ActivityEvent.Bsdd", () => {

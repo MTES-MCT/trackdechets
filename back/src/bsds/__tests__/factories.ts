@@ -1,15 +1,7 @@
 import { prisma } from "@td/prisma";
 import { getUid } from "../../utils";
 import { addMinutes } from "date-fns";
-import {
-  BsdType,
-  Form,
-  Bsdasri,
-  User,
-  Bsda,
-  Bsff,
-  Bsvhu
-} from "@prisma/client";
+import { BsdType, Form, Bsdasri, User, Bsda, Bsff, Bsvhu } from "@td/prisma";
 
 export const pdfAccessTokenFactory = async ({
   bsd,

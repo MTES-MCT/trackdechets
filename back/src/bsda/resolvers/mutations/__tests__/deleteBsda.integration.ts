@@ -1,4 +1,4 @@
-import { BsdaStatus, UserRole } from "@prisma/client";
+import { BsdaStatus, UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationDeleteBsdaArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";

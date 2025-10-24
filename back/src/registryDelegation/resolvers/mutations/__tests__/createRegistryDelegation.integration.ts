@@ -6,7 +6,7 @@ import {
   userInCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { User, RegistryDelegation } from "@prisma/client";
+import { User, RegistryDelegation } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { GraphQLFormattedError } from "graphql";

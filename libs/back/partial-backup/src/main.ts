@@ -1,8 +1,8 @@
-import { unescape } from "node:querystring";
 import readLine from "node:readline";
 import getPipelines from "./pipelines";
 import traversals from "./traversals";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@td/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const { DATABASE_URL, TUNNELED_DB, ROOT_OBJ } = process.env;
 
@@ -45,28 +45,23 @@ if (!TUNNELED_DB) {
   throw new Error("TUNNELED_DB is not defined");
 }
 
-function getDbUrlWithSchema(rawDatabaseUrl: string) {
-  try {
-    const dbUrl = new URL(rawDatabaseUrl);
-    dbUrl.searchParams.set("schema", "default$default");
-
-    return unescape(dbUrl.href); // unescape needed because of the `$`
-  } catch (err) {
-    return "";
-  }
-}
+const localAdapter = new PrismaPg(
+  { connectionString: DATABASE_URL },
+  { schema: "default$default" }
+);
 
 const prismaLocal = new PrismaClient({
-  datasources: {
-    db: { url: getDbUrlWithSchema(DATABASE_URL) }
-  },
+  adapter: localAdapter,
   log: []
 });
 
+const tunneledAdapter = new PrismaPg(
+  { connectionString: TUNNELED_DB },
+  { schema: "default$default" }
+);
+
 const prismaRemote = new PrismaClient({
-  datasources: {
-    db: { url: getDbUrlWithSchema(TUNNELED_DB) }
-  },
+  adapter: tunneledAdapter,
   log: []
 });
 

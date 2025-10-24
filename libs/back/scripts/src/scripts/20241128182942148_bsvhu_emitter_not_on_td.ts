@@ -1,4 +1,4 @@
-import { Bsvhu, BsvhuStatus } from "@prisma/client";
+import { Bsvhu, BsvhuStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import Queue, { JobOptions } from "bull";

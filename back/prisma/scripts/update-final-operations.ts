@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import { registerUpdater, Updater } from "./helper/helper";

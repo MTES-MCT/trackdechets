@@ -2,7 +2,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { gql } from "graphql-tag";
 import { AuthType } from "../../../../auth/auth";
 import { prisma } from "@td/prisma";

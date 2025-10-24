@@ -20,7 +20,7 @@ import {
   CollectorType,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 import { UserInputError } from "../../common/errors";
 import { getCompanySplittedAddress } from "../../companies/companyUtils";

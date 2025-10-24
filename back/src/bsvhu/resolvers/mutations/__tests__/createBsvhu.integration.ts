@@ -11,7 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import gql from "graphql-tag";
-import { BsvhuIdentificationType } from "@prisma/client";
+import { BsvhuIdentificationType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 const CREATE_VHU_FORM = gql`

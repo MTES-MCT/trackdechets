@@ -27,7 +27,7 @@ import {
   WasteAcceptationStatus,
   CompanyType,
   WasteProcessorType
-} from "@prisma/client";
+} from "@td/prisma";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";

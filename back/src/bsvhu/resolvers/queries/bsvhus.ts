@@ -8,7 +8,7 @@ import { getReadonlyBsvhuRepository } from "../../repository";
 
 import { toPrismaWhereInput } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export default async function bsvhus(
   _,

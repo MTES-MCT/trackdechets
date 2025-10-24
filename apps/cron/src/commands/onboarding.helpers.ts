@@ -23,7 +23,7 @@ import {
   User,
   AdminRequestStatus,
   AdminRequestValidationMethod
-} from "@prisma/client";
+} from "@td/prisma";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import {
   renderMail,
