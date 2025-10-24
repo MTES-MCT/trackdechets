@@ -1,6 +1,7 @@
 // List all company types that are considered as "waste professionals"
 export const PROFESSIONALS = [
   "WASTEPROCESSOR",
+  "WASTE_CENTER",
   "COLLECTOR",
   "TRANSPORTER",
   "TRADER",
@@ -12,7 +13,7 @@ export const PROFESSIONALS = [
   "RECOVERY_FACILITY"
 ];
 
-export const NON_PROFESSIONALS = ["PRODUCER", "WASTE_CENTER", "WORKER"];
+export const NON_PROFESSIONALS = ["PRODUCER", "WORKER"];
 
 // min and max lengths for myCompanies resolver search param
 export const MIN_MY_COMPANIES_SEARCH = 3;
