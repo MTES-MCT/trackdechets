@@ -1,4 +1,4 @@
-import { prisma } from "@td/prisma";
+import { prisma, MembershipRequestStatus } from "@td/prisma";
 import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -18,7 +18,6 @@ import {
   getNotificationSubscribers,
   UserNotification
 } from "../../notifications";
-import { MembershipRequestStatus } from "@prisma/client";
 import { subHours } from "date-fns";
 
 const MAX_MEMBERSHIP_REQUESTS_PER_HOUR = 50;
