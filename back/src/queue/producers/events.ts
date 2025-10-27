@@ -10,7 +10,8 @@ export const syncEventsQueue = new Queue<void>(
   REDIS_URL!,
   {
     defaultJobOptions: {
-      removeOnComplete: 1000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );

@@ -8,7 +8,8 @@ const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
  */
 export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`, {
   defaultJobOptions: {
-    removeOnComplete: 10_000
+    removeOnComplete: 1000,
+    removeOnFail: 5000
   },
   // Bull docs: https://docs.bullmq.io/guide/rate-limiting
   // Sendinblue rate limiting docs: https://developers.sendinblue.com/docs/api-limits#general-rate-limiting

@@ -25,7 +25,8 @@ export const webhooksQueue = new Queue<WebhookQueueItem>(
     defaultJobOptions: {
       attempts: 3,
       backoff: { type: "fixed", delay: 1000 },
-      removeOnComplete: 100
+      removeOnComplete: 100,
+      removeOnFail: 500
     }
   }
 );
