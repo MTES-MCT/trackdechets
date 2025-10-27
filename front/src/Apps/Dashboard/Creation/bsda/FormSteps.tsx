@@ -21,6 +21,7 @@ import initialState from "./utils/initial-state";
 import Worker from "./steps/Worker";
 import TransporterBsda from "./steps/Transporter";
 import DestinationBsda from "./steps/Destination";
+import ActorsList from "./steps/ActorsList";
 
 interface Props {
   bsdId?: string;
@@ -114,7 +115,7 @@ const BsdaFormSteps = ({
           )}
         />
       ),
-      other: <p>TODO</p>
+      other: <ActorsList />
     }),
     [publishErrorMessages]
   );

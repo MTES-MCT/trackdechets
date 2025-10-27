@@ -119,9 +119,11 @@ export const rawBsdaSchema = z.object({
     recepisse: z.object({
       number: z.string().nullish(),
       department: z.string().nullish(),
-      validityLimit: z.coerce.date().nullish()
+      validityLimit: z.string().nullish()
     })
   }),
+  hasBroker: z.boolean().nullish(),
+  hasIntermediaries: z.boolean().nullish(),
   destination: z.object({
     company: zodCompany,
     cap: z.string().nullish(),
@@ -192,28 +194,7 @@ export const rawBsdaSchema = z.object({
     .optional(),
   grouping: z.array(z.string()).optional().nullish(),
   forwarding: z.string().nullish(),
-  intermediaries: z
-    .array(
-      z.object({
-        siret: z.string(),
-        contact: z.string({
-          required_error:
-            "Intermédiaires : les nom et prénom de contact sont obligatoires"
-        }),
-        vatNumber: z.string().nullish(),
-        address: z.string({
-          required_error:
-            "Intermédiaires : l'adresse de l'établissement est obligatoire"
-        }), // should be auto-completed through sirenify
-        name: z.string({
-          required_error:
-            "Intermédiaires : la raison sociale de l'établissement est obligatoire"
-        }), // should be auto-completed through sirenify
-        phone: z.string().nullish(),
-        mail: z.string().nullish()
-      })
-    )
-    .nullish(),
+  intermediaries: z.array(zodCompany).nullish(),
   intermediariesOrgIds: z.array(z.string()).optional(),
   transportersOrgIds: z.array(z.string()).optional()
 });

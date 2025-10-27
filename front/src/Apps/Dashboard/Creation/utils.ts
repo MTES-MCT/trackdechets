@@ -98,6 +98,10 @@ export const getTabs = (
   if (bsdType === BsdType.Bsvhu) {
     return getBsvhuTabs(commonsTabs, errorTabIds);
   }
+
+  if (bsdType === BsdType.Bsda) {
+    return getBsdaTabs(commonsTabs, errorTabIds);
+  }
   return commonsTabs;
 };
 
@@ -111,6 +115,18 @@ const getBsvhuTabs = (commonTabs, errorTabIds) => {
     }
   ];
   return vhuTabs;
+};
+
+const getBsdaTabs = (commonTabs, errorTabIds) => {
+  const bsdaTabs = [
+    ...commonTabs,
+    {
+      tabId: TabId.other,
+      label: "Autres acteurs",
+      iconId: getTabClassName(errorTabIds, "other")
+    }
+  ];
+  return bsdaTabs;
 };
 
 const pathPrefixToTab = {
