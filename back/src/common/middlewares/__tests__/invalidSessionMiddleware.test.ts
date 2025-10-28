@@ -48,7 +48,7 @@ describe("invalidSessionMiddleware", () => {
     await invalidSessionMiddleware(req, res, next);
 
     expect(req.logout).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalledWith("http://example.com");
+    expect(res.redirect).toHaveBeenCalledWith("http://example.com/login");
     expect(next).not.toHaveBeenCalled();
   });
 
