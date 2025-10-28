@@ -24,7 +24,7 @@ export async function invalidSessionMiddleware(
         return next(err);
       }
 
-      res.redirect(UI_BASE_URL);
+      res.redirect(`${UI_BASE_URL}/login`);
     });
     return;
   }

@@ -89,7 +89,7 @@ describe("disconnectDeletedUser Middleware", () => {
       .set("Cookie", `${sess.name}=${cookieValue}`);
 
     expect(rejected.status).toBe(302);
-    expect(rejected.headers["location"]).toBe(getUIBaseURL());
+    expect(rejected.headers["location"]).toBe(`${getUIBaseURL()}/login`);
   });
 
   it("must not disconnect a user when associated with a company with only one admin", async () => {

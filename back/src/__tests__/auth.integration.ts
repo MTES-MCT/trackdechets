@@ -625,7 +625,7 @@ describe("Session invalidation on password change", () => {
       .set("Cookie", cookie1);
 
     expect(res1.status).toEqual(302);
-    expect(res1.headers["location"]).toEqual(getUIBaseURL());
+    expect(res1.headers["location"]).toEqual(`${getUIBaseURL()}/login`);
 
     // "Old" second session should be invalid
     const res2 = await request
