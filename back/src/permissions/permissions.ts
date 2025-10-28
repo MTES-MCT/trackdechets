@@ -1,4 +1,4 @@
-import { User, UserRole } from "@prisma/client";
+import { User, UserRole } from "@td/prisma";
 import { cachedGet } from "../common/redis";
 import { prisma } from "@td/prisma";
 import type {

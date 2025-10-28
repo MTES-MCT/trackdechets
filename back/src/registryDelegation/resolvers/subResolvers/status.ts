@@ -1,4 +1,4 @@
-import { RegistryDelegation } from "@prisma/client";
+import { RegistryDelegation } from "@td/prisma";
 import type { RegistryDelegationResolvers } from "@td/codegen-back";
 import { getDelegationStatus } from "../utils";
 

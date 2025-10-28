@@ -6,7 +6,7 @@ import {
 } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 import { getBsdasriRepository } from "../../repository";
 
 import { checkCanCreate } from "../../permissions";

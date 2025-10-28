@@ -6,7 +6,7 @@ import {
   processAdministrativeTransferJob
 } from "../administrativeTransfer";
 import { Job } from "bull";
-import { BsdaStatus } from "@prisma/client";
+import { BsdaStatus } from "@td/prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 
 describe("processAdministrativeTransferJob", () => {

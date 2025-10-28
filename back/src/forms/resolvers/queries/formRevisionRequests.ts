@@ -2,7 +2,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { prisma } from "@td/prisma";
 import { getConnection } from "../../../common/pagination";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import type {
   Form,
   FormCompany,

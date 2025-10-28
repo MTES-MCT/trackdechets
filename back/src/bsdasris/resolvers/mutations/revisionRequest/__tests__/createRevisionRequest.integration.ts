@@ -11,7 +11,7 @@ import {
   CANCELLABLE_BSDASRI_STATUSES,
   NON_CANCELLABLE_BSDASRI_STATUSES
 } from "../createRevisionRequest";
-import { BsdasriStatus } from "@prisma/client";
+import { BsdasriStatus } from "@td/prisma";
 
 const CREATE_BSDASRI_REVISION_REQUEST = `
   mutation CreateBsdasriRevisionRequest($input: CreateBsdasriRevisionRequestInput!) {

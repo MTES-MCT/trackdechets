@@ -1,4 +1,4 @@
-import { RevisionRequestStatus } from "@prisma/client";
+import { RevisionRequestStatus } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationCancelFormRevisionRequestArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";

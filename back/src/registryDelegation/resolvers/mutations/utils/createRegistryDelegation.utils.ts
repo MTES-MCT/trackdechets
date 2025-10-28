@@ -1,4 +1,4 @@
-import { Company, RegistryDelegation } from "@prisma/client";
+import { Company, RegistryDelegation } from "@td/prisma";
 import { UserInputError } from "../../../../common/errors";
 import { getRegistryDelegationRepository } from "../../../repository";
 import { ParsedCreateRegistryDelegationInput } from "../../../validation";

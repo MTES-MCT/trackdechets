@@ -1,4 +1,4 @@
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   formFactory,

@@ -1,4 +1,4 @@
-import { EmptyReturnADR } from "@prisma/client";
+import { EmptyReturnADR } from "@td/prisma";
 
 const LABELS = {
   EMPTY_RETURN_NOT_WASHED: "Retour à vide, non nettoyé",

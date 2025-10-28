@@ -15,7 +15,7 @@ import {
 } from "../sirenify";
 import { AuthType } from "../../auth/auth";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 const searchResult = (companyName: string) => {
   return {

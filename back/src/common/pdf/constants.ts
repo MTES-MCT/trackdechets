@@ -1,4 +1,4 @@
-import { TransportMode } from "@prisma/client";
+import { TransportMode } from "@td/prisma";
 
 export const TRANSPORT_MODE_LABELS: Record<TransportMode, string> = {
   [TransportMode.ROAD]: "Route",

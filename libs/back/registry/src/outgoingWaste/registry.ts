@@ -5,7 +5,7 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   RegistryOutgoingWaste
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,

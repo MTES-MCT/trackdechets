@@ -1,4 +1,4 @@
-import { Prisma, BsdasriType } from "@prisma/client";
+import { Prisma, BsdasriType } from "@td/prisma";
 import { safeInput } from "../common/converter";
 import type { BsdasriWhere } from "@td/codegen-back";
 import {

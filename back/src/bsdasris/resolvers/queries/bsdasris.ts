@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { expandBsdasriFromDB } from "../../converter";
 
 import { checkIsAuthenticated } from "../../../common/permissions";

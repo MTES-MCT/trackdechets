@@ -2,7 +2,7 @@ import { formFactory, userFactory } from "../../__tests__/factories";
 import { getFormOrFormNotFound } from "../database";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 
 let user: User;
 

@@ -9,7 +9,7 @@ import {
   WasteAcceptationStatus,
   OperationMode,
   EmptyReturnADR
-} from "@prisma/client";
+} from "@td/prisma";
 import { Decimal } from "decimal.js";
 import { checkVAT } from "jsvat";
 import countries from "world-countries";

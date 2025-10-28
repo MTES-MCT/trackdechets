@@ -6,7 +6,7 @@ import type {
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { bulkUpdateCompanySchema } from "../../validation/schema";
 import { UserInputError } from "../../../common/errors";
 import { toGqlCompanyPrivate } from "../../converters";

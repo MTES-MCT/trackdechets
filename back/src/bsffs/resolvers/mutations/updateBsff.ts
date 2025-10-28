@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getFirstTransporterSync } from "../../database";

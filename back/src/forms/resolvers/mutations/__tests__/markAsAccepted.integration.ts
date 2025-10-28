@@ -8,7 +8,7 @@ import {
   User,
   UserRole,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { format } from "date-fns";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";

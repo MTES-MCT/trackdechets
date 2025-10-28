@@ -3,7 +3,7 @@ import {
   expandBsdasriFromDB,
   flattenBsdasriInput
 } from "../../converter";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 
 import type { BsdasriInput } from "@td/codegen-back";
 

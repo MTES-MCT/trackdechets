@@ -1,4 +1,4 @@
-import { BsffType, User } from "@prisma/client";
+import { BsffType, User } from "@td/prisma";
 import {
   ZodBsff,
   ZodBsffTransporter,

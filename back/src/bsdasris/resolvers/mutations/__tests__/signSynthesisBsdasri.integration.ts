@@ -4,11 +4,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  BsdasriStatus,
-  BsdasriType,
-  WasteAcceptationStatus
-} from "@prisma/client";
+import { BsdasriStatus, BsdasriType, WasteAcceptationStatus } from "@td/prisma";
 import {
   bsdasriFactory,
   initialData,

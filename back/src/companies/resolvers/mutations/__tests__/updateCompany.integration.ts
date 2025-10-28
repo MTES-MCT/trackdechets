@@ -11,7 +11,7 @@ import {
   CompanyType,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import gql from "graphql-tag";
 
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();

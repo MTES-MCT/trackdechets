@@ -1,6 +1,6 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationUpdateBsvhuArgs } from "@td/codegen-back";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { GraphQLContext } from "../../../types";
 import {
   companyToIntermediaryInput,

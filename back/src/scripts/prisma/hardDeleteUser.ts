@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   checkCompanyAssociations,

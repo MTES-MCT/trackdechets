@@ -1,7 +1,7 @@
 import { ZodBsvhu, ZodBsvhuTransporter } from "./schema";
 import { BsvhuUserFunctions, BsvhuValidationContext } from "./types";
 import type { BsvhuInput, BsvhuTransporterInput } from "@td/codegen-back";
-import { User, WasteAcceptationStatus, TransportMode } from "@prisma/client";
+import { User, WasteAcceptationStatus, TransportMode } from "@td/prisma";
 
 import { isForeignVat } from "@td/constants";
 import {

@@ -1,4 +1,4 @@
-import { Prisma, Form, Status, User, EmitterType } from "@prisma/client";
+import { Prisma, Form, Status, User, EmitterType } from "@td/prisma";
 import { safeInput } from "../common/converter";
 import { objectDiff } from "../forms/workflow/diff";
 import type { UpdateFormInput } from "@td/codegen-back";

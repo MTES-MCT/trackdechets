@@ -1,4 +1,4 @@
-import { Bspaoh, User, BspaohStatus, BspaohTransporter } from "@prisma/client";
+import { Bspaoh, User, BspaohStatus, BspaohTransporter } from "@td/prisma";
 import { objectDiff } from "../../forms/workflow/diff";
 import type { BspaohSignatureType } from "@td/codegen-back";
 

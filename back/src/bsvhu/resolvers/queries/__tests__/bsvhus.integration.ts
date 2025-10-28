@@ -10,7 +10,7 @@ import {
   bsvhuFactory,
   toIntermediaryCompany
 } from "../../../__tests__/factories.vhu";
-import { OperationMode, UserRole } from "@prisma/client";
+import { OperationMode, UserRole } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 
 const GET_BSVHUS = `

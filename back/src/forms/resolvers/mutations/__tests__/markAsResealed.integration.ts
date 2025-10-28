@@ -17,7 +17,7 @@ import {
   Status,
   CollectorType,
   WasteProcessorType
-} from "@prisma/client";
+} from "@td/prisma";
 import type { Mutation, MutationMarkAsResealedArgs } from "@td/codegen-back";
 import { gql } from "graphql-tag";
 import { sirenifyResealedFormInput } from "../../../sirenify";

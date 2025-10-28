@@ -1,4 +1,4 @@
-import { TransportMode, UserRole, BspaohStatus } from "@prisma/client";
+import { TransportMode, UserRole, BspaohStatus } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationUpdateBspaohArgs } from "@td/codegen-back";
 import {

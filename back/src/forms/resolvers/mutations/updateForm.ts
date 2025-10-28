@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@td/prisma";
 import { isDangerous, BSDD_WASTE_CODES } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {

@@ -1,4 +1,4 @@
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import type { CompanyPrivate, CompanyPublic } from "@td/codegen-back";
 import { libelleFromCodeNaf } from "./sirene/utils";
 

@@ -8,7 +8,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../__tests__/factories";
-import { BsdasriStatus } from "@prisma/client";
+import { BsdasriStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import type { Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";

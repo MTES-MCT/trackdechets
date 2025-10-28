@@ -51,7 +51,7 @@ import {
   undefinedOrDefault,
   processDecimal
 } from "../common/converter";
-import { Bsdasri, Prisma, BsdasriRevisionRequest } from "@prisma/client";
+import { Bsdasri, Prisma, BsdasriRevisionRequest } from "@td/prisma";
 import { Decimal } from "decimal.js";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdasriForElastic } from "./elastic";

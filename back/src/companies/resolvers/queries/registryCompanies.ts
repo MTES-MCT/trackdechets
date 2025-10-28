@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";

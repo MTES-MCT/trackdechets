@@ -9,7 +9,7 @@ import {
 } from "../../../common/pagination";
 import { getMembershipRequestRepository } from "../../repository";
 import { isDefined } from "../../../common/helpers";
-import { MembershipRequestStatus, User } from "@prisma/client";
+import { MembershipRequestStatus, User } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkUserPermissions, Permission } from "../../../permissions";
 

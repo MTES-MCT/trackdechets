@@ -4,7 +4,7 @@ import {
   UserRole,
   CiterneNotWashedOutReason,
   EmptyReturnADR
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Query } from "@td/codegen-back";
 import {

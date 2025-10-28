@@ -7,7 +7,7 @@ import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getBsdaRepository } from "../../repository";
 import { Permission, can, getUserRoles } from "../../../permissions";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export default async function bsdas(
   _,

@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../__tests__/factories";
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 import supertest from "supertest";
 import { app } from "../../server";
 import { prisma } from "@td/prisma";

@@ -4,7 +4,7 @@ import {
   UserRole,
   CompanyType,
   WasteProcessorType
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";

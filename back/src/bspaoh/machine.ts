@@ -1,4 +1,4 @@
-import { Bspaoh, BspaohStatus } from "@prisma/client";
+import { Bspaoh, BspaohStatus } from "@td/prisma";
 import { createMachine } from "xstate";
 import type { BspaohSignatureType } from "@td/codegen-back";
 

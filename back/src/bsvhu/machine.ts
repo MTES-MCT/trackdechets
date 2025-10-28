@@ -1,4 +1,4 @@
-import { Bsvhu, BsvhuStatus } from "@prisma/client";
+import { Bsvhu, BsvhuStatus } from "@td/prisma";
 import { Machine } from "xstate";
 import type { SignatureTypeInput } from "@td/codegen-back";
 

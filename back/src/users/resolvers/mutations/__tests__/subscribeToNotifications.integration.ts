@@ -5,7 +5,7 @@ import type {
 } from "@td/codegen-back";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { associateUserToCompany } from "../../../database";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import gql from "graphql-tag";
 import makeClient from "../../../../__tests__/testClient";
 import { prisma } from "@td/prisma";

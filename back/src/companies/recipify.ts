@@ -6,7 +6,7 @@ import {
   BspaohTransporter,
   BsdaTransporter,
   BsffTransporter
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 
 type RecipifyOutput = {

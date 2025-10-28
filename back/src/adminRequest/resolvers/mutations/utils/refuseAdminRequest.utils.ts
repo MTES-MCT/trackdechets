@@ -5,7 +5,7 @@ import {
   CompanyAssociation,
   User,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getAdminRequestRepository } from "../../../repository";
 import { AdminRequestWithUserAndCompany } from "../../typing";

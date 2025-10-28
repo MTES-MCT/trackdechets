@@ -7,7 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { CompanyType, WasteProcessorType } from "@prisma/client";
+import { CompanyType, WasteProcessorType } from "@td/prisma";
 
 const MARK_AS_RESENT = `
   mutation MarkAsResent($id: ID!, $resentInfos: ResentFormInput!){

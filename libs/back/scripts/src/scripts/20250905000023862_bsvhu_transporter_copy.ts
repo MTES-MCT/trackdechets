@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 import Queue, { JobOptions } from "bull";
-import { Bsvhu } from "@prisma/client";
+import { Bsvhu } from "@td/prisma";
 
 const { REDIS_URL, NODE_ENV } = process.env;
 

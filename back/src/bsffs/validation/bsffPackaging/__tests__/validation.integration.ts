@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { searchCompany } from "../../../../companies/search";
 import { ZodBsffPackaging } from "../schema";
 import { parseBsffPackaging, parseBsffPackagingAsync } from "..";
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import { ZodOperationEnum } from "../../bsff/schema";
 import {
   UserWithCompany,

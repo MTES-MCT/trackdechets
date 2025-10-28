@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma, Status, User } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status, User } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";
 import { getFirstTransporter, getFormOrFormNotFound } from "../../database";

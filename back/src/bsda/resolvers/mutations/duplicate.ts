@@ -1,4 +1,4 @@
-import { BsdaStatus, Prisma } from "@prisma/client";
+import { BsdaStatus, Prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type { MutationDuplicateBsdaArgs } from "@td/codegen-back";

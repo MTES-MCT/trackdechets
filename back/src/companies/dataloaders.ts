@@ -1,6 +1,6 @@
 import DataLoader from "dataloader";
 import { prisma } from "@td/prisma";
-import { Company, UserRole } from "@prisma/client";
+import { Company, UserRole } from "@td/prisma";
 
 export function createCompanyDataLoaders() {
   return {

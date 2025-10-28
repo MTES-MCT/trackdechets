@@ -1,4 +1,4 @@
-import { Bsvhu, BsvhuStatus, Prisma } from "@prisma/client";
+import { Bsvhu, BsvhuStatus, Prisma } from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
   BsvhuSignatureInput,

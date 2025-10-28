@@ -5,7 +5,7 @@ import {
   User,
   UserRole,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import type {

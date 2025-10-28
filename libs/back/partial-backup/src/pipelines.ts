@@ -47,7 +47,7 @@ import {
   VhuAgrement,
   WebhookSetting,
   WorkerCertification
-} from "@prisma/client";
+} from "@td/prisma";
 
 /*
   This is an object that contains getters and setters to fetch various object types from the source DB

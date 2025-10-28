@@ -1,4 +1,4 @@
-import { Company, Prisma } from "@prisma/client";
+import { Company, Prisma } from "@td/prisma";
 import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";

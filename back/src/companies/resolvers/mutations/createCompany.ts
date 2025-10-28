@@ -7,7 +7,7 @@ import {
   UserRole,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { sendMail } from "../../../mailer/mailing";

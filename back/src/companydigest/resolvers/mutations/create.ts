@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { prisma } from "@td/prisma";
 import { sendGericoApiRequest } from "../../../queue/producers/gerico";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 
 const createCompanyDigestResolver = async (
   _: ResolversParentTypes["Mutation"],

@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import { setWebhookSetting } from "../../common/redis/webhooksettings";
 
 import { getUid, aesEncrypt } from "../../utils";

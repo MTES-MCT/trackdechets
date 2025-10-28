@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status } from "@td/prisma";
 import Decimal from "decimal.js";
 import { enqueueUpdateAppendix2Job } from "../queue/producers/updateAppendix2";
 import { getFormRepository } from "./repository";

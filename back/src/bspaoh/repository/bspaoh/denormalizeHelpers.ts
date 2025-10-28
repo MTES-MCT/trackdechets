@@ -1,5 +1,5 @@
 import { getUserCompanies } from "../../../users/database";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 import { PrismaBspaohWithTransporters } from "../../types";
 
 export const getDenormalizedSirets = async (

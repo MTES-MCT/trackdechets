@@ -1,4 +1,4 @@
-import { Status, UserRole, WasteAcceptationStatus } from "@prisma/client";
+import { Status, UserRole, WasteAcceptationStatus } from "@td/prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { renderBspaohRefusedEmail } from "../refused";
 import { buildPdfAsBase64 } from "../../pdf/generator";

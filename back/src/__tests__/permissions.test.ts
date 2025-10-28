@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { Permission, can } from "../permissions";
 
 describe("roles permissions", () => {

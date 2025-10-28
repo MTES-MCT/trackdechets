@@ -1,4 +1,4 @@
-import { Company, Prisma } from "@prisma/client";
+import { Company, Prisma } from "@td/prisma";
 import type {
   OutgoingWasteLine,
   IncomingTexsLine,

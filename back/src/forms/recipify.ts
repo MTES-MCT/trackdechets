@@ -6,7 +6,7 @@ import type {
 } from "@td/codegen-back";
 
 import { recipifyGeneric } from "../companies/recipify";
-import { BsddTransporter, Prisma } from "@prisma/client";
+import { BsddTransporter, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 type Receipt = {

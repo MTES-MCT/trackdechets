@@ -3,6 +3,7 @@ import { impersonateMiddleware } from "../impersonate";
 import { prisma } from "@td/prisma";
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: {
       findUniqueOrThrow: jest.fn()

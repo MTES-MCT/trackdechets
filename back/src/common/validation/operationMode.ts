@@ -1,5 +1,5 @@
 import * as yup from "yup";
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import { getOperationModesFromOperationCode } from "../operationModes";
 
 export const destinationOperationModeValidation = () =>

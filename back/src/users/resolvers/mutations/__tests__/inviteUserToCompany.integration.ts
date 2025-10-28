@@ -11,7 +11,7 @@ import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { templateIds } from "@td/mail";
 import { getDefaultNotifications } from "../../../notifications";
 

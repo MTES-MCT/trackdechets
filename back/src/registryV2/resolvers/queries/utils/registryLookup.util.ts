@@ -3,7 +3,7 @@ import {
   RegistryExportType,
   RegistryExportWasteType,
   RegistryLookup
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getUserCompanies } from "../../../../users/database";
 import { UserInputError } from "../../../../common/errors";

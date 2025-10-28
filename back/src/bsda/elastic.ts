@@ -4,7 +4,7 @@ import {
   BsdaTransporter,
   BsdType,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";

@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import { operationHook } from "../operationHook";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { bsdaFactory } from "./factories";
 

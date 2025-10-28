@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { TransportMode } from "@prisma/client";
+import { TransportMode } from "@td/prisma";
 import { isForeignVat, isSiret, isVat } from "@td/constants";
 import { ERROR_TRANSPORTER_PLATES_TOO_MANY } from "../messages";
 import countries from "world-countries";

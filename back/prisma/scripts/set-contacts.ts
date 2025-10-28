@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import axios from "axios";
 import { addContact } from "../../src/mailer/mailing";
 import { prisma } from "@td/prisma";

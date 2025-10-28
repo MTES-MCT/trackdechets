@@ -3,7 +3,7 @@ import {
   Bsff,
   BsffPackaging,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
   BsffSignatureInput,

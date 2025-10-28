@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import { enqueueUpdateAppendix2Job } from "../../../queue/producers/updateAppendix2";
 

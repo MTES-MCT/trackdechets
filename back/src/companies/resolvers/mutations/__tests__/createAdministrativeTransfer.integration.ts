@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 
 const CREATE_ADMINISTRATIVE_TRANSFER = `
   mutation CreateAdministrativeTransfer($input: CreateAdministrativeTransferInput!) {

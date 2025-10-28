@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 import Queue, { JobOptions } from "bull";
-import { Bsdasri, Company, Event, User } from "@prisma/client";
+import { Bsdasri, Company, Event, User } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { logger } from "@td/logger";
 

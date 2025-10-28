@@ -1,4 +1,4 @@
-import { GovernmentPermission } from "@prisma/client";
+import { GovernmentPermission } from "@td/prisma";
 import {
   refreshElasticSearch,
   resetDatabase

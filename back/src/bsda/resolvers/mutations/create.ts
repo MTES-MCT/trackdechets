@@ -8,7 +8,7 @@ import { checkCanCreate } from "../../permissions";
 import { UserInputError } from "../../../common/errors";
 import { parseBsdaAsync } from "../../validation";
 import { graphQlInputToZodBsda } from "../../validation/helpers";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 type CreateBsda = {
   isDraft: boolean;

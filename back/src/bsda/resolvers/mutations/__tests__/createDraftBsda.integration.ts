@@ -17,7 +17,7 @@ import { prisma } from "@td/prisma";
 import { gql } from "graphql-tag";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { getFirstTransporterSync } from "../../../database";
-import { Company, CompanyType, EcoOrganisme, User } from "@prisma/client";
+import { Company, CompanyType, EcoOrganisme, User } from "@td/prisma";
 
 const CREATE_DRAFT_BSDA = gql`
   mutation CreateDraftBsda($input: BsdaInput!) {

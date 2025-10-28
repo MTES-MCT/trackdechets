@@ -1,7 +1,7 @@
 import {
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

@@ -4,7 +4,7 @@ import {
   User,
   BsvhuIdentificationType,
   BsvhuPackaging
-} from "@prisma/client";
+} from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import type { MutationDuplicateBsvhuArgs } from "@td/codegen-back";

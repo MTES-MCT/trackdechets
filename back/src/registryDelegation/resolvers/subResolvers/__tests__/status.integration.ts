@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { nowPlusXHours } from "../../../../utils";
 import { registryDelegationFactory } from "../../../__tests__/factories";
 import { getDelegation } from "../../queries/__tests__/registryDelegation.integration";

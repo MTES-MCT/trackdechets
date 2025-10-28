@@ -1,4 +1,4 @@
-import { BsffPackaging, Prisma } from "@prisma/client";
+import { BsffPackaging, Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

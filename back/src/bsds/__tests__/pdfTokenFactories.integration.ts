@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { pdfAccessTokenFactory } from "./factories";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
-import { BsdType } from "@prisma/client";
+import { BsdType } from "@td/prisma";
 
 describe("Mutation.creatPdfAccessToken", () => {
   afterEach(resetDatabase);

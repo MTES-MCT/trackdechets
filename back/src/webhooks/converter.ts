@@ -1,5 +1,5 @@
 import type { WebhookSetting } from "@td/codegen-back";
-import { WebhookSetting as DbWebhookSetting } from "@prisma/client";
+import { WebhookSetting as DbWebhookSetting } from "@td/prisma";
 
 export function formatWebhookSettingFromDB(
   webhookSetting: DbWebhookSetting

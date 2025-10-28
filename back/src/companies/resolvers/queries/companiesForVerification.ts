@@ -1,4 +1,4 @@
-import { CompanyType, Prisma } from "@prisma/client";
+import { CompanyType, Prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";

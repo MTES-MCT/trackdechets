@@ -1,7 +1,7 @@
 import { GraphQLContext } from "../../../types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { prisma } from "@td/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import {
   IncomingTexsLine,
   IncomingWasteLine,

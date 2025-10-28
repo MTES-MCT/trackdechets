@@ -4,7 +4,7 @@ import {
   BsffStatus,
   BsffPackaging,
   BsffType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getReadableId, reindex, ReadableIdPrefix } from "back";
 

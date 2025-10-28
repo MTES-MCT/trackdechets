@@ -1,6 +1,5 @@
-import { RegistryExportStatus, RegistryImportStatus } from "@prisma/client";
 import { subDays } from "date-fns";
-import { prisma } from "@td/prisma";
+import { RegistryExportStatus, RegistryImportStatus, prisma } from "@td/prisma";
 
 export async function cleanPendingRegistry() {
   await prisma.registryImport.updateMany({

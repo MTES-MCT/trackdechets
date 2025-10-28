@@ -3,7 +3,7 @@ import {
   RevisionRequestApprovalStatus as Status,
   RevisionRequestStatus,
   User
-} from "@prisma/client";
+} from "@td/prisma";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import type { MutationSubmitBsdaRevisionRequestApprovalArgs } from "@td/codegen-back";
 import { GraphQLContext } from "../../../../types";
@@ -11,10 +11,9 @@ import { getBsdaRepository } from "../../../repository";
 import { Permission, can, getUserRoles } from "../../../../permissions";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 
-const bsdaRevisionRequestWithApprovals =
-  Prisma.validator<Prisma.BsdaRevisionRequestDefaultArgs>()({
-    include: { approvals: true }
-  });
+const bsdaRevisionRequestWithApprovals = {
+  include: { approvals: true }
+} satisfies Prisma.BsdaRevisionRequestDefaultArgs;
 type BsdaRevisionRequestWithApprovals = Prisma.BsdaRevisionRequestGetPayload<
   typeof bsdaRevisionRequestWithApprovals
 >;
