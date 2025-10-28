@@ -609,8 +609,8 @@ describe("Test Form reception", () => {
               wasteRefusalReason: "Parce que",
               signedAt: "2019-01-18" as any,
               signedBy: "John",
-              quantityReceived: 0,
-              quantityRefused: 0
+              quantityReceived: 1,
+              quantityRefused: 1
             }
           }
         }

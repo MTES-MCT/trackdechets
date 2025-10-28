@@ -327,8 +327,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
             signedAt: "2019-01-18" as any,
             signedBy: "John",
             quantityType: "REAL",
-            quantityReceived: 0,
-            quantityRefused: 0
+            quantityReceived: 1,
+            quantityRefused: 1
           }
         }
       });
