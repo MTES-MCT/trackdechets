@@ -114,6 +114,7 @@ declare module "express-session" {
     impersonatedUserId?: string;
     impersonationStartsAt?: number;
     issuedAt?: string;
+    passport?: { user: string };
   }
 }
 

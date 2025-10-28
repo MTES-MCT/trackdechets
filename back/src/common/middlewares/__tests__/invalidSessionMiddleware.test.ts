@@ -32,14 +32,14 @@ describe("invalidSessionMiddleware", () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it("should logout and redirect when no userPasswordChangedAt", async () => {
+  it("should call next() when no user", async () => {
     req.user = undefined;
 
     await invalidSessionMiddleware(req, res, next);
 
-    expect(req.logout).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalledWith("http://example.com");
-    expect(next).not.toHaveBeenCalled();
+    expect(req.logout).not.toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
   });
 
   it("should logout and redirect when session issued before password change", async () => {
@@ -52,18 +52,18 @@ describe("invalidSessionMiddleware", () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it("should logout and redirect when no session issuedAt", async () => {
+  it("should call next() when no session issuedAt", async () => {
     req.session.issuedAt = undefined;
 
     await invalidSessionMiddleware(req, res, next);
 
-    expect(req.logout).toHaveBeenCalled();
-    expect(res.redirect).toHaveBeenCalledWith("http://example.com");
-    expect(next).not.toHaveBeenCalled();
+    expect(req.logout).not.toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalled();
   });
 
   it("should handle logout error", async () => {
-    req.user = undefined;
+    req.session.issuedAt = "2023-01-01T00:00:00.000Z"; // Before password change
     req.logout = jest.fn(callback => callback(new Error("Logout error")));
 
     await invalidSessionMiddleware(req, res, next);

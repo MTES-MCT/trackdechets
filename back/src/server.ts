@@ -342,7 +342,6 @@ app.use(session(sess));
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);

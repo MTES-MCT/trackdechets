@@ -11,9 +11,12 @@ export async function invalidSessionMiddleware(
   const sessionIssuedAt = req.session.issuedAt;
   const userPasswordChangedAt = req.user?.passwordUpdatedAt?.toISOString();
 
+  // Only check if:
+  // - there is a req.user. Otherwise, it's not an authenticated request, let the resolvers throw
+  // - the session has an issuedAt date (set at login). Otherwise, it's probably a bearer token request
   if (
-    !userPasswordChangedAt ||
-    !sessionIssuedAt ||
+    userPasswordChangedAt &&
+    sessionIssuedAt &&
     sessionIssuedAt <= userPasswordChangedAt
   ) {
     req.logout(err => {

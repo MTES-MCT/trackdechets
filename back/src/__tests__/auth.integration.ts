@@ -633,8 +633,9 @@ describe("Session invalidation on password change", () => {
       .send({ query: "{ me { email } }" })
       .set("Cookie", cookie2);
 
-    expect(res2.status).toEqual(302);
-    expect(res2.headers["location"]).toEqual(getUIBaseURL());
+    expect(res2.status).toEqual(200);
+    expect(res2.body.errors).toHaveLength(1);
+    expect(res2.body.errors[0].message).toEqual("Vous n'êtes pas connecté.");
 
     // But "new" second session should work (regenerated on password change)
     const res3 = await request
