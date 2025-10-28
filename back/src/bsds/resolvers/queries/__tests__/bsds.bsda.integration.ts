@@ -213,7 +213,8 @@ describe("Query.bsds.bsda base workflow", () => {
               reception: {
                 acceptationStatus: "ACCEPTED",
                 date: new Date().toISOString() as any,
-                weight: 1
+                weight: 1,
+                refusedWeight: 0
               },
               operation: {
                 code: "D 5",
@@ -1284,7 +1285,8 @@ describe("Query.bsds.bsda base workflow", () => {
         where: { id: bsdaId },
         data: {
           status: "SENT",
-          destinationReceptionWeight: 0,
+          destinationReceptionWeight: 1,
+          destinationReceptionRefusedWeight: 1,
           destinationReceptionAcceptationStatus: "REFUSED",
           destinationReceptionRefusalReason: "Ugly waste...",
           destinationOperationCode: null,
