@@ -29,7 +29,8 @@ export const geocodeCompanyQueue = new Queue(
       duration: 1000 // ms
     },
     defaultJobOptions: {
-      removeOnComplete: 10_000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );
@@ -47,7 +48,8 @@ export const setCompanyDepartementQueue = new Queue(
       duration: 1000 // ms
     },
     defaultJobOptions: {
-      removeOnComplete: 10_000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );
@@ -81,7 +83,8 @@ export const favoritesCompanyQueue = new Queue(
 
   {
     defaultJobOptions: {
-      removeOnComplete: 10_000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );

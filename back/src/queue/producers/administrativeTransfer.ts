@@ -12,7 +12,8 @@ export const administrativeTransferQueue =
     REDIS_URL!,
     {
       defaultJobOptions: {
-        removeOnComplete: 100
+        removeOnComplete: 100,
+        removeOnFail: 500
       }
     }
   );

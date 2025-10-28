@@ -18,7 +18,7 @@ import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { AddRegistryLinesResponse } from "@td/codegen-back";
 
-const LINES_LIMIT = 1_000;
+const LINES_LIMIT = 1000;
 
 type UnparsedLine = {
   reason?: "MODIFIER" | "ANNULER" | "IGNORER" | "EDIT" | "CANCEL" | null;
