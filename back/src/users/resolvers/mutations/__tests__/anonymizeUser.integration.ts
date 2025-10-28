@@ -1,16 +1,17 @@
 import { gql } from "graphql-tag";
 import supertest from "supertest";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { app, sess } from "../../../../server";
 import { logIn } from "../../../../__tests__/auth.helper";
 import {
+  adminFactory,
   userFactory,
   userWithAccessTokenFactory,
-  userWithCompanyFactory,
-  adminFactory
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
-import { AuthType } from "../../../../auth/auth";
 import makeClient from "../../../../__tests__/testClient";
+import { AuthType } from "../../../../auth/auth";
+import { app, sess } from "../../../../server";
+import { getUIBaseURL } from "../../../../utils";
 
 const request = supertest(app);
 const cookieRegExp = new RegExp(
@@ -87,12 +88,8 @@ describe("disconnectDeletedUser Middleware", () => {
       .send({ query: "{ me { email } }" })
       .set("Cookie", `${sess.name}=${cookieValue}`);
 
-    expect(rejected.status).toBe(200);
-    expect(rejected.body.errors.length).toBe(1);
-    expect(rejected.body.errors[0]).toMatchObject({
-      extensions: { code: "UNAUTHENTICATED" },
-      message: "Vous n'êtes pas connecté."
-    });
+    expect(rejected.status).toBe(302);
+    expect(rejected.headers["location"]).toBe(getUIBaseURL());
   });
 
   it("must not disconnect a user when associated with a company with only one admin", async () => {
