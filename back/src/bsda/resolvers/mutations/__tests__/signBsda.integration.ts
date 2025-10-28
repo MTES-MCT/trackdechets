@@ -2064,7 +2064,8 @@ describe("Mutation.Bsda.sign", () => {
           status: BsdaStatus.SENT,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
           destinationReceptionRefusalReason: "Invalid bsda, cant accept",
-          destinationReceptionWeight: 0,
+          destinationReceptionWeight: 1,
+          destinationReceptionRefusedWeight: 1,
           destinationOperationCode: null
         },
         transporterOpt: {
@@ -2168,7 +2169,8 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           emitterCompanySiret: emitter.siret,
           destinationCompanySiret: destination.siret,
-          destinationReceptionWeight: 0,
+          destinationReceptionWeight: 1,
+          destinationReceptionRefusedWeight: 1,
           destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
           destinationReceptionRefusalReason: "Invalid bsda, cant accept",
           destinationOperationCode: null,
