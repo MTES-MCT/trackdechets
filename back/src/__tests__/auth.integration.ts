@@ -4,7 +4,7 @@ import { resetDatabase } from "../../integration-tests/helper";
 import { getLoginError } from "../auth/auth";
 import { prisma } from "@td/prisma";
 import { app, sess } from "../server";
-import { getUid, hashToken } from "../utils";
+import { getUIBaseURL, getUid, hashToken } from "../utils";
 import { userFactory, userWithAccessTokenFactory } from "./factories";
 import { TOTP } from "totp-generator";
 import { clearUserLoginNeedsCaptcha } from "../common/redis/captcha";
@@ -571,5 +571,79 @@ describe("Authentification with token", () => {
       where: { token: hashToken(token) }
     });
     expect(accessToken.lastUsed).not.toBeNull();
+  });
+});
+
+describe("Session invalidation on password change", () => {
+  afterEach(() => resetDatabase());
+
+  it("should invalidate old sessions when password is changed", async () => {
+    const user = await userFactory();
+
+    // First login
+    const login1 = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    expect(login1.header["set-cookie"]).toHaveLength(1);
+    const cookie1 = login1.header["set-cookie"][0];
+
+    // Second login
+    const login2 = await request
+      .post("/login")
+      .send(`email=${user.email}`)
+      .send(`password=pass`);
+
+    expect(login2.header["set-cookie"]).toHaveLength(1);
+    const cookie2 = login2.header["set-cookie"][0];
+
+    // Change password using second session
+    const changePasswordQuery = `
+      mutation ChangePassword($oldPassword: String!, $newPassword: String!){
+        changePassword(oldPassword: $oldPassword, newPassword: $newPassword){
+          id
+        }
+      }
+    `;
+
+    const changeRes = await request
+      .post("/")
+      .send({
+        query: changePasswordQuery,
+        variables: { oldPassword: "pass", newPassword: "Trackdechets1#" }
+      })
+      .set("Cookie", cookie2);
+
+    expect(changeRes.body.data.changePassword.id).toBe(user.id);
+    const regeneratedCookie2 = changeRes.header["set-cookie"][0];
+
+    // First session should be invalid
+    const res1 = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", cookie1);
+
+    expect(res1.status).toEqual(302);
+    expect(res1.headers["location"]).toEqual(getUIBaseURL());
+
+    // "Old" second session should be invalid
+    const res2 = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", cookie2);
+
+    expect(res2.status).toEqual(302);
+    expect(res2.headers["location"]).toEqual(getUIBaseURL());
+
+    // But "new" second session should work (regenerated on password change)
+    const res3 = await request
+      .post("/")
+      .send({ query: "{ me { email } }" })
+      .set("Cookie", regeneratedCookie2);
+
+    expect(res3.body.data).toEqual({
+      me: { email: user.email }
+    });
   });
 });

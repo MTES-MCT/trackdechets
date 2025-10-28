@@ -11,8 +11,6 @@ import {
 } from "../../../../__tests__/factories";
 import { AuthType } from "../../../../auth/auth";
 import makeClient from "../../../../__tests__/testClient";
-import { redisClient } from "../../../../common/redis";
-import { USER_SESSIONS_CACHE_KEY } from "../../../../common/redis/users";
 
 const request = supertest(app);
 const cookieRegExp = new RegExp(
@@ -95,10 +93,6 @@ describe("disconnectDeletedUser Middleware", () => {
       extensions: { code: "UNAUTHENTICATED" },
       message: "Vous n'êtes pas connecté."
     });
-    const cachedSessions = await redisClient.smembers(
-      `${USER_SESSIONS_CACHE_KEY}-${user.id}`
-    );
-    expect(cachedSessions?.length).toBe(0);
   });
 
   it("must not disconnect a user when associated with a company with only one admin", async () => {
@@ -161,10 +155,5 @@ describe("disconnectDeletedUser Middleware", () => {
     expect(rejected.body.errors[0]).toMatchObject({
       message: "Vous n'êtes pas connecté."
     });
-
-    const cachedSessions = await redisClient.smembers(
-      `${USER_SESSIONS_CACHE_KEY}-${user.id}`
-    );
-    expect(cachedSessions?.length).toBe(0);
   });
 });

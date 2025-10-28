@@ -6,11 +6,6 @@ import { compare } from "bcrypt";
 import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode } from "../../../../common/errors";
-import { redisClient } from "../../../../common/redis";
-import {
-  storeUserSessionsId,
-  getUserSessions
-} from "../../../../common/redis/users";
 
 const CHANGE_PASSWORD = `
   mutation ChangePassword($oldPassword: String!, $newPassword: String!){
@@ -26,17 +21,6 @@ describe("mutation changePassword", () => {
   it("should update a user password", async () => {
     const user = await userFactory();
 
-    // create a few redis sessions entries
-    const sessionId1 = `xyz123`;
-    const sessionId2 = `abcd654`;
-    const sessionKey1 = `sess:${sessionId1}`;
-    const sessionKey2 = `sess:${sessionId2}`;
-    await redisClient.set(sessionKey1, "data");
-    await redisClient.set(sessionKey2, "data");
-    // reference them
-    await storeUserSessionsId(user.id, sessionId1);
-    await storeUserSessionsId(user.id, sessionId2);
-
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const newPassword = "Trackdechets1#";
     const { data } = await mutate<Pick<Mutation, "changePassword">>(
@@ -50,12 +34,6 @@ describe("mutation changePassword", () => {
       where: { id: user.id }
     });
     expect(await compare(newPassword, updatedUser.password)).toEqual(true);
-
-    // other sessions are deleted
-    expect(await redisClient.exists(sessionKey1)).toBeFalsy();
-    expect(await redisClient.exists(sessionKey2)).toBeFalsy();
-    // user sessions references entry set to a new session id
-    expect((await getUserSessions(user.id)).length).toEqual(1);
   });
 
   it("should deny short password", async () => {
@@ -103,13 +81,6 @@ describe("mutation changePassword", () => {
 
     const oldPassword = "pass";
     const newPassword = "New-pass-123$";
-
-    // create a few redis sessions entries
-    const sessionId1 = `xyz123`;
-    const sessionKey1 = `sess:${sessionId1}`;
-    await redisClient.set(sessionKey1, "data");
-    // reference them
-    await storeUserSessionsId(user.id, sessionId1);
 
     // Create a user reset password hash
     await prisma.userResetPasswordHash.create({
