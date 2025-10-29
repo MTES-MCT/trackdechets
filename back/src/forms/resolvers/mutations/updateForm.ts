@@ -318,11 +318,17 @@ const updateFormResolver = async (
     };
   }
 
-  const existingParent = await prisma.form
-    .findUnique({ where: { id: existingForm.id } })
-    .groupedIn();
+  // If a form is part of a groupement, its emitterType cannot be changed
+  // This checks the children, validateGroupement() below checks the parent
+  const existingGroupement = await prisma.formGroupement.findFirst({
+    where: { initialFormId: existingForm.id }
+  });
 
-  if (existingParent && futureForm.emitterType !== existingForm.emitterType) {
+  if (
+    existingGroupement &&
+    futureForm.emitterType !== existingForm.emitterType
+  ) {
+    console.log(futureForm.emitterType, existingForm.emitterType);
     throw new UserInputError(
       "Le type d'émetteur ne peut pas être modifié car le bordereau fait partie d'un groupement."
     );
