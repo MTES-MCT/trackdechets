@@ -201,6 +201,7 @@ export const FullBsdaFragment = gql`
       reception {
         date
         weight
+        weightIsEstimate
         refusedWeight
         acceptedWeight
         acceptationStatus
