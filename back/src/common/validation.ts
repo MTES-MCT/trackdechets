@@ -236,7 +236,8 @@ export const siretConditions: SiretConditions = {
 const {
   VERIFY_COMPANY,
   VERIFY_DESTINATION_PROFILES_FOR_BSDD_CREATED_AFTER,
-  OVERRIDE_V20250201
+  OVERRIDE_V20250201,
+  OVERRIDE_V20251101
 } = process.env;
 
 // Date de la MAJ 2024.11.1 qui rend obligatoire certtains sous profils pour traiter les déchets dangereux et non dangereux
@@ -250,6 +251,10 @@ export const v20241101 = new Date(
 // et d'avoir renseigné un récépissé
 export const v20250201 = new Date(
   OVERRIDE_V20250201 || "2025-02-12T00:00:00.000Z"
+);
+
+export const v20251101 = new Date(
+  OVERRIDE_V20251101 || "2025-11-18T00:00:00.000Z"
 );
 
 export const siretTests: SiretTests = {
