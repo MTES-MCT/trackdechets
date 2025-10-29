@@ -36,9 +36,21 @@ const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
     associatedUsers.map(user => deleteCachedUserRoles(user.id))
   );
 
-  await prisma.companyAssociation.deleteMany({ where: { companyId: id } });
-  await prisma.membershipRequest.deleteMany({ where: { companyId: id } });
-  await prisma.company.delete({ where: { id } });
+  await prisma.$transaction(async tx => {
+    await tx.companyAssociation.deleteMany({ where: { companyId: id } });
+    await tx.membershipRequest.deleteMany({ where: { companyId: id } });
+    await tx.company.delete({ where: { id } });
+
+    await tx.event.create({
+      data: {
+        streamId: companyAssociation.company.orgId,
+        actor: user.id,
+        type: "CompanyDeleted",
+        data: { content: { companyId: id } },
+        metadata: { authType: user.auth }
+      }
+    });
+  });
 
   return toGqlCompanyPrivate(companyAssociation.company);
 };
