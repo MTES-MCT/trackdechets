@@ -4455,6 +4455,119 @@ describe("Mutation.updateForm", () => {
     expect(errors).toBeUndefined();
   });
 
+  it("should not allow to update an appendix1 emitter type if it's already grouped with an appendix1_producer", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        recipientCompanySiret: destination.siret,
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    // Update APPENDIX1 emitter type to another type
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: { type: EmitterType.PRODUCER }
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+    );
+  });
+
+  it("should not allow to update an appendix1_producer emitter type if it's already grouped to an appendix1", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    // Group with appendix1_1
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        recipientCompanySiret: destination.siret,
+
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    // Update APPENDIX1 emitter type to another type
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: appendix1_1.id,
+          emitter: { type: EmitterType.PRODUCER }
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Le type d'émetteur ne peut pas être modifié car le bordereau fait partie d'un groupement."
+    );
+  });
+
   it.each([Status.DRAFT, Status.SEALED, Status.SIGNED_BY_PRODUCER])(
     "should be possible to update transporter when status is %p",
     async status => {

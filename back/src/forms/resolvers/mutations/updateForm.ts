@@ -318,6 +318,16 @@ const updateFormResolver = async (
     };
   }
 
+  const existingParent = await prisma.form
+    .findUnique({ where: { id: existingForm.id } })
+    .groupedIn();
+
+  if (existingParent && futureForm.emitterType !== existingForm.emitterType) {
+    throw new UserInputError(
+      "Le type d'émetteur ne peut pas être modifié car le bordereau fait partie d'un groupement."
+    );
+  }
+
   const existingFormFractions = await prisma.form
     .findUnique({ where: { id: existingForm.id } })
     .grouping({ include: { initialForm: true } });
