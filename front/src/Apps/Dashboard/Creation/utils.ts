@@ -80,11 +80,6 @@ export const getTabs = (
       iconId: getTabClassName(errorTabIds, "emitter")
     },
     {
-      tabId: TabId.worker,
-      label: "Entreprise de travaux",
-      iconId: getTabClassName(errorTabIds, "worker")
-    },
-    {
       tabId: TabId.transporter,
       label: "Transporteur",
       iconId: getTabClassName(errorTabIds, "transporter")
@@ -119,7 +114,23 @@ const getBsvhuTabs = (commonTabs, errorTabIds) => {
 
 const getBsdaTabs = (commonTabs, errorTabIds) => {
   const bsdaTabs = [
-    ...commonTabs,
+    {
+      ...commonTabs[0]
+    },
+    {
+      ...commonTabs[1]
+    },
+    {
+      tabId: TabId.worker,
+      label: "Entreprise de travaux",
+      iconId: getTabClassName(errorTabIds, "worker")
+    },
+    {
+      ...commonTabs[2]
+    },
+    {
+      ...commonTabs[3]
+    },
     {
       tabId: TabId.other,
       label: "Autres acteurs",

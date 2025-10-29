@@ -180,6 +180,17 @@ const DestinationBsda = ({ errors }) => {
     [destination?.company?.orgId, destination?.company?.siret]
   );
 
+  const orgIdNextDestination = useMemo(
+    () =>
+      destination?.operation?.nextDestination?.company?.orgId ??
+      destination?.operation?.nextDestination?.company?.siret ??
+      null,
+    [
+      destination?.operation?.nextDestination?.company?.orgId,
+      destination?.operation?.nextDestination?.company?.siret
+    ]
+  );
+
   function onNextDestinationToggle() {
     // When we toggle the next destination switch, we swap destination <-> nextDestination
     // That's because the final destination is always displayed first:
@@ -272,9 +283,21 @@ const DestinationBsda = ({ errors }) => {
           <h4 className="fr-h4">Exutoire</h4>
           <CompanySelectorWrapper
             orgId={siret}
-            favoriteType={FavoriteType.Destination}
-            disabled={sealedFields.includes(`destination.company.siret`)}
-            selectedCompanyOrgId={orgId}
+            favoriteType={
+              hasNextDestination
+                ? FavoriteType.NextDestination
+                : FavoriteType.Destination
+            }
+            disabled={sealedFields.includes(
+              `${
+                hasNextDestination
+                  ? "destination.operation.nextDestination.company"
+                  : "destination.company.siret"
+              }`
+            )}
+            selectedCompanyOrgId={
+              hasNextDestination ? orgIdNextDestination : orgId
+            }
             selectedCompanyError={selectedCompanyError}
             onCompanySelected={company => {
               if (company) {
@@ -291,7 +314,11 @@ const DestinationBsda = ({ errors }) => {
                 };
 
                 // [tra-13734] don't override field with api data keep the user data value
-                if (company.siret === destination?.company?.siret) {
+                const currentCompanySiret = hasNextDestination
+                  ? destination?.operation.nextDestination.company.siret
+                  : destination?.company.siret;
+
+                if (company.siret === currentCompanySiret) {
                   companyData = {
                     orgId: company.orgId,
                     siret: company.siret,
@@ -312,13 +339,18 @@ const DestinationBsda = ({ errors }) => {
                   clearCompanyError(destination, "destination", clearErrors);
                 }
 
-                setValue("destination", {
-                  ...destination,
-                  company: {
+                if (!hasNextDestination) {
+                  setValue("destination.company", {
                     ...destination.company,
                     ...companyData
-                  }
-                });
+                  });
+                } else {
+                  setValue("destination.operation", {
+                    nextDestination: {
+                      company: { ...destination.company, ...companyData }
+                    }
+                  });
+                }
               }
             }}
           />
@@ -329,6 +361,7 @@ const DestinationBsda = ({ errors }) => {
                 {formState.errors?.destination?.["company"]?.siret?.message}
               </p>
             )}
+
           <CompanyContactInfo
             fieldName={
               hasNextDestination
@@ -429,7 +462,6 @@ const DestinationBsda = ({ errors }) => {
                     label:
                       "Je souhaite ajouter une installation intermédiaire de transit ou de groupement d'amiante",
                     nativeInputProps: {
-                      ...register("destination.operation.nextDestination"),
                       onChange: onNextDestinationToggle,
                       checked: hasNextDestination
                     }
