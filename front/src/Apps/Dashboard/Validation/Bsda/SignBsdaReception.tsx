@@ -444,12 +444,10 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                       title="Code d'opération & poids receptionné estimé"
                       description={
                         <>
-                          Lorsque l'un des contenants est un conteneur-bag, vous
-                          pouvez indiquer que le poids réceptionné est estimé.
-                          Dans ce cas, seuls les codes d'opération non finaux
-                          (R13 ou D15) seront disponibles. La sélection d'un
-                          code de traitement final ne sera pas possible avec un
-                          poids estimé.
+                          Il est permis de renseigner un poids estimé uniquement
+                          dans le cas d'un conteneur-bag et d'une installation
+                          intermédiaire. L'exutoire final devra renseigner un
+                          poids réel.
                         </>
                       }
                     />

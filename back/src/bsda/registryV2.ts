@@ -343,7 +343,8 @@ export const toIncomingWasteV2 = (
     destinationReceptionAcceptedWeight: quantityAccepted
       ? quantityAccepted.dividedBy(1000).toDecimalPlaces(6).toNumber()
       : null,
-    destinationReceptionWeightIsEstimate: bsda.destinationReceptionWeightIsEstimate,
+    destinationReceptionWeightIsEstimate:
+      bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationOperationCodes: bsda.destinationOperationCode
