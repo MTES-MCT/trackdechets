@@ -67,17 +67,22 @@ export async function run() {
         update: eo
       });
 
-      console.log(`✅ Upserted ${result.name} (siret=${result.siret}) id=${result.id}`);
+      console.log(
+        `✅ Upserted ${result.name} (siret=${result.siret}) id=${result.id}`
+      );
       upserted++;
     } catch (err) {
       errors++;
-      console.error(`❌ Failed to upsert ${eo.name} (${eo.siret}):`, err.message || err);
+      console.error(
+        `❌ Failed to upsert ${eo.name} (${eo.siret}):`,
+        err.message || err
+      );
     }
   }
 
   console.log("\n=== RÉSUMÉ FINAL ===");
   console.log(`${upserted} eco-organismes traités, ${errors} erreurs`);
-  
+
   if (errors === 0) {
     console.log("✅ Tous les eco-organismes ont été ajoutés avec succès!");
   }
