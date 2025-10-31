@@ -1,3 +1,4 @@
+import compression from "compression";
 import express from "express";
 import helmet from "helmet";
 import fetch from "node-fetch";
@@ -63,7 +64,22 @@ app.use((_, res, next) => {
 });
 
 const directory = path.join(__dirname, "../../../../../front");
-app.use(express.static(directory));
+app.use(
+  express.static(directory, {
+    maxAge: "1y", // Cache for 1 year
+    immutable: true, // Because filenames change when content changes
+    setHeaders: (res, filePath) => {
+      // Disable caching for index.html
+      if (filePath.endsWith("index.html")) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      }
+    }
+  })
+);
+
+app.use(compression());
 
 const pathToIndex = path.join(directory, "index.html");
 
@@ -75,6 +91,7 @@ const indexContent =
         '<meta name="robots" content="noindex nofollow" />'
       )
     : raw;
+const indexLength = Buffer.byteLength(indexContent);
 
 app.use(express.text());
 
@@ -105,6 +122,12 @@ app.post("/sentry", async function (req, res) {
 });
 
 app.get("/*", function (req, res) {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Content-Length", indexLength);
+
   res.send(indexContent);
 });
 
