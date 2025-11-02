@@ -933,7 +933,7 @@ describe("dashboardServices", () => {
         currentSiret,
         {
           ...bsd,
-          destination: { company: { siret: "123456789" } }
+          destination: { company: { siret: currentSiret } }
         },
         permissions,
         bsdCurrentTab
@@ -941,26 +941,34 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_ACCEPTATION);
     });
 
-    it("should return VALIDER_TRAITEMENT for bsda type", () => {
+    it("should return VALIDER_TRAITEMENT for bsda type with same SIRET destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
-        { ...bsd, type: BsdType.Bsda },
+        {
+          ...bsd,
+          type: BsdType.Bsda,
+          destination: { company: { siret: "123456789" } }
+        },
         permissions,
         bsdCurrentTab
       );
       expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
-    it("should return VALIDER_TRAITEMENT for bsvhu type", () => {
+    it("should return VALIDER_TRAITEMENT for bsvhu type  with same SIRET destination", () => {
       const permissions: UserPermission[] = [
         UserPermission.BsdCanSignOperation
       ];
       const result = getReceivedBtnLabel(
         currentSiret,
-        { ...bsd, type: BsdType.Bsvhu },
+        {
+          ...bsd,
+          type: BsdType.Bsvhu,
+          destination: { company: { siret: currentSiret } }
+        },
         permissions,
         bsdCurrentTab
       );
