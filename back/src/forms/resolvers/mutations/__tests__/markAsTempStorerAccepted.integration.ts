@@ -166,8 +166,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
     });
 
     const { mutate } = makeClient(user);
-
-    await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
+    const { errors } = await mutate(MARK_AS_TEMP_STORER_ACCEPTED, {
       variables: {
         id: form.id,
         tempStorerAcceptedInfo: {
@@ -175,13 +174,14 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
           wasteRefusalReason: "Thats isn't what I was expecting man !",
           signedBy: "John Doe",
           signedAt: "2018-12-11T00:00:00.000Z",
-          quantityReceived: 0,
-          quantityRefused: 0,
+          quantityReceived: 1,
+          quantityRefused: 1,
           quantityType: "REAL"
         }
       }
     });
 
+    expect(errors).toBeUndefined();
     const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
@@ -327,8 +327,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
             signedAt: "2019-01-18" as any,
             signedBy: "John",
             quantityType: "REAL",
-            quantityReceived: 0,
-            quantityRefused: 0
+            quantityReceived: 1,
+            quantityRefused: 1
           }
         }
       });

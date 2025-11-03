@@ -694,12 +694,16 @@ export const validateDestinationReceptionWeight: (
       return;
     }
 
-    if (
+    const isAcceptedButNoWeight =
       !bsda.destinationReceptionWeight &&
       ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
         bsda.destinationReceptionAcceptationStatus ?? ""
-      )
-    ) {
+      );
+    const isRefusedButZeroWeight =
+      bsda.destinationReceptionWeight === 0 &&
+      bsda.destinationReceptionAcceptationStatus === "REFUSED";
+
+    if (isAcceptedButNoWeight || isRefusedButZeroWeight) {
       addIssue({
         code: z.ZodIssueCode.custom,
         path: ["destination", "reception", "weight"] as EditionRulePath,
