@@ -1635,7 +1635,7 @@ describe("Mutation.Bsda.sign", () => {
       }
     );
 
-    it("should forbid operation signature when weight is 0 ans status is REFUSED", async () => {
+    it("should forbid operation signature when weight is 0 and status is REFUSED", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
       const transporter = await userWithCompanyFactory(UserRole.ADMIN);
