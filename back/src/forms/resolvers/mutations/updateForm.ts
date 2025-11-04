@@ -328,7 +328,6 @@ const updateFormResolver = async (
     existingGroupement &&
     futureForm.emitterType !== existingForm.emitterType
   ) {
-    console.log(futureForm.emitterType, existingForm.emitterType);
     throw new UserInputError(
       "Le type d'émetteur ne peut pas être modifié car le bordereau fait partie d'un groupement."
     );
