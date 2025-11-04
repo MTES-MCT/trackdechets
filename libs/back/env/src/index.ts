@@ -164,7 +164,8 @@ export const schema = z.object({
 
   OVERRIDE_V20241201: z.string().datetime().optional(),
   OVERRIDE_V20250101: z.string().datetime().optional(),
-  OVERRIDE_V20250201: z.string().datetime().optional()
+  OVERRIDE_V20250201: z.string().datetime().optional(),
+  OVERRIDE_V20251101: z.string().datetime().optional()
 });
 
 export const envVariables = schema.superRefine((val, ctx) => {

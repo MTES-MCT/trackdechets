@@ -18,7 +18,7 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
 import { AllBsdaSignatureType } from "../types";
-import { v20250201 } from "../../common/validation";
+import { v20250201, v20251101 } from "../../common/validation";
 import {
   BsdaInput,
   BsdaSignatureType,
@@ -942,6 +942,13 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteConsistenceDescription: {
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: {
+      from: fromWorkOrEmissionWhenThereIsNoWorker,
+      when: bsda =>
+        bsda.wasteConsistence === "OTHER" &&
+        !!bsda.createdAt &&
+        bsda.createdAt.getTime() > v20251101.getTime()
+    },
     readableFieldName: "La description de la consistance",
     path: ["waste", "consistenceDescription"]
   },
