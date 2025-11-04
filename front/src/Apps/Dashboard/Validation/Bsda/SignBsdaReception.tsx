@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
+import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import Input from "@codegouvfr/react-dsfr/Input";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -72,6 +73,7 @@ const schema = z
             }
           ),
           weight: z.coerce.number().positive().nullish(),
+          weightIsEstimate: z.boolean().nullish(),
           refusedWeight: z.coerce.number().nonnegative().nullish(),
           refusalReason: z.string().nullish(),
           date: z.coerce
@@ -215,7 +217,13 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
     }
   ];
 
+  const isEligibleToEstimateWeight = data?.bsda?.packagings?.some(
+    p => p.type === "CONTENEUR_BAG"
+  );
   const receivedWeight = watch("destination.reception.weight");
+  const receivedWeightIsEstimate = watch(
+    "destination.reception.weightIsEstimate"
+  );
   const refusedWeight = watch("destination.reception.refusedWeight");
   const isFormValid = !Object.keys(formState.errors ?? {}).length;
 
@@ -354,7 +362,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 </h4>
                 <div className="fr-grid-row fr-grid-row--top">
                   <div className="fr-grid-row fr-grid-row--gutters fr-mb-0">
-                    <div className="fr-col-12">
+                    <div className="fr-col-6">
                       <NonScrollableInput
                         label="Poids total net en tonnes"
                         state={
@@ -383,8 +391,68 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                         {multiplyByRounded(receivedWeight)} kilos
                       </p>
                     </div>
+                    {isEligibleToEstimateWeight && (
+                      <div className="fr-col-6">
+                        <p className="fr-text fr-mt-1w fr-mb-2w">
+                          Cette quantité est
+                        </p>
+                        <RadioButtons
+                          state={
+                            formState.errors?.destination?.reception
+                              ?.weightIsEstimate && "error"
+                          }
+                          stateRelatedMessage={
+                            (formState.errors?.destination?.reception
+                              ?.weightIsEstimate?.message as string) ?? ""
+                          }
+                          options={[
+                            {
+                              label: "réelle",
+                              nativeInputProps: {
+                                onChange: () =>
+                                  setValue(
+                                    "destination.reception.weightIsEstimate",
+                                    false
+                                  ),
+
+                                checked: receivedWeightIsEstimate == false
+                              }
+                            },
+                            {
+                              label: "estimée",
+                              nativeInputProps: {
+                                onChange: () =>
+                                  setValue(
+                                    "destination.reception.weightIsEstimate",
+                                    true
+                                  ),
+                                checked: receivedWeightIsEstimate === true
+                              }
+                            }
+                          ]}
+                          className="fr-mb-1w"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
+
+                {receivedWeightIsEstimate && (
+                  <div>
+                    <Alert
+                      severity="warning"
+                      title="Code d'opération & poids receptionné estimé"
+                      description={
+                        <>
+                          Il est permis de renseigner un poids estimé uniquement
+                          dans le cas d'un conteneur-bag et d'une installation
+                          intermédiaire. L'exutoire final devra renseigner un
+                          poids réel.
+                        </>
+                      }
+                    />
+                  </div>
+                )}
 
                 {[
                   WasteAcceptationStatus.Accepted,

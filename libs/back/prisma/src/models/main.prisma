@@ -1777,6 +1777,7 @@ model Bsda {
   destinationPlannedOperationCode                         String?
   destinationReceptionDate                                DateTime?               @db.Timestamptz(6)
   destinationReceptionWeight                              Decimal?                @db.Decimal(65, 30)
+  destinationReceptionWeightIsEstimate                    Boolean?
   destinationReceptionRefusedWeight                       Decimal?                @db.Decimal(65, 30)
   destinationReceptionAcceptationStatus                   WasteAcceptationStatus?
   destinationReceptionRefusalReason                       String?

@@ -711,6 +711,18 @@ export const validateDestinationReceptionWeight: (
         fatal: true
       });
     }
+
+    const packagingTypes = bsda.packagings?.map(p => p.type);
+    if (
+      bsda.destinationReceptionWeightIsEstimate &&
+      packagingTypes.every(t => t !== "CONTENEUR_BAG")
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le poids du déchet reçu ne peut pas être estimé si au moins un des contenants n'est pas un conteneur-bag.`,
+        fatal: true
+      });
+    }
   };
 };
 
@@ -864,6 +876,20 @@ export const validateReceptionOperationCode: (
         code: z.ZodIssueCode.custom,
         message: "Vous ne pouvez pas renseigner un code de traitement final",
         path: ["destination", "operation", "code"] as EditionRulePath
+      });
+    }
+
+    const estimateReceptionPossibleCodes = ["R 13", "D 15"];
+    if (
+      bsda.destinationReceptionWeightIsEstimate &&
+      destinationOperationCode &&
+      !estimateReceptionPossibleCodes.includes(destinationOperationCode)
+    ) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "Le poids de reception est indiqué comme estimé. La destination est obligatoirement un TTR et le code d'opération doit être R13 ou D15",
+        path: ["destination", "operation", "code"]
       });
     }
 
