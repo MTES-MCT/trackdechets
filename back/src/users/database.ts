@@ -8,7 +8,7 @@ import { User, UserRole, Prisma, Company, UserAccountHash } from "@td/prisma";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserRoles } from "../common/redis/users";
-import { hashPassword, passwordVersion } from "./utils";
+import { hashPassword } from "./utils";
 import { UserInputError } from "../common/errors";
 import { PrismaTransaction } from "../common/repository/types";
 import { getDefaultNotifications } from "./notifications";
@@ -241,16 +241,14 @@ export async function getMembershipRequestOrNotFoundError(
 export async function createUser({
   data
 }: {
-  data: Omit<Prisma.UserCreateInput, "passwordVersion">;
+  data: Omit<Prisma.UserCreateInput, "passwordUpdatedAt">;
 }): Promise<User> {
   const user = await prisma.user.create({
-    data: {
-      ...data,
-      passwordVersion
-    }
+    data
   });
   return user;
 }
+
 export async function updateUserPassword({
   userId,
   trimmedPassword
@@ -262,7 +260,7 @@ export async function updateUserPassword({
 
   return prisma.user.update({
     where: { id: userId },
-    data: { password: hashedPassword, passwordVersion }
+    data: { password: hashedPassword, passwordUpdatedAt: new Date() }
   });
 }
 

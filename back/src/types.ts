@@ -113,6 +113,8 @@ declare module "express-session" {
     warningMessage?: string;
     impersonatedUserId?: string;
     impersonationStartsAt?: number;
+    issuedAt?: string;
+    passport?: { user: string };
   }
 }
 

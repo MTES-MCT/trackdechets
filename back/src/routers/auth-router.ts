@@ -5,7 +5,6 @@ import { prisma } from "@td/prisma";
 import { z } from "zod";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
-import { storeUserSessionsId } from "../common/redis/users";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 import { getSafeReturnTo } from "../common/helpers";
 
@@ -53,7 +52,7 @@ authRouter.post(
         );
       }
       req.logIn(user, () => {
-        storeUserSessionsId(user.id, req.session.id);
+        req.session.issuedAt = new Date().toISOString();
         const returnTo = getSafeReturnTo(req.body.returnTo, UI_BASE_URL);
         return res.redirect(`${UI_BASE_URL}${returnTo}`);
       });
@@ -87,7 +86,7 @@ authRouter.post("/otp", (req, res, next) => {
       );
     }
     req.logIn(user, () => {
-      storeUserSessionsId(user.id, req.session.id);
+      req.session.issuedAt = new Date().toISOString();
       const returnTo = getSafeReturnTo(req.body.returnTo, UI_BASE_URL);
       return res.redirect(`${UI_BASE_URL}${returnTo}`);
     });

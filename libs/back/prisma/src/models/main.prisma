@@ -905,7 +905,7 @@ model User {
   id                   String             @id @default(cuid()) @db.VarChar(30)
   email                String             @unique(map: "User.email_unique")
   password             String
-  passwordVersion      Int?
+  passwordUpdatedAt    DateTime?          @default(now()) @db.Timestamptz(6)
   name                 String
   phone                String?
   createdAt            DateTime           @default(now()) @db.Timestamptz(6)

@@ -29,6 +29,7 @@ export function gqlRegenerateSessionPlugin(
             if (names.includes(queryKey)) {
               const { req, res } = requestContext.contextValue;
               const currentSession = req.session;
+              currentSession.issuedAt = new Date().toISOString();
 
               return new Promise<void>(resolve =>
                 req.session.regenerate(regenerateError => {
