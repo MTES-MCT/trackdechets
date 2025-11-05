@@ -56,6 +56,37 @@ export const BsdaTransporterFragment = gql`
   }
 `;
 
+export const BsvhuTransporterFragment = gql`
+  fragment BsvhuTransporterFragment on BsvhuTransporter {
+    id
+    company {
+      name
+      orgId
+      siret
+      address
+      country
+      contact
+      phone
+      mail
+      vatNumber
+      omiNumber
+    }
+    recepisse {
+      isExempted
+      number
+      validityLimit
+      department
+    }
+    transport {
+      mode
+      plates
+      signature {
+        date
+      }
+    }
+  }
+`;
+
 export const CREATE_BSDA_TRANSPORTER = gql`
   mutation CreateBsdaTransporter($input: BsdaTransporterInput!) {
     createBsdaTransporter(input: $input) {
@@ -77,6 +108,30 @@ export const UPDATE_BSDA_TRANSPORTER = gql`
 export const DELETE_BSDA_TRANSPORTER = gql`
   mutation DeleteBsdaTransporter($id: ID!) {
     deleteBsdaTransporter(id: $id)
+  }
+`;
+
+export const CREATE_BSVHU_TRANSPORTER = gql`
+  mutation CreateBsvhuTransporter($input: BsvhuTransporterInput!) {
+    createBsvhuTransporter(input: $input) {
+      ...BsvhuTransporterFragment
+    }
+  }
+  ${BsvhuTransporterFragment}
+`;
+
+export const UPDATE_BSVHU_TRANSPORTER = gql`
+  mutation UpdateBsvhuTransporter($id: ID!, $input: BsvhuTransporterInput!) {
+    updateBsvhuTransporter(id: $id, input: $input) {
+      ...BsvhuTransporterFragment
+    }
+  }
+  ${BsvhuTransporterFragment}
+`;
+
+export const DELETE_BSVHU_TRANSPORTER = gql`
+  mutation DeleteBsvhuTransporter($id: ID!) {
+    deleteBsvhuTransporter(id: $id)
   }
 `;
 

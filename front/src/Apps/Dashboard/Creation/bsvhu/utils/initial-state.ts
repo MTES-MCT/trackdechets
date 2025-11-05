@@ -2,6 +2,7 @@
 
 import {
   BsvhuCompanyInput,
+  BsvhuTransporterInput,
   TransportMode,
   WasteVehiclesType
 } from "@td/codegen-ui";
@@ -70,22 +71,16 @@ export default {
     value: null,
     isEstimate: false
   },
-  transporter: {
-    company: {
-      ...getInitialCompany()
-    },
-    recepisse: {
-      isExempted: false
-    },
-    transport: {
-      mode: TransportMode.Road,
-      plates: [],
-      signature: {
-        author: null,
-        takenOverAt: null
-      }
+  transporters: [
+    {
+      transport: {
+        mode: TransportMode.Road,
+        plates: []
+      },
+      recepisse: { isExempted: false },
+      company: getInitialCompany()
     }
-  },
+  ],
   ecoOrganisme: {
     name: "",
     siret: ""
@@ -98,4 +93,14 @@ export default {
   },
   intermediaries: [getInitialCompany()],
   containsElectricOrHybridVehicles: null
+};
+
+// Les données transporteurs du formulaire représente soit un transporteur BSVHU
+// déjà crée en base de données qui dispose d'un identifiant, soit un transporteur
+// non encore crée en base ne disposant pas encore d'identifiant. Par ailleurs on a
+// besoin de connaitre la valeur de `takenOverAt` pour l'affichage des infos transporteur
+// en mode formulaire ou statique dans la liste.
+export type CreateOrUpdateBsvhuTransporterInput = BsvhuTransporterInput & {
+  id?: string | null;
+  takenOverAt?: string | null;
 };
