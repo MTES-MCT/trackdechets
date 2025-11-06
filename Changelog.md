@@ -5,7 +5,13 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2025.10.1] 21/10/2025
+# [2025.11.1] 21/10/2025
+
+#### :bug: Corrections de bugs
+
+- Corrige l'affichage du bouton "Signer le traitement" pour les acteurs non concernés du bsda/bsvhu [PR 4505](https://github.com/MTES-MCT/trackdechets/pull/4505)
+
+# [2025.10.1] 18/11/2025
 
 #### :nail_care: Améliorations
 
