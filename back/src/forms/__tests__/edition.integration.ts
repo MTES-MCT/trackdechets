@@ -90,7 +90,7 @@ describe("checkEditionRules", () => {
         numberOfPackages: 50,
         quantity: 200,
         quantityType: "ESTIMATED",
-        consistence: "DOUGHY",
+        consistences: ["DOUGHY"],
         pop: !form.wasteDetailsPop,
         isDangerous: !form.wasteDetailsIsDangerous,
         parcelNumbers: [

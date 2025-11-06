@@ -170,7 +170,7 @@ describe("Query.bsds workflow", () => {
           isSubjectToADR: false,
           onuCode: null,
           name: "Stylos bille",
-          consistence: "SOLID",
+          consistences: ["SOLID"],
           packagingInfos: [
             {
               type: "BENNE",

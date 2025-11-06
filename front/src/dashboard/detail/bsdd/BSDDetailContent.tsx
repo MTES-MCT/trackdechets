@@ -813,7 +813,7 @@ export default function BSDDetailContent({
                 />
               )}
               <dt>Consistance</dt>{" "}
-              <dd>{getConsistenceLabel(form.wasteDetails?.consistence)}</dd>
+              <dd>{getConsistenceLabel(form.wasteDetails?.consistences)}</dd>
               <DetailRow
                 value={form.wasteDetails?.parcelNumbers
                   ?.map(

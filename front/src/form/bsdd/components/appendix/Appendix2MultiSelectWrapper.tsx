@@ -28,7 +28,7 @@ const APPENDIX2_FORMS = gql`
         code
         name
         quantity
-        consistence
+        consistences
         packagingInfos {
           type
           other
@@ -87,8 +87,8 @@ function Appendix2MultiSelectWrapper({
   );
 
   const updateConsistence = useCallback(
-    (consistence: Consistence) =>
-      setFieldValue("wasteDetails.consistence", consistence),
+    (consistences: Consistence[]) =>
+      setFieldValue("wasteDetails.consistences", consistences),
     [setFieldValue]
   );
 
