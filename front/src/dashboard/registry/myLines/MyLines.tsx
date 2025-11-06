@@ -156,19 +156,27 @@ export function MyLines() {
   const tableData = lookupNodes?.map(lookup => {
     let companyText = lookup.reportAsSiret ?? lookup.siret;
     let canEdit = false;
+
     if (lookup.reportAs) {
       companyText = `${lookup.reportAs.givenName ?? lookup.reportAs.name} - ${
         lookup.reportAs.siret
       }`;
-      const permissions = lookup.reportAs.userPermissions;
-      canEdit = permissions.includes(UserPermission.RegistryCanImport);
     } else if (lookup.reportFor) {
       companyText = `${lookup.reportFor.givenName ?? lookup.reportFor.name} - ${
         lookup.reportFor.siret
       }`;
-      const permissions = lookup.reportFor.userPermissions;
-      canEdit = permissions.includes(UserPermission.RegistryCanImport);
     }
+
+    const reportAsPermissions = lookup.reportAs?.userPermissions;
+    const reportForPermissions = lookup.reportFor?.userPermissions;
+
+    if (
+      reportAsPermissions?.includes(UserPermission.RegistryCanImport) ||
+      reportForPermissions?.includes(UserPermission.RegistryCanImport)
+    ) {
+      canEdit = true;
+    }
+
     return [
       format(new Date(lookup.declaredAt), "dd/MM/yyyy HH'h'mm"),
       TYPES[lookup.type],
