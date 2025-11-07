@@ -2,7 +2,8 @@ import type {
   BsvhuError,
   BsvhuMetadataFields,
   BsvhuMetadata,
-  BsvhuMetadataResolvers
+  BsvhuMetadataResolvers,
+  SignatureTypeInput
 } from "@td/codegen-back";
 import { parseBsvhu } from "../validation";
 import {
@@ -13,6 +14,17 @@ import {
 } from "../validation/helpers";
 import { ZodIssue } from "zod";
 import { getRequiredAndSealedFieldPaths } from "../validation/rules";
+import { AllBsvhuSignatureType } from "../types";
+
+function getNextSignatureForErrors(
+  nextSignatureType: AllBsvhuSignatureType | undefined
+): SignatureTypeInput | undefined {
+  return nextSignatureType
+    ? nextSignatureType.startsWith("TRANSPORT")
+      ? "TRANSPORT"
+      : (nextSignatureType as SignatureTypeInput)
+    : undefined;
+}
 
 const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
   errors: async (
@@ -24,7 +36,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     const zodBsvhu = prismaToZodBsvhu(bsvhu);
     const currentSignature = getCurrentSignatureType(zodBsvhu);
     const nextSignature = getNextSignatureType(currentSignature);
-
+    const nextSignatureForErrors = getNextSignatureForErrors(nextSignature);
     try {
       parseBsvhu(zodBsvhu, {
         currentSignatureType: nextSignature
@@ -36,7 +48,7 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
           return {
             message: e.message,
             path: e.path,
-            requiredFor: nextSignature
+            requiredFor: nextSignatureForErrors
           };
         }) ?? []
       );
