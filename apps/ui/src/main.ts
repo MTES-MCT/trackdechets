@@ -1,4 +1,3 @@
-import compression from "compression";
 import express from "express";
 import helmet from "helmet";
 import fetch from "node-fetch";
@@ -78,8 +77,6 @@ app.use(
     }
   })
 );
-
-app.use(compression());
 
 const pathToIndex = path.join(directory, "index.html");
 
