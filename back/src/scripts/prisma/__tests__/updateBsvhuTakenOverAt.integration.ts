@@ -16,7 +16,12 @@ describe("updateBsvhuTakenOverAt", () => {
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2023-01-22"),
-        transporterTransportTakenOverAt: new Date("2023-01-21")
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportTakenOverAt: new Date("2023-01-21")
+          }
+        }
       }
     });
 
@@ -25,7 +30,12 @@ describe("updateBsvhuTakenOverAt", () => {
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2023-01-21"),
-        transporterTransportTakenOverAt: new Date("2023-01-22")
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportTakenOverAt: new Date("2023-01-22")
+          }
+        }
       }
     });
 
@@ -34,7 +44,12 @@ describe("updateBsvhuTakenOverAt", () => {
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2022-12-01"),
-        transporterTransportTakenOverAt: new Date("2022-11-29")
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportTakenOverAt: new Date("2022-11-29")
+          }
+        }
       }
     });
 
@@ -45,28 +60,31 @@ describe("updateBsvhuTakenOverAt", () => {
     expect(count).toEqual(1);
 
     const updatedBsvhu1 = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu1.id }
+      where: { id: bsvhu1.id },
+      include: { transporters: true }
     });
 
-    expect(updatedBsvhu1.transporterTransportTakenOverAt).toEqual(
-      updatedBsvhu1.emitterEmissionSignatureDate
-    );
+    expect(
+      updatedBsvhu1.transporters[0].transporterTransportTakenOverAt
+    ).toEqual(updatedBsvhu1.emitterEmissionSignatureDate);
 
     const updatedBsvhu2 = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu2.id }
+      where: { id: bsvhu2.id },
+      include: { transporters: true }
     });
 
-    expect(updatedBsvhu2.transporterTransportTakenOverAt).not.toEqual(
-      updatedBsvhu2.emitterEmissionSignatureDate
-    );
+    expect(
+      updatedBsvhu2.transporters[0].transporterTransportTakenOverAt
+    ).not.toEqual(updatedBsvhu2.emitterEmissionSignatureDate);
 
     const updatedBsvhu3 = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: bsvhu3.id }
+      where: { id: bsvhu3.id },
+      include: { transporters: true }
     });
 
-    expect(updatedBsvhu3.transporterTransportTakenOverAt).not.toEqual(
-      updatedBsvhu3.emitterEmissionSignatureDate
-    );
+    expect(
+      updatedBsvhu3.transporters[0].transporterTransportTakenOverAt
+    ).not.toEqual(updatedBsvhu3.emitterEmissionSignatureDate);
 
     const events = await getStream(bsvhu1.id);
 

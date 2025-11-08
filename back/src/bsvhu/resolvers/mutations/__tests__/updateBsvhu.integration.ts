@@ -186,7 +186,12 @@ describe("Mutation.Vhu.update", () => {
         isDraft: true,
         status: "INITIAL",
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company2.siret
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company2.siret
+          }
+        }
       }
     });
     const { mutate } = makeClient(user2);
@@ -342,7 +347,12 @@ describe("Mutation.Vhu.update", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -383,7 +393,12 @@ describe("Mutation.Vhu.update", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -419,10 +434,15 @@ describe("Mutation.Vhu.update", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
         emitterEmissionSignatureDate: new Date(),
-        transporterCompanySiret: company.siret,
-        transporterRecepisseNumber: "xyz",
-        transporterRecepisseDepartment: "13",
-        transporterRecepisseValidityLimit: new Date()
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company.siret,
+            transporterRecepisseNumber: "xyz",
+            transporterRecepisseDepartment: "13",
+            transporterRecepisseValidityLimit: new Date()
+          }
+        }
       }
     });
 
@@ -496,8 +516,13 @@ describe("Mutation.Vhu.update", () => {
     const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        transporterTransportSignatureDate: new Date(),
-        transporterTransportPlates: ["XY-23-TR"],
+        transporters: {
+          create: {
+            number: 1,
+            transporterTransportSignatureDate: new Date(),
+            transporterTransportPlates: ["XY-23-TR"]
+          }
+        },
         intermediaries: {
           create: {
             siret: company.siret!,

@@ -153,7 +153,6 @@ describe("mutation.duplicateBsvhu", () => {
         emitterEmissionSignatureDate: new Date(),
         emitterEmissionSignatureAuthor: "John",
         transporterTransportSignatureDate: new Date(),
-        transporterTransportSignatureAuthor: "John",
         destinationReceptionSignatureDate: new Date(),
         destinationReceptionSignatureAuthor: "John",
         destinationReceptionDate: new Date(),
@@ -470,7 +469,6 @@ describe("mutation.duplicateBsvhu", () => {
     expect(duplicatedBsvhu.destinationOperationSignatureDate).toBeNull();
     expect(duplicatedBsvhu.destinationOperationSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.transporterTransportSignatureDate).toBeNull();
-    expect(duplicatedBsvhu.transporterTransportSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionSignatureAuthor).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionSignatureDate).toBeNull();
     expect(duplicatedBsvhu.destinationReceptionDate).toBeNull();
@@ -507,11 +505,18 @@ describe("mutation.duplicateBsvhu", () => {
       }
     );
     const duplicateBsvhu = await prisma.bsvhu.findUniqueOrThrow({
-      where: { id: data.duplicateBsvhu.id }
+      where: { id: data.duplicateBsvhu.id },
+      include: { transporters: true }
     });
-    expect(duplicateBsvhu?.transporterRecepisseDepartment).toBeNull();
-    expect(duplicateBsvhu?.transporterRecepisseValidityLimit).toBeNull();
-    expect(duplicateBsvhu?.transporterRecepisseNumber).toBeNull();
+    expect(
+      duplicateBsvhu?.transporters[0].transporterRecepisseDepartment
+    ).toBeNull();
+    expect(
+      duplicateBsvhu?.transporters[0].transporterRecepisseValidityLimit
+    ).toBeNull();
+    expect(
+      duplicateBsvhu?.transporters[0].transporterRecepisseNumber
+    ).toBeNull();
   });
 
   it("should duplicate transporter receipt when it was emptied info", async () => {
