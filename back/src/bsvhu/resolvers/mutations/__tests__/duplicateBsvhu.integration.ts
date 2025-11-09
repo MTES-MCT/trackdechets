@@ -332,25 +332,7 @@ describe("mutation.duplicateBsvhu", () => {
       "intermediaries",
       "intermediariesOrgIds",
       "canAccessDraftOrgIds",
-      "transporters",
-
-      // temporary, we will remove those properties later, they are only here to avoid breaking the test
-      "transporterCompanyAddress",
-      "transporterCompanyContact",
-      "transporterCompanyMail",
-      "transporterCompanyName",
-      "transporterCompanyPhone",
-      "transporterCompanySiret",
-      "transporterCompanyVatNumber",
-      "transporterCustomInfo",
-      "transporterRecepisseDepartment",
-      "transporterRecepisseIsExempted",
-      "transporterRecepisseNumber",
-      "transporterRecepisseValidityLimit",
-      "transporterTransportMode",
-      "transporterTransportPlates",
-      "transporterTransportSignatureAuthor",
-      "transporterTransportTakenOverAt"
+      "transporters"
     ];
 
     const expectedSkippedTransporter = [
