@@ -37,14 +37,18 @@ const EcoOrganismesPartnersForm = ({
   const options = useMemo(() => {
     if (!data?.ecoOrganismes) return [];
 
-    return data.ecoOrganismes.map(
-      (eo: { id: string; name: string; siret: string }) => ({
+    return [...data.ecoOrganismes]
+      .sort((a: { name: string }, b: { name: string }) => {
+        if (a.name === "RECYCLER MON VEHICULE") return -1;
+        if (b.name === "RECYCLER MON VEHICULE") return 1;
+        return 0;
+      })
+      .map((eo: { id: string; name: string; siret: string }) => ({
         label: `${eo.name} (${
           eo.name === "RECYCLER MON VEHICULE" ? "SI" : "ÉO"
         })`,
         value: eo.id
-      })
-    );
+      }));
   }, [data]);
 
   const selectedOptions = useMemo(() => {
