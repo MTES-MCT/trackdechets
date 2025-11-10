@@ -6,7 +6,7 @@ import type {
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { AdminRequestStatus, UserRole } from "@prisma/client";
+import { AdminRequestStatus, UserRole } from "@td/prisma";
 import { parseAcceptAdminRequestInput } from "../../validation";
 import { UserInputError } from "../../../common/errors";
 import { getAdminRequestRepository } from "../../repository";

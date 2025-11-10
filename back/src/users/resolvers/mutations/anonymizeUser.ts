@@ -3,7 +3,6 @@ import type { MutationResolvers } from "@td/codegen-back";
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { hashPassword } from "../../utils";
-import { clearUserSessions } from "../../clearUserSessions";
 import { getUid } from "../../../utils";
 import { UserInputError } from "../../../common/errors";
 import {
@@ -57,10 +56,10 @@ async function anonymizeUserFn(userId: string): Promise<string> {
           name: uuid,
           isActive: false,
           phone: "00000000",
-          password: await hashPassword(getUid(16))
+          password: await hashPassword(getUid(16)),
+          passwordUpdatedAt: new Date()
         }
       });
-      await clearUserSessions(user.id);
     });
 
     return anonEmail;

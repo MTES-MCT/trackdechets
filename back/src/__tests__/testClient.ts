@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { server, getServerDataloaders } from "../server";
 import { DocumentNode, print } from "graphql";
 import { AuthType } from "../auth/auth";

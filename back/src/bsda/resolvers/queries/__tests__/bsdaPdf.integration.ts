@@ -8,7 +8,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdaFactory } from "../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
-import { GovernmentPermission } from "@prisma/client";
+import { GovernmentPermission } from "@td/prisma";
 import supertest from "supertest";
 import { faker } from "@faker-js/faker";
 import { app } from "../../../../server";

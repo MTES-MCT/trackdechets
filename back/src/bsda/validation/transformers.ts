@@ -9,7 +9,7 @@ import { ParsedZodBsda } from "./schema";
 import { sirenifyBsda } from "./sirenify";
 import { recipifyBsda } from "./recipify";
 import { getSealedFields } from "./rules";
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import { trim } from "../../common/strings";
 
 export const runTransformers = async (

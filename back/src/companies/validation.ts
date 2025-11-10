@@ -4,7 +4,7 @@ import {
   CompanyType,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   cleanClue,
   isForeignVat,

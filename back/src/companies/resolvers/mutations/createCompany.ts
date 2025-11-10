@@ -7,7 +7,7 @@ import {
   UserRole,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { sendMail } from "../../../mailer/mailing";
@@ -206,25 +206,41 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const notifications = getDefaultNotifications(UserRole.ADMIN);
-  const companyAssociation = await prisma.companyAssociation.create({
-    data: {
-      user: { connect: { id: user.id } },
-      company: {
-        create: companyCreateInput
+
+  const companyAssociation = await prisma.$transaction(async tx => {
+    const companyAssociation = await tx.companyAssociation.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: {
+          create: companyCreateInput
+        },
+        role: UserRole.ADMIN,
+        ...notifications
       },
-      role: UserRole.ADMIN,
-      ...notifications
-    },
-    include: { company: true }
+      include: { company: true }
+    });
+
+    await tx.event.create({
+      data: {
+        streamId: companyCreateInput.orgId, // Use the orgId and not the company id to have a consistent streamId even if the company is deleted
+        actor: user.id,
+        type: "CompanyCreated",
+        data: { content: companyCreateInput } as Prisma.InputJsonObject,
+        metadata: { authType: user.auth }
+      }
+    });
+
+    // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
+    await tx.user.updateMany({
+      where: { id: user.id, firstAssociationDate: null },
+      data: { firstAssociationDate: new Date() }
+    });
+
+    return companyAssociation;
   });
+
   await deleteCachedUserRoles(user.id);
   let company = companyAssociation.company;
-
-  // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
-  await prisma.user.updateMany({
-    where: { id: user.id, firstAssociationDate: null },
-    data: { firstAssociationDate: new Date() }
-  });
 
   // Company needs to be verified
   if (process.env.VERIFY_COMPANY === "true") {

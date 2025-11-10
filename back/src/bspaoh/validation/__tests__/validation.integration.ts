@@ -1,4 +1,4 @@
-import { UserRole, BspaohStatus } from "@prisma/client";
+import { UserRole, BspaohStatus } from "@td/prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   companyFactory,

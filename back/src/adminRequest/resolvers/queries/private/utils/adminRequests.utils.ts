@@ -3,7 +3,7 @@ import {
   getConnection,
   getPrismaPaginationArgs
 } from "../../../../../common/pagination";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 interface Args {
   skip?: number | null | undefined;

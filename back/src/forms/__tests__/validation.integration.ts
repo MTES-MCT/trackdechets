@@ -5,7 +5,7 @@ import {
   OperationMode,
   TransportMode,
   WasteProcessorType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   draftFormSchema,
   sealedFormSchema,

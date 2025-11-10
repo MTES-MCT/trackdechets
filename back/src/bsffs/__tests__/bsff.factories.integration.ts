@@ -3,7 +3,7 @@ import {
   userWithCompanyFactory,
   companyAssociatedToExistingUserFactory
 } from "../../__tests__/factories";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { createBsff } from "./factories";
 
 describe("Bsff factories", () => {

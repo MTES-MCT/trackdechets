@@ -4,7 +4,7 @@ import {
   BsffFicheIntervention,
   BsffStatus,
   BsffTransporter
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   BsffFicheInterventionInput,
   BsffInput,

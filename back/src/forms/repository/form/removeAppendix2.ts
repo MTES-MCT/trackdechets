@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import buildFindGroupedFormsById from "./findGroupedFormsById";
 import buildFindUniqueForm from "./findUnique";

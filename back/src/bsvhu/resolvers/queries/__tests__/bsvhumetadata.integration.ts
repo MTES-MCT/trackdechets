@@ -1,4 +1,4 @@
-import { UserRole, BsvhuStatus } from "@prisma/client";
+import { UserRole, BsvhuStatus } from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Query } from "@td/codegen-back";

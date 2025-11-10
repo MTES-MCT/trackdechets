@@ -1,6 +1,6 @@
 import { Machine } from "xstate";
 import { BsdasriEvent } from "./types";
-import { WasteAcceptationStatus, BsdasriStatus } from "@prisma/client";
+import { WasteAcceptationStatus, BsdasriStatus } from "@td/prisma";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "@td/constants";
 
 /**

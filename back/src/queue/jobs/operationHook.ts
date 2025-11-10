@@ -3,7 +3,7 @@ import { operationHookFn as formOperationHookFn } from "../../forms/operationHoo
 import { operationHookFn as bsdaOperationHookFn } from "../../bsda/operationHook";
 import { operationHookFn as bsffOperationHookFn } from "../../bsffs/operationHook";
 import { operationHookFn as bsdasriOperationHookFn } from "../../bsdasris/operationHook";
-import { BsdType } from "@prisma/client";
+import { BsdType } from "@td/prisma";
 
 export type OperationHookJobArgs = {
   bsdType: BsdType;

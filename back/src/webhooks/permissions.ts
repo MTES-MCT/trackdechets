@@ -1,4 +1,4 @@
-import { User, WebhookSetting } from "@prisma/client";
+import { User, WebhookSetting } from "@td/prisma";
 
 import { getUserWebhookCompanyOrgIds } from "./database";
 

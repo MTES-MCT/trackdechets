@@ -1,4 +1,4 @@
-import { BsdasriStatus } from "@prisma/client";
+import { BsdasriStatus } from "@td/prisma";
 import type { BsdasriWhere } from "@td/codegen-back";
 import { toPrismaWhereInput } from "../where";
 

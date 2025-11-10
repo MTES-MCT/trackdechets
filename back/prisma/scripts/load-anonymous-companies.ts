@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { Updater, registerUpdater } from "./helper/helper";
 import { prisma } from "@td/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 @registerUpdater(
   "Load anonymous companies",

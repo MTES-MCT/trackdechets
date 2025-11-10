@@ -1,4 +1,4 @@
-import { Bsdasri } from "@prisma/client";
+import { Bsdasri } from "@td/prisma";
 import type {
   BsdasriMetadata,
   BsdasriMetadataResolvers

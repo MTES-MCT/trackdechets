@@ -1,4 +1,4 @@
-import * as Prisma from "@prisma/client";
+import * as Prisma from "@td/prisma";
 import {
   nullIfNoValues,
   safeInput,
@@ -8,7 +8,7 @@ import {
   processDecimal
 } from "../common/converter";
 import * as GraphQL from "@td/codegen-back";
-import { BsffPackaging, BsffPackagingType } from "@prisma/client";
+import { BsffPackaging, BsffPackagingType } from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsffForElastic } from "./elastic";
 import { getFirstTransporterSync } from "./database";

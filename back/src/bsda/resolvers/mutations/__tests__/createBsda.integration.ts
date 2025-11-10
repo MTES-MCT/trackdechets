@@ -10,7 +10,7 @@ import {
   ecoOrganismeFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsdaStatus, Company, EcoOrganisme, User } from "@prisma/client";
+import { BsdaStatus, Company, EcoOrganisme, User } from "@td/prisma";
 import { bsdaFactory } from "../../../__tests__/factories";
 import { prisma } from "@td/prisma";
 import { gql } from "graphql-tag";

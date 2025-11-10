@@ -11,7 +11,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, storeRedisCompanyInfo } from "../../../__tests__/helpers";
 import type { Query } from "@td/codegen-back";
-import { StatusLog } from "@prisma/client";
+import { StatusLog } from "@td/prisma";
 
 // No mails
 jest.mock("../../../../mailer/mailing");

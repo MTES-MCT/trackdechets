@@ -1,4 +1,4 @@
-import { TransportMode } from "@prisma/client";
+import { TransportMode } from "@td/prisma";
 import {
   getBsffUserFunctions,
   getCurrentSignatureType,

@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { GovernmentPermission } from "@prisma/client";
+import { GovernmentPermission } from "@td/prisma";
 import { NotLoggedIn } from "../common/errors";
 
 export async function hasGovernmentPerm(

@@ -6,7 +6,7 @@ import {
   Bsvhu,
   TransportMode,
   Bsdasri
-} from "@prisma/client";
+} from "@td/prisma";
 import { BsffForBuildPdf } from "../../../bsffs/pdf/generator";
 import { BsdaForPDF } from "../../../bsda/pdf/generator";
 import { Decimal } from "decimal.js";

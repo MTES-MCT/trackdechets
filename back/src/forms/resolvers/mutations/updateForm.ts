@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@td/prisma";
 import { isDangerous, BSDD_WASTE_CODES } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type {
@@ -316,6 +316,21 @@ const updateFormResolver = async (
         skipDuplicates: true
       }
     };
+  }
+
+  // If a form is part of a groupement, its emitterType cannot be changed
+  // This checks the children, validateGroupement() below checks the parent
+  const existingGroupement = await prisma.formGroupement.findFirst({
+    where: { initialFormId: existingForm.id }
+  });
+
+  if (
+    existingGroupement &&
+    futureForm.emitterType !== existingForm.emitterType
+  ) {
+    throw new UserInputError(
+      "Le type d'émetteur ne peut pas être modifié car le bordereau fait partie d'un groupement."
+    );
   }
 
   const existingFormFractions = await prisma.form

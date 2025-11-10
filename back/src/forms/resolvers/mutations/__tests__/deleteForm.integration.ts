@@ -9,7 +9,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
-import { Status } from "@prisma/client";
+import { Status } from "@td/prisma";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
 import { waitForJobsCompletion } from "../../../../queue/helpers";
 

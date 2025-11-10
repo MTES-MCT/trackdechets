@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { UserInCompany } from "./types";
 import * as Excel from "exceljs";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 
 type Column = {
   field: keyof UserInCompany;

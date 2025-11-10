@@ -1,4 +1,4 @@
-import { BspaohStatus, UserRole, WasteAcceptationStatus } from "@prisma/client";
+import { BspaohStatus, UserRole, WasteAcceptationStatus } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import type { Mutation, MutationSignBspaohArgs } from "@td/codegen-back";

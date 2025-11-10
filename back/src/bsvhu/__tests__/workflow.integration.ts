@@ -1,5 +1,5 @@
 import supertest from "supertest";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { app } from "../../server";
 import { createAccessToken } from "../../users/database";

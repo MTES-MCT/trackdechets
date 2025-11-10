@@ -8,6 +8,7 @@ import { siretify } from "../../../../__tests__/factories";
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     company: {
       findUnique: jest.fn((...args) => companyMock(...args)),

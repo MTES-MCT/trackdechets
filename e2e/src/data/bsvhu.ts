@@ -1,4 +1,4 @@
-import { Company, Prisma, BsvhuStatus } from "@prisma/client";
+import { Company, Prisma, BsvhuStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getReadableId, reindex, ReadableIdPrefix } from "back";
 

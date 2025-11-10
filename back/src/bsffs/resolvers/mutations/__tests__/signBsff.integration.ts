@@ -6,7 +6,7 @@ import {
   TransportMode,
   UserRole,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type {

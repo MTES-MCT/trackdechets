@@ -1,4 +1,4 @@
-import { Prisma, RegistryDelegation } from "@prisma/client";
+import { Prisma, RegistryDelegation } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindFirstRegistryDelegationFn = (

@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import type { CompanySearchResult, Mutation } from "@td/codegen-back";
 import { gql } from "graphql-tag";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { xDaysAgo } from "../../../../utils";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -267,6 +267,7 @@ describe("Mutation.Bsda.duplicate", () => {
       "workerWorkSignatureDate",
       "destinationCustomInfo",
       "destinationReceptionWeight",
+      "destinationReceptionWeightIsEstimate",
       "destinationReceptionRefusedWeight",
       "destinationReceptionDate",
       "destinationReceptionAcceptationStatus",

@@ -1,6 +1,8 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["metrics"]
+  provider        = "prisma-client"
+  output          = "./generated/prisma"
+  previewFeatures = []
+  engineType      = "client"
 }
 
 datasource db {

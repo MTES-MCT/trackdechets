@@ -3,7 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { registryDelegationFactory } from "../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type { Query } from "@td/codegen-back";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { userFactory } from "../../../../__tests__/factories";
 
 const REGISTRY_DELEGATION = gql`

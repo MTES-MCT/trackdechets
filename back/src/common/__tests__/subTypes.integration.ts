@@ -1,4 +1,4 @@
-import { BsdasriType, BsdaType, BsffType } from "@prisma/client";
+import { BsdasriType, BsdaType, BsffType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { bsdaFactory } from "../../bsda/__tests__/factories";

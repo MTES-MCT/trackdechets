@@ -1,4 +1,4 @@
-import { EmitterType, Form, Status } from "@prisma/client";
+import { EmitterType, Form, Status } from "@td/prisma";
 import { yourCompanyIsIdentifiedOnABsd, renderMail } from "@td/mail";
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../../common/errors";

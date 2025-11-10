@@ -4,21 +4,20 @@ import {
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   deleteRegistryLookup,
   generateDateInfos,
   rebuildRegistryLookupGeneric
 } from "../lookup/utils";
-import { ITXClientDenyList } from "@prisma/client/runtime/library";
 import type { IncomingWasteV2 } from "@td/codegen-back";
 import { isDangerous } from "@td/constants";
+import { ITXClientDenyList } from "@prisma/client/runtime/client";
 
-export const RegistryV2IncomingTexsInclude =
-  Prisma.validator<Prisma.RegistryIncomingTexsInclude>()({
-    texsAnalysisFiles: true
-  });
+export const RegistryV2IncomingTexsInclude = {
+  texsAnalysisFiles: true
+} satisfies Prisma.RegistryIncomingTexsInclude;
 
 export type RegistryV2IncomingTexs = Prisma.RegistryIncomingTexsGetPayload<{
   include: typeof RegistryV2IncomingTexsInclude;

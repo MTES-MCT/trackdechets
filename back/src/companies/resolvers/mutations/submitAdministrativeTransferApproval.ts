@@ -4,7 +4,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
-import { AdministrativeTransferStatus } from "@prisma/client";
+import { AdministrativeTransferStatus } from "@td/prisma";
 import { companyEventTypes } from "../../types";
 import { enqueueProcessAdministrativeTransferJob } from "../../../queue/producers/administrativeTransfer";
 

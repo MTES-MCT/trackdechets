@@ -9,7 +9,7 @@ import {
 
 import { checkUserPermissions, Permission } from "../../../permissions";
 import { NotCompanyAdminErrorMsg } from "../../../common/errors";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { ZodCompany } from "../../validation/schema";
 import { safeInput } from "../../../common/converter";
 import { parseCompanyAsync } from "../../validation/index";

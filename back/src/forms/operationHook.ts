@@ -1,5 +1,5 @@
 import { OperationHookJobArgs } from "../queue/jobs/operationHook";
-import { BsdType, Form, Prisma } from "@prisma/client";
+import { BsdType, Form, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import Decimal from "decimal.js";
 import { enqueueOperationHookJob } from "../queue/producers/operationHook";

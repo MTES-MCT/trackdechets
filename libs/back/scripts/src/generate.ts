@@ -24,7 +24,7 @@ function createScript(name: string) {
   const timestamp = new Date().toISOString().replace(/[-:.TZ]/g, "");
   const scriptName = `${timestamp}_${name}`;
 
-  const scriptTemplate = `import { Prisma } from "@prisma/client";
+  const scriptTemplate = `import { Prisma } from "@td/prisma";
 
 export async function run(tx: Prisma.TransactionClient) {
   // Script logic goes here...

@@ -13,7 +13,7 @@ import {
   CompanyAssociation,
   User,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { getNextWorkday } from "../../../../dateUtils";
 import { sameDayMidnight } from "../../../../utils";
 import { ParsedCreateAdminRequestInput } from "../../../validation";

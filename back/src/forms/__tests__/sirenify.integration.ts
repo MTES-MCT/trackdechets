@@ -13,7 +13,7 @@ import {
 } from "../sirenify";
 import { AuthType } from "../../auth/auth";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { EmitterType, Prisma, Status } from "@prisma/client";
+import { EmitterType, Prisma, Status } from "@td/prisma";
 
 jest.mock("../../companies/search");
 

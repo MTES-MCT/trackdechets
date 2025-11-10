@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma } from "@prisma/client";
+import { EmitterType, Form, Prisma } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

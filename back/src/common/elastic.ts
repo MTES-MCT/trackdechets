@@ -10,7 +10,7 @@ import {
   BsddRevisionRequest,
   BsdasriRevisionRequest,
   OperationMode
-} from "@prisma/client";
+} from "@td/prisma";
 import { FormForElastic } from "../forms/elastic";
 import { BsdaForElastic } from "../bsda/elastic";
 import { BsdasriForElastic } from "../bsdasris/elastic";

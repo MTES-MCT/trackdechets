@@ -1,4 +1,4 @@
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import { trim } from "./strings";
 
 /**

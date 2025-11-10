@@ -9,7 +9,7 @@ import {
 // If you modify this, also modify it in the backend
 const CANCELLABLE_BSDA_STATUSES = [
   // BsdaStatus.Initial,
-  // BsdaStatus.SignedByProducer,
+  BsdaStatus.SignedByProducer,
   BsdaStatus.SignedByWorker,
   BsdaStatus.Sent
   // BsdaStatus.Processed,

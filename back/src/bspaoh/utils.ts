@@ -1,4 +1,4 @@
-import { BspaohType } from "@prisma/client";
+import { BspaohType } from "@td/prisma";
 
 export function getWasteDescription(wasteType: string | null) {
   if (wasteType === BspaohType.FOETUS) {

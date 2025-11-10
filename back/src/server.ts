@@ -12,15 +12,18 @@ import { GraphQLError } from "graphql";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
 import http from "http";
+import i18next from "i18next";
 import passport from "passport";
 import path from "path";
 import { ValidationError } from "yup";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
+import { zodI18nMap } from "zod-i18n-map";
+import translation from "zod-i18n-map/locales/fr/zod.json";
 import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth/auth";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
-import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
+import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ErrorCode, UserInputError } from "./common/errors";
 import { correlationIdMiddleware } from "./common/middlewares/correlationId";
@@ -28,11 +31,13 @@ import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
 import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { impersonateMiddleware } from "./common/middlewares/impersonate";
+import { invalidSessionMiddleware } from "./common/middlewares/invalidSessionMiddleware";
 import { loggingMiddleware } from "./common/middlewares/loggingMiddleware";
 import { namedMiddleware } from "./common/middlewares/namedMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
 import { gqlInfosPlugin } from "./common/plugins/gqlInfosPlugin";
+import { gqlPayloadSizeLimiterPlugin } from "./common/plugins/gqlPayloadSizeLimiterPlugin";
 import { gqlRateLimitPlugin } from "./common/plugins/gqlRateLimitPlugin";
 import { gqlRegenerateSessionPlugin } from "./common/plugins/gqlRegenerateSessionPlugin";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
@@ -40,25 +45,20 @@ import { graphqlQueryMergingLimiter } from "./common/plugins/graphqlQueryMerging
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
+import configureYup from "./common/yup/configureYup";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
-import { oauth2Router } from "./routers/oauth2-router";
 import { gericoWebhookHandler } from "./routers/gericoWebhookRouter";
+import { oauth2Router } from "./routers/oauth2-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { GraphQLContext } from "./types";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
-import configureYup from "./common/yup/configureYup";
-import i18next from "i18next";
-import { z } from "zod";
-import { zodI18nMap } from "zod-i18n-map";
-import translation from "zod-i18n-map/locales/fr/zod.json";
-import { gqlPayloadSizeLimiterPlugin } from "./common/plugins/gqlPayloadSizeLimiterPlugin";
 
 const {
   SESSION_SECRET,
@@ -69,6 +69,7 @@ const {
   MAX_REQUESTS_PER_WINDOW = "1000",
   NODE_ENV,
   TRUST_PROXY_HOPS,
+  ENV_NAME,
   GERICO_WEBHOOK_SLUG
 } = process.env;
 
@@ -121,7 +122,8 @@ export const server = new ApolloServer<GraphQLContext>({
 
     if (
       formattedError.extensions?.code === ErrorCode.INTERNAL_SERVER_ERROR &&
-      NODE_ENV === "production"
+      NODE_ENV === "production" &&
+      ENV_NAME !== "recette"
     ) {
       // Do not leak error for internal server error in production
       const sentryId = (originalError as any).sentryId;
@@ -344,6 +346,7 @@ app.use(passport.session());
 app.use(authRouter);
 app.use(oauth2Router);
 
+app.use(invalidSessionMiddleware);
 app.use(impersonateMiddleware);
 
 app.get("/ping", (_, res) => res.send("Pong!"));

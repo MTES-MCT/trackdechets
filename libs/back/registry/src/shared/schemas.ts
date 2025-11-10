@@ -1,4 +1,4 @@
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
   ALL_OPERATION_MODES,
@@ -401,13 +401,13 @@ export const actorNameSchema = z
   .string()
   .trim()
   .min(1, `La raison sociale ne peut pas faire moins de 1 caractère`)
-  .max(150, `La raison sociale ne peut pas dépasser 150 caractères`);
+  .max(250, `La raison sociale ne peut pas dépasser 150 caractères`);
 
 export const actorAddressSchema = z
   .string()
   .trim()
   .min(1, `Le libellé de l'adresse ne peut pas faire moins de 1 caractère`)
-  .max(150, `Le libellé de l'adresse ne peut pas dépasser 150 caractères`);
+  .max(250, `Le libellé de l'adresse ne peut pas dépasser 150 caractères`);
 
 export const actorCitySchema = z
   .string()

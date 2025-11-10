@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriType } from "@td/prisma";
 import * as QRCode from "qrcode";
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";

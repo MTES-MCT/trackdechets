@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import { BsddTransporter, Form, Prisma } from "@prisma/client";
+import { BsddTransporter, Form, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import type { FormRole } from "@td/codegen-back";
 import { FormNotFound, FormTransporterNotFound } from "./errors";

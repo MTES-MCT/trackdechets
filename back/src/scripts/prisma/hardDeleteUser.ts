@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   checkCompanyAssociations,
@@ -10,7 +10,6 @@ import {
   deleteUserGrants,
   deleteUserAccountHash
 } from "../../users/database";
-import { clearUserSessions } from "../../users/clearUserSessions";
 import { UserInputError } from "../../common/errors";
 
 /**
@@ -38,7 +37,6 @@ export default async function deleteUser(user: User) {
   await prisma.user.delete({
     where: { id: user.id }
   });
-  await clearUserSessions(user.id);
 }
 
 async function checkForms(user: User): Promise<string[]> {

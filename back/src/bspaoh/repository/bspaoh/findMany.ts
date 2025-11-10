@@ -1,4 +1,4 @@
-import { Bspaoh, Prisma } from "@prisma/client";
+import { Bspaoh, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindManyBspaohFn = (

@@ -1,4 +1,4 @@
-import { BspaohStatus, TransportMode, UserRole } from "@prisma/client";
+import { BspaohStatus, TransportMode, UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import type {

@@ -14,7 +14,7 @@ import {
   signTransportFormAfterTempStorage
 } from "../steps/signTransportForm";
 import fixtures from "../fixturesForeignTransporter";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: "Entreposage provisoire avec transporteur étranger",

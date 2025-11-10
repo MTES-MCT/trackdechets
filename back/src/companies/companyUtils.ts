@@ -1,5 +1,5 @@
 import { splitAddress } from "../common/addresses";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import { isDefinedStrict } from "../common/helpers";
 import type { CompanySearchResult } from "@td/codegen-back";
 

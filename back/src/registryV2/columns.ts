@@ -10,7 +10,7 @@ import {
 } from "@td/codegen-back";
 import { isDefined } from "../common/helpers";
 import { format } from "date-fns";
-import { TransportMode, EmitterType } from "@prisma/client";
+import { TransportMode, EmitterType } from "@td/prisma";
 import { formatStatusLabel as _formatStatusLabel } from "@td/constants";
 
 import { fr } from "date-fns/locale";

@@ -6,7 +6,6 @@ import type {
 } from "@td/codegen-back";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
-import { clearUserSessions } from "../../clearUserSessions";
 import { UserInputError } from "../../../common/errors";
 /**
  * Update user password in a password reset workflow
@@ -48,9 +47,6 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   await prisma.userResetPasswordHash.deleteMany({
     where: { userId: user.id }
   });
-
-  // bust opened sessions to disconnect user from all devices and browsers
-  await clearUserSessions(user.id);
 
   return true;
 };

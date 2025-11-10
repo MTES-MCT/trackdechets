@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { objectDiff } from "../../forms/workflow/diff";
 import type {
   BsdaInput,

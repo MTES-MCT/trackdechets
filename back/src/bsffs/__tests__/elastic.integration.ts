@@ -25,7 +25,7 @@ import {
   BsffFicheIntervention,
   BsffStatus,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { xDaysAgo } from "../../utils";
 
 describe("getOrgIdsByTab", () => {

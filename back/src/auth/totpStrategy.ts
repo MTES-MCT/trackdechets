@@ -1,9 +1,8 @@
 import { Strategy as PassportStrategy } from "passport-strategy";
 import { Request } from "express";
 import { TOTP } from "totp-generator";
-import { prisma } from "@td/prisma";
+import { prisma, User } from "@td/prisma";
 import { sanitizeEmail } from "../utils";
-import { User } from "@prisma/client";
 import { addSeconds } from "date-fns";
 
 const TOTP_LOCK_FACTOR = 5;

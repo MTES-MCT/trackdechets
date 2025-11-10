@@ -20,7 +20,7 @@ import {
   WasteAcceptationStatus,
   BsvhuIdentificationType,
   TransportMode
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   destinationOperationModeRefinement,
   isBrokerRefinement,

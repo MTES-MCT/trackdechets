@@ -11,7 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import type { Mutation } from "@td/codegen-back";
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 
 jest.mock("axios", () => ({
   default: {

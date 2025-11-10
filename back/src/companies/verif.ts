@@ -1,4 +1,4 @@
-import { CompanyType, CompanyVerificationStatus } from "@prisma/client";
+import { CompanyType, CompanyVerificationStatus } from "@td/prisma";
 import { addDays } from "date-fns";
 import * as COMPANY_CONSTANTS from "@td/constants";
 import { sendVerificationCodeLetter } from "../common/post";

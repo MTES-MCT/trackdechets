@@ -3,7 +3,7 @@ import {
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { z } from "zod";
 import { BSDA_WASTE_CODES } from "@td/constants";
 import {
@@ -100,7 +100,7 @@ export const bsdaPackagingSchema = z
       .number()
       .positive("Le volume doit être un nombre positif")
       .nullish(),
-    identificationNumbers: z.array(z.string().max(150)).nullish()
+    identificationNumbers: z.array(z.string().max(250)).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
     message:
@@ -141,28 +141,28 @@ export const rawBsdaSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  emitterCompanyName: z.string().max(150).nullish(),
+  emitterCompanyName: z.string().max(250).nullish(),
   emitterCompanySiret: siretSchema(CompanyRole.Emitter).nullish(),
-  emitterCompanyAddress: z.string().max(150).nullish(),
-  emitterCompanyContact: z.string().max(150).nullish(),
-  emitterCompanyPhone: z.string().max(150).nullish(),
-  emitterCompanyMail: z.string().max(150).nullish(),
-  emitterCustomInfo: z.string().max(150).nullish(),
-  emitterPickupSiteName: z.string().max(150).nullish(),
-  emitterPickupSiteAddress: z.string().max(150).nullish(),
-  emitterPickupSiteCity: z.string().max(150).nullish(),
-  emitterPickupSitePostalCode: z.string().max(150).nullish(),
-  emitterPickupSiteInfos: z.string().max(150).nullish(),
-  emitterEmissionSignatureAuthor: z.string().max(150).nullish(),
+  emitterCompanyAddress: z.string().max(250).nullish(),
+  emitterCompanyContact: z.string().max(250).nullish(),
+  emitterCompanyPhone: z.string().max(250).nullish(),
+  emitterCompanyMail: z.string().max(250).nullish(),
+  emitterCustomInfo: z.string().max(250).nullish(),
+  emitterPickupSiteName: z.string().max(250).nullish(),
+  emitterPickupSiteAddress: z.string().max(250).nullish(),
+  emitterPickupSiteCity: z.string().max(250).nullish(),
+  emitterPickupSitePostalCode: z.string().max(250).nullish(),
+  emitterPickupSiteInfos: z.string().max(250).nullish(),
+  emitterEmissionSignatureAuthor: z.string().max(250).nullish(),
   emitterEmissionSignatureDate: z.coerce.date().nullish(),
-  ecoOrganismeName: z.string().max(150).nullish(),
+  ecoOrganismeName: z.string().max(250).nullish(),
   ecoOrganismeSiret: siretSchema(CompanyRole.EcoOrganisme).nullish(),
   wasteCode: ZodWasteCodeEnum,
-  wasteFamilyCode: z.string().max(150).nullish(),
-  wasteMaterialName: z.string().max(150).nullish(),
+  wasteFamilyCode: z.string().max(250).nullish(),
+  wasteMaterialName: z.string().max(250).nullish(),
   wasteConsistence: z.nativeEnum(BsdaConsistence).nullish(),
-  wasteConsistenceDescription: z.string().max(150).nullish(),
-  wasteSealNumbers: z.array(z.string().max(150)).default([]),
+  wasteConsistenceDescription: z.string().max(250).nullish(),
+  wasteSealNumbers: z.array(z.string().max(250)).default([]),
   wasteIsSubjectToADR: z.boolean().nullish(),
   wasteAdr: z
     .string()
@@ -172,7 +172,7 @@ export const rawBsdaSchema = z.object({
     .transform(value =>
       isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
     ),
-  wasteNonRoadRegulationMention: z.string().max(150).nullish(),
+  wasteNonRoadRegulationMention: z.string().max(250).nullish(),
   wastePop: z
     .boolean()
     .nullish()
@@ -187,43 +187,44 @@ export const rawBsdaSchema = z.object({
     .nullish()
     .transform(v => Boolean(v)),
   weightValue: z.number().nullish(),
-  brokerCompanyName: z.string().max(150).nullish(),
+  brokerCompanyName: z.string().max(250).nullish(),
   brokerCompanySiret: siretSchema(CompanyRole.Broker).nullish(),
-  brokerCompanyAddress: z.string().max(150).nullish(),
-  brokerCompanyContact: z.string().max(150).nullish(),
-  brokerCompanyPhone: z.string().max(150).nullish(),
-  brokerCompanyMail: z.string().max(150).nullish(),
-  brokerRecepisseNumber: z.string().max(150).nullish(),
-  brokerRecepisseDepartment: z.string().max(150).nullish(),
+  brokerCompanyAddress: z.string().max(250).nullish(),
+  brokerCompanyContact: z.string().max(250).nullish(),
+  brokerCompanyPhone: z.string().max(250).nullish(),
+  brokerCompanyMail: z.string().max(250).nullish(),
+  brokerRecepisseNumber: z.string().max(250).nullish(),
+  brokerRecepisseDepartment: z.string().max(250).nullish(),
   brokerRecepisseValidityLimit: z.coerce.date().nullish(),
-  destinationCompanyName: z.string().max(150).nullish(),
+  destinationCompanyName: z.string().max(250).nullish(),
   destinationCompanySiret: siretSchema(CompanyRole.Destination).nullish(),
-  destinationCompanyAddress: z.string().max(150).nullish(),
-  destinationCompanyContact: z.string().max(150).nullish(),
-  destinationCompanyPhone: z.string().max(150).nullish(),
-  destinationCompanyMail: z.string().max(150).nullish(),
-  destinationCap: z.string().max(150).nullish(),
+  destinationCompanyAddress: z.string().max(250).nullish(),
+  destinationCompanyContact: z.string().max(250).nullish(),
+  destinationCompanyPhone: z.string().max(250).nullish(),
+  destinationCompanyMail: z.string().max(250).nullish(),
+  destinationCap: z.string().max(250).nullish(),
   destinationPlannedOperationCode: ZodOperationEnum,
-  destinationCustomInfo: z.string().max(150).nullish(),
+  destinationCustomInfo: z.string().max(250).nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationReceptionWeight: z.number().nullish(),
+  destinationReceptionWeightIsEstimate: z.boolean().nullish(),
   destinationReceptionRefusedWeight: z.number().min(0).nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)
     .nullish(),
-  destinationReceptionRefusalReason: z.string().max(150).nullish(),
+  destinationReceptionRefusalReason: z.string().max(250).nullish(),
   destinationOperationCode: ZodOperationEnum.nullish(),
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
-  destinationReceptionSignatureAuthor: z.string().max(150).nullish(),
+  destinationReceptionSignatureAuthor: z.string().max(250).nullish(),
   destinationReceptionSignatureDate: z.coerce.date().nullish(),
-  destinationOperationDescription: z.string().max(150).nullish(),
+  destinationOperationDescription: z.string().max(250).nullish(),
   destinationOperationDate: z.coerce
     .date()
     .nullish()
     .refine(val => !val || val < new Date(), {
       message: "La date d'opération ne peut pas être dans le futur."
     }),
-  destinationOperationSignatureAuthor: z.string().max(150).nullish(),
+  destinationOperationSignatureAuthor: z.string().max(250).nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationNextDestinationCompanySiret: siretSchema(
     CompanyRole.NextDestination
@@ -231,35 +232,35 @@ export const rawBsdaSchema = z.object({
   destinationOperationNextDestinationCompanyVatNumber: foreignVatNumberSchema(
     CompanyRole.NextDestination
   ).nullish(),
-  destinationOperationNextDestinationCompanyName: z.string().max(150).nullish(),
+  destinationOperationNextDestinationCompanyName: z.string().max(250).nullish(),
   destinationOperationNextDestinationCompanyAddress: z
     .string()
-    .max(150)
+    .max(250)
     .nullish(),
   destinationOperationNextDestinationCompanyContact: z
     .string()
-    .max(150)
+    .max(250)
     .nullish(),
   destinationOperationNextDestinationCompanyPhone: z
     .string()
-    .max(150)
+    .max(250)
     .nullish(),
-  destinationOperationNextDestinationCompanyMail: z.string().max(150).nullish(),
-  destinationOperationNextDestinationCap: z.string().max(150).nullish(),
+  destinationOperationNextDestinationCompanyMail: z.string().max(250).nullish(),
+  destinationOperationNextDestinationCap: z.string().max(250).nullish(),
   destinationOperationNextDestinationPlannedOperationCode: z
     .string()
-    .max(150)
+    .max(250)
     .nullish(),
   workerIsDisabled: z
     .boolean()
     .default(false)
     .nullish()
     .transform(v => Boolean(v)),
-  workerCompanyName: z.string().max(150).nullish(),
+  workerCompanyName: z.string().max(250).nullish(),
   workerCompanySiret: siretSchema(CompanyRole.Worker).nullish(),
-  workerCompanyAddress: z.string().max(150).nullish(),
-  workerCompanyContact: z.string().max(150).nullish(),
-  workerCompanyPhone: z.string().max(150).nullish(),
+  workerCompanyAddress: z.string().max(250).nullish(),
+  workerCompanyContact: z.string().max(250).nullish(),
+  workerCompanyPhone: z.string().max(250).nullish(),
   workerCompanyMail: z.string().nullish(),
   workerCertificationHasSubSectionFour: z
     .boolean()
@@ -269,14 +270,14 @@ export const rawBsdaSchema = z.object({
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  workerCertificationCertificationNumber: z.string().max(150).nullish(),
+  workerCertificationCertificationNumber: z.string().max(250).nullish(),
   workerCertificationValidityLimit: z.coerce.date().nullish(),
   workerCertificationOrganisation: ZodWorkerCertificationOrganismEnum,
   workerWorkHasEmitterPaperSignature: z
     .boolean()
     .nullish()
     .transform(v => Boolean(v)),
-  workerWorkSignatureAuthor: z.string().max(150).nullish(),
+  workerWorkSignatureAuthor: z.string().max(250).nullish(),
   workerWorkSignatureDate: z.coerce.date().nullish(),
   transporters: z
     .array(rawBsdaTransporterSchema)

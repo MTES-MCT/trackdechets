@@ -7,7 +7,7 @@ import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { getAndExpandFormFromDb } from "../../converter";
 import { DestinationCannotTempStore } from "../../errors";
-import { Prisma, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, WasteAcceptationStatus } from "@td/prisma";
 import { getFormRepository } from "../../repository";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";

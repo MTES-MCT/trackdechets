@@ -1,4 +1,4 @@
-import { QuantityType, Status } from "@prisma/client";
+import { QuantityType, Status } from "@td/prisma";
 import type {
   Form,
   FormResolvers,

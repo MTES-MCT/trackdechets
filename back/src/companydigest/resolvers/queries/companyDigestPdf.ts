@@ -14,7 +14,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { getUserRoles } from "../../../permissions";
 
 import { UserInputError } from "../../../common/errors";
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 import { logger } from "@td/logger";
 
 const { GERICO_API_KEY, GERICO_API_URL } = process.env;

@@ -1,4 +1,4 @@
-import { RegistryDelegation } from "@prisma/client";
+import { RegistryDelegation } from "@td/prisma";
 import type { CompanyPublic, RegistryDelegationStatus } from "@td/codegen-back";
 
 // Revolvers don't provide some of the fields, because they are computed

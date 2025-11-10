@@ -6,7 +6,7 @@ import {
   BsffStatus,
   BsffType,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { getStatus, toBsffDestination } from "../compat";
 
 describe("toBsffDestination", () => {

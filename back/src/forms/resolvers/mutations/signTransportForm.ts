@@ -1,4 +1,4 @@
-import { CompanyType, EmitterType, Form, Prisma, Status } from "@prisma/client";
+import { CompanyType, EmitterType, Form, Prisma, Status } from "@td/prisma";
 import type {
   MutationResolvers,
   Form as GraphQLForm,

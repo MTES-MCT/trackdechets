@@ -1,4 +1,4 @@
-import { Company, UserRole } from "@prisma/client";
+import { Company, UserRole } from "@td/prisma";
 
 // Représente un utilisateur au sein d'un établissement
 export type UserInCompany = Company & {

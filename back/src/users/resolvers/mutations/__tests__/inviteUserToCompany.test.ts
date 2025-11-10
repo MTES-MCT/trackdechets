@@ -1,13 +1,14 @@
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
 import { siretify } from "../../../../__tests__/factories";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 
 const userMock = jest.fn();
 const companyMock = jest.fn();
 const membershipRequestMock = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: { findUnique: jest.fn((...args) => userMock(...args)) },
     company: { findUnique: jest.fn((...args) => companyMock(...args)) },

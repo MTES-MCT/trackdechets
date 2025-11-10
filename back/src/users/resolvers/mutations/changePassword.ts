@@ -8,8 +8,6 @@ import type {
 } from "@td/codegen-back";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
-import { storeUserSessionsId } from "../../../common/redis/users";
-import { clearUserSessions } from "../../clearUserSessions";
 import { UserInputError } from "../../../common/errors";
 
 /**
@@ -17,8 +15,7 @@ import { UserInputError } from "../../../common/errors";
  */
 export async function changePasswordFn(
   userId: string,
-  { oldPassword, newPassword }: MutationChangePasswordArgs,
-  currentSessionId: string
+  { oldPassword, newPassword }: MutationChangePasswordArgs
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -45,13 +42,6 @@ export async function changePasswordFn(
     trimmedPassword
   });
 
-  // bust opened sessions to disconnect user from all devices and browsers
-  // current user session is regenerated thanks to graphqlRegenerateSessionMiddleware,
-  // but not yet referenced is userSessionsIds, so user is not disconnected
-  await clearUserSessions(user.id);
-  // store session reference
-  await storeUserSessionsId(user.id, currentSessionId);
-
   return {
     ...updatedUser,
     // companies are resolved through a separate resolver (User.companies)
@@ -60,8 +50,8 @@ export async function changePasswordFn(
   };
 }
 
-const changePasswordResolver: MutationResolvers["changePassword"] = (
-  parent,
+const changePasswordResolver: MutationResolvers["changePassword"] = async (
+  _,
   args,
   context
 ) => {
@@ -69,7 +59,11 @@ const changePasswordResolver: MutationResolvers["changePassword"] = (
 
   const user = checkIsAuthenticated(context);
 
-  return changePasswordFn(user.id, args, context.req.sessionID);
+  const result = await changePasswordFn(user.id, args);
+  // Update session issuedAt to prevent invalidation by invalidSessionMiddleware
+  context.req.session.issuedAt = new Date().toISOString();
+
+  return result;
 };
 
 export default changePasswordResolver;

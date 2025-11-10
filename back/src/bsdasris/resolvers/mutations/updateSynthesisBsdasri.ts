@@ -1,5 +1,5 @@
 import { expandBsdasriFromDB } from "../../converter";
-import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, BsdasriType } from "@td/prisma";
 import type { BsdasriInput } from "@td/codegen-back";
 
 import { mergeInputAndParseBsdasriAsync } from "../../validation";

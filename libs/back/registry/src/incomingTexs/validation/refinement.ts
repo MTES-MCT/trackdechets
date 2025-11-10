@@ -4,7 +4,7 @@ import {
   refineTransporterInfos
 } from "../../shared/refinement";
 import { ParsedZodIncomingTexsItem } from "./schema";
-import { $Enums } from "@prisma/client";
+import { $Enums } from "@td/prisma";
 import { getCachedCompany } from "../../shared/helpers";
 
 export const initialEmitterRefinement: Refinement<ParsedZodIncomingTexsItem> =

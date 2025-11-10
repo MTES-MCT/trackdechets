@@ -3,7 +3,7 @@ import {
   Company,
   CompanyVerificationMode,
   Form
-} from "@prisma/client";
+} from "@td/prisma";
 import { cleanupSpecialChars, toFrFormat } from "../helpers";
 import { MailTemplate } from "../types";
 import { templateIds } from "./provider/templateIds";

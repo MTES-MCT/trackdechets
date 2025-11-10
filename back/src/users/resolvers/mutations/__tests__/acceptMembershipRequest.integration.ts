@@ -9,7 +9,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { renderMail, membershipRequestAccepted } from "@td/mail";
 import type { Mutation } from "@td/codegen-back";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
 
 // No mails

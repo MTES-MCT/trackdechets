@@ -3,7 +3,7 @@ import path from "path";
 import { Job } from "bull";
 import { SearchResponse } from "@elastic/elasticsearch/api/types";
 import { ApiResponse, Client } from "@elastic/elasticsearch";
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import {
   mergeCompanyToCompanySearchResult,

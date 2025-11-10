@@ -13,7 +13,7 @@ import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";
 import { sirenify as sirenifyBspaohInput } from "../../../validation/sirenify";
 import { crematoriumFactory } from "../../../__tests__/factories";
-import { BspaohType } from "@prisma/client";
+import { BspaohType } from "@td/prisma";
 
 jest.mock("../../../validation/sirenify");
 (sirenifyBspaohInput as jest.Mock).mockImplementation(input =>

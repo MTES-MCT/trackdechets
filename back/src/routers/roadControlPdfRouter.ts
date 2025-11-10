@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { getAPIBaseURL, getUid } from "../utils";
 import { setInCache, SetOptions } from "../common/redis";
-import { BsdType } from "@prisma/client";
+import { BsdType } from "@td/prisma";
 
 const handlers = {
   [BsdType.BSDD]: "formPdf",

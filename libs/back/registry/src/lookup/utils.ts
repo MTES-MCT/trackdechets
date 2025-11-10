@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { v7 as uuidv7 } from "uuid";
 import { ITXClientDenyList } from "@prisma/client/runtime/library";

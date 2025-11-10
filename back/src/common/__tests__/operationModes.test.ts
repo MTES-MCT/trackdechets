@@ -1,4 +1,4 @@
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 import {
   CODES_AND_EXPECTED_OPERATION_MODES,
   getOperationModesFromOperationCode

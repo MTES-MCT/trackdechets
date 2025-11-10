@@ -1,4 +1,4 @@
-import * as Prisma from "@prisma/client";
+import * as Prisma from "@td/prisma";
 import * as GraphQL from "@td/codegen-back";
 
 export const OPERATION: Record<

@@ -21,6 +21,7 @@ const mockCreateAnonymous = jest.fn();
 const mockFindAnonymous = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     anonymousCompany: {
       create: jest.fn((...args) => mockCreateAnonymous(...args)),

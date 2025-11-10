@@ -2,7 +2,8 @@ import { ZodIssue } from "zod";
 import type {
   BsdaMetadata,
   BsdaMetadataFields,
-  BsdaMetadataResolvers
+  BsdaMetadataResolvers,
+  BsdaSignatureType
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
@@ -14,17 +15,30 @@ import {
   prismaToZodBsda
 } from "../validation/helpers";
 import { getRequiredAndSealedFieldPaths } from "../validation/rules";
+import { AllBsdaSignatureType } from "../types";
+
+function getNextSignatureForErrors(
+  nextSignatureType: AllBsdaSignatureType | undefined
+): BsdaSignatureType | undefined {
+  return nextSignatureType
+    ? nextSignatureType.startsWith("TRANSPORT")
+      ? "TRANSPORT"
+      : (nextSignatureType as BsdaSignatureType)
+    : undefined;
+}
 
 export const Metadata: BsdaMetadataResolvers = {
   errors: async (metadata: BsdaMetadata & { id: string }, _, context) => {
     const bsda = await context.dataloaders.bsdas.load(metadata.id);
 
     const zodBsda = prismaToZodBsda(bsda);
-    const currentSignature = getCurrentSignatureType(zodBsda);
-    const nextSignature = getNextSignatureType(currentSignature);
+    const currentSignatureType = getCurrentSignatureType(zodBsda);
+
+    const nextSignatureType = getNextSignatureType(currentSignatureType);
+    const nextSignatureForErrors = getNextSignatureForErrors(nextSignatureType);
     try {
       parseBsda(zodBsda, {
-        currentSignatureType: nextSignature
+        currentSignatureType: nextSignatureType
       });
       return [];
     } catch (errors) {
@@ -32,7 +46,7 @@ export const Metadata: BsdaMetadataResolvers = {
         return {
           message: e.message,
           path: e.path,
-          requiredFor: nextSignature
+          requiredFor: nextSignatureForErrors
         };
       });
     }

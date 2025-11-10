@@ -9,7 +9,7 @@ import { sanitizeEmail } from "../../../utils";
 import { associateUserToCompany, createUserAccountHash } from "../../database";
 
 import { inviteUserToJoin, notifyUserOfInvite, renderMail } from "@td/mail";
-import { User } from "@prisma/client";
+import { User } from "@td/prisma";
 import { toGqlCompanyPrivate } from "../../../companies/converters";
 
 export async function inviteUserToCompanyFn(

@@ -8,7 +8,7 @@ import {
   CompanyType,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import { setCompanyOrgId } from "./transformers";
 import {
   checkEcoOrganisme,

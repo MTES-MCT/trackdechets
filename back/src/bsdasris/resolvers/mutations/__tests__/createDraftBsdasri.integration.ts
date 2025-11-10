@@ -6,7 +6,7 @@ import {
   companyFactory,
   siretify
 } from "../../../../__tests__/factories";
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { fullBsdasriFragment } from "../../../fragments";

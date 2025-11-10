@@ -16,7 +16,7 @@ import {
   RegistryExhaustiveExport,
   RegistryExportFormat,
   RegistryExportStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   dateFilterToElasticFilter,
   toPrismaBsds

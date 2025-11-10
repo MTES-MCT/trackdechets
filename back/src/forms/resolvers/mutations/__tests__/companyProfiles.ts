@@ -1,4 +1,4 @@
-import { CompanyType, WasteProcessorType, CollectorType } from "@prisma/client";
+import { CompanyType, WasteProcessorType, CollectorType } from "@td/prisma";
 
 export const forbbidenProfilesForDangerousWaste = [
   {

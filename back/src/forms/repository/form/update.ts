@@ -1,4 +1,4 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@td/prisma";
 import {
   LogMetadata,
   RepositoryFnDeps

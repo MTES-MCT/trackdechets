@@ -3,7 +3,7 @@ import type { RegistryImportAssociationResolvers } from "@td/codegen-back";
 import {
   type Company,
   type RegistryImportAssociation as PrismaRegistryImportAssociation
-} from "@prisma/client";
+} from "@td/prisma";
 
 export const RegistryImportAssociation: Omit<
   RegistryImportAssociationResolvers,
