@@ -907,6 +907,7 @@ export const getReceivedBtnLabel = (
 
   if (
     (isBsda(bsd.type) || isBsvhu(bsd.type)) &&
+    isSameSiretDestination(currentSiret, bsd) &&
     permissions.includes(UserPermission.BsdCanSignOperation)
   ) {
     return VALIDER_TRAITEMENT;
