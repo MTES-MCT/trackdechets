@@ -31,7 +31,7 @@ import WasteTree from "../search/WasteTree";
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
-  `Trackdéchets vous accompagne avec des formations en ligne ouvertes à tous, chaque jeudi à 15h.`
+  `⚠️ Registre national – Fin de la période de tolérance le 31/12/2025. N’attendez pas la fin de l’année pour transmettre vos registres ! Les modèles d’import définitifs sont disponibles et utilisables dès maintenant sur Trackdéchets.`
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -68,10 +68,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Voir la programmation",
-                    href: "https://trackdechets.beta.gouv.fr/"
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/registre-national/informations-generales"
                   }}
-                  persistedSurveyName="td-20251021"
+                  persistedSurveyName="td-20251111"
                 />
               }
             />
