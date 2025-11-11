@@ -612,8 +612,8 @@ export function BsddPdf({
                   <input
                     type="checkbox"
                     checked={
-                      form.wasteDetails?.consistence?.includes(
-                        consistenceType.value
+                      form.wasteDetails?.consistences?.some(
+                        consistence => consistence === consistenceType.value
                       ) && renderCheckboxState
                     }
                     readOnly
