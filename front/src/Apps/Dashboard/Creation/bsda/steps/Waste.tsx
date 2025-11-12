@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
@@ -25,6 +25,10 @@ import Input from "@codegouvfr/react-dsfr/Input";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import {
+  getInitialCompany,
+  initialTransporter
+} from "../../../../common/data/initialState";
 
 const BSDA_COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -57,6 +61,29 @@ const WasteBsda = ({ errors }) => {
   const weight = watch("weight", {});
   const packagings = watch("packagings", {});
   const type = watch("type", {});
+
+  useEffect(() => {
+    if (type !== BsdaType.Gathering) {
+      setValue("grouping", []);
+    }
+    if (type !== BsdaType.Reshipment) {
+      setValue("forwarding", null);
+    }
+    if ([BsdaType.Reshipment, BsdaType.Gathering].includes(type)) {
+      setValue("worker.company", getInitialCompany());
+    }
+    if (type === BsdaType.Collection_2710) {
+      setValue("destination.company.siret", data?.companyInfos.siret);
+      setValue("destination.company.address", data?.companyInfos.address);
+      setValue("destination.company.name", data?.companyInfos.name);
+      setValue("worker.company", getInitialCompany());
+      // Nettoie les données transporteurs en gardant quand même un
+      // transporteur vide par défaut au cas où on repasse sur un autre type
+      // de BSDA. Un clean sera fait au moment de la soumission du formulaire
+      // pour s'assurer que `transporters: []` en cas de collecte en déchetterie.
+      setValue("transporters", [initialTransporter]);
+    }
+  }, [type, setValue, data]);
 
   const isWasteCenter = data?.companyInfos.companyTypes?.includes(
     "WASTE_CENTER" as CompanyType
