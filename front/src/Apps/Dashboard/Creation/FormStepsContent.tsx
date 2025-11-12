@@ -65,7 +65,6 @@ const FormStepsContent = ({
   const onSubmit = (data, e) => {
     const draft = e.nativeEvent.submitter.id === "id_save_draft";
     const { id, ...input } = data;
-
     saveForm(input, draft)
       .then(_ => {
         navigate(-1);
@@ -76,7 +75,8 @@ const FormStepsContent = ({
       });
   };
 
-  const onErrors = () => {
+  const onErrors = error => {
+    console.log(error);
     scrollToTop();
   };
 
@@ -100,7 +100,7 @@ const FormStepsContent = ({
               isNextStepDisabled={selectedTabId === lastTabId}
               onSubmit={useformMethods.handleSubmit(
                 (data, e) => onSubmit(data, e),
-                () => onErrors()
+                error => onErrors(error)
               )}
               onCancel={() => navigate(-1)}
               onPrevTab={() => {

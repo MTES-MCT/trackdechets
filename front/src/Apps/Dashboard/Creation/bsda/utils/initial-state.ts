@@ -1,4 +1,10 @@
-import { BsdaEmitterInput, BsdaType, TransportMode } from "@td/codegen-ui";
+import {
+  BsdaEmitterInput,
+  BsdaInput,
+  BsdaTransporterInput,
+  BsdaType,
+  TransportMode
+} from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
 const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
@@ -18,6 +24,20 @@ const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
   };
 };
 
+// Les données transporteurs du formulaire représente soit un transporteur BSDA
+// déjà crée en base de données qui dispose d'un identifiant, soit un transporteur
+// non encore crée en base ne disposant pas encore d'identifiant. Par ailleurs on a
+// besoin de connaitre la valeur de `takenOverAt` pour l'affichage des infos transporteur
+// en mode formulaire ou statique dans la liste.
+export type CreateOrUpdateBsdaTransporterInput = BsdaTransporterInput & {
+  id?: string | null;
+  takenOverAt?: string | null;
+};
+
+export type BsdaValues = Omit<BsdaInput, "transporters"> & {
+  transporters: CreateOrUpdateBsdaTransporterInput[];
+} & { id?: string | null };
+
 export default {
   emitter: {
     company: getInitialEmitterCompany(),
@@ -29,17 +49,11 @@ export default {
       city: "",
       postalCode: "",
       infos: ""
-    },
-    emission: {
-      signature: {
-        author: null,
-        date: null
-      }
     }
   },
   ecoOrganisme: null,
   waste: {
-    code: "",
+    code: null,
     familyCode: "",
     materialName: "",
     consistence: null,
@@ -68,21 +82,13 @@ export default {
       weight: null,
       refusedWeight: null,
       acceptationStatus: null,
-      refusalReason: null,
-      signature: {
-        author: null,
-        date: null
-      }
+      refusalReason: null
     },
     operation: {
       code: null,
       mode: null,
       description: null,
       date: null,
-      signature: {
-        author: null,
-        date: null
-      },
       nextDestination: null
     }
   },
@@ -90,18 +96,14 @@ export default {
     isDisabled: false,
     company: getInitialCompany(),
     certification: {
-      hasSubSectionFour: null,
-      hasSubSectionThree: null,
+      hasSubSectionFour: false,
+      hasSubSectionThree: false,
       certificationNumber: null,
       validityLimit: null,
       organisation: null
     },
     work: {
-      hasEmitterPaperSignature: false,
-      signature: {
-        author: null,
-        date: null
-      }
+      hasEmitterPaperSignature: false
     }
   },
   transporters: [
@@ -116,8 +118,6 @@ export default {
   ],
   grouping: [],
   forwarding: null,
-  intermediaries: [getInitialCompany()],
-  intermediariesOrgIds: [],
-  transportersOrgIds: [],
+  intermediaries: null,
   type: BsdaType.OtherCollections
 };

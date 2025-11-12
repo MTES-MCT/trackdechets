@@ -167,6 +167,12 @@ const pathPrefixToTab = {
       return TabId[pathPrefix];
     }
     return null;
+  },
+  [BsdType.Bsda]: (pathPrefix: string): TabId | null => {
+    if (Object.values(TabId).includes(pathPrefix as TabId)) {
+      return TabId[pathPrefix];
+    }
+    return null;
   }
 };
 
