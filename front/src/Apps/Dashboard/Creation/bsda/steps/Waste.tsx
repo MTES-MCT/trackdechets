@@ -172,10 +172,10 @@ const WasteBsda = ({ errors }) => {
           <>
             <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
 
-            <WasteCodeSelector name={"wasteCode"} methods={methods} />
+            <WasteCodeSelector name={"waste.code"} methods={methods} />
 
             <Select
-              className="fr-col-md-8"
+              className="fr-col-md-8 fr-mt-1w"
               label="Code famille"
               nativeSelectProps={{
                 ...register("waste.familyCode")
