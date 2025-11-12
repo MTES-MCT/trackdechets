@@ -60,19 +60,18 @@ const WasteBsda = ({ errors }) => {
   const bsdaType = watch("type");
   const weight = watch("weight", {});
   const packagings = watch("packagings", {});
-  const type = watch("type", {});
 
   useEffect(() => {
-    if (type !== BsdaType.Gathering) {
+    if (bsdaType !== BsdaType.Gathering) {
       setValue("grouping", []);
     }
-    if (type !== BsdaType.Reshipment) {
+    if (bsdaType !== BsdaType.Reshipment) {
       setValue("forwarding", null);
     }
-    if ([BsdaType.Reshipment, BsdaType.Gathering].includes(type)) {
+    if ([BsdaType.Reshipment, BsdaType.Gathering].includes(bsdaType)) {
       setValue("worker.company", getInitialCompany());
     }
-    if (type === BsdaType.Collection_2710) {
+    if (bsdaType === BsdaType.Collection_2710) {
       setValue("destination.company.siret", data?.companyInfos.siret);
       setValue("destination.company.address", data?.companyInfos.address);
       setValue("destination.company.name", data?.companyInfos.name);
@@ -83,7 +82,7 @@ const WasteBsda = ({ errors }) => {
       // pour s'assurer que `transporters: []` en cas de collecte en déchetterie.
       setValue("transporters", [initialTransporter]);
     }
-  }, [type, setValue, data]);
+  }, [bsdaType, setValue, data]);
 
   const isWasteCenter = data?.companyInfos.companyTypes?.includes(
     "WASTE_CENTER" as CompanyType
@@ -92,7 +91,7 @@ const WasteBsda = ({ errors }) => {
   if (loading) return <p>Loading...</p>;
   if (error) return <InlineError apolloError={error} />;
 
-  const isDechetterie = type === BsdaType.Collection_2710;
+  const isDechetterie = bsdaType === BsdaType.Collection_2710;
   const sealNumbersLength = waste?.sealNumbers.length ?? 0;
 
   return (
