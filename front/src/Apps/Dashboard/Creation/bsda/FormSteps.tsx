@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Bsda, BsdType, Query, QueryBsdaArgs } from "@td/codegen-ui";
+import { Bsda, BsdType, BsdaType, Query, QueryBsdaArgs } from "@td/codegen-ui";
 import React, { useMemo, useState, createContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Loader } from "../../../common/Components";
@@ -85,6 +85,8 @@ const BsdaFormSteps = ({
   );
   const [bsdaContext, setBsdaContext] = useState<Bsda | undefined>();
 
+  const type = methods.watch("type");
+
   useEffect(() => {
     if (bsdaQuery.data?.bsda?.id) {
       setBsdaContext(bsdaQuery.data.bsda);
@@ -107,13 +109,14 @@ const BsdaFormSteps = ({
           )}
         />
       ),
-      worker: (
-        <Worker
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.worker
-          )}
-        />
-      ),
+      worker:
+        type === BsdaType.OtherCollections ? (
+          <Worker
+            errors={publishErrorMessages.filter(
+              error => error.tabId === TabId.worker
+            )}
+          />
+        ) : null,
       transporter: <TransporterBsda />,
       destination: (
         <DestinationBsda
@@ -124,7 +127,7 @@ const BsdaFormSteps = ({
       ),
       other: <ActorsList />
     }),
-    [publishErrorMessages]
+    [publishErrorMessages, type]
   );
 
   const loading = false; //creatingDraft || updating || creating; // FIXME
