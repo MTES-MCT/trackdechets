@@ -167,8 +167,10 @@ const RhfCompanyTypeForm = ({
     }
 
     // Pour le moment seuls les VHUs sont concernés par les éco-organismes partenaires
-    if (value !== CompanyType.WasteVehicles) {
-      setValue("ecoOrganismePartnersIds", []);
+    if (value === CompanyType.WasteVehicles) {
+      if (!checked) {
+        setValue("ecoOrganismePartnersIds", []);
+      }
     }
   };
 
