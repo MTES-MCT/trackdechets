@@ -63,6 +63,7 @@ const EcoOrganism = () => {
   // Fetch destination and emitter company info
   const destination = watch("destination");
   const emitter = watch("emitter");
+  const currentlySelectedEcoOrganisme = watch("ecoOrganisme");
 
   // Fetch destination company info
   useEffect(() => {
@@ -160,7 +161,12 @@ const EcoOrganism = () => {
               ?.map(ecoOrg => {
                 // Si la destination ou l'émétteur a des ecoOrganismePartnersIds, on ne montre que ceux-ci
                 if (ecoOrganismePartnersIds?.length) {
-                  if (!ecoOrganismePartnersIds.includes(ecoOrg.id)) {
+                  if (
+                    // Si l'éco-organisme n'est pas dans les partenaires de la destination ou de l'émetteur...
+                    !ecoOrganismePartnersIds.includes(ecoOrg.id) &&
+                    // ...Et qu'il n'a pas déjà été sélectionné!
+                    ecoOrg.siret !== currentlySelectedEcoOrganisme?.siret
+                  ) {
                     return null;
                   }
                 }
