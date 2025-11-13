@@ -48,6 +48,9 @@ type CompanyPrivate {
   "Liste des notifications auquels l'utilisateur authentifié est abonné pour cet établissement"
   userNotifications: UserNotifications!
 
+  "Eco-organismes avec lesquels l'entreprise travaille"
+  ecoOrganismePartnersIds: [String!]!
+
   """
   Nom d'usage de l'entreprise qui permet de différencier
   différents établissements ayant le même nom
@@ -285,6 +288,9 @@ type CompanyPublic {
   Indique si l'entreprise est en sommeil sur Trackdéchets
   """
   isDormant: Boolean!
+
+  "Liste des éco-organismes avec lesquels l'entreprise travaille"
+  ecoOrganismePartnersIds: [String!]!
 }
 
 interface CompanySearchPrivateCommon {
@@ -381,6 +387,9 @@ interface CompanySearchPrivateCommon {
   Indique si l'entreprise est en sommeil sur Trackdéchets
   """
   isDormant: Boolean!
+
+  "Liste des éco-organismes avec lesquels l'entreprise travaille"
+  ecoOrganismePartnersIds: [String!]!
 }
 
 "Information sur un établissement accessible publiquement en recherche floue"
@@ -496,6 +505,9 @@ type CompanySearchResult implements CompanySearchPrivateCommon {
   Indique si l'entreprise est en sommeil sur Trackdéchets
   """
   isDormant: Boolean!
+
+  "Liste des éco-organismes avec lesquels l'entreprise travaille"
+  ecoOrganismePartnersIds: [String!]!
 }
 
 """

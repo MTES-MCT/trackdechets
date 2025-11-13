@@ -1,12 +1,27 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useMemo } from "react";
 import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { useFormContext } from "react-hook-form";
 import Select from "@codegouvfr/react-dsfr/Select";
 import { ZodBsvhu } from "../schema";
-import { BsvhuEcoOrganismeInput, Query } from "@td/codegen-ui";
+import {
+  BsvhuEcoOrganismeInput,
+  Query,
+  QueryCompanyInfosArgs
+} from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useLazyQuery } from "@apollo/client";
 import { capitalize } from "../../../../../common/helper";
+
+const COMPANY_INFOS = gql`
+  query CompanyInfos($siret: String!) {
+    companyInfos(siret: $siret) {
+      orgId
+      siret
+      vatNumber
+      ecoOrganismePartnersIds
+    }
+  }
+`;
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -27,6 +42,56 @@ const EcoOrganism = () => {
     useFormContext<ZodBsvhu>(); // retrieve all hook methods
   const sealedFields = useContext(SealedFieldsContext);
   const { data } = useQuery<Pick<Query, "ecoOrganismes">>(GET_ECO_ORGANISMES);
+
+  // On récupère l'entreprise de destination. On a besoin des ecoOrganismePartnersIds pour filtrer la liste des éco-organismes
+  const [getDestinationCompanyInfos, { data: destinationCompany }] =
+    useLazyQuery<Pick<Query, "companyInfos">, QueryCompanyInfosArgs>(
+      COMPANY_INFOS,
+      {
+        fetchPolicy: "no-cache"
+      }
+    );
+
+  // On récupère l'entreprise émettrice. On a besoin des ecoOrganismePartnersIds pour filtrer la liste des éco-organismes
+  const [getEmitterCompanyInfos, { data: emitterCompany }] = useLazyQuery<
+    Pick<Query, "companyInfos">,
+    QueryCompanyInfosArgs
+  >(COMPANY_INFOS, {
+    fetchPolicy: "no-cache"
+  });
+
+  // Fetch destination and emitter company info
+  const destination = watch("destination");
+  const emitter = watch("emitter");
+  const currentlySelectedEcoOrganisme = watch("ecoOrganisme");
+
+  // Fetch destination company info
+  useEffect(() => {
+    if (destination?.company?.siret) {
+      getDestinationCompanyInfos({
+        variables: { siret: destination?.company?.siret }
+      });
+    }
+  }, [destination?.company?.siret, getDestinationCompanyInfos]);
+
+  // Fetch emitter company info
+  useEffect(() => {
+    if (emitter?.company?.siret) {
+      getEmitterCompanyInfos({
+        variables: { siret: emitter?.company?.siret }
+      });
+    }
+  }, [emitter?.company?.siret, getEmitterCompanyInfos]);
+
+  // On regroupe les ecoOrganismePartnersIds de la destination et de l'émetteur
+  const ecoOrganismePartnersIds = useMemo(() => {
+    return Array.from(
+      new Set([
+        ...(destinationCompany?.companyInfos?.ecoOrganismePartnersIds || []),
+        ...(emitterCompany?.companyInfos?.ecoOrganismePartnersIds || [])
+      ])
+    );
+  }, [destinationCompany, emitterCompany]);
 
   const ecoOrganisme = watch("ecoOrganisme");
   const hasEcoOrganisme = ecoOrganisme.hasEcoOrganisme;
@@ -92,17 +157,31 @@ const EcoOrganism = () => {
               Sélectionner un éco-organisme ou système individuel
             </option>
 
-            {data?.ecoOrganismes?.map(ecoOrg => {
-              return (
-                <option
-                  key={ecoOrg.siret}
-                  value={ecoOrg.siret}
-                  defaultValue={ecoOrganisme?.siret || ""}
-                >
-                  {`${ecoOrg.siret} - ${capitalize(ecoOrg.name)}`}
-                </option>
-              );
-            })}
+            {data?.ecoOrganismes
+              ?.map(ecoOrg => {
+                // Si la destination ou l'émétteur a des ecoOrganismePartnersIds, on ne montre que ceux-ci
+                if (ecoOrganismePartnersIds?.length) {
+                  if (
+                    // Si l'éco-organisme n'est pas dans les partenaires de la destination ou de l'émetteur...
+                    !ecoOrganismePartnersIds.includes(ecoOrg.id) &&
+                    // ...Et qu'il n'a pas déjà été sélectionné!
+                    ecoOrg.siret !== currentlySelectedEcoOrganisme?.siret
+                  ) {
+                    return null;
+                  }
+                }
+
+                return (
+                  <option
+                    key={ecoOrg.siret}
+                    value={ecoOrg.siret}
+                    defaultValue={ecoOrganisme?.siret || ""}
+                  >
+                    {`${ecoOrg.siret} - ${capitalize(ecoOrg.name)}`}
+                  </option>
+                );
+              })
+              .filter(Boolean)}
           </Select>
 
           <input

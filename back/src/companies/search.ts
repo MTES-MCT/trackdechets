@@ -57,6 +57,8 @@ export const mergeCompanyToCompanySearchResult = (
   website: trackdechetsCompanyInfo?.website,
   ecoOrganismeAgreements:
     trackdechetsCompanyInfo?.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
+  ecoOrganismePartnersIds:
+    trackdechetsCompanyInfo?.ecoOrganismePartnersIds ?? [],
   allowBsdasriTakeOverWithoutSignature:
     trackdechetsCompanyInfo?.allowBsdasriTakeOverWithoutSignature,
   // specific data for CompanySearchResult
@@ -84,7 +86,8 @@ const companySelectedFields = {
   website: true,
   ecoOrganismeAgreements: true,
   allowBsdasriTakeOverWithoutSignature: true,
-  isDormantSince: true
+  isDormantSince: true,
+  ecoOrganismePartnersIds: true
 };
 
 /**
@@ -270,7 +273,8 @@ export const makeSearchCompanies =
         ...searchResult,
         orgId: searchResult.siret!,
         isRegistered: false,
-        isDormant: false
+        isDormant: false,
+        ecoOrganismePartnersIds: []
       };
     });
   };
