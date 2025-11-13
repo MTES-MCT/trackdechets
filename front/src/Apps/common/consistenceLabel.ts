@@ -1,22 +1,25 @@
 import { Consistence, Maybe } from "@td/codegen-ui";
 
 export const getConsistenceLabel = (
-  consistence: Maybe<Consistence> | undefined
+  consistences: Maybe<Consistence[]> | undefined
 ) => {
-  if (!consistence) {
+  if (!consistences || !consistences.length) {
     return "Non soumis";
   }
-
-  switch (consistence) {
-    case Consistence.Liquid:
-      return "Liquide";
-    case Consistence.Solid:
-      return "Solide";
-    case Consistence.Doughy:
-      return "Pâteux";
-    case Consistence.Gaseous:
-      return "Gazeux";
-    default:
-      return "";
-  }
+  return consistences
+    .map(c => {
+      switch (c) {
+        case Consistence.Liquid:
+          return "Liquide";
+        case Consistence.Solid:
+          return "Solide";
+        case Consistence.Doughy:
+          return "Pâteux";
+        case Consistence.Gaseous:
+          return "Gaseux";
+        default:
+          return "";
+      }
+    })
+    .join(", ");
 };

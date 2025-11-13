@@ -99,7 +99,7 @@ describe("mutation / importPaperForm", () => {
           packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
           isSubjectToADR: true,
           onuCode: "ONU",
-          consistence: Consistence.SOLID
+          consistences: [Consistence.SOLID]
         },
         signingInfo: {
           sentAt: "2019-12-20T00:00:00.000Z" as any,

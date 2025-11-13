@@ -712,8 +712,11 @@ input WasteDetailsInput {
   "Réelle ou estimée"
   quantityType: QuantityType
 
-  "Consistance"
+  "DEPRECATED - Consistance"
   consistence: Consistence
+
+  "Consistances"
+  consistences: [Consistence!]
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean

@@ -111,7 +111,7 @@ const wasteDetailsInput = {
   packagingInfos: [{ type: "CITERNE", quantity: 1 }],
   quantity: 1,
   quantityType: "ESTIMATED",
-  consistence: "LIQUID"
+  consistences: ["LIQUID"]
 };
 
 function signEmissionFormInput() {

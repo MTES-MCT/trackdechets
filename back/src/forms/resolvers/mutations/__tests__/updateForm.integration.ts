@@ -4233,7 +4233,7 @@ describe("Mutation.updateForm", () => {
         variables: {
           updateFormInput: {
             id: form.id,
-            wasteDetails: { consistence: "SOLID" }
+            wasteDetails: { consistences: ["SOLID"] }
           }
         }
       });
