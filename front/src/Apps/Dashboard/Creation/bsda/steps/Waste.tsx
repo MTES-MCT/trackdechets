@@ -179,6 +179,7 @@ const WasteBsda = ({ errors }) => {
               nativeSelectProps={{
                 ...register("waste.familyCode")
               }}
+              disabled={sealedFields.includes(`waste.familyCode`)}
             >
               <option value="...">Sélectionnez une valeur...</option>
               <option value="1">
@@ -210,6 +211,7 @@ const WasteBsda = ({ errors }) => {
             <Input
               className="fr-col-md-8"
               label="Dénomination usuelle"
+              disabled={sealedFields.includes(`waste.materialName`)}
               nativeInputProps={{
                 ...register("waste.materialName")
               }}
@@ -229,6 +231,7 @@ const WasteBsda = ({ errors }) => {
                   </a>
                 </span>
               }
+              disabled={sealedFields.includes(`waste.pop`)}
               checked={Boolean(waste.pop)}
               onChange={(checked: boolean) => {
                 setValue("waste.pop", checked);
@@ -238,6 +241,7 @@ const WasteBsda = ({ errors }) => {
 
             <ToggleSwitch
               label="Le déchet est soumis à l'ADR"
+              disabled={sealedFields.includes(`waste.isSubjectToADR`)}
               checked={Boolean(waste.isSubjectToADR)}
               onChange={(checked: boolean) => {
                 setValue("waste.isSubjectToADR", checked);
@@ -248,6 +252,7 @@ const WasteBsda = ({ errors }) => {
             <Input
               className="fr-col-md-8 fr-mt-4w"
               label="Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
+              disabled={sealedFields.includes(`waste.nonRoadRegulationMention`)}
               nativeInputProps={{
                 ...register("waste.nonRoadRegulationMention")
               }}
@@ -255,6 +260,7 @@ const WasteBsda = ({ errors }) => {
 
             <h4 className="fr-h4 fr-mt-4w">Conditionnement</h4>
             <RhfPackagingList
+              disabled={sealedFields.includes(`packagings`)}
               fieldName="packagings"
               packagingTypes={bsdaPackagingTypes}
             />
@@ -262,6 +268,7 @@ const WasteBsda = ({ errors }) => {
             <h4 className="fr-h4 fr-mt-4w">Consistance</h4>
 
             <RadioButtons
+              disabled={sealedFields.includes(`waste.consistence`)}
               orientation="horizontal"
               options={[
                 {
@@ -308,6 +315,7 @@ const WasteBsda = ({ errors }) => {
 
             {waste.consistence === BsdaConsistence.Other && (
               <Input
+                disabled={sealedFields.includes(`waste.consistenceDescription`)}
                 className="fr-col-md-8 fr-mt-4w"
                 label="Si Autre, préciser :"
                 nativeInputProps={{
@@ -380,6 +388,7 @@ const WasteBsda = ({ errors }) => {
                 <h4 className="fr-h4 fr-mt-4w">Numéros de scellés</h4>
 
                 <RhfTagsInputWrapper
+                  disabled={sealedFields.includes(`waste.sealNumbers`)}
                   label="Numéros"
                   fieldName={"waste.sealNumbers"}
                 />
