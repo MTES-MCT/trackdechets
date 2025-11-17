@@ -45,7 +45,7 @@ const EcoOrganismesPartnersForm = ({
       })
       .map((eo: { id: string; name: string; siret: string }) => ({
         label: `${eo.name} (${
-          eo.name === "RECYCLER MON VEHICULE" ? "SI" : "ÉO"
+          eo.name === "RECYCLER MON VEHICULE" ? "ÉO" : "SI"
         })`,
         value: eo.id
       }));
