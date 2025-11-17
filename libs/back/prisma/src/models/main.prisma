@@ -305,7 +305,7 @@ model Company {
   bsdasriRevisionRequests              BsdasriRevisionRequest[]
 
   // Eco organismes avec lesquels l'entreprise travaille
-  ecoOrganismePartnersIds                String[] @default([]) 
+  ecoOrganismePartnersIds String[] @default([])
 
   givenSignatureAutomations       SignatureAutomation[]    @relation("SignatureAutomationFrom")
   receivedSignatureAutomations    SignatureAutomation[]    @relation("SignatureAutomationTo")
@@ -1396,7 +1396,35 @@ model Bsdasri {
   canAccessDraftOrgIds String[] @default([])
   intermediariesOrgIds String[] @default([])
 
-  // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+  // Note: Partial indexes are defined in migration files:
+  // - _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+  // - Bsdasri_intermediaries_nonempty: GIN index on non-empty intermediariesOrgIds
+  // - Bsdasri_emitter_active_rownum: BTREE index on emitterCompanySiret, rowNumber
+  // - Bsdasri_transporter_active_rownum: BTREE index on transporterCompanySiret, rowNumber
+  // - Bsdasri_transporter_vat_active_rownum: BTREE index on transporterCompanyVatNumber, rowNumber
+  // - Bsdasri_destination_active_rownum: BTREE index on destinationCompanySiret, rowNumber
+  // - Bsdasri_eco_active_rownum: BTREE index on ecoOrganismeSiret, rowNumber
+  // - Bsdasri_trader_active_rownum: BTREE index on traderCompanySiret, rowNumber
+
+  // PERFORMANCE OPTIMIZATION: PostgreSQL Statistics Configuration
+  //
+  // To improve query planner decisions and avoid costly sequential scans,
+  // we've increased the STATISTICS target in production for frequently-queried columns
+  // directly in PostgreSQL.
+  //
+  // Affected columns:
+  // - *siret columns
+  // - isDraft
+  // - isDeleted
+  //
+  // Configuration applied:
+  //   ALTER TABLE "default$default"."Bsdasri"
+  //   ALTER COLUMN "emitterCompanySiret" SET STATISTICS 1000;
+  //
+  // Statistics values:
+  // - Default: 100 (PostgreSQL default)
+  // - Configured: 1000 (10x sampling for better selectivity estimates)
+
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsdasriTransporterCompanyVatNumberIdx")
@@ -1410,6 +1438,9 @@ model Bsdasri {
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
   @@index([groupingEmitterSirets], map: "_BsdasriGroupingEmitterSiretIdx", type: Gin)
   @@index([synthesisEmitterSirets], map: "_BsdasriSynthesisEmitterSiretsIdx", type: Gin)
+  @@index([traderCompanySiret], map: "_BsdasriTraderCompanySiretIdx")
+  @@index([brokerCompanySiret], map: "_BsdasriBrokerCompanySiretIdx")
+  @@index([intermediariesOrgIds], map: "_BsdasriIntermediariesOrgIdsIdx", type: Gin)
 }
 
 model IntermediaryBsdasriAssociation {
