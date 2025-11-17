@@ -10,7 +10,8 @@ export const updateAppendix2Queue = new Queue<UpdateAppendix2JobArgs>(
   REDIS_URL!,
   {
     defaultJobOptions: {
-      removeOnComplete: 10_000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );

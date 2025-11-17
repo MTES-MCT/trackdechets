@@ -13,7 +13,8 @@ export const sirenifyQueue = new Queue<string>(
       attempts: 2,
       backoff: { type: "fixed", delay: 100 },
       stackTraceLimit: 100,
-      removeOnComplete: 10_000,
+      removeOnComplete: 1000,
+      removeOnFail: 5000,
       // 30 secondes
       timeout: 30 * 1000
     }

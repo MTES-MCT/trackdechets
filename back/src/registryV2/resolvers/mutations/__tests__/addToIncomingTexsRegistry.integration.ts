@@ -157,7 +157,7 @@ describe("Registry - addToIncomingTexsRegistry", () => {
     );
   });
 
-  it("should not be able to import more than 1_000 lines at once", async () => {
+  it("should not be able to import more than 1000 lines at once", async () => {
     const { user } = await userWithCompanyFactory();
     const { mutate } = makeClient(user);
 

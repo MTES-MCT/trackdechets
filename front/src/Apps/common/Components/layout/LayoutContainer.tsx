@@ -31,7 +31,7 @@ import WasteTree from "../search/WasteTree";
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
-  `Abonnez-vous à notre lettre d'information mensuelle pour suivre les nouveautés de la plateforme, la programmation des formations, des conseils pratiques, ainsi que les évolutions réglementaires liées à la traçabilité des déchets.`
+  `⚠️ Registre national – Fin de la période de tolérance le 31/12/2025. N’attendez pas la fin de l’année pour transmettre vos registres ! Les modèles d’import définitifs sont disponibles et utilisables dès maintenant sur Trackdéchets.`
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -68,10 +68,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "Je m'abonne",
-                    href: "https://0806de2d.sibforms.com/serve/MUIEAG29k1cikyqt55ql5CSQp_3hunRICQ8Eu8IvTZMpZl1EuQSEYeErCYUb31W6nx1mUfBKGfamqI9xMrql4caFpN2IUJQ_NR-00sPbnSv5Kw21AYm8tMHap8_7ah9NCHlcPqpNKrp7CPjO2zYsiAaBFX8r3PHDY72zP55LieF3N9gc3sUfOG16ioQgATXDPF0GeDpTuU46gBWT "
+                    title: "En savoir plus",
+                    href: "https://faq.trackdechets.fr/registre-national/informations-generales"
                   }}
-                  persistedSurveyName="td-20250923"
+                  persistedSurveyName="td-20251111"
                 />
               }
             />
