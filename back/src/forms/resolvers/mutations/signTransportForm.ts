@@ -101,7 +101,11 @@ const signTransportFn = async (
 
   const receiptFields = await getFormReceiptField(signingTransporter!);
 
-  const transportersForValidation = [...transporters];
+  // We only validate transporters up to the signing one
+  const transportersForValidation = [...transporters].filter((t, idx) => {
+    return idx <= signingTransporterIdx;
+  });
+
   // Prend en compte la plaque d'immatriculation et le mode
   // de transport envoyés dans l'input de signature pour
   // la validation des données
