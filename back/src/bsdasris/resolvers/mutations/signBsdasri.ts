@@ -12,7 +12,7 @@ import {
   BsdasriType,
   Prisma,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFullBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";

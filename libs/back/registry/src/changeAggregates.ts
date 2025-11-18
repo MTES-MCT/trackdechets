@@ -1,4 +1,4 @@
-import { RegistryImportType, RegistrySource } from "@prisma/client";
+import { RegistryImportType, RegistrySource } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getCachedCompany } from "./shared/helpers";
 

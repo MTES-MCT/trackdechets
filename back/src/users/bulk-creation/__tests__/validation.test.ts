@@ -1,12 +1,13 @@
 import { ValidationError } from "yup";
 import { companyValidationSchema, validateRoleGenerator } from "../validations";
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import { siretify } from "../../../__tests__/factories";
 
 const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     company: { findFirst: jest.fn(() => mockCompanyExists()) },
     user: { findFirst: jest.fn(() => mockUserExists()) }

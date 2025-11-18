@@ -14,7 +14,7 @@ import {
 import makeClient from "../../../__tests__/testClient";
 import { getStream } from "../../data";
 import { getFirstTransporterSync } from "../../../forms/database";
-import { WasteProcessorType, CompanyType } from "@prisma/client";
+import { WasteProcessorType, CompanyType } from "@td/prisma";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -125,7 +125,7 @@ describe("ActivityEvent.Bsdd", () => {
             ],
             quantity: 1.5,
             quantityType: "REAL",
-            consistence: "SOLID"
+            consistences: ["SOLID"]
           }
         }
       }

@@ -4,7 +4,7 @@ import {
   BsffStatus,
   BsffPackagingType,
   Prisma
-} from "@prisma/client";
+} from "@td/prisma";
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "@td/constants";

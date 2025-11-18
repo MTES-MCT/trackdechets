@@ -1,5 +1,5 @@
 import { prisma } from "@td/prisma";
-import { BspaohStatus, Prisma } from "@prisma/client";
+import { BspaohStatus, Prisma } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import {
   siretify,

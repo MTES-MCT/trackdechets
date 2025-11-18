@@ -12,7 +12,7 @@ import type {
   MutationSubmitBsdaRevisionRequestApprovalArgs
 } from "@td/codegen-back";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
-import { BsdaStatus, UserRole, WasteAcceptationStatus } from "@prisma/client";
+import { BsdaStatus, UserRole, WasteAcceptationStatus } from "@td/prisma";
 import { operationHook } from "../../../../operationHook";
 import { operationHooksQueue } from "../../../../../queue/producers/operationHook";
 import { sendMail } from "../../../../../mailer/mailing";

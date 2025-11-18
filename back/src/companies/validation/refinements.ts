@@ -1,6 +1,6 @@
 import { Refinement } from "zod";
 import { ParsedZodCompany } from "./schema";
-import { CompanyType, WasteVehiclesType } from "@prisma/client";
+import { CompanyType, WasteVehiclesType } from "@td/prisma";
 import { prisma } from "@td/prisma";
 
 export const checkForeignTransporter: Refinement<ParsedZodCompany> = (
@@ -202,5 +202,38 @@ export const checkWorkerSubsection: Refinement<ParsedZodCompany> = async (
       message:
         "Impossible de sélectionner le type Entreprise de travaux amiante si au moins une sous section n'est pas sélectionnée"
     });
+  }
+};
+
+export const checkEcoOrganismePartnersIds: Refinement<
+  ParsedZodCompany
+> = async (company, { addIssue }) => {
+  const { ecoOrganismePartnersIds } = company;
+
+  // On vérifie que les éco-organismes déclarés existent bien
+  if (ecoOrganismePartnersIds && ecoOrganismePartnersIds.length > 0) {
+    const ecoOrganismes = await prisma.ecoOrganisme.findMany({
+      where: {
+        id: {
+          in: ecoOrganismePartnersIds
+        }
+      },
+      select: {
+        id: true
+      }
+    });
+
+    const notFoundIds = ecoOrganismePartnersIds.filter(
+      id => !ecoOrganismes.map(e => e.id).includes(id)
+    );
+
+    if (notFoundIds.length > 0) {
+      addIssue({
+        code: "custom",
+        message: `Les IDs suivants n'appartiennent pas à un éco-organisme : ${notFoundIds.join(
+          ", "
+        )}`
+      });
+    }
   }
 };

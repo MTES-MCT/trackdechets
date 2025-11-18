@@ -3,7 +3,7 @@ import {
   CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { MutationResolvers } from "@td/codegen-back";

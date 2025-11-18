@@ -4,7 +4,7 @@ import {
   BsdaType,
   Prisma,
   RevisionRequestStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
@@ -34,7 +34,7 @@ import {
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
   // BsdaStatus.INITIAL,
-  // BsdaStatus.SIGNED_BY_PRODUCER,
+  BsdaStatus.SIGNED_BY_PRODUCER,
   BsdaStatus.SIGNED_BY_WORKER,
   BsdaStatus.SENT
   // BsdaStatus.PROCESSED,

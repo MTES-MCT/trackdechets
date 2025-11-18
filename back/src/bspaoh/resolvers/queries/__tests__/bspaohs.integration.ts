@@ -4,7 +4,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bspaohFactory } from "../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
-import { BspaohStatus } from "@prisma/client";
+import { BspaohStatus } from "@td/prisma";
 
 import { fullBspaoh } from "../../../fragments";
 import { gql } from "graphql-tag";

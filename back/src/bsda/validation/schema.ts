@@ -3,7 +3,7 @@ import {
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { z } from "zod";
 import { BSDA_WASTE_CODES } from "@td/constants";
 import {
@@ -207,6 +207,7 @@ export const rawBsdaSchema = z.object({
   destinationCustomInfo: z.string().max(250).nullish(),
   destinationReceptionDate: z.coerce.date().nullish(),
   destinationReceptionWeight: z.number().nullish(),
+  destinationReceptionWeightIsEstimate: z.boolean().nullish(),
   destinationReceptionRefusedWeight: z.number().min(0).nullish(),
   destinationReceptionAcceptationStatus: z
     .nativeEnum(WasteAcceptationStatus)

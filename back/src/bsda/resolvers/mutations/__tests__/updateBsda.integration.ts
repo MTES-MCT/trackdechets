@@ -1,10 +1,4 @@
-import {
-  Bsda,
-  BsdaStatus,
-  TransportMode,
-  Prisma,
-  UserRole
-} from "@prisma/client";
+import { Bsda, BsdaStatus, TransportMode, Prisma, UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type {
   BsdaInput,

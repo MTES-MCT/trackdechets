@@ -7,7 +7,7 @@ import { getBsdaOrNotFound, getFirstTransporterSync } from "../../database";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { mergeInputAndParseBsdaAsync } from "../../validation";
-import { Bsda, BsdaStatus, Prisma } from "@prisma/client";
+import { Bsda, BsdaStatus, Prisma } from "@td/prisma";
 import {
   bsdaDestinationCapModificationEmail,
   MessageVersion,
@@ -33,7 +33,6 @@ export default async function edit(
   const existingFirstTransporter = getFirstTransporterSync(existingBsda)!;
 
   await checkCanUpdate(user, existingBsda, input);
-
   const {
     parsedBsda: { createdAt, ...bsda },
     updatedFields

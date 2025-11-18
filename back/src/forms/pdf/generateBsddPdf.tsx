@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
-import { Form as PrismaForm } from "@prisma/client";
+import { Form as PrismaForm } from "@td/prisma";
 
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";

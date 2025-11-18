@@ -1,4 +1,4 @@
-import { Company, Prisma, BsvhuStatus } from "@prisma/client";
+import { Company, Prisma, BsvhuStatus } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getReadableId, reindex, ReadableIdPrefix } from "back";
 
@@ -16,8 +16,13 @@ const optToBsvhuCreateInput = (opt: BsvhuOpt): Prisma.BsvhuCreateInput => {
     // Companies
     destinationCompanySiret: opt.destination?.siret,
     destinationCompanyName: opt.destination?.name,
-    transporterCompanySiret: opt.transporter?.siret,
-    transporterCompanyName: opt.transporter?.name
+    transporters: {
+      create: {
+        number: 1,
+        transporterCompanySiret: opt.transporter?.siret,
+        transporterCompanyName: opt.transporter?.name
+      }
+    }
   };
 };
 

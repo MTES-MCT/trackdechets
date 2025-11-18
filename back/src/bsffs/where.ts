@@ -1,5 +1,5 @@
 import type { BsffWhere, BsffPackagingWhere } from "@td/codegen-back";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { safeInput } from "../common/converter";
 import {
   toPrismaDateFilter,

@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, Prisma } from "@prisma/client";
+import { BsffFicheIntervention, Prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { ficheInterventionSchema } from "../validation";

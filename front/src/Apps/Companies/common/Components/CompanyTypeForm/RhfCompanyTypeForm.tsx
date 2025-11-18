@@ -34,6 +34,7 @@ export interface RhfCompanyTypeFormField {
   wasteProcessorTypes: WasteProcessorType[];
   wasteVehiclesTypes: WasteVehiclesType[];
   ecoOrganismeAgreements: string[];
+  ecoOrganismePartnersIds: string[];
 }
 
 type RhfCompanyTypeFormProps = Pick<
@@ -57,6 +58,7 @@ const RhfCompanyTypeForm = ({
   const wasteProcessorTypes = watch("wasteProcessorTypes");
   const wasteVehiclesTypes = watch("wasteVehiclesTypes");
   const ecoOrganismeAgreements = watch("ecoOrganismeAgreements");
+  const ecoOrganismePartnersIds = watch("ecoOrganismePartnersIds");
 
   // Reçoit le type ou sous-type d'établissement qui a été sélectionné, pour mettre
   // à jour l'un des champs suivants : `companyType`, `wasteProcessTypes`, `collectorTypes`
@@ -163,6 +165,13 @@ const RhfCompanyTypeForm = ({
         setValue("ecoOrganismeAgreements", []);
       }
     }
+
+    // Pour le moment seuls les VHUs sont concernés par les éco-organismes partenaires
+    if (value === CompanyType.WasteVehicles) {
+      if (!checked) {
+        setValue("ecoOrganismePartnersIds", []);
+      }
+    }
   };
 
   const { errors } = formState;
@@ -213,7 +222,8 @@ const RhfCompanyTypeForm = ({
         workerCertification: {
           hasSubSectionThree
         },
-        ecoOrganismeAgreements
+        ecoOrganismeAgreements,
+        ecoOrganismePartnersIds
       }}
       handleToggle={handleToggle}
       inputProps={{
@@ -351,6 +361,14 @@ const RhfCompanyTypeForm = ({
               ecoOrganismeAgreements.filter((_, i) => i !== index)
             );
           }
+        },
+        ecoOrganismePartnersIds: {
+          onChange: (value: string[]) => {
+            setValue("ecoOrganismePartnersIds", value, {
+              shouldDirty: true
+            });
+          },
+          value: ecoOrganismePartnersIds
         }
       }}
       inputErrors={{
@@ -375,6 +393,7 @@ const RhfCompanyTypeForm = ({
           validityLimit: errors.workerCertification?.validityLimit?.message,
           organisation: errors.workerCertification?.organisation?.message
         },
+        ecoOrganismePartnersIds: errors.ecoOrganismePartnersIds?.message,
         ecoOrganismeAgreements: ecoOrganismeAgreements.map((_, i) => {
           if (!!errors.ecoOrganismeAgreements) {
             return errors.ecoOrganismeAgreements[i]?.message ?? null;

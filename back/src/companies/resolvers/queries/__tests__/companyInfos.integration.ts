@@ -1,4 +1,4 @@
-import { CompanyType } from "@prisma/client";
+import { CompanyType } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { companyFactory, siretify } from "../../../../__tests__/factories";
@@ -503,5 +503,41 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.companyInfos.isDormant).toBe(isDormant);
+  });
+
+  it("should return ecoOrganismePartnersIds", async () => {
+    // Given
+    const siret = siretify(8);
+    mockSearchSirene.mockResolvedValueOnce({
+      siret,
+      etatAdministratif: "A",
+      name: "OPTIQUE LES AIX",
+      address: "49 Rue de la République 18220 Les Aix-d'Angillon"
+    });
+
+    await companyFactory({
+      siret,
+      allowBsdasriTakeOverWithoutSignature: true,
+      ecoOrganismePartnersIds: ["EO1", "EO2"],
+      companyTypes: {
+        set: [CompanyType.WASTEPROCESSOR]
+      }
+    });
+    const gqlquery = `
+      query {
+        companyInfos(siret: "${siret}") {
+          ecoOrganismePartnersIds
+        }
+      }`;
+
+    // When
+    const { data, errors } = await query<any>(gqlquery);
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.companyInfos.ecoOrganismePartnersIds).toStrictEqual([
+      "EO1",
+      "EO2"
+    ]);
   });
 });

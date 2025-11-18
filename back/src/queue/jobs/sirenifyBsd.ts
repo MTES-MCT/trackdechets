@@ -9,10 +9,11 @@ import {
   Bspaoh,
   BspaohTransporter,
   Bsvhu,
+  BsvhuTransporter,
   Form,
   IntermediaryFormAssociation,
   Prisma
-} from "@prisma/client";
+} from "@td/prisma";
 import { logger } from "@td/logger";
 import { prisma } from "@td/prisma";
 import { searchCompanyFailFast } from "../../companies/sirenify";
@@ -332,7 +333,8 @@ export async function sirenifyBsff(id: string) {
 
 async function sirenifyBsvhu(id: string) {
   const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
-    where: { id }
+    where: { id },
+    include: { transporters: true }
   });
 
   const sirenifyOpts: SirenifyOpts<Bsvhu, Prisma.BsvhuUpdateInput>[] = [
@@ -345,14 +347,6 @@ async function sirenifyBsvhu(id: string) {
       })
     },
     {
-      getter: bsvhu => bsvhu.transporterCompanySiret,
-      setter: (data, company) => ({
-        ...data,
-        transporterCompanyName: company.name,
-        transporterCompanyAddress: company.address
-      })
-    },
-    {
       getter: bsvhu => bsvhu.destinationCompanySiret,
       setter: (data, company) => ({
         ...data,
@@ -362,9 +356,34 @@ async function sirenifyBsvhu(id: string) {
     }
   ];
 
+  const transporterSirenifyOpts: SirenifyOpts<
+    BsvhuTransporter,
+    Prisma.BsvhuTransporterUpdateInput
+  >[] = [
+    {
+      getter: transporter => transporter.transporterCompanySiret,
+      setter: (data, company) => ({
+        ...data,
+        transporterCompanyName: company.name,
+        transporterCompanyAddress: company.address
+      })
+    }
+  ];
+
   const data = await sirenify(bsvhu, sirenifyOpts);
 
   await prisma.bsvhu.update({ data, where: { id } });
+
+  for (const transporter of bsvhu.transporters) {
+    const transporterData = await sirenify(
+      transporter,
+      transporterSirenifyOpts
+    );
+    await prisma.bsvhuTransporter.update({
+      where: { id: transporter.id },
+      data: transporterData
+    });
+  }
 }
 
 export async function sirenifyBspaoh(id: string) {

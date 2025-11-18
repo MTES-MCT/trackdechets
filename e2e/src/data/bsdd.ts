@@ -1,4 +1,4 @@
-import { Status, EmitterType, Company, Form, Prisma } from "@prisma/client";
+import { Status, EmitterType, Company, Form, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getReadableId, reindex } from "back";
 

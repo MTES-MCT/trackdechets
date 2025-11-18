@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { parse, join } from "node:path";
 import { prisma } from "@td/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export type Script = {
   run: (tx: Prisma.TransactionClient) => Promise<void>;

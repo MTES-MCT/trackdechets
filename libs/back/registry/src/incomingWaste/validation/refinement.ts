@@ -1,7 +1,7 @@
 import { Refinement, z } from "zod";
 import { ParsedZodIncomingWasteItem } from "./schema";
 import { getCachedCompany } from "../../shared/helpers";
-import { $Enums } from "@prisma/client";
+import { $Enums } from "@td/prisma";
 import {
   refineActorInfos,
   refineTransporterInfos

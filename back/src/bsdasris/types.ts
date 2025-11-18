@@ -1,4 +1,4 @@
-import { Bsdasri, Prisma } from "@prisma/client";
+import { Bsdasri, Prisma } from "@td/prisma";
 
 /**
  * A Prisma Dasri with owner user type
@@ -18,51 +18,45 @@ export interface FullDbBsdasri extends Bsdasri {
   synthesizing: { id: string }[];
 }
 
-export const BsdasriWithGroupingInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    grouping: { select: { id: true } }
-  });
+export const BsdasriWithGroupingInclude = {
+  grouping: { select: { id: true } }
+} satisfies Prisma.BsdasriInclude;
 
 export type BsdasriWithGrouping = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithGroupingInclude;
 }>;
 
-export const BsdasriWithSynthesizingInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    synthesizing: { select: { id: true } }
-  });
+export const BsdasriWithSynthesizingInclude = {
+  synthesizing: { select: { id: true } }
+} satisfies Prisma.BsdasriInclude;
 
 export type BsdasriWithSynthesizing = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithSynthesizingInclude;
 }>;
 
-export const BsdasriRevisionRequestWithAuthoringCompanyInclude =
-  Prisma.validator<Prisma.BsdasriRevisionRequestInclude>()({
-    authoringCompany: { select: { orgId: true } }
-  });
-export const BsdasriRevisionRequestWithApprovalsInclude =
-  Prisma.validator<Prisma.BsdasriRevisionRequestInclude>()({
-    approvals: { select: { approverSiret: true } }
-  });
+export const BsdasriRevisionRequestWithAuthoringCompanyInclude = {
+  authoringCompany: { select: { orgId: true } }
+} satisfies Prisma.BsdasriRevisionRequestInclude;
+export const BsdasriRevisionRequestWithApprovalsInclude = {
+  approvals: { select: { approverSiret: true } }
+} satisfies Prisma.BsdasriRevisionRequestInclude;
 
-export const BsdasriWithRevisionRequestsInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    bsdasriRevisionRequests: {
-      include: {
-        ...BsdasriRevisionRequestWithAuthoringCompanyInclude,
-        ...BsdasriRevisionRequestWithApprovalsInclude
-      }
+export const BsdasriWithRevisionRequestsInclude = {
+  bsdasriRevisionRequests: {
+    include: {
+      ...BsdasriRevisionRequestWithAuthoringCompanyInclude,
+      ...BsdasriRevisionRequestWithApprovalsInclude
     }
-  });
+  }
+} satisfies Prisma.BsdasriInclude;
 
 export type BsdasriWithRevisionRequests = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithRevisionRequestsInclude;
 }>;
 
-export const BsdasriWithIntermediariesInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    intermediaries: true
-  });
+export const BsdasriWithIntermediariesInclude = {
+  intermediaries: true
+} satisfies Prisma.BsdasriInclude;
 
 export type BsdasriWithIntermediaries = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriWithIntermediariesInclude;

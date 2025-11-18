@@ -2,7 +2,7 @@ import { prisma } from "@td/prisma";
 
 import { webhookPayloadSchema } from "../companydigest/validation";
 
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 
 const { GERICO_WEBHOOK_TOKEN } = process.env;
 

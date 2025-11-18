@@ -6,7 +6,7 @@ import {
   companyAssociatedToExistingUserFactory,
   siretify
 } from "../../../../__tests__/factories";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { fullBspaoh } from "../../../fragments";

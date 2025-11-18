@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { GenericWasteV2 } from "./types";
 import { IncomingWasteV2, OutgoingWasteV2, SsdWasteV2 } from "@td/codegen-back";

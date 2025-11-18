@@ -1,10 +1,5 @@
 import { z } from "zod";
-import {
-  OperationMode,
-  BsdasriStatus,
-  BsdasriType,
-  Bsdasri
-} from "@prisma/client";
+import { OperationMode, BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
 
 import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { capitalize, trim } from "../../common/strings";

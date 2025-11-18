@@ -2,7 +2,7 @@ import { FINAL_OPERATION_CODES, TdOperationCode, isSiret } from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
 import { getWasteCodeSchema } from "./schemas";
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 
 export function refineTransporterInfos<T>({
   modeKey,

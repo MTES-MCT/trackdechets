@@ -19,7 +19,7 @@ import {
 import { prismaToZodBsff } from "../helpers";
 import { ZodBsff } from "../schema";
 import { parseBsff, parseBsffAsync } from "..";
-import { BsffType, TransportMode } from "@prisma/client";
+import { BsffType, TransportMode } from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { CompanySearchResult } from "@td/codegen-back";
 import { searchCompany } from "../../../../companies/search";

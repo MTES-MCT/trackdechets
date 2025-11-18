@@ -1,6 +1,6 @@
-import { unescape } from "node:querystring";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@td/prisma";
 import objects from "./objects";
-import { PrismaClient } from "@prisma/client";
 
 const { DATABASE_URL } = process.env;
 
@@ -12,21 +12,13 @@ if (!DATABASE_URL) {
   throw new Error("DATABASE_URL is not defined");
 }
 
-function getDbUrlWithSchema(rawDatabaseUrl: string) {
-  try {
-    const dbUrl = new URL(rawDatabaseUrl);
-    dbUrl.searchParams.set("schema", "default$default");
-
-    return unescape(dbUrl.href); // unescape needed because of the `$`
-  } catch (_) {
-    return "";
-  }
-}
+const adapter = new PrismaPg(
+  { connectionString: DATABASE_URL },
+  { schema: "default$default" }
+);
 
 const prisma = new PrismaClient({
-  datasources: {
-    db: { url: getDbUrlWithSchema(DATABASE_URL) }
-  },
+  adapter,
   log: []
 });
 

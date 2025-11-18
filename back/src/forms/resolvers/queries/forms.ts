@@ -2,7 +2,7 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MissingSiret } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
-import { Company, Status, Prisma } from "@prisma/client";
+import { Company, Status, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { getUserCompanies } from "../../../users/database";
 import { getFormsRightFilter } from "../../database";

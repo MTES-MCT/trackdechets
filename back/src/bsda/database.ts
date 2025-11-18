@@ -1,4 +1,4 @@
-import { Bsda, BsdaTransporter, Prisma } from "@prisma/client";
+import { Bsda, BsdaTransporter, Prisma } from "@td/prisma";
 import { FormNotFound } from "../forms/errors";
 import { getReadonlyBsdaRepository } from "./repository";
 import { prisma } from "@td/prisma";

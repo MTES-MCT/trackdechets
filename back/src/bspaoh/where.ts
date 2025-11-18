@@ -1,4 +1,4 @@
-import { Prisma, BspaohStatus } from "@prisma/client";
+import { Prisma, BspaohStatus } from "@td/prisma";
 
 import { safeInput } from "../common/converter";
 

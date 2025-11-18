@@ -5,7 +5,7 @@ import { PickupSite } from "./PickupSite";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";
 import { WasteDetails } from "./WasteDetails";
-import { BsdaStatus, OperationMode } from "@prisma/client";
+import { BsdaStatus, OperationMode } from "@td/prisma";
 import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 import { getOperationModeLabel } from "../../../common/operationModes";
 import { dateToXMonthAtHHMM, isDefined } from "../../../common/helpers";
@@ -361,6 +361,21 @@ export function BsdaPdf({
               />{" "}
               partiellement
               <br />
+              Type de quantité :{" "}
+              <input
+                type="checkbox"
+                checked={!bsda?.destination?.reception?.weightIsEstimate}
+                readOnly
+              />{" "}
+              Réelle{" "}
+              <input
+                type="checkbox"
+                checked={Boolean(
+                  bsda?.destination?.reception?.weightIsEstimate
+                )}
+                readOnly
+              />{" "}
+              Estimée
               <br />
               Quantité présentée nette :{" "}
               {isDefined(bsda?.destination?.reception?.weight)

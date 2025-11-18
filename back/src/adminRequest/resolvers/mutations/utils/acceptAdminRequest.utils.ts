@@ -6,7 +6,7 @@ import {
   CompanyAssociation,
   User,
   UserRole
-} from "@prisma/client";
+} from "@td/prisma";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 import { isDefined } from "../../../../common/helpers";
 import { getAdminRequestRepository } from "../../../repository";

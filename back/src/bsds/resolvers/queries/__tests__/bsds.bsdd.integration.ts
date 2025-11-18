@@ -4,7 +4,7 @@ import {
   UserRole,
   WasteProcessorType,
   CompanyType
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   Query,
   QueryBsdsArgs,
@@ -170,7 +170,7 @@ describe("Query.bsds workflow", () => {
           isSubjectToADR: false,
           onuCode: null,
           name: "Stylos bille",
-          consistence: "SOLID",
+          consistences: ["SOLID"],
           packagingInfos: [
             {
               type: "BENNE",

@@ -2,10 +2,7 @@ import type { Query } from "@td/codegen-back";
 import makeClient from "../../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../../integration-tests/helper";
 import gql from "graphql-tag";
-import {
-  AdminRequestStatus,
-  AdminRequestValidationMethod
-} from "@prisma/client";
+import { AdminRequestStatus, AdminRequestValidationMethod } from "@td/prisma";
 import {
   companyFactory,
   userFactory,

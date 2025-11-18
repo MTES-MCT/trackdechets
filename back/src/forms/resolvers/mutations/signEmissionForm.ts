@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@td/prisma";
 import type {
   MutationResolvers,
   MutationSignEmissionFormArgs,

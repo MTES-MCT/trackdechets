@@ -3,7 +3,7 @@ import {
   TransportMode,
   User,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { ParsedZodBsda, ZodBsda, ZodBsdaTransporter } from "./schema";
 import { isForeignVat } from "@td/constants";
 import {
@@ -18,7 +18,7 @@ import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
 import { AllBsdaSignatureType } from "../types";
-import { v20250201 } from "../../common/validation";
+import { v20250201, v20251101 } from "../../common/validation";
 import {
   BsdaInput,
   BsdaSignatureType,
@@ -545,6 +545,10 @@ export const bsdaEditionRules: BsdaEditionRules = {
     required: { from: "RECEPTION" },
     path: ["destination", "reception", "weight"]
   },
+  destinationReceptionWeightIsEstimate: {
+    readableFieldName: "Le caractère estimatif du poids du déchet",
+    sealed: { from: "RECEPTION", when: isReceptionDataSealed }
+  },
   destinationReceptionRefusedWeight: {
     readableFieldName: "Le poids refusé",
     sealed: { from: "RECEPTION", when: isReceptionDataSealed },
@@ -942,6 +946,13 @@ export const bsdaEditionRules: BsdaEditionRules = {
   },
   wasteConsistenceDescription: {
     sealed: { from: fromWorkOrEmissionWhenThereIsNoWorker },
+    required: {
+      from: fromWorkOrEmissionWhenThereIsNoWorker,
+      when: bsda =>
+        bsda.wasteConsistence === "OTHER" &&
+        !!bsda.createdAt &&
+        bsda.createdAt.getTime() > v20251101.getTime()
+    },
     readableFieldName: "La description de la consistance",
     path: ["waste", "consistenceDescription"]
   },

@@ -4,7 +4,7 @@ import {
   siretSchema,
   vatNumberSchema
 } from "../../common/validation/zod/schema";
-import { AdminRequestValidationMethod } from "@prisma/client";
+import { AdminRequestValidationMethod } from "@td/prisma";
 import { isDefined } from "../../common/helpers";
 import { isSiret } from "@td/constants";
 

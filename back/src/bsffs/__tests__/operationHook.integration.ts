@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { createBsffAfterOperation } from "./factories";
 import {

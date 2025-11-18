@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User } from "@td/prisma";
 import { ParsedZodBsff, ParsedZodBsffTransporter } from "./schema";
 import { RefinementCtx } from "zod";
 import { MultiModalSignatureType } from "../../../common/types";
@@ -25,11 +25,11 @@ export type ZodBsffTransporterTransformer = (
   bsffTransporter: ParsedZodBsffTransporter
 ) => ParsedZodBsffTransporter | Promise<ParsedZodBsffTransporter>;
 
-export const BsffForParsingInclude = Prisma.validator<Prisma.BsffInclude>()({
+export const BsffForParsingInclude = {
   transporters: true,
   packagings: { include: { previousPackagings: true } },
   ficheInterventions: true
-});
+} satisfies Prisma.BsffInclude;
 
 export type PrismaBsffForParsing = Prisma.BsffGetPayload<{
   include: typeof BsffForParsingInclude;

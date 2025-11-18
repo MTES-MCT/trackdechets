@@ -3,7 +3,7 @@ import type {
   BsdasriRevisionRequestResolvers
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
-import { BsdasriRevisionRequest as PrismaBsdasriRevisionRequest } from "@prisma/client";
+import { BsdasriRevisionRequest as PrismaBsdasriRevisionRequest } from "@td/prisma";
 import {
   expandBsdasriRevisionRequestContent,
   expandBsdasriFromDB

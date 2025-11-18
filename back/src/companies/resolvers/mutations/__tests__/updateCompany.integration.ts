@@ -1,7 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import { AuthType } from "../../../../auth/auth";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  ecoOrganismeFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import { searchCompany } from "../../../search";
 import makeClient from "../../../../__tests__/testClient";
 import type { Mutation, MutationUpdateCompanyArgs } from "@td/codegen-back";
@@ -11,7 +14,7 @@ import {
   CompanyType,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import gql from "graphql-tag";
 
 const mockGetUpdatedCompanyNameAndAddress = jest.fn();
@@ -43,6 +46,7 @@ const UPDATE_COMPANY = gql`
     $traderReceiptId: String
     $ecoOrganismeAgreements: [URL!]
     $allowBsdasriTakeOverWithoutSignature: Boolean
+    $ecoOrganismePartnersIds: [String!]
   ) {
     updateCompany(
       id: $id
@@ -59,12 +63,14 @@ const UPDATE_COMPANY = gql`
       traderReceiptId: $traderReceiptId
       ecoOrganismeAgreements: $ecoOrganismeAgreements
       allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
+      ecoOrganismePartnersIds: $ecoOrganismePartnersIds
     ) {
       id
       name
       address
       naf
       libelleNaf
+      ecoOrganismePartnersIds
     }
   }
 `;
@@ -1205,6 +1211,198 @@ describe("mutation updateCompany", () => {
       expect(updatedCompany?.postalCode).toBe("4570");
       expect(updatedCompany?.city).toBe("Marchin");
       expect(updatedCompany?.country).toBe("BE");
+    });
+  });
+
+  describe("TRA-15995 - Un VHU peut sélectionner des éco-organismes avec lesquels il travaille", () => {
+    it("should be able to add eco-organismes partners", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      // Eco-organismes
+      const { company: ecoOrganismeCompany1 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme1 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany1.siret!,
+        handle: { handleBsvhu: true }
+      });
+      const { company: ecoOrganismeCompany2 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme2 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany2.siret!,
+        handle: { handleBsvhu: true }
+      });
+
+      const variables = {
+        id: company.id,
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables
+        }
+      );
+      expect(data.updateCompany.id).toEqual(company.id);
+      expect(errors).toBeUndefined();
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id,
+        ecoOrganisme2.id
+      ]);
+
+      // Then
+      const updatedCompany = await prisma.company.findUnique({
+        where: { id: company.id }
+      });
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id,
+        ecoOrganisme2.id
+      ]);
+    });
+
+    it("should be able to remove eco-organismes partners", async () => {
+      // Eco-organismes
+      const { company: ecoOrganismeCompany1 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme1 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany1.siret!,
+        handle: { handleBsvhu: true }
+      });
+      const { company: ecoOrganismeCompany2 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme2 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany2.siret!,
+        handle: { handleBsvhu: true }
+      });
+
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
+      });
+
+      const variables = {
+        id: company.id,
+        ecoOrganismePartnersIds: [ecoOrganisme1.id] // remove ecoOrganisme2
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables
+        }
+      );
+      expect(data.updateCompany.id).toEqual(company.id);
+      expect(errors).toBeUndefined();
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id
+      ]);
+
+      // Then
+      const updatedCompany = await prisma.company.findUnique({
+        where: { id: company.id }
+      });
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([
+        ecoOrganisme1.id
+      ]);
+    });
+
+    it("should be able to remove all eco-organismes partners", async () => {
+      // Eco-organismes
+      const { company: ecoOrganismeCompany1 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme1 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany1.siret!,
+        handle: { handleBsvhu: true }
+      });
+      const { company: ecoOrganismeCompany2 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme2 = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany2.siret!,
+        handle: { handleBsvhu: true }
+      });
+
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        ecoOrganismePartnersIds: [ecoOrganisme1.id, ecoOrganisme2.id]
+      });
+
+      const variables = {
+        id: company.id,
+        ecoOrganismePartnersIds: [] // remove all
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { data, errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables
+        }
+      );
+      expect(data.updateCompany.id).toEqual(company.id);
+      expect(errors).toBeUndefined();
+      expect(data.updateCompany.ecoOrganismePartnersIds).toStrictEqual([]);
+
+      // Then
+      const updatedCompany = await prisma.company.findUnique({
+        where: { id: company.id }
+      });
+      expect(updatedCompany?.ecoOrganismePartnersIds).toStrictEqual([]);
+    });
+
+    it("should throw if eco-organisme partners are not eco-organismes", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("ADMIN", {
+        ecoOrganismePartnersIds: []
+      });
+
+      // Non eco-organisme
+      const { company: nonEcoOrganismeCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      // Eco-organisme
+      const { company: ecoOrganismeCompany1 } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const ecoOrganisme = await ecoOrganismeFactory({
+        siret: ecoOrganismeCompany1.siret!,
+        handle: { handleBsvhu: true }
+      });
+
+      const variables = {
+        id: company.id,
+        ecoOrganismePartnersIds: [
+          nonEcoOrganismeCompany.id, // invalid
+          ecoOrganisme.id
+        ]
+      };
+
+      // When
+      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+      const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+        UPDATE_COMPANY,
+        {
+          variables
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        `Les IDs suivants n'appartiennent pas à un éco-organisme : ${nonEcoOrganismeCompany.id}`
+      );
     });
   });
 });

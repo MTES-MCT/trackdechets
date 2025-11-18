@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 
 export type DeleteFormStaleSegmentsFn = (

@@ -4,7 +4,7 @@ import {
   BsddTransporter,
   TransportMode,
   IntermediaryFormAssociation
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import {
   chain,
@@ -127,7 +127,11 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: undefinedOrDefault(
       chain(input.wasteDetails, w =>
-        w.consistence ? [w.consistence] : undefined
+        w.consistences
+          ? w.consistences
+          : w.consistence
+          ? [w.consistence]
+          : undefined
       ),
       []
     ),
@@ -595,10 +599,10 @@ export function expandTransporterFromDb(
 /**
  * Prisma form with optional computed fields
  */
-export const expandableFormIncludes = Prisma.validator<Prisma.FormInclude>()({
+export const expandableFormIncludes = {
   forwardedIn: { include: { transporters: true } },
   transporters: true
-});
+} satisfies Prisma.FormInclude;
 export type PrismaFormWithForwardedInAndTransporters = Prisma.FormGetPayload<{
   include: typeof expandableFormIncludes;
 }>;
@@ -719,6 +723,7 @@ export function expandFormFromDb(
         : null,
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence?.[0],
+      consistences: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
@@ -908,6 +913,7 @@ export function expandFormFromDb(
               : null,
             quantityType: forwardedIn.wasteDetailsQuantityType,
             consistence: forwardedIn.wasteDetailsConsistence?.[0],
+            consistences: forwardedIn.wasteDetailsConsistence,
             pop: forwardedIn.wasteDetailsPop,
             isDangerous: forwardedIn.wasteDetailsIsDangerous
           }),

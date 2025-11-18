@@ -2,7 +2,7 @@ import { Job } from "bull";
 import { prisma } from "@td/prisma";
 import { geocode } from "../../companies/geo/geocode";
 import { GeocodeJobData } from "../producers/company";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 
 export async function geocodeJob(
   job: Job<GeocodeJobData>

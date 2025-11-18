@@ -3,12 +3,13 @@ import {
   AuthType,
   applyAuthStrategies
 } from "../auth/auth";
-import { AccessToken, User } from "@prisma/client";
+import { AccessToken, User } from "@td/prisma";
 import { GraphQLContext } from "../types";
 import { sameDayMidnight } from "../utils";
 
 const updateAccessTokenMock = jest.fn();
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     accessToken: {
       update: jest.fn((...args) => updateAccessTokenMock(...args))

@@ -8,7 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsvhuIdentificationType } from "@prisma/client";
+import { BsvhuIdentificationType } from "@td/prisma";
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {

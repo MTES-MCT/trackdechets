@@ -31,7 +31,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: "SOLID",
+      consistences: ["SOLID"],
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -71,7 +71,7 @@ const appendixForms = [
       code: "07 01 01*",
       name: "eaux de lavage",
       quantity: 1,
-      consistence: "LIQUID",
+      consistences: ["LIQUID"],
       packagingInfos: [
         {
           __typename: "PackagingInfo",
@@ -287,8 +287,7 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
-    expect(updateConsistence).toHaveBeenCalledWith("SOLID");
-    updateConsistence.mockClear();
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID"]);
 
     fireEvent.click(checkbox3);
     await waitFor(() => expect(checkbox3).toBeChecked());
@@ -310,7 +309,7 @@ describe("<Appendix2MultiSelect />", () => {
       }
     ]);
     expect(input3).not.toBeDisabled();
-    expect(updateConsistence).not.toHaveBeenCalled();
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
     expect(headerCheckbox).toBeChecked();
 
     const user = userEvent.setup();
@@ -347,7 +346,7 @@ describe("<Appendix2MultiSelect />", () => {
 
     expect(updateTotalQuantity).toHaveBeenCalledWith(0);
     expect(updatePackagings).toHaveBeenCalledWith([]);
-    expect(updateConsistence).not.toHaveBeenCalled();
+    expect(updateConsistence).toHaveBeenCalledWith([]);
 
     // Les inputs sont tous disabled et leurs valeurs est reset à
     // la quantité restante disponible
@@ -386,7 +385,7 @@ describe("<Appendix2MultiSelect />", () => {
         identificationNumbers: []
       }
     ]);
-    expect(updateConsistence).not.toHaveBeenCalled();
+    expect(updateConsistence).toHaveBeenCalledWith(["SOLID", "LIQUID"]);
 
     const readableIfFilter = screen.getByLabelText("Numéro de bordereau");
     expect(readableIfFilter).toBeInTheDocument();

@@ -19,7 +19,7 @@ import {
   CompanyType,
   WasteProcessorType,
   OperationMode
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   CANCELLABLE_BSDD_STATUSES,
   NON_CANCELLABLE_BSDD_STATUSES

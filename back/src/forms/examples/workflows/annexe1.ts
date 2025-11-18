@@ -12,7 +12,7 @@ import {
   groupAppendix1Producer,
   switchAppendixContext
 } from "../steps/updateForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 const workflow: Workflow = {
   title: "Bordereau chapeau et annexe 1",
   description: `Le collecteur crée un bordereau chapeau. Il crée ensuite ses bordereaux d'annexe 1 et les rattache à ce chapeau.

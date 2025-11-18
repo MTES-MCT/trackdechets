@@ -1,4 +1,4 @@
-import { CollectorType, WasteProcessorType, Company } from "@prisma/client";
+import { CollectorType, WasteProcessorType, Company } from "@td/prisma";
 
 const hasAuthorization = (requiredAuthorizations, companySubTypes): boolean => {
   const matching = requiredAuthorizations.filter(i =>

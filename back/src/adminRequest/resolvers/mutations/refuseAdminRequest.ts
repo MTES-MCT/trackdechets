@@ -10,7 +10,7 @@ import { parseMutationRefuseAdminRequestArgs } from "../../validation";
 import { prisma } from "@td/prisma";
 import { getAdminRequestRepository } from "../../repository";
 import { fixTyping } from "../typing";
-import { AdminRequestStatus } from "@prisma/client";
+import { AdminRequestStatus } from "@td/prisma";
 import {
   checkCanRefuseAdminRequest,
   getAdminRequestOrThrow,

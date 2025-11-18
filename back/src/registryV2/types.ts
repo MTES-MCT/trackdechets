@@ -6,13 +6,13 @@ import type {
   ManagedWasteV2,
   AllWasteV2
 } from "@td/codegen-back";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 export type GenericWasteV2 = SsdWasteV2 | IncomingWasteV2 | OutgoingWasteV2;
 
 type Nullable<T> = { [K in keyof T]: T[K] | null };
 
 // BSDD
-export const RegistryV2BsddInclude = Prisma.validator<Prisma.FormInclude>()({
+export const RegistryV2BsddInclude = {
   forwarding: { include: { transporters: true } },
   intermediaries: true,
   forwardedIn: { include: { transporters: true } },
@@ -28,14 +28,14 @@ export const RegistryV2BsddInclude = Prisma.validator<Prisma.FormInclude>()({
   },
   grouping: { include: { initialForm: { include: { transporters: true } } } },
   transporters: true
-});
+} satisfies Prisma.FormInclude;
 
 export type RegistryV2Bsdd = Prisma.FormGetPayload<{
   include: typeof RegistryV2BsddInclude;
 }>;
 
 // BSDA
-export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
+export const RegistryV2BsdaInclude = {
   grouping: true,
   forwarding: true,
   intermediaries: true,
@@ -50,28 +50,27 @@ export const RegistryV2BsdaInclude = Prisma.validator<Prisma.BsdaInclude>()({
       }
     }
   }
-});
+} satisfies Prisma.BsdaInclude;
 
 export type RegistryV2Bsda = Prisma.BsdaGetPayload<{
   include: typeof RegistryV2BsdaInclude;
 }>;
 
 // BSDASRI
-export const RegistryV2BsdasriInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    grouping: true,
-    intermediaries: true,
-    finalOperations: {
-      include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
-    }
-  });
+export const RegistryV2BsdasriInclude = {
+  grouping: true,
+  intermediaries: true,
+  finalOperations: {
+    include: { finalBsdasri: { select: { destinationCompanySiret: true } } }
+  }
+} satisfies Prisma.BsdasriInclude;
 
 export type RegistryV2Bsdasri = Prisma.BsdasriGetPayload<{
   include: typeof RegistryV2BsdasriInclude;
 }>;
 
 // BSFF
-export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
+export const RegistryV2BsffInclude = {
   transporters: true,
   packagings: {
     include: {
@@ -93,28 +92,26 @@ export const RegistryV2BsffInclude = Prisma.validator<Prisma.BsffInclude>()({
       }
     }
   }
-});
+} satisfies Prisma.BsffInclude;
 
 export type RegistryV2Bsff = Prisma.BsffGetPayload<{
   include: typeof RegistryV2BsffInclude;
 }>;
 
 // BSPAOH
-export const RegistryV2BspaohInclude = Prisma.validator<Prisma.BspaohInclude>()(
-  {
-    transporters: true
-  }
-);
+export const RegistryV2BspaohInclude = {
+  transporters: true
+} satisfies Prisma.BspaohInclude;
 
 export type RegistryV2Bspaoh = Prisma.BspaohGetPayload<{
   include: typeof RegistryV2BspaohInclude;
 }>;
 
 // BSVHU
-export const RegistryV2BsvhuInclude = Prisma.validator<Prisma.BsvhuInclude>()({
+export const RegistryV2BsvhuInclude = {
   intermediaries: true,
   transporters: true
-});
+} satisfies Prisma.BsvhuInclude;
 
 export type RegistryV2Bsvhu = Prisma.BsvhuGetPayload<{
   include: typeof RegistryV2BsvhuInclude;

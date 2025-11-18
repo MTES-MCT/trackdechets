@@ -3,7 +3,7 @@ import {
   BsdasriStatus,
   Prisma,
   RevisionRequestStatus
-} from "@prisma/client";
+} from "@td/prisma";
 
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
 

@@ -3,7 +3,7 @@ import {
   RegistryExportDeclarationType,
   RegistryExportType,
   RegistryExportWasteType
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import type {
   IncomingWasteV2,
@@ -1358,7 +1358,6 @@ export const getElasticExhaustiveRegistryFields = (bsvhu: BsvhuForElastic) => {
     registryFields.isExhaustiveWasteFor = [
       bsvhu.destinationCompanySiret,
       bsvhu.emitterCompanySiret,
-      bsvhu.transporterCompanySiret,
       bsvhu.ecoOrganismeSiret,
       bsvhu.brokerCompanySiret,
       bsvhu.traderCompanySiret
@@ -1389,10 +1388,6 @@ const minimalBsvhuForLookupSelect = {
   destinationOperationSignatureDate: true,
   destinationReceptionDate: true,
   destinationCompanySiret: true,
-  transporterTransportSignatureDate: true,
-  transporterTransportTakenOverAt: true,
-  transporterCompanySiret: true,
-  transporterCompanyVatNumber: true,
   emitterCompanySiret: true,
   ecoOrganismeSiret: true,
   brokerCompanySiret: true,
@@ -1494,8 +1489,8 @@ const bsvhuToLookupCreateInputs = (
         wasteType: RegistryExportWasteType.DD,
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
-          bsvhu.transporterTransportTakenOverAt ??
-            bsvhu.transporterTransportSignatureDate!,
+          transporter.transporterTransportTakenOverAt ??
+            transporter.transporterTransportSignatureDate!,
           bsvhu.createdAt
         ),
         bsvhuId: bsvhu.id

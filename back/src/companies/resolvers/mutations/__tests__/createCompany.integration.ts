@@ -5,8 +5,10 @@ import { ErrorCode } from "../../../../common/errors";
 import { sendMail } from "../../../../mailer/mailing";
 import {
   companyFactory,
+  ecoOrganismeFactory,
   siretify,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { geocode } from "../../../geo/geocode";
@@ -18,7 +20,7 @@ import {
   UserRole,
   WasteProcessorType,
   WasteVehiclesType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   onboardingFirstStep,
   renderMail,
@@ -95,6 +97,7 @@ const CREATE_COMPANY = gql`
       }
       allowBsdasriTakeOverWithoutSignature
       verificationStatus
+      ecoOrganismePartnersIds
     }
   }
 `;
@@ -1309,6 +1312,63 @@ describe("Mutation.createCompany", () => {
     );
   });
 
+  it("WASTE_CENTER > should send verification email and not onboarding email", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory();
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste center",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTE_CENTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      siret: companyInput.siret,
+      orgId: companyInput.siret,
+      name: companyInput.companyName,
+      companyTypes: companyInput.companyTypes
+    });
+
+    const newCompany = await prisma.company.findFirst({
+      where: {
+        orgId: companyInput.siret
+      }
+    });
+    expect(newCompany).not.toBeUndefined();
+
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(1);
+
+    // Verification e-mail
+    expect(sendMail as jest.Mock).toHaveBeenCalledWith(
+      renderMail(verificationProcessInfo, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { company: newCompany as any }
+      })
+    );
+  });
+
   it("foreign transporter > should auto validate and send onboarding email", async () => {
     // Given
     process.env.VERIFY_COMPANY = "true";
@@ -1417,6 +1477,56 @@ describe("Mutation.createCompany", () => {
     expect(company?.verificationMode).toEqual(CompanyVerificationMode.LETTER);
   });
 
+  it("WASTE_CENTER with generic email > should auto send verification letter", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory({ email: "user@gmail.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste center",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTE_CENTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification letter
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(1);
+
+    const company = await prisma.company.findFirst({
+      where: {
+        siret
+      }
+    });
+
+    expect(company?.verificationStatus).toEqual(
+      CompanyVerificationStatus.LETTER_SENT
+    );
+    expect(company?.verificationMode).toEqual(CompanyVerificationMode.LETTER);
+  });
+
   it("professional with pro email > should not send email verification letter", async () => {
     // Given
     process.env.VERIFY_COMPANY = "true";
@@ -1434,6 +1544,48 @@ describe("Mutation.createCompany", () => {
       companyName: "Transporteur",
       address: "une adresse",
       companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      verificationStatus: "TO_BE_VERIFIED"
+    });
+
+    jest.mock("../../../../common/post");
+    (sendVerificationCodeLetter as jest.Mock).mockImplementation(() =>
+      Promise.resolve()
+    );
+
+    // Verification letter
+    expect(sendVerificationCodeLetter as jest.Mock).toHaveBeenCalledTimes(0);
+  });
+
+  it("WASTE_CENTER with pro email > should not send email verification letter", async () => {
+    // Given
+    process.env.VERIFY_COMPANY = "true";
+    const user = await userFactory({ email: "user@dechets.com" });
+    const siret = siretify(8);
+    const orgId = siret;
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    const companyInput = {
+      siret,
+      companyName: "Waste center",
+      address: "une adresse",
+      companyTypes: [CompanyType.WASTE_CENTER]
     };
 
     // When
@@ -2237,5 +2389,66 @@ describe("Mutation.createCompany", () => {
       expect(company?.city).toBe("Marchin");
       expect(company?.country).toBe("BE");
     });
+  });
+
+  it("should create company and ecoOrganismePartnersIds", async () => {
+    // Given
+    const user = await userFactory();
+    const orgId = siretify(7);
+
+    // Eco-organisme
+    const { company: ecoOrganismeCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const ecoOrganisme = await ecoOrganismeFactory({
+      siret: ecoOrganismeCompany.siret!,
+      handle: { handleBsvhu: true }
+    });
+
+    const companyInput = {
+      siret: orgId,
+      gerepId: "1234",
+      companyName: "Acme",
+      address: "3 rue des granges",
+      companyTypes: [CompanyType.WASTE_VEHICLES],
+      website: "https://trackdechets.beta.gouv.fr",
+      ecoOrganismePartnersIds: [ecoOrganisme.id]
+    };
+
+    (searchCompany as jest.Mock).mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "A"
+    });
+
+    // When
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data, errors } = await mutate<Pick<Mutation, "createCompany">>(
+      CREATE_COMPANY,
+      {
+        variables: {
+          companyInput
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(data.createCompany).toMatchObject({
+      siret: companyInput.siret,
+      gerepId: companyInput.gerepId,
+      name: companyInput.companyName,
+      companyTypes: companyInput.companyTypes,
+      allowBsdasriTakeOverWithoutSignature: false, // by default
+      ecoOrganismePartnersIds: [ecoOrganisme.id]
+    });
+
+    const newCompany = await prisma.company.findFirst({
+      where: {
+        siret: companyInput.siret
+      }
+    });
+    expect(newCompany).not.toBeUndefined();
+    expect(newCompany?.ecoOrganismePartnersIds).toEqual([ecoOrganisme.id]);
   });
 });

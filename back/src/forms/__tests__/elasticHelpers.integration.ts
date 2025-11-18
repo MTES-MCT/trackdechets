@@ -9,7 +9,7 @@ import { getFormRevisionOrgIds } from "../elasticHelpers";
 import { getFormForElastic } from "../elastic";
 import { prisma } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { CompanyType, WasteProcessorType } from "@prisma/client";
+import { CompanyType, WasteProcessorType } from "@td/prisma";
 
 const CREATE_FORM_REVISION_REQUEST = gql`
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {

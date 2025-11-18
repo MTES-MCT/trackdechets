@@ -1,9 +1,4 @@
-import {
-  BsffPackagingType,
-  BsffStatus,
-  BsffType,
-  UserRole
-} from "@prisma/client";
+import { BsffPackagingType, BsffStatus, BsffType, UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationDeleteBsffArgs } from "@td/codegen-back";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";

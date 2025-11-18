@@ -20,6 +20,7 @@ type PermissionsContextType = {
   permissionsInfos: PermissionsInfos;
   orgIds: string[];
   defaultOrgId: string | undefined;
+  loading: boolean;
 };
 
 export const PERMISSIONS_INFOS = gql`
@@ -45,7 +46,12 @@ export function usePermissions(orgId?: string) {
     throw new Error("usePermissions must be used within a PermissionsProvider");
   }
 
-  const { permissionsInfos, orgIds, defaultOrgId } = context;
+  const {
+    permissionsInfos,
+    orgIds,
+    defaultOrgId,
+    loading: loadingPermissions
+  } = context;
 
   const orgPermissions = useMemo(
     () =>
@@ -63,13 +69,14 @@ export function usePermissions(orgId?: string) {
     permissionsInfos,
     orgPermissions,
     orgIds,
-    defaultOrgId
+    defaultOrgId,
+    loadingPermissions
   };
 }
 
 export function PermissionsProvider({ children }: PropsWithChildren<{}>) {
   const { isAuthenticated } = useAuth();
-  const { data } = useQuery<Pick<Query, "permissionsInfos">>(
+  const { data, loading } = useQuery<Pick<Query, "permissionsInfos">>(
     PERMISSIONS_INFOS,
     { skip: !isAuthenticated }
   );
@@ -96,7 +103,7 @@ export function PermissionsProvider({ children }: PropsWithChildren<{}>) {
 
   return (
     <PermissionsContext.Provider
-      value={{ permissionsInfos, orgIds, defaultOrgId }}
+      value={{ permissionsInfos, orgIds, defaultOrgId, loading }}
     >
       {children}
     </PermissionsContext.Provider>

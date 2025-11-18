@@ -32,7 +32,7 @@ import {
   Prisma,
   BsvhuTransporter as PrismaBsvhuTransporter,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { BsvhuWithTransporters } from "./types";
 import { getFirstTransporterSync } from "./database";

@@ -8,6 +8,8 @@ import {
   formatDateViewDisplay
 } from "../common/utils";
 import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
+import { useQuery } from "@apollo/client";
+import { GET_ECO_ORGANISMES } from "../../../form/registry/common/EcoOrganismes";
 
 interface CompanyProfileFormProps {
   company: CompanyPrivate;
@@ -40,6 +42,12 @@ function getFormattedCompanyTypes(companyTypes: CompanyType[]) {
 }
 
 const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
+  const { data, loading: loadingEcoOrganismes } = useQuery(GET_ECO_ORGANISMES, {
+    variables: {
+      handleBsvhu: true
+    }
+  });
+
   const companyTypesFormatted = getFormattedCompanyTypes(company.companyTypes);
   return (
     <ul data-testid="company-types">
@@ -58,7 +66,6 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                   }
                 ]}
               />
-
               {companyType.value === CompanyType.Worker && (
                 <div data-testid="company-worker-section" className="fr-mb-3w">
                   <Highlight>
@@ -219,11 +226,34 @@ const CompanyProfileInformation = ({ company }: CompanyProfileFormProps) => {
                   </Highlight>
                 </div>
               )}
+              {companyType.value === CompanyType.WasteVehicles && (
+                <Highlight>
+                  <p className="companyFormWrapper__title-field">
+                    Éco-organismes (ÉO) ou Systèmes individuels (SI) (optionnel)
+                  </p>
+                  <p className="companyFormWrapper__value-field fr-pb-1w">
+                    {loadingEcoOrganismes && (
+                      <i>Chargement des éco-organismes...</i>
+                    )}
+                    {(!loadingEcoOrganismes &&
+                      company.ecoOrganismePartnersIds
+                        .map(ecoOrganismeId => {
+                          const ecoOrganisme = data?.ecoOrganismes.find(
+                            ecoOrganisme => ecoOrganisme.id === ecoOrganismeId
+                          );
+                          return ecoOrganisme ? ecoOrganisme.name : null;
+                        })
+                        .filter(Boolean)
+                        .join(", ")) ||
+                      " - "}
+                  </p>
+                </Highlight>
+              )}
               {companyType.value === CompanyType.WasteVehicles &&
                 company.wasteVehiclesTypes.includes(
                   WasteVehiclesType.Broyeur
                 ) && (
-                  <div data-testid="wasteVehiculesReceipt">
+                  <div data-testid="wasteVehiculesReceipt" className="fr-mb-3w">
                     <Highlight>
                       <p className="companyFormWrapper__title-field">
                         Broyeur VHU

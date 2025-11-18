@@ -1,6 +1,6 @@
 import { prisma } from "@td/prisma";
 import { getCompanySplittedAddress } from "../../companies/companyUtils";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import { searchCompanyTD } from "../../companies/sirene/trackdechets/client";
 import { SiretNotFoundError } from "../../companies/sirene/errors";
 import { SireneSearchResult } from "../../companies/sirene/types";

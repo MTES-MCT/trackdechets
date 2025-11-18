@@ -1,5 +1,5 @@
 import { ParsedZodBsda, ParsedZodBsdaTransporter } from "./schema";
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User } from "@td/prisma";
 import { BsdaUserFunctions } from "./helpers";
 import { AllBsdaSignatureType } from "../types";
 
@@ -19,11 +19,11 @@ export type BsdaValidationContext = {
   userFunctions?: BsdaUserFunctions;
 };
 
-export const BsdaForParsingInclude = Prisma.validator<Prisma.BsdaInclude>()({
+export const BsdaForParsingInclude = {
   intermediaries: true,
   grouping: true,
   transporters: true
-});
+} satisfies Prisma.BsdaInclude;
 
 export type PrismaBsdaForParsing = Prisma.BsdaGetPayload<{
   include: typeof BsdaForParsingInclude;

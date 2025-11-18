@@ -225,7 +225,8 @@ export function BsdAdmin() {
                   permissions: [UserPermission.BsdCanRead]
                 },
                 defaultOrgId: "unset",
-                orgIds: ["unset"]
+                orgIds: ["unset"],
+                loading: false
               }}
             >
               <BsdCard

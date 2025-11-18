@@ -8,7 +8,7 @@ import {
   WasteAcceptationStatus,
   BsffPackagingType,
   OperationMode
-} from "@prisma/client";
+} from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import { UserWithCompany } from "../../__tests__/factories";

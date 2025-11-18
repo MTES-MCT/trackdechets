@@ -1,4 +1,4 @@
-import { OperationMode, WasteAcceptationStatus } from "@prisma/client";
+import { OperationMode, WasteAcceptationStatus } from "@td/prisma";
 import { z } from "zod";
 import { weightSchema } from "../../../common/validation/weight";
 import { WeightUnits } from "../../../common/validation";

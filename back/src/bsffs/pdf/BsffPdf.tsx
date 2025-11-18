@@ -4,7 +4,7 @@ import {
   BsffType,
   OperationMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   Document,
   formatDate,

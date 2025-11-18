@@ -1,4 +1,4 @@
-import { RegistryDelegation } from "@prisma/client";
+import { RegistryDelegation } from "@td/prisma";
 import { getRegistryDelegationRepository } from "../../../repository";
 
 export const cancelDelegation = async (

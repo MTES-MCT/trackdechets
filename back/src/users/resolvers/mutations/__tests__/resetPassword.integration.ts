@@ -6,11 +6,6 @@ import type { Mutation } from "@td/codegen-back";
 import { compare } from "bcrypt";
 import { addHours } from "date-fns";
 import { ErrorCode } from "../../../../common/errors";
-import { redisClient } from "../../../../common/redis";
-import {
-  storeUserSessionsId,
-  genUserSessionsIdsKey
-} from "../../../../common/redis/users";
 
 const RESET_PASSWORD = `
   mutation ResetPassword($newPassword: String! ,$hash: String! ){
@@ -94,16 +89,6 @@ describe("mutation resetPassword", () => {
 
   it("should reset user password", async () => {
     const user = await userFactory();
-    // create a few redis sessions entries
-    const sessionId1 = `xyz123`;
-    const sessionId2 = `abcd654`;
-    const sessionKey1 = `sess:${sessionId1}`;
-    const sessionKey2 = `sess:${sessionId2}`;
-    await redisClient.set(sessionKey1, "data");
-    await redisClient.set(sessionKey2, "data");
-    // reference them
-    await storeUserSessionsId(user.id, sessionId1);
-    await storeUserSessionsId(user.id, sessionId2);
 
     await prisma.userResetPasswordHash.create({
       data: {
@@ -144,14 +129,6 @@ describe("mutation resetPassword", () => {
       where: { userId: user.id }
     });
     expect(resetHashExists).toEqual(0);
-
-    // sessions are deleted
-    expect(await redisClient.exists(sessionKey1)).toBeFalsy();
-    expect(await redisClient.exists(sessionKey2)).toBeFalsy();
-    // user sessions references entry is deleted
-    expect(
-      await redisClient.exists(genUserSessionsIdsKey(user.id))
-    ).toBeFalsy();
 
     const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }

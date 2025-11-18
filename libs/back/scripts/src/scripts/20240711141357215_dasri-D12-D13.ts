@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@td/prisma";
 
 export async function run(tx: Prisma.TransactionClient) {
   await tx.bsdasri.updateMany({

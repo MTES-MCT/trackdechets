@@ -1,4 +1,4 @@
-import { Bspaoh, User } from "@prisma/client";
+import { Bspaoh, User } from "@td/prisma";
 import type { BspaohInput, BspaohSignatureType } from "@td/codegen-back";
 import { getUserRoles } from "../../permissions";
 import { editionRules } from "./rules";

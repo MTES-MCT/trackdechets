@@ -20,7 +20,7 @@ import {
   Status,
   UserRole,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
 import { operationHooksQueue } from "../../../../queue/producers/operationHook";

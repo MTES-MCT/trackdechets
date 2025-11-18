@@ -2,7 +2,7 @@ import { createForm } from "../steps/createForm";
 import { markAsSealed } from "../steps/markAsSealed";
 import { importPaperForm } from "../steps/importPaperForm";
 import { Workflow } from "../../../common/workflow";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: `Acheminement direct du producteur à l'installation de traitement avec import de BSD signé papier.`,

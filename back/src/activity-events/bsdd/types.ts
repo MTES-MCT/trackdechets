@@ -1,4 +1,4 @@
-import { Prisma, Status } from "@prisma/client";
+import { Prisma, Status } from "@td/prisma";
 import { ActivityEvent } from "..";
 import { RevisionRequestContent } from "../../forms/resolvers/mutations/createFormRevisionRequest";
 

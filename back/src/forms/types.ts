@@ -7,97 +7,87 @@ import {
   IntermediaryFormAssociation,
   OperationMode,
   EmitterType
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   CiterneNotWashedOutReason,
   FormStatus,
   PackagingInfo
 } from "@td/codegen-back";
 
-export const FormWithTransportersInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    transporters: true
-  });
+export const FormWithTransportersInclude = {
+  transporters: true
+} satisfies Prisma.FormInclude;
 
 export type FormWithTransporters = Prisma.FormGetPayload<{
   include: typeof FormWithTransportersInclude;
 }>;
 
-export const FormWithForwardedInInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    forwardedIn: true
-  });
+export const FormWithForwardedInInclude = {
+  forwardedIn: true
+} satisfies Prisma.FormInclude;
 
 export type FormWithForwardedIn = Prisma.FormGetPayload<{
   include: typeof FormWithForwardedInInclude;
 }>;
 
-export const FormWithForwardedInWithTransportersInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    forwardedIn: { include: { transporters: true } }
-  });
+export const FormWithForwardedInWithTransportersInclude = {
+  forwardedIn: { include: { transporters: true } }
+} satisfies Prisma.FormInclude;
 
 export type FormWithForwardedInWithTransporters = Prisma.FormGetPayload<{
   include: typeof FormWithForwardedInWithTransportersInclude;
 }>;
 
-export const FormWithIntermediariesInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    intermediaries: true
-  });
+export const FormWithIntermediariesInclude = {
+  intermediaries: true
+} satisfies Prisma.FormInclude;
 
 export type FormWithIntermediaries = Prisma.FormGetPayload<{
   include: typeof FormWithIntermediariesInclude;
 }>;
 
-export const FormWithForwardingInclude = Prisma.validator<Prisma.FormInclude>()(
-  {
-    forwarding: true
-  }
-);
+export const FormWithForwardingInclude = {
+  forwarding: true
+} satisfies Prisma.FormInclude;
 
 export type FormWithForwarding = Prisma.FormGetPayload<{
   include: typeof FormWithForwardingInclude;
 }>;
 
-export const BsddRevisionRequestWithAuthoringCompanyInclude =
-  Prisma.validator<Prisma.BsddRevisionRequestInclude>()({
-    authoringCompany: { select: { orgId: true } }
-  });
+export const BsddRevisionRequestWithAuthoringCompanyInclude = {
+  authoringCompany: { select: { orgId: true } }
+} satisfies Prisma.BsddRevisionRequestInclude;
 
 export type BsddRevisionRequestWithAuthoringCompany =
   Prisma.BsddRevisionRequestGetPayload<{
     include: typeof BsddRevisionRequestWithAuthoringCompanyInclude;
   }>;
 
-export const BsddRevisionRequestWithApprovalsInclude =
-  Prisma.validator<Prisma.BsddRevisionRequestInclude>()({
-    approvals: { select: { approverSiret: true } }
-  });
+export const BsddRevisionRequestWithApprovalsInclude = {
+  approvals: { select: { approverSiret: true } }
+} satisfies Prisma.BsddRevisionRequestInclude;
 
 export type BsddRevisionRequestWithApprovals =
   Prisma.BsddRevisionRequestGetPayload<{
     include: typeof BsddRevisionRequestWithApprovalsInclude;
   }>;
 
-export const FormWithRevisionRequestsInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    bsddRevisionRequests: {
-      include: {
-        ...BsddRevisionRequestWithAuthoringCompanyInclude,
-        ...BsddRevisionRequestWithApprovalsInclude
-      }
+export const FormWithRevisionRequestsInclude = {
+  bsddRevisionRequests: {
+    include: {
+      ...BsddRevisionRequestWithAuthoringCompanyInclude,
+      ...BsddRevisionRequestWithApprovalsInclude
     }
-  });
+  }
+} satisfies Prisma.FormInclude;
 
 export type FormWithRevisionRequests = Prisma.FormGetPayload<{
   include: typeof FormWithRevisionRequestsInclude;
 }>;
 
-export const FormWithAppendix1GroupingInfoInclude =
-  Prisma.validator<Prisma.FormInclude>()({
-    groupedIn: { select: { id: true } }
-  });
+export const FormWithAppendix1GroupingInfoInclude = {
+  groupedIn: { select: { id: true } }
+} satisfies Prisma.FormInclude;
 
 export type FormWithAppendix1GroupingInfo = Prisma.FormGetPayload<{
   include: typeof FormWithAppendix1GroupingInfoInclude;

@@ -3,7 +3,7 @@ import {
   BsvhuPackaging,
   Company,
   Prisma
-} from "@prisma/client";
+} from "@td/prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { prisma } from "@td/prisma";
 import {

@@ -1,4 +1,4 @@
-import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, Status, WasteAcceptationStatus } from "@td/prisma";
 import { Machine } from "xstate";
 import {
   isForeignVat,

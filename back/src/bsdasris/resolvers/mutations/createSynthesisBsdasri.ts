@@ -4,7 +4,7 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 import { getBsdasriRepository } from "../../repository";
 import { checkCanCreateSynthesis } from "../../permissions";
 import { UserInputError } from "../../../common/errors";

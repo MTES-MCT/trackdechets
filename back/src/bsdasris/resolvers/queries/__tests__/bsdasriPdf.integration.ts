@@ -14,7 +14,7 @@ import {
   intermediaryData
 } from "../../../__tests__/factories";
 import type { Query } from "@td/codegen-back";
-import { BsdasriType, GovernmentPermission } from "@prisma/client";
+import { BsdasriType, GovernmentPermission } from "@td/prisma";
 import { faker } from "@faker-js/faker";
 import { app } from "../../../../server";
 import { gql } from "graphql-tag";

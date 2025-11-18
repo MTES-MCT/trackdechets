@@ -3,7 +3,7 @@ import { Refinement, z } from "zod";
 import { refineActorInfos } from "../../shared/refinement";
 import { ParsedZodSsdItem } from "./schema";
 import { getCachedCompany } from "../../shared/helpers";
-import { $Enums } from "@prisma/client";
+import { $Enums } from "@td/prisma";
 
 export const refineDates: Refinement<ParsedZodSsdItem> = (
   ssdItem,

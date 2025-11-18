@@ -1,4 +1,4 @@
-import { Company, Prisma, User, UserRole } from "@prisma/client";
+import { Company, Prisma, User, UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type {
   Mutation,

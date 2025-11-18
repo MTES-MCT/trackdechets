@@ -56,7 +56,17 @@ export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
       )}
       {isDefined(bsda.destination?.reception?.acceptedWeight) && (
         <DsfrDataListItem>
-          <DsfrDataListTerm>Poids accepté</DsfrDataListTerm>
+          <DsfrDataListTerm>
+            {[
+              "Poids",
+              bsda.destination?.reception?.weightIsEstimate === true
+                ? "estimé"
+                : "réel",
+              "accepté"
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          </DsfrDataListTerm>
           <DsfrDataListDescription>
             {`${bsda.destination?.reception?.acceptedWeight} t`}
           </DsfrDataListDescription>

@@ -13,7 +13,7 @@ import {
 } from "@td/codegen-back";
 import { UserInputError } from "../../../common/errors";
 import { Permission, checkUserPermissions } from "../../../permissions";
-import { RegistryImportType } from "@prisma/client";
+import { RegistryImportType } from "@td/prisma";
 import {
   getLookupsFilterInfos,
   getTypeFilter

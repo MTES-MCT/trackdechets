@@ -1,5 +1,5 @@
 import { addDays, format, subDays } from "date-fns";
-import { Form, Prisma } from "@prisma/client";
+import { Form, Prisma } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
 import {

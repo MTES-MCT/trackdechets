@@ -18,7 +18,7 @@ import {
 import { prismaToZodBsdasri } from "../helpers";
 import { BsdasriValidationContext } from "../types";
 import { ZodOperationEnum } from "../../../bsda/validation/schema";
-import { OperationMode } from "@prisma/client";
+import { OperationMode } from "@td/prisma";
 
 jest.mock("../../../companies/search");
 

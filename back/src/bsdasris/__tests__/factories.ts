@@ -7,7 +7,7 @@ import {
   OperationMode,
   TransportMode,
   Company
-} from "@prisma/client";
+} from "@td/prisma";
 import type { BsdasriPackagingsInput } from "@td/codegen-back";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import { distinct } from "../../common/arrays";

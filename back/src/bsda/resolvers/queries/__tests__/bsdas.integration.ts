@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Query, QueryBsdasArgs } from "@td/codegen-back";
 import {

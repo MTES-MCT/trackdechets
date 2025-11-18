@@ -1,4 +1,4 @@
-import { Consistence, Form, Prisma } from "@prisma/client";
+import { Consistence, Form, Prisma } from "@td/prisma";
 import { BsddEvent } from "./types";
 import { Decimal } from "decimal.js";
 

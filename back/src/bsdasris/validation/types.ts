@@ -1,4 +1,4 @@
-import { Prisma, User } from "@prisma/client";
+import { Prisma, User } from "@td/prisma";
 import { ParsedZodBsdasri } from "./schema";
 import { RefinementCtx } from "zod";
 import type { SignatureTypeInput } from "@td/codegen-back";
@@ -28,12 +28,11 @@ export type ZodBsdasriTransformer = (
   ctx: RefinementCtx
 ) => ParsedZodBsdasri | Promise<ParsedZodBsdasri>;
 
-export const BsdasriForParsingInclude =
-  Prisma.validator<Prisma.BsdasriInclude>()({
-    grouping: true,
-    synthesizing: true,
-    intermediaries: true
-  });
+export const BsdasriForParsingInclude = {
+  grouping: true,
+  synthesizing: true,
+  intermediaries: true
+} satisfies Prisma.BsdasriInclude;
 
 export type PrismaBsdasriForParsing = Prisma.BsdasriGetPayload<{
   include: typeof BsdasriForParsingInclude;

@@ -18,7 +18,7 @@ import { CompanyVatSearchResult } from "./vat/vies/types";
 import { removeEmptyKeys } from "../common/converter";
 import { UserInputError } from "../common/errors";
 import { SearchOptions } from "./sirene/trackdechets/types";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import type { CompanySearchResult } from "@td/codegen-back";
 import { ViesClientError } from "./vat/vies/client";
 
@@ -57,6 +57,8 @@ export const mergeCompanyToCompanySearchResult = (
   website: trackdechetsCompanyInfo?.website,
   ecoOrganismeAgreements:
     trackdechetsCompanyInfo?.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
+  ecoOrganismePartnersIds:
+    trackdechetsCompanyInfo?.ecoOrganismePartnersIds ?? [],
   allowBsdasriTakeOverWithoutSignature:
     trackdechetsCompanyInfo?.allowBsdasriTakeOverWithoutSignature,
   // specific data for CompanySearchResult
@@ -84,7 +86,8 @@ const companySelectedFields = {
   website: true,
   ecoOrganismeAgreements: true,
   allowBsdasriTakeOverWithoutSignature: true,
-  isDormantSince: true
+  isDormantSince: true,
+  ecoOrganismePartnersIds: true
 };
 
 /**
@@ -270,7 +273,8 @@ export const makeSearchCompanies =
         ...searchResult,
         orgId: searchResult.siret!,
         isRegistered: false,
-        isDormant: false
+        isDormant: false,
+        ecoOrganismePartnersIds: []
       };
     });
   };

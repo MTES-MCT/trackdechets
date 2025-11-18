@@ -4,7 +4,7 @@ import {
   OperationMode,
   TransportMode,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import {
   UserWithCompany,
@@ -245,6 +245,51 @@ describe("BSDA parsing", () => {
       const parsed = parseBsda(data, {
         ...context,
         currentSignatureType: "OPERATION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is provided (before effective date)", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: "Some description",
+        createdAt: new Date("2025-10-30T00:00:00Z") // Before November 18th, 2025
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is not provided (before effective date)", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: null,
+        createdAt: new Date("2025-10-30T00:00:00Z") // Before November 18th, 2025
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+      expect(parsed).toBeDefined();
+    });
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is provided (after effective date)", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: "Some description",
+        createdAt: new Date("2025-11-19T00:00:00Z") // After November 18th, 2025
+      };
+
+      const parsed = parseBsda(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
       });
       expect(parsed).toBeDefined();
     });
@@ -774,6 +819,73 @@ describe("BSDA parsing", () => {
         }
       }
     );
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is not provided (no worker)", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: null,
+        workerCompanySiret: null,
+        workerCompanyName: null,
+        workerIsDisabled: true,
+        createdAt: new Date("2025-11-19T00:00:00Z") // After November 18st, 2025
+      };
+
+      expect.assertions(1);
+
+      try {
+        await parseBsdaAsync(data, {
+          ...context,
+          currentSignatureType: "EMISSION"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "La description de la consistance est obligatoire."
+          })
+        ]);
+      }
+    });
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is not provided (with worker)", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: null,
+        workerIsDisabled: false,
+        createdAt: new Date("2025-11-19T00:00:00Z") // After November 18st, 2025
+      };
+
+      expect.assertions(1);
+
+      try {
+        await parseBsdaAsync(data, {
+          ...context,
+          currentSignatureType: "WORK"
+        });
+      } catch (err) {
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message: "La description de la consistance est obligatoire."
+          })
+        ]);
+      }
+    });
+
+    test("when wasteConsistence is OTHER and wasteConsistenceDescription is not provided but BSDA created before effective date", async () => {
+      const data: ZodBsda = {
+        ...bsda,
+        wasteConsistence: "OTHER",
+        wasteConsistenceDescription: null,
+        createdAt: new Date("2025-10-30T00:00:00Z") // Before November 18st, 2025
+      };
+
+      const parsed = await parseBsdaAsync(data, {
+        ...context,
+        currentSignatureType: "EMISSION"
+      });
+      expect(parsed).toBeDefined();
+    });
   });
 
   describe("Operation modes", () => {

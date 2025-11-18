@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { CompanyDigestStatus } from "@prisma/client";
+import { CompanyDigestStatus } from "@td/prisma";
 
 export const webhookPayloadSchema = z.object({
   distantId: z.string(),

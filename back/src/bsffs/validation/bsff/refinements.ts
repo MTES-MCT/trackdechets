@@ -27,7 +27,7 @@ import {
   BsffType,
   Prisma,
   TransportMode
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { OPERATION } from "../../constants";
 import type { BsffOperationCode } from "@td/codegen-back";
@@ -291,11 +291,10 @@ function checkEmitterSiretIsDefined(
   return true;
 }
 
-const PreviousPackagingInclude =
-  Prisma.validator<Prisma.BsffPackagingInclude>()({
-    bsff: true,
-    nextPackaging: { select: { bsffId: true } }
-  });
+const PreviousPackagingInclude = {
+  bsff: true,
+  nextPackaging: { select: { bsffId: true } }
+} satisfies Prisma.BsffPackagingInclude;
 
 export type PreviousPackaging = Prisma.BsffPackagingGetPayload<{
   include: typeof PreviousPackagingInclude;

@@ -1,4 +1,4 @@
-import { Company, Prisma } from "@prisma/client";
+import { Company, Prisma } from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import { startOfDay } from "../../utils";

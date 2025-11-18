@@ -7,6 +7,7 @@ const updateUserMock = jest.fn();
 const deleteManyMock = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     user: {
       findUnique: jest.fn((...args) => userMock(...args)),
@@ -16,16 +17,6 @@ jest.mock("@td/prisma", () => ({
       deleteMany: jest.fn((...args) => deleteManyMock(...args))
     }
   }
-}));
-
-const clearUserSessionsMock = jest.fn();
-const storeUserSessionsIdMock = jest.fn();
-jest.mock("../../../../common/redis/users", () => ({
-  storeUserSessionsId: jest.fn((...args) => storeUserSessionsIdMock(...args))
-}));
-
-jest.mock("../../../clearUserSessions", () => ({
-  clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args))
 }));
 
 describe("changePassword", () => {
@@ -40,14 +31,10 @@ describe("changePassword", () => {
     });
     expect.assertions(1);
     try {
-      await changePassword(
-        "userId",
-        {
-          oldPassword: "badOldPassword",
-          newPassword: "trackdechets#"
-        },
-        "xyz"
-      );
+      await changePassword("userId", {
+        oldPassword: "badOldPassword",
+        newPassword: "trackdechets#"
+      });
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
@@ -58,14 +45,10 @@ describe("changePassword", () => {
     userMock.mockResolvedValueOnce({
       password: hashedPassword
     });
-    await changePassword(
-      "userId",
-      {
-        oldPassword: "oldPassword",
-        newPassword: "Trackdechets1#"
-      },
-      "xyz"
-    );
+    await changePassword("userId", {
+      oldPassword: "oldPassword",
+      newPassword: "Trackdechets1#"
+    });
     expect(updateUserMock).toHaveBeenCalled();
   });
 });

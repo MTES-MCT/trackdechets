@@ -15,6 +15,13 @@ interface BSDAPreviewDestinationProps {
   bsd: Bsda;
 }
 const BSDAPreviewDestination = ({ bsd }: BSDAPreviewDestinationProps) => {
+  const receptionWeightPrefix =
+    bsd.destination?.reception?.weightIsEstimate === true
+      ? "estimé"
+      : bsd.destination?.reception?.weightIsEstimate === false
+      ? "réel"
+      : "";
+
   return (
     <PreviewContainer>
       <PreviewContainerRow title={"Destinataire"}>
@@ -48,7 +55,9 @@ const BSDAPreviewDestination = ({ bsd }: BSDAPreviewDestinationProps) => {
           />
 
           <PreviewTextRow
-            label="Poids réceptionné net"
+            label={["Poids", receptionWeightPrefix, "réceptionné net"]
+              .filter(Boolean)
+              .join(" ")}
             value={bsd.destination?.reception?.weight}
             units="tonne(s)"
           />

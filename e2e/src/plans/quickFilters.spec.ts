@@ -1,5 +1,5 @@
 import { test, Page } from "@playwright/test";
-import { Company } from "@prisma/client";
+import { Company } from "@td/prisma";
 import { seedUser } from "../data/user";
 import { seedCompanyAssociations, seedDefaultCompanies } from "../data/company";
 import { seedBsdd, seedFormGroupment } from "../data/bsdd";

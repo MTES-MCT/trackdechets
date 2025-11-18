@@ -188,6 +188,8 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
     !bsda.forwarding &&
     !bsda.grouping?.length &&
     bsda.destination?.operation?.nextDestination?.company?.siret;
+  const isEstimatedReceptionWeight =
+    bsda.destination?.reception?.weightIsEstimate === true;
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
@@ -226,7 +228,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             }
           >
             <option value="">Sélectionnez une valeur...</option>
-            {!isTempStorageReception && (
+            {!isTempStorageReception && !isEstimatedReceptionWeight && (
               <>
                 <option value="R 5">
                   R 5 - Recyclage ou récupération d'autres matières inorganiques

@@ -304,6 +304,9 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
   bsdasriRevisionRequests              BsdasriRevisionRequest[]
 
+  // Eco organismes avec lesquels l'entreprise travaille
+  ecoOrganismePartnersIds String[] @default([])
+
   givenSignatureAutomations       SignatureAutomation[]    @relation("SignatureAutomationFrom")
   receivedSignatureAutomations    SignatureAutomation[]    @relation("SignatureAutomationTo")
   givenAdministrativeTransfers    AdministrativeTransfer[] @relation("AdministrativeTransferFrom")
@@ -905,7 +908,7 @@ model User {
   id                   String             @id @default(cuid()) @db.VarChar(30)
   email                String             @unique(map: "User.email_unique")
   password             String
-  passwordVersion      Int?
+  passwordUpdatedAt    DateTime?          @default(now()) @db.Timestamptz(6)
   name                 String
   phone                String?
   createdAt            DateTime           @default(now()) @db.Timestamptz(6)
@@ -1102,25 +1105,6 @@ model Bsvhu {
   // pour optimiser certains calculs
   transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
 
-  // legacy, à supprimer prochaine MEP
-  transporterCompanyName              String?
-  transporterCompanySiret             String?        @db.VarChar(17)
-  transporterCompanyAddress           String?
-  transporterCompanyContact           String?
-  transporterCompanyPhone             String?
-  transporterCompanyMail              String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
-  transporterCompanyVatNumber         String?        @db.VarChar(50)
-  transporterTransportSignatureAuthor String?
-  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
-  transporterCustomInfo               String?
-  transporterTransportMode            TransportMode? @default(ROAD)
-  transporterTransportPlates          String[]
-  transporterRecepisseIsExempted      Boolean?
-  // end legacy
-
   containsElectricOrHybridVehicles Boolean?
 
   ecoOrganismeName  String?
@@ -1159,8 +1143,6 @@ model Bsvhu {
 
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
-  @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
   @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
   @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
   @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")
@@ -1393,7 +1375,35 @@ model Bsdasri {
   canAccessDraftOrgIds String[] @default([])
   intermediariesOrgIds String[] @default([])
 
-  // partial indices _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+  // Note: Partial indexes are defined in migration files:
+  // - _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+  // - Bsdasri_intermediaries_nonempty: GIN index on non-empty intermediariesOrgIds
+  // - Bsdasri_emitter_active_rownum: BTREE index on emitterCompanySiret, rowNumber
+  // - Bsdasri_transporter_active_rownum: BTREE index on transporterCompanySiret, rowNumber
+  // - Bsdasri_transporter_vat_active_rownum: BTREE index on transporterCompanyVatNumber, rowNumber
+  // - Bsdasri_destination_active_rownum: BTREE index on destinationCompanySiret, rowNumber
+  // - Bsdasri_eco_active_rownum: BTREE index on ecoOrganismeSiret, rowNumber
+  // - Bsdasri_trader_active_rownum: BTREE index on traderCompanySiret, rowNumber
+
+  // PERFORMANCE OPTIMIZATION: PostgreSQL Statistics Configuration
+  //
+  // To improve query planner decisions and avoid costly sequential scans,
+  // we've increased the STATISTICS target in production for frequently-queried columns
+  // directly in PostgreSQL.
+  //
+  // Affected columns:
+  // - *siret columns
+  // - isDraft
+  // - isDeleted
+  //
+  // Configuration applied:
+  //   ALTER TABLE "default$default"."Bsdasri"
+  //   ALTER COLUMN "emitterCompanySiret" SET STATISTICS 1000;
+  //
+  // Statistics values:
+  // - Default: 100 (PostgreSQL default)
+  // - Configured: 1000 (10x sampling for better selectivity estimates)
+
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_BsdasriTransporterCompanyVatNumberIdx")
@@ -1407,6 +1417,9 @@ model Bsdasri {
   @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
   @@index([groupingEmitterSirets], map: "_BsdasriGroupingEmitterSiretIdx", type: Gin)
   @@index([synthesisEmitterSirets], map: "_BsdasriSynthesisEmitterSiretsIdx", type: Gin)
+  @@index([traderCompanySiret], map: "_BsdasriTraderCompanySiretIdx")
+  @@index([brokerCompanySiret], map: "_BsdasriBrokerCompanySiretIdx")
+  @@index([intermediariesOrgIds], map: "_BsdasriIntermediariesOrgIdsIdx", type: Gin)
 }
 
 model IntermediaryBsdasriAssociation {
@@ -1777,6 +1790,7 @@ model Bsda {
   destinationPlannedOperationCode                         String?
   destinationReceptionDate                                DateTime?               @db.Timestamptz(6)
   destinationReceptionWeight                              Decimal?                @db.Decimal(65, 30)
+  destinationReceptionWeightIsEstimate                    Boolean?
   destinationReceptionRefusedWeight                       Decimal?                @db.Decimal(65, 30)
   destinationReceptionAcceptationStatus                   WasteAcceptationStatus?
   destinationReceptionRefusalReason                       String?

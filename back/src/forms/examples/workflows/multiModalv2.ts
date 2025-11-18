@@ -8,7 +8,7 @@ import { signTransportForm } from "../steps/signTransportForm";
 import { createFormTransporter } from "../steps/createFormTransporter";
 import { updateFormTransporterPlates } from "../steps/updateFormTransporter";
 import { updateFormTransporters } from "../steps/updateForm";
-import { WasteProcessorType } from "@prisma/client";
+import { WasteProcessorType } from "@td/prisma";
 
 const workflow: Workflow = {
   title: "Transport multi-modal (amélioration juillet 2023)",

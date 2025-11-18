@@ -10,7 +10,7 @@ import { hash } from "bcrypt";
 import { AuthType } from "../../../../auth/auth";
 import type { Mutation } from "@td/codegen-back";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
 import { getUserRoles } from "../../../../permissions/permissions";
 

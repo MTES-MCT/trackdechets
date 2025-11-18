@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { Form } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindForwardedInByIdFn = (id: string) => Promise<Form | null>;

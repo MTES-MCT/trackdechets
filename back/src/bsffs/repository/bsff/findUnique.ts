@@ -1,4 +1,4 @@
-import { BsffFicheIntervention, BsffPackaging, Prisma } from "@prisma/client";
+import { BsffFicheIntervention, BsffPackaging, Prisma } from "@td/prisma";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueBsffFn = <Args extends Prisma.BsffFindUniqueArgs>(

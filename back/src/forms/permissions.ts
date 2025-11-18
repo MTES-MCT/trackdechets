@@ -5,7 +5,7 @@ import {
   Prisma,
   Status,
   User
-} from "@prisma/client";
+} from "@td/prisma";
 import type {
   CreateFormInput,
   ImportPaperFormInput,

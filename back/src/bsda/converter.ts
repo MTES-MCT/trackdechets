@@ -46,7 +46,7 @@ import {
   Prisma,
   BsdaTransporter as PrismaBsdaTransporter,
   BsdaRevisionRequest
-} from "@prisma/client";
+} from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
 import { Decimal } from "decimal.js";
 import { BsdaForElastic } from "./elastic";
@@ -143,6 +143,7 @@ export function expandBsdaFromDb(bsda: BsdaWithTransporters): GraphqlBsda {
               .dividedBy(1000)
               .toNumber()
           : null,
+        weightIsEstimate: bsda.destinationReceptionWeightIsEstimate ?? null,
         refusedWeight: quantityRefused
           ? processDecimal(quantityRefused).dividedBy(1000).toNumber()
           : null,
@@ -404,6 +405,9 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r =>
         r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
       )
+    ),
+    destinationReceptionWeightIsEstimate: chain(destination, d =>
+      chain(d.reception, r => r.weightIsEstimate)
     ),
     destinationReceptionRefusedWeight: chain(destination, d =>
       chain(d.reception, r =>

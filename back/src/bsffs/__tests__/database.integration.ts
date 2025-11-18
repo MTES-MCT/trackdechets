@@ -1,4 +1,4 @@
-import { BsffType } from "@prisma/client";
+import { BsffType } from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { getReadonlyBsffPackagingRepository } from "../repository";
 import { createBsff } from "./factories";

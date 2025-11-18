@@ -3,7 +3,7 @@ import { companyFactory } from "../../__tests__/factories";
 import { getBspaohForElastic, toBsdElastic } from "../elastic";
 import { BsdElastic } from "../../common/elastic";
 import { bspaohFactory } from "./factories";
-import { BspaohStatus, Company, WasteAcceptationStatus } from "@prisma/client";
+import { BspaohStatus, Company, WasteAcceptationStatus } from "@td/prisma";
 import { xDaysAgo } from "../../utils";
 
 describe("toBsdElastic > companies Names & OrgIds", () => {

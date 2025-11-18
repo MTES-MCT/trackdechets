@@ -21,6 +21,7 @@ const mockCreateAnonymous = jest.fn();
 const mockFindAnonymous = jest.fn();
 
 jest.mock("@td/prisma", () => ({
+  ...jest.requireActual("@td/prisma"),
   prisma: {
     anonymousCompany: {
       create: jest.fn((...args) => mockCreateAnonymous(...args)),
@@ -331,6 +332,7 @@ describe("searchCompanies", () => {
       collectorTypes: [],
       wasteProcessorTypes: [],
       wasteVehiclesTypes: [],
+      ecoOrganismePartnersIds: [],
       website: undefined
     };
     expect(companiesSearched[0]).toEqual(expected);

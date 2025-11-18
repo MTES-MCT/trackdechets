@@ -10,7 +10,7 @@ import type {
   MutationSubscribeToCompanyNotificationsArgs
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
-import { UserRole } from "@prisma/client";
+import { UserRole } from "@td/prisma";
 import { toPrismaNotifications } from "../../../notifications";
 
 export const SUBSCRIBE_TO_COMPANY_NOTIFICATIONS = gql`

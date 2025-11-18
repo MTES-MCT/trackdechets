@@ -4,7 +4,7 @@ import {
   Status,
   WasteProcessorType,
   CollectorType
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type { Mutation, MutationMarkAsSealedArgs } from "@td/codegen-back";
 import { prisma } from "@td/prisma";

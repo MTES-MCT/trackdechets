@@ -7,7 +7,7 @@ import {
   RevisionRequestStatus,
   Status,
   EmitterType
-} from "@prisma/client";
+} from "@td/prisma";
 import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   isDangerous

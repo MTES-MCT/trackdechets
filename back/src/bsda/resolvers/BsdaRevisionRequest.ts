@@ -7,7 +7,7 @@ import {
   expandBsdaRevisionRequestContent,
   expandBsdaFromDb
 } from "../converter";
-import { BsdaRevisionRequest as PrismaBsdaRevisionRequest } from "@prisma/client";
+import { BsdaRevisionRequest as PrismaBsdaRevisionRequest } from "@td/prisma";
 
 const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   approvals: async parent => {

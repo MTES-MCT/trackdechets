@@ -6,7 +6,7 @@ import {
   BsvhuStatus,
   Status,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
   companyFactory,
@@ -145,7 +145,12 @@ describe("elasticHelpers", () => {
         destinationReceptionAcceptationStatus:
           opt?.wasteAcceptationStatus ??
           WasteAcceptationStatus.PARTIALLY_REFUSED,
-        transporterCompanySiret: transporter.siret
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 

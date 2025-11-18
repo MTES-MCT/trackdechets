@@ -10,7 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
-import { CompanyType, Status, UserRole } from "@prisma/client";
+import { CompanyType, Status, UserRole } from "@td/prisma";
 import type { Mutation, MutationMarkAsTempStoredArgs } from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sendMail } from "../../../../mailer/mailing";

@@ -10,7 +10,7 @@ import {
   BsdasriType,
   CompanyType,
   WasteAcceptationStatus
-} from "@prisma/client";
+} from "@td/prisma";
 import { prisma } from "@td/prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {

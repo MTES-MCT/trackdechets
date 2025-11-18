@@ -1,4 +1,4 @@
-import { BsdasriType } from "@prisma/client";
+import { BsdasriType } from "@td/prisma";
 
 import type {
   ResolversParentTypes,

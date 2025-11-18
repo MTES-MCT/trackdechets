@@ -1,4 +1,4 @@
-import { BsvhuStatus } from "@prisma/client";
+import { BsvhuStatus } from "@td/prisma";
 import type { BsvhuWhere } from "@td/codegen-back";
 import { toPrismaWhereInput } from "../where";
 

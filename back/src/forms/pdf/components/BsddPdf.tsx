@@ -33,7 +33,7 @@ import {
   Status,
   OperationMode,
   CiterneNotWashedOutReason
-} from "@prisma/client";
+} from "@td/prisma";
 import { getEmptyReturnADRLabel } from "../../helpers/emptyReturnADR";
 import { getCiterneNotWashedOutReasonLabel } from "../../helpers/citerneNotWashedOutReason";
 import PackagingsTable from "../../../common/pdf/components/PackagingsTable";
@@ -612,8 +612,8 @@ export function BsddPdf({
                   <input
                     type="checkbox"
                     checked={
-                      form.wasteDetails?.consistence?.includes(
-                        consistenceType.value
+                      form.wasteDetails?.consistences?.some(
+                        consistence => consistence === consistenceType.value
                       ) && renderCheckboxState
                     }
                     readOnly

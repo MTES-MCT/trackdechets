@@ -1,4 +1,4 @@
-import { Grant } from "@prisma/client";
+import { Grant } from "@td/prisma";
 
 /**
  * Check whether or not a grant has expired

@@ -1,7 +1,7 @@
 import { prisma } from "@td/prisma";
 import { UserInputError } from "../../common/errors";
 import { getRegistryDelegationRepository } from "../repository";
-import { Company, Prisma, RegistryDelegation } from "@prisma/client";
+import { Company, Prisma, RegistryDelegation } from "@td/prisma";
 import type { RegistryDelegationStatus } from "@td/codegen-back";
 import { endOfDay, inXDays, todayAtMidnight } from "../../utils";
 

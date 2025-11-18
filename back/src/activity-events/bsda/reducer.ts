@@ -1,4 +1,4 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Bsda, Prisma } from "@td/prisma";
 import { BsdaEvent } from "./types";
 
 export function bsdaReducer(
