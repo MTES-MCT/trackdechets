@@ -1105,25 +1105,6 @@ model Bsvhu {
   // pour optimiser certains calculs
   transporterTransportSignatureDate DateTime? @db.Timestamptz(6)
 
-  // legacy, à supprimer prochaine MEP
-  transporterCompanyName              String?
-  transporterCompanySiret             String?        @db.VarChar(17)
-  transporterCompanyAddress           String?
-  transporterCompanyContact           String?
-  transporterCompanyPhone             String?
-  transporterCompanyMail              String?
-  transporterRecepisseNumber          String?
-  transporterRecepisseDepartment      String?
-  transporterRecepisseValidityLimit   DateTime?      @db.Timestamptz(6)
-  transporterCompanyVatNumber         String?        @db.VarChar(50)
-  transporterTransportSignatureAuthor String?
-  transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
-  transporterCustomInfo               String?
-  transporterTransportMode            TransportMode? @default(ROAD)
-  transporterTransportPlates          String[]
-  transporterRecepisseIsExempted      Boolean?
-  // end legacy
-
   containsElectricOrHybridVehicles Boolean?
 
   ecoOrganismeName  String?
@@ -1162,8 +1143,6 @@ model Bsvhu {
 
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
-  @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_BsvhuTransporterCompanyVatNumberIdx")
   @@index([ecoOrganismeSiret], map: "_BsvhuEcoOrganismeSiretIdx")
   @@index([brokerCompanySiret], map: "_BsvhuBrokerCompanySiretIdx")
   @@index([traderCompanySiret], map: "_BsvhuTraderCompanySiretIdx")

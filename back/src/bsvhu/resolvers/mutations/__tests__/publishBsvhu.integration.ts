@@ -93,7 +93,12 @@ describe("Mutation.Vhu.publish", () => {
       userId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: company2.siret,
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: company2.siret
+          }
+        },
         isDraft: true
       }
     });
