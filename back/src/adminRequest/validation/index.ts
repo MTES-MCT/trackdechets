@@ -3,13 +3,15 @@ import {
   AcceptAdminRequestInput,
   QueryAdminRequestsArgs,
   QueryAdminRequestArgs,
-  MutationRefuseAdminRequestArgs
+  MutationRefuseAdminRequestArgs,
+  QueryAdminRequestsAdminArgs
 } from "@td/codegen-back";
 import {
   createAdminRequestInputSchema,
   queryAdminRequestsArgsSchema,
   adminRequestIdSchema,
-  acceptAdminRequestInputSchema
+  acceptAdminRequestInputSchema,
+  queryAdminRequestsAdminArgsSchema
 } from "./schema";
 
 export const parseCreateAdminRequestInput = (
@@ -28,6 +30,16 @@ export function parseQueryAdminRequestsArgs(args: QueryAdminRequestsArgs) {
 
 export type ParsedQueryAdminRequestsArgs = ReturnType<
   typeof parseQueryAdminRequestsArgs
+>;
+
+export function parseQueryAdminRequestsAdminArgs(
+  args: QueryAdminRequestsAdminArgs
+) {
+  return queryAdminRequestsAdminArgsSchema.parse(args);
+}
+
+export type ParsedQueryAdminRequestsAdminArgs = ReturnType<
+  typeof parseQueryAdminRequestsAdminArgs
 >;
 
 export function parseQueryAdminRequestArgs(args: QueryAdminRequestArgs) {
