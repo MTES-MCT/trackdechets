@@ -45,7 +45,8 @@ import {
   bsd_sub_type_option_reshipment,
   bsd_sub_type_option_synthesis,
   bsd_sub_type_option_temp_stored,
-  bsd_sub_type_option_tournee
+  bsd_sub_type_option_tournee,
+  filter_bsd_status
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
@@ -161,6 +162,67 @@ const bsdTypeFilterSelectOptions = [
   }
 ];
 
+const bsdStatusFilterSelectOptions = [
+  { value: "BROUILLON", label: "Brouillon" },
+  { value: "PUBLIE", label: "Publié" },
+  { value: "SIGNE_PAR_EMETTEUR", label: "Signé par l’émetteur" },
+  {
+    value: "SIGNER_PAR_ENTREPRISE_TRAVAUX",
+    label: "Signé par l’entreprise de travaux"
+  },
+  { value: "SIGNE_PAR_TRANSPORTEUR", label: "Signé par le transporteur" },
+  {
+    value: "ARRIVE_ENTREPOS_PROVISOIRE",
+    label: "Réceptionné à l’entreposage provisoire, en attente d’acceptation"
+  },
+  {
+    value: "ENTREPOS_TEMPORAIREMENT",
+    label: "Entreposé temporairement ou en reconditionnement"
+  },
+  { value: "BSD_SUITE_PREPARE", label: "BSD suite préparé" },
+  {
+    value: "SIGNE_PAR_ENTREPOS_PROVISOIRE",
+    label: "BSD suite signé par l'entreposage provisoire"
+  },
+  { value: "RECU", label: "Reçu, en attente d'acceptation" },
+  {
+    value: "ACCEPTE",
+    label: "Accepté, en attente de traitement"
+  },
+  {
+    value: "EN_ATTENTE_BSD_SUITE",
+    label: "En attente d’un bordereau suite"
+  },
+  {
+    value: "ANNEXE_BORDEREAU_SUITE",
+    label: "Annexé à un bordereau suite"
+  },
+  { value: "TRAITE", label: "Traité" },
+  { value: "REFUSE", label: "Refusé" },
+  { value: "PARTIELLEMENT_REFUSE", label: "Partiellement refusé" },
+  { value: "ANNULE", label: "Annulé" }
+];
+
+const statusesEquivalents = {
+  BROUILLON: ["DRAFT"],
+  PUBLIE: ["INITIAL"],
+  SIGNE_PAR_EMETTEUR: ["SEALED"],
+  SIGNER_PAR_ENTREPRISE_TRAVAUX: ["SIGNED_BY_WORKER"],
+  SIGNE_PAR_TRANSPORTEUR: ["SENT", "RESENT"],
+  ARRIVE_ENTREPOS_PROVISOIRE: ["SIGNED_BY_TEMP_STORER"],
+  ENTREPOS_TEMPORAIREMENT: ["TEMP_STORER_ACCEPTED"],
+  BSD_SUITE_PREPARE: ["RESEALED"],
+  SIGNE_PAR_ENTREPOS_PROVISOIRE: ["SIGNED_BY_TEMP_STORER"],
+  RECU: ["RECEIVED"],
+  ACCEPTE: ["ACCEPTED"],
+  EN_ATTENTE_BSD_SUITE: ["AWAITING_CHILD", "AWAITING_GROUP"],
+  ANNEXE_BORDEREAU_SUITE: ["GROUPED", "INTERMEDIATELY_PROCESSED"],
+  TRAITE: ["PROCESSED", "FOLLOWED_WITH_PNTTD", "NO_TRACEABILITY"],
+  REFUSE: ["REFUSED"],
+  PARTIELLEMENT_REFUSE: ["PARTIALLY_REFUSED"],
+  ANNULE: ["CANCELLED"]
+};
+
 enum FilterName {
   types = "types",
   waste = "waste",
@@ -184,6 +246,7 @@ enum FilterName {
   givenName = "givenName",
   sealNumbers = "sealNumbers",
   ficheInterventionNumbers = "ficheInterventionNumbers",
+  status = "status",
   cap = "cap"
 }
 
@@ -233,6 +296,14 @@ export const advancedFilterList: Filter[][] = [
       type: FilterType.select,
       isMultiple: true,
       options: bsdTypeFilterSelectOptions,
+      isActive: true
+    },
+    {
+      name: FilterName.status,
+      label: filter_bsd_status,
+      type: FilterType.select,
+      isMultiple: true,
+      options: bsdStatusFilterSelectOptions,
       isActive: true
     },
     {
@@ -366,13 +437,34 @@ export const filterPredicates: {
     }
   },
   {
+    filterName: FilterName.status,
+    where: value => {
+      const actualStatuses = value
+        .map((val: string) => {
+          const equivalents = statusesEquivalents[val];
+          return equivalents;
+        })
+        .flat();
+
+      const query = {
+        status: { _in: actualStatuses }
+      };
+
+      return query;
+    }
+  },
+  {
     filterName: FilterName.waste,
-    where: value => ({
-      _or: [
-        { waste: { code: { _contains: value } } },
-        { waste: { description: { _match: value } } }
-      ]
-    })
+    where: value => {
+      const query = {
+        _or: [
+          { waste: { code: { _contains: value } } },
+          { waste: { description: { _match: value } } }
+        ]
+      };
+
+      return query;
+    }
   },
   {
     filterName: FilterName.readableId,
