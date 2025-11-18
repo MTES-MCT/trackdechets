@@ -14,6 +14,9 @@ import {
 } from "./types";
 import { capitalize } from "../../../common/strings";
 import { SealedFieldError } from "../../../common/errors";
+import { BsffPackagingInput, BsffTransporterInput } from "@td/codegen-back";
+import { Leaves } from "../../../types";
+import { BsffInput } from "@td/codegen-back";
 
 // Specs métier
 // https://docs.google.com/spreadsheets/d/1Uvd04DsmTNiMr4wzpfmS2uLd84i6IzJsgXssxzy_2ns/edit#gid=0
@@ -62,6 +65,26 @@ type GetBsffSignatureTypeFn<
   T extends ZodBsff | ZodBsffTransporter | ZodBsffPackaging
 > = (bsff: T, ruleContext?: RuleContext<T>) => AllBsffSignatureType | undefined;
 
+export type EditionRulePath = Leaves<
+  BsffInput & {
+    transporters: {
+      1: BsffTransporterInput;
+      2: BsffTransporterInput;
+      3: BsffTransporterInput;
+      4: BsffTransporterInput;
+      5: BsffTransporterInput;
+    };
+    packagings: {
+      [key: number]: BsffPackagingInput;
+    };
+  },
+  5
+>;
+
+export type TransporterEditionRulePath = Leaves<BsffTransporterInput, 5>;
+
+export type PackagingEditionRulePath = Leaves<BsffPackagingInput, 5>;
+
 // Règle d'édition qui permet de définir à partir de quelle signature
 // un champ est verrouillé / requis avec une config contenant un paramètre
 // optionnel `when`
@@ -89,6 +112,12 @@ export type EditionRules<
     // At what signature the field is required, and under which circumstances. If absent, field is never required
     required?: EditionRule<T>;
     readableFieldName?: string; // A custom field name for errors
+    // a path to return in the errors to help the front display the error in context
+    path?: T extends ZodBsff
+      ? EditionRulePath
+      : T extends ZodBsffPackaging
+      ? PackagingEditionRulePath
+      : TransporterEditionRulePath;
   };
 };
 
@@ -127,7 +156,8 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
     sealed: {
       from: transporterSignature
     },
-    required: { from: transporterSignature }
+    required: { from: transporterSignature },
+    path: ["company", "name"]
   },
   transporterCompanySiret: {
     readableFieldName: "Le SIRET du transporteur",
@@ -135,35 +165,40 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: transporter => !transporter.transporterCompanyVatNumber
-    }
+    },
+    path: ["company", "siret"]
   },
   transporterCompanyAddress: {
     readableFieldName: "L'adresse du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "address"]
   },
   transporterCompanyContact: {
     readableFieldName: "La personne à contacter du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "contact"]
   },
   transporterCompanyPhone: {
     readableFieldName: "Le N° de téléphone du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "phone"]
   },
   transporterCompanyMail: {
     readableFieldName: "L'adresse e-mail du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["company", "mail"]
   },
   transporterCompanyVatNumber: {
     readableFieldName: "le numéro de TVA du transporteur",
@@ -171,18 +206,21 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: transporter => !transporter.transporterCompanySiret
-    }
+    },
+    path: ["company", "vatNumber"]
   },
   transporterCustomInfo: {
     readableFieldName: "Le champ libre du transporteur",
-    sealed: { from: transporterSignature }
+    sealed: { from: transporterSignature },
+    path: ["customInfo"]
   },
   transporterRecepisseIsExempted: {
     readableFieldName: "L'exemption de récépissé du transporteur",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["recepisse", "isExempted"]
   },
   transporterRecepisseNumber: {
     readableFieldName: "Le numéro de récépissé du transporteur",
@@ -192,7 +230,8 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["recepisse", "number"]
   },
   transporterRecepisseDepartment: {
     readableFieldName: "Le département de récépissé du transporteur",
@@ -202,7 +241,8 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["recepisse", "department"]
   },
   transporterRecepisseValidityLimit: {
     readableFieldName: "La date de validité du récépissé du transporteur",
@@ -212,14 +252,16 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
       when: requireTransporterRecepisse,
       customErrorMessage:
         "L'établissement doit renseigner son récépissé dans Trackdéchets"
-    }
+    },
+    path: ["recepisse", "validityLimit"]
   },
   transporterTransportMode: {
     readableFieldName: "Le mode de transport",
     sealed: { from: transporterSignature },
     required: {
       from: transporterSignature
-    }
+    },
+    path: ["transport", "mode"]
   },
   transporterTransportPlates: {
     readableFieldName: "L'immatriculation du transporteur",
@@ -227,11 +269,13 @@ export const bsffTransporterEditionRules: BsffTransporterEditionRules = {
     required: {
       from: transporterSignature,
       when: bsff => bsff.transporterTransportMode === "ROAD"
-    }
+    },
+    path: ["transport", "plates"]
   },
   transporterTransportTakenOverAt: {
     readableFieldName: "La date d'enlèvement",
-    sealed: { from: transporterSignature }
+    sealed: { from: transporterSignature },
+    path: ["transport", "takenOverAt"]
   }
 };
 
@@ -272,41 +316,49 @@ export const bsffEditionRules: BsffEditionRules = {
       from: sealedFromEmissionExceptForEmitter
     },
     required: { from: "EMISSION" },
-    readableFieldName: "Le type de bordereau"
+    readableFieldName: "Le type de bordereau",
+    path: ["type"]
   },
   emitterCompanyName: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La raison sociale de l'émetteur"
+    readableFieldName: "La raison sociale de l'émetteur",
+    path: ["emitter", "company", "name"]
   },
   emitterCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le SIRET de l'émetteur"
+    readableFieldName: "Le SIRET de l'émetteur",
+    path: ["emitter", "company", "siret"]
   },
   emitterCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse de l'émetteur"
+    readableFieldName: "L'adresse de l'émetteur",
+    path: ["emitter", "company", "address"]
   },
   emitterCompanyContact: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La personne à contacter chez l'émetteur"
+    readableFieldName: "La personne à contacter chez l'émetteur",
+    path: ["emitter", "company", "contact"]
   },
   emitterCompanyPhone: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° de téléphone de l'émetteur"
+    readableFieldName: "Le N° de téléphone de l'émetteur",
+    path: ["emitter", "company", "phone"]
   },
   emitterCompanyMail: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse e-mail de l'émetteur"
+    readableFieldName: "L'adresse e-mail de l'émetteur",
+    path: ["emitter", "company", "mail"]
   },
   emitterCustomInfo: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "le champ libre de l'émetteur"
+    readableFieldName: "le champ libre de l'émetteur",
+    path: ["emitter", "customInfo"]
   },
   emitterEmissionSignatureAuthor: {
     sealed: { from: "EMISSION" },
@@ -315,7 +367,8 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
     },
-    readableFieldName: "L'auteur de la signature émetteur"
+    readableFieldName: "L'auteur de la signature émetteur",
+    path: ["emitter"]
   },
   emitterEmissionSignatureDate: {
     sealed: { from: "EMISSION" },
@@ -324,7 +377,8 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
     },
-    readableFieldName: "La date de signature de l'émetteur"
+    readableFieldName: "La date de signature de l'émetteur",
+    path: ["emitter"]
   },
   transporterTransportSignatureDate: {
     sealed: { from: "TRANSPORT" },
@@ -333,81 +387,97 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "L'installation de destination ne peut pas signer la réception avant que le transporteur ait signé le bordereau"
     },
-    readableFieldName: "La date de signature du transporteur"
+    readableFieldName: "La date de signature du transporteur",
+    path: ["transporter", "transport"]
   },
   wasteCode: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le code déchet"
+    readableFieldName: "Le code déchet",
+    path: ["waste", "code"]
   },
   wasteDescription: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La description du déchet"
+    readableFieldName: "La description du déchet",
+    path: ["waste", "description"]
   },
   wasteAdr: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "L'ADR"
+    readableFieldName: "L'ADR",
+    path: ["waste", "adr"]
   },
   weightValue: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La quantité totale"
+    readableFieldName: "La quantité totale",
+    path: ["weight", "value"]
   },
   weightIsEstimate: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le champ estimé ou non"
+    readableFieldName: "Le champ estimé ou non",
+    path: ["weight", "isEstimate"]
   },
   destinationCompanyName: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "La raison sociale de l'installation de destination"
+    readableFieldName: "La raison sociale de l'installation de destination",
+    path: ["destination", "company", "name"]
   },
   destinationCompanySiret: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le SIRET de l'installation de destination"
+    readableFieldName: "Le SIRET de l'installation de destination",
+    path: ["destination", "company", "siret"]
   },
   destinationCompanyAddress: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse de l'installation de destination"
+    readableFieldName: "L'adresse de l'installation de destination",
+    path: ["destination", "company", "address"]
   },
   destinationCompanyContact: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
     readableFieldName:
-      "La personne à contacter de l'installation de destination"
+      "La personne à contacter de l'installation de destination",
+    path: ["destination", "company", "contact"]
   },
   destinationCompanyPhone: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le N° de téléphone de l'installation de destination"
+    readableFieldName: "Le N° de téléphone de l'installation de destination",
+    path: ["destination", "company", "phone"]
   },
   destinationPlannedOperationCode: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
     required: { from: "EMISSION" },
-    readableFieldName: "Le code d'opération prévu"
+    readableFieldName: "Le code d'opération prévu",
+    path: ["destination", "plannedOperationCode"]
   },
   destinationCompanyMail: {
     sealed: { from: "OPERATION" },
     required: { from: "EMISSION" },
-    readableFieldName: "L'adresse e-mail de l'installation de destination"
+    readableFieldName: "L'adresse e-mail de l'installation de destination",
+    path: ["destination", "company", "mail"]
   },
   destinationCap: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "Le CAP de l'installation de destination"
+    readableFieldName: "Le CAP de l'installation de destination",
+    path: ["destination", "cap"]
   },
   destinationCustomInfo: {
     sealed: { from: "OPERATION" },
-    readableFieldName: "Le champ libre de l'installation de destination"
+    readableFieldName: "Le champ libre de l'installation de destination",
+    path: ["destination", "customInfo"]
   },
   destinationReceptionDate: {
     sealed: { from: "RECEPTION" },
     required: { from: "RECEPTION" },
-    readableFieldName: "La date de la réception"
+    readableFieldName: "La date de la réception",
+    path: ["destination", "reception", "date"]
   },
   destinationReceptionSignatureAuthor: {
     sealed: { from: "RECEPTION" },
@@ -416,7 +486,8 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "L'installation de destination n'a pas encore signé la réception"
     },
-    readableFieldName: "L'auteur de la signature de la réception"
+    readableFieldName: "L'auteur de la signature de la réception",
+    path: ["destination", "reception"]
   },
   destinationReceptionSignatureDate: {
     sealed: { from: "RECEPTION" },
@@ -425,11 +496,13 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "L'installation de destination n'a pas encore signé la réception"
     },
-    readableFieldName: "La date de signature de la réception"
+    readableFieldName: "La date de signature de la réception",
+    path: ["destination", "reception"]
   },
   ficheInterventions: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
-    readableFieldName: "La liste des fiches d'intervention"
+    readableFieldName: "La liste des fiches d'intervention",
+    path: ["ficheInterventions"]
   },
   transporters: {
     readableFieldName: "La liste des transporteurs",
@@ -440,7 +513,8 @@ export const bsffEditionRules: BsffEditionRules = {
     },
     required: {
       from: "TRANSPORT"
-    }
+    },
+    path: ["transporters"]
   },
   packagings: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -451,7 +525,8 @@ export const bsffEditionRules: BsffEditionRules = {
       // les contenants sont auto-complétés par un transformer en cas de réexpedition
       // ou de groupement
     },
-    readableFieldName: "La liste des contenants"
+    readableFieldName: "La liste des contenants",
+    path: ["packagings"]
   },
   forwarding: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -460,7 +535,8 @@ export const bsffEditionRules: BsffEditionRules = {
       // il s'agit d'une réexpédition
       when: bsff => bsff.type === "REEXPEDITION"
     },
-    readableFieldName: "La liste des contenants à réexpedier"
+    readableFieldName: "La liste des contenants à réexpedier",
+    path: ["forwarding"]
   },
   grouping: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -469,7 +545,8 @@ export const bsffEditionRules: BsffEditionRules = {
       // il s'agit d'un groupement
       when: bsff => bsff.type === "GROUPEMENT"
     },
-    readableFieldName: "La liste des contenants à grouper"
+    readableFieldName: "La liste des contenants à grouper",
+    path: ["grouping"]
   },
   repackaging: {
     sealed: { from: sealedFromEmissionExceptForEmitter },
@@ -478,7 +555,8 @@ export const bsffEditionRules: BsffEditionRules = {
       // il s'agit d'un reconditionnement
       when: bsff => bsff.type === "RECONDITIONNEMENT"
     },
-    readableFieldName: "La liste des contenants à regrouper"
+    readableFieldName: "La liste des contenants à regrouper",
+    path: ["repackaging"]
   }
 };
 
@@ -486,9 +564,14 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
   type: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le type de contenant"
+    readableFieldName: "Le type de contenant",
+    path: ["type"]
   },
-  other: { sealed: { from: "EMISSION" } },
+  other: {
+    sealed: { from: "EMISSION" },
+    readableFieldName: "Le type de contenant",
+    path: ["other"]
+  },
   volume: {
     sealed: { from: "EMISSION" },
     // En attente de https://favro.com/organization/ab14a4f0460a99a9d64d4945/2c84e07578945e0ee8fb61f3?card=tra-14567

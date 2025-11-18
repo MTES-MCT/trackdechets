@@ -11,6 +11,7 @@ import {
   BsffPackagingEditableFields,
   BsffTransporterEditableFields,
   EditionRule,
+  EditionRulePath,
   bsffEditionRules,
   bsffPackagingEditionRules,
   bsffTransporterEditionRules,
@@ -533,6 +534,7 @@ type CheckFieldIsDefinedArgs<
   field: string;
   rule: EditionRule<T>;
   readableFieldName?: string;
+  path?: EditionRulePath;
   ctx: RefinementCtx;
   errorMsg?: (fieldDescription: string) => string;
 };
@@ -540,7 +542,8 @@ type CheckFieldIsDefinedArgs<
 function checkFieldIsDefined<
   T extends ZodBsff | ZodBsffTransporter | ZodBsffPackaging
 >(args: CheckFieldIsDefinedArgs<T>) {
-  const { resource, field, rule, ctx, readableFieldName, errorMsg } = args;
+  const { resource, field, rule, ctx, readableFieldName, path, errorMsg } =
+    args;
   const value = resource[field];
   if (value == null || (isArray(value) && (value as any[]).length === 0)) {
     const fieldDescription = readableFieldName
@@ -549,7 +552,7 @@ function checkFieldIsDefined<
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: [field],
+      path: path ?? [field],
       message: [
         errorMsg
           ? errorMsg(fieldDescription)
@@ -572,7 +575,7 @@ export const checkRequiredFields: (
 
   return (bsff, zodContext) => {
     for (const bsffField of Object.keys(bsffEditionRules)) {
-      const { required, readableFieldName } =
+      const { required, readableFieldName, path } =
         bsffEditionRules[bsffField as keyof BsffEditableFields];
 
       if (required) {
@@ -586,6 +589,7 @@ export const checkRequiredFields: (
             resource: bsff,
             field: bsffField,
             rule: required,
+            path,
             readableFieldName,
             ctx: zodContext
           });
@@ -597,10 +601,13 @@ export const checkRequiredFields: (
       for (const bsffTransporterField of Object.keys(
         bsffTransporterEditionRules
       )) {
-        const { required, readableFieldName } =
-          bsffTransporterEditionRules[
-            bsffTransporterField as keyof BsffTransporterEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsffTransporterPath
+        } = bsffTransporterEditionRules[
+          bsffTransporterField as keyof BsffTransporterEditableFields
+        ];
 
         if (required) {
           const isRequired = isBsffTransporterFieldRequired(
@@ -614,6 +621,9 @@ export const checkRequiredFields: (
               field: bsffTransporterField,
               rule: required,
               readableFieldName,
+              path: ["transporters", `${idx + 1}`].concat(
+                bsffTransporterPath ?? []
+              ) as EditionRulePath,
               ctx: zodContext,
               errorMsg: fieldDescription =>
                 `${fieldDescription} n° ${idx + 1} est obligatoire.`
@@ -623,12 +633,15 @@ export const checkRequiredFields: (
       }
     });
 
-    (bsff.packagings ?? []).forEach(packaging => {
+    (bsff.packagings ?? []).forEach((packaging, idx) => {
       for (const bsffPackaginField of Object.keys(bsffPackagingEditionRules)) {
-        const { required, readableFieldName } =
-          bsffPackagingEditionRules[
-            bsffPackaginField as keyof BsffPackagingEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsffPackagingPath
+        } = bsffPackagingEditionRules[
+          bsffPackaginField as keyof BsffPackagingEditableFields
+        ];
         if (required) {
           const isRequired = isBsffPackagingFieldRequired(
             required,
@@ -641,6 +654,9 @@ export const checkRequiredFields: (
               field: bsffPackaginField,
               rule: required,
               readableFieldName,
+              path: ["packagings", `${idx + 1}`].concat(
+                bsffPackagingPath ?? []
+              ) as EditionRulePath,
               ctx: zodContext
             });
           }
