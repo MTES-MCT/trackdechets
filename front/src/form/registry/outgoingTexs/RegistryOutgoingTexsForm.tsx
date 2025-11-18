@@ -101,6 +101,9 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
     getInitialDisabledFields(DEFAULT_VALUES)
   );
+  const [loadingLookup, setLoadingLookup] = useState(
+    !!queryParams.get("publicId") && !!queryParams.get("siret")
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -110,97 +113,95 @@ export function RegistryOutgoingTexsForm({ onClose }: Props) {
     resolver: zodResolver(schemaFromShape(outgoingTexsFormShape))
   });
 
-  const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_OUTGOING_TEXS_REGISTRY_LOOKUP,
-    {
-      variables: {
-        type: RegistryImportType.OutgoingTexs,
-        publicId: queryParams.get("publicId"),
-        siret: queryParams.get("siret")
-      },
-      skip: !queryParams.get("publicId") || !queryParams.get("siret"),
-      fetchPolicy: "network-only",
-      onCompleted: data => {
-        if (data?.registryLookup?.outgoingTexs) {
-          const transportersObj: Record<string, Partial<FormTransporter>> = {};
-          const definedOutgoingTexsProps = Object.fromEntries(
-            Object.entries(data.registryLookup.outgoingTexs).filter(
-              ([key, value]) => {
-                if (key.startsWith("transporter")) {
-                  const [_, transporterNum, field] =
-                    key.match(/transporter(\d)(.*)/) || [];
-                  if (transporterNum && field) {
-                    const transporterKey = `transporter${transporterNum}`;
-                    if (!transportersObj[transporterKey]) {
-                      transportersObj[transporterKey] = {};
-                    }
-                    transportersObj[transporterKey][field] = value;
-                    return false; // Don't include these fields in the main object
+  useQuery<Pick<Query, "registryLookup">>(GET_OUTGOING_TEXS_REGISTRY_LOOKUP, {
+    variables: {
+      type: RegistryImportType.OutgoingTexs,
+      publicId: queryParams.get("publicId"),
+      siret: queryParams.get("siret")
+    },
+    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    fetchPolicy: "network-only",
+    onCompleted: data => {
+      if (data?.registryLookup?.outgoingTexs) {
+        const transportersObj: Record<string, Partial<FormTransporter>> = {};
+        const definedOutgoingTexsProps = Object.fromEntries(
+          Object.entries(data.registryLookup.outgoingTexs).filter(
+            ([key, value]) => {
+              if (key.startsWith("transporter")) {
+                const [_, transporterNum, field] =
+                  key.match(/transporter(\d)(.*)/) || [];
+                if (transporterNum && field) {
+                  const transporterKey = `transporter${transporterNum}`;
+                  if (!transportersObj[transporterKey]) {
+                    transportersObj[transporterKey] = {};
                   }
+                  transportersObj[transporterKey][field] = value;
+                  return false; // Don't include these fields in the main object
                 }
-                return value != null;
               }
-            )
-          ) as OutgoingTexsLineInput;
-
-          const transporters = Object.values(transportersObj).filter(
-            partialTransporter => {
-              if (
-                partialTransporter.TransportMode ||
-                partialTransporter.CompanyType
-              ) {
-                return true;
-              }
-              return false;
+              return value != null;
             }
-          );
-          // Set the form values with the transformed data
-          const resetValues = {
-            ...DEFAULT_VALUES,
-            ...definedOutgoingTexsProps,
-            dispatchDate: isoDateToHtmlDate(
-              definedOutgoingTexsProps.dispatchDate
-            ),
-            parcelInseeCodes: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.parcelInseeCodes
-            ),
-            parcelNumbers: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.parcelNumbers
-            ),
-            parcelCoordinates: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.parcelCoordinates
-            ),
-            destinationParcelInseeCodes: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.destinationParcelInseeCodes
-            ),
-            destinationParcelNumbers: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.destinationParcelNumbers
-            ),
-            destinationParcelCoordinates: transformToFieldArrayObjects(
-              definedOutgoingTexsProps.destinationParcelCoordinates
-            ),
-            reason: RegistryLineReason.Edit,
-            transporter: transporters,
-            texsAnalysisFileId:
-              data.registryLookup.outgoingTexs.texsAnalysisFiles?.[0]?.id ||
-              null
-          };
+          )
+        ) as OutgoingTexsLineInput;
 
-          methods.reset(resetValues);
+        const transporters = Object.values(transportersObj).filter(
+          partialTransporter => {
+            if (
+              partialTransporter.TransportMode ||
+              partialTransporter.CompanyType
+            ) {
+              return true;
+            }
+            return false;
+          }
+        );
+        // Set the form values with the transformed data
+        const resetValues = {
+          ...DEFAULT_VALUES,
+          ...definedOutgoingTexsProps,
+          dispatchDate: isoDateToHtmlDate(
+            definedOutgoingTexsProps.dispatchDate
+          ),
+          parcelInseeCodes: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.parcelInseeCodes
+          ),
+          parcelNumbers: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.parcelNumbers
+          ),
+          parcelCoordinates: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.parcelCoordinates
+          ),
+          destinationParcelInseeCodes: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.destinationParcelInseeCodes
+          ),
+          destinationParcelNumbers: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.destinationParcelNumbers
+          ),
+          destinationParcelCoordinates: transformToFieldArrayObjects(
+            definedOutgoingTexsProps.destinationParcelCoordinates
+          ),
+          reason: RegistryLineReason.Edit,
+          transporter: transporters,
+          texsAnalysisFileId:
+            data.registryLookup.outgoingTexs.texsAnalysisFiles?.[0]?.id || null
+        };
 
-          const initialDisabled = getInitialDisabledFields(resetValues);
-          setDisabledFieldNames([
-            ...initialDisabled,
-            "publicId",
-            "reportForCompanySiret"
-          ]);
-        }
-      },
-      onError: error => {
-        handleServerError(methods, error as ApolloError | Error);
+        methods.reset(resetValues);
+
+        const initialDisabled = getInitialDisabledFields(resetValues);
+        setDisabledFieldNames([
+          ...initialDisabled,
+          "publicId",
+          "reportForCompanySiret"
+        ]);
       }
+      setLoadingLookup(false);
+    },
+    onError: error => {
+      setLoadingLookup(false);
+      handleServerError(methods, error as ApolloError | Error);
     }
-  );
+  });
 
   const isUpcycled = methods.watch("isUpcycled");
   useEffect(() => {

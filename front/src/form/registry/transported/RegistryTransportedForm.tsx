@@ -60,6 +60,9 @@ export function RegistryTransportedForm({ onClose }: Props) {
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
     getInitialDisabledFields(DEFAULT_VALUES)
   );
+  const [loadingLookup, setLoadingLookup] = useState(
+    !!queryParams.get("publicId") && !!queryParams.get("siret")
+  );
 
   const methods = useForm<TransportedLineInput>({
     defaultValues: {
@@ -69,50 +72,49 @@ export function RegistryTransportedForm({ onClose }: Props) {
     resolver: zodResolver(schemaFromShape(transportedFormShape))
   });
 
-  const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_TRANSPORTED_REGISTRY_LOOKUP,
-    {
-      variables: {
-        type: RegistryImportType.Transported,
-        publicId: queryParams.get("publicId"),
-        siret: queryParams.get("siret")
-      },
-      skip: !queryParams.get("publicId") || !queryParams.get("siret"),
-      fetchPolicy: "network-only",
-      onCompleted: data => {
-        if (data?.registryLookup?.transportedWaste) {
-          const definedTransportedProps = Object.fromEntries(
-            Object.entries(data.registryLookup.transportedWaste).filter(
-              ([_, value]) => value != null
-            )
-          ) as TransportedLineInput;
+  useQuery<Pick<Query, "registryLookup">>(GET_TRANSPORTED_REGISTRY_LOOKUP, {
+    variables: {
+      type: RegistryImportType.Transported,
+      publicId: queryParams.get("publicId"),
+      siret: queryParams.get("siret")
+    },
+    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    fetchPolicy: "network-only",
+    onCompleted: data => {
+      if (data?.registryLookup?.transportedWaste) {
+        const definedTransportedProps = Object.fromEntries(
+          Object.entries(data.registryLookup.transportedWaste).filter(
+            ([_, value]) => value != null
+          )
+        ) as TransportedLineInput;
 
-          // Set the form values with the transformed data
-          const resetValues = {
-            ...DEFAULT_VALUES,
-            ...definedTransportedProps,
-            collectionDate: isoDateToHtmlDate(
-              definedTransportedProps.collectionDate
-            ),
-            unloadingDate: isoDateToHtmlDate(
-              definedTransportedProps.unloadingDate
-            ),
-            reason: RegistryLineReason.Edit
-          };
-          methods.reset(resetValues);
-          const initialDisabled = getInitialDisabledFields(resetValues);
-          setDisabledFieldNames([
-            ...initialDisabled,
-            "publicId",
-            "reportForCompanySiret"
-          ]);
-        }
-      },
-      onError: error => {
-        handleServerError(methods, error as ApolloError | Error);
+        // Set the form values with the transformed data
+        const resetValues = {
+          ...DEFAULT_VALUES,
+          ...definedTransportedProps,
+          collectionDate: isoDateToHtmlDate(
+            definedTransportedProps.collectionDate
+          ),
+          unloadingDate: isoDateToHtmlDate(
+            definedTransportedProps.unloadingDate
+          ),
+          reason: RegistryLineReason.Edit
+        };
+        methods.reset(resetValues);
+        const initialDisabled = getInitialDisabledFields(resetValues);
+        setDisabledFieldNames([
+          ...initialDisabled,
+          "publicId",
+          "reportForCompanySiret"
+        ]);
       }
+      setLoadingLookup(false);
+    },
+    onError: error => {
+      setLoadingLookup(false);
+      handleServerError(methods, error as ApolloError | Error);
     }
-  );
+  });
 
   const reportForTransportIsWaste = methods.watch("reportForTransportIsWaste");
   useEffect(() => {

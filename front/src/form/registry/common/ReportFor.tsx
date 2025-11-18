@@ -54,14 +54,16 @@ export function ReportFor({
     });
 
   useEffect(() => {
-    if (
-      isDelegation &&
-      registryDelegationsData?.registryDelegations.edges.length === 1
-    ) {
-      methods.setValue(
-        "reportAsCompanySiret",
-        registryDelegationsData.registryDelegations.edges[0].node.delegate.orgId
-      );
+    if (isDelegation && registryDelegationsData) {
+      if (registryDelegationsData?.registryDelegations.edges.length === 1) {
+        methods.setValue(
+          "reportAsCompanySiret",
+          registryDelegationsData.registryDelegations.edges[0].node.delegate
+            .orgId
+        );
+      } else {
+        methods.setValue("reportAsCompanySiret", null);
+      }
     } else if (!isDelegation) {
       methods.setValue("reportAsCompanySiret", null);
     }
