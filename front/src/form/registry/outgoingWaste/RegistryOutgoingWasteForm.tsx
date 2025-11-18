@@ -67,6 +67,9 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
     getInitialDisabledFields(DEFAULT_VALUES)
   );
+  const [loadingLookup, setLoadingLookup] = useState(
+    !!queryParams.get("publicId") && !!queryParams.get("siret")
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -76,74 +79,73 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
     resolver: zodResolver(schemaFromShape(outgoingWasteFormShape))
   });
 
-  const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_OUTGOING_WASTE_REGISTRY_LOOKUP,
-    {
-      variables: {
-        type: RegistryImportType.OutgoingWaste,
-        publicId: queryParams.get("publicId"),
-        siret: queryParams.get("siret")
-      },
-      skip: !queryParams.get("publicId") || !queryParams.get("siret"),
-      fetchPolicy: "network-only",
-      onCompleted: data => {
-        if (data?.registryLookup?.outgoingWaste) {
-          const transportersObj: Record<string, Partial<FormTransporter>> = {};
-          const definedOutgoingWasteProps = Object.fromEntries(
-            Object.entries(data.registryLookup.outgoingWaste).filter(
-              ([key, value]) => {
-                if (key.startsWith("transporter")) {
-                  const [_, transporterNum, field] =
-                    key.match(/transporter(\d)(.*)/) || [];
-                  if (transporterNum && field) {
-                    const transporterKey = `transporter${transporterNum}`;
-                    if (!transportersObj[transporterKey]) {
-                      transportersObj[transporterKey] = {};
-                    }
-                    transportersObj[transporterKey][field] = value;
-                    return false; // Don't include these fields in the main object
+  useQuery<Pick<Query, "registryLookup">>(GET_OUTGOING_WASTE_REGISTRY_LOOKUP, {
+    variables: {
+      type: RegistryImportType.OutgoingWaste,
+      publicId: queryParams.get("publicId"),
+      siret: queryParams.get("siret")
+    },
+    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    fetchPolicy: "network-only",
+    onCompleted: data => {
+      if (data?.registryLookup?.outgoingWaste) {
+        const transportersObj: Record<string, Partial<FormTransporter>> = {};
+        const definedOutgoingWasteProps = Object.fromEntries(
+          Object.entries(data.registryLookup.outgoingWaste).filter(
+            ([key, value]) => {
+              if (key.startsWith("transporter")) {
+                const [_, transporterNum, field] =
+                  key.match(/transporter(\d)(.*)/) || [];
+                if (transporterNum && field) {
+                  const transporterKey = `transporter${transporterNum}`;
+                  if (!transportersObj[transporterKey]) {
+                    transportersObj[transporterKey] = {};
                   }
+                  transportersObj[transporterKey][field] = value;
+                  return false; // Don't include these fields in the main object
                 }
-                return value != null;
               }
-            )
-          ) as OutgoingWasteLineInput;
-
-          const transporters = Object.values(transportersObj).filter(
-            partialTransporter => {
-              if (
-                partialTransporter.TransportMode ||
-                partialTransporter.CompanyType
-              ) {
-                return true;
-              }
-              return false;
+              return value != null;
             }
-          );
-          // Set the form values with the transformed data
-          const resetValues = {
-            ...DEFAULT_VALUES,
-            ...definedOutgoingWasteProps,
-            dispatchDate: isoDateToHtmlDate(
-              definedOutgoingWasteProps.dispatchDate
-            ),
-            reason: RegistryLineReason.Edit,
-            transporter: transporters
-          };
-          methods.reset(resetValues);
-          const initialDisabled = getInitialDisabledFields(resetValues);
-          setDisabledFieldNames([
-            ...initialDisabled,
-            "publicId",
-            "reportForCompanySiret"
-          ]);
-        }
-      },
-      onError: error => {
-        handleServerError(methods, error as ApolloError | Error);
+          )
+        ) as OutgoingWasteLineInput;
+
+        const transporters = Object.values(transportersObj).filter(
+          partialTransporter => {
+            if (
+              partialTransporter.TransportMode ||
+              partialTransporter.CompanyType
+            ) {
+              return true;
+            }
+            return false;
+          }
+        );
+        // Set the form values with the transformed data
+        const resetValues = {
+          ...DEFAULT_VALUES,
+          ...definedOutgoingWasteProps,
+          dispatchDate: isoDateToHtmlDate(
+            definedOutgoingWasteProps.dispatchDate
+          ),
+          reason: RegistryLineReason.Edit,
+          transporter: transporters
+        };
+        methods.reset(resetValues);
+        const initialDisabled = getInitialDisabledFields(resetValues);
+        setDisabledFieldNames([
+          ...initialDisabled,
+          "publicId",
+          "reportForCompanySiret"
+        ]);
       }
+      setLoadingLookup(false);
+    },
+    onError: error => {
+      setLoadingLookup(false);
+      handleServerError(methods, error as ApolloError | Error);
     }
-  );
+  });
 
   const isDirectSupply = methods.watch("isDirectSupply");
   useEffect(() => {
