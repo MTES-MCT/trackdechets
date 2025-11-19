@@ -2,7 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { BsdaEcoOrganisme, EcoOrganisme, Query } from "@td/codegen-ui";
 import React, { useState } from "react";
 import { useFormContext } from "react-hook-form";
-import CompanyResults from "../../../common/components/company/CompanyResults";
+import CompanyResults from "../../../../../form/common/components/company/CompanyResults";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 const GET_ECO_ORGANISMES = gql`

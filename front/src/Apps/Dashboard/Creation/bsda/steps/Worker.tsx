@@ -18,7 +18,7 @@ import {
 } from "@td/codegen-ui";
 import { useParams } from "react-router-dom";
 import { formatDate } from "../../../../../common/datetime";
-import { NoWorkerAlert } from "../../../../../form/bsda/components/NoWorkerAlert";
+import { NoWorkerAlert } from "../components/NoWorkerAlert";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";

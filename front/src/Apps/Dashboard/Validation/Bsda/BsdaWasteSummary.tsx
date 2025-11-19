@@ -1,14 +1,13 @@
 import * as React from "react";
-import { Bsda, BsdaConsistence } from "@td/codegen-ui";
+import { Bsda, BsdaConsistence, BsdaPackagingType } from "@td/codegen-ui";
 import {
   DsfrDataList,
   DsfrDataListDescription,
   DsfrDataListItem,
   DsfrDataListTerm
 } from "../../../../common/components";
-import { PACKAGINGS_NAMES } from "../../../../form/bsda/components/packagings/Packagings";
 import { WASTE_NAME_LABEL } from "../../../common/wordings/wordingsCommon";
-import ExpandableList from "../../../../dashboard/detail/bsda/ExpandableList";
+import ExpandableList from "./ExpandableList";
 import { isDefined } from "../../../../common/helper";
 import { getWasteConsistenceLabel } from "../../Preview/BSDA/utils";
 
@@ -17,6 +16,15 @@ interface Props {
   showCap?: boolean;
   showScelles?: boolean;
 }
+
+export const PACKAGINGS_NAMES = {
+  [BsdaPackagingType.BigBag]: "Big-bag / GRV",
+  [BsdaPackagingType.DepotBag]: "Dépôt-bag",
+  [BsdaPackagingType.PaletteFilme]: "Palette filmée",
+  [BsdaPackagingType.SacRenforce]: "Sac renforcé",
+  [BsdaPackagingType.ConteneurBag]: "Conteneur-bag",
+  [BsdaPackagingType.Other]: "Autre(s)"
+};
 
 export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
   return (

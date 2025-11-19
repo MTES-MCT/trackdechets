@@ -2,7 +2,7 @@ import { BsdType, CompanySearchResult } from "@td/codegen-ui";
 import { isForeignVat } from "@td/constants";
 import { CreateOrUpdateTransporterInput } from "../../../form/bsdd/utils/initial-state";
 import { AnyTransporterInput } from "../types";
-import { CreateOrUpdateBsdaTransporterInput } from "../../../form/bsda/stepper/initial-state";
+import { CreateOrUpdateBsdaTransporterInput } from "../../Dashboard/Creation/bsda/bsda-state";
 import { mapBsdTransporter } from "../bsdTransporterMapper";
 import { useFormContext, useWatch } from "react-hook-form";
 
