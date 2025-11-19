@@ -109,6 +109,32 @@ export const dashboardVhuFragment = gql`
   ${dashboardCompanyFragment}
 `;
 
+export const FullBsvhuTransporterFragment = gql`
+  fragment FullBsvhuTransporter on BsvhuTransporter {
+    id
+    company {
+      ...CompanyFragment
+    }
+    customInfo
+    recepisse {
+      number
+      department
+      validityLimit
+      isExempted
+    }
+    transport {
+      mode
+      plates
+      takenOverAt
+      signature {
+        author
+        date
+      }
+    }
+  }
+  ${companyFragment}
+`;
+
 export const FullBsvhuFragment = gql`
   fragment FullBsvhu on Bsvhu {
     id
@@ -203,6 +229,9 @@ export const FullBsvhuFragment = gql`
         }
       }
     }
+    transporters {
+      ...FullBsvhuTransporter
+    }
     ecoOrganisme {
       siret
       name
@@ -232,4 +261,5 @@ export const FullBsvhuFragment = gql`
     }
   }
   ${companyFragment}
+  ${FullBsvhuTransporterFragment}
 `;
