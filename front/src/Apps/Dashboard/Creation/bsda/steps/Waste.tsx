@@ -2,7 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useQuery, gql } from "@apollo/client";
-import { pluralize } from "@td/constants";
+import { BSDA_WASTE_CODES, pluralize } from "@td/constants";
 import {
   BsdaConsistence,
   BsdaType,
@@ -29,6 +29,7 @@ import {
   getInitialCompany,
   initialTransporter
 } from "../../../../common/data/initialState";
+import { setFieldError } from "../../utils";
 
 const BSDA_COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -44,7 +45,7 @@ const BSDA_COMPANY_INFOS = gql`
 const WasteBsda = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
   const methods = useFormContext();
-  const { register, setValue, watch } = methods;
+  const { register, setValue, watch, formState, setError } = methods;
 
   const { data, loading, error } = useQuery<
     Pick<Query, "companyInfos">,
@@ -60,6 +61,18 @@ const WasteBsda = ({ errors }) => {
   const bsdaType = watch("type");
   const weight = watch("weight", {});
   const packagings = watch("packagings", {});
+
+  useEffect(() => {
+    if (errors?.length) {
+      setFieldError(
+        errors,
+        "waste.code",
+        formState.errors?.waste?.["code"],
+        setError
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   useEffect(() => {
     if (bsdaType !== BsdaType.Gathering) {
@@ -171,10 +184,18 @@ const WasteBsda = ({ errors }) => {
           <>
             <h4 className="fr-h4 fr-mt-4w">Déchet</h4>
 
-            <WasteCodeSelector name={"waste.code"} methods={methods} />
-
+            <WasteCodeSelector
+              name={"waste.code"}
+              methods={methods}
+              whiteList={[...BSDA_WASTE_CODES]}
+            />
+            {!waste?.code && formState?.errors?.waste?.["code"] && (
+              <p className="fr-text--sm fr-error-text fr-mb-4v">
+                {formState?.errors?.waste?.["code"]?.message}
+              </p>
+            )}
             <Select
-              className="fr-col-md-8 fr-mt-1w"
+              className="fr-col-md-8 fr-mt-2w"
               label="Code famille"
               nativeSelectProps={{
                 ...register("waste.familyCode")

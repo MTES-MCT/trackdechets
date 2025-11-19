@@ -158,7 +158,7 @@ const BsdaFormSteps = ({
       waste: (
         <WasteBsda
           errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.emitter
+            error => error.tabId === TabId.waste
           )}
         />
       ),
@@ -218,32 +218,14 @@ const BsdaFormSteps = ({
           { ...input, transporters: [] }
         : input;
 
-    const addressCleanup: string[] = [];
-    // the emitter company object (FormCompany) doesn't support street/city/postalCode
-    // so on updates, even if the address hasn't changed, those fields will be null.
-    // in order to avoid erasing the street/city/postalCode fields on updates, we remove them
-    // from the input.
-    if (input.emitter?.company?.address) {
-      //@ts-ignore
-      if (!input.emitter.company.street) {
-        addressCleanup.push("emitter.company.street");
-      }
-      //@ts-ignore
-      if (!input.emitter.company.city) {
-        addressCleanup.push("emitter.company.city");
-      }
-      //@ts-ignore
-      if (!input.emitter.company.postalCode) {
-        addressCleanup.push("emitter.company.postalCode");
-      }
-    }
-
     const cleanInput = omitDeep(cleanInputTransporters, [
       "isDraft",
       "ecoOrganisme.hasEcoOrganisme",
       "hasBroker",
       "hasIntermediaries",
-      ...addressCleanup
+      "emitter.company.street",
+      "emitter.company.city",
+      "emitter.company.postalCode"
     ]);
     return bsdaState.id
       ? updateBsda({

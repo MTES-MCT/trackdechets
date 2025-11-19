@@ -135,6 +135,14 @@ const DestinationBsda = ({ errors }) => {
           setError
         );
       }
+      if (!destination?.cap) {
+        setFieldError(
+          errors,
+          `${actor}.cap`,
+          formState.errors?.[actor]?.["cap"],
+          setError
+        );
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
@@ -398,6 +406,12 @@ const DestinationBsda = ({ errors }) => {
                   : sealedFields.includes(
                       `destination.operation.nextDestination.cap`
                     )
+              }
+              state={
+                formState.errors.destination?.["cap"] ? "error" : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.destination?.["cap"]?.message
               }
             />
             {showDestinationCAPModificationAlert(bsdaContext) && (

@@ -161,8 +161,10 @@ const Worker = ({ errors }) => {
     if (company) {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme entreprise de travaux sur ce bordereau.";
-      } else if (formState.errors?.worker?.["company"]?.siret?.message) {
-        return formState.errors?.worker?.["company"]?.siret?.message;
+      } else if (!company.companyTypes?.includes(CompanyType.Worker)) {
+        return "Cet établissement n'a pas le profil Entreprise de travaux.";
+      } else if (formState.errors?.destination?.["company"]?.siret?.message) {
+        return formState.errors?.destination?.["company"]?.siret?.message;
       }
     }
     return null;

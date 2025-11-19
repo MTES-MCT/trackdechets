@@ -33,13 +33,13 @@ const ActorsList = () => {
   const sealedFields = useContext(SealedFieldsContext);
 
   useEffect(() => {
-    if (broker?.company.siret && !hasBroker) {
+    if (broker?.company?.siret && !hasBroker) {
       setValue("hasBroker", true);
     }
 
     if (
       intermediaries?.length &&
-      intermediaries[0].siret &&
+      intermediaries[0]?.siret &&
       !hasIntermediaries
     ) {
       setValue("hasIntermediaries", true);
@@ -128,7 +128,7 @@ const ActorsList = () => {
         <div className="fr-pt-2w">
           <CompanySelectorWrapper
             orgId={siret}
-            selectedCompanyOrgId={broker?.company.siret ?? null}
+            selectedCompanyOrgId={broker?.company?.siret ?? null}
             favoriteType={FavoriteType.Broker}
             selectedCompanyError={company =>
               selectedCompanyError(company, CompanyType.Broker)
@@ -201,7 +201,7 @@ const ActorsList = () => {
               <CompanySelectorWrapper
                 orgId={siret}
                 selectedCompanyOrgId={
-                  (intermediaries && intermediaries[index].siret) ?? null
+                  (intermediaries && intermediaries[index]?.siret) ?? null
                 }
                 selectedCompanyError={selectedCompanyError}
                 disabled={sealedFields.includes(`intermediaries`)}
