@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="AddRegistryLine"><meta data-rh="true" property="og:description" content="AddRegistryLine"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.4c0fb972.js" defer="defer"></script>
-<script src="/assets/js/main.dc013a74.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.6849d393.js" defer="defer"></script>
+<script src="/assets/js/main.ee4c0c00.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -281,7 +281,8 @@ header d&#x27;autorisation <code>Authorization: Bearer ******</code></p></td></t
 <a href="objects#companymember"><code>[CompanyMember!]</code></a></p></td><td><p>Liste des utilisateurs appartenant à cet établissement</p></td></tr><tr><td><p>userRole<br>
 <a href="enums#userrole"><code>UserRole</code></a></p></td><td><p>Rôle de l&#x27;utilisateur authentifié au sein de cet établissement</p></td></tr><tr><td><p>userPermissions<br>
 <a href="enums#userpermission"><code>[UserPermission!]!</code></a></p></td><td><p>Liste des permissions de l&#x27;utilisateur authentifié au sein de cet établissement</p></td></tr><tr><td><p>userNotifications<br>
-<a href="objects#usernotifications"><code>UserNotifications!</code></a></p></td><td><p>Liste des notifications auquels l&#x27;utilisateur authentifié est abonné pour cet établissement</p></td></tr><tr><td><p>givenName<br>
+<a href="objects#usernotifications"><code>UserNotifications!</code></a></p></td><td><p>Liste des notifications auquels l&#x27;utilisateur authentifié est abonné pour cet établissement</p></td></tr><tr><td><p>ecoOrganismePartnersIds<br>
+<a href="scalars#string"><code>[String!]!</code></a></p></td><td><p>Eco-organismes avec lesquels l&#x27;entreprise travaille</p></td></tr><tr><td><p>givenName<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Nom d&#x27;usage de l&#x27;entreprise qui permet de différencier
 différents établissements ayant le même nom</p></td></tr><tr><td><p>orgId<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>SIRET ou TVA de l&#x27;établissement</p></td></tr><tr><td><p>siret<br>
@@ -293,7 +294,7 @@ différents établissements ayant le même nom</p></td></tr><tr><td><p>orgId<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Libellé NAF de l&#x27;établissement</p></td></tr><tr><td><p>installation<br>
 <a href="objects#installation"><code>Installation</code></a></p></td><td><p>Installation classée pour la protection de l&#x27;environnement (ICPE)
 associé à cet établissement (le cas échéant)</p></td></tr><tr><td><p>transporterReceipt<br>
-<a href="objects#transporterreceipt"><code>TransporterReceipt</code></a></p></td><td><p>Récépissé transporteur (le cas  échéant, pour les profils transporteur)</p></td></tr><tr><td><p>traderReceipt<br>
+<a href="objects#transporterreceipt"><code>TransporterReceipt</code></a></p></td><td><p>Récépissé transporteur (le cas échéant, pour les profils transporteur)</p></td></tr><tr><td><p>traderReceipt<br>
 <a href="objects#traderreceipt"><code>TraderReceipt</code></a></p></td><td><p>Récépissé négociant (le cas échéant, pour les profils négociant)</p></td></tr><tr><td><p>brokerReceipt<br>
 <a href="objects#brokerreceipt"><code>BrokerReceipt</code></a></p></td><td><p>Récépissé courtier (le cas échéant, pour les profils courtier)</p></td></tr><tr><td><p>vhuAgrementDemolisseur<br>
 <a href="objects#vhuagrement"><code>VhuAgrement</code></a></p></td><td><p>Agrément démolisseur (le cas échéant, pour les profils VHU)</p></td></tr><tr><td><p>vhuAgrementBroyeur<br>
@@ -361,7 +362,8 @@ n&#x27;est pas inscrit sur la plateforme <code>isRegistered=false</code></p></td
 <a href="objects#vhuagrement"><code>VhuAgrement</code></a></p></td><td><p>Agrément VHU démolisseur (le cas échéant, pour les profils VHU)</p></td></tr><tr><td><p>vhuAgrementBroyeur<br>
 <a href="objects#vhuagrement"><code>VhuAgrement</code></a></p></td><td><p>Agrément VHU broyeur (le cas échéant, pour les profils VHU)</p></td></tr><tr><td><p>workerCertification<br>
 <a href="objects#workercertification"><code>WorkerCertification</code></a></p></td><td><p>Certification entreprise de travaux</p></td></tr><tr><td><p>isDormant<br>
-<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise est en sommeil sur Trackdéchets</p></td></tr></tbody></table>
+<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise est en sommeil sur Trackdéchets</p></td></tr><tr><td><p>ecoOrganismePartnersIds<br>
+<a href="scalars#string"><code>[String!]!</code></a></p></td><td><p>Liste des éco-organismes avec lesquels l&#x27;entreprise travaille</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="companyregistryconnection">CompanyRegistryConnection<a href="#companyregistryconnection" class="hash-link" aria-label="Direct link to CompanyRegistryConnection" title="Direct link to CompanyRegistryConnection">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Fields</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>totalCount<br>
@@ -412,7 +414,8 @@ n&#x27;est pas inscrit sur la plateforme <code>isRegistered=false</code></p></td
 <a href="objects#vhuagrement"><code>VhuAgrement</code></a></p></td><td><p>Agrément VHU broyeur (le cas échéant, pour les profils VHU)</p></td></tr><tr><td><p>statutDiffusionEtablissement<br>
 <a href="enums#statutdiffusionetablissement"><code>StatutDiffusionEtablissement</code></a></p></td><td><p>Statut de diffusion des informations de l&#x27;établisement selon l&#x27;INSEE. O = Oui, P = Non ou Partiel</p></td></tr><tr><td><p>workerCertification<br>
 <a href="objects#workercertification"><code>WorkerCertification</code></a></p></td><td><p>Certification entreprise de travaux</p></td></tr><tr><td><p>isDormant<br>
-<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise est en sommeil sur Trackdéchets</p></td></tr></tbody></table>
+<a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise est en sommeil sur Trackdéchets</p></td></tr><tr><td><p>ecoOrganismePartnersIds<br>
+<a href="scalars#string"><code>[String!]!</code></a></p></td><td><p>Liste des éco-organismes avec lesquels l&#x27;entreprise travaille</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="declaration">Declaration<a href="#declaration" class="hash-link" aria-label="Direct link to Declaration" title="Direct link to Declaration">​</a></h2>
 <p>Représente une ligne dans une déclaration GEREP</p>
 <p style="margin-bottom:0.4em"><strong>Fields</strong></p>
@@ -706,7 +709,7 @@ permettant de valider le téléchargement.</p>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le pays de l&#x27;établissement expéditeur des déchets</p></td></tr><tr><td><p>emitterCompanyMail<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Adresse email de contact de l&#x27;expéditeur du déchet</p></td></tr><tr><td><p>emitterPickupsiteName<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le nom du point de prise en charge lorsqu&#x27;il se distingue du nom de l&#x27;établissement</p></td></tr><tr><td><p>emitterPickupsiteAddress<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>L&#x27;adresse de prise en charge lorsqu&#x27;elle se distingue de l&#x27;adresse de l&#x27;établissement exp éditeur des déchets</p></td></tr><tr><td><p>emitterPickupsitePostalCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>L&#x27;adresse de prise en charge lorsqu&#x27;elle se distingue de l&#x27;adresse de l&#x27;établissement expéditeur des déchets</p></td></tr><tr><td><p>emitterPickupsitePostalCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le code postal de prise en charge</p></td></tr><tr><td><p>emitterPickupsiteCity<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>La ville de prise en charge</p></td></tr><tr><td><p>emitterPickupsiteCountry<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le pays de prise en charge</p></td></tr><tr><td><p>workerCompanyName<br>
@@ -1170,7 +1173,7 @@ sont toujours partiellement masquées.</p></td></tr></tbody></table>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du chantier ou du lieu de collecte de l&#x27;expéditeur ou du détenteur</p></td></tr><tr><td><p>reportForPickupSiteCity<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Commune du chantier ou du lieu de collecte de l&#x27;expéditeur ou du détenteur</p></td></tr><tr><td><p>reportForPickupSiteCountryCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code pays du chantier ou du lieu de collecte de l&#x27;expéditeur ou du détenteur</p></td></tr><tr><td><p>wasteDescription<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Dénomination usuelle des terres excavées et s édiments ou des déchets</p></td></tr><tr><td><p>wasteCode<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Dénomination usuelle des terres excavées et sédiments ou des déchets</p></td></tr><tr><td><p>wasteCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code déchet</p></td></tr><tr><td><p>wasteCodeBale<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code déchet Bâle</p></td></tr><tr><td><p>wastePop<br>
 <a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>POP</p></td></tr><tr><td><p>wasteIsDangerous<br>
