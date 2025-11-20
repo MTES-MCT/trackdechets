@@ -145,6 +145,76 @@ describe("signTransportForm", () => {
     }
   );
 
+  it("TRA-15464: should only validate plates for current transporter", async () => {
+    // Given
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter1.company });
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        signedByTransporter: null,
+        sentAt: null,
+        sentBy: null,
+        emittedAt: emittedAt,
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            transporterCompanyName: transporter1.company.name,
+            transporterNumberPlate: "AZ-ER-TY", // Valid plate
+            number: 1
+          }
+        }
+      }
+    });
+
+    // Add a different 2nd transporter
+    const transporter2 = await userWithCompanyFactory("ADMIN");
+    await transporterReceiptFactory({ company: transporter2.company });
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret,
+        transporterCompanyName: transporter2.company.name,
+        transporterNumberPlate: null // No plate
+      }
+    });
+
+    // Add second transporter without plate
+    await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter1.company.siret,
+        transporterCompanyName: transporter1.company.name,
+        transporterNumberPlate: null // No plate
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(transporter1.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter1.user.name
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+  });
+
   it("should sign transport for transporter N", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
     const transporter1 = await userWithCompanyFactory("ADMIN");
