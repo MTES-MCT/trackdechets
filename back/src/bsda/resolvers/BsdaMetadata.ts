@@ -33,9 +33,11 @@ export const Metadata: BsdaMetadataResolvers = {
 
     const zodBsda = prismaToZodBsda(bsda);
     const currentSignatureType = getCurrentSignatureType(zodBsda);
-
     const nextSignatureType = getNextSignatureType(currentSignatureType);
     const nextSignatureForErrors = getNextSignatureForErrors(nextSignatureType);
+    if (!nextSignatureForErrors) {
+      return [];
+    }
     try {
       parseBsda(zodBsda, {
         currentSignatureType: nextSignatureType
