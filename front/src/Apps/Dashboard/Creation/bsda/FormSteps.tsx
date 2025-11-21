@@ -1,65 +1,97 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { ReactElement, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Loader } from "../../../Apps/common/Components";
-import { IStepContainerProps } from "../../common/stepper/Step";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  Bsda,
+  BsdType,
+  BsdaType,
+  Query,
+  QueryBsdaArgs,
   Mutation,
   MutationCreateBsdaArgs,
   MutationUpdateBsdaArgs,
-  QueryBsdaArgs,
-  Query,
-  Bsda,
-  BsdaInput,
-  BsdaType,
-  TransportMode,
   MutationCreateBsdaTransporterArgs,
   MutationUpdateBsdaTransporterArgs,
-  BsdaTransporterInput
+  BsdaInput,
+  BsdaTransporterInput,
+  TransportMode
 } from "@td/codegen-ui";
-import {
-  BsdaFormikValues,
-  CreateOrUpdateBsdaTransporterInput,
-  getInitialState
-} from "./initial-state";
+import omitDeep from "omit-deep-lodash";
+import React, { useMemo, useState, createContext, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { Loader } from "../../../common/Components";
+import FormStepsContent from "../FormStepsContent";
+import EmitterBsda from "./steps/Emitter";
+
 import {
   CREATE_BSDA,
-  UPDATE_BSDA,
-  GET_BSDA
-} from "../../../Apps/common/queries/bsda/queries";
-import omitDeep from "omit-deep-lodash";
-import { toastApolloError } from "../../../Apps/Dashboard/Creation/toaster";
-import { bsdaValidationSchema } from "./schema";
+  GET_BSDA,
+  UPDATE_BSDA
+} from "../../../common/queries/bsda/queries";
+import { getComputedState } from "../getComputedState";
+import {
+  getErrorTabIds,
+  getPublishErrorMessages,
+  getPublishErrorTabIds,
+  TabId
+} from "../utils";
+import { rawBsdaSchema, ZodBsda } from "./schema";
+import initialState, {
+  BsdaValues,
+  CreateOrUpdateBsdaTransporterInput
+} from "./utils/initial-state";
+import Worker from "./steps/Worker";
+import TransporterBsda from "./steps/Transporter";
+import DestinationBsda from "./steps/Destination";
+import ActorsList from "./steps/ActorsList";
+import WasteBsda from "./steps/Waste";
 import {
   CREATE_BSDA_TRANSPORTER,
   UPDATE_BSDA_TRANSPORTER
-} from "../../../Apps/Forms/Components/query";
+} from "../../../Forms/Components/query";
 import { isForeignVat } from "@td/constants";
-import { cleanPackagings } from "../../../Apps/Forms/Components/PackagingList/helpers";
-import GenericStepList from "../../common/stepper/GenericStepList";
-import { isDefinedStrict } from "../../../common/helper";
+import { toastApolloError } from "../toaster";
+import { cleanPackagings } from "../../../Forms/Components/PackagingList/helpers";
+import { isDefinedStrict } from "../../../../common/helper";
+import { parseDate } from "../../../../common/datetime";
 
 interface Props {
-  children: (bsda: Bsda | undefined) => ReactElement;
-  formId?: string;
-  initialStep: number;
+  bsdId?: string;
+  publishErrorsFromRedirect?: {
+    code: string;
+    path: string[];
+    message: string;
+  }[];
 }
+export const BsdaContext = createContext<Bsda | undefined>(undefined);
 
-export default function BsdaStepsList(props: Props) {
-  const navigate = useNavigate();
+const BsdaFormSteps = ({
+  bsdId,
+  publishErrorsFromRedirect
+}: Readonly<Props>) => {
+  const [publishErrors, setPublishErrors] = useState<
+    | {
+        code: string;
+        path: string[];
+        message: string;
+      }[]
+    | undefined
+  >();
 
   const bsdaQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
-      id: props.formId!
+      id: bsdId!
     },
-    skip: !props.formId,
+    skip: !bsdId,
     fetchPolicy: "network-only"
   });
 
-  const bsdaState = useMemo(() => {
-    const existingBsda = bsdaQuery.data?.bsda;
-    return getInitialState(existingBsda);
-  }, [bsdaQuery.data]);
+  const sealedFields = useMemo(
+    () =>
+      (bsdaQuery?.data?.bsda?.metadata?.fields?.sealed ?? [])
+        ?.map(f => f.join("."))
+        .filter(Boolean),
+    [bsdaQuery.data]
+  );
 
   const [createBsda, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsda">,
@@ -83,8 +115,85 @@ export default function BsdaStepsList(props: Props) {
       MutationUpdateBsdaTransporterArgs
     >(UPDATE_BSDA_TRANSPORTER);
 
+  const bsdaState = useMemo(
+    () => getComputedState(initialState, bsdaQuery.data?.bsda),
+    [bsdaQuery.data]
+  );
+
+  const methods = useForm<ZodBsda>({
+    values: bsdaState,
+
+    resolver: async (data, context, options) => {
+      return zodResolver(rawBsdaSchema)(data, context, options);
+    }
+  });
+  const errorsFromPublishApi = publishErrors || publishErrorsFromRedirect;
+  const publishErrorTabIds = getPublishErrorTabIds(
+    BsdType.Bsda,
+    errorsFromPublishApi
+  );
+
+  const formStateErrorsKeys = Object.keys(methods?.formState?.errors);
+  const errorTabIds = getErrorTabIds(
+    BsdType.Bsda,
+    publishErrorTabIds,
+    formStateErrorsKeys
+  );
+  const publishErrorMessages = useMemo(
+    () => getPublishErrorMessages(BsdType.Bsda, errorsFromPublishApi),
+    [errorsFromPublishApi]
+  );
+  const [bsdaContext, setBsdaContext] = useState<Bsda | undefined>();
+
+  const type = methods.watch("type");
+
+  useEffect(() => {
+    if (bsdaQuery.data?.bsda?.id) {
+      setBsdaContext(bsdaQuery.data.bsda);
+    }
+  }, [bsdaQuery.data?.bsda]);
+
+  const tabsContent = useMemo(
+    () => ({
+      waste: (
+        <WasteBsda
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.waste
+          )}
+        />
+      ),
+      emitter: (
+        <EmitterBsda
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.emitter
+          )}
+        />
+      ),
+      worker:
+        type === BsdaType.OtherCollections ? (
+          <Worker
+            errors={publishErrorMessages.filter(
+              error => error.tabId === TabId.worker
+            )}
+          />
+        ) : null,
+      transporter: <TransporterBsda />,
+      destination: (
+        <DestinationBsda
+          errors={publishErrorMessages.filter(
+            error => error.tabId === TabId.destination
+          )}
+        />
+      ),
+      other: <ActorsList />
+    }),
+    [publishErrorMessages, type]
+  );
+
   const loading =
     creating || updating || creatingBsdaTransporter || updatingBsdaTransporter;
+  const mainCtaLabel = bsdaState.id ? "Enregistrer" : "Publier";
+  const draftCtaLabel = bsdaState.id ? "" : "Enregistrer en brouillon";
 
   const cleanupFields = (input: BsdaInput): BsdaInput => {
     // When created through api, this field might be null in db
@@ -97,8 +206,11 @@ export default function BsdaStepsList(props: Props) {
     return omitDeep(input, "worker.work");
   };
 
-  function saveBsda(input: BsdaInput): Promise<any> {
-    const cleanInput =
+  async function saveBsda(values: BsdaInput): Promise<any> {
+    const bsdaInput = await saveTransporters(values as BsdaValues);
+    const input = { ...bsdaInput };
+
+    const cleanInputTransporters =
       input.type === BsdaType.Collection_2710
         ? // s'assure qu'on ne crée pas un transporteur "vide"
           // dans le cadre d'un BSDA de collecte en déchetterie
@@ -106,6 +218,15 @@ export default function BsdaStepsList(props: Props) {
           { ...input, transporters: [] }
         : input;
 
+    const cleanInput = omitDeep(cleanInputTransporters, [
+      "isDraft",
+      "ecoOrganisme.hasEcoOrganisme",
+      "hasBroker",
+      "hasIntermediaries",
+      "emitter.company.street",
+      "emitter.company.city",
+      "emitter.company.postalCode"
+    ]);
     return bsdaState.id
       ? updateBsda({
           variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }
@@ -131,6 +252,9 @@ export default function BsdaStepsList(props: Props) {
       },
       recepisse: {
         ...input.recepisse,
+        validityLimit: !!input.recepisse?.validityLimit
+          ? parseDate(input.recepisse.validityLimit).toISOString()
+          : null,
         ...(input.recepisse?.isExempted ||
         isForeignVat(input?.company?.vatNumber) ||
         transport?.mode !== TransportMode.Road
@@ -178,9 +302,8 @@ export default function BsdaStepsList(props: Props) {
     }
   }
 
-  async function onSubmit(values: BsdaFormikValues) {
+  async function saveTransporters(values: BsdaValues) {
     const { id, transporters, packagings, ...input } = values;
-
     let transporterIds: string[] = [];
 
     try {
@@ -213,31 +336,29 @@ export default function BsdaStepsList(props: Props) {
       bsdaInput.waste.isSubjectToADR = null;
     }
 
-    saveBsda(bsdaInput)
-      .then(_ => {
-        navigate(-1);
-      })
-      .catch(err => toastApolloError(err));
+    return bsdaInput;
   }
 
-  // As it's a render function, the steps are nested into a `<></>` block
-  // So we render then unwrap to get the steps
-  const parentOfSteps = props.children(bsdaQuery.data?.bsda);
-  const steps = parentOfSteps.props
-    .children as ReactElement<IStepContainerProps>[];
-
   return (
-    <>
-      <GenericStepList
-        children={steps}
-        formId={props.formId}
-        formQuery={bsdaQuery}
-        onSubmit={onSubmit}
-        initialValues={bsdaState}
-        validationSchema={bsdaValidationSchema}
-        initialStep={props.initialStep}
+    <BsdaContext.Provider value={bsdaContext}>
+      <FormStepsContent
+        bsdType={BsdType.Bsda}
+        draftCtaLabel={draftCtaLabel}
+        isLoading={loading}
+        mainCtaLabel={mainCtaLabel}
+        saveForm={saveBsda}
+        useformMethods={methods}
+        tabsContent={tabsContent}
+        sealedFields={sealedFields}
+        setPublishErrors={setPublishErrors}
+        errorTabIds={errorTabIds}
+        genericErrorMessage={publishErrorMessages.filter(
+          error => error.tabId === TabId.none
+        )}
       />
       {loading && <Loader />}
-    </>
+    </BsdaContext.Provider>
   );
-}
+};
+
+export default BsdaFormSteps;

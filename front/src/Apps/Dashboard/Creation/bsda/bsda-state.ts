@@ -2,16 +2,28 @@ import {
   Bsda,
   BsdaConsistence,
   BsdaInput,
+  BsdaPickupSite,
   BsdaTransporterInput,
   BsdaType,
   FormCompany
 } from "@td/codegen-ui";
-import { getInitialEmitterPickupSite } from "./steps/Emitter";
 import {
   getInitialCompany,
   initialTransporter
-} from "../../../Apps/common/data/initialState";
-import { emptyBsdaPackaging } from "../../../Apps/Forms/Components/PackagingList/helpers";
+} from "../../../common/data/initialState";
+import { emptyBsdaPackaging } from "../../../Forms/Components/PackagingList/helpers";
+
+export function getInitialEmitterPickupSite(
+  pickupSite?: BsdaPickupSite | null
+) {
+  return {
+    name: pickupSite?.name ?? "",
+    address: pickupSite?.address ?? "",
+    city: pickupSite?.city ?? "",
+    postalCode: pickupSite?.postalCode ?? "",
+    infos: pickupSite?.infos ?? ""
+  };
+}
 
 // Les données transporteurs du formulaire représente soit un transporteur BSDA
 // déjà crée en base de données qui dispose d'un identifiant, soit un transporteur

@@ -23,6 +23,7 @@ export const getPrevTab = (tabIds: TabId[], currentTabId: TabId) => {
 export enum TabId {
   waste = "waste",
   emitter = "emitter",
+  worker = "worker",
   transporter = "transporter",
   destination = "destination",
   none = "none",
@@ -35,7 +36,7 @@ export type NormalizedError = {
   message: string;
 };
 
-export type SupportedBsdTypes = BsdType.Bsvhu | BsdType.Bspaoh;
+export type SupportedBsdTypes = BsdType.Bsvhu | BsdType.Bspaoh | BsdType.Bsda;
 
 export type TabError = {
   tabId: TabId;
@@ -48,6 +49,16 @@ export type IconIdName =
   | "tabError fr-icon-warning-line fr-icon-arrow-right-line"
   | FrIconClassName
   | RiIconClassName;
+
+const getDestinationTabLabel = (bsdType: SupportedBsdTypes) => {
+  if (bsdType === BsdType.Bspaoh) {
+    return "Crématorium";
+  } else if (bsdType === BsdType.Bsda) {
+    return "Destinataire";
+  } else {
+    return "Destination finale";
+  }
+};
 
 export const getTabs = (
   bsdType: SupportedBsdTypes,
@@ -75,12 +86,16 @@ export const getTabs = (
     },
     {
       tabId: TabId.destination,
-      label: bsdType === BsdType.Bspaoh ? "Crématorium" : "Destination finale",
+      label: getDestinationTabLabel(bsdType),
       iconId: getTabClassName(errorTabIds, "destination")
     }
   ];
   if (bsdType === BsdType.Bsvhu) {
     return getBsvhuTabs(commonsTabs, errorTabIds);
+  }
+
+  if (bsdType === BsdType.Bsda) {
+    return getBsdaTabs(commonsTabs, errorTabIds);
   }
   return commonsTabs;
 };
@@ -95,6 +110,34 @@ const getBsvhuTabs = (commonTabs, errorTabIds) => {
     }
   ];
   return vhuTabs;
+};
+
+const getBsdaTabs = (commonTabs, errorTabIds) => {
+  const bsdaTabs = [
+    {
+      ...commonTabs[0]
+    },
+    {
+      ...commonTabs[1]
+    },
+    {
+      tabId: TabId.worker,
+      label: "Entreprise de travaux",
+      iconId: getTabClassName(errorTabIds, "worker")
+    },
+    {
+      ...commonTabs[2]
+    },
+    {
+      ...commonTabs[3]
+    },
+    {
+      tabId: TabId.other,
+      label: "Autres acteurs",
+      iconId: getTabClassName(errorTabIds, "other")
+    }
+  ];
+  return bsdaTabs;
 };
 
 const pathPrefixToTab = {
@@ -120,6 +163,12 @@ const pathPrefixToTab = {
     return null;
   },
   [BsdType.Bspaoh]: (pathPrefix: string): TabId | null => {
+    if (Object.values(TabId).includes(pathPrefix as TabId)) {
+      return TabId[pathPrefix];
+    }
+    return null;
+  },
+  [BsdType.Bsda]: (pathPrefix: string): TabId | null => {
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];
     }

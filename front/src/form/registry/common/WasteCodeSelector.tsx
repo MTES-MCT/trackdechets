@@ -110,8 +110,8 @@ export function WasteCodeSelector({
                   <span
                     className={
                       expanded.has(node.code)
-                        ? "fr-icon-arrow-down-s-line"
-                        : "fr-icon-arrow-up-s-line"
+                        ? "fr-icon-arrow-up-s-line"
+                        : "fr-icon-arrow-down-s-line"
                     }
                   ></span>
                 </div>

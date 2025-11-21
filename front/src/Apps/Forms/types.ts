@@ -1,6 +1,6 @@
 import { BsdaTransporterInput } from "@td/codegen-ui";
 import { CreateOrUpdateTransporterInput } from "../../form/bsdd/utils/initial-state";
-import { CreateOrUpdateBsdaTransporterInput } from "../../form/bsda/stepper/initial-state";
+import { CreateOrUpdateBsdaTransporterInput } from "../Dashboard/Creation/bsda/bsda-state";
 import { CreateOrUpdateBsffTransporterInput } from "../../form/bsff/utils/initial-state";
 
 // On veut pouvoir utiliser le formulaire transporteurs pour tous les types de bordereau.
