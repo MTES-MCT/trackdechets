@@ -7,9 +7,10 @@ prod_volume_size="400GB"
 sandbox_instance_size="DEV1-L"
 prod_instance_size="DEV1-L"
 sandbox_volume_snapshot_id="2bf194d5-a7dc-48c7-89fb-10ed76a2d1e1"
-production_volume_snapshot_id_full="e217babc-74ca-403c-b9a3-661278d952eb"
+production_volume_snapshot_id_full="394a95b5-3adb-49a9-8d2b-a173f4fa90b2"
 production_volume_snapshot_id_empty="6dce8bb8-4827-4153-b71d-6186bd64d3f2"
 project_id=$(grep "SCALEWAY_RESTORE_PROJECT_ID=" ../../.env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
+snapshot_id=$(grep "SCALEWAY_RESTORE_SNAPSHOT_ID=" ../../.env | cut -d'=' -f2 | tr -d '"' | tr -d "'")
 
 bold=$(tput bold)
 reset=$(tput sgr0)
@@ -19,7 +20,7 @@ red=$(tput setaf 9)
 # 1. Create the instance
 
 echo "${bold}→ Do you want to create a sandbox or prod testing instance, or delete an existing one?${reset}"
-options=("Sandbox" "Production (full db, backup from 07/08/25)" "Production (empty)" "Delete" "Cancel")
+options=("Sandbox" "Production (full db, backup from 20/11/25)" "Production (empty)" "Production snapshot from env.SCALEWAY_RESTORE_SNAPSHOT_ID" "Delete" "Cancel")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -31,7 +32,7 @@ do
             volume_snapshot_id=$sandbox_volume_snapshot_id
             break
             ;;
-        "Production (full db, backup from 07/08/25)")
+        "Production (full db, backup from 20/11/25)")
             echo "Creating production instance..."
             instance_type="production"
             volume_size=$prod_volume_size
@@ -45,6 +46,18 @@ do
             volume_size=$prod_volume_size
             instance_size=$prod_instance_size
             volume_snapshot_id=$production_volume_snapshot_id_empty
+            break
+            ;;
+        "Production snapshot from env.SCALEWAY_RESTORE_SNAPSHOT_ID")
+            if [ -z "$snapshot_id" ]; then
+                echo "SCALEWAY_RESTORE_SNAPSHOT_ID is not set in the .env file, please set it"
+                exit 1
+            fi
+            echo "Creating instance from production snapshot $snapshot_id..."
+            instance_type="production"
+            volume_size=$prod_volume_size
+            instance_size=$prod_instance_size
+            volume_snapshot_id=$snapshot_id
             break
             ;;
         "Delete")
