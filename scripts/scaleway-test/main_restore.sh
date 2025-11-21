@@ -49,7 +49,7 @@ do
             break
             ;;
         "Production snapshot from env.SCALEWAY_RESTORE_SNAPSHOT_ID")
-            if [ -z "$snapshot_id" ]; then
+            if [[ -z "$snapshot_id" ]]; then
                 echo "SCALEWAY_RESTORE_SNAPSHOT_ID is not set in the .env file, please set it"
                 exit 1
             fi
