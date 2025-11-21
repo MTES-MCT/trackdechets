@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Query,
   QueryAdminRequestsAdminArgs,
@@ -19,6 +19,22 @@ import { formatDateViewDisplay } from "../../Apps/Companies/common/utils";
 import Button from "@codegouvfr/react-dsfr/Button";
 import toast from "react-hot-toast";
 import { getStatusBadge } from "../../Apps/Companies/CompanyManage/CompanyAdminRequest/CompanyAdminRequestsTable";
+import Input from "@codegouvfr/react-dsfr/Input";
+import z from "zod";
+import { debounce, isDefinedStrict } from "../../common/helper";
+
+const filtersSchema = z.object({
+  siret: z
+    .string()
+    .optional()
+    .transform(val => (isDefinedStrict(val) ? val : undefined)),
+  date: z.coerce
+    .date()
+    .optional()
+    .transform(val => (val ? new Date(val) : undefined))
+});
+
+export type ZodFilters = z.infer<typeof filtersSchema>;
 
 const getMethod = (method: AdminRequestValidationMethod) => {
   switch (method) {
@@ -33,6 +49,8 @@ const getMethod = (method: AdminRequestValidationMethod) => {
 
 export const AdminRequests = () => {
   const [pageIndex, setPageIndex] = useState(0);
+  const [siret, setSiret] = useState<string | undefined>(undefined);
+  const [date, setDate] = useState<Date | undefined>(undefined);
 
   const PAGE_SIZE = 50;
 
@@ -42,8 +60,10 @@ export const AdminRequests = () => {
   >(ADMIN_REQUESTS_ADMIN, {
     fetchPolicy: "network-only",
     variables: {
-      skip: 0,
-      first: PAGE_SIZE
+      input: {
+        skip: 0,
+        first: PAGE_SIZE
+      }
     }
   });
 
@@ -66,14 +86,86 @@ export const AdminRequests = () => {
     setPageIndex(page);
 
     refetch({
-      skip: page * PAGE_SIZE,
-      first: PAGE_SIZE
+      input: {
+        skip: page * PAGE_SIZE,
+        first: PAGE_SIZE
+      }
     });
   };
+
+  // Filters form
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(params => {
+        try {
+          // Validate params
+          const parsed = filtersSchema.parse(params);
+
+          // Reset page index
+          setPageIndex(0);
+
+          refetch({
+            input: {
+              skip: 0,
+              first: PAGE_SIZE,
+              siret: parsed.siret,
+              date: parsed.date?.toISOString()
+            }
+          });
+        } catch (err: any) {
+          console.error(err);
+          return;
+        }
+      }, 500),
+    [refetch]
+  );
 
   return (
     <div>
       <h3 className="fr-sr-only">Demandes administrateur</h3>
+
+      {/* Filters */}
+      <div className="fr-grid-row fr-grid-row--top">
+        <div className="fr-col-sm-6 fr-col-lg-4 fr-col-xl-3 fr-pr-2w">
+          <Input
+            label={false}
+            nativeInputProps={{
+              type: "text",
+              placeholder: "SIRET",
+              onChange: e => {
+                const value = isDefinedStrict(e.target.value)
+                  ? e.target.value
+                  : undefined;
+                setSiret(value);
+                debouncedSearch({
+                  siret: value,
+                  date
+                });
+              }
+            }}
+          />
+        </div>
+
+        <div className="fr-col-sm-6 fr-col-lg-4 fr-col-xl-3">
+          <Input
+            label={false}
+            nativeInputProps={{
+              type: "date",
+              onChange: e => {
+                const value = isDefinedStrict(e.target.value)
+                  ? new Date(e.target.value)
+                  : undefined;
+                setDate(value);
+                debouncedSearch({
+                  siret,
+                  date: value
+                });
+              }
+            }}
+          />
+        </div>
+      </div>
 
       <div className="fr-table--sm fr-table fr-table" id="table-sm-component">
         <div className="fr-table__wrapper">

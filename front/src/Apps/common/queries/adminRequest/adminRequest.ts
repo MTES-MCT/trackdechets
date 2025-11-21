@@ -48,8 +48,8 @@ export const ADMIN_REQUESTS = gql`
 `;
 
 export const ADMIN_REQUESTS_ADMIN = gql`
-  query adminRequestsAdmin($skip: Int!, $first: Int!) {
-    adminRequestsAdmin(skip: $skip, first: $first) {
+  query adminRequestsAdmin($input: AdminRequestsAdminInput!) {
+    adminRequestsAdmin(input: $input) {
       totalCount
       pageInfo {
         startCursor

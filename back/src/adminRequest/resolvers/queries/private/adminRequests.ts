@@ -2,7 +2,7 @@ import { applyAuthStrategies, AuthType } from "../../../../auth/auth";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import type { QueryResolvers } from "@td/codegen-back";
 import { parseQueryAdminRequestsArgs } from "../../../validation";
-import { getPaginatedDelegations } from "./utils/adminRequests.utils";
+import { getPaginatedAdminRequests } from "./utils/adminRequests.utils";
 import { fixPaginatedTyping } from "../../typing";
 
 const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
@@ -19,8 +19,8 @@ const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
   // Sync validation of args
   const { skip, first } = parseQueryAdminRequestsArgs(args);
 
-  // Get paginated delegations
-  const paginatedDelegations = await getPaginatedDelegations(
+  // Get paginated requests
+  const paginatedRequests = await getPaginatedAdminRequests(
     user,
     { userId: user.id },
     {
@@ -29,7 +29,7 @@ const adminRequestsResolver: QueryResolvers["adminRequests"] = async (
     }
   );
 
-  return fixPaginatedTyping(paginatedDelegations);
+  return fixPaginatedTyping(paginatedRequests);
 };
 
 export default adminRequestsResolver;

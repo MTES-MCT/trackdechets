@@ -7,7 +7,7 @@ type Query {
   """
   Endpoint à destination des administrateurs Trackdéchets, pour récupérer toutes les adminRequests (paginées)
   """
-  adminRequestsAdmin(skip: Int, first: Int): AdminRequestConnection!
+  adminRequestsAdmin(input: AdminRequestsAdminInput!): AdminRequestConnection!
 
   adminRequest(adminRequestId: ID!): AdminRequest!
 }
