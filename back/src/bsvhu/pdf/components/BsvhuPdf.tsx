@@ -533,6 +533,37 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             )}
           </div>
         </div>
+        {bsvhu?.destination?.operation?.nextDestination?.company?.siret && (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <strong>12. Installation de broyage prévisionnelle </strong>
+              <p>
+                SIRET:{" "}
+                {bsvhu?.destination?.operation?.nextDestination?.company?.siret}
+              </p>
+              <p>
+                NOM (Raison sociale):{" "}
+                {bsvhu?.destination?.operation?.nextDestination?.company
+                  ?.name ?? ""}
+              </p>
+              <p>
+                Adresse:{" "}
+                {bsvhu?.destination?.operation?.nextDestination?.company
+                  ?.address ?? ""}
+              </p>
+              <p>
+                Tel:{" "}
+                {bsvhu?.destination?.operation?.nextDestination?.company
+                  ?.phone ?? ""}
+              </p>
+              <p>
+                Mail:{" "}
+                {bsvhu?.destination?.operation?.nextDestination?.company
+                  ?.mail ?? ""}
+              </p>
+            </div>
+          </div>
+        )}
         <p className="mb-3">
           (*) les VHU doivent être intégrés au livre de police de l’installation
           de destination (si démolisseur)
