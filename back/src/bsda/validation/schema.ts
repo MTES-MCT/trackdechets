@@ -172,7 +172,7 @@ export const rawBsdaSchema = z.object({
     .transform(value =>
       isDefinedStrict(value?.replace(/\s/g, "")) ? value : null
     ),
-  wasteNonRoadRegulationMention: z.string().max(250).nullish(),
+  wasteNonRoadRegulationMention: z.string().max(750).nullish(),
   wastePop: z
     .boolean()
     .nullish()
