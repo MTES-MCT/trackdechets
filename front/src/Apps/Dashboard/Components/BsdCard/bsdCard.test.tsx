@@ -23,6 +23,7 @@ import {
   IS_AUTHENTICATED
 } from "../../../../common/contexts/AuthContext";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../../Apps/common/queries/company/query";
+import { addYears } from "date-fns";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
@@ -47,7 +48,9 @@ describe("Bsd card primary action label", () => {
             __typename: "User",
             id: "user-123",
             email: "user@example.com",
-            isAdmin: false
+            isAdmin: false,
+            trackingConsent: true,
+            trackingConsentUntil: addYears(new Date(), 1).toISOString()
           }
         }
       },
@@ -602,6 +605,7 @@ describe("Bsd card primary action label", () => {
           </AuthProvider>
         </MockedProvider>
       );
+
       const primaryActionBtn = await screen.findByTestId(
         `bsd-card-btn-primary-${bsvhu.id}`
       );
@@ -616,6 +620,7 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
       expect(queryByTestId("bsd-review-btn")).toBeFalsy();
       expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-clone-btn")).toBeInTheDocument();
       expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });

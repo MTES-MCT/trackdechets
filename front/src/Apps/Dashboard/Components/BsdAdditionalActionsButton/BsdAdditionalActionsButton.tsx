@@ -318,7 +318,7 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
-                data-testid="bsd-duplicate-btn"
+                data-testid="bsd-clone-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleClone}
