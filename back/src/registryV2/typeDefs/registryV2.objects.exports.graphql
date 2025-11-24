@@ -346,7 +346,7 @@ type IncomingWasteV2 {
   destinationReceptionRefusedWeight: Float
   "La quantité de déchet entrant acceptée exprimée en tonne"
   destinationReceptionAcceptedWeight: Float
-
+  "Type de poids de la quantité reçue"
   destinationReceptionWeightIsEstimate: Boolean
   destinationReceptionVolume: Float
 
@@ -1098,6 +1098,8 @@ type TransportedWasteV2 {
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
   "La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
+  "Type de poids de la quantité reçue"
+  destinationReceptionWeightIsEstimate: Boolean
   "La quantité de déchet entrant acceptée exprimée en tonne"
   destinationReceptionAcceptedWeight: Float
   "La quantité de déchet entrant refusée exprimée en tonne"
@@ -1482,6 +1484,8 @@ type ManagedWasteV2 {
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
   "La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
+  "Type de poids de la quantité reçue"
+  destinationReceptionWeightIsEstimate: Boolean
   "La quantité de déchet entrant acceptée exprimée en tonne"
   destinationReceptionAcceptedWeight: Float
   "La quantité de déchet entrant refusée exprimée en tonne"
@@ -1900,6 +1904,8 @@ type AllWasteV2 {
   destinationReceptionAcceptationStatus: WasteAcceptationStatus
   "La quantité de déchet reçu sur l'installation de destination ou d'entreposage provisoire exprimée en tonne"
   destinationReceptionWeight: Float
+  "Type de poids de la quantité reçue"
+  destinationReceptionWeightIsEstimate: Boolean
   "La quantité de déchet entrant acceptée exprimée en tonne"
   destinationReceptionAcceptedWeight: Float
   "La quantité de déchet entrant refusée exprimée en tonne"

@@ -791,6 +791,7 @@ export const toTransportedWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : bsvhu.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
     destinationHasCiterneBeenWashedOut: null,
@@ -1049,6 +1050,7 @@ export const toManagedWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : bsvhu.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,
@@ -1326,6 +1328,7 @@ export const toAllWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : bsvhu.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,

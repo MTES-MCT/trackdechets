@@ -987,6 +987,7 @@ export const toTransportedWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight,
     destinationHasCiterneBeenWashedOut: null,
@@ -1257,6 +1258,7 @@ export const toAllWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,

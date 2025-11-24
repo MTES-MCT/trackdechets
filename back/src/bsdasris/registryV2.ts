@@ -581,6 +581,7 @@ export const toTransportedWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
@@ -757,6 +758,7 @@ export const toManagedWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: null,
@@ -936,6 +938,7 @@ export const toAllWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
