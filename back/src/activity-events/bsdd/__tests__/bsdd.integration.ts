@@ -125,7 +125,7 @@ describe("ActivityEvent.Bsdd", () => {
             ],
             quantity: 1.5,
             quantityType: "REAL",
-            consistence: "SOLID"
+            consistences: ["SOLID"]
           }
         }
       }

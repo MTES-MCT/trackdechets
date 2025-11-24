@@ -15,7 +15,8 @@ import {
   checkForeignTransporter,
   checkRecepisses,
   checkWorkerSubsection,
-  checkSubTypes
+  checkSubTypes,
+  checkEcoOrganismePartnersIds
 } from "./refinements";
 import { isValidWebsite } from "@td/constants";
 import { isSafeSSTI } from "../../common/validation/zod/refinement";
@@ -73,6 +74,11 @@ const rawCompanySchema = z.object({
   workerCertificationId: z.string().nullish(),
   vhuAgrementDemolisseurId: z.string().nullish(),
   vhuAgrementBroyeurId: z.string().nullish(),
+  ecoOrganismePartnersIds: z
+    .array(z.string())
+    .transform(toSet)
+    .nullish()
+    .default([]),
   allowBsdasriTakeOverWithoutSignature: z
     .boolean()
     .nullish()
@@ -92,7 +98,8 @@ export const companySchema = rawCompanySchema
   .superRefine(checkEcoOrganisme)
   .superRefine(checkSubTypes)
   .superRefine(checkRecepisses)
-  .superRefine(checkWorkerSubsection);
+  .superRefine(checkWorkerSubsection)
+  .superRefine(checkEcoOrganismePartnersIds);
 
 const rawBulkUpdateCompanySchema = rawCompanySchema.pick({
   companyTypes: true,

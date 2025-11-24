@@ -19,7 +19,8 @@ export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL!, {
   defaultJobOptions: {
     attempts: 3,
     backoff: { type: "fixed", delay: 1000 }, // ES refresh takes around 1s
-    removeOnComplete: 10_000,
+    removeOnComplete: 1000,
+    removeOnFail: 5000,
     timeout: 10000
   }
 });
@@ -40,7 +41,8 @@ export const bulkIndexQueue = new Queue<string>(
       attempts: 1,
       backoff: { type: "fixed", delay: 100 },
       stackTraceLimit: 100,
-      removeOnComplete: 10_000,
+      removeOnComplete: 1000,
+      removeOnFail: 5000,
       // 10 minutes
       timeout: 10 * 60 * 1000
     }
@@ -60,7 +62,8 @@ export const bulkIndexMasterQueue = new Queue<string>(
     defaultJobOptions: {
       attempts: 1,
       backoff: { type: "fixed", delay: 100 },
-      removeOnComplete: 10_000,
+      removeOnComplete: 1000,
+      removeOnFail: 5000,
       // 24h pour prendre de la marge, les jobs de cette queue attendent que toutes les chunks
       // soit process lors d'un reindex global
       timeout: 24 * 3600 * 1000

@@ -227,38 +227,50 @@ export default function WasteInfo({ disabled }) {
             Sélectionnez une ou plusieurs consistances.
           </div>
           <div className="tw-flex tw-flex-row tw-gap-4">
-            <Field
-              name="wasteDetails.consistence"
-              id={Consistence.Solid}
-              label="Solide"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id={Consistence.Liquid}
-              label="Liquide"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id={Consistence.Gaseous}
-              label="Gazeux"
-              component={RadioButton}
-              disabled={disabled}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id={Consistence.Doughy}
-              label="Pâteux"
-              component={RadioButton}
-              disabled={disabled}
-            />
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistences"
+                value={Consistence.Solid}
+                className="td-checkbox"
+              />
+              Solide
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistences"
+                value={Consistence.Liquid}
+                className="td-checkbox"
+              />
+              Liquide
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistences"
+                value={Consistence.Gaseous}
+                className="td-checkbox"
+              />
+              Gazeux
+            </label>
+            <label>
+              <Field
+                disabled={disabled}
+                type="checkbox"
+                name="wasteDetails.consistences"
+                value={Consistence.Doughy}
+                className="td-checkbox"
+              />
+              Pâteux
+            </label>
           </div>
         </fieldset>
 
-        <RedErrorMessage name="wasteDetails.consistence" />
+        <RedErrorMessage name="wasteDetails.consistences" />
       </div>
 
       {showDuplicateWarning && (

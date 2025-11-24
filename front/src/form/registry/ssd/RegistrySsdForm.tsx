@@ -52,6 +52,9 @@ export function RegistrySsdForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
+  const [loadingLookup, setLoadingLookup] = useState(
+    !!queryParams.get("publicId") && !!queryParams.get("siret")
+  );
 
   const methods = useForm<FormValues>({
     defaultValues: {
@@ -61,49 +64,46 @@ export function RegistrySsdForm({ onClose }: Props) {
     resolver: zodResolver(schemaFromShape(ssdFormShape))
   });
 
-  const { loading: loadingLookup } = useQuery<Pick<Query, "registryLookup">>(
-    GET_SSD_REGISTRY_LOOKUP,
-    {
-      variables: {
-        type: RegistryImportType.Ssd,
-        publicId: queryParams.get("publicId"),
-        siret: queryParams.get("siret")
-      },
-      skip: !queryParams.get("publicId") || !queryParams.get("siret"),
-      fetchPolicy: "network-only",
-      onCompleted: data => {
-        if (data.registryLookup.ssd) {
-          const definedSsdProps = Object.fromEntries(
-            Object.entries(data.registryLookup.ssd).filter(
-              ([_, v]) => v != null
-            )
-          ) as SsdLineInput;
+  useQuery<Pick<Query, "registryLookup">>(GET_SSD_REGISTRY_LOOKUP, {
+    variables: {
+      type: RegistryImportType.Ssd,
+      publicId: queryParams.get("publicId"),
+      siret: queryParams.get("siret")
+    },
+    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    fetchPolicy: "network-only",
+    onCompleted: data => {
+      if (data.registryLookup.ssd) {
+        const definedSsdProps = Object.fromEntries(
+          Object.entries(data.registryLookup.ssd).filter(([_, v]) => v != null)
+        ) as SsdLineInput;
 
-          methods.reset({
-            ...DEFAULT_VALUES,
-            ...definedSsdProps,
-            secondaryWasteCodes: transformToFieldArrayObjects(
-              definedSsdProps.secondaryWasteCodes
-            ),
-            secondaryWasteDescriptions: transformToFieldArrayObjects(
-              definedSsdProps.secondaryWasteDescriptions
-            ),
-            processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
-            processingEndDate: isoDateToHtmlDate(
-              definedSsdProps.processingEndDate
-            ),
-            dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
-            useDate: isoDateToHtmlDate(definedSsdProps.useDate),
-            reason: RegistryLineReason.Edit
-          });
-          setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
-        }
-      },
-      onError: error => {
-        handleServerError(methods, error as ApolloError | Error);
+        methods.reset({
+          ...DEFAULT_VALUES,
+          ...definedSsdProps,
+          secondaryWasteCodes: transformToFieldArrayObjects(
+            definedSsdProps.secondaryWasteCodes
+          ),
+          secondaryWasteDescriptions: transformToFieldArrayObjects(
+            definedSsdProps.secondaryWasteDescriptions
+          ),
+          processingDate: isoDateToHtmlDate(definedSsdProps.processingDate),
+          processingEndDate: isoDateToHtmlDate(
+            definedSsdProps.processingEndDate
+          ),
+          dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
+          useDate: isoDateToHtmlDate(definedSsdProps.useDate),
+          reason: RegistryLineReason.Edit
+        });
+        setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
       }
+      setLoadingLookup(false);
+    },
+    onError: error => {
+      setLoadingLookup(false);
+      handleServerError(methods, error as ApolloError | Error);
     }
-  );
+  });
 
   const [addToSsdRegistry, { loading }] = useMutation<
     Pick<Mutation, "addToSsdRegistry">

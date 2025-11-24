@@ -127,7 +127,11 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: undefinedOrDefault(
       chain(input.wasteDetails, w =>
-        w.consistence ? [w.consistence] : undefined
+        w.consistences
+          ? w.consistences
+          : w.consistence
+          ? [w.consistence]
+          : undefined
       ),
       []
     ),
@@ -719,6 +723,7 @@ export function expandFormFromDb(
         : null,
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence?.[0],
+      consistences: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
@@ -908,6 +913,7 @@ export function expandFormFromDb(
               : null,
             quantityType: forwardedIn.wasteDetailsQuantityType,
             consistence: forwardedIn.wasteDetailsConsistence?.[0],
+            consistences: forwardedIn.wasteDetailsConsistence,
             pop: forwardedIn.wasteDetailsPop,
             isDangerous: forwardedIn.wasteDetailsIsDangerous
           }),

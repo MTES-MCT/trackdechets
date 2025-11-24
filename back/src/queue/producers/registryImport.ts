@@ -11,7 +11,8 @@ export const registryImportQueue = new Queue<RegistryImportJobArgs>(
   REDIS_URL!,
   {
     defaultJobOptions: {
-      removeOnComplete: 10_000
+      removeOnComplete: 1000,
+      removeOnFail: 5000
     }
   }
 );

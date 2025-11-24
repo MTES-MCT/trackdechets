@@ -1,4 +1,4 @@
-import { getSignedUrlForUpload, validateAndGetContentType } from "@td/registry";
+import { getSignedUrlForUpload } from "@td/registry";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import type { QueryRegistryUploadTexsAnalysisSignedUrlArgs } from "@td/codegen-back";
 import { Permission, checkUserPermissions } from "../../../permissions";
@@ -21,11 +21,10 @@ export async function registryUploadTexsAnalysisSignedUrl(
   );
 
   const fileKey = [Date.now(), user.id, fileName].join("_");
-  // Validate file type and get content type
-  const contentType = validateAndGetContentType(fileName);
-  if (!contentType) {
+  const extension = fileName.toLowerCase().substring(fileName.lastIndexOf("."));
+  if (extension !== ".pdf") {
     throw new ForbiddenError(
-      `Type de fichier non autorisé. Seuls les fichiers CSV (.csv) et Excel (.xlsx/.xls) sont acceptés.`
+      `Type de fichier non autorisé. Seuls les fichiers PDF (.pdf) sont acceptés.`
     );
   }
 
@@ -34,7 +33,7 @@ export async function registryUploadTexsAnalysisSignedUrl(
     key: fileKey,
     metadata: { filename: fileName },
     tags: { userId: user.id },
-    contentType
+    contentType: "application/pdf"
   });
 
   return { fileKey, signedUrl: url, fields };

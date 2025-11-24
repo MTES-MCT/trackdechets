@@ -2,23 +2,29 @@ import { ZodIssue } from "zod";
 import type {
   BsdaMetadata,
   BsdaMetadataFields,
-  BsdaMetadataResolvers
+  BsdaMetadataResolvers,
+  BsdaSignatureType
 } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { computeLatestRevision } from "../converter";
 import { parseBsda } from "../validation";
 import {
   getCurrentSignatureType,
+  getNextSignatureType,
   getSignatureAncestors,
   prismaToZodBsda
 } from "../validation/helpers";
 import { getRequiredAndSealedFieldPaths } from "../validation/rules";
+import { AllBsdaSignatureType } from "../types";
 
-function getNextSignature(bsda) {
-  if (bsda.destinationOperationSignatureAuthor != null) return "OPERATION";
-  if (bsda.transporterTransportSignatureAuthor != null) return "TRANSPORT";
-  if (bsda.workerWorkSignatureAuthor != null) return "WORK";
-  return "EMISSION";
+function getNextSignatureForErrors(
+  nextSignatureType: AllBsdaSignatureType | undefined
+): BsdaSignatureType | undefined {
+  return nextSignatureType
+    ? nextSignatureType.startsWith("TRANSPORT")
+      ? "TRANSPORT"
+      : (nextSignatureType as BsdaSignatureType)
+    : undefined;
 }
 
 export const Metadata: BsdaMetadataResolvers = {
@@ -26,11 +32,13 @@ export const Metadata: BsdaMetadataResolvers = {
     const bsda = await context.dataloaders.bsdas.load(metadata.id);
 
     const zodBsda = prismaToZodBsda(bsda);
-    const currentSignatureType = getNextSignature(bsda);
+    const currentSignatureType = getCurrentSignatureType(zodBsda);
 
+    const nextSignatureType = getNextSignatureType(currentSignatureType);
+    const nextSignatureForErrors = getNextSignatureForErrors(nextSignatureType);
     try {
       parseBsda(zodBsda, {
-        currentSignatureType
+        currentSignatureType: nextSignatureType
       });
       return [];
     } catch (errors) {
@@ -38,7 +46,7 @@ export const Metadata: BsdaMetadataResolvers = {
         return {
           message: e.message,
           path: e.path,
-          requiredFor: currentSignatureType
+          requiredFor: nextSignatureForErrors
         };
       });
     }

@@ -145,7 +145,12 @@ describe("elasticHelpers", () => {
         destinationReceptionAcceptationStatus:
           opt?.wasteAcceptationStatus ??
           WasteAcceptationStatus.PARTIALLY_REFUSED,
-        transporterCompanySiret: transporter.siret
+        transporters: {
+          create: {
+            number: 1,
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 

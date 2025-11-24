@@ -138,6 +138,7 @@ describe("expandFormFromDb", () => {
         quantity: 22.5,
         quantityType: form.wasteDetailsQuantityType,
         consistence: form.wasteDetailsConsistence[0],
+        consistences: form.wasteDetailsConsistence,
         pop: false,
         isDangerous: true,
         analysisReferences: [],
@@ -239,6 +240,7 @@ describe("expandFormFromDb", () => {
         quantity: 1,
         quantityType: "ESTIMATED",
         consistence: "SOLID",
+        consistences: ["SOLID"],
         pop: false,
         isDangerous: forwardedIn!.wasteDetailsIsDangerous
       },

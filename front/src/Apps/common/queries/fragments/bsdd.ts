@@ -78,7 +78,7 @@ export const wasteDetailsFragment = gql`
     }
     quantity
     quantityType
-    consistence
+    consistences
     pop
     isDangerous
     parcelNumbers {

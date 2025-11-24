@@ -17,7 +17,8 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   {
     defaultJobOptions: {
       delay: INDEX_REFRESH_INTERVAL, // We delay processing to make sure updates have been refreshed in ES
-      removeOnComplete: 100
+      removeOnComplete: 100,
+      removeOnFail: 500
     }
   }
 );

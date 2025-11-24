@@ -101,7 +101,7 @@ export function DsfrFormWasteSummary({ form }: FormWasteSummaryProps) {
       <DsfrDataListItem>
         <DsfrDataListTerm>Consistance</DsfrDataListTerm>
         <DsfrDataListDescription>
-          {getConsistenceLabel(form.wasteDetails?.consistence)}
+          {getConsistenceLabel(form.wasteDetails?.consistences)}
         </DsfrDataListDescription>
       </DsfrDataListItem>
       <DsfrDataListItem>

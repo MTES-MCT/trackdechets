@@ -2,7 +2,7 @@ import { deleteStreamEvent, getStreamEvents } from "../../events/mongodb";
 import { prisma } from "@td/prisma";
 import { cursorTo, clearLine } from "node:readline";
 
-const PAGE_SIZE = 1_000; // Keep it relatively small as iterating over all events can be slow
+const PAGE_SIZE = 1000; // Keep it relatively small as iterating over all events can be slow
 
 export async function cleanMongoEvents() {
   console.info(`Buckle up, you're in for a while...`);

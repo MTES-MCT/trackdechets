@@ -361,6 +361,21 @@ export function BsdaPdf({
               />{" "}
               partiellement
               <br />
+              Type de quantité :{" "}
+              <input
+                type="checkbox"
+                checked={!bsda?.destination?.reception?.weightIsEstimate}
+                readOnly
+              />{" "}
+              Réelle{" "}
+              <input
+                type="checkbox"
+                checked={Boolean(
+                  bsda?.destination?.reception?.weightIsEstimate
+                )}
+                readOnly
+              />{" "}
+              Estimée
               <br />
               Quantité présentée nette :{" "}
               {isDefined(bsda?.destination?.reception?.weight)
