@@ -163,64 +163,74 @@ const bsdTypeFilterSelectOptions = [
 ];
 
 const bsdStatusFilterSelectOptions = [
-  { value: "BROUILLON", label: "Brouillon" },
-  { value: "PUBLIE", label: "Publié" },
-  { value: "SIGNE_PAR_EMETTEUR", label: "Signé par l’émetteur" },
+  { value: "BROUILLON", label: "Brouillon / Publié" },
+  { value: "SIGNED_BY_EMITTER", label: "Signé par l'émetteur" },
+  { value: "SIGNED_BY_WORKER", label: "Signé par l'entreprise de travaux" },
+  { value: "SIGNED_BY_TRANSPORTER", label: "Signé par le transporteur" },
+  { value: "AWAITING_ACCEPTANCE", label: "En attente d'acceptation" },
+  { value: "RESEALED", label: "BSD suite préparé" },
   {
-    value: "SIGNER_PAR_ENTREPRISE_TRAVAUX",
-    label: "Signé par l’entreprise de travaux"
+    value: "SIGNED_BY_TEMP_STORER",
+    label: "Signé par l'installation d'entreposage provisoire"
   },
-  { value: "SIGNE_PAR_TRANSPORTEUR", label: "Signé par le transporteur" },
+  { value: "AWAITING_TREATMENT", label: "En attente de traitement" },
+  { value: "PROCESSED", label: "Traité (avec ou sans rupture de traçabilité)" },
   {
-    value: "ARRIVE_ENTREPOS_PROVISOIRE",
-    label: "Réceptionné à l’entreposage provisoire, en attente d’acceptation"
+    value: "AWAITING_CHILD",
+    label: "En attente d'un ou annexé à un bordereau suite"
   },
-  {
-    value: "ENTREPOS_TEMPORAIREMENT",
-    label: "Entreposé temporairement ou en reconditionnement"
-  },
-  { value: "BSD_SUITE_PREPARE", label: "BSD suite préparé" },
-  {
-    value: "SIGNE_PAR_ENTREPOS_PROVISOIRE",
-    label: "BSD suite signé par l'entreposage provisoire"
-  },
-  { value: "RECU", label: "Reçu, en attente d'acceptation" },
-  {
-    value: "ACCEPTE",
-    label: "Accepté, en attente de traitement"
-  },
-  {
-    value: "EN_ATTENTE_BSD_SUITE",
-    label: "En attente d’un bordereau suite"
-  },
-  {
-    value: "ANNEXE_BORDEREAU_SUITE",
-    label: "Annexé à un bordereau suite"
-  },
-  { value: "TRAITE", label: "Traité" },
-  { value: "REFUSE", label: "Refusé" },
-  { value: "PARTIELLEMENT_REFUSE", label: "Partiellement refusé" },
-  { value: "ANNULE", label: "Annulé" }
+  { value: "REFUSED", label: "Refusé" },
+  { value: "CANCELLED", label: "Annulé" }
 ];
 
 const statusesEquivalents = {
-  BROUILLON: ["DRAFT"],
-  PUBLIE: ["INITIAL"],
-  SIGNE_PAR_EMETTEUR: ["SEALED"],
-  SIGNER_PAR_ENTREPRISE_TRAVAUX: ["SIGNED_BY_WORKER"],
-  SIGNE_PAR_TRANSPORTEUR: ["SENT", "RESENT"],
-  ARRIVE_ENTREPOS_PROVISOIRE: ["SIGNED_BY_TEMP_STORER"],
-  ENTREPOS_TEMPORAIREMENT: ["TEMP_STORER_ACCEPTED"],
-  BSD_SUITE_PREPARE: ["RESEALED"],
-  SIGNE_PAR_ENTREPOS_PROVISOIRE: ["SIGNED_BY_TEMP_STORER"],
-  RECU: ["RECEIVED"],
-  ACCEPTE: ["ACCEPTED"],
-  EN_ATTENTE_BSD_SUITE: ["AWAITING_CHILD", "AWAITING_GROUP"],
-  ANNEXE_BORDEREAU_SUITE: ["GROUPED", "INTERMEDIATELY_PROCESSED"],
-  TRAITE: ["PROCESSED", "FOLLOWED_WITH_PNTTD", "NO_TRACEABILITY"],
-  REFUSE: ["REFUSED"],
-  PARTIELLEMENT_REFUSE: ["PARTIALLY_REFUSED"],
-  ANNULE: ["CANCELLED"]
+  BROUILLON: { status: { _in: ["DRAFT", "INITIAL", "SEALED"] } },
+  SIGNED_BY_EMITTER: {
+    status: { _in: ["SIGNED_BY_PRODUCER", "SIGNED_BY_EMITTER"] }
+  },
+  SIGNED_BY_WORKER: { status: { _in: ["SIGNED_BY_WORKER"] } },
+  SIGNED_BY_TRANSPORTER: { status: { _in: ["SENT", "RESENT"] } },
+  AWAITING_ACCEPTANCE: {
+    _or: [
+      { status: { _eq: "TEMPSTORED" } },
+      {
+        type: { _in: [BsdType.Bsdd, BsdType.Bsff] },
+        status: { _eq: "RECEIVED" }
+      }
+    ]
+  },
+  RESEALED: { status: { _in: ["RESEALED"] } },
+  SIGNED_BY_TEMP_STORER: { status: { _in: ["SIGNED_BY_TEMP_STORER"] } },
+  AWAITING_TREATMENT: {
+    _or: [
+      {
+        status: {
+          _in: ["ACCEPTED", "INTERMEDIATELY_PROCESSED", "PARTIALLY_REFUSED"]
+        }
+      },
+      {
+        type: {
+          _in: [BsdType.Bsda, BsdType.Bsdasri, BsdType.Bspaoh, BsdType.Bsvhu]
+        },
+        status: { _eq: "RECEIVED" }
+      }
+    ]
+  },
+  PROCESSED: {
+    status: { _in: ["NO_TRACEABILITY", "PROCESSED", "FOLLOWED_WITH_PNTTD"] }
+  },
+  AWAITING_CHILD: {
+    status: {
+      _in: [
+        "AWAITING_CHILD",
+        "AWAITING_GROUP",
+        "GROUPED",
+        "TEMP_STORER_ACCEPTED"
+      ]
+    }
+  },
+  REFUSED: { status: { _in: ["REFUSED"] } },
+  CANCELLED: { status: { _in: ["CANCELED"] } }
 };
 
 enum FilterName {
@@ -439,18 +449,23 @@ export const filterPredicates: {
   {
     filterName: FilterName.status,
     where: value => {
-      const actualStatuses = value
-        .map((val: string) => {
-          const equivalents = statusesEquivalents[val];
-          return equivalents;
-        })
-        .flat();
+      // If every possible filter has been selected, we don't apply any filter
+      if (value.length === bsdStatusFilterSelectOptions.length) {
+        return {};
+      }
 
-      const query = {
-        status: { _in: actualStatuses }
-      };
+      // If multiple statuses are selected, we combine their equivalent filters with _or
+      if (value.length > 1) {
+        const combinedStatusesFilter: BsdWhere = { _or: [] };
 
-      return query;
+        value.forEach((status: string) => {
+          combinedStatusesFilter._or?.push(statusesEquivalents[status]);
+        });
+
+        return combinedStatusesFilter;
+      }
+
+      return statusesEquivalents[value];
     }
   },
   {
