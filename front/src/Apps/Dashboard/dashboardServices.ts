@@ -63,7 +63,9 @@ import {
   VALIDER_SYNTHESE_LABEL,
   VALIDER_TRAITEMENT,
   FIN_DE_MISSION,
-  completer_bsd_suite
+  completer_bsd_suite,
+  EN_ATTENTE_ACCEPTATION,
+  TRAITE_SUIVI_PNTTD
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
 import { sub } from "date-fns";
@@ -107,16 +109,22 @@ export const getBsdStatusLabel = (
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
       if (bsdType === BsdType.Bsdasri) {
-        return ACCEPTE;
+        return EN_ATTENTE_TRAITEMENT;
       }
-      if (bsdType === BsdType.Bspaoh) {
-        return ACCEPTE;
+      if (bsdType === BsdType.Bsda) {
+        return EN_ATTENTE_TRAITEMENT;
       }
       if (bsdType === BsdType.Bsvhu) {
         return EN_ATTENTE_TRAITEMENT;
       }
+      if (bsdType === BsdType.Bspaoh) {
+        return EN_ATTENTE_TRAITEMENT;
+      }
       return RECU;
     case BsdStatusCode.Accepted:
+      if (bsdType === BsdType.Bsdd || bsdType === BsdType.Bsff) {
+        return EN_ATTENTE_TRAITEMENT;
+      }
       return ACCEPTE;
     case BsdStatusCode.Processed:
       return TRAITE;
@@ -137,8 +145,14 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Refused:
       return REFUSE;
     case BsdStatusCode.TempStored:
+      if (bsdType === BsdType.Bsdd) {
+        return EN_ATTENTE_ACCEPTATION;
+      }
       return ARRIVE_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.TempStorerAccepted:
+      if (bsdType === BsdType.Bsdd) {
+        return EN_ATTENTE_BSD_SUITE;
+      }
       return ENTREPOS_TEMPORAIREMENT;
     case BsdStatusCode.Resealed:
       return BSD_SUITE_PREPARE;
@@ -157,8 +171,14 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SignedByTempStorer:
       return SIGNER_PAR_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.PartiallyRefused:
+      if (bsdType === BsdType.Bsff || bsdType === BsdType.Bspaoh) {
+        return EN_ATTENTE_TRAITEMENT;
+      }
       return PARTIELLEMENT_REFUSE;
     case BsdStatusCode.FollowedWithPnttd:
+      if (bsdType === BsdType.Bsdd) {
+        return TRAITE_SUIVI_PNTTD;
+      }
       return SUIVI_PAR_PNTTD;
     case BsdStatusCode.SignedByWorker:
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
@@ -185,6 +205,274 @@ export const getBsdStatusLabel = (
       return "unknown status";
   }
 };
+
+// function debugBsdStatusLabels() {
+//   console.log("=== DEBUG: getBsdStatusLabel test results ===");
+
+//   interface TestResult {
+//     BsdType: string;
+//     Status: string;
+//     IsDraft: boolean | undefined;
+//     BsdaAnnexed: boolean | undefined;
+//     OperationCode: string | undefined;
+//     Transporters: string | undefined;
+//     Result: string;
+//   }
+
+//   const finalResults: TestResult[] = [];
+
+//   // All possible status codes and BSD types
+//   const allStatusCodes = Object.values(BsdStatusCode);
+//   const bsdTypes = [
+//     { name: "Bsdd", value: BsdType.Bsdd },
+//     { name: "Bsda", value: BsdType.Bsda },
+//     { name: "Bsdasri", value: BsdType.Bsdasri },
+//     { name: "Bsff", value: BsdType.Bsff },
+//     { name: "Bsvhu", value: BsdType.Bsvhu },
+//     { name: "Bspaoh", value: BsdType.Bspaoh }
+//   ];
+
+//   // All possible parameter variations to test
+//   const isDraftOptions = [undefined, false, true];
+//   const bsdaAnnexedOptions = [undefined, false, true];
+//   const operationCodeOptions = [undefined, "R12", "D13", "R1", "D10"];
+//   const transporterOptions = [
+//     undefined,
+//     [],
+//     [{ takenOverAt: "2023-01-01" }], // Single transporter (signed)
+//     [{ takenOverAt: null }], // Single transporter (not signed)
+//     [{ takenOverAt: "2023-01-01" }, { takenOverAt: null }], // Multi-modal (1 signed)
+//     [{ takenOverAt: "2023-01-01" }, { takenOverAt: "2023-01-02" }], // Multi-modal (both signed)
+//     // Also test BSDA/BSFF transporter format
+//     [{ transport: { signature: { date: "2023-01-01" } } }],
+//     [{ transport: { signature: { date: null } } }],
+//     [
+//       { transport: { signature: { date: "2023-01-01" } } },
+//       { transport: { signature: { date: null } } }
+//     ]
+//   ];
+
+//   // For each BsdType and BsdStatus combination
+//   bsdTypes.forEach(bsdType => {
+//     allStatusCodes.forEach(status => {
+//       // Get baseline result with minimal parameters
+//       let baselineResult: string;
+//       try {
+//         baselineResult = getBsdStatusLabel(status, undefined, bsdType.value);
+//       } catch (error: any) {
+//         baselineResult = `ERROR: ${error?.message || "Unknown error"}`;
+//       }
+
+//       // Track all meaningful parameter combinations for this status/type
+//       const meaningfulResults: TestResult[] = [];
+
+//       // Always add the baseline case
+//       meaningfulResults.push({
+//         BsdType: bsdType.name,
+//         Status: status,
+//         IsDraft: undefined,
+//         BsdaAnnexed: undefined,
+//         OperationCode: undefined,
+//         Transporters: undefined,
+//         Result: baselineResult
+//       });
+
+//       // Test isDraft parameter
+//       isDraftOptions.forEach(isDraft => {
+//         if (isDraft === undefined) return; // Skip baseline case
+
+//         try {
+//           const result = getBsdStatusLabel(status, isDraft, bsdType.value);
+//           if (result !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: isDraft,
+//               BsdaAnnexed: undefined,
+//               OperationCode: undefined,
+//               Transporters: undefined,
+//               Result: result
+//             });
+//           }
+//         } catch (error: any) {
+//           const errorResult = `ERROR: ${error?.message || "Unknown error"}`;
+//           if (errorResult !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: isDraft,
+//               BsdaAnnexed: undefined,
+//               OperationCode: undefined,
+//               Transporters: undefined,
+//               Result: errorResult
+//             });
+//           }
+//         }
+//       });
+
+//       // Test bsdaAnnexed parameter
+//       bsdaAnnexedOptions.forEach(bsdaAnnexed => {
+//         if (bsdaAnnexed === undefined) return; // Skip baseline case
+
+//         try {
+//           const result = getBsdStatusLabel(
+//             status,
+//             undefined,
+//             bsdType.value,
+//             undefined,
+//             bsdaAnnexed
+//           );
+//           if (result !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: bsdaAnnexed,
+//               OperationCode: undefined,
+//               Transporters: undefined,
+//               Result: result
+//             });
+//           }
+//         } catch (error: any) {
+//           const errorResult = `ERROR: ${error?.message || "Unknown error"}`;
+//           if (errorResult !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: bsdaAnnexed,
+//               OperationCode: undefined,
+//               Transporters: undefined,
+//               Result: errorResult
+//             });
+//           }
+//         }
+//       });
+
+//       // Test operationCode parameter
+//       operationCodeOptions.forEach(operationCode => {
+//         if (operationCode === undefined) return; // Skip baseline case
+
+//         try {
+//           const result = getBsdStatusLabel(
+//             status,
+//             undefined,
+//             bsdType.value,
+//             operationCode
+//           );
+//           if (result !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: undefined,
+//               OperationCode: operationCode,
+//               Transporters: undefined,
+//               Result: result
+//             });
+//           }
+//         } catch (error: any) {
+//           const errorResult = `ERROR: ${error?.message || "Unknown error"}`;
+//           if (errorResult !== baselineResult) {
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: undefined,
+//               OperationCode: operationCode,
+//               Transporters: undefined,
+//               Result: errorResult
+//             });
+//           }
+//         }
+//       });
+
+//       // Test transporters parameter
+//       transporterOptions.forEach(transporters => {
+//         if (transporters === undefined) return; // Skip baseline case
+
+//         try {
+//           const result = getBsdStatusLabel(
+//             status,
+//             undefined,
+//             bsdType.value,
+//             undefined,
+//             undefined,
+//             transporters as any
+//           );
+//           if (result !== baselineResult) {
+//             const transporterDesc = Array.isArray(transporters)
+//               ? `Array(${transporters.length})`
+//               : String(transporters);
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: undefined,
+//               OperationCode: undefined,
+//               Transporters: transporterDesc,
+//               Result: result
+//             });
+//           }
+//         } catch (error: any) {
+//           const errorResult = `ERROR: ${error?.message || "Unknown error"}`;
+//           if (errorResult !== baselineResult) {
+//             const transporterDesc = Array.isArray(transporters)
+//               ? `Array(${transporters.length})`
+//               : String(transporters);
+//             meaningfulResults.push({
+//               BsdType: bsdType.name,
+//               Status: status,
+//               IsDraft: undefined,
+//               BsdaAnnexed: undefined,
+//               OperationCode: undefined,
+//               Transporters: transporterDesc,
+//               Result: errorResult
+//             });
+//           }
+//         }
+//       });
+
+//       // Add all meaningful results for this status/type combination
+//       finalResults.push(...meaningfulResults);
+//     });
+//   });
+
+//   // Group results by BsdType for cleaner display
+//   const resultsByType = finalResults.reduce((acc, result) => {
+//     if (!acc[result.BsdType]) {
+//       acc[result.BsdType] = [];
+//     }
+//     acc[result.BsdType].push(result);
+//     return acc;
+//   }, {} as Record<string, TestResult[]>);
+
+//   // Log separate tables for each BSD type
+//   Object.keys(resultsByType)
+//     .sort()
+//     .forEach(bsdType => {
+//       const typeResults = resultsByType[bsdType];
+
+//       // Sort by Status then by Result
+//       typeResults.sort((a, b) => {
+//         const statusCompare = a.Status.localeCompare(b.Status);
+//         if (statusCompare !== 0) return statusCompare;
+//         return a.Result.localeCompare(b.Result);
+//       });
+
+//       console.log(`\n=== ${bsdType} Status Labels ===`);
+//       console.table(typeResults, Object.keys(typeResults[0] || {}));
+//       console.log(`${bsdType} test cases: ${typeResults.length}`);
+//     });
+
+//   console.log(`\n=== SUMMARY ===`);
+//   console.log(`Total meaningful combinations: ${finalResults.length}`);
+//   console.log("=== End DEBUG ===");
+// }
+
+// Affiche dans la console tous les statuts affichés possibles, de tous les bordereaux,
+// selon toutes les combinaisons possibles de la méthode getBsdStatusLabel
+// debugBsdStatusLabels();
 
 export const getRevisionStatusLabel = (status: string) => {
   switch (status) {
