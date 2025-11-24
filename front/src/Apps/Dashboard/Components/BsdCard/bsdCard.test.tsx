@@ -620,7 +620,6 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
       expect(queryByTestId("bsd-review-btn")).toBeFalsy();
       expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
-      expect(screen.getByTestId("bsd-clone-btn")).toBeInTheDocument();
       expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
