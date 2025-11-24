@@ -75,8 +75,7 @@ const FormStepsContent = ({
       });
   };
 
-  const onErrors = error => {
-    console.log(error);
+  const onErrors = () => {
     scrollToTop();
   };
 
@@ -100,7 +99,7 @@ const FormStepsContent = ({
               isNextStepDisabled={selectedTabId === lastTabId}
               onSubmit={useformMethods.handleSubmit(
                 (data, e) => onSubmit(data, e),
-                error => onErrors(error)
+                () => onErrors()
               )}
               onCancel={() => navigate(-1)}
               onPrevTab={() => {
