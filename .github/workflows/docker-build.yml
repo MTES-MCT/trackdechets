@@ -1,0 +1,30 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+  pull_request: # TODO: used for testing, remove later
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          filter: tree:0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+      - run: npm ci
+      - run: npx allow-scripts
+      - uses: nrwl/nx-set-shas@v4
+        with:
+          main-branch-name: ${{ github.base_ref || github.ref_name }}
+      - run: npx nx affected -t docker:build --parallel=3

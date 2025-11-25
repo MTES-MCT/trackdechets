@@ -3,6 +3,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/cron/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -18,7 +19,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/cron",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "apps/cron/src/main.ts",
@@ -45,7 +46,7 @@
             "output": "./libs/back/prisma/src"
           }
         ],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
@@ -99,6 +100,5 @@
         }
       }
     }
-  },
-  "tags": []
+  }
 }

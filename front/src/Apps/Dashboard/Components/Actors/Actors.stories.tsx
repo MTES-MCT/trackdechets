@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import Actors from "./Actors";
 
 const meta: Meta<typeof Actors> = {

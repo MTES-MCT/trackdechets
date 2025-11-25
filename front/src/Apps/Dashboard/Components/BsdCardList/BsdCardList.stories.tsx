@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import { MemoryRouter, Route } from "react-router-dom";
 import { BsdEdge } from "@td/codegen-ui";

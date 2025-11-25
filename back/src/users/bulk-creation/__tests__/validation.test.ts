@@ -114,7 +114,7 @@ describe("company validation", () => {
       wasteVehiclesTypes: []
     });
     // a warning must be emitted
-    expect(console.warn).toBeCalled();
+    expect(console.warn).toHaveBeenCalled();
   });
 
   test("missing companyTypes", async () => {
@@ -394,7 +394,7 @@ describe("role validation", () => {
       email: "john.snow@trackdechets.fr",
       role: "MEMBER"
     });
-    expect(console.warn).toBeCalled();
+    expect(console.warn).toHaveBeenCalled();
   });
 
   test("missing siret", async () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import CompanyTypeForm from "./CompanyTypeForm";
 import { useState } from "react";
 import { AllCompanyType } from "../../utils";
