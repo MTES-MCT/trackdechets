@@ -6,15 +6,18 @@ import {
   userExists,
   createUser
 } from "../../database";
-import { hashPassword } from "../../utils";
+import { checkPasswordCriteria, hashPassword } from "../../utils";
 import { UserInputError } from "../../../common/errors";
 
 const validationSchema = yup.object({
   name: yup.string().required("Le nom est un champ requis").isSafeSSTI(),
   password: yup
     .string()
-    .required("Le mot de passe est un champ requis")
-    .min(8, "Le mot de passe doit faire au moins 8 caractères")
+    .required("Vous devez saisir un mot de passe.")
+    .test("new-user-password-meets-criteria", "", (password: string) => {
+      checkPasswordCriteria(password);
+      return true;
+    })
 });
 
 const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
