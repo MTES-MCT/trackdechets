@@ -71,8 +71,7 @@
       "plugin": "@nx/docker",
       "options": {
         "buildTarget": {
-          "name": "docker:build",
-          "cwd": "{projectRoot}"
+          "name": "docker:build"
         },
         "runTarget": {
           "name": "docker:run"

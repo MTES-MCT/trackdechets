@@ -2,6 +2,7 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+RUN pwd
 # This assumes you run the build command BEFORE docker build
 COPY dist/apps/api .
 
