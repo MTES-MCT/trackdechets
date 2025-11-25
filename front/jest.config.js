@@ -10,10 +10,7 @@ module.exports = {
     "^.+.(svg)$": "jest-transform-stub"
   },
   testEnvironment: "jsdom",
-  setupFilesAfterEnv: [
-    "@testing-library/jest-dom/extend-expect",
-    "./jest.setup.js"
-  ],
+  setupFilesAfterEnv: ["@testing-library/jest-dom", "./jest.setup.js"],
   transformIgnorePatterns: [
     "node_modules/(?!@codegouvfr/react-dsfr|copy-text-to-clipboard)"
   ]
