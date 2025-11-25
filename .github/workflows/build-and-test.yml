@@ -54,3 +54,4 @@ jobs:
           S3_REGISTRY_MODELS_BUCKET: registry-models-integration
           S3_TEXS_ANALYSIS_BUCKET: registry-texs-analysis-integration
       - run: npx nx affected -t build --parallel=3
+      - run: npx nx affected -t docker:build --parallel=3
