@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/queues-runner/src",
   "projectType": "application",
+  "tags": ["backend:queues", "backend:background"],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -77,6 +78,7 @@
         "buildTarget": "queues-runner:build",
         "inspect": false
       },
+      "continuous": true,
       "configurations": {
         "development": {
           "buildTarget": "queues-runner:build:development"
@@ -101,6 +103,5 @@
         "jestConfig": "apps/queues-runner/jest.config.ts"
       }
     }
-  },
-  "tags": ["backend:queues", "backend:background"]
+  }
 }

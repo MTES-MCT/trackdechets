@@ -49,8 +49,8 @@ describe("toPrismaNestedWhereInput", () => {
         }
       ]
     };
-    expect(() =>
-      toPrismaNestedWhereInput(where, toPrismaWhereInput)
-    ).toThrowError(new NestingWhereError());
+    expect(() => toPrismaNestedWhereInput(where, toPrismaWhereInput)).toThrow(
+      new NestingWhereError()
+    );
   });
 });
