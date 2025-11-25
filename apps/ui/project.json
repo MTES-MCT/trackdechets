@@ -22,7 +22,7 @@
         "main": "apps/ui/src/main.ts",
         "tsConfig": "apps/ui/tsconfig.app.json",
         "assets": ["apps/ui/src/assets"],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
