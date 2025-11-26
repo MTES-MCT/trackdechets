@@ -5,7 +5,8 @@ import { subHours } from "date-fns";
 import {
   Query,
   RegistryExportStatus,
-  QueryRegistryExhaustiveExportDownloadSignedUrlArgs
+  QueryRegistryExhaustiveExportDownloadSignedUrlArgs,
+  UserPermission
 } from "@td/codegen-ui";
 import {
   downloadFromSignedUrl,
@@ -14,6 +15,7 @@ import {
   REGISTRY_EXHAUSTIVE_EXPORT_DOWNLOAD_SIGNED_URL
 } from "./shared";
 import { RegistryExportContextType } from "./RegistryV2ExportContext";
+import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 const PAGE_SIZE = 20;
 
@@ -49,6 +51,13 @@ export const RegistryExhaustiveExportProvider: React.FC<{
       fetchPolicy: "cache-and-network"
     }
   );
+
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
+  const canExport =
+    permissions.includes(UserPermission.RegistryCanRead) || asAdmin;
+
   const registryExports =
     exportsData?.[
       asAdmin ? "registryExhaustiveExportsAsAdmin" : "registryExhaustiveExports"
@@ -117,6 +126,7 @@ export const RegistryExhaustiveExportProvider: React.FC<{
     <RegistryExhaustiveExportContext.Provider
       value={{
         type: "registryExhaustive",
+        canExport,
         pageIndex,
         pageCount,
         downloadLoadingExportId,

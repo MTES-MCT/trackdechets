@@ -7,8 +7,7 @@ import {
   RegistryExportStatus,
   RegistryV2ExportType,
   RegistryV2Export,
-  RegistryExhaustiveExport,
-  UserPermission
+  RegistryExhaustiveExport
 } from "@td/codegen-ui";
 import { badges } from "./shared";
 
@@ -21,7 +20,6 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import RegistryTable from "./RegistryTable";
 import { useRegistryExport } from "./RegistryV2ExportContext";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
-import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 export const getRegistryTypeWording = (
   registryType: RegistryV2ExportType
@@ -90,6 +88,7 @@ const formatRegistryDates = (
 export function MyExports() {
   const {
     type,
+    canExport,
     pageIndex,
     pageCount,
     downloadLoadingExportId,
@@ -101,12 +100,6 @@ export function MyExports() {
     error
   } = useRegistryExport();
   const { onOpen: onOpenExportModal } = useRegistryExportModal();
-
-  const {
-    permissionsInfos: { permissions }
-  } = usePermissions();
-
-  const canExport = permissions.includes(UserPermission.RegistryCanRead);
 
   const tableData = useMemo(() => {
     if (!registryExports) return [];

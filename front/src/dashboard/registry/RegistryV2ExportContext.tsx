@@ -14,7 +14,8 @@ import {
   QueryRegistryV2ExportDownloadSignedUrlArgs,
   RegistryV2Export,
   RegistryExhaustiveExport,
-  RegistryExportStatus
+  RegistryExportStatus,
+  UserPermission
 } from "@td/codegen-ui";
 import {
   downloadFromSignedUrl,
@@ -23,10 +24,12 @@ import {
   REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL
 } from "./shared";
 import { RegistryExhaustiveExportContext } from "./RegistryExhaustiveExportContext";
+import { usePermissions } from "../../common/contexts/PermissionsContext";
 
 const PAGE_SIZE = 20;
 
 type BaseRegistryExportContext = {
+  canExport: boolean;
   pageIndex: number;
   pageCount: number;
   downloadLoadingExportId: string | null;
@@ -85,6 +88,13 @@ export const RegistryV2ExportProvider: React.FC<{
       fetchPolicy: "cache-and-network"
     }
   );
+
+  const {
+    permissionsInfos: { permissions }
+  } = usePermissions();
+  const canExport =
+    permissions.includes(UserPermission.RegistryCanRead) || asAdmin;
+
   const registryExports =
     exportsData?.[asAdmin ? "registryV2ExportsAsAdmin" : "registryV2Exports"]
       ?.edges;
@@ -149,6 +159,7 @@ export const RegistryV2ExportProvider: React.FC<{
     <RegistryV2ExportContext.Provider
       value={{
         type: "registryV2",
+        canExport,
         pageIndex,
         pageCount,
         downloadLoadingExportId,
