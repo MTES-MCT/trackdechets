@@ -145,6 +145,10 @@ export const server = new ApolloServer<GraphQLContext>({
     gqlInfosPlugin(),
     gqlPayloadSizeLimiterPlugin(),
     gqlRateLimitPlugin({
+      signup: {
+        windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000 * 60,
+        maxRequestsPerWindow: 10 // 10 requests per hour
+      },
       createPasswordResetRequest: {
         windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
         maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
