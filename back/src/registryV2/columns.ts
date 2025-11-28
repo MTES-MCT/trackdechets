@@ -702,6 +702,10 @@ export const EXPORT_COLUMNS: {
       label: "Quantité réceptionnée nette (tonnes)",
       format: formatNumber
     },
+    destinationReceptionWeightIsEstimate: {
+      label: "Type de poids de la quantité traitée nette",
+      format: formatEstimateBoolean
+    },
     destinationReceptionRefusedWeight: {
       label: "Quantité refusée nette (tonnes)",
       format: formatNumber

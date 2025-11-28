@@ -397,6 +397,7 @@ export const toOutgoingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue

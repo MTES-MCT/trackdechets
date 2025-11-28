@@ -679,6 +679,8 @@ export const toOutgoingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : null,
+    destinationReceptionWeightIsEstimate:
+      bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: bsda.destinationReceptionRefusedWeight
       ? bsda.destinationReceptionRefusedWeight

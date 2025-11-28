@@ -455,6 +455,7 @@ export const toOutgoingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : bsvhu.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
     destinationPlannedOperationCode: bsvhu.destinationPlannedOperationCode,

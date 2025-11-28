@@ -344,6 +344,7 @@ export const toOutgoingWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bspaoh.destinationReceptionWasteAcceptedWeightValue
         ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)

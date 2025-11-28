@@ -427,6 +427,7 @@ export const emptyOutgoingWasteV2: Omit<
   postTempStorageDestinationCountry: null,
   destinationReceptionAcceptationStatus: null,
   destinationReceptionWeight: null,
+  destinationReceptionWeightIsEstimate: null,
   destinationReceptionAcceptedWeight: null,
   destinationReceptionRefusedWeight: null,
   destinationPlannedOperationCode: null,

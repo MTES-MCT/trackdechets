@@ -667,6 +667,7 @@ export const toOutgoingWasteV2 = (
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
