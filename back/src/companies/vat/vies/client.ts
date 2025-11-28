@@ -87,11 +87,13 @@ export const client = async (
     // auto-correct VIES "unknown data"
     const address = viesResult.address === "---" ? "" : viesResult.address!;
     const name = viesResult.name === "---" ? "" : viesResult.name!;
-
+    // some foreign companies have characters in their name that aren't allowed in later
+    // sanitization. So we remove them in advance to avoid issues.
+    const sanitizedName = name.replace(/[{}%<>$"=]/g, "");
     return {
       vatNumber: vatNumber,
       address: address,
-      name: name,
+      name: sanitizedName,
       // Compat mapping avec SireneSearchResult
       codePaysEtrangerEtablissement: country!.isoCode.short,
       statutDiffusionEtablissement: "O",
