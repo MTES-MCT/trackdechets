@@ -849,14 +849,18 @@ describe("signEmissionForm", () => {
         });
 
         expect(errors).not.toBeUndefined();
-        
+
         // Check if the error message includes remaining attempts info for the first 2 attempts
         if (i < 2) {
           const expectedRemainingAttempts = 2 - i;
-          expect(errors[0].message).toContain(`${expectedRemainingAttempts} tentative(s) restante(s)`);
+          expect(errors[0].message).toContain(
+            `${expectedRemainingAttempts} tentative(s) restante(s)`
+          );
         } else {
           // On the 3rd attempt, should be blocked
-          expect(errors[0].message).toContain("Trop de tentatives de validation du code de sécurité");
+          expect(errors[0].message).toContain(
+            "Trop de tentatives de validation du code de sécurité"
+          );
           expect(errors[0].message).toContain("bloqué pendant");
         }
       }
@@ -878,7 +882,9 @@ describe("signEmissionForm", () => {
       });
 
       expect(blockedErrors).not.toBeUndefined();
-      expect(blockedErrors[0].message).toContain("Trop de tentatives de validation du code de sécurité");
+      expect(blockedErrors[0].message).toContain(
+        "Trop de tentatives de validation du code de sécurité"
+      );
     });
 
     it("should reset attempts after successful validation", async () => {
@@ -901,7 +907,7 @@ describe("signEmissionForm", () => {
       });
 
       const { mutate } = makeClient(transporter.user);
-      
+
       // Make 1 failed attempt first (leaving 2 attempts remaining)
       const { errors } = await mutate<
         Pick<Mutation, "signEmissionForm">,
@@ -941,7 +947,7 @@ describe("signEmissionForm", () => {
 
       // Verify that attempts were reset by checking the status
       const status = await securityCodeBruteForceProtection.getDetailedStatus(
-        `${transporter.user.id}:${emitter.company.siret!}`, 
+        `${transporter.user.id}:${emitter.company.siret!}`,
         "security_code_validation"
       );
       expect(status.currentAttempts).toBe(0);
@@ -951,7 +957,7 @@ describe("signEmissionForm", () => {
       const emitter1 = await userWithCompanyFactory("ADMIN");
       const emitter2 = await userWithCompanyFactory("ADMIN");
       const transporter = await userWithCompanyFactory("ADMIN");
-      
+
       const form1 = await formFactory({
         ownerId: emitter1.user.id,
         opt: {
@@ -988,20 +994,20 @@ describe("signEmissionForm", () => {
 
       // Make 3 failed attempts for emitter1 (should get blocked)
       for (let i = 0; i < 3; i++) {
-        await mutate<Pick<Mutation, "signEmissionForm">, MutationSignEmissionFormArgs>(
-          SIGN_EMISSION_FORM,
-          {
-            variables: {
-              id: form1.id,
-              input: {
-                emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
-                emittedBy: emitter1.user.name,
-                quantity: 1
-              },
-              securityCode: 9999
-            }
+        await mutate<
+          Pick<Mutation, "signEmissionForm">,
+          MutationSignEmissionFormArgs
+        >(SIGN_EMISSION_FORM, {
+          variables: {
+            id: form1.id,
+            input: {
+              emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
+              emittedBy: emitter1.user.name,
+              quantity: 1
+            },
+            securityCode: 9999
           }
-        );
+        });
       }
 
       // Emitter1 should be blocked for this user
@@ -1035,7 +1041,7 @@ describe("signEmissionForm", () => {
       const emitter = await userWithCompanyFactory("ADMIN");
       const transporter1 = await userWithCompanyFactory("ADMIN");
       const transporter2 = await userWithCompanyFactory("ADMIN");
-      
+
       const form = await formFactory({
         ownerId: emitter.user.id,
         opt: {
@@ -1055,20 +1061,20 @@ describe("signEmissionForm", () => {
       // Transporter1 makes 3 failed attempts (gets blocked)
       const mutate1 = makeClient(transporter1.user).mutate;
       for (let i = 0; i < 3; i++) {
-        await mutate1<Pick<Mutation, "signEmissionForm">, MutationSignEmissionFormArgs>(
-          SIGN_EMISSION_FORM,
-          {
-            variables: {
-              id: form.id,
-              input: {
-                emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
-                emittedBy: emitter.user.name,
-                quantity: 1
-              },
-              securityCode: 9999
-            }
+        await mutate1<
+          Pick<Mutation, "signEmissionForm">,
+          MutationSignEmissionFormArgs
+        >(SIGN_EMISSION_FORM, {
+          variables: {
+            id: form.id,
+            input: {
+              emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
+              emittedBy: emitter.user.name,
+              quantity: 1
+            },
+            securityCode: 9999
           }
-        );
+        });
       }
 
       // Transporter1 should be blocked
@@ -1122,20 +1128,20 @@ describe("signEmissionForm", () => {
 
       // Make 2 failed attempts to get close to lockout (1 attempt remaining)
       for (let i = 0; i < 2; i++) {
-        await mutate<Pick<Mutation, "signEmissionForm">, MutationSignEmissionFormArgs>(
-          SIGN_EMISSION_FORM,
-          {
-            variables: {
-              id: form.id,
-              input: {
-                emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
-                emittedBy: emitter.user.name,
-                quantity: 1
-              },
-              securityCode: 9999 // invalid code
-            }
+        await mutate<
+          Pick<Mutation, "signEmissionForm">,
+          MutationSignEmissionFormArgs
+        >(SIGN_EMISSION_FORM, {
+          variables: {
+            id: form.id,
+            input: {
+              emittedAt: "2018-12-11T00:00:00.000Z" as unknown as Date,
+              emittedBy: emitter.user.name,
+              quantity: 1
+            },
+            securityCode: 9999 // invalid code
           }
-        );
+        });
       }
 
       // Now try with the CORRECT security code - should still be blocked
@@ -1158,9 +1164,11 @@ describe("signEmissionForm", () => {
 
       // Even with correct code, user should get rate limited error
       expect(correctCodeErrors).not.toBeUndefined();
-      expect(correctCodeErrors[0].message).toContain("Trop de tentatives de validation du code de sécurité");
+      expect(correctCodeErrors[0].message).toContain(
+        "Trop de tentatives de validation du code de sécurité"
+      );
       expect(correctCodeErrors[0].message).toContain("bloqué pendant");
-      
+
       // Verify the attacker cannot distinguish between correct and incorrect codes
       const { errors: incorrectCodeErrors } = await mutate<
         Pick<Mutation, "signEmissionForm">,
@@ -1179,7 +1187,9 @@ describe("signEmissionForm", () => {
 
       // Should get the same error message regardless of whether code is correct
       expect(incorrectCodeErrors).not.toBeUndefined();
-      expect(incorrectCodeErrors[0].message).toEqual(correctCodeErrors[0].message);
+      expect(incorrectCodeErrors[0].message).toEqual(
+        correctCodeErrors[0].message
+      );
     });
   });
 });

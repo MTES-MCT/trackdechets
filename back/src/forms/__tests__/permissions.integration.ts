@@ -483,7 +483,11 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is valid", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-    const check = await checkSecurityCode(user.id, company.siret!, company.securityCode);
+    const check = await checkSecurityCode(
+      user.id,
+      company.siret!,
+      company.securityCode
+    );
     expect(check).toEqual(true);
   });
 
@@ -492,13 +496,18 @@ describe("checkSecurityCode", () => {
       siret: null,
       vatNumber: "BE0541696005"
     });
-    const check = await checkSecurityCode(user.id, company.orgId, company.securityCode);
+    const check = await checkSecurityCode(
+      user.id,
+      company.orgId,
+      company.securityCode
+    );
     expect(check).toEqual(true);
   });
 
   test("securityCode is invalid", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-    const checkFn = () => checkSecurityCode(user.id, company.siret!, 1258478956);
+    const checkFn = () =>
+      checkSecurityCode(user.id, company.siret!, 1258478956);
     expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });

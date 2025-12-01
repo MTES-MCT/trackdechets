@@ -18,7 +18,11 @@ export function checkIsAdmin(context: GraphQLContext): Express.User {
   return user;
 }
 
-export async function checkSecurityCode(userId: string, siret: string, securityCode: number) {
+export async function checkSecurityCode(
+  userId: string,
+  siret: string,
+  securityCode: number
+) {
   return protectSecurityCodeValidation(
     `${userId}:${siret}`, // Use combination of userId and siret as identifier
     async () => {
