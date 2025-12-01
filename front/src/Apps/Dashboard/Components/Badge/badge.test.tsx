@@ -93,7 +93,7 @@ describe("Bsd Badge status", () => {
   });
   test("RECEIVED bsdasri", () => {
     render(<Badge status={BsdStatusCode.Received} bsdType={BsdType.Bsdasri} />);
-    expect(screen.getByText(/ACCEPTÉ, EN ATTENTE DE TRAITEMENT/i));
+    expect(screen.getByText(/En attente de traitement/i));
   });
   test("ACCEPTED", () => {
     render(<Badge status={BsdStatusCode.Accepted} />);
