@@ -263,6 +263,9 @@ export function OperationSignatureForm() {
             </>
           ) : null}
         </Field>
+        {values?.destination?.operation?.code === "D9F" && (
+          <p className="fr-mt-2v fr-info-text">Pour un traitement final</p>
+        )}
       </div>
       <OperationModeSelect
         operationCode={values?.destination?.operation?.code}
