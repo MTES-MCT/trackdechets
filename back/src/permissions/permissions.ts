@@ -293,6 +293,7 @@ export async function checkCanSignFor<SignatureType>(
       for (const orgId of orgIds) {
         try {
           const securityCodeValid = await checkSecurityCode(
+            user.id,
             orgId,
             securityCode
           );
