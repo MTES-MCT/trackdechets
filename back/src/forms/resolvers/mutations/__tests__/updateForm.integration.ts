@@ -30,7 +30,7 @@ import type {
 } from "@td/codegen-back";
 import getReadableId from "../../../readableId";
 import { sirenifyFormInput } from "../../../sirenify";
-import { sub } from "date-fns";
+import { addYears, sub } from "date-fns";
 import { getFirstTransporter, getTransportersSync } from "../../../database";
 import { getStream } from "../../../../activity-events";
 import { updateAppendix2Queue } from "../../../../queue/producers/updateAppendix2";
@@ -3731,6 +3731,54 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
+  it("should not be possible to update a weight > 40 T when transport mode is ROAD", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    // recipient needs appropriate profiles and subprofiles
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR],
+      wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
+    });
+
+    const { mutate } = makeClient(user);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*",
+        recipientCompanySiret: destination.siret,
+        createdAt: addYears(new Date(), -10), // Even if the BSD was created before all MEPs!
+        transporters: {
+          create: {
+            transporterTransportMode: "ROAD",
+            number: 1
+          }
+        }
+      }
+    });
+
+    // When
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: 50 }
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toEqual(
+      "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+    );
+  });
+
   it("should be possible to update a weight > 40 T when transport mode is not ROAD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     // recipient needs appropriate profiles and subprofiles
@@ -4195,52 +4243,6 @@ describe("Mutation.updateForm", () => {
 
     expect(data.updateForm.grouping).toHaveLength(1);
   });
-
-  it(
-    "should be possible to update a form where transport is ROAD and wasteDetailsQuantity is > 40T " +
-      "if it was created before (<=) process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER",
-    async () => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
-      const { mutate } = makeClient(user);
-      // recipient needs appropriate profiles and subprofiles
-      const destination = await companyFactory({
-        companyTypes: [CompanyType.WASTEPROCESSOR],
-        wasteProcessorTypes: [WasteProcessorType.DANGEROUS_WASTES_INCINERATION]
-      });
-      const form = await formFactory({
-        ownerId: user.id,
-        opt: {
-          createdAt: new Date(0), // same as default value for MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER
-          status: "SEALED",
-          emitterCompanySiret: company.siret,
-          emitterType: EmitterType.APPENDIX2,
-          recipientCompanySiret: destination.siret,
-
-          wasteDetailsCode: "01 03 04*",
-          wasteDetailsQuantity: 50,
-          transporters: {
-            create: {
-              transporterTransportMode: "ROAD",
-              number: 1
-            }
-          }
-        }
-      });
-      const { errors } = await mutate<
-        Pick<Mutation, "updateForm">,
-        MutationUpdateFormArgs
-      >(UPDATE_FORM, {
-        variables: {
-          updateFormInput: {
-            id: form.id,
-            wasteDetails: { consistences: ["SOLID"] }
-          }
-        }
-      });
-
-      expect(errors).toBeUndefined();
-    }
-  );
 
   it("should not allow updating appendix1 if one of them has been signed by the transporter for more than 5 days", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
