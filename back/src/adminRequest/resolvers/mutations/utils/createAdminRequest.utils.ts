@@ -17,12 +17,12 @@ import {
 import { getNextWorkday } from "../../../../dateUtils";
 import { sameDayMidnight } from "../../../../utils";
 import { ParsedCreateAdminRequestInput } from "../../../validation";
-import { ForbiddenError, UserInputError } from "../../../../common/errors";
+import { UserInputError } from "../../../../common/errors";
 import { getAdminRequestRepository } from "../../../repository";
 import { addDays } from "date-fns";
 import { isDefinedStrict } from "../../../../common/helpers";
 
-const MAX_SIMULTANEOUS_PENDING_REQUESTS = 5;
+
 
 // Generates an 8 digit code, using only numbers. Can include and start with zeros
 export const generateCode = () => {
@@ -71,17 +71,6 @@ export const checkCanCreateAdminRequest = async (
   }
 
   const { findFirst, count } = getAdminRequestRepository(user);
-
-  // Do not allow lots of simultaneous requests
-  const pendingRequests = await count({
-    userId: user.id,
-    status: AdminRequestStatus.PENDING
-  });
-  if (pendingRequests >= MAX_SIMULTANEOUS_PENDING_REQUESTS) {
-    throw new ForbiddenError(
-      `Il n'est pas possible d'avoir plus de ${MAX_SIMULTANEOUS_PENDING_REQUESTS} demandes en cours.`
-    );
-  }
 
   // Careful here not to be spammed and spend lots of $ on sending mail
   if (
@@ -203,3 +192,4 @@ export const getAdminOnlyEndDate = (): Date => {
 
   return sameDayMidnight(resultDate);
 };
+
