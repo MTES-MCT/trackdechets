@@ -202,7 +202,7 @@ const WasteBsda = ({ errors }) => {
               }}
               disabled={sealedFields.includes(`waste.familyCode`)}
             >
-              <option value="...">Sélectionnez une valeur...</option>
+              <option value="">Sélectionnez une valeur</option>
               <option value="1">
                 1 - amiante pur utilisé en bourrage ou en sac
               </option>

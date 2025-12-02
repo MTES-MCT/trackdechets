@@ -439,7 +439,7 @@ const DestinationBsda = ({ errors }) => {
                 )
           }
         >
-          <option />
+          <option value="">Sélectionnez une valeur</option>
           {isDechetterie && !hasNextDestination ? (
             <>
               <option value="R 13">
@@ -598,7 +598,7 @@ const DestinationBsda = ({ errors }) => {
                       "destination.plannedOperationCode"
                     )}
                   >
-                    <option />
+                    <option value="">Sélectionnez une valeur</option>
                     <option value="R 13">
                       R 13 - Opérations de transit incluant le groupement sans
                       transvasement préalable à R 5
