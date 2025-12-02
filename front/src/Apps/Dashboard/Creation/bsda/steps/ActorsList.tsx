@@ -95,7 +95,7 @@ const ActorsList = () => {
   };
 
   return (
-    <>
+    <div className="fr-col-md-10">
       <h4 className="fr-h4 fr-mt-3w">Courtier</h4>
 
       <ToggleSwitch
@@ -258,7 +258,7 @@ const ActorsList = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

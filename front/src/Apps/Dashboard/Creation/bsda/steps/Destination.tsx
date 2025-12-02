@@ -247,7 +247,7 @@ const DestinationBsda = ({ errors }) => {
   };
 
   return (
-    <>
+    <div className="fr-col-md-10">
       {!!sealedFields.length && <DisabledParagraphStep />}
       {isDechetterie && !hasNextDestination ? (
         <div className="form__row">
@@ -613,7 +613,7 @@ const DestinationBsda = ({ errors }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

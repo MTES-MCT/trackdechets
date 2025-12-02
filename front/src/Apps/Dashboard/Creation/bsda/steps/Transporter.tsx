@@ -25,11 +25,13 @@ const TransporterBsda = () => {
   }
 
   return (
-    <RhfTransporterList
-      orgId={siret}
-      fieldName="transporters"
-      bsdType={BsdType.Bsda}
-    />
+    <div className="fr-col-md-10">
+      <RhfTransporterList
+        orgId={siret}
+        fieldName="transporters"
+        bsdType={BsdType.Bsda}
+      />
+    </div>
   );
 };
 

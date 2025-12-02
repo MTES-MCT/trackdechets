@@ -208,7 +208,7 @@ const Worker = ({ errors }) => {
       )}
 
       {!worker?.isDisabled && (
-        <>
+        <div className="fr-col-md-10">
           <h4 className="fr-h4">Entreprise de travaux</h4>
           <CompanySelectorWrapper
             orgId={siret}
@@ -341,7 +341,7 @@ const Worker = ({ errors }) => {
               </div>
             </>
           )}
-        </>
+        </div>
       )}
     </>
   );
