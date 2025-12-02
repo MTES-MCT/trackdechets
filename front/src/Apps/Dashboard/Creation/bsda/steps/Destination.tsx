@@ -467,11 +467,11 @@ const DestinationBsda = ({ errors }) => {
           )}
         </Select>
 
-        {(destination?.operation?.nextDestination?.company as string) ===
-          "D 9 F" ||
-          ((destination?.plannedOperationCode as string) === "D 9 F" && (
-            <p className="fr-mb-0 fr-info-text">Pour un traitement final</p>
-          ))}
+        {((destination?.operation?.nextDestination
+          ?.plannedOperationCode as string) === "D 9 F" ||
+          (destination?.plannedOperationCode as string) === "D 9 F") && (
+          <p className="fr-mb-0 fr-info-text">Pour un traitement final</p>
+        )}
       </div>
 
       <div className="fr-mt-4w">
