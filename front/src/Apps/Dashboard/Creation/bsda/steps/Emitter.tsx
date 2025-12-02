@@ -150,6 +150,9 @@ const EmitterBsda = ({ errors }) => {
                       "emitter.isPrivateIndividual",
                       e.currentTarget.checked
                     );
+                    if (e.currentTarget.checked) {
+                      setValue("emitter.company.siret", null);
+                    }
                   }
                 }
               }
@@ -194,30 +197,35 @@ const EmitterBsda = ({ errors }) => {
               )}
             </div>
             <div className="form__row">
-              <Input
-                label="Adresse"
-                nativeInputProps={{
-                  ...register("emitter.company.address")
+              <DsfrfWorkSiteAddress
+                address={emitter?.company?.address}
+                city={emitter?.company?.city}
+                postalCode={emitter?.company?.postalCode}
+                onAddressSelection={details => {
+                  // `address` is passed as `name` because of adresse api return fields
+                  setValue("emitter.company.address", details.name);
+                  setValue("emitter.company.city", details.city);
+                  setValue("emitter.company.postalCode", details.postcode);
                 }}
-                disabled={sealedFields.includes(`emitter.company.address`)}
+                designation=""
               />
             </div>
-            <div className="form__row">
+            <div className="fr-grid-row">
               <Input
                 label="Téléphone"
                 nativeInputProps={{
                   ...register("emitter.company.phone")
                 }}
                 disabled={sealedFields.includes(`emitter.company.phone`)}
+                className="fr-col-md-4 fr-mr-2w"
               />
-            </div>
-            <div className="form__row">
               <Input
                 label="Courriel"
                 nativeInputProps={{
                   ...register("emitter.company.mail")
                 }}
                 disabled={sealedFields.includes(`emitter.company.mail`)}
+                className="fr-col-md-6"
               />
             </div>
           </>
