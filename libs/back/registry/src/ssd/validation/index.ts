@@ -1,4 +1,7 @@
-import { refineRequiredOperationMode } from "../../shared/refinement";
+import {
+  refineOperationModeConsistency,
+  refineRequiredOperationMode
+} from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
 import {
@@ -17,6 +20,7 @@ export function safeParseAsyncSsd(line: unknown) {
     .superRefine(refineDestination)
     .superRefine(refineSecondaryWasteCodes)
     .superRefine(refineRequiredOperationMode)
+    .superRefine(refineOperationModeConsistency)
     .transform(transformAndRefineReason)
     .transform(transformReportForInfos)
     .transform(transformDestination)

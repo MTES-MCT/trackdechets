@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo } from "react";
 import { formatError } from "../builder/error";
 import Select from "@codegouvfr/react-dsfr/Select";
-import { PROCESSING_OPERATIONS, FINAL_OPERATION_CODES } from "@td/constants";
+import {
+  PROCESSING_OPERATIONS,
+  FINAL_OPERATION_CODES,
+  CODES_AND_EXPECTED_OPERATION_MODES
+} from "@td/constants";
 import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import { Controller, UseFormReturn } from "react-hook-form";
@@ -36,7 +40,6 @@ export function Operation({
   disabled,
   title,
   operationCodes,
-  operationModes,
   showNoTraceability,
   showNextOperationCode,
   isPlannedOperation
@@ -48,7 +51,6 @@ export function Operation({
         methods={methods}
         disabled={disabled}
         operationCodes={operationCodes}
-        operationModes={operationModes}
         showNoTraceability={showNoTraceability}
         showNextOperationCode={showNextOperationCode}
         isPlannedOperation={isPlannedOperation}
@@ -61,7 +63,6 @@ export function InlineOperation({
   methods,
   disabled,
   operationCodes,
-  operationModes,
   showNoTraceability,
   showNextOperationCode,
   isPlannedOperation
@@ -87,13 +88,14 @@ export function InlineOperation({
   );
 
   const operationModesList = useMemo(() => {
-    const possibleOperationModes = operationModes
-      ? OPERATION_MODES.filter(mode => operationModes.includes(mode.value))
-      : OPERATION_MODES;
-    return selectedOperationCode && selectedOperationCode.startsWith("D")
-      ? possibleOperationModes.filter(mode => mode.value === "ELIMINATION")
-      : possibleOperationModes.filter(mode => mode.value !== "ELIMINATION");
-  }, [selectedOperationCode, operationModes]);
+    if (!selectedOperationCode) return [];
+
+    const possibleOperationModes =
+      CODES_AND_EXPECTED_OPERATION_MODES[selectedOperationCode] ?? [];
+    return OPERATION_MODES.filter(mode =>
+      possibleOperationModes.includes(mode.value)
+    );
+  }, [selectedOperationCode]);
 
   useEffect(() => {
     if (selectedOperationCode && selectedOperationCode.startsWith("D")) {

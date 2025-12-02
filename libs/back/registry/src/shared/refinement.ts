@@ -1,4 +1,9 @@
-import { FINAL_OPERATION_CODES, TdOperationCode, isSiret } from "@td/constants";
+import {
+  CODES_AND_EXPECTED_OPERATION_MODES,
+  FINAL_OPERATION_CODES,
+  TdOperationCode,
+  isSiret
+} from "@td/constants";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
 import { getWasteCodeSchema } from "./schemas";
@@ -449,6 +454,17 @@ export const refineOperationModeConsistency: Refinement<{
       message: `Le mode de traitement doit obligatoirement être Élimination lorsque le code de traitement commence par D`,
       path: ["operationMode"]
     });
+  }
+
+  if (item.operationMode) {
+    const allowedModes = CODES_AND_EXPECTED_OPERATION_MODES[item.operationCode];
+    if (!allowedModes.some(mode => mode === item.operationMode)) {
+      addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `Le mode de traitement n'est pas compatible avec le code de traitement choisi`,
+        path: ["operationMode"]
+      });
+    }
   }
 };
 
