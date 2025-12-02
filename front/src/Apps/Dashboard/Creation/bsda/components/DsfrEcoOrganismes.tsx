@@ -36,7 +36,7 @@ export default function DsfrBsdaEcoOrganismes() {
 
   const ecoOrganisme = watch("ecoOrganisme");
 
-  const [hasEcoOrganisme, setHasEcoOrganisme] = useState(false);
+  const [hasEcoOrganisme, setHasEcoOrganisme] = useState(ecoOrganisme !== null);
 
   function handleEcoOrganismeToggle() {
     if (hasEcoOrganisme) {
@@ -48,15 +48,14 @@ export default function DsfrBsdaEcoOrganismes() {
   }
   return (
     <div className="form__row">
-      <h4 className="fr-h4 fr-mt-2v">Eco-organisme</h4>
-      <div className="form__row">
-        <ToggleSwitch
-          checked={hasEcoOrganisme}
-          onChange={handleEcoOrganismeToggle}
-          inputTitle="ecoOrganisme"
-          label="Un éco-organisme est responsable de la prise en charge des déchets"
-        />
-      </div>
+      <h4 className="fr-h4">Éco-organisme</h4>
+      <ToggleSwitch
+        checked={hasEcoOrganisme}
+        onChange={handleEcoOrganismeToggle}
+        inputTitle="ecoOrganisme"
+        label="Un éco-organisme est responsable de la prise en charge des déchets"
+        showCheckedHint={false}
+      />
 
       {hasEcoOrganisme && (
         <>

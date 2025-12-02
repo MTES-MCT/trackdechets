@@ -12,7 +12,6 @@ import { clearCompanyError, setFieldError } from "../../utils";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import DsfrBsdaEcoOrganismes from "../components/DsfrEcoOrganismes";
 import Input from "@codegouvfr/react-dsfr/Input";
 
 const EmitterBsda = ({ errors }) => {
@@ -317,8 +316,6 @@ const EmitterBsda = ({ errors }) => {
             />
           </>
         )}
-
-        <DsfrBsdaEcoOrganismes />
       </div>
     </>
   );
