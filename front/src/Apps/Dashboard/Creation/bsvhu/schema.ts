@@ -187,7 +187,7 @@ export const rawBsvhuSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["broker.company.mail"],
-        message: `L'adresse e-mail du courtier est un champ requis.`
+        message: `Le courriel du courtier est un champ requis.`
       });
     }
 
@@ -210,7 +210,7 @@ export const rawBsvhuSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["trader.company.mail"],
-        message: `L'adresse e-mail du négociant est un champ requis.`
+        message: `Le courriel du négociant est un champ requis.`
       });
     }
 
@@ -241,7 +241,7 @@ export const rawBsvhuSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["intermediaries", index, "mail"],
-            message: `L'adresse e-mail de l'intermédiaire est un champ requis.`
+            message: `Le courriel de l'intermédiaire est un champ requis.`
           });
         }
       });
