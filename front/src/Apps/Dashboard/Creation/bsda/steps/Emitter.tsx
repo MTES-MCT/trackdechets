@@ -131,7 +131,7 @@ const EmitterBsda = ({ errors }) => {
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
-      <div className="fr-col-md-10 fr-mt-4w">
+      <div className="fr-col-md-10">
         {isBsdaSuite ? (
           <Alert
             title=""
