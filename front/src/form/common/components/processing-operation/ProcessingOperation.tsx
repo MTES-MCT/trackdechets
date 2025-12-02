@@ -34,6 +34,10 @@ export default function ProcessingOperation({
         disabled={disabled}
       />
 
+      {operationDetail && ["D 9 F"].includes(operationDetail.code) && (
+        <p className="fr-mt-2v fr-info-text">Pour un traitement final</p>
+      )}
+
       {operationDetail != null && (
         <div
           className={classNames(

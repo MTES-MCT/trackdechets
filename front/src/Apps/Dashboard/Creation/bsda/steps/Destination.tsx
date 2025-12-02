@@ -422,6 +422,7 @@ const DestinationBsda = ({ errors }) => {
       )}
       <div className="form__row">
         <Select
+          className="fr-mt-1v fr-mb-1v"
           label="Opération d'élimination / valorisation prévue (code D/R)"
           nativeSelectProps={{
             ...register(
@@ -458,12 +459,19 @@ const DestinationBsda = ({ errors }) => {
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
-              <option value="D 9">
-                D 9 - Traitement chimique ou prétraitement (dont vitrification)
+              <option value="D 9 F">
+                D 9 F - Traitement chimique ou prétraitement (dont
+                vitrification)
               </option>
             </>
           )}
         </Select>
+
+        {(destination?.operation?.nextDestination?.company as string) ===
+          "D 9 F" ||
+          ((destination?.plannedOperationCode as string) === "D 9 F" && (
+            <p className="fr-mb-0 fr-info-text">Pour un traitement final</p>
+          ))}
       </div>
 
       <div className="fr-mt-4w">
