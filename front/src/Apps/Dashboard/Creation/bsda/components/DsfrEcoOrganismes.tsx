@@ -1,10 +1,9 @@
-import { useQuery, gql } from "@apollo/client";
-import { useField, useFormikContext } from "formik";
-import React from "react";
-import CompanyResults from "../../../common/components/company/CompanyResults";
-import { Query, EcoOrganisme, Bsda, BsdaEcoOrganisme } from "@td/codegen-ui";
-import TdSwitch from "../../../../common/components/Switch";
-import { capitalize } from "../../../../common/helper";
+import { gql, useQuery } from "@apollo/client";
+import { BsdaEcoOrganisme, EcoOrganisme, Query } from "@td/codegen-ui";
+import React, { useState } from "react";
+import { useFormContext } from "react-hook-form";
+import CompanyResults from "../../../../../form/common/components/company/CompanyResults";
+import ToggleSwitch from "@codegouvfr/react-dsfr/ToggleSwitch";
 
 const GET_ECO_ORGANISMES = gql`
   {
@@ -25,36 +24,36 @@ export function getInitialEcoOrganisme(ecoOrganisme?: BsdaEcoOrganisme | null) {
   };
 }
 
-interface EcoOrganismesProps {
-  name: string;
-}
-
 type EcoOrganismeWithOrgId = EcoOrganisme & {
   orgId: string;
 };
 
-export default function BsdaEcoOrganismes(props: EcoOrganismesProps) {
-  const [field] = useField<Bsda["ecoOrganisme"]>(props);
-  const { setFieldValue } = useFormikContext<Bsda>();
+export default function DsfrBsdaEcoOrganismes() {
+  const { setValue, watch } = useFormContext();
 
   const { loading, error, data } =
     useQuery<Pick<Query, "ecoOrganismes">>(GET_ECO_ORGANISMES);
 
-  const hasEcoOrganisme = field.value != null;
+  const ecoOrganisme = watch("ecoOrganisme");
+
+  const [hasEcoOrganisme, setHasEcoOrganisme] = useState(false);
+
   function handleEcoOrganismeToggle() {
     if (hasEcoOrganisme) {
-      setFieldValue(field.name, null, false);
+      setHasEcoOrganisme(false);
+      setValue("ecoOrganisme", null);
     } else {
-      setFieldValue(field.name, getInitialEcoOrganisme(), false);
+      setHasEcoOrganisme(true);
     }
   }
   return (
     <div className="form__row">
-      <h4 className="form__section-heading">Eco-organisme</h4>
+      <h4 className="fr-h4 fr-mt-2v">Eco-organisme</h4>
       <div className="form__row">
-        <TdSwitch
+        <ToggleSwitch
           checked={hasEcoOrganisme}
           onChange={handleEcoOrganismeToggle}
+          inputTitle="ecoOrganisme"
           label="Un éco-organisme est responsable de la prise en charge des déchets"
         />
       </div>
@@ -67,7 +66,7 @@ export default function BsdaEcoOrganismes(props: EcoOrganismesProps) {
             <div className="tw-overflow-auto my-6">
               <CompanyResults<EcoOrganismeWithOrgId>
                 onSelect={eo =>
-                  setFieldValue(field.name, {
+                  setValue("ecoOrganisme", {
                     name: eo.name,
                     siret: eo.siret,
                     orgId: eo.orgId
@@ -75,8 +74,7 @@ export default function BsdaEcoOrganismes(props: EcoOrganismesProps) {
                 }
                 results={data.ecoOrganismes.map(eo => ({
                   ...eo,
-                  orgId: eo.siret,
-                  name: capitalize(eo.name) as string
+                  orgId: eo.siret
                 }))}
                 selectedItem={
                   data.ecoOrganismes
@@ -84,7 +82,7 @@ export default function BsdaEcoOrganismes(props: EcoOrganismesProps) {
                       ...eo,
                       orgId: eo.siret
                     }))
-                    .find(eo => eo.siret === field.value?.siret) || null
+                    .find(eo => eo.siret === ecoOrganisme?.siret) || null
                 }
               />
             </div>

@@ -13,7 +13,7 @@ import {
   TransportMode,
   Transporter
 } from "@td/codegen-ui";
-import { CreateOrUpdateBsdaTransporterInput } from "../../../../form/bsda/stepper/initial-state";
+import { CreateOrUpdateBsdaTransporterInput } from "../../../Dashboard/Creation/bsda/bsda-state";
 import { initialTransporter } from "../../../common/data/initialState";
 
 function getBsddTransporter(
