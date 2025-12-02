@@ -1,5 +1,5 @@
 import { redisClient, generateKey } from "./redis";
-import { randomBytes } from "crypto";
+import { randomBytes } from "node:crypto";
 
 export interface LockOptions {
   /** Lock expiration time in milliseconds (default: 30000ms = 30s) */
@@ -28,12 +28,12 @@ const DEFAULT_OPTIONS: Required<LockOptions> = {
 /**
  * Acquires a distributed lock using Redis.
  * Uses SET with NX and PX options for atomic lock acquisition with TTL.
- * 
+ *
  * @param lockName - Name of the lock (will be prefixed with 'lock:')
  * @param options - Lock configuration options
  * @returns Promise<AcquiredLock> - Object containing lock info and release function
  * @throws Error if lock cannot be acquired within timeout period
- * 
+ *
  * @example
  * ```typescript
  * const lock = await acquireLock(`user:${userId}:admin-requests`, { ttl: 10000 });
@@ -57,8 +57,14 @@ export async function acquireLock(
   while (Date.now() - startTime < config.timeout) {
     // Try to acquire the lock atomically
     // SET key value NX PX ttl - Set if Not eXists with expiration in milliseconds
-    const result = await redisClient.set(lockKey, lockId, "NX", "PX", config.ttl);
-    
+    const result = await redisClient.set(
+      lockKey,
+      lockId,
+      "NX",
+      "PX",
+      config.ttl
+    );
+
     if (result === "OK") {
       // Lock acquired successfully
       return {
@@ -83,18 +89,20 @@ export async function acquireLock(
     await new Promise(resolve => setTimeout(resolve, config.retryInterval));
   }
 
-  throw new Error(`Failed to acquire lock '${lockName}' within ${config.timeout}ms`);
+  throw new Error(
+    `Failed to acquire lock '${lockName}' within ${config.timeout}ms`
+  );
 }
 
 /**
  * Executes a function with a distributed lock.
  * Automatically acquires the lock before execution and releases it afterwards.
- * 
+ *
  * @param lockName - Name of the lock
  * @param fn - Function to execute while holding the lock
  * @param options - Lock configuration options
  * @returns Promise<T> - Result of the executed function
- * 
+ *
  * @example
  * ```typescript
  * const result = await withLock(`user:${userId}:admin-requests`, async () => {
