@@ -1,6 +1,15 @@
 {
-  "extends": ["plugin:@nx/react", "../.eslintrc.json"],
-  "ignorePatterns": ["!**/*", "public/dsfr/"],
+  "extends": [
+    "plugin:@nx/react",
+    "../.eslintrc.json",
+    "plugin:storybook/recommended"
+  ],
+  "ignorePatterns": [
+    "!**/*",
+    "public/dsfr/",
+    "**/vite.config.*.timestamp*",
+    "**/vitest.config.*.timestamp*"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],

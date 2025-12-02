@@ -9,7 +9,6 @@ README.md
 LICENSE
 .vscode
 **/__tests__/**/*.pdf
-dist
 tmp
 logs
 generated/
@@ -17,3 +16,6 @@ dsfr/
 scripts
 nginx
 doc
+
+# Allow the dist folder so Docker can see the built app
+!dist
