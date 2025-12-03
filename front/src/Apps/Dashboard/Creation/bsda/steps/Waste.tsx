@@ -60,7 +60,7 @@ const WasteBsda = ({ errors }) => {
   const sealedFields = useContext(SealedFieldsContext);
   const bsdaType = watch("type");
   const weight = watch("weight", {});
-  const packagings = watch("packagings", {});
+  const packagings = watch("packagings");
 
   useEffect(() => {
     if (errors?.length) {
@@ -106,6 +106,8 @@ const WasteBsda = ({ errors }) => {
 
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
   const sealNumbersLength = waste?.sealNumbers.length ?? 0;
+
+  const packagingsQuantity = packagings?.filter(p => p.type !== "").length ?? 0;
 
   return (
     <>
@@ -417,8 +419,8 @@ const WasteBsda = ({ errors }) => {
                 <p className="fr-info-text">
                   Vous avez saisi {sealNumbersLength}{" "}
                   {pluralize("numéro", sealNumbersLength)} pour{" "}
-                  {Number(packagings.length ?? 0)}{" "}
-                  {pluralize("conditionnement", packagings.length ?? 0)}
+                  {Number(packagingsQuantity)}{" "}
+                  {pluralize("conditionnement", packagingsQuantity)}
                 </p>
               </>
             )}

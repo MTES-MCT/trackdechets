@@ -6,6 +6,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
+import { emptyBsdaPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
 const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
   return {
@@ -64,7 +65,7 @@ export default {
     nonRoadRegulationMention: null,
     pop: false
   },
-  packagings: [],
+  packagings: [emptyBsdaPackaging],
   weight: {
     isEstimate: false,
     value: null
