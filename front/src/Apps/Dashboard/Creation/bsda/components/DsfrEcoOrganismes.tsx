@@ -47,7 +47,7 @@ export default function DsfrBsdaEcoOrganismes() {
     }
   }
   return (
-    <div className="form__row">
+    <>
       <h4 className="fr-h4">Éco-organisme</h4>
       <ToggleSwitch
         checked={hasEcoOrganisme}
@@ -88,6 +88,6 @@ export default function DsfrBsdaEcoOrganismes() {
           )}
         </>
       )}
-    </div>
+    </>
   );
 }
