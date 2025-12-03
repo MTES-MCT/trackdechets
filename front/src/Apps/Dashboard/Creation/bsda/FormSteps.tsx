@@ -234,9 +234,13 @@ const BsdaFormSteps = ({
         ...cleanInput.worker,
         certification: {
           ...cleanInput.worker.certification,
-          validityLimit: parseDate(
+          validityLimit: Boolean(
             cleanInput.worker?.certification?.validityLimit
-          ).toISOString()
+          )
+            ? parseDate(
+                cleanInput.worker?.certification?.validityLimit
+              ).toISOString()
+            : null
         }
       }
     };

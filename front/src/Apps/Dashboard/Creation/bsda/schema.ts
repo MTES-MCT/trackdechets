@@ -35,7 +35,8 @@ const ZodBsdaPackagingEnum = z.enum([
   "DEPOT_BAG",
   "OTHER",
   "PALETTE_FILME",
-  "SAC_RENFORCE"
+  "SAC_RENFORCE",
+  ""
 ]);
 
 type ZodBsdaPackagingEnum = z.infer<typeof ZodBsdaPackagingEnum>;
@@ -55,13 +56,12 @@ type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
 const bsdaPackagingSchema = z
   .object({
-    type: ZodBsdaPackagingEnum.nullish(),
+    type: ZodBsdaPackagingEnum.nullish().transform(val =>
+      val === "" ? null : val
+    ),
     other: z.string().nullish(),
-    quantity: z.number().nullish(),
-    volume: z
-      .number()
-      .positive("Le volume doit être un nombre positif")
-      .nullish(),
+    quantity: z.coerce.number().nonnegative().nullish(),
+    volume: z.coerce.number().nonnegative().nullish(),
     identificationNumbers: z.array(z.string()).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
@@ -111,7 +111,7 @@ export const rawBsdaSchema = z.object({
   packagings: z.array(bsdaPackagingSchema).nullish(),
   weight: z.object({
     isEstimate: z.boolean().nullish(),
-    value: z.number().nullish()
+    value: z.coerce.number().nonnegative().nullish()
   }),
   broker: z.object({
     company: zodCompany,
@@ -134,8 +134,8 @@ export const rawBsdaSchema = z.object({
       reception: z
         .object({
           date: z.coerce.date().nullish(),
-          weight: z.number().nullish(),
-          refusedWeight: z.number().min(0).nullish(),
+          weight: z.coerce.number().nonnegative().nullish(),
+          refusedWeight: z.coerce.number().nonnegative().nullish(),
           acceptationStatus: z.nativeEnum(WasteAcceptationStatus).nullish(),
           refusalReason: z.string().nullish(),
           signature: zodSignature
@@ -185,7 +185,7 @@ export const rawBsdaSchema = z.object({
     .array(
       z
         .object({
-          number: z.number().nullish(),
+          number: z.coerce.number().nonnegative().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),
           recepisse: z.object({

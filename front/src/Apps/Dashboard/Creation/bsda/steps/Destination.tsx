@@ -162,6 +162,14 @@ const DestinationBsda = ({ errors }) => {
           setError
         );
       }
+      if (!destination?.plannedOperationCode) {
+        setFieldError(
+          errors,
+          `${actor}.plannedOperationCode`,
+          formState.errors?.[actor]?.["plannedOperationCode"],
+          setError
+        );
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
