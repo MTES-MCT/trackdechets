@@ -181,61 +181,63 @@ const EmitterBsda = ({ errors }) => {
           )}
 
         {emitter?.isPrivateIndividual || isBsdaSuite ? (
-          <>
-            <h4 className="fr-h4">Particulier</h4>
+          emitter?.isPrivateIndividual && (
+            <>
+              <h4 className="fr-h4">Particulier</h4>
 
-            <div className="form__row">
-              {emitter?.isPrivateIndividual ? (
-                <Input
-                  label="Nom et prénom"
-                  nativeInputProps={{
-                    ...register("emitter.company.name")
+              <div className="form__row">
+                {emitter?.isPrivateIndividual ? (
+                  <Input
+                    label="Nom et prénom"
+                    nativeInputProps={{
+                      ...register("emitter.company.name")
+                    }}
+                    disabled={sealedFields.includes(`emitter.company.name`)}
+                  />
+                ) : (
+                  <Input
+                    label="Personne à contacter"
+                    nativeInputProps={{
+                      ...register("emitter.company.contact")
+                    }}
+                    disabled={sealedFields.includes(`emitter.company.contact`)}
+                  />
+                )}
+              </div>
+              <div className="form__row">
+                <DsfrfWorkSiteAddress
+                  address={emitter?.company?.address}
+                  city={emitter?.company?.city}
+                  postalCode={emitter?.company?.postalCode}
+                  onAddressSelection={details => {
+                    // `address` is passed as `name` because of adresse api return fields
+                    setValue("emitter.company.address", details.name);
+                    setValue("emitter.company.city", details.city);
+                    setValue("emitter.company.postalCode", details.postcode);
                   }}
-                  disabled={sealedFields.includes(`emitter.company.name`)}
+                  designation=""
                 />
-              ) : (
+              </div>
+              <div className="fr-grid-row">
                 <Input
-                  label="Personne à contacter"
+                  label="Téléphone"
                   nativeInputProps={{
-                    ...register("emitter.company.contact")
+                    ...register("emitter.company.phone")
                   }}
-                  disabled={sealedFields.includes(`emitter.company.contact`)}
+                  disabled={sealedFields.includes(`emitter.company.phone`)}
+                  className="fr-col-md-4 fr-mr-2w"
                 />
-              )}
-            </div>
-            <div className="form__row">
-              <DsfrfWorkSiteAddress
-                address={emitter?.company?.address}
-                city={emitter?.company?.city}
-                postalCode={emitter?.company?.postalCode}
-                onAddressSelection={details => {
-                  // `address` is passed as `name` because of adresse api return fields
-                  setValue("emitter.company.address", details.name);
-                  setValue("emitter.company.city", details.city);
-                  setValue("emitter.company.postalCode", details.postcode);
-                }}
-                designation=""
-              />
-            </div>
-            <div className="fr-grid-row">
-              <Input
-                label="Téléphone"
-                nativeInputProps={{
-                  ...register("emitter.company.phone")
-                }}
-                disabled={sealedFields.includes(`emitter.company.phone`)}
-                className="fr-col-md-4 fr-mr-2w"
-              />
-              <Input
-                label="Courriel"
-                nativeInputProps={{
-                  ...register("emitter.company.mail")
-                }}
-                disabled={sealedFields.includes(`emitter.company.mail`)}
-                className="fr-col-md-6"
-              />
-            </div>
-          </>
+                <Input
+                  label="Courriel"
+                  nativeInputProps={{
+                    ...register("emitter.company.mail")
+                  }}
+                  disabled={sealedFields.includes(`emitter.company.mail`)}
+                  className="fr-col-md-6"
+                />
+              </div>
+            </>
+          )
         ) : (
           <>
             <h4 className="fr-h4">Établissement</h4>
