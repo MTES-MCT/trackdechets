@@ -162,6 +162,14 @@ const DestinationBsda = ({ errors }) => {
           setError
         );
       }
+      if (!destination?.operation?.nextDestination?.cap) {
+        setFieldError(
+          errors,
+          `${actor}.operation.nextDestination.cap`,
+          formState.errors?.[actor]?.["operation"]?.nextDestination.cap,
+          setError
+        );
+      }
       if (!destination?.plannedOperationCode) {
         setFieldError(
           errors,
@@ -435,10 +443,20 @@ const DestinationBsda = ({ errors }) => {
                     )
               }
               state={
-                formState.errors.destination?.["cap"] ? "error" : "default"
+                hasNextDestination
+                  ? formState.errors.destination?.["operation"]
+                      ?.nextDestination?.["cap"]
+                    ? "error"
+                    : "default"
+                  : formState.errors.destination?.["cap"]
+                  ? "error"
+                  : "default"
               }
               stateRelatedMessage={
-                formState.errors.destination?.["cap"]?.message
+                hasNextDestination
+                  ? formState.errors.destination?.["operation"]
+                      ?.nextDestination?.["cap"]?.message
+                  : formState.errors.destination?.["cap"]?.message
               }
             />
             {showDestinationCAPModificationAlert(bsdaContext) && (
