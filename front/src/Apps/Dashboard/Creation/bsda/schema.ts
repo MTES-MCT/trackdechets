@@ -45,8 +45,11 @@ const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
 const PARTIAL_OPERATIONS = ["R 13", "D 15"] as const;
-const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS] as const;
-const ZodOperationEnum = z.enum(OPERATIONS).nullish();
+const OPERATIONS = ["R 5", "D 5", "D 9", "", ...PARTIAL_OPERATIONS] as const;
+const ZodOperationEnum = z
+  .enum(OPERATIONS)
+  .nullish()
+  .transform(val => (val === "" ? null : val));
 
 type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
@@ -128,33 +131,37 @@ export const rawBsdaSchema = z.object({
       cap: z.string().nullish(),
       plannedOperationCode: ZodOperationEnum,
       customInfo: z.string().nullish(),
-      reception: z.object({
-        date: z.coerce.date().nullish(),
-        weight: z.number().nullish(),
-        refusedWeight: z.number().min(0).nullish(),
-        acceptationStatus: z.nativeEnum(WasteAcceptationStatus).nullish(),
-        refusalReason: z.string().nullish(),
-        signature: zodSignature
-      }),
-      operation: z.object({
-        code: ZodOperationEnum.nullish(),
-        mode: z.nativeEnum(OperationMode).nullish(),
-        description: z.string().nullish(),
-        date: z.coerce
-          .date()
-          .nullish()
-          .refine(val => !val || val < new Date(), {
-            message: "La date d'opération ne peut pas être dans le futur."
-          }),
-        signature: zodSignature,
-        nextDestination: z
-          .object({
-            company: zodCompany,
-            cap: z.string().nullish(),
-            plannedOperationCode: z.string().nullish()
-          })
-          .nullish()
-      })
+      reception: z
+        .object({
+          date: z.coerce.date().nullish(),
+          weight: z.number().nullish(),
+          refusedWeight: z.number().min(0).nullish(),
+          acceptationStatus: z.nativeEnum(WasteAcceptationStatus).nullish(),
+          refusalReason: z.string().nullish(),
+          signature: zodSignature
+        })
+        .nullish(),
+      operation: z
+        .object({
+          code: ZodOperationEnum.nullish(),
+          mode: z.nativeEnum(OperationMode).nullish(),
+          description: z.string().nullish(),
+          date: z.coerce
+            .date()
+            .nullish()
+            .refine(val => !val || val < new Date(), {
+              message: "La date d'opération ne peut pas être dans le futur."
+            }),
+          signature: zodSignature,
+          nextDestination: z
+            .object({
+              company: zodCompany,
+              cap: z.string().nullish(),
+              plannedOperationCode: z.string().nullish()
+            })
+            .nullish()
+        })
+        .nullish()
     })
     .nullish(),
   worker: z.object({

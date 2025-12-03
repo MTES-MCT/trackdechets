@@ -36,6 +36,13 @@ const EmitterBsda = ({ errors }) => {
   }, [register]);
 
   useEffect(() => {
+    if (emitter?.company?.siret) {
+      setValue("emitter", emitter);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     const actor = "emitter";
     if (errors?.length) {
       setFieldError(

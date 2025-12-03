@@ -88,6 +88,25 @@ const DestinationBsda = ({ errors }) => {
   }, [register]);
 
   useEffect(() => {
+    if (destination?.company?.siret) {
+      if (hasNextDestination) {
+        setValue("destination.operation.nextDestination.company", {
+          ...destination?.operation?.nextDestination?.company
+        });
+
+        setValue("destination.company", {
+          ...destination.company
+        });
+      } else {
+        setValue("destination.company", {
+          ...destination.company
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (errors?.length) {
       setFieldError(
         errors,
@@ -424,6 +443,24 @@ const DestinationBsda = ({ errors }) => {
         <Select
           className="fr-mt-1v fr-mb-1v"
           label="Opération d'élimination / valorisation prévue (code D/R)"
+          state={
+            !hasNextDestination
+              ? formState.errors.destination?.["plannedOperationCode"]
+                ? "error"
+                : "default"
+              : formState.errors.destination?.["operation"]?.nextDestination?.[
+                  "plannedOperationCode"
+                ]
+              ? "error"
+              : "default"
+          }
+          stateRelatedMessage={
+            hasNextDestination
+              ? formState.errors.destination?.["operation"]?.nextDestination?.[
+                  "plannedOperationCode"
+                ]?.message
+              : formState.errors.destination?.["plannedOperationCode"]?.message
+          }
           nativeSelectProps={{
             ...register(
               hasNextDestination
@@ -597,6 +634,15 @@ const DestinationBsda = ({ errors }) => {
                     disabled={sealedFields.includes(
                       "destination.plannedOperationCode"
                     )}
+                    state={
+                      formState.errors.destination?.["plannedOperationCode"]
+                        ? "error"
+                        : "default"
+                    }
+                    stateRelatedMessage={
+                      formState.errors.destination?.["plannedOperationCode"]
+                        ?.message
+                    }
                   >
                     <option value="">Sélectionnez une valeur</option>
                     <option value="R 13">
