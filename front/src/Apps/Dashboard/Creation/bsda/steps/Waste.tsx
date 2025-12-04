@@ -31,6 +31,7 @@ import {
   initialTransporter
 } from "../../../../common/data/initialState";
 import { setFieldError } from "../../utils";
+import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 
 const BSDA_COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -413,7 +414,15 @@ const WasteBsda = ({ errors }) => {
                       }
                     },
                     {
-                      label: "Estimée",
+                      label: (
+                        <span>
+                          Estimée{" "}
+                          <Tooltip
+                            className="fr-ml-1w"
+                            title={`"Quantité estimée conformément à l'article 5.4.1.1.3.2 de l'ADR" si soumis`}
+                          />
+                        </span>
+                      ),
                       nativeInputProps: {
                         onChange: () => setValue("weight.isEstimate", true),
                         checked: weight.isEstimate === true
