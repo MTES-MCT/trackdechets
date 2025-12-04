@@ -59,7 +59,7 @@ export const getOperationModesFromOperationCode = (
   return CODES_AND_EXPECTED_OPERATION_MODES[trimmed] || [];
 };
 
-export const getOperationModeLabel = (operationMode: OperationMode) => {
+export const getOperationModeLabel = (operationMode?: OperationMode) => {
   switch (operationMode) {
     case OperationMode.Elimination:
       return "Elimination";
@@ -71,5 +71,7 @@ export const getOperationModeLabel = (operationMode: OperationMode) => {
       return "Valorisation énergétique";
     case OperationMode.AutresValorisations:
       return "Autres valorisations";
+    default:
+      return "";
   }
 };

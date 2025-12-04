@@ -9,6 +9,7 @@ import {
   PreviewCompanyContact
 } from "../BSDPreviewComponents";
 import { getVerboseAcceptationStatus } from "../BSDPreviewUtils";
+import { getOperationModeLabel } from "../../../common/operationModes";
 
 interface BSVHUPreviewDestinationProps {
   bsd: Bsvhu;
@@ -70,6 +71,13 @@ const BSVHUPreviewDestination = ({ bsd }: BSVHUPreviewDestinationProps) => {
           <PreviewTextRow
             label="Opération réalisée"
             value={bsd.destination?.operation?.code}
+          />
+
+          <PreviewTextRow
+            label="Mode de traitement"
+            value={getOperationModeLabel(
+              bsd.destination?.operation?.mode ?? undefined
+            )}
           />
         </PreviewContainerCol>
 
