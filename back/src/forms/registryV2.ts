@@ -667,6 +667,7 @@ export const toOutgoingWasteV2 = (
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -946,6 +947,7 @@ export const toTransportedWasteV2 = (
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationHasCiterneBeenWashedOut: bsdd.destinationHasCiterneBeenWashedOut,
@@ -1209,6 +1211,7 @@ export const toManagedWasteV2 = (
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
@@ -1503,6 +1506,7 @@ export const toAllWasteV2 = (
     destinationReceptionAcceptationStatus:
       bsdd.destinationReceptionAcceptationStatus,
     destinationReceptionWeight: bsdd.destinationReceptionWeight,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: bsdd.destinationReceptionAcceptedWeight,
     destinationReceptionRefusedWeight: bsdd.destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsdd.destinationPlannedOperationCode,
