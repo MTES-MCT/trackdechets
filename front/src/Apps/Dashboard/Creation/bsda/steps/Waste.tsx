@@ -72,6 +72,13 @@ const WasteBsda = ({ errors }) => {
         formState.errors?.waste?.["code"],
         setError
       );
+
+      setFieldError(
+        errors,
+        "waste.adr",
+        formState.errors?.waste?.["adr"],
+        setError
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
@@ -290,6 +297,8 @@ const WasteBsda = ({ errors }) => {
                 nativeInputProps={{
                   ...register("waste.adr")
                 }}
+                state={formState.errors.waste?.["adr"] ? "error" : "default"}
+                stateRelatedMessage={formState.errors.waste?.["adr"]?.message}
               />
             )}
 

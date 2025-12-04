@@ -41,7 +41,10 @@ const ZodBsdaPackagingEnum = z.enum([
 
 type ZodBsdaPackagingEnum = z.infer<typeof ZodBsdaPackagingEnum>;
 
-const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
+const ZodWasteCodeEnum = z
+  .enum(BSDA_WASTE_CODES)
+  .nullish()
+  .transform(val => (val === "" ? null : val));
 
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 

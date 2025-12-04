@@ -144,14 +144,8 @@ const Worker = ({ errors }) => {
         setError
       );
     }
-  }, [
-    errors,
-    errors?.length,
-    formState,
-    setError,
-    worker?.company?.siret,
-    worker?.company?.orgId
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   useEffect(() => {
     if (errors?.length && worker?.company?.siret) {

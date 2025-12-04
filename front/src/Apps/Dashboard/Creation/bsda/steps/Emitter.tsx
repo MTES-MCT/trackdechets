@@ -88,14 +88,8 @@ const EmitterBsda = ({ errors }) => {
         setError
       );
     }
-  }, [
-    errors,
-    errors?.length,
-    formState,
-    setError,
-    emitter?.company?.siret,
-    emitter?.company?.orgId
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errors]);
 
   useEffect(() => {
     if (errors?.length && emitter?.company?.siret) {

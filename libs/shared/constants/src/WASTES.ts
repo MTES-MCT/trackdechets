@@ -5560,7 +5560,8 @@ export const BSDA_WASTE_CODES = [
   "17 05 07*",
   "17 06 03*",
   "17 08 01*",
-  "17 09 03*"
+  "17 09 03*",
+  ""
 ] as const;
 
 export const BSFF_WASTE_CODES = [
