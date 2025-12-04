@@ -47,6 +47,15 @@ export const CREATE_BSDA = gql`
   ${FullBsdaFragment}
 `;
 
+export const PUBLISH_BSDA = gql`
+  mutation CreateBsda($input: BsdaInput!) {
+    createBsda(input: $input) {
+      ...FullBsda
+    }
+  }
+  ${FullBsdaFragment}
+`;
+
 export const UPDATE_BSDA = gql`
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
     updateBsda(id: $id, input: $input) {
