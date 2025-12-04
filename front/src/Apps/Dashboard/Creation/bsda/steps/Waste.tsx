@@ -272,6 +272,17 @@ const WasteBsda = ({ errors }) => {
               className="fr-mt-4w"
             />
 
+            {waste.isSubjectToADR && (
+              <Input
+                className="fr-col-md-8 fr-pl-9w fr-mt-1w"
+                label="Mention au titre de la réglementation ADR"
+                disabled={sealedFields.includes(`waste.adr`)}
+                nativeInputProps={{
+                  ...register("waste.adr")
+                }}
+              />
+            )}
+
             <Input
               className="fr-col-md-8 fr-mt-4w"
               label="Mention au titre des règlements RID, ADNR, IMDG (optionnel)"
