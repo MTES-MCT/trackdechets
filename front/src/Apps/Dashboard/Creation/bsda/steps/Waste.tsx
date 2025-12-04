@@ -199,11 +199,13 @@ const WasteBsda = ({ errors }) => {
               methods={methods}
               whiteList={[...BSDA_WASTE_CODES]}
             />
+
             {!waste?.code && formState?.errors?.waste?.["code"] && (
               <p className="fr-text--sm fr-error-text fr-mb-4v">
                 {formState?.errors?.waste?.["code"]?.message}
               </p>
             )}
+
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label="Code famille"
