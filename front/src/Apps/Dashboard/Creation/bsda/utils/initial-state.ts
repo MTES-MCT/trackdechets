@@ -60,7 +60,7 @@ export default {
     consistence: null,
     consistenceDescription: null,
     sealNumbers: [],
-    isSubjectToADR: false,
+    isSubjectToADR: true,
     adr: null,
     nonRoadRegulationMention: null,
     pop: false
