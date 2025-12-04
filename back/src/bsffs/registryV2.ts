@@ -1023,8 +1023,8 @@ export const toAllWasteV2 = (
     city: transporter1CompanyCity,
     country: transporter1CompanyCountry
   } = splitAddress(
-    transporter.transporterCompanyAddress,
-    transporter.transporterCompanyVatNumber
+    transporter?.transporterCompanyAddress,
+    transporter?.transporterCompanyVatNumber
   );
 
   const {
