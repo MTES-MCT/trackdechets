@@ -17,6 +17,7 @@ jobs:
           node-version: 22
           cache: 'npm'
       - run: npm ci
+      - run: npx allow-scripts
       - uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: 'dev'

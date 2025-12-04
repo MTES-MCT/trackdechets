@@ -24,6 +24,8 @@ jobs:
           cache: 'npm'
       - name: Run npm ci
         run: npm ci
+      - name: Run authorized scripts
+        run: npx allow-scripts
 
       - name: Run build
         run: npx nx run-many -t build
