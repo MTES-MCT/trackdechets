@@ -8,7 +8,8 @@ import {
   BsdaType,
   Query,
   QueryCompanyInfosArgs,
-  CompanyType
+  CompanyType,
+  BsdaPackaging
 } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
@@ -105,9 +106,15 @@ const WasteBsda = ({ errors }) => {
   if (error) return <InlineError apolloError={error} />;
 
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
-  const sealNumbersLength = waste?.sealNumbers.length ?? 0;
+  const sealNumbersLength = waste?.sealNumbers?.length || 0;
 
   const packagingsQuantity = packagings?.filter(p => p.type !== "").length ?? 0;
+
+  const quantityLength: number = packagings.reduce(
+    (acc: number, packaging: BsdaPackaging) =>
+      acc + (Number(packaging.quantity) || 0),
+    0
+  );
 
   return (
     <>
@@ -366,7 +373,7 @@ const WasteBsda = ({ errors }) => {
                 label="En nombre"
                 disabled={true}
                 nativeInputProps={{
-                  value: sealNumbersLength
+                  value: quantityLength
                 }}
               />
 
