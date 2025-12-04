@@ -227,22 +227,25 @@ const BsdaFormSteps = ({
       "emitter.company.city",
       "emitter.company.postalCode"
     ]);
+    const worker = cleanInput.worker.isDisabled
+      ? { ...cleanInput.worker }
+      : {
+          ...cleanInput.worker,
+          certification: {
+            ...cleanInput.worker.certification,
+            validityLimit: Boolean(
+              cleanInput.worker?.certification?.validityLimit
+            )
+              ? parseDate(
+                  cleanInput.worker?.certification?.validityLimit
+                ).toISOString()
+              : null
+          }
+        };
 
     cleanInput = {
       ...cleanInput,
-      worker: {
-        ...cleanInput.worker,
-        certification: {
-          ...cleanInput.worker.certification,
-          validityLimit: Boolean(
-            cleanInput.worker?.certification?.validityLimit
-          )
-            ? parseDate(
-                cleanInput.worker?.certification?.validityLimit
-              ).toISOString()
-            : null
-        }
-      }
+      worker
     };
 
     return bsdaState.id
