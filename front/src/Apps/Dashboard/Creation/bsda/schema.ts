@@ -35,7 +35,8 @@ const ZodBsdaPackagingEnum = z.enum([
   "DEPOT_BAG",
   "OTHER",
   "PALETTE_FILME",
-  "SAC_RENFORCE"
+  "SAC_RENFORCE",
+  ""
 ]);
 
 type ZodBsdaPackagingEnum = z.infer<typeof ZodBsdaPackagingEnum>;
@@ -45,20 +46,22 @@ const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
 const PARTIAL_OPERATIONS = ["R 13", "D 15"] as const;
-const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS] as const;
-const ZodOperationEnum = z.enum(OPERATIONS).nullish();
+const OPERATIONS = ["R 5", "D 5", "D 9", "", ...PARTIAL_OPERATIONS] as const;
+const ZodOperationEnum = z
+  .enum(OPERATIONS)
+  .nullish()
+  .transform(val => (val === "" ? null : val));
 
 type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
 const bsdaPackagingSchema = z
   .object({
-    type: ZodBsdaPackagingEnum.nullish(),
+    type: ZodBsdaPackagingEnum.nullish().transform(val =>
+      val === "" ? null : val
+    ),
     other: z.string().nullish(),
-    quantity: z.number().nullish(),
-    volume: z
-      .number()
-      .positive("Le volume doit être un nombre positif")
-      .nullish(),
+    quantity: z.coerce.number().nonnegative().nullish(),
+    volume: z.coerce.number().nonnegative().nullish(),
     identificationNumbers: z.array(z.string()).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
@@ -108,7 +111,7 @@ export const rawBsdaSchema = z.object({
   packagings: z.array(bsdaPackagingSchema).nullish(),
   weight: z.object({
     isEstimate: z.boolean().nullish(),
-    value: z.number().nullish()
+    value: z.coerce.number().nonnegative().nullish()
   }),
   broker: z.object({
     company: zodCompany,
@@ -128,33 +131,37 @@ export const rawBsdaSchema = z.object({
       cap: z.string().nullish(),
       plannedOperationCode: ZodOperationEnum,
       customInfo: z.string().nullish(),
-      reception: z.object({
-        date: z.coerce.date().nullish(),
-        weight: z.number().nullish(),
-        refusedWeight: z.number().min(0).nullish(),
-        acceptationStatus: z.nativeEnum(WasteAcceptationStatus).nullish(),
-        refusalReason: z.string().nullish(),
-        signature: zodSignature
-      }),
-      operation: z.object({
-        code: ZodOperationEnum.nullish(),
-        mode: z.nativeEnum(OperationMode).nullish(),
-        description: z.string().nullish(),
-        date: z.coerce
-          .date()
-          .nullish()
-          .refine(val => !val || val < new Date(), {
-            message: "La date d'opération ne peut pas être dans le futur."
-          }),
-        signature: zodSignature,
-        nextDestination: z
-          .object({
-            company: zodCompany,
-            cap: z.string().nullish(),
-            plannedOperationCode: z.string().nullish()
-          })
-          .nullish()
-      })
+      reception: z
+        .object({
+          date: z.coerce.date().nullish(),
+          weight: z.coerce.number().nonnegative().nullish(),
+          refusedWeight: z.coerce.number().nonnegative().nullish(),
+          acceptationStatus: z.nativeEnum(WasteAcceptationStatus).nullish(),
+          refusalReason: z.string().nullish(),
+          signature: zodSignature
+        })
+        .nullish(),
+      operation: z
+        .object({
+          code: ZodOperationEnum.nullish(),
+          mode: z.nativeEnum(OperationMode).nullish(),
+          description: z.string().nullish(),
+          date: z.coerce
+            .date()
+            .nullish()
+            .refine(val => !val || val < new Date(), {
+              message: "La date d'opération ne peut pas être dans le futur."
+            }),
+          signature: zodSignature,
+          nextDestination: z
+            .object({
+              company: zodCompany,
+              cap: z.string().nullish(),
+              plannedOperationCode: z.string().nullish()
+            })
+            .nullish()
+        })
+        .nullish()
     })
     .nullish(),
   worker: z.object({
@@ -178,7 +185,7 @@ export const rawBsdaSchema = z.object({
     .array(
       z
         .object({
-          number: z.number().nullish(),
+          number: z.coerce.number().nonnegative().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),
           recepisse: z.object({

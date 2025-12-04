@@ -128,15 +128,8 @@ function RhfPackagingForm({
             }
           }
         }),
-        volume:
-          packagingType === Packagings.Benne
-            ? volumeInputProps
-            : register(fieldPath("volume"), {
-                valueAsNumber: true
-              }),
-        quantity: register(fieldPath("quantity"), {
-          valueAsNumber: true
-        }),
+        volume: volumeInputProps,
+        quantity: register(fieldPath("quantity")),
         other: register(fieldPath("other")),
         identificationNumbers: {
           push: append,

@@ -8,7 +8,8 @@ import {
   BsdaType,
   Query,
   QueryCompanyInfosArgs,
-  CompanyType
+  CompanyType,
+  BsdaPackaging
 } from "@td/codegen-ui";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
@@ -30,6 +31,7 @@ import {
   initialTransporter
 } from "../../../../common/data/initialState";
 import { setFieldError } from "../../utils";
+import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 
 const BSDA_COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
@@ -60,7 +62,7 @@ const WasteBsda = ({ errors }) => {
   const sealedFields = useContext(SealedFieldsContext);
   const bsdaType = watch("type");
   const weight = watch("weight", {});
-  const packagings = watch("packagings", {});
+  const packagings = watch("packagings");
 
   useEffect(() => {
     if (errors?.length) {
@@ -105,7 +107,15 @@ const WasteBsda = ({ errors }) => {
   if (error) return <InlineError apolloError={error} />;
 
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
-  const sealNumbersLength = waste?.sealNumbers.length ?? 0;
+  const sealNumbersLength = waste?.sealNumbers?.length || 0;
+
+  const packagingsQuantity = packagings?.filter(p => p.type !== "").length ?? 0;
+
+  const quantityLength: number = packagings.reduce(
+    (acc: number, packaging: BsdaPackaging) =>
+      acc + (Number(packaging.quantity) || 0),
+    0
+  );
 
   return (
     <>
@@ -189,11 +199,13 @@ const WasteBsda = ({ errors }) => {
               methods={methods}
               whiteList={[...BSDA_WASTE_CODES]}
             />
+
             {!waste?.code && formState?.errors?.waste?.["code"] && (
               <p className="fr-text--sm fr-error-text fr-mb-4v">
                 {formState?.errors?.waste?.["code"]?.message}
               </p>
             )}
+
             <Select
               className="fr-col-md-8 fr-mt-2w"
               label="Code famille"
@@ -202,7 +214,7 @@ const WasteBsda = ({ errors }) => {
               }}
               disabled={sealedFields.includes(`waste.familyCode`)}
             >
-              <option value="...">Sélectionnez une valeur...</option>
+              <option value="">Sélectionnez une valeur</option>
               <option value="1">
                 1 - amiante pur utilisé en bourrage ou en sac
               </option>
@@ -269,6 +281,17 @@ const WasteBsda = ({ errors }) => {
               }}
               className="fr-mt-4w"
             />
+
+            {waste.isSubjectToADR && (
+              <Input
+                className="fr-col-md-8 fr-pl-9w fr-mt-1w"
+                label="Mention au titre de la réglementation ADR"
+                disabled={sealedFields.includes(`waste.adr`)}
+                nativeInputProps={{
+                  ...register("waste.adr")
+                }}
+              />
+            )}
 
             <Input
               className="fr-col-md-8 fr-mt-4w"
@@ -353,7 +376,7 @@ const WasteBsda = ({ errors }) => {
                 label="En nombre"
                 disabled={true}
                 nativeInputProps={{
-                  value: sealNumbersLength
+                  value: quantityLength
                 }}
               />
 
@@ -393,7 +416,15 @@ const WasteBsda = ({ errors }) => {
                       }
                     },
                     {
-                      label: "Estimée",
+                      label: (
+                        <span>
+                          Estimée{" "}
+                          <Tooltip
+                            className="fr-ml-1w"
+                            title={`"Quantité estimée conformément à l'article 5.4.1.1.3.2 de l'ADR" si soumis`}
+                          />
+                        </span>
+                      ),
                       nativeInputProps: {
                         onChange: () => setValue("weight.isEstimate", true),
                         checked: weight.isEstimate === true
@@ -417,8 +448,8 @@ const WasteBsda = ({ errors }) => {
                 <p className="fr-info-text">
                   Vous avez saisi {sealNumbersLength}{" "}
                   {pluralize("numéro", sealNumbersLength)} pour{" "}
-                  {Number(packagings.length ?? 0)}{" "}
-                  {pluralize("conditionnement", packagings.length ?? 0)}
+                  {Number(packagingsQuantity)}{" "}
+                  {pluralize("conditionnement", packagingsQuantity)}
                 </p>
               </>
             )}

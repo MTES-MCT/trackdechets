@@ -6,6 +6,7 @@ import {
   TransportMode
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
+import { emptyBsdaPackaging } from "../../../../Forms/Components/PackagingList/helpers";
 
 const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
   return {
@@ -59,12 +60,12 @@ export default {
     consistence: null,
     consistenceDescription: null,
     sealNumbers: [],
-    isSubjectToADR: false,
+    isSubjectToADR: true,
     adr: null,
     nonRoadRegulationMention: null,
     pop: false
   },
-  packagings: [],
+  packagings: [emptyBsdaPackaging],
   weight: {
     isEstimate: false,
     value: null

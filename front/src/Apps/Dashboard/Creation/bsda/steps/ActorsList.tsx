@@ -9,6 +9,7 @@ import { CompanySearchResult, CompanyType, FavoriteType } from "@td/codegen-ui";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import { getInitialCompany } from "../../../../common/data/initialState";
 import Recepisse from "../../../Components/Recepisse/Recepisse";
+import DsfrBsdaEcoOrganismes from "../components/DsfrEcoOrganismes";
 
 const ActorsList = () => {
   const { siret } = useParams<{ siret: string }>();
@@ -95,8 +96,10 @@ const ActorsList = () => {
   };
 
   return (
-    <>
-      <h4 className="fr-h4 fr-mt-3w">Courtier</h4>
+    <div className="fr-col-md-10">
+      <DsfrBsdaEcoOrganismes />
+
+      <h4 className="fr-h4 fr-mt-4w">Courtier</h4>
 
       <ToggleSwitch
         label="Présence d'un courtier"
@@ -258,7 +261,7 @@ const ActorsList = () => {
           )}
         </>
       )}
-    </>
+    </div>
   );
 };
 

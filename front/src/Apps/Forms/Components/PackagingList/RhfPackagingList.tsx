@@ -1,4 +1,5 @@
 import React from "react";
+import { PackagingInfoInput } from "@td/codegen-ui";
 import PackagingList, { PackagingListProps } from "./PackagingList";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import RhfPackagingForm from "./RhfPackagingForm";
@@ -17,7 +18,7 @@ function RhfPackagingList({
     name: fieldName
   });
 
-  const packagings = watch(fieldName);
+  const packagings: PackagingInfoInput[] = watch(fieldName);
 
   return (
     <PackagingList

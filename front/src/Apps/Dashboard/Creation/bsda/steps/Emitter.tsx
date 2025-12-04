@@ -12,7 +12,6 @@ import { clearCompanyError, setFieldError } from "../../utils";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import DsfrBsdaEcoOrganismes from "../components/DsfrEcoOrganismes";
 import Input from "@codegouvfr/react-dsfr/Input";
 
 const EmitterBsda = ({ errors }) => {
@@ -35,6 +34,13 @@ const EmitterBsda = ({ errors }) => {
     register("emitter.company.street");
     register("emitter.company.postalCode");
   }, [register]);
+
+  useEffect(() => {
+    if (emitter?.company?.siret) {
+      setValue("emitter", emitter);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const actor = "emitter";
@@ -131,7 +137,7 @@ const EmitterBsda = ({ errors }) => {
   return (
     <>
       {!!sealedFields.length && <DisabledParagraphStep />}
-      <div className="fr-col-md-10 fr-mt-4w">
+      <div className="fr-col-md-10">
         {isBsdaSuite ? (
           <Alert
             title=""
@@ -151,6 +157,9 @@ const EmitterBsda = ({ errors }) => {
                       "emitter.isPrivateIndividual",
                       e.currentTarget.checked
                     );
+                    if (e.currentTarget.checked) {
+                      setValue("emitter.company.siret", null);
+                    }
                   }
                 }
               }
@@ -172,56 +181,63 @@ const EmitterBsda = ({ errors }) => {
           )}
 
         {emitter?.isPrivateIndividual || isBsdaSuite ? (
-          <>
-            <h4 className="fr-h4">Particulier</h4>
+          emitter?.isPrivateIndividual && (
+            <>
+              <h4 className="fr-h4">Particulier</h4>
 
-            <div className="form__row">
-              {emitter?.isPrivateIndividual ? (
-                <Input
-                  label="Nom et prénom"
-                  nativeInputProps={{
-                    ...register("emitter.company.name")
+              <div className="form__row">
+                {emitter?.isPrivateIndividual ? (
+                  <Input
+                    label="Nom et prénom"
+                    nativeInputProps={{
+                      ...register("emitter.company.name")
+                    }}
+                    disabled={sealedFields.includes(`emitter.company.name`)}
+                  />
+                ) : (
+                  <Input
+                    label="Personne à contacter"
+                    nativeInputProps={{
+                      ...register("emitter.company.contact")
+                    }}
+                    disabled={sealedFields.includes(`emitter.company.contact`)}
+                  />
+                )}
+              </div>
+              <div className="form__row">
+                <DsfrfWorkSiteAddress
+                  address={emitter?.company?.address}
+                  city={emitter?.company?.city}
+                  postalCode={emitter?.company?.postalCode}
+                  onAddressSelection={details => {
+                    // `address` is passed as `name` because of adresse api return fields
+                    setValue("emitter.company.address", details.name);
+                    setValue("emitter.company.city", details.city);
+                    setValue("emitter.company.postalCode", details.postcode);
                   }}
-                  disabled={sealedFields.includes(`emitter.company.name`)}
+                  designation=""
                 />
-              ) : (
+              </div>
+              <div className="fr-grid-row">
                 <Input
-                  label="Personne à contacter"
+                  label="Téléphone"
                   nativeInputProps={{
-                    ...register("emitter.company.contact")
+                    ...register("emitter.company.phone")
                   }}
-                  disabled={sealedFields.includes(`emitter.company.contact`)}
+                  disabled={sealedFields.includes(`emitter.company.phone`)}
+                  className="fr-col-md-4 fr-mr-2w"
                 />
-              )}
-            </div>
-            <div className="form__row">
-              <Input
-                label="Adresse"
-                nativeInputProps={{
-                  ...register("emitter.company.address")
-                }}
-                disabled={sealedFields.includes(`emitter.company.address`)}
-              />
-            </div>
-            <div className="form__row">
-              <Input
-                label="Téléphone"
-                nativeInputProps={{
-                  ...register("emitter.company.phone")
-                }}
-                disabled={sealedFields.includes(`emitter.company.phone`)}
-              />
-            </div>
-            <div className="form__row">
-              <Input
-                label="Courriel"
-                nativeInputProps={{
-                  ...register("emitter.company.mail")
-                }}
-                disabled={sealedFields.includes(`emitter.company.mail`)}
-              />
-            </div>
-          </>
+                <Input
+                  label="Courriel"
+                  nativeInputProps={{
+                    ...register("emitter.company.mail")
+                  }}
+                  disabled={sealedFields.includes(`emitter.company.mail`)}
+                  className="fr-col-md-6"
+                />
+              </div>
+            </>
+          )
         ) : (
           <>
             <h4 className="fr-h4">Établissement</h4>
@@ -317,8 +333,6 @@ const EmitterBsda = ({ errors }) => {
             />
           </>
         )}
-
-        <DsfrBsdaEcoOrganismes />
       </div>
     </>
   );

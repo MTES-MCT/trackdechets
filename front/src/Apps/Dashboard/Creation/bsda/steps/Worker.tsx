@@ -38,7 +38,7 @@ const Worker = ({ errors }) => {
   const isEntreposageProvisoire = bsdaType === BsdaType.Reshipment;
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
 
-  const isWorker = () => companyTypes?.includes(CompanyType.Worker) ?? false;
+  const isWorker = companyTypes?.includes(CompanyType.Worker) ?? false;
 
   const hasCertification =
     worker?.certification &&
@@ -90,6 +90,13 @@ const Worker = ({ errors }) => {
     register("worker.company.street");
     register("worker.company.postalCode");
   }, [register]);
+
+  useEffect(() => {
+    if (worker?.company?.siret) {
+      updateWorkerState(worker);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const actor = "worker";
@@ -193,6 +200,9 @@ const Worker = ({ errors }) => {
               onChange: e => {
                 setValue("worker.isDisabled", e.currentTarget.checked);
                 setValue("worker.company", null);
+                setValue("worker.company.contact", null);
+                setValue("worker.company.phone", null);
+                setValue("worker.company.mail", null);
                 setValue("worker.certification", null);
               }
             }
@@ -208,7 +218,7 @@ const Worker = ({ errors }) => {
       )}
 
       {!worker?.isDisabled && (
-        <>
+        <div className="fr-col-md-10">
           <h4 className="fr-h4">Entreprise de travaux</h4>
           <CompanySelectorWrapper
             orgId={siret}
@@ -284,7 +294,7 @@ const Worker = ({ errors }) => {
                 entreprise
               </h4>
 
-              {!isWorker() && (
+              {!isWorker && (
                 <div>
                   <Alert
                     title={
@@ -296,7 +306,7 @@ const Worker = ({ errors }) => {
                 </div>
               )}
 
-              {isWorker() && !hasCertification && (
+              {isWorker && !hasCertification && (
                 <div className="form__row">
                   {!worker?.certification?.hasSubSectionFour &&
                     !worker?.certification?.hasSubSectionThree && (
@@ -341,7 +351,7 @@ const Worker = ({ errors }) => {
               </div>
             </>
           )}
-        </>
+        </div>
       )}
     </>
   );

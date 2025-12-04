@@ -18,7 +18,7 @@ export const emptyBsddPackaging: PackagingInfoInput = {
 
 export const emptyBsdaPackaging: BsdaPackagingInput = {
   type: "" as BsdaPackagingType,
-  quantity: "" as any as number
+  quantity: null as any as number
 };
 
 /**

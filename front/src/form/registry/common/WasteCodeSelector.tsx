@@ -302,7 +302,10 @@ function recursiveFilterTree(
 ): WasteCode[] {
   return nodes
     .map(node => {
-      if (node.description.toLowerCase().includes(search.toLowerCase())) {
+      if (
+        node.description.toLowerCase().includes(search.toLowerCase()) ||
+        node.code.toLowerCase().includes(search.toLowerCase())
+      ) {
         return node;
       }
       if (node.children.length > 0) {

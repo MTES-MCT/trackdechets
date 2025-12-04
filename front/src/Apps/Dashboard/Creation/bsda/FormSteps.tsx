@@ -218,7 +218,7 @@ const BsdaFormSteps = ({
           { ...input, transporters: [] }
         : input;
 
-    const cleanInput = omitDeep(cleanInputTransporters, [
+    let cleanInput = omitDeep(cleanInputTransporters, [
       "isDraft",
       "ecoOrganisme.hasEcoOrganisme",
       "hasBroker",
@@ -227,6 +227,24 @@ const BsdaFormSteps = ({
       "emitter.company.city",
       "emitter.company.postalCode"
     ]);
+
+    cleanInput = {
+      ...cleanInput,
+      worker: {
+        ...cleanInput.worker,
+        certification: {
+          ...cleanInput.worker.certification,
+          validityLimit: Boolean(
+            cleanInput.worker?.certification?.validityLimit
+          )
+            ? parseDate(
+                cleanInput.worker?.certification?.validityLimit
+              ).toISOString()
+            : null
+        }
+      }
+    };
+
     return bsdaState.id
       ? updateBsda({
           variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }

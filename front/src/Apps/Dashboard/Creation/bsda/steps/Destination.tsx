@@ -88,6 +88,25 @@ const DestinationBsda = ({ errors }) => {
   }, [register]);
 
   useEffect(() => {
+    if (destination?.company?.siret) {
+      if (hasNextDestination) {
+        setValue("destination.operation.nextDestination.company", {
+          ...destination?.operation?.nextDestination?.company
+        });
+
+        setValue("destination.company", {
+          ...destination.company
+        });
+      } else {
+        setValue("destination.company", {
+          ...destination.company
+        });
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     if (errors?.length) {
       setFieldError(
         errors,
@@ -140,6 +159,22 @@ const DestinationBsda = ({ errors }) => {
           errors,
           `${actor}.cap`,
           formState.errors?.[actor]?.["cap"],
+          setError
+        );
+      }
+      if (!destination?.operation?.nextDestination?.cap) {
+        setFieldError(
+          errors,
+          `${actor}.operation.nextDestination.cap`,
+          formState.errors?.[actor]?.["operation"]?.nextDestination.cap,
+          setError
+        );
+      }
+      if (!destination?.plannedOperationCode) {
+        setFieldError(
+          errors,
+          `${actor}.plannedOperationCode`,
+          formState.errors?.[actor]?.["plannedOperationCode"],
           setError
         );
       }
@@ -247,7 +282,7 @@ const DestinationBsda = ({ errors }) => {
   };
 
   return (
-    <>
+    <div className="fr-col-md-10">
       {!!sealedFields.length && <DisabledParagraphStep />}
       {isDechetterie && !hasNextDestination ? (
         <div className="form__row">
@@ -408,10 +443,20 @@ const DestinationBsda = ({ errors }) => {
                     )
               }
               state={
-                formState.errors.destination?.["cap"] ? "error" : "default"
+                hasNextDestination
+                  ? formState.errors.destination?.["operation"]
+                      ?.nextDestination?.["cap"]
+                    ? "error"
+                    : "default"
+                  : formState.errors.destination?.["cap"]
+                  ? "error"
+                  : "default"
               }
               stateRelatedMessage={
-                formState.errors.destination?.["cap"]?.message
+                hasNextDestination
+                  ? formState.errors.destination?.["operation"]
+                      ?.nextDestination?.["cap"]?.message
+                  : formState.errors.destination?.["cap"]?.message
               }
             />
             {showDestinationCAPModificationAlert(bsdaContext) && (
@@ -424,6 +469,24 @@ const DestinationBsda = ({ errors }) => {
         <Select
           className="fr-mt-1v fr-mb-1v"
           label="Opération d'élimination / valorisation prévue (code D/R)"
+          state={
+            !hasNextDestination
+              ? formState.errors.destination?.["plannedOperationCode"]
+                ? "error"
+                : "default"
+              : formState.errors.destination?.["operation"]?.nextDestination?.[
+                  "plannedOperationCode"
+                ]
+              ? "error"
+              : "default"
+          }
+          stateRelatedMessage={
+            hasNextDestination
+              ? formState.errors.destination?.["operation"]?.nextDestination?.[
+                  "plannedOperationCode"
+                ]?.message
+              : formState.errors.destination?.["plannedOperationCode"]?.message
+          }
           nativeSelectProps={{
             ...register(
               hasNextDestination
@@ -439,7 +502,7 @@ const DestinationBsda = ({ errors }) => {
                 )
           }
         >
-          <option />
+          <option value="">Sélectionnez une valeur</option>
           {isDechetterie && !hasNextDestination ? (
             <>
               <option value="R 13">
@@ -467,11 +530,11 @@ const DestinationBsda = ({ errors }) => {
           )}
         </Select>
 
-        {(destination?.operation?.nextDestination?.company as string) ===
-          "D 9 F" ||
-          ((destination?.plannedOperationCode as string) === "D 9 F" && (
-            <p className="fr-mb-0 fr-info-text">Pour un traitement final</p>
-          ))}
+        {((destination?.operation?.nextDestination
+          ?.plannedOperationCode as string) === "D 9 F" ||
+          (destination?.plannedOperationCode as string) === "D 9 F") && (
+          <p className="fr-mb-0 fr-info-text">Pour un traitement final</p>
+        )}
       </div>
 
       <div className="fr-mt-4w">
@@ -597,8 +660,17 @@ const DestinationBsda = ({ errors }) => {
                     disabled={sealedFields.includes(
                       "destination.plannedOperationCode"
                     )}
+                    state={
+                      formState.errors.destination?.["plannedOperationCode"]
+                        ? "error"
+                        : "default"
+                    }
+                    stateRelatedMessage={
+                      formState.errors.destination?.["plannedOperationCode"]
+                        ?.message
+                    }
                   >
-                    <option />
+                    <option value="">Sélectionnez une valeur</option>
                     <option value="R 13">
                       R 13 - Opérations de transit incluant le groupement sans
                       transvasement préalable à R 5
@@ -613,7 +685,7 @@ const DestinationBsda = ({ errors }) => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
