@@ -100,6 +100,7 @@ export const filter_type_select_label = "Type de filtre";
 export const filter_bsd_type = "Type de bordereau";
 export const filter_waste_code = "N° de déchet / nom usuel";
 export const filter_bsd_number = "N° libre / BSD / contenant";
+export const filter_bsd_status = "Statut du bordereau";
 export const filter_immat_number = "Numéro d'immatriculation";
 export const filter_chantier_name = "Nom de chantier";
 export const filter_chantier_adress = "Adresse du chantier";
