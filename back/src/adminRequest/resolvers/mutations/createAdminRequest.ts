@@ -6,11 +6,11 @@ import type {
   ResolversParentTypes
 } from "@td/codegen-back";
 import { GraphQLContext } from "../../../types";
-import { AdminRequestValidationMethod } from "@td/prisma";
+import { AdminRequestValidationMethod, AdminRequestStatus } from "@td/prisma";
 import { parseCreateAdminRequestInput } from "../../validation";
 import { prisma } from "@td/prisma";
-import { UserInputError } from "../../../common/errors";
-import { getAdminRequestRepository } from "../../repository";
+import { ForbiddenError, UserInputError } from "../../../common/errors";
+
 import { fixTyping } from "../typing";
 import { sendAdminRequestVerificationCodeLetter } from "../../../common/post";
 import {
@@ -20,6 +20,8 @@ import {
   sendEmailToAuthor,
   sendEmailToCompanyAdmins
 } from "./utils/createAdminRequest.utils";
+import { getAdminRequestRepository } from "../../repository";
+import { withLock } from "../../../common/redis/lock";
 
 const createAdminRequest = async (
   _: ResolversParentTypes["Mutation"],
@@ -81,19 +83,40 @@ const createAdminRequest = async (
       ? getAdminOnlyEndDate()
       : null;
 
-  const { create } = getAdminRequestRepository(user);
+  // Create admin request atomically to prevent race conditions
+  const adminRequest = await withLock(
+    `user-admin-requests:${user.id}`,
+    async () => {
+      // Check pending request count
+      const { count, create } = getAdminRequestRepository(user);
+      
+      const pendingRequests = await count({
+        userId: user.id,
+        status: AdminRequestStatus.PENDING
+      });
 
-  // Create admin request
-  const adminRequest = await create(
-    {
-      user: { connect: { id: user.id } },
-      company: { connect: { id: company.id } },
-      collaboratorId: collaborator?.id,
-      validationMethod: adminRequestInput.validationMethod,
-      adminOnlyEndDate,
-      code
+      if (pendingRequests >= 5) { // MAX_SIMULTANEOUS_PENDING_REQUESTS
+        throw new ForbiddenError(
+          `Il n'est pas possible d'avoir plus de 5 demandes en cours.`
+        );
+      }
+      
+      return await create(
+        {
+          user: { connect: { id: user.id } },
+          company: { connect: { id: company.id } },
+          collaboratorId: collaborator?.id,
+          validationMethod: adminRequestInput.validationMethod,
+          adminOnlyEndDate,
+          code
+        },
+        { include: { company: true } }
+      );
     },
-    { include: { company: true } }
+    {
+      ttl: 10000, // 10 second lock TTL
+      timeout: 5000 // 5 second timeout to acquire lock
+    }
   );
 
   if (
