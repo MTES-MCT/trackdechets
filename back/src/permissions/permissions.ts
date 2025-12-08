@@ -131,6 +131,29 @@ export function can(role: UserRole, permission: Permission) {
   return !!role && !!grants[role].find(p => p === permission);
 }
 
+/**
+ * Checks if the user has at least one of the given permissions
+ */
+export async function checkHasSomePermission(
+  user: User,
+  permissions: Permission[],
+  errorMsg?: string
+) {
+  const userRoles = await getUserRoles(user.id);
+
+  for (const orgId of Object.keys(userRoles)) {
+    for (const permission of permissions) {
+      if (can(userRoles[orgId], permission)) {
+        return true;
+      }
+    }
+  }
+
+  throw new ForbiddenError(
+    errorMsg || "Vous n'êtes pas autorisé à effectuer cette action"
+  );
+}
+
 const USER_ROLES_CACHE_EXPIRY = 10 * 60; // 10 minutes
 export const USER_ROLES_CACHE_KEY = "UserRoles";
 

@@ -1,5 +1,8 @@
 import { gql } from "graphql-tag";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import type {
   Mutation,
@@ -7,7 +10,6 @@ import type {
 } from "@td/codegen-back";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { prisma } from "@td/prisma";
-import { AuthType } from "../../../../auth/auth";
 
 const CREATE_FORM_TRANSPORTER = gql`
   mutation CreateFormTransporter($input: TransporterInput!) {
@@ -22,6 +24,36 @@ const CREATE_FORM_TRANSPORTER = gql`
 
 describe("Mutation.createFormTransporter", () => {
   afterEach(resetDatabase);
+
+  it("should disallow user without create permission", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("READER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormTransporter">,
+      MutationCreateFormTransporterArgs
+    >(CREATE_FORM_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          mode: "ROAD"
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining("permission")
+      })
+    ]);
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient(null);
@@ -51,7 +83,7 @@ describe("Mutation.createFormTransporter", () => {
   });
 
   it("should throw error if data does not pass validation", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "createFormTransporter">,
@@ -75,7 +107,7 @@ describe("Mutation.createFormTransporter", () => {
   });
 
   it("should throw error if plates are invalid", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -116,7 +148,7 @@ describe("Mutation.createFormTransporter", () => {
   });
 
   it("should create a form transporter", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -203,11 +235,8 @@ describe("Mutation.createFormTransporter", () => {
     const makeClientLocal = require("../../../../__tests__/testClient")
       .default as typeof makeClient;
 
-    const user = await userFactory();
-    const { mutate } = makeClientLocal({
-      ...user,
-      auth: AuthType.Bearer
-    });
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClientLocal(user);
     const { errors, data } = await mutate<
       Pick<Mutation, "createFormTransporter">,
       MutationCreateFormTransporterArgs
@@ -239,7 +268,7 @@ describe("Mutation.createFormTransporter", () => {
   });
 
   it("should not auto-complete recepisse information if transporter is exempted", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
