@@ -3510,8 +3510,7 @@ describe("Mutation.Bsda.sign", () => {
           destinationReceptionSignatureDate: new Date(),
           destinationReceptionSignatureAuthor: "Reception signature",
           destinationOperationCode: operationCode,
-          destinationOperationMode:
-            getOperationModes(operationCode)[0],
+          destinationOperationMode: getOperationModes(operationCode)[0],
           destinationOperationDate: new Date()
         });
 
@@ -3582,8 +3581,7 @@ describe("Mutation.Bsda.sign", () => {
           destinationReceptionSignatureDate: new Date(),
           destinationReceptionSignatureAuthor: "Reception signature",
           destinationOperationCode: operationCode,
-          destinationOperationMode:
-            getOperationModes(operationCode)[0],
+          destinationOperationMode: getOperationModes(operationCode)[0],
           destinationOperationDate: new Date(),
           destinationOperationNextDestinationCompanySiret: null
         });
