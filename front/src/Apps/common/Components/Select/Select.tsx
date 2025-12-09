@@ -1,7 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { filter_type_select_option_placeholder } from "../../wordings/dashboard/wordingsDashboard";
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
-import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
 
 export interface Option {
   value: string;
@@ -39,21 +38,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     ref
   ) => {
     const select: ReactNode = useMemo(() => {
-      const hasSubOptions = options.some(o => o.options?.length);
-
-      if (hasSubOptions) {
-        return (
-          //@ts-ignore
-          // quick fix pour réparer la nav clavier avec ce type de select
-          <div ref={ref} tabIndex={-1}>
-            <SelectWithSubOptions
-              options={options}
-              selected={selected}
-              onChange={onChange}
-            />
-          </div>
-        );
-      } else if (isMultiple) {
+      if (isMultiple) {
         return (
           <MultiSelectWrapper
             options={options}
@@ -85,7 +70,6 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         </select>
       );
     }, [
-      label,
       options,
       id,
       isMultiple,

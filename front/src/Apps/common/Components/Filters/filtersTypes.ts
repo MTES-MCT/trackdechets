@@ -3,6 +3,7 @@ import { ChangeEvent } from "react";
 export enum FilterType {
   input = "input",
   select = "select",
+  selectWithSubOptions = "selectWithSubOptions",
   date = "date"
 }
 

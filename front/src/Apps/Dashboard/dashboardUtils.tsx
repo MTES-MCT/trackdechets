@@ -303,7 +303,7 @@ export const advancedFilterList: Filter[][] = [
     {
       name: FilterName.types,
       label: filter_bsd_type,
-      type: FilterType.select,
+      type: FilterType.selectWithSubOptions,
       isMultiple: true,
       options: bsdTypeFilterSelectOptions,
       isActive: true
@@ -311,7 +311,7 @@ export const advancedFilterList: Filter[][] = [
     {
       name: FilterName.status,
       label: filter_bsd_status,
-      type: FilterType.select,
+      type: FilterType.selectWithSubOptions,
       isMultiple: true,
       options: bsdStatusFilterSelectOptions,
       isActive: true
