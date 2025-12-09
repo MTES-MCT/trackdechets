@@ -10,6 +10,7 @@ import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 import "./filters.scss";
 import usePrevious from "../../../../common/hooks/usePrevious";
 import { getValuesFromOptions } from "../SelectWithSubOptions/SelectWithSubOptions.utils";
+import SelectWithSubOptions from "../SelectWithSubOptions/SelectWithSubOptions";
 
 const AdvancedFilters = ({
   open = false,
@@ -21,9 +22,10 @@ const AdvancedFilters = ({
   const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(false);
   const [filterValues, setFilterValues] = useState({});
   const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
-  const [selectMultipleValueArray, setSelectMultipleValueArray] = useState<
-    { value: string; label: string }[]
-  >([]);
+  // Store selected values for each multi-select filter by filter name
+  const [selectMultipleValueArray, setSelectMultipleValueArray] = useState<{
+    [filterName: string]: { value: string; label: string }[];
+  }>({});
   const [error, setError] = useState({});
 
   const prevOpen = usePrevious(open);
@@ -35,7 +37,7 @@ const AdvancedFilters = ({
       setIsApplyDisabled(false);
       setFilterValues({});
       setHasReachMaxFilter(false);
-      setSelectMultipleValueArray([]);
+      setSelectMultipleValueArray({});
       setError({});
 
       onApplyFilters({});
@@ -131,7 +133,10 @@ const AdvancedFilters = ({
     selectList: Option[],
     filterName: string
   ) => {
-    setSelectMultipleValueArray(selectList);
+    setSelectMultipleValueArray(prev => ({
+      ...prev,
+      [filterName]: selectList
+    }));
     const newFilterValues = { ...filterValues };
     const newFilterValue = getValuesFromOptions(selectList);
 
@@ -213,11 +218,47 @@ const AdvancedFilters = ({
           label={filter.label}
           isMultiple={filter.isMultiple}
           options={filter.options!}
-          selected={selectMultipleValueArray}
+          selected={
+            filter.isMultiple
+              ? selectMultipleValueArray[filter.name] || []
+              : undefined
+          }
           disableSearch={filter.isMultiple}
         />
       );
     }
+
+    if (filter?.type === FilterType.selectWithSubOptions) {
+      return (
+        //@ts-ignore
+        // quick fix pour réparer la nav clavier avec ce type de select
+        <div ref={newSelectElementRef} tabIndex={-1}>
+          <div className="fr-select-group">
+            <label className="fr-label" htmlFor={`${filter.name}_filter`}>
+              {filter.label}
+            </label>
+
+            <SelectWithSubOptions
+              options={filter.options!}
+              selected={
+                filter.isMultiple
+                  ? selectMultipleValueArray[filter.name] || []
+                  : []
+              }
+              onChange={e =>
+                !filter.isMultiple
+                  ? onFilterValueChange(e, filter.name)
+                  : onFilterSelectMultipleValueChange(
+                      e as unknown as Option[],
+                      filter.name
+                    )
+              }
+            />
+          </div>
+        </div>
+      );
+    }
+
     if (filter?.type === FilterType.date) {
       const filterName = filter.name;
       return (
