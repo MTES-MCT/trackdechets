@@ -372,12 +372,21 @@ export const CODES_AND_EXPECTED_OPERATION_MODES = {
   "R 3": ["RECYCLAGE", "AUTRES_VALORISATIONS"],
   "R 4": ["RECYCLAGE"],
   "R 5": ["RECYCLAGE", "AUTRES_VALORISATIONS"],
-  "R 6": ["RECYCLAGE"],
+  "R 6": ["RECYCLAGE", "REUTILISATION"],
   "R 7": ["REUTILISATION"],
-  "R 8": ["RECYCLAGE"],
+  "R 8": ["RECYCLAGE", "REUTILISATION"],
   "R 9": ["REUTILISATION", "RECYCLAGE", "VALORISATION_ENERGETIQUE"],
   "R 10": ["RECYCLAGE"],
   "R 11": ["RECYCLAGE", "AUTRES_VALORISATIONS", "VALORISATION_ENERGETIQUE"],
   "R 12": [],
   "R 13": []
 } as const;
+
+export function getOperationModes(operationCode: string) {
+  const formatedCode = operationCode.replace(
+    /^([A-Z])(\d{1,2})([A-Z]?)$/,
+    (_, p1, p2, p3) => [p1, p2, p3].filter(Boolean).join(" ")
+  ) as keyof typeof CODES_AND_EXPECTED_OPERATION_MODES;
+
+  return CODES_AND_EXPECTED_OPERATION_MODES[formatedCode] || [];
+}

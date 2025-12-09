@@ -1,8 +1,8 @@
 import { OperationMode } from "@td/codegen-ui";
 import {
-  getOperationModesFromOperationCode,
-  CODES_AND_EXPECTED_OPERATION_MODES
-} from "./operationModes";
+  CODES_AND_EXPECTED_OPERATION_MODES,
+  getOperationModes
+} from "@td/constants";
 
 const addSpaceAfterFirstCharacter = (input: string): string => {
   return input[0] + " " + input.slice(1);
@@ -10,17 +10,15 @@ const addSpaceAfterFirstCharacter = (input: string): string => {
 
 const test = (code: string, expectedModes: OperationMode[]) => {
   // Without spaces
-  const mode = getOperationModesFromOperationCode(code);
+  const mode = getOperationModes(code);
   expect(mode).toEqual(expectedModes);
 
   // With spaces
-  const modeWithSpace = getOperationModesFromOperationCode(
-    addSpaceAfterFirstCharacter(code)
-  );
+  const modeWithSpace = getOperationModes(addSpaceAfterFirstCharacter(code));
   expect(modeWithSpace).toEqual(expectedModes);
 };
 
-describe("getOperationModesFromOperationCode", () => {
+describe("getOperationModes", () => {
   it.each(Object.keys(CODES_AND_EXPECTED_OPERATION_MODES))("Code %p", code => {
     test(code, CODES_AND_EXPECTED_OPERATION_MODES[code]);
   });

@@ -1,6 +1,6 @@
 import { Refinement, z } from "zod";
 import { ParsedZodBsffPackaging } from "./schema";
-import { getOperationModesFromOperationCode } from "../../../common/operationModes";
+import {  } from "../../../common/operationModes";
 import { BsffPackagingValidationContext } from "./types";
 import { getSignatureAncestors } from "./helpers";
 import {
@@ -10,6 +10,7 @@ import {
 import { capitalize } from "../../../common/strings";
 import { isDestinationRefinement } from "../../../common/validation/zod/refinement";
 import { isFinalOperation } from "../../constants";
+import { getOperationModes } from "@td/constants";
 
 /**
  * Ce refinement permet de vérifier que les établissements présents sur le
@@ -39,7 +40,7 @@ export const checkOperationMode: Refinement<ParsedZodBsffPackaging> = (
   }
 
   if (operationCode) {
-    const modes = getOperationModesFromOperationCode(operationCode);
+    const modes = getOperationModes(operationCode);
 
     if (
       (modes.length && operationMode && !modes.includes(operationMode)) ||

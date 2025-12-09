@@ -1,5 +1,5 @@
+import { getOperationModes } from "@td/constants";
 import { SealedFieldError } from "../../../common/errors";
-import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import { capitalize } from "../../../common/strings";
 import { isFinalOperation } from "../../constants";
 import { getUpdatedFields } from "../bsff/helpers";
@@ -120,9 +120,7 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
       from: "OPERATION",
       when: bsffPackaging => {
         if (bsffPackaging.operationCode) {
-          const modes = getOperationModesFromOperationCode(
-            bsffPackaging.operationCode
-          );
+          const modes = getOperationModes(bsffPackaging.operationCode);
           return modes.length > 0;
         }
         return false;

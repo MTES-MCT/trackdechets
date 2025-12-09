@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { OperationMode, BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
 
-import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { capitalize, trim } from "../../common/strings";
 import { fixOperationModeForD9F } from "./transformers";
+import { getOperationModes } from "@td/constants";
 
 // Dasri still uses yup for main validation but migration to zod is on its way
 const ZodWasteCodeEnum = z.enum(["18 01 03*", "18 02 02*"]).nullish();
@@ -69,9 +69,7 @@ export const revisionSchema = z
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
-      const modes = getOperationModesFromOperationCode(
-        destinationOperationCode
-      );
+      const modes = getOperationModes(destinationOperationCode);
 
       if (modes.length && !destinationOperationMode) {
         ctx.addIssue({

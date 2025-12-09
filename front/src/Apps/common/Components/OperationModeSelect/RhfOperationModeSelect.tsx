@@ -1,12 +1,10 @@
 import React, { useEffect, useMemo } from "react";
 
 import { useFormContext } from "react-hook-form";
-import {
-  getOperationModeLabel,
-  getOperationModesFromOperationCode
-} from "../../operationModes";
+import { getOperationModeLabel } from "../../operationModes";
 import Tooltip from "../Tooltip/Tooltip";
 import { RadioButtons } from "@codegouvfr/react-dsfr/RadioButtons";
+import { getOperationModes } from "@td/constants";
 
 const RhfOperationModeSelect = ({
   operationCode,
@@ -16,7 +14,7 @@ const RhfOperationModeSelect = ({
   const { setValue, watch, getFieldState } = useFormContext();
   const { error: fieldError } = getFieldState(path);
   const modes = useMemo(
-    () => getOperationModesFromOperationCode(operationCode),
+    () => getOperationModes(operationCode),
     [operationCode]
   );
   const fieldValue = watch(path);
