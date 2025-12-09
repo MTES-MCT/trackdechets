@@ -17,7 +17,7 @@ type CompanyRole =
   | "Installation dans laquelle les déchets perdent leur statut de déchet";
 
 type CompanySubRole =
-  | "Crémation"
+  | "Crématorium (ou cimetière Guyane)"
   | "Broyeur VHU"
   | "Casse automobile / démolisseur";
 

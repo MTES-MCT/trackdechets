@@ -68,7 +68,7 @@ export const WASTE_PROCESSOR_TYPE_OPTIONS: CompanySubTypeOption[] = [
     value: WasteProcessorType.NonDangerousWastesIncineration
   },
   {
-    label: "Crémation",
+    label: "Crématorium (ou cimetière Guyane)",
     value: WasteProcessorType.Cremation
   },
   {
