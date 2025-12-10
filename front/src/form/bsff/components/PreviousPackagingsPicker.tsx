@@ -32,9 +32,14 @@ export function PreviousPackagingsPicker({
   bsff,
   onAddOrRemove
 }: PreviousBsffsPickerProps) {
-  const code_in = Object.values(OPERATION)
-    .filter(operation => operation.successors.includes(bsff.type))
-    .map(operation => operation.code);
+  const [debouncing, setDebouncing] = React.useState(false);
+  const code_in = React.useMemo(
+    () =>
+      Object.values(OPERATION)
+        .filter(operation => operation.successors.includes(bsff.type))
+        .map(operation => operation.code),
+    [bsff.type]
+  );
 
   const columns: Column<BsffPackaging>[] = React.useMemo(
     () => [
@@ -110,8 +115,8 @@ export function PreviousPackagingsPicker({
     return null;
   }, [previousPackagings, bsff.type]);
 
-  const baseWhere: BsffPackagingWhere = React.useMemo(
-    () => ({
+  const baseWhere: BsffPackagingWhere = React.useMemo(() => {
+    let tmpBaseWhere: BsffPackagingWhere = {
       ...(wasteCode ? { acceptation: { wasteCode: { _eq: wasteCode } } } : {}),
       operation: { code: { _in: code_in }, noTraceability: false },
       bsff: {
@@ -122,9 +127,18 @@ export function PreviousPackagingsPicker({
         }
       },
       nextBsff: null
-    }),
-    [wasteCode, code_in, bsff.emitter?.company?.siret]
-  );
+    };
+    if (bsff.type === BsffType.Reexpedition && previousPackagings?.length > 0) {
+      tmpBaseWhere = {
+        ...tmpBaseWhere,
+        bsff: {
+          ...tmpBaseWhere.bsff,
+          id: { _eq: previousPackagings[0].bsffId }
+        }
+      };
+    }
+    return tmpBaseWhere;
+  }, [wasteCode, code_in, bsff, previousPackagings]);
 
   // Build where clause including column filters
   const where: BsffPackagingWhere = React.useMemo(() => {
@@ -174,17 +188,6 @@ export function PreviousPackagingsPicker({
       };
     }
 
-    // On autorise uniquement les réexpéditions de contenants présents sur le même BSFF
-    if (bsff.type === BsffType.Reexpedition && previousPackagings?.length > 0) {
-      whereClause = {
-        ...whereClause,
-        bsff: {
-          ...whereClause.bsff,
-          id: { _eq: previousPackagings[0].bsffId }
-        }
-      };
-    }
-
     if (bsff.id) {
       // En cas d'update, on autorise les contenants qui ont déjà été ajouté à ce BSFF
       whereClause = {
@@ -196,14 +199,7 @@ export function PreviousPackagingsPicker({
     }
 
     return whereClause;
-  }, [
-    baseWhere,
-    wasteCode,
-    bsff.type,
-    previousPackagings,
-    bsff.id,
-    columnFilters
-  ]);
+  }, [baseWhere, wasteCode, bsff.id, columnFilters]);
 
   const { data, loading, refetch } = useQuery<
     Pick<Query, "bsffPackagings">,
@@ -216,7 +212,8 @@ export function PreviousPackagingsPicker({
     },
     // make sure we have fresh data here
     fetchPolicy: "cache-and-network",
-    skip: !bsff.emitter?.company?.siret?.length
+    skip: !bsff.emitter?.company?.siret?.length,
+    notifyOnNetworkStatusChange: true
   });
 
   const debouncedRefetch = React.useMemo(() => {
@@ -229,10 +226,12 @@ export function PreviousPackagingsPicker({
         console.error(err);
         return;
       }
+      setDebouncing(false);
     }, 500);
   }, [refetch]);
 
   React.useEffect(() => {
+    setDebouncing(true);
     debouncedRefetch(where);
   }, [where, debouncedRefetch]);
 
@@ -261,7 +260,8 @@ export function PreviousPackagingsPicker({
   if (
     !loading &&
     !pickablePackagings?.length &&
-    Object.keys(columnFilters).length === 0
+    Object.keys(columnFilters).length === 0 &&
+    !debouncing
   ) {
     return (
       <div>
