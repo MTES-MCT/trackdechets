@@ -288,7 +288,7 @@ test.describe
         company: {
           name: "013 - Crématorium",
           roles: ["Installation de traitement"],
-          subRoles: ["Crémation"]
+          subRoles: ["Crématorium (ou cimetière Guyane)"]
         },
         contact: {
           name: "Crématorium 013",
