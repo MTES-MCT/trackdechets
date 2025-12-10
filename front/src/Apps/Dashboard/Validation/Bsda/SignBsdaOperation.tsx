@@ -253,7 +253,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             </option>
           </Select>
 
-          {bsda.destination?.plannedOperationCode === "D 9 F" && (
+          {bsda.destination?.operation?.code === "D 9 F" && (
             <p className="fr-mt-5v fr-mb-5v fr-info-text">
               Pour un traitement final
             </p>
