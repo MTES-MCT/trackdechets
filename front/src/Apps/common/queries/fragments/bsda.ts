@@ -175,6 +175,7 @@ export const FullBsdaFragment = gql`
     type
     emitter {
       isPrivateIndividual
+      customInfo
       company {
         ...CompanyFragment
       }

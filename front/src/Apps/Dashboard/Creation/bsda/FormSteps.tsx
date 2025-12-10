@@ -25,6 +25,7 @@ import EmitterBsda from "./steps/Emitter";
 import {
   CREATE_BSDA,
   GET_BSDA,
+  PUBLISH_BSDA,
   UPDATE_BSDA
 } from "../../../common/queries/bsda/queries";
 import { getComputedState } from "../getComputedState";
@@ -97,6 +98,11 @@ const BsdaFormSteps = ({
     Pick<Mutation, "createBsda">,
     MutationCreateBsdaArgs
   >(CREATE_BSDA);
+
+  const [publishBsda, { loading: publishing }] = useMutation<
+    Pick<Mutation, "createBsda">,
+    MutationCreateBsdaArgs
+  >(PUBLISH_BSDA);
 
   const [updateBsda, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsda">,
@@ -191,7 +197,11 @@ const BsdaFormSteps = ({
   );
 
   const loading =
-    creating || updating || creatingBsdaTransporter || updatingBsdaTransporter;
+    creating ||
+    publishing ||
+    updating ||
+    creatingBsdaTransporter ||
+    updatingBsdaTransporter;
   const mainCtaLabel = bsdaState.id ? "Enregistrer" : "Publier";
   const draftCtaLabel = bsdaState.id ? "" : "Enregistrer en brouillon";
 
@@ -206,7 +216,7 @@ const BsdaFormSteps = ({
     return omitDeep(input, "worker.work");
   };
 
-  async function saveBsda(values: BsdaInput): Promise<any> {
+  async function saveBsda(values: BsdaInput, draft: boolean): Promise<any> {
     const bsdaInput = await saveTransporters(values as BsdaValues);
     const input = { ...bsdaInput };
 
@@ -227,29 +237,50 @@ const BsdaFormSteps = ({
       "emitter.company.city",
       "emitter.company.postalCode"
     ]);
+    const worker = cleanInput.worker.isDisabled
+      ? { ...cleanInput.worker }
+      : cleanInput.worker.certification
+      ? {
+          ...cleanInput.worker,
+          certification: {
+            ...cleanInput.worker.certification,
+            validityLimit: Boolean(
+              cleanInput.worker?.certification?.validityLimit
+            )
+              ? parseDate(
+                  cleanInput.worker?.certification?.validityLimit
+                ).toISOString()
+              : null
+          }
+        }
+      : {
+          isDisabled: false,
+          company: cleanInput.worker.company,
+          certification: {
+            hasSubSectionFour: false,
+            hasSubSectionThree: false,
+            certificationNumber: "",
+            validityLimit: null,
+            organisation: ""
+          }
+        };
 
     cleanInput = {
       ...cleanInput,
-      worker: {
-        ...cleanInput.worker,
-        certification: {
-          ...cleanInput.worker.certification,
-          validityLimit: Boolean(
-            cleanInput.worker?.certification?.validityLimit
-          )
-            ? parseDate(
-                cleanInput.worker?.certification?.validityLimit
-              ).toISOString()
-            : null
-        }
-      }
+      worker
     };
 
-    return bsdaState.id
-      ? updateBsda({
-          variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }
-        })
-      : createBsda({ variables: { input: cleanInput } });
+    if (bsdaState.id) {
+      return updateBsda({
+        variables: { id: bsdaState.id, input: cleanupFields(cleanInput) }
+      });
+    } else {
+      if (draft) {
+        return createBsda({ variables: { input: cleanInput } });
+      } else {
+        return publishBsda({ variables: { input: cleanInput } });
+      }
+    }
   }
 
   async function saveBsdaTransporter(

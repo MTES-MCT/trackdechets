@@ -23,6 +23,13 @@ export function getComputedState(initialState, actualForm) {
       !(initialValue instanceof Array)
     ) {
       prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
+    } else if (
+      initialValue instanceof Array &&
+      actualForm[curKey].length === 0 &&
+      initialValue.length > 0
+    ) {
+      // some forms have an initialized array that isn't saved by the backend
+      prev[curKey] = initialValue;
     } else {
       // Keep null values - only replace undefined.
       prev[curKey] =

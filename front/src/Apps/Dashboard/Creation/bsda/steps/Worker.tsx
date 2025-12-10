@@ -147,12 +147,6 @@ const Worker = ({ errors }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
 
-  useEffect(() => {
-    if (errors?.length && worker?.company?.siret) {
-      clearCompanyError(worker, "worker", clearErrors);
-    }
-  }, [clearErrors, worker?.company?.siret, errors?.length, worker]);
-
   const orgId = useMemo(
     () => worker?.company?.orgId ?? worker?.company?.siret ?? null,
     [worker?.company?.orgId, worker?.company?.siret]
@@ -163,9 +157,9 @@ const Worker = ({ errors }) => {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets. Il ne peut être visé comme entreprise de travaux sur ce bordereau.";
       } else if (!company.companyTypes?.includes(CompanyType.Worker)) {
-        return "Cet établissement n'a pas le profil Entreprise de travaux.";
-      } else if (formState.errors?.destination?.["company"]?.siret?.message) {
-        return formState.errors?.destination?.["company"]?.siret?.message;
+        return `L'entreprise de travaux saisie sur le bordereau (SIRET: ${company.siret}) n'est pas inscrite sur Trackdéchets en tant qu'entreprise de travaux. Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements.`;
+      } else if (formState.errors?.worker?.["company"]?.siret?.message) {
+        return formState.errors?.worker?.["company"]?.siret?.message;
       }
     }
     return null;

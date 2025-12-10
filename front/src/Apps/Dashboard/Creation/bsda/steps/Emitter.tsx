@@ -33,6 +33,7 @@ const EmitterBsda = ({ errors }) => {
     register("emitter.company.city");
     register("emitter.company.street");
     register("emitter.company.postalCode");
+    register("emitter.customInfo");
   }, [register]);
 
   useEffect(() => {
@@ -136,8 +137,9 @@ const EmitterBsda = ({ errors }) => {
           <Alert
             title=""
             description={`Vous effectuez un groupement ou une réexpédition. L'entreprise
-            émettrice est obligatoirement la vôtre : ${emitter?.company?.name} - ${emitter?.company?.siret}`}
+            émettrice est obligatoirement la vôtre.`}
             severity="info"
+            className="fr-mb-2w"
           />
         ) : (
           <SingleCheckbox
@@ -153,6 +155,10 @@ const EmitterBsda = ({ errors }) => {
                     );
                     if (e.currentTarget.checked) {
                       setValue("emitter.company.siret", null);
+                      setValue("emitter.company.name", null);
+                      setValue("emitter.company.contact", null);
+                      setValue("emitter.company.phone", null);
+                      setValue("emitter.company.mail", null);
                     }
                   }
                 }
@@ -174,71 +180,71 @@ const EmitterBsda = ({ errors }) => {
             />
           )}
 
-        {emitter?.isPrivateIndividual || isBsdaSuite ? (
-          emitter?.isPrivateIndividual && (
-            <>
-              <h4 className="fr-h4">Particulier</h4>
+        {emitter?.isPrivateIndividual ? (
+          <>
+            <h4 className="fr-h4">Particulier</h4>
 
-              <div className="form__row">
-                {emitter?.isPrivateIndividual ? (
-                  <Input
-                    label="Nom et prénom"
-                    nativeInputProps={{
-                      ...register("emitter.company.name")
-                    }}
-                    disabled={sealedFields.includes(`emitter.company.name`)}
-                  />
-                ) : (
-                  <Input
-                    label="Personne à contacter"
-                    nativeInputProps={{
-                      ...register("emitter.company.contact")
-                    }}
-                    disabled={sealedFields.includes(`emitter.company.contact`)}
-                  />
-                )}
-              </div>
-              <div className="form__row">
-                <DsfrfWorkSiteAddress
-                  address={emitter?.company?.address}
-                  city={emitter?.company?.city}
-                  postalCode={emitter?.company?.postalCode}
-                  onAddressSelection={details => {
-                    // `address` is passed as `name` because of adresse api return fields
-                    setValue("emitter.company.address", details.name);
-                    setValue("emitter.company.city", details.city);
-                    setValue("emitter.company.postalCode", details.postcode);
-                  }}
-                  designation=""
-                />
-              </div>
-              <div className="fr-grid-row">
+            <div className="form__row">
+              {emitter?.isPrivateIndividual ? (
                 <Input
-                  label="Téléphone"
+                  label="Nom et prénom"
                   nativeInputProps={{
-                    ...register("emitter.company.phone")
+                    ...register("emitter.company.name")
                   }}
-                  disabled={sealedFields.includes(`emitter.company.phone`)}
-                  className="fr-col-md-4 fr-mr-2w"
+                  disabled={sealedFields.includes(`emitter.company.name`)}
                 />
+              ) : (
                 <Input
-                  label="Courriel"
+                  label="Personne à contacter"
                   nativeInputProps={{
-                    ...register("emitter.company.mail")
+                    ...register("emitter.company.contact")
                   }}
-                  disabled={sealedFields.includes(`emitter.company.mail`)}
-                  className="fr-col-md-6"
+                  disabled={sealedFields.includes(`emitter.company.contact`)}
                 />
-              </div>
-            </>
-          )
+              )}
+            </div>
+            <div className="form__row">
+              <DsfrfWorkSiteAddress
+                address={emitter?.company?.address}
+                city={emitter?.company?.city}
+                postalCode={emitter?.company?.postalCode}
+                onAddressSelection={details => {
+                  // `address` is passed as `name` because of adresse api return fields
+                  setValue("emitter.company.address", details.name);
+                  setValue("emitter.company.city", details.city);
+                  setValue("emitter.company.postalCode", details.postcode);
+                }}
+                designation=""
+              />
+            </div>
+            <div className="fr-grid-row">
+              <Input
+                label="Téléphone"
+                nativeInputProps={{
+                  ...register("emitter.company.phone")
+                }}
+                disabled={sealedFields.includes(`emitter.company.phone`)}
+                className="fr-col-md-4 fr-mr-2w"
+              />
+              <Input
+                label="Courriel"
+                nativeInputProps={{
+                  ...register("emitter.company.mail")
+                }}
+                disabled={sealedFields.includes(`emitter.company.mail`)}
+                className="fr-col-md-6"
+              />
+            </div>
+          </>
         ) : (
           <>
             <h4 className="fr-h4">Établissement</h4>
             <CompanySelectorWrapper
               orgId={siret}
               favoriteType={FavoriteType.Emitter}
-              disabled={sealedFields.includes(`emitter.company.siret`)}
+              disabled={
+                sealedFields.includes(`emitter.company.siret`) || isBsdaSuite
+              }
               selectedCompanyOrgId={orgId}
               selectedCompanyError={selectedCompanyError}
               onCompanySelected={company => {
@@ -306,7 +312,6 @@ const EmitterBsda = ({ errors }) => {
             <h4 className="fr-h4 fr-mt-4w">
               Adresse de chantier ou de collecte (optionnel)
             </h4>
-
             <Input
               label="Nom du site d’enlèvement (optionnel)"
               nativeInputProps={{
@@ -324,6 +329,16 @@ const EmitterBsda = ({ errors }) => {
                 setValue("emitter.pickupSite.postalCode", details.postcode);
               }}
               designation="du site d’enlèvement (optionnel)"
+            />
+
+            <Input
+              label="Informations complémentaires (optionnel)"
+              textArea
+              nativeTextAreaProps={{
+                placeholder: "Champ libre pour préciser…",
+                ...register("emitter.customInfo")
+              }}
+              disabled={sealedFields.includes(`emitter.customInfo`)}
             />
           </>
         )}
