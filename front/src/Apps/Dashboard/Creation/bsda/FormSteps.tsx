@@ -239,7 +239,8 @@ const BsdaFormSteps = ({
     ]);
     const worker = cleanInput.worker.isDisabled
       ? { ...cleanInput.worker }
-      : {
+      : cleanInput.worker.certification
+      ? {
           ...cleanInput.worker,
           certification: {
             ...cleanInput.worker.certification,
@@ -250,6 +251,17 @@ const BsdaFormSteps = ({
                   cleanInput.worker?.certification?.validityLimit
                 ).toISOString()
               : null
+          }
+        }
+      : {
+          isDisabled: false,
+          company: cleanInput.worker.company,
+          certification: {
+            hasSubSectionFour: false,
+            hasSubSectionThree: false,
+            certificationNumber: "",
+            validityLimit: null,
+            organisation: ""
           }
         };
 
