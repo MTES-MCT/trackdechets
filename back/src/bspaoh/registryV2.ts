@@ -344,6 +344,7 @@ export const toOutgoingWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bspaoh.destinationReceptionWasteAcceptedWeightValue
         ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
@@ -527,6 +528,7 @@ export const toTransportedWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bspaoh.destinationReceptionWasteAcceptedWeightValue
         ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
@@ -691,6 +693,7 @@ export const toAllWasteV2 = (
             .toDecimalPlaces(6)
             .toNumber()
         : bspaoh.destinationReceptionWasteReceivedWeightValue,
+    destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bspaoh.destinationReceptionWasteAcceptedWeightValue
         ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
