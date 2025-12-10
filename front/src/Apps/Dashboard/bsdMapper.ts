@@ -369,6 +369,7 @@ export const mapBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: transporter,
+    transporters: bsvhu.transporters,
     transporterCustomInfo: transporter?.customInfo,
     transporterNumberPlate: transporter?.transport?.plates,
     updatedAt: bsvhu["bsvhuUpdatedAt"],
