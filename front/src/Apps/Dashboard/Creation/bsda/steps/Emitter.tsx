@@ -33,6 +33,7 @@ const EmitterBsda = ({ errors }) => {
     register("emitter.company.city");
     register("emitter.company.street");
     register("emitter.company.postalCode");
+    register("emitter.customInfo");
   }, [register]);
 
   useEffect(() => {
@@ -311,7 +312,6 @@ const EmitterBsda = ({ errors }) => {
             <h4 className="fr-h4 fr-mt-4w">
               Adresse de chantier ou de collecte (optionnel)
             </h4>
-
             <Input
               label="Nom du site d’enlèvement (optionnel)"
               nativeInputProps={{
@@ -329,6 +329,16 @@ const EmitterBsda = ({ errors }) => {
                 setValue("emitter.pickupSite.postalCode", details.postcode);
               }}
               designation="du site d’enlèvement (optionnel)"
+            />
+
+            <Input
+              label="Informations complémentaires (optionnel)"
+              textArea
+              nativeTextAreaProps={{
+                placeholder: "Champ libre pour préciser…",
+                ...register("emitter.customInfo")
+              }}
+              disabled={sealedFields.includes(`emitter.customInfo`)}
             />
           </>
         )}
