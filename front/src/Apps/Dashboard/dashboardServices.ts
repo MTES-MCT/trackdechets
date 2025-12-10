@@ -1131,12 +1131,21 @@ export const getSentBtnLabel = (
     }
   }
   // VHU
-  if (
-    isSameSiretDestination(currentSiret, bsd) &&
-    isBsvhu(bsd.type) &&
-    permissions.includes(UserPermission.BsdCanSignOperation)
-  ) {
-    return VALIDER_RECEPTION;
+  if (isBsvhu(bsd.type)) {
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
+
+    if (
+      isSameSiretDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignOperation)
+    ) {
+      return VALIDER_RECEPTION;
+    }
   }
   // PAOH
   if (isBspaoh(bsd.type)) {
