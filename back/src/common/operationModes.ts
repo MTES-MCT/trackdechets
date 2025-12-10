@@ -1,5 +1,4 @@
 import { OperationMode } from "@td/prisma";
-import { trim } from "./strings";
 
 export const getOperationModeLabel = (operationMode: OperationMode) => {
   switch (operationMode) {
