@@ -205,7 +205,9 @@ function SelectableWasteTableWrapper({
             ]);
           }
         }}
-        isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
+        isSelected={bsda =>
+          grouping!.findIndex(grouped => grouped.id === bsda.id) >= 0
+        }
         bsdas={bsdas}
         pickerType={BsdaType.Gathering}
         selected={grouping}
