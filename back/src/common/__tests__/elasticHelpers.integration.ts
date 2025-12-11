@@ -423,11 +423,11 @@ describe("elasticHelpers", () => {
     };
 
     describe("all BSDs mixed together", () => {
-      const SIX_MONTHS_AGO = addMonths(new Date(), -6);
-      const EIGHT_MONTHS_AGO = addMonths(new Date(), -8);
+      const EIGHTEEN_MONTHS_AGO = addMonths(new Date(), -18);
+      const NINETEEN_MONTHS_AGO = addMonths(new Date(), -19);
       const THREE_MONTHS_AGO = addMonths(new Date(), -3);
       const ONE_MONTH_AGO = addMonths(new Date(), -1);
-      const ONE_YEAR_AGO = addYears(new Date(), -1);
+      const TWO_YEARS_AGO = addYears(new Date(), -2);
       const TODAY = new Date();
 
       it("should remove old revisions", async () => {
@@ -441,24 +441,30 @@ describe("elasticHelpers", () => {
         await reindex();
 
         // Manually update BSDs to add false revision fields
-        await changeRevisionUpdatedAtAndRevisionTab(bsda.id, SIX_MONTHS_AGO, [
-          bsda.emitterCompanySiret!
-        ]);
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bsda.id,
+          EIGHTEEN_MONTHS_AGO,
+          [bsda.emitterCompanySiret!]
+        );
         await changeRevisionUpdatedAtAndRevisionTab(
           bsdasri.id,
-          EIGHT_MONTHS_AGO,
+          NINETEEN_MONTHS_AGO,
           [bsdasri.emitterCompanySiret!]
         );
-        await changeRevisionUpdatedAtAndRevisionTab(bsdd.id, EIGHT_MONTHS_AGO, [
-          bsdd.emitterCompanySiret!
-        ]);
-        await changeRevisionUpdatedAtAndRevisionTab(bsff.id, ONE_YEAR_AGO, [
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bsdd.id,
+          NINETEEN_MONTHS_AGO,
+          [bsdd.emitterCompanySiret!]
+        );
+        await changeRevisionUpdatedAtAndRevisionTab(bsff.id, TWO_YEARS_AGO, [
           bsff.emitterCompanySiret!
         ]);
-        await changeRevisionUpdatedAtAndRevisionTab(bspaoh.id, SIX_MONTHS_AGO, [
-          bspaoh.emitterCompanySiret!
-        ]);
-        await changeRevisionUpdatedAtAndRevisionTab(bsvhu.id, ONE_YEAR_AGO, [
+        await changeRevisionUpdatedAtAndRevisionTab(
+          bspaoh.id,
+          EIGHTEEN_MONTHS_AGO,
+          [bspaoh.emitterCompanySiret!]
+        );
+        await changeRevisionUpdatedAtAndRevisionTab(bsvhu.id, TWO_YEARS_AGO, [
           bsvhu.emitterCompanySiret!
         ]);
 
