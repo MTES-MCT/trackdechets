@@ -3,6 +3,7 @@ import {
   BsdType,
   BsdaTransporter,
   BsffTransporter,
+  BsvhuTransporter,
   RevisionRequestStatus,
   Transporter
 } from "@td/codegen-ui";
@@ -14,5 +15,9 @@ export interface BadgeProps {
   reviewStatus?: TBsdStatusCode | null | RevisionRequestStatus;
   operationCode?: string;
   bsdaAnnexed?: boolean;
-  transporters?: Transporter[] | BsdaTransporter[] | BsffTransporter[];
+  transporters?:
+    | Transporter[]
+    | BsdaTransporter[]
+    | BsffTransporter[]
+    | BsvhuTransporter[];
 }

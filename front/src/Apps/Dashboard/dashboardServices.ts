@@ -21,7 +21,8 @@ import {
   Transporter,
   BsdaTransporter,
   BsffTransporter,
-  BsvhuStatus
+  BsvhuStatus,
+  BsvhuTransporter
 } from "@td/codegen-ui";
 import {
   ACCEPTE,
@@ -82,7 +83,11 @@ export const getBsdStatusLabel = (
   bsdType?: BsdType,
   operationCode?: string,
   bsdaAnnexed?: boolean,
-  transporters?: Transporter[] | BsdaTransporter[] | BsffTransporter[]
+  transporters?:
+    | Transporter[]
+    | BsdaTransporter[]
+    | BsffTransporter[]
+    | BsvhuTransporter[]
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -98,7 +103,7 @@ export const getBsdStatusLabel = (
           lastTransporterNumero = (transporters as Transporter[]).filter(t =>
             Boolean(t.takenOverAt)
           ).length;
-        } else if (isBsda(bsdType) || isBsff(bsdType)) {
+        } else if (isBsda(bsdType) || isBsff(bsdType) || isBsvhu(bsdType)) {
           lastTransporterNumero = (transporters as BsdaTransporter[]).filter(
             t => Boolean(t.transport?.signature?.date)
           ).length;
@@ -1126,12 +1131,21 @@ export const getSentBtnLabel = (
     }
   }
   // VHU
-  if (
-    isSameSiretDestination(currentSiret, bsd) &&
-    isBsvhu(bsd.type) &&
-    permissions.includes(UserPermission.BsdCanSignOperation)
-  ) {
-    return VALIDER_RECEPTION;
+  if (isBsvhu(bsd.type)) {
+    if (
+      isToCollectTab &&
+      isSameSiretNextTransporter(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignTransport)
+    ) {
+      return SIGNER;
+    }
+
+    if (
+      isSameSiretDestination(currentSiret, bsd) &&
+      permissions.includes(UserPermission.BsdCanSignOperation)
+    ) {
+      return VALIDER_RECEPTION;
+    }
   }
   // PAOH
   if (isBspaoh(bsd.type)) {

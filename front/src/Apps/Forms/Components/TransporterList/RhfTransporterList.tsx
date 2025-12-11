@@ -66,12 +66,14 @@ export function RhfTransporterList<
 
         if (!t) return null;
 
-        const hasTakenOver = Boolean(t?.takenOverAt);
+        const hasTakenOver = Boolean(t?.transport?.takenOverAt);
         const previousHasTakenOver =
-          idx > 0 ? Boolean(transporters[idx - 1]?.takenOverAt) : false;
+          idx > 0
+            ? Boolean(transporters[idx - 1]?.transport?.takenOverAt)
+            : false;
         const nextHasTakenOver =
           idx < transporters.length - 1 &&
-          Boolean(transporters[idx + 1]?.takenOverAt);
+          Boolean(transporters[idx + 1]?.transport?.takenOverAt);
 
         const disableAdd = transporters.length >= 5 || nextHasTakenOver;
         const disableDelete =
@@ -133,7 +135,7 @@ export function RhfTransporterList<
             expanded={expandedIdx === idx}
             deleteLabel={deleteLabel}
           >
-            {t?.takenOverAt ? (
+            {t?.transport?.takenOverAt ? (
               <TransporterDisplay transporter={t} />
             ) : (
               <RhfTransporterForm
