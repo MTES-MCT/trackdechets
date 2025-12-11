@@ -19,7 +19,7 @@ async function enqueueUpdatedBsdToIndex(
   await indexQueue.add("index_updated", bsdId, options);
 }
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 1000;
 const now = new Date();
 const twentyMonthsAgo = new Date(now);
 twentyMonthsAgo.setMonth(now.getMonth() - 20);
@@ -29,10 +29,9 @@ fourMonthsAgo.setMonth(now.getMonth() - 4);
 async function processPaginated(
   modelName: string,
   revisionModel: any,
-  bsdModel: any,
   bsdIdField: string
 ) {
-  let cursor: string | undefined = undefined;
+  let cursor: { createdAt: Date; id: string } | undefined = undefined;
   let totalProcessed = 0;
   let totalReindexed = 0;
   console.log(`\n--- Processing ${modelName} revision requests ---`);
@@ -43,14 +42,15 @@ async function processPaginated(
       createdAt: {
         gte: twentyMonthsAgo,
         lte: fourMonthsAgo
-      }
+      },
+      status: { not: "PENDING" }
     }
   });
   console.log(
-    `[${modelName}] Total revision requests in range: ${totalRevisions}`
+    `[${modelName}] Total non-pending revision requests in range: ${totalRevisions}`
   );
   if (totalRevisions === 0) {
-    console.log(`[${modelName}] No revision requests to process.`);
+    console.log(`[${modelName}] No non-pending revision requests to process.`);
     return;
   }
 
@@ -64,11 +64,12 @@ async function processPaginated(
         createdAt: {
           gte: twentyMonthsAgo,
           lte: fourMonthsAgo
-        }
+        },
+        status: { not: "PENDING" }
       },
-      ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
+      ...(cursor ? { skip: 1, cursor } : {}),
       take: BATCH_SIZE,
-      orderBy: { id: "asc" },
+      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       select: { id: true, [bsdIdField]: true, createdAt: true }
     });
 
@@ -110,7 +111,9 @@ async function processPaginated(
       )}s. Estimated time left: ${estRemainingMin}m${estRemainingSecDisplay}s for ${remaining} items.`
     );
 
-    cursor = page[page.length - 1].id;
+    // Use composite cursor for next batch
+    const last = page[page.length - 1];
+    cursor = { createdAt: last.createdAt, id: last.id };
     if (page.length < BATCH_SIZE) break;
   }
   const totalDuration = (Date.now() - startTime) / 1000;
@@ -128,19 +131,16 @@ export async function run() {
   await processPaginated(
     "BSDD",
     prisma.bsddRevisionRequest,
-    prisma.form,
     "bsddId"
   );
   await processPaginated(
     "BSDA",
     prisma.bsdaRevisionRequest,
-    prisma.bsda,
     "bsdaId"
   );
   await processPaginated(
     "BSDASRI",
     prisma.bsdasriRevisionRequest,
-    prisma.bsdasri,
     "bsdasriId"
   );
   console.log("Re-indexation script completed.");
