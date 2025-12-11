@@ -274,6 +274,17 @@ const DestinationBsda = ({ errors }) => {
     if (company) {
       if (!company.isRegistered) {
         return "Cet établissement n'est pas inscrit sur Trackdéchets, il ne peut pas être ajouté sur le bordereau.";
+      } else if (
+        !company.companyTypes?.filter(
+          type =>
+            type === CompanyType.Collector ||
+            type === CompanyType.Wasteprocessor
+        ).length
+      ) {
+        return `L'installation de destination ou d'entreposage ou de reconditionnement avec le SIRET ${company.siret} n'est pas inscrite
+          sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc
+          pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il
+          modifie le profil de l'établissement depuis l'interface Trackdéchets dans Mes établissements`;
       } else if (formState.errors?.destination?.["company"]?.siret?.message) {
         return formState.errors?.destination?.["company"]?.siret?.message;
       }
@@ -377,7 +388,7 @@ const DestinationBsda = ({ errors }) => {
                   };
                 }
 
-                if (errors?.length) {
+                if (errors?.length && company.siret !== currentCompanySiret) {
                   // server errors
                   clearCompanyError(destination, "destination", clearErrors);
                 }

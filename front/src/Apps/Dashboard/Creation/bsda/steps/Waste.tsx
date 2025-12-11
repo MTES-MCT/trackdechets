@@ -79,6 +79,24 @@ const WasteBsda = ({ errors }) => {
         formState.errors?.waste?.["adr"],
         setError
       );
+      setFieldError(
+        errors,
+        "waste.familyCode",
+        formState.errors?.waste?.["familyCode"],
+        setError
+      );
+      setFieldError(
+        errors,
+        "waste.materialName",
+        formState.errors?.waste?.["materialName"],
+        setError
+      );
+      setFieldError(
+        errors,
+        "waste.consistence",
+        formState.errors?.waste?.["consistence"],
+        setError
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errors]);
@@ -219,6 +237,12 @@ const WasteBsda = ({ errors }) => {
               nativeSelectProps={{
                 ...register("waste.familyCode")
               }}
+              state={
+                formState.errors.waste?.["familyCode"] ? "error" : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.waste?.["familyCode"]?.message
+              }
               disabled={sealedFields.includes(`waste.familyCode`)}
             >
               <option value="">Sélectionnez une valeur</option>
@@ -255,6 +279,12 @@ const WasteBsda = ({ errors }) => {
               nativeInputProps={{
                 ...register("waste.materialName")
               }}
+              state={
+                formState.errors.waste?.["materialName"] ? "error" : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.waste?.["materialName"]?.message
+              }
             />
 
             <ToggleSwitch
@@ -323,6 +353,12 @@ const WasteBsda = ({ errors }) => {
             <RadioButtons
               disabled={sealedFields.includes(`waste.consistence`)}
               orientation="horizontal"
+              state={
+                formState.errors.waste?.["consistence"] ? "error" : "default"
+              }
+              stateRelatedMessage={
+                formState.errors.waste?.["consistence"]?.message
+              }
               options={[
                 {
                   label: "Solide",
