@@ -19,7 +19,7 @@ async function enqueueUpdatedBsdToIndex(
   await indexQueue.add("index_updated", bsdId, options);
 }
 
-const BATCH_SIZE = 1000;
+const BATCH_SIZE = 5000;
 const now = new Date();
 const twentyMonthsAgo = new Date(now);
 twentyMonthsAgo.setMonth(now.getMonth() - 20);
@@ -69,7 +69,7 @@ async function processPaginated(
       },
       ...(cursor ? { skip: 1, cursor } : {}),
       take: BATCH_SIZE,
-      orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
       select: { id: true, [bsdIdField]: true, createdAt: true }
     });
 
@@ -98,6 +98,10 @@ async function processPaginated(
       await enqueueUpdatedBsdToIndex(bsdId);
 
       totalReindexed++;
+      // Stop if we've processed the initial count
+      if (totalProcessed >= totalRevisions) {
+        break;
+      }
     }
     const batchDuration = (Date.now() - batchStart) / 1000;
     const avgPerItem = batchDuration / page.length;
@@ -111,10 +115,11 @@ async function processPaginated(
       )}s. Estimated time left: ${estRemainingMin}m${estRemainingSecDisplay}s for ${remaining} items.`
     );
 
-    // Use composite cursor for next batch
+    // Use composite cursor for next batch (newest to oldest)
     const last = page[page.length - 1];
     cursor = { createdAt: last.createdAt, id: last.id };
     if (page.length < BATCH_SIZE) break;
+    if (totalProcessed >= totalRevisions) break;
   }
   const totalDuration = (Date.now() - startTime) / 1000;
   console.log(
@@ -128,21 +133,9 @@ export async function run() {
   console.log(
     "Starting re-indexation of BSDs with revision requests between 20 and 4 months ago..."
   );
-  await processPaginated(
-    "BSDD",
-    prisma.bsddRevisionRequest,
-    "bsddId"
-  );
-  await processPaginated(
-    "BSDA",
-    prisma.bsdaRevisionRequest,
-    "bsdaId"
-  );
-  await processPaginated(
-    "BSDASRI",
-    prisma.bsdasriRevisionRequest,
-    "bsdasriId"
-  );
+  await processPaginated("BSDD", prisma.bsddRevisionRequest, "bsddId");
+  await processPaginated("BSDA", prisma.bsdaRevisionRequest, "bsdaId");
+  await processPaginated("BSDASRI", prisma.bsdasriRevisionRequest, "bsdasriId");
   console.log("Re-indexation script completed.");
 }
 
