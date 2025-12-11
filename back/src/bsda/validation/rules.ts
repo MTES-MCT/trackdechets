@@ -5,7 +5,7 @@ import {
   WasteAcceptationStatus
 } from "@td/prisma";
 import { ParsedZodBsda, ZodBsda, ZodBsdaTransporter } from "./schema";
-import { isForeignVat } from "@td/constants";
+import { getOperationModes, isForeignVat } from "@td/constants";
 import {
   getCurrentSignatureType,
   getSignatureAncestors,
@@ -13,7 +13,6 @@ import {
   getBsdaUserFunctions,
   BsdaUserFunctions
 } from "./helpers";
-import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { capitalize } from "../../common/strings";
 import { SealedFieldError } from "../../common/errors";
 import { BsdaValidationContext } from "./types";
@@ -588,9 +587,7 @@ export const bsdaEditionRules: BsdaEditionRules = {
       // il y a un code d'opération final renseigné
       when: bsda => {
         if (bsda.destinationOperationCode) {
-          const modes = getOperationModesFromOperationCode(
-            bsda.destinationOperationCode
-          );
+          const modes = getOperationModes(bsda.destinationOperationCode);
           if (modes.length && !bsda.destinationOperationMode) {
             return true;
           }

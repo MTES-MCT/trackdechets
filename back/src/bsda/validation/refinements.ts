@@ -25,7 +25,6 @@ import {
 } from "@td/prisma";
 import { PARTIAL_OPERATIONS } from "./constants";
 import { getReadonlyBsdaRepository } from "../repository";
-import { getOperationModesFromOperationCode } from "../../common/operationModes";
 import { ParsedZodBsda } from "./schema";
 import { prisma } from "@td/prisma";
 import { isWorker } from "../../companies/validation";
@@ -41,6 +40,7 @@ import {
 import { CompanyRole } from "../../common/validation/zod/schema";
 import { isDefined } from "../../common/helpers";
 import { isBSDAFinalOperationCode } from "../../common/operationCodes";
+import { getOperationModes } from "@td/constants";
 
 export const checkOperationIsAfterReception: Refinement<ParsedZodBsda> = (
   bsda,
@@ -75,7 +75,7 @@ export const checkOperationMode: Refinement<ParsedZodBsda> = (
   }
 
   if (destinationOperationCode) {
-    const modes = getOperationModesFromOperationCode(destinationOperationCode);
+    const modes = getOperationModes(destinationOperationCode);
 
     if (
       (modes.length &&

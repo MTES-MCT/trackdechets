@@ -33,10 +33,7 @@ import { operationHooksQueue } from "../../../../queue/producers/operationHook";
 import { AllBsdaSignatureType } from "../../../types";
 import gql from "graphql-tag";
 import { cleanse } from "../../../../__tests__/utils";
-import {
-  CODES_AND_EXPECTED_OPERATION_MODES,
-  getOperationModesFromOperationCode
-} from "../../../../common/operationModes";
+import { getOperationModes } from "@td/constants";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -3513,8 +3510,7 @@ describe("Mutation.Bsda.sign", () => {
           destinationReceptionSignatureDate: new Date(),
           destinationReceptionSignatureAuthor: "Reception signature",
           destinationOperationCode: operationCode,
-          destinationOperationMode:
-            getOperationModesFromOperationCode(operationCode)[0],
+          destinationOperationMode: getOperationModes(operationCode)[0],
           destinationOperationDate: new Date()
         });
 
@@ -3551,8 +3547,7 @@ describe("Mutation.Bsda.sign", () => {
           destinationReceptionSignatureDate: new Date(),
           destinationReceptionSignatureAuthor: "Reception signature",
           destinationOperationCode: operationCode,
-          destinationOperationMode:
-            CODES_AND_EXPECTED_OPERATION_MODES[operationCode]?.[0],
+          destinationOperationMode: getOperationModes(operationCode)[0],
           destinationOperationDate: new Date()
         });
 
@@ -3586,8 +3581,7 @@ describe("Mutation.Bsda.sign", () => {
           destinationReceptionSignatureDate: new Date(),
           destinationReceptionSignatureAuthor: "Reception signature",
           destinationOperationCode: operationCode,
-          destinationOperationMode:
-            getOperationModesFromOperationCode(operationCode)[0],
+          destinationOperationMode: getOperationModes(operationCode)[0],
           destinationOperationDate: new Date(),
           destinationOperationNextDestinationCompanySiret: null
         });

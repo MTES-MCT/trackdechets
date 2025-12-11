@@ -12,7 +12,6 @@ import {
 } from "../../../companies/validation";
 import { prisma } from "@td/prisma";
 import { BsdType, Company, CompanyVerificationStatus } from "@td/prisma";
-import { getOperationModesFromOperationCode } from "../../operationModes";
 import { CompanyRole, pathFromCompanyRole } from "./schema";
 import { v20250201 } from "../../validation";
 
@@ -20,7 +19,7 @@ import {
   ERROR_TRANSPORTER_PLATES_INCORRECT_LENGTH,
   ERROR_TRANSPORTER_PLATES_INCORRECT_FORMAT
 } from "../messages";
-import { SSTI_CHARS } from "@td/constants";
+import { getOperationModes, SSTI_CHARS } from "@td/constants";
 
 const { VERIFY_COMPANY } = process.env;
 
@@ -280,7 +279,7 @@ export function destinationOperationModeRefinement(
   }
 
   if (destinationOperationCode) {
-    const modes = getOperationModesFromOperationCode(destinationOperationCode);
+    const modes = getOperationModes(destinationOperationCode);
 
     if (modes.length && !destinationOperationMode) {
       return ctx.addIssue({

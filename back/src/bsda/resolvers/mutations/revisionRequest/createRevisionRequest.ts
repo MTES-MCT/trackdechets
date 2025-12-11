@@ -7,7 +7,6 @@ import {
 } from "@td/prisma";
 import { z } from "zod";
 import { ForbiddenError, UserInputError } from "../../../../common/errors";
-import { getOperationModesFromOperationCode } from "../../../../common/operationModes";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import type {
   BsdaRevisionRequestContentInput,
@@ -30,6 +29,7 @@ import {
   castD9toD9F,
   fixOperationModeForD9F
 } from "../../../validation/transformers";
+import { getOperationModes } from "@td/constants";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -333,9 +333,7 @@ const schema = rawBsdaSchema
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
-      const modes = getOperationModesFromOperationCode(
-        destinationOperationCode
-      );
+      const modes = getOperationModes(destinationOperationCode);
 
       if (modes.length && !destinationOperationMode) {
         ctx.addIssue({

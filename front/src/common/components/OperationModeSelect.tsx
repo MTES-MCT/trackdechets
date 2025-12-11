@@ -3,11 +3,9 @@ import React, { useEffect, useMemo } from "react";
 import { Field, useFormikContext } from "formik";
 import { RadioButton } from "../../form/common/components/custom-inputs/RadioButton";
 import RedErrorMessage from "./RedErrorMessage";
-import {
-  getOperationModeLabel,
-  getOperationModesFromOperationCode
-} from "../../Apps/common/operationModes";
+import { getOperationModeLabel } from "../../Apps/common/operationModes";
 import Tooltip from "../../Apps/common/Components/Tooltip/Tooltip";
+import { getOperationModes } from "@td/constants";
 
 const OperationModeSelect = ({ operationCode, name }) => {
   const { setFieldValue, values } = useFormikContext();
@@ -15,7 +13,7 @@ const OperationModeSelect = ({ operationCode, name }) => {
   const modeValue = values?.["destination"]?.operation?.mode;
 
   const modes = useMemo(
-    () => getOperationModesFromOperationCode(operationCode),
+    () => getOperationModes(operationCode),
     [operationCode]
   );
 

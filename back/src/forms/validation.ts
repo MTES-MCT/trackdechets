@@ -26,7 +26,8 @@ import {
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  getOperationModes
 } from "@td/constants";
 import {
   foreignVatNumber,
@@ -71,7 +72,6 @@ import {
 import { format, sub } from "date-fns";
 import { UserInputError } from "../common/errors";
 import { ConditionConfig } from "yup/lib/Condition";
-import { getOperationModesFromOperationCode } from "../common/operationModes";
 import { isFinalOperationCode } from "../common/operationCodes";
 import { flattenFormInput } from "./converter";
 import { bsddWasteQuantities } from "./helpers/bsddWasteQuantities";
@@ -2063,9 +2063,7 @@ const processedInfoSchemaFn: (
           const destinationOperationMode = item;
 
           if (processingOperationDone) {
-            const modes = getOperationModesFromOperationCode(
-              processingOperationDone
-            );
+            const modes = getOperationModes(processingOperationDone);
 
             if (modes.length && !destinationOperationMode) {
               return new yup.ValidationError(
