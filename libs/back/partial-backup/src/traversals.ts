@@ -556,7 +556,13 @@ const traversals = {
       foreignKey: "userId"
     }
   ],
-  StatusLog: [],
+  StatusLog: [
+    {
+      type: "User",
+      localKey: "userId",
+      foreignKey: "id"
+    }
+  ],
   BsddRevisionRequest: [
     {
       type: "Company",
