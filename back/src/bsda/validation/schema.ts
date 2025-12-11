@@ -38,7 +38,7 @@ import {
   emptyWorkerCertificationWhenWorkerIsDisabled,
   updateTransporterRecepisse,
   runTransformers,
-  fixOperationModeForD9F
+  fixOperationMode
 } from "./transformers";
 import { sirenifyBsdaTransporter } from "./sirenify";
 import {
@@ -331,7 +331,7 @@ const transformedSyncSchema = refinedSchema
   // devrait se faire dans le repository pour s'assurer que les données restent synchro
   .transform(fillIntermediariesOrgIds)
   .transform(emptyWorkerCertificationWhenWorkerIsDisabled)
-  .transform(fixOperationModeForD9F);
+  .transform(fixOperationMode);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

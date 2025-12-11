@@ -28,7 +28,7 @@ import { checkDestinationReceptionRefusedWeight } from "../../../validation/refi
 import { isDefined } from "../../../../common/helpers";
 import {
   castD9toD9F,
-  fixOperationModeForD9F
+  fixOperationMode
 } from "../../../validation/transformers";
 
 // If you modify this, also modify it in the frontend
@@ -329,7 +329,7 @@ const schema = rawBsdaSchema
   })
   .extend({ isCanceled: z.boolean().nullish() })
   .transform(castD9toD9F)
-  .transform(fixOperationModeForD9F)
+  .transform(fixOperationMode)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {

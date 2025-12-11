@@ -9,8 +9,8 @@ import { ParsedZodBsda } from "./schema";
 import { sirenifyBsda } from "./sirenify";
 import { recipifyBsda } from "./recipify";
 import { getSealedFields } from "./rules";
-import { OperationMode } from "@td/prisma";
 import { trim } from "../../common/strings";
+import { getOperationModesFromOperationCode } from "../../common/operationModes";
 
 export const runTransformers = async (
   bsda: ParsedZodBsda,
@@ -102,16 +102,19 @@ export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
     return bsda;
   };
 
-// TRA-16750: pour aider les intégrateurs, on auto-complète
-// le mode d'opération à "Élimination" si l'opération est
-// "D 9 F" et que le mode n'est pas fourni.
-export const fixOperationModeForD9F = obj => {
-  if (
-    obj.destinationOperationCode &&
-    trim(obj.destinationOperationCode) === "D9F"
-  ) {
-    if (!obj.destinationOperationMode) {
-      obj.destinationOperationMode = OperationMode.ELIMINATION;
+// TRA-16750 & TRA-17541: Pour aider les intégrateurs, on auto-complète
+// le mode d'opération si un seul est possible, ou si aucun mode ne doit être renseigné
+// celà permet aussi de faire passer des révisions qui passent d'un code final à un code non final
+// (qui n'attend pas de mode de traitement)
+export const fixOperationMode = obj => {
+  if (obj.destinationOperationCode) {
+    const trimmed = trim(obj.destinationOperationCode);
+    const possibleModes = getOperationModesFromOperationCode(trimmed);
+
+    if (possibleModes.length === 1 && !obj.destinationOperationMode) {
+      obj.destinationOperationMode = possibleModes[0];
+    } else if (!possibleModes.length) {
+      obj.destinationOperationMode = null;
     }
   }
   return obj;
