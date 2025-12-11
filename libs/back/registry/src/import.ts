@@ -228,11 +228,22 @@ export async function processStream({
       try {
         await options.saveLine({ line, importId });
       } catch (error) {
-        if (
-          error instanceof Prisma.PrismaClientKnownRequestError &&
-          error.code === "P2002" // "Unique constraint failed on the {constraint}"
-        ) {
-          throw new Error(`Une ligne avec un numéro identique égal à ${line.publicId} a déjà été importée.`);
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+          const cleanedRawLine = cleanFormulaObjects(rawLine);
+
+          // "Unique constraint failed on the {constraint}"
+          if (error.code === "P2002") {
+            errorStream.write({
+              errors: `Une ligne avec un numéro identique (${line.publicId}) a déjà été importée.`,
+              ...cleanedRawLine
+            });
+            continue;
+          }
+          errorStream.write({
+            errors: `Une erreur s'est produite lors de la sauvegarde de la ligne (code erreur ${error.code}).`,
+            ...cleanedRawLine
+          });
+          continue;
         }
         throw error;
       }
