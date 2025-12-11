@@ -33,10 +33,15 @@ export default function ProcessingOperation({
         field={{ value: value, name: name, onChange: onChange, enableReuse }}
         disabled={disabled}
       />
-
       {operationDetail && ["D 9 F"].includes(operationDetail.code) && (
         <p className="fr-mt-2v fr-info-text">Pour un traitement final</p>
       )}
+      {operationDetail &&
+        ["D 3", "D 4", "D 12"].includes(operationDetail.code) && (
+          <p className="fr-mt-2v fr-info-text">
+            Non utilisable en France, sauf situation exceptionnelle
+          </p>
+        )}
 
       {operationDetail != null && (
         <div
