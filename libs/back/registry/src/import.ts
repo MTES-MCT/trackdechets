@@ -24,6 +24,7 @@ import {
   RegistryImportHeaderError
 } from "./transformers";
 import { Utf8ValidationError, Utf8ValidatorTransform } from "./utf8Transformer";
+import { Prisma } from "@td/prisma";
 
 /**
  * Cleans formula objects and raw formula strings from rawLine data to prevent memory exhaustion
@@ -224,7 +225,17 @@ export async function processStream({
       }
 
       const line = { ...result.data, createdById };
-      await options.saveLine({ line, importId });
+      try {
+        await options.saveLine({ line, importId });
+      } catch (error) {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === "P2002" // "Unique constraint failed on the {constraint}"
+        ) {
+          throw new Error(`Une ligne avec un numéro identique égal à ${line.publicId} a déjà été importée.`);
+        }
+        throw error;
+      }
 
       incrementLocalChangesForCompany(changesByCompany, {
         reason,
