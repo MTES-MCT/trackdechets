@@ -43,7 +43,7 @@ export function getComputedState(
       // Keep null values - only replace undefined.
       let value = actualForm[curKey] === undefined ? initialValue : actualForm[curKey];
       
-      // Keep null values - only replace undefined.
+      // Do we have a callback for this path?
       if (onPaths.length > 0) {
         onPaths.forEach(callback => {
           if (
