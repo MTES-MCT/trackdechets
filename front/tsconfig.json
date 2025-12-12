@@ -3,7 +3,8 @@
     "jsx": "react",
     "allowJs": true,
     "module": "ESNext",
-    "strict": true
+    "strict": true,
+    "lib": ["DOM"]
   },
   "files": [],
   "include": [],
