@@ -189,36 +189,26 @@ function SelectableWasteTableWrapper({
     return (
       <SelectableWasteTable
         onClick={bsda => {
-          const clickedBsdaIndex = grouping!.findIndex(
-            grouped => grouped.id === bsda.id
-          );
+          const clickedBsdaIndex = grouping!.findIndex(id => id === bsda.id);
           const isSelected = clickedBsdaIndex >= 0;
 
           if (isSelected) {
             remove(clickedBsdaIndex);
             onGroupingChange(
-              bsdas.filter(
-                b =>
-                  grouping!.findIndex(grouped => grouped.id === b.id) >= 0 &&
-                  b.id !== bsda.id
-              )
+              bsdas.filter(b => grouping?.includes(b.id) && b.id !== bsda.id)
             );
           } else {
-            append(bsda);
+            append(bsda.id);
             onGroupingChange([
-              ...bsdas.filter(
-                b => grouping!.findIndex(grouped => grouped.id === b.id) >= 0
-              ),
+              ...bsdas.filter(b => grouping?.includes(b.id)),
               bsda
             ]);
           }
         }}
-        isSelected={bsda => {
-          return grouping!.findIndex(grouped => grouped.id === bsda.id) >= 0;
-        }}
+        isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
         bsdas={bsdas}
         pickerType={BsdaType.Gathering}
-        selected={grouping.map(g => g.id)}
+        selected={grouping}
       />
     );
   }
