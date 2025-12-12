@@ -634,5 +634,67 @@ describe("Process registry import job", () => {
       expect(result.numberOfEdits).toBe(0);
       expect(result.numberOfErrors).toBe(0);
     });
+
+    it("should work with clear errors when an import is made with several lines containing the same publicId", async () => {
+      // Those indexes are not part of the Prisma schema, so we need to create them manually
+      // Because Prisma doesnt have support for partial indexes yet
+      await prisma.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS
+        "_RegistrySsdPublicIdReportForSiretIsLatestUIdx" ON "default$default"."RegistrySsd"("publicId", "reportForCompanySiret")
+        WHERE "isLatest"=TRUE;
+      `);
+
+      const fileKey = "mixed.csv";
+      const { company, user } = await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["RECOVERY_FACILITY"] }
+      });
+
+      const { s3Stream, upload } = getUploadWithWritableStream({
+        bucketName: process.env.S3_REGISTRY_IMPORTS_BUCKET,
+        key: fileKey,
+        contentType: "text/csv"
+      });
+
+      const line = getCorrectLine(company.orgId);
+
+      s3Stream.write(Object.values(SSD_HEADERS).join(";") + "\n");
+
+      // 5 lines with the same publicId
+      s3Stream.write(Object.values(line).join(";") + "\n");
+      s3Stream.write(Object.values(line).join(";") + "\n");
+      s3Stream.write(Object.values(line).join(";") + "\n");
+      s3Stream.write(Object.values(line).join(";") + "\n");
+      s3Stream.end(Object.values(line).join(";"));
+
+      await upload.done();
+
+      const registryImport = await prisma.registryImport.create({
+        data: {
+          s3FileKey: fileKey,
+          originalFileName: "mixed.csv",
+          type: "SSD",
+          status: "PENDING",
+          createdById: user.id
+        }
+      });
+
+      await processRegistryImportJob({
+        data: {
+          importId: registryImport.id,
+          importType: registryImport.type,
+          s3FileKey: registryImport.s3FileKey
+        }
+      } as Job<RegistryImportJobArgs>);
+
+      const result = await prisma.registryImport.findUniqueOrThrow({
+        where: { id: registryImport.id }
+      });
+
+      expect(result.status).toBe("PARTIALLY_SUCCESSFUL");
+      expect(result.numberOfInsertions).toBe(1);
+      expect(result.numberOfCancellations).toBe(0);
+      expect(result.numberOfEdits).toBe(0);
+      expect(result.numberOfErrors).toBe(4);
+    });
   });
 });

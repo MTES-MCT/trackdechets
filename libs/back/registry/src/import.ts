@@ -230,6 +230,7 @@ export async function processStream({
       } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
           const cleanedRawLine = cleanFormulaObjects(rawLine);
+          globalErrorNumber++;
 
           // "Unique constraint failed on the {constraint}"
           if (error.code === "P2002") {
