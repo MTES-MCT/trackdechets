@@ -3,7 +3,7 @@
 # Workflow de déploiement
 # Le front et le back ne sont pas inclut dans ce fichier car leur déploiement
 # se fait automatiquement via l'intégration Scalingo <> Github
-name: Deploy Docs and Sentry Release on production
+name: Deploy Docs
 
 on:
   push:
@@ -11,36 +11,6 @@ on:
       - master
 
 jobs:
-  sentry-release-production:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Run npm ci
-        run: npm ci
-      
-      - name: Run authorized scripts
-        run: npx allow-scripts
-
-      - name: Run build
-        run: npx nx run-many -t build
-
-      - name: Create a Sentry Release
-        uses: getsentry/action-release@v3
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: betagouv
-          SENTRY_URL: https://sentry.incubateur.net/
-        with:
-          environment: production
-          sourcemaps: ./dist/apps/api ./dist/front/assets
-          projects: trackdechets-api trackdechets-front
-          ignore_missing: true
-
   doc:
     runs-on: ubuntu-latest
     permissions:
