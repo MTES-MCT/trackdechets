@@ -420,7 +420,7 @@ export async function checkCanSignFor(
     return true;
   }
   if (securityCode) {
-    return checkSecurityCode(siret, securityCode);
+    return checkSecurityCode(user.id, siret, securityCode);
   }
 
   throw new ForbiddenError(

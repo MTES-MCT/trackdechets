@@ -482,23 +482,32 @@ describe("checkSecurityCode", () => {
   afterAll(resetDatabase);
 
   test("securityCode is valid", async () => {
-    const company = await companyFactory();
-    const check = await checkSecurityCode(company.siret!, company.securityCode);
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const check = await checkSecurityCode(
+      user.id,
+      company.siret!,
+      company.securityCode
+    );
     expect(check).toEqual(true);
   });
 
   test("securityCode is valid for foreign transporter", async () => {
-    const company = await companyFactory({
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
       siret: null,
       vatNumber: "BE0541696005"
     });
-    const check = await checkSecurityCode(company.orgId, company.securityCode);
+    const check = await checkSecurityCode(
+      user.id,
+      company.orgId,
+      company.securityCode
+    );
     expect(check).toEqual(true);
   });
 
   test("securityCode is invalid", async () => {
-    const company = await companyFactory();
-    const checkFn = () => checkSecurityCode(company.siret!, 1258478956);
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const checkFn = () =>
+      checkSecurityCode(user.id, company.siret!, 1258478956);
     expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });
