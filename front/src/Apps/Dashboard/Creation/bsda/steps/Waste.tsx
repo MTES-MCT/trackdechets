@@ -198,6 +198,7 @@ const WasteBsda = ({ errors }) => {
               small
               className="fr-mb-2w"
             />
+
             <SelectableWasteTableWrapper type={bsdaType} bsdaId={id} />
           </>
         )}

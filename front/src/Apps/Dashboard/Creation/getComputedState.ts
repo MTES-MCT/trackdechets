@@ -6,9 +6,20 @@
  *
  * @param initialState what an empty Form is
  * @param actualForm the actual form
+ * @param onPaths array of objects containing paths to watch and corresponding callbacks to allow external computation of the default value
+ * @param currentPath is used for recursion to track the current path
+ *
  */
 
-export function getComputedState(initialState, actualForm) {
+export function getComputedState(
+  initialState: any,
+  actualForm: any,
+  onPaths: Array<{
+    path: string;
+    getComputedValue: (initialValue: any, actualValue: any) => any;
+  }> = [],
+  fullPath = ""
+) {
   if (!actualForm) {
     return initialState;
   }
@@ -17,23 +28,36 @@ export function getComputedState(initialState, actualForm) {
 
   return Object.keys(initialState).reduce((prev, curKey) => {
     const initialValue = initialState[curKey];
+    const currentPath = fullPath.concat(
+      `${fullPath.length > 0 ? "." : ""}${curKey}`
+    );
+
     if (
       typeof initialValue === "object" &&
       initialValue !== null &&
       !(initialValue instanceof Array)
     ) {
-      prev[curKey] = getComputedState(initialValue, actualForm[curKey]);
-    } else if (
-      initialValue instanceof Array &&
-      actualForm[curKey].length === 0 &&
-      initialValue.length > 0
-    ) {
-      // some forms have an initialized array that isn't saved by the backend
-      prev[curKey] = initialValue;
+      prev[curKey] = getComputedState(
+        initialValue,
+        actualForm[curKey],
+        onPaths,
+        currentPath
+      );
     } else {
       // Keep null values - only replace undefined.
-      prev[curKey] =
+      let value =
         actualForm[curKey] === undefined ? initialValue : actualForm[curKey];
+
+      // Do we have a callback for this path?
+      if (onPaths.length > 0) {
+        onPaths.forEach(callback => {
+          if (callback.path === currentPath) {
+            value = callback.getComputedValue(initialValue, actualForm[curKey]);
+          }
+        });
+      }
+
+      prev[curKey] = value;
     }
 
     return prev;

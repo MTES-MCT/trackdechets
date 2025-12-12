@@ -122,7 +122,19 @@ const BsdaFormSteps = ({
     >(UPDATE_BSDA_TRANSPORTER);
 
   const bsdaState = useMemo(
-    () => getComputedState(initialState, bsdaQuery.data?.bsda),
+    () =>
+      getComputedState(initialState, bsdaQuery.data?.bsda, [
+        {
+          path: "packagings",
+          getComputedValue: (intialValue, actualValue) =>
+            actualValue.length ? actualValue : intialValue
+        },
+        {
+          path: "grouping",
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue?.map(g => g.id) ?? initialValue
+        }
+      ]),
     [bsdaQuery.data]
   );
 

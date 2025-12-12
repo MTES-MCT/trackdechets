@@ -110,7 +110,7 @@ function PackagingForm({
             nativeSelectProps={inputProps.type}
             className="fr-mb-2w"
           >
-            <option value="">...</option>
+            <option value="">Sélectionnez une valeur</option>
             {options.map(({ value, label }, idx) => (
               <option value={value} key={idx}>
                 {label}
