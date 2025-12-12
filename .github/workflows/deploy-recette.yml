@@ -36,6 +36,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_ORG: betagouv
           SENTRY_URL: https://sentry.incubateur.net/
+          SENTRY_LOG_LEVEL: debug
         with:
           environment: recette
           sourcemaps: ./dist/apps/api ./dist/front/assets
