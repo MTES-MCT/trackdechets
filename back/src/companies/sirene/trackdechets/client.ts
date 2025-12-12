@@ -1,6 +1,11 @@
 import { errors, estypes } from "@elastic/elasticsearch";
 import { logger } from "@td/logger";
-import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
+import {
+  libelleFromCodeNaf,
+  buildAddress,
+  removeDiacritics,
+  removeSpecialCharacters
+} from "../utils";
 import { SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";
 import {
@@ -272,6 +277,5 @@ function buildCompanyName(etablissement: SearchStockEtablissement) {
       companyName = etablissement.denominationUniteLegale;
     }
   }
-
-  return companyName?.trim();
+  return removeSpecialCharacters(companyName?.trim() ?? "");
 }

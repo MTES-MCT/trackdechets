@@ -6,6 +6,7 @@ import { countries, isVat } from "@td/constants";
 import { logger } from "@td/logger";
 import { ErrorCode, UserInputError } from "../../../common/errors";
 import { GraphQLError } from "graphql";
+import { removeSpecialCharacters } from "../../sirene/utils";
 
 const viesUrl = path.join(__dirname, "checkVatService.wsdl");
 
@@ -87,11 +88,13 @@ export const client = async (
     // auto-correct VIES "unknown data"
     const address = viesResult.address === "---" ? "" : viesResult.address!;
     const name = viesResult.name === "---" ? "" : viesResult.name!;
-
+    // some foreign companies have characters in their name that aren't allowed in later
+    // sanitization. So we remove them in advance to avoid issues.
+    const sanitizedName = removeSpecialCharacters(name ?? "");
     return {
       vatNumber: vatNumber,
       address: address,
-      name: name,
+      name: sanitizedName,
       // Compat mapping avec SireneSearchResult
       codePaysEtrangerEtablissement: country!.isoCode.short,
       statutDiffusionEtablissement: "O",

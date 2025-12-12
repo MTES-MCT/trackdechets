@@ -42,18 +42,25 @@ export const reasonSchema = enumValueAsStringSchema
   )
   .nullish();
 
-export const publicIdSchema = z.coerce
-  .string({
-    required_error: "L'identifiant unique est requis",
-    invalid_type_error:
-      "L'identifiant unique doit être une chaîne de caractères"
+export const publicIdSchema = z
+  .any()
+  .refine(val => val !== null && val !== undefined, {
+    message: "L'identifiant unique est requis"
   })
-  .min(1, "L'identifiant unique doit faire au moins 1 caractères")
-  .max(36, "L'identifiant unique ne peut pas dépasser 36 caractères")
-  .refine(val => /^[a-zA-Z0-9-_./]+$/.test(val), {
-    message:
-      "L'identifiant unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
-  });
+  .pipe(
+    z.coerce
+      .string({
+        required_error: "L'identifiant unique est requis",
+        invalid_type_error:
+          "L'identifiant unique doit être une chaîne de caractères"
+      })
+      .min(1, "L'identifiant unique doit faire au moins 1 caractères")
+      .max(36, "L'identifiant unique ne peut pas dépasser 36 caractères")
+      .refine(val => /^[a-zA-Z0-9-_./]+$/.test(val), {
+        message:
+          "L'identifiant unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
+      })
+  );
 
 export const siretSchema = z.coerce
   .string({

@@ -29,3 +29,10 @@ export function safeParseFloat(f: string) {
 export function removeDiacritics(str: string): string {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
+
+/**
+ * Remove special characters from a string that are not allowed in later sanitization.
+ */
+export function removeSpecialCharacters(str: string): string {
+  return str.replace(/[{}%<>$"=]/g, "");
+}

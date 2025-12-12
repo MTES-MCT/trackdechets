@@ -3,7 +3,11 @@ import {
   FullTextSearchResponseInsee,
   SireneSearchResult
 } from "../types";
-import { libelleFromCodeNaf, buildAddress } from "../utils";
+import {
+  libelleFromCodeNaf,
+  buildAddress,
+  removeSpecialCharacters
+} from "../utils";
 import { authorizedAxiosGet } from "./token";
 import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
@@ -63,12 +67,14 @@ function searchResponseToCompany({
 
   if (isEntrepreneurIndividuel) {
     // concatenate prénom et nom
-    company.name = [
-      etablissement.uniteLegale.prenom1UniteLegale,
-      etablissement.uniteLegale.nomUniteLegale
-    ]
-      .join(" ")
-      .trim();
+    company.name = removeSpecialCharacters(
+      [
+        etablissement.uniteLegale.prenom1UniteLegale,
+        etablissement.uniteLegale.nomUniteLegale
+      ]
+        .join(" ")
+        .trim()
+    );
   }
 
   return company;

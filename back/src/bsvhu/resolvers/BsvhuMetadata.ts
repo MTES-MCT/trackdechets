@@ -37,6 +37,9 @@ const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
     const currentSignature = getCurrentSignatureType(zodBsvhu);
     const nextSignature = getNextSignatureType(currentSignature);
     const nextSignatureForErrors = getNextSignatureForErrors(nextSignature);
+    if (!nextSignatureForErrors) {
+      return [];
+    }
     try {
       parseBsvhu(zodBsvhu, {
         currentSignatureType: nextSignature

@@ -189,15 +189,15 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
           error.requiredFor === BsdaSignatureType.Transport &&
           // Transporter Receipt will be auto-completed by the transporter
           !(
-            error.path.length >= 2 &&
-            error.path[0] === "transporter" &&
-            error.path[1] === "recepisse"
+            error.path.length &&
+            error.path[0] === "transporters" &&
+            error.path[2] === "recepisse"
           ) &&
           !(
-            error.path.length === 3 &&
-            error.path[0] === "transporter" &&
-            error.path[1] === "transport" &&
-            error.path[2] === "plates"
+            error.path.length &&
+            error.path[0] === "transporters" &&
+            error.path[2] === "transport" &&
+            error.path[3] === "plates"
           )
       ) ? (
         <>
