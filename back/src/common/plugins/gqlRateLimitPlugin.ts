@@ -45,13 +45,11 @@ export function gqlRateLimitPlugin(
             return;
           }
 
-          const operationNames = gqlInfos.map(info => info.name);
+          const names = gqlInfos.map(info => info.name);
           const { req, res } = requestContext.contextValue;
-
-          // Apply rate limiting for each operation occurrence (not just unique operations)
-          for (const operationName of operationNames) {
-            if (operationName in rules) {
-              const rateLimiterFn = rateLimiters[operationName];
+          for (const key of Object.keys(rules)) {
+            if (names.includes(key)) {
+              const rateLimiterFn = rateLimiters[key];
               await new Promise(resolve => rateLimiterFn(req, res, resolve));
             }
           }
