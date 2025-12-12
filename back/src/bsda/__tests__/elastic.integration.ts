@@ -351,7 +351,7 @@ describe("toBsdElastic > companies Names & OrgIds", () => {
       },
       data: {
         status: "ACCEPTED",
-        updatedAt: addMonths(new Date(), -7)
+        updatedAt: addMonths(new Date(), -19)
       }
     });
 
