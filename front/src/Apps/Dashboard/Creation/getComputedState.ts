@@ -28,8 +28,6 @@ export function getComputedState(
     const initialValue = initialState[curKey];  
     const currentPath = fullPath.concat(`${fullPath.length > 0 ? "." : ""}${curKey}`);
 
-    console.log(currentPath);
-
     if (
       typeof initialValue === "object" &&
       initialValue !== null &&
