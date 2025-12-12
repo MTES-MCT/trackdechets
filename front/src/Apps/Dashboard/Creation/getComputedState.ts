@@ -8,13 +8,16 @@
  * @param actualForm the actual form
  * @param onPaths array of objects containing paths to watch and corresponding callbacks to allow external computation of the default value
  * @param currentPath is used for recursion to track the current path
- * 
+ *
  */
 
 export function getComputedState(
   initialState: any,
   actualForm: any,
-  onPaths: Array<{ path: string; getComputedValue: (initialValue: any, actualValue: any) => any }> = [],
+  onPaths: Array<{
+    path: string;
+    getComputedValue: (initialValue: any, actualValue: any) => any;
+  }> = [],
   fullPath = ""
 ) {
   if (!actualForm) {
@@ -23,10 +26,11 @@ export function getComputedState(
 
   const startingObject = actualForm.id ? { id: actualForm.id } : {};
 
-    
   return Object.keys(initialState).reduce((prev, curKey) => {
-    const initialValue = initialState[curKey];  
-    const currentPath = fullPath.concat(`${fullPath.length > 0 ? "." : ""}${curKey}`);
+    const initialValue = initialState[curKey];
+    const currentPath = fullPath.concat(
+      `${fullPath.length > 0 ? "." : ""}${curKey}`
+    );
 
     if (
       typeof initialValue === "object" &&
@@ -41,19 +45,18 @@ export function getComputedState(
       );
     } else {
       // Keep null values - only replace undefined.
-      let value = actualForm[curKey] === undefined ? initialValue : actualForm[curKey];
-      
+      let value =
+        actualForm[curKey] === undefined ? initialValue : actualForm[curKey];
+
       // Do we have a callback for this path?
       if (onPaths.length > 0) {
         onPaths.forEach(callback => {
-          if (
-            callback.path === currentPath
-          ) {
+          if (callback.path === currentPath) {
             value = callback.getComputedValue(initialValue, actualForm[curKey]);
           }
         });
       }
-      
+
       prev[curKey] = value;
     }
 
