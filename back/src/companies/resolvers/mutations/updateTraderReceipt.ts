@@ -6,6 +6,7 @@ import { getTraderReceiptOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteTraderReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
 import { removeEmptyKeys } from "../../../common/converter";
+import { checkHasSomePermission, Permission } from "../../../permissions";
 
 /**
  * Update a trader receipt
@@ -18,6 +19,13 @@ const updateTraderReceiptResolver: MutationResolvers["updateTraderReceipt"] =
     const {
       input: { id, ...data }
     } = args;
+
+    await checkHasSomePermission(
+      user,
+      [Permission.CompanyCanUpdate],
+      "Vous n'avez pas le droit d'éditer ou supprimer ce récépissé négociant"
+    );
+
     const receipt = await getTraderReceiptOrNotFound({ id });
     await receiptSchema.validate({ ...receipt, ...data });
     await checkCanReadUpdateDeleteTraderReceipt(user, receipt);

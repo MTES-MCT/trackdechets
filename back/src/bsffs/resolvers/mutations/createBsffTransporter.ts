@@ -5,10 +5,15 @@ import { prisma } from "@td/prisma";
 import { graphqlInputToZodBsffTransporter } from "../../validation/bsff/helpers";
 import { parseBsffTransporterAsync } from "../../validation/bsff";
 import { expandBsffTransporterFromDb } from "../../converter";
+import { checkHasSomePermission, Permission } from "../../../permissions";
 
 const createBsffTransporterResolver: MutationResolvers["createBsffTransporter"] =
   async (parent, { input }, context) => {
-    checkIsAuthenticated(context);
+    const user = checkIsAuthenticated(context);
+    await checkHasSomePermission(user, [
+      Permission.BsdCanCreate,
+      Permission.BsdCanUpdate
+    ]);
     const zodTransporter = graphqlInputToZodBsffTransporter(input);
     // run validation, sirenify et recipify
     const { id, bsffId, ...parsed } = await parseBsffTransporterAsync(

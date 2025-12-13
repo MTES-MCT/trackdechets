@@ -1,7 +1,10 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import type {
   Mutation,
   MutationCreateBsvhuTransporterArgs
@@ -21,6 +24,38 @@ const CREATE_BSVHU_TRANSPORTER = gql`
 
 describe("Mutation.createBsvhuTransporter", () => {
   afterEach(resetDatabase);
+
+  it("should disallow user without create permission", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("READER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsvhuTransporter">,
+      MutationCreateBsvhuTransporterArgs
+    >(CREATE_BSVHU_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          transport: {
+            mode: "ROAD"
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringContaining("permission")
+      })
+    ]);
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient(null);
@@ -49,7 +84,7 @@ describe("Mutation.createBsvhuTransporter", () => {
   });
 
   it("should throw error if data does not pass validation", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "createBsvhuTransporter">,
@@ -71,7 +106,7 @@ describe("Mutation.createBsvhuTransporter", () => {
   });
 
   it("should throw error if plate is invalid", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -112,7 +147,7 @@ describe("Mutation.createBsvhuTransporter", () => {
   });
 
   it("should create a BSVHU transporter", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -201,7 +236,7 @@ describe("Mutation.createBsvhuTransporter", () => {
     const makeClientLocal = require("../../../../__tests__/testClient")
       .default as typeof makeClient;
 
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClientLocal(user);
     const { errors, data } = await mutate<
       Pick<Mutation, "createBsvhuTransporter">,
@@ -234,7 +269,7 @@ describe("Mutation.createBsvhuTransporter", () => {
   });
 
   it("should not auto-complete recepisse information if transporter is exempted", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
