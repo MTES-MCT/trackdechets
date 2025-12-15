@@ -33,7 +33,6 @@ const EmitterBsda = ({ errors }) => {
     register("emitter.company.city");
     register("emitter.company.street");
     register("emitter.company.postalCode");
-    register("emitter.customInfo");
   }, [register]);
 
   useEffect(() => {
@@ -336,9 +335,9 @@ const EmitterBsda = ({ errors }) => {
               textArea
               nativeTextAreaProps={{
                 placeholder: "Champ libre pour préciser…",
-                ...register("emitter.customInfo")
+                ...register("emitter.pickupSite.infos")
               }}
-              disabled={sealedFields.includes(`emitter.customInfo`)}
+              disabled={sealedFields.includes(`emitter.pickupSite.infos`)}
             />
           </>
         )}
