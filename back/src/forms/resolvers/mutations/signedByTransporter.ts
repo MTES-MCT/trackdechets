@@ -109,7 +109,11 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       // BSD has already been sent, it must be a signature for frame 18
 
       // check security code is temp storer's
-      await checkSecurityCode(form.recipientCompanySiret!, securityCode);
+      await checkSecurityCode(
+        user.id,
+        form.recipientCompanySiret!,
+        securityCode
+      );
 
       const { forwardedIn } =
         (await getFormRepository(user).findFullFormById(id)) ?? {};
@@ -171,9 +175,14 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
           "Impossible de signer au nom de l'éco-organisme : le BSD n'en mentionne aucun."
         );
       }
-      await checkSecurityCode(form.ecoOrganismeSiret, signingInfo.securityCode);
+      await checkSecurityCode(
+        user.id,
+        form.ecoOrganismeSiret,
+        signingInfo.securityCode
+      );
     } else {
       await checkSecurityCode(
+        user.id,
         form.emitterCompanySiret!,
         signingInfo.securityCode
       );
