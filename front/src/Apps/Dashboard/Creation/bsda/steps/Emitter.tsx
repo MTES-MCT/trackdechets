@@ -158,6 +158,9 @@ const EmitterBsda = ({ errors }) => {
                       setValue("emitter.company.contact", null);
                       setValue("emitter.company.phone", null);
                       setValue("emitter.company.mail", null);
+                      setValue("emitter.company.address", null);
+                      setValue("emitter.company.city", null);
+                      setValue("emitter.company.postaCode", null);
                     }
                   }
                 }
