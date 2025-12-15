@@ -46,7 +46,7 @@ const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
 const PARTIAL_OPERATIONS = ["R 13", "D 15"] as const;
-const OPERATIONS = ["R 5", "D 5", "D 9", "", ...PARTIAL_OPERATIONS] as const;
+const OPERATIONS = ["R 5", "D 5", "D 9 F", "", ...PARTIAL_OPERATIONS] as const;
 const ZodOperationEnum = z
   .enum(OPERATIONS)
   .nullish()
