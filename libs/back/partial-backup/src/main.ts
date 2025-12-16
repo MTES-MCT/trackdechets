@@ -163,7 +163,7 @@ const run = async () => {
     children: []
   };
   struct.push(bsdRoot);
-  alreadyFetched[bsd.id] = {
+  alreadyFetched[`${originType}-${bsd.id}`] = {
     type: originType,
     obj: bsd
   };
@@ -191,10 +191,13 @@ const run = async () => {
       const objects = await getter?.(item.foreignKey, root.obj[item.localKey]);
       const filteredObjects = objects
         ? objects?.filter(obj => {
-            if (alreadyFetched[obj.id]) {
+            if (
+              alreadyFetched[`${item.type}-${obj.id}`] &&
+              alreadyFetched[`${item.type}-${obj.id}`].type === item.type
+            ) {
               return false;
             }
-            alreadyFetched[obj.id] = {
+            alreadyFetched[`${item.type}-${obj.id}`] = {
               type: item.type,
               obj
             };
@@ -285,8 +288,9 @@ const run = async () => {
         alreadySaved[id] = true;
         successfulSaves += 1;
         print(`saved ${alreadyFetched[id].type} ${id}`);
-      } catch (error) {
+      } catch /*(error)*/ {
         // console.log(`could not save ${alreadyFetched[id].type} ${id}`);
+        // console.log(error);
       }
     }
     if (successfulSaves === 0) {
