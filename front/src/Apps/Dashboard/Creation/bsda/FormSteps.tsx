@@ -298,7 +298,7 @@ const BsdaFormSteps = ({
   async function saveBsdaTransporter(
     transporterInput: CreateOrUpdateBsdaTransporterInput
   ): Promise<string> {
-    const { id, takenOverAt, transport, ...input } = transporterInput;
+    const { id, transport, ...input } = transporterInput;
 
     // S'assure que les données de récépissé transport sont nulles dans les
     // cas suivants :
@@ -332,7 +332,7 @@ const BsdaFormSteps = ({
       // Le transporteur existe déjà en base de données, on met
       // à jour les infos (uniquement si le transporteur n'a pas encore
       // pris en charge le déchet) et on renvoie l'identifiant
-      if (!takenOverAt) {
+      if (!transport?.takenOverAt) {
         const { errors } = await updateBsdaTransporter({
           variables: { id, input: cleanInput },
           onError: err => {

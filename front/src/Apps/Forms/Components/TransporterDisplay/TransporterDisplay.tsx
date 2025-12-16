@@ -129,7 +129,11 @@ export default function TransporterDisplay({ transporter }: TransporterProps) {
           <TransporterField
             label="Date de prise en charge"
             value={
-              transporter.takenOverAt ? formatDate(transporter.takenOverAt) : ""
+              transporter.takenOverAt
+                ? formatDate(transporter.takenOverAt)
+                : transporter.transport?.takenOverAt
+                ? formatDate(transporter.transport.takenOverAt)
+                : ""
             }
           />
         </div>
