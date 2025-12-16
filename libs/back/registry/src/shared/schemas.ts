@@ -1,4 +1,4 @@
-import { OperationMode } from "@td/prisma";
+import { OperationMode } from "@td/prisma/types";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
   ALL_OPERATION_MODES,
