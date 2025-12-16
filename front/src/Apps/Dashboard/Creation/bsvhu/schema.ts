@@ -89,6 +89,7 @@ export const rawBsvhuSchema = z
     transporters: z
       .array(
         z.object({
+          id: z.string().nullish(),
           number: z.number().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),

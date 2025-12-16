@@ -188,6 +188,7 @@ export const rawBsdaSchema = z.object({
     .array(
       z
         .object({
+          id: z.string().nullish(),
           number: z.coerce.number().nonnegative().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),
