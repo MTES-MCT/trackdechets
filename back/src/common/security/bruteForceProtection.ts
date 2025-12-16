@@ -87,6 +87,7 @@ export class BruteForceProtectionService {
 
     // Check if currently locked out
     const lockoutData = await redisClient.get(lockoutKey);
+
     if (lockoutData) {
       const lockoutInfo = JSON.parse(lockoutData) as { until: number };
       const blockedUntil = new Date(lockoutInfo.until);
