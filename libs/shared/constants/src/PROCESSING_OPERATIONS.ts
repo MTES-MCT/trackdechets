@@ -382,7 +382,11 @@ export const CODES_AND_EXPECTED_OPERATION_MODES = {
   "R 13": []
 } as const;
 
-export function getOperationModes(operationCode: string) {
+export function getOperationModes(operationCode: string | null | undefined) {
+  if (!operationCode) {
+    return [];
+  }
+
   // D5 becomes D 5, D9F becomes D 9 F
   const formatedCode = operationCode.replace(
     /^([A-Z])(\d{1,2})([A-Z]?)$/,
