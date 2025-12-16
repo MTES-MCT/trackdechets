@@ -65,6 +65,7 @@ const bsdaPackagingSchema = z
     identificationNumbers: z.array(z.string()).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
+    path: ["other"],
     message:
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
   });
