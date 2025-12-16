@@ -134,8 +134,6 @@ const WasteBsda = ({ errors }) => {
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
   const sealNumbersLength = waste?.sealNumbers?.length || 0;
 
-  const packagingsQuantity = packagings?.filter(p => p.type !== "").length ?? 0;
-
   const quantityLength: number = packagings.reduce(
     (acc: number, packaging: BsdaPackaging) =>
       acc + (Number(packaging.quantity) || 0),
@@ -316,6 +314,9 @@ const WasteBsda = ({ errors }) => {
               checked={Boolean(waste.isSubjectToADR)}
               onChange={(checked: boolean) => {
                 setValue("waste.isSubjectToADR", checked);
+                if (!checked) {
+                  setValue("waste.adr", null);
+                }
               }}
               className="fr-mt-4w"
             />
@@ -494,8 +495,8 @@ const WasteBsda = ({ errors }) => {
                 <p className="fr-info-text">
                   Vous avez saisi {sealNumbersLength}{" "}
                   {pluralize("numéro", sealNumbersLength)} pour{" "}
-                  {Number(packagingsQuantity)}{" "}
-                  {pluralize("conditionnement", packagingsQuantity)}
+                  {Number(quantityLength)}{" "}
+                  {pluralize("conditionnement", quantityLength)}
                 </p>
               </>
             )}
