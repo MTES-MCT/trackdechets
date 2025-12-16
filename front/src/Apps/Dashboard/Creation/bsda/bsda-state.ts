@@ -1,6 +1,4 @@
-import {
-  BsdaTransporterInput,
-} from "@td/codegen-ui";
+import { BsdaTransporterInput } from "@td/codegen-ui";
 
 // Les données transporteurs du formulaire représente soit un transporteur BSDA
 // déjà crée en base de données qui dispose d'un identifiant, soit un transporteur

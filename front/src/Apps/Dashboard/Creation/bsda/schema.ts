@@ -11,6 +11,8 @@ import { z } from "zod";
 const zodCompany = z
   .object({
     siret: z.string().nullish(),
+    orgId: z.string().nullish(),
+    vatNumber: z.string().nullish(),
     name: z.string().nullish(),
     contact: z.string().nullish(),
     phone: z.string().nullish(),
