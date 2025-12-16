@@ -101,7 +101,6 @@ export default function CompanySelectorWrapper({
     },
     [setSelectedCompany, onCompanySelected]
   );
-
   // S'assure que `selectedCompany` reste sync avec les données
   // du store Formik lors du render initial ou en cas modification
   // des données provoquée par un autre événement que la sélection d'un établissement
@@ -113,13 +112,13 @@ export default function CompanySelectorWrapper({
       selectedCompanyOrgId !== selectedCompany?.orgId
     ) {
       searchCompaniesFromCompanyOrgId({
-        variables: { clue: selectedCompanyOrgId },
-        onCompleted: result => {
-          if (result.searchCompanies?.length > 0) {
-            onSelectCompany(result.searchCompanies[0]);
-          } else {
-            onUnknownInputCompany?.();
-          }
+        variables: { clue: selectedCompanyOrgId }
+      }).then(result => {
+        const searchCompanies = result.data?.searchCompanies;
+        if (searchCompanies?.length) {
+          onSelectCompany(searchCompanies[0]);
+        } else {
+          onUnknownInputCompany?.();
         }
       });
     }

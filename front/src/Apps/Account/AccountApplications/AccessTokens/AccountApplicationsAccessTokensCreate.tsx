@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Modal } from "../../../../common/components";
 import { useMutation } from "@apollo/client";
 import { CREATE_ACCESS_TOKEN, ACCESS_TOKENS } from "./queries";
-import copyTextToClipboard from "copy-text-to-clipboard";
 import { DEVELOPERS_DOCUMENTATION_URL } from "../../../../common/config";
 import {
   NotificationError,
@@ -12,6 +11,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Input from "@codegouvfr/react-dsfr/Input";
+import { useCopyToClipboard } from "../../../common/hooks/useCopyToClipboard";
 
 const validationSchema = z.object({
   description: z.string({
@@ -27,7 +27,8 @@ export default function AccountApplicationsAccessTokenCreate({
   onClose
 }: AccountApplicationsAccessTokenCreateProps) {
   const [accessToken, setAccessToken] = useState("");
-
+  const { copy } = useCopyToClipboard();
+  const tokenRef = useRef<HTMLDivElement>(null);
   const [createAccessToken, { loading, error }] = useMutation(
     CREATE_ACCESS_TOKEN,
     {
@@ -79,6 +80,7 @@ export default function AccountApplicationsAccessTokenCreate({
           </div>
           <div
             className="fr-mt-2w"
+            ref={tokenRef}
             style={{
               display: "flex",
               alignItems: "center",
@@ -91,7 +93,9 @@ export default function AccountApplicationsAccessTokenCreate({
             <button
               className="fr-btn fr-btn--icon-right fr-icon-draft-line"
               onClick={() => {
-                copyTextToClipboard(accessToken);
+                if (tokenRef.current) {
+                  copy({ text: accessToken, target: tokenRef.current });
+                }
               }}
             >
               Copier

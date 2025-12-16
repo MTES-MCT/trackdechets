@@ -361,7 +361,8 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Le code de signature est invalide."
+          message:
+            "Le code de signature est invalide. (2 tentative(s) restante(s))"
         })
       ]);
     });
