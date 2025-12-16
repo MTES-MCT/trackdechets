@@ -1,7 +1,10 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import type {
   Mutation,
   MutationCreateBsdaTransporterArgs
@@ -48,8 +51,40 @@ describe("Mutation.createBsdaTransporter", () => {
     ]);
   });
 
+  it("should disallow user without create permission", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("READER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaTransporter">,
+      MutationCreateBsdaTransporterArgs
+    >(CREATE_BSDA_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          transport: {
+            mode: "ROAD"
+          }
+        }
+      }
+    });
+
+    // Then
+    expect(errors[0].message).toBe(
+      "Vous n'êtes pas autorisé à effectuer cette action"
+    );
+  });
+
   it("should throw error if data does not pass validation", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "createBsdaTransporter">,
@@ -71,7 +106,7 @@ describe("Mutation.createBsdaTransporter", () => {
   });
 
   it("should throw error if plate is invalid", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -112,7 +147,7 @@ describe("Mutation.createBsdaTransporter", () => {
   });
 
   it("should create a BSDA transporter", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -170,6 +205,7 @@ describe("Mutation.createBsdaTransporter", () => {
   });
 
   it("should auto-complete name and address from SIRENE database", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
 
     const searchResult = {
@@ -201,7 +237,6 @@ describe("Mutation.createBsdaTransporter", () => {
     const makeClientLocal = require("../../../../__tests__/testClient")
       .default as typeof makeClient;
 
-    const user = await userFactory();
     const { mutate } = makeClientLocal(user);
     const { errors, data } = await mutate<
       Pick<Mutation, "createBsdaTransporter">,
@@ -234,7 +269,7 @@ describe("Mutation.createBsdaTransporter", () => {
   });
 
   it("should not auto-complete recepisse information if transporter is exempted", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],

@@ -9,11 +9,15 @@ import {
 import { transporterSchemaFn } from "../../validation";
 import { sirenifyTransporterInput } from "../../sirenify";
 import { recipifyTransporterInput } from "../../recipify";
+import { checkHasSomePermission, Permission } from "../../../permissions";
 
 const createFormTransporterResolver: MutationResolvers["createFormTransporter"] =
   async (parent, { input }, context) => {
     const user = checkIsAuthenticated(context);
-
+    await checkHasSomePermission(user, [
+      Permission.BsdCanCreate,
+      Permission.BsdCanUpdate
+    ]);
     const sirenifiedInput = await sirenifyTransporterInput(input, user);
     const recipifiedInput = await recipifyTransporterInput(sirenifiedInput);
 

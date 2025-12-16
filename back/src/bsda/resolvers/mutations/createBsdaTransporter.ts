@@ -5,10 +5,17 @@ import { prisma } from "@td/prisma";
 import { expandTransporterFromDb } from "../../converter";
 import { parseBsdaTransporterAsync } from "../../validation";
 import { graphqlInputToZodBsdaTransporter } from "../../validation/helpers";
+import { checkHasSomePermission, Permission } from "../../../permissions";
 
 const createBsdaTransporterResolver: MutationResolvers["createBsdaTransporter"] =
   async (parent, { input }, context) => {
-    checkIsAuthenticated(context);
+    const user = checkIsAuthenticated(context);
+
+    await checkHasSomePermission(user, [
+      Permission.BsdCanCreate,
+      Permission.BsdCanUpdate
+    ]);
+
     const zodTransporter = graphqlInputToZodBsdaTransporter(input);
     // run validation, sirenify et recipify
     const { id, bsdaId, ...parsed } = await parseBsdaTransporterAsync(

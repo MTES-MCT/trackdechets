@@ -100,4 +100,43 @@ describe("{ mutation { updateTraderReceipt } }", () => {
     // Then
     expect(errors).not.toBeUndefined();
   });
+
+  test("should throw if user does not have sufficient permissions", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("READER");
+    const receipt = {
+      receiptNumber: "receiptNumber",
+      validityLimit: "2050-03-31T00:00:00.000Z",
+      department: "07"
+    };
+    const createdReceipt = await prisma.traderReceipt.create({ data: receipt });
+    const update = {
+      receiptNumber: "receiptNumber2",
+      validityLimit: "2051-04-30T00:00:00.000Z",
+      department: "13"
+    };
+
+    // Given
+    const mutation = `
+      mutation {
+        updateTraderReceipt(
+          input: {
+            id: "${createdReceipt.id}"
+            receiptNumber: "${update.receiptNumber}"
+            validityLimit: "${update.validityLimit}"
+            department: "${update.department}"
+          }
+          ) { receiptNumber, validityLimit, department }
+        }`;
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate<Pick<Mutation, "updateTraderReceipt">>(
+      mutation
+    );
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors[0].message).toContain(
+      "Vous n'avez pas le droit d'éditer ou supprimer ce récépissé négociant"
+    );
+  });
 });
