@@ -31,7 +31,7 @@ import {
   refineRequiredOperationMode,
   refineOperationModeConsistency
 } from "../refinement";
-import { OperationMode } from "@td/prisma";
+import { OperationMode } from "@td/prisma/types";
 
 z.setErrorMap(registryErrorMap);
 
