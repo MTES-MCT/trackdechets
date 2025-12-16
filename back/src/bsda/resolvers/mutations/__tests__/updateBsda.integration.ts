@@ -2391,10 +2391,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${bsda.destinationCompanyName}
-  ${bsda.destinationCompanySiret}.
+  l'entreprise de travaux amiante ${bsda.workerCompanyName} ${bsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${bsda.destinationCompanyName} ${bsda.destinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2472,10 +2471,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${bsda.destinationOperationNextDestinationCompanyName}
-  ${bsda.destinationOperationNextDestinationCompanySiret}.
+  l'entreprise de travaux amiante ${bsda.workerCompanyName} ${bsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${bsda.destinationOperationNextDestinationCompanyName} ${bsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2661,10 +2659,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
-  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${updatedBsda.destinationOperationNextDestinationCompanyName}
-  ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName} ${updatedBsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${updatedBsda.destinationOperationNextDestinationCompanyName} ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2846,10 +2843,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
-  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${updatedBsda.destinationCompanyName}
-  ${updatedBsda.destinationCompanySiret}.
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName} ${updatedBsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${updatedBsda.destinationCompanyName} ${updatedBsda.destinationCompanySiret}.
 </p>
 `,
             messageVersions: [

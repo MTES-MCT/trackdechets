@@ -13,4 +13,4 @@ export const prisma = new PrismaClient({
   log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
 });
 
-export * from "./generated/prisma/client";
+export * from "./types";

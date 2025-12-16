@@ -48,11 +48,9 @@ describe("Mutation.createFormTransporter", () => {
         }
       }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: expect.stringContaining("permission")
-      })
-    ]);
+    expect(errors[0].message).toBe(
+      "Vous n'êtes pas autorisé à effectuer cette action"
+    );
   });
 
   it("should disallow unauthenticated user", async () => {
