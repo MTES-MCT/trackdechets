@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="AddRegistryLine"><meta data-rh="true" property="og:description" content="AddRegistryLine"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/registreV2/objects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.6849d393.js" defer="defer"></script>
-<script src="/assets/js/main.0fe7205e.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.0c390ebb.js" defer="defer"></script>
+<script src="/assets/js/main.f5762cac.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -211,7 +211,8 @@ transport maritime de marchandises dangereuses</p></td></tr><tr><td><p>nonRoadRe
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Destination post entreposage provisoire Ville</p></td></tr><tr><td><p>postTempStorageDestinationCountry<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Destination post entreposage provisoire Pays</p></td></tr><tr><td><p>destinationReceptionAcceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Statut d&#x27;acceptation du déchet</p></td></tr><tr><td><p>destinationReceptionWeight<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionWeightIsEstimate<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Type de poids de la quantité reçue</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant acceptée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionRefusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant refusée exprimée en tonne</p></td></tr><tr><td><p>destinationPlannedOperationCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le code du traitement qui va être opéré dans l&#x27;installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;</p></td></tr><tr><td><p>destinationPlannedOperationMode<br>
@@ -544,7 +545,7 @@ permettant de valider le téléchargement.</p>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Numéro de récépissé du transporteur n°4</p></td></tr><tr><td><p>transporter4CompanyName<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Raison sociale du transporteur n°4</p></td></tr><tr><td><p>transporter4CompanyAddress<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Adresse du transporteur n°4</p></td></tr><tr><td><p>transporter4CompanyPostalCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du transporteur n°4</p></td></tr><tr><td><p>transporter4CompanyCity<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du transporteur n °4</p></td></tr><tr><td><p>transporter4CompanyCity<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Commune du transporteur n°4</p></td></tr><tr><td><p>transporter4CompanyCountryCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code pays du transporteur n°4</p></td></tr><tr><td><p>transporter5TransportMode<br>
 <a href="enums#transportmode"><code>TransportMode</code></a></p></td><td><p>Mode de transport du transporteur n°5</p></td></tr><tr><td><p>transporter5CompanyType<br>
@@ -817,7 +818,7 @@ transport maritime de marchandises dangereuses</p></td></tr><tr><td><p>nonRoadRe
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionRefusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant refusée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant acceptée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionWeightIsEstimate<br>
-<a href="scalars#boolean"><code>Boolean</code></a></p></td><td></td></tr><tr><td><p>destinationReceptionVolume<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Type de poids de la quantité reçue</p></td></tr><tr><td><p>destinationReceptionVolume<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td></td></tr><tr><td><p>destinationPlannedOperationCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le code du traitement qui va être opéré dans l&#x27;installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;</p></td></tr><tr><td><p>destinationOperationCodes<br>
 <a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Le code du traitement qui va être opéré dans l&#x27;établissement selon les annexes I et II de la directive 2008/98/CE relative aux déchets</p></td></tr><tr><td><p>destinationOperationModes<br>
@@ -1126,7 +1127,8 @@ transport maritime de marchandises dangereuses</p></td></tr><tr><td><p>nonRoadRe
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Commune de l&#x27;adresse de dépôt du destinataire</p></td></tr><tr><td><p>destinationDropSiteCountryCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Pays de l&#x27;adresse de dépôt du destinataire</p></td></tr><tr><td><p>destinationReceptionAcceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Statut d&#x27;acceptation du déchet</p></td></tr><tr><td><p>destinationReceptionWeight<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionWeightIsEstimate<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Type de poids de la quantité reçue</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant acceptée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionRefusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant refusée exprimée en tonne</p></td></tr><tr><td><p>destinationPlannedOperationCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le code du traitement qui va être opéré dans l&#x27;installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;</p></td></tr><tr><td><p>destinationPlannedOperationMode<br>
@@ -1540,7 +1542,8 @@ transport maritime de marchandises dangereuses</p></td></tr><tr><td><p>nonRoadRe
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Destination post entreposage provisoire Ville</p></td></tr><tr><td><p>postTempStorageDestinationCountry<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Destination post entreposage provisoire Pays</p></td></tr><tr><td><p>destinationReceptionAcceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Statut d&#x27;acceptation du déchet</p></td></tr><tr><td><p>destinationReceptionWeight<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionWeightIsEstimate<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Type de poids de la quantité reçue</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant acceptée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionRefusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant refusée exprimée en tonne</p></td></tr><tr><td><p>destinationPlannedOperationCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Le code du traitement qui va être opéré dans l&#x27;installation vers laquelle le déchet est expédié, selon les annexes I et II de la directive 2008/98/CE relative aux déchets ;</p></td></tr><tr><td><p>destinationPlannedOperationMode<br>
@@ -2012,7 +2015,8 @@ transport maritime de marchandises dangereuses</p></td></tr><tr><td><p>nonRoadRe
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Commune de l&#x27;adresse de dépôt du destinataire</p></td></tr><tr><td><p>destinationDropSiteCountryCode<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Pays de l&#x27;adresse de dépôt du destinataire</p></td></tr><tr><td><p>destinationReceptionAcceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Statut d&#x27;acceptation du déchet</p></td></tr><tr><td><p>destinationReceptionWeight<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet reçu sur l&#x27;installation de destination ou d&#x27;entreposage provisoire exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionWeightIsEstimate<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Type de poids de la quantité reçue</p></td></tr><tr><td><p>destinationReceptionAcceptedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant acceptée exprimée en tonne</p></td></tr><tr><td><p>destinationReceptionRefusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>La quantité de déchet entrant refusée exprimée en tonne</p></td></tr><tr><td><p>destinationHasCiterneBeenWashedOut<br>
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Charte citerne - Est-ce que la citerne a été rincée ou non?</p></td></tr><tr><td><p>gistridNumber<br>
