@@ -317,6 +317,9 @@ function SignOperationModal({
     ? "En cas d'export, indiquer ici le N° de notification prévu à l'annexe 1-B du règlement N°1013/2006, au format PPAAAADDDRRR avec PP pour le code pays, AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre."
     : "En cas d'export, indiquer ici le N° de déclaration Annexe 7 (optionnel) prévu à l'annexe 1-B du règlement N°1013/2006, au format A7E AAAA DDDRRR avec A7E pour Annexe 7 Export (ou A7I pour Annexe 7 Import), AAAA pour l'année du dossier, DDD pour le département de départ et RRR pour le numéro d'ordre. ";
 
+  const isOperationCodeNeedComment = ["D 3", "D 4", "D 12", "D 9 F"].includes(
+    processingOperationDone as string
+  );
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -352,6 +355,10 @@ function SignOperationModal({
               state={errors.processingOperationDone ? "error" : "default"}
               stateRelatedMessage={errors.processingOperationDone?.message}
               className="fr-mb-2w"
+              hint={`Code de traitement prévu : ${
+                form.temporaryStorageDetail?.destination?.processingOperation ??
+                form.recipient?.processingOperation
+              }`}
             >
               {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
                 <option value={operation.code} key={operation.code}>
@@ -359,11 +366,14 @@ function SignOperationModal({
                 </option>
               ))}
             </Select>
-            <p className="fr-info-text">
-              Code de traitement prévu :{" "}
-              {form.temporaryStorageDetail?.destination?.processingOperation ??
-                form.recipient?.processingOperation}
-            </p>
+
+            {isOperationCodeNeedComment && (
+              <p className="fr-info-text">
+                {processingOperationDone === "D 9 F"
+                  ? "Pour un traitement final"
+                  : "Non utilisable en France, sauf situation exceptionnelle"}
+              </p>
+            )}
           </div>
         </div>
         <RhfOperationModeSelect

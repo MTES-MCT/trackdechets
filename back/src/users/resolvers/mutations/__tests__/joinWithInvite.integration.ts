@@ -28,7 +28,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         inviteHash: "invalid",
         name: "John Snow",
-        password: "password"
+        password: "P4a$$woRd_1234"
       }
     });
     expect(errors).toHaveLength(1);
@@ -52,7 +52,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         inviteHash: invitation.hash,
         name: "John Snow",
-        password: "password"
+        password: "P4a$$woRd_1234"
       }
     });
     expect(errors).toHaveLength(1);
@@ -80,7 +80,7 @@ describe("joinWithInvite mutation", () => {
           variables: {
             inviteHash: invitation.hash,
             name: "John Snow",
-            password: "password"
+            password: "P4a$$woRd_1234"
           }
         }
       );
@@ -145,7 +145,7 @@ describe("joinWithInvite mutation", () => {
       variables: {
         name: "John Snow",
         inviteHash: invitation1.hash,
-        password: "password"
+        password: "P4a$$woRd_1234"
       }
     });
 
@@ -167,7 +167,7 @@ describe("joinWithInvite mutation", () => {
     );
   });
 
-  it("should return an error if name is empty or password less than 8 characters", async () => {
+  it("should return an error if name is empty or password less than 12 characters", async () => {
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
@@ -188,16 +188,76 @@ describe("joinWithInvite mutation", () => {
     });
     expect(errs1).toHaveLength(1);
     expect(errs1[0].message).toEqual(
-      "Le mot de passe doit faire au moins 8 caractères"
+      "Le mot de passe est trop court (Il fait 4 caractères, le minimum est de 12 caractères)"
     );
     const { errors: errs2 } = await mutate(JOIN_WITH_INVITE, {
       variables: {
         inviteHash: invitation.hash,
         name: "",
-        password: "password"
+        password: "P4a$$woRd_1234"
       }
     });
     expect(errs2).toHaveLength(1);
     expect(errs2[0].message).toEqual("Le nom est un champ requis");
+  });
+
+  it("should return an error if password is too long", async () => {
+    // Given
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret!,
+        role: "MEMBER",
+        hash: "hash"
+      }
+    });
+
+    // When
+    const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "John Snow",
+        password: "T00LOnG_PA55W0RD_12345678901234567890".repeat(3)
+      }
+    });
+
+    // Then
+    expect(errs1).toHaveLength(1);
+    expect(errs1[0].message).toEqual(
+      "Le mot de passe est trop long.(Il fait 111 caractères, le maximum est de 64 caractères)"
+    );
+  });
+
+  it("should return an error if password is not complex enough", async () => {
+    // Given
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret!,
+        role: "MEMBER",
+        hash: "hash"
+      }
+    });
+
+    // When
+    const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "John Snow",
+        password: "password1234"
+      }
+    });
+
+    // Then
+    expect(errs1).toHaveLength(1);
+    expect(errs1[0].message).toEqual(
+      "Le mot de passe doit contenir au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial."
+    );
   });
 });

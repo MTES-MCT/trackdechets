@@ -135,10 +135,12 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
           duration: TOAST_DURATION
         });
       },
-      onError: () =>
+      onError: err => {
         toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
           duration: TOAST_DURATION
-        })
+        });
+        handleGraphQlError(err, setPublishErrors);
+      }
     }
   );
 
@@ -238,6 +240,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                   id: bsd.id
                 })}
                 className="fr-btn fr-btn--primary"
+                onClick={onClose}
+                state={{ background: location, publishErrors: publishErrors }}
               >
                 Mettre le bordereau à jour pour le publier
               </Link>
@@ -291,7 +295,7 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
                     siret: currentSiret,
                     id: bsd.id
                   })}
-                  className="btn btn--primary"
+                  className="fr-btn fr-btn--primary"
                   onClick={onClose}
                   state={{ background: location, publishErrors: publishErrors }}
                 >

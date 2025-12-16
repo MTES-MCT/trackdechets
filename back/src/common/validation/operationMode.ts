@@ -1,6 +1,6 @@
 import * as yup from "yup";
 import { OperationMode } from "@td/prisma";
-import { getOperationModesFromOperationCode } from "../operationModes";
+import { getOperationModes } from "@td/constants";
 
 export const destinationOperationModeValidation = () =>
   yup
@@ -15,9 +15,7 @@ export const destinationOperationModeValidation = () =>
         const destinationOperationMode = item;
 
         if (destinationOperationCode) {
-          const modes = getOperationModesFromOperationCode(
-            destinationOperationCode
-          );
+          const modes = getOperationModes(destinationOperationCode);
 
           if (modes.length && !destinationOperationMode) {
             return new yup.ValidationError(

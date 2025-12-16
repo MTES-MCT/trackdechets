@@ -1,4 +1,4 @@
-import Loader from "./Loader/Loaders";
+import Loader, { InlineLoader } from "./Loader/Loaders";
 
-export { Loader };
+export { Loader, InlineLoader };
 export * from "./Blankstate/Blankslate";

@@ -13,7 +13,8 @@ import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES,
   BSDD_APPENDIX1_WASTE_CODES,
-  BSDD_SAMPLE_NUMBER_WASTE_CODES
+  BSDD_SAMPLE_NUMBER_WASTE_CODES,
+  getOperationModes
 } from "@td/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { WeightUnits, weight, v20241101 } from "../../../common/validation";
@@ -41,7 +42,6 @@ import {
   traderSchemaFn
 } from "../../validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
-import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import { isDangerous } from "@td/constants";
 import {
   canProcessDangerousWaste,
@@ -640,9 +640,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
           const destinationOperationMode = item;
 
           if (processingOperationDone) {
-            const modes = getOperationModesFromOperationCode(
-              processingOperationDone
-            );
+            const modes = getOperationModes(processingOperationDone);
 
             if (modes.length) {
               if (!destinationOperationMode) {

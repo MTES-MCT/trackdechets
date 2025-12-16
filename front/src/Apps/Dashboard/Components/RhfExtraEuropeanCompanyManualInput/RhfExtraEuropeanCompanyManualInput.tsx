@@ -97,7 +97,7 @@ export default function RhfExtraEuropeanCompanyManualInput({
       />
 
       <Input
-        label="Adresse e-mail"
+        label="Courriel"
         className="fr-col-12"
         state={errorObject?.mail && "error"}
         stateRelatedMessage={(errorObject?.mail?.message as string) ?? ""}

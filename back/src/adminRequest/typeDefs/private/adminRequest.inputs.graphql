@@ -31,3 +31,21 @@ input AcceptAdminRequestInput {
   """
   code: String
 }
+
+input AdminRequestsAdminInput {
+  """
+  Pagination
+  """
+  skip: Int
+  first: Int
+
+  """
+  Filtrer par SIRET
+  """
+  siret: String
+
+  """
+  Filtrer par date de création (YYYY-MM-DD)
+  """
+  date: String
+}

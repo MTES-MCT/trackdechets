@@ -110,8 +110,8 @@ export function WasteCodeSelector({
                   <span
                     className={
                       expanded.has(node.code)
-                        ? "fr-icon-arrow-down-s-line"
-                        : "fr-icon-arrow-up-s-line"
+                        ? "fr-icon-arrow-up-s-line"
+                        : "fr-icon-arrow-down-s-line"
                     }
                   ></span>
                 </div>
@@ -302,7 +302,10 @@ function recursiveFilterTree(
 ): WasteCode[] {
   return nodes
     .map(node => {
-      if (node.description.toLowerCase().includes(search.toLowerCase())) {
+      if (
+        node.description.toLowerCase().includes(search.toLowerCase()) ||
+        node.code.toLowerCase().includes(search.toLowerCase())
+      ) {
         return node;
       }
       if (node.children.length > 0) {

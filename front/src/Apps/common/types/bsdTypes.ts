@@ -114,7 +114,11 @@ export interface BsdDisplay {
     | Maybe<BsvhuTransporter>
     | Maybe<BsffTransporter>
     | Maybe<BspaohTransporter>;
-  transporters?: Transporter[] | BsdaTransporter[] | BsffTransporter[];
+  transporters?:
+    | Transporter[]
+    | BsdaTransporter[]
+    | BsffTransporter[]
+    | BsvhuTransporter[];
   ecoOrganisme?:
     | Maybe<FormEcoOrganisme>
     | Maybe<BsdaEcoOrganisme>

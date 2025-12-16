@@ -17,12 +17,11 @@ import {
 } from "../../../../common/components";
 import Table from "@codegouvfr/react-dsfr/Table";
 import Alert from "@codegouvfr/react-dsfr/Alert";
-import { getOperationModesFromOperationCode } from "../../../common/operationModes";
 import Badge from "../../Components/Badge/Badge";
 import { BsdStatusCode, TBsdStatusCode } from "../../../common/types/bsdTypes";
 import SignBsffPackagingButton from "./SignBsffPackagingButton";
 import { GET_BSFF } from "./queries";
-import { pluralize } from "@td/constants";
+import { getOperationModes, pluralize } from "@td/constants";
 
 interface SignPackagingsModalProps {
   bsffId: string;
@@ -85,9 +84,7 @@ function packagingStatus(packaging: BsffPackaging) {
       // Le contenant a été accepté
       if (packaging?.operation?.signature?.date && packaging?.operation?.code) {
         // Le contenant a été traité
-        const operationModes = getOperationModesFromOperationCode(
-          packaging.operation.code
-        );
+        const operationModes = getOperationModes(packaging.operation.code);
         if (operationModes.length > 0) {
           // Il s'agit d'un code de traitement final
           status = BsdStatusCode.Processed;

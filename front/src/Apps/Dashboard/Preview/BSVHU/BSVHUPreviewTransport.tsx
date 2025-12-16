@@ -16,81 +16,102 @@ interface BSVHUPreviewTransportProps {
   bsd: Bsvhu;
 }
 const BSVHUPreviewTransport = ({ bsd }: BSVHUPreviewTransportProps) => {
-  const isForeignCompany =
-    bsd.transporter?.company?.vatNumber &&
-    isForeignVat(bsd.transporter?.company?.vatNumber);
+  const isMultiModal = bsd?.transporters.length > 1;
+
+  const isForeignCompany = (index: number) =>
+    bsd.transporters[index]?.company?.vatNumber &&
+    isForeignVat(bsd.transporters[index]?.company?.vatNumber);
+
+  const prefix = (index: number) => (isMultiModal ? `${index + 1} - ` : "");
+
+  const isTransporterProvided =
+    bsd.transporters.length >= 1 && !!bsd.transporters[0].company;
+
   return (
     <PreviewContainer>
-      <PreviewContainerRow title={bsd.transporter?.company?.name}>
-        <PreviewContainerCol gridWidth={3}>
-          <PreviewTextRow
-            label="Raison sociale"
-            value={bsd.transporter?.company?.name}
-          />
+      {isTransporterProvided ? (
+        bsd.transporters?.map((transporter, idx) => (
+          <>
+            <PreviewContainerRow
+              key="idx"
+              title={`${prefix(idx)}${transporter?.company?.name}`}
+              separator={idx !== 0}
+            >
+              <PreviewContainerCol gridWidth={3}>
+                <PreviewTextRow
+                  label="Raison sociale"
+                  value={transporter?.company?.name}
+                />
 
-          <PreviewTextRow
-            label={!isForeignCompany ? "SIRET" : "TVA intracommunautaire"}
-            value={
-              !isForeignCompany
-                ? bsd.transporter?.company?.siret
-                : bsd.transporter?.company?.vatNumber
-            }
-          />
+                <PreviewTextRow
+                  label={
+                    !isForeignCompany(idx) ? "SIRET" : "TVA intracommunautaire"
+                  }
+                  value={
+                    !isForeignCompany(idx)
+                      ? transporter?.company?.siret
+                      : transporter?.company?.vatNumber
+                  }
+                />
 
-          <PreviewTextRow
-            label="Adresse"
-            value={bsd.transporter?.company?.address}
-          />
-        </PreviewContainerCol>
+                <PreviewTextRow
+                  label="Adresse"
+                  value={transporter?.company?.address}
+                />
+              </PreviewContainerCol>
 
-        <PreviewContainerCol gridWidth={3}>
-          <PreviewCompanyContact company={bsd.transporter?.company} />
-        </PreviewContainerCol>
+              <PreviewContainerCol gridWidth={3}>
+                <PreviewCompanyContact company={transporter?.company} />
+              </PreviewContainerCol>
 
-        <PreviewContainerCol gridWidth={3}>
-          <PreviewTransporterReceiptDetails transporter={bsd.transporter} />
-        </PreviewContainerCol>
+              <PreviewContainerCol gridWidth={3}>
+                <PreviewTransporterReceiptDetails transporter={transporter} />
+              </PreviewContainerCol>
 
-        <PreviewContainerCol gridWidth={3} highlight>
-          <PreviewTextRow
-            label="Mode de transport"
-            value={getTransportModeLabel(bsd.transporter?.transport?.mode)}
-          />
+              <PreviewContainerCol gridWidth={3} highlight>
+                <PreviewTextRow
+                  label="Mode de transport"
+                  value={getTransportModeLabel(transporter?.transport?.mode)}
+                />
 
-          <PreviewTextRow
-            label="Immatriculation(s)"
-            value={
-              bsd.transporter?.transport?.plates
-                ? bsd.transporter.transport.plates.join(", ")
-                : null
-            }
-          />
+                <PreviewTextRow
+                  label="Immatriculation(s)"
+                  value={
+                    transporter?.transport?.plates
+                      ? transporter.transport.plates.join(", ")
+                      : null
+                  }
+                />
 
-          <PreviewDateRow
-            label="Emporté le"
-            value={bsd.transporter?.transport?.takenOverAt}
-          />
+                <PreviewDateRow
+                  label="Emporté le"
+                  value={transporter?.transport?.takenOverAt}
+                />
 
-          <PreviewTextRow
-            label="Signé par"
-            value={bsd.transporter?.transport?.signature?.author}
-          />
+                <PreviewTextRow
+                  label="Signé par"
+                  value={transporter?.transport?.signature?.author}
+                />
 
-          <PreviewDateRow
-            label="Remis au destinataire"
-            value={bsd.destination?.reception?.date}
-          />
-        </PreviewContainerCol>
-      </PreviewContainerRow>
-
-      <PreviewContainerRow separator>
-        <PreviewContainerCol gridWidth={3}>
-          <PreviewTextRow
-            label="Champ libre"
-            value={bsd.transporter?.customInfo}
-          />
-        </PreviewContainerCol>
-      </PreviewContainerRow>
+                <PreviewDateRow
+                  label="Remis au destinataire"
+                  value={bsd.destination?.reception?.date}
+                />
+              </PreviewContainerCol>
+            </PreviewContainerRow>
+            <PreviewContainerRow separator>
+              <PreviewContainerCol gridWidth={3}>
+                <PreviewTextRow
+                  label="Champ libre"
+                  value={transporter?.transport?.["customInfo"]}
+                />
+              </PreviewContainerCol>
+            </PreviewContainerRow>
+          </>
+        ))
+      ) : (
+        <div>Aucun transporteur n'est visé sur le bordereau.</div>
+      )}
     </PreviewContainer>
   );
 };

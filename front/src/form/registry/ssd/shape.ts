@@ -1,8 +1,7 @@
 import {
   ADMINISTRATIVE_ACT_REFERENCES,
   ADMINISTRATIVE_ACT_EXPLANATIONS,
-  SSD_PROCESSING_OPERATIONS_CODES,
-  SSD_OPERATION_MODES
+  SSD_PROCESSING_OPERATIONS_CODES
 } from "@td/constants";
 import { FormShape } from "../builder/types";
 import { CompanySelector } from "../common/CompanySelector";
@@ -180,7 +179,6 @@ export const ssdFormShape: FormShape = [
         Component: Operation,
         props: {
           operationCodes: SSD_PROCESSING_OPERATIONS_CODES,
-          operationModes: SSD_OPERATION_MODES,
           showNoTraceability: false,
           showNextOperationCode: false
         },

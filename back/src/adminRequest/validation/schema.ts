@@ -78,6 +78,26 @@ export const queryAdminRequestsArgsSchema = z.object({
   first: z.number().min(1).max(50).default(10).nullish()
 });
 
+export const queryAdminRequestsAdminArgsSchema = z.object({
+  input: z.object({
+    skip: z.number().nonnegative().default(0).nullish(),
+    first: z.number().min(1).max(50).default(10).nullish(),
+    siret: z.string().nullish(),
+    date: z
+      .string()
+      .refine(
+        val => {
+          if (!val) return true;
+          return !isNaN(Date.parse(val));
+        },
+        {
+          message: "La date doit être une chaîne ISO valide."
+        }
+      )
+      .nullish()
+  })
+});
+
 export const adminRequestIdSchema = z.object({
   adminRequestId: idSchema
 });

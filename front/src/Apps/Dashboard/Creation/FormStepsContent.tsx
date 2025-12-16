@@ -48,7 +48,9 @@ const FormStepsContent = ({
 }: FormStepsContentProps) => {
   const [selectedTabId, setSelectedTabId] = useState<TabId>(TabId.waste);
   const navigate = useNavigate();
-  const tabList = getTabs(bsdType, errorTabIds);
+  const tabList = getTabs(bsdType, errorTabIds).filter(
+    tab => tabsContent[tab.tabId]
+  );
   const tabIds = tabList.map(tab => tab.tabId);
   const lastTabId = tabIds[tabIds.length - 1];
   const firstTabId = tabIds[0];
@@ -63,7 +65,6 @@ const FormStepsContent = ({
   const onSubmit = (data, e) => {
     const draft = e.nativeEvent.submitter.id === "id_save_draft";
     const { id, ...input } = data;
-
     saveForm(input, draft)
       .then(_ => {
         navigate(-1);

@@ -1,7 +1,10 @@
 import { gql } from "graphql-tag";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import type {
   Mutation,
   MutationCreateBsffTransporterArgs
@@ -21,6 +24,36 @@ const CREATE_BSFF_TRANSPORTER = gql`
 
 describe("Mutation.createBsffTransporter", () => {
   afterEach(resetDatabase);
+
+  it("should disallow user without create permission", async () => {
+    // Given
+    const { user } = await userWithCompanyFactory("READER");
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsffTransporter">,
+      MutationCreateBsffTransporterArgs
+    >(CREATE_BSFF_TRANSPORTER, {
+      variables: {
+        input: {
+          company: {
+            siret: transporter.siret,
+            name: transporter.name,
+            address: transporter.address,
+            contact: transporter.contact
+          },
+          transport: {
+            mode: "ROAD"
+          }
+        }
+      }
+    });
+    expect(errors[0].message).toEqual(
+      "Vous n'êtes pas autorisé à effectuer cette action"
+    );
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient(null);
@@ -49,7 +82,7 @@ describe("Mutation.createBsffTransporter", () => {
   });
 
   it("should throw error if data does not pass validation", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "createBsffTransporter">,
@@ -71,7 +104,7 @@ describe("Mutation.createBsffTransporter", () => {
   });
 
   it("should forbid invalid plates", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -116,7 +149,7 @@ describe("Mutation.createBsffTransporter", () => {
   });
 
   it("should create a BSFF transporter", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],
@@ -205,7 +238,7 @@ describe("Mutation.createBsffTransporter", () => {
     const makeClientLocal = require("../../../../__tests__/testClient")
       .default as typeof makeClient;
 
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClientLocal(user);
     const { errors, data } = await mutate<
       Pick<Mutation, "createBsffTransporter">,
@@ -238,7 +271,7 @@ describe("Mutation.createBsffTransporter", () => {
   });
 
   it("should not auto-complete recepisse information if transporter is exempted", async () => {
-    const user = await userFactory();
+    const { user } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
     const transporter = await companyFactory({
       companyTypes: ["TRANSPORTER"],

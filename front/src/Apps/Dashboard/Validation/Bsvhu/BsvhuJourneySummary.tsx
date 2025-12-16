@@ -50,23 +50,35 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
           {bsvhu.emitter?.company?.address}
         </JourneyStopDescription>
       </JourneyStop>
-      <JourneyStop
-        variant={
-          bsvhu.transporter?.transport?.signature
-            ? "complete"
-            : bsvhu.emitter?.emission?.signature
-            ? "active"
-            : "incomplete"
-        }
-      >
-        <JourneyStopName>Transporteur</JourneyStopName>
-        <JourneyStopDescription>
-          {bsvhu.transporter?.company?.name} (
-          {bsvhu.transporter?.company?.orgId})
-          <br />
-          {bsvhu.transporter?.company?.address}
-        </JourneyStopDescription>
-      </JourneyStop>
+      {bsvhu.transporters.map((transporter, idx) => {
+        return (
+          <JourneyStop
+            key={idx}
+            variant={
+              transporter?.transport?.signature?.date
+                ? "complete"
+                : // Le transporteur est considéré actif s'il est le premier
+                // dans la liste des transporteurs à ne pas encore avoir pris
+                // en charge le déchet après la signature émetteur
+                idx > 0 &&
+                  bsvhu.transporters[idx - 1].transport?.signature?.date
+                ? "active"
+                : "incomplete"
+            }
+          >
+            <JourneyStopName>
+              Transporteur
+              {bsvhu.transporters.length > 1 ? ` n° ${idx + 1}` : ""}
+            </JourneyStopName>
+
+            <JourneyStopDescription>
+              {transporter?.company?.name} ({transporter?.company?.orgId})
+              <br />
+              {transporter?.company?.address}
+            </JourneyStopDescription>
+          </JourneyStop>
+        );
+      })}
       <JourneyStop
         variant={
           bsvhu.destination?.operation?.signature

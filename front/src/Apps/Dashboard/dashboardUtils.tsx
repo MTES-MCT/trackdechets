@@ -45,7 +45,8 @@ import {
   bsd_sub_type_option_reshipment,
   bsd_sub_type_option_synthesis,
   bsd_sub_type_option_temp_stored,
-  bsd_sub_type_option_tournee
+  bsd_sub_type_option_tournee,
+  filter_bsd_status
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { Filter, FilterType } from "../common/Components/Filters/filtersTypes";
 import {
@@ -161,6 +162,77 @@ const bsdTypeFilterSelectOptions = [
   }
 ];
 
+const bsdStatusFilterSelectOptions = [
+  { value: "BROUILLON", label: "Brouillon / Publié" },
+  { value: "SIGNED_BY_EMITTER", label: "Signé par l'émetteur" },
+  { value: "SIGNED_BY_WORKER", label: "Signé par l'entreprise de travaux" },
+  { value: "SIGNED_BY_TRANSPORTER", label: "Signé par le transporteur" },
+  { value: "AWAITING_ACCEPTANCE", label: "En attente d'acceptation" },
+  { value: "RESEALED", label: "BSD suite préparé" },
+  {
+    value: "SIGNED_BY_TEMP_STORER",
+    label: "Signé par l'installation d'entreposage provisoire"
+  },
+  { value: "AWAITING_TREATMENT", label: "En attente de traitement" },
+  { value: "PROCESSED", label: "Traité (avec ou sans rupture de traçabilité)" },
+  {
+    value: "AWAITING_CHILD",
+    label: "En attente d'un ou annexé à un bordereau suite"
+  },
+  { value: "REFUSED", label: "Refusé" },
+  { value: "CANCELLED", label: "Annulé" }
+];
+
+const statusesEquivalents = {
+  BROUILLON: { status: { _in: ["DRAFT", "INITIAL", "SEALED"] } },
+  SIGNED_BY_EMITTER: {
+    status: { _in: ["SIGNED_BY_PRODUCER", "SIGNED_BY_EMITTER"] }
+  },
+  SIGNED_BY_WORKER: { status: { _in: ["SIGNED_BY_WORKER"] } },
+  SIGNED_BY_TRANSPORTER: { status: { _in: ["SENT", "RESENT"] } },
+  AWAITING_ACCEPTANCE: {
+    _or: [
+      { status: { _eq: "TEMPSTORED" } },
+      {
+        type: { _in: [BsdType.Bsdd, BsdType.Bsff] },
+        status: { _eq: "RECEIVED" }
+      }
+    ]
+  },
+  RESEALED: { status: { _in: ["RESEALED"] } },
+  SIGNED_BY_TEMP_STORER: { status: { _in: ["SIGNED_BY_TEMP_STORER"] } },
+  AWAITING_TREATMENT: {
+    _or: [
+      {
+        status: {
+          _in: ["ACCEPTED", "INTERMEDIATELY_PROCESSED", "PARTIALLY_REFUSED"]
+        }
+      },
+      {
+        type: {
+          _in: [BsdType.Bsda, BsdType.Bsdasri, BsdType.Bspaoh, BsdType.Bsvhu]
+        },
+        status: { _eq: "RECEIVED" }
+      }
+    ]
+  },
+  PROCESSED: {
+    status: { _in: ["NO_TRACEABILITY", "PROCESSED", "FOLLOWED_WITH_PNTTD"] }
+  },
+  AWAITING_CHILD: {
+    status: {
+      _in: [
+        "AWAITING_CHILD",
+        "AWAITING_GROUP",
+        "GROUPED",
+        "TEMP_STORER_ACCEPTED"
+      ]
+    }
+  },
+  REFUSED: { status: { _in: ["REFUSED"] } },
+  CANCELLED: { status: { _in: ["CANCELED"] } }
+};
+
 enum FilterName {
   types = "types",
   waste = "waste",
@@ -184,6 +256,7 @@ enum FilterName {
   givenName = "givenName",
   sealNumbers = "sealNumbers",
   ficheInterventionNumbers = "ficheInterventionNumbers",
+  status = "status",
   cap = "cap"
 }
 
@@ -230,9 +303,17 @@ export const advancedFilterList: Filter[][] = [
     {
       name: FilterName.types,
       label: filter_bsd_type,
-      type: FilterType.select,
+      type: FilterType.selectWithSubOptions,
       isMultiple: true,
       options: bsdTypeFilterSelectOptions,
+      isActive: true
+    },
+    {
+      name: FilterName.status,
+      label: filter_bsd_status,
+      type: FilterType.selectWithSubOptions,
+      isMultiple: true,
+      options: bsdStatusFilterSelectOptions,
       isActive: true
     },
     {
@@ -366,13 +447,39 @@ export const filterPredicates: {
     }
   },
   {
+    filterName: FilterName.status,
+    where: value => {
+      // If every possible filter has been selected, we don't apply any filter
+      if (value.length === bsdStatusFilterSelectOptions.length) {
+        return {};
+      }
+
+      // If multiple statuses are selected, we combine their equivalent filters with _or
+      if (value.length > 1) {
+        const combinedStatusesFilter: BsdWhere = { _or: [] };
+
+        value.forEach((status: string) => {
+          combinedStatusesFilter._or?.push(statusesEquivalents[status]);
+        });
+
+        return combinedStatusesFilter;
+      }
+
+      return statusesEquivalents[value];
+    }
+  },
+  {
     filterName: FilterName.waste,
-    where: value => ({
-      _or: [
-        { waste: { code: { _contains: value } } },
-        { waste: { description: { _match: value } } }
-      ]
-    })
+    where: value => {
+      const query = {
+        _or: [
+          { waste: { code: { _contains: value } } },
+          { waste: { description: { _match: value } } }
+        ]
+      };
+
+      return query;
+    }
   },
   {
     filterName: FilterName.readableId,
@@ -577,6 +684,7 @@ export const dropdownCreateLinks = (siret, location) => [
   {
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
+    state: { background: location },
     icon: <IconBSDa />
   },
   {

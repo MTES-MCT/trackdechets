@@ -328,17 +328,74 @@ export const FINAL_OPERATION_CODES = [
   // "D 15"
 ];
 
-export const ALL_OPERATION_MODES: [string, ...string[]] = [
+export const ALL_OPERATION_MODES = [
   "REUTILISATION",
   "RECYCLAGE",
   "VALORISATION_ENERGETIQUE",
   "ELIMINATION",
   "AUTRES_VALORISATIONS"
-];
+] as const;
 
-export const SSD_OPERATION_MODES: [string, ...string[]] = [
+export const SSD_OPERATION_MODES = [
   "REUTILISATION",
   "RECYCLAGE",
   "VALORISATION_ENERGETIQUE",
   "AUTRES_VALORISATIONS"
-];
+] as const;
+
+type OperationMode = (typeof ALL_OPERATION_MODES)[number];
+
+/**
+ * Documentation: https://app.gitbook.com/o/-LxvsGVFUcY-b40HZcJs/s/bOGR2l18BC74rMQs4CWK/~/changes/2/general/codes-de-traitement
+ */
+export const CODES_AND_EXPECTED_OPERATION_MODES = {
+  // Opérations d'élimination
+  "D 1": ["ELIMINATION"],
+  "D 2": ["ELIMINATION"],
+  "D 3": ["ELIMINATION"],
+  "D 4": ["ELIMINATION"],
+  "D 5": ["ELIMINATION"],
+  // "D6": Interdit en France
+  "D 7": ["ELIMINATION"],
+  "D 8": ["ELIMINATION"],
+  "D 9": [],
+  "D 9 F": ["ELIMINATION"],
+  "D 10": ["ELIMINATION"],
+  "D 11": ["ELIMINATION"],
+  "D 12": ["ELIMINATION"],
+  "D 13": [],
+  "D 14": [],
+  "D 15": [],
+
+  // Opérations de valorisation
+  "R 0": ["REUTILISATION"],
+  "R 1": ["VALORISATION_ENERGETIQUE"],
+  "R 2": ["REUTILISATION", "RECYCLAGE"],
+  "R 3": ["RECYCLAGE", "AUTRES_VALORISATIONS"],
+  "R 4": ["RECYCLAGE"],
+  "R 5": ["RECYCLAGE", "AUTRES_VALORISATIONS"],
+  "R 6": ["RECYCLAGE", "REUTILISATION"],
+  "R 7": ["REUTILISATION"],
+  "R 8": ["RECYCLAGE", "REUTILISATION"],
+  "R 9": ["REUTILISATION", "RECYCLAGE", "VALORISATION_ENERGETIQUE"],
+  "R 10": ["RECYCLAGE"],
+  "R 11": ["RECYCLAGE", "AUTRES_VALORISATIONS", "VALORISATION_ENERGETIQUE"],
+  "R 12": [],
+  "R 13": []
+} as const;
+
+export function getOperationModes(
+  operationCode: string | null | undefined
+): readonly OperationMode[] {
+  if (!operationCode) {
+    return [];
+  }
+
+  // D5 becomes D 5, D9F becomes D 9 F
+  const formatedCode = operationCode.replace(
+    /^([A-Z])(\d{1,2})([A-Z]?)$/,
+    (_, p1, p2, p3) => [p1, p2, p3].filter(Boolean).join(" ")
+  ) as keyof typeof CODES_AND_EXPECTED_OPERATION_MODES;
+
+  return CODES_AND_EXPECTED_OPERATION_MODES[formatedCode] || [];
+}

@@ -1,27 +1,17 @@
-import { OperationMode } from "@td/prisma";
 import {
   CODES_AND_EXPECTED_OPERATION_MODES,
-  getOperationModesFromOperationCode
-} from "../operationModes";
+  getOperationModes
+} from "@td/constants";
 
-const addSpaceAfterFirstCharacter = (input: string): string => {
-  return input[0] + " " + input.slice(1);
-};
-
-const test = (code: string, expectedModes: OperationMode[]) => {
+const test = (code: string) => {
   // Without spaces
-  const mode = getOperationModesFromOperationCode(code);
-  expect(mode).toEqual(expectedModes);
-
-  // With spaces
-  const modeWithSpace = getOperationModesFromOperationCode(
-    addSpaceAfterFirstCharacter(code)
-  );
-  expect(modeWithSpace).toEqual(expectedModes);
+  const mode = getOperationModes(code);
+  const modeWithoutSpace = getOperationModes(code.replace(/ /g, ""));
+  expect(mode).toEqual(modeWithoutSpace);
 };
 
-describe("getOperationModesFromOperationCode", () => {
+describe("getOperationModes", () => {
   it.each(Object.keys(CODES_AND_EXPECTED_OPERATION_MODES))("Code %p", code => {
-    test(code, CODES_AND_EXPECTED_OPERATION_MODES[code]);
+    test(code);
   });
 });

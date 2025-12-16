@@ -76,9 +76,9 @@ export function getRevisionOrgIds(
         };
       }
 
-      // La révision a abouti (et a moins de 6 mois)
-      const SIX_MONTHS_AGO = addMonths(new Date(), -6).getTime();
-      if (revisionRequest.updatedAt.getTime() >= SIX_MONTHS_AGO) {
+      // La révision a abouti (et a moins de 18 mois)
+      const EIGHTEEN_MONTHS_AGO = addMonths(new Date(), -18).getTime();
+      if (revisionRequest.updatedAt.getTime() >= EIGHTEEN_MONTHS_AGO) {
         return {
           isPendingRevisionFor,
           isEmittedRevisionFor,
@@ -178,10 +178,10 @@ export const cleanUpIsReturnForTab = async (alias = index.alias) => {
 
 /**
  * On ne veut plus afficher dans le dashboard les révisions qui ont été
- * acceptées, refusées ou annulées il y a plus de 6 mois.
+ * acceptées, refusées ou annulées il y a plus de 18 mois.
  */
 export const cleanUpIsReviewedRevisionForTab = async (alias = index.alias) => {
-  const sixMonthsAgo = addMonths(new Date(), -6);
+  const eighteenMonthsAgo = addMonths(new Date(), -18);
 
   const { body }: ApiResponse<UpdateByQueryResponse> =
     await client.updateByQuery({
@@ -199,7 +199,7 @@ export const cleanUpIsReviewedRevisionForTab = async (alias = index.alias) => {
               {
                 range: {
                   nonPendingLatestRevisionRequestUpdatedAt: {
-                    lt: sixMonthsAgo.getTime()
+                    lt: eighteenMonthsAgo.getTime()
                   }
                 }
               }

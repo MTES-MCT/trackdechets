@@ -1,11 +1,22 @@
 import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
 import React from "react";
 
-const WasteRadioGroup = ({ title, options, disabled }) => {
+const WasteRadioGroup = ({
+  title,
+  options,
+  disabled,
+  legend
+}: {
+  title: string;
+  options: any;
+  disabled: boolean;
+  legend?: string;
+}) => {
   return (
     <>
       <h4 className="fr-h4">{title}</h4>
       <RadioButtons
+        legend={legend ?? ""}
         disabled={disabled}
         className="fr-col-sm-10"
         options={options}

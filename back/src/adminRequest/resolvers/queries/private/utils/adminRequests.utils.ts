@@ -10,14 +10,14 @@ interface Args {
   first?: number | null | undefined;
 }
 
-export const getPaginatedDelegations = async (
+export const getPaginatedAdminRequests = async (
   user: Express.User,
   where: Prisma.AdminRequestWhereInput,
   { skip, first }: Args
 ) => {
-  const delegationRepository = getAdminRequestRepository(user);
+  const adminRequestRepository = getAdminRequestRepository(user);
 
-  const totalCount = await delegationRepository.count(where);
+  const totalCount = await adminRequestRepository.count(where);
 
   const paginationArgs = getPrismaPaginationArgs({
     skip: skip ?? 0,
@@ -27,7 +27,7 @@ export const getPaginatedDelegations = async (
   const result = await getConnection({
     totalCount,
     findMany: () =>
-      delegationRepository.findMany(where, {
+      adminRequestRepository.findMany(where, {
         ...paginationArgs,
         orderBy: { updatedAt: "desc" },
         include: { company: true }

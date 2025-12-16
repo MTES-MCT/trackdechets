@@ -226,6 +226,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             stateRelatedMessage={
               formState.errors.destination?.operation?.code?.message
             }
+            hint={`Code de traitement prévu : ${bsda.destination?.plannedOperationCode}`}
           >
             <option value="">Sélectionnez une valeur...</option>
             {!isTempStorageReception && !isEstimatedReceptionWeight && (
@@ -252,9 +253,11 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             </option>
           </Select>
 
-          <p className="fr-mt-5v fr-mb-5v fr-info-text">
-            Code de traitement prévu : {bsda.destination?.plannedOperationCode}
-          </p>
+          {bsda.destination?.operation?.code === "D 9 F" && (
+            <p className="fr-mt-5v fr-mb-5v fr-info-text">
+              Pour un traitement final
+            </p>
+          )}
 
           <RhfOperationModeSelect
             operationCode={operationCode}

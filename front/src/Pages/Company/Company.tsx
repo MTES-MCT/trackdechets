@@ -20,6 +20,7 @@ const COMPANY_INFOS = gql`
       naf
       libelleNaf
       isRegistered
+      isDormant
       companyTypes
       contactEmail
       contactPhone
@@ -157,7 +158,7 @@ export default function CompanyInfo() {
                     </ul>
                   </div>
                 ) : (
-                  <div className="fr-alert fr-alert--error">
+                  <div className="fr-alert fr-alert--error fr-mt-4w">
                     <h3 className="fr-alert__title">
                       Cet établissement n'est pas encore inscrit sur
                       Trackdéchets
@@ -172,6 +173,33 @@ export default function CompanyInfo() {
                         vous inscrivant
                       </a>
                       .
+                    </p>
+                  </div>
+                )}
+
+                {company.isDormant && (
+                  <div className="fr-alert fr-alert--error fr-mt-4w">
+                    <h3 className="fr-alert__title">
+                      Cet établissement est mis en sommeil sur Trackdéchets
+                    </h3>
+                    <p>
+                      Du fait de son statut, cet établissement ne pourra être
+                      visé sur de nouveaux bordereaux. Il s'agit de votre
+                      établissement ? Mettez à jour cette information en{" "}
+                      <a
+                        className="fr-link force-underline-link"
+                        href={routes.login}
+                      >
+                        vous connectant
+                      </a>{" "}
+                      ou en{" "}
+                      <a
+                        className="fr-link force-underline-link"
+                        href={routes.signup.index}
+                      >
+                        vous inscrivant
+                      </a>{" "}
+                      si vous n'avez pas de compte.
                     </p>
                   </div>
                 )}

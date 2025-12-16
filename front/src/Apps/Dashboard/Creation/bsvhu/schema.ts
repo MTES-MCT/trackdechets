@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 import { BSVHU_WASTE_CODES } from "@td/constants";
+import { TransportMode } from "@td/codegen-ui";
 
 const zodCompany = z.object({
   siret: z.string().nullish(),
+  orgId: z.string().nullish(),
+  vatNumber: z.string().nullish(),
   name: z.string(),
   contact: z.string().nullish(),
   phone: z.string().nullish(),
@@ -19,30 +22,6 @@ const zodEmitter = z.object({
   agrementNumber: z.string().nullish(),
   irregularSituation: z.boolean(),
   noSiret: z.boolean()
-});
-
-const zodTransporter = z.object({
-  company: zodCompany.extend({ vatNumber: z.string().nullish() }),
-  transport: z.object({
-    takenOverAt: z.coerce
-      .date()
-      .nullish()
-      .transform(v => v?.toISOString()),
-    mode: z.string().nullish(),
-    plates: z.preprocess(
-      (val: string) => (typeof val === "string" ? val.split(",") : val ?? []),
-      z
-        .string()
-        .array()
-        .max(2, { message: "Un maximum de 2 plaques est accepté" })
-    )
-  }),
-
-  recepisse: z
-    .object({
-      isExempted: z.boolean().nullish()
-    })
-    .nullish()
 });
 
 const zodDestination = z.object({
@@ -107,7 +86,34 @@ export const rawBsvhuSchema = z
     customId: z.string().nullish(),
     wasteCode: z.enum(BSVHU_WASTE_CODES).nullish(),
     emitter: zodEmitter,
-    transporter: zodTransporter,
+    transporters: z
+      .array(
+        z.object({
+          id: z.string().nullish(),
+          number: z.number().nullish(),
+          company: zodCompany,
+          customInfo: z.string().nullish(),
+          recepisse: z.object({
+            isExempted: z.boolean().nullish(),
+            number: z.string().nullish(),
+            department: z.string().nullish(),
+            validityLimit: z.coerce.date().nullish()
+          }),
+          transport: z.object({
+            mode: z.nativeEnum(TransportMode).nullish(),
+            plates: z.array(z.string()),
+            takenOverAt: z.coerce.date().nullish(),
+            signature: z
+              .object({
+                author: z.string().nullish(),
+                date: z.coerce.date().nullish()
+              })
+              .nullish()
+          })
+        })
+      )
+      .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
+      .optional(),
     destination: zodDestination,
     packaging: z.enum(["LOT", "UNITE"]).nullish(),
     identification: z.object({
@@ -187,7 +193,7 @@ export const rawBsvhuSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["broker.company.mail"],
-        message: `L'adresse e-mail du courtier est un champ requis.`
+        message: `Le courriel du courtier est un champ requis.`
       });
     }
 
@@ -210,7 +216,7 @@ export const rawBsvhuSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["trader.company.mail"],
-        message: `L'adresse e-mail du négociant est un champ requis.`
+        message: `Le courriel du négociant est un champ requis.`
       });
     }
 
@@ -241,7 +247,7 @@ export const rawBsvhuSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["intermediaries", index, "mail"],
-            message: `L'adresse e-mail de l'intermédiaire est un champ requis.`
+            message: `Le courriel de l'intermédiaire est un champ requis.`
           });
         }
       });

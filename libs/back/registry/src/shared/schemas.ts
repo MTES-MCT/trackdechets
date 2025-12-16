@@ -1,4 +1,4 @@
-import { OperationMode } from "@td/prisma";
+import { OperationMode } from "@td/prisma/types";
 import {
   ALL_TD_PROCESSING_OPERATIONS_CODES,
   ALL_OPERATION_MODES,
@@ -161,7 +161,7 @@ export const getOperationCodeSchema = (
     );
 
 export const getOperationModeSchema = (
-  operationModes: [string, ...string[]] = ALL_OPERATION_MODES
+  operationModes: readonly [string, ...string[]] = ALL_OPERATION_MODES
 ) =>
   enumValueAsStringSchema
     .transform(val => val.replace(/ /g, "_"))

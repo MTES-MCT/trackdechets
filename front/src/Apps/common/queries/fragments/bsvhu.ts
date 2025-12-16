@@ -54,6 +54,32 @@ export const vhuFragment = gql`
   ${companyFragment}
 `;
 
+export const FullBsvhuTransporterFragment = gql`
+  fragment FullBsvhuTransporter on BsvhuTransporter {
+    id
+    company {
+      ...CompanyFragment
+    }
+    customInfo
+    recepisse {
+      number
+      department
+      validityLimit
+      isExempted
+    }
+    transport {
+      mode
+      plates
+      takenOverAt
+      signature {
+        author
+        date
+      }
+    }
+  }
+  ${companyFragment}
+`;
+
 // This fragment query only the fields required for dashboard and workflow action button
 // Would you need to query more fields, pay attention to sub resolvers which
 // might make unwanted db queries
@@ -87,6 +113,9 @@ export const dashboardVhuFragment = gql`
       }
       customInfo
     }
+    transporters {
+      ...FullBsvhuTransporter
+    }
     destination {
       type
       company {
@@ -107,6 +136,7 @@ export const dashboardVhuFragment = gql`
     bsvhuUpdatedAt: updatedAt
   }
   ${dashboardCompanyFragment}
+  ${FullBsvhuTransporterFragment}
 `;
 
 export const FullBsvhuFragment = gql`
@@ -203,6 +233,9 @@ export const FullBsvhuFragment = gql`
         }
       }
     }
+    transporters {
+      ...FullBsvhuTransporter
+    }
     ecoOrganisme {
       siret
       name
@@ -232,4 +265,5 @@ export const FullBsvhuFragment = gql`
     }
   }
   ${companyFragment}
+  ${FullBsvhuTransporterFragment}
 `;

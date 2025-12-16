@@ -3,12 +3,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BsdType,
   BsvhuInput,
+  BsvhuTransporterInput,
   Mutation,
   MutationCreateBsvhuArgs,
+  MutationCreateBsvhuTransporterArgs,
   MutationCreateDraftBsvhuArgs,
   MutationUpdateBsvhuArgs,
+  MutationUpdateBsvhuTransporterArgs,
   Query,
-  QueryBsvhuArgs
+  QueryBsvhuArgs,
+  TransportMode
 } from "@td/codegen-ui";
 import omitDeep from "omit-deep-lodash";
 import React, { useMemo, useState } from "react";
@@ -21,7 +25,9 @@ import DestinationBsvhu from "./steps/Destination";
 import EmitterBsvhu from "./steps/Emitter";
 import TransporterBsvhu from "./steps/Transporter";
 import WasteBsvhu from "./steps/Waste";
-import initialState from "./utils/initial-state";
+import initialState, {
+  CreateOrUpdateBsvhuTransporterInput
+} from "./utils/initial-state";
 import {
   CREATE_BSVHU,
   CREATE_DRAFT_VHU,
@@ -36,6 +42,13 @@ import {
   TabId
 } from "../utils";
 import OtherActors from "./steps/OtherActors";
+import { isForeignVat } from "@td/constants";
+import { toastApolloError } from "../toaster";
+import {
+  CREATE_BSVHU_TRANSPORTER,
+  UPDATE_BSVHU_TRANSPORTER
+} from "../../../Forms/Components/query";
+import { parseDate } from "../../../../common/datetime";
 
 const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
   const addressCleanup: string[] = [];
@@ -136,12 +149,113 @@ const BsvhuFormSteps = ({
     MutationUpdateBsvhuArgs
   >(UPDATE_VHU_FORM);
 
-  const loading = creatingDraft || updating || creating;
+  const [createBsvhuTransporter, { loading: creatingBsvhuTransporter }] =
+    useMutation<
+      Pick<Mutation, "createBsvhuTransporter">,
+      MutationCreateBsvhuTransporterArgs
+    >(CREATE_BSVHU_TRANSPORTER);
+
+  const [updateBsvhuTransporter, { loading: updatingBsvhuTransporter }] =
+    useMutation<
+      Pick<Mutation, "updateBsdaTransporter">,
+      MutationUpdateBsvhuTransporterArgs
+    >(UPDATE_BSVHU_TRANSPORTER);
+
+  const loading =
+    creatingDraft ||
+    updating ||
+    creating ||
+    creatingBsvhuTransporter ||
+    updatingBsvhuTransporter;
   const mainCtaLabel = formState.id ? "Enregistrer" : "Publier";
   const draftCtaLabel = formState.id ? "" : "Enregistrer en brouillon";
 
-  const saveForm = (input: ZodBsvhu, draft: boolean): Promise<any> => {
+  async function saveBsvhuTransporter(
+    transporterInput: CreateOrUpdateBsvhuTransporterInput
+  ): Promise<string> {
+    const { id, transport, ...input } = transporterInput;
+
+    // S'assure que les données de récépissé transport sont nulles dans les
+    // cas suivants :
+    // - l'exemption est cochée
+    // - le transporteur est étranger
+    // - le transport ne se fait pas par la route
+    const cleanInput: BsvhuTransporterInput = {
+      ...input,
+      transport: {
+        mode: transport?.mode,
+        plates: transport?.plates
+      },
+      recepisse: {
+        ...input.recepisse,
+        validityLimit: !!input.recepisse?.validityLimit
+          ? parseDate(input.recepisse.validityLimit).toISOString()
+          : null,
+        ...(input.recepisse?.isExempted ||
+        isForeignVat(input?.company?.vatNumber) ||
+        transport?.mode !== TransportMode.Road
+          ? {
+              number: null,
+              validityLimit: null,
+              department: null
+            }
+          : {})
+      }
+    };
+
+    if (id) {
+      // Le transporteur existe déjà en base de données, on met
+      // à jour les infos (uniquement si le transporteur n'a pas encore
+      // pris en charge le déchet) et on renvoie l'identifiant
+      if (!transport?.takenOverAt) {
+        const { errors } = await updateBsvhuTransporter({
+          variables: { id, input: cleanInput },
+          onError: err => {
+            toastApolloError(err);
+          }
+        });
+        if (errors) {
+          throw new Error(errors.map(e => e.message).join("\n"));
+        }
+      }
+      return id;
+    } else {
+      // Le transporteur n'existe pas encore en base, on le crée
+      // et on renvoie l'identifiant retourné
+      const { data, errors } = await createBsvhuTransporter({
+        variables: { input: cleanInput },
+        onError: err => {
+          toastApolloError(err);
+        }
+      });
+      if (errors) {
+        throw new Error(errors.map(e => e.message).join("\n"));
+      }
+      // if `errors` is not defined then data?.createFormTransporter?.id
+      // should be defined. For type safety we return "" if it is not, but
+      // it should not hapen
+      return data?.createBsvhuTransporter?.id ?? "";
+    }
+  }
+
+  const saveForm = async (input: ZodBsvhu, draft: boolean): Promise<any> => {
     const cleanedInput = vhuToInput(input);
+    const { transporters } = cleanedInput;
+
+    let transporterIds: string[] = [];
+
+    try {
+      transporterIds = await Promise.all(
+        //@ts-ignore
+        (transporters ?? []).map(t => saveBsvhuTransporter(t))
+      );
+      cleanedInput.transporters = transporterIds;
+    } catch (_) {
+      // Si une erreur survient pendant la sauvegarde des données
+      // transporteur, on n'essaye même pas de sauvgarder le bordereau
+      return;
+    }
+
     if (formState.id!) {
       return updateVhuForm({
         variables: { id: formState.id, input: cleanedInput }
@@ -204,13 +318,7 @@ const BsvhuFormSteps = ({
           )}
         />
       ),
-      transporter: (
-        <TransporterBsvhu
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.transporter
-          )}
-        />
-      ),
+      transporter: <TransporterBsvhu />,
       destination: (
         <DestinationBsvhu
           errors={publishErrorMessages.filter(
