@@ -154,14 +154,18 @@ const EmitterBsda = ({ errors }) => {
                     );
                     if (e.currentTarget.checked) {
                       setValue("emitter.company.siret", null);
+                      setValue("emitter.company.orgId", null);
+                      setValue("emitter.company.vatNumber", null);
                       setValue("emitter.company.name", null);
-                      setValue("emitter.company.contact", null);
-                      setValue("emitter.company.phone", null);
-                      setValue("emitter.company.mail", null);
-                      setValue("emitter.company.address", null);
-                      setValue("emitter.company.city", null);
-                      setValue("emitter.company.postaCode", null);
                     }
+
+                    setValue("emitter.company.contact", null);
+                    setValue("emitter.company.address", null);
+                    setValue("emitter.company.city", null);
+                    setValue("emitter.company.street", null);
+                    setValue("emitter.company.postalCode", null);
+                    setValue("emitter.company.phone", null);
+                    setValue("emitter.company.mail", null);
                   }
                 }
               }
