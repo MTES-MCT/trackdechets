@@ -21,7 +21,7 @@ import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleC
 import { getInitialCompany } from "../../../../common/data/initialState";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../../common/queries/company/query";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
-import { clearCompanyError, setFieldError } from "../../utils";
+import { clearCompanyError } from "../../utils";
 import { BsdaContext } from "../FormSteps";
 
 const DestinationCAPModificationAlert = () => (
@@ -57,7 +57,7 @@ const showNextDestinationCAPModificationAlert = bsdaContext => {
 
 const DestinationBsda = ({ errors }) => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError, clearErrors } =
+  const { register, setValue, watch, formState, clearErrors } =
     useFormContext(); // retrieve all hook methods
   const bsdaType = watch("type");
   const destination = watch("destination");
