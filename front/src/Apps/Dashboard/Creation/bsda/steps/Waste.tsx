@@ -133,6 +133,8 @@ const WasteBsda = ({ errors }) => {
 
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
   const sealNumbersLength = waste?.sealNumbers?.length || 0;
+  const isSubjectToADR =
+    waste?.isSubjectToADR === null || Boolean(waste?.isSubjectToADR); // Legacy compatibility, null means true
 
   const quantityLength: number = packagings.reduce(
     (acc: number, packaging: BsdaPackaging) =>
@@ -311,7 +313,7 @@ const WasteBsda = ({ errors }) => {
             <ToggleSwitch
               label="Le déchet est soumis à l'ADR"
               disabled={sealedFields.includes(`waste.isSubjectToADR`)}
-              checked={Boolean(waste.isSubjectToADR)}
+              checked={isSubjectToADR}
               onChange={(checked: boolean) => {
                 setValue("waste.isSubjectToADR", checked);
                 if (!checked) {
@@ -321,7 +323,7 @@ const WasteBsda = ({ errors }) => {
               className="fr-mt-4w"
             />
 
-            {waste.isSubjectToADR && (
+            {isSubjectToADR && (
               <Input
                 className="fr-col-md-8 fr-pl-9w fr-mt-1w"
                 label="Mention au titre de la réglementation ADR"
