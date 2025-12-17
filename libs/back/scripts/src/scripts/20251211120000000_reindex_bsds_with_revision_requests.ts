@@ -29,7 +29,9 @@ fourMonthsAgo.setMonth(now.getMonth() - 4);
 async function processPaginated(
   modelName: string,
   revisionModel: any,
-  bsdIdField: string
+  bsdIdField?: string,
+  deepBsdIdField?: string,
+  includeForBsdIdField?: string
 ) {
   let cursor: { createdAt: Date; id: string } | undefined = undefined;
   let totalProcessed = 0;
@@ -70,7 +72,14 @@ async function processPaginated(
       ...(cursor ? { skip: 1, cursor } : {}),
       take: BATCH_SIZE,
       orderBy: [{ createdAt: "desc" }, { id: "desc" }],
-      select: { id: true, [bsdIdField]: true, createdAt: true }
+      select: {
+        id: true,
+        createdAt: true,
+        ...(bsdIdField ? { [bsdIdField]: true } : {})
+      },
+      include: {
+        ...(includeForBsdIdField ? { [includeForBsdIdField]: true } : {})
+      }
     });
 
     if (!page.length) break;
@@ -86,7 +95,11 @@ async function processPaginated(
     const batchStart = Date.now();
     for (const revision of page) {
       totalProcessed++;
-      const bsdId = revision[bsdIdField];
+      const bsdId = bsdIdField
+        ? revision[bsdIdField]
+        : includeForBsdIdField && deepBsdIdField
+        ? revision[includeForBsdIdField]?.[deepBsdIdField]
+        : undefined;
 
       if (!bsdId) {
         console.warn(
@@ -133,7 +146,13 @@ export async function run() {
   console.log(
     "Starting re-indexation of BSDs with revision requests between 20 and 4 months ago..."
   );
-  await processPaginated("BSDD", prisma.bsddRevisionRequest, "bsddId");
+  await processPaginated(
+    "BSDD",
+    prisma.bsddRevisionRequest,
+    undefined,
+    "readableId",
+    "bsdd"
+  );
   await processPaginated("BSDA", prisma.bsdaRevisionRequest, "bsdaId");
   await processPaginated("BSDASRI", prisma.bsdasriRevisionRequest, "bsdasriId");
   console.log("Re-indexation script completed.");
