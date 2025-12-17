@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { Bsda, BsdaType } from "@td/codegen-ui";
 import Table from "@codegouvfr/react-dsfr/Table";
 import Input from "@codegouvfr/react-dsfr/Input";
@@ -11,6 +11,12 @@ type SelectableWasteTableProps = {
   isSelected: (bsda: Bsda) => boolean;
   pickerType: BsdaType.Reshipment | BsdaType.Gathering;
   selected: string | string[] | undefined | null;
+  idFilter: string;
+  wasteCodeFilter: string;
+  finalDestinationSiretFilter: string;
+  setIdFilter: (id: string) => void;
+  setWasteCodeFilter: (wasteCode: string) => void;
+  setFinalDestinationSiretFilter: (finalDestinationSiret: string) => void;
 };
 
 export default function SelectableWasteTable({
@@ -18,13 +24,14 @@ export default function SelectableWasteTable({
   onClick,
   isSelected,
   pickerType,
-  selected
+  selected,
+  idFilter,
+  wasteCodeFilter,
+  finalDestinationSiretFilter,
+  setIdFilter,
+  setWasteCodeFilter,
+  setFinalDestinationSiretFilter
 }: SelectableWasteTableProps) {
-  const [idFilter, setIdFilter] = useState("");
-  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
-  const [finalDestinationSiretFilter, setFinalDestinationSiretFilter] =
-    useState("");
-
   const filteredBsdas = useMemo(() => {
     return bsdas.filter(bsda => {
       if (idFilter.length > 0 && !bsda.id.includes(idFilter)) {

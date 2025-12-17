@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import {
@@ -28,7 +28,10 @@ function SelectableWasteTableWrapper({
   bsdaId
 }: SelectableWasteTableWrapperProps) {
   const { siret } = useParams<{ siret: string }>();
-
+  const [idFilter, setIdFilter] = useState("");
+  const [wasteCodeFilter, setWasteCodeFilter] = useState("");
+  const [finalDestinationSiretFilter, setFinalDestinationSiretFilter] =
+    useState("");
   const codeFilter =
     type === BsdaType.Gathering ? { _in: ["D 15", "R 13"] } : { _eq: "D 15" };
 
@@ -38,11 +41,24 @@ function SelectableWasteTableWrapper({
   >(GET_BSDAS, {
     variables: {
       where: {
+        ...(idFilter.length > 0 ? { id: { _eq: idFilter } } : {}),
+        ...(wasteCodeFilter.length > 0
+          ? { waste: { code: { _contains: wasteCodeFilter } } }
+          : {}),
         status: { _eq: BsdaStatus.AwaitingChild },
         _or: [{ groupedIn: { _eq: null } }, { groupedIn: { _eq: bsdaId } }],
         forwardedIn: { _eq: null },
         destination: {
-          operation: { code: codeFilter },
+          operation: {
+            code: codeFilter,
+            ...(finalDestinationSiretFilter.length > 0
+              ? {
+                  nextDestination: {
+                    company: { siret: { _eq: finalDestinationSiretFilter } }
+                  }
+                }
+              : {})
+          },
           company: { siret: { _eq: siret } }
         }
       }
@@ -182,6 +198,12 @@ function SelectableWasteTableWrapper({
           bsdas={bsdas}
           pickerType={BsdaType.Reshipment}
           selected={forwarding}
+          idFilter={idFilter}
+          wasteCodeFilter={wasteCodeFilter}
+          finalDestinationSiretFilter={finalDestinationSiretFilter}
+          setIdFilter={setIdFilter}
+          setWasteCodeFilter={setWasteCodeFilter}
+          setFinalDestinationSiretFilter={setFinalDestinationSiretFilter}
         />
       );
     }
@@ -209,6 +231,12 @@ function SelectableWasteTableWrapper({
         bsdas={bsdas}
         pickerType={BsdaType.Gathering}
         selected={grouping}
+        idFilter={idFilter}
+        wasteCodeFilter={wasteCodeFilter}
+        finalDestinationSiretFilter={finalDestinationSiretFilter}
+        setIdFilter={setIdFilter}
+        setWasteCodeFilter={setWasteCodeFilter}
+        setFinalDestinationSiretFilter={setFinalDestinationSiretFilter}
       />
     );
   }

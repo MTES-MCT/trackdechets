@@ -10,6 +10,8 @@ input BsdaWhere {
   createdAt: DateFilter
   "Filtre sur la date de dernière modification"
   updatedAt: DateFilter
+  "Filtre sur le champ waste."
+  waste: BsdaWasteWhere
   "Filtre sur le champ emitter."
   emitter: BsdaEmitterWhere
   "Filtre sur le champ worker."
@@ -36,6 +38,11 @@ input BsdaWhere {
 input BsdaStatusFilter {
   _eq: BsdaStatus
   _in: [BsdaStatus!]
+}
+
+"Champs possible pour le filtre sur le déchet."
+input BsdaWasteWhere {
+  code: StringFilter
 }
 
 "Champs possible pour le filtre sur l'émetteur."
@@ -84,7 +91,13 @@ input BsdaReceptionWhere {
 "Champs possible pour le filtre sur l'opération."
 input BsdaOperationWhere {
   code: StringFilter
+  nextDestination: BsdaNextDestinationWhere
   signature: SignatureWhere
+}
+
+"Champs possible pour le filtre sur l'exutoire final."
+input BsdaNextDestinationWhere {
+  company: CompanyWhere
 }
 
 "Champs possible pour le filtre sur l'entreprise de travaux."
