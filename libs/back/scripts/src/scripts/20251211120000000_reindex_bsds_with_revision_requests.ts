@@ -75,10 +75,17 @@ async function processPaginated(
       select: {
         id: true,
         createdAt: true,
-        ...(bsdIdField ? { [bsdIdField]: true } : {})
-      },
-      include: {
-        ...(includeForBsdIdField ? { [includeForBsdIdField]: true } : {})
+        ...(bsdIdField ? { [bsdIdField]: true } : {}),
+        ...(includeForBsdIdField
+          ? {
+              [includeForBsdIdField]: {
+                select: {
+                  id: true,
+                  ...(deepBsdIdField ? { [deepBsdIdField]: true } : {})
+                }
+              }
+            }
+          : {})
       }
     });
 
