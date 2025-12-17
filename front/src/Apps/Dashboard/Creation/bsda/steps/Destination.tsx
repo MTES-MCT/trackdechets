@@ -271,12 +271,24 @@ const DestinationBsda = ({ errors }) => {
             }}
           />
 
-          {!destination?.company?.siret &&
-            formState.errors?.destination?.["company"]?.siret && (
-              <p className="fr-text--sm fr-error-text fr-mb-4v">
-                {formState.errors?.destination?.["company"]?.siret?.message}
-              </p>
-            )}
+          {hasNextDestination
+            ? !destination?.operation?.nextDestination?.company?.siret &&
+              formState.errors?.destination?.["operation"]?.nextDestination?.[
+                "company"
+              ]?.siret && (
+                <p className="fr-text--sm fr-error-text fr-mb-4v">
+                  {
+                    formState.errors?.destination?.["operation"]
+                      ?.nextDestination?.["company"]?.siret?.message
+                  }
+                </p>
+              )
+            : !destination?.company?.siret &&
+              formState.errors?.destination?.["company"]?.siret && (
+                <p className="fr-text--sm fr-error-text fr-mb-4v">
+                  {formState.errors?.destination?.["company"]?.siret?.message}
+                </p>
+              )}
 
           <CompanyContactInfo
             fieldName={
