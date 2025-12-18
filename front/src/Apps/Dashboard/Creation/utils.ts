@@ -240,23 +240,33 @@ export const getErrorTabIds = (
 };
 
 export const handleGraphQlError = (err: ApolloError) => {
-  if (err.graphQLErrors?.length) {
-    const issues = err.graphQLErrors[0]?.extensions
-      ?.issues as NormalizedError[];
-    if (issues?.length) {
-      const errorsWithEmptyPath = issues.filter(f => !f.path.length);
-      if (errorsWithEmptyPath.length) {
-        toastApolloError(err);
+  const firstGqlError = err.graphQLErrors[0];
+  if (!firstGqlError) {
+    return [
+      {
+        code: "unknown",
+        path: ["none"],
+        message: "Une erreur inconnue est survenue"
       }
-      return issues;
-    }
+    ];
   }
+
+  const issues = firstGqlError?.extensions?.issues as NormalizedError[];
+  if (issues?.length) {
+    const errorsWithEmptyPath = issues.filter(f => !f.path.length);
+    if (errorsWithEmptyPath.length) {
+      toastApolloError(err);
+    }
+    return issues;
+  }
+
   // other case like forbidden, we need to display an error anyway ...
   return [
     {
-      code: err.graphQLErrors[0]?.extensions?.code as string,
+      code: firstGqlError?.extensions?.code as string,
       path: ["none"],
-      message: err.graphQLErrors[0]?.extensions?.message as string
+      message:
+        firstGqlError?.message ?? (firstGqlError?.extensions?.message as string)
     }
   ];
 };
