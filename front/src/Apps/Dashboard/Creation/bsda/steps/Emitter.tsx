@@ -181,6 +181,15 @@ const EmitterBsda = () => {
                 }}
                 designation=""
               />
+
+              {formState.errors?.emitter?.["company"]?.address?.message && (
+                <p
+                  id="text-input-error-desc-error"
+                  className="fr-mb-4v fr-error-text"
+                >
+                  {formState.errors?.emitter?.["company"]?.address?.message}
+                </p>
+              )}
             </div>
             <div className="fr-grid-row">
               <Input
