@@ -239,42 +239,36 @@ export const getErrorTabIds = (
   return errorTabIds;
 };
 
-export const handleGraphQlError = (
-  err: ApolloError,
-  setPublishErrors: (normalizedErrors: NormalizedError[]) => void
-) => {
-  if (err.graphQLErrors?.length) {
-    const issues = err.graphQLErrors[0]?.extensions
-      ?.issues as NormalizedError[];
-    if (issues?.length) {
-      const errorsWithEmptyPath = issues.filter(f => !f.path.length);
-      if (errorsWithEmptyPath.length) {
-        toastApolloError(err);
-      }
-      const errorDetailList = issues?.map(error => {
-        return error;
-      });
-      setPublishErrors(errorDetailList as NormalizedError[]);
-    } else {
-      // other case like forbidden, we need to display an error anyway ...
-      setPublishErrors([
-        {
-          code: err.graphQLErrors[0]?.extensions?.code,
-          path: ["none"],
-          message: err.graphQLErrors[0]?.message
-        }
-      ] as NormalizedError[]);
-    }
-  } else {
-    // other case like forbidden, we need to display an error anyway ...
-    setPublishErrors([
+export const handleGraphQlError = (err: ApolloError) => {
+  const firstGqlError = err.graphQLErrors[0];
+  if (!firstGqlError) {
+    return [
       {
-        code: err.graphQLErrors[0]?.extensions?.code,
+        code: "unknown",
         path: ["none"],
-        message: err.graphQLErrors[0]?.extensions?.message
+        message: "Une erreur inconnue est survenue"
       }
-    ] as NormalizedError[]);
+    ];
   }
+
+  const issues = firstGqlError?.extensions?.issues as NormalizedError[];
+  if (issues?.length) {
+    const errorsWithEmptyPath = issues.filter(f => !f.path.length);
+    if (errorsWithEmptyPath.length) {
+      toastApolloError(err);
+    }
+    return issues;
+  }
+
+  // other case like forbidden, we need to display an error anyway ...
+  return [
+    {
+      code: firstGqlError?.extensions?.code as string,
+      path: ["none"],
+      message:
+        firstGqlError?.message ?? (firstGqlError?.extensions?.message as string)
+    }
+  ];
 };
 
 export const setFieldError = (errors, errorPath, stateError, setError) => {

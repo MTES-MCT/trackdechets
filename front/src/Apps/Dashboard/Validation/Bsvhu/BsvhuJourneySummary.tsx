@@ -84,7 +84,9 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
         variant={
           bsvhu.destination?.operation?.signature
             ? "complete"
-            : bsvhu.transporter?.transport?.signature
+            : (bsvhu.transporters ?? []).every(t =>
+                Boolean(t?.transport?.signature?.date)
+              )
             ? "active"
             : "incomplete"
         }
