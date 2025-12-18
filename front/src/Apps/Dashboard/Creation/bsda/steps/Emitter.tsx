@@ -8,15 +8,15 @@ import { useParams } from "react-router-dom";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
-import { clearCompanyError, setFieldError } from "../../utils";
+import { clearCompanyError } from "../../utils";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Input from "@codegouvfr/react-dsfr/Input";
 
-const EmitterBsda = ({ errors }) => {
+const EmitterBsda = () => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError, clearErrors } =
+  const { register, setValue, watch, formState, clearErrors } =
     useFormContext();
 
   const emitter = watch("emitter", {});
@@ -41,61 +41,6 @@ const EmitterBsda = ({ errors }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const actor = "emitter";
-    if (errors?.length) {
-      setFieldError(
-        errors,
-        `${actor}.company.siret`,
-        formState.errors?.[actor]?.["company"]?.siret,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.name`,
-        formState.errors?.[actor]?.["company"]?.name,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.contact`,
-        formState.errors?.[actor]?.["company"]?.contact,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.address`,
-        formState.errors?.[actor]?.["company"]?.address,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.phone`,
-        formState.errors?.[actor]?.["company"]?.phone,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.mail`,
-        formState.errors?.[actor]?.["company"]?.mail,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.vatNumber`,
-        formState.errors?.[actor]?.["company"]?.vatNumber,
-        setError
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
-
-  useEffect(() => {
-    if (errors?.length && emitter?.company?.siret) {
-      clearCompanyError(emitter, "emitter", clearErrors);
-    }
-  }, [clearErrors, emitter?.company?.siret, errors?.length, emitter]);
 
   const orgId = useMemo(
     () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
@@ -283,10 +228,7 @@ const EmitterBsda = ({ errors }) => {
                     };
                   }
 
-                  if (errors?.length) {
-                    // server errors
-                    clearCompanyError(emitter, "emitter", clearErrors);
-                  }
+                  clearCompanyError(emitter, "emitter", clearErrors);
 
                   setValue("emitter", {
                     ...emitter,
