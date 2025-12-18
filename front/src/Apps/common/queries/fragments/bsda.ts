@@ -297,11 +297,28 @@ export const FullBsdaFragment = gql`
     }
     grouping {
       id
+      packagings {
+        other
+        quantity
+        type
+        volume
+        identificationNumbers
+      }
       waste {
         code
+        familyCode
+        adr
         materialName
+        isSubjectToADR
+        sealNumbers
+        nonRoadRegulationMention
       }
       destination {
+        company {
+          siret
+          name
+          orgId
+        }
         cap
         operation {
           nextDestination {
@@ -322,10 +339,28 @@ export const FullBsdaFragment = gql`
     }
     forwarding {
       id
+      packagings {
+        other
+        quantity
+        type
+        volume
+        identificationNumbers
+      }
       waste {
         code
+        familyCode
+        adr
+        materialName
+        isSubjectToADR
+        sealNumbers
+        nonRoadRegulationMention
       }
       destination {
+        company {
+          siret
+          name
+          orgId
+        }
         cap
         operation {
           nextDestination {

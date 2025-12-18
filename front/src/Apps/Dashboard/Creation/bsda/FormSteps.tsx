@@ -132,7 +132,12 @@ const BsdaFormSteps = ({
         {
           path: "grouping",
           getComputedValue: (initialValue, actualValue) =>
-            actualValue?.map(g => g.id) ?? initialValue
+            actualValue?.length ? actualValue : initialValue
+        },
+        {
+          path: "forwarding",
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue ?? initialValue
         }
       ]),
     [bsdaQuery.data]
@@ -292,9 +297,13 @@ const BsdaFormSteps = ({
           }
         };
 
+    const forwarding = cleanInput.forwarding?.id;
+    const grouping = cleanInput.grouping?.map(g => g.id) ?? [];
     cleanInput = {
       ...cleanInput,
-      worker
+      worker,
+      forwarding,
+      grouping
     };
 
     if (bsdaState.id) {

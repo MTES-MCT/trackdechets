@@ -19,7 +19,6 @@ function RhfPackagingList({
   });
 
   const packagings: PackagingInfoInput[] = watch(fieldName);
-
   return (
     <PackagingList
       packagingInfos={packagings}

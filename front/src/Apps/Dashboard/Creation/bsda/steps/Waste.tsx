@@ -63,7 +63,6 @@ const WasteBsda = ({ errors }) => {
   const bsdaType = watch("type");
   const weight = watch("weight", {});
   const packagings = watch("packagings");
-
   useEffect(() => {
     if (errors?.length) {
       setFieldError(
