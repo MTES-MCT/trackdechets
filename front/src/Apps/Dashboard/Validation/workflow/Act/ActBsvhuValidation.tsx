@@ -28,6 +28,14 @@ const ActBsvhuValidation = ({
   };
 
   const renderSentModal = () => {
+    const nextTransporter = (bsd.transporters ?? []).find(
+      t => !t.transport?.signature?.date
+    );
+
+    if (nextTransporter && nextTransporter.company?.orgId === currentSiret) {
+      return <SignVhuTransport bsvhuId={bsd.id} onClose={onClose} />;
+    }
+
     return <SignVhuReception bsvhuId={bsd.id} onClose={onClose} />;
   };
 
