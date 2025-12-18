@@ -514,7 +514,6 @@ describe("Mutation.updateBsdasri", () => {
   );
 
   it.each([
-    ["D9", "ELIMINATION", "D9F"], // tolerance on code D9
     ["D9F", "ELIMINATION", "D9F"],
     ["D10", "ELIMINATION", "D10"],
     ["R1", "VALORISATION_ENERGETIQUE", "R1"]
