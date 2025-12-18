@@ -2572,7 +2572,7 @@ describe("Mutation.Bsda.create", () => {
       expect(data.createBsda?.destination?.plannedOperationCode).toBe("D 9 F");
     });
 
-    it("should cast plannedOperationCode D9 to D9F (tolerance)", async () => {
+    it("should no longer cast plannedOperationCode D9 to D9F (end of tolerance)", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const { company: destinationCompany } = await userWithCompanyFactory(
@@ -2634,7 +2634,7 @@ describe("Mutation.Bsda.create", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors, data } = await mutate<Pick<Mutation, "createBsda">>(
+      const { errors } = await mutate<Pick<Mutation, "createBsda">>(
         CREATE_BSDA,
         {
           variables: {
@@ -2644,8 +2644,10 @@ describe("Mutation.Bsda.create", () => {
       );
 
       // Then
-      expect(errors).toBeUndefined();
-      expect(data.createBsda?.destination?.plannedOperationCode).toBe("D 9 F");
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toContain(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
     });
   });
 });

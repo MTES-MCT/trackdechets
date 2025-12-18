@@ -101,15 +101,3 @@ export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
 
     return bsda;
   };
-
-// TRA-16750: pour aider les intégrateurs, on cast
-// le code d'opération "D9" en "D9F" (tolérance)
-export const castD9toD9F = obj => {
-  if (
-    obj.destinationOperationCode &&
-    trim(obj.destinationOperationCode) === "D9"
-  ) {
-    obj.destinationOperationCode = "D 9 F";
-  }
-  return obj;
-};
