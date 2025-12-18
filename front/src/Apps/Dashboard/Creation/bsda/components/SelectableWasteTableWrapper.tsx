@@ -231,10 +231,6 @@ function SelectableWasteTableWrapper({
     setValue("destination.company", nextDestinationCompany);
   }
 
-  // if (loading) {
-  //   return <Loader />;
-  // }
-
   if (error) {
     return (
       <Alert
