@@ -23,11 +23,11 @@ import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleC
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
-import { clearCompanyError, setFieldError } from "../../utils";
+import { clearCompanyError } from "../../utils";
 
-const Worker = ({ errors }) => {
+const Worker = () => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError, clearErrors } =
+  const { register, setValue, watch, formState, clearErrors } =
     useFormContext();
   const [companyTypes, setcompanyTypes] = useState<CompanyType[]>([]);
 
@@ -97,55 +97,6 @@ const Worker = ({ errors }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const actor = "worker";
-    if (errors?.length) {
-      setFieldError(
-        errors,
-        `${actor}.company.siret`,
-        formState.errors?.[actor]?.["company"]?.siret,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.name`,
-        formState.errors?.[actor]?.["company"]?.name,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.contact`,
-        formState.errors?.[actor]?.["company"]?.contact,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.address`,
-        formState.errors?.[actor]?.["company"]?.address,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.phone`,
-        formState.errors?.[actor]?.["company"]?.phone,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.mail`,
-        formState.errors?.[actor]?.["company"]?.mail,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.vatNumber`,
-        formState.errors?.[actor]?.["company"]?.vatNumber,
-        setError
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
 
   const orgId = useMemo(
     () => worker?.company?.orgId ?? worker?.company?.siret ?? null,
@@ -245,10 +196,7 @@ const Worker = ({ errors }) => {
                   };
                 }
 
-                if (errors?.length) {
-                  // server errors
-                  clearCompanyError(worker, "worker", clearErrors);
-                }
+                clearCompanyError(worker, "worker", clearErrors);
 
                 setValue("worker", {
                   ...worker,

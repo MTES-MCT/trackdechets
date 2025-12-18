@@ -55,7 +55,7 @@ const showNextDestinationCAPModificationAlert = bsdaContext => {
   );
 };
 
-const DestinationBsda = ({ errors }) => {
+const DestinationBsda = () => {
   const { siret } = useParams<{ siret: string }>();
   const { register, setValue, watch, formState, clearErrors } =
     useFormContext(); // retrieve all hook methods
@@ -73,6 +73,18 @@ const DestinationBsda = ({ errors }) => {
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS);
+
+  useEffect(() => {
+    // register fields managed under the hood by company selector
+    register(`destination.company.orgId`);
+    register(`destination.company.siret`);
+    register(`destination.company.name`);
+    register(`destination.company.contact`);
+    register(`destination.company.vatNumber`);
+    register(`destination.company.address`);
+    register(`destination.company.mail`);
+    register(`destination.transport.plates`);
+  }, [register]);
 
   useEffect(() => {
     if (isDechetterie) {
@@ -262,8 +274,7 @@ const DestinationBsda = ({ errors }) => {
               const name = hasNextDestination
                 ? "destination.operation.nextDestination.company"
                 : "destination.company";
-              if (errors?.length && company.siret !== currentCompany?.siret) {
-                // server errors
+              if (company.siret !== currentCompany?.siret) {
                 clearCompanyError(destination, name, clearErrors);
               }
 
@@ -480,14 +491,11 @@ const DestinationBsda = ({ errors }) => {
                         country: company.codePaysEtrangerEtablissement
                       };
 
-                      if (errors?.length) {
-                        // server errors
-                        clearCompanyError(
-                          destination,
-                          "destination",
-                          clearErrors
-                        );
-                      }
+                      clearCompanyError(
+                        destination,
+                        "destination",
+                        clearErrors
+                      );
 
                       setValue("destination.company", companyData);
                     }
