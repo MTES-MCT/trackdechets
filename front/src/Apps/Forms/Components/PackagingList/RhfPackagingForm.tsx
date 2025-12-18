@@ -18,15 +18,8 @@ function RhfPackagingForm({
 }: RenderPackagingFormProps) {
   const fieldPath = (name: string) => `${fieldName}.${idx}.${name}`;
 
-  const {
-    control,
-    register,
-    getFieldState,
-    formState,
-    watch,
-    setValue,
-    resetField
-  } = useFormContext();
+  const { control, register, getFieldState, formState, setValue, resetField } =
+    useFormContext();
   const { append, remove } = useFieldArray({
     control,
     name: fieldPath("identificationNumbers")
@@ -73,15 +66,15 @@ function RhfPackagingForm({
     other: isTouchedOther && hasBeenSubmitted
   };
 
-  const packagingType = watch(fieldPath("type"));
-  const quantity = watch(fieldPath("quantity"));
-  const other = watch(fieldPath("other"));
-  const volume = watch(fieldPath("volume"));
+  const packagingType = packaging.type;
+  const quantity = packaging.quantity;
+  const other = packaging.other;
+  const volume = packaging.volume;
 
   const volumeInputProps = {
     onChange: volumeField.onChange,
     onBlur: volumeField.onBlur,
-    value: volume,
+    value: volume ?? "",
     name: volumeField.name,
     inputRef: volumeField.ref
   };
@@ -135,11 +128,11 @@ function RhfPackagingForm({
         },
         volume: volumeInputProps,
         quantity: {
-          value: quantity,
+          value: quantity ?? "",
           ...register(fieldPath("quantity"))
         },
         other: {
-          value: other,
+          value: other ?? "",
           ...register(fieldPath("other"))
         },
         identificationNumbers: {
