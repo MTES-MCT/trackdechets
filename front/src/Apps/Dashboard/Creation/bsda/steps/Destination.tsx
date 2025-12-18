@@ -549,10 +549,10 @@ const DestinationBsda = () => {
                         ? false
                         : sealedFields.includes(`destination.cap`)
                     }
-                    state={formState.errors?.destination?.cap && "error"}
+                    state={formState.errors?.destination?.["cap"] && "error"}
                     stateRelatedMessage={
-                      (formState.errors?.destination?.cap?.message as string) ??
-                      ""
+                      (formState.errors?.destination?.["cap"]
+                        ?.message as string) ?? ""
                     }
                   />
 
