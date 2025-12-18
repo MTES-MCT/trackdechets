@@ -360,81 +360,79 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 <h4 className="fr-h4">
                   <strong>Réception</strong>
                 </h4>
-                <div className="fr-grid-row fr-grid-row--top">
-                  <div className="fr-grid-row fr-grid-row--gutters fr-mb-0">
+                <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters fr-mb-0">
+                  <div className="fr-col-4">
+                    <NonScrollableInput
+                      label="Poids total net en tonnes"
+                      state={
+                        formState.errors?.destination?.reception?.weight &&
+                        "error"
+                      }
+                      stateRelatedMessage={
+                        (formState.errors?.destination?.reception?.weight
+                          ?.message as string) ?? ""
+                      }
+                      nativeInputProps={{
+                        inputMode: "decimal",
+                        step: "0.000001",
+                        type: "number",
+                        ...register("destination.reception.weight")
+                      }}
+                      disabled={
+                        acceptationStatus === WasteAcceptationStatus.Refused
+                      }
+                    />
+                    <p
+                      className="fr-text fr-text--xs"
+                      style={{ color: "#0063CB" }}
+                    >
+                      <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
+                      {multiplyByRounded(receivedWeight)} kilos
+                    </p>
+                  </div>
+                  {isEligibleToEstimateWeight && (
                     <div className="fr-col-6">
-                      <NonScrollableInput
-                        label="Poids total net en tonnes"
+                      <p className="fr-text fr-mt-1w fr-mb-2w">
+                        Cette quantité est
+                      </p>
+                      <RadioButtons
                         state={
-                          formState.errors?.destination?.reception?.weight &&
-                          "error"
+                          formState.errors?.destination?.reception
+                            ?.weightIsEstimate && "error"
                         }
                         stateRelatedMessage={
-                          (formState.errors?.destination?.reception?.weight
-                            ?.message as string) ?? ""
+                          (formState.errors?.destination?.reception
+                            ?.weightIsEstimate?.message as string) ?? ""
                         }
-                        nativeInputProps={{
-                          inputMode: "decimal",
-                          step: "0.000001",
-                          type: "number",
-                          ...register("destination.reception.weight")
-                        }}
-                        disabled={
-                          acceptationStatus === WasteAcceptationStatus.Refused
-                        }
-                      />
-                      <p
-                        className="fr-text fr-text--xs"
-                        style={{ color: "#0063CB" }}
-                      >
-                        <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                        {multiplyByRounded(receivedWeight)} kilos
-                      </p>
-                    </div>
-                    {isEligibleToEstimateWeight && (
-                      <div className="fr-col-6">
-                        <p className="fr-text fr-mt-1w fr-mb-2w">
-                          Cette quantité est
-                        </p>
-                        <RadioButtons
-                          state={
-                            formState.errors?.destination?.reception
-                              ?.weightIsEstimate && "error"
-                          }
-                          stateRelatedMessage={
-                            (formState.errors?.destination?.reception
-                              ?.weightIsEstimate?.message as string) ?? ""
-                          }
-                          options={[
-                            {
-                              label: "réelle",
-                              nativeInputProps: {
-                                onChange: () =>
-                                  setValue(
-                                    "destination.reception.weightIsEstimate",
-                                    false
-                                  ),
+                        options={[
+                          {
+                            label: "réelle",
+                            nativeInputProps: {
+                              onChange: () =>
+                                setValue(
+                                  "destination.reception.weightIsEstimate",
+                                  false
+                                ),
 
-                                checked: receivedWeightIsEstimate == false
-                              }
-                            },
-                            {
-                              label: "estimée",
-                              nativeInputProps: {
-                                onChange: () =>
-                                  setValue(
-                                    "destination.reception.weightIsEstimate",
-                                    true
-                                  ),
-                                checked: receivedWeightIsEstimate === true
-                              }
+                              checked: receivedWeightIsEstimate == false
                             }
-                          ]}
-                          className="fr-mb-1w"
-                        />
-                      </div>
-                    )}
-                  </div>
+                          },
+                          {
+                            label: "estimée",
+                            nativeInputProps: {
+                              onChange: () =>
+                                setValue(
+                                  "destination.reception.weightIsEstimate",
+                                  true
+                                ),
+                              checked: receivedWeightIsEstimate === true
+                            }
+                          }
+                        ]}
+                        className="fr-mb-1w"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {receivedWeightIsEstimate && (
