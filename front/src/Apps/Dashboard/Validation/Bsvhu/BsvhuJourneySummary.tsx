@@ -60,8 +60,9 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
                 : // Le transporteur est considéré actif s'il est le premier
                 // dans la liste des transporteurs à ne pas encore avoir pris
                 // en charge le déchet après la signature émetteur
-                idx > 0 &&
-                  bsvhu.transporters[idx - 1].transport?.signature?.date
+                (idx > 0 &&
+                    bsvhu.transporters[idx - 1].transport?.signature?.date) ||
+                  idx === 0
                 ? "active"
                 : "incomplete"
             }
