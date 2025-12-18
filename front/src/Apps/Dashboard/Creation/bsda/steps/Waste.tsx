@@ -433,7 +433,7 @@ const WasteBsda = ({ errors }) => {
                   disabled={sealedFields.includes("weight.value")}
                   nativeInputProps={{
                     inputMode: "decimal",
-                    step: "0.1",
+                    step: "0.000001",
                     type: "number",
                     ...register("weight.value")
                   }}
