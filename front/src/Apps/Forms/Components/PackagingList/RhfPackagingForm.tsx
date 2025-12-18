@@ -73,16 +73,18 @@ function RhfPackagingForm({
     other: isTouchedOther && hasBeenSubmitted
   };
 
+  const packagingType = watch(fieldPath("type"));
+  const quantity = watch(fieldPath("quantity"));
+  const other = watch(fieldPath("other"));
+  const volume = watch(fieldPath("volume"));
+
   const volumeInputProps = {
     onChange: volumeField.onChange,
     onBlur: volumeField.onBlur,
-    value: volumeField.value,
+    value: volume,
     name: volumeField.name,
     inputRef: volumeField.ref
   };
-
-  const packagingType = watch(fieldPath("type"));
-
   if (packagingType === Packagings.Benne) {
     // Dans le cas d'une benne, on veut pouvoir afficher et saisir
     // le volume en m3 tout en gardant des litres côté API. Il faut donc
@@ -112,25 +114,34 @@ function RhfPackagingForm({
       errors={errors}
       touched={touched}
       inputProps={{
-        type: register(fieldPath("type"), {
-          onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
-            if (
-              event.target.value === Packagings.Autre ||
-              event.target.value === BsdaPackagingType.Other
-            ) {
-              setValue(fieldPath("other"), "", {
-                shouldTouch: true,
-                shouldDirty: true
-              });
-            } else {
-              resetField(fieldPath("other"));
-              setValue(fieldPath("other"), null);
+        type: {
+          value: packagingType,
+          ...register(fieldPath("type"), {
+            onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+              if (
+                event.target.value === Packagings.Autre ||
+                event.target.value === BsdaPackagingType.Other
+              ) {
+                setValue(fieldPath("other"), "", {
+                  shouldTouch: true,
+                  shouldDirty: true
+                });
+              } else {
+                resetField(fieldPath("other"));
+                setValue(fieldPath("other"), null);
+              }
             }
-          }
-        }),
+          })
+        },
         volume: volumeInputProps,
-        quantity: register(fieldPath("quantity")),
-        other: register(fieldPath("other")),
+        quantity: {
+          value: quantity,
+          ...register(fieldPath("quantity"))
+        },
+        other: {
+          value: other,
+          ...register(fieldPath("other"))
+        },
         identificationNumbers: {
           push: append,
           remove

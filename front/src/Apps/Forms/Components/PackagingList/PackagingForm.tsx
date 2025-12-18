@@ -97,7 +97,6 @@ function PackagingForm({
           );
         })
       : packagingTypeOptions;
-
   return (
     <>
       <div className="fr-grid-row fr-grid-row--gutters">

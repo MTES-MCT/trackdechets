@@ -52,6 +52,7 @@ import {
   validateTransporterPlates
 } from "../../common/validation/zod/refinement";
 import { isDefinedStrict } from "../../common/helpers";
+import { startOfDay, startOfDayPlusOneDay } from "../../utils";
 
 const ZodBsdaPackagingEnum = z.enum([
   "BIG_BAG",
@@ -221,9 +222,19 @@ export const rawBsdaSchema = z.object({
   destinationOperationDate: z.coerce
     .date()
     .nullish()
-    .refine(val => !val || val < new Date(), {
-      message: "La date d'opération ne peut pas être dans le futur."
-    }),
+    .refine(
+      val => {
+        if (!val) return true;
+        // Compare only the date part (day) in UTC to avoid timezone issues
+        // A date that is "today" in the user's timezone should be valid
+        const operationDate = startOfDay(val);
+        const today = startOfDayPlusOneDay(new Date());
+        return operationDate <= today;
+      },
+      {
+        message: "La date d'opération ne peut pas être dans le futur."
+      }
+    ),
   destinationOperationSignatureAuthor: z.string().max(250).nullish(),
   destinationOperationSignatureDate: z.coerce.date().nullish(),
   destinationOperationNextDestinationCompanySiret: siretSchema(

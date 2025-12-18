@@ -8,7 +8,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Decimal from "decimal.js";
 import { ZodBsdaGroupingOrForwarding } from "../schema";
 
-export const MAX_BSDA_COUNT_TABLE_DISPLAY = 5;
+export const MAX_BSDA_COUNT_TABLE_DISPLAY = 50;
 
 type SelectableWasteTableProps = {
   bsdas: Bsda[];
