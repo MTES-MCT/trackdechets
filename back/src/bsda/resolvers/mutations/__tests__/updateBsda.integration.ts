@@ -9,6 +9,7 @@ import { prisma } from "@td/prisma";
 import {
   siretify,
   userWithCompanyFactory,
+  companyAssociatedToExistingUserFactory,
   companyFactory,
   transporterReceiptFactory,
   ecoOrganismeFactory,
@@ -1293,6 +1294,67 @@ describe("Mutation.updateBsda", () => {
     expect(errors[0].message).toBe(
       "Impossible d'ajouter un intermédiaire d'entreposage provisoire sans indiquer la destination prévue initialement comme destination finale."
     );
+  });
+
+  it("should allow updating destination if there is already a next destination", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const changedDestination = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+    const emitter = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+    const nextDestination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.siret, // current user is emitter so destinationCompanySiret is still editable
+        destinationCompanySiret: company.siret,
+        destinationOperationNextDestinationCompanySiret:
+          nextDestination.company.siret,
+        emitterEmissionSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: changedDestination.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: changedDestination.siret // Changing destination
+        },
+        operation: {
+          nextDestination: {
+            company: {
+              siret: nextDestination.company.siret, // Next destination remains the same
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
+          }
+        }
+      }
+    };
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsda.id).toBeDefined();
   });
 
   it("should allow removing the nextDestination", async () => {

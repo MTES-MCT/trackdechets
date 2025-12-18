@@ -132,7 +132,12 @@ const BsdaFormSteps = ({
         {
           path: "grouping",
           getComputedValue: (initialValue, actualValue) =>
-            actualValue?.map(g => g.id) ?? initialValue
+            actualValue?.length ? actualValue : initialValue
+        },
+        {
+          path: "forwarding",
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue ?? initialValue
         }
       ]),
     [bsdaQuery.data]
@@ -230,6 +235,21 @@ const BsdaFormSteps = ({
 
   async function saveBsda(values: BsdaInput, draft: boolean): Promise<any> {
     const bsdaInput = await saveTransporters(values as BsdaValues);
+
+    // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field
+    // set to null, but the toggle is automatically set to true.
+    const initialBsda = bsdaQuery.data?.bsda;
+    if (
+      // If legacy BSDA...
+      initialBsda?.waste?.isSubjectToADR === null &&
+      // ...and the user did not change the toggle (nor the ADR value)
+      bsdaInput.waste?.isSubjectToADR === true &&
+      (!isDefinedStrict(bsdaInput.waste?.adr) ||
+        bsdaInput.waste?.adr === initialBsda.waste?.adr)
+    ) {
+      bsdaInput.waste.isSubjectToADR = null;
+    }
+
     const input = { ...bsdaInput };
 
     const cleanInputTransporters =
@@ -277,9 +297,13 @@ const BsdaFormSteps = ({
           }
         };
 
+    const forwarding = cleanInput.forwarding?.id;
+    const grouping = cleanInput.grouping?.map(g => g.id) ?? [];
     cleanInput = {
       ...cleanInput,
-      worker
+      worker,
+      forwarding,
+      grouping
     };
 
     if (bsdaState.id) {
@@ -367,35 +391,15 @@ const BsdaFormSteps = ({
     const { id, transporters, packagings, ...input } = values;
     let transporterIds: string[] = [];
 
-    try {
-      transporterIds = await Promise.all(
-        transporters.map(t => saveBsdaTransporter(t))
-      );
-    } catch (_) {
-      // Si une erreur survient pendant la sauvegarde des données
-      // transporteur, on n'essaye même pas de sauvgarder le bordereau
-      return;
-    }
+    transporterIds = await Promise.all(
+      transporters.map(t => saveBsdaTransporter(t))
+    );
 
     const bsdaInput: BsdaInput = {
       ...input,
       transporters: transporterIds,
       packagings: cleanPackagings(packagings ?? [])
     };
-
-    // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field
-    // set to null, but the toggle is automatically set to true.
-    const initialBsda = bsdaQuery.data?.bsda;
-    if (
-      // If legacy BSDA...
-      initialBsda?.waste?.isSubjectToADR === null &&
-      // ...and the user did not change the toggle (nor the ADR value)
-      bsdaInput.waste?.isSubjectToADR === true &&
-      (!isDefinedStrict(bsdaInput.waste?.adr) ||
-        bsdaInput.waste?.adr === initialBsda.waste?.adr)
-    ) {
-      bsdaInput.waste.isSubjectToADR = null;
-    }
 
     return bsdaInput;
   }
