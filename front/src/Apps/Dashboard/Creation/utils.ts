@@ -239,10 +239,7 @@ export const getErrorTabIds = (
   return errorTabIds;
 };
 
-export const handleGraphQlError = (
-  err: ApolloError,
-  setPublishErrors: (normalizedErrors: NormalizedError[]) => void
-) => {
+export const handleGraphQlError = (err: ApolloError) => {
   if (err.graphQLErrors?.length) {
     const issues = err.graphQLErrors[0]?.extensions
       ?.issues as NormalizedError[];
@@ -251,30 +248,17 @@ export const handleGraphQlError = (
       if (errorsWithEmptyPath.length) {
         toastApolloError(err);
       }
-      const errorDetailList = issues?.map(error => {
-        return error;
-      });
-      setPublishErrors(errorDetailList as NormalizedError[]);
-    } else {
-      // other case like forbidden, we need to display an error anyway ...
-      setPublishErrors([
-        {
-          code: err.graphQLErrors[0]?.extensions?.code,
-          path: ["none"],
-          message: err.graphQLErrors[0]?.message
-        }
-      ] as NormalizedError[]);
+      return issues;
     }
-  } else {
-    // other case like forbidden, we need to display an error anyway ...
-    setPublishErrors([
-      {
-        code: err.graphQLErrors[0]?.extensions?.code,
-        path: ["none"],
-        message: err.graphQLErrors[0]?.extensions?.message
-      }
-    ] as NormalizedError[]);
   }
+  // other case like forbidden, we need to display an error anyway ...
+  return [
+    {
+      code: err.graphQLErrors[0]?.extensions?.code as string,
+      path: ["none"],
+      message: err.graphQLErrors[0]?.extensions?.message as string
+    }
+  ];
 };
 
 export const setFieldError = (errors, errorPath, stateError, setError) => {

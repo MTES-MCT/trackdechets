@@ -70,7 +70,8 @@ const FormStepsContent = ({
         navigate(-1);
       })
       .catch(err => {
-        handleGraphQlError(err, setPublishErrors);
+        const normalizedErrors = handleGraphQlError(err);
+        setPublishErrors(normalizedErrors);
         scrollToTop();
       });
   };

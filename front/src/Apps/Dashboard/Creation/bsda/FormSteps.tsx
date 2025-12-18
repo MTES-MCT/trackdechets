@@ -166,6 +166,16 @@ const BsdaFormSteps = ({
     () => getPublishErrorMessages(BsdType.Bsda, errorsFromPublishApi),
     [errorsFromPublishApi]
   );
+
+  useEffect(() => {
+    for (const error of publishErrorMessages) {
+      methods.setError(error.name as keyof ZodBsda, {
+        type: "custom",
+        message: error.message
+      });
+    }
+  }, [publishErrorMessages, methods]);
+
   const [bsdaContext, setBsdaContext] = useState<Bsda | undefined>();
 
   const type = methods.watch("type");
@@ -178,39 +188,14 @@ const BsdaFormSteps = ({
 
   const tabsContent = useMemo(
     () => ({
-      waste: (
-        <WasteBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.waste
-          )}
-        />
-      ),
-      emitter: (
-        <EmitterBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.emitter
-          )}
-        />
-      ),
-      worker:
-        type === BsdaType.OtherCollections ? (
-          <Worker
-            errors={publishErrorMessages.filter(
-              error => error.tabId === TabId.worker
-            )}
-          />
-        ) : null,
+      waste: <WasteBsda />,
+      emitter: <EmitterBsda />,
+      worker: type === BsdaType.OtherCollections ? <Worker /> : null,
       transporter: <TransporterBsda />,
-      destination: (
-        <DestinationBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.destination
-          )}
-        />
-      ),
+      destination: <DestinationBsda />,
       other: <ActorsList />
     }),
-    [publishErrorMessages, type]
+    [type]
   );
 
   const loading =
