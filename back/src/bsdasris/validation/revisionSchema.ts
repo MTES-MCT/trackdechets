@@ -2,7 +2,6 @@ import { z } from "zod";
 import { OperationMode, BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
 
 import { capitalize, trim } from "../../common/strings";
-import { fixOperationModeForD9F } from "./transformers";
 import { getOperationModes } from "@td/constants";
 
 // Dasri still uses yup for main validation but migration to zod is on its way
@@ -65,7 +64,6 @@ export const revisionSchema = z
     emitterPickupSitePostalCode: z.string().nullish(),
     emitterPickupSiteInfos: z.string().nullish()
   })
-  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {

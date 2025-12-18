@@ -2148,7 +2148,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       ).toBe("D 9 F");
     });
 
-    it("if code is D9F, should automatically set mode to ELIMINATION", async () => {
+    it("if code is D9F, should NOT automatically set mode to ELIMINATION", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -2158,7 +2158,50 @@ describe("Mutation.createBsdaRevisionRequest", () => {
         opt: {
           emitterCompanySiret: company.siret,
           destinationCompanySiret: destinationCompany.siret,
-          status: "SENT"
+          status: "SENT",
+          destinationOperationCode: "R5",
+          destinationOperationMode: "RECYCLAGE"
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: {
+              destination: { operation: { code: "D 9 F" } }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      );
+    });
+
+    it("should work if code is D9F and mode is ELIMINATION", async () => {
+      // Given
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "SENT",
+          destinationOperationCode: "R5",
+          destinationOperationMode: "RECYCLAGE"
         }
       });
 
@@ -2172,7 +2215,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           input: {
             bsdaId: bsda.id,
             content: {
-              destination: { operation: { code: "D 9 F" } }
+              destination: { operation: { code: "D 9 F", mode: "ELIMINATION" } }
             },
             comment: "A comment",
             authoringCompanySiret: company.siret!

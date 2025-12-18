@@ -1413,15 +1413,50 @@ describe("Mutation.updateBsdasri", () => {
       );
     });
 
-    it("if updating with code D9F, should auto set mode to ELIMINATION", async () => {
+    it("if updating with code D9F, should NOT auto set mode to ELIMINATION", async () => {
       // Given
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const dasri = await bsdasriFactory({
         userId: user.id,
         opt: {
           status: BsdasriStatus.RECEIVED,
-          destinationOperationCode: "D10",
-          destinationOperationMode: "ELIMINATION",
+          destinationOperationCode: "R4",
+          destinationOperationMode: "RECYCLAGE",
+          emitterCompanySiret: company.siret,
+          ...readyToPublishData(company)
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+        UPDATE_DASRI,
+        {
+          variables: {
+            id: dasri.id,
+            input: {
+              destination: { operation: { code: "D9F" } }
+            }
+          }
+        }
+      );
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+      );
+    });
+
+    it("can update code to D9F and mode to ELIMINATION", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const dasri = await bsdasriFactory({
+        userId: user.id,
+        opt: {
+          status: BsdasriStatus.RECEIVED,
+          destinationOperationCode: "R4",
+          destinationOperationMode: "RECYCLAGE",
           emitterCompanySiret: company.siret,
           ...readyToPublishData(company)
         }
@@ -1435,7 +1470,7 @@ describe("Mutation.updateBsdasri", () => {
           variables: {
             id: dasri.id,
             input: {
-              destination: { operation: { code: "D9F" } }
+              destination: { operation: { code: "D9F", mode: "ELIMINATION" } }
             }
           }
         }

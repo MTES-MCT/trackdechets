@@ -3567,12 +3567,13 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
     });
 
-    it("if not providing an operation mode with D9F, should auto-set to ELIMINATION", async () => {
+    it("if not providing an operation mode with D9F, should not auto-complete", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: company.siret
+          emitterCompanySiret: company.siret,
+          destinationOperationMode: null
         }
       });
 
@@ -3596,9 +3597,8 @@ describe("Mutation.updateBsda", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.updateBsda.id).toBeTruthy();
       expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
-      expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
+      expect(data.updateBsda.destination?.operation?.mode).toBeNull();
     });
 
     it("can provide an operation code and mode, and it's not changed because it's not D9F", async () => {

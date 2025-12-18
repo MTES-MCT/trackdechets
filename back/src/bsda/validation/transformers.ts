@@ -102,21 +102,6 @@ export const emptyWorkerCertificationWhenWorkerIsDisabled: ZodBsdaTransformer =
     return bsda;
   };
 
-// TRA-16750: pour aider les intégrateurs, on auto-complète
-// le mode d'opération à "Élimination" si l'opération est
-// "D 9 F" et que le mode n'est pas fourni.
-export const fixOperationModeForD9F = obj => {
-  if (
-    obj.destinationOperationCode &&
-    trim(obj.destinationOperationCode) === "D9F"
-  ) {
-    if (!obj.destinationOperationMode) {
-      obj.destinationOperationMode = OperationMode.ELIMINATION;
-    }
-  }
-  return obj;
-};
-
 // TRA-16750: pour aider les intégrateurs, on cast
 // le code d'opération "D9" en "D9F" (tolérance)
 export const castD9toD9F = obj => {
