@@ -109,15 +109,20 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
   const title = "Signer l'enlèvement";
   const TODAY = new Date();
 
+  const currentTransporter = [...(data?.bsvhu?.transporters ?? [])].find(
+    transporter => !transporter.transport?.signature?.date
+  );
+
+  const transportMode = currentTransporter?.transport?.mode;
+
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
     author: "",
     mode:
-      data?.bsvhu?.transporter?.transport?.mode &&
-      transportModes.includes(data?.bsvhu?.transporter?.transport?.mode)
-        ? data?.bsvhu?.transporter?.transport?.mode
+      transportMode && transportModes.includes(transportMode)
+        ? transportMode
         : TransportMode.Road,
-    plates: data?.bsvhu?.transporter?.transport?.plates ?? []
+    plates: currentTransporter?.transport?.plates ?? []
   };
 
   const methods = useForm<ZodBsvhuTransport>({

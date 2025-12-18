@@ -11,7 +11,8 @@ import {
   FormStatus,
   Transporter,
   BsdaTransporter,
-  BsffTransporter
+  BsffTransporter,
+  BsvhuTransporter
 } from "@td/codegen-ui";
 
 import {
@@ -79,6 +80,7 @@ export const getCurrentTransporterInfos = (
       return getBsddCurrentTransporterInfos(bsd, currentSiret, isToCollectTab);
     case BsdTypename.Bsda:
     case BsdTypename.Bsff:
+    case BsdTypename.Bsvhu:
       return getMultiModalCurrentTransporterInfos(
         bsd,
         currentSiret,
@@ -86,8 +88,6 @@ export const getCurrentTransporterInfos = (
       );
     case BsdTypename.Bsdasri:
       return getBsdasriCurrentTransporterInfos(bsd);
-    case BsdTypename.Bsvhu:
-      return getBsvhuCurrentTransporterInfos(bsd);
     case BsdTypename.Bspaoh:
       return getBspaohCurrentTransporterInfos(bsd);
     default:
@@ -156,11 +156,15 @@ export const getBsddCurrentTransporterInfos = (
 };
 
 export const getMultiModalCurrentTransporterInfos = (
-  bsd: Bsda | Bsff,
+  bsd: Bsda | Bsff | Bsvhu,
   currentSiret: string,
   isToCollectTab: boolean
 ): BsdCurrentTransporterInfos => {
-  let currentTransporter: BsdaTransporter | BsffTransporter | undefined;
+  let currentTransporter:
+    | BsdaTransporter
+    | BsffTransporter
+    | BsvhuTransporter
+    | undefined;
   if (isToCollectTab) {
     // find the first transporter with this SIRET who hasn't taken over yet
     currentTransporter = bsd.transporters?.find(
@@ -191,22 +195,6 @@ export const getBsdasriCurrentTransporterInfos = (
   const currentTransporter = bsdasri.transporter;
   // since there is only one transporter per BSDASRI, transporterId is useless,
   // the update is done through the BSD using its id
-  return {
-    transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
-      plate => plate.trim()
-    ),
-    transporterCustomInfo: currentTransporter?.customInfo,
-    transporterMode: currentTransporter?.transport?.mode ?? undefined
-  };
-};
-
-export const getBsvhuCurrentTransporterInfos = (
-  bsvhu: Bsvhu
-): BsdCurrentTransporterInfos => {
-  const currentTransporter = bsvhu.transporter;
-  // since there is only one transporter per BSVHU, transporterId is useless,
-  // the update is done through the BSD using its id
-
   return {
     transporterNumberPlate: currentTransporter?.transport?.plates?.filter(
       plate => plate.trim()
