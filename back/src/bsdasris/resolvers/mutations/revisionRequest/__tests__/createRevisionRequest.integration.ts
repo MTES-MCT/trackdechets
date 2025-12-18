@@ -1150,7 +1150,7 @@ describe("Mutation.createBsdasriRevisionRequest synthesis", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { data, errors } = await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "createBsdasriRevisionRequest">,
         MutationCreateBsdasriRevisionRequestArgs
       >(CREATE_BSDASRI_REVISION_REQUEST, {
