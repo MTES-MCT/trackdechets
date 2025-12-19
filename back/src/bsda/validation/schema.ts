@@ -37,8 +37,7 @@ import {
   fillWasteConsistenceWhenForwarding,
   emptyWorkerCertificationWhenWorkerIsDisabled,
   updateTransporterRecepisse,
-  runTransformers,
-  fixOperationModeForD9F
+  runTransformers
 } from "./transformers";
 import { sirenifyBsdaTransporter } from "./sirenify";
 import {
@@ -69,18 +68,7 @@ const ZodWasteCodeEnum = z.enum(BSDA_WASTE_CODES).nullish();
 
 export type ZodWasteCodeEnum = z.infer<typeof ZodWasteCodeEnum>;
 
-const ZodOperationEnum = z
-  .enum([...OPERATIONS, "D 9"])
-  .transform(value => {
-    if (!value) return value;
-
-    // TRA-16750: on tolère temporairement la valeur "D 9" mais on la transforme en "D 9 F"
-    if (value === "D 9") {
-      return "D 9 F";
-    }
-    return value as (typeof OPERATIONS)[number];
-  })
-  .nullish();
+const ZodOperationEnum = z.enum(OPERATIONS).nullish();
 
 export type ZodOperationEnum = z.infer<typeof ZodOperationEnum>;
 
@@ -341,8 +329,7 @@ const transformedSyncSchema = refinedSchema
   // FIXME le calcul du champ dénormalisé `intermediariesOrgIds`
   // devrait se faire dans le repository pour s'assurer que les données restent synchro
   .transform(fillIntermediariesOrgIds)
-  .transform(emptyWorkerCertificationWhenWorkerIsDisabled)
-  .transform(fixOperationModeForD9F);
+  .transform(emptyWorkerCertificationWhenWorkerIsDisabled);
 
 /**
  * Modification du schéma Zod pour appliquer des tranformations et

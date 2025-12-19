@@ -1,24 +1,14 @@
 import { z } from "zod";
 import { OperationMode, BsdasriStatus, BsdasriType, Bsdasri } from "@td/prisma";
 
-import { capitalize, trim } from "../../common/strings";
-import { fixOperationModeForD9F } from "./transformers";
+import { capitalize } from "../../common/strings";
 import { getOperationModes } from "@td/constants";
 
 // Dasri still uses yup for main validation but migration to zod is on its way
 const ZodWasteCodeEnum = z.enum(["18 01 03*", "18 02 02*"]).nullish();
 
 const ZodOperationCodes = ["D9F", "D10", "R1"] as const;
-const ZodOperationEnum = z
-  .enum(["D9", ...ZodOperationCodes])
-  // TRA-16750: transform D9 into D9F (tolerance)
-  .transform(value => {
-    if (trim(value) === "D9") {
-      return "D9F";
-    }
-    return value as (typeof ZodOperationCodes)[number];
-  })
-  .nullish();
+const ZodOperationEnum = z.enum(ZodOperationCodes).nullish();
 
 const ZodBsdasriPackagingEnum = z.enum([
   "BOITE_CARTON",
@@ -65,7 +55,6 @@ export const revisionSchema = z
     emitterPickupSitePostalCode: z.string().nullish(),
     emitterPickupSiteInfos: z.string().nullish()
   })
-  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
