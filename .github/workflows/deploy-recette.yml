@@ -30,9 +30,9 @@ jobs:
       - name: Create a Sentry Release
         uses: getsentry/action-release@v3
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.TEST_SENTRY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN_TD }}
           SENTRY_ORG: betagouv
-          SENTRY_URL: https://debug.sentry.betagouv.boscop.cloud
+          SENTRY_URL: https://sentry.incubateur.net/
           SENTRY_LOG_LEVEL: debug
         with:
           environment: recette
