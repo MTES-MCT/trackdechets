@@ -3,10 +3,7 @@
 # se fait automatiquement via l'intégration Scalingo <> Github
 name: Deploy Sentry Release on recette
 
-on:
-  push:
-    branches:
-      - dev
+on: pull_request
 
 jobs:
   sentry-release-recette:
