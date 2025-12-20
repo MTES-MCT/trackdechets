@@ -201,7 +201,28 @@ input BsdaWasteInput {
   code: String
   "DEPRECATED - Dénomination usuelle"
   name: String @deprecated(reason: "Utiliser materialName")
-  "Code famille"
+  """
+  Code famille
+  La valeur attendue est un numéro de 1 à 9 correspondant à ces familles :
+
+  1 - amiante pur utilisé en bourrage ou en sac
+
+  2 - amiante mélangé dans des poudres ou des produits minéraux sans liaison forte
+
+  3 - amiante intégré dans des liquides ou des solutions visqueuses
+
+  4 - amiante tissé ou tressé
+
+  5 - amiante en feuilles ou en plaques
+
+  6 - amiante lié à des matériaux inertes
+
+  7 - amiante noyé dans une résine ou une matière plastique
+
+  8 - amiante dans des matériels et équipements
+
+  9 - tous les matériaux contaminés susceptibles d'émettre des fibres
+  """
   familyCode: String
   "Nom usuel du matériau"
   materialName: String
