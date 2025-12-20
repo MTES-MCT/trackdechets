@@ -56,7 +56,7 @@ export const publicIdSchema = z
       })
       .min(1, "L'identifiant unique doit faire au moins 1 caractères")
       .max(36, "L'identifiant unique ne peut pas dépasser 36 caractères")
-      .refine(val => /^[a-zA-Z0-9-_./]+$/.test(val), {
+      .refine(val => /^[a-zA-Z0-9-_.]+$/.test(val), {
         message:
           "L'identifiant unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
       })
