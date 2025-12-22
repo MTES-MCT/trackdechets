@@ -228,6 +228,10 @@ export function simpleFormToBsdd(
     destinationOperationSignatureDate: form.processedAt,
     destinationCap: form.recipientCap,
     destinationOperationNoTraceability: form.noTraceability,
+    isUpcycled: form.isUpcycled,
+    destinationParcelInseeCodes: form.destinationParcelInseeCodes,
+    destinationParcelNumbers: form.destinationParcelNumbers,
+    destinationParcelCoordinates: form.destinationParcelCoordinates,
     destinationHasCiterneBeenWashedOut: form.hasCiterneBeenWashedOut,
     destinationCiterneNotWashedOutReason: form.citerneNotWashedOutReason,
     destinationOperationNextDestinationCompanyName:
