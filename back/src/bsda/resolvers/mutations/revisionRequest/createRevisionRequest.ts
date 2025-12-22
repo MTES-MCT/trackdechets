@@ -25,6 +25,7 @@ import { isBrokerRefinement } from "../../../../common/validation/zod/refinement
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
 import { getOperationModes } from "@td/constants";
+import { isDefined } from "../../../../common/helpers";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -260,6 +261,13 @@ async function getFlatContent(
   }
 
   const contentToValidate = { ...flatContent };
+
+  // If the user modifies the operation mode,
+  // we need to make sure both fields are present for the validation
+  if (isDefined(flatContent.destinationOperationMode)) {
+    contentToValidate.destinationOperationCode =
+      flatContent.destinationOperationCode ?? bsda.destinationOperationCode;
+  }
 
   const parsed = await schema
     // For the refused weight, we need the bsda previous state
