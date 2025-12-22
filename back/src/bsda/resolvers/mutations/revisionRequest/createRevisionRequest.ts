@@ -24,7 +24,6 @@ import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
-import { isDefined } from "../../../../common/helpers";
 import {
   castD9toD9F,
   fixOperationModeForD9F
@@ -125,7 +124,8 @@ export async function createBsdaRevisionRequest(
       create: approversSirets.map(approverSiret => ({ approverSiret }))
     },
     comment,
-    ...history
+    ...history,
+    initialPackagings: history.initialPackagings as Prisma.InputJsonValue
   });
 }
 
@@ -240,10 +240,6 @@ async function getAuthoringCompany(
 async function getFlatContent(
   content: BsdaRevisionRequestContentInput,
   bsda: Bsda
-);
-async function getFlatContent(
-  content: BsdaRevisionRequestContentInput,
-  bsda: Bsda
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsdaRevisionRequestInput(content);
   const { isCanceled, ...fields } = flatContent;
@@ -268,18 +264,6 @@ async function getFlatContent(
   }
 
   const contentToValidate = { ...flatContent };
-
-  // If the user modifies either the operation code or the operation mode,
-  // we need to make sure both fields are present for the validation
-  if (
-    isDefined(flatContent.destinationOperationCode) ||
-    isDefined(flatContent.destinationOperationMode)
-  ) {
-    contentToValidate.destinationOperationCode =
-      flatContent.destinationOperationCode ?? bsda.destinationOperationCode;
-    contentToValidate.destinationOperationMode =
-      flatContent.destinationOperationMode ?? bsda.destinationOperationMode;
-  }
 
   const parsed = await schema
     // For the refused weight, we need the bsda previous state
