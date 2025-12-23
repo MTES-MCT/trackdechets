@@ -18,6 +18,9 @@ export function bsddReducer(
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
         wasteDetailsConsistence,
+        destinationParcelInseeCodes,
+        destinationParcelCoordinates,
+        destinationParcelNumbers,
         intermediaries,
         recipientsSirets,
         transportersSirets,
@@ -58,6 +61,23 @@ export function bsddReducer(
               wasteDetailsConsistence: wasteDetailsConsistence as Consistence[]
             }
           : {}),
+        ...(destinationParcelInseeCodes
+          ? {
+              destinationParcelInseeCodes:
+                destinationParcelInseeCodes as string[]
+            }
+          : {}),
+        ...(destinationParcelCoordinates
+          ? {
+              destinationParcelCoordinates:
+                destinationParcelCoordinates as string[]
+            }
+          : {}),
+        ...(destinationParcelNumbers
+          ? {
+              destinationParcelNumbers: destinationParcelNumbers as string[]
+            }
+          : {}),
         ...dateConverter({}, bsdd),
         ...decimalConverter({}, bsdd)
       };
@@ -74,6 +94,9 @@ export function bsddReducer(
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
         wasteDetailsConsistence,
+        destinationParcelInseeCodes,
+        destinationParcelCoordinates,
+        destinationParcelNumbers,
         intermediaries,
         recipientsSirets,
         transportersSirets,
@@ -112,6 +135,23 @@ export function bsddReducer(
         ...(wasteDetailsConsistence
           ? {
               wasteDetailsConsistence: wasteDetailsConsistence as Consistence[]
+            }
+          : {}),
+        ...(destinationParcelInseeCodes
+          ? {
+              destinationParcelInseeCodes:
+                destinationParcelInseeCodes as string[]
+            }
+          : {}),
+        ...(destinationParcelCoordinates
+          ? {
+              destinationParcelCoordinates:
+                destinationParcelCoordinates as string[]
+            }
+          : {}),
+        ...(destinationParcelNumbers
+          ? {
+              destinationParcelNumbers: destinationParcelNumbers as string[]
             }
           : {}),
         ...dateConverter(currentState, event.data.content as any),

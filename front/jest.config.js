@@ -11,5 +11,5 @@ module.exports = {
   },
   testEnvironment: "jsdom",
   setupFilesAfterEnv: ["@testing-library/jest-dom", "./jest.setup.js"],
-  transformIgnorePatterns: ["node_modules/(?!@codegouvfr/react-dsfr)"]
+  transformIgnorePatterns: ["node_modules/(?!(@codegouvfr|react-dsfr|ol|geoportal-extensions-openlayers))"]
 };
