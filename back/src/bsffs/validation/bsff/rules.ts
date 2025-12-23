@@ -1,4 +1,4 @@
-import { TransportMode } from "@td/prisma";
+import { TransportMode, User } from "@td/prisma";
 import {
   getBsffUserFunctions,
   getCurrentSignatureType,
@@ -65,21 +65,20 @@ type GetBsffSignatureTypeFn<
   T extends ZodBsff | ZodBsffTransporter | ZodBsffPackaging
 > = (bsff: T, ruleContext?: RuleContext<T>) => AllBsffSignatureType | undefined;
 
-export type EditionRulePath = Leaves<
-  BsffInput & {
-    transporters: {
-      1: BsffTransporterInput;
-      2: BsffTransporterInput;
-      3: BsffTransporterInput;
-      4: BsffTransporterInput;
-      5: BsffTransporterInput;
-    };
-    packagings: {
-      [key: number]: BsffPackagingInput;
-    };
-  },
-  5
->;
+export type EditionRulePath =
+  | Leaves<
+      BsffInput & {
+        transporters: {
+          [key: string]: BsffTransporterInput;
+        };
+        packagings: {
+          [key: string]: BsffPackagingInput;
+        };
+      },
+      5
+    >
+  | ["transporters"]
+  | ["packagings"];
 
 export type TransporterEditionRulePath = Leaves<BsffTransporterInput, 5>;
 
@@ -576,28 +575,117 @@ export const bsffPackagingEditionRules: BsffPackagingEditionRules = {
     sealed: { from: "EMISSION" },
     // En attente de https://favro.com/organization/ab14a4f0460a99a9d64d4945/2c84e07578945e0ee8fb61f3?card=tra-14567
     // required: { from: "EMISSION" }
-    readableFieldName: "Le volume du contenant"
+    readableFieldName: "Le volume du contenant",
+    path: ["volume"]
   },
   weight: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
-    readableFieldName: "La masse du contenu"
+    readableFieldName: "La masse du contenu",
+    path: ["weight"]
   },
   emissionNumero: {
     sealed: { from: "EMISSION" },
     required: { from: "EMISSION" },
-    readableFieldName: "Le numéro de contenant à l'émission"
+    readableFieldName: "Le numéro de contenant à l'émission",
+    path: ["numero"]
   },
   numero: {
     sealed: {
       from: "EMISSION"
     },
     required: { from: "EMISSION" },
-    readableFieldName: "Le numéro de contenant"
+    readableFieldName: "Le numéro de contenant",
+    path: ["numero"]
   },
   previousPackagings: {
     sealed: { from: "EMISSION" }
   }
+};
+
+export const getRequiredAndSealedFieldPaths = async (
+  bsff: ZodBsff,
+  currentSignatures: AllBsffSignatureType[],
+  user: User | undefined
+): Promise<{
+  sealed: EditionRulePath[];
+}> => {
+  const sealedFields: EditionRulePath[] = [];
+  const userFunctions = await getBsffUserFunctions(user, bsff);
+  for (const bsffField of Object.keys(bsffEditionRules)) {
+    const { sealed, path } =
+      bsffEditionRules[bsffField as keyof BsffEditableFields];
+    if (path && sealed) {
+      const isSealed = isBsffFieldSealed(sealed, bsff, currentSignatures, {
+        persisted: bsff,
+        userFunctions
+      });
+      if (isSealed) {
+        sealedFields.push(path);
+      }
+    }
+  }
+  const transporters = bsff.transporters ?? [];
+  for (let i = 0; i < transporters.length; i++) {
+    const bsffTransporter = transporters[i];
+    for (const bsffTransporterField of Object.keys(
+      bsffTransporterEditionRules
+    )) {
+      const { sealed: bsffTransporterSealed, path: bsffTransporterPath } =
+        bsffTransporterEditionRules[
+          bsffTransporterField as keyof BsffTransporterEditableFields
+        ];
+      if (bsffTransporterSealed && bsffTransporterPath) {
+        const isSealed = isBsffTransporterFieldSealed(
+          bsffTransporterSealed,
+          bsffTransporter,
+          currentSignatures
+        );
+        if (isSealed) {
+          if (i === 0) {
+            // backward compatibility for single transporter UI
+            sealedFields.push(
+              ["transporter"].concat(bsffTransporterPath) as EditionRulePath
+            );
+          }
+          sealedFields.push(
+            ["transporters", `${i + 1}`].concat(
+              bsffTransporterPath
+            ) as EditionRulePath
+          );
+        }
+      }
+    }
+  }
+
+  const packagings = bsff.packagings ?? [];
+  for (let i = 0; i < packagings.length; i++) {
+    const bsffPackaging = packagings[i];
+    for (const bsffPackagingField of Object.keys(bsffPackagingEditionRules)) {
+      const { sealed: bsffPackagingSealed, path: bsffPackagingPath } =
+        bsffPackagingEditionRules[
+          bsffPackagingField as keyof BsffPackagingEditableFields
+        ];
+      if (bsffPackagingSealed && bsffPackagingPath) {
+        const isSealed = isBsffPackagingFieldSealed(
+          bsffPackagingSealed,
+          bsffPackaging,
+          currentSignatures
+        );
+        if (isSealed) {
+          sealedFields.push(
+            ["packagings", `${i + 1}`].concat(
+              bsffPackagingPath
+            ) as EditionRulePath
+          );
+        }
+      }
+    }
+  }
+
+  return {
+    sealed: sealedFields
+  };
 };
 
 /**
@@ -818,4 +906,13 @@ export function isBsffPackagingFieldRequired(
   signatures: AllBsffSignatureType[]
 ) {
   return isRuleApplied(rule, bsffPackaging, signatures);
+}
+
+function isBsffPackagingFieldSealed(
+  rule: EditionRule<ZodBsffPackaging>,
+  bsffPackaging: ZodBsffPackaging,
+  signatures: AllBsffSignatureType[],
+  context?: RuleContext<ZodBsffPackaging>
+) {
+  return isRuleApplied(rule, bsffPackaging, signatures, context);
 }
