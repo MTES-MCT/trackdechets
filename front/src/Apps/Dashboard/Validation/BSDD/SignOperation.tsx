@@ -221,7 +221,7 @@ function SignOperationModal({
 
   const showIsUpcycled =
     form.wasteDetails?.code &&
-    INCOMING_TEXS_WASTE_CODES.includes(form.wasteDetails.code) &&
+    INCOMING_TEXS_WASTE_CODES.includes(form.wasteDetails.code as any) &&
     processingOperationDone?.startsWith("R");
   const isUpcycled = watch("isUpcycled");
 
