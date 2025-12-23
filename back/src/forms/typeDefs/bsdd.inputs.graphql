@@ -177,6 +177,26 @@ input ProcessedFormInput {
   destinationOperationMode: OperationMode
 
   """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+
+  """
+  Codes INSEE des parcelles si valorisation
+  """
+  destinationParcelInseeCodes: [String!]
+
+  """
+  Numéro(s) des parcelles si valorisation
+  """
+  destinationParcelNumbers: [String!]
+
+  """
+  Coordonnées des parcelles si valorisation
+  """
+  destinationParcelCoordinates: [String!]
+
+  """
   Description de l'opération d’élimination / valorisation (case 11)
   Elle se complète automatiquement lorsque non fournie
   """

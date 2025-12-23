@@ -548,6 +548,10 @@ model Form {
   processingOperationDescription        String?
   noTraceability                        Boolean?
   destinationOperationMode              OperationMode?
+  isUpcycled                            Boolean?
+  destinationParcelInseeCodes           String[]
+  destinationParcelNumbers              String[]
+  destinationParcelCoordinates          String[]
   currentTransporterOrgId               String?
   hasCiterneBeenWashedOut               Boolean?
   citerneNotWashedOutReason             CiterneNotWashedOutReason?

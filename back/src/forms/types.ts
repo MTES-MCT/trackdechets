@@ -296,6 +296,10 @@ export type Bsdd = {
   destinationOperationCode: string | null;
   destinationOperationMode: OperationMode | null;
   destinationOperationNoTraceability: boolean | null;
+  isUpcycled: boolean | null;
+  destinationParcelInseeCodes: string[] | null;
+  destinationParcelNumbers: string[] | null;
+  destinationParcelCoordinates: string[] | null;
   destinationOperationNextDestinationCompanyName: string | null;
   destinationOperationNextDestinationCompanySiret: string | null;
   destinationOperationNextDestinationCompanyVatNumber: string | null;

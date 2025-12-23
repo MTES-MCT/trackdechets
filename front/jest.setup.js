@@ -26,3 +26,5 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn()
   }))
 });
+
+window.URL.createObjectURL = jest.fn();

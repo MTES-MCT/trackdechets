@@ -27,7 +27,8 @@ import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  getOperationModes
+  getOperationModes,
+  INCOMING_TEXS_WASTE_CODES
 } from "@td/constants";
 import {
   foreignVatNumber,
@@ -2084,7 +2085,60 @@ const processedInfoSchemaFn: (
           return true;
         }
       ),
-    processingOperationDescription: yup.string().max(250).nullable()
+    processingOperationDescription: yup.string().max(250).nullable(),
+    isUpcycled: yup
+      .boolean()
+      .nullable()
+      .test(
+        "is-upcycled-validity",
+        "Le champ 'La terre est valorisée en remblayage' ne peut être coché que pour les codes déchets terre et des opérations de réemploi.",
+        function (isUpcycled) {
+          const { processingOperationDone, wasteDetailsCode } = this.parent;
+
+          if (!isUpcycled) {
+            return true;
+          }
+
+          const isROperation = processingOperationDone.startsWith("R");
+          const isTexsCode =
+            INCOMING_TEXS_WASTE_CODES.includes(wasteDetailsCode);
+
+          return isROperation && isTexsCode;
+        }
+      )
+      .test(
+        "has-detination-values",
+        "Lorsque la terre est valorisée il faut saisir au moins une des informations de parcelle de destination (code INSEE, numéro de parcelle ou coordonnées géographiques).",
+        function (isUpcycled) {
+          if (!isUpcycled) {
+            return true;
+          }
+
+          const {
+            destinationParcelInseeCodes,
+            destinationParcelNumbers,
+            destinationParcelCoordinates
+          } = this.parent;
+
+          return (
+            destinationParcelInseeCodes?.length > 0 ||
+            destinationParcelNumbers?.length > 0 ||
+            destinationParcelCoordinates?.length > 0
+          );
+        }
+      ),
+    destinationParcelInseeCodes: yup
+      .array()
+      .of(yup.string().trim().length(5))
+      .nullable(),
+    destinationParcelNumbers: yup
+      .array()
+      .of(yup.string().matches(/^\d{1,3}-[A-Z0-9]{1,2}-\d{1,4}$/))
+      .nullable(),
+    destinationParcelCoordinates: yup
+      .array()
+      .of(yup.string().matches(/^-?\d+(\.\d+)? -?\d+(\.\d+)?$/))
+      .nullable()
   });
 
   if (
