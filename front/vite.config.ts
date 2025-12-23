@@ -7,7 +7,7 @@ import svgrPlugin from "vite-plugin-svgr";
 export default defineConfig({
   root: __dirname,
   build: {
-    outDir: "../dist/front",
+    outDir: "./dist",
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true

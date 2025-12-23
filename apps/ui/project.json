@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ui/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -16,13 +17,13 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/ui",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "apps/ui/src/main.ts",
         "tsConfig": "apps/ui/tsconfig.app.json",
         "assets": ["apps/ui/src/assets"],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
@@ -68,6 +69,5 @@
         "jestConfig": "apps/ui/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

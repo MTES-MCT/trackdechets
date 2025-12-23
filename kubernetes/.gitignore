@@ -1,0 +1,28 @@
+# Secrets and sensitive data
+secrets-*.yaml
+*.secret.yaml
+*-secrets.yaml
+
+# Kustomize build output
+kustomization-*.yaml.bak
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Environment-specific overrides (if created locally)
+overlays/*/secrets.yaml
+
+# Backup files
+*.bak
+*.backup
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db

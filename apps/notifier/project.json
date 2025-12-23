@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/notifier/src",
   "projectType": "application",
+  "tags": ["backend:background"],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -18,7 +19,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/notifier",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "apps/notifier/src/main.ts",
@@ -45,7 +46,7 @@
             "output": "./libs/back/prisma/src"
           }
         ],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
@@ -74,6 +75,7 @@
         "buildTarget": "notifier:build",
         "inspect": false
       },
+      "continuous": true,
       "configurations": {
         "development": {
           "buildTarget": "notifier:build:development"
@@ -97,6 +99,5 @@
         "jestConfig": "apps/notifier/jest.config.ts"
       }
     }
-  },
-  "tags": ["backend:background"]
+  }
 }

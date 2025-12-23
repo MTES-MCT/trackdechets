@@ -1,0 +1,147 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base configuration
+resources:
+  - ../../base
+
+# Namespace override
+namespace: trackdechets-staging
+
+# Common labels for staging environment
+commonLabels:
+  environment: staging
+
+# Environment-specific ConfigMap
+configMapGenerator:
+  - name: env-specific-config
+    literals:
+      - ENV_NAME=sandbox
+      - API_HOST=api.sandbox.trackdechets.beta.gouv.fr
+      - UI_HOST=sandbox.trackdechets.beta.gouv.fr
+      - NOTIFIER_HOST=notifier.sandbox.trackdechets.beta.gouv.fr
+      - SESSION_COOKIE_HOST=sandbox.trackdechets.beta.gouv.fr
+      - API_URL_SCHEME=https
+      - UI_URL_SCHEME=https
+
+# Patches for staging environment
+patches:
+  # Moderate replicas for staging
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: api
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: ui
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 2
+    target:
+      kind: Deployment
+      name: notifier
+
+  # Reduce database instances for staging (not full HA)
+  - patch: |-
+      - op: replace
+        path: /spec/instances
+        value: 2
+    target:
+      kind: Cluster
+      name: postgres
+      group: postgresql.cnpg.io
+  - patch: |-
+      - op: replace
+        path: /spec/nodeSets/0/count
+        value: 2
+    target:
+      kind: Elasticsearch
+      name: elasticsearch
+  - patch: |-
+      - op: replace
+        path: /spec/redis/replicas
+        value: 2
+    target:
+      kind: RedisFailover
+      name: redis
+  - patch: |-
+      - op: replace
+        path: /spec/replsets/0/size
+        value: 2
+    target:
+      kind: PerconaServerMongoDB
+      name: mongodb
+
+  # Update Ingress for sandbox environment
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: sandbox.trackdechets.beta.gouv.fr
+      - op: replace
+        path: /spec/rules/1/host
+        value: api.sandbox.trackdechets.beta.gouv.fr
+      - op: replace
+        path: /spec/rules/2/host
+        value: notifier.sandbox.trackdechets.beta.gouv.fr
+    target:
+      kind: Ingress
+      name: trackdechets-ingress
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: notifier.sandbox.trackdechets.beta.gouv.fr
+    target:
+      kind: Ingress
+      name: trackdechets-notifier-sse
+
+  # Adjust HPA for staging
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 6
+    target:
+      kind: HorizontalPodAutoscaler
+      name: api
+  - patch: |-
+      - op: replace
+        path: /spec/minReplicas
+        value: 2
+      - op: replace
+        path: /spec/maxReplicas
+        value: 4
+    target:
+      kind: HorizontalPodAutoscaler
+      name: ui
+
+images:
+  # Use staging image tags
+  - name: ghcr.io/trackdechets/ui
+    newTag: staging
+  - name: ghcr.io/trackdechets/api
+    newTag: staging
+  - name: ghcr.io/trackdechets/notifier
+    newTag: staging
+  - name: ghcr.io/trackdechets/cron
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-runner
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-indexation
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-bulk-indexation
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-bulk-indexation-master
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-webhooks
+    newTag: staging
+  - name: ghcr.io/trackdechets/queues-gerico

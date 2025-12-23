@@ -1,0 +1,139 @@
+# MongoDB Replica Set using Percona Operator
+# Requires Percona Operator for MongoDB to be installed:
+# kubectl apply -f https://raw.githubusercontent.com/percona/percona-server-mongodb-operator/main/deploy/bundle.yaml
+
+---
+apiVersion: psmdb.percona.com/v1
+kind: PerconaServerMongoDB
+metadata:
+  name: mongodb
+  namespace: trackdechets
+spec:
+  crVersion: 1.15.0
+  image: percona/percona-server-mongodb:6.0.9-7
+  imagePullPolicy: IfNotPresent
+
+  # Secrets for MongoDB users
+  secrets:
+    users: mongodb-secrets
+
+  # Replica set configuration
+  replsets:
+    - name: rs0
+      size: 3
+
+      affinity:
+        antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+      resources:
+        limits:
+          cpu: "1000m"
+          memory: "2Gi"
+        requests:
+          cpu: "300m"
+          memory: "512Mi"
+
+      volumeSpec:
+        persistentVolumeClaim:
+          storageClassName: standard
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+
+      expose:
+        enabled: false
+        exposeType: ClusterIP
+
+      nonvoting:
+        enabled: false
+        size: 0
+
+      arbiter:
+        enabled: false
+        size: 0
+
+  # Backup configuration
+  backup:
+    enabled: true
+    image: percona/percona-backup-mongodb:2.3.0
+    storages:
+      s3-backup:
+        type: s3
+        s3:
+          bucket: trackdechets-mongodb-backups
+          region: fr-par
+          endpointUrl: https://s3.fr-par.scw.cloud
+          credentialsSecret: mongodb-backup-credentials
+
+    pitr:
+      enabled: true
+      oplogSpanMin: 10
+
+    tasks:
+      - name: daily-backup
+        enabled: true
+        schedule: "0 3 * * *" # Daily at 3 AM
+        keep: 7
+        storageName: s3-backup
+        compressionType: gzip
+
+  # Monitoring
+  pmm:
+    enabled: false
+
+  sharding:
+    enabled: false
+
+---
+# Secret for MongoDB user credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-secrets
+  namespace: trackdechets
+type: Opaque
+stringData:
+  MONGODB_BACKUP_USER: backup
+  MONGODB_BACKUP_PASSWORD: changeme-backup-password
+  MONGODB_CLUSTER_ADMIN_USER: clusterAdmin
+  MONGODB_CLUSTER_ADMIN_PASSWORD: changeme-admin-password
+  MONGODB_CLUSTER_MONITOR_USER: clusterMonitor
+  MONGODB_CLUSTER_MONITOR_PASSWORD: changeme-monitor-password
+  MONGODB_USER_ADMIN_USER: userAdmin
+  MONGODB_USER_ADMIN_PASSWORD: changeme-useradmin-password
+  # Application user
+  MONGODB_DATABASE_ADMIN_USER: trackdechets
+  MONGODB_DATABASE_ADMIN_PASSWORD: changeme-trackdechets-password
+
+---
+# Secret for backup S3 credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mongodb-backup-credentials
+  namespace: trackdechets
+type: Opaque
+stringData:
+  AWS_ACCESS_KEY_ID: changeme
+  AWS_SECRET_ACCESS_KEY: changeme
+
+---
+# Service to expose MongoDB
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: trackdechets
+  labels:
+    app: mongodb
+spec:
+  selector:
+    app.kubernetes.io/name: percona-server-mongodb
+    app.kubernetes.io/instance: mongodb
+  ports:
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

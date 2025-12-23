@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import InfoWithIcon from "./InfoWithIcon";
 import { InfoIconCode } from "./infoWithIconTypes";
 

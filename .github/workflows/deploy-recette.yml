@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
       - name: Run npm ci
         run: npm ci
@@ -39,6 +39,6 @@ jobs:
           SENTRY_LOG_LEVEL: debug
         with:
           environment: recette
-          sourcemaps: ./dist/apps/api ./dist/front/assets
+          sourcemaps: ./apps/api/dist ./front/dist/assets
           projects: trackdechets-api trackdechets-front
           ignore_missing: true

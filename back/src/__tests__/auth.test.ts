@@ -65,7 +65,7 @@ describe("updateAccessTokenLastUsed", () => {
       userId: ""
     };
     updateAccessTokenLastUsed(accessToken);
-    expect(updateAccessTokenMock).not.toBeCalled();
+    expect(updateAccessTokenMock).not.toHaveBeenCalled();
   });
 
   it("should set lastUsed if it was set more than one day ago", () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import DropdownMenu from "./DropdownMenu";
 import { MemoryRouter, Route } from "react-router-dom";
 

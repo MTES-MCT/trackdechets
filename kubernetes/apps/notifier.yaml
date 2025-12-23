@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifier
+  namespace: trackdechets
+  labels:
+    app: notifier
+    app.kubernetes.io/name: notifier
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notifier
+  template:
+    metadata:
+      labels:
+        app: notifier
+        app.kubernetes.io/name: notifier
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: notifier
+          image: ghcr.io/trackdechets/notifier:latest
+          ports:
+            - name: http
+              containerPort: 82
+              protocol: TCP
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          env:
+            - name: PORT
+              value: "82"
+            - name: NOTIFIER_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: env-specific-config
+                  key: NOTIFIER_HOST
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 82
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 82
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: notifier
+                topologyKey: kubernetes.io/hostname
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: notifier
+  namespace: trackdechets
+  labels:
+    app: notifier
+spec:
+  type: ClusterIP
+  # Session affinity for SSE connections (4h timeout)
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 14400 # 4 hours
+  ports:
+    - port: 82
+      targetPort: 82
+      protocol: TCP
+      name: http
+  selector:
+    app: notifier
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: notifier
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: notifier
+  minReplicas: 2
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 600 # 10 minutes to avoid disrupting SSE connections
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 300
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 60
+      selectPolicy: Max
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: notifier
+  namespace: trackdechets
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: notifier

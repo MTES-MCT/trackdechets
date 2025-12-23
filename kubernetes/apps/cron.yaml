@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cron
+  namespace: trackdechets
+  labels:
+    app: cron
+    app.kubernetes.io/name: cron
+    app.kubernetes.io/component: cron
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  # IMPORTANT: Only 1 replica for cron jobs to avoid duplicate execution
+  replicas: 1
+  strategy:
+    type: Recreate # Ensure old pod terminates before new one starts
+  selector:
+    matchLabels:
+      app: cron
+  template:
+    metadata:
+      labels:
+        app: cron
+        app.kubernetes.io/name: cron
+        app.kubernetes.io/component: cron
+    spec:
+      containers:
+        - name: cron
+          image: ghcr.io/trackdechets/cron:latest
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+      # Ensure only one cron pod runs at a time
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: cron
+              topologyKey: kubernetes.io/hostname
+
+---
+# No HPA for cron - must remain at 1 replica
+# No Service needed - cron doesn't expose any ports

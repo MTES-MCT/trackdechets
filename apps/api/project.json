@@ -3,6 +3,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -17,7 +18,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/api",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "apps/api/src/main.ts",
@@ -44,7 +45,7 @@
             "output": "./libs/back/prisma/src"
           }
         ],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
@@ -72,6 +73,7 @@
       "options": {
         "buildTarget": "api:build"
       },
+      "continuous": true,
       "configurations": {
         "development": {
           "buildTarget": "api:build:development"
@@ -95,6 +97,5 @@
         "jestConfig": "apps/api/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

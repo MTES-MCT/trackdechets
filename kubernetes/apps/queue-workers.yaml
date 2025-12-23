@@ -1,0 +1,465 @@
+# Queue Workers - Each queue type has independent deployment for fine-grained scaling
+# All workers share same base configuration but can scale independently
+
+---
+# Queue Runner - General purpose queue worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-runner
+  namespace: trackdechets
+  labels:
+    app: queues-runner
+    app.kubernetes.io/name: queues-runner
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: queues-runner
+  template:
+    metadata:
+      labels:
+        app: queues-runner
+        app.kubernetes.io/name: queues-runner
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-runner
+          image: ghcr.io/trackdechets/queues-runner:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 1500m
+              memory: 2Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: queues-runner
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queues-runner
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# Queue Indexation - Elasticsearch indexing worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-indexation
+  namespace: trackdechets
+  labels:
+    app: queues-indexation
+    app.kubernetes.io/name: queues-indexation
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: queues-indexation
+  template:
+    metadata:
+      labels:
+        app: queues-indexation
+        app.kubernetes.io/name: queues-indexation
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-indexation
+          image: ghcr.io/trackdechets/queues-indexation:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 300m
+              memory: 512Mi
+            limits:
+              cpu: 1500m
+              memory: 2Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: queues-indexation
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queues-indexation
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# Queue Bulk Indexation - High-resource bulk indexing worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-bulk-indexation
+  namespace: trackdechets
+  labels:
+    app: queues-bulk-indexation
+    app.kubernetes.io/name: queues-bulk-indexation
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queues-bulk-indexation
+  template:
+    metadata:
+      labels:
+        app: queues-bulk-indexation
+        app.kubernetes.io/name: queues-bulk-indexation
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-bulk-indexation
+          image: ghcr.io/trackdechets/queues-bulk-indexation:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: queues-bulk-indexation
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queues-bulk-indexation
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 75
+
+---
+# Queue Bulk Indexation Master - Orchestrator (single instance)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-bulk-indexation-master
+  namespace: trackdechets
+  labels:
+    app: queues-bulk-indexation-master
+    app.kubernetes.io/name: queues-bulk-indexation-master
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: queues-bulk-indexation-master
+  template:
+    metadata:
+      labels:
+        app: queues-bulk-indexation-master
+        app.kubernetes.io/name: queues-bulk-indexation-master
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-bulk-indexation-master
+          image: ghcr.io/trackdechets/queues-bulk-indexation-master:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: queues-bulk-indexation-master
+              topologyKey: kubernetes.io/hostname
+
+---
+# Queue Webhooks - Webhook delivery worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-webhooks
+  namespace: trackdechets
+  labels:
+    app: queues-webhooks
+    app.kubernetes.io/name: queues-webhooks
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: queues-webhooks
+  template:
+    metadata:
+      labels:
+        app: queues-webhooks
+        app.kubernetes.io/name: queues-webhooks
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-webhooks
+          image: ghcr.io/trackdechets/queues-webhooks:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: queues-webhooks
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queues-webhooks
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+---
+# Queue Gerico - Gerico API integration worker
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: queues-gerico
+  namespace: trackdechets
+  labels:
+    app: queues-gerico
+    app.kubernetes.io/name: queues-gerico
+    app.kubernetes.io/component: queue-worker
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: queues-gerico
+  template:
+    metadata:
+      labels:
+        app: queues-gerico
+        app.kubernetes.io/name: queues-gerico
+        app.kubernetes.io/component: queue-worker
+    spec:
+      containers:
+        - name: queues-gerico
+          image: ghcr.io/trackdechets/queues-gerico:latest
+          imagePullPolicy: Always
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: queues-gerico
+  namespace: trackdechets
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: queues-gerico
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

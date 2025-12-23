@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { Bsdasri } from "@td/codegen-ui";
 
 import BsdCard from "./BsdCard";

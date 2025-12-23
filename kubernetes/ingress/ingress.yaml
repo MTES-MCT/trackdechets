@@ -1,0 +1,202 @@
+# Ingress configuration for Trackdéchets
+# Requires nginx-ingress-controller to be installed:
+# helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+# helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trackdechets-ingress
+  namespace: trackdechets
+  annotations:
+    # Use nginx ingress controller
+    kubernetes.io/ingress.class: nginx
+
+    # Enable SSL redirect (uncomment for production)
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+
+    # Body size for file uploads
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+
+    # Timeout configurations
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+
+    # CORS settings for API and Notifier
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://app.trackdechets.beta.gouv.fr"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
+    # WebSocket support for SSE (Notifier)
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/proxy-set-headers: |
+      Connection "upgrade"
+      Upgrade $http_upgrade
+
+    # Certificate manager (uncomment when using cert-manager)
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  # TLS configuration (uncomment for production with cert-manager)
+  # tls:
+  # - hosts:
+  #   - app.trackdechets.beta.gouv.fr
+  #   - api.trackdechets.beta.gouv.fr
+  #   - notifier.trackdechets.beta.gouv.fr
+  #   secretName: trackdechets-tls
+
+  rules:
+    # UI - Main frontend
+    - host: app.trackdechets.beta.gouv.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ui
+                port:
+                  number: 3000
+
+    # API - GraphQL backend
+    - host: api.trackdechets.beta.gouv.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 4000
+
+    # Notifier - SSE server
+    - host: notifier.trackdechets.beta.gouv.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: notifier
+                port:
+                  number: 82
+
+---
+# Additional Ingress for Notifier with extended timeout for SSE connections
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trackdechets-notifier-sse
+  namespace: trackdechets
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+    # Extended timeouts for SSE (4 hours)
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "14400"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "14400"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "14400"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+
+    # Keep-alive for long-lived connections
+    nginx.ingress.kubernetes.io/upstream-keepalive-timeout: "14400"
+
+    # WebSocket/SSE headers
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Connection '';
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_cache_bypass $http_upgrade;
+      chunked_transfer_encoding off;
+
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://app.trackdechets.beta.gouv.fr"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+spec:
+  rules:
+    - host: notifier.trackdechets.beta.gouv.fr
+      http:
+        paths:
+          - path: /updates
+            pathType: Prefix
+            backend:
+              service:
+                name: notifier
+                port:
+                  number: 82
+
+---
+# NetworkPolicy to allow ingress traffic to apps
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress
+  namespace: trackdechets
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: trackdechets
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+        - protocol: TCP
+          port: 4000
+        - protocol: TCP
+          port: 82
+
+---
+# NetworkPolicy to allow internal communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-internal
+  namespace: trackdechets
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: trackdechets
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: trackdechets
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/part-of: trackdechets
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow external traffic (HTTPS, external APIs)
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80

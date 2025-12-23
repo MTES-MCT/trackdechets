@@ -15,7 +15,7 @@ describe("applicationSchema", () => {
   test("0 length redirectUris", async () => {
     const shouldThrow = () =>
       applicationSchema.validate({ ...application, redirectUris: [] });
-    await expect(shouldThrow()).rejects.toThrowError(
+    await expect(shouldThrow()).rejects.toThrow(
       "Vous devez préciser au moins une URL de redirection"
     );
   });
@@ -26,7 +26,7 @@ describe("applicationSchema", () => {
         ...application,
         redirectUris: ["ceci n'est pas une URL"]
       });
-    await expect(shouldThrow()).rejects.toThrowError(
+    await expect(shouldThrow()).rejects.toThrow(
       "URL de redirection non sécurisée ou invalide"
     );
   });
