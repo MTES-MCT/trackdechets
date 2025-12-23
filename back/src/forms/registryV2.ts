@@ -689,10 +689,10 @@ export const toOutgoingWasteV2 = (
     destinationFinalOperationWeights,
     gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null,
-    isUpcycled: null,
-    destinationParcelInseeCodes: null,
-    destinationParcelNumbers: null,
-    destinationParcelCoordinates: null
+    isUpcycled: bsdd.isUpcycled,
+    destinationParcelInseeCodes: bsdd.destinationParcelInseeCodes,
+    destinationParcelNumbers: bsdd.destinationParcelNumbers,
+    destinationParcelCoordinates: bsdd.destinationParcelCoordinates
   };
 };
 
@@ -1233,10 +1233,10 @@ export const toManagedWasteV2 = (
     destinationFinalOperationWeights,
     gistridNumber: bsdd.nextDestinationNotificationNumber,
     movementNumber: null,
-    isUpcycled: null,
-    destinationParcelInseeCodes: null,
-    destinationParcelNumbers: null,
-    destinationParcelCoordinates: null
+    isUpcycled: bsdd.isUpcycled,
+    destinationParcelInseeCodes: bsdd.destinationParcelInseeCodes,
+    destinationParcelNumbers: bsdd.destinationParcelNumbers,
+    destinationParcelCoordinates: bsdd.destinationParcelCoordinates
   };
 };
 
@@ -1527,10 +1527,10 @@ export const toAllWasteV2 = (
     destinationFinalOperationCodes,
     destinationFinalOperationWeights,
     gistridNumber: bsdd.nextDestinationNotificationNumber,
-    isUpcycled: null,
-    destinationParcelInseeCodes: null,
-    destinationParcelNumbers: null,
-    destinationParcelCoordinates: null
+    isUpcycled: bsdd.isUpcycled,
+    destinationParcelInseeCodes: bsdd.destinationParcelInseeCodes,
+    destinationParcelNumbers: bsdd.destinationParcelNumbers,
+    destinationParcelCoordinates: bsdd.destinationParcelCoordinates
   };
 };
 
