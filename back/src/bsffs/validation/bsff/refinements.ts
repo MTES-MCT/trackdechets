@@ -102,11 +102,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Conditionnements : le volume est requis",
-        path: [
-          "packagings",
-          `${i + 1}`,
-          "volume"
-        ] as EditionRulePath as string[]
+        path: ["packagings", i, "volume"]
       });
     }
 
@@ -119,11 +115,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Conditionnements : le volume doit être supérieur à 0",
-        path: [
-          "packagings",
-          `${i + 1}`,
-          "volume"
-        ] as EditionRulePath as string[]
+        path: ["packagings", i, "volume"]
       });
     }
 
@@ -136,11 +128,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       addIssue({
         code: z.ZodIssueCode.custom,
         message: "Conditionnements : le poids doit être supérieur à 0",
-        path: [
-          "packagings",
-          `${i + 1}`,
-          "weight"
-        ] as EditionRulePath as string[]
+        path: ["packagings", i, "weight"]
       });
     }
 
@@ -152,7 +140,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
         code: z.ZodIssueCode.custom,
         message:
           "Conditionnement : le champ `other` doit être précisée pour le conditionnement 'AUTRE'.",
-        path: ["packagings", `${i + 1}`, "other"] as EditionRulePath as string[]
+        path: ["packagings", i, "other"]
       });
     }
 
@@ -165,7 +153,7 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
         code: z.ZodIssueCode.custom,
         message:
           "Conditionnement : le champ `other` ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'.",
-        path: ["packagings", `${i + 1}`, "other"] as EditionRulePath as string[]
+        path: ["packagings", i, "other"]
       });
     }
   }

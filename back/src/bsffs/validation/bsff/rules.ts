@@ -65,20 +65,21 @@ type GetBsffSignatureTypeFn<
   T extends ZodBsff | ZodBsffTransporter | ZodBsffPackaging
 > = (bsff: T, ruleContext?: RuleContext<T>) => AllBsffSignatureType | undefined;
 
-export type EditionRulePath =
-  | Leaves<
-      BsffInput & {
-        transporters: {
-          [key: string]: BsffTransporterInput;
-        };
-        packagings: {
-          [key: string]: BsffPackagingInput;
-        };
-      },
-      5
-    >
-  | ["transporters"]
-  | ["packagings"];
+export type EditionRulePath = Leaves<
+  BsffInput & {
+    transporters: {
+      1: BsffTransporterInput;
+      2: BsffTransporterInput;
+      3: BsffTransporterInput;
+      4: BsffTransporterInput;
+      5: BsffTransporterInput;
+    };
+    packagings: {
+      [key: number]: BsffPackagingInput;
+    };
+  },
+  5
+>;
 
 export type TransporterEditionRulePath = Leaves<BsffTransporterInput, 5>;
 
@@ -366,8 +367,7 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
     },
-    readableFieldName: "L'auteur de la signature émetteur",
-    path: ["emitter"]
+    readableFieldName: "L'auteur de la signature émetteur"
   },
   emitterEmissionSignatureDate: {
     sealed: { from: "EMISSION" },
@@ -376,8 +376,7 @@ export const bsffEditionRules: BsffEditionRules = {
       customErrorMessage:
         "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
     },
-    readableFieldName: "La date de signature de l'émetteur",
-    path: ["emitter"]
+    readableFieldName: "La date de signature de l'émetteur"
   },
   transporterTransportSignatureDate: {
     sealed: { from: "TRANSPORT" },
@@ -674,9 +673,7 @@ export const getRequiredAndSealedFieldPaths = async (
         );
         if (isSealed) {
           sealedFields.push(
-            ["packagings", `${i + 1}`].concat(
-              bsffPackagingPath
-            ) as EditionRulePath
+            ["packagings", `${i}`].concat(bsffPackagingPath) as EditionRulePath
           );
         }
       }
