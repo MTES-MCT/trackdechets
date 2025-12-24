@@ -250,9 +250,7 @@ const BsdaFormSteps = ({
       "ecoOrganisme.hasEcoOrganisme",
       "hasBroker",
       "hasIntermediaries",
-      "emitter.company.street",
-      "emitter.company.city",
-      "emitter.company.postalCode"
+      "emitter.company.city"
     ]);
     const worker = cleanInput.worker.isDisabled
       ? { ...cleanInput.worker }

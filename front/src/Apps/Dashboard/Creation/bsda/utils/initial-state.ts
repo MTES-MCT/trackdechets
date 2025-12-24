@@ -14,8 +14,6 @@ const getInitialEmitterCompany = (emitter?: BsdaEmitterInput | null) => {
     name: emitter?.company?.name ?? "",
     address: emitter?.company?.address ?? "",
     city: "",
-    street: "",
-    postalCode: "",
     contact: emitter?.company?.contact ?? "",
     mail: emitter?.company?.mail ?? "",
     phone: emitter?.company?.phone ?? "",
