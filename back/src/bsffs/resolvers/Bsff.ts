@@ -98,5 +98,10 @@ export const Bsff: BsffResolvers = {
       1
     );
     return grouping.map(p => expandBsffPackagingFromDB(p));
+  },
+  metadata: bsff => {
+    return {
+      id: bsff.id
+    } as any;
   }
 };

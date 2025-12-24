@@ -95,6 +95,8 @@ type Bsff {
   grouping: [BsffPackaging!]!
 
   repackaging: [BsffPackaging!]!
+
+  metadata: BsffMetadata!
 }
 
 """
@@ -356,4 +358,21 @@ type BsffPackagingConnection {
 type BsffPackagingEdge {
   cursor: String!
   node: BsffPackaging!
+}
+
+type BsffMetadataFields {
+  "Liste des champs scellés"
+  sealed: [[String!]!]!
+}
+
+type BsffMetadata {
+  errors: [BsffError!]!
+  "Informations sur les champs"
+  fields: BsffMetadataFields!
+}
+
+type BsffError {
+  message: String!
+  path: [String!]!
+  requiredFor: BsffSignatureType!
 }

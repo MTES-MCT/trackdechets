@@ -5,6 +5,7 @@ import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
 import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
+import { createBsffDataLoaders } from "./bsffs/dataloader";
 import { GqlInfo } from "./common/plugins/gqlInfosPlugin";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
@@ -14,6 +15,7 @@ export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
   ReturnType<typeof createCompanyDataLoaders> &
   ReturnType<typeof createFormDataLoaders> &
   ReturnType<typeof createBsdaDataLoaders> &
+  ReturnType<typeof createBsffDataLoaders> &
   ReturnType<typeof createBsvhuDataLoaders> &
   ReturnType<typeof createBspaohDataLoaders> &
   ReturnType<typeof createEventsDataLoaders>;

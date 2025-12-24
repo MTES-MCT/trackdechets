@@ -23,6 +23,7 @@ import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { passportBearerMiddleware } from "./auth/auth";
 import { createBsdaDataLoaders } from "./bsda/dataloader";
 import { createBspaohDataLoaders } from "./bspaoh/dataloader";
+import { createBsffDataLoaders } from "./bsffs/dataloader";
 import { createBsvhuDataLoaders } from "./bsvhu/dataloader";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
 import { ErrorCode, UserInputError } from "./common/errors";
@@ -429,6 +430,7 @@ export const getServerDataloaders = () => ({
   ...createCompanyDataLoaders(),
   ...createFormDataLoaders(),
   ...createBsdaDataLoaders(),
+  ...createBsffDataLoaders(),
   ...createBsvhuDataLoaders(),
   ...createBspaohDataLoaders(),
   ...createEventsDataLoaders()
