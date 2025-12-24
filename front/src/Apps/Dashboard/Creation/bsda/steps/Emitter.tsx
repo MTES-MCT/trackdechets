@@ -31,8 +31,6 @@ const EmitterBsda = () => {
     register("emitter.company.vatNumber");
     register("emitter.company.address");
     register("emitter.company.city");
-    register("emitter.company.street");
-    register("emitter.company.postalCode");
   }, [register]);
 
   useEffect(() => {
@@ -107,8 +105,6 @@ const EmitterBsda = () => {
                     setValue("emitter.company.contact", null);
                     setValue("emitter.company.address", null);
                     setValue("emitter.company.city", null);
-                    setValue("emitter.company.street", null);
-                    setValue("emitter.company.postalCode", null);
                     setValue("emitter.company.phone", null);
                     setValue("emitter.company.mail", null);
                   }
@@ -135,70 +131,47 @@ const EmitterBsda = () => {
           <>
             <h4 className="fr-h4">Particulier</h4>
 
-            <div className="form__row">
-              {emitter?.isPrivateIndividual ? (
-                <Input
-                  label="Nom et prénom"
-                  nativeInputProps={{
-                    ...register("emitter.company.name")
-                  }}
-                  disabled={sealedFields.includes(`emitter.company.name`)}
-                  state={
-                    formState.errors?.emitter?.["company"]?.name && "error"
-                  }
-                  stateRelatedMessage={
-                    (formState.errors?.emitter?.["company"]?.name
-                      ?.message as string) ?? ""
-                  }
-                />
-              ) : (
-                <Input
-                  label="Personne à contacter"
-                  nativeInputProps={{
-                    ...register("emitter.company.contact")
-                  }}
-                  disabled={sealedFields.includes(`emitter.company.contact`)}
-                  state={
-                    formState.errors?.emitter?.["company"]?.contact && "error"
-                  }
-                  stateRelatedMessage={
-                    (formState.errors?.emitter?.["company"]?.contact
-                      ?.message as string) ?? ""
-                  }
-                />
-              )}
-            </div>
-            <div className="form__row">
-              <DsfrfWorkSiteAddress
-                address={emitter?.company?.address}
-                city={emitter?.company?.city}
-                postalCode={emitter?.company?.postalCode}
-                onAddressSelection={details => {
-                  // `address` is passed as `name` because of adresse api return fields
-                  setValue("emitter.company.address", details.name);
-                  setValue("emitter.company.city", details.city);
-                  setValue("emitter.company.postalCode", details.postcode);
-                }}
-                designation=""
-              />
-
-              {formState.errors?.emitter?.["company"]?.address?.message && (
-                <p
-                  id="text-input-error-desc-error"
-                  className="fr-mb-4v fr-error-text"
-                >
-                  {formState.errors?.emitter?.["company"]?.address?.message}
-                </p>
-              )}
-            </div>
             <div className="fr-grid-row">
+              <Input
+                label="Nom et prénom"
+                nativeInputProps={{
+                  ...register("emitter.company.name")
+                }}
+                disabled={sealedFields.includes(`emitter.company.name`)}
+                state={formState.errors?.emitter?.["company"]?.name && "error"}
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.name
+                    ?.message as string) ?? ""
+                }
+              />
+            </div>
+
+            <div className="fr-grid-row fr-grid-row--gutters">
+              <Input
+                label="Adresse"
+                className="fr-col-md-10"
+                nativeInputProps={{
+                  ...register("emitter.company.address")
+                }}
+                disabled={sealedFields.includes(`emitter.company.address`)}
+                state={
+                  formState.errors?.emitter?.["company"]?.address && "error"
+                }
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.address
+                    ?.message as string) ?? ""
+                }
+              />
+            </div>
+
+            <div className="fr-grid-row fr-grid-row--gutters">
               <Input
                 label="Téléphone"
                 nativeInputProps={{
                   ...register("emitter.company.phone")
                 }}
                 disabled={sealedFields.includes(`emitter.company.phone`)}
-                className="fr-col-md-4 fr-mr-2w"
+                className="fr-col-md-4"
                 state={formState.errors?.emitter?.["company"]?.phone && "error"}
                 stateRelatedMessage={
                   (formState.errors?.emitter?.["company"]?.phone
