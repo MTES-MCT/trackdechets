@@ -24,6 +24,7 @@ import {
   companySchema,
   transporterCompanySchema
 } from "../../../common/validation/schema";
+import { envConfig } from "../../../common/envConfig";
 
 setLocale({
   mixed: {
@@ -117,9 +118,7 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
       .test(
         "is-siret",
         "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
-        siret =>
-          !siret ||
-          isSiret(siret, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
+        siret => !siret || isSiret(siret, envConfig.VITE_ALLOW_TEST_COMPANY)
       ),
     contact: string().required(
       "Intermédiaires: les nom et prénom de contact sont obligatoires"

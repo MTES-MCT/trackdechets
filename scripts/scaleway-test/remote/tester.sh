@@ -5,7 +5,7 @@ reset=$(tput sgr0)
 green=$(tput setaf 2)
 red=$(tput setaf 9)
 
-echo "${bold}→ This utility will automatically restore the sandbox database from a dump,"
+echo "${bold}→ This utility will automatically restore the sandbox or prod database from a dump,"
 echo "pull everything from the branch you specify"
 echo "You can then run npx prisma migrate dev to test your migrations, or npx nx run @td/scripts:migrate to run scripts${reset}"
 

@@ -1,7 +1,8 @@
 import { QueryBsdsArgs } from "@td/codegen-ui";
 import { useState, useEffect } from "react";
+import { envConfig } from "../../../common/envConfig";
 
-const host = import.meta.env.VITE_NOTIFIER_ENDPOINT;
+const host = envConfig.VITE_NOTIFIER_ENDPOINT;
 
 export function useNotifier(
   siret: string,

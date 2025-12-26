@@ -1,7 +1,8 @@
 import {
   refineOperationCodeWhenUpcycled,
   refineOperationModeConsistency,
-  refineTransportersConsistency
+  refineTransportersConsistency,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -24,6 +25,7 @@ import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncManaged(line: unknown) {
   return managedSchema
+    .superRefine(refineDateLimits(["managingStartDate", "managingEndDate"]))
     .superRefine(refineDates)
     .superRefine(refineInitialEmitter)
     .superRefine(refineEmitter)

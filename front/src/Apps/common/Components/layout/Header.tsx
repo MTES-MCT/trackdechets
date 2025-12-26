@@ -37,6 +37,7 @@ import routes from "../../../routes";
 import styles from "./Header.module.scss";
 import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
 import { useMyCompany } from "../../hooks/useMyCompany";
+import { envConfig } from "../../../../common/envConfig";
 
 const MenuLink = ({ entry }) => {
   return entry.navlink ? (
@@ -621,7 +622,7 @@ const getDesktopMenuEntries = (
  * On mobile appear as a sliding panel and includes other items
  */
 export default function Header() {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const {
