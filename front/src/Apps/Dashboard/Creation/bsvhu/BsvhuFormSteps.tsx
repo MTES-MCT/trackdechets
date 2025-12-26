@@ -49,6 +49,7 @@ import {
   UPDATE_BSVHU_TRANSPORTER
 } from "../../../Forms/Components/query";
 import { parseDate } from "../../../../common/datetime";
+import { envConfig } from "../../../../common/envConfig";
 
 const vhuToInput = (vhu: ZodBsvhu): BsvhuInput => {
   const addressCleanup: string[] = [];
@@ -293,7 +294,7 @@ const BsvhuFormSteps = ({
 
   // Date de la MAJ 2024.12.1 qui modifie les règles de validation de BsvhuInput.packaging et identification.type
   const v20241201Date =
-    import.meta.env.VITE_OVERRIDE_V20241201 || "2024-12-18T00:00:00.000";
+    envConfig.VITE_OVERRIDE_V20241201 || "2024-12-18T00:00:00.000";
 
   const v20241201 = new Date(v20241201Date);
 

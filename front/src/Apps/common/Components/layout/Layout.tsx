@@ -10,13 +10,14 @@ import downtimeIcon from "./assets/code-downtime.svg";
 import PageTitle from "../PageTitle/PageTitle";
 import A11ySkipLinks from "../A11ySkipLinks/A11ySkipLinks";
 import { ConsentBanner } from "../ConsentBanner/ConsentBanner";
+import { envConfig } from "../../../../common/envConfig";
 interface AuthProps {
   v2banner?: JSX.Element;
   isAuthenticated?: boolean;
 }
 
 const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE, VITE_API_ENDPOINT } =
-  import.meta.env;
+  envConfig;
 
 const GET_WARNING_MESSAGE = gql`
   query GetWarningMessage {

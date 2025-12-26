@@ -4,10 +4,11 @@ import CompanyIdentificationForm from "./CompanyIdentificationForm";
 import CompanyProfileForm from "./CompanyProfileForm";
 import AccountFieldCompanyVerificationStatus from "../../Account/fields/AccountFieldCompanyVerificationStatus";
 import { PROFESSIONALS } from "@td/constants";
+import { envConfig } from "../../../common/envConfig";
 
 import "./companyInfo.scss";
 
-const { VITE_VERIFY_COMPANY } = import.meta.env;
+const { VITE_VERIFY_COMPANY } = envConfig;
 
 interface CompanyInfoProps {
   company: CompanyPrivate;
@@ -24,7 +25,7 @@ const CompanyInfo = ({ company }: CompanyInfoProps) => {
       <br />
       <hr />
       <CompanyProfileForm company={company} />
-      {isWasteProfessional && VITE_VERIFY_COMPANY === "true" && (
+      {isWasteProfessional && VITE_VERIFY_COMPANY && (
         <AccountFieldCompanyVerificationStatus company={company} />
       )}
     </div>

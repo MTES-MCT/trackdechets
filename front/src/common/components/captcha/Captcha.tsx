@@ -4,8 +4,9 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import classNames from "classnames";
 import "./Captcha.scss";
 import { Loader } from "../../../Apps/common/Components";
+import { envConfig } from "../../envConfig";
 
-const { VITE_API_ENDPOINT } = import.meta.env;
+const { VITE_API_ENDPOINT } = envConfig;
 
 const CaptchaAudio = ({ captchaToken }) => {
   const [playing, setPlaying] = useState(false);

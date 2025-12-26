@@ -6,10 +6,8 @@ import {
   isSiret,
   TdOperationCodeEnum,
   WASTE_CODES_BALE,
-  WasteCodeEnum,
-  MIN_DATE_FOR_REGISTRY
+  WasteCodeEnum
 } from "@td/constants";
-import { sub } from "date-fns";
 import { z } from "zod";
 
 const enumValueAsStringSchema = z
@@ -244,10 +242,10 @@ export const volumeSchema = z
 
 export const dateSchema = z.coerce
   .date()
-  .min(
-    sub(new Date(), MIN_DATE_FOR_REGISTRY),
-    "La date ne peut pas être antérieure à J-18 mois"
-  )
+  // .min(
+  //   sub(new Date(), MIN_DATE_FOR_REGISTRY),
+  //   "La date ne peut pas être antérieure à J-18 mois"
+  // )
   .refine(date => date <= new Date(), "La date ne peut pas être dans le futur"); // Dont use max() as the date must be dynamic
 
 export const nullishDateSchema = z
@@ -277,10 +275,10 @@ export const nullishDateSchema = z
   .pipe(
     z
       .date()
-      .min(
-        sub(new Date(), MIN_DATE_FOR_REGISTRY),
-        "La date ne peut pas être antérieure à J-18 mois"
-      )
+      // .min(
+      //   sub(new Date(), MIN_DATE_FOR_REGISTRY),
+      //   "La date ne peut pas être antérieure à J-18 mois"
+      // )
       .refine(
         date => date <= new Date(),
         "La date ne peut pas être dans le futur"

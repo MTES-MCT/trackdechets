@@ -4,7 +4,8 @@ import {
   refineMunicipalities,
   refineGistridNumber,
   refineTransportersConsistency,
-  refineOperationModeConsistency
+  refineOperationModeConsistency,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -22,6 +23,7 @@ import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncOutgoingWaste(line: unknown) {
   return outgoingWasteSchema
+    .superRefine(refineDateLimits(["dispatchDate"]))
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)
     .superRefine(refineGistridNumber)

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
+import { envConfig } from "../../envConfig";
 
 export interface CaptchaData {
   img: string;
   token: string;
 }
 
-const { VITE_API_ENDPOINT } = import.meta.env;
+const { VITE_API_ENDPOINT } = envConfig;
 const captchaUrl = `${VITE_API_ENDPOINT}/captcha`;
 
 export function useCaptcha(displayCaptcha: boolean) {

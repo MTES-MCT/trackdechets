@@ -11,6 +11,7 @@ import { PasswordInput } from "@codegouvfr/react-dsfr/blocks/PasswordInput";
 import { Loader } from "../Apps/common/Components";
 
 import styles from "./Login.module.scss";
+import { envConfig } from "../common/envConfig";
 
 function getErrorMessage(errorCode: string): {
   description: string | React.ReactElement;
@@ -100,7 +101,7 @@ export default function Login() {
   }
 
   const formRef = createRef<HTMLFormElement>();
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
 
   const createdWithSuccess = queries.signup === "complete";
 
