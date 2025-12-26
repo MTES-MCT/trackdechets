@@ -8,6 +8,7 @@ import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
 import { removeOrgId } from "./common/helper";
 import { localAuthService } from "./login/auth.service";
+import { envConfig } from "./common/envConfig";
 
 /**
  * Automatically erase `__typename` from variables
@@ -63,7 +64,7 @@ const errorLink = onError(({ response, graphQLErrors }) => {
 });
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_API_ENDPOINT as string,
+  uri: envConfig.VITE_API_ENDPOINT,
   credentials: "include"
 });
 

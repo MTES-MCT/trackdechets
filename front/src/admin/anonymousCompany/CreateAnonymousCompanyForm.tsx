@@ -14,6 +14,7 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import Button from "@codegouvfr/react-dsfr/Button";
 import { CodeCommuneLinks } from "./CodeCommuneLinks";
 import { isFRVat, isSiret, isVat, nafCodes } from "@td/constants";
+import { envConfig } from "../../common/envConfig";
 
 export const MISSING_COMPANY_SIRET = "Le SIRET de l'entreprise est obligatoire";
 
@@ -61,9 +62,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       .test(
         "is-siret",
         "SIRET invalide",
-        value =>
-          !value ||
-          isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
+        value => !value || isSiret(value, envConfig.VITE_ALLOW_TEST_COMPANY)
       )
   });
 

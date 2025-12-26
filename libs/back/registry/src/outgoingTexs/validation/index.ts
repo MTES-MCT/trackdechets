@@ -7,7 +7,8 @@ import {
   refineOperationCodeWhenUpcycled,
   refineTransportersConsistency,
   requiredParcelsRefinement,
-  refineOperationModeConsistency
+  refineOperationModeConsistency,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -25,6 +26,7 @@ import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncOutgoingTexs(line: unknown) {
   return outgoingTexsSchema
+    .superRefine(refineDateLimits(["dispatchDate"]))
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)
     .superRefine(refineGistridNumber)

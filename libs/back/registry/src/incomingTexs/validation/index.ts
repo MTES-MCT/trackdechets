@@ -9,7 +9,8 @@ import {
   refineRequiredOperationMode,
   refineOperationModeConsistency,
   refineTransportersConsistency,
-  requiredParcelsRefinement
+  requiredParcelsRefinement,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -28,6 +29,7 @@ import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncIncomingTexs(line: unknown) {
   return incomingTexsSchema
+    .superRefine(refineDateLimits(["receptionDate"]))
     .superRefine(refineReportForProfile)
     .superRefine(refineIsDangerous)
     .superRefine(refineMunicipalities)

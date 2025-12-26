@@ -28,6 +28,7 @@ import { Modal } from "../../common/components";
 import { PermissionsContext } from "../../common/contexts/PermissionsContext";
 import { BsdDetailContent } from "./BsdDetailContent";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { envConfig } from "../../common/envConfig";
 
 const BSD = gql`
   query Bsd($id: String!) {
@@ -78,7 +79,7 @@ const COMPANY_ACCOUNT_ADD_PRIVATE_INFOS = gql`
   }
 `;
 
-const { VITE_API_ENDPOINT } = import.meta.env;
+const { VITE_API_ENDPOINT } = envConfig;
 
 export function BsdAdmin() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);

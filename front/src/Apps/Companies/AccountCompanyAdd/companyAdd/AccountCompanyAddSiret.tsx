@@ -19,6 +19,7 @@ import { Input } from "@codegouvfr/react-dsfr/Input";
 import AccountCompanyAddAnonymousCompany from "./anonymous/AccountCompanyAddAnonymousCompany";
 import AccountCompanyAddSiretError from "./AccountCompanyAddSiretError";
 import { CREATE_TEST_COMPANY } from "../../common/queries";
+import { envConfig } from "../../../../common/envConfig";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -170,7 +171,7 @@ export default function AccountCompanyAddSiret({
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,
-                import.meta.env.VITE_ALLOW_TEST_COMPANY
+                envConfig.VITE_ALLOW_TEST_COMPANY
               );
               const isValidVat = isVat(values.siret);
 
@@ -278,25 +279,24 @@ export default function AccountCompanyAddSiret({
                   }}
                 </Field>
 
-                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" &&
-                  !onlyForeignVAT && (
-                    <Button
-                      type="button"
-                      priority="tertiary"
-                      disabled={loading || isDisabled}
-                      title="Génère un SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
-                      onClick={() =>
-                        createTestCompany().then(response => {
-                          setFieldValue(
-                            "siret",
-                            response.data?.createTestCompany
-                          );
-                        })
-                      }
-                    >
-                      Obtenir un SIRET factice
-                    </Button>
-                  )}
+                {envConfig.VITE_ALLOW_TEST_COMPANY && !onlyForeignVAT && (
+                  <Button
+                    type="button"
+                    priority="tertiary"
+                    disabled={loading || isDisabled}
+                    title="Génère un SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
+                    onClick={() =>
+                      createTestCompany().then(response => {
+                        setFieldValue(
+                          "siret",
+                          response.data?.createTestCompany
+                        );
+                      })
+                    }
+                  >
+                    Obtenir un SIRET factice
+                  </Button>
+                )}
 
                 {isRegistered && (
                   <AccountCompanyAddMembershipRequest siret={values.siret} />

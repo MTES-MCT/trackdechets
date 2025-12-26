@@ -5,9 +5,10 @@ import { useOAuth2, AuthorizePayload } from "./use-oauth2";
 import { localAuthService } from "../login/auth.service";
 
 import Button from "@codegouvfr/react-dsfr/Button";
+import { envConfig } from "../common/envConfig";
 
 export function Oauth2Dialog() {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
   const { loading, error, authorizePayload } = useOAuth2();
 
   return (
@@ -35,7 +36,7 @@ function AuthDialog({
   error,
   nonce
 }: AuthDialogProps) {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
 
   if (loading) {
     return <Loader />;
