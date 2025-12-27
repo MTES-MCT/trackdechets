@@ -445,7 +445,7 @@ export const managedFormShape: FormShape = [
         shape: "generic",
         type: "checkbox",
         label: Labels.isUpcycled,
-        required: false,
+        required: true,
         validation: {
           isUpcycled: booleanString
         }
