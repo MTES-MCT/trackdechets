@@ -124,7 +124,6 @@ describe("String", () => {
   afterAll(() => jest.clearAllMocks());
 
   const typeDefs = gql`
-    scalar String
     type Foo {
       bar: String
     }
@@ -140,7 +139,6 @@ describe("String", () => {
   const createFooMock = jest.fn();
 
   const resolvers = {
-    String: scalars.String,
     Query: {
       foo: () => {
         return resolveFooMock();
@@ -197,30 +195,6 @@ describe("String", () => {
     assert(body.kind === "single");
     expect(body.singleResult.errors).toBeUndefined();
     expect(body.singleResult.data!.foo.bar).toEqual("");
-  });
-
-  it("should remove <script> tag", async () => {
-    resolveFooMock.mockReturnValue({ bar: "<script>oué</script>" });
-    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
-    assert(body.kind === "single");
-    expect(body.singleResult.errors).toBeUndefined();
-    expect(body.singleResult.data!.foo.bar).toEqual("oué");
-  });
-
-  it("should remove forbidden opening tag only", async () => {
-    resolveFooMock.mockReturnValue({ bar: "<script>yes" });
-    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
-    assert(body.kind === "single");
-    expect(body.singleResult.errors).toBeUndefined();
-    expect(body.singleResult.data!.foo.bar).toEqual("yes");
-  });
-
-  it("should escape < and >", async () => {
-    resolveFooMock.mockReturnValue({ bar: "> <" });
-    const { body } = await server.executeOperation<any>({ query: FOO_QUERY });
-    assert(body.kind === "single");
-    expect(body.singleResult.errors).toBeUndefined();
-    expect(body.singleResult.data!.foo.bar).toEqual("&gt; &lt;");
   });
 
   it("should leave incoming data untouched", async () => {

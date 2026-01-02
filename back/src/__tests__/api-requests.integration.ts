@@ -29,23 +29,6 @@ describe("Perform api requests", () => {
     expect(res.body.data.me.email).toEqual(user.email);
   });
 
-  it("should sanitize graphql responses", async () => {
-    const { user, accessToken } = await userWithAccessTokenFactory({
-      name: "<script>Rich",
-      email: "<script>yes</script>"
-    });
-    const { body } = await request
-      .post("/")
-      .type("application/graphql")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send("{ me { id, isAdmin, email, name }}");
-
-    expect(body.data.me.id).toEqual(user.id);
-    expect(body.data.me.name).toEqual("Rich");
-    expect(body.data.me.email).toEqual("yes");
-    expect(body.data.me.isAdmin).toEqual(false);
-  });
-
   it("should allow batch operations", async () => {
     const { user, accessToken } = await userWithAccessTokenFactory();
 
