@@ -11,6 +11,48 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Remontée des chemins d'erreurs et de champs scellés sur BSFF [PR 4604](https://github.com/MTES-MCT/trackdechets/pull/4604)
 
+# [2025.12.1] 16/12/2025
+
+#### :nail_care: Améliorations
+
+- Amélioration de la remontée d'erreur en cas de publicId dupiqué dans un import au registre [PR 4560](https://github.com/MTES-MCT/trackdechets/pull/4560)
+- Affichage des révisions passées jusqu'à 18 mois à la place de seulement 6 mois [PR 4559](https://github.com/MTES-MCT/trackdechets/pull/4559)
+- Augmentation de la limite de caractères sur le champ "Mentions au titre des règlements RID, ADN, IMDG" du BSDA [PR 4529](https://github.com/MTES-MCT/trackdechets/pull/4529)
+- Ajout d'une protection anti bruteforce sur les signatures via code [PR 4539](https://github.com/MTES-MCT/trackdechets/pull/4539)
+- Sanitization des noms d'entreprise en sortie de répertoire SIRENE pour éviter les problèmes de caractères spéciaux [PR 4563](https://github.com/MTES-MCT/trackdechets/pull/4563)
+- Amélioration du rate limiting prenant en compte les requêtes multiples [PR 4536](https://github.com/MTES-MCT/trackdechets/pull/4536)
+- Ajout de pagination dynamique sur les requêtes de pagaging BSFF dans le cas de reconditionnements [PR 4555](https://github.com/MTES-MCT/trackdechets/pull/4555)
+- Ajout d'un rate limiting sur le signup [PR 4537](https://github.com/MTES-MCT/trackdechets/pull/4537)
+- Renommage du type d'établissement "Crémation" par "Crématorium (ou cimetière Guyane)" [PR 4553](https://github.com/MTES-MCT/trackdechets/pull/4553)
+- Ajout de la mention « Établissement mis en sommeil » sur la fiche Trackdéchets de l’établissement lorsque la fonctionnalité est activée [PR 4554](https://github.com/MTES-MCT/trackdechets/pull/4554)
+- Ajout d'une colonne "Type de poids de la quantité traitée nette" sur les registres sortant, gestion, transport et exhaustif [PR 4531](https://github.com/MTES-MCT/trackdechets/pull/4531)
+- Ajout du mode d'opération sélectionné au traitement sur l'aperçu d'un BSVHU [PR 4546](https://github.com/MTES-MCT/trackdechets/pull/4546)
+- Renommage de Adresse e-mail par Courriel lorsque je vise une destination ultérieure à l'étranger sur le BSDD [PR 4541](https://github.com/MTES-MCT/trackdechets/pull/4541)
+- Harmonisation des statuts affichés des bordereaux dans le tableau de bord [PR 4527](https://github.com/MTES-MCT/trackdechets/pull/4527)
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Passage du formulaire de création BSDA au DSFR [PR 4484](https://github.com/MTES-MCT/trackdechets/pull/4484)
+- Ajout d'un filtre "Statut du bordereau" sur le tableau de bord [PR 4510](https://github.com/MTES-MCT/trackdechets/pull/4510)
+- Ajout d'un cadre 12, "Installation de broyage prévisionnelle", au PDF du BSVHU [PR 4517](https://github.com/MTES-MCT/trackdechets/pull/4517)
+- Ajout du multi-modal transporteur à la création/modification du BSVHU [PR 4504](https://github.com/MTES-MCT/trackdechets/pull/4504)
+- Ajout des informations complémentaires de chantier sur le PDF du BSDA [PR 4514](https://github.com/MTES-MCT/trackdechets/pull/4514)
+
+#### :bug: Corrections de bugs
+
+- Blocage des utilisateurs ayant le rôle lecteur sur certaines actions de création/modification de transporteur et récépissés [PR 4550](https://github.com/MTES-MCT/trackdechets/pull/4550)
+- Réparation de la copie de clé d'API dans le presse papier [PR 4562](https://github.com/MTES-MCT/trackdechets/pull/4562)
+- Résolution d'un problème d'export du registre exhaustif en cas de BSFF sans transporteur [PR 4549](https://github.com/MTES-MCT/trackdechets/pull/4549)
+- Résolution d'un problème d'affichage du company selector après un changement de page sur même company dans le formulaire de registre [PR 4545](https://github.com/MTES-MCT/trackdechets/pull/4545)
+- Amélioration de la validation côté serveur du mot de passe lors d'une inscription sur invitation [PR 4534](https://github.com/MTES-MCT/trackdechets/pull/4534)
+- Résolution d'un problème de validation des registres laissant passer des publicId null ou undefined [PR 4535](https://github.com/MTES-MCT/trackdechets/pull/4535)
+- Nettoyage des dates antérieures à 1900 en base de données pour éviter des problèmes d'accès aux données après une mise à jour Prisma [PR 4528](https://github.com/MTES-MCT/trackdechets/pull/4528)
+- Correction de la validation BSDD sur les plaques des transporteurs [PR 4520](https://github.com/MTES-MCT/trackdechets/pull/4520)
+
+#### :boom: Breaking Change
+
+- Conditionnementdes modes de traitement selon le code d'opération renseigné sur tous les registres (sauf transport) [PR 4530](https://github.com/MTES-MCT/trackdechets/pull/4530)
+
 # [2025.11.1] 18/11/2025
 
 #### :nail_care: Améliorations
