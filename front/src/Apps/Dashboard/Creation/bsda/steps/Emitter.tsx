@@ -143,6 +143,13 @@ const EmitterBsda = () => {
                     ...register("emitter.company.name")
                   }}
                   disabled={sealedFields.includes(`emitter.company.name`)}
+                  state={
+                    formState.errors?.emitter?.["company"]?.name && "error"
+                  }
+                  stateRelatedMessage={
+                    (formState.errors?.emitter?.["company"]?.name
+                      ?.message as string) ?? ""
+                  }
                 />
               ) : (
                 <Input
@@ -151,6 +158,13 @@ const EmitterBsda = () => {
                     ...register("emitter.company.contact")
                   }}
                   disabled={sealedFields.includes(`emitter.company.contact`)}
+                  state={
+                    formState.errors?.emitter?.["company"]?.contact && "error"
+                  }
+                  stateRelatedMessage={
+                    (formState.errors?.emitter?.["company"]?.contact
+                      ?.message as string) ?? ""
+                  }
                 />
               )}
             </div>
@@ -167,6 +181,15 @@ const EmitterBsda = () => {
                 }}
                 designation=""
               />
+
+              {formState.errors?.emitter?.["company"]?.address?.message && (
+                <p
+                  id="text-input-error-desc-error"
+                  className="fr-mb-4v fr-error-text"
+                >
+                  {formState.errors?.emitter?.["company"]?.address?.message}
+                </p>
+              )}
             </div>
             <div className="fr-grid-row">
               <Input
@@ -176,6 +199,11 @@ const EmitterBsda = () => {
                 }}
                 disabled={sealedFields.includes(`emitter.company.phone`)}
                 className="fr-col-md-4 fr-mr-2w"
+                state={formState.errors?.emitter?.["company"]?.phone && "error"}
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.phone
+                    ?.message as string) ?? ""
+                }
               />
               <Input
                 label="Courriel"
@@ -184,6 +212,11 @@ const EmitterBsda = () => {
                 }}
                 disabled={sealedFields.includes(`emitter.company.mail`)}
                 className="fr-col-md-6"
+                state={formState.errors?.emitter?.["company"]?.mail && "error"}
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.mail
+                    ?.message as string) ?? ""
+                }
               />
             </div>
           </>
@@ -265,6 +298,11 @@ const EmitterBsda = () => {
               nativeInputProps={{
                 ...register("emitter.pickupSite.name")
               }}
+              state={formState.errors?.emitter?.["pickupSite"]?.name && "error"}
+              stateRelatedMessage={
+                (formState.errors?.emitter?.["pickupSite"]?.name
+                  ?.message as string) ?? ""
+              }
             />
             <DsfrfWorkSiteAddress
               address={emitter?.pickupSite?.address}
@@ -287,6 +325,13 @@ const EmitterBsda = () => {
                 ...register("emitter.pickupSite.infos")
               }}
               disabled={sealedFields.includes(`emitter.pickupSite.infos`)}
+              state={
+                formState.errors?.emitter?.["pickupSite"]?.infos && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.emitter?.["pickupSite"]?.infos
+                  ?.message as string) ?? ""
+              }
             />
           </>
         )}

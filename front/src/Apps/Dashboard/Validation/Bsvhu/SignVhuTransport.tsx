@@ -8,8 +8,8 @@ import {
   Query,
   QueryBsvhuArgs,
   SignatureTypeInput,
-  MutationUpdateBsvhuArgs,
-  TransportMode
+  TransportMode,
+  MutationUpdateBsvhuTransporterArgs
 } from "@td/codegen-ui";
 import { format, subMonths } from "date-fns";
 import React from "react";
@@ -23,7 +23,7 @@ import TdModal from "../../../common/Components/Modal/Modal";
 import {
   GET_VHU_FORM,
   SIGN_BSVHU,
-  UPDATE_VHU_FORM
+  UPDATE_BSVHU_TRANSPORTER
 } from "../../../common/queries/bsvhu/queries";
 import routes from "../../../routes";
 import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
@@ -97,10 +97,10 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
     }
   );
 
-  const [updateBsvhu, { error: updateError }] = useMutation<
-    Pick<Mutation, "updateBsvhu">,
-    MutationUpdateBsvhuArgs
-  >(UPDATE_VHU_FORM);
+  const [updateBsvhuTransporter, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsvhuTransporter">,
+    MutationUpdateBsvhuTransporterArgs
+  >(UPDATE_BSVHU_TRANSPORTER);
   const [signBsvhu, { loading, error: signError }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
@@ -109,15 +109,20 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
   const title = "Signer l'enlèvement";
   const TODAY = new Date();
 
+  const currentTransporter = [...(data?.bsvhu?.transporters ?? [])].find(
+    transporter => !transporter.transport?.signature?.date
+  );
+
+  const transportMode = currentTransporter?.transport?.mode;
+
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
     author: "",
     mode:
-      data?.bsvhu?.transporter?.transport?.mode &&
-      transportModes.includes(data?.bsvhu?.transporter?.transport?.mode)
-        ? data?.bsvhu?.transporter?.transport?.mode
+      transportMode && transportModes.includes(transportMode)
+        ? transportMode
         : TransportMode.Road,
-    plates: data?.bsvhu?.transporter?.transport?.plates ?? []
+    plates: currentTransporter?.transport?.plates ?? []
   };
 
   const methods = useForm<ZodBsvhuTransport>({
@@ -174,20 +179,26 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
               onSubmit={handleSubmit(async values => {
                 const { author, date, mode, plates } = values;
 
-                await updateBsvhu({
+                const signingTransporter = data.bsvhu.transporters.find(
+                  t => !t.transport?.signature
+                );
+                if (!signingTransporter) {
+                  return;
+                }
+                const transporterId = signingTransporter.id;
+                await updateBsvhuTransporter({
                   variables: {
-                    id: bsvhuId,
+                    id: transporterId,
                     input: {
-                      transporter: {
-                        transport: {
-                          mode: mode as TransportMode,
-                          plates,
-                          takenOverAt: date
-                        }
+                      transport: {
+                        mode: mode as TransportMode,
+                        plates,
+                        takenOverAt: date
                       }
                     }
                   }
                 });
+
                 await signBsvhu({
                   variables: {
                     id: bsvhu.id,

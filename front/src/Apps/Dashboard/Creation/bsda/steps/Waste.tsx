@@ -305,6 +305,13 @@ const WasteBsda = () => {
               nativeInputProps={{
                 ...register("waste.nonRoadRegulationMention")
               }}
+              state={
+                formState.errors.waste?.["nonRoadRegulationMention"] && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors.waste?.["nonRoadRegulationMention"]
+                  ?.message as string) ?? ""
+              }
             />
 
             <h4 className="fr-h4 fr-mt-4w">Conditionnement</h4>
@@ -376,6 +383,13 @@ const WasteBsda = () => {
                 nativeInputProps={{
                   ...register("waste.consistenceDescription")
                 }}
+                state={
+                  formState.errors.waste?.["consistenceDescription"] && "error"
+                }
+                stateRelatedMessage={
+                  (formState.errors.waste?.["consistenceDescription"]
+                    ?.message as string) ?? ""
+                }
               />
             )}
 
@@ -401,6 +415,11 @@ const WasteBsda = () => {
                     type: "number",
                     ...register("weight.value")
                   }}
+                  state={formState.errors?.weight?.["value"] && "error"}
+                  stateRelatedMessage={
+                    (formState.errors?.weight?.["value"]?.message as string) ??
+                    ""
+                  }
                 />
 
                 <p className="fr-info-text fr-mt-5v">

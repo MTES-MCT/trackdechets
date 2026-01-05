@@ -206,6 +206,13 @@ const DestinationBsda = () => {
                 ...register("destination.company.contact")
               }}
               disabled={sealedFields.includes(`destination.company.contact`)}
+              state={
+                formState.errors?.destination?.["company"]?.contact && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.contact
+                  ?.message as string) ?? ""
+              }
             />
           </div>
           <div className="form__row">
@@ -215,6 +222,13 @@ const DestinationBsda = () => {
                 ...register("destination.company.phone")
               }}
               disabled={sealedFields.includes(`destination.company.phone`)}
+              state={
+                formState.errors?.destination?.["company"]?.phone && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.phone
+                  ?.message as string) ?? ""
+              }
             />
           </div>
           <div className="form__row">
@@ -224,6 +238,13 @@ const DestinationBsda = () => {
                 ...register("destination.company.mail")
               }}
               disabled={sealedFields.includes(`destination.company.mail`)}
+              state={
+                formState.errors?.destination?.["company"]?.mail && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.mail
+                  ?.message as string) ?? ""
+              }
             />
           </div>
         </div>
@@ -527,6 +548,11 @@ const DestinationBsda = () => {
                       hasNextDestination
                         ? false
                         : sealedFields.includes(`destination.cap`)
+                    }
+                    state={formState.errors?.destination?.["cap"] && "error"}
+                    stateRelatedMessage={
+                      (formState.errors?.destination?.["cap"]
+                        ?.message as string) ?? ""
                     }
                   />
 
