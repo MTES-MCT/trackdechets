@@ -15,7 +15,12 @@ function validateArgs(args: MutationSignupArgs) {
       name: yup
         .string()
         .isSafeSSTI()
-        .required("Vous devez saisir nom et prénom."),
+        .required("Vous devez saisir nom et prénom.")
+        .test(
+          "not-empty-or-spaces",
+          "Le champ ne peut pas être vide.",
+          value => !!value && value.trim().length > 0
+        ),
       email: yup
         .string()
         .email("L'email saisi n'est pas conforme.")

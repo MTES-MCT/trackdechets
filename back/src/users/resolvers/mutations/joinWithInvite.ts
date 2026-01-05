@@ -10,7 +10,15 @@ import { checkPasswordCriteria, hashPassword } from "../../utils";
 import { UserInputError } from "../../../common/errors";
 
 const validationSchema = yup.object({
-  name: yup.string().required("Le nom est un champ requis").isSafeSSTI(),
+  name: yup
+    .string()
+    .required("Le nom est un champ requis")
+    .isSafeSSTI()
+    .test(
+      "not-empty-or-spaces",
+      "Le champ ne peut pas être vide.",
+      value => !!value && value.trim().length > 0
+    ),
   password: yup
     .string()
     .required("Vous devez saisir un mot de passe.")

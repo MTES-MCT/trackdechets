@@ -69,6 +69,31 @@ describe("Mutation.signup", () => {
     );
   });
 
+  it("should not allow name with only spaces", async () => {
+    // Given
+    const user = {
+      email: "newuser@td.io",
+      name: "  ",
+      phone: "06 00 00 00 00"
+    };
+
+    // When
+    const { errors } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: viablePassword,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+
+    // Then
+    expect(errors).not.toBeUndefined();
+    expect(errors?.[0].message).toBe("Le champ ne peut pas être vide.");
+  });
+
   it("should return the same result if email already exist", async () => {
     const alreadyExistingUser = await userFactory();
 
