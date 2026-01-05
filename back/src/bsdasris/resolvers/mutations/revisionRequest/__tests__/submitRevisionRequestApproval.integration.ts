@@ -806,4 +806,98 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
 
     expect(updatedBsdasri?.synthesisEmitterSirets.length).toBe(0);
   });
+
+  it("should approve both emitter and ecoOrganisme request when ecoOrganisme approves", async () => {
+    // Given
+    const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company: ecoOrganisme } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret
+      }
+    });
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: destinationCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: ecoOrganisme.siret! },
+            { approverSiret: emitterCompany.siret! }
+          ]
+        },
+        comment: "comment"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(data.submitBsdasriRevisionRequestApproval.status).toBe("ACCEPTED");
+  });
+
+  it("should approve both emitter and ecoOrganisme request when emitter approves", async () => {
+    // Given
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: ecoOrganisme } = await userWithCompanyFactory("ADMIN");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: emitterCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        ecoOrganismeSiret: ecoOrganisme.siret
+      }
+    });
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: destinationCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: ecoOrganisme.siret! },
+            { approverSiret: emitterCompany.siret! }
+          ]
+        },
+        comment: "comment"
+      }
+    });
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    // Then
+    expect(data.submitBsdasriRevisionRequestApproval.status).toBe("ACCEPTED");
+  });
 });
