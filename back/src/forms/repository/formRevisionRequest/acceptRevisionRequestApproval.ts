@@ -230,7 +230,10 @@ async function getUpdateFromFormRevisionRequest(
         processingOperationDescription:
           revisionRequest.processingOperationDescription,
         wasteDetailsQuantity:
-          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived,
+        ...(revisionRequest.wasteDetailsPackagingInfos && {
+          wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos
+        })
       }
     : {};
 
