@@ -7,6 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import * as yup from "yup";
 import { addDays } from "date-fns";
+import { isDefined } from "../../../common/helpers";
 const TRACKING_CONSENT_PERIOD = 6 * 30; // 6 months
 /**
  * Edit user profile
@@ -22,10 +23,8 @@ export async function editProfileFn(
   const editProfileSchema = yup.object({
     name: yup
       .string()
-      .test(
-        "empty",
-        "The name cannot be an empty string",
-        name => name?.length !== 0
+      .test("empty", "The name cannot be an empty string", name =>
+        isDefined(name) ? !!name && name.trim().length > 0 : true
       )
       .isSafeSSTI(),
     phone: yup.string(),
