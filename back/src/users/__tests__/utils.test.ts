@@ -25,7 +25,7 @@ describe("partiallyHideEmail", () => {
 
   it("should throw an error if string is not an email", () => {
     const t = () => partiallyHideEmail("this is not an email");
-    expect(t).toThrowError("this must be a valid email");
+    expect(t).toThrow("this must be a valid email");
   });
 });
 
