@@ -139,15 +139,29 @@ const SignVhuOperation = ({ bsvhuId, onClose }) => {
   const title = "Signer le traitement";
   const TODAY = new Date();
 
-  const initialState = {
+  const initialState: ZodBsvhuOperation = {
     date: datetimeToYYYYMMDDHHSS(TODAY),
     author: "",
     destination: {
       operation: {
-        date: datetimeToYYYYMMDD(TODAY)
+        date: datetimeToYYYYMMDD(TODAY),
+        code: null,
+        mode: null,
+        nextDestination: {
+          company: {
+            orgId: null,
+            siret: null,
+            vatNumber: null,
+            name: null,
+            address: null,
+            contact: null,
+            phone: null,
+            mail: null
+          }
+        }
       }
     }
-  } as ZodBsvhuOperation;
+  };
 
   const methods = useForm<ZodBsvhuOperation>({
     values: initialState,
