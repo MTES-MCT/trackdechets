@@ -1,2 +1,6 @@
-back
-front
+# Ignore everything by default
+*
+
+# Un-ignore only the specific dist directories we want to deploy
+!apps/ui/dist/
+!front/dist/
