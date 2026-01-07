@@ -225,8 +225,6 @@ function SignOperationModal({
     processingOperationDone?.startsWith("R");
   const isUpcycled = watch("isUpcycled");
 
-  console.log(watch("destinationParcelNumbers"));
-
   const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId ? true : false
   );

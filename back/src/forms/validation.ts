@@ -2134,7 +2134,21 @@ const processedInfoSchemaFn: (
     destinationParcelNumbers: yup
       .array()
       .of(yup.string().matches(/^\d{1,3}-[A-Z0-9]{1,2}-\d{1,4}$/))
-      .nullable(),
+      .nullable()
+      .test(
+        "equal-length-insee-numbers",
+        "Vous devez renseigner autant de codes INSEE de parcelles que de numéros des parcelles",
+        function (value) {
+          if (!value || value.length === 0) return true;
+          const { destinationParcelInseeCodes } = this.parent;
+          if (
+            !destinationParcelInseeCodes ||
+            destinationParcelInseeCodes.length === 0
+          )
+            return true;
+          return value.length === destinationParcelInseeCodes.length;
+        }
+      ),
     destinationParcelCoordinates: yup
       .array()
       .of(yup.string().matches(/^-?\d+(\.\d+)? -?\d+(\.\d+)?$/))
