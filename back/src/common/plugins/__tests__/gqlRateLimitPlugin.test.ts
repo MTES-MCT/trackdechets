@@ -12,9 +12,11 @@ jest.mock("../../redis", () => ({}));
 
 describe("gqlRateLimitPlugin", () => {
   let request;
+  let server;
+  let app;
 
-  beforeAll(async () => {
-    const app = express();
+  beforeEach(async () => {
+    app = express();
     const typeDefs = gql`
       type Foo {
         bar: String
@@ -32,11 +34,11 @@ describe("gqlRateLimitPlugin", () => {
       }
     };
 
-    const server = new ApolloServer<GraphQLContext>({
+    server = new ApolloServer<GraphQLContext>({
       typeDefs,
       resolvers,
       plugins: [
-        gqlInfosPlugin(), // We rely on `gqlInfosPlugin`
+        gqlInfosPlugin(),
         gqlRateLimitPlugin({
           accessTokens: {
             maxRequestsPerWindow: 1,
@@ -67,6 +69,15 @@ describe("gqlRateLimitPlugin", () => {
     request = supertest(app);
   });
 
+  afterEach(async () => {
+    if (server) {
+      await server.stop();
+    }
+    app = undefined;
+    request = undefined;
+    server = undefined;
+  });
+
   it("should only allow 1 request per timeframe on rate limited query", async () => {
     const body = { query: "{ accessTokens { bar } }" };
     const response1 = await request.post("/graphql").send(body);
@@ -83,5 +94,30 @@ describe("gqlRateLimitPlugin", () => {
 
     const response2 = await request.post("/graphql").send(body);
     expect(response2.status).toEqual(200);
+  });
+
+  it("should rate limit each aliased operation independently in a single request", async () => {
+    // This query sends two aliased accessTokens queries in a single request
+    const body = {
+      query: `{
+        a1: accessTokens { bar }
+        a2: accessTokens { bar }
+      }`
+    };
+
+    const response = await request.post("/graphql").send(body);
+
+    // The middleware blocks the whole request if any operation exceeds the limit
+    expect(response.status).toBe(429);
+
+    // The response should contain a rate limit error message
+    expect(
+      response.text.includes("Quota") ||
+        (response.body &&
+          response.body.errors &&
+          response.body.errors.some((e: any) =>
+            /rate limit|quota/i.test(e.message)
+          ))
+    ).toBe(true);
   });
 });
