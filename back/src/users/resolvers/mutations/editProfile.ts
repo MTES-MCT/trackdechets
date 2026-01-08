@@ -23,8 +23,16 @@ export async function editProfileFn(
   const editProfileSchema = yup.object({
     name: yup
       .string()
-      .test("empty", "The name cannot be an empty string", name =>
-        isDefined(name) ? !!name && name.trim().length > 0 : true
+      .test(
+        "at-least-2-letters",
+        "Le nom doit contenir au moins 2 lettres.",
+        name => {
+          if (!isDefined(name)) return true;
+          if (!name) return false;
+          const trimmed = name.trim();
+          const letterCount = (trimmed.match(/[\p{L}]/gu) || []).length;
+          return letterCount >= 2;
+        }
       )
       .isSafeSSTI(),
     phone: yup.string(),

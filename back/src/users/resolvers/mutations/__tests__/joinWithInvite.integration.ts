@@ -16,6 +16,49 @@ const JOIN_WITH_INVITE = `
 `;
 
 describe("joinWithInvite mutation", () => {
+    it("should not allow name with less than 2 letters", async () => {
+      const company = await companyFactory();
+      const invitee = "shortname@td.io";
+      const invitation = await prisma.userAccountHash.create({
+        data: {
+          email: invitee,
+          companySiret: company.siret!,
+          role: "MEMBER",
+          hash: "hash-shortname"
+        }
+      });
+      const { errors } = await mutate(JOIN_WITH_INVITE, {
+        variables: {
+          inviteHash: invitation.hash,
+          name: "A",
+          password: "P4a$$woRd_1234"
+        }
+      });
+      expect(errors).not.toBeUndefined();
+      expect(errors?.[0].message).toBe("Le nom doit contenir au moins 2 lettres.");
+    });
+
+    it("should not allow name with only special characters", async () => {
+      const company = await companyFactory();
+      const invitee = "specialchars@td.io";
+      const invitation = await prisma.userAccountHash.create({
+        data: {
+          email: invitee,
+          companySiret: company.siret!,
+          role: "MEMBER",
+          hash: "hash-specialchars"
+        }
+      });
+      const { errors } = await mutate(JOIN_WITH_INVITE, {
+        variables: {
+          inviteHash: invitation.hash,
+          name: ".-",
+          password: "P4a$$woRd_1234"
+        }
+      });
+      expect(errors).not.toBeUndefined();
+      expect(errors?.[0].message).toBe("Le nom doit contenir au moins 2 lettres.");
+    });
   let mutate: ReturnType<typeof makeClient>["mutate"];
   beforeAll(() => {
     const testClient = makeClient();

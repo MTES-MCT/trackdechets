@@ -20,6 +20,45 @@ const SIGNUP = `
 `;
 
 describe("Mutation.signup", () => {
+    it("should not allow name with less than 2 letters", async () => {
+      const user = {
+        email: "shortname@td.io",
+        name: "A",
+        phone: "06 00 00 00 00"
+      };
+      const { errors } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
+        variables: {
+          userInfos: {
+            email: user.email,
+            password: viablePassword,
+            name: user.name,
+            phone: user.phone
+          }
+        }
+      });
+      expect(errors).not.toBeUndefined();
+      expect(errors?.[0].message).toBe("Le nom doit contenir au moins 2 lettres.");
+    });
+
+    it("should not allow name with only special characters", async () => {
+      const user = {
+        email: "specialchars@td.io",
+        name: ".-",
+        phone: "06 00 00 00 00"
+      };
+      const { errors } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
+        variables: {
+          userInfos: {
+            email: user.email,
+            password: viablePassword,
+            name: user.name,
+            phone: user.phone
+          }
+        }
+      });
+      expect(errors).not.toBeUndefined();
+      expect(errors?.[0].message).toBe("Le nom doit contenir au moins 2 lettres.");
+    });
   let mutate: ReturnType<typeof makeClient>["mutate"];
   beforeAll(() => {
     const testClient = makeClient();
