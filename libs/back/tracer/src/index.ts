@@ -37,7 +37,7 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
       [ATTR_DEPLOYMENT_ENVIRONMENT]:
         process.env.OTEL_ENVIRONMENT || "development",
       [ATTR_CLOUD_REGION]: process.env.REGION_NAME,
-      [ATTR_CONTAINER_NAME]: process.env.APP
+      [ATTR_CONTAINER_NAME]: process.env.HOSTNAME
     }),
     logRecordProcessor: new BatchLogRecordProcessor(new OTLPLogExporter()),
     traceExporter: new OTLPTraceExporter(),

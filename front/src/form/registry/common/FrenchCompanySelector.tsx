@@ -97,7 +97,7 @@ export function InlineFrenchCompanySelector({
                   methods.setValue(`${prefix}CompanyName`, company.name);
                   methods.setValue(
                     `${prefix}CompanyAddress`,
-                    company.addressVoie
+                    company.addressVoie || "-" // Some companies have no address, but the field is required, so we fill it with a dash
                   );
                   methods.setValue(`${prefix}CompanyCity`, company.addressCity);
                   methods.setValue(

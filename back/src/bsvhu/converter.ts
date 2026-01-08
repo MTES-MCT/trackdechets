@@ -48,10 +48,13 @@ export const getAddress = ({
   city?: string | null;
   postalCode?: string | null;
 }): string | null => {
+  if (address) {
+    return address;
+  }
   if (street && city && postalCode) {
     return `${street} ${postalCode} ${city}`;
   }
-  return address ?? null;
+  return null;
 };
 
 export function expandVhuFormFromDb(
