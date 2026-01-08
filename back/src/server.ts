@@ -260,20 +260,25 @@ const baseCSPDirectives = {
   upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
 };
 
-// Conditional CSP middleware - only changes requireTrustedTypesFor for Bull board
+// Conditional CSP middleware - only changes requireTrustedTypesFor for Bull board and GraphiQL
 app.use((req, res, next) => {
   const isBullBoardPath = req.path.startsWith(
     `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`
   );
+  // GraphiQL is served as the landing page for GET requests to the root GraphQL endpoint
+  const isGraphiQLPath = req.path === "/" && req.method === "GET";
 
   helmet({
     hsts: false, // Auto injected by Scalingo
     contentSecurityPolicy: {
       directives: {
         ...baseCSPDirectives,
-        // Conditionally disable Trusted Types for Bull board admin dashboard
-        // This is secure because Bull board is admin-only and token-protected
-        ...(isBullBoardPath ? {} : { requireTrustedTypesFor: ["'script'"] })
+        // Conditionally disable Trusted Types for Bull board admin dashboard and GraphiQL
+        // This is secure because Bull board is admin-only and token-protected,
+        // and GraphiQL is admin-only. GraphiQL doesn't support Trusted Types.
+        ...(isBullBoardPath || isGraphiQLPath
+          ? {}
+          : { requireTrustedTypesFor: ["'script'"] })
       }
     },
     xXssProtection: false
