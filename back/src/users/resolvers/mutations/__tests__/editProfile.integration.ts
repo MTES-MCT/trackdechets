@@ -101,6 +101,33 @@ describe("mutation editProfile", () => {
     expect(updatedUser.phone).toEqual(user.phone);
   });
 
+  it("should not be able to empty the name with only spaces", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "  ";
+
+    // When
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
+    });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `The name cannot be an empty string`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+    expect(updatedUser.phone).toEqual(user.phone);
+  });
+
   it("should be able to empty the phone number", async () => {
     // Given
     const user = await userFactory();

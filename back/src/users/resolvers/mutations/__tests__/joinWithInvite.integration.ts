@@ -118,6 +118,37 @@ describe("joinWithInvite mutation", () => {
     }
   );
 
+  it("should throw if name is only spaces", async () => {
+    // Given
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret!,
+        role: UserRole.MEMBER,
+        hash: "hash"
+      }
+    });
+
+    // When
+    const { errors } = await mutate<Pick<Mutation, "joinWithInvite">>(
+      JOIN_WITH_INVITE,
+      {
+        variables: {
+          inviteHash: invitation.hash,
+          name: "  ",
+          password: "P4a$$woRd_1234"
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeDefined();
+    expect(errors[0].message).toContain("Le champ ne peut pas être vide.");
+  });
+
   it("should accept other pending invitations", async () => {
     const company1 = await companyFactory();
     const company2 = await companyFactory();
