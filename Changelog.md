@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Remontée des chemins d'erreurs et de champs scellés sur BSFF [PR 4604](https://github.com/MTES-MCT/trackdechets/pull/4604)
 
+#### :bug: Corrections de bugs
+
+- BSDA : ne pas passer les infos de certification si pas de sous-section 3 [PR 4617](https://github.com/MTES-MCT/trackdechets/pull/4617)
+
 # [2025.12.1] 16/12/2025
 
 #### :nail_care: Améliorations
