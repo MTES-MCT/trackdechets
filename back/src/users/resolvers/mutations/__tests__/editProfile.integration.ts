@@ -26,35 +26,43 @@ export const UPDATE_TRACKING_CONSENT = gql`
 `;
 
 describe("mutation editProfile", () => {
-    it("should not allow name with less than 2 letters", async () => {
-      const user = await userFactory();
-      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-      const newName = "A";
-      const { errors } = await mutate(EDIT_PROFILE, { variables: { name: newName } });
-      const updatedUser = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: `Le nom doit contenir au moins 2 lettres.`,
-          extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
-        })
-      ]);
-      expect(updatedUser.name).toEqual(user.name);
+  it("should not allow name with less than 2 letters", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "A";
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
     });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le nom doit contenir au moins 2 lettres.`,
+        extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+  });
 
-    it("should not allow name with only special characters", async () => {
-      const user = await userFactory();
-      const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-      const newName = ".-";
-      const { errors } = await mutate(EDIT_PROFILE, { variables: { name: newName } });
-      const updatedUser = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message: `Le nom doit contenir au moins 2 lettres.`,
-          extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
-        })
-      ]);
-      expect(updatedUser.name).toEqual(user.name);
+  it("should not allow name with only special characters", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = ".-";
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
     });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le nom doit contenir au moins 2 lettres.`,
+        extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+  });
   afterAll(resetDatabase);
   it("should edit user profile", async () => {
     const user = await userFactory();
