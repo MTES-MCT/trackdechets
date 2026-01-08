@@ -25,10 +25,6 @@ import { isBrokerRefinement } from "../../../../common/validation/zod/refinement
 import { prisma } from "@td/prisma";
 import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
 import { isDefined } from "../../../../common/helpers";
-import {
-  castD9toD9F,
-  fixOperationModeForD9F
-} from "../../../validation/transformers";
 import { getOperationModes } from "@td/constants";
 
 // If you modify this, also modify it in the frontend
@@ -328,8 +324,6 @@ const schema = rawBsdaSchema
     emitterPickupSiteInfos: true
   })
   .extend({ isCanceled: z.boolean().nullish() })
-  .transform(castD9toD9F)
-  .transform(fixOperationModeForD9F)
   .superRefine((val, ctx) => {
     const { destinationOperationCode, destinationOperationMode } = val;
     if (destinationOperationCode) {
