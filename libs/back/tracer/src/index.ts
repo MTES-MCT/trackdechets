@@ -21,6 +21,7 @@ import {
 import { PrismaInstrumentation } from "@prisma/instrumentation";
 import { ElasticsearchInstrumentation } from "opentelemetry-instrumentation-elasticsearch";
 import { getAppRootFolderName } from "./utils";
+import { initializeNodeRuntimeMetrics } from "./metric";
 
 // Incubating attributes
 const ATTR_CLOUD_REGION = "cloud.region";
@@ -68,14 +69,17 @@ if (process.env.NODE_ENV !== "test" && !process.env.OTEL_SDK_DISABLED) {
   try {
     sdk.start();
     console.info("Telemetry started");
+
+    const cleanupRuntimeMetrics = initializeNodeRuntimeMetrics();
+
+    process.on("SIGTERM", () => {
+      cleanupRuntimeMetrics();
+      sdk.shutdown();
+    });
   } catch (error) {
     console.error(
       "Error initializing OpenTelemetry SDK. Your application is not instrumented and will not produce telemetry",
       error
     );
   }
-
-  process.on("SIGTERM", () => {
-    sdk.shutdown();
-  });
 }
