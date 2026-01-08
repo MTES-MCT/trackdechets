@@ -139,7 +139,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
           duration: TOAST_DURATION
         });
-        handleGraphQlError(err, setPublishErrors);
+        const normalizedErrors = handleGraphQlError(err);
+        setPublishErrors(normalizedErrors);
       }
     }
   );
@@ -165,7 +166,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
             duration: TOAST_DURATION
           });
-          handleGraphQlError(err, setPublishErrors);
+          const normalizedErrors = handleGraphQlError(err);
+          setPublishErrors(normalizedErrors);
         }
       }
     );
@@ -185,7 +187,8 @@ const DraftValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
           toast.error(`Le bordereau ${bsd.id} n'a pas pu être publié`, {
             duration: TOAST_DURATION
           });
-          handleGraphQlError(err, setPublishErrors);
+          const normalizedErrors = handleGraphQlError(err);
+          setPublishErrors(normalizedErrors);
         }
       }
     );

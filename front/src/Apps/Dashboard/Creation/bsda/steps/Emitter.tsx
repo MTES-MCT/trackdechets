@@ -8,15 +8,15 @@ import { useParams } from "react-router-dom";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
 import CompanyContactInfo from "../../../../Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
-import { clearCompanyError, setFieldError } from "../../utils";
+import { clearCompanyError } from "../../utils";
 import DsfrfWorkSiteAddress from "../../../../../form/common/components/dsfr-work-site/DsfrfWorkSiteAddress";
 import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleCheckbox";
 import Alert from "@codegouvfr/react-dsfr/Alert";
 import Input from "@codegouvfr/react-dsfr/Input";
 
-const EmitterBsda = ({ errors }) => {
+const EmitterBsda = () => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError, clearErrors } =
+  const { register, setValue, watch, formState, clearErrors } =
     useFormContext();
 
   const emitter = watch("emitter", {});
@@ -41,61 +41,6 @@ const EmitterBsda = ({ errors }) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    const actor = "emitter";
-    if (errors?.length) {
-      setFieldError(
-        errors,
-        `${actor}.company.siret`,
-        formState.errors?.[actor]?.["company"]?.siret,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.name`,
-        formState.errors?.[actor]?.["company"]?.name,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.contact`,
-        formState.errors?.[actor]?.["company"]?.contact,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.address`,
-        formState.errors?.[actor]?.["company"]?.address,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.phone`,
-        formState.errors?.[actor]?.["company"]?.phone,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.mail`,
-        formState.errors?.[actor]?.["company"]?.mail,
-        setError
-      );
-      setFieldError(
-        errors,
-        `${actor}.company.vatNumber`,
-        formState.errors?.[actor]?.["company"]?.vatNumber,
-        setError
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
-
-  useEffect(() => {
-    if (errors?.length && emitter?.company?.siret) {
-      clearCompanyError(emitter, "emitter", clearErrors);
-    }
-  }, [clearErrors, emitter?.company?.siret, errors?.length, emitter]);
 
   const orgId = useMemo(
     () => emitter?.company?.orgId ?? emitter?.company?.siret ?? null,
@@ -154,11 +99,18 @@ const EmitterBsda = ({ errors }) => {
                     );
                     if (e.currentTarget.checked) {
                       setValue("emitter.company.siret", null);
+                      setValue("emitter.company.orgId", null);
+                      setValue("emitter.company.vatNumber", null);
                       setValue("emitter.company.name", null);
-                      setValue("emitter.company.contact", null);
-                      setValue("emitter.company.phone", null);
-                      setValue("emitter.company.mail", null);
                     }
+
+                    setValue("emitter.company.contact", null);
+                    setValue("emitter.company.address", null);
+                    setValue("emitter.company.city", null);
+                    setValue("emitter.company.street", null);
+                    setValue("emitter.company.postalCode", null);
+                    setValue("emitter.company.phone", null);
+                    setValue("emitter.company.mail", null);
                   }
                 }
               }
@@ -191,6 +143,13 @@ const EmitterBsda = ({ errors }) => {
                     ...register("emitter.company.name")
                   }}
                   disabled={sealedFields.includes(`emitter.company.name`)}
+                  state={
+                    formState.errors?.emitter?.["company"]?.name && "error"
+                  }
+                  stateRelatedMessage={
+                    (formState.errors?.emitter?.["company"]?.name
+                      ?.message as string) ?? ""
+                  }
                 />
               ) : (
                 <Input
@@ -199,6 +158,13 @@ const EmitterBsda = ({ errors }) => {
                     ...register("emitter.company.contact")
                   }}
                   disabled={sealedFields.includes(`emitter.company.contact`)}
+                  state={
+                    formState.errors?.emitter?.["company"]?.contact && "error"
+                  }
+                  stateRelatedMessage={
+                    (formState.errors?.emitter?.["company"]?.contact
+                      ?.message as string) ?? ""
+                  }
                 />
               )}
             </div>
@@ -215,6 +181,15 @@ const EmitterBsda = ({ errors }) => {
                 }}
                 designation=""
               />
+
+              {formState.errors?.emitter?.["company"]?.address?.message && (
+                <p
+                  id="text-input-error-desc-error"
+                  className="fr-mb-4v fr-error-text"
+                >
+                  {formState.errors?.emitter?.["company"]?.address?.message}
+                </p>
+              )}
             </div>
             <div className="fr-grid-row">
               <Input
@@ -224,6 +199,11 @@ const EmitterBsda = ({ errors }) => {
                 }}
                 disabled={sealedFields.includes(`emitter.company.phone`)}
                 className="fr-col-md-4 fr-mr-2w"
+                state={formState.errors?.emitter?.["company"]?.phone && "error"}
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.phone
+                    ?.message as string) ?? ""
+                }
               />
               <Input
                 label="Courriel"
@@ -232,6 +212,11 @@ const EmitterBsda = ({ errors }) => {
                 }}
                 disabled={sealedFields.includes(`emitter.company.mail`)}
                 className="fr-col-md-6"
+                state={formState.errors?.emitter?.["company"]?.mail && "error"}
+                stateRelatedMessage={
+                  (formState.errors?.emitter?.["company"]?.mail
+                    ?.message as string) ?? ""
+                }
               />
             </div>
           </>
@@ -276,10 +261,7 @@ const EmitterBsda = ({ errors }) => {
                     };
                   }
 
-                  if (errors?.length) {
-                    // server errors
-                    clearCompanyError(emitter, "emitter", clearErrors);
-                  }
+                  clearCompanyError(emitter, "emitter", clearErrors);
 
                   setValue("emitter", {
                     ...emitter,
@@ -316,6 +298,11 @@ const EmitterBsda = ({ errors }) => {
               nativeInputProps={{
                 ...register("emitter.pickupSite.name")
               }}
+              state={formState.errors?.emitter?.["pickupSite"]?.name && "error"}
+              stateRelatedMessage={
+                (formState.errors?.emitter?.["pickupSite"]?.name
+                  ?.message as string) ?? ""
+              }
             />
             <DsfrfWorkSiteAddress
               address={emitter?.pickupSite?.address}
@@ -338,6 +325,13 @@ const EmitterBsda = ({ errors }) => {
                 ...register("emitter.pickupSite.infos")
               }}
               disabled={sealedFields.includes(`emitter.pickupSite.infos`)}
+              state={
+                formState.errors?.emitter?.["pickupSite"]?.infos && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.emitter?.["pickupSite"]?.infos
+                  ?.message as string) ?? ""
+              }
             />
           </>
         )}

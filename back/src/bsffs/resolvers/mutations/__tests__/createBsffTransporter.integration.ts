@@ -50,11 +50,9 @@ describe("Mutation.createBsffTransporter", () => {
         }
       }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: expect.stringContaining("permission")
-      })
-    ]);
+    expect(errors[0].message).toEqual(
+      "Vous n'êtes pas autorisé à effectuer cette action"
+    );
   });
 
   it("should disallow unauthenticated user", async () => {

@@ -7,7 +7,7 @@ import svgrPlugin from "vite-plugin-svgr";
 export default defineConfig({
   root: __dirname,
   build: {
-    outDir: "../dist/front",
+    outDir: "./dist",
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true
@@ -33,6 +33,7 @@ export default defineConfig({
   server: {
     port: 3000,
     host: "localhost",
+    allowedHosts: ["trackdechets.local"],
     fs: {
       // Allow serving files from one level up to the project root
       allow: [".."]

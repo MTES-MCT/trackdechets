@@ -61,7 +61,7 @@ export const Labels = {
   movementNumber: "Numéro de mouvement GISTRID",
   isDirectSupply: "Approvisionnement direct (pipeline, convoyeur)",
   sisIdentifier: "Identifiant SIS du terrain",
-  isUpcycled: "Terres valorisées",
+  isUpcycled: "La terre est valorisée en remblayage",
   gistridNumber: "Numéro de notification ou de déclaration GISTRID",
   product: "Produit",
   administrativeActReference: "Référence de l'acte administratif",

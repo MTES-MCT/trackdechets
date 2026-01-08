@@ -18,6 +18,7 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
   return safeInput<Prisma.BsdaWhereInput>({
     ...toPrismaGenericWhereInput(where),
     status: toPrismaEnumFilter(where.status),
+    wasteCode: toPrismaStringFilter(where.waste?.code),
     emitterCompanySiret: toPrismaStringFilter(where.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where.emitter?.emission?.signature?.date
@@ -62,6 +63,9 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
+    ),
+    destinationOperationNextDestinationCompanySiret: toPrismaStringFilter(
+      where.destination?.operation?.nextDestination?.company?.siret
     ),
     destinationCustomInfo: toPrismaStringFilter(where.destination?.customInfo),
     brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret),

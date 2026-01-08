@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/queues-bulk-indexation/src",
   "projectType": "application",
+  "tags": ["backend:queues"],
   "targets": {
     "build": {
       "executor": "@nx/esbuild:esbuild",
@@ -18,7 +19,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/apps/queues-bulk-indexation",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "apps/queues-bulk-indexation/src/main.ts",
@@ -45,7 +46,7 @@
             "output": "./libs/back/prisma/src"
           }
         ],
-        "generatePackageJson": false,
+        "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,
           "outExtension": {
@@ -77,6 +78,7 @@
         "buildTarget": "queues-bulk-indexation:build",
         "inspect": false
       },
+      "continuous": true,
       "configurations": {
         "development": {
           "buildTarget": "queues-bulk-indexation:build:development"
@@ -101,6 +103,5 @@
         "jestConfig": "apps/queues-bulk-indexation/jest.config.ts"
       }
     }
-  },
-  "tags": ["backend:queues"]
+  }
 }

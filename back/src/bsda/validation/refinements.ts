@@ -591,6 +591,7 @@ export const validateDestination: (
     if (
       currentBsda.destinationCompanySiret !== bsda.destinationCompanySiret &&
       bsda.destinationOperationNextDestinationCompanySiret &&
+      !currentBsda.destinationOperationNextDestinationCompanySiret &&
       bsda.destinationOperationNextDestinationCompanySiret !==
         currentBsda.destinationCompanySiret
     ) {

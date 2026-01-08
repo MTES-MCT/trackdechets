@@ -343,6 +343,8 @@ export const SSD_OPERATION_MODES = [
   "AUTRES_VALORISATIONS"
 ] as const;
 
+type OperationMode = (typeof ALL_OPERATION_MODES)[number];
+
 /**
  * Documentation: https://app.gitbook.com/o/-LxvsGVFUcY-b40HZcJs/s/bOGR2l18BC74rMQs4CWK/~/changes/2/general/codes-de-traitement
  */
@@ -382,7 +384,13 @@ export const CODES_AND_EXPECTED_OPERATION_MODES = {
   "R 13": []
 } as const;
 
-export function getOperationModes(operationCode: string) {
+export function getOperationModes(
+  operationCode: string | null | undefined
+): readonly OperationMode[] {
+  if (!operationCode) {
+    return [];
+  }
+
   // D5 becomes D 5, D9F becomes D 9 F
   const formatedCode = operationCode.replace(
     /^([A-Z])(\d{1,2})([A-Z]?)$/,

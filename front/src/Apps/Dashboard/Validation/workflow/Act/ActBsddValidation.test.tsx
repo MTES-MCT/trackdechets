@@ -21,7 +21,8 @@ describe("ActBsddValidation", () => {
           form: {
             readableId: "FORM-1",
             wasteDetails: { code: "01 01 01*" },
-            recipient: { company: { siret: "111111111" } }
+            recipient: { company: { siret: "111111111" } },
+            transporters: []
           }
         }
       }

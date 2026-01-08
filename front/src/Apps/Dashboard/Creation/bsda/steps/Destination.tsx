@@ -11,7 +11,7 @@ import {
   Query,
   QueryCompanyPrivateInfosArgs
 } from "@td/codegen-ui";
-import React, { useContext, useEffect, useMemo } from "react";
+import React, { useContext, useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { SealedFieldsContext } from "../../../../Dashboard/Creation/context";
@@ -21,7 +21,7 @@ import SingleCheckbox from "../../../../common/Components/SingleCheckbox/SingleC
 import { getInitialCompany } from "../../../../common/data/initialState";
 import { COMPANY_SELECTOR_PRIVATE_INFOS } from "../../../../common/queries/company/query";
 import DisabledParagraphStep from "../../DisabledParagraphStep";
-import { clearCompanyError, setFieldError } from "../../utils";
+import { clearCompanyError } from "../../utils";
 import { BsdaContext } from "../FormSteps";
 
 const DestinationCAPModificationAlert = () => (
@@ -55,13 +55,12 @@ const showNextDestinationCAPModificationAlert = bsdaContext => {
   );
 };
 
-const DestinationBsda = ({ errors }) => {
+const DestinationBsda = () => {
   const { siret } = useParams<{ siret: string }>();
-  const { register, setValue, watch, formState, setError, clearErrors } =
+  const { register, setValue, watch, formState, clearErrors } =
     useFormContext(); // retrieve all hook methods
-  const actor = "destination";
-  const destination = watch(actor) ?? {};
   const bsdaType = watch("type");
+  const destination = watch("destination");
 
   const bsdaContext = useContext(BsdaContext);
   const hasNextDestination = Boolean(
@@ -77,110 +76,15 @@ const DestinationBsda = ({ errors }) => {
 
   useEffect(() => {
     // register fields managed under the hood by company selector
-    register(`${actor}.company.orgId`);
-    register(`${actor}.company.siret`);
-    register(`${actor}.company.name`);
-    register(`${actor}.company.contact`);
-    register(`${actor}.company.vatNumber`);
-    register(`${actor}.company.address`);
-    register(`${actor}.company.mail`);
-    register(`${actor}.transport.plates`);
+    register(`destination.company.orgId`);
+    register(`destination.company.siret`);
+    register(`destination.company.name`);
+    register(`destination.company.contact`);
+    register(`destination.company.vatNumber`);
+    register(`destination.company.address`);
+    register(`destination.company.mail`);
+    register(`destination.transport.plates`);
   }, [register]);
-
-  useEffect(() => {
-    if (destination?.company?.siret) {
-      if (hasNextDestination) {
-        setValue("destination.operation.nextDestination.company", {
-          ...destination?.operation?.nextDestination?.company
-        });
-
-        setValue("destination.company", {
-          ...destination.company
-        });
-      } else {
-        setValue("destination.company", {
-          ...destination.company
-        });
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    if (errors?.length) {
-      setFieldError(
-        errors,
-        `${actor}.company.siret`,
-        formState.errors?.[actor]?.["company"]?.siret,
-        setError
-      );
-      if (!destination?.company?.contact) {
-        setFieldError(
-          errors,
-          `${actor}.company.contact`,
-          formState.errors?.[actor]?.["company"]?.contact,
-          setError
-        );
-      }
-      if (!destination?.company?.address) {
-        setFieldError(
-          errors,
-          `${actor}.company.address`,
-          formState.errors?.[actor]?.["company"]?.address,
-          setError
-        );
-      }
-      if (!destination?.company?.phone) {
-        setFieldError(
-          errors,
-          `${actor}.company.phone`,
-          formState.errors?.[actor]?.["company"]?.phone,
-          setError
-        );
-      }
-      if (!destination?.company?.mail) {
-        setFieldError(
-          errors,
-          `${actor}.company.mail`,
-          formState.errors?.[actor]?.["company"]?.mail,
-          setError
-        );
-      }
-      if (!destination?.company?.vatNumber) {
-        setFieldError(
-          errors,
-          `${actor}.company.vatNumber`,
-          formState.errors?.[actor]?.["company"]?.vatNumber,
-          setError
-        );
-      }
-      if (!destination?.cap) {
-        setFieldError(
-          errors,
-          `${actor}.cap`,
-          formState.errors?.[actor]?.["cap"],
-          setError
-        );
-      }
-      if (!destination?.operation?.nextDestination?.cap) {
-        setFieldError(
-          errors,
-          `${actor}.operation.nextDestination.cap`,
-          formState.errors?.[actor]?.["operation"]?.nextDestination.cap,
-          setError
-        );
-      }
-      if (!destination?.plannedOperationCode) {
-        setFieldError(
-          errors,
-          `${actor}.plannedOperationCode`,
-          formState.errors?.[actor]?.["plannedOperationCode"],
-          setError
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
 
   useEffect(() => {
     if (isDechetterie) {
@@ -218,21 +122,12 @@ const DestinationBsda = ({ errors }) => {
     destination?.company?.phone
   ]);
 
-  const orgId = useMemo(
-    () => destination?.company?.orgId ?? destination?.company?.siret ?? null,
-    [destination?.company?.orgId, destination?.company?.siret]
-  );
-
-  const orgIdNextDestination = useMemo(
-    () =>
-      destination?.operation?.nextDestination?.company?.orgId ??
-      destination?.operation?.nextDestination?.company?.siret ??
-      null,
-    [
-      destination?.operation?.nextDestination?.company?.orgId,
-      destination?.operation?.nextDestination?.company?.siret
-    ]
-  );
+  const destinationOrgId =
+    destination?.company?.orgId ?? destination?.company?.siret ?? null;
+  const nextDestinationOrgId =
+    destination?.operation?.nextDestination?.company?.orgId ??
+    destination?.operation?.nextDestination?.company?.siret ??
+    null;
 
   function onNextDestinationToggle() {
     // When we toggle the next destination switch, we swap destination <-> nextDestination
@@ -311,6 +206,13 @@ const DestinationBsda = ({ errors }) => {
                 ...register("destination.company.contact")
               }}
               disabled={sealedFields.includes(`destination.company.contact`)}
+              state={
+                formState.errors?.destination?.["company"]?.contact && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.contact
+                  ?.message as string) ?? ""
+              }
             />
           </div>
           <div className="form__row">
@@ -320,6 +222,13 @@ const DestinationBsda = ({ errors }) => {
                 ...register("destination.company.phone")
               }}
               disabled={sealedFields.includes(`destination.company.phone`)}
+              state={
+                formState.errors?.destination?.["company"]?.phone && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.phone
+                  ?.message as string) ?? ""
+              }
             />
           </div>
           <div className="form__row">
@@ -329,6 +238,13 @@ const DestinationBsda = ({ errors }) => {
                 ...register("destination.company.mail")
               }}
               disabled={sealedFields.includes(`destination.company.mail`)}
+              state={
+                formState.errors?.destination?.["company"]?.mail && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors?.destination?.["company"]?.mail
+                  ?.message as string) ?? ""
+              }
             />
           </div>
         </div>
@@ -350,71 +266,61 @@ const DestinationBsda = ({ errors }) => {
               }`
             )}
             selectedCompanyOrgId={
-              hasNextDestination ? orgIdNextDestination : orgId
+              hasNextDestination ? nextDestinationOrgId : destinationOrgId
             }
             selectedCompanyError={selectedCompanyError}
             onCompanySelected={company => {
-              if (company) {
-                let companyData = {
-                  orgId: company.orgId,
-                  siret: company.siret,
-                  vatNumber: company.vatNumber,
-                  name: company.name ?? "",
-                  address: company.address ?? "",
-                  contact: company.contact ?? "",
-                  phone: company.contactPhone ?? "",
-                  mail: company.contactEmail ?? "",
-                  country: company.codePaysEtrangerEtablissement
-                };
-
-                // [tra-13734] don't override field with api data keep the user data value
-                const currentCompanySiret = hasNextDestination
-                  ? destination?.operation.nextDestination.company.siret
-                  : destination?.company.siret;
-
-                if (company.siret === currentCompanySiret) {
-                  companyData = {
-                    orgId: company.orgId,
-                    siret: company.siret,
-                    vatNumber: company.vatNumber,
-                    name: (destination?.company?.name ||
-                      company.name) as string,
-                    address: (destination?.company?.address ||
-                      company.address) as string,
-                    contact: destination?.company?.contact,
-                    phone: destination?.company?.phone,
-                    mail: destination?.company?.mail,
-                    country: company.codePaysEtrangerEtablissement
-                  };
-                }
-
-                if (errors?.length && company.siret !== currentCompanySiret) {
-                  // server errors
-                  clearCompanyError(destination, "destination", clearErrors);
-                }
-
-                if (!hasNextDestination) {
-                  setValue("destination.company", {
-                    ...destination.company,
-                    ...companyData
-                  });
-                } else {
-                  setValue("destination.operation", {
-                    nextDestination: {
-                      company: { ...destination.company, ...companyData }
-                    }
-                  });
-                }
+              if (!company) {
+                return;
               }
+              // [tra-13734] don't override field with api data keep the user data value
+              const currentCompany = hasNextDestination
+                ? destination?.operation.nextDestination.company
+                : destination?.company;
+              const companyValuesToUse =
+                company.siret === currentCompany?.siret ? currentCompany : null;
+
+              const companyData = {
+                orgId: company.orgId,
+                siret: company.siret,
+                vatNumber: company.vatNumber,
+                name: companyValuesToUse?.name ?? company.name ?? "",
+                address: companyValuesToUse?.address ?? company.address ?? "",
+                contact: companyValuesToUse?.contact ?? company.contact ?? "",
+                phone: companyValuesToUse?.phone ?? company.contactPhone ?? "",
+                mail: companyValuesToUse?.mail ?? company.contactEmail ?? "",
+                country: company.codePaysEtrangerEtablissement
+              };
+
+              const name = hasNextDestination
+                ? "destination.operation.nextDestination.company"
+                : "destination.company";
+              if (company.siret !== currentCompany?.siret) {
+                clearCompanyError(destination, name, clearErrors);
+              }
+
+              setValue(name, companyData);
             }}
           />
 
-          {!destination?.company?.siret &&
-            formState.errors?.destination?.["company"]?.siret && (
-              <p className="fr-text--sm fr-error-text fr-mb-4v">
-                {formState.errors?.destination?.["company"]?.siret?.message}
-              </p>
-            )}
+          {hasNextDestination
+            ? !destination?.operation?.nextDestination?.company?.siret &&
+              formState.errors?.destination?.["operation"]?.nextDestination?.[
+                "company"
+              ]?.siret && (
+                <p className="fr-text--sm fr-error-text fr-mb-4v">
+                  {
+                    formState.errors?.destination?.["operation"]
+                      ?.nextDestination?.["company"]?.siret?.message
+                  }
+                </p>
+              )
+            : !destination?.company?.siret &&
+              formState.errors?.destination?.["company"]?.siret && (
+                <p className="fr-text--sm fr-error-text fr-mb-4v">
+                  {formState.errors?.destination?.["company"]?.siret?.message}
+                </p>
+              )}
 
           <CompanyContactInfo
             fieldName={
@@ -433,7 +339,7 @@ const DestinationBsda = ({ errors }) => {
                 ? "destination.operation.nextDestination.company"
                 : "destination.company"
             )}
-            key={orgId}
+            key={destinationOrgId}
           />
 
           <div className="form__row">
@@ -576,55 +482,43 @@ const DestinationBsda = ({ errors }) => {
                   orgId={siret}
                   favoriteType={FavoriteType.NextDestination}
                   disabled={sealedFields.includes(`destination.company.siret`)}
-                  selectedCompanyOrgId={orgId}
+                  selectedCompanyOrgId={destinationOrgId}
                   selectedCompanyError={selectedCompanyError}
                   onCompanySelected={company => {
                     if (company) {
-                      let companyData = {
+                      // [tra-13734] don't override field with api data keep the user data value
+                      const companyValuesToUse =
+                        company.siret === destination?.company?.siret
+                          ? destination?.company
+                          : null;
+
+                      const companyData = {
                         orgId: company.orgId,
                         siret: company.siret,
                         vatNumber: company.vatNumber,
-                        name: company.name ?? "",
-                        address: company.address ?? "",
-                        contact: company.contact ?? "",
-                        phone: company.contactPhone ?? "",
-                        mail: company.contactEmail ?? "",
+                        name: companyValuesToUse?.name ?? company.name ?? "",
+                        address:
+                          companyValuesToUse?.address ?? company.address ?? "",
+                        contact:
+                          companyValuesToUse?.contact ?? company.contact ?? "",
+                        phone:
+                          companyValuesToUse?.phone ??
+                          company.contactPhone ??
+                          "",
+                        mail:
+                          companyValuesToUse?.mail ??
+                          company.contactEmail ??
+                          "",
                         country: company.codePaysEtrangerEtablissement
                       };
 
-                      // [tra-13734] don't override field with api data keep the user data value
-                      if (company.siret === destination?.company?.siret) {
-                        companyData = {
-                          orgId: company.orgId,
-                          siret: company.siret,
-                          vatNumber: company.vatNumber,
-                          name: (destination?.company?.name ||
-                            company.name) as string,
-                          address: (destination?.company?.address ||
-                            company.address) as string,
-                          contact: destination?.company?.contact,
-                          phone: destination?.company?.phone,
-                          mail: destination?.company?.mail,
-                          country: company.codePaysEtrangerEtablissement
-                        };
-                      }
+                      clearCompanyError(
+                        destination,
+                        "destination",
+                        clearErrors
+                      );
 
-                      if (errors?.length) {
-                        // server errors
-                        clearCompanyError(
-                          destination,
-                          "destination",
-                          clearErrors
-                        );
-                      }
-
-                      setValue("destination", {
-                        ...destination,
-                        company: {
-                          ...destination.company,
-                          ...companyData
-                        }
-                      });
+                      setValue("destination.company", companyData);
                     }
                   }}
                 />
@@ -641,7 +535,7 @@ const DestinationBsda = ({ errors }) => {
                   fieldName={"destination.company"}
                   errorObject={formState.errors?.destination?.["company"]}
                   disabled={sealedFields.includes(`destination.company.siret`)}
-                  key={orgId}
+                  key={destinationOrgId}
                 />
 
                 <div className="form__row">
@@ -654,6 +548,11 @@ const DestinationBsda = ({ errors }) => {
                       hasNextDestination
                         ? false
                         : sealedFields.includes(`destination.cap`)
+                    }
+                    state={formState.errors?.destination?.["cap"] && "error"}
+                    stateRelatedMessage={
+                      (formState.errors?.destination?.["cap"]
+                        ?.message as string) ?? ""
                     }
                   />
 

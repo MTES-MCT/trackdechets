@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-migrate
+  namespace: trackdechets
+  labels:
+    app: prisma-migrate
+    app.kubernetes.io/name: prisma-migrate
+    app.kubernetes.io/component: migration
+    app.kubernetes.io/part-of: trackdechets
+spec:
+  template:
+    metadata:
+      labels:
+        app: prisma-migrate
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: ghcr.io/trackdechets/api:latest
+          command: ["npx", "prisma", "migrate", "deploy"]
+
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: trackdechets-secrets
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+  backoffLimit: 3
+  activeDeadlineSeconds: 600 # 10 minutes timeout

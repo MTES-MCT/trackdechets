@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import QuickFilters from "./QuickFilters";
 import { FilterType } from "./filtersTypes";
 

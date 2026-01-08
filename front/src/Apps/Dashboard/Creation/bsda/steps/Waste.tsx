@@ -30,7 +30,6 @@ import {
   getInitialCompany,
   initialTransporter
 } from "../../../../common/data/initialState";
-import { setFieldError } from "../../utils";
 import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 
 const BSDA_COMPANY_INFOS = gql`
@@ -44,10 +43,10 @@ const BSDA_COMPANY_INFOS = gql`
   }
 `;
 
-const WasteBsda = ({ errors }) => {
+const WasteBsda = () => {
   const { siret } = useParams<{ siret: string }>();
   const methods = useFormContext();
-  const { register, setValue, watch, formState, setError } = methods;
+  const { register, setValue, watch, formState } = methods;
 
   const { data, loading, error } = useQuery<
     Pick<Query, "companyInfos">,
@@ -63,43 +62,6 @@ const WasteBsda = ({ errors }) => {
   const bsdaType = watch("type");
   const weight = watch("weight", {});
   const packagings = watch("packagings");
-
-  useEffect(() => {
-    if (errors?.length) {
-      setFieldError(
-        errors,
-        "waste.code",
-        formState.errors?.waste?.["code"],
-        setError
-      );
-
-      setFieldError(
-        errors,
-        "waste.adr",
-        formState.errors?.waste?.["adr"],
-        setError
-      );
-      setFieldError(
-        errors,
-        "waste.familyCode",
-        formState.errors?.waste?.["familyCode"],
-        setError
-      );
-      setFieldError(
-        errors,
-        "waste.materialName",
-        formState.errors?.waste?.["materialName"],
-        setError
-      );
-      setFieldError(
-        errors,
-        "waste.consistence",
-        formState.errors?.waste?.["consistence"],
-        setError
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
 
   useEffect(() => {
     if (bsdaType !== BsdaType.Gathering) {
@@ -133,8 +95,8 @@ const WasteBsda = ({ errors }) => {
 
   const isDechetterie = bsdaType === BsdaType.Collection_2710;
   const sealNumbersLength = waste?.sealNumbers?.length || 0;
-
-  const packagingsQuantity = packagings?.filter(p => p.type !== "").length ?? 0;
+  const isSubjectToADR =
+    waste?.isSubjectToADR === null || Boolean(waste?.isSubjectToADR); // Legacy compatibility, null means true
 
   const quantityLength: number = packagings.reduce(
     (acc: number, packaging: BsdaPackaging) =>
@@ -313,14 +275,17 @@ const WasteBsda = ({ errors }) => {
             <ToggleSwitch
               label="Le déchet est soumis à l'ADR"
               disabled={sealedFields.includes(`waste.isSubjectToADR`)}
-              checked={Boolean(waste.isSubjectToADR)}
+              checked={isSubjectToADR}
               onChange={(checked: boolean) => {
                 setValue("waste.isSubjectToADR", checked);
+                if (!checked) {
+                  setValue("waste.adr", null);
+                }
               }}
               className="fr-mt-4w"
             />
 
-            {waste.isSubjectToADR && (
+            {isSubjectToADR && (
               <Input
                 className="fr-col-md-8 fr-pl-9w fr-mt-1w"
                 label="Mention au titre de la réglementation ADR"
@@ -340,6 +305,13 @@ const WasteBsda = ({ errors }) => {
               nativeInputProps={{
                 ...register("waste.nonRoadRegulationMention")
               }}
+              state={
+                formState.errors.waste?.["nonRoadRegulationMention"] && "error"
+              }
+              stateRelatedMessage={
+                (formState.errors.waste?.["nonRoadRegulationMention"]
+                  ?.message as string) ?? ""
+              }
             />
 
             <h4 className="fr-h4 fr-mt-4w">Conditionnement</h4>
@@ -411,6 +383,13 @@ const WasteBsda = ({ errors }) => {
                 nativeInputProps={{
                   ...register("waste.consistenceDescription")
                 }}
+                state={
+                  formState.errors.waste?.["consistenceDescription"] && "error"
+                }
+                stateRelatedMessage={
+                  (formState.errors.waste?.["consistenceDescription"]
+                    ?.message as string) ?? ""
+                }
               />
             )}
 
@@ -436,6 +415,11 @@ const WasteBsda = ({ errors }) => {
                     type: "number",
                     ...register("weight.value")
                   }}
+                  state={formState.errors?.weight?.["value"] && "error"}
+                  stateRelatedMessage={
+                    (formState.errors?.weight?.["value"]?.message as string) ??
+                    ""
+                  }
                 />
 
                 <p className="fr-info-text fr-mt-5v">
@@ -448,9 +432,10 @@ const WasteBsda = ({ errors }) => {
                   legend="Cette quantité est"
                   disabled={sealedFields.includes("weight.isEstimate")}
                   orientation="horizontal"
-                  state={errors?.weight?.isEstimate && "error"}
+                  state={formState.errors?.weight?.["isEstimate"] && "error"}
                   stateRelatedMessage={
-                    (errors?.weight?.isEstimate?.message as string) ?? ""
+                    (formState.errors?.weight?.["isEstimate"]
+                      ?.message as string) ?? ""
                   }
                   options={[
                     {
@@ -494,8 +479,8 @@ const WasteBsda = ({ errors }) => {
                 <p className="fr-info-text">
                   Vous avez saisi {sealNumbersLength}{" "}
                   {pluralize("numéro", sealNumbersLength)} pour{" "}
-                  {Number(packagingsQuantity)}{" "}
-                  {pluralize("conditionnement", packagingsQuantity)}
+                  {Number(quantityLength)}{" "}
+                  {pluralize("conditionnement", quantityLength)}
                 </p>
               </>
             )}

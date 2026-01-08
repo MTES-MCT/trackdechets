@@ -9,6 +9,7 @@ import { prisma } from "@td/prisma";
 import {
   siretify,
   userWithCompanyFactory,
+  companyAssociatedToExistingUserFactory,
   companyFactory,
   transporterReceiptFactory,
   ecoOrganismeFactory,
@@ -1295,6 +1296,67 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
+  it("should allow updating destination if there is already a next destination", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const changedDestination = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+    const emitter = await companyAssociatedToExistingUserFactory(
+      user,
+      UserRole.ADMIN
+    );
+    const nextDestination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.siret, // current user is emitter so destinationCompanySiret is still editable
+        destinationCompanySiret: company.siret,
+        destinationOperationNextDestinationCompanySiret:
+          nextDestination.company.siret,
+        emitterEmissionSignatureDate: new Date()
+      },
+      transporterOpt: {
+        transporterCompanySiret: changedDestination.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      destination: {
+        company: {
+          siret: changedDestination.siret // Changing destination
+        },
+        operation: {
+          nextDestination: {
+            company: {
+              siret: nextDestination.company.siret, // Next destination remains the same
+              address: "adresse",
+              contact: "contact",
+              phone: "0101010101",
+              mail: "o@o.fr"
+            },
+            plannedOperationCode: "R 5",
+            cap: "cap"
+          }
+        }
+      }
+    };
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsda.id).toBeDefined();
+  });
+
   it("should allow removing the nextDestination", async () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -2391,10 +2453,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${bsda.destinationCompanyName}
-  ${bsda.destinationCompanySiret}.
+  l'entreprise de travaux amiante ${bsda.workerCompanyName} ${bsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${bsda.destinationCompanyName} ${bsda.destinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2472,10 +2533,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${bsda.workerCompanyName}
-  ${bsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${bsda.destinationOperationNextDestinationCompanyName}
-  ${bsda.destinationOperationNextDestinationCompanySiret}.
+  l'entreprise de travaux amiante ${bsda.workerCompanyName} ${bsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${bsda.destinationOperationNextDestinationCompanyName} ${bsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2661,10 +2721,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
-  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${updatedBsda.destinationOperationNextDestinationCompanyName}
-  ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName} ${updatedBsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${updatedBsda.destinationOperationNextDestinationCompanyName} ${updatedBsda.destinationOperationNextDestinationCompanySiret}.
 </p>
 `,
             messageVersions: [
@@ -2846,10 +2905,9 @@ describe("Mutation.updateBsda", () => {
 <br />
 <p>
   En cas de désaccord ou de question, il convient de vous rapprocher de
-  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName}
-  ${updatedBsda.workerCompanySiret} mandatée et visée sur ce même bordereau, ou de
-  l'établissement de destination finale ${updatedBsda.destinationCompanyName}
-  ${updatedBsda.destinationCompanySiret}.
+  l'entreprise de travaux amiante ${updatedBsda.workerCompanyName} ${updatedBsda.workerCompanySiret}
+  mandatée et visée sur ce même bordereau, ou de l'établissement de destination
+  finale ${updatedBsda.destinationCompanyName} ${updatedBsda.destinationCompanySiret}.
 </p>
 `,
             messageVersions: [

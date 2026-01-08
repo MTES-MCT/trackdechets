@@ -70,6 +70,13 @@ export function endOfDay(date: Date | string): Date {
   return result;
 }
 
+export function startOfDayPlusOneDay(date: Date | string): Date {
+  const result = new Date(date);
+  result.setDate(result.getDate() + 1);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
 export function todayAtMidnight(): Date {
   return sameDayMidnight(new Date());
 }

@@ -10,7 +10,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/libs/back/partial-backup",
+        "outputPath": "{projectRoot}/dist",
         "format": ["cjs"],
         "bundle": false,
         "main": "libs/back/partial-backup/src/main.ts",

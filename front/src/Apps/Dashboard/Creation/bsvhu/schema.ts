@@ -5,6 +5,8 @@ import { TransportMode } from "@td/codegen-ui";
 
 const zodCompany = z.object({
   siret: z.string().nullish(),
+  orgId: z.string().nullish(),
+  vatNumber: z.string().nullish(),
   name: z.string(),
   contact: z.string().nullish(),
   phone: z.string().nullish(),
@@ -87,6 +89,7 @@ export const rawBsvhuSchema = z
     transporters: z
       .array(
         z.object({
+          id: z.string().nullish(),
           number: z.number().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),

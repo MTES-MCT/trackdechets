@@ -132,7 +132,12 @@ const BsdaFormSteps = ({
         {
           path: "grouping",
           getComputedValue: (initialValue, actualValue) =>
-            actualValue?.map(g => g.id) ?? initialValue
+            actualValue?.length ? actualValue : initialValue
+        },
+        {
+          path: "forwarding",
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue ?? initialValue
         }
       ]),
     [bsdaQuery.data]
@@ -161,6 +166,16 @@ const BsdaFormSteps = ({
     () => getPublishErrorMessages(BsdType.Bsda, errorsFromPublishApi),
     [errorsFromPublishApi]
   );
+
+  useEffect(() => {
+    for (const error of publishErrorMessages) {
+      methods.setError(error.name as keyof ZodBsda, {
+        type: "custom",
+        message: error.message
+      });
+    }
+  }, [publishErrorMessages, methods]);
+
   const [bsdaContext, setBsdaContext] = useState<Bsda | undefined>();
 
   const type = methods.watch("type");
@@ -173,39 +188,14 @@ const BsdaFormSteps = ({
 
   const tabsContent = useMemo(
     () => ({
-      waste: (
-        <WasteBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.waste
-          )}
-        />
-      ),
-      emitter: (
-        <EmitterBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.emitter
-          )}
-        />
-      ),
-      worker:
-        type === BsdaType.OtherCollections ? (
-          <Worker
-            errors={publishErrorMessages.filter(
-              error => error.tabId === TabId.worker
-            )}
-          />
-        ) : null,
+      waste: <WasteBsda />,
+      emitter: <EmitterBsda />,
+      worker: type === BsdaType.OtherCollections ? <Worker /> : null,
       transporter: <TransporterBsda />,
-      destination: (
-        <DestinationBsda
-          errors={publishErrorMessages.filter(
-            error => error.tabId === TabId.destination
-          )}
-        />
-      ),
+      destination: <DestinationBsda />,
       other: <ActorsList />
     }),
-    [publishErrorMessages, type]
+    [type]
   );
 
   const loading =
@@ -230,6 +220,21 @@ const BsdaFormSteps = ({
 
   async function saveBsda(values: BsdaInput, draft: boolean): Promise<any> {
     const bsdaInput = await saveTransporters(values as BsdaValues);
+
+    // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field
+    // set to null, but the toggle is automatically set to true.
+    const initialBsda = bsdaQuery.data?.bsda;
+    if (
+      // If legacy BSDA...
+      initialBsda?.waste?.isSubjectToADR === null &&
+      // ...and the user did not change the toggle (nor the ADR value)
+      bsdaInput.waste?.isSubjectToADR === true &&
+      (!isDefinedStrict(bsdaInput.waste?.adr) ||
+        bsdaInput.waste?.adr === initialBsda.waste?.adr)
+    ) {
+      bsdaInput.waste.isSubjectToADR = null;
+    }
+
     const input = { ...bsdaInput };
 
     const cleanInputTransporters =
@@ -277,9 +282,13 @@ const BsdaFormSteps = ({
           }
         };
 
+    const forwarding = cleanInput.forwarding?.id;
+    const grouping = cleanInput.grouping?.map(g => g.id) ?? [];
     cleanInput = {
       ...cleanInput,
-      worker
+      worker,
+      forwarding,
+      grouping
     };
 
     if (bsdaState.id) {
@@ -298,7 +307,7 @@ const BsdaFormSteps = ({
   async function saveBsdaTransporter(
     transporterInput: CreateOrUpdateBsdaTransporterInput
   ): Promise<string> {
-    const { id, takenOverAt, transport, ...input } = transporterInput;
+    const { id, transport, ...input } = transporterInput;
 
     // S'assure que les données de récépissé transport sont nulles dans les
     // cas suivants :
@@ -332,7 +341,7 @@ const BsdaFormSteps = ({
       // Le transporteur existe déjà en base de données, on met
       // à jour les infos (uniquement si le transporteur n'a pas encore
       // pris en charge le déchet) et on renvoie l'identifiant
-      if (!takenOverAt) {
+      if (!transport?.takenOverAt) {
         const { errors } = await updateBsdaTransporter({
           variables: { id, input: cleanInput },
           onError: err => {
@@ -367,35 +376,15 @@ const BsdaFormSteps = ({
     const { id, transporters, packagings, ...input } = values;
     let transporterIds: string[] = [];
 
-    try {
-      transporterIds = await Promise.all(
-        transporters.map(t => saveBsdaTransporter(t))
-      );
-    } catch (_) {
-      // Si une erreur survient pendant la sauvegarde des données
-      // transporteur, on n'essaye même pas de sauvgarder le bordereau
-      return;
-    }
+    transporterIds = await Promise.all(
+      transporters.map(t => saveBsdaTransporter(t))
+    );
 
     const bsdaInput: BsdaInput = {
       ...input,
       transporters: transporterIds,
       packagings: cleanPackagings(packagings ?? [])
     };
-
-    // Careful. Legacy BSDAs have a `waste.isSubjectToADR` field
-    // set to null, but the toggle is automatically set to true.
-    const initialBsda = bsdaQuery.data?.bsda;
-    if (
-      // If legacy BSDA...
-      initialBsda?.waste?.isSubjectToADR === null &&
-      // ...and the user did not change the toggle (nor the ADR value)
-      bsdaInput.waste?.isSubjectToADR === true &&
-      (!isDefinedStrict(bsdaInput.waste?.adr) ||
-        bsdaInput.waste?.adr === initialBsda.waste?.adr)
-    ) {
-      bsdaInput.waste.isSubjectToADR = null;
-    }
 
     return bsdaInput;
   }

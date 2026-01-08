@@ -11,6 +11,8 @@ import { z } from "zod";
 const zodCompany = z
   .object({
     siret: z.string().nullish(),
+    orgId: z.string().nullish(),
+    vatNumber: z.string().nullish(),
     name: z.string().nullish(),
     contact: z.string().nullish(),
     phone: z.string().nullish(),
@@ -65,9 +67,46 @@ const bsdaPackagingSchema = z
     identificationNumbers: z.array(z.string()).nullish()
   })
   .refine(val => val.type !== "OTHER" || !!val.other, {
+    path: ["other"],
     message:
       "Vous devez saisir la description du conditionnement quand le type de conditionnement est 'Autre'"
   });
+
+const bsdaGroupingOrForwardingSchema = z.object({
+  id: z.string(),
+  waste: z
+    .object({
+      code: z.string().nullish(),
+      familyCode: z.string().nullish(),
+      adr: z.string().nullish(),
+      materialName: z.string().nullish(),
+      isSubjectToADR: z.boolean().nullish(),
+      sealNumbers: z.array(z.string()).nullish(),
+      nonRoadRegulationMention: z.string().nullish()
+    })
+    .nullish(),
+  destination: z
+    .object({
+      company: zodCompany.nullish(),
+      reception: z
+        .object({
+          weight: z.number().nonnegative().nullish(),
+          acceptedWeight: z.number().nonnegative().nullish()
+        })
+        .nullish(),
+      operation: z
+        .object({
+          nextDestination: z
+            .object({
+              company: zodCompany.nullish()
+            })
+            .nullish()
+        })
+        .nullish()
+    })
+    .nullish(),
+  packagings: z.array(bsdaPackagingSchema).nullish()
+});
 
 export const rawBsdaSchema = z.object({
   type: z.nativeEnum(BsdaType).default(BsdaType.OtherCollections),
@@ -185,6 +224,7 @@ export const rawBsdaSchema = z.object({
     .array(
       z
         .object({
+          id: z.string().nullish(),
           number: z.coerce.number().nonnegative().nullish(),
           company: zodCompany,
           customInfo: z.string().nullish(),
@@ -205,11 +245,14 @@ export const rawBsdaSchema = z.object({
     )
     .max(5, "Vous ne pouvez pas ajouter plus de 5 transporteurs")
     .optional(),
-  grouping: z.array(z.string()).optional().nullish(),
-  forwarding: z.string().nullish(),
+  grouping: z.array(bsdaGroupingOrForwardingSchema).optional().nullish(),
+  forwarding: bsdaGroupingOrForwardingSchema.nullish(),
   intermediaries: z.array(zodCompany).nullish(),
   intermediariesOrgIds: z.array(z.string()).optional(),
   transportersOrgIds: z.array(z.string()).optional()
 });
 
 export type ZodBsda = z.infer<typeof rawBsdaSchema>;
+export type ZodBsdaGroupingOrForwarding = z.infer<
+  typeof bsdaGroupingOrForwardingSchema
+>;

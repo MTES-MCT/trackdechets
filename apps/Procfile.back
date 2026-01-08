@@ -1,11 +1,11 @@
-web: node dist/apps/api/main.js
-clock: node dist/apps/cron/main.js
-queue: node dist/apps/queues-runner/main.js
-indexqueue: node dist/apps/queues-indexation/main.js
-bulkindexqueue: node dist/apps/queues-bulk-indexation/main.js
-bulkindexqueuemaster: node dist/apps/queues-bulk-indexation-master/main.js
-webhooksqueue: node dist/apps/queues-webhooks/main.js
-gericoqueue: node dist/apps/queues-gerico/main.js
+web: node apps/api/dist/main.js
+clock: node apps/cron/dist/main.js
+queue: node apps/queues-runner/dist/main.js
+indexqueue: node apps/queues-indexation/dist/main.js
+bulkindexqueue: node apps/queues-bulk-indexation/dist/main.js
+bulkindexqueuemaster: node apps/queues-bulk-indexation-master/dist/main.js
+webhooksqueue: node apps/queues-webhooks/dist/main.js
+gericoqueue: node apps/queues-gerico/dist/main.js
 
 # post-deploy tasks
 postdeploy: npx nx run back:generate-bsds-templates
