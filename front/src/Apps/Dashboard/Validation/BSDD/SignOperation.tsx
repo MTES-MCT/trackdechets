@@ -11,7 +11,8 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   PROCESSING_AND_REUSE_OPERATIONS,
   isDangerous,
-  isForeignVat
+  isForeignVat,
+  INCOMING_TEXS_WASTE_CODES
 } from "@td/constants";
 import { useMutation, gql } from "@apollo/client";
 import { useForm, FormProvider } from "react-hook-form";
@@ -32,6 +33,9 @@ import Alert from "@codegouvfr/react-dsfr/Alert";
 import RhfExtraEuropeanCompanyManualInput from "../../Components/RhfExtraEuropeanCompanyManualInput/RhfExtraEuropeanCompanyManualInput";
 import CompanyContactInfo from "../../../../Apps/Forms/Components/RhfCompanyContactInfo/RhfCompanyContactInfo";
 import SingleCheckbox from "../../../common/Components/SingleCheckbox/SingleCheckbox";
+import RadioButtons from "@codegouvfr/react-dsfr/RadioButtons";
+import { ParcelsVisualizer } from "../../../../form/registry/common/ParcelsVisualizer/ParcelsVisualizer";
+import { fieldArray } from "../../../../form/registry/builder/validation";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -68,6 +72,10 @@ const schema = z.object({
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
   processingOperationDescription: z.string().nullish(),
   processingOperationDone: z.string().nullish(),
+  isUpcycled: z.boolean(),
+  destinationParcelInseeCodes: fieldArray,
+  destinationParcelNumbers: fieldArray,
+  destinationParcelCoordinates: fieldArray,
   nextDestination: z
     .object({
       company: z
@@ -148,6 +156,10 @@ function SignOperationModal({
     processingOperationDone: "",
     destinationOperationMode: undefined,
     processingOperationDescription: "",
+    isUpcycled: false,
+    destinationParcelInseeCodes: [],
+    destinationParcelNumbers: [],
+    destinationParcelCoordinates: [],
     nextDestination: null,
     noTraceability: null
   } as ZodFormOperation;
@@ -206,6 +218,12 @@ function SignOperationModal({
   const nextDestination = watch("nextDestination");
   const noTraceability = watch("noTraceability");
   const vatNumber = watch("nextDestination.company.vatNumber");
+
+  const showIsUpcycled =
+    form.wasteDetails?.code &&
+    INCOMING_TEXS_WASTE_CODES.includes(form.wasteDetails.code as any) &&
+    processingOperationDone?.startsWith("R");
+  const isUpcycled = watch("isUpcycled");
 
   const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId ? true : false
@@ -397,6 +415,43 @@ function SignOperationModal({
             />
           </div>
         </div>
+        {showIsUpcycled && (
+          <div>
+            <p className="fr-mb-2w">
+              La terre est valorisée en remblayage (optionnel)
+            </p>
+            <RadioButtons
+              orientation="horizontal"
+              options={[
+                {
+                  label: "Oui",
+                  nativeInputProps: {
+                    onChange: () => {
+                      setValue("isUpcycled", true);
+                    },
+                    checked: isUpcycled === true
+                  }
+                },
+                {
+                  label: "Non",
+                  nativeInputProps: {
+                    onChange: () => {
+                      setValue("isUpcycled", false);
+                    },
+                    checked: !isUpcycled
+                  }
+                }
+              ]}
+            />
+          </div>
+        )}
+        {isUpcycled && (
+          <ParcelsVisualizer
+            methods={methods}
+            prefix="destinationParcel"
+            title=""
+          />
+        )}
         {isGroupement && noTraceability !== null && (
           <div className="fr-grid-row fr-grid-row--gutters">
             <div className="fr-col-12 fr-pb-0">

@@ -177,6 +177,57 @@ input ProcessedFormInput {
   destinationOperationMode: OperationMode
 
   """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+
+  """
+  Codes INSEE des parcelles si valorisation
+
+  Le ou les codes INSEE des communes des parcelles cadastrales du site de destination, plusieurs numéros peuvent être renseignés. Attention, le code INSEE n'est pas toujours égal au code postal.
+
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+
+  Valeurs :
+  - Chaque code INSEE doit faire 5 caractères
+
+  Exemple: "96140"
+  """
+  destinationParcelInseeCodes: [String!]
+
+  """
+  Numéro(s) des parcelles si valorisation
+
+  Le ou les numéros des parcelles cadastrales du site de destination, numéro composé d'un préfixe, d'une section et d'un numéro de parcelle.
+
+  Il est obligatoire de renseigner : soit les codes INSEE des communes des parcelles ainsi que leur(s) numéro(s) soit leurs coordonnées (identification précise du lieu géographique de production).
+  Pour chaque code INSEE, un numéro de parcelle doit être renseigné. Donc si il y a 2 codes INSEE, l'API attend 2 numéros de parcelle.
+
+  Valeurs :
+  - Format : [préfixe]-[section]-[numéro]
+  - Préfixe : 1 à 3 chiffres
+  - Section : 1 à 2 lettres majuscules ou chiffres
+  - Numéro de parcelle : 1 à 4 chiffres
+
+  Exemples : "123-A-4567" ou "1-AB-1234"
+  """
+  destinationParcelNumbers: [String!]
+
+  """
+  Coordonnées des parcelles si valorisation
+
+  Coordonnées de la ou des parcelles cadastrales du site de destination.
+
+  Format des coordonnées :
+  - Valeur attendue en degrés
+  - Le séparateur de décimales utilisé doit être un point
+  - Entre la latitude et la longitude d'une coordonnée, il doit y avoir un espace
+
+  Exemple: "48.894258 2.240027"
+  """
+  destinationParcelCoordinates: [String!]
+
+  """
   Description de l'opération d’élimination / valorisation (case 11)
   Elle se complète automatiquement lorsque non fournie
   """

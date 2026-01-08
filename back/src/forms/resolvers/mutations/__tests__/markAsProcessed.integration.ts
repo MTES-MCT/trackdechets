@@ -2333,4 +2333,148 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(resultingForm.status).toBe("PROCESSED");
   });
+
+  it("should fail to mark a form as processed when isUpcycled is true but waste code is not TEXS", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "05 01 04*" // Not in INCOMING_TEXS_WASTE_CODES
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          isUpcycled: true,
+          destinationParcelInseeCodes: ["75001"]
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Le champ 'La terre est valorisée en remblayage' ne peut être coché que pour les codes déchets terre et des opérations de réemploi."
+    );
+  });
+
+  it("should fail to mark a form as processed when isUpcycled is true but operation does not start with R", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "17 05 04" // In INCOMING_TEXS_WASTE_CODES
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1", // Does not start with R
+          destinationOperationMode: OperationMode.ELIMINATION,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          isUpcycled: true,
+          destinationParcelInseeCodes: ["75001"]
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Le champ 'La terre est valorisée en remblayage' ne peut être coché que pour les codes déchets terre et des opérations de réemploi."
+    );
+  });
+
+  it("should fail to mark a form as processed when isUpcycled is true but no destination parcel info is provided", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "17 05 04" // In INCOMING_TEXS_WASTE_CODES
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          isUpcycled: true
+          // No destination parcel info
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Lorsque la terre est valorisée il faut saisir au moins une des informations de parcelle de destination (code INSEE, numéro de parcelle ou coordonnées géographiques)."
+    );
+  });
+
+  it("should mark a form as processed when isUpcycled is true with valid conditions and destination parcel info", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        quantityReceived: 10,
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret,
+        wasteDetailsCode: "17 05 04" // In INCOMING_TEXS_WASTE_CODES
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "R 1",
+          destinationOperationMode: OperationMode.VALORISATION_ENERGETIQUE,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          isUpcycled: true,
+          destinationParcelInseeCodes: ["75001"]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    const resultingForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { finalOperations: true }
+    });
+    expect(resultingForm.status).toBe("PROCESSED");
+    expect(resultingForm.isUpcycled).toBe(true);
+    expect(resultingForm.destinationParcelInseeCodes).toEqual(["75001"]);
+  });
 });
