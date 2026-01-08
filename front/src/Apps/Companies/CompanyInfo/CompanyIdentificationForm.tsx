@@ -18,6 +18,7 @@ import { NotificationError } from "../../common/Components/Error/Error";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Loader } from "../../common/Components";
 import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
+import { envConfig } from "../../../common/envConfig";
 
 interface CompanyIdentificationFormProps {
   company: CompanyPrivate;
@@ -44,10 +45,7 @@ const CompanyIdentificationForm = ({
     givenName: company?.givenName || ""
   };
   const isAdmin = company.userRole === UserRole.Admin;
-  const isASiret = isSiret(
-    company.siret,
-    import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
-  );
+  const isASiret = isSiret(company.siret, envConfig.VITE_ALLOW_TEST_COMPANY);
 
   const [updateIdentificationInfo, { data, error, loading }] = useMutation(
     UPDATE_GIVEN_NAME_OR_GEREP_ID

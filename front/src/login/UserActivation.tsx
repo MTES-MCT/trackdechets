@@ -6,6 +6,7 @@ import routes from "../Apps/routes";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import styles from "./Login.module.scss";
+import { envConfig } from "../common/envConfig";
 
 function getErrorMessage(errorCode: string) {
   if (errorCode === "INVALID_OR_MISSING_HASH") {
@@ -21,7 +22,7 @@ export default function UserActivation() {
   const queries = queryString.parse(location.search);
 
   const formRef = createRef<HTMLFormElement>();
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
 
   if (queries.errorCode) {
     const { errorCode } = queries;

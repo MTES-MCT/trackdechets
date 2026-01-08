@@ -6,6 +6,7 @@ import { Query } from "@td/codegen-ui";
 import React from "react";
 import { SIRET_STORAGE_KEY } from "../../Apps/common/Components/CompanySwitcher/CompanySwitcher";
 import Alert from "@codegouvfr/react-dsfr/Alert";
+import { envConfig } from "../../common/envConfig";
 
 const COMPANY_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
@@ -25,7 +26,7 @@ const COMPANY_PRIVATE_INFOS = gql`
   }
 `;
 
-const { VITE_API_ENDPOINT } = import.meta.env;
+const { VITE_API_ENDPOINT } = envConfig;
 
 export function Impersonate() {
   const [search, { loading, error, data }] = useLazyQuery<

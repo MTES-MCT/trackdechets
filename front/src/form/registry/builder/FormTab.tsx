@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { type UseFormReturn, Controller } from "react-hook-form";
 import { Select } from "@codegouvfr/react-dsfr/Select";
 import NonScrollableInput from "../../../Apps/common/Components/NonScrollableInput/NonScrollableInput";
@@ -7,7 +7,7 @@ import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
 import { Tooltip } from "@codegouvfr/react-dsfr/Tooltip";
 import { Alert } from "@codegouvfr/react-dsfr/Alert";
 import { sub } from "date-fns";
-
+import { envConfig } from "../../../common/envConfig";
 import type { FormShapeFieldWithState } from "./types";
 import { formatError } from "./error";
 import "./FormTab.scss";
@@ -17,6 +17,22 @@ type Props = { fields: FormShapeFieldWithState[]; methods: UseFormReturn<any> };
 
 export function FormTab({ fields, methods }: Props) {
   const { errors } = methods.formState;
+  const reportForCompanySiret = methods.watch("reportForCompanySiret");
+  const noDateLimit = useMemo(
+    () => envConfig.VITE_NO_DATE_LIMIT_SIRETS.includes(reportForCompanySiret),
+    [reportForCompanySiret]
+  );
+
+  const maxDate = useMemo(() => new Date().toISOString().split("T")[0], []);
+
+  const minDate = useMemo(
+    () =>
+      noDateLimit
+        ? undefined
+        : sub(new Date(), MIN_DATE_FOR_REGISTRY).toISOString().split("T")[0],
+    [noDateLimit]
+  );
+
   function renderField(field: FormShapeFieldWithState, idx?: number) {
     if (field.shape === "custom") {
       const { Component, props } = field;
@@ -56,10 +72,8 @@ export function FormTab({ fields, methods }: Props) {
                 nativeInputProps={{
                   type: field.type,
                   ...(field.type === "date" && {
-                    min: sub(new Date(), MIN_DATE_FOR_REGISTRY)
-                      .toISOString()
-                      .split("T")[0],
-                    max: new Date().toISOString().split("T")[0]
+                    min: minDate,
+                    max: maxDate
                   }),
                   ...methods.register(field.name)
                 }}

@@ -1,13 +1,16 @@
 import {
   CODES_AND_EXPECTED_OPERATION_MODES,
   FINAL_OPERATION_CODES,
+  MIN_DATE_FOR_REGISTRY,
   TdOperationCode,
   isSiret
 } from "@td/constants";
+import { envConfig } from "../config";
 import { checkVAT, countries } from "jsvat";
 import { Refinement, z } from "zod";
 import { getWasteCodeSchema } from "./schemas";
 import { OperationMode } from "@td/prisma";
+import { sub } from "date-fns";
 
 export function refineTransporterInfos<T>({
   modeKey,
@@ -696,3 +699,27 @@ export const refineEcoOrgBrokerAndTrader: Refinement<{
     }
   }
 };
+
+export const refineDateLimits =
+  <T extends { reportForCompanySiret: string }>(
+    dateFields: string[]
+  ): Refinement<T> =>
+  (item, { addIssue }) => {
+    const reportForSiret = item.reportForCompanySiret;
+    if (envConfig.NO_DATE_LIMIT_SIRETS.includes(reportForSiret)) {
+      return;
+    }
+    for (const dateField of dateFields) {
+      if (
+        item[dateField] &&
+        item[dateField] instanceof Date &&
+        sub(new Date(), MIN_DATE_FOR_REGISTRY) > item[dateField]
+      ) {
+        addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `La date ne peut pas être antérieure à J-18 mois`,
+          path: [dateField]
+        });
+      }
+    }
+  };

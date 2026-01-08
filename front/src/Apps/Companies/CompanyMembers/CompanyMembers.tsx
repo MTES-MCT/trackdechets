@@ -10,8 +10,9 @@ import * as COMPANY_CONSTANTS from "@td/constants";
 import "./companyMembers.scss";
 import CompanyMembersList from "./CompanyMembersList";
 import CompanyMembersRequestsList from "./CompanyMembersRequestsList";
+import { envConfig } from "../../../common/envConfig";
 
-const { VITE_VERIFY_COMPANY } = import.meta.env;
+const { VITE_VERIFY_COMPANY } = envConfig;
 
 export type CompanyPrivateMembers = Pick<
   CompanyPrivate,
@@ -38,7 +39,7 @@ const CompanyMembers = ({
     <div className="company-members">
       {isAdmin && <CompanyMembersRequestsList company={company} />}
       {isAdmin &&
-        (VITE_VERIFY_COMPANY !== "true" ||
+        (!VITE_VERIFY_COMPANY ||
         !isProfessional ||
         (isProfessional && isVerified) ? (
           <CompanyMembersInvite company={company} />

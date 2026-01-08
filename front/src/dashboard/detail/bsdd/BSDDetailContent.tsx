@@ -79,6 +79,7 @@ import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard
 import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../Apps/common/utils/citerneBsddSummary";
 import { useMyCompany } from "../../../Apps/common/hooks/useMyCompany";
 import { getConsistenceLabel } from "../../../Apps/common/consistenceLabel";
+import { envConfig } from "../../../common/envConfig";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -219,7 +220,7 @@ const TempStorage = ({ form }) => {
               label={
                 isSiret(
                   temporaryStorageDetail?.transporter?.company?.orgId,
-                  import.meta.env.VITE_ALLOW_TEST_COMPANY
+                  envConfig.VITE_ALLOW_TEST_COMPANY
                 )
                   ? "SIRET"
                   : "Numéro de TVA"

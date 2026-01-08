@@ -70,6 +70,7 @@ import {
 } from "../common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "../common/types/commonTypes";
 import { sub } from "date-fns";
+import { envConfig } from "../../common/envConfig";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -1755,7 +1756,7 @@ export const canDuplicate = (bsd, siret) =>
   canDuplicateBspaoh(bsd);
 
 export const canClone = () => {
-  return import.meta.env.VITE_ALLOW_CLONING_BSDS === "true";
+  return envConfig.VITE_ALLOW_CLONING_BSDS;
 };
 
 const canDeleteBsff = (bsd, siret) =>

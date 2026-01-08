@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { envConfig } from "../common/envConfig";
 
 export interface AuthorizePayload {
   transactionID: string;
@@ -22,7 +23,7 @@ export function useOAuth2() {
   const [authorizePayload, setAuthorizePayload] =
     useState<AuthorizePayload | null>(null);
 
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
 
   const location = useLocation();
 
