@@ -15,9 +15,14 @@ const validationSchema = yup.object({
     .required("Le nom est un champ requis")
     .isSafeSSTI()
     .test(
-      "not-empty-or-spaces",
-      "Le champ ne peut pas être vide.",
-      value => !!value && value.trim().length > 0
+      "at-least-2-letters",
+      "Le nom doit contenir au moins 2 lettres.",
+      value => {
+        if (!value) return false;
+        const trimmed = value.trim();
+        const letterCount = (trimmed.match(/[\p{L}]/gu) || []).length;
+        return letterCount >= 2;
+      }
     ),
   password: yup
     .string()
