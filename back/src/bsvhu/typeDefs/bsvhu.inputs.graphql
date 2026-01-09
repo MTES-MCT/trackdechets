@@ -93,6 +93,8 @@ input BsvhuInput {
   """
   Identifiant personnalisé permettant de faire le lien avec un
   objet un système d'information tierce
+
+  Max: 250 caractères
   """
   customId: String
   "Code déchet. Presque toujours 16 01 06"
@@ -149,7 +151,11 @@ input BsvhuInput {
 }
 
 input BsvhuEmitterInput {
-  "Numéro d'agrément émetteur"
+  """
+  Numéro d'agrément émetteur
+
+  Max: 100 caractères
+  """
   agrementNumber: String
   "Indique si l'émetteur est en situation irrégulière"
   irregularSituation: Boolean
@@ -160,6 +166,11 @@ input BsvhuEmitterInput {
 }
 
 input BsvhuEcoOrganismeInput {
+  """
+  Nom de l'éco-organisme
+
+  Max: 250 caractères
+  """
   name: String!
   siret: String!
 }
@@ -184,25 +195,57 @@ input BsvhuCompanyInput {
   """
   vatNumber: String
 
-  "Nom de l'établissement"
+  """
+  Nom de l'établissement
+
+  Max: 250 caractères
+  """
   name: String
 
-  "Adresse de l'établissement"
+  """
+  Adresse de l'établissement
+
+  Max: 250 caractères
+  """
   address: String
-  "Rue de l'adresse de l'établissement"
+  """
+  Rue de l'adresse de l'établissement
+
+  Max: 250 caractères
+  """
   street: String
-  "Ville de l'adresse de l'établissement"
+  """
+  Ville de l'adresse de l'établissement
+
+  Max: 250 caractères
+  """
   city: String
-  "Code postal de l'adresse de l'établissement"
+  """
+  Code postal de l'adresse de l'établissement
+
+  Max: 250 caractères
+  """
   postalCode: String
 
-  "Nom du contact dans l'établissement"
+  """
+  Nom du contact dans l'établissement
+
+  Max: 250 caractères
+  """
   contact: String
 
-  "Email du contact dans l'établissement"
+  """
+  Email du contact dans l'établissement
+
+  Max: 250 caractères
+  """
   mail: String
 
-  "Numéro de téléphone de contact dans l'établissement"
+  """
+  Numéro de téléphone de contact dans l'établissement
+
+  Max: 250 caractères
+  """
   phone: String
 
   "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
@@ -214,12 +257,20 @@ input BsvhuCompanyInput {
   """
   omiNumber: String
 
-  "Un identifiant d'établissement hors EU"
+  """
+  Un identifiant d'établissement hors EU
+
+  Max: 250 caractères
+  """
   extraEuropeanId: String
 }
 
 input BsvhuIdentificationInput {
-  "Numéros d'identification"
+  """
+  Numéros d'identification
+
+  Max: 250 caractères par élément
+  """
   numbers: [String!]
   "Type de numéros d'identification"
   type: BsvhuIdentificationType
@@ -239,7 +290,11 @@ input BsvhuWeightInput {
 input BsvhuDestinationInput {
   "Type de receveur: broyeur ou second centre VHU"
   type: BsvhuDestinationType
-  "Numéro d'agrément de receveur"
+  """
+  Numéro d'agrément de receveur
+
+  Max: 100 caractères
+  """
   agrementNumber: String
   "Coordonnées de l'entreprise qui recoit les déchets"
   company: CompanyInput
@@ -266,7 +321,11 @@ input BsvhuReceptionInput {
   weight: Float
   "Lot accepté oui/non"
   acceptationStatus: WasteAcceptationStatus
-  "Motif de refus"
+  """
+  Motif de refus
+
+  Max: 250 caractères
+  """
   refusalReason: String
   "Identification éventuelle des VHU à la reception (numéro de lots ou d'ordre)"
   identification: BsvhuIdentificationInput
@@ -292,7 +351,11 @@ input BsvhuTransporterInput {
   company: CompanyInput
   "Récépissé transporteur"
   recepisse: BsvhuRecepisseInput
-  "Champ libre"
+  """
+  Champ libre
+
+  Max: 250 caractères
+  """
   customInfo: String
   "Informations liés au transport"
   transport: BsvhuTransportInput
@@ -343,7 +406,11 @@ input BsvhuSignatureInput {
   type: SignatureTypeInput!
   "Date de la signature"
   date: DateTime
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+
+  Max: 250 caractères
+  """
   author: String!
   "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int
