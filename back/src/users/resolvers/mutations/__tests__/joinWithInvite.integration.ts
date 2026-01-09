@@ -193,7 +193,9 @@ describe("joinWithInvite mutation", () => {
 
     // Then
     expect(errors).toBeDefined();
-    expect(errors[0].message).toContain("Le champ ne peut pas être vide.");
+    expect(errors[0].message).toContain(
+      "Le nom doit contenir au moins 2 lettres."
+    );
   });
 
   it("should accept other pending invitations", async () => {

@@ -134,7 +134,9 @@ describe("Mutation.signup", () => {
 
     // Then
     expect(errors).not.toBeUndefined();
-    expect(errors?.[0].message).toBe("Le champ ne peut pas être vide.");
+    expect(errors?.[0].message).toBe(
+      "Le nom doit contenir au moins 2 lettres."
+    );
   });
 
   it("should return the same result if email already exist", async () => {
