@@ -122,6 +122,10 @@ input BsffFicheInterventionWhere {
 
 input SignatureInput {
   date: DateTime!
+  """
+  Nom et prénom du signataire
+  Max: 250 caractères
+  """
   author: String!
 }
 
@@ -137,7 +141,10 @@ input BsffSignatureInput {
 
   "Date de la signature"
   date: DateTime
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+  Max: 250 caractères
+  """
   author: String!
   """
   Code de signature de l'auteur de la signature.
@@ -203,7 +210,10 @@ input BsffInput {
 
 input BsffEmitterInput {
   company: CompanyInput
-  "Champ libre"
+  """
+  Champ libre
+  Max: 250 caractères
+  """
   customInfo: String
 }
 
@@ -211,20 +221,35 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   "Type de contenant : bouteille, ou autre à préciser ;"
   type: BsffPackagingType
-  "Précision sur le type de contenant lorsque type=AUTRE"
+  """
+  Précision sur le type de contenant lorsque type=AUTRE
+  Max: 250 caractères
+  """
   other: String
   "DEPRECATED - Dénomination du contenant."
   name: String @deprecated(reason: "Utiliser `type`")
-  "Volume du contenant."
+  """
+  Volume du contenant.
+  Min: 0L
+  """
   volume: Float
-  "Numéro du contenant."
+  """
+  Numéro du contenant.
+  Min: 1 caractère, Max: 250 caractères
+  """
   numero: String!
-  "Poids en kilogrammes"
+  """
+  Poids en kilogrammes
+  Min: 0kg
+  """
   weight: Float!
 }
 
 input UpdateBsffPackagingInput {
-  "Permet au destintaire du contenant de rectifier le numéro du contenant en cas d'erreur de saisie"
+  """
+  Permet au destintaire du contenant de rectifier le numéro du contenant en cas d'erreur de saisie
+  Max: 250 caractères
+  """
   numero: String
   "Informations sur l'acceptation du contenant sur l'installation de destination"
   acceptation: BsffPackagingAcceptationInput
@@ -239,11 +264,17 @@ input BsffPackagingAcceptationInput {
   weight: Float!
   "Accepté ou refusé"
   status: WasteAcceptationStatus!
-  "En cas de refus, la raison"
+  """
+  En cas de refus, la raison
+  Max: 250 caractères
+  """
   refusalReason: String
   "Code déchet après une éventuelle analyse. Si omis, c'est le code déchet du BSFF qui s'applique."
   wasteCode: String
-  "Dénomination usuelle du déchet après une éventuelle analyse."
+  """
+  Dénomination usuelle du déchet après une éventuelle analyse.
+  Max: 250 caractères
+  """
   wasteDescription: String
 }
 
@@ -254,7 +285,10 @@ input BsffPackagingOperationInput {
   code: BsffOperationCode!
   "Qualification du traitement final"
   mode: OperationMode
-  "Description de l'opération réaliséee"
+  """
+  Description de l'opération réaliséee
+  Max: 250 caractères
+  """
   description: String!
   "Rupture de traçabilité autorisée par arrêté préfectoral"
   noTraceability: Boolean
@@ -268,9 +302,15 @@ input BsffWasteInput {
   14 06 01*, 14 06 02*, 14 06 03*, 16 05 04*, 13 03 10*.
   """
   code: String!
-  "La dénomination usuelle du déchet"
+  """
+  La dénomination usuelle du déchet
+  Max: 250 caractères
+  """
   description: String
-  "Les informations relatives au transport de marchandises dangereuses par voies terrestres"
+  """
+  Les informations relatives au transport de marchandises dangereuses par voies terrestres
+  Max: 750 caractères
+  """
   adr: String
 }
 
@@ -286,7 +326,10 @@ input BsffTransporterInput {
   "Informations sur le récepissé transporteur. Si 'null', l'exemption de récépissé est assumée (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
-  "Champ libre"
+  """
+  Champ libre
+  Max: 250 caractères
+  """
   customInfo: String
 }
 input BsffTransporterRecepisseInput {
@@ -318,20 +361,29 @@ input BsffTransporterTransportInput {
 
 input BsffDestinationInput {
   company: CompanyInput
-  "Le cas échéant, numéro de certificat d'acceptation préalable des déchets."
+  """
+  Le cas échéant, numéro de certificat d'acceptation préalable des déchets.
+  Max: 250 caractères
+  """
   cap: String
   "Informations concernant la réception du déchet"
   reception: BsffDestinationReceptionInput
   "Code de l'opération d'élimination ou valorisation prévue selon les annexes I et II de la directive 2008/98/CE relative aux déchets susvisée."
   plannedOperationCode: BsffOperationCode
-  "Champ libre"
+  """
+  Champ libre
+  Max: 250 caractères
+  """
   customInfo: String
 }
 
 input BsffAcceptationInput {
   "Accepté ou refusé"
   status: WasteAcceptationStatus!
-  "En cas de refus, la raison"
+  """
+  En cas de refus, la raison
+  Max: 250 caractères
+  """
   refusalReason: String
 }
 
@@ -341,12 +393,19 @@ input BsffDestinationReceptionInput {
 
 input BsffPackagingNextDestinationInput {
   plannedOperationCode: BsffOperationCode
+  """
+  N° de CAP (le cas échéant)
+  Max: 250 caractères
+  """
   cap: String
   company: CompanyInput
 }
 
 input BsffFicheInterventionInput {
-  "Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement"
+  """
+  Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement
+  Max: 250 caractères
+  """
   numero: String!
   "La quantité totale réelle ou estimée exprimée en kilogramme"
   weight: Float!

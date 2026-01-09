@@ -101,25 +101,58 @@ input BsdasriPackagingsInput {
   "Type de conditionnement"
   type: BsdasriPackagingType!
 
-  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  """
+  Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+  Max: 250 caractères
+  """
   other: String
 
-  "Volume de chaque colis associé à ce conditionnement"
+  """
+  Volume de chaque colis associé à ce conditionnement
+  Min: 0L
+  """
   volume: Float!
 
-  "Nombre de colis associés à ce conditionnement"
+  """
+  Nombre de colis associés à ce conditionnement
+  Min: 1
+  """
   quantity: Int!
 }
 
 input PickupSiteInput {
+  """
+  Nom du chantier
+  Max: 250 caractères
+  """
   name: String
+  """
+  Adresse du chantier
+  Max: 250 caractères
+  """
   address: String
+  """
+  Ville du chantier
+  Max: 250 caractères
+  """
   city: String
+  """
+  Code postal du chantier
+  Max: 250 caractères
+  """
   postalCode: String
+  """
+  Informations complémentaires sur le chantier
+  Max: 250 caractères
+  """
   infos: String
 }
 
 input BsdasriWasteInput {
+  """
+  Mention au titre du règlement ADR
+  Max: 750 caractères
+  """
   adr: String
   code: String
 }
@@ -137,12 +170,19 @@ input BsdasriEmissionInput {
 input BsdasriEmitterInput {
   company: CompanyInput
   pickupSite: PickupSiteInput
-  "Champ libre émetteur"
+  """
+  Champ libre émetteur
+  Max: 250 caractères
+  """
   customInfo: String
   emission: BsdasriEmissionInput
 }
 
 input BsdasriEcoOrganismeInput {
+  """
+  Nom de l'éco-organisme
+  Max: 250 caractères
+  """
   name: String!
   """
   SIRET composé de 14 caractères correspondant à un éco-organisme? Seul DASTRI est autorisé à ce jour.
@@ -172,7 +212,10 @@ input BsdasriRealWeightInput {
 input BsdasriAcceptationInput {
   "Accepté, refusé ou refusé partiellement"
   status: WasteAcceptationStatus
-  "Raison en cas de refus ou refus partiel"
+  """
+  Raison en cas de refus ou refus partiel
+  Max: 250 caractères
+  """
   refusalReason: String
   "Poids en kilogrammes de déchets refusé"
   refusedWeight: Float
@@ -222,7 +265,10 @@ input BsdasriTransporterInput {
   "Récépissé transporteur"
   recepisse: BsdasriRecepisseInput
 
-  "Champ libre transporteur"
+  """
+  Champ libre transporteur
+  Max: 250 caractères
+  """
   customInfo: String
 
   transport: BsdasriTransportInput
@@ -232,10 +278,16 @@ input BsdasriDestinationInput {
   "Établissement émetteur"
   company: CompanyInput
 
-  "N° de CAP (le cas échéant)"
+  """
+  N° de CAP (le cas échéant)
+  Max: 250 caractères
+  """
   cap: String
 
-  "Champ libre transporteur"
+  """
+  Champ libre transporteur
+  Max: 250 caractères
+  """
   customInfo: String
 
   reception: BsdasriReceptionInput
@@ -266,7 +318,10 @@ input BsdasriOperationInput {
 }
 
 input BsdasriIdentificationInput {
-  "Numéros d'identification des conteneurs concernés"
+  """
+  Numéros d'identification des conteneurs concernés
+  Max: 250 caractères par élément
+  """
   numbers: [String!]
 }
 input BsdasriRecepisseInput {
@@ -333,14 +388,20 @@ input BsdasriInput {
 input BsdasriSignatureInput {
   "Type de signature apposée"
   type: BsdasriSignatureType!
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+  Max: 250 caractères
+  """
   author: String!
   "Date de la signature"
   date: DateTime
 }
 
 input BsdasriSignatureWithSecretCodeInput {
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+  Max: 250 caractères
+  """
   author: String!
   "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int!
@@ -356,7 +417,10 @@ input CreateBsdasriRevisionRequestInput {
   authoringCompanySiret: String!
   "Contenu de la révision"
   content: BsdasriRevisionRequestContentInput!
-  "Commentaire pour expliquer la demande de révision"
+  """
+  Commentaire pour expliquer la demande de révision
+  Max: 250 caractères
+  """
   comment: String!
 }
 

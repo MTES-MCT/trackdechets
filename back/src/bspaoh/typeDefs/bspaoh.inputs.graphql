@@ -95,29 +95,44 @@ input BspaohSignatureInput {
   type: BspaohSignatureType!
   "Date de la signature"
   date: DateTime
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+  Max: 250 caractères
+  """
   author: String!
 }
 
 input BspaohWasteWeightInput {
-  "Poids en kilos"
+  """
+  Poids en kilos
+  Min: 0kg
+  """
   value: Float!
   "Type de quantité (réelle ou estimée)"
   isEstimate: Boolean!
 }
 
 input BspaohReceptionWasteWeightInput {
-  "Poids en kilos"
+  """
+  Poids en kilos
+  Min: 0kg
+  """
   value: Float!
 }
 input BspaohWasteDetailInput {
   weight: BspaohWasteWeightInput
-  "Quantité en nombre"
+  """
+  Quantité en nombre
+  Min: 0
+  """
   quantity: Int
 }
 
 input BspaohPackagingAcceptationInput {
-  "Identifiant du packaging"
+  """
+  Identifiant du packaging
+  Max: 250 caractères
+  """
   id: String
   "Accepté par le destinataire "
   acceptation: BspaohPackagingAcceptationStatus
@@ -126,7 +141,10 @@ input BspaohPackagingAcceptationInput {
 input BspaohWasteAcceptationInput {
   "Accepté, refusé ou refusé partiellement"
   status: WasteAcceptationStatus
-  "Raison en cas de refus ou refus partiel"
+  """
+  Raison en cas de refus ou refus partiel
+  Max: 250 caractères
+  """
   refusalReason: String
   "Acceptation détaillée des conditionnements"
   packagings: [BspaohPackagingAcceptationInput!]
@@ -135,23 +153,52 @@ input BspaohWasteAcceptationInput {
 input BspaohPackagingInput {
   "Type de conditionnement"
   type: BspaohPackagingType!
-  "Volume en litres"
+  """
+  Volume en litres
+  Min: 0L
+  """
   volume: Int
-  "Numérotation"
+  """
+  Numérotation
+  Max: 50 caractères
+  """
   containerNumber: String!
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
-  "Codes d'identification utilisés par l'établissement"
+  """
+  Codes d'identification utilisés par l'établissement
+  Au moins 1 code requis, Max: 250 caractères par élément
+  """
   identificationCodes: [String!]
   "Consistance"
   consistence: BspaohConsistence!
 }
 
 input PickupSiteInput {
+  """
+  Nom du chantier
+  Max: 250 caractères
+  """
   name: String
+  """
+  Adresse du chantier
+  Max: 250 caractères
+  """
   address: String
+  """
+  Ville du chantier
+  Max: 250 caractères
+  """
   city: String
+  """
+  Code postal du chantier
+  Max: 250 caractères
+  """
   postalCode: String
+  """
+  Informations complémentaires sur le chantier
+  Max: 250 caractères
+  """
   infos: String
 }
 
@@ -176,7 +223,10 @@ input BspaohTransportInput {
 input BspaohReceptionWasteDetailInput {
   receivedWeight: BspaohReceptionWasteWeightInput
   refusedWeight: BspaohReceptionWasteWeightInput
-  "Quantité en nombre"
+  """
+  Quantité en nombre
+  Min: 0
+  """
   quantity: Int
 }
 
@@ -201,7 +251,10 @@ input BspaohWasteInput {
   type: BspaohType
   "Rubrique Déchet"
   code: String
-  "Mention ADR"
+  """
+  Mention ADR
+  Max: 750 caractères
+  """
   adr: String
   "Conditionnements"
   packagings: [BspaohPackagingInput!]
@@ -212,7 +265,10 @@ input BspaohEmitterInput {
   company: CompanyInput
   "Adresse de collecte"
   pickupSite: PickupSiteInput
-  "Champ libre émetteur"
+  """
+  Champ libre émetteur
+  Max: 250 caractères
+  """
   customInfo: String
   emission: BspaohEmissionInput
 }
@@ -220,7 +276,10 @@ input BspaohEmitterInput {
 input BspaohTransporterInput {
   "Entreprise de transport"
   company: CompanyInput
-  "Champ libre"
+  """
+  Champ libre
+  Max: 250 caractères
+  """
   customInfo: String
   "Recepissé - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport "
   recepisse: BspaohRecepisseInput
@@ -230,13 +289,19 @@ input BspaohTransporterInput {
 input BspaohDestinationInput {
   "Établissement de destination"
   company: CompanyInput
-  "N° de CAP (le cas échéant)"
+  """
+  N° de CAP (le cas échéant)
+  Max: 250 caractères
+  """
   cap: String
   "Expédition reçue à l'installation de destination"
   reception: BspaohReceptionInput
   "Réalisation de l'opération (case 11)"
   operation: BspaohOperationInput
-  "Champ libre"
+  """
+  Champ libre
+  Max: 250 caractères
+  """
   customInfo: String
 }
 
