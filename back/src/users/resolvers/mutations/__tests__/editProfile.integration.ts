@@ -128,7 +128,7 @@ describe("mutation editProfile", () => {
     // Then
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `The name cannot be an empty string`,
+        message: `Le nom doit contenir au moins 2 lettres.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -155,7 +155,7 @@ describe("mutation editProfile", () => {
     // Then
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `The name cannot be an empty string`,
+        message: `Le nom doit contenir au moins 2 lettres.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
