@@ -11,11 +11,16 @@ input SignEmissionFormInput {
 
   """
   Mention au titre du règlement ADR.
+
   Max: 750 caractères
   """
   onuCode: String
 
-  "Mention au titre des règlements RID, ADNR, IMDG (optionnel). Max: 250 caractères"
+  """
+  Mention au titre des règlements RID, ADNR, IMDG (optionnel).
+
+  Max: 250 caractères
+  """
   nonRoadRegulationMention: String
 
   """
@@ -30,6 +35,7 @@ input SignEmissionFormInput {
 
   """
   Nom de la personne signant pour l'émetteur.
+
   Max: 250 caractères
   """
   emittedBy: String!
@@ -44,6 +50,7 @@ input SignTransportFormInput {
 
   """
   Nom de la personne signant pour le transporteur.
+
   Max: 250 caractères
   """
   takenOverBy: String!
@@ -75,6 +82,7 @@ input TransporterSignatureFormInput {
 
   """
   Nom de la personne responsable de l'envoi du déchet (case 9).
+
   Max: 250 caractères
   """
   sentBy: String!
@@ -97,6 +105,7 @@ input TransporterSignatureFormInput {
 
   """
   Mention au titre du règlement ADR.
+
   Max: 750 caractères
   """
   onuCode: String
@@ -108,6 +117,7 @@ input SignatureFormInput {
   sentAt: DateTime!
   """
   Nom de la personne responsable de l'envoi du déchet (case 9).
+
   Max: 250 caractères
   """
   sentBy: String!
@@ -119,6 +129,7 @@ input AcceptedFormInput {
 
   """
   Raison du refus (case 10). Obligatoire en cas de refus de déchet.
+
   Max: 250 caractères
   """
   wasteRefusalReason: String
@@ -128,6 +139,7 @@ input AcceptedFormInput {
 
   """
   Nom de la personne en charge de l'acceptation' du déchet (case 10).
+
   Max: 250 caractères
   """
   signedBy: String!
@@ -161,6 +173,7 @@ input AcceptedFormInput {
 input ReceivedFormInput {
   """
   Nom de la personne en charge de la réception du déchet (case 10).
+
   Max: 250 caractères
   """
   receivedBy: String!
@@ -199,6 +212,7 @@ input ReceivedFormInput {
 input ProcessedFormInput {
   """
   Traitement réalisé (code D/R).
+
   Max: 250 caractères
   """
   processingOperationDone: String!
@@ -260,12 +274,14 @@ input ProcessedFormInput {
   """
   Description de l'opération d'élimination / valorisation (case 11)
   Elle se complète automatiquement lorsque non fournie.
-  Max: 250 caractères  
+
+  Max: 250 caractères
   """
   processingOperationDescription: String
 
   """
   Personne en charge du traitement.
+
   Max: 250 caractères
   """
   processedBy: String!
@@ -283,6 +299,7 @@ input ProcessedFormInput {
 input NextDestinationInput {
   """
   Traitement prévue (code D/R).
+
   Max: 250 caractères
   """
   processingOperation: String!
@@ -298,6 +315,7 @@ input NextDestinationInput {
   - code déchet dangereux, ou signalé comme dangereux (isDangerous), ou présence de POP
   - et le  traitement est non final
   - et la destination ultérieure est à l'étranger ( UE et non UE)
+
   Max: 15 caractères
   """
   notificationNumber: String
@@ -547,6 +565,7 @@ input InitialFormFractionInput {
 input EcoOrganismeInput {
   """
   Nom de l'éco-organisme
+
   Max: 250 caractères
   """
   name: String!
@@ -571,6 +590,7 @@ input DestinationInput {
 
   """
   N° de CAP prévu (le cas échéant). Le champ CAP est obligatoire pour les déchets dangereux.
+
   Max: 250 caractères
   """
   cap: String
@@ -589,26 +609,31 @@ input DestinationInput {
 input WorkSiteInput {
   """
   Nom du chantier
+
   Max: 250 caractères
   """
   name: String
   """
   Adresse du chantier
+
   Max: 250 caractères
   """
   address: String
   """
   Ville du chantier
+
   Max: 100 caractères
   """
   city: String
   """
   Code postal du chantier
+
   Max: 20 caractères
   """
   postalCode: String
   """
   Informations complémentaires sur le chantier
+
   Max: 500 caractères
   """
   infos: String
@@ -642,12 +667,14 @@ ou de reconditionnement prévue (case 2)
 input RecipientInput {
   """
   N° de CAP (le cas échéant).
+
   Max: 250 caractères
   """
   cap: String
 
   """
   Opération d'élimination / valorisation prévue (code D/R).
+
   Max: 250 caractères
   """
   processingOperation: String
@@ -704,6 +731,7 @@ input TransporterInput {
 
   """
   Information libre, destinée aux transporteurs.
+
   Max: 250 caractères
   """
   customInfo: String
@@ -767,6 +795,7 @@ input PackagingInfoInput {
 
   """
   Description du conditionnement dans le cas où le type de conditionnement est `OTHER`.
+
   Max: 250 caractères
   """
   other: String
@@ -779,6 +808,7 @@ input PackagingInfoInput {
 
   """
   Volume du conditionnement en litre(s).
+
   Min: 0L
   """
   volume: Float
@@ -811,6 +841,7 @@ input WasteDetailsInput {
 
   """
   Dénomination usuelle. Obligatoire.
+
   Max: 250 caractères
   """
   name: String
@@ -820,12 +851,14 @@ input WasteDetailsInput {
 
   """
   Mention au titre du règlement ADR. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire.
+
   Max: 750 caractères
   """
   onuCode: String
 
   """
   Mention au titre des règlements RID, ADNR, IMDG (optionnel).
+
   Max: 250 caractères
   """
   nonRoadRegulationMention: String
@@ -884,18 +917,21 @@ input WasteDetailsInput {
 
   """
   Numéros de référence(s) d'analyse(s).
+
   Max: 250 caractères par élément
   """
   analysisReferences: [String!]
 
   """
   Identifiant(s) du ou des terrains lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6.
+
   Max: 250 caractères par élément
   """
   landIdentifiers: [String!]
 
   """
   Numéro d'échantillon pour les huiles noires. Ne concerne que les bordereaux parmi les codes suivants: 13 02 04*, 13 02 05*, 13 02 06*, 13 02 07*, 13 02 08*.
+
   Max: 250 caractères
   """
   sampleNumber: String
@@ -907,41 +943,49 @@ Payload lié au numéro de parcelle cadastrale
 input ParcelNumberInput {
   """
   Ville.
+
   Max: 250 caractères
   """
   city: String!
   """
   Code postal.
+
   Max: 20 caractères
   """
   postalCode: String @deprecated(reason: "Ignoré - Remplacé par inseeCode")
   """
   Code commune Insee.
+
   Max: 250 caractères
   """
   inseeCode: String
   """
   Prefixe cadastral.
+
   Min: 1 caractère, Max: 5 caractères
   """
   prefix: String
   """
   Numéro de section cadastrale.
+
   Min: 1 caractère, Max: 5 caractères
   """
   section: String
   """
   Numéro de parcelle cadastrale.
+
   Min: 1 caractère, Max: 5 caractères
   """
   number: String
   """
   Coordonnée X au format WGS 84, à utiliser uniquement en cas de domaine non cadastré.
+
   Min: -90, Max: 90
   """
   x: Float
   """
   Coordonnée Y au format WGS 84, à utiliser uniquement en cas de domaine non cadastré.
+
   Min: -180, Max: 180
   """
   y: Float
@@ -953,12 +997,14 @@ Payload lié au reconditionnement (case 15 à 17)
 input WasteDetailsRepackagingInput {
   """
   Mention au titre du règlement ADR.
+
   Max: 750 caractères
   """
   onuCode: String
 
   """
   Mention au titre des règlements RID, ADNR, IMDG (optionnel).
+
   Max: 250 caractères
   """
   wasteDetailsNonRoadRegulationMention: String
@@ -983,6 +1029,7 @@ input TempStorerAcceptedFormInput {
 
   """
   Nom de la personne en charge de l'acceptation du déchet (case 13).
+
   Max: 250 caractères
   """
   signedBy: String!
@@ -992,6 +1039,7 @@ input TempStorerAcceptedFormInput {
 
   """
   Raison du refus (case 13). Obligatoire en cas de refus de déchet.
+
   Max: 250 caractères
   """
   wasteRefusalReason: String
@@ -1021,12 +1069,14 @@ input TempStoredFormInput {
 
   """
   Raison du refus (case 13). Obligatoire en cas de refus de déchet.
+
   Max: 250 caractères
   """
   wasteRefusalReason: String
 
   """
   Nom de la personne en charge de la réception du déchet (case 13).
+
   Max: 250 caractères
   """
   receivedBy: String!
@@ -1062,12 +1112,14 @@ Payload lié au reconditionnement (case 15 à 17)
 input WasteDetailsRepackagingInput {
   """
   Mention au titre du règlement ADR.
+
   Max: 750 caractères
   """
   onuCode: String
 
   """
   Mention au titre des règlements RID, ADNR, IMDG (optionnel).
+
   Max: 250 caractères
   """
   wasteDetailsNonRoadRegulationMention: String
@@ -1099,6 +1151,7 @@ input ResentFormInput {
 
   """
   Nom du signataire du BSD suite (case 19).
+
   Max: 250 caractères
   """
   signedBy: String!
@@ -1195,6 +1248,7 @@ input CreateFormRevisionRequestInput {
   content: FormRevisionRequestContentInput!
   """
   Commentaire pour expliquer la demande de révision.
+
   Max: 250 caractères
   """
   comment: String!
@@ -1226,18 +1280,21 @@ input FormRevisionRequestContentInput {
 
   """
   Quantité reçue sur l'installation de destination, en tonnes.
+
   Max: 40 tonnes (transport routier), Max: 50 000 tonnes (tous transports)
   """
   quantityReceived: Float
 
   """
   Quantité refusée nette, en tonnes.
+
   Max: 40 tonnes (transport routier), Max: 50 000 tonnes (tous transports)
   """
   quantityRefused: Float
 
   """
   Traitement réalisé (code D/R).
+
   Max: 250 caractères
   """
   processingOperationDone: String
@@ -1247,6 +1304,7 @@ input FormRevisionRequestContentInput {
 
   """
   Description de l'opération d'élimination / valorisation réalisée.
+
   Max: 250 caractères
   """
   processingOperationDescription: String
@@ -1258,12 +1316,14 @@ input FormRevisionRequestContentInput {
 input FormRevisionRequestWasteDetailsInput {
   """
   Code CED.
+
   Max: 250 caractères
   """
   code: String
 
   """
   Description du déchet.
+
   Max: 250 caractères
   """
   name: String
@@ -1277,6 +1337,7 @@ input FormRevisionRequestWasteDetailsInput {
   """
   Numéro d'échantillon
   Uniquement révisable sur les annexes 1 pour les codes déchets concernés.
+
   Max: 250 caractères
   """
   sampleNumber: String
@@ -1293,6 +1354,7 @@ input FormRevisionRequestWasteDetailsInput {
 input FormRevisionRequestRecipientInput {
   """
   CAP de l'installation de destination ou d'entreposage ou de reconditionnement prévue.
+
   Max: 250 caractères
   """
   cap: String
@@ -1308,12 +1370,14 @@ input FormRevisionRequestTemporaryStorageDetailInput {
 input FormRevisionRequestDestinationInput {
   """
   N° de CAP de l'installation de destination.
+
   Max: 250 caractères
   """
   cap: String
 
   """
   Opération d'élimination / valorisation prévue (code D/R).
+
   Max: 250 caractères
   """
   processingOperation: String
@@ -1322,12 +1386,14 @@ input FormRevisionRequestDestinationInput {
 input FormRevisionRequestTemporaryStorerInput {
   """
   Quantité reçue sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes).
+
   Max: 40 tonnes (transport routier), Max: 50 000 tonnes (tous transports)
   """
   quantityReceived: Float
 
   """
   Quantité refusée sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes).
+
   Max: 40 tonnes (transport routier), Max: 50 000 tonnes (tous transports)
   """
   quantityRefused: Float

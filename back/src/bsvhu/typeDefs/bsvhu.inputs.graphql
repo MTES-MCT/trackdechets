@@ -93,6 +93,7 @@ input BsvhuInput {
   """
   Identifiant personnalisé permettant de faire le lien avec un
   objet un système d'information tierce
+
   Max: 250 caractères
   """
   customId: String
@@ -152,6 +153,7 @@ input BsvhuInput {
 input BsvhuEmitterInput {
   """
   Numéro d'agrément émetteur
+
   Max: 100 caractères
   """
   agrementNumber: String
@@ -166,6 +168,7 @@ input BsvhuEmitterInput {
 input BsvhuEcoOrganismeInput {
   """
   Nom de l'éco-organisme
+
   Max: 250 caractères
   """
   name: String!
@@ -194,45 +197,53 @@ input BsvhuCompanyInput {
 
   """
   Nom de l'établissement
+
   Max: 250 caractères
   """
   name: String
 
   """
   Adresse de l'établissement
+
   Max: 250 caractères
   """
   address: String
   """
   Rue de l'adresse de l'établissement
+
   Max: 250 caractères
   """
   street: String
   """
   Ville de l'adresse de l'établissement
+
   Max: 250 caractères
   """
   city: String
   """
   Code postal de l'adresse de l'établissement
+
   Max: 250 caractères
   """
   postalCode: String
 
   """
   Nom du contact dans l'établissement
+
   Max: 250 caractères
   """
   contact: String
 
   """
   Email du contact dans l'établissement
+
   Max: 250 caractères
   """
   mail: String
 
   """
   Numéro de téléphone de contact dans l'établissement
+
   Max: 250 caractères
   """
   phone: String
@@ -248,6 +259,7 @@ input BsvhuCompanyInput {
 
   """
   Un identifiant d'établissement hors EU
+
   Max: 250 caractères
   """
   extraEuropeanId: String
@@ -256,6 +268,7 @@ input BsvhuCompanyInput {
 input BsvhuIdentificationInput {
   """
   Numéros d'identification
+
   Max: 250 caractères par élément
   """
   numbers: [String!]
@@ -279,6 +292,7 @@ input BsvhuDestinationInput {
   type: BsvhuDestinationType
   """
   Numéro d'agrément de receveur
+
   Max: 100 caractères
   """
   agrementNumber: String
@@ -309,6 +323,7 @@ input BsvhuReceptionInput {
   acceptationStatus: WasteAcceptationStatus
   """
   Motif de refus
+
   Max: 250 caractères
   """
   refusalReason: String
@@ -338,6 +353,7 @@ input BsvhuTransporterInput {
   recepisse: BsvhuRecepisseInput
   """
   Champ libre
+
   Max: 250 caractères
   """
   customInfo: String
@@ -392,6 +408,7 @@ input BsvhuSignatureInput {
   date: DateTime
   """
   Nom et prénom du signataire
+
   Max: 250 caractères
   """
   author: String!

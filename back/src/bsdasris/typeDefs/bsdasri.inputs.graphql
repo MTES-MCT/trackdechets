@@ -103,18 +103,21 @@ input BsdasriPackagingsInput {
 
   """
   Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
   Max: 250 caractères
   """
   other: String
 
   """
   Volume de chaque colis associé à ce conditionnement
+
   Min: 0L
   """
   volume: Float!
 
   """
   Nombre de colis associés à ce conditionnement
+
   Min: 1
   """
   quantity: Int!
@@ -123,26 +126,31 @@ input BsdasriPackagingsInput {
 input PickupSiteInput {
   """
   Nom du chantier
+
   Max: 250 caractères
   """
   name: String
   """
   Adresse du chantier
+
   Max: 250 caractères
   """
   address: String
   """
   Ville du chantier
+
   Max: 250 caractères
   """
   city: String
   """
   Code postal du chantier
+
   Max: 250 caractères
   """
   postalCode: String
   """
   Informations complémentaires sur le chantier
+
   Max: 250 caractères
   """
   infos: String
@@ -151,6 +159,7 @@ input PickupSiteInput {
 input BsdasriWasteInput {
   """
   Mention au titre du règlement ADR
+
   Max: 750 caractères
   """
   adr: String
@@ -172,6 +181,7 @@ input BsdasriEmitterInput {
   pickupSite: PickupSiteInput
   """
   Champ libre émetteur
+
   Max: 250 caractères
   """
   customInfo: String
@@ -181,6 +191,7 @@ input BsdasriEmitterInput {
 input BsdasriEcoOrganismeInput {
   """
   Nom de l'éco-organisme
+
   Max: 250 caractères
   """
   name: String!
@@ -214,6 +225,7 @@ input BsdasriAcceptationInput {
   status: WasteAcceptationStatus
   """
   Raison en cas de refus ou refus partiel
+
   Max: 250 caractères
   """
   refusalReason: String
@@ -267,6 +279,7 @@ input BsdasriTransporterInput {
 
   """
   Champ libre transporteur
+
   Max: 250 caractères
   """
   customInfo: String
@@ -280,12 +293,14 @@ input BsdasriDestinationInput {
 
   """
   N° de CAP (le cas échéant)
+
   Max: 250 caractères
   """
   cap: String
 
   """
   Champ libre transporteur
+
   Max: 250 caractères
   """
   customInfo: String
@@ -320,6 +335,7 @@ input BsdasriOperationInput {
 input BsdasriIdentificationInput {
   """
   Numéros d'identification des conteneurs concernés
+
   Max: 250 caractères par élément
   """
   numbers: [String!]
@@ -390,6 +406,7 @@ input BsdasriSignatureInput {
   type: BsdasriSignatureType!
   """
   Nom et prénom du signataire
+
   Max: 250 caractères
   """
   author: String!
@@ -400,6 +417,7 @@ input BsdasriSignatureInput {
 input BsdasriSignatureWithSecretCodeInput {
   """
   Nom et prénom du signataire
+
   Max: 250 caractères
   """
   author: String!
@@ -419,6 +437,7 @@ input CreateBsdasriRevisionRequestInput {
   content: BsdasriRevisionRequestContentInput!
   """
   Commentaire pour expliquer la demande de révision
+
   Max: 250 caractères
   """
   comment: String!

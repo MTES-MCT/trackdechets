@@ -97,6 +97,7 @@ input BspaohSignatureInput {
   date: DateTime
   """
   Nom et prénom du signataire
+
   Max: 250 caractères
   """
   author: String!
@@ -105,6 +106,7 @@ input BspaohSignatureInput {
 input BspaohWasteWeightInput {
   """
   Poids en kilos
+
   Min: 0kg
   """
   value: Float!
@@ -115,6 +117,7 @@ input BspaohWasteWeightInput {
 input BspaohReceptionWasteWeightInput {
   """
   Poids en kilos
+
   Min: 0kg
   """
   value: Float!
@@ -123,6 +126,7 @@ input BspaohWasteDetailInput {
   weight: BspaohWasteWeightInput
   """
   Quantité en nombre
+
   Min: 0
   """
   quantity: Int
@@ -131,6 +135,7 @@ input BspaohWasteDetailInput {
 input BspaohPackagingAcceptationInput {
   """
   Identifiant du packaging
+
   Max: 250 caractères
   """
   id: String
@@ -143,6 +148,7 @@ input BspaohWasteAcceptationInput {
   status: WasteAcceptationStatus
   """
   Raison en cas de refus ou refus partiel
+
   Max: 250 caractères
   """
   refusalReason: String
@@ -155,11 +161,13 @@ input BspaohPackagingInput {
   type: BspaohPackagingType!
   """
   Volume en litres
+
   Min: 0L
   """
   volume: Int
   """
   Numérotation
+
   Max: 50 caractères
   """
   containerNumber: String!
@@ -167,6 +175,7 @@ input BspaohPackagingInput {
   quantity: Int!
   """
   Codes d'identification utilisés par l'établissement
+
   Au moins 1 code requis, Max: 250 caractères par élément
   """
   identificationCodes: [String!]
@@ -177,26 +186,31 @@ input BspaohPackagingInput {
 input PickupSiteInput {
   """
   Nom du chantier
+
   Max: 250 caractères
   """
   name: String
   """
   Adresse du chantier
+
   Max: 250 caractères
   """
   address: String
   """
   Ville du chantier
+
   Max: 250 caractères
   """
   city: String
   """
   Code postal du chantier
+
   Max: 250 caractères
   """
   postalCode: String
   """
   Informations complémentaires sur le chantier
+
   Max: 250 caractères
   """
   infos: String
@@ -225,6 +239,7 @@ input BspaohReceptionWasteDetailInput {
   refusedWeight: BspaohReceptionWasteWeightInput
   """
   Quantité en nombre
+
   Min: 0
   """
   quantity: Int
@@ -253,6 +268,7 @@ input BspaohWasteInput {
   code: String
   """
   Mention ADR
+
   Max: 750 caractères
   """
   adr: String
@@ -267,6 +283,7 @@ input BspaohEmitterInput {
   pickupSite: PickupSiteInput
   """
   Champ libre émetteur
+
   Max: 250 caractères
   """
   customInfo: String
@@ -278,6 +295,7 @@ input BspaohTransporterInput {
   company: CompanyInput
   """
   Champ libre
+
   Max: 250 caractères
   """
   customInfo: String
@@ -291,6 +309,7 @@ input BspaohDestinationInput {
   company: CompanyInput
   """
   N° de CAP (le cas échéant)
+
   Max: 250 caractères
   """
   cap: String
@@ -300,6 +319,7 @@ input BspaohDestinationInput {
   operation: BspaohOperationInput
   """
   Champ libre
+
   Max: 250 caractères
   """
   customInfo: String
