@@ -1,6 +1,10 @@
 import { OperationMode } from "@td/prisma";
 
-export const getOperationModeLabel = (operationMode: OperationMode) => {
+export const getOperationModeLabel = (
+  operationMode: OperationMode | null | undefined
+) => {
+  if (!operationMode) return "";
+
   switch (operationMode) {
     case OperationMode.ELIMINATION:
       return "Elimination";
