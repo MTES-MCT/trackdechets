@@ -472,24 +472,50 @@ const Recipient = ({
             <GroupedIn form={form} key={form.id} />
           ))}
       </div>
-      {form.nextDestination?.company && (
-        <div className={styles.detailGrid}>
-          <DetailRow
-            value={form.nextDestination?.processingOperation}
-            label="Opération ultérieure prévue"
-          />
-          {form.nextDestination.notificationNumber && (
+      <div className={styles.detailGrid}>
+        {form.nextDestination?.company && (
+          <>
             <DetailRow
-              value={form.nextDestination?.notificationNumber}
-              label="Numéro de notification"
+              value={form.nextDestination?.processingOperation}
+              label="Opération ultérieure prévue"
             />
-          )}
-          <Company
-            label="Destination ultérieure prévue"
-            company={form.nextDestination?.company}
-          />
-        </div>
-      )}
+            {form.nextDestination.notificationNumber && (
+              <DetailRow
+                value={form.nextDestination?.notificationNumber}
+                label="Numéro de notification"
+              />
+            )}
+            <Company
+              label="Destination ultérieure prévue"
+              company={form.nextDestination?.company}
+            />
+          </>
+        )}
+        {form.isUpcycled !== null && (
+          <>
+            <DetailRow
+              value={form.isUpcycled ? "Oui" : "Non"}
+              label="Terre valorisée"
+            />
+            {form.isUpcycled && (
+              <>
+                <DetailRow
+                  value={form.recipient?.parcelInseeCodes?.join(", ")}
+                  label="Codes INSEE des parcelles si valorisation"
+                />
+                <DetailRow
+                  value={form.recipient?.parcelNumbers?.join(", ")}
+                  label="Numéro(s) des parcelles si valorisation"
+                />
+                <DetailRow
+                  value={form.recipient?.parcelCoordinates?.join(", ")}
+                  label="Coordonnées des parcelles si valorisation"
+                />
+              </>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };

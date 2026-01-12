@@ -701,6 +701,7 @@ export function expandFormFromDb(
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
     transporters: transporters.map(t => expandTransporterFromDb(t)!),
     isDirectSupply: form.isDirectSupply,
+    isUpcycled: form.isUpcycled,
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,
@@ -712,7 +713,10 @@ export function expandFormFromDb(
         phone: form.recipientCompanyPhone,
         mail: form.recipientCompanyMail
       }),
-      isTempStorage: form.recipientIsTempStorage
+      isTempStorage: form.recipientIsTempStorage,
+      parcelCoordinates: form.destinationParcelCoordinates,
+      parcelInseeCodes: form.destinationParcelInseeCodes,
+      parcelNumbers: form.destinationParcelNumbers
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,

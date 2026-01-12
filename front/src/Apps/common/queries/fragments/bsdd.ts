@@ -34,6 +34,9 @@ const recipientFragment = gql`
     company {
       ...CompanyFragment
     }
+    parcelCoordinates
+    parcelInseeCodes
+    parcelNumbers
   }
   ${companyFragment}
 `;
@@ -202,6 +205,7 @@ const mutableFieldsFragment = gql`
     id
     customId
     isDirectSupply
+    isUpcycled
     sentAt
     emittedAt
     emittedBy
