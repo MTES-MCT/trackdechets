@@ -58,6 +58,7 @@ describe("expandFormFromDb", () => {
         isPrivateIndividual: false
       },
       emptyReturnADR: form.emptyReturnADR,
+      isUpcycled: null,
       recipient: {
         cap: form.recipientCap,
         processingOperation: form.recipientProcessingOperation,
@@ -69,7 +70,10 @@ describe("expandFormFromDb", () => {
           phone: form.recipientCompanyPhone,
           mail: form.recipientCompanyMail
         },
-        isTempStorage: false
+        isTempStorage: false,
+        parcelCoordinates: [],
+        parcelInseeCodes: [],
+        parcelNumbers: []
       },
       grouping: null,
       transportSegments: [],
