@@ -218,7 +218,8 @@ export function expandBsffFromDB(
     ficheInterventions: [],
     forwarding: [],
     repackaging: [],
-    grouping: []
+    grouping: [],
+    metadata: {} as any
   };
 }
 

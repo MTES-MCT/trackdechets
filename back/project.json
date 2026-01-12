@@ -3,6 +3,7 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "back/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "types": {
       "command": "tsc -p back/tsconfig.lib.json --noEmit"
@@ -74,6 +75,5 @@
         "integration": {}
       }
     }
-  },
-  "tags": []
+  }
 }

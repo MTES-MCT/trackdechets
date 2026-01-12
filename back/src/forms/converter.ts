@@ -473,6 +473,18 @@ export function flattenProcessedFormInput(
   const { nextDestination, ...rest } = processedFormInput;
   return safeInput({
     ...rest,
+    destinationParcelCoordinates: undefinedOrDefault(
+      rest.destinationParcelCoordinates,
+      []
+    ),
+    destinationParcelInseeCodes: undefinedOrDefault(
+      rest.destinationParcelInseeCodes,
+      []
+    ),
+    destinationParcelNumbers: undefinedOrDefault(
+      rest.destinationParcelNumbers,
+      []
+    ),
     ...flattenNextDestinationInput(processedFormInput)
   });
 }

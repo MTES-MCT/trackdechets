@@ -6,7 +6,7 @@ import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 import { ErrorCode } from "../../errors";
 import { MAX_OPERATIONS_PER_REQUEST } from "../../middlewares/graphqlBatchLimiter";
 import cors from "cors";
-import { expressMiddleware } from "@apollo/server/express4";
+import { expressMiddleware } from "@as-integrations/express4";
 
 const graphQLPath = "/gql";
 

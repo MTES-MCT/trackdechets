@@ -214,8 +214,8 @@ describe("mutation createAnonymousCompanyFromPDF", () => {
 
     expect(anonymousCompany).not.toBeUndefined();
     expect(anonymousCompany?.codeCommune).toEqual("44109");
-    expect(getCodeCommune).toBeCalledTimes(1);
-    expect(getCodeCommune).toBeCalledWith("4 BD PASTEUR 44100 NANTES");
+    expect(getCodeCommune).toHaveBeenCalledTimes(1);
+    expect(getCodeCommune).toHaveBeenCalledWith("4 BD PASTEUR 44100 NANTES");
   });
 
   it("if getCodeCommune doesn't return anything, should throw", async () => {

@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 
 import WasteDetails from "./WasteDetails";
 import { BsdType } from "@td/codegen-ui";

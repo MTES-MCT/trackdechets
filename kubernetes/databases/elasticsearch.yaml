@@ -1,0 +1,156 @@
+# Elasticsearch Cluster using Elastic Cloud on Kubernetes (ECK)
+# Requires ECK operator to be installed:
+# kubectl create -f https://download.elastic.co/downloads/eck/2.11.0/crds.yaml
+# kubectl apply -f https://download.elastic.co/downloads/eck/2.11.0/operator.yaml
+
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elasticsearch
+  namespace: trackdechets
+spec:
+  version: 7.10.2
+
+  nodeSets:
+    - name: default
+      count: 3
+
+      config:
+        node.store.allow_mmap: false
+        # Single-node discovery replaced with proper cluster formation
+        cluster.initial_master_nodes:
+          - elasticsearch-es-default-0
+          - elasticsearch-es-default-1
+          - elasticsearch-es-default-2
+
+      volumeClaimTemplates:
+        - metadata:
+            name: elasticsearch-data
+          spec:
+            accessModes:
+              - ReadWriteOnce
+            resources:
+              requests:
+                storage: 50Gi
+            storageClassName: standard
+
+      podTemplate:
+        metadata:
+          labels:
+            app: elasticsearch
+        spec:
+          containers:
+            - name: elasticsearch
+              env:
+                - name: ES_JAVA_OPTS
+                  value: "-Xms512m -Xmx512m"
+              resources:
+                requests:
+                  memory: "1Gi"
+                  cpu: "500m"
+                limits:
+                  memory: "2Gi"
+                  cpu: "2000m"
+              readinessProbe:
+                httpGet:
+                  path: /_cluster/health
+                  port: 9200
+                  scheme: HTTP
+                initialDelaySeconds: 30
+                periodSeconds: 10
+                timeoutSeconds: 5
+              livenessProbe:
+                httpGet:
+                  path: /_cluster/health
+                  port: 9200
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                periodSeconds: 20
+                timeoutSeconds: 5
+
+          # Init container to set vm.max_map_count
+          initContainers:
+            - name: sysctl
+              image: busybox
+              command: ["sysctl", "-w", "vm.max_map_count=262144"]
+              securityContext:
+                privileged: true
+
+          # Pod anti-affinity to spread across nodes
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchLabels:
+                        elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+                    topologyKey: kubernetes.io/hostname
+
+---
+# Service to expose Elasticsearch
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: trackdechets
+  labels:
+    app: elasticsearch
+spec:
+  selector:
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+  ports:
+    - name: http
+      port: 9200
+      targetPort: 9200
+  type: ClusterIP
+
+---
+# Job to create the bsds index alias after deployment
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: elasticsearch-init-index
+  namespace: trackdechets
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: curl
+          image: curlimages/curl:latest
+          command:
+            - sh
+            - -c
+            - |
+              # Wait for Elasticsearch to be ready
+              until curl -s http://elasticsearch:9200/_cluster/health | grep -q '"status":"green"\|"status":"yellow"'; do
+                echo "Waiting for Elasticsearch..."
+                sleep 5
+              done
+
+              # Create bsds index with settings
+              curl -X PUT "http://elasticsearch:9200/bsds-v1" -H 'Content-Type: application/json' -d'
+              {
+                "settings": {
+                  "number_of_shards": 3,
+                  "number_of_replicas": 1,
+                  "refresh_interval": "5s"
+                }
+              }'
+
+              # Create alias
+              curl -X POST "http://elasticsearch:9200/_aliases" -H 'Content-Type: application/json' -d'
+              {
+                "actions": [
+                  {
+                    "add": {
+                      "index": "bsds-v1",
+                      "alias": "bsds"
+                    }
+                  }
+                ]
+              }'
+
+              echo "Index and alias created successfully"
