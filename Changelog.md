@@ -7,13 +7,20 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2026.01.1] 13/01/2026
 
+### :boom: Breaking changes
+
+- L'ajout manuel du mode de traitement ELIMINATION pour le code D9F sur le BSDA et le DASRI devient obligatoire [PR 4592](https://github.com/MTES-MCT/trackdechets/pull/4592)
+- Le code D9 n'est plus accepté sur le BSDA et le BSDASRI (remplacé par D9F) [PR 4592](https://github.com/MTES-MCT/trackdechets/pull/4592)
+
 #### :nail_care: Améliorations
 
 - Remontée des chemins d'erreurs et de champs scellés sur BSFF [PR 4604](https://github.com/MTES-MCT/trackdechets/pull/4604)
+- Sur un BSDASRI, lorsqu'un éco-organisme approuve une révision, sa voix doit compter comme celle du producteur et vice versa (une deuxième approbation ne doit pas être requise pour valider la révision) [PR 4612](https://github.com/MTES-MCT/trackdechets/pull/4612)
 
 #### :bug: Corrections de bugs
 
 - BSDA : ne pas passer les infos de certification si pas de sous-section 3 [PR 4617](https://github.com/MTES-MCT/trackdechets/pull/4617)
+- Il n'est plus possible de s'inscrire avec uniquement des espaces ou des caractères spéciaux dans le nom [PR 4613](https://github.com/MTES-MCT/trackdechets/pull/4613)
 
 # [2025.12.1] 16/12/2025
 
