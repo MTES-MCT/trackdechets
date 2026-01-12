@@ -2130,7 +2130,12 @@ const processedInfoSchemaFn: (
     destinationParcelInseeCodes: yup
       .array()
       .of(yup.string().trim().length(5))
-      .nullable(),
+      .nullable()
+      .test(
+        "no-duplicates",
+        "Les codes INSEE de destination ne doivent pas contenir de doublons",
+        value => !value || new Set(value).size === value.length
+      ),
     destinationParcelNumbers: yup
       .array()
       .of(yup.string().matches(/^\d{1,3}-[A-Z0-9]{1,2}-\d{1,4}$/))
@@ -2148,11 +2153,21 @@ const processedInfoSchemaFn: (
             return true;
           return value.length === destinationParcelInseeCodes.length;
         }
+      )
+      .test(
+        "no-duplicates",
+        "Les numéros de parcelles de destination ne doivent pas contenir de doublons",
+        value => !value || new Set(value).size === value.length
       ),
     destinationParcelCoordinates: yup
       .array()
       .of(yup.string().matches(/^-?\d+(\.\d+)? -?\d+(\.\d+)?$/))
       .nullable()
+      .test(
+        "no-duplicates",
+        "Les coordonnées de parcelles de destination ne doivent pas contenir de doublons",
+        value => !value || new Set(value).size === value.length
+      )
   });
 
   if (
