@@ -42,6 +42,7 @@ import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotic
 import FormikCompanyTypeForm, {
   FormikCompanyTypeValues
 } from "../common/Components/CompanyTypeForm/FormikCompanyTypeForm";
+import { envConfig } from "../../../common/envConfig";
 
 const GET_ME = gql`
   {
@@ -482,7 +483,7 @@ export default function AccountCompanyAdd() {
                   ...((isFRVat(values.vatNumber) ||
                     (!isSiret(
                       values.siret,
-                      import.meta.env.VITE_ALLOW_TEST_COMPANY
+                      envConfig.VITE_ALLOW_TEST_COMPANY
                     ) &&
                       !isVat(values.vatNumber))) && {
                     siret:

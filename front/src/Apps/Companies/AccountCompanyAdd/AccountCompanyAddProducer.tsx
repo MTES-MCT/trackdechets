@@ -22,6 +22,7 @@ import { CREATE_COMPANY_HOOK_OPTIONS } from "./AccountCompanyAdd";
 import { CREATE_COMPANY } from "../common/queries";
 import GivenNameNotice from "../common/Components/GivenNameNotice/GivenNameNotice";
 import SingleCheckbox from "../../common/Components/SingleCheckbox/SingleCheckbox";
+import { envConfig } from "../../../common/envConfig";
 
 interface Values extends FormikValues {
   siret?: string | null;
@@ -105,7 +106,7 @@ export default function AccountCompanyAddProducer() {
                   }),
                   ...(!isSiret(
                     values.siret,
-                    import.meta.env.VITE_ALLOW_TEST_COMPANY
+                    envConfig.VITE_ALLOW_TEST_COMPANY
                   ) &&
                     !isVat(values.vatNumber) && {
                       siret:

@@ -22,6 +22,7 @@ import RegistryTable from "./RegistryTable";
 import { useRegistryExport } from "./RegistryV2ExportContext";
 import { useRegistryExportModal } from "./RegistryV2ExportModalContext";
 import { usePermissions } from "../../common/contexts/PermissionsContext";
+import { envConfig } from "../../common/envConfig";
 
 export const getRegistryTypeWording = (
   registryType: RegistryV2ExportType
@@ -251,10 +252,10 @@ export function MyExports() {
             />
           </div>
         )}
-        {import.meta.env.VITE_REGISTRY_EXPORT_ISSUE_NOTICE && (
+        {envConfig.VITE_REGISTRY_EXPORT_ISSUE_NOTICE && (
           <div className="fr-mt-2w">
             <Alert
-              description={import.meta.env.VITE_REGISTRY_EXPORT_ISSUE_NOTICE}
+              description={envConfig.VITE_REGISTRY_EXPORT_ISSUE_NOTICE}
               severity="info"
               small
             />

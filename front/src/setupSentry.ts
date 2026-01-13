@@ -1,12 +1,11 @@
 import * as Sentry from "@sentry/browser";
+import { envConfig } from "./common/envConfig";
 
-if (import.meta.env.VITE_SENTRY_DSN) {
+if (envConfig.VITE_SENTRY_DSN) {
   Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN as string,
-    environment: import.meta.env.VITE_ENV_NAME as string,
-    ...(import.meta.env.VITE_SENTRY_USE_TUNNEL === "true"
-      ? { tunnel: "/sentry" }
-      : {}),
+    dsn: envConfig.VITE_SENTRY_DSN,
+    environment: envConfig.VITE_SENTRY_ENV_NAME,
+    ...(envConfig.VITE_SENTRY_USE_TUNNEL ? { tunnel: "/sentry" } : {}),
     ignoreErrors: [
       // The user is having issues with their internet connection
       "NetworkError when attempting to fetch resource.",

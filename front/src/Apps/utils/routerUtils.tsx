@@ -9,6 +9,7 @@ import * as Sentry from "@sentry/browser";
 import Loader from "../common/Components/Loader/Loaders";
 import routes from "../routes";
 import { useAuth } from "../../common/contexts/AuthContext";
+import { envConfig } from "../../common/envConfig";
 
 export function RequireAuth({
   children,
@@ -19,7 +20,7 @@ export function RequireAuth({
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if (import.meta.env.VITE_SENTRY_DSN && user?.email) {
+    if (envConfig.VITE_SENTRY_DSN && user?.email) {
       Sentry.setUser({ email: user.email });
     }
   }, [user?.email]);

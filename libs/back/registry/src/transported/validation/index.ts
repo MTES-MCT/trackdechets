@@ -8,6 +8,7 @@ import {
   refineWasteCode,
   refinePlates
 } from "./refinement";
+import { refineDateLimits } from "../../shared/refinement";
 import { transportedSchema } from "./schema";
 import {
   transformAndRefineReason,
@@ -16,6 +17,7 @@ import {
 
 export function safeParseAsyncTransported(line: unknown) {
   return transportedSchema
+    .superRefine(refineDateLimits(["collectionDate", "unloadingDate"]))
     .superRefine(refineDates)
     .superRefine(refineEmitter)
     .superRefine(refineDestination)

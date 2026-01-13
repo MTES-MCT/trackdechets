@@ -7,7 +7,8 @@ import {
   refineRequiredOperationMode,
   refineOperationModeConsistency,
   refineTransportersConsistency,
-  refineWeightIsEstimate
+  refineWeightIsEstimate,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -28,6 +29,7 @@ import { transformAndRefineReason } from "./transform";
 
 export function safeParseAsyncIncomingWaste(line: unknown) {
   return incomingWasteSchema
+    .superRefine(refineDateLimits(["receptionDate"]))
     .superRefine(refineReportForProfile)
     .superRefine(refineIsDangerous)
     .superRefine(refineWeighingHour)

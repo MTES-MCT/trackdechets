@@ -10,6 +10,7 @@ import { convertFileToBase64 } from "../../../../utils/fileUtils";
 import { InvalidSirenePDFFormatError } from "./InvalidSirenePDFFormatError";
 import { InvalidSirenePDFSizeError } from "./InvalidSirenePDFSizeError";
 import { AnonymousCompanyCreationSuccess } from "./AnonymousCompanyCreationSuccess";
+import { envConfig } from "../../../../../common/envConfig";
 
 const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
   mutation CreateAnonymousCompanyFromPDF(
@@ -22,8 +23,7 @@ const CREATE_ANONYMOUS_COMPANY_FROM_PDF = gql`
 // Because we rely on SIRENE's PDF formats, which may change and break
 // the feature, we keep a fallback to the old-fashioned way, going through
 // the support for each request
-const DISABLE_FILE_UPLOAD =
-  import.meta.env.VITE_DISABLE_SIRENE_PDF_UPLOAD === "true";
+const DISABLE_FILE_UPLOAD = envConfig.VITE_DISABLE_SIRENE_PDF_UPLOAD;
 
 const AccountCompanyAddAnonymousCompany = ({ siret }: { siret: string }) => {
   const [fileHasInvalidFormat, setFileHasInvalidFormat] =
