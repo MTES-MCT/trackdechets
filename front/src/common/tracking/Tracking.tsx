@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { envConfig } from "../envConfig";
 
 declare global {
   interface Window {
@@ -17,8 +18,7 @@ window.matomoHeatmapSessionRecordingAsyncInit = function (_: any) {
 };
 
 export function MatomoTracker() {
-  const { VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL } = import.meta
-    .env;
+  const { VITE_MATOMO_TRACKER_SITE_ID, VITE_MATOMO_TRACKER_URL } = envConfig;
   const { user } = useAuth();
 
   const trackingConsentUntil = user?.trackingConsentUntil;

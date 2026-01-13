@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/back/prisma/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint",
@@ -29,6 +30,5 @@
         "command": "pg-validate-migrations {projectRoot}/src/migrate/migrations"
       }
     }
-  },
-  "tags": []
+  }
 }

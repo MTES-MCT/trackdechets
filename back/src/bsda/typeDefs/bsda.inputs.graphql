@@ -178,21 +178,54 @@ input BsdaEmitterInput {
   company: CompanyInput
   "Informations chantier (si différente de l'adresse de l'entreprise)"
   pickupSite: BsdaPickupSiteInput
-  "Champ libre"
+  """
+  Champ libre
+
+  Max: 250 caractères
+  """
   customInfo: String
 }
 
 input BsdaEcoOrganismeInput {
+  """
+  Nom de l'éco-organisme
+
+  Max: 250 caractères
+  """
   name: String!
   siret: String!
 }
 
 input BsdaPickupSiteInput {
+  """
+  Nom du chantier
+
+  Max: 250 caractères
+  """
   name: String
+  """
+  Adresse du chantier
+
+  Max: 250 caractères
+  """
   address: String
+  """
+  Ville du chantier
+
+  Max: 250 caractères
+  """
   city: String
+  """
+  Code postal du chantier
+
+  Max: 250 caractères
+  """
   postalCode: String
-  "Autres informations, notamment le code chantier"
+  """
+  Autres informations, notamment le code chantier
+
+  Max: 250 caractères
+  """
   infos: String
 }
 
@@ -201,21 +234,62 @@ input BsdaWasteInput {
   code: String
   "DEPRECATED - Dénomination usuelle"
   name: String @deprecated(reason: "Utiliser materialName")
-  "Code famille"
+  """
+  Code famille
+  La valeur attendue est un numéro de 1 à 9 correspondant à ces familles :
+
+  1 - amiante pur utilisé en bourrage ou en sac
+
+  2 - amiante mélangé dans des poudres ou des produits minéraux sans liaison forte
+
+  3 - amiante intégré dans des liquides ou des solutions visqueuses
+
+  4 - amiante tissé ou tressé
+
+  5 - amiante en feuilles ou en plaques
+
+  6 - amiante lié à des matériaux inertes
+
+  7 - amiante noyé dans une résine ou une matière plastique
+
+  8 - amiante dans des matériels et équipements
+
+  9 - tous les matériaux contaminés susceptibles d'émettre des fibres
+  """
   familyCode: String
-  "Nom usuel du matériau"
+  """
+  Nom usuel du matériau
+
+  Max: 250 caractères
+  """
   materialName: String
   "Consistance"
   consistence: BsdaConsistence
-  "Détail de la consistance, dans le cas où la consistance est 'AUTRE'"
+  """
+  Détail de la consistance, dans le cas où la consistance est 'AUTRE'
+
+  Max: 250 caractères
+  """
   consistenceDescription: String
-  "Numéros de scellés"
+  """
+  Numéros de scellés
+
+  Max: 250 caractères par élément
+  """
   sealNumbers: [String!]
   "Si le déchet est soumis à l'ADR ou non"
   isSubjectToADR: Boolean
-  "Mention au titre du règlement ADR la plus à jour"
+  """
+  Mention au titre du règlement ADR la plus à jour
+
+  Max: 750 caractères
+  """
   adr: String
-  "Mentions au titre des règlements RID, ADN, IMDG (optionnel)"
+  """
+  Mentions au titre des règlements RID, ADN, IMDG (optionnel)
+
+  Max: 750 caractères
+  """
   nonRoadRegulationMention: String
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
@@ -224,13 +298,25 @@ input BsdaWasteInput {
 input BsdaPackagingInput {
   "Type de conditionnement"
   type: BsdaPackagingType!
-  "Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`"
+  """
+  Description du conditionnement dans le cas où le type de conditionnement est `AUTRE`
+
+  Max: 250 caractères
+  """
   other: String
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
-  "Volume du conditionnement en litre(s)"
+  """
+  Volume du conditionnement en litre(s)
+
+  Min: 0L
+  """
   volume: Float
-  "Numéros des contenants"
+  """
+  Numéros des contenants
+
+  Max: 250 caractères par élément
+  """
   identificationNumbers: [String!]
 }
 
@@ -248,15 +334,27 @@ input BsdaWeightInput {
 input BsdaDestinationInput {
   "Établissement de destination"
   company: CompanyInput
-  "N° de CAP (le cas échéant)"
+  """
+  N° de CAP (le cas échéant)
+
+  Max: 250 caractères
+  """
   cap: String
-  "Opération d'élimination / valorisation prévue (code D/R)"
+  """
+  Opération d'élimination / valorisation prévue (code D/R)
+
+  Max: 250 caractères
+  """
   plannedOperationCode: String
   "Expédition reçue à l'installation de destination"
   reception: BsdaReceptionInput
   "Réalisation de l'opération (case 11)"
   operation: BsdaOperationInput
-  "Champ libre"
+  """
+  Champ libre
+
+  Max: 250 caractères
+  """
   customInfo: String
 }
 
@@ -287,7 +385,11 @@ input BsdaReceptionInput {
 
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus
-  "Motif de refus"
+  """
+  Motif de refus
+
+  Max: 250 caractères
+  """
   refusalReason: String
 }
 
@@ -296,7 +398,11 @@ input BsdaOperationInput {
   code: String
   "Qualification du traitement final"
   mode: OperationMode
-  "Description de l'opération"
+  """
+  Description de l'opération
+
+  Max: 250 caractères
+  """
   description: String
   "Date de réalisation de l'opération"
   date: DateTime
@@ -307,9 +413,17 @@ input BsdaOperationInput {
 input BsdaNextDestinationInput {
   "Entreprise de travaux"
   company: CompanyInput
-  "N° de CAP (le cas échéant)"
+  """
+  N° de CAP (le cas échéant)
+
+  Max: 250 caractères
+  """
   cap: String
-  "Opération d'élimination / valorisation prévue (code D/R)"
+  """
+  Opération d'élimination / valorisation prévue (code D/R)
+
+  Max: 250 caractères
+  """
   plannedOperationCode: String
 }
 
@@ -337,6 +451,8 @@ input BsdaWorkerCertificationInput {
 
   """
   Numéro de certification (sous-section 3 uniquement)
+
+  Max: 250 caractères
   """
   certificationNumber: String
 
@@ -348,6 +464,8 @@ input BsdaWorkerCertificationInput {
   """
   Organisation qui a décerné la certification (sous-section 3 uniquement)
   Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+
+  Max: 250 caractères
   """
   organisation: String
 }
@@ -363,7 +481,11 @@ input BsdaWorkInput {
 input BsdaTransporterInput {
   "Entreprise de transport"
   company: CompanyInput
-  "Champ libre"
+  """
+  Champ libre
+
+  Max: 250 caractères
+  """
   customInfo: String
   recepisse: BsdaRecepisseInput
   transport: BsdaTransportInput
@@ -430,7 +552,11 @@ input BsdaSignatureInput {
   type: BsdaSignatureType!
   "Date de la signature"
   date: DateTime
-  "Nom et prénom du signataire"
+  """
+  Nom et prénom du signataire
+
+  Max: 250 caractères
+  """
   author: String!
   "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int
@@ -444,7 +570,11 @@ input CreateBsdaRevisionRequestInput {
   authoringCompanySiret: String!
   "Contenu de la révision"
   content: BsdaRevisionRequestContentInput!
-  "Commentaire pour expliquer la demande de révision"
+  """
+  Commentaire pour expliquer la demande de révision
+
+  Max: 250 caractères
+  """
   comment: String!
 }
 
@@ -475,7 +605,11 @@ input BsdaRevisionRequestEmitterInput {
 }
 
 input BsdaRevisionRequestDestinationInput {
-  "N° de CAP (le cas échéant). Modifie le CAP de l'exutoire même en cas de TTR"
+  """
+  N° de CAP (le cas échéant). Modifie le CAP de l'exutoire même en cas de TTR
+
+  Max: 250 caractères
+  """
   cap: String
 
   "Expédition reçue à l'installation de destination"
@@ -500,7 +634,11 @@ input BsdaRevisionRequestOperationInput {
   "Mode de traitement"
   mode: OperationMode
 
-  "Description de l'opération"
+  """
+  Description de l'opération
+
+  Max: 250 caractères
+  """
   description: String
 }
 
@@ -508,10 +646,18 @@ input BsdaRevisionRequestWasteInput {
   "Rubrique Déchet"
   code: String
 
-  "Nom usuel du matériau"
+  """
+  Nom usuel du matériau
+
+  Max: 250 caractères
+  """
   materialName: String
 
-  "Numéros de scellés"
+  """
+  Numéros de scellés
+
+  Max: 250 caractères par élément
+  """
   sealNumbers: [String!]
 
   "Contient des Polluants Organiques Persistants (POP) oui / non"

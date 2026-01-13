@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/back/scripts/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "generate": {
       "executor": "nx:run-commands",
@@ -27,6 +28,5 @@
         "jestConfig": "libs/back/scripts/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

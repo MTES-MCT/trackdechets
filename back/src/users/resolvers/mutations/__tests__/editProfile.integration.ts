@@ -26,6 +26,43 @@ export const UPDATE_TRACKING_CONSENT = gql`
 `;
 
 describe("mutation editProfile", () => {
+  it("should not allow name with less than 2 letters", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "A";
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
+    });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le nom doit contenir au moins 2 lettres.`,
+        extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+  });
+
+  it("should not allow name with only special characters", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = ".-";
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
+    });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le nom doit contenir au moins 2 lettres.`,
+        extensions: expect.objectContaining({ code: ErrorCode.BAD_USER_INPUT })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+  });
   afterAll(resetDatabase);
   it("should edit user profile", async () => {
     const user = await userFactory();
@@ -91,7 +128,34 @@ describe("mutation editProfile", () => {
     // Then
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `The name cannot be an empty string`,
+        message: `Le nom doit contenir au moins 2 lettres.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+    expect(updatedUser.phone).toEqual(user.phone);
+  });
+
+  it("should not be able to empty the name with only spaces", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "  ";
+
+    // When
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
+    });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le nom doit contenir au moins 2 lettres.`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -221,6 +221,19 @@ export async function getBsffUserFunctions(
   };
 }
 
+export function getNextSignatureType(
+  currentSignature: AllBsffSignatureType | undefined | null
+): AllBsffSignatureType | undefined {
+  if (!currentSignature) {
+    return "EMISSION";
+  }
+  const signature = BSFF_SIGNATURES_HIERARCHY[currentSignature];
+  if (signature.next) {
+    return signature.next;
+  }
+  return undefined;
+}
+
 /**
  * Renvoie la dernière signature en date sur un BSFF
  */

@@ -6,10 +6,8 @@ import {
   isSiret,
   TdOperationCodeEnum,
   WASTE_CODES_BALE,
-  WasteCodeEnum,
-  MIN_DATE_FOR_REGISTRY
+  WasteCodeEnum
 } from "@td/constants";
-import { sub } from "date-fns";
 import { z } from "zod";
 
 const enumValueAsStringSchema = z
@@ -54,9 +52,10 @@ export const publicIdSchema = z
         invalid_type_error:
           "L'identifiant unique doit être une chaîne de caractères"
       })
+      .trim()
       .min(1, "L'identifiant unique doit faire au moins 1 caractères")
       .max(36, "L'identifiant unique ne peut pas dépasser 36 caractères")
-      .refine(val => /^[a-zA-Z0-9-_./]+$/.test(val), {
+      .refine(val => /^[a-zA-Z0-9-_.]+$/.test(val), {
         message:
           "L'identifiant unique ne peut contenir que des lettres, des chiffres, des tirets, des underscores et des points"
       })
@@ -243,10 +242,10 @@ export const volumeSchema = z
 
 export const dateSchema = z.coerce
   .date()
-  .min(
-    sub(new Date(), MIN_DATE_FOR_REGISTRY),
-    "La date ne peut pas être antérieure à J-18 mois"
-  )
+  // .min(
+  //   sub(new Date(), MIN_DATE_FOR_REGISTRY),
+  //   "La date ne peut pas être antérieure à J-18 mois"
+  // )
   .refine(date => date <= new Date(), "La date ne peut pas être dans le futur"); // Dont use max() as the date must be dynamic
 
 export const nullishDateSchema = z
@@ -276,10 +275,10 @@ export const nullishDateSchema = z
   .pipe(
     z
       .date()
-      .min(
-        sub(new Date(), MIN_DATE_FOR_REGISTRY),
-        "La date ne peut pas être antérieure à J-18 mois"
-      )
+      // .min(
+      //   sub(new Date(), MIN_DATE_FOR_REGISTRY),
+      //   "La date ne peut pas être antérieure à J-18 mois"
+      // )
       .refine(
         date => date <= new Date(),
         "La date ne peut pas être dans le futur"

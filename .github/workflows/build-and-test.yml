@@ -14,7 +14,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
       - run: npm ci
       - run: npx allow-scripts
@@ -38,6 +38,7 @@ jobs:
           DATABASE_URL: "postgresql://user:password@postgres:5432/db"
           UI_HOST: "http://ui.td.local"
           API_HOST: "http://api.td.local"
+          VITE_API_ENDPOINT: "http://api.td.local"
           TD_COMPANY_ELASTICSEARCH_INDEX: "stocketablissement-production"
           TD_COMPANY_ELASTICSEARCH_URL: ${{ secrets.TD_COMPANY_ELASTICSEARCH_URL }}
           TD_COMPANY_ELASTICSEARCH_CACERT: ${{ secrets.TD_COMPANY_ELASTICSEARCH_CACERT }}

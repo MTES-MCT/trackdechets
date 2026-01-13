@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { FullBsvhuFragment } from "../fragments";
+import { BsvhuTransporterFragment } from "../../../Forms/Components/query";
 
 export const GET_VHU_FORM = gql`
   query Bsvhu($id: ID!) {
@@ -77,6 +78,15 @@ export const UPDATE_VHU_FORM = gql`
     }
   }
   ${FullBsvhuFragment}
+`;
+
+export const UPDATE_BSVHU_TRANSPORTER = gql`
+  mutation UpdateBsvhuTransporter($id: ID!, $input: BsvhuTransporterInput!) {
+    updateBsvhuTransporter(id: $id, input: $input) {
+      ...BsvhuTransporterFragment
+    }
+  }
+  ${BsvhuTransporterFragment}
 `;
 
 export const SIGN_BSVHU = gql`

@@ -1030,7 +1030,11 @@ export const cloneBsdd = async (
     wasteDetailsQuantityType: bsdd.wasteDetailsQuantityType,
     wasteDetailsSampleNumber: bsdd.wasteDetailsSampleNumber,
     wasteRefusalReason: bsdd.wasteRefusalReason,
-    isDirectSupply: bsdd.isDirectSupply
+    isDirectSupply: bsdd.isDirectSupply,
+    isUpcycled: bsdd.isUpcycled,
+    destinationParcelInseeCodes: bsdd.destinationParcelInseeCodes,
+    destinationParcelNumbers: bsdd.destinationParcelNumbers,
+    destinationParcelCoordinates: bsdd.destinationParcelCoordinates
   };
 
   const newBsdd = await create(newBsddCreateInput);

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import * as Sentry from "@sentry/browser";
 import ErrorPage from "./Pages/ErrorPage";
+import { envConfig } from "./common/envConfig";
 
 // After a deploy, users navigating from one page to another without
 // refreshing the page will encounter the error "Failed to fetch dynamically
@@ -63,8 +64,7 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
   }
 
   render() {
-    const { DEV } = import.meta.env; //built-in variable exposed with Vite
-    const isDevelopment = DEV;
+    const isDevelopment = envConfig.DEV;
     const { children } = this.props;
     //@ts-ignore
     const { hasError, hideReloadPageCTA, eventId, errorInfo, error } =

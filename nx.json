@@ -65,5 +65,19 @@
       }
     }
   },
-  "defaultBase": "dev"
+  "defaultBase": "dev",
+  "plugins": [
+    {
+      "plugin": "@nx/docker",
+      "options": {
+        "buildTarget": {
+          "name": "docker:build",
+          "cwd": "{projectRoot}"
+        },
+        "runTarget": {
+          "name": "docker:run"
+        }
+      }
+    }
+  ]
 }

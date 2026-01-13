@@ -8,6 +8,7 @@ import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
 
 import styles from "./Login.module.scss";
+import { envConfig } from "../common/envConfig";
 
 function getErrorMessage(
   errorCode: string,
@@ -62,7 +63,7 @@ export default function SecondFactor() {
   const queries = queryString.parse(location.search);
 
   const formRef = createRef<HTMLFormElement>();
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
 
   if (queries.errorCode || queries.returnTo) {
     const { errorCode, returnTo, username, lockout = 0 } = queries;

@@ -1,0 +1,122 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base configuration
+resources:
+  - ../../base
+
+# Namespace for production
+namespace: trackdechets
+
+# Common labels for production environment
+commonLabels:
+  environment: production
+
+# Environment-specific ConfigMap
+configMapGenerator:
+  - name: env-specific-config
+    literals:
+      - ENV_NAME=production
+      - API_HOST=api.trackdechets.beta.gouv.fr
+      - UI_HOST=trackdechets.beta.gouv.fr
+      - NOTIFIER_HOST=notifier.trackdechets.beta.gouv.fr
+      - SESSION_COOKIE_HOST=trackdechets.beta.gouv.fr
+      - API_URL_SCHEME=https
+      - UI_URL_SCHEME=https
+
+# Patches for production environment
+patches:
+  # Update Ingress for production with TLS
+  - patch: |-
+      - op: add
+        path: /metadata/annotations/cert-manager.io~1cluster-issuer
+        value: letsencrypt-prod
+      - op: add
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1ssl-redirect
+        value: "true"
+      - op: add
+        path: /metadata/annotations/nginx.ingress.kubernetes.io~1force-ssl-redirect
+        value: "true"
+      - op: add
+        path: /spec/tls
+        value:
+        - hosts:
+          - app.trackdechets.beta.gouv.fr
+          - api.trackdechets.beta.gouv.fr
+          - notifier.trackdechets.beta.gouv.fr
+          secretName: trackdechets-tls
+    target:
+      kind: Ingress
+      name: trackdechets-ingress
+
+  # Production has full HA - keep base values (3 instances)
+  # No patches needed for databases, they already have 3 replicas
+
+  # Production resource requests - increase for critical services
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: "1000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: "2Gi"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "4000m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "8Gi"
+    target:
+      kind: Deployment
+      name: api
+
+  # Enable PodDisruptionBudget for all critical services
+  - patch: |-
+      apiVersion: policy/v1
+      kind: PodDisruptionBudget
+      metadata:
+        name: ui
+        namespace: trackdechets
+      spec:
+        minAvailable: 1
+        selector:
+          matchLabels:
+            app: ui
+    target:
+      kind: PodDisruptionBudget
+      name: ui
+
+  # Production monitoring annotations
+  - patch: |-
+      - op: add
+        path: /spec/template/metadata/annotations
+        value:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "4000"
+          prometheus.io/path: "/metrics"
+    target:
+      kind: Deployment
+      name: api
+
+images:
+  # Use production image tags (git sha or semantic version)
+  - name: ghcr.io/trackdechets/-ui
+    newTag: latest # Replace with specific version in production
+  - name: ghcr.io/trackdechets/api
+    newTag: latest
+  - name: ghcr.io/trackdechets/notifier
+    newTag: latest
+  - name: ghcr.io/trackdechets/cron
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-runner
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-indexation
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-bulk-indexation
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-bulk-indexation-master
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-webhooks
+    newTag: latest
+  - name: ghcr.io/trackdechets/queues-gerico
+    newTag: latest

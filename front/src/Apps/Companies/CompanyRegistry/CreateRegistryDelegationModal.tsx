@@ -20,6 +20,7 @@ import {
   REGISTRY_DELEGATIONS
 } from "../../common/queries/registryDelegation/queries";
 import toast from "react-hot-toast";
+import { envConfig } from "../../../common/envConfig";
 
 const displayError = (error: FieldError | undefined) => {
   return error ? <>{error.message}</> : null;
@@ -31,8 +32,7 @@ const getSchema = () =>
       delegateOrgId: z
         .string({ required_error: "Ce champ est requis" })
         .refine(
-          check =>
-            isSiret(check, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"),
+          check => isSiret(check, envConfig.VITE_ALLOW_TEST_COMPANY),
           "SIRET non valide"
         ),
       startDate: z.coerce

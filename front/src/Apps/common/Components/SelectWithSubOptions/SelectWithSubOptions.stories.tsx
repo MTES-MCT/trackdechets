@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { ComponentMeta, ComponentStory } from "@storybook/react-vite";
 import SelectWithSubOptions from "./SelectWithSubOptions";
 import { Option } from "../Select/Select";
 

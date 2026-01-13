@@ -1,6 +1,7 @@
 import {
   refineOperationModeConsistency,
-  refineRequiredOperationMode
+  refineRequiredOperationMode,
+  refineDateLimits
 } from "../../shared/refinement";
 import { transformReportForInfos } from "../../shared/transform";
 import { registryErrorMap } from "../../zodErrors";
@@ -15,6 +16,14 @@ import { transformAndRefineReason, transformDestination } from "./transform";
 
 export function safeParseAsyncSsd(line: unknown) {
   return ssdSchema
+    .superRefine(
+      refineDateLimits([
+        "useDate",
+        "dispatchDate",
+        "processingDate",
+        "processingEndDate"
+      ])
+    )
     .superRefine(refineReportForProfile)
     .superRefine(refineDates)
     .superRefine(refineDestination)

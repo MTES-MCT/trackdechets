@@ -1,5 +1,6 @@
 import {
   BsdasriRevisionRequest,
+  BsdasriRevisionRequestApproval,
   BsdasriStatus,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
@@ -25,6 +26,75 @@ export type AcceptRevisionRequestApprovalFn = (
   logMetadata?: LogMetadata
 ) => Promise<void>;
 
+/**
+ * Si l'émetteur (resp éco-organisme) approuve
+ * sa voix compte comme celle de l'éco-organisme (resp émetteur)
+ */
+async function handleEcoOrganismeApprovals(
+  prisma: RepositoryTransaction,
+  approval: BsdasriRevisionRequestApproval & {
+    revisionRequest: BsdasriRevisionRequest;
+  }
+) {
+  const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
+    where: { id: approval.revisionRequest.bsdasriId }
+  });
+
+  if (bsdasri.emitterCompanySiret && bsdasri.ecoOrganismeSiret) {
+    // Il y a à la fois un émetteur et un éco-organisme
+
+    let otherApproval: BsdasriRevisionRequestApproval | null = null;
+
+    if (approval.approverSiret === bsdasri.emitterCompanySiret) {
+      // L'émetteur approuve, il faut également approuver pour
+      // l'éco-organisme
+      otherApproval = await prisma.bsdasriRevisionRequestApproval.findFirst({
+        where: {
+          revisionRequestId: approval.revisionRequestId,
+          approverSiret: bsdasri.ecoOrganismeSiret
+        }
+      });
+    }
+
+    if (approval.approverSiret === bsdasri.ecoOrganismeSiret) {
+      // L'éco-organisme approuve, il faut également approuver pour
+      // l'émetteur
+      otherApproval = await prisma.bsdasriRevisionRequestApproval.findFirst({
+        where: {
+          revisionRequestId: approval.revisionRequestId,
+          approverSiret: bsdasri.emitterCompanySiret
+        }
+      });
+    }
+
+    if (otherApproval) {
+      await prisma.bsdasriRevisionRequestApproval.update({
+        where: {
+          id: otherApproval.id
+        },
+        data: {
+          status: RevisionRequestApprovalStatus.ACCEPTED,
+          comment: "Auto approval"
+        }
+      });
+
+      await prisma.event.create({
+        data: {
+          streamId: otherApproval.revisionRequestId,
+          actor: "system",
+          type: "BsdasriRevisionRequestAccepted",
+          data: {
+            content: {
+              status: RevisionRequestApprovalStatus.ACCEPTED,
+              comment: "Auto"
+            }
+          }
+        }
+      });
+    }
+  }
+}
+
 export function buildAcceptRevisionRequestApproval(
   deps: RepositoryFnDeps
 ): AcceptRevisionRequestApprovalFn {
@@ -36,7 +106,8 @@ export function buildAcceptRevisionRequestApproval(
       data: {
         status: RevisionRequestApprovalStatus.ACCEPTED,
         comment
-      }
+      },
+      include: { revisionRequest: true }
     });
 
     await prisma.event.create({
@@ -51,6 +122,8 @@ export function buildAcceptRevisionRequestApproval(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    await handleEcoOrganismeApprovals(prisma, updatedApproval);
 
     // If it was the last approval:
     // - mark the revision as approved

@@ -11,6 +11,7 @@ import {
   BsffPackagingEditableFields,
   BsffTransporterEditableFields,
   EditionRule,
+  EditionRulePath,
   bsffEditionRules,
   bsffPackagingEditionRules,
   bsffTransporterEditionRules,
@@ -79,7 +80,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
   bsff,
   { addIssue }
 ) => {
-  for (const packaging of bsff.packagings ?? []) {
+  for (let i = 0; i < (bsff.packagings ?? []).length; i++) {
+    const packaging = (bsff.packagings ?? [])[i];
     const isCreatedAfterV2024071 =
       bsff.createdAt && bsff.createdAt.getTime() - v2024071.getTime() > 0;
 
@@ -99,7 +101,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       // étant calculés automatiquement à partir des contenants réexpédiés / regroupés).
       addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Conditionnements : le volume est requis"
+        message: "Conditionnements : le volume est requis",
+        path: ["packagings", i, "volume"]
       });
     }
 
@@ -111,7 +114,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.
       addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Conditionnements : le volume doit être supérieur à 0"
+        message: "Conditionnements : le volume doit être supérieur à 0",
+        path: ["packagings", i, "volume"]
       });
     }
 
@@ -123,7 +127,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.
       addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Conditionnements : le poids doit être supérieur à 0"
+        message: "Conditionnements : le poids doit être supérieur à 0",
+        path: ["packagings", i, "weight"]
       });
     }
 
@@ -134,7 +139,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "Conditionnement : le champ `other` doit être précisée pour le conditionnement 'AUTRE'."
+          "Conditionnement : le champ `other` doit être précisée pour le conditionnement 'AUTRE'.",
+        path: ["packagings", i, "other"]
       });
     }
 
@@ -146,7 +152,8 @@ export const checkPackagings: Refinement<ParsedZodBsff> = (
       addIssue({
         code: z.ZodIssueCode.custom,
         message:
-          "Conditionnement : le champ `other` ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+          "Conditionnement : le champ `other` ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'.",
+        path: ["packagings", i, "other"]
       });
     }
   }
@@ -160,7 +167,8 @@ export const checkFicheInterventions: Refinement<ParsedZodBsff> = async (
     if (bsff.type !== BsffType.COLLECTE_PETITES_QUANTITES) {
       addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Le type de BSFF choisi ne permet pas d'associer des fiches d'intervention.`
+        message: `Le type de BSFF choisi ne permet pas d'associer des fiches d'intervention.`,
+        path: ["ficheInterventions"] as EditionRulePath as string[]
       });
     }
     const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
@@ -174,7 +182,8 @@ export const checkFicheInterventions: Refinement<ParsedZodBsff> = async (
       ) {
         addIssue({
           code: z.ZodIssueCode.custom,
-          message: `L'opérateur identifié sur la fiche d'intervention ${ficheIntervention.numero} ne correspond pas à l'émetteur de BSFF`
+          message: `L'opérateur identifié sur la fiche d'intervention ${ficheIntervention.numero} ne correspond pas à l'émetteur de BSFF`,
+          path: ["ficheInterventions"] as EditionRulePath as string[]
         });
       }
     }
@@ -198,7 +207,8 @@ export const checkWeights: Refinement<ParsedZodBsff> = (bsff, { addIssue }) => {
         code: z.ZodIssueCode.custom,
         message:
           `le poids doit être inférieur à ${MAX_WEIGHT_BY_ROAD_TONNES}` +
-          ` tonnes lorsque le transport se fait par la route`
+          ` tonnes lorsque le transport se fait par la route`,
+        path: ["weight", "value"] as EditionRulePath as string[]
       });
     }
   }
@@ -215,7 +225,8 @@ export const checkWeights: Refinement<ParsedZodBsff> = (bsff, { addIssue }) => {
     // On pourra à terme passer de .nonnegative à .positive directement dans le schéma zod.}
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: "Le poids doit être supérieur à 0"
+      message: "Le poids doit être supérieur à 0",
+      path: ["weight", "value"] as EditionRulePath as string[]
     });
   }
 };
@@ -238,7 +249,8 @@ function checkBsffTypeIsCompatible(
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez sélectionner le type de BSFF `REEXPEDITION` avec le paramètre `forwarding`"
+        "Vous devez sélectionner le type de BSFF `REEXPEDITION` avec le paramètre `forwarding`",
+      path: ["type"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -247,7 +259,8 @@ function checkBsffTypeIsCompatible(
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez sélectionner le type de BSFF `RECONDITIONNEMENT` avec le paramètre `repackaging`"
+        "Vous devez sélectionner le type de BSFF `RECONDITIONNEMENT` avec le paramètre `repackaging`",
+      path: ["type"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -256,7 +269,8 @@ function checkBsffTypeIsCompatible(
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez sélectionner le type de BSFF `GROUPEMENT` avec le paramètre `repackaging`"
+        "Vous devez sélectionner le type de BSFF `GROUPEMENT` avec le paramètre `repackaging`",
+      path: ["type"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -284,7 +298,8 @@ function checkEmitterSiretIsDefined(
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez renseigner le siret de l'installation émettrice du nouveau BSFF en cas de groupement, réexpédition ou reéxpédition"
+        "Vous devez renseigner le siret de l'installation émettrice du nouveau BSFF en cas de groupement, réexpédition ou reéxpédition",
+      path: ["emitter", "company", "siret"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -338,7 +353,15 @@ async function checkPreviousPackagingsExists(
       code: z.ZodIssueCode.custom,
       message: `Les identifiants de contenants de fluide à ${action} ${notFoundIds.join(
         ", "
-      )} n'existent pas`
+      )} n'existent pas`,
+      path:
+        bsff.type === BsffType.GROUPEMENT
+          ? (["grouping"] as EditionRulePath as string[])
+          : bsff.type === BsffType.REEXPEDITION
+          ? (["forwarding"] as EditionRulePath as string[])
+          : bsff.type === BsffType.RECONDITIONNEMENT
+          ? (["repackaging"] as EditionRulePath as string[])
+          : undefined
     });
     return [];
   }
@@ -356,7 +379,8 @@ function checkForwardingAreOnSameBsff(
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
+        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial",
+      path: ["forwarding"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -388,7 +412,8 @@ function checkSameWasteCodes(
       code: z.ZodIssueCode.custom,
       message: `Vous ne pouvez pas ${action} des contenants ayant des codes déchet différents : ${wasteCodesUniqueSorted.join(
         ", "
-      )}`
+      )}`,
+      path: ["waste", "code"] as EditionRulePath as string[]
     });
     return false;
   }
@@ -407,20 +432,29 @@ function checkPreviousPackaging(
   ctx: RefinementCtx
 ) {
   const { addIssue } = ctx;
-
+  const path =
+    bsff.type === BsffType.GROUPEMENT
+      ? (["grouping"] as EditionRulePath as string[])
+      : bsff.type === BsffType.REEXPEDITION
+      ? (["forwarding"] as EditionRulePath as string[])
+      : bsff.type === BsffType.RECONDITIONNEMENT
+      ? (["repackaging"] as EditionRulePath as string[])
+      : undefined;
   if (packaging.bsff.destinationCompanySiret !== bsff.emitterCompanySiret) {
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
         `Le BSFF ${packaging.bsffId} sur lequel apparait le contenant ${packaging.id} (${packaging.numero}) ` +
-        `n'a pas été traité sur l'installation émettrice du nouveau BSFF ${bsff.emitterCompanySiret}`
+        `n'a pas été traité sur l'installation émettrice du nouveau BSFF ${bsff.emitterCompanySiret}`,
+      path
     });
   }
 
   if (!packaging.operationSignatureDate) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `La signature de l'opération n'a pas encore été faite sur le contenant ${packaging.id} - ${packaging.numero}`
+      message: `La signature de l'opération n'a pas encore été faite sur le contenant ${packaging.id} - ${packaging.numero}`,
+      path
     });
   } else {
     const operation = OPERATION[packaging.operationCode as BsffOperationCode];
@@ -430,7 +464,8 @@ function checkPreviousPackaging(
         code: z.ZodIssueCode.custom,
         message:
           `Une opération de traitement finale a été déclarée sur le contenant n°${packaging.id} (${packaging.numero}). ` +
-          `Vous ne pouvez pas l'ajouter sur un BSFF de groupement, reconditionnement ou réexpédition`
+          `Vous ne pouvez pas l'ajouter sur un BSFF de groupement, reconditionnement ou réexpédition`,
+        path
       });
     }
   }
@@ -441,7 +476,8 @@ function checkPreviousPackaging(
   ) {
     addIssue({
       code: z.ZodIssueCode.custom,
-      message: `Le contenant n°${packaging.id} (${packaging.numero}) a déjà été réexpédié, reconditionné ou groupé dans un autre BSFF.`
+      message: `Le contenant n°${packaging.id} (${packaging.numero}) a déjà été réexpédié, reconditionné ou groupé dans un autre BSFF.`,
+      path
     });
   }
 }
@@ -480,7 +516,15 @@ export const checkPreviousPackagings: (
     addIssue({
       code: z.ZodIssueCode.custom,
       message:
-        "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
+        "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition",
+      path:
+        bsff.type === BsffType.GROUPEMENT
+          ? (["grouping"] as EditionRulePath as string[])
+          : bsff.type === BsffType.REEXPEDITION
+          ? (["forwarding"] as EditionRulePath as string[])
+          : bsff.type === BsffType.RECONDITIONNEMENT
+          ? (["repackaging"] as EditionRulePath as string[])
+          : undefined
     });
     return [];
   }
@@ -533,6 +577,7 @@ type CheckFieldIsDefinedArgs<
   field: string;
   rule: EditionRule<T>;
   readableFieldName?: string;
+  path?: EditionRulePath;
   ctx: RefinementCtx;
   errorMsg?: (fieldDescription: string) => string;
 };
@@ -540,7 +585,8 @@ type CheckFieldIsDefinedArgs<
 function checkFieldIsDefined<
   T extends ZodBsff | ZodBsffTransporter | ZodBsffPackaging
 >(args: CheckFieldIsDefinedArgs<T>) {
-  const { resource, field, rule, ctx, readableFieldName, errorMsg } = args;
+  const { resource, field, rule, ctx, readableFieldName, path, errorMsg } =
+    args;
   const value = resource[field];
   if (value == null || (isArray(value) && (value as any[]).length === 0)) {
     const fieldDescription = readableFieldName
@@ -549,7 +595,7 @@ function checkFieldIsDefined<
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      path: [field],
+      path: (path ?? [field]) as EditionRulePath as string[],
       message: [
         errorMsg
           ? errorMsg(fieldDescription)
@@ -572,7 +618,7 @@ export const checkRequiredFields: (
 
   return (bsff, zodContext) => {
     for (const bsffField of Object.keys(bsffEditionRules)) {
-      const { required, readableFieldName } =
+      const { required, readableFieldName, path } =
         bsffEditionRules[bsffField as keyof BsffEditableFields];
 
       if (required) {
@@ -586,6 +632,7 @@ export const checkRequiredFields: (
             resource: bsff,
             field: bsffField,
             rule: required,
+            path,
             readableFieldName,
             ctx: zodContext
           });
@@ -597,10 +644,13 @@ export const checkRequiredFields: (
       for (const bsffTransporterField of Object.keys(
         bsffTransporterEditionRules
       )) {
-        const { required, readableFieldName } =
-          bsffTransporterEditionRules[
-            bsffTransporterField as keyof BsffTransporterEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsffTransporterPath
+        } = bsffTransporterEditionRules[
+          bsffTransporterField as keyof BsffTransporterEditableFields
+        ];
 
         if (required) {
           const isRequired = isBsffTransporterFieldRequired(
@@ -614,6 +664,9 @@ export const checkRequiredFields: (
               field: bsffTransporterField,
               rule: required,
               readableFieldName,
+              path: ["transporters", `${idx + 1}`].concat(
+                bsffTransporterPath ?? []
+              ) as EditionRulePath,
               ctx: zodContext,
               errorMsg: fieldDescription =>
                 `${fieldDescription} n° ${idx + 1} est obligatoire.`
@@ -623,12 +676,15 @@ export const checkRequiredFields: (
       }
     });
 
-    (bsff.packagings ?? []).forEach(packaging => {
+    (bsff.packagings ?? []).forEach((packaging, idx) => {
       for (const bsffPackaginField of Object.keys(bsffPackagingEditionRules)) {
-        const { required, readableFieldName } =
-          bsffPackagingEditionRules[
-            bsffPackaginField as keyof BsffPackagingEditableFields
-          ];
+        const {
+          required,
+          readableFieldName,
+          path: bsffPackagingPath
+        } = bsffPackagingEditionRules[
+          bsffPackaginField as keyof BsffPackagingEditableFields
+        ];
         if (required) {
           const isRequired = isBsffPackagingFieldRequired(
             required,
@@ -641,6 +697,9 @@ export const checkRequiredFields: (
               field: bsffPackaginField,
               rule: required,
               readableFieldName,
+              path: ["packagings", `${idx + 1}`].concat(
+                bsffPackagingPath ?? []
+              ) as EditionRulePath,
               ctx: zodContext
             });
           }

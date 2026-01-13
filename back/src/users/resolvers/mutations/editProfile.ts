@@ -7,6 +7,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth/auth";
 import * as yup from "yup";
 import { addDays } from "date-fns";
+import { isDefined } from "../../../common/helpers";
 const TRACKING_CONSENT_PERIOD = 6 * 30; // 6 months
 /**
  * Edit user profile
@@ -23,9 +24,15 @@ export async function editProfileFn(
     name: yup
       .string()
       .test(
-        "empty",
-        "The name cannot be an empty string",
-        name => name?.length !== 0
+        "at-least-2-letters",
+        "Le nom doit contenir au moins 2 lettres.",
+        name => {
+          if (!isDefined(name)) return true;
+          if (!name) return false;
+          const trimmed = name.trim();
+          const letterCount = (trimmed.match(/[\p{L}]/gu) || []).length;
+          return letterCount >= 2;
+        }
       )
       .isSafeSSTI(),
     phone: yup.string(),

@@ -3567,12 +3567,13 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
     });
 
-    it("if not providing an operation mode with D9F, should auto-set to ELIMINATION", async () => {
+    it("if not providing an operation mode with D9F, should not auto-complete", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
         opt: {
-          emitterCompanySiret: company.siret
+          emitterCompanySiret: company.siret,
+          destinationOperationMode: null
         }
       });
 
@@ -3596,9 +3597,8 @@ describe("Mutation.updateBsda", () => {
 
       // Then
       expect(errors).toBeUndefined();
-      expect(data.updateBsda.id).toBeTruthy();
       expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
-      expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
+      expect(data.updateBsda.destination?.operation?.mode).toBeNull();
     });
 
     it("can provide an operation code and mode, and it's not changed because it's not D9F", async () => {
@@ -3636,7 +3636,7 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.operation?.mode).toBe("RECYCLAGE");
     });
 
-    it("can still use code D9, auto-cast to D9F (tolerance)", async () => {
+    it("can no longer use code D9 (end of tolerance)", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
@@ -3647,7 +3647,7 @@ describe("Mutation.updateBsda", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors, data } = await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "updateBsda">,
         MutationUpdateBsdaArgs
       >(UPDATE_BSDA, {
@@ -3664,10 +3664,10 @@ describe("Mutation.updateBsda", () => {
       });
 
       // Then
-      expect(errors).toBeUndefined();
-      expect(data.updateBsda.id).toBeTruthy();
-      expect(data.updateBsda.destination?.operation?.code).toBe("D 9 F");
-      expect(data.updateBsda.destination?.operation?.mode).toBe("ELIMINATION");
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
     });
 
     it("should allow user to update plannedOperationCode with code D9F", async () => {
@@ -3701,7 +3701,7 @@ describe("Mutation.updateBsda", () => {
       expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
     });
 
-    it("should allow user to update plannedOperationCode with code D9, auto-case to D9F (tolerance)", async () => {
+    it("should no long erallow user to update plannedOperationCode with code D9 (end of tolerance)", async () => {
       // Given
       const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
       const bsda = await bsdaFactory({
@@ -3712,7 +3712,7 @@ describe("Mutation.updateBsda", () => {
 
       // When
       const { mutate } = makeClient(user);
-      const { errors, data } = await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "updateBsda">,
         MutationUpdateBsdaArgs
       >(UPDATE_BSDA, {
@@ -3727,9 +3727,10 @@ describe("Mutation.updateBsda", () => {
       });
 
       // Then
-      expect(errors).toBeUndefined();
-      expect(data.updateBsda.id).toBeTruthy();
-      expect(data.updateBsda.destination?.plannedOperationCode).toBe("D 9 F");
+      expect(errors).not.toBeUndefined();
+      expect(errors[0].message).toBe(
+        "La valeur « D 9 » n'existe pas dans les options : 'R 5' | 'D 5' | 'D 9 F' | 'R 13' | 'D 15'"
+      );
     });
 
     it("should allow user to update destinationOperationNextDestinationPlannedOperationCode with code D9F", async () => {

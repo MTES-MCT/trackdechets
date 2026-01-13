@@ -79,6 +79,7 @@ import { BSD_DETAILS_QTY_TOOLTIP } from "../../../Apps/common/wordings/dashboard
 import { CITERNE_NOT_WASHED_OUT_REASON } from "../../../Apps/common/utils/citerneBsddSummary";
 import { useMyCompany } from "../../../Apps/common/hooks/useMyCompany";
 import { getConsistenceLabel } from "../../../Apps/common/consistenceLabel";
+import { envConfig } from "../../../common/envConfig";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -219,7 +220,7 @@ const TempStorage = ({ form }) => {
               label={
                 isSiret(
                   temporaryStorageDetail?.transporter?.company?.orgId,
-                  import.meta.env.VITE_ALLOW_TEST_COMPANY
+                  envConfig.VITE_ALLOW_TEST_COMPANY
                 )
                   ? "SIRET"
                   : "Numéro de TVA"
@@ -472,24 +473,51 @@ const Recipient = ({
             <GroupedIn form={form} key={form.id} />
           ))}
       </div>
-      {form.nextDestination?.company && (
-        <div className={styles.detailGrid}>
-          <DetailRow
-            value={form.nextDestination?.processingOperation}
-            label="Opération ultérieure prévue"
-          />
-          {form.nextDestination.notificationNumber && (
+      <div className={styles.detailGrid}>
+        {form.nextDestination?.company && (
+          <>
             <DetailRow
-              value={form.nextDestination?.notificationNumber}
-              label="Numéro de notification"
+              value={form.nextDestination?.processingOperation}
+              label="Opération ultérieure prévue"
             />
-          )}
-          <Company
-            label="Destination ultérieure prévue"
-            company={form.nextDestination?.company}
-          />
-        </div>
-      )}
+            {form.nextDestination.notificationNumber && (
+              <DetailRow
+                value={form.nextDestination?.notificationNumber}
+                label="Numéro de notification"
+              />
+            )}
+            <Company
+              label="Destination ultérieure prévue"
+              company={form.nextDestination?.company}
+            />
+          </>
+        )}
+        {form.isUpcycled !== null && (
+          <>
+            <DetailRow
+              value={form.isUpcycled ? "Oui" : "Non"}
+              label="Terre valorisée"
+            />
+            {form.isUpcycled && (
+              <>
+                <DetailRow
+                  value={form.recipient?.parcelInseeCodes
+                    ?.map(
+                      (code, idx) =>
+                        `${code} / ${form.recipient?.parcelNumbers?.[idx]}`
+                    )
+                    .join(", ")}
+                  label="Codes INSEE & numéros des parcelles de valorisation"
+                />
+                <DetailRow
+                  value={form.recipient?.parcelCoordinates?.join(", ")}
+                  label="Coordonnées des parcelles de valorisation"
+                />
+              </>
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };

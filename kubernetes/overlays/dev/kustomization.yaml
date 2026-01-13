@@ -1,0 +1,159 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Base configuration
+resources:
+  - ../../base
+
+# Namespace override
+namespace: trackdechets-dev
+
+# Common labels for dev environment
+commonLabels:
+  environment: dev
+
+# Environment-specific ConfigMap
+configMapGenerator:
+  - name: env-specific-config
+    literals:
+      - ENV_NAME=recette
+      - API_HOST=api.recette.trackdechets.fr
+      - UI_HOST=recette.trackdechets.fr
+      - NOTIFIER_HOST=notifier.recette.trackdechets.fr
+      - SESSION_COOKIE_HOST=recette.trackdechets.fr
+      - API_URL_SCHEME=https
+      - UI_URL_SCHEME=https
+
+# Patches for dev environment
+patches:
+  # Reduce replicas for dev
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: api
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: ui
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: notifier
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: queues-runner
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: queues-indexation
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: queues-webhooks
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: queues-gerico
+
+  # Reduce database instances for dev
+  - patch: |-
+      - op: replace
+        path: /spec/instances
+        value: 1
+    target:
+      kind: Cluster
+      name: postgres
+      group: postgresql.cnpg.io
+  - patch: |-
+      - op: replace
+        path: /spec/nodeSets/0/count
+        value: 1
+    target:
+      kind: Elasticsearch
+      name: elasticsearch
+  - patch: |-
+      - op: replace
+        path: /spec/redis/replicas
+        value: 1
+    target:
+      kind: RedisFailover
+      name: redis
+  - patch: |-
+      - op: replace
+        path: /spec/replsets/0/size
+        value: 1
+    target:
+      kind: PerconaServerMongoDB
+      name: mongodb
+
+  # Update Ingress for recette environment
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: recette.trackdechets.fr
+      - op: replace
+        path: /spec/rules/1/host
+        value: api.recette.trackdechets.fr
+      - op: replace
+        path: /spec/rules/2/host
+        value: notifier.recette.trackdechets.fr
+    target:
+      kind: Ingress
+      name: trackdechets-ingress
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: notifier.recette.trackdechets.fr
+    target:
+      kind: Ingress
+      name: trackdechets-notifier-sse
+
+  # Disable HPA for dev (fixed replicas)
+  - patch: |-
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+
+images:
+  # Use dev image tags
+  - name: ghcr.io/trackdechets/ui
+    newTag: dev
+  - name: ghcr.io/trackdechets/api
+    newTag: dev
+  - name: ghcr.io/trackdechets/notifier
+    newTag: dev
+  - name: ghcr.io/trackdechets/cron
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-runner
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-indexation
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-bulk-indexation
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-bulk-indexation-master
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-webhooks
+    newTag: dev
+  - name: ghcr.io/trackdechets/queues-gerico

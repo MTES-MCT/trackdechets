@@ -37,6 +37,7 @@ import routes from "../../../routes";
 import styles from "./Header.module.scss";
 import CompanySwitcher from "../CompanySwitcher/CompanySwitcher";
 import { useMyCompany } from "../../hooks/useMyCompany";
+import { envConfig } from "../../../../common/envConfig";
 
 const MenuLink = ({ entry }) => {
   return entry.navlink ? (
@@ -621,7 +622,7 @@ const getDesktopMenuEntries = (
  * On mobile appear as a sliding panel and includes other items
  */
 export default function Header() {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT } = envConfig;
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const {
@@ -831,17 +832,17 @@ export function UnauthenticatedHeader() {
               <div className="fr-header__brand-top">
                 <div className="fr-header__logo">
                   <p className="fr-logo">
-                    Ministère
+                    MINISTÈRE
                     <br />
-                    de la transition
+                    DE LA TRANSITION ÉCOLOGIQUE,
                     <br />
-                    écologique,
+                    DE LA BIODIVERSITÉ
                     <br />
-                    de la biodiversité,
+                    ET DES NÉGOCIATIONS
                     <br />
-                    de la forêt, de la mer
+                    INTERNATIONALES
                     <br />
-                    et de la pêche
+                    SUR LE CLIMAT ET LA NATURE
                   </p>
                 </div>
                 <div className="fr-header__operator">

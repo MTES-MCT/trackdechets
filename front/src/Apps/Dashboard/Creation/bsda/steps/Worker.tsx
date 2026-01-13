@@ -57,18 +57,23 @@ const Worker = () => {
             "worker.certification.hasSubSectionThree",
             workerSelected?.workerCertification?.hasSubSectionThree
           );
-          setValue(
-            "worker.certification.certificationNumber",
-            workerSelected?.workerCertification?.certificationNumber
-          );
-          setValue(
-            "worker.certification.validityLimit",
-            workerSelected?.workerCertification?.validityLimit
-          );
-          setValue(
-            "worker.certification.organisation",
-            workerSelected?.workerCertification?.organisation
-          );
+          // it's possible that a company has some certification informations left out by mistake
+          // but submitting them with no sub-section 3 certification will result in a validation error
+          // so we only submit them if the company has a sub-section 3 certification
+          if (workerSelected?.workerCertification?.hasSubSectionThree) {
+            setValue(
+              "worker.certification.certificationNumber",
+              workerSelected?.workerCertification?.certificationNumber
+            );
+            setValue(
+              "worker.certification.validityLimit",
+              workerSelected?.workerCertification?.validityLimit
+            );
+            setValue(
+              "worker.certification.organisation",
+              workerSelected?.workerCertification?.organisation
+            );
+          }
         } else {
           setValue("worker.certification", null);
         }

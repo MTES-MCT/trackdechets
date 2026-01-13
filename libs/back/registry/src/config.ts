@@ -8,6 +8,17 @@ export const envConfig = z
     S3_SECRET_ACCESS_KEY: z.string(),
     S3_REGISTRY_ERRORS_BUCKET: z.string(),
     S3_REGISTRY_IMPORTS_BUCKET: z.string(),
-    S3_REGISTRY_MODELS_BUCKET: z.string()
+    S3_REGISTRY_MODELS_BUCKET: z.string(),
+    NO_DATE_LIMIT_SIRETS: z
+      .string()
+      .optional()
+      .transform(val =>
+        val
+          ? val
+              .split(",")
+              .map(s => s.trim())
+              .filter(Boolean)
+          : []
+      )
   })
   .parse(process.env);

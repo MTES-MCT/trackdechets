@@ -149,6 +149,11 @@ type Form {
   "Si oui ou non il y a eu rupture de traçabilité"
   noTraceability: Boolean
 
+  """
+  Terre valorisée
+  """
+  isUpcycled: Boolean
+
   "Destination ultérieure prévue (case 12)"
   nextDestination: NextDestination
 
@@ -444,6 +449,13 @@ type Recipient {
 
   "Indique si c'est un établissement d'entreposage temporaire ou de reocnditionnement"
   isTempStorage: Boolean
+
+  "Codes INSEE des parcelles si valorisation"
+  parcelInseeCodes: [String!]
+  "Numéro(s) des parcelles si valorisation"
+  parcelNumbers: [String!]
+  "Coordonnées des parcelles si valorisation"
+  parcelCoordinates: [String!]
 }
 
 "Collecteur - transporteur (case 8)"

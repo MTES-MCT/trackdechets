@@ -26,3 +26,20 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: jest.fn()
   }))
 });
+
+window.URL.createObjectURL = jest.fn();
+
+// Mock Vite environment variables for tests
+// The Babel plugin transforms import.meta.env to process.env
+// Vite normally sets DEV and PROD automatically, but in Jest we need to set them manually
+// In tests, we're typically in development mode, so DEV=true and PROD=false
+if (process.env.DEV === undefined) {
+  process.env.DEV = "true";
+}
+if (process.env.PROD === undefined) {
+  process.env.PROD = "false";
+}
+// Set a default API endpoint for tests if not provided
+if (!process.env.VITE_API_ENDPOINT) {
+  process.env.VITE_API_ENDPOINT = "http://api.td.local";
+}
