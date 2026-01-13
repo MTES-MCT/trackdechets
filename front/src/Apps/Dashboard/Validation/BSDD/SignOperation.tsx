@@ -72,7 +72,7 @@ const schema = z.object({
   destinationOperationMode: z.nativeEnum(OperationMode).nullish(),
   processingOperationDescription: z.string().nullish(),
   processingOperationDone: z.string().nullish(),
-  isUpcycled: z.boolean(),
+  isUpcycled: z.boolean().nullish(),
   destinationParcelInseeCodes: fieldArray,
   destinationParcelNumbers: fieldArray,
   destinationParcelCoordinates: fieldArray,
@@ -156,13 +156,13 @@ function SignOperationModal({
     processingOperationDone: "",
     destinationOperationMode: undefined,
     processingOperationDescription: "",
-    isUpcycled: false,
+    isUpcycled: null,
     destinationParcelInseeCodes: [],
     destinationParcelNumbers: [],
     destinationParcelCoordinates: [],
     nextDestination: null,
     noTraceability: null
-  } as ZodFormOperation;
+  };
 
   const methods = useForm<ZodFormOperation>({
     values: initialState,
@@ -224,6 +224,7 @@ function SignOperationModal({
     INCOMING_TEXS_WASTE_CODES.includes(form.wasteDetails.code as any) &&
     processingOperationDone?.startsWith("R");
   const isUpcycled = watch("isUpcycled");
+  const processingOperationDoneProps = register("processingOperationDone");
 
   const [isExtraEuropeanCompany, setIsExtraEuropeanCompany] = useState(
     nextDestination?.company?.extraEuropeanId ? true : false
@@ -369,7 +370,25 @@ function SignOperationModal({
           <div className="fr-col-12">
             <Select
               label="Traitement d’élimination / valorisation effectuée (code D/R)"
-              nativeSelectProps={register("processingOperationDone")}
+              nativeSelectProps={{
+                ...processingOperationDoneProps,
+                onChange: e => {
+                  processingOperationDoneProps.onChange(e);
+                  const newValue = e.target.value;
+                  const shouldShowIsUpcycled =
+                    form.wasteDetails?.code &&
+                    INCOMING_TEXS_WASTE_CODES.includes(
+                      form.wasteDetails.code as any
+                    ) &&
+                    newValue?.startsWith("R");
+                  if (!shouldShowIsUpcycled) {
+                    setValue("isUpcycled", false);
+                    setValue("destinationParcelInseeCodes", []);
+                    setValue("destinationParcelNumbers", []);
+                    setValue("destinationParcelCoordinates", []);
+                  }
+                }
+              }}
               state={errors.processingOperationDone ? "error" : "default"}
               stateRelatedMessage={errors.processingOperationDone?.message}
               className="fr-mb-2w"
@@ -426,8 +445,15 @@ function SignOperationModal({
                 {
                   label: "Oui",
                   nativeInputProps: {
-                    onChange: () => {
-                      setValue("isUpcycled", true);
+                    onClick: () => {
+                      if (isUpcycled === true) {
+                        setValue("isUpcycled", null);
+                      } else {
+                        setValue("isUpcycled", true);
+                      }
+                      setValue("destinationParcelInseeCodes", []);
+                      setValue("destinationParcelNumbers", []);
+                      setValue("destinationParcelCoordinates", []);
                     },
                     checked: isUpcycled === true
                   }
@@ -435,10 +461,17 @@ function SignOperationModal({
                 {
                   label: "Non",
                   nativeInputProps: {
-                    onChange: () => {
-                      setValue("isUpcycled", false);
+                    onClick: () => {
+                      if (isUpcycled === false) {
+                        setValue("isUpcycled", null);
+                      } else {
+                        setValue("isUpcycled", false);
+                      }
+                      setValue("destinationParcelInseeCodes", []);
+                      setValue("destinationParcelNumbers", []);
+                      setValue("destinationParcelCoordinates", []);
                     },
-                    checked: !isUpcycled
+                    checked: isUpcycled === false
                   }
                 }
               ]}

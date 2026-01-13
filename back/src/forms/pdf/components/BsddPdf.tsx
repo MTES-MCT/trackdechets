@@ -832,7 +832,7 @@ export function BsddPdf({
           </div>
           <div className="BoxCol">
             <p>
-              <strong>11. Réalisation de l’opération</strong>
+              <strong>11. Réalisation de l'opération</strong>
             </p>
             {form.emitter?.type === EmitterType.APPENDIX1_PRODUCER ? (
               appendix1ProducerPlaceholder
@@ -850,6 +850,24 @@ export function BsddPdf({
                   <br />
                   Date de l’opération : {formatDate(form.processedAt)}
                   <br />
+                  Terres valorisées : {form.isUpcycled ? "oui" : "non"}
+                  <br />
+                  {form.isUpcycled && (
+                    <>
+                      Codes INSEE & numéros des parcelles de valorisation :{" "}
+                      {form.recipient?.parcelInseeCodes?.join(", ")}
+                      {form.recipient?.parcelInseeCodes
+                        ?.map(
+                          (code, idx) =>
+                            `${code} / ${form.recipient?.parcelNumbers?.[idx]}`
+                        )
+                        .join(", ")}
+                      <br />
+                      Coordonnées des parcelles de valorisation :{" "}
+                      {form.recipient?.parcelCoordinates?.join(", ")}
+                      <br />
+                    </>
+                  )}
                   <input
                     type="checkbox"
                     checked={

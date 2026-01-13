@@ -2153,6 +2153,11 @@ const processedInfoSchemaFn: (
       .array()
       .of(yup.string().matches(/^-?\d+(\.\d+)? -?\d+(\.\d+)?$/))
       .nullable()
+      .test(
+        "no-duplicates",
+        "Les coordonnées de parcelles de destination ne doivent pas contenir de doublons",
+        value => !value || new Set(value).size === value.length
+      )
   });
 
   if (

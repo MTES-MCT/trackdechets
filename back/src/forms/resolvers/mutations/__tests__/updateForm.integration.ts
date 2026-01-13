@@ -2664,7 +2664,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.recipient).toBeNull();
+    expect(data.updateForm.recipient?.company).toBeNull();
   });
 
   it.each([
