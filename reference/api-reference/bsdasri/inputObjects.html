@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Input objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdasri/inputObjects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Input objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="BsdasriAcceptationInput"><meta data-rh="true" property="og:description" content="BsdasriAcceptationInput"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdasri/inputObjects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdasri/inputObjects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdasri/inputObjects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Input objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdasri/inputObjects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.de4a84d9.js" defer="defer"></script>
-<script src="/assets/js/main.736e070d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.14b0baa2.js" defer="defer"></script>
+<script src="/assets/js/main.edb34eed.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -15,7 +15,7 @@
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>status<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Accepté, refusé ou refusé partiellement</p></td></tr><tr><td><p>refusalReason<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Raison en cas de refus ou refus partiel</p></td></tr><tr><td><p>refusedWeight<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Raison en cas de refus ou refus partiel</p><p>Max: 250 caractères</p></td></tr><tr><td><p>refusedWeight<br>
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>Poids en kilogrammes de déchets refusé</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasribrokerinput">BsdasriBrokerInput<a href="#bsdasribrokerinput" class="hash-link" aria-label="Direct link to BsdasriBrokerInput" title="Direct link to BsdasriBrokerInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -32,8 +32,8 @@ est présent dans la liste passée en paramètre</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement émetteur</p></td></tr><tr><td><p>cap<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre transporteur</p></td></tr><tr><td><p>reception<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>customInfo<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre transporteur</p><p>Max: 250 caractères</p></td></tr><tr><td><p>reception<br>
 <a href="inputObjects#bsdasrireceptioninput"><code>BsdasriReceptionInput</code></a></p></td><td></td></tr><tr><td><p>operation<br>
 <a href="inputObjects#bsdasrioperationinput"><code>BsdasriOperationInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasridestinationwhere">BsdasriDestinationWhere<a href="#bsdasridestinationwhere" class="hash-link" aria-label="Direct link to BsdasriDestinationWhere" title="Direct link to BsdasriDestinationWhere">​</a></h2>
@@ -45,7 +45,7 @@ est présent dans la liste passée en paramètre</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriecoorganismeinput">BsdasriEcoOrganismeInput<a href="#bsdasriecoorganismeinput" class="hash-link" aria-label="Direct link to BsdasriEcoOrganismeInput" title="Direct link to BsdasriEcoOrganismeInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>name<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td></td></tr><tr><td><p>siret<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom de l&#x27;éco-organisme</p><p>Max: 250 caractères</p></td></tr><tr><td><p>siret<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>SIRET composé de 14 caractères correspondant à un éco-organisme? Seul DASTRI est autorisé à ce jour.</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriemissioninput">BsdasriEmissionInput<a href="#bsdasriemissioninput" class="hash-link" aria-label="Direct link to BsdasriEmissionInput" title="Direct link to BsdasriEmissionInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -61,7 +61,7 @@ est présent dans la liste passée en paramètre</p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td></td></tr><tr><td><p>pickupSite<br>
 <a href="inputObjects#pickupsiteinput"><code>PickupSiteInput</code></a></p></td><td></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre émetteur</p></td></tr><tr><td><p>emission<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre émetteur</p><p>Max: 250 caractères</p></td></tr><tr><td><p>emission<br>
 <a href="inputObjects#bsdasriemissioninput"><code>BsdasriEmissionInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriemitterwhere">BsdasriEmitterWhere<a href="#bsdasriemitterwhere" class="hash-link" aria-label="Direct link to BsdasriEmitterWhere" title="Direct link to BsdasriEmitterWhere">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -71,7 +71,7 @@ est présent dans la liste passée en paramètre</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriidentificationinput">BsdasriIdentificationInput<a href="#bsdasriidentificationinput" class="hash-link" aria-label="Direct link to BsdasriIdentificationInput" title="Direct link to BsdasriIdentificationInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>numbers<br>
-<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros d&#x27;identification des conteneurs concernés</p></td></tr></tbody></table>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros d&#x27;identification des conteneurs concernés</p><p>Max: 250 caractères par élément</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriinput">BsdasriInput<a href="#bsdasriinput" class="hash-link" aria-label="Direct link to BsdasriInput" title="Direct link to BsdasriInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>waste<br>
@@ -106,9 +106,9 @@ Les codes R12 et D13 ne sont autorisé que si le destinataire est une installati
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bsdasripackagingtype"><code>BsdasriPackagingType!</code></a></p></td><td><p>Type de conditionnement</p></td></tr><tr><td><p>other<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p></td></tr><tr><td><p>volume<br>
-<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Volume de chaque colis associé à ce conditionnement</p></td></tr><tr><td><p>quantity<br>
-<a href="scalars#int"><code>Int!</code></a></p></td><td><p>Nombre de colis associés à ce conditionnement</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p><p>Max: 250 caractères</p></td></tr><tr><td><p>volume<br>
+<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Volume de chaque colis associé à ce conditionnement</p><p>Min: 0L</p></td></tr><tr><td><p>quantity<br>
+<a href="scalars#int"><code>Int!</code></a></p></td><td><p>Nombre de colis associés à ce conditionnement</p><p>Min: 1</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasrirealweightinput">BsdasriRealWeightInput<a href="#bsdasrirealweightinput" class="hash-link" aria-label="Direct link to BsdasriRealWeightInput" title="Direct link to BsdasriRealWeightInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>value<br>
@@ -171,12 +171,12 @@ Les codes R12 et D13 ne sont autorisé que si le destinataire est une installati
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bsdasrisignaturetype"><code>BsdasriSignatureType!</code></a></p></td><td><p>Type de signature apposée</p></td></tr><tr><td><p>author<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p></td></tr><tr><td><p>date<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p><p>Max: 250 caractères</p></td></tr><tr><td><p>date<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de la signature</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasrisignaturewithsecretcodeinput">BsdasriSignatureWithSecretCodeInput<a href="#bsdasrisignaturewithsecretcodeinput" class="hash-link" aria-label="Direct link to BsdasriSignatureWithSecretCodeInput" title="Direct link to BsdasriSignatureWithSecretCodeInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>author<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p></td></tr><tr><td><p>securityCode<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p><p>Max: 250 caractères</p></td></tr><tr><td><p>securityCode<br>
 <a href="scalars#int"><code>Int!</code></a></p></td><td><p>Code de sécurité de l&#x27;entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel</p></td></tr><tr><td><p>signatureAuthor<br>
 <a href="enums#signatureauthor"><code>SignatureAuthor</code></a></p></td><td><p>Dénomination de l&#x27;auteur de la signature, par défaut il s&#x27;agit de l&#x27;émetteur</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasristatusfilter">BsdasriStatusFilter<a href="#bsdasristatusfilter" class="hash-link" aria-label="Direct link to BsdasriStatusFilter" title="Direct link to BsdasriStatusFilter">​</a></h2>
@@ -195,7 +195,7 @@ Les codes R12 et D13 ne sont autorisé que si le destinataire est une installati
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement collecteur - transporteur</p></td></tr><tr><td><p>recepisse<br>
 <a href="inputObjects#bsdasrirecepisseinput"><code>BsdasriRecepisseInput</code></a></p></td><td><p>Récépissé transporteur</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre transporteur</p></td></tr><tr><td><p>transport<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre transporteur</p><p>Max: 250 caractères</p></td></tr><tr><td><p>transport<br>
 <a href="inputObjects#bsdasritransportinput"><code>BsdasriTransportInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasritransporterwhere">BsdasriTransporterWhere<a href="#bsdasritransporterwhere" class="hash-link" aria-label="Direct link to BsdasriTransporterWhere" title="Direct link to BsdasriTransporterWhere">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -225,7 +225,7 @@ Les codes R12 et D13 ne sont autorisé que si le destinataire est une installati
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriwasteinput">BsdasriWasteInput<a href="#bsdasriwasteinput" class="hash-link" aria-label="Direct link to BsdasriWasteInput" title="Direct link to BsdasriWasteInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>adr<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>code<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Mention au titre du règlement ADR</p><p>Max: 750 caractères</p></td></tr><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdasriweightinput">BsdasriWeightInput<a href="#bsdasriweightinput" class="hash-link" aria-label="Direct link to BsdasriWeightInput" title="Direct link to BsdasriWeightInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -295,7 +295,7 @@ Il est composé des trois lettres IMO suivi d&#x27;un nombre de sept chiffres (e
 <a href="scalars#id"><code>ID!</code></a></p></td><td><p>Identifiant du bordereau à réviser</p></td></tr><tr><td><p>authoringCompanySiret<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>SIRET du demandeur</p></td></tr><tr><td><p>content<br>
 <a href="inputObjects#bsdasrirevisionrequestcontentinput"><code>BsdasriRevisionRequestContentInput!</code></a></p></td><td><p>Contenu de la révision</p></td></tr><tr><td><p>comment<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Commentaire pour expliquer la demande de révision</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Commentaire pour expliquer la demande de révision</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="createpdfaccesstokeninput">CreatePdfAccessTokenInput<a href="#createpdfaccesstokeninput" class="hash-link" aria-label="Direct link to CreatePdfAccessTokenInput" title="Direct link to CreatePdfAccessTokenInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>bsdId<br>
@@ -327,11 +327,11 @@ Il est composé des trois lettres IMO suivi d&#x27;un nombre de sept chiffres (e
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="pickupsiteinput">PickupSiteInput<a href="#pickupsiteinput" class="hash-link" aria-label="Direct link to PickupSiteInput" title="Direct link to PickupSiteInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>name<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>address<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>city<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>postalCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>infos<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>address<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Adresse du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>city<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Ville du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>postalCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>infos<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Informations complémentaires sur le chantier</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="signaturewhere">SignatureWhere<a href="#signaturewhere" class="hash-link" aria-label="Direct link to SignatureWhere" title="Direct link to SignatureWhere">​</a></h2>
 <p>Filtre pour les signatures</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>

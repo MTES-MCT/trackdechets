@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Input objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bspaoh/inputObjects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Input objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="BspaohBrokerWhere"><meta data-rh="true" property="og:description" content="BspaohBrokerWhere"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bspaoh/inputObjects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bspaoh/inputObjects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bspaoh/inputObjects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Input objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bspaoh/inputObjects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.de4a84d9.js" defer="defer"></script>
-<script src="/assets/js/main.736e070d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.14b0baa2.js" defer="defer"></script>
+<script src="/assets/js/main.edb34eed.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -20,10 +20,10 @@
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement de destination</p></td></tr><tr><td><p>cap<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p></td></tr><tr><td><p>reception<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>reception<br>
 <a href="inputObjects#bspaohreceptioninput"><code>BspaohReceptionInput</code></a></p></td><td><p>Expédition reçue à l&#x27;installation de destination</p></td></tr><tr><td><p>operation<br>
 <a href="inputObjects#bspaohoperationinput"><code>BspaohOperationInput</code></a></p></td><td><p>Réalisation de l&#x27;opération (case 11)</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohdestinationwhere">BspaohDestinationWhere<a href="#bspaohdestinationwhere" class="hash-link" aria-label="Direct link to BspaohDestinationWhere" title="Direct link to BspaohDestinationWhere">​</a></h2>
 <p>Champs possible pour le filtre sur la destination.</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -46,7 +46,7 @@
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement émetteur</p></td></tr><tr><td><p>pickupSite<br>
 <a href="inputObjects#pickupsiteinput"><code>PickupSiteInput</code></a></p></td><td><p>Adresse de collecte</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre émetteur</p></td></tr><tr><td><p>emission<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre émetteur</p><p>Max: 250 caractères</p></td></tr><tr><td><p>emission<br>
 <a href="inputObjects#bspaohemissioninput"><code>BspaohEmissionInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohemitterwhere">BspaohEmitterWhere<a href="#bspaohemitterwhere" class="hash-link" aria-label="Direct link to BspaohEmitterWhere" title="Direct link to BspaohEmitterWhere">​</a></h2>
 <p>Champs possible pour le filtre sur l&#x27;émetteur.</p>
@@ -77,16 +77,16 @@
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohpackagingacceptationinput">BspaohPackagingAcceptationInput<a href="#bspaohpackagingacceptationinput" class="hash-link" aria-label="Direct link to BspaohPackagingAcceptationInput" title="Direct link to BspaohPackagingAcceptationInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>id<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Identifiant du packaging</p></td></tr><tr><td><p>acceptation<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Identifiant du packaging</p><p>Max: 250 caractères</p></td></tr><tr><td><p>acceptation<br>
 <a href="enums#bspaohpackagingacceptationstatus"><code>BspaohPackagingAcceptationStatus</code></a></p></td><td><p>Accepté par le destinataire </p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohpackaginginput">BspaohPackagingInput<a href="#bspaohpackaginginput" class="hash-link" aria-label="Direct link to BspaohPackagingInput" title="Direct link to BspaohPackagingInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bspaohpackagingtype"><code>BspaohPackagingType!</code></a></p></td><td><p>Type de conditionnement</p></td></tr><tr><td><p>volume<br>
-<a href="scalars#int"><code>Int</code></a></p></td><td><p>Volume en litres</p></td></tr><tr><td><p>containerNumber<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Numérotation</p></td></tr><tr><td><p>quantity<br>
+<a href="scalars#int"><code>Int</code></a></p></td><td><p>Volume en litres</p><p>Min: 0L</p></td></tr><tr><td><p>containerNumber<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Numérotation</p><p>Max: 50 caractères</p></td></tr><tr><td><p>quantity<br>
 <a href="scalars#int"><code>Int!</code></a></p></td><td><p>Nombre de colis associés à ce conditionnement</p></td></tr><tr><td><p>identificationCodes<br>
-<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Codes d&#x27;identification utilisés par l&#x27;établissement</p></td></tr><tr><td><p>consistence<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Codes d&#x27;identification utilisés par l&#x27;établissement</p><p>Au moins 1 code requis, Max: 250 caractères par élément</p></td></tr><tr><td><p>consistence<br>
 <a href="enums#bspaohconsistence"><code>BspaohConsistence!</code></a></p></td><td><p>Consistance</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohrecepisseinput">BspaohRecepisseInput<a href="#bspaohrecepisseinput" class="hash-link" aria-label="Direct link to BspaohRecepisseInput" title="Direct link to BspaohRecepisseInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -103,11 +103,11 @@
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>receivedWeight<br>
 <a href="inputObjects#bspaohreceptionwasteweightinput"><code>BspaohReceptionWasteWeightInput</code></a></p></td><td></td></tr><tr><td><p>refusedWeight<br>
 <a href="inputObjects#bspaohreceptionwasteweightinput"><code>BspaohReceptionWasteWeightInput</code></a></p></td><td></td></tr><tr><td><p>quantity<br>
-<a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité en nombre</p></td></tr></tbody></table>
+<a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité en nombre</p><p>Min: 0</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohreceptionwasteweightinput">BspaohReceptionWasteWeightInput<a href="#bspaohreceptionwasteweightinput" class="hash-link" aria-label="Direct link to BspaohReceptionWasteWeightInput" title="Direct link to BspaohReceptionWasteWeightInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>value<br>
-<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Poids en kilos</p></td></tr></tbody></table>
+<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Poids en kilos</p><p>Min: 0kg</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohreceptionwhere">BspaohReceptionWhere<a href="#bspaohreceptionwhere" class="hash-link" aria-label="Direct link to BspaohReceptionWhere" title="Direct link to BspaohReceptionWhere">​</a></h2>
 <p>Champs possibles pour le filtre sur la réception</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -118,7 +118,7 @@
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bspaohsignaturetype"><code>BspaohSignatureType!</code></a></p></td><td><p>Type de signature apposé</p></td></tr><tr><td><p>date<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de la signature</p></td></tr><tr><td><p>author<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohstatusfilter">BspaohStatusFilter<a href="#bspaohstatusfilter" class="hash-link" aria-label="Direct link to BspaohStatusFilter" title="Direct link to BspaohStatusFilter">​</a></h2>
 <p>Filtre sur le statut</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -129,7 +129,7 @@
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Entreprise de transport</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr><tr><td><p>recepisse<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p><p>Max: 250 caractères</p></td></tr><tr><td><p>recepisse<br>
 <a href="inputObjects#bspaohrecepisseinput"><code>BspaohRecepisseInput</code></a></p></td><td><p>Recepissé - Complété par Trackdéchets en fonction des informations renseignées par l&#x27;entreprise de transport </p></td></tr><tr><td><p>transport<br>
 <a href="inputObjects#bspaohtransportinput"><code>BspaohTransportInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohtransporterwhere">BspaohTransporterWhere<a href="#bspaohtransporterwhere" class="hash-link" aria-label="Direct link to BspaohTransporterWhere" title="Direct link to BspaohTransporterWhere">​</a></h2>
@@ -155,24 +155,24 @@
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>status<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Accepté, refusé ou refusé partiellement</p></td></tr><tr><td><p>refusalReason<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Raison en cas de refus ou refus partiel</p></td></tr><tr><td><p>packagings<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Raison en cas de refus ou refus partiel</p><p>Max: 250 caractères</p></td></tr><tr><td><p>packagings<br>
 <a href="inputObjects#bspaohpackagingacceptationinput"><code>[BspaohPackagingAcceptationInput!]</code></a></p></td><td><p>Acceptation détaillée des conditionnements</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohwastedetailinput">BspaohWasteDetailInput<a href="#bspaohwastedetailinput" class="hash-link" aria-label="Direct link to BspaohWasteDetailInput" title="Direct link to BspaohWasteDetailInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>weight<br>
 <a href="inputObjects#bspaohwasteweightinput"><code>BspaohWasteWeightInput</code></a></p></td><td></td></tr><tr><td><p>quantity<br>
-<a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité en nombre</p></td></tr></tbody></table>
+<a href="scalars#int"><code>Int</code></a></p></td><td><p>Quantité en nombre</p><p>Min: 0</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohwasteinput">BspaohWasteInput<a href="#bspaohwasteinput" class="hash-link" aria-label="Direct link to BspaohWasteInput" title="Direct link to BspaohWasteInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bspaohtype"><code>BspaohType</code></a></p></td><td><p>Type de déchet</p></td></tr><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Rubrique Déchet</p></td></tr><tr><td><p>adr<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Mention ADR</p></td></tr><tr><td><p>packagings<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Mention ADR</p><p>Max: 750 caractères</p></td></tr><tr><td><p>packagings<br>
 <a href="inputObjects#bspaohpackaginginput"><code>[BspaohPackagingInput!]</code></a></p></td><td><p>Conditionnements</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohwasteweightinput">BspaohWasteWeightInput<a href="#bspaohwasteweightinput" class="hash-link" aria-label="Direct link to BspaohWasteWeightInput" title="Direct link to BspaohWasteWeightInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>value<br>
-<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Poids en kilos</p></td></tr><tr><td><p>isEstimate<br>
+<a href="scalars#float"><code>Float!</code></a></p></td><td><p>Poids en kilos</p><p>Min: 0kg</p></td></tr><tr><td><p>isEstimate<br>
 <a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Type de quantité (réelle ou estimée)</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bspaohwhere">BspaohWhere<a href="#bspaohwhere" class="hash-link" aria-label="Direct link to BspaohWhere" title="Direct link to BspaohWhere">​</a></h2>
 <p>Filtres possibles pour la récupération de bordereaux.</p>
@@ -264,11 +264,11 @@ Il est composé des trois lettres IMO suivi d&#x27;un nombre de sept chiffres (e
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="pickupsiteinput">PickupSiteInput<a href="#pickupsiteinput" class="hash-link" aria-label="Direct link to PickupSiteInput" title="Direct link to PickupSiteInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>name<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>address<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>city<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>postalCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>infos<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>address<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Adresse du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>city<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Ville du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>postalCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>infos<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Informations complémentaires sur le chantier</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="signaturewhere">SignatureWhere<a href="#signaturewhere" class="hash-link" aria-label="Direct link to SignatureWhere" title="Direct link to SignatureWhere">​</a></h2>
 <p>Filtre pour les signatures</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>

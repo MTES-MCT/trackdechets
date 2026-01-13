@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="Broker"><meta data-rh="true" property="og:description" content="Broker"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsdd/objects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.de4a84d9.js" defer="defer"></script>
-<script src="/assets/js/main.736e070d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.14b0baa2.js" defer="defer"></script>
+<script src="/assets/js/main.edb34eed.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -100,7 +100,8 @@ Peut contenir un maximum de 5 transporteurs différents en cas de transport mult
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Description de l&#x27;opération d’élimination / valorisation (case 11)</p></td></tr><tr><td><p>processedBy<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Personne en charge du traitement</p></td></tr><tr><td><p>processedAt<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date à laquelle le déchet a été traité</p></td></tr><tr><td><p>noTraceability<br>
-<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Si oui ou non il y a eu rupture de traçabilité</p></td></tr><tr><td><p>nextDestination<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Si oui ou non il y a eu rupture de traçabilité</p></td></tr><tr><td><p>isUpcycled<br>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Terre valorisée</p></td></tr><tr><td><p>nextDestination<br>
 <a href="objects#nextdestination"><code>NextDestination</code></a></p></td><td><p>Destination ultérieure prévue (case 12)</p></td></tr><tr><td><p>appendix2Forms<br>
 <a href="objects#initialform"><code>[InitialForm!]</code></a></p></td><td><blockquote>Deprecated: Utiliser <code>grouping</code></blockquote><p>Bordereaux que celui-ci regroupe (Annexe 2)</p></td></tr><tr><td><p>grouping<br>
 <a href="objects#initialformfraction"><code>[InitialFormFraction!]</code></a></p></td><td><p>Bordereaux que celui-ci regroupe (Annexe 2)</p></td></tr><tr><td><p>quantityGrouped<br>
@@ -330,7 +331,10 @@ ou de reconditionnement prévue (case 2)</p>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p></td></tr><tr><td><p>processingOperation<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Opération d&#x27;élimination / valorisation prévue (code D/R)</p></td></tr><tr><td><p>company<br>
 <a href="objects#formcompany"><code>FormCompany</code></a></p></td><td><p>Établissement de destination</p></td></tr><tr><td><p>isTempStorage<br>
-<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Indique si c&#x27;est un établissement d&#x27;entreposage temporaire ou de reocnditionnement</p></td></tr></tbody></table>
+<a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Indique si c&#x27;est un établissement d&#x27;entreposage temporaire ou de reocnditionnement</p></td></tr><tr><td><p>parcelInseeCodes<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Codes INSEE des parcelles si valorisation</p></td></tr><tr><td><p>parcelNumbers<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéro(s) des parcelles si valorisation</p></td></tr><tr><td><p>parcelCoordinates<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Coordonnées des parcelles si valorisation</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="signature">Signature<a href="#signature" class="hash-link" aria-label="Direct link to Signature" title="Direct link to Signature">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Fields</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>date<br>

@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
 <title data-rh="true">Input objects | Documentation technique de l&#x27;API Trackdéchets</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsda/inputObjects"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="Input objects | Documentation technique de l&#x27;API Trackdéchets"><meta data-rh="true" name="description" content="BsdaBrokerInput"><meta data-rh="true" property="og:description" content="BsdaBrokerInput"><link data-rh="true" rel="icon" href="/img/trackdechets.png"><link data-rh="true" rel="canonical" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsda/inputObjects"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsda/inputObjects" hreflang="en"><link data-rh="true" rel="alternate" href="https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsda/inputObjects" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://2UK4UF9U8K-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Input objects","item":"https://developers.trackdechets.beta.gouv.fr/reference/api-reference/bsda/inputObjects"}]}</script><link rel="search" type="application/opensearchdescription+xml" title="Documentation technique de l&#39;API Trackdéchets" href="/opensearch.xml"><link rel="stylesheet" href="/assets/css/styles.d1285a78.css">
-<script src="/assets/js/runtime~main.de4a84d9.js" defer="defer"></script>
-<script src="/assets/js/main.736e070d.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.14b0baa2.js" defer="defer"></script>
+<script src="/assets/js/main.edb34eed.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -32,11 +32,11 @@
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement de destination</p></td></tr><tr><td><p>cap<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p></td></tr><tr><td><p>plannedOperationCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Opération d&#x27;élimination / valorisation prévue (code D/R)</p></td></tr><tr><td><p>reception<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>plannedOperationCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Opération d&#x27;élimination / valorisation prévue (code D/R)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>reception<br>
 <a href="inputObjects#bsdareceptioninput"><code>BsdaReceptionInput</code></a></p></td><td><p>Expédition reçue à l&#x27;installation de destination</p></td></tr><tr><td><p>operation<br>
 <a href="inputObjects#bsdaoperationinput"><code>BsdaOperationInput</code></a></p></td><td><p>Réalisation de l&#x27;opération (case 11)</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdadestinationwhere">BsdaDestinationWhere<a href="#bsdadestinationwhere" class="hash-link" aria-label="Direct link to BsdaDestinationWhere" title="Direct link to BsdaDestinationWhere">​</a></h2>
 <p>Champs possible pour le filtre sur la destination.</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -48,7 +48,7 @@
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdaecoorganismeinput">BsdaEcoOrganismeInput<a href="#bsdaecoorganismeinput" class="hash-link" aria-label="Direct link to BsdaEcoOrganismeInput" title="Direct link to BsdaEcoOrganismeInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>name<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td></td></tr><tr><td><p>siret<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom de l&#x27;éco-organisme</p><p>Max: 250 caractères</p></td></tr><tr><td><p>siret<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdaemissionwhere">BsdaEmissionWhere<a href="#bsdaemissionwhere" class="hash-link" aria-label="Direct link to BsdaEmissionWhere" title="Direct link to BsdaEmissionWhere">​</a></h2>
 <p>Champs possibles pour le filtre sur l&#x27;émission</p>
@@ -61,7 +61,7 @@
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Indique si le détenteur est un particulier ou une entreprise</p></td></tr><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Établissement MOA/détenteur. Partiellement rempli si l&#x27;émetteur est en fait un particulier</p></td></tr><tr><td><p>pickupSite<br>
 <a href="inputObjects#bsdapickupsiteinput"><code>BsdaPickupSiteInput</code></a></p></td><td><p>Informations chantier (si différente de l&#x27;adresse de l&#x27;entreprise)</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdaemitterwhere">BsdaEmitterWhere<a href="#bsdaemitterwhere" class="hash-link" aria-label="Direct link to BsdaEmitterWhere" title="Direct link to BsdaEmitterWhere">​</a></h2>
 <p>Champs possible pour le filtre sur l&#x27;émetteur.</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -96,8 +96,8 @@ collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.</p><
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Entreprise de travaux</p></td></tr><tr><td><p>cap<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p></td></tr><tr><td><p>plannedOperationCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Opération d&#x27;élimination / valorisation prévue (code D/R)</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>plannedOperationCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Opération d&#x27;élimination / valorisation prévue (code D/R)</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdanextdestinationwhere">BsdaNextDestinationWhere<a href="#bsdanextdestinationwhere" class="hash-link" aria-label="Direct link to BsdaNextDestinationWhere" title="Direct link to BsdaNextDestinationWhere">​</a></h2>
 <p>Champs possible pour le filtre sur l&#x27;exutoire final.</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -108,7 +108,7 @@ collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.</p><
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code D/R</p></td></tr><tr><td><p>mode<br>
 <a href="enums#operationmode"><code>OperationMode</code></a></p></td><td><p>Qualification du traitement final</p></td></tr><tr><td><p>description<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Description de l&#x27;opération</p></td></tr><tr><td><p>date<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Description de l&#x27;opération</p><p>Max: 250 caractères</p></td></tr><tr><td><p>date<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de réalisation de l&#x27;opération</p></td></tr><tr><td><p>nextDestination<br>
 <a href="inputObjects#bsdanextdestinationinput"><code>BsdaNextDestinationInput</code></a></p></td><td><p>Exutoire final (si la destination ne l&#x27;est pas)</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdaoperationwhere">BsdaOperationWhere<a href="#bsdaoperationwhere" class="hash-link" aria-label="Direct link to BsdaOperationWhere" title="Direct link to BsdaOperationWhere">​</a></h2>
@@ -122,18 +122,18 @@ collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.</p><
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bsdapackagingtype"><code>BsdaPackagingType!</code></a></p></td><td><p>Type de conditionnement</p></td></tr><tr><td><p>other<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p></td></tr><tr><td><p>quantity<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Description du conditionnement dans le cas où le type de conditionnement est <code>AUTRE</code></p><p>Max: 250 caractères</p></td></tr><tr><td><p>quantity<br>
 <a href="scalars#int"><code>Int!</code></a></p></td><td><p>Nombre de colis associés à ce conditionnement</p></td></tr><tr><td><p>volume<br>
-<a href="scalars#float"><code>Float</code></a></p></td><td><p>Volume du conditionnement en litre(s)</p></td></tr><tr><td><p>identificationNumbers<br>
-<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros des contenants</p></td></tr></tbody></table>
+<a href="scalars#float"><code>Float</code></a></p></td><td><p>Volume du conditionnement en litre(s)</p><p>Min: 0L</p></td></tr><tr><td><p>identificationNumbers<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros des contenants</p><p>Max: 250 caractères par élément</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdapickupsiteinput">BsdaPickupSiteInput<a href="#bsdapickupsiteinput" class="hash-link" aria-label="Direct link to BsdaPickupSiteInput" title="Direct link to BsdaPickupSiteInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>name<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>address<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>city<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>postalCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td></td></tr><tr><td><p>infos<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Autres informations, notamment le code chantier</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>address<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Adresse du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>city<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Ville du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>postalCode<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Code postal du chantier</p><p>Max: 250 caractères</p></td></tr><tr><td><p>infos<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Autres informations, notamment le code chantier</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarecepisseinput">BsdaRecepisseInput<a href="#bsdarecepisseinput" class="hash-link" aria-label="Direct link to BsdaRecepisseInput" title="Direct link to BsdaRecepisseInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>isExempted<br>
@@ -151,13 +151,13 @@ Doit être strictement supérieur à 0 lorsque le déchet est accepté ou partie
 <a href="scalars#float"><code>Float</code></a></p></td><td><p>Quantité refusée (optionnelle)
 Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à weight si le déchet est partiellement refusé.</li><li>doit être égale à 0 si le déchet est totalement accepté.</li><li>doit être égale à weight si le déchet est totalement refusé.</li></ul></td></tr><tr><td><p>acceptationStatus<br>
 <a href="enums#wasteacceptationstatus"><code>WasteAcceptationStatus</code></a></p></td><td><p>Lot accepté, accepté partiellement ou refusé</p></td></tr><tr><td><p>refusalReason<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Motif de refus</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Motif de refus</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdareceptionwhere">BsdaReceptionWhere<a href="#bsdareceptionwhere" class="hash-link" aria-label="Direct link to BsdaReceptionWhere" title="Direct link to BsdaReceptionWhere">​</a></h2>
 <p>Champs possibles pour le filtre sur la réception</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>date<br>
 <a href="inputObjects#datefilter"><code>DateFilter</code></a></p></td><td></td></tr></tbody></table>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestcontentinput">BsdaRevisionRequestContentInput<a href="#bsdarevisionrequestcontentinput" class="hash-link" aria-label="Direct link to BsdaRevisionRequestContentInput" title="Direct link to BsdaRevisionRequestContentInput">  ​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestcontentinput">BsdaRevisionRequestContentInput<a href="#bsdarevisionrequestcontentinput" class="hash-link" aria-label="Direct link to BsdaRevisionRequestContentInput" title="Direct link to BsdaRevisionRequestContentInput">​</a></h2>
 <p>Payload de révision d&#x27;un bordereau. Disponible sur une liste restreinte de champs.</p>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>emitter<br>
@@ -170,7 +170,7 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestdestinationinput">BsdaRevisionRequestDestinationInput<a href="#bsdarevisionrequestdestinationinput" class="hash-link" aria-label="Direct link to BsdaRevisionRequestDestinationInput" title="Direct link to BsdaRevisionRequestDestinationInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>cap<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant). Modifie le CAP de l&#x27;exutoire même en cas de TTR</p></td></tr><tr><td><p>reception<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>N° de CAP (le cas échéant). Modifie le CAP de l&#x27;exutoire même en cas de TTR</p><p>Max: 250 caractères</p></td></tr><tr><td><p>reception<br>
 <a href="inputObjects#bsdarevisionrequestreceptioninput"><code>BsdaRevisionRequestReceptionInput</code></a></p></td><td><p>Expédition reçue à l&#x27;installation de destination</p></td></tr><tr><td><p>operation<br>
 <a href="inputObjects#bsdarevisionrequestoperationinput"><code>BsdaRevisionRequestOperationInput</code></a></p></td><td><p>Réalisation de l&#x27;opération (case 11)</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestemitterinput">BsdaRevisionRequestEmitterInput<a href="#bsdarevisionrequestemitterinput" class="hash-link" aria-label="Direct link to BsdaRevisionRequestEmitterInput" title="Direct link to BsdaRevisionRequestEmitterInput">​</a></h2>
@@ -182,7 +182,7 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Code D/R</p></td></tr><tr><td><p>mode<br>
 <a href="enums#operationmode"><code>OperationMode</code></a></p></td><td><p>Mode de traitement</p></td></tr><tr><td><p>description<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Description de l&#x27;opération</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Description de l&#x27;opération</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestreceptioninput">BsdaRevisionRequestReceptionInput<a href="#bsdarevisionrequestreceptioninput" class="hash-link" aria-label="Direct link to BsdaRevisionRequestReceptionInput" title="Direct link to BsdaRevisionRequestReceptionInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>weight<br>
@@ -192,8 +192,8 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Rubrique Déchet</p></td></tr><tr><td><p>materialName<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom usuel du matériau</p></td></tr><tr><td><p>sealNumbers<br>
-<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros de scellés</p></td></tr><tr><td><p>pop<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom usuel du matériau</p><p>Max: 250 caractères</p></td></tr><tr><td><p>sealNumbers<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros de scellés</p><p>Max: 250 caractères par élément</p></td></tr><tr><td><p>pop<br>
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Contient des Polluants Organiques Persistants (POP) oui / non</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdarevisionrequestwhere">BsdaRevisionRequestWhere<a href="#bsdarevisionrequestwhere" class="hash-link" aria-label="Direct link to BsdaRevisionRequestWhere" title="Direct link to BsdaRevisionRequestWhere">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
@@ -205,7 +205,7 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>type<br>
 <a href="enums#bsdasignaturetype"><code>BsdaSignatureType!</code></a></p></td><td><p>Type de signature apposé</p></td></tr><tr><td><p>date<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Date de la signature</p></td></tr><tr><td><p>author<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p></td></tr><tr><td><p>securityCode<br>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Nom et prénom du signataire</p><p>Max: 250 caractères</p></td></tr><tr><td><p>securityCode<br>
 <a href="scalars#int"><code>Int</code></a></p></td><td><p>Code de sécurité de l&#x27;entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdastatusfilter">BsdaStatusFilter<a href="#bsdastatusfilter" class="hash-link" aria-label="Direct link to BsdaStatusFilter" title="Direct link to BsdaStatusFilter">​</a></h2>
 <p>Filtre sur le statut</p>
@@ -217,7 +217,7 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>company<br>
 <a href="inputObjects#companyinput"><code>CompanyInput</code></a></p></td><td><p>Entreprise de transport</p></td></tr><tr><td><p>customInfo<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p></td></tr><tr><td><p>recepisse<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Champ libre</p><p>Max: 250 caractères</p></td></tr><tr><td><p>recepisse<br>
 <a href="inputObjects#bsdarecepisseinput"><code>BsdaRecepisseInput</code></a></p></td><td></td></tr><tr><td><p>transport<br>
 <a href="inputObjects#bsdatransportinput"><code>BsdaTransportInput</code></a></p></td><td></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdatransporterwhere">BsdaTransporterWhere<a href="#bsdatransporterwhere" class="hash-link" aria-label="Direct link to BsdaTransporterWhere" title="Direct link to BsdaTransporterWhere">​</a></h2>
@@ -244,14 +244,15 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>code<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Rubrique Déchet</p></td></tr><tr><td><p>name<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><blockquote>Deprecated: Utiliser materialName</blockquote><p>DEPRECATED - Dénomination usuelle</p></td></tr><tr><td><p>familyCode<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Code famille</p></td></tr><tr><td><p>materialName<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom usuel du matériau</p></td></tr><tr><td><p>consistence<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Code famille
+La valeur attendue est un numéro de 1 à 9 correspondant à ces familles :</p><p>1 - amiante pur utilisé en bourrage ou en sac</p><p>2 - amiante mélangé dans des poudres ou des produits minéraux sans liaison forte</p><p>3 - amiante intégré dans des liquides ou des solutions visqueuses</p><p>4 - amiante tissé ou tressé</p><p>5 - amiante en feuilles ou en plaques</p><p>6 - amiante lié à des matériaux inertes</p><p>7 - amiante noyé dans une résine ou une matière plastique</p><p>8 - amiante dans des matériels et équipements</p><p>9 - tous les matériaux contaminés susceptibles d&#x27;émettre des fibres</p></td></tr><tr><td><p>materialName<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Nom usuel du matériau</p><p>Max: 250 caractères</p></td></tr><tr><td><p>consistence<br>
 <a href="enums#bsdaconsistence"><code>BsdaConsistence</code></a></p></td><td><p>Consistance</p></td></tr><tr><td><p>consistenceDescription<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Détail de la consistance, dans le cas où la consistance est &#x27;AUTRE&#x27;</p></td></tr><tr><td><p>sealNumbers<br>
-<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros de scellés</p></td></tr><tr><td><p>isSubjectToADR<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Détail de la consistance, dans le cas où la consistance est &#x27;AUTRE&#x27;</p><p>Max: 250 caractères</p></td></tr><tr><td><p>sealNumbers<br>
+<a href="scalars#string"><code>[String!]</code></a></p></td><td><p>Numéros de scellés</p><p>Max: 250 caractères par élément</p></td></tr><tr><td><p>isSubjectToADR<br>
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Si le déchet est soumis à l&#x27;ADR ou non</p></td></tr><tr><td><p>adr<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Mention au titre du règlement ADR la plus à jour</p></td></tr><tr><td><p>nonRoadRegulationMention<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Mentions au titre des règlements RID, ADN, IMDG (optionnel)</p></td></tr><tr><td><p>pop<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Mention au titre du règlement ADR la plus à jour</p><p>Max: 750 caractères</p></td></tr><tr><td><p>nonRoadRegulationMention<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Mentions au titre des règlements RID, ADN, IMDG (optionnel)</p><p>Max: 750 caractères</p></td></tr><tr><td><p>pop<br>
 <a href="scalars#boolean"><code>Boolean</code></a></p></td><td><p>Contient des Polluants Organiques Persistants (POP) oui / non</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdawastewhere">BsdaWasteWhere<a href="#bsdawastewhere" class="hash-link" aria-label="Direct link to BsdaWasteWhere" title="Direct link to BsdaWasteWhere">​</a></h2>
 <p>Champs possible pour le filtre sur le déchet.</p>
@@ -288,10 +289,10 @@ Si définie:</p><ul><li>doit être supérieure à 0 et inférieure ou égale à 
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>hasSubSectionFour<br>
 <a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise réalise des travaux relevant de la sous-section 4</p></td></tr><tr><td><p>hasSubSectionThree<br>
 <a href="scalars#boolean"><code>Boolean!</code></a></p></td><td><p>Indique si l&#x27;entreprise réalise des travaux relevant de la sous-section 3</p></td></tr><tr><td><p>certificationNumber<br>
-<a href="scalars#string"><code>String</code></a></p></td><td><p>Numéro de certification (sous-section 3 uniquement)</p></td></tr><tr><td><p>validityLimit<br>
+<a href="scalars#string"><code>String</code></a></p></td><td><p>Numéro de certification (sous-section 3 uniquement)</p><p>Max: 250 caractères</p></td></tr><tr><td><p>validityLimit<br>
 <a href="scalars#datetime"><code>DateTime</code></a></p></td><td><p>Limite de validité de la certification (sous-section 3 uniquement)</p></td></tr><tr><td><p>organisation<br>
 <a href="scalars#string"><code>String</code></a></p></td><td><p>Organisation qui a décerné la certification (sous-section 3 uniquement)
-Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT</p></td></tr></tbody></table>
+Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="bsdaworkerinput">BsdaWorkerInput<a href="#bsdaworkerinput" class="hash-link" aria-label="Direct link to BsdaWorkerInput" title="Direct link to BsdaWorkerInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>isDisabled<br>
@@ -355,7 +356,7 @@ Il est composé des trois lettres IMO suivi d&#x27;un nombre de sept chiffres (e
 <a href="scalars#id"><code>ID!</code></a></p></td><td><p>Identifiant du bordereau à réviser</p></td></tr><tr><td><p>authoringCompanySiret<br>
 <a href="scalars#string"><code>String!</code></a></p></td><td><p>SIRET du demandeur</p></td></tr><tr><td><p>content<br>
 <a href="inputObjects#bsdarevisionrequestcontentinput"><code>BsdaRevisionRequestContentInput!</code></a></p></td><td><p>Contenu de la révision</p></td></tr><tr><td><p>comment<br>
-<a href="scalars#string"><code>String!</code></a></p></td><td><p>Commentaire pour expliquer la demande de révision</p></td></tr></tbody></table>
+<a href="scalars#string"><code>String!</code></a></p></td><td><p>Commentaire pour expliquer la demande de révision</p><p>Max: 250 caractères</p></td></tr></tbody></table>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="createpdfaccesstokeninput">CreatePdfAccessTokenInput<a href="#createpdfaccesstokeninput" class="hash-link" aria-label="Direct link to CreatePdfAccessTokenInput" title="Direct link to CreatePdfAccessTokenInput">​</a></h2>
 <p style="margin-bottom:0.4em"><strong>Arguments</strong></p>
 <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><p>bsdId<br>
