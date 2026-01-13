@@ -500,16 +500,17 @@ const Recipient = ({
             {form.isUpcycled && (
               <>
                 <DetailRow
-                  value={form.recipient?.parcelInseeCodes?.join(", ")}
-                  label="Codes INSEE des parcelles si valorisation"
-                />
-                <DetailRow
-                  value={form.recipient?.parcelNumbers?.join(", ")}
-                  label="Numéro(s) des parcelles si valorisation"
+                  value={form.recipient?.parcelInseeCodes
+                    ?.map(
+                      (code, idx) =>
+                        `${code} / ${form.recipient?.parcelNumbers?.[idx]}`
+                    )
+                    .join(", ")}
+                  label="Codes INSEE & numéros des parcelles de valorisation"
                 />
                 <DetailRow
                   value={form.recipient?.parcelCoordinates?.join(", ")}
-                  label="Coordonnées des parcelles si valorisation"
+                  label="Coordonnées des parcelles de valorisation"
                 />
               </>
             )}

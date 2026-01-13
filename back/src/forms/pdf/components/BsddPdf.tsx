@@ -854,13 +854,16 @@ export function BsddPdf({
                   <br />
                   {form.isUpcycled && (
                     <>
-                      Codes INSEE des parcelles si valorisation :{" "}
+                      Codes INSEE & numéros des parcelles de valorisation :{" "}
                       {form.recipient?.parcelInseeCodes?.join(", ")}
+                      {form.recipient?.parcelInseeCodes
+                        ?.map(
+                          (code, idx) =>
+                            `${code} / ${form.recipient?.parcelNumbers?.[idx]}`
+                        )
+                        .join(", ")}
                       <br />
-                      Numéro(s) des parcelles si valorisation :{" "}
-                      {form.recipient?.parcelNumbers?.join(", ")}
-                      <br />
-                      Coordonnées des parcelles si valorisation :{" "}
+                      Coordonnées des parcelles de valorisation :{" "}
                       {form.recipient?.parcelCoordinates?.join(", ")}
                       <br />
                     </>
