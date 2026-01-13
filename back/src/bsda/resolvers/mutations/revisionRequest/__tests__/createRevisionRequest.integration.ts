@@ -2185,7 +2185,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        "Vous devez préciser un mode de traitement"
       );
     });
 
@@ -2413,7 +2413,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       );
     });
 
-    it("one cannot change the operation code to a new one that doesn't match the old operation mode", async () => {
+    it("one cannot change the operation code without specifying the corresponding operation mode", async () => {
       // Given
       const { company: destinationCompany } = await userWithCompanyFactory(
         "ADMIN"
@@ -2441,7 +2441,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             bsdaId: bsda.id,
             content: {
               destination: {
-                operation: { code: "D 5" } // Pas valide avec RECYCLAGE!
+                operation: { code: "D 5" }
               }
             },
             comment: "A comment",
@@ -2453,7 +2453,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        "Vous devez préciser un mode de traitement"
       );
     });
   });
