@@ -2185,7 +2185,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       // Then
       expect(errors).not.toBeUndefined();
       expect(errors[0].message).toBe(
-        "Le mode de traitement n'est pas compatible avec l'opération de traitement choisie"
+        "Vous devez préciser un mode de traitement"
       );
     });
 
