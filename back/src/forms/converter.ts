@@ -714,18 +714,9 @@ export function expandFormFromDb(
         mail: form.recipientCompanyMail
       }),
       isTempStorage: form.recipientIsTempStorage,
-      parcelCoordinates:
-        form.destinationParcelCoordinates.length > 0
-          ? form.destinationParcelCoordinates
-          : null,
-      parcelInseeCodes:
-        form.destinationParcelInseeCodes.length > 0
-          ? form.destinationParcelInseeCodes
-          : null,
-      parcelNumbers:
-        form.destinationParcelNumbers.length > 0
-          ? form.destinationParcelNumbers
-          : null
+      parcelCoordinates: form.destinationParcelCoordinates,
+      parcelInseeCodes: form.destinationParcelInseeCodes,
+      parcelNumbers: form.destinationParcelNumbers
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
