@@ -30,7 +30,11 @@ import WasteTree from "../search/WasteTree";
 const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
-  `⚠️ Registre national – Fin de la période de tolérance le 31/12/2025. N’attendez pas la fin de l’année pour transmettre vos registres ! Les modèles d’import définitifs sont disponibles et utilisables dès maintenant sur Trackdéchets.`
+  <>
+    Depuis le <i>1er janvier 2026</i>, les acteurs soumis aux obligations du
+    registre national doivent effectuer l’ensemble de leurs déclarations via
+    l’onglet <i>"Mes registres"</i> de la plateforme Trackdéchets.
+  </>
 ];
 
 const IS_AUTHENTICATED = gql`
@@ -70,7 +74,7 @@ export default function LayoutContainer() {
                     title: "En savoir plus",
                     href: "https://faq.trackdechets.fr/registre-national/informations-generales"
                   }}
-                  persistedSurveyName="td-20251111"
+                  persistedSurveyName="td-20260113"
                 />
               }
             />
