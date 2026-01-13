@@ -17,11 +17,18 @@ const stringArray = z
       : []
   );
 
+// Helper to handle DEV/PROD which can be booleans (from Vite) or strings (from process.env in tests)
+const devProdBoolean = z.union([z.boolean(), z.string()]).transform(val => {
+  if (typeof val === "boolean") return val;
+  if (typeof val === "string") return val === "true";
+  return false;
+});
+
 export const envConfig = z
   .object({
     NODE_ENV: z.string().optional(),
-    DEV: z.boolean(),
-    PROD: z.boolean(),
+    DEV: devProdBoolean,
+    PROD: devProdBoolean,
     VITE_API_ENDPOINT: z.string(),
     VITE_NOTIFIER_ENDPOINT: z.string().optional(),
     VITE_WARNING_MESSAGE: z.string().optional(),
