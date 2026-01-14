@@ -375,9 +375,6 @@ export const RegistryV2ExportModalProvider: React.FC<{
         wasteCodes
       } = input;
       let delegateSiret = input.delegateSiret;
-      console.log("delegateSiret", delegateSiret);
-      console.log("isDelegation", isDelegation);
-      console.log("registryDelegationsData", registryDelegationsData);
       if (isDelegation) {
         if (!delegateSiret) {
           if (registryDelegationsData?.registryDelegations.edges.length === 1) {
