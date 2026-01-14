@@ -803,7 +803,7 @@ export const getIsNonDraftLabel = (
     isTransporter &&
     permissions.includes(UserPermission.BsdCanSignTransport) &&
     bsd.emitter?.irregularSituation &&
-    bsd.emitter?.noSiret
+    (bsd.emitter?.noSiret || bsd.emitter?.notOnTD)
   ) {
     return SIGNER;
   }
