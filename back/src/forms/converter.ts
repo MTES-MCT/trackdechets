@@ -126,13 +126,7 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: undefinedOrDefault(
-      chain(input.wasteDetails, w =>
-        w.consistences
-          ? w.consistences
-          : w.consistence
-          ? [w.consistence]
-          : undefined
-      ),
+      chain(input.wasteDetails, w => w.consistences),
       []
     ),
     wasteDetailsPop: undefinedOrDefault(
@@ -738,7 +732,6 @@ export function expandFormFromDb(
         ? processDecimal(form.wasteDetailsQuantity).toNumber()
         : null,
       quantityType: form.wasteDetailsQuantityType,
-      consistence: form.wasteDetailsConsistence?.[0],
       consistences: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
       isDangerous: form.wasteDetailsIsDangerous,
@@ -928,7 +921,6 @@ export function expandFormFromDb(
               ? processDecimal(forwardedIn.wasteDetailsQuantity).toNumber()
               : null,
             quantityType: forwardedIn.wasteDetailsQuantityType,
-            consistence: forwardedIn.wasteDetailsConsistence?.[0],
             consistences: forwardedIn.wasteDetailsConsistence,
             pop: forwardedIn.wasteDetailsPop,
             isDangerous: forwardedIn.wasteDetailsIsDangerous

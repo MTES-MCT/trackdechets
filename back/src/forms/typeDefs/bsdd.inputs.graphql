@@ -885,14 +885,6 @@ input WasteDetailsInput {
   "Réelle ou estimée"
   quantityType: QuantityType
 
-  """
-  DEPRECATED - Consistance
-
-  Ce champ sera définitivement supprimé le 16 Décembre 2025.
-  Il est remplacé par le champ `consistences`, qui permet de renseigner plusieurs consistances pour un déchet.
-  """
-  consistence: Consistence
-
   "Consistances"
   consistences: [Consistence!]
 
