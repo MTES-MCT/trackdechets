@@ -26,11 +26,15 @@ import { parseBsvhu, parseBsvhuAsync, parseBsvhuTransporterAsync } from "..";
 import { ZodError } from "zod";
 import { CompanyRole } from "../../../common/validation/zod/schema";
 
-const searchResult = (companyName: string) => {
+const searchResult = (
+  companyName: string,
+  etatAdministratif: "A" | "F" = "A"
+) => {
   return {
     name: companyName,
     address: `Adresse ${companyName}`,
-    statutDiffusionEtablissement: "O"
+    statutDiffusionEtablissement: "O",
+    etatAdministratif: etatAdministratif
   } as CompanySearchResult;
 };
 
@@ -1390,6 +1394,32 @@ describe("BSVHU validation", () => {
       expect(sirenified.traderCompanyName).toEqual(
         searchResults[traderCompany.siret!].name
       );
+    });
+    it("should not throw error if emitter is closed and emitter is in irregular situation", async () => {
+      const searchResults = {
+        [bsvhu.emitterCompanySiret!]: searchResult("émetteur", "F"),
+        [bsvhu.transporters![0].transporterCompanySiret!]:
+          searchResult("transporteur"),
+        [bsvhu.destinationCompanySiret!]: searchResult("destinataire"),
+        [intermediaryCompany.siret!]: searchResult("intermédiaire"),
+        [ecoOrganisme.siret!]: searchResult("ecoOrganisme"),
+        [brokerCompany.siret!]: searchResult("broker"),
+        [traderCompany.siret!]: searchResult("trader")
+      };
+      (searchCompany as jest.Mock).mockImplementation((clue: string) => {
+        return Promise.resolve(searchResults[clue]);
+      });
+
+      const sirenified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          emitterIrregularSituation: true
+        },
+        {
+          ...context
+        }
+      );
+      expect(sirenified).toBeDefined();
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
       const searchResults = {

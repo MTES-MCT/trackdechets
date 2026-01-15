@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.02.1] 10/02/2026
+
+#### :bug: Corrections de bugs
+
+- Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
+
 # [2026.01.1] 13/01/2026
 
 ### :boom: Breaking changes

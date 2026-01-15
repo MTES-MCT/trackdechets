@@ -108,6 +108,8 @@ export default function buildSirenify<T>(
 export type NextCompanyInputAccessor<T> = {
   siret: string | null | undefined;
   skip: boolean;
+  // an optional parameter to not throw errors on closed companies, but still populate informations if they are found
+  ignoreClosed?: boolean;
   // an optional function that will be run if the company is not found or not registered on trackdechet
   setterIfNotRegistered?: (input: T) => void;
   setter: (
@@ -145,7 +147,8 @@ export function nextBuildSirenify<T>(
     const sirenifiedInput = { ...input };
 
     for (const [idx, companySearchResult] of companySearchResults.entries()) {
-      const { siret, skip, setter, setterIfNotRegistered } = accessors[idx];
+      const { siret, skip, setter, setterIfNotRegistered, ignoreClosed } =
+        accessors[idx];
       if (
         siret &&
         !skip &&
@@ -162,7 +165,7 @@ export function nextBuildSirenify<T>(
       if (company.statutDiffusionEtablissement === "P") {
         continue;
       }
-      if (company.etatAdministratif === "F") {
+      if (company.etatAdministratif === "F" && !ignoreClosed) {
         throw new UserInputError(
           `L'établissement ${company.siret} est fermé selon le répertoire SIRENE`
         );
