@@ -1525,24 +1525,21 @@ describe("BSDA parsing", () => {
       }
     );
 
-    it.each([null, undefined, 10])(
-      "waste is REFUSED > weight = 10 > refusedWeight can be %p",
-      async destinationReceptionRefusedWeight => {
-        // Given
-        const data: ZodBsda = {
-          ...bsda,
-          destinationReceptionAcceptationStatus: "REFUSED",
-          destinationReceptionWeight: 10,
-          destinationReceptionRefusedWeight
-        };
+    it("waste is REFUSED > weight = 10 > refusedWeight must be 10", async () => {
+      // Given
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "REFUSED",
+        destinationReceptionWeight: 10,
+        destinationReceptionRefusedWeight: 10
+      };
 
-        // When
-        const parsed = parseBsda(data, context);
+      // When
+      const parsed = parseBsda(data, context);
 
-        // Then
-        expect(parsed).toBeDefined();
-      }
-    );
+      // Then
+      expect(parsed).toBeDefined();
+    });
 
     it.each([0, 3, 15])(
       "waste is REFUSED > weight = 10 > refusedWeight can NOT be %p",

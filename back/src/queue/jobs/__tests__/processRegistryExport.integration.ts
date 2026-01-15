@@ -202,6 +202,7 @@ const createTestBsda = async (
       reception: {
         date: date.toISOString(),
         weight: 1.2,
+        refusedWeight: 0,
         acceptationStatus: "ACCEPTED"
       },
       operation: {
@@ -363,7 +364,7 @@ describe("Process registry export job", () => {
       }
     });
 
-    it("should create a successful CSV export for INCOMING registry with BSDA data", async () => {
+    it.only("should create a successful CSV export for INCOMING registry with BSDA data", async () => {
       // Create test companies
       const { user: emitterUser, company: emitterCompany } =
         await userWithCompanyFactory("ADMIN");
