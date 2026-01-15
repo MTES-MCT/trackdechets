@@ -1395,7 +1395,7 @@ describe("BSVHU validation", () => {
         searchResults[traderCompany.siret!].name
       );
     });
-    it("should not throw error if emitter is closed", async () => {
+    it("should not throw error if emitter is closed and emitter is in irregular situation", async () => {
       const searchResults = {
         [bsvhu.emitterCompanySiret!]: searchResult("émetteur", "F"),
         [bsvhu.transporters![0].transporterCompanySiret!]:
@@ -1410,9 +1410,15 @@ describe("BSVHU validation", () => {
         return Promise.resolve(searchResults[clue]);
       });
 
-      const sirenified = await parseBsvhuAsync(bsvhu, {
-        ...context
-      });
+      const sirenified = await parseBsvhuAsync(
+        {
+          ...bsvhu,
+          emitterIrregularSituation: true
+        },
+        {
+          ...context
+        }
+      );
       expect(sirenified).toBeDefined();
     });
     it("should not overwrite `name` and `address` based on SIRENE data for sealed fields", async () => {
