@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import * as Sentry from "@sentry/node";
 import { GraphQLError } from "graphql";
 import { GraphQLContext } from "../../types";
+import { getOpenTelemetryTraceId } from "../utils/getTraceId";
 
 const knownErrors = [GraphQLError, ValidationError, ZodError];
 
@@ -56,6 +57,14 @@ const sentryReporter: ApolloServerPlugin = {
               scope.setExtra(key, errorContext.request.http.headers.get(key));
             }
           });
+
+          // Ajouter le trace ID OpenTelemetry pour corrélation avec Datadog
+          const traceId = getOpenTelemetryTraceId();
+          if (traceId) {
+            scope.setContext("trace", {
+              trace_id: traceId
+            });
+          }
 
           const sentryId = Sentry.captureException(error, scope);
           error.extensions.sentryId = sentryId;
