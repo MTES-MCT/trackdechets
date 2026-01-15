@@ -1571,67 +1571,62 @@ describe("Mutation.Bsda.sign", () => {
       expect(signedBsda.finalOperations[0].operationCode).toBe("D 9 F");
     });
 
-    it.each([
-      WasteAcceptationStatus.ACCEPTED,
-      WasteAcceptationStatus.PARTIALLY_REFUSED
-    ])(
-      "should forbid operation signature when weight is 0 ans status is %p",
-      async destinationReceptionAcceptationStatus => {
-        const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-        const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-        const transporterReceipt = await transporterReceiptFactory({
-          company: transporter.company
-        });
-        const bsda = await bsdaFactory({
-          opt: {
-            status: "SENT",
-            emitterEmissionSignatureAuthor: "Emétteur",
-            emitterEmissionSignatureDate: new Date(),
-            workerWorkSignatureAuthor: "Worker",
-            workerWorkSignatureDate: new Date(),
-            destinationCompanySiret: company.siret,
-            destinationOperationCode: "R 5",
-            destinationOperationMode: "RECYCLAGE",
-            destinationReceptionWeight: 0,
-            destinationReceptionAcceptationStatus
-          },
-          transporterOpt: {
-            transporterCompanySiret: transporter.company.siret,
-            transporterTransportSignatureAuthor: "Transporter",
-            transporterTransportSignatureDate: new Date(),
-            transporterRecepisseNumber: transporterReceipt.receiptNumber,
-            transporterRecepisseDepartment: transporterReceipt.department,
-            transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+    it("should forbid operation signature when weight is 0 ans status is WasteAcceptationStatus.ACCEPTED", async () => {
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+      const transporterReceipt = await transporterReceiptFactory({
+        company: transporter.company
+      });
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SENT",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerWorkSignatureAuthor: "Worker",
+          workerWorkSignatureDate: new Date(),
+          destinationCompanySiret: company.siret,
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationReceptionWeight: 0,
+          destinationReceptionRefusedWeight: 0,
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
+        },
+        transporterOpt: {
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportSignatureAuthor: "Transporter",
+          transporterTransportSignatureDate: new Date(),
+          transporterRecepisseNumber: transporterReceipt.receiptNumber,
+          transporterRecepisseDepartment: transporterReceipt.department,
+          transporterRecepisseValidityLimit: transporterReceipt.validityLimit
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
           }
-        });
+        }
+      });
 
-        const { mutate } = makeClient(user);
-        const { errors } = await mutate<
-          Pick<Mutation, "signBsda">,
-          MutationSignBsdaArgs
-        >(SIGN_BSDA, {
-          variables: {
-            id: bsda.id,
-            input: {
-              type: "OPERATION",
-              author: user.name
-            }
-          }
-        });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: "Le poids du déchet reçu doit être renseigné et non nul."
+        })
+      ]);
 
-        expect(errors).toEqual([
-          expect.objectContaining({
-            message: "Le poids du déchet reçu doit être renseigné et non nul."
-          })
-        ]);
+      const updateBsda = await prisma.bsda.findUniqueOrThrow({
+        where: { id: bsda.id }
+      });
 
-        const updateBsda = await prisma.bsda.findUniqueOrThrow({
-          where: { id: bsda.id }
-        });
-
-        expect(updateBsda.status).toBe("SENT");
-      }
-    );
+      expect(updateBsda.status).toBe("SENT");
+    });
 
     it("should forbid operation signature when weight is 0 and status is REFUSED", async () => {
       // Given
@@ -2376,6 +2371,7 @@ describe("Mutation.Bsda.sign", () => {
           // Reception
           destinationReceptionAcceptationStatus: null,
           destinationReceptionWeight: null,
+          destinationReceptionRefusedWeight: null,
           destinationReceptionDate: null,
           destinationReceptionSignatureDate: null,
           destinationReceptionSignatureAuthor: null,
@@ -2438,6 +2434,7 @@ describe("Mutation.Bsda.sign", () => {
             reception: {
               acceptationStatus: "ACCEPTED",
               weight: 20,
+              refusedWeight: 0,
               date: new Date().toISOString() as any
             }
           }
@@ -2461,6 +2458,32 @@ describe("Mutation.Bsda.sign", () => {
         SIGNATURE_DATE
       );
       expect(data.signBsda.status).toBe("RECEIVED");
+    });
+
+    it("refused weight is not optional", async () => {
+      // Given
+      const bsda = await createBsda({
+        destinationReceptionRefusedWeight: null
+      });
+
+      // When
+      const { errors } = await updateBsda(destinationUser, bsda.id, {
+        // Reception data
+        destination: {
+          reception: {
+            acceptationStatus: "ACCEPTED",
+            weight: 20,
+            refusedWeight: null,
+            date: new Date().toISOString() as any
+          }
+        }
+      });
+
+      // Then
+      expect(errors).not.toBeUndefined();
+      expect(errors![0].message).toBe(
+        "La quantité refusée (destinationReceptionRefusedWeight) est requise"
+      );
     });
 
     it("should be able to sign reception after transport even if transporter 2 hasn't signed yet", async () => {
@@ -2556,6 +2579,8 @@ describe("Mutation.Bsda.sign", () => {
           destinationCompanySiret: destinationCompany.siret,
           destinationReceptionAcceptationStatus: "REFUSED",
           destinationReceptionRefusalReason: "Pas bon",
+          destinationReceptionWeight: 10,
+          destinationReceptionRefusedWeight: 10,
           workerCompanyName: null,
           workerCompanySiret: null
         },
@@ -2710,6 +2735,7 @@ describe("Mutation.Bsda.sign", () => {
               acceptationStatus: "PARTIALLY_REFUSED",
               refusalReason: "Pas bon",
               weight: 10,
+              refusedWeight: 5,
               date: new Date().toISOString() as any
             }
           }
@@ -2735,7 +2761,7 @@ describe("Mutation.Bsda.sign", () => {
         `Le déchet de l’entreprise emitter company a été partiellement refusé à réception`
       );
 
-      const expectedBody = `<li>Quantité réelle présentée nette : 10 tonnes</li> <li>Quantité refusée nette : Non renseignée</li> <li>Quantité acceptée nette : Non renseignée</li>`;
+      const expectedBody = `<li>Quantité réelle présentée nette : 10 tonnes</li> <li>Quantité refusée nette : 5 tonnes</li> <li>Quantité acceptée nette : 5 tonnes</li>`;
       expect(cleanse(body)).toContain(cleanse(expectedBody));
     });
 
@@ -2777,32 +2803,6 @@ describe("Mutation.Bsda.sign", () => {
       expect(sendMail as jest.Mock).not.toHaveBeenCalled();
     });
 
-    it("should not be able to sign reception after transport if quantityReceived = 0", async () => {
-      // Given
-      const bsda = await createBsda();
-
-      // When
-      await updateBsda(destinationUser, bsda.id, {
-        // Reception data
-        destination: {
-          reception: {
-            acceptationStatus: "ACCEPTED",
-            weight: 0,
-            date: new Date().toISOString() as any
-          }
-        }
-      });
-
-      // Step 2: sign reception
-      const { errors } = await signBsda(destinationUser, bsda.id, "RECEPTION");
-
-      // Then
-      expect(errors).not.toBeUndefined();
-      expect(errors[0].message).toBe(
-        "Le poids du déchet reçu doit être renseigné et non nul."
-      );
-    });
-
     it("should return error if trying to sign RECEPTION and reception params are not filled", async () => {
       // Given
       const bsda = await createBsda();
@@ -2834,7 +2834,8 @@ describe("Mutation.Bsda.sign", () => {
           destination: {
             reception: {
               acceptationStatus: "ACCEPTED",
-              weight: 20
+              weight: 20,
+              refusedWeight: 0
               // date: null, // Not required!
             },
             operation: {
@@ -2896,6 +2897,7 @@ describe("Mutation.Bsda.sign", () => {
         // Reception data
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationReceptionWeight: 20,
+        destinationReceptionRefusedWeight: 0,
         destinationReceptionDate: new Date(),
         destinationReceptionSignatureAuthor: destinationUser.name,
         destinationReceptionSignatureDate: new Date()
@@ -2916,6 +2918,7 @@ describe("Mutation.Bsda.sign", () => {
         // Reception data
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationReceptionWeight: 20,
+        destinationReceptionRefusedWeight: 0,
         destinationReceptionDate: new Date(),
         // Operation data
         destinationOperationCode: "R 5",
@@ -2942,6 +2945,7 @@ describe("Mutation.Bsda.sign", () => {
         // Reception data
         destinationReceptionAcceptationStatus: "ACCEPTED",
         destinationReceptionWeight: 20,
+        destinationReceptionRefusedWeight: 0,
         destinationReceptionDate: new Date()
       });
 

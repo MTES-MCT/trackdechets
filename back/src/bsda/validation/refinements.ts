@@ -773,8 +773,18 @@ export const checkDestinationReceptionRefusedWeight = (
     destinationReceptionAcceptationStatus
   } = bsd;
 
-  // Param is optional
   if (!isDefined(destinationReceptionRefusedWeight)) {
+    // If status is defined, it means that the reception happened. Refused weight is required
+    if (isDefined(destinationReceptionAcceptationStatus)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          "La quantité refusée (destinationReceptionRefusedWeight) est requise",
+        path
+      });
+      return;
+    }
+
     return;
   }
 
