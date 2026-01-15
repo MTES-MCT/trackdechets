@@ -224,6 +224,7 @@ describe("BSDA parsing", () => {
         destinationReceptionAcceptationStatus:
           WasteAcceptationStatus.PARTIALLY_REFUSED,
         destinationReceptionWeight: 1.5,
+        destinationReceptionRefusedWeight: 0.5,
         destinationReceptionRefusalReason: "pas très très conforme"
       };
 
@@ -1430,7 +1431,7 @@ describe("BSDA parsing", () => {
   });
 
   describe("destinationReceptionRefusedWeight", () => {
-    it("refusedWeight is not mandatory", async () => {
+    it("refusedWeight is mandatory", async () => {
       // Given
       const data: ZodBsda = {
         ...bsda,
@@ -1439,11 +1440,20 @@ describe("BSDA parsing", () => {
         destinationReceptionRefusedWeight: null
       };
 
-      // When
-      const parsed = parseBsda(data, context);
+      expect.assertions(1);
 
-      // Then
-      expect(parsed).toBeDefined();
+      // When
+      try {
+        parseBsda(data, context);
+      } catch (err) {
+        // Then
+        expect((err as ZodError).issues).toEqual([
+          expect.objectContaining({
+            message:
+              "La quantité refusée (destinationReceptionRefusedWeight) est requise"
+          })
+        ]);
+      }
     });
 
     it("refusedWeight cannot be defined if weight is not", async () => {
@@ -1471,24 +1481,21 @@ describe("BSDA parsing", () => {
       }
     });
 
-    it.each([null, undefined, 0])(
-      "waste is ACCEPTED > weight = 10 > refusedWeight can be %p",
-      async destinationReceptionRefusedWeight => {
-        // Given
-        const data: ZodBsda = {
-          ...bsda,
-          destinationReceptionAcceptationStatus: "ACCEPTED",
-          destinationReceptionWeight: 10,
-          destinationReceptionRefusedWeight
-        };
+    it("waste is ACCEPTED > weight = 10 > refusedWeight can be 0", async () => {
+      // Given
+      const data: ZodBsda = {
+        ...bsda,
+        destinationReceptionAcceptationStatus: "ACCEPTED",
+        destinationReceptionWeight: 10,
+        destinationReceptionRefusedWeight: 0
+      };
 
-        // When
-        const parsed = parseBsda(data, context);
+      // When
+      const parsed = parseBsda(data, context);
 
-        // Then
-        expect(parsed).toBeDefined();
-      }
-    );
+      // Then
+      expect(parsed).toBeDefined();
+    });
 
     it.each([5, 10, 15])(
       "waste is ACCEPTED > weight = 10 > refusedWeight can NOT be %p",

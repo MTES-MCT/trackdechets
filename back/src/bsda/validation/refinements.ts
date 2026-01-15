@@ -761,7 +761,7 @@ export const wasteAdrRefinement: (
   };
 };
 
-export const checkDestinationReceptionRefusedWeight = (
+export const checkBsdaDestinationReceptionRefusedWeight = (
   bsd,
   ctx: z.RefinementCtx
 ) => {
