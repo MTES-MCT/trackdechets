@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.02.1] 10/02/2026
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la possibilité de dupliquer une déclaration depuis la liste des déclarations passées [PR 4636](https://github.com/MTES-MCT/trackdechets/pull/4636)
+
 # [2026.01.1] 13/01/2026
 
 ### :boom: Breaking changes
