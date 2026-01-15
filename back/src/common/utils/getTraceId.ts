@@ -11,7 +11,7 @@ export function getOpenTelemetryTraceId(): string | undefined {
       const spanContext = activeSpan.spanContext();
       return spanContext.traceId;
     }
-  } catch (error) {
+  } catch {
     // Si OpenTelemetry n'est pas disponible ou désactivé, on ignore silencieusement
     // Cela permet au code de fonctionner même si OTEL est désactivé
   }

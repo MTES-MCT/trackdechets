@@ -10,7 +10,7 @@ export function initSentry() {
       dsn: SENTRY_DSN,
       environment: ENV_NAME,
       integrations: [new CaptureConsole({ levels: ["error"] })],
-      beforeSend(event, hint) {
+      beforeSend(event) {
         // Ajouter le trace ID OpenTelemetry à toutes les erreurs capturées
         const traceId = getOpenTelemetryTraceId();
         if (traceId) {
