@@ -123,7 +123,8 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
           }
         );
         // For duplication, exclude publicId from the form data
-        const { publicId: _, ...propsWithoutPublicId } = definedIncomingWasteProps;
+        const { publicId: _, ...propsWithoutPublicId } =
+          definedIncomingWasteProps;
 
         // Set the form values with the transformed data
         const resetValues = {
@@ -139,7 +140,9 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
         const initialDisabled = getInitialDisabledFields(resetValues);
         // For duplication, don't disable any fields
         setDisabledFieldNames(
-          isDuplicate ? initialDisabled : [...initialDisabled, "publicId", "reportForCompanySiret"]
+          isDuplicate
+            ? initialDisabled
+            : [...initialDisabled, "publicId", "reportForCompanySiret"]
         );
       }
       setLoadingLookup(false);
