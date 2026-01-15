@@ -15,6 +15,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la possibilité de dupliquer une déclaration depuis la liste des déclarations passées [PR 4636](https://github.com/MTES-MCT/trackdechets/pull/4636)
+
 # [2026.01.1] 13/01/2026
 
 ### :boom: Breaking changes
