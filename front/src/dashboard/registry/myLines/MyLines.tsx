@@ -223,6 +223,21 @@ export function MyLines() {
                     }
                   },
                   {
+                    title: "Dupliquer",
+                    isButton: true,
+                    handleClick: () => {
+                      const path = generatePath(TYPES_ROUTES[lookup.type]);
+                      const queryString = new URLSearchParams({
+                        siret: lookup.siret,
+                        publicId: lookup.publicId,
+                        duplicate: "1"
+                      }).toString();
+                      navigate(`${path}?${queryString}`, {
+                        state: { background: location }
+                      });
+                    }
+                  },
+                  {
                     title: "Annuler",
                     isButton: true,
                     handleClick: () => {
