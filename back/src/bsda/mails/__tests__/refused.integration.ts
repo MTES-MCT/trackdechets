@@ -4,6 +4,7 @@ import { renderBsdaRefusedEmail } from "../refused";
 import { buildPdfAsBase64 } from "../../pdf/generator";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { bsdaFactory } from "../../__tests__/factories";
+import Decimal from "decimal.js";
 
 jest.mock("../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -138,7 +139,8 @@ describe("renderBsdaRefusedEmail", () => {
         destinationReceptionAcceptationStatus:
           WasteAcceptationStatus.PARTIALLY_REFUSED,
         destinationReceptionRefusalReason: "Parce que !!",
-        destinationReceptionWeight: 10
+        destinationReceptionWeight: 10,
+        destinationReceptionRefusedWeight: 4
       }
     });
     const email = await renderBsdaRefusedEmail(bsda);
@@ -168,8 +170,17 @@ describe("renderBsdaRefusedEmail", () => {
       ?.dividedBy(1000)
       .toDecimalPlaces(6)
       .toNumber()} tonnes</li>
-    <li>Quantité refusée nette : Non renseignée</li>
-    <li>Quantité acceptée nette : Non renseignée</li>
+    <li>Quantité refusée nette : ${bsda.destinationReceptionRefusedWeight
+      ?.dividedBy(1000)
+      .toDecimalPlaces(6)
+      .toNumber()} tonnes</li>
+    <li>Quantité acceptée nette : ${new Decimal(
+      bsda.destinationReceptionWeight || 0
+    )
+      .minus(bsda.destinationReceptionRefusedWeight || 0)
+      .dividedBy(1000)
+      .toDecimalPlaces(6)
+      .toNumber()} tonnes</li>
     <li>
       Motif de refus :
       <span>${bsda.destinationReceptionRefusalReason}</span>`);

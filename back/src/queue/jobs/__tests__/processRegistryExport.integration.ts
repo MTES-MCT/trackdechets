@@ -364,7 +364,7 @@ describe("Process registry export job", () => {
       }
     });
 
-    it.only("should create a successful CSV export for INCOMING registry with BSDA data", async () => {
+    it("should create a successful CSV export for INCOMING registry with BSDA data", async () => {
       // Create test companies
       const { user: emitterUser, company: emitterCompany } =
         await userWithCompanyFactory("ADMIN");
