@@ -29,7 +29,7 @@ import {
   validatePreviousBsdas,
   validateDestinationReceptionWeight,
   wasteAdrRefinement,
-  checkDestinationReceptionRefusedWeight,
+  checkBsdaDestinationReceptionRefusedWeight,
   validateReceptionOperationCode
 } from "./refinements";
 import {
@@ -321,7 +321,7 @@ export const refinedSchema = rawBsdaSchema
   .superRefine(checkNoBothGroupingAndForwarding)
   .superRefine(checkTransporters)
   .superRefine(validateMultiTransporterPlates)
-  .superRefine(checkDestinationReceptionRefusedWeight);
+  .superRefine(checkBsdaDestinationReceptionRefusedWeight);
 
 // Transformations synchrones qui sont toujours
 // joués même si `enableCompletionTransformers=false`

@@ -202,6 +202,7 @@ const createTestBsda = async (
       reception: {
         date: date.toISOString(),
         weight: 1.2,
+        refusedWeight: 0,
         acceptationStatus: "ACCEPTED"
       },
       operation: {

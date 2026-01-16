@@ -23,7 +23,7 @@ import { bsdaEditionRules } from "../../../validation/rules";
 import { capitalize } from "../../../../common/strings";
 import { isBrokerRefinement } from "../../../../common/validation/zod/refinement";
 import { prisma } from "@td/prisma";
-import { checkDestinationReceptionRefusedWeight } from "../../../validation/refinements";
+import { checkBsdaDestinationReceptionRefusedWeight } from "../../../validation/refinements";
 import { getOperationModes } from "@td/constants";
 import { isDefined } from "../../../../common/helpers";
 
@@ -272,7 +272,7 @@ async function getFlatContent(
   const parsed = await schema
     // For the refused weight, we need the bsda previous state
     .superRefine((contentToValidate, ctx) =>
-      checkDestinationReceptionRefusedWeight(
+      checkBsdaDestinationReceptionRefusedWeight(
         { ...bsda, ...contentToValidate },
         ctx
       )

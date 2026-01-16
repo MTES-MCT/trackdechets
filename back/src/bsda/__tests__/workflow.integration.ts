@@ -79,6 +79,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
               reception: {
                   date: "2020-06-30"
                   weight: 1.1
+                  refusedWeight: 0
                   acceptationStatus: ACCEPTED
               }
               operation: {
@@ -240,6 +241,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   reception: {
                       date: "2020-06-30"
                       weight: 1.1
+                      refusedWeight: 0
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
@@ -430,6 +432,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
                   reception: {
                       date: "2020-06-30"
                       weight: 1.1
+                      refusedWeight: 0
                       acceptationStatus: ACCEPTED
                   }
                   operation: {
