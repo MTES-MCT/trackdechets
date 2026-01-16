@@ -259,16 +259,23 @@ export async function processRegistryExportJob(
         }
       };
     }
+
+    // optimize the query by checking if the export wants all waste types,
+    // in which case we don't need to filter by waste type
+    const ALL_WASTE_TYPES = ["DND", "DD", "TEXS"] as const;
+    const hasAllWasteTypes =
+      registryExport.wasteTypes?.length === 3 &&
+      ALL_WASTE_TYPES.every(type => registryExport.wasteTypes.includes(type));
+
     //craft the query
     const query: Prisma.RegistryLookupWhereInput = {
       ...condition,
       reportAsSiret: registryExport.delegateSiret ?? undefined,
       exportRegistryType: registryExport.registryType ?? undefined,
-      wasteType: registryExport.wasteTypes?.length
-        ? {
-            in: registryExport.wasteTypes
-          }
-        : undefined,
+      wasteType:
+        registryExport.wasteTypes?.length && !hasAllWasteTypes
+          ? { in: registryExport.wasteTypes }
+          : undefined,
       wasteCode: registryExport.wasteCodes?.length
         ? {
             in: registryExport.wasteCodes
