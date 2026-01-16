@@ -41,7 +41,7 @@ jobs:
       - run: npx nx run-many -t docker:build --all --parallel=3
       - name: Tag and Push Images
         run: |
-          TAG=${{ github.head_ref || github.ref_name }}
+          TAG=$(echo "${{ github.head_ref || github.ref_name }}" | sed 's|/|-|g')
           PROJECTS="api ui queues-runner queues-indexation queues-webhooks queues-gerico queues-bulk-indexation queues-bulk-indexation-master cron notifier"
           for project in $PROJECTS; do
             docker tag apps-${project}:latest ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
