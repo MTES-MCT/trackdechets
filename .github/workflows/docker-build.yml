@@ -7,6 +7,10 @@ on:
       - dev
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -34,14 +38,12 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: ${{ github.base_ref || github.ref_name }}
-      - run: npx nx affected -t docker:build --parallel=3
+      - run: npx nx run-many -t docker:build --all --parallel=3
       - name: Tag and Push Images
         run: |
           TAG=${{ github.ref_name }}
-          PROJECTS=$(npx nx show projects --affected --json | jq -r '.[]')
+          PROJECTS="api ui queues-runner queues-indexation queues-webhooks queues-gerico queues-bulk-indexation queues-bulk-indexation-master cron notifier"
           for project in $PROJECTS; do
-            if docker images --format "table {{.Repository}}" | grep -q "^${project}$"; then
-              docker tag ${project}:latest ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
-              docker push ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
-            fi
+            docker tag ${project}:latest ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
+            docker push ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
           done
