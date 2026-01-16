@@ -1,6 +1,7 @@
 name: Docker Build
 
 on:
+  pull_request:
   push:
     branches:
       - dev
@@ -11,11 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           filter: tree:0
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -27,3 +35,13 @@ jobs:
         with:
           main-branch-name: ${{ github.base_ref || github.ref_name }}
       - run: npx nx affected -t docker:build --parallel=3
+      - name: Tag and Push Images
+        run: |
+          TAG=${{ github.ref_name }}
+          PROJECTS=$(npx nx show projects --affected --json | jq -r '.[]')
+          for project in $PROJECTS; do
+            if docker images --format "table {{.Repository}}" | grep -q "^${project}$"; then
+              docker tag ${project}:latest ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
+              docker push ghcr.io/MTES-MCT/trackdechets/${project}:${TAG}
+            fi
+          done
