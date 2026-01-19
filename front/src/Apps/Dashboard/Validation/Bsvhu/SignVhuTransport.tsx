@@ -12,7 +12,7 @@ import {
   MutationUpdateBsvhuTransporterArgs
 } from "@td/codegen-ui";
 import { format, subMonths } from "date-fns";
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { generatePath, Link, useLocation, useParams } from "react-router-dom";
 import { z } from "zod";
@@ -30,6 +30,7 @@ import { BsvhuJourneySummary } from "./BsvhuJourneySummary";
 import WasteVhuSummary from "./WasteVhuSummary";
 import { RhfTagsInputWrapper } from "../../../Forms/Components/TagsInput/TagsInputWrapper";
 import { RhfTransportModeSelect } from "../../../Forms/Components/TransportMode/TransportMode";
+import TransporterRecepisseWrapper from "../../../../form/common/components/company/TransporterRecepisseWrapper";
 
 const transportModes = [
   TransportMode.Road,
@@ -114,6 +115,11 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
   );
 
   const transportMode = currentTransporter?.transport?.mode;
+
+  const signingTransporter = useMemo(
+    () => data?.bsvhu?.transporters?.find(t => !t.transport?.signature),
+    [data?.bsvhu]
+  );
 
   const initialState = {
     date: datetimeToYYYYMMDD(TODAY),
@@ -222,6 +228,13 @@ const SignVhuTransport = ({ bsvhuId, onClose }) => {
                 fieldName={"plates"}
                 hintText="2 max : Véhicule, remorque"
               />
+
+              {signingTransporter && (
+                <TransporterRecepisseWrapper
+                  transporter={signingTransporter}
+                  customClass="fr-col-md-11 fr-mb-2w fr-mt-2w"
+                />
+              )}
 
               <p className="fr-text fr-mt-2w fr-mb-2w">
                 En qualité <strong>de transporteur du déchet</strong>, j'atteste
