@@ -64,17 +64,18 @@ const getInitialDisabledFields = (values: {
 export function RegistryOutgoingWasteForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
+  const isDuplicate = queryParams.get("duplicate") === "1";
+  const hasPublicId = !!queryParams.get("publicId");
+  const hasSiret = !!queryParams.get("siret");
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>(
     getInitialDisabledFields(DEFAULT_VALUES)
   );
-  const [loadingLookup, setLoadingLookup] = useState(
-    !!queryParams.get("publicId") && !!queryParams.get("siret")
-  );
+  const [loadingLookup, setLoadingLookup] = useState(hasPublicId && hasSiret);
 
   const methods = useForm<FormValues>({
     defaultValues: {
       ...DEFAULT_VALUES,
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : undefined
+      reason: hasPublicId && !isDuplicate ? RegistryLineReason.Edit : undefined
     },
     resolver: zodResolver(schemaFromShape(outgoingWasteFormShape))
   });
@@ -85,7 +86,7 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
       publicId: queryParams.get("publicId"),
       siret: queryParams.get("siret")
     },
-    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    skip: !hasPublicId || !hasSiret,
     fetchPolicy: "network-only",
     onCompleted: data => {
       if (data?.registryLookup?.outgoingWaste) {
@@ -121,23 +122,28 @@ export function RegistryOutgoingWasteForm({ onClose }: Props) {
             return false;
           }
         );
+        // For duplication, exclude publicId from the form data
+        const { publicId: _, ...propsWithoutPublicId } =
+          definedOutgoingWasteProps;
+
         // Set the form values with the transformed data
         const resetValues = {
           ...DEFAULT_VALUES,
-          ...definedOutgoingWasteProps,
+          ...(isDuplicate ? propsWithoutPublicId : definedOutgoingWasteProps),
           dispatchDate: isoDateToHtmlDate(
             definedOutgoingWasteProps.dispatchDate
           ),
-          reason: RegistryLineReason.Edit,
+          reason: isDuplicate ? undefined : RegistryLineReason.Edit,
           transporter: transporters
         };
         methods.reset(resetValues);
         const initialDisabled = getInitialDisabledFields(resetValues);
-        setDisabledFieldNames([
-          ...initialDisabled,
-          "publicId",
-          "reportForCompanySiret"
-        ]);
+        // For duplication, don't disable any fields
+        setDisabledFieldNames(
+          isDuplicate
+            ? initialDisabled
+            : [...initialDisabled, "publicId", "reportForCompanySiret"]
+        );
       }
       setLoadingLookup(false);
     },
