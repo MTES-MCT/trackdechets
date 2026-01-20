@@ -1,5 +1,5 @@
 import { logger } from "@td/logger";
-import { prisma } from "@td/prisma";
+import { CompanyType, prisma, WasteProcessorType } from "@td/prisma";
 import {
   getUploadWithWritableStream,
   RegistryV2IncomingTexsInclude,
@@ -192,12 +192,36 @@ export async function processRegistryExportJob(
     const outputStream = streamInfos.s3Stream;
 
     let condition: Prisma.RegistryLookupWhereInput;
-    // if there is a chance that DND BSDs are in the export
-    if (
+    /**
+     * Filtering logic for DND (Non-Dangerous Waste) BSDs in regulatory registry exports.
+     * 
+     * 1. If a company has NOT activated the DND traceability option (hasEnabledRegistryDndFromBsdSince is null):
+     *    - No DND BSDs appear in regulatory registries for that company
+     *    - DD (Dangerous Waste) and TEXS (waste codes 17 05 04, 17 05 06, 20 02 02) BSDs can still appear
+     *    - REGISTRY declarations always appear
+     *
+     * 2. If a company HAS activated the DND traceability option (hasEnabledRegistryDndFromBsdSince is set):
+     *    a. TEXS BSDs (waste codes 17 05 04, 17 05 06, 20 02 02):
+     *       - Always appear in regulatory registries, regardless of company profile type
+     *
+     *    b. DND BSDs (other non-dangerous waste codes):
+     *       - Only appear if the company has at least one of these waste processor sub-profiles:
+     *         * "Incinération de déchets non dangereux" (Non-dangerous waste incineration)
+     *         * "Installation de stockage de déchets non dangereux" (Non-dangerous waste storage)
+     *       - Only appear for BSDs dated on or after the activation date (hasEnabledRegistryDndFromBsdSince)
+     *       - If the company doesn't have these profiles, DND BSDs are excluded even if the option is enabled
+     *
+     * This filter is only applied when:
+     * - The export may contain DND waste types (no wasteTypes filter OR DND is included)
+     * - The export is not REGISTRY-only (declarationType !== "REGISTRY")
+     * - The export is not SSD type (registryType !== "SSD", as SSD exports don't contain BSDs)
+     */
+
+    if ( // if there is a chance that DND BSDs are in the export
       (!registryExport.wasteTypes?.length ||
         registryExport.wasteTypes.some(wasteType => wasteType === "DND")) && // the user wants DNDs in the export
-      registryExport.declarationType !== "REGISTRY" && // the user only wants BSDs in the export
-      registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry
+      registryExport.declarationType !== "REGISTRY" && // the user doesn't want a RNDTS declaration only export
+      registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry (no BSDs in SSD export)
     ) {
       const companies = await prisma.company.findMany({
         where: {
@@ -207,33 +231,63 @@ export async function processRegistryExportJob(
         },
         select: {
           orgId: true,
+          companyTypes: true,
+          wasteProcessorTypes: true,
           hasEnabledRegistryDndFromBsdSince: true
         }
       });
       // create a pre-filter that hides DND BSDs pre-hasEnabledRegistryDndFromBsdSince if it's defined for a company
       const orCondition = companies.map(company => {
         if (company.hasEnabledRegistryDndFromBsdSince) {
-          return {
-            siret: company.orgId,
-            OR: [
-              {
-                declarationType: "REGISTRY"
-              },
-              {
-                wasteType: { in: ["DD", "TEXS"] },
-                declarationType: "BSD"
-              },
-              {
-                wasteType: "DND",
-                declarationType: "BSD",
-                date: {
-                  gte: company.hasEnabledRegistryDndFromBsdSince
+          // Company has activated DND traceability
+          if (
+            company.companyTypes.includes(CompanyType.WASTEPROCESSOR) &&
+            (
+              company.wasteProcessorTypes.includes(WasteProcessorType.NON_DANGEROUS_WASTES_INCINERATION) ||
+              company.wasteProcessorTypes.includes(WasteProcessorType.NON_DANGEROUS_WASTES_STORAGE)
+            )
+          ) {
+            // Company is a waste processor with non-dangerous waste incineration or storage profile
+            // Include: REGISTRY declarations, DD/TEXS BSDs, and DND BSDs after activation date
+            return {
+              siret: company.orgId,
+              OR: [
+                {
+                  declarationType: "REGISTRY"
+                },
+                {
+                  wasteType: { in: ["DD", "TEXS"] },
+                  declarationType: "BSD"
+                },
+                {
+                  wasteType: "DND",
+                  declarationType: "BSD",
+                  date: {
+                    gte: company.hasEnabledRegistryDndFromBsdSince
+                  }
                 }
-              }
-            ]
-          } as Prisma.RegistryLookupWhereInput;
+              ]
+            } as Prisma.RegistryLookupWhereInput;
+          } else {
+            // Company has activated DND traceability but doesn't have the required waste processor profiles
+            // Include: REGISTRY declarations and DD/TEXS BSDs only (exclude DND BSDs)
+            return {
+              siret: company.orgId,
+              OR: [
+                {
+                  declarationType: "REGISTRY"
+                },
+                {
+                  wasteType: { in: ["DD", "TEXS"] },
+                  declarationType: "BSD"
+                }
+              ]
+            } as Prisma.RegistryLookupWhereInput;
+          }
+
         } else {
-          // the company has not enabled DND BSDs, so we always hide them
+          // Company has NOT activated DND traceability
+          // Include: REGISTRY declarations and DD/TEXS BSDs only (exclude all DND BSDs)
           return {
             siret: company.orgId,
             OR: [
