@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.02.1] 10/02/2026
+
+### :boom: Breaking changes
+
+- Suppression du champ `consistence` sur WasteDetails et WasteDetailsInput (BSDD). L'utilisation du champ `consistences` est maintenant obligatoire [PR 4634](https://github.com/MTES-MCT/trackdechets/pull/4634)
+
 # [2026.01.1] 13/01/2026
 
 ### :boom: Breaking changes
