@@ -194,7 +194,7 @@ export async function processRegistryExportJob(
     let condition: Prisma.RegistryLookupWhereInput;
     /**
      * Filtering logic for DND (Non-Dangerous Waste) BSDs in regulatory registry exports.
-     * 
+     *
      * 1. If a company has NOT activated the DND traceability option (hasEnabledRegistryDndFromBsdSince is null):
      *    - No DND BSDs appear in regulatory registries for that company
      *    - DD (Dangerous Waste) and TEXS (waste codes 17 05 04, 17 05 06, 20 02 02) BSDs can still appear
@@ -217,7 +217,8 @@ export async function processRegistryExportJob(
      * - The export is not SSD type (registryType !== "SSD", as SSD exports don't contain BSDs)
      */
 
-    if ( // if there is a chance that DND BSDs are in the export
+    if (
+      // if there is a chance that DND BSDs are in the export
       (!registryExport.wasteTypes?.length ||
         registryExport.wasteTypes.some(wasteType => wasteType === "DND")) && // the user wants DNDs in the export
       registryExport.declarationType !== "REGISTRY" && // the user doesn't want a RNDTS declaration only export
@@ -242,10 +243,12 @@ export async function processRegistryExportJob(
           // Company has activated DND traceability
           if (
             company.companyTypes.includes(CompanyType.WASTEPROCESSOR) &&
-            (
-              company.wasteProcessorTypes.includes(WasteProcessorType.NON_DANGEROUS_WASTES_INCINERATION) ||
-              company.wasteProcessorTypes.includes(WasteProcessorType.NON_DANGEROUS_WASTES_STORAGE)
-            )
+            (company.wasteProcessorTypes.includes(
+              WasteProcessorType.NON_DANGEROUS_WASTES_INCINERATION
+            ) ||
+              company.wasteProcessorTypes.includes(
+                WasteProcessorType.NON_DANGEROUS_WASTES_STORAGE
+              ))
           ) {
             // Company is a waste processor with non-dangerous waste incineration or storage profile
             // Include: REGISTRY declarations, DD/TEXS BSDs, and DND BSDs after activation date
@@ -284,7 +287,6 @@ export async function processRegistryExportJob(
               ]
             } as Prisma.RegistryLookupWhereInput;
           }
-
         } else {
           // Company has NOT activated DND traceability
           // Include: REGISTRY declarations and DD/TEXS BSDs only (exclude all DND BSDs)
