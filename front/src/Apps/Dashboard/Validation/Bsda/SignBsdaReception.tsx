@@ -32,7 +32,7 @@ import {
   SIGN_BsDA,
   UPDATE_BSDA
 } from "../../../common/queries/bsda/queries";
-import { generatePath, Link, useParams } from "react-router-dom";
+import { generatePath, Link, useLocation, useParams } from "react-router-dom";
 import routes from "../../../routes";
 import { getComputedState } from "../../Creation/getComputedState";
 import SignBsdaOperation from "./SignBsdaOperation";
@@ -133,6 +133,7 @@ export type ZodBsdaReception = z.infer<typeof schema>;
 
 const SignBsdaReception = ({ bsdaId, onClose }) => {
   const { siret } = useParams<{ siret: string }>();
+  const location = useLocation();
 
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
@@ -310,6 +311,7 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
                 id: bsda.id
               })}
               className="fr-btn fr-btn--primary"
+              state={{ background: location }}
             >
               Mettre le bordereau à jour pour le signer
             </Link>
