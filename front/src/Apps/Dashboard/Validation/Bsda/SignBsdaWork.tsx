@@ -14,7 +14,7 @@ import {
 import { subMonths } from "date-fns";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { generatePath, Link, useParams } from "react-router-dom";
+import { generatePath, Link, useLocation, useParams } from "react-router-dom";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
@@ -139,6 +139,7 @@ export type ZodBdsaWork = z.infer<typeof schema>;
 
 const SignBsdaWork = ({ bsdaId, onClose }) => {
   const { siret } = useParams<{ siret: string }>();
+  const location = useLocation();
 
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
@@ -233,6 +234,7 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
               id: bsda.id
             })}
             className="fr-btn fr-btn--primary"
+            state={{ background: location }}
           >
             Mettre le bordereau à jour pour le signer
           </Link>
