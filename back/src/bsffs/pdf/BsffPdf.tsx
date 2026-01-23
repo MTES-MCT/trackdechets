@@ -538,6 +538,10 @@ function BsffOnePackagingOperation({
         />{" "}
         D 15
       </div>
+      <div>
+        Mode de traitement :{" "}
+        {getOperationModeLabel(packaging?.operation?.mode as OperationMode)}
+      </div>
       <div> Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
       <br />
       <div>
@@ -590,14 +594,14 @@ function BsffPackagingOperation({ packaging }: { packaging: BsffPackaging }) {
           `(
         ${packaging?.operation?.description})`}
       </div>
-      {packaging?.operation?.noTraceability && (
-        <div>Rupture de traçabilité autorisée par arrêté préfectoral</div>
-      )}
-      <div>Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
       <div>
         Mode de traitement :{" "}
         {getOperationModeLabel(packaging?.operation?.mode as OperationMode)}
       </div>
+      {packaging?.operation?.noTraceability && (
+        <div>Rupture de traçabilité autorisée par arrêté préfectoral</div>
+      )}
+      <div>Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
       {packaging?.operation?.nextDestination?.company?.siret && (
         <>
           <div>
