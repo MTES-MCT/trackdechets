@@ -12,6 +12,17 @@ import { ErrorCode } from "../../../../common/errors";
 import { AuthType } from "../../../../auth/auth";
 import { subDays } from "date-fns";
 
+const INVITE_USER_TO_COMPANY = gql`
+  mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
+    inviteUserToCompany(email: $email, siret: $siret, role: $role){
+      users {
+        email
+        isActive
+      }
+    }
+  }
+`;
+
 const MY_COMPANIES = gql`
   query MyCompanies(
     $first: Int
@@ -45,6 +56,7 @@ const MY_COMPANIES = gql`
           users {
             email
             name
+            isActive
           }
           userRole
           userPermissions
@@ -391,6 +403,56 @@ describe("query { myCompanies }", () => {
       .map(u => u.name);
     expect(userNames?.length).toBe(1);
     expect(userNames).toStrictEqual([member.name]);
+  }, 20000);
+
+  it("should obfuscate isActive if user has not joined", async () => {
+    // Given
+    const user = await userFactory();
+    const company = await companyFactory();
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+
+    const { query, mutate } = makeClient(user);
+    const { errors: inviteErrors } = await mutate(INVITE_USER_TO_COMPANY, {
+      variables: {
+        email: "test@mail.com",
+        siret: company.siret,
+        role: "MEMBER"
+      }
+    });
+    expect(inviteErrors).toBeUndefined();
+
+    // When
+    const { data: page1, errors } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(page1!.myCompanies.edges[0].node.users?.find(u => u.email === "test@mail.com")?.isActive).toBe(null);
+  }, 20000);
+
+  it("should not obfuscate isActive if user has joined", async () => {
+    // Given
+    const user = await userFactory();
+    const member = await userFactory();
+    const company = await companyFactory();
+
+    await associateUserToCompany(user.id, company.orgId, "ADMIN");
+    // association created 8 days ago - no more name obfuscation
+    await associateUserToCompany(member.id, company.orgId, "MEMBER", {
+      automaticallyAccepted: true,
+      createdAt: subDays(new Date(), 8)
+    });
+
+    // When
+    const { query } = makeClient(user);
+    const { data: page1, errors } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(page1!.myCompanies.edges[0].node.users?.find(u => u.email === member.email)?.isActive).toBe(true);
   }, 20000);
 
   it("should obfuscate user name when association comes from a recent automatically accepted invitation", async () => {
