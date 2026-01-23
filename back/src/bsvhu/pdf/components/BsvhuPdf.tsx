@@ -468,7 +468,9 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </p>
             <p className="mb-3">
               N° du ou des lots entrant-s (*) :{" "}
-              {bsvhu?.identification?.numbers?.join(", ")}
+              {bsvhu?.destination?.reception?.identification?.numbers?.join(
+                ", "
+              )}
             </p>
           </div>
           <div className="BoxCol">
