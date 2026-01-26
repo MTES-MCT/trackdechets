@@ -1,6 +1,10 @@
 @import "../../../../scss/Constants.scss";
 @import "../../../../scss/Breakpoints.scss";
 
+.fr-header__brand-top {
+  flex-wrap: wrap;
+}
+
 .header {
   background-color: #fff;
   width: 100%;
