@@ -94,4 +94,18 @@
       width: 255px;
     }
   }
+
+  &--RECEIVED--BSDASRI,
+  &--RECEIVED--BSDA,
+  &--RECEIVED--BSVHU,
+  &--RECEIVED--BSPAOH,
+  &--ACCEPTED--BSDD,
+  &--ACCEPTED--BSFF,
+  &--GROUPED--BSFF,
+  &--PARTIALLY_REFUSED--BSFF,
+  &--PARTIALLY_REFUSED--BSPAOH,
+  &--INTERMEDIATELY_PROCESSED--BSFF {
+    background-color: #006a6f;
+    color: #e5fbfd;
+  }
 }
