@@ -106,18 +106,19 @@ const createAdminRequest = async (
     async () => {
       // Check pending request count
       const { count, create } = getAdminRequestRepository(user);
-      
+
       const pendingRequests = await count({
         userId: user.id,
         status: AdminRequestStatus.PENDING
       });
 
-      if (pendingRequests >= 5) { // MAX_SIMULTANEOUS_PENDING_REQUESTS
+      if (pendingRequests >= 5) {
+        // MAX_SIMULTANEOUS_PENDING_REQUESTS
         throw new ForbiddenError(
           `Il n'est pas possible d'avoir plus de 5 demandes en cours.`
         );
       }
-      
+
       const collaboratorId =
         collaboratorCheckFailed || !collaborator ? null : collaborator.id;
 

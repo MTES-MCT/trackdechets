@@ -22,8 +22,6 @@ import { getAdminRequestRepository } from "../../../repository";
 import { addDays } from "date-fns";
 import { isDefinedStrict } from "../../../../common/helpers";
 
-
-
 // Generates an 8 digit code, using only numbers. Can include and start with zeros
 export const generateCode = () => {
   return Math.floor(10000000 + Math.random() * 90000000).toString();
@@ -198,4 +196,3 @@ export const getAdminOnlyEndDate = (): Date => {
 
   return sameDayMidnight(resultDate);
 };
-
