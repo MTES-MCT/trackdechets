@@ -13,8 +13,12 @@ import { AuthType } from "../../../../auth/auth";
 import { subDays } from "date-fns";
 
 const INVITE_USER_TO_COMPANY = gql`
-  mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
-    inviteUserToCompany(email: $email, siret: $siret, role: $role){
+  mutation InviteUserToCompany(
+    $email: String!
+    $siret: String!
+    $role: UserRole!
+  ) {
+    inviteUserToCompany(email: $email, siret: $siret, role: $role) {
       users {
         email
         isActive
@@ -428,7 +432,11 @@ describe("query { myCompanies }", () => {
 
     // Then
     expect(errors).toBeUndefined();
-    expect(page1!.myCompanies.edges[0].node.users?.find(u => u.email === "test@mail.com")?.isActive).toBe(null);
+    expect(
+      page1!.myCompanies.edges[0].node.users?.find(
+        u => u.email === "test@mail.com"
+      )?.isActive
+    ).toBe(null);
   }, 20000);
 
   it("should not obfuscate isActive if user has joined", async () => {
@@ -452,7 +460,11 @@ describe("query { myCompanies }", () => {
 
     // Then
     expect(errors).toBeUndefined();
-    expect(page1!.myCompanies.edges[0].node.users?.find(u => u.email === member.email)?.isActive).toBe(true);
+    expect(
+      page1!.myCompanies.edges[0].node.users?.find(
+        u => u.email === member.email
+      )?.isActive
+    ).toBe(true);
   }, 20000);
 
   it("should obfuscate user name when association comes from a recent automatically accepted invitation", async () => {

@@ -16,11 +16,11 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     );
 
     return users.map(user => {
-      if(user.isPendingInvitation){
+      if (user.isPendingInvitation) {
         return {
           ...user,
           isActive: null
-        }
+        };
       }
 
       return user;
