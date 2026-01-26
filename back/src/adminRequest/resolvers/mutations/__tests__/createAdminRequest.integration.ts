@@ -120,7 +120,7 @@ describe("Mutation createAdminRequest", () => {
     );
   });
 
-  it("should throw error if collaborator email does not exist", async () => {
+  it("should not throw error if collaborator email does not exist (to not leak info)", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -140,14 +140,19 @@ describe("Mutation createAdminRequest", () => {
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      "Ce collaborateur n'est pas inscrit sur Trackdéchets."
-    );
+    // Then: should not reveal collaborator existence — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    // Request should have been created but without a collaborator id
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 
-  it("should throw error if collaborator does not belong to target company", async () => {
+  it("should not throw error if collaborator does not belong to target company (to not leak info)", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const collaborator = await userFactory({ email: "collaborator@mail.com" });
@@ -168,11 +173,16 @@ describe("Mutation createAdminRequest", () => {
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      "Ce collaborateur n'est pas rattaché à cet établissement."
-    );
+    // Then: should not reveal collaborator existence/affiliation — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    // Request should have been created but without a collaborator id
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 
   it("should throw if requesting validation by collaborator email but providing no collaborator email", async () => {
@@ -1280,10 +1290,14 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
-    );
+    // Then: should not reveal user existence — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 });

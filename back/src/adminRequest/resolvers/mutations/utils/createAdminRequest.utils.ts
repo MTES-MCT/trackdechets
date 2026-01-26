@@ -33,41 +33,12 @@ export const checkCanCreateAdminRequest = async (
   user: Express.User,
   adminRequestInput: ParsedCreateAdminRequestInput,
   company: Company,
-  companyAssociation: CompanyAssociation | null,
-  collaborator: User | null
+  companyAssociation: CompanyAssociation | null
 ) => {
   if (companyAssociation?.role === UserRole.ADMIN) {
     throw new UserInputError(
       "Vous êtes déjà administrateur de cet établissement."
     );
-  }
-
-  if (adminRequestInput.collaboratorEmail) {
-    if (!collaborator) {
-      throw new UserInputError(
-        "Ce collaborateur n'est pas inscrit sur Trackdéchets."
-      );
-    }
-
-    if (collaborator && collaborator.id === user.id) {
-      throw new UserInputError(
-        "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
-      );
-    }
-
-    const collaboratorCompanyAssociation =
-      await prisma.companyAssociation.findFirst({
-        where: {
-          userId: collaborator.id,
-          companyId: company.id
-        }
-      });
-
-    if (!collaboratorCompanyAssociation) {
-      throw new UserInputError(
-        "Ce collaborateur n'est pas rattaché à cet établissement."
-      );
-    }
   }
 
   const { findFirst, count } = getAdminRequestRepository(user);
@@ -120,6 +91,41 @@ export const checkCanCreateAdminRequest = async (
   if (existingRefusedRequest) {
     throw new UserInputError(
       "Une demande a déjà été refusée pour cet établissement au cours des 7 derniers jours."
+    );
+  }
+};
+
+export const checkCollaboratorForAdminRequest = async (
+  user: Express.User,
+  adminRequestInput: ParsedCreateAdminRequestInput,
+  company: Company,
+  collaborator: User | null
+) => {
+  if (!adminRequestInput.collaboratorEmail) return;
+
+  if (!collaborator) {
+    throw new UserInputError(
+      "Ce collaborateur n'est pas inscrit sur Trackdéchets."
+    );
+  }
+
+  if (collaborator && collaborator.id === user.id) {
+    throw new UserInputError(
+      "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
+    );
+  }
+
+  const collaboratorCompanyAssociation =
+    await prisma.companyAssociation.findFirst({
+      where: {
+        userId: collaborator.id,
+        companyId: company.id
+      }
+    });
+
+  if (!collaboratorCompanyAssociation) {
+    throw new UserInputError(
+      "Ce collaborateur n'est pas rattaché à cet établissement."
     );
   }
 };
