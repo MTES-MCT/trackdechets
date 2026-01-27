@@ -24,8 +24,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash-shortname"
-        , expiresAt: new Date()
+        hash: "hash-shortname",
+        expiresAt: new Date()
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -49,8 +49,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash-specialchars"
-        , expiresAt: new Date()
+        hash: "hash-specialchars",
+        expiresAt: new Date()
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -143,8 +143,8 @@ describe("joinWithInvite mutation", () => {
           email: invitee,
           companySiret: company.siret!,
           role,
-          hash: "hash"
-          , expiresAt: new Date()
+          hash: "hash",
+          expiresAt: new Date()
         }
       });
 
@@ -202,8 +202,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: UserRole.MEMBER,
-        hash: "hash"
-        , expiresAt: new Date()
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
 
@@ -236,8 +236,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company1.siret!,
         role: "MEMBER",
-        hash: "hash1"
-        , expiresAt: new Date()
+        hash: "hash1",
+        expiresAt: new Date()
       }
     });
 
@@ -246,8 +246,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company2.siret!,
         role: "MEMBER",
-        hash: "hash2"
-        , expiresAt: new Date()
+        hash: "hash2",
+        expiresAt: new Date()
       }
     });
 
@@ -286,8 +286,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
-        , expiresAt: new Date()
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
     const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
@@ -322,8 +322,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
-        , expiresAt: new Date()
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
 
@@ -353,8 +353,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
-        , expiresAt: new Date()
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
 

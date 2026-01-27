@@ -18,7 +18,7 @@ const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){
     changeUserRole(userId: $userId, orgId: $orgId, role: $role){
       email
-      role
+      role 
     }
   }
 `;
@@ -195,8 +195,8 @@ describe("mutation changeUserRole", () => {
         hash: userAccoutHash,
         email: invitedUserEmail,
         role: "MEMBER",
-        companySiret: company.siret!
-        , expiresAt: new Date()
+        companySiret: company.siret!,
+        expiresAt: new Date()
       }
     });
     const { data } = await mutate<Pick<Mutation, "changeUserRole">>(
