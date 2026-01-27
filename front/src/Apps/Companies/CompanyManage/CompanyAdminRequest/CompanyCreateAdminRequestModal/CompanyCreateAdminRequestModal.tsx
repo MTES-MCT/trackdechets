@@ -96,8 +96,8 @@ export const CompanyCreateAdminRequestModal = ({
   return (
     <TdModal
       onClose={closeAndReset}
-      title="Demander le droits administrateur"
-      ariaLabel="Demander le droits administrateur"
+      title="Demander les droits administrateur"
+      ariaLabel="Demander les droits administrateur"
       isOpen={isOpen}
       size="L"
     >
