@@ -5,7 +5,10 @@ import { associateUserToCompany } from "../../users/database";
  * Accept all pending invitations for users who have already joined by invitation link
  */
 export default async function acceptPendingInvitations() {
-  const invitations = await prisma.userAccountHash.findMany();
+  // only consider non-expired invitations
+  const invitations = await prisma.userAccountHash.findMany({
+    where: { expiresAt: { gte: new Date() } }
+  });
   for (const invitation of invitations) {
     const user = await prisma.user.findUnique({
       where: { email: invitation.email }

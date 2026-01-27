@@ -85,11 +85,12 @@ const changeUserRoleResolver: MutationResolvers["changeUserRole"] = async (
     return assocationToComp;
   }
 
-  const userAccountHash = await prisma.userAccountHash.findUnique({
+  const userAccountHash = await prisma.userAccountHash.findFirst({
     where: {
       id: args.userId,
       companySiret: args.orgId,
-      acceptedAt: null
+      acceptedAt: null,
+      expiresAt: { gte: new Date() }
     },
     select: {
       id: true

@@ -25,7 +25,8 @@ describe("query / invitation", () => {
         email: "john.snow@trackdechets.fr",
         companySiret: siretify(2),
         hash: "azerty",
-        role: "MEMBER"
+        role: "MEMBER",
+        expiresAt: new Date()
       }
     });
     const { data } = await query<Pick<Query, "invitation">>(INVITATION, {
@@ -44,5 +45,23 @@ describe("query / invitation", () => {
     });
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
+  });
+
+  it("should not return expired invitations", async () => {
+    const { query } = makeClient();
+    const userAccountHash = await prisma.userAccountHash.create({
+      data: {
+        email: "expired@trackdechets.fr",
+        companySiret: siretify(3),
+        hash: "oldhash",
+        role: "MEMBER",
+        expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
+      }
+    });
+    const { errors } = await query<Pick<Query, "invitation">>(INVITATION, {
+      variables: { hash: userAccountHash.hash }
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors![0].message).toEqual("Cette invitation n'existe pas");
   });
 });

@@ -10,7 +10,11 @@ const invitationResolver: QueryResolvers["invitation"] = async (
   parent,
   { hash }
 ) => {
-  const h = await getUserAccountHashOrNotFound({ hash });
+  const h = await getUserAccountHashOrNotFound({
+    hash,
+    acceptedAt: null,
+    expiresAt: { gte: new Date() }
+  });
   // type casting is necessary here as long as we
   // do not expose READER and DRIVER role in the API
   return { ...h, role: h.role };

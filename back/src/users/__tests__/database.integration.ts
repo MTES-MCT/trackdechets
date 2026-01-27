@@ -36,7 +36,8 @@ describe("createUserAccountHash", () => {
         email,
         role,
         companySiret: siret,
-        hash: "hash"
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
     try {

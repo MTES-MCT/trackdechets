@@ -196,6 +196,7 @@ describe("mutation changeUserRole", () => {
         email: invitedUserEmail,
         role: "MEMBER",
         companySiret: company.siret!
+        , expiresAt: new Date()
       }
     });
     const { data } = await mutate<Pick<Mutation, "changeUserRole">>(

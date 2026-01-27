@@ -35,7 +35,8 @@ export async function createUserAccountHash(
 ) {
   // check for existing records
   const existingHashes = await prisma.userAccountHash.findMany({
-    where: { email, companySiret: siret }
+    // consider only active (non-expired) invites when checking duplicates
+    where: { email, companySiret: siret, expiresAt: { gte: new Date() } }
   });
 
   if (existingHashes && existingHashes.length > 0) {
@@ -55,6 +56,7 @@ export async function createUserAccountHash(
       email,
       role,
       companySiret: siret
+      , expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     }
   });
 }
@@ -188,7 +190,8 @@ export async function userExists(unsafeEmail: string) {
  */
 export async function acceptNewUserCompanyInvitations(user: User) {
   const existingHashes = await prisma.userAccountHash.findMany({
-    where: { email: user.email }
+    // only accept pending, non-expired invitations
+    where: { email: user.email, expiresAt: { gte: new Date() } }
   });
 
   if (!existingHashes.length) {

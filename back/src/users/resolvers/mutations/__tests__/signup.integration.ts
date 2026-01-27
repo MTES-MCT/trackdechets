@@ -284,6 +284,7 @@ describe("Mutation.signup", () => {
         role: "MEMBER"
       }
     });
+    await prisma.userAccountHash.update({ where: { id: invitation.id }, data: { expiresAt: new Date() } });
 
     await mutate(SIGNUP, {
       variables: {

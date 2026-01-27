@@ -24,7 +24,8 @@ describe("getInvitedUsers", () => {
         companySiret: company.siret!,
         hash: "hash1",
         role: "MEMBER",
-        acceptedAt: new Date()
+        acceptedAt: new Date(),
+        expiresAt: new Date()
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(
@@ -41,7 +42,8 @@ describe("getInvitedUsers", () => {
         email: "john.snow@trackdechets.fr",
         companySiret: company.siret!,
         hash: "hash2",
-        role: "MEMBER"
+        role: "MEMBER",
+        expiresAt: new Date()
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(

@@ -20,7 +20,8 @@ describe("acceptPendingInvitations", () => {
           email: "john.snow@trackdechets.fr",
           companySiret: company.siret!,
           role: "MEMBER",
-          hash: "hash1"
+          hash: "hash1",
+          expiresAt: new Date()
         }
       });
       await acceptPendingInvitations();
@@ -45,7 +46,8 @@ describe("acceptPendingInvitations", () => {
           email: user.email,
           companySiret: company.siret!,
           role: "MEMBER",
-          hash: "hash2"
+          hash: "hash2",
+          expiresAt: new Date()
         }
       });
       await acceptPendingInvitations();
@@ -69,7 +71,8 @@ describe("acceptPendingInvitations", () => {
           email: user.email,
           companySiret: company.siret!,
           role: "MEMBER",
-          hash: "hash3"
+          hash: "hash3",
+          expiresAt: new Date()
         }
       });
       await acceptPendingInvitations();

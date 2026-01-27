@@ -30,7 +30,7 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   );
 
   const invitations = await prisma.userAccountHash.findMany({
-    where: { email, companySiret: siret }
+    where: { email, companySiret: siret, expiresAt: { gte: new Date() } }
   });
 
   if (invitations.length === 0) {

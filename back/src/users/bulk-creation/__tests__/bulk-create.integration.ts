@@ -275,7 +275,8 @@ describe("bulk create users and companies from csv files", () => {
         email: "john.snow@trackdechets.fr",
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
 
@@ -313,7 +314,8 @@ describe("bulk create users and companies from csv files", () => {
         email: "john.snow@trackdechets.fr",
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
+        hash: "hash",
+        expiresAt: new Date()
       }
     });
 
