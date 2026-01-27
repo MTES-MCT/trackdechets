@@ -665,7 +665,7 @@ export const getAdminRequestEmailPayloads = async () => {
   const payloads: Mail[] = [];
   for (const adminRequest of adminRequests) {
     // Careful with null collaboratorIds
-    if (adminRequest.collaboratorId === null) {
+    if (!adminRequest.collaboratorId) {
       continue;
     }
 

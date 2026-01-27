@@ -2386,6 +2386,20 @@ describe("getAdminRequestEmailPayloads", () => {
       }
     });
 
+    // Simulate a request created when collaborator validation failed: collaboratorId = null
+    // The function under test should ignore it and not crash.
+    await prisma.adminRequest.create({
+      data: {
+        user: { connect: { id: user1.id } },
+        company: { connect: { id: company2.id } },
+        status: AdminRequestStatus.PENDING,
+        validationMethod:
+          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+        collaboratorId: null,
+        adminOnlyEndDate: TODAY
+      }
+    });
+
     // When
     const payloads = await getAdminRequestEmailPayloads();
 
