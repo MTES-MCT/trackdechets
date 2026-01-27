@@ -78,7 +78,8 @@ const searchCompaniesMock = (
   request: {
     query: SEARCH_COMPANIES,
     variables: {
-      clue: transporter.company?.orgId
+      clue: transporter.company?.orgId,
+      allowForeignCompanies: true
     }
   },
   result: () => {

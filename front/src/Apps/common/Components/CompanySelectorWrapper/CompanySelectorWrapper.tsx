@@ -112,7 +112,7 @@ export default function CompanySelectorWrapper({
       selectedCompanyOrgId !== selectedCompany?.orgId
     ) {
       searchCompaniesFromCompanyOrgId({
-        variables: { clue: selectedCompanyOrgId }
+        variables: { clue: selectedCompanyOrgId, allowForeignCompanies }
       }).then(result => {
         const searchCompanies = result.data?.searchCompanies;
         if (searchCompanies?.length) {
@@ -130,7 +130,8 @@ export default function CompanySelectorWrapper({
     selectedCompanyOrgId,
     searchCompaniesFromCompanyOrgId,
     onSelectCompany,
-    onUnknownInputCompany
+    onUnknownInputCompany,
+    allowForeignCompanies
   ]);
 
   const onSearchCompany = (searchClue: string, postalCodeClue: string) => {

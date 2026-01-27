@@ -13,7 +13,8 @@ describe("CompanySelectorWrapper", () => {
       request: {
         query: SEARCH_COMPANIES,
         variables: {
-          clue: selectedCompanyOrgId
+          clue: selectedCompanyOrgId,
+          allowForeignCompanies: false
         }
       },
       result: () => {
