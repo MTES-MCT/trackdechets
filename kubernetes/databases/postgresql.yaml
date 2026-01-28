@@ -6,7 +6,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:16.8
@@ -90,15 +90,52 @@ spec:
   primaryUpdateStrategy: unsupervised
 
   # Affinity rules to spread instances
-  #affinity:
-  #  podAntiAffinity:
-  #    preferredDuringSchedulingIgnoredDuringExecution:
-  #      - weight: 100
-  #        podAffinityTerm:
-  #          labelSelector:
-  #            matchExpressions:
-  #              - key: cnpg.io/cluster
-  #                operator: In
-  #                values:
-  #                  - postgres
-  #          topologyKey: kubernetes.io/hostname
+   #affinity:
+   #  podAntiAffinity:
+   #    preferredDuringSchedulingIgnoredDuringExecution:
+ #        - weight: 100
+     #      podAffinityTerm:
+     #        labelSelector:
+      #         matchExpressions:
+     #            - key: cnpg.io/cluster
+     #              operator: In
+     #              values:
+     #                - postgres
+    #         topologyKey: kubernetes.io/hostname
+
+---
+# Secret for PostgreSQL user credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-credentials
+  namespace: trackdechets-backend
+type: kubernetes.io/basic-auth
+stringData:
+  username: trackdechets
+  password: changeme-generate-strong-password
+
+---
+# Secret for backup S3 credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-backup-credentials
+  namespace: trackdechets-backend
+type: Opaque
+stringData:
+  ACCESS_KEY_ID: changeme
+  SECRET_ACCESS_KEY: changeme
+
+---
+# Scheduled backup
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres-backup-schedule
+  namespace: trackdechets-backend
+spec:
+  schedule: "0 2 * * *" # Daily at 2 AM
+  backupOwnerReference: self
+  cluster:
+    name: postgres

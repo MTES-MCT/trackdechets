@@ -7,7 +7,7 @@ apiVersion: psmdb.percona.com/v1
 kind: PerconaServerMongoDB
 metadata:
   name: mongodb
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   crVersion: 1.15.0
   image: percona/percona-server-mongodb:6.0.9-7
@@ -92,7 +92,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-secrets
-  namespace: trackdechets
+  namespace: trackdechets-backend
 type: Opaque
 stringData:
   MONGODB_BACKUP_USER: backup
@@ -113,7 +113,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: mongodb-backup-credentials
-  namespace: trackdechets
+  namespace: trackdechets-backend
 type: Opaque
 stringData:
   AWS_ACCESS_KEY_ID: changeme
@@ -125,7 +125,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: mongodb
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: mongodb
 spec:

@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespaces.yaml
+  - frontend-configmap.yaml
+  - frontend-resourcequota.yaml
+  - frontend-limitrange.yaml
+  - ../external-secrets/frontend-secretstore.yaml
+  - ../external-secrets/frontend-externalsecret.yaml
+  - ../apps/ui.yaml
+  - ../ingress/ingress.yaml
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/part-of: trackdechets
+  app.kubernetes.io/managed-by: kustomize
+
+# Note: Resources are in trackdechets-frontend namespace
+# Some resources (like ingress) may need namespace specified explicitly

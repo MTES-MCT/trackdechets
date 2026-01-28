@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: notifier
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: notifier
     app.kubernetes.io/name: notifier
@@ -32,7 +32,7 @@ spec:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           env:
             - name: PORT
@@ -84,7 +84,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: notifier
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: notifier
 spec:
@@ -107,7 +107,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: notifier
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -148,7 +148,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: notifier
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   minAvailable: 1
   selector:
