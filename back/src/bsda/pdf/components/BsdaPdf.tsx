@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Document, formatDate, FormCompanyFields } from "../../../common/pdf";
+import {
+  Document,
+  formatDate,
+  FormCompanyFields,
+  SignatureStamp
+} from "../../../common/pdf";
 import type { Bsda } from "@td/codegen-back";
 import { PickupSite } from "./PickupSite";
 import { TraceabilityTable } from "./TraceabilityTable";
@@ -152,7 +157,15 @@ export function BsdaPdf({
             <p>
               <strong>1.1 Signature</strong>
             </p>
-            <Signature signature={bsda?.emitter?.emission?.signature} />
+            <p>
+              <span>Nom : {bsda?.emitter?.emission?.signature?.author}</span>
+            </p>
+            <p>
+              <span>
+                Date : {formatDate(bsda?.emitter?.emission?.signature?.date)}
+              </span>
+            </p>
+            {bsda?.emitter?.emission?.signature?.date && <SignatureStamp />}
           </div>
         </div>
 
