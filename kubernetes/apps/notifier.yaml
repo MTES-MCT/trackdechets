@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: notifier
-          image: ghcr.io/trackdechets/notifier:latest
+          image: ghcr.io/mtes-mct/trackdechets/notifier:latest
           ports:
             - name: http
               containerPort: 82

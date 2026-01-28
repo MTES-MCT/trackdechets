@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
         - name: queues-runner
-          image: ghcr.io/trackdechets/queues-runner:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-runner:latest
           imagePullPolicy: Always
 
           envFrom:
@@ -107,7 +107,7 @@ spec:
     spec:
       containers:
         - name: queues-indexation
-          image: ghcr.io/trackdechets/queues-indexation:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-indexation:latest
           imagePullPolicy: Always
 
           envFrom:
@@ -187,7 +187,7 @@ spec:
     spec:
       containers:
         - name: queues-bulk-indexation
-          image: ghcr.io/trackdechets/queues-bulk-indexation:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation:latest
           imagePullPolicy: Always
 
           envFrom:
@@ -269,7 +269,7 @@ spec:
     spec:
       containers:
         - name: queues-bulk-indexation-master
-          image: ghcr.io/trackdechets/queues-bulk-indexation-master:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation-master:latest
           imagePullPolicy: Always
 
           envFrom:
@@ -330,7 +330,7 @@ spec:
     spec:
       containers:
         - name: queues-webhooks
-          image: ghcr.io/trackdechets/queues-webhooks:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-webhooks:latest
           imagePullPolicy: Always
 
           envFrom:
@@ -410,7 +410,7 @@ spec:
     spec:
       containers:
         - name: queues-gerico
-          image: ghcr.io/trackdechets/queues-gerico:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-gerico:latest
           imagePullPolicy: Always
 
           envFrom:

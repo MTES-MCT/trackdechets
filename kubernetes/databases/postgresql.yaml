@@ -38,8 +38,8 @@ spec:
         name: postgres-credentials
 
   storage:
-    size: 50Gi
-    storageClass: standard
+    size: 5Gi
+    storageClass: sbs-default
 
   resources:
     requests:
@@ -50,21 +50,21 @@ spec:
       cpu: "2000m"
 
   # Connection pooling via PgBouncer
-  pooler:
-    enabled: true
-    type: rw
-    instances: 3
-    pgbouncer:
-      poolMode: transaction
-      parameters:
-        max_client_conn: "1000"
-        default_pool_size: "25"
-        max_db_connections: "100"
+  #pooler:
+  #  enabled: true
+  #  type: rw
+  #  instances: 3
+  #  pgbouncer:
+  #    poolMode: transaction
+  #    parameters:
+  #      max_client_conn: "1000"
+  #      default_pool_size: "25"
+  #      max_db_connections: "100"
 
   # Monitoring
-  monitoring:
-    enabled: true
-    podMonitorEnabled: true
+  #monitoring:
+  #  enabled: true
+  #  podMonitorEnabled: true
 
   # Backup configuration (configure for external S3)
   backup:
@@ -90,52 +90,15 @@ spec:
   primaryUpdateStrategy: unsupervised
 
   # Affinity rules to spread instances
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: cnpg.io/cluster
-                  operator: In
-                  values:
-                    - postgres
-            topologyKey: kubernetes.io/hostname
-
----
-# Secret for PostgreSQL user credentials
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-credentials
-  namespace: trackdechets
-type: kubernetes.io/basic-auth
-stringData:
-  username: trackdechets
-  password: changeme-generate-strong-password
-
----
-# Secret for backup S3 credentials
-apiVersion: v1
-kind: Secret
-metadata:
-  name: postgres-backup-credentials
-  namespace: trackdechets
-type: Opaque
-stringData:
-  ACCESS_KEY_ID: changeme
-  SECRET_ACCESS_KEY: changeme
-
----
-# Scheduled backup
-apiVersion: postgresql.cnpg.io/v1
-kind: ScheduledBackup
-metadata:
-  name: postgres-backup-schedule
-  namespace: trackdechets
-spec:
-  schedule: "0 2 * * *" # Daily at 2 AM
-  backupOwnerReference: self
-  cluster:
-    name: postgres
+  #affinity:
+  #  podAntiAffinity:
+  #    preferredDuringSchedulingIgnoredDuringExecution:
+  #      - weight: 100
+  #        podAffinityTerm:
+  #          labelSelector:
+  #            matchExpressions:
+  #              - key: cnpg.io/cluster
+  #                operator: In
+  #                values:
+  #                  - postgres
+  #          topologyKey: kubernetes.io/hostname

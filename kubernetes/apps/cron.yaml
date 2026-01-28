@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
         - name: cron
-          image: ghcr.io/trackdechets/cron:latest
+          image: ghcr.io/mtes-mct/trackdechets/cron:latest
           envFrom:
             - configMapRef:
                 name: trackdechets-config

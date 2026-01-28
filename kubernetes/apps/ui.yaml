@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/trackdechets/ui:latest
+          image: ghcr.io/mtes-mct/trackdechets/ui:dev
           ports:
             - name: http
               containerPort: 3000
