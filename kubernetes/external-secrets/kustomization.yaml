@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - frontend-secretstore.yaml
+  - backend-secretstore.yaml
+  - frontend-externalsecret.yaml
+  - backend-externalsecret.yaml
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/part-of: trackdechets
+  app.kubernetes.io/managed-by: kustomize
+
+# Note: Resources are in different namespaces
+# Frontend resources: trackdechets-frontend
+# Backend resources: trackdechets-backend

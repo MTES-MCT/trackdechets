@@ -8,7 +8,7 @@ apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
   name: elasticsearch
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   version: 7.10.2
 
@@ -94,7 +94,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: elasticsearch
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: elasticsearch
 spec:
@@ -112,7 +112,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: elasticsearch-init-index
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   template:
     spec:

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: trackdechets-frontend-quota
+  namespace: trackdechets-frontend
+spec:
+  hard:
+    # Compute resources (frontend typically needs less)
+    requests.cpu: "10"
+    requests.memory: "20Gi"
+    limits.cpu: "20"
+    limits.memory: "40Gi"
+
+    # Storage
+    persistentvolumeclaims: "2"
+    requests.storage: "10Gi"
+
+    # Object counts
+    pods: "20"
+    services: "5"
+    configmaps: "10"
+    secrets: "10"

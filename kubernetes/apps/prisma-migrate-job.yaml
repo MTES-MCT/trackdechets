@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: prisma-migrate
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: prisma-migrate
     app.kubernetes.io/name: prisma-migrate
@@ -24,7 +24,7 @@ spec:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:

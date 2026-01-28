@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trackdechets-config
+  namespace: trackdechets-backend
+data:
+  # Timezone (REQUIRED for French data compliance)
+  TZ: "Europe/Paris"
+
+  # Node environment
+  NODE_ENV: "production"
+
+  # API configuration
+  API_PORT: "4000"
+  API_URL_SCHEME: "https"
+
+  # Notifier configuration
+  NOTIFIER_PORT: "82"
+
+  # Queue configuration
+  QUEUE_NAME_SENDMAIL: "queue_sendmail"
+  QUEUE_MAXRATE_SENDMAIL: "16"
+  QUEUE_NAME_COMPANY: "queue_company"
+
+  # Elasticsearch configuration
+  ELASTICSEARCH_BSDS_ALIAS_NAME: "bsds"
+
+  # Session configuration
+  SESSION_NAME: "connect.sid"
+  SESSION_COOKIE_SECURE: "true"
+
+  # Feature flags
+  VERIFY_COMPANY: "true"
+  ALLOW_TEST_COMPANY: "false"
+  NOTIFY_DREAL_WHEN_FORM_DECLINED: "true"
+
+  # Monitoring
+  OTEL_SDK_DISABLED: "false"
+
+  # Email backend
+  EMAIL_BACKEND: "sendinblue"
+
+  # Bulk indexation
+  BULK_INDEX_BATCH_SIZE: "100"
+  BULK_INDEX_JOB_CONCURRENCY: "1"
