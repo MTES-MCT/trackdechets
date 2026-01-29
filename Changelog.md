@@ -11,6 +11,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Suppression du champ `consistence` sur WasteDetails et WasteDetailsInput (BSDD). L'utilisation du champ `consistences` est maintenant obligatoire [PR 4634](https://github.com/MTES-MCT/trackdechets/pull/4634)
 
+#### :nail_care: Améliorations
+
+- Changement des règles de traçabilité DND/TEXS selon les types d'établissements [PR 4643](https://github.com/MTES-MCT/trackdechets/pull/4643)
+
 #### :bug: Corrections de bugs
 
 - Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
