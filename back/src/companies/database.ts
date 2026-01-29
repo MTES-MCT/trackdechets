@@ -159,7 +159,7 @@ const OBFUSCATED_USER_NAME = "Temporairement masqué";
  */
 export const userNameDisplay = (
   association: CompanyAssociation & {
-    user: User;
+    user: Pick<User, "name">;
   },
   requestingUserid?: string,
   isTDAdmin?: boolean
