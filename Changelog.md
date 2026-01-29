@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
 - Rendre la colonne RegistryTexsAnalysisFile.s3FileKey unique pour éviter des accès non-autorisés [PR 4659](https://github.com/MTES-MCT/trackdechets/pull/4659)
+- Ajout d'un rate limiting à l'export de registre ne prenant pas en compte les paramètres [PR 4658](https://github.com/MTES-MCT/trackdechets/pull/4658)
 
 #### :rocket: Nouvelles fonctionnalités
 
