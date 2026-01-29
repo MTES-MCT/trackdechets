@@ -6,6 +6,7 @@ import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
+import { addDays } from "date-fns";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -25,7 +26,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash-shortname",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -50,7 +51,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash-specialchars",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -109,6 +110,7 @@ describe("joinWithInvite mutation", () => {
   });
 
   it("should raise exception if invitation was already accepted", async () => {
+    // Given
     const company = await companyFactory();
     const invitee = "john.snow@trackdechets.fr";
 
@@ -118,9 +120,11 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        acceptedAt: new Date()
+        acceptedAt: addDays(new Date(), -1)
       }
     });
+
+    // When
     const { errors } = await mutate(JOIN_WITH_INVITE, {
       variables: {
         inviteHash: invitation.hash,
@@ -128,8 +132,10 @@ describe("joinWithInvite mutation", () => {
         password: "P4a$$woRd_1234"
       }
     });
+
+    // Then
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual("Cette invitation a déjà été acceptée");
+    expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
 
   it.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.READER, UserRole.DRIVER])(
@@ -144,7 +150,7 @@ describe("joinWithInvite mutation", () => {
           companySiret: company.siret!,
           role,
           hash: "hash",
-          expiresAt: new Date()
+          expiresAt: addDays(new Date(), 7)
         }
       });
 
@@ -203,7 +209,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: UserRole.MEMBER,
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -237,7 +243,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company1.siret!,
         role: "MEMBER",
         hash: "hash1",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -247,7 +253,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company2.siret!,
         role: "MEMBER",
         hash: "hash2",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -287,7 +293,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
@@ -323,7 +329,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -354,7 +360,7 @@ describe("joinWithInvite mutation", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 

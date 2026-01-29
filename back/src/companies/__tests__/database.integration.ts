@@ -10,6 +10,7 @@ import {
 } from "../database";
 import { createUserDataLoaders } from "../../users/dataloaders";
 import { AppDataloaders } from "../../types";
+import { addDays } from "date-fns";
 
 const dataloaders = createUserDataLoaders() as AppDataloaders;
 
@@ -43,7 +44,7 @@ describe("getInvitedUsers", () => {
         companySiret: company.siret!,
         hash: "hash2",
         role: "MEMBER",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(

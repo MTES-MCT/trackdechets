@@ -8,6 +8,7 @@ import { sirenify } from "../sirene";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { bulkCreate, Opts } from "../index";
 import { searchCompany } from "../../../companies/search";
+import { addDays } from "date-fns";
 
 // No mails
 jest.mock("../../../mailer/mailing");
@@ -276,7 +277,7 @@ describe("bulk create users and companies from csv files", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -315,7 +316,7 @@ describe("bulk create users and companies from csv files", () => {
         companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
 

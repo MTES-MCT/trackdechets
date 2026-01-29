@@ -6,6 +6,7 @@ import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import { renderMail, onSignup } from "@td/mail";
 import type { Mutation } from "@td/codegen-back";
 import makeClient from "../../../../__tests__/testClient";
+import { addDays } from "date-fns";
 
 const viablePassword = "Trackdechets1#";
 
@@ -81,7 +82,7 @@ describe("Mutation.signup", () => {
       phone: "06 00 00 00 00"
     };
 
-    const { data } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
+    const { data, errors } = await mutate<Pick<Mutation, "signup">>(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,
@@ -92,6 +93,7 @@ describe("Mutation.signup", () => {
       }
     });
 
+    expect(errors).toBeUndefined();
     expect(data.signup).toEqual(true);
 
     const newUser = await prisma.user.findUniqueOrThrow({
@@ -267,6 +269,7 @@ describe("Mutation.signup", () => {
   });
 
   it("should accept pending invitations", async () => {
+    // Given
     const user = {
       email: "newuser@td.io",
       name: "New User",
@@ -286,10 +289,11 @@ describe("Mutation.signup", () => {
     });
     await prisma.userAccountHash.update({
       where: { id: invitation.id },
-      data: { expiresAt: new Date() }
+      data: { expiresAt: addDays(new Date(), 7) }
     });
 
-    await mutate(SIGNUP, {
+    // When
+    const { errors } = await mutate(SIGNUP, {
       variables: {
         userInfos: {
           email: user.email,
@@ -300,6 +304,8 @@ describe("Mutation.signup", () => {
       }
     });
 
+    // Then
+    expect(errors).toBeUndefined();
     const newUser = await prisma.user.findUniqueOrThrow({
       where: { email: user.email }
     });
@@ -316,5 +322,103 @@ describe("Mutation.signup", () => {
     });
 
     expect(companyAssociation).toHaveLength(1);
+  });
+
+  it("should not be able to accept expired invitations", async () => {
+    // Given
+    const user = {
+      email: "newuser@td.io",
+      name: "New User",
+      phone: "06 00 00 00 00",
+      password: "newUserPassword"
+    };
+
+    const company = await companyFactory();
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: user.email,
+        companySiret: company.siret!,
+        hash: "hash",
+        role: "MEMBER"
+      }
+    });
+    await prisma.userAccountHash.update({
+      where: { id: invitation.id },
+      data: { expiresAt: addDays(new Date(), -1) }
+    });
+
+    // When
+    const { errors } = await mutate(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: viablePassword,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const updatedHash = await prisma.userAccountHash.update({
+      where: { id: invitation.id },
+      data: { expiresAt: addDays(new Date(), -1) }
+    });
+
+    // The invitation was not accepted
+    expect(updatedHash.acceptedAt).toBeNull();
+  });
+
+  it("should not accept already accepted invitations", async () => {
+    // Given
+    const user = {
+      email: "newuser@td.io",
+      name: "New User",
+      phone: "06 00 00 00 00",
+      password: "newUserPassword"
+    };
+
+    const company = await companyFactory();
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: user.email,
+        companySiret: company.siret!,
+        hash: "hash",
+        role: "MEMBER"
+      }
+    });
+
+    const acceptedAt = addDays(new Date(), -2);
+    await prisma.userAccountHash.update({
+      where: { id: invitation.id },
+      data: { acceptedAt, expiresAt: addDays(new Date(), 5) }
+    });
+
+    // When
+    const { errors } = await mutate(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: viablePassword,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    const updatedHash = await prisma.userAccountHash.update({
+      where: { id: invitation.id },
+      data: { expiresAt: addDays(new Date(), -1) }
+    });
+
+    // The invitation shall not have changed
+    expect(updatedHash.acceptedAt?.toISOString()).toBe(
+      acceptedAt.toISOString()
+    );
   });
 });

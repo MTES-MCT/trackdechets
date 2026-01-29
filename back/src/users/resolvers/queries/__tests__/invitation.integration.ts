@@ -3,6 +3,7 @@ import type { Query } from "@td/codegen-back";
 import { prisma } from "@td/prisma";
 import { siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { addDays } from "date-fns";
 
 const INVITATION = `
   query Invitation($hash: String!){
@@ -19,6 +20,7 @@ describe("query / invitation", () => {
   afterEach(resetDatabase);
 
   it("should return an invitation by hash", async () => {
+    // Given
     const { query } = makeClient();
     const userAccountHash = await prisma.userAccountHash.create({
       data: {
@@ -26,12 +28,20 @@ describe("query / invitation", () => {
         companySiret: siretify(2),
         hash: "azerty",
         role: "MEMBER",
-        expiresAt: new Date()
+        expiresAt: addDays(new Date(), 7)
       }
     });
-    const { data } = await query<Pick<Query, "invitation">>(INVITATION, {
-      variables: { hash: userAccountHash.hash }
-    });
+
+    // When
+    const { data, errors } = await query<Pick<Query, "invitation">>(
+      INVITATION,
+      {
+        variables: { hash: userAccountHash.hash }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
     expect(data.invitation!.email).toEqual(userAccountHash.email);
     expect(data.invitation!.companySiret).toEqual(userAccountHash.companySiret);
     expect(data.invitation!.role).toEqual(userAccountHash.role);

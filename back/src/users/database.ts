@@ -191,7 +191,11 @@ export async function userExists(unsafeEmail: string) {
 export async function acceptNewUserCompanyInvitations(user: User) {
   const existingHashes = await prisma.userAccountHash.findMany({
     // only accept pending, non-expired invitations
-    where: { email: user.email, expiresAt: { gte: new Date() } }
+    where: {
+      email: user.email,
+      acceptedAt: null,
+      expiresAt: { gte: new Date() }
+    }
   });
 
   if (!existingHashes.length) {
