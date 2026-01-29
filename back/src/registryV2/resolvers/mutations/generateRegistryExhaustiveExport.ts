@@ -40,14 +40,17 @@ export function getGenerateRegistryExhaustiveExport({
       );
     }
 
-    const recentExportsByUserCount = await prisma.registryExhaustiveExport.count({
-      where: {
-        createdById: user.id,
-        createdAt: { gte: subMinutes(new Date(), 5) }
-      }
-    });
+    const recentExportsByUserCount =
+      await prisma.registryExhaustiveExport.count({
+        where: {
+          createdById: user.id,
+          createdAt: { gte: subMinutes(new Date(), 5) }
+        }
+      });
     if (recentExportsByUserCount >= 10) {
-      throw new TooManyRequestsError("Vous avez déjà réalisé 10 exports dans les 5 dernières minutes. Veuillez réessayer plus tard.");
+      throw new TooManyRequestsError(
+        "Vous avez déjà réalisé 10 exports dans les 5 dernières minutes. Veuillez réessayer plus tard."
+      );
     }
 
     const userCompanies = await getUserCompanies(user.id);
