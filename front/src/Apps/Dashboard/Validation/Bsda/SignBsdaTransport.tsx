@@ -15,13 +15,11 @@ import {
 import { subMonths } from "date-fns";
 import React, { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { generatePath, Link, useLocation, useParams } from "react-router-dom";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
-import routes from "../../../routes";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import { GET_BSDA, SIGN_BsDA } from "../../../common/queries/bsda/queries";
@@ -97,9 +95,6 @@ const schema = z.object({
 export type ZodBdsaTransport = z.infer<typeof schema>;
 
 const SignBsdaTransport = ({ bsdaId, onClose }) => {
-  const { siret } = useParams<{ siret: string }>();
-  const location = useLocation();
-
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: bsdaId
@@ -184,45 +179,7 @@ const SignBsdaTransport = ({ bsdaId, onClose }) => {
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
-      {(bsda.metadata?.errors ?? []).some(
-        error =>
-          error &&
-          error.requiredFor === BsdaSignatureType.Transport &&
-          // Transporter Receipt will be auto-completed by the transporter
-          !(
-            error.path.length &&
-            error.path[0] === "transporters" &&
-            error.path[2] === "recepisse"
-          ) &&
-          !(
-            error.path.length &&
-            error.path[0] === "transporters" &&
-            error.path[2] === "transport" &&
-            error.path[3] === "plates"
-          )
-      ) ? (
-        <>
-          <p className="tw-mt-2 tw-text-red-700">
-            Vous devez mettre à jour le bordereau et renseigner les champs
-            obligatoires avant de le signer.
-          </p>
-          <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
-            {bsda.metadata?.errors?.map((error, idx) => (
-              <li key={idx}>{error?.message}</li>
-            ))}
-          </ul>
-          <Link
-            to={generatePath(routes.dashboard.bsdas.edit, {
-              siret,
-              id: bsda.id
-            })}
-            className="fr-btn fr-btn--primary"
-            state={{ background: location }}
-          >
-            Mettre le bordereau à jour pour le signer
-          </Link>
-        </>
-      ) : !signingTransporter ? (
+      {!signingTransporter ? (
         <div>Tous les transporteurs ont déjà signé</div>
       ) : (
         <>

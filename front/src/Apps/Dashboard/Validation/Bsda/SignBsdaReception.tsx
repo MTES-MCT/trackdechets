@@ -32,8 +32,6 @@ import {
   SIGN_BsDA,
   UPDATE_BSDA
 } from "../../../common/queries/bsda/queries";
-import { generatePath, Link, useLocation, useParams } from "react-router-dom";
-import routes from "../../../routes";
 import { getComputedState } from "../../Creation/getComputedState";
 import SignBsdaOperation from "./SignBsdaOperation";
 import { datetimeToYYYYMMDDHHSS } from "../BSPaoh/paohUtils";
@@ -132,9 +130,6 @@ const schema = z
 export type ZodBsdaReception = z.infer<typeof schema>;
 
 const SignBsdaReception = ({ bsdaId, onClose }) => {
-  const { siret } = useParams<{ siret: string }>();
-  const location = useLocation();
-
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: bsdaId
@@ -296,331 +291,304 @@ const SignBsdaReception = ({ bsdaId, onClose }) => {
         isOpen
         size="L"
       >
-        {bsda.metadata?.errors?.some(
-          error => error?.requiredFor === BsdaSignatureType.Emission
-        ) ? (
-          <>
-            <p className="fr-mt-2w tw-text-red-700">
-              Vous devez mettre à jour le bordereau et renseigner les champs
-              obligatoires avant de le signer.
-            </p>
-
-            <Link
-              to={generatePath(routes.dashboard.bsdas.edit, {
-                siret,
-                id: bsda.id
+        <>
+          <BsdaWasteSummary bsda={bsda} />
+          <BsdaJourneySummary bsda={bsda} />
+          <FormProvider {...methods}>
+            <form
+              onSubmit={handleSubmit(async data => {
+                const { author, date, ...update } = data;
+                await updateBsda({
+                  variables: {
+                    id: bsda.id,
+                    input: update as BsdaInput
+                  }
+                });
+                await signBsda({
+                  variables: {
+                    id: bsda.id,
+                    input: {
+                      date,
+                      author,
+                      type: BsdaSignatureType.Reception
+                    }
+                  }
+                });
+                handleClose();
               })}
-              className="fr-btn fr-btn--primary"
-              state={{ background: location }}
             >
-              Mettre le bordereau à jour pour le signer
-            </Link>
-          </>
-        ) : (
-          <>
-            <BsdaWasteSummary bsda={bsda} />
-            <BsdaJourneySummary bsda={bsda} />
-            <FormProvider {...methods}>
-              <form
-                onSubmit={handleSubmit(async data => {
-                  const { author, date, ...update } = data;
-                  await updateBsda({
-                    variables: {
-                      id: bsda.id,
-                      input: update as BsdaInput
-                    }
-                  });
-                  await signBsda({
-                    variables: {
-                      id: bsda.id,
-                      input: {
-                        date,
-                        author,
-                        type: BsdaSignatureType.Reception
-                      }
-                    }
-                  });
-                  handleClose();
-                })}
-              >
-                <p className="fr-text fr-mt-1w fr-mb-2w">
-                  Je souhaite effectuer
-                </p>
-                <RadioButtons
-                  state={
-                    formState.errors?.destination?.reception
-                      ?.acceptationStatus && "error"
-                  }
-                  stateRelatedMessage={
-                    (formState.errors?.destination?.reception?.acceptationStatus
-                      ?.message as string) ?? ""
-                  }
-                  options={acceptationRadioOptions}
-                  className="fr-mb-1w"
-                />
+              <p className="fr-text fr-mt-1w fr-mb-2w">Je souhaite effectuer</p>
+              <RadioButtons
+                state={
+                  formState.errors?.destination?.reception?.acceptationStatus &&
+                  "error"
+                }
+                stateRelatedMessage={
+                  (formState.errors?.destination?.reception?.acceptationStatus
+                    ?.message as string) ?? ""
+                }
+                options={acceptationRadioOptions}
+                className="fr-mb-1w"
+              />
 
-                <h4 className="fr-h4">
-                  <strong>Réception</strong>
-                </h4>
-                <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters fr-mb-0">
-                  <div className="fr-col-4">
-                    <NonScrollableInput
-                      label="Poids total net en tonnes"
-                      state={
-                        formState.errors?.destination?.reception?.weight &&
-                        "error"
-                      }
-                      stateRelatedMessage={
-                        (formState.errors?.destination?.reception?.weight
-                          ?.message as string) ?? ""
-                      }
-                      nativeInputProps={{
-                        inputMode: "decimal",
-                        step: "0.000001",
-                        type: "number",
-                        ...register("destination.reception.weight")
-                      }}
-                      disabled={
-                        acceptationStatus === WasteAcceptationStatus.Refused
-                      }
-                    />
-                    <p
-                      className="fr-text fr-text--xs"
-                      style={{ color: "#0063CB" }}
-                    >
-                      <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
-                      {multiplyByRounded(receivedWeight)} kilos
-                    </p>
-                  </div>
-                  {isEligibleToEstimateWeight && (
-                    <div className="fr-col-6">
-                      <p className="fr-text fr-mt-1w fr-mb-2w">
-                        Cette quantité est
-                      </p>
-                      <RadioButtons
-                        state={
-                          formState.errors?.destination?.reception
-                            ?.weightIsEstimate && "error"
-                        }
-                        stateRelatedMessage={
-                          (formState.errors?.destination?.reception
-                            ?.weightIsEstimate?.message as string) ?? ""
-                        }
-                        options={[
-                          {
-                            label: "réelle",
-                            nativeInputProps: {
-                              onChange: () =>
-                                setValue(
-                                  "destination.reception.weightIsEstimate",
-                                  false
-                                ),
-
-                              checked: receivedWeightIsEstimate == false
-                            }
-                          },
-                          {
-                            label: "estimée",
-                            nativeInputProps: {
-                              onChange: () =>
-                                setValue(
-                                  "destination.reception.weightIsEstimate",
-                                  true
-                                ),
-                              checked: receivedWeightIsEstimate === true
-                            }
-                          }
-                        ]}
-                        className="fr-mb-1w"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                {receivedWeightIsEstimate && (
-                  <div>
-                    <Alert
-                      severity="warning"
-                      title="Code d'opération & poids receptionné estimé"
-                      description={
-                        <>
-                          Il est permis de renseigner un poids estimé uniquement
-                          dans le cas d'un conteneur-bag et d'une installation
-                          intermédiaire. L'exutoire final devra renseigner un
-                          poids réel.
-                        </>
-                      }
-                    />
-                  </div>
-                )}
-
-                {[
-                  WasteAcceptationStatus.Accepted,
-                  WasteAcceptationStatus.Refused,
-                  WasteAcceptationStatus.PartiallyRefused
-                ].includes(acceptationStatus as WasteAcceptationStatus) && (
-                  <>
-                    <h4 className="fr-h4">
-                      <strong>Acceptation</strong>
-                    </h4>
-                    <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
-                      <div className="fr-col-12 fr-col-md-4">
-                        <h6 className="fr-text--lg">
-                          <strong>Poids refusé</strong>
-                        </h6>
-                        <NonScrollableInput
-                          label="Poids total net en tonnes"
-                          disabled={refusedWeightDisabled}
-                          className="fr-col-12"
-                          state={
-                            formState.errors?.destination?.reception
-                              ?.refusedWeight && "error"
-                          }
-                          stateRelatedMessage={
-                            (formState.errors?.destination?.reception
-                              ?.refusedWeight?.message as string) ?? ""
-                          }
-                          nativeInputProps={{
-                            inputMode: "decimal",
-                            step: "0.000001",
-                            type: "number",
-                            ...register("destination.reception.refusedWeight")
-                          }}
-                        />
-                        <p
-                          className="fr-text fr-text--xs"
-                          style={{ color: "#0063CB" }}
-                        >
-                          <span className="fr-icon-info-fill fr-mr-1w"></span>
-                          Soit {multiplyByRounded(refusedWeight)} kilos
-                        </p>
-                      </div>
-                      <div className="fr-col-12 fr-col-md-4">
-                        <h6 className="fr-text--lg">
-                          <strong>Poids accepté</strong>
-                        </h6>
-                        <NonScrollableInput
-                          label="Poids total net en tonnes"
-                          disabled
-                          className="fr-col-12"
-                          nativeInputProps={{
-                            value: acceptedWeight,
-                            inputMode: "decimal",
-                            step: "0.000001",
-                            type: "number"
-                          }}
-                        />
-                        <p
-                          className="fr-text fr-text--xs"
-                          style={{ color: "#0063CB" }}
-                        >
-                          <span className="fr-icon-info-fill fr-mr-1w"></span>
-                          Soit {multiplyByRounded(acceptedWeight)} kilos
-                        </p>
-                      </div>
-                    </div>
-                    {[
-                      WasteAcceptationStatus.Refused,
-                      WasteAcceptationStatus.PartiallyRefused
-                    ].includes(acceptationStatus as WasteAcceptationStatus) && (
-                      <Input
-                        label="Motif de refus"
-                        textArea
-                        className="fr-col-12 fr-mb-2w"
-                        state={
-                          formState.errors?.destination?.reception
-                            ?.refusalReason && "error"
-                        }
-                        stateRelatedMessage={
-                          (formState.errors?.destination?.reception
-                            ?.refusalReason?.message as string) ?? ""
-                        }
-                        nativeTextAreaProps={{
-                          ...register("destination.reception.refusalReason")
-                        }}
-                      />
-                    )}
-                  </>
-                )}
-
-                <p className="fr-text fr-mb-2w">
-                  En qualité de <strong>destinataire du déchet</strong>, je
-                  confirme la réception des déchets pour la quantité indiquée
-                  dans ce bordereau. En cas de refus partiel ou total
-                  uniquement, un mail automatique Trackdéchets informera le
-                  producteur de ce refus, accompagné du récépissé PDF.
-                  L'inspection des ICPE et ma société en recevront également une
-                  copie.
-                </p>
-
-                <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
-                  <Input
-                    label="Date de réception"
-                    nativeInputProps={{
-                      type: "date",
-                      min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
-                      max: datetimeToYYYYMMDD(TODAY),
-                      ...register("destination.reception.date")
-                    }}
+              <h4 className="fr-h4">
+                <strong>Réception</strong>
+              </h4>
+              <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters fr-mb-0">
+                <div className="fr-col-4">
+                  <NonScrollableInput
+                    label="Poids total net en tonnes"
                     state={
-                      formState.errors.destination?.reception?.date
-                        ? "error"
-                        : "default"
+                      formState.errors?.destination?.reception?.weight &&
+                      "error"
                     }
                     stateRelatedMessage={
-                      formState.errors.destination?.reception?.date?.message
+                      (formState.errors?.destination?.reception?.weight
+                        ?.message as string) ?? ""
+                    }
+                    nativeInputProps={{
+                      inputMode: "decimal",
+                      step: "0.000001",
+                      type: "number",
+                      ...register("destination.reception.weight")
+                    }}
+                    disabled={
+                      acceptationStatus === WasteAcceptationStatus.Refused
+                    }
+                  />
+                  <p
+                    className="fr-text fr-text--xs"
+                    style={{ color: "#0063CB" }}
+                  >
+                    <span className="fr-icon-info-fill fr-mr-1w"></span>Soit{" "}
+                    {multiplyByRounded(receivedWeight)} kilos
+                  </p>
+                </div>
+                {isEligibleToEstimateWeight && (
+                  <div className="fr-col-6">
+                    <p className="fr-text fr-mt-1w fr-mb-2w">
+                      Cette quantité est
+                    </p>
+                    <RadioButtons
+                      state={
+                        formState.errors?.destination?.reception
+                          ?.weightIsEstimate && "error"
+                      }
+                      stateRelatedMessage={
+                        (formState.errors?.destination?.reception
+                          ?.weightIsEstimate?.message as string) ?? ""
+                      }
+                      options={[
+                        {
+                          label: "réelle",
+                          nativeInputProps: {
+                            onChange: () =>
+                              setValue(
+                                "destination.reception.weightIsEstimate",
+                                false
+                              ),
+
+                            checked: receivedWeightIsEstimate == false
+                          }
+                        },
+                        {
+                          label: "estimée",
+                          nativeInputProps: {
+                            onChange: () =>
+                              setValue(
+                                "destination.reception.weightIsEstimate",
+                                true
+                              ),
+                            checked: receivedWeightIsEstimate === true
+                          }
+                        }
+                      ]}
+                      className="fr-mb-1w"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {receivedWeightIsEstimate && (
+                <div>
+                  <Alert
+                    severity="warning"
+                    title="Code d'opération & poids receptionné estimé"
+                    description={
+                      <>
+                        Il est permis de renseigner un poids estimé uniquement
+                        dans le cas d'un conteneur-bag et d'une installation
+                        intermédiaire. L'exutoire final devra renseigner un
+                        poids réel.
+                      </>
                     }
                   />
                 </div>
+              )}
 
-                <div className="fr-col-8 fr-mb-2w">
-                  <Input
-                    label="Nom et prénom"
-                    state={formState.errors.author ? "error" : "default"}
-                    nativeInputProps={{
-                      ...register("author")
-                    }}
-                    stateRelatedMessage={formState.errors.author?.message}
-                  />
-                </div>
-                <div className="fr-mb-8w">
-                  {updateError && (
-                    <DsfrNotificationError apolloError={updateError} />
+              {[
+                WasteAcceptationStatus.Accepted,
+                WasteAcceptationStatus.Refused,
+                WasteAcceptationStatus.PartiallyRefused
+              ].includes(acceptationStatus as WasteAcceptationStatus) && (
+                <>
+                  <h4 className="fr-h4">
+                    <strong>Acceptation</strong>
+                  </h4>
+                  <div className="fr-grid-row fr-grid-row--top fr-grid-row--gutters">
+                    <div className="fr-col-12 fr-col-md-4">
+                      <h6 className="fr-text--lg">
+                        <strong>Poids refusé</strong>
+                      </h6>
+                      <NonScrollableInput
+                        label="Poids total net en tonnes"
+                        disabled={refusedWeightDisabled}
+                        className="fr-col-12"
+                        state={
+                          formState.errors?.destination?.reception
+                            ?.refusedWeight && "error"
+                        }
+                        stateRelatedMessage={
+                          (formState.errors?.destination?.reception
+                            ?.refusedWeight?.message as string) ?? ""
+                        }
+                        nativeInputProps={{
+                          inputMode: "decimal",
+                          step: "0.000001",
+                          type: "number",
+                          ...register("destination.reception.refusedWeight")
+                        }}
+                      />
+                      <p
+                        className="fr-text fr-text--xs"
+                        style={{ color: "#0063CB" }}
+                      >
+                        <span className="fr-icon-info-fill fr-mr-1w"></span>
+                        Soit {multiplyByRounded(refusedWeight)} kilos
+                      </p>
+                    </div>
+                    <div className="fr-col-12 fr-col-md-4">
+                      <h6 className="fr-text--lg">
+                        <strong>Poids accepté</strong>
+                      </h6>
+                      <NonScrollableInput
+                        label="Poids total net en tonnes"
+                        disabled
+                        className="fr-col-12"
+                        nativeInputProps={{
+                          value: acceptedWeight,
+                          inputMode: "decimal",
+                          step: "0.000001",
+                          type: "number"
+                        }}
+                      />
+                      <p
+                        className="fr-text fr-text--xs"
+                        style={{ color: "#0063CB" }}
+                      >
+                        <span className="fr-icon-info-fill fr-mr-1w"></span>
+                        Soit {multiplyByRounded(acceptedWeight)} kilos
+                      </p>
+                    </div>
+                  </div>
+                  {[
+                    WasteAcceptationStatus.Refused,
+                    WasteAcceptationStatus.PartiallyRefused
+                  ].includes(acceptationStatus as WasteAcceptationStatus) && (
+                    <Input
+                      label="Motif de refus"
+                      textArea
+                      className="fr-col-12 fr-mb-2w"
+                      state={
+                        formState.errors?.destination?.reception
+                          ?.refusalReason && "error"
+                      }
+                      stateRelatedMessage={
+                        (formState.errors?.destination?.reception?.refusalReason
+                          ?.message as string) ?? ""
+                      }
+                      nativeTextAreaProps={{
+                        ...register("destination.reception.refusalReason")
+                      }}
+                    />
                   )}
-                  {error && <DsfrNotificationError apolloError={error} />}
-                </div>
+                </>
+              )}
 
-                <hr className="fr-mt-2w" />
-                <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+              <p className="fr-text fr-mb-2w">
+                En qualité de <strong>destinataire du déchet</strong>, je
+                confirme la réception des déchets pour la quantité indiquée dans
+                ce bordereau. En cas de refus partiel ou total uniquement, un
+                mail automatique Trackdéchets informera le producteur de ce
+                refus, accompagné du récépissé PDF. L'inspection des ICPE et ma
+                société en recevront également une copie.
+              </p>
+
+              <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
+                <Input
+                  label="Date de réception"
+                  nativeInputProps={{
+                    type: "date",
+                    min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
+                    max: datetimeToYYYYMMDD(TODAY),
+                    ...register("destination.reception.date")
+                  }}
+                  state={
+                    formState.errors.destination?.reception?.date
+                      ? "error"
+                      : "default"
+                  }
+                  stateRelatedMessage={
+                    formState.errors.destination?.reception?.date?.message
+                  }
+                />
+              </div>
+
+              <div className="fr-col-8 fr-mb-2w">
+                <Input
+                  label="Nom et prénom"
+                  state={formState.errors.author ? "error" : "default"}
+                  nativeInputProps={{
+                    ...register("author")
+                  }}
+                  stateRelatedMessage={formState.errors.author?.message}
+                />
+              </div>
+              <div className="fr-mb-8w">
+                {updateError && (
+                  <DsfrNotificationError apolloError={updateError} />
+                )}
+                {error && <DsfrNotificationError apolloError={error} />}
+              </div>
+
+              <hr className="fr-mt-2w" />
+              <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+                <Button
+                  type="button"
+                  priority="secondary"
+                  onClick={onCancel}
+                  disabled={loading || loadingUpdate}
+                >
+                  Annuler
+                </Button>
+                {acceptationStatus !== "REFUSED" && (
                   <Button
                     type="button"
-                    priority="secondary"
-                    onClick={onCancel}
-                    disabled={loading || loadingUpdate}
-                  >
-                    Annuler
-                  </Button>
-                  {acceptationStatus !== "REFUSED" && (
-                    <Button
-                      type="button"
-                      disabled={
-                        loading || formState.isSubmitting || !isFormValid
-                      }
-                      onClick={onClickTwoStepSignature}
-                    >
-                      Signer et passer à l'étape traitement
-                    </Button>
-                  )}
-                  <Button
                     disabled={loading || formState.isSubmitting || !isFormValid}
+                    onClick={onClickTwoStepSignature}
                   >
-                    Signer
+                    Signer et passer à l'étape traitement
                   </Button>
-                </div>
-              </form>
-            </FormProvider>
-          </>
-        )}
+                )}
+                <Button
+                  disabled={loading || formState.isSubmitting || !isFormValid}
+                >
+                  Signer
+                </Button>
+              </div>
+            </form>
+          </FormProvider>
+        </>
       </TdModal>
       {isOperationModalOpended && (
         <SignBsdaOperation bsdaId={bsdaId} onClose={onClose} />
