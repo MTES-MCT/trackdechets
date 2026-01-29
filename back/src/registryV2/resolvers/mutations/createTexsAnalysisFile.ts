@@ -1,4 +1,4 @@
-import { prisma } from "@td/prisma";
+import { Prisma, prisma } from "@td/prisma";
 import { getFileMetadata } from "@td/registry";
 import { UserInputError } from "../../../common/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -37,14 +37,22 @@ export async function createTexsAnalysisFile(
       `Nom de fichier manquant pour l'import "${s3FileKey}"`
     );
   }
+  try {
+    const texsAnalysisFile = await prisma.registryTexsAnalysisFile.create({
+      data: {
+        createdById: user.id,
+        s3FileKey,
+        originalFileName
+      }
+    });
 
-  const texsAnalysisFile = await prisma.registryTexsAnalysisFile.create({
-    data: {
-      createdById: user.id,
-      s3FileKey,
-      originalFileName
+    return texsAnalysisFile;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2002") {
+        throw new UserInputError(`Fichier "${s3FileKey}" déjà existant.`);
+      }
     }
-  });
-
-  return texsAnalysisFile;
+    throw error;
+  }
 }

@@ -149,7 +149,6 @@ export function TexsAnalysisFile({ methods, disabled }: Props) {
                     Object.keys(fields).forEach(key =>
                       form.append(key, fields[key])
                     );
-                    form.append("Content-Type", file.type);
                     form.append("file", file);
 
                     const uploadResponse = await fetch(signedUrl, {
