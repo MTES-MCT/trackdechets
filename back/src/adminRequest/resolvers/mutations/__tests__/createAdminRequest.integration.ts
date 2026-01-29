@@ -482,10 +482,14 @@ describe("Mutation createAdminRequest", () => {
     const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
     const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
     const body =
-      adminCallArg.body ?? adminCallArg.messageVersions?.[0]?.params?.body ?? adminCallArg.params?.body;
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
     const subject = adminCallArg.subject;
 
-    expect(to).toMatchObject([{ email: "admin@mail.com", name: "Company admin" }]);
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
     expect(subject).toBe(
       `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
@@ -630,10 +634,14 @@ describe("Mutation createAdminRequest", () => {
     const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
     const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
     const body =
-      adminCallArg.body ?? adminCallArg.messageVersions?.[0]?.params?.body ?? adminCallArg.params?.body;
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
     const subject = adminCallArg.subject;
 
-    expect(to).toMatchObject([{ email: "admin@mail.com", name: "Company admin" }]);
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
     expect(subject).toBe(
       `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
@@ -711,10 +719,14 @@ describe("Mutation createAdminRequest", () => {
     const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
     const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
     const body =
-      adminCallArg.body ?? adminCallArg.messageVersions?.[0]?.params?.body ?? adminCallArg.params?.body;
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
     const subject = adminCallArg.subject;
 
-    expect(to).toMatchObject([{ email: "admin@mail.com", name: "Company admin" }]);
+    expect(to).toMatchObject([
+      { email: "admin@mail.com", name: "Company admin" }
+    ]);
     expect(subject).toBe(
       `Demande de droits administrateur pour l'établissement ${company.name} - ${company.orgId}`
     );
