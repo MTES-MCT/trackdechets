@@ -18,6 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Ne pas vérifier que l'établissement Producteur est ouvert ou fermé à la création d'un BSVHU lorsque la case "Situation irrégulière" est cochée [PR 4635](https://github.com/MTES-MCT/trackdechets/pull/4635)
+- Rendre la colonne RegistryTexsAnalysisFile.s3FileKey unique pour éviter des accès non-autorisés [PR 4659](https://github.com/MTES-MCT/trackdechets/pull/4659)
 
 #### :rocket: Nouvelles fonctionnalités
 
