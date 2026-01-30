@@ -634,5 +634,7 @@ export const emptyBsvhu: Bsvhu = {
   traderRecepisseDepartment: null,
   traderRecepisseValidityLimit: null,
   intermediariesOrgIds: [],
-  canAccessDraftOrgIds: []
+  canAccessDraftOrgIds: [],
+  intermediaries: [],
+  transporters: []
 };
