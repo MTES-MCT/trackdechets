@@ -14,6 +14,7 @@ import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@td/prisma";
 import { templateIds } from "@td/mail";
 import { getDefaultNotifications } from "../../../notifications";
+import { startOfDay } from "date-fns";
 
 const INVITE_USER_TO_COMPANY = `
   mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
@@ -193,5 +194,34 @@ describe("mutation inviteUserToCompany", () => {
         })
       })
     ]);
+  });
+
+  test("invitation has an expiration date", async () => {
+    // Given
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+
+    // When
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+    const invitedUserEmail = "newuser@example.test";
+    const { errors } = await mutate(INVITE_USER_TO_COMPANY, {
+      variables: {
+        email: invitedUserEmail,
+        siret: company.siret,
+        role: UserRole.MEMBER
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // Check userAccountHash has been successfully created
+    const hashes = await prisma.userAccountHash.findMany({
+      where: { email: invitedUserEmail, companySiret: company.siret! }
+    });
+    expect(hashes.length).toEqual(1);
+    expect(hashes[0].expiresAt).toBeDefined();
+    expect(startOfDay(hashes[0].expiresAt!)).toEqual(
+      startOfDay(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+    );
   });
 });
