@@ -138,6 +138,11 @@ const BsdaFormSteps = ({
           path: "forwarding",
           getComputedValue: (initialValue, actualValue) =>
             actualValue ?? initialValue
+        },
+        {
+          path: "transporters",
+          getComputedValue: (initialValue, actualValue) =>
+            actualValue?.length ? actualValue : initialValue
         }
       ]),
     [bsdaQuery.data]
@@ -374,8 +379,11 @@ const BsdaFormSteps = ({
     const { id, transporters, packagings, ...input } = values;
     let transporterIds: string[] = [];
 
+    // we want to remove default transporters that are empty so as not to overcharge the db
     transporterIds = await Promise.all(
-      transporters.map(t => saveBsdaTransporter(t))
+      transporters
+        .filter(t => !!t.company?.siret || !!t.company?.vatNumber)
+        .map(t => saveBsdaTransporter(t))
     );
 
     const bsdaInput: BsdaInput = {
