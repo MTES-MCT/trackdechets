@@ -160,7 +160,7 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
           >
             <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
               <Input
-                label="Date de prise en charge"
+                label="Date d'émission"
                 nativeInputProps={{
                   type: "date",
                   min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
