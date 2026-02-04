@@ -8,9 +8,10 @@ resources:
   - backend-externalsecret.yaml
 
 # Common labels
-commonLabels:
-  app.kubernetes.io/part-of: trackdechets
-  app.kubernetes.io/managed-by: kustomize
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: trackdechets
+      app.kubernetes.io/managed-by: kustomize
 # Note: Resources are in different namespaces
 # Frontend resources: trackdechets-frontend
 # Backend resources: trackdechets-backend

@@ -19,7 +19,11 @@ resources:
   - ../apps/prisma-migrate-job.yaml
 
 # Common labels
-commonLabels:
-  app.kubernetes.io/part-of: trackdechets
-  app.kubernetes.io/managed-by: kustomize
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: trackdechets
+      app.kubernetes.io/managed-by: kustomize
+
+# Namespace for backend resources
+namespace: trackdechets-dev-backend
 # Note: Resources are in trackdechets-backend namespace

@@ -1,0 +1,92 @@
+# Redis using OT-Container-Kit Redis Operator
+# Install operator: kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/crd/bases/redis.redis.opstreelabs.in_redises.yaml
+# kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/service_account.yaml
+# kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/role.yaml
+# kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/role_binding.yaml
+# kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/manager/manager.yaml
+
+---
+apiVersion: redis.redis.opstreelabs.in/v1beta1
+kind: Redis
+metadata:
+  name: redis
+  namespace: trackdechets-backend
+spec:
+  kubernetesConfig:
+    image: redis:7.0-alpine
+    imagePullPolicy: IfNotPresent
+  redisConfig:
+    additionalRedisConfig: |
+      maxmemory 2gb
+      maxmemory-policy allkeys-lru
+      save 900 1
+      save 300 10
+      save 60 10000
+  storage:
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: standard
+  redisLeader:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+  redisFollower:
+    replicas: 2
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+
+---
+# Alternative: Helm values file for Bitnami Redis
+# Save this as redis-values.yaml and use with Helm
+# ---
+# architecture: replication
+# auth:
+#   enabled: false
+# master:
+#   count: 1
+#   persistence:
+#     enabled: true
+#     size: 10Gi
+#   resources:
+#     requests:
+#       cpu: 200m
+#       memory: 512Mi
+#     limits:
+#       cpu: 1000m
+#       memory: 2Gi
+#   podAntiAffinityPreset: soft
+# replica:
+#   replicaCount: 2
+#   persistence:
+#     enabled: true
+#     size: 10Gi
+#   resources:
+#     requests:
+#       cpu: 200m
+#       memory: 512Mi
+#     limits:
+#       cpu: 1000m
+#       memory: 2Gi
+#   podAntiAffinityPreset: soft
+# sentinel:
+#   enabled: true
+#   quorum: 2
+# metrics:
+#   enabled: true
+#   serviceMonitor:
+#     enabled: true

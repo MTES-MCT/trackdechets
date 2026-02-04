@@ -3,14 +3,12 @@ kind: Kustomization
 
 # Base configuration
 resources:
-  - ../../base
-
-# Namespace override
-namespace: trackdechets-dev
+  - ../../stack
 
 # Common labels for dev environment
-commonLabels:
-  environment: dev
+labels:
+  - pairs:
+      environment: dev
 
 # Environment-specific ConfigMap
 configMapGenerator:
@@ -95,10 +93,10 @@ patches:
       name: elasticsearch
   - patch: |-
       - op: replace
-        path: /spec/redis/replicas
-        value: 1
+        path: /spec/redisFollower/replicas
+        value: 0
     target:
-      kind: RedisFailover
+      kind: Redis
       name: redis
   - patch: |-
       - op: replace
@@ -112,16 +110,27 @@ patches:
   - patch: |-
       - op: replace
         path: /spec/rules/0/host
-        value: recette.trackdechets.fr
-      - op: replace
-        path: /spec/rules/1/host
         value: api.recette.trackdechets.fr
       - op: replace
-        path: /spec/rules/2/host
+        path: /spec/rules/1/host
         value: notifier.recette.trackdechets.fr
     target:
       kind: Ingress
       name: trackdechets-ingress
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: recette.trackdechets.fr
+    target:
+      kind: Ingress
+      name: trackdechets-ui-ingress
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: notifier.recette.trackdechets.fr
+    target:
+      kind: Ingress
+      name: trackdechets-notifier-sse
   - patch: |-
       - op: replace
         path: /spec/rules/0/host
@@ -132,9 +141,77 @@ patches:
 
   # Disable HPA for dev (fixed replicas)
   - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: api
       $patch: delete
     target:
       kind: HorizontalPodAutoscaler
+      name: api
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: ui
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: ui
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: notifier
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: notifier
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: queues-runner
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: queues-runner
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: queues-indexation
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: queues-indexation
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: queues-bulk-indexation
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: queues-bulk-indexation
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: queues-webhooks
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: queues-webhooks
+  - patch: |-
+      apiVersion: autoscaling/v2
+      kind: HorizontalPodAutoscaler
+      metadata:
+        name: queues-gerico
+      $patch: delete
+    target:
+      kind: HorizontalPodAutoscaler
+      name: queues-gerico
 
 images:
   # Use dev image tags

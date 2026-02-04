@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - base
+  - external-secrets
+  - databases/postgresql.yaml
+  - databases/redis.yaml
+  - databases/elasticsearch.yaml
+  - databases/mongodb.yaml
+  - apps/ui.yaml
+  - apps/api.yaml
+  - apps/notifier.yaml
+  - apps/cron.yaml
+  - apps/queue-workers.yaml
+  - ingress/ingress.yaml

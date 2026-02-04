@@ -3,14 +3,15 @@ kind: Kustomization
 
 # Base configuration
 resources:
-  - ../../base
+  - ../../stack
 
 # Namespace for production
 namespace: trackdechets
 
 # Common labels for production environment
-commonLabels:
-  environment: production
+labels:
+  - pairs:
+      environment: production
 
 # Environment-specific ConfigMap
 configMapGenerator:

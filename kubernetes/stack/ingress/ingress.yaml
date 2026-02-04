@@ -8,8 +8,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: trackdechets-ingress
-  # Ingress can be in either namespace, but typically in frontend
-  namespace: trackdechets-frontend
+  # Ingress in backend namespace for API and notifier
+  namespace: trackdechets-backend
   annotations:
     # Use nginx ingress controller
     kubernetes.io/ingress.class: nginx
@@ -53,19 +53,6 @@ spec:
   #   secretName: trackdechets-tls
 
   rules:
-    # UI - Main frontend
-    - host: app.trackdechets.beta.gouv.fr
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: ui
-                namespace: trackdechets-frontend
-                port:
-                  number: 3000
-
     # API - GraphQL backend
     - host: api.trackdechets.beta.gouv.fr
       http:
@@ -75,7 +62,6 @@ spec:
             backend:
               service:
                 name: api
-                namespace: trackdechets-backend
                 port:
                   number: 4000
 
@@ -88,9 +74,32 @@ spec:
             backend:
               service:
                 name: notifier
-                namespace: trackdechets-backend
                 port:
                   number: 82
+
+---
+# Ingress for UI in frontend namespace
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trackdechets-ui-ingress
+  namespace: trackdechets-frontend
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+spec:
+  rules:
+    # UI - Main frontend
+    - host: app.trackdechets.beta.gouv.fr
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ui
+                port:
+                  number: 3000
 
 ---
 # Additional Ingress for Notifier with extended timeout for SSE connections
@@ -98,7 +107,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: trackdechets-notifier-sse
-  namespace: trackdechets-frontend
+  namespace: trackdechets-backend
   annotations:
     kubernetes.io/ingress.class: nginx
 
@@ -113,13 +122,13 @@ metadata:
 
     # WebSocket/SSE headers
     nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Connection '';
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_cache_bypass $http_upgrade;
-      chunked_transfer_encoding off;
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   proxy_set_header Connection '';
+    #   proxy_set_header X-Real-IP $remote_addr;
+    #   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #   proxy_set_header X-Forwarded-Proto $scheme;
+    #   proxy_cache_bypass $http_upgrade;
+    #   chunked_transfer_encoding off;
 
     # CORS
     nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -135,7 +144,6 @@ spec:
             backend:
               service:
                 name: notifier
-                namespace: trackdechets-backend
                 port:
                   number: 82
 

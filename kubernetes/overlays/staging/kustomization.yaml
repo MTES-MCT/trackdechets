@@ -3,14 +3,15 @@ kind: Kustomization
 
 # Base configuration
 resources:
-  - ../../base
+  - ../../stack
 
 # Namespace override
 namespace: trackdechets-staging
 
 # Common labels for staging environment
-commonLabels:
-  environment: staging
+labels:
+  - pairs:
+      environment: staging
 
 # Environment-specific ConfigMap
 configMapGenerator:
