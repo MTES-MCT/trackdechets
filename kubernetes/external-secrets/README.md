@@ -24,6 +24,7 @@ Each SecretStore uses different Scaleway IAM credentials, and the namespace sepa
 Create two separate IAM application users in Scaleway:
 
 1. **Frontend Application User** (`trackdechets-frontend-secrets`)
+
    - Permissions: `SecretManagerReadOnly` + `SecretManagerSecretAccess`
    - Scope: Only secrets prefixed with `trackdechets-frontend/` or specific frontend secret names
 
@@ -32,6 +33,7 @@ Create two separate IAM application users in Scaleway:
    - Scope: Only secrets prefixed with `trackdechets-backend/` or specific backend secret names
 
 **Best Practice**: Use IAM policies to restrict access:
+
 - Frontend user can only read secrets matching pattern: `trackdechets-frontend/*`
 - Backend user can only read secrets matching pattern: `trackdechets-backend/*`
 
@@ -40,11 +42,13 @@ Create two separate IAM application users in Scaleway:
 Organize your secrets in Scaleway Secret Manager:
 
 #### Frontend Secrets (minimal, public-facing config only)
+
 - `trackdechets-frontend/api-endpoint` - API endpoint URL
 - `trackdechets-frontend/sentry-dsn` - Sentry DSN (optional, for error tracking)
 - Any other frontend-specific non-sensitive configuration
 
 #### Backend Secrets (all sensitive data)
+
 - `trackdechets-backend/database-url` - PostgreSQL connection string
 - `trackdechets-backend/redis-url` - Redis connection string
 - `trackdechets-backend/mongo-url` - MongoDB connection string
@@ -82,6 +86,7 @@ kubectl create secret generic scw-backend-credentials \
 **Important**: Secrets must be created in the same namespace as the SecretStore that references them.
 
 **Security Note**: These Kubernetes secrets contain the Scaleway credentials. Consider using:
+
 - Sealed Secrets for encrypting these credentials
 - Or store them in a separate secret management system
 - Or use Scaleway's Workload Identity (if available) to avoid storing credentials
@@ -175,6 +180,7 @@ In Scaleway Secret Manager, use this naming convention:
 - Backend: `trackdechets-backend/<secret-name>`
 
 This makes it easy to:
+
 - Apply IAM policies based on path prefixes
 - Organize secrets logically
 - Understand which secrets belong to which component
@@ -184,6 +190,7 @@ This makes it easy to:
 ### Secrets not syncing
 
 1. Check ExternalSecret status:
+
    ```bash
    # For frontend secrets
    kubectl describe externalsecret frontend-secrets -n trackdechets-frontend
@@ -192,11 +199,13 @@ This makes it easy to:
    ```
 
 2. Check External Secrets Operator logs:
+
    ```bash
    kubectl logs -n external-secrets-system -l app.kubernetes.io/name=external-secrets
    ```
 
 3. Verify Scaleway credentials:
+
    ```bash
    kubectl get secret scw-frontend-credentials -n trackdechets-frontend -o yaml
    kubectl get secret scw-backend-credentials -n trackdechets-backend -o yaml
@@ -211,6 +220,7 @@ This makes it easy to:
 ### IAM Permission Issues
 
 If you see permission errors:
+
 1. Verify IAM user has `SecretManagerReadOnly` and `SecretManagerSecretAccess` permissions
 2. Check IAM policies restrict access to the correct secret paths
 3. Verify secret names in Scaleway match those in ExternalSecret resources
@@ -218,6 +228,7 @@ If you see permission errors:
 ### Secret Not Found
 
 If a secret is not found:
+
 1. Verify the secret exists in Scaleway Secret Manager
 2. Check the secret name/path matches exactly (case-sensitive)
 3. Verify the IAM user has access to that specific secret
@@ -237,6 +248,7 @@ If a secret is not found:
 To migrate from existing Kubernetes secrets:
 
 1. **Create namespaces** (if not already created):
+
    ```bash
    kubectl apply -f kubernetes/base/namespaces.yaml
    ```
@@ -248,6 +260,7 @@ To migrate from existing Kubernetes secrets:
 4. Create Scaleway credential secrets in the correct namespaces (see Step 3)
 
 5. Verify secrets are synced correctly:
+
    ```bash
    kubectl get externalsecret -n trackdechets-frontend
    kubectl get externalsecret -n trackdechets-backend

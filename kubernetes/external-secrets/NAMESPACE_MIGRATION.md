@@ -105,6 +105,7 @@ Services in different namespaces are accessible using the FQDN format:
 ```
 
 Examples:
+
 - `api.trackdechets-backend.svc.cluster.local:4000` - API service
 - `notifier.trackdechets-backend.svc.cluster.local:82` - Notifier service
 - `postgres-rw.trackdechets-backend.svc.cluster.local:5432` - PostgreSQL service
@@ -125,6 +126,7 @@ New NetworkPolicies have been created:
 If frontend can't reach backend:
 
 1. Check NetworkPolicies:
+
    ```bash
    kubectl get networkpolicies -n trackdechets-backend
    kubectl describe networkpolicy allow-frontend-to-backend -n trackdechets-backend
@@ -140,6 +142,7 @@ If frontend can't reach backend:
 ### Secrets Not Syncing
 
 1. Verify ExternalSecrets are in correct namespaces:
+
    ```bash
    kubectl get externalsecret -n trackdechets-frontend
    kubectl get externalsecret -n trackdechets-backend

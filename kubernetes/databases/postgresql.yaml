@@ -90,18 +90,18 @@ spec:
   primaryUpdateStrategy: unsupervised
 
   # Affinity rules to spread instances
-   #affinity:
-   #  podAntiAffinity:
-   #    preferredDuringSchedulingIgnoredDuringExecution:
- #        - weight: 100
-     #      podAffinityTerm:
-     #        labelSelector:
-      #         matchExpressions:
-     #            - key: cnpg.io/cluster
-     #              operator: In
-     #              values:
-     #                - postgres
-    #         topologyKey: kubernetes.io/hostname
+  #affinity:
+  #  podAntiAffinity:
+  #    preferredDuringSchedulingIgnoredDuringExecution:
+  #        - weight: 100
+  #      podAffinityTerm:
+  #        labelSelector:
+  #         matchExpressions:
+  #            - key: cnpg.io/cluster
+  #              operator: In
+  #              values:
+  #                - postgres
+  #         topologyKey: kubernetes.io/hostname
 
 ---
 # Secret for PostgreSQL user credentials

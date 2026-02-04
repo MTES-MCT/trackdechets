@@ -11,7 +11,6 @@ resources:
 commonLabels:
   app.kubernetes.io/part-of: trackdechets
   app.kubernetes.io/managed-by: kustomize
-
 # Note: Resources are in different namespaces
 # Frontend resources: trackdechets-frontend
 # Backend resources: trackdechets-backend

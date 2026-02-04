@@ -22,5 +22,4 @@ resources:
 commonLabels:
   app.kubernetes.io/part-of: trackdechets
   app.kubernetes.io/managed-by: kustomize
-
 # Note: Resources are in trackdechets-backend namespace

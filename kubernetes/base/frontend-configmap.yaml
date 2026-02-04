@@ -6,9 +6,9 @@ metadata:
 data:
   # Timezone
   TZ: "Europe/Paris"
-  
+
   # Node environment
   NODE_ENV: "production"
-  
+
   # UI configuration
   UI_PORT: "3000"

@@ -16,31 +16,27 @@ This is a quick reference guide. For detailed documentation, see [README.md](./R
 In Scaleway Console → IAM → Application Users:
 
 **Frontend User:**
+
 - Name: `trackdechets-frontend-secrets`
 - Permissions: `SecretManagerReadOnly`, `SecretManagerSecretAccess`
 - IAM Policy (optional but recommended):
   ```json
   {
     "Effect": "Allow",
-    "Action": [
-      "secretmanager:ReadSecret",
-      "secretmanager:AccessSecret"
-    ],
+    "Action": ["secretmanager:ReadSecret", "secretmanager:AccessSecret"],
     "Resource": "arn:scw:secretmanager:fr-par:*:secret/trackdechets-frontend/*"
   }
   ```
 
 **Backend User:**
+
 - Name: `trackdechets-backend-secrets`
 - Permissions: `SecretManagerReadOnly`, `SecretManagerSecretAccess`
 - IAM Policy (optional but recommended):
   ```json
   {
     "Effect": "Allow",
-    "Action": [
-      "secretmanager:ReadSecret",
-      "secretmanager:AccessSecret"
-    ],
+    "Action": ["secretmanager:ReadSecret", "secretmanager:AccessSecret"],
     "Resource": "arn:scw:secretmanager:fr-par:*:secret/trackdechets-backend/*"
   }
   ```
@@ -96,8 +92,8 @@ Edit `frontend-secretstore.yaml` and `backend-secretstore.yaml`:
 spec:
   provider:
     scaleway:
-      region: fr-par  # Your Scaleway region
-      projectId: "YOUR_SCALEWAY_PROJECT_ID"  # Update this!
+      region: fr-par # Your Scaleway region
+      projectId: "YOUR_SCALEWAY_PROJECT_ID" # Update this!
 ```
 
 ### 5. Apply External Secrets Resources
@@ -161,11 +157,13 @@ kubectl exec -n trackdechets-backend deployment/api -- env | grep DATABASE_URL
 ### ExternalSecret shows "SecretSyncedError"
 
 1. Check ExternalSecret status:
+
    ```bash
    kubectl describe externalsecret backend-secrets -n trackdechets-backend
    ```
 
 2. Check External Secrets Operator logs:
+
    ```bash
    kubectl logs -n external-secrets-system -l app.kubernetes.io/name=external-secrets --tail=100
    ```
@@ -179,6 +177,7 @@ kubectl exec -n trackdechets-backend deployment/api -- env | grep DATABASE_URL
 ### SecretStore shows "InvalidProvider"
 
 1. Check SecretStore status:
+
    ```bash
    kubectl describe secretstore backend-secretstore -n trackdechets-backend
    ```
@@ -192,6 +191,7 @@ kubectl exec -n trackdechets-backend deployment/api -- env | grep DATABASE_URL
 ### Pods failing to start
 
 1. Check if secrets exist:
+
    ```bash
    kubectl get secrets -n trackdechets-frontend frontend-secrets
    kubectl get secrets -n trackdechets-backend backend-secrets

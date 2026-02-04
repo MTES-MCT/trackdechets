@@ -75,6 +75,7 @@ The architecture uses **separate Kubernetes namespaces** for additional security
 - **`trackdechets-backend`**: Contains all backend services, workers, and databases
 
 This provides:
+
 - **Namespace-level RBAC**: Different permissions per namespace
 - **Network isolation**: NetworkPolicies can restrict cross-namespace traffic
 - **Secret isolation**: Frontend pods cannot access backend secrets even if RBAC allows it
@@ -91,10 +92,12 @@ This provides:
 ### Attack Surface Reduction
 
 **Before (Single Secret):**
+
 - If any pod is compromised → All secrets are accessible
 - Frontend pods have access to database credentials, API keys, etc.
 
 **After (Segregated Secrets):**
+
 - If frontend pod is compromised → Only frontend secrets accessible (minimal impact)
 - If backend pod is compromised → Only backend secrets accessible (contained)
 
@@ -114,6 +117,7 @@ This provides:
 - `backend-secretstore`: Uses backend IAM credentials
 
 **Configuration**:
+
 - Region (e.g., `fr-par`)
 - Project ID
 - Authentication via Kubernetes secret containing access keys
@@ -126,6 +130,7 @@ This provides:
 - `backend-externalsecret`: Fetches backend secrets → Creates `backend-secrets` Kubernetes secret
 
 **Features**:
+
 - Automatic refresh (default: 1 hour)
 - Maps Scaleway secret names to Kubernetes secret keys
 - Supports JSON secrets with gjson syntax
@@ -142,10 +147,12 @@ This provides:
 ### 4. Pod Deployments
 
 **Frontend Pods** (`ui.yaml`):
+
 - Mount: `frontend-secrets`
 - Access: Only frontend configuration
 
 **Backend Pods** (`api.yaml`, `queue-workers.yaml`, etc.):
+
 - Mount: `backend-secrets`
 - Access: All backend secrets
 
@@ -161,10 +168,12 @@ trackdechets-backend/<secret-name>
 ### Example Structure
 
 **Frontend:**
+
 - `trackdechets-frontend/api-endpoint`
 - `trackdechets-frontend/sentry-dsn`
 
 **Backend:**
+
 - `trackdechets-backend/database-url`
 - `trackdechets-backend/redis-url`
 - `trackdechets-backend/api-token-secret`
@@ -182,10 +191,7 @@ trackdechets-backend/<secret-name>
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "secretmanager:ReadSecret",
-        "secretmanager:AccessSecret"
-      ],
+      "Action": ["secretmanager:ReadSecret", "secretmanager:AccessSecret"],
       "Resource": "arn:scw:secretmanager:fr-par:*:secret/trackdechets-frontend/*"
     },
     {
@@ -205,10 +211,7 @@ trackdechets-backend/<secret-name>
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "secretmanager:ReadSecret",
-        "secretmanager:AccessSecret"
-      ],
+      "Action": ["secretmanager:ReadSecret", "secretmanager:AccessSecret"],
       "Resource": "arn:scw:secretmanager:fr-par:*:secret/trackdechets-backend/*"
     },
     {
