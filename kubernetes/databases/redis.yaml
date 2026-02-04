@@ -12,7 +12,7 @@ apiVersion: databases.spotahome.com/v1
 kind: RedisFailover
 metadata:
   name: redis
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   sentinel:
     replicas: 3

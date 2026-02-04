@@ -1,0 +1,35 @@
+# Namespaces for Trackdéchets
+# Using separate namespaces for frontend and backend provides better isolation,
+# security boundaries, and allows for namespace-scoped RBAC and NetworkPolicies
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trackdechets-frontend
+  labels:
+    name: trackdechets-frontend
+    app.kubernetes.io/part-of: trackdechets
+    app.kubernetes.io/component: frontend
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trackdechets-backend
+  labels:
+    name: trackdechets-backend
+    app.kubernetes.io/part-of: trackdechets
+    app.kubernetes.io/component: backend
+
+---
+# Optional: Shared namespace for databases if you want to isolate them further
+# Uncomment if you want databases in a separate namespace
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: trackdechets-databases
+#   labels:
+#     name: trackdechets-databases
+#     app.kubernetes.io/part-of: trackdechets
+#     app.kubernetes.io/component: databases

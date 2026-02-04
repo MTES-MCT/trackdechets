@@ -100,23 +100,23 @@ patches:
 
 images:
   # Use production image tags (git sha or semantic version)
-  - name: ghcr.io/trackdechets/-ui
+  - name: ghcr.io/mtes-mct/trackdechets/-ui
     newTag: latest # Replace with specific version in production
-  - name: ghcr.io/trackdechets/api
+  - name: ghcr.io/mtes-mct/trackdechets/api
     newTag: latest
-  - name: ghcr.io/trackdechets/notifier
+  - name: ghcr.io/mtes-mct/trackdechets/notifier
     newTag: latest
-  - name: ghcr.io/trackdechets/cron
+  - name: ghcr.io/mtes-mct/trackdechets/cron
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-runner
+  - name: ghcr.io/mtes-mct/trackdechets/queues-runner
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-indexation
+  - name: ghcr.io/mtes-mct/trackdechets/queues-indexation
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-bulk-indexation
+  - name: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-bulk-indexation-master
+  - name: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation-master
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-webhooks
+  - name: ghcr.io/mtes-mct/trackdechets/queues-webhooks
     newTag: latest
-  - name: ghcr.io/trackdechets/queues-gerico
+  - name: ghcr.io/mtes-mct/trackdechets/queues-gerico
     newTag: latest

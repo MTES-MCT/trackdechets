@@ -1,0 +1,22 @@
+# Secret for PostgreSQL user credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-credentials
+  namespace: trackdechets
+type: kubernetes.io/basic-auth
+stringData:
+  username: trackdechets
+  password: changeme-generate-strong-password
+
+---
+# Secret for backup S3 credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-backup-credentials
+  namespace: trackdechets
+type: Opaque
+stringData:
+  ACCESS_KEY_ID: changeme
+  SECRET_ACCESS_KEY: changeme

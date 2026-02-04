@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trackdechets-config
+  namespace: trackdechets-frontend
+data:
+  # Timezone
+  TZ: "Europe/Paris"
+
+  # Node environment
+  NODE_ENV: "production"
+
+  # UI configuration
+  UI_PORT: "3000"

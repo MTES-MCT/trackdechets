@@ -126,22 +126,22 @@ patches:
 
 images:
   # Use staging image tags
-  - name: ghcr.io/trackdechets/ui
+  - name: ghcr.io/mtes-mct/trackdechets/ui
     newTag: staging
-  - name: ghcr.io/trackdechets/api
+  - name: ghcr.io/mtes-mct/trackdechets/api
     newTag: staging
-  - name: ghcr.io/trackdechets/notifier
+  - name: ghcr.io/mtes-mct/trackdechets/notifier
     newTag: staging
-  - name: ghcr.io/trackdechets/cron
+  - name: ghcr.io/mtes-mct/trackdechets/cron
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-runner
+  - name: ghcr.io/mtes-mct/trackdechets/queues-runner
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-indexation
+  - name: ghcr.io/mtes-mct/trackdechets/queues-indexation
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-bulk-indexation
+  - name: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-bulk-indexation-master
+  - name: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation-master
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-webhooks
+  - name: ghcr.io/mtes-mct/trackdechets/queues-webhooks
     newTag: staging
-  - name: ghcr.io/trackdechets/queues-gerico
+  - name: ghcr.io/mtes-mct/trackdechets/queues-gerico

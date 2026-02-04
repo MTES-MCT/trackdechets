@@ -62,7 +62,7 @@ app.use((_, res, next) => {
   next();
 });
 
-const directory = path.join(__dirname, "../../../../../../front/dist");
+const directory = path.join(__dirname, "../../../front");
 app.use(
   express.static(directory, {
     maxAge: "1y", // Cache for 1 year

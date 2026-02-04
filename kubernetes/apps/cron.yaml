@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cron
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: cron
     app.kubernetes.io/name: cron
@@ -25,12 +25,12 @@ spec:
     spec:
       containers:
         - name: cron
-          image: ghcr.io/trackdechets/cron:latest
+          image: ghcr.io/mtes-mct/trackdechets/cron:latest
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:

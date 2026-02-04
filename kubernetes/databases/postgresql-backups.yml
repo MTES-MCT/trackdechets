@@ -1,0 +1,11 @@
+# Scheduled backup
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: postgres-backup-schedule
+  namespace: trackdechets
+spec:
+  schedule: "0 2 * * *" # Daily at 2 AM
+  backupOwnerReference: self
+  cluster:
+    name: postgres
