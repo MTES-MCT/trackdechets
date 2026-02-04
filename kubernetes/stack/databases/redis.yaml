@@ -6,7 +6,7 @@
 # kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/manager/manager.yaml
 
 ---
-apiVersion: redis.redis.opstreelabs.in/v1beta1
+apiVersion: redis.redis.opstreelabs.in/v1beta2
 kind: Redis
 metadata:
   name: redis
@@ -31,15 +31,6 @@ spec:
           requests:
             storage: 10Gi
         storageClassName: standard
-  redisLeader:
-    replicas: 1
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
   redisFollower:
     replicas: 2
     resources:

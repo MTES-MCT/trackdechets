@@ -21,19 +21,53 @@ kubectl apply -f https://raw.githubusercontent.com/cloudnative-pg/cloudnative-pg
 kubectl create -f https://download.elastic.co/downloads/eck/2.11.0/crds.yaml
 kubectl apply -f https://download.elastic.co/downloads/eck/2.11.0/operator.yaml
 
-# Redis
-kubectl apply -f https://raw.githubusercontent.com/spotahome/redis-operator/master/manifests/databases.spotahome.com_redisfailovers.yaml
-kubectl apply -f https://raw.githubusercontent.com/spotahome/redis-operator/master/example/operator.yaml
+# Redis (OT-Container-Kit)
+kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/crd/bases/redis.redis.opstreelabs.in_redises.yaml
+kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/service_account.yaml
+kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/role.yaml
+kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/rbac/role_binding.yaml
+kubectl apply -f https://raw.githubusercontent.com/OT-CONTAINER-KIT/redis-operator/master/config/manager/manager.yaml
 
-# MongoDB
-kubectl apply -f https://raw.githubusercontent.com/percona/percona-server-mongodb-operator/main/deploy/bundle.yaml
+# External Secrets
+helm repo add external-secrets https://charts.external-secrets.io
+helm install external-secrets external-secrets/external-secrets -n external-secrets --create-namespace
+
+# MongoDB (use Helm to avoid CRD annotation issues)
+helm repo add percona https://percona.github.io/percona-helm-charts/
+helm install psmdb-operator percona/psmdb-operator --namespace mongodb-system --create-namespace
 
 # Nginx Ingress
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
 ```
 
-### 2. Update Configuration
+### 2. Configure Secrets and Project ID
+
+```bash
+# Create Scaleway credentials secrets
+kubectl create secret generic scw-frontend-credentials \
+  --namespace=trackdechets-frontend \
+  --from-literal=access-key=YOUR_SCALEWAY_ACCESS_KEY \
+  --from-literal=secret-key=YOUR_SCALEWAY_SECRET_KEY
+
+kubectl create secret generic scw-backend-credentials \
+  --namespace=trackdechets-backend \
+  --from-literal=access-key=YOUR_SCALEWAY_ACCESS_KEY \
+  --from-literal=secret-key=YOUR_SCALEWAY_SECRET_KEY
+
+# Set Scaleway project ID (replace YOUR_PROJECT_ID)
+kubectl patch secretstore backend-secretstore \
+  --namespace trackdechets-backend \
+  --type merge \
+  -p '{"spec":{"provider":{"scaleway":{"projectId":"YOUR_PROJECT_ID"}}}}'
+
+kubectl patch secretstore frontend-secretstore \
+  --namespace trackdechets-frontend \
+  --type merge \
+  -p '{"spec":{"provider":{"scaleway":{"projectId":"YOUR_PROJECT_ID"}}}}'
+```
+
+### 3. Update Configuration
 
 ```bash
 cd kubernetes/overlays/dev  # or staging/production (recette/sandbox/production)
@@ -41,12 +75,9 @@ cd kubernetes/overlays/dev  # or staging/production (recette/sandbox/production)
 # Edit kustomization.yaml - update:
 # - Image registry URLs (replace "your-registry")
 # - Domain names (if using custom domains)
-
-# Edit ../../base/secrets.yaml - replace ALL "changeme" values
-# OR create secrets with kubectl (see README.md)
 ```
 
-### 3. Deploy
+### 4. Deploy
 
 ```bash
 # For development (recette)

@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - namespaces.yaml
   - configmap.yaml
-  - secrets.yaml
   - resourcequota.yaml
   - limitrange.yaml
 

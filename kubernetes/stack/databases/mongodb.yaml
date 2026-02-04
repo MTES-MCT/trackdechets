@@ -79,10 +79,6 @@ spec:
         storageName: s3-backup
         compressionType: gzip
 
-  # Monitoring
-  pmm:
-    enabled: false
-
   sharding:
     enabled: false
 
