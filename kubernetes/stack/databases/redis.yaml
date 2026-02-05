@@ -7,77 +7,54 @@
 
 ---
 apiVersion: redis.redis.opstreelabs.in/v1beta2
-kind: Redis
+kind: RedisReplication
 metadata:
-  name: redis
+  name:  redis-replication
   namespace: trackdechets-backend
 spec:
+  clusterSize: 3
+  podSecurityContext:
+    runAsUser: 1000
+    fsGroup: 1000
   kubernetesConfig:
-    image: redis:7.0-alpine
+    image: quay.io/opstree/redis:v7.0.15
     imagePullPolicy: IfNotPresent
-  redisConfig:
-    additionalRedisConfig: |
-      maxmemory 2gb
-      maxmemory-policy allkeys-lru
-      save 900 1
-      save 300 10
-      save 60 10000
+    resources:
+      requests:
+        cpu: 101m
+        memory: 128Mi
+      limits:
+        cpu: 101m
+        memory: 128Mi
   storage:
     volumeClaimTemplate:
       spec:
-        accessModes:
-          - ReadWriteOnce
+        # storageClassName: standard
+        accessModes: ["ReadWriteOnce"]
         resources:
           requests:
-            storage: 10Gi
-        storageClassName: standard
-  redisFollower:
-    replicas: 2
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-      limits:
-        cpu: 1000m
-        memory: 2Gi
+            storage: 1Gi
 
 ---
-# Alternative: Helm values file for Bitnami Redis
-# Save this as redis-values.yaml and use with Helm
-# ---
-# architecture: replication
-# auth:
-#   enabled: false
-# master:
-#   count: 1
-#   persistence:
-#     enabled: true
-#     size: 10Gi
-#   resources:
-#     requests:
-#       cpu: 200m
-#       memory: 512Mi
-#     limits:
-#       cpu: 1000m
-#       memory: 2Gi
-#   podAntiAffinityPreset: soft
-# replica:
-#   replicaCount: 2
-#   persistence:
-#     enabled: true
-#     size: 10Gi
-#   resources:
-#     requests:
-#       cpu: 200m
-#       memory: 512Mi
-#     limits:
-#       cpu: 1000m
-#       memory: 2Gi
-#   podAntiAffinityPreset: soft
-# sentinel:
-#   enabled: true
-#   quorum: 2
-# metrics:
-#   enabled: true
-#   serviceMonitor:
-#     enabled: true
+apiVersion: redis.redis.opstreelabs.in/v1beta2
+kind: RedisSentinel
+metadata:
+  name: redis-sentinel
+  namespace: trackdechets-backend
+spec:
+  clusterSize: 3
+  podSecurityContext:
+    runAsUser: 1000
+    fsGroup: 1000
+  redisSentinelConfig:
+    redisReplicationName : redis-replication  # Must match the name of an existing RedisReplication resource
+  kubernetesConfig:
+    image: quay.io/opstree/redis-sentinel:v7.0.15
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 101m
+        memory: 128Mi
+      limits:
+        cpu: 101m
+        memory: 128Mi
