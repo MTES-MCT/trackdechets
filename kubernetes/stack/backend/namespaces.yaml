@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trackdechets-backend
+  labels:
+    name: trackdechets-backend
+    app.kubernetes.io/part-of: trackdechets
+    app.kubernetes.io/component: backend

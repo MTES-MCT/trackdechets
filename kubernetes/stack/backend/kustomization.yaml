@@ -3,11 +3,13 @@ kind: Kustomization
 
 resources:
   - namespaces.yaml
-  - configmap.yaml
-  - resourcequota.yaml
-  - limitrange.yaml
+  - backend-configmap.yaml
+  - backend-resourcequota.yaml
+  - backend-limitrange.yaml
+  - backend-secretstore.yaml
+  - backend-externalsecret.yaml
 
-# Common labels applied to all resources
+# Common labels
 labels:
   - pairs:
       app.kubernetes.io/part-of: trackdechets
