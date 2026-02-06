@@ -34,7 +34,10 @@ import {
   WasteAcceptationStatus
 } from "@td/prisma";
 import { getTransporterCompanyOrgId } from "@td/constants";
-import { BsvhuWithTransporters } from "./types";
+import {
+  BsvhuWithTransporters,
+  BsvhuWithTransportersAndIntermediaries
+} from "./types";
 import { getFirstTransporterSync } from "./database";
 
 export const getAddress = ({
@@ -56,6 +59,27 @@ export const getAddress = ({
   }
   return null;
 };
+
+export function expandVhuFormFromDbWithIntermediaries(
+  bsvhu: BsvhuWithTransportersAndIntermediaries
+): GraphqlVhuForm {
+  const expandedForm = expandVhuFormFromDb(bsvhu);
+
+  return {
+    ...expandedForm,
+    intermediaries:
+      bsvhu.intermediaries?.map(intermediary => ({
+        id: intermediary.id,
+        name: intermediary.name,
+        siret: intermediary.siret,
+        vatNumber: intermediary.vatNumber,
+        address: intermediary.address,
+        contact: intermediary.contact,
+        phone: intermediary.phone,
+        mail: intermediary.mail
+      })) || []
+  };
+}
 
 export function expandVhuFormFromDb(
   bsvhu: BsvhuWithTransporters
