@@ -3,6 +3,7 @@ import { sendMail } from "../../../../mailer/mailing";
 import {
   adminRequestInitialInfoToAuthorEmail,
   adminRequestInitialWarningToAdminEmail,
+  MessageVersion,
   renderMail
 } from "@td/mail";
 import {
@@ -21,8 +22,6 @@ import { UserInputError } from "../../../../common/errors";
 import { getAdminRequestRepository } from "../../../repository";
 import { addDays } from "date-fns";
 import { isDefinedStrict } from "../../../../common/helpers";
-
-
 
 // Generates an 8 digit code, using only numbers. Can include and start with zeros
 export const generateCode = () => {
@@ -140,22 +139,32 @@ export const sendEmailToCompanyAdmins = async (
   });
 
   if (adminsCompanyAssociations.length) {
+    const variables = {
+      company: { orgId: company.orgId, name: company.name },
+      user: { name: author.name, email: author.email },
+      adminRequest,
+      isValidationByCollaboratorApproval:
+        adminRequest.validationMethod ===
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+      isValidationByMail:
+        adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL
+    };
+
+    const messageVersions: MessageVersion[] = adminsCompanyAssociations.map(
+      association => ({
+        to: [
+          {
+            email: association.user.email,
+            name: association.user.name
+          }
+        ],
+        params: { body: "" }
+      })
+    );
+
     const mail = renderMail(adminRequestInitialWarningToAdminEmail, {
-      to: adminsCompanyAssociations.map(association => ({
-        email: association.user.email,
-        name: association.user.name
-      })),
-      variables: {
-        company: { orgId: company.orgId, name: company.name },
-        user: { name: author.name, email: author.email },
-        adminRequest,
-        isValidationByCollaboratorApproval:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
-        isValidationByMail:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.SEND_MAIL
-      }
+      variables,
+      messageVersions
     });
 
     await sendMail(mail);
@@ -192,4 +201,3 @@ export const getAdminOnlyEndDate = (): Date => {
 
   return sameDayMidnight(resultDate);
 };
-
