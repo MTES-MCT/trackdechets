@@ -47,6 +47,10 @@ const CompanySignatureCode = ({ company }: CompanySignatureCodeProps) => {
     confirmModal.open();
   };
 
+  if (company.userRole === UserRole.Driver) {
+    return null;
+  }
+
   return (
     <div className="company-signature__code">
       <h3 className="fr-h4">Code signature</h3>
