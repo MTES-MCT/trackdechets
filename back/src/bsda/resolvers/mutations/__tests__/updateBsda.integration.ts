@@ -1,4 +1,11 @@
-import { Bsda, BsdaStatus, TransportMode, Prisma, UserRole } from "@td/prisma";
+import {
+  Bsda,
+  BsdaStatus,
+  TransportMode,
+  Prisma,
+  UserRole,
+  BsdaType
+} from "@td/prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import type {
   BsdaInput,
@@ -37,9 +44,17 @@ export const UPDATE_BSDA = gql`
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
     updateBsda(id: $id, input: $input) {
       id
+      type
       emitter {
         company {
           name
+        }
+        pickupSite {
+          name
+          address
+          city
+          postalCode
+          infos
         }
       }
       waste {
@@ -3756,5 +3771,77 @@ describe("Mutation.updateBsda", () => {
           ?.plannedOperationCode
       ).toBe("D 9 F");
     });
+  });
+
+  it("TRA-15651 - if the bsda changes from GATHERING, pickup site info should be nullified", async () => {
+    // Given
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        type: "GATHERING",
+        emitterPickupSiteName: "Pickup site",
+        emitterPickupSiteAddress: "Pickup site address",
+        emitterPickupSiteCity: "Pickup site city",
+        emitterPickupSitePostalCode: "12345",
+        emitterPickupSiteInfos: "Pickup site infos",
+        transporters: {
+          createMany: {
+            data: []
+          }
+        },
+        workerCompanyAddress: null,
+        workerCertificationCertificationNumber: null,
+        workerCertificationHasSubSectionFour: null,
+        workerCertificationHasSubSectionThree: null,
+        workerCertificationOrganisation: null,
+        workerCertificationValidityLimit: null,
+        workerCompanySiret: null,
+        workerCompanyName: null,
+        workerCompanyContact: null,
+        workerCompanyPhone: null,
+        workerCompanyMail: null
+      }
+    });
+
+    const bsdaInDb = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(bsdaInDb.emitterPickupSiteName).toBe("Pickup site");
+    expect(bsdaInDb.emitterPickupSiteAddress).toBe("Pickup site address");
+    expect(bsdaInDb.emitterPickupSiteCity).toBe("Pickup site city");
+    expect(bsdaInDb.emitterPickupSitePostalCode).toBe("12345");
+    expect(bsdaInDb.emitterPickupSiteInfos).toBe("Pickup site infos");
+
+    // When
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          type: BsdaType.COLLECTION_2710
+        }
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    expect(data.updateBsda.type).toBe(BsdaType.COLLECTION_2710);
+    expect(data.updateBsda.emitter?.pickupSite).toBeNull();
+
+    const updatedBsdaInDb = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsdaInDb.emitterPickupSiteName).toBeNull();
+    expect(updatedBsdaInDb.emitterPickupSiteAddress).toBeNull();
+    expect(updatedBsdaInDb.emitterPickupSiteCity).toBeNull();
+    expect(updatedBsdaInDb.emitterPickupSitePostalCode).toBeNull();
+    expect(updatedBsdaInDb.emitterPickupSiteInfos).toBeNull();
   });
 });
