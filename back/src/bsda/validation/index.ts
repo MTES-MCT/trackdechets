@@ -9,6 +9,7 @@ import { contextualSchema } from "./schema";
 import { ZodBsdaTransporter, transformedBsdaTransporterSchema } from "./schema";
 import { ZodBsda, contextualSchemaAsync } from "./schema";
 import { BsdaValidationContext, PrismaBsdaForParsing } from "./types";
+import { BsdaType } from "@td/prisma";
 
 /**
  * Wrapper autour de `parseBsdaAsync` qui peut être appelé
@@ -61,6 +62,15 @@ export async function mergeInputAndParseBsdaAsync(
     ...context,
     currentSignatureType
   };
+
+  // Si le type du BSDA n'est pas un BSD de collecte, on réinitialise les champs liés au point de collecte
+  if (bsda.type !== BsdaType.GATHERING) {
+    bsda.emitterPickupSiteName = null;
+    bsda.emitterPickupSiteAddress = null;
+    bsda.emitterPickupSiteCity = null;
+    bsda.emitterPickupSitePostalCode = null;
+    bsda.emitterPickupSiteInfos = null;
+  }
 
   // Vérifie que l'on n'est pas en train de modifier des données
   // vérrouillées par signature.
