@@ -9,7 +9,6 @@ import { contextualSchema } from "./schema";
 import { ZodBsdaTransporter, transformedBsdaTransporterSchema } from "./schema";
 import { ZodBsda, contextualSchemaAsync } from "./schema";
 import { BsdaValidationContext, PrismaBsdaForParsing } from "./types";
-import { BsdaType } from "@td/prisma";
 
 /**
  * Wrapper autour de `parseBsdaAsync` qui peut être appelé
