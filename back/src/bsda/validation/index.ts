@@ -63,15 +63,6 @@ export async function mergeInputAndParseBsdaAsync(
     currentSignatureType
   };
 
-  // Si le type du BSDA n'est pas un BSD de collecte, on réinitialise les champs liés au point de collecte
-  if (bsda.type !== BsdaType.GATHERING) {
-    bsda.emitterPickupSiteName = null;
-    bsda.emitterPickupSiteAddress = null;
-    bsda.emitterPickupSiteCity = null;
-    bsda.emitterPickupSitePostalCode = null;
-    bsda.emitterPickupSiteInfos = null;
-  }
-
   // Vérifie que l'on n'est pas en train de modifier des données
   // vérrouillées par signature.
   const updatedFields = await checkBsdaSealedFields(
