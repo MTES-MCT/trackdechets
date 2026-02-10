@@ -50,6 +50,19 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
         "Le champ siret est obligatoire si l'export est demandé en tant qu'administrateur."
       );
     }
+
+    const recentExportsByUserCount = await prisma.registryExport.count({
+      where: {
+        createdById: user.id,
+        createdAt: { gte: subMinutes(new Date(), 5) }
+      }
+    });
+    if (recentExportsByUserCount >= 10 && !(user.isAdmin && asAdmin)) {
+      throw new TooManyRequestsError(
+        "Vous avez déjà réalisé 10 exports dans les 5 dernières minutes. Veuillez réessayer plus tard."
+      );
+    }
+
     const userCompanies = await getUserCompanies(user.id);
     if (siret) {
       const hasGovernmentPermission = await hasGovernmentRegistryPerm(user, [
