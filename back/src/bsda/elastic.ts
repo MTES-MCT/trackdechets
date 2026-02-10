@@ -434,7 +434,26 @@ export function toBsdElastic(bsda: BsdaForElastic): BsdElastic {
       bsda.ecoOrganismeSiret,
       bsda.destinationOperationNextDestinationCompanySiret,
       ...bsda.intermediaries.map(intermediary => intermediary.siret)
-    ].filter(Boolean)
+    ].filter(Boolean),
+    // Contacts
+    destinationCompanyContact: bsda.destinationCompanyContact ?? "",
+    destinationCompanyPhone: bsda.destinationCompanyPhone ?? "",
+    destinationCompanyMail: bsda.destinationCompanyMail ?? "",
+    emitterCompanyContact: bsda.emitterCompanyContact ?? "",
+    emitterCompanyPhone: bsda.emitterCompanyPhone ?? "",
+    emitterCompanyMail: bsda.emitterCompanyMail ?? "",
+    transporterCompanyContact: transporter?.transporterCompanyContact ?? "",
+    transporterCompanyPhone: transporter?.transporterCompanyPhone ?? "",
+    transporterCompanyMail: transporter?.transporterCompanyMail ?? "",
+    workerCompanyContact: bsda.workerCompanyContact ?? "",
+    workerCompanyPhone: bsda.workerCompanyPhone ?? "",
+    workerCompanyMail: bsda.workerCompanyMail ?? "",
+    nextDestinationCompanyContact:
+      bsda.destinationOperationNextDestinationCompanyContact ?? "",
+    nextDestinationCompanyPhone:
+      bsda.destinationOperationNextDestinationCompanyPhone ?? "",
+    nextDestinationCompanyMail:
+      bsda.destinationOperationNextDestinationCompanyMail ?? ""
   };
 }
 

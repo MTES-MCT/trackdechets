@@ -184,7 +184,65 @@ export function toElasticSimpleQuery(where: BsdWhere) {
         ),
         toElasticStringListQuery("sirets", where.sirets),
         toElasticTextQuery("companyNames", where.companyNames),
-        toElasticStringListQuery("companyOrgIds", where.companyOrgIds)
+        toElasticStringListQuery("companyOrgIds", where.companyOrgIds),
+        // Contacts
+        toElasticStringQuery(
+          "emitterCompanyContact",
+          where.emitter?.company?.contact
+        ),
+        toElasticStringQuery(
+          "emitterCompanyPhone",
+          where.emitter?.company?.phone
+        ),
+        toElasticStringQuery(
+          "emitterCompanyMail",
+          where.emitter?.company?.mail
+        ),
+        toElasticStringQuery(
+          "destinationCompanyContact",
+          where.destination?.company?.contact
+        ),
+        toElasticStringQuery(
+          "destinationCompanyPhone",
+          where.destination?.company?.phone
+        ),
+        toElasticStringQuery(
+          "destinationCompanyMail",
+          where.destination?.company?.mail
+        ),
+        toElasticStringQuery(
+          "nextDestinationCompanyContact",
+          where.destination?.operation?.nextDestination?.company?.contact
+        ),
+        toElasticStringQuery(
+          "nextDestinationCompanyPhone",
+          where.destination?.operation?.nextDestination?.company?.phone
+        ),
+        toElasticStringQuery(
+          "nextDestinationCompanyMail",
+          where.destination?.operation?.nextDestination?.company?.mail
+        ),
+        toElasticStringQuery(
+          "workerCompanyContact",
+          where.worker?.company?.contact
+        ),
+        toElasticStringQuery(
+          "workerCompanyPhone",
+          where.worker?.company?.phone
+        ),
+        toElasticStringQuery("workerCompanyMail", where.worker?.company?.mail),
+        toElasticStringQuery(
+          "transporterCompanyContact",
+          where.transporter?.company?.contact
+        ),
+        toElasticStringQuery(
+          "transporterCompanyPhone",
+          where.transporter?.company?.phone
+        ),
+        toElasticStringQuery(
+          "transporterCompanyMail",
+          where.transporter?.company?.mail
+        )
       ].filter(Boolean)
     }
   };

@@ -321,7 +321,24 @@ export function toBsdElastic(bsdasri: BsdasriForElastic): BsdElastic {
       bsdasri.traderCompanySiret,
       ...bsdasri.intermediaries.map(intermediary => intermediary.siret),
       ...bsdasri.intermediaries.map(intermediary => intermediary.vatNumber)
-    ].filter(Boolean)
+    ].filter(Boolean),
+
+    // Contacts
+    destinationCompanyContact: bsdasri.destinationCompanyContact ?? "",
+    destinationCompanyPhone: bsdasri.destinationCompanyPhone ?? "",
+    destinationCompanyMail: bsdasri.destinationCompanyMail ?? "",
+    emitterCompanyContact: bsdasri.emitterCompanyContact ?? "",
+    emitterCompanyPhone: bsdasri.emitterCompanyPhone ?? "",
+    emitterCompanyMail: bsdasri.emitterCompanyMail ?? "",
+    transporterCompanyContact: bsdasri.transporterCompanyContact ?? "",
+    transporterCompanyPhone: bsdasri.transporterCompanyPhone ?? "",
+    transporterCompanyMail: bsdasri.transporterCompanyMail ?? "",
+    workerCompanyContact: "",
+    workerCompanyPhone: "",
+    workerCompanyMail: "",
+    nextDestinationCompanyContact: "",
+    nextDestinationCompanyPhone: "",
+    nextDestinationCompanyMail: ""
   };
 }
 
