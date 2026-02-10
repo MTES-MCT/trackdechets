@@ -197,17 +197,19 @@ export async function processRegistryExportJob(
      *
      * 1. If a company has NOT activated the DND traceability option (hasEnabledRegistryDndFromBsdSince is null):
      *    - No DND BSDs appear in regulatory registries for that company
-     *    - DD (Dangerous Waste) and TEXS (waste codes 17 05 04, 17 05 06, 20 02 02) BSDs can still appear
+     *    - DD (Dangerous Waste) and dangerous TEXS (waste codes 17 05 05*, 17 05 03*) BSDs can still appear
      *    - REGISTRY declarations always appear
      *
      * 2. If a company HAS activated the DND traceability option (hasEnabledRegistryDndFromBsdSince is set):
-     *    a. TEXS BSDs (waste codes 17 05 04, 17 05 06, 20 02 02):
+     *    a. non-dangerous TEXS BSDs (waste codes 17 05 04, 17 05 06, 20 02 02):
      *       - Always appear in regulatory registries, regardless of company profile type
+     *       - Only for BSDs dated on or after the activation date (hasEnabledRegistryDndFromBsdSince)
      *
      *    b. DND BSDs (other non-dangerous waste codes):
      *       - Only appear if the company has at least one of these waste processor sub-profiles:
-     *         * "Incinération de déchets non dangereux" (Non-dangerous waste incineration)
-     *         * "Installation de stockage de déchets non dangereux" (Non-dangerous waste storage)
+     *         * "Incinération de déchets non dangereux" (Non-dangerous waste incineration) WASTEPROCESSOR + NON_DANGEROUS_WASTES_INCINERATION
+     *         * "Installation de stockage de déchets non dangereux" (Non-dangerous waste storage) WASTEPROCESSOR + NON_DANGEROUS_WASTES_STORAGE
+     *         * "Installation dans laquelle les déchets perdent leur statut de déchet" RECOVERY_FACILITY
      *       - Only appear for BSDs dated on or after the activation date (hasEnabledRegistryDndFromBsdSince)
      *       - If the company doesn't have these profiles, DND BSDs are excluded even if the option is enabled
      *
@@ -220,7 +222,7 @@ export async function processRegistryExportJob(
     if (
       // if there is a chance that DND BSDs are in the export
       (!registryExport.wasteTypes?.length ||
-        registryExport.wasteTypes.some(wasteType => wasteType === "DND")) && // the user wants DNDs in the export
+        registryExport.wasteTypes.some(wasteType => wasteType === "DND" || wasteType === "TEXS")) && // the user wants DNDs or dangerous TEXS in the export
       registryExport.declarationType !== "REGISTRY" && // the user doesn't want a RNDTS declaration only export
       registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry (no BSDs in SSD export)
     ) {
@@ -242,13 +244,14 @@ export async function processRegistryExportJob(
         if (company.hasEnabledRegistryDndFromBsdSince) {
           // Company has activated DND traceability
           if (
-            company.companyTypes.includes(CompanyType.WASTEPROCESSOR) &&
-            (company.wasteProcessorTypes.includes(
-              WasteProcessorType.NON_DANGEROUS_WASTES_INCINERATION
-            ) ||
-              company.wasteProcessorTypes.includes(
-                WasteProcessorType.NON_DANGEROUS_WASTES_STORAGE
-              ))
+            (company.companyTypes.includes(CompanyType.WASTEPROCESSOR) &&
+              (company.wasteProcessorTypes.includes(
+                WasteProcessorType.NON_DANGEROUS_WASTES_INCINERATION
+              ) ||
+                company.wasteProcessorTypes.includes(
+                  WasteProcessorType.NON_DANGEROUS_WASTES_STORAGE
+                ))) ||
+            company.companyTypes.includes(CompanyType.RECOVERY_FACILITY)
           ) {
             // Company is a waste processor with non-dangerous waste incineration or storage profile
             // Include: REGISTRY declarations, DD/TEXS BSDs, and DND BSDs after activation date
@@ -259,8 +262,21 @@ export async function processRegistryExportJob(
                   declarationType: "REGISTRY"
                 },
                 {
-                  wasteType: { in: ["DD", "TEXS"] },
+                  wasteType: "DD",
                   declarationType: "BSD"
+                },
+                {
+                  wasteType: "TEXS",
+                  declarationType: "BSD",
+                  wasteCode: { in: ["17 05 05*", "17 05 03*"] },
+                },
+                {
+                  wasteType: "TEXS",
+                  declarationType: "BSD",
+                  wasteCode: { in: ["17 05 04", "17 05 06", "20 02 02"] },
+                  date: {
+                    gte: company.hasEnabledRegistryDndFromBsdSince
+                  }
                 },
                 {
                   wasteType: "DND",
@@ -281,15 +297,28 @@ export async function processRegistryExportJob(
                   declarationType: "REGISTRY"
                 },
                 {
-                  wasteType: { in: ["DD", "TEXS"] },
+                  wasteType: "DD",
                   declarationType: "BSD"
-                }
+                },
+                {
+                  wasteType: "TEXS",
+                  declarationType: "BSD",
+                  wasteCode: { in: ["17 05 05*", "17 05 03*"] },
+                },
+                {
+                  wasteType: "TEXS",
+                  declarationType: "BSD",
+                  wasteCode: { in: ["17 05 04", "17 05 06", "20 02 02"] },
+                  date: {
+                    gte: company.hasEnabledRegistryDndFromBsdSince
+                  }
+                },
               ]
             } as Prisma.RegistryLookupWhereInput;
           }
         } else {
           // Company has NOT activated DND traceability
-          // Include: REGISTRY declarations and DD/TEXS BSDs only (exclude all DND BSDs)
+          // Include: REGISTRY declarations, DD BSDs and dangerous TEXS BSDs only (exclude all DND BSDs)
           return {
             siret: company.orgId,
             OR: [
@@ -297,8 +326,13 @@ export async function processRegistryExportJob(
                 declarationType: "REGISTRY"
               },
               {
-                wasteType: { in: ["DD", "TEXS"] },
+                wasteType: "DD",
                 declarationType: "BSD"
+              },
+              {
+                wasteType: "TEXS",
+                declarationType: "BSD",
+                wasteCode: { in: ["17 05 05*", "17 05 03*"] },
               }
             ]
           } as Prisma.RegistryLookupWhereInput;
@@ -334,8 +368,8 @@ export async function processRegistryExportJob(
           : undefined,
       wasteCode: registryExport.wasteCodes?.length
         ? {
-            in: registryExport.wasteCodes
-          }
+          in: registryExport.wasteCodes
+        }
         : undefined,
       declarationType: registryExport.declarationType ?? undefined,
       date: {
