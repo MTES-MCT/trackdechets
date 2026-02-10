@@ -11,6 +11,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { sendMail } from "../../../../mailer/mailing";
 import { renderMail, inviteUserToJoin } from "@td/mail";
 import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
+import { prisma } from "@td/prisma";
 
 // No mails
 jest.mock("../../../../mailer/mailing");
@@ -56,6 +57,31 @@ describe("mutation resendInvitation", () => {
       })
     );
   });
+
+  it("should not resend expired invitations", async () => {
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+    const usrToInvite = "expired.resend@trackdechets.fr";
+    // create an expired invitation
+    await prisma.userAccountHash.create({
+      data: {
+        email: usrToInvite,
+        role: "MEMBER",
+        companySiret: company.siret!,
+        hash: "expired-resend",
+        expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
+      }
+    });
+
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+
+    const { errors } = await mutate(RESEND_INVITATION, {
+      variables: { email: usrToInvite, siret: company.siret }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors?.[0].message).toEqual("Invitation non trouvée");
+  });
+
   test("TD admin user can resend a pending invitation", async () => {
     const company = await companyFactory();
     const usrToInvite = "john.snow@trackdechets.fr";
