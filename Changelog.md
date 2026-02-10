@@ -10,10 +10,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 ### :boom: Breaking changes
 
 - Suppression du champ `consistence` sur WasteDetails et WasteDetailsInput (BSDD). L'utilisation du champ `consistences` est maintenant obligatoire [PR 4634](https://github.com/MTES-MCT/trackdechets/pull/4634)
+- Le champ `destinationReceptionRefusedWeight` est désormais obligatoire sur le BSDA [PR 4638](https://github.com/MTES-MCT/trackdechets/pull/4638)
 
 #### :nail_care: Améliorations
 
 - Changement des règles de traçabilité DND/TEXS selon les types d'établissements [PR 4643](https://github.com/MTES-MCT/trackdechets/pull/4643)
+- Ajout du mode de traitement sur le PDF d'un BSFF [PR 4624](https://github.com/MTES-MCT/trackdechets/pull/4624)
+- Affichage des bons lots entrants dans le cadre 10 des PDFs des BSVHUs [PR 4625](https://github.com/MTES-MCT/trackdechets/pull/4625)
+- Ajout des intermédiaires au PDF du BSVHU [PR 4661](https://github.com/MTES-MCT/trackdechets/pull/4661)
+- Retrait de l'affichage du code de signature aux chauffeurs [PR 4664](https://github.com/MTES-MCT/trackdechets/pull/4664)
 
 #### :bug: Corrections de bugs
 
