@@ -22,7 +22,9 @@ export const myCompaniesXlsDownloadHandler: DownloadHandler<MyCompaniesXlsArgs> 
       const companyIds = associations.map(a => a.companyId);
       const reader = myCompaniesReader({
         companyIds,
-        chunk: 100
+        chunk: 100,
+        requestingUserId: userId,
+        isTDAdmin: false
       });
 
       const filename = getCompaniesExportFileName();

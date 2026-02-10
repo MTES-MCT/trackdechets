@@ -21,7 +21,9 @@ export const myCompaniesCsvDownloadHandler: DownloadHandler<MyCompaniesCsvArgs> 
       const companyIds = associations.map(a => a.companyId);
       const reader = myCompaniesReader({
         companyIds,
-        chunk: 100
+        chunk: 100,
+        requestingUserId: userId,
+        isTDAdmin: false
       });
       const filename = getCompaniesExportFileName();
       res.set("Content-disposition", `attachment; filename=${filename}.csv`);
