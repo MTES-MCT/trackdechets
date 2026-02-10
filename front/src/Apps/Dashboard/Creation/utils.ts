@@ -169,6 +169,9 @@ const pathPrefixToTab = {
     return null;
   },
   [BsdType.Bsda]: (pathPrefix: string): TabId | null => {
+    if (pathPrefix.startsWith("packagings")) {
+      return TabId.waste;
+    }
     if (Object.values(TabId).includes(pathPrefix as TabId)) {
       return TabId[pathPrefix];
     }
