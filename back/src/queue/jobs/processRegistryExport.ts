@@ -222,7 +222,9 @@ export async function processRegistryExportJob(
     if (
       // if there is a chance that DND BSDs are in the export
       (!registryExport.wasteTypes?.length ||
-        registryExport.wasteTypes.some(wasteType => wasteType === "DND" || wasteType === "TEXS")) && // the user wants DNDs or dangerous TEXS in the export
+        registryExport.wasteTypes.some(
+          wasteType => wasteType === "DND" || wasteType === "TEXS"
+        )) && // the user wants DNDs or dangerous TEXS in the export
       registryExport.declarationType !== "REGISTRY" && // the user doesn't want a RNDTS declaration only export
       registryExport.registryType !== "SSD" // the user doesn't want a RNDTS declaration only registry (no BSDs in SSD export)
     ) {
@@ -268,7 +270,7 @@ export async function processRegistryExportJob(
                 {
                   wasteType: "TEXS",
                   declarationType: "BSD",
-                  wasteCode: { in: ["17 05 05*", "17 05 03*"] },
+                  wasteCode: { in: ["17 05 05*", "17 05 03*"] }
                 },
                 {
                   wasteType: "TEXS",
@@ -303,7 +305,7 @@ export async function processRegistryExportJob(
                 {
                   wasteType: "TEXS",
                   declarationType: "BSD",
-                  wasteCode: { in: ["17 05 05*", "17 05 03*"] },
+                  wasteCode: { in: ["17 05 05*", "17 05 03*"] }
                 },
                 {
                   wasteType: "TEXS",
@@ -312,7 +314,7 @@ export async function processRegistryExportJob(
                   date: {
                     gte: company.hasEnabledRegistryDndFromBsdSince
                   }
-                },
+                }
               ]
             } as Prisma.RegistryLookupWhereInput;
           }
@@ -332,7 +334,7 @@ export async function processRegistryExportJob(
               {
                 wasteType: "TEXS",
                 declarationType: "BSD",
-                wasteCode: { in: ["17 05 05*", "17 05 03*"] },
+                wasteCode: { in: ["17 05 05*", "17 05 03*"] }
               }
             ]
           } as Prisma.RegistryLookupWhereInput;
@@ -368,8 +370,8 @@ export async function processRegistryExportJob(
           : undefined,
       wasteCode: registryExport.wasteCodes?.length
         ? {
-          in: registryExport.wasteCodes
-        }
+            in: registryExport.wasteCodes
+          }
         : undefined,
       declarationType: registryExport.declarationType ?? undefined,
       date: {
