@@ -7,6 +7,7 @@ resources:
   - secrets.yaml
   - resourcequota.yaml
   - limitrange.yaml
+  - ../external-secrets/
   - ../databases/postgresql.yaml
   - ../databases/redis.yaml
   - ../databases/elasticsearch.yaml

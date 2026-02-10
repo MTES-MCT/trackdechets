@@ -95,10 +95,10 @@ model RegistrySsd {
     destinationCompanyCountryCode String?
 
     registryLookups RegistryLookup[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistrySsdImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistrySsdPublicIdReportForSiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryIncomingWaste {
@@ -218,10 +218,10 @@ model RegistryIncomingWaste {
     transporter5CompanyCountryCode         String?
 
     registryLookups RegistryLookup[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryIncomingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingWastePublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryIncomingTexs {
@@ -350,10 +350,10 @@ model RegistryIncomingTexs {
 
     registryLookups   RegistryLookup[]
     texsAnalysisFiles RegistryTexsAnalysisFile[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryIncomingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryIncomingTexsPublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryOutgoingTexs {
@@ -483,10 +483,10 @@ model RegistryOutgoingTexs {
 
     registryLookups   RegistryLookup[]
     texsAnalysisFiles RegistryTexsAnalysisFile[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryOutgoingTexsImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingTexsPublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryOutgoingWaste {
@@ -606,10 +606,10 @@ model RegistryOutgoingWaste {
     transporter5CompanyCountryCode         String?
 
     registryLookups RegistryLookup[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryOutgoingWasteImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryOutgoingWastePublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryTransported {
@@ -683,10 +683,10 @@ model RegistryTransported {
     traderRecepisseNumber          String?
 
     registryLookups RegistryLookup[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryTransportedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryTransportedPublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 model RegistryManaged {
@@ -825,10 +825,10 @@ model RegistryManaged {
 
     registryLookups   RegistryLookup[]
     texsAnalysisFiles RegistryTexsAnalysisFile[]
+    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 
     @@index([importId], map: "_RegistryManagedImportIdIdx")
     @@index([publicId, reportForCompanySiret], map: "_RegistryManagedPublicIdReportForCompanySiretIdx")
-    // + Unique index on (publicId, reportForCompanySiret) where isLatest = true - not supported by Prisma
 }
 
 enum RegistryExportType {
@@ -990,12 +990,12 @@ model RegistryLookup {
     // array of elements so gin index
     @@index([reportAsSiret], map: "_RegistryLookupReportAsSiretIdx")
     // multi-column index because those columns are mandatory for any export
-    @@index([siret, exportRegistryType, date(sort: Asc)], map: "_RegistryLookupMainIdx")
+    @@index([siret, exportRegistryType, date(sort: Asc), dateId(sort: Asc)], map: "_RegistryLookupMainSortIdx")
     @@index([declarationType], map: "_RegistryLookupDeclarationTypeIdx")
     @@index([wasteType], map: "_RegistryLookupWasteTypeIdx")
     @@index([wasteCode], map: "_RegistryLookupWasteCodeIdx")
     @@index([readableId], map: "_RegistryLookupReadableIdIdx")
-    @@index([siret, declaredAt(sort: Desc), declarationType], map: "_RegistryLookupLinesReadIdx")
+    @@index([siret, declarationType, declaredAtId(sort: Desc)], map: "_RegistryLookupLinesReadSortIdx")
 }
 
 enum RegistrySource {
@@ -1035,7 +1035,7 @@ model RegistryTexsAnalysisFile {
     id        String   @id @default(cuid())
     createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-    s3FileKey        String
+    s3FileKey        String @unique(map: "RegistryTexsAnalysisFile.s3FileKey._UNIQUE")
     originalFileName String
 
     registryIncomingTexsId String?

@@ -51,15 +51,16 @@ const DEFAULT_VALUES: Partial<FormValues> = {
 export function RegistrySsdForm({ onClose }: Props) {
   const { search } = useLocation();
   const queryParams = new URLSearchParams(search);
+  const isDuplicate = queryParams.get("duplicate") === "1";
+  const hasPublicId = !!queryParams.get("publicId");
+  const hasSiret = !!queryParams.get("siret");
   const [disabledFieldNames, setDisabledFieldNames] = useState<string[]>([]);
-  const [loadingLookup, setLoadingLookup] = useState(
-    !!queryParams.get("publicId") && !!queryParams.get("siret")
-  );
+  const [loadingLookup, setLoadingLookup] = useState(hasPublicId && hasSiret);
 
   const methods = useForm<FormValues>({
     defaultValues: {
       ...DEFAULT_VALUES,
-      reason: queryParams.get("publicId") ? RegistryLineReason.Edit : null
+      reason: hasPublicId && !isDuplicate ? RegistryLineReason.Edit : null
     },
     resolver: zodResolver(schemaFromShape(ssdFormShape))
   });
@@ -70,7 +71,7 @@ export function RegistrySsdForm({ onClose }: Props) {
       publicId: queryParams.get("publicId"),
       siret: queryParams.get("siret")
     },
-    skip: !queryParams.get("publicId") || !queryParams.get("siret"),
+    skip: !hasPublicId || !hasSiret,
     fetchPolicy: "network-only",
     onCompleted: data => {
       if (data.registryLookup.ssd) {
@@ -78,9 +79,12 @@ export function RegistrySsdForm({ onClose }: Props) {
           Object.entries(data.registryLookup.ssd).filter(([_, v]) => v != null)
         ) as SsdLineInput;
 
+        // For duplication, exclude publicId from the form data
+        const { publicId: _, ...propsWithoutPublicId } = definedSsdProps;
+
         methods.reset({
           ...DEFAULT_VALUES,
-          ...definedSsdProps,
+          ...(isDuplicate ? propsWithoutPublicId : definedSsdProps),
           secondaryWasteCodes: transformToFieldArrayObjects(
             definedSsdProps.secondaryWasteCodes
           ),
@@ -93,9 +97,12 @@ export function RegistrySsdForm({ onClose }: Props) {
           ),
           dispatchDate: isoDateToHtmlDate(definedSsdProps.dispatchDate),
           useDate: isoDateToHtmlDate(definedSsdProps.useDate),
-          reason: RegistryLineReason.Edit
+          reason: isDuplicate ? null : RegistryLineReason.Edit
         });
-        setDisabledFieldNames(["publicId", "reportForCompanySiret"]);
+        // For duplication, only disable reportForCompanySiret, not publicId
+        setDisabledFieldNames(
+          isDuplicate ? [] : ["publicId", "reportForCompanySiret"]
+        );
       }
       setLoadingLookup(false);
     },

@@ -15,6 +15,7 @@ import { fixTyping } from "../typing";
 import { sendAdminRequestVerificationCodeLetter } from "../../../common/post";
 import {
   checkCanCreateAdminRequest,
+  checkCollaboratorForAdminRequest,
   generateCode,
   getAdminOnlyEndDate,
   sendEmailToAuthor,
@@ -65,9 +66,25 @@ const createAdminRequest = async (
     user,
     adminRequestInput,
     company,
-    companyAssociation,
-    collaborator
+    companyAssociation
   );
+
+  // Run collaborator-specific checks but don't reveal collaborator existence to caller.
+  // If collaborator checks fail, we still create the request (to avoid leaking existence),
+  // but we'll avoid setting `collaboratorId` and therefore avoid sending any collaborator-specific mails.
+  let collaboratorCheckFailed = false;
+  if (adminRequestInput.collaboratorEmail) {
+    try {
+      await checkCollaboratorForAdminRequest(
+        user,
+        adminRequestInput,
+        company,
+        collaborator
+      );
+    } catch (_) {
+      collaboratorCheckFailed = true;
+    }
+  }
 
   // If validation method is mail, generate a code
   const code =
@@ -89,23 +106,27 @@ const createAdminRequest = async (
     async () => {
       // Check pending request count
       const { count, create } = getAdminRequestRepository(user);
-      
+
       const pendingRequests = await count({
         userId: user.id,
         status: AdminRequestStatus.PENDING
       });
 
-      if (pendingRequests >= 5) { // MAX_SIMULTANEOUS_PENDING_REQUESTS
+      if (pendingRequests >= 5) {
+        // MAX_SIMULTANEOUS_PENDING_REQUESTS
         throw new ForbiddenError(
           `Il n'est pas possible d'avoir plus de 5 demandes en cours.`
         );
       }
-      
+
+      const collaboratorId =
+        collaboratorCheckFailed || !collaborator ? null : collaborator.id;
+
       return await create(
         {
           user: { connect: { id: user.id } },
           company: { connect: { id: company.id } },
-          collaboratorId: collaborator?.id,
+          collaboratorId,
           validationMethod: adminRequestInput.validationMethod,
           adminOnlyEndDate,
           code

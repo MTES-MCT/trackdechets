@@ -13,13 +13,11 @@ import {
 import { subMonths } from "date-fns";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { generatePath, Link, useParams } from "react-router-dom";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
-import routes from "../../../routes";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import { GET_BSDA, SIGN_BsDA } from "../../../common/queries/bsda/queries";
@@ -51,8 +49,6 @@ const schema = z.object({
 export type ZodBdsaEmission = z.infer<typeof schema>;
 
 const SignBsdaEmission = ({ bsdaId, onClose }) => {
-  const { siret } = useParams<{ siret: string }>();
-
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: bsdaId
@@ -97,102 +93,76 @@ const SignBsdaEmission = ({ bsdaId, onClose }) => {
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
-      {bsda.metadata?.errors?.some(
-        error => error?.requiredFor === BsdaSignatureType.Emission
-      ) ? (
-        <>
-          <p className="tw-mt-2 tw-text-red-700">
-            Vous devez mettre à jour le bordereau et renseigner les champs
-            obligatoires avant de le signer.
-          </p>
-          <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
-            {bsda.metadata?.errors.map((error, idx) => (
-              <li key={idx}>{error?.message}</li>
-            ))}
-          </ul>
-          <Link
-            to={generatePath(routes.dashboard.bsdas.edit, {
-              siret,
-              id: bsda.id
-            })}
-            className="fr-btn fr-btn--primary"
-          >
-            Mettre le bordereau à jour pour le signer
-          </Link>
-        </>
-      ) : (
-        <>
-          <BsdaWasteSummary
-            bsda={bsda}
-            showScelles={
-              bsda.status === "INITIAL" &&
-              (bsda.type === BsdaType.Gathering ||
-                bsda.type === BsdaType.Reshipment)
-            }
-          />
-          <BsdaJourneySummary bsda={bsda} />
-          {!!initialBsdas?.length && (
-            <div className="tw-pb-4">
-              <h4 className="fr-text fr-text--bold">BSDAs associés</h4>
-              <InitialBsdas bsdas={initialBsdas} />
-            </div>
-          )}
+      <>
+        <BsdaWasteSummary
+          bsda={bsda}
+          showScelles={
+            bsda.status === "INITIAL" &&
+            (bsda.type === BsdaType.Gathering ||
+              bsda.type === BsdaType.Reshipment)
+          }
+        />
+        <BsdaJourneySummary bsda={bsda} />
+        {!!initialBsdas?.length && (
+          <div className="tw-pb-4">
+            <h4 className="fr-text fr-text--bold">BSDAs associés</h4>
+            <InitialBsdas bsdas={initialBsdas} />
+          </div>
+        )}
 
-          <p className="fr-text fr-mb-2w">
-            En qualité <strong>d'émetteur du déchet</strong>, j'atteste que les
-            informations ci-dessus sont correctes. En signant ce document,
-            j'autorise les établissements désignés à prendre en charge le
-            déchet.
-          </p>
+        <p className="fr-text fr-mb-2w">
+          En qualité <strong>d'émetteur du déchet</strong>, j'atteste que les
+          informations ci-dessus sont correctes. En signant ce document,
+          j'autorise les établissements désignés à prendre en charge le déchet.
+        </p>
 
-          <form
-            onSubmit={handleSubmit(async data => {
-              await signBsda({
-                variables: {
-                  id: bsda.id,
-                  input: { ...data, type: BsdaSignatureType.Emission }
-                }
-              });
-              onClose();
-            })}
-          >
-            <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
-              <Input
-                label="Date de prise en charge"
-                nativeInputProps={{
-                  type: "date",
-                  min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
-                  max: datetimeToYYYYMMDD(TODAY),
-                  ...register("date")
-                }}
-                state={formState.errors.date ? "error" : "default"}
-                stateRelatedMessage={formState.errors.date?.message}
-              />
-            </div>
-            <div className="fr-col-8 fr-mb-2w">
-              <Input
-                label="Nom et prénom"
-                state={formState.errors.author ? "error" : "default"}
-                nativeInputProps={{
-                  ...register("author")
-                }}
-                stateRelatedMessage={formState.errors.author?.message}
-              />
-            </div>
-            <div className="fr-mb-8w">
-              {error && <DsfrNotificationError apolloError={error} />}
-            </div>
+        <form
+          onSubmit={handleSubmit(async data => {
+            await signBsda({
+              variables: {
+                id: bsda.id,
+                input: { ...data, type: BsdaSignatureType.Emission }
+              }
+            });
+            onClose();
+          })}
+        >
+          <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
+            <Input
+              label="Date d'émission"
+              nativeInputProps={{
+                type: "date",
+                min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
+                max: datetimeToYYYYMMDD(TODAY),
+                ...register("date")
+              }}
+              state={formState.errors.date ? "error" : "default"}
+              stateRelatedMessage={formState.errors.date?.message}
+            />
+          </div>
+          <div className="fr-col-8 fr-mb-2w">
+            <Input
+              label="Nom et prénom"
+              state={formState.errors.author ? "error" : "default"}
+              nativeInputProps={{
+                ...register("author")
+              }}
+              stateRelatedMessage={formState.errors.author?.message}
+            />
+          </div>
+          <div className="fr-mb-8w">
+            {error && <DsfrNotificationError apolloError={error} />}
+          </div>
 
-            <hr className="fr-mt-2w" />
-            <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-              <Button type="button" priority="secondary" onClick={onCancel}>
-                Annuler
-              </Button>
-              <Button disabled={loading}>Signer</Button>
-            </div>
-          </form>
-        </>
-      )}
+          <hr className="fr-mt-2w" />
+          <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+            <Button type="button" priority="secondary" onClick={onCancel}>
+              Annuler
+            </Button>
+            <Button disabled={loading}>Signer</Button>
+          </div>
+        </form>
+      </>
     </TdModal>
   );
 };

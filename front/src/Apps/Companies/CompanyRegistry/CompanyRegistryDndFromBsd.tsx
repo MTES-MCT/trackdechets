@@ -160,6 +160,44 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
               </li>
             </ul>
           </div>
+          <p className="fr-text--bold">
+            Précisions selon les codes déchets et types de profils établissement
+            :{" "}
+          </p>
+          <div className="fr-my-5v">
+            <ul className="fr-list">
+              <li>
+                Les bordereaux concernant les codes déchets terres ou sédiments
+                non dangereux, à savoir <b>17 05 04, 17 05 06 et 20 02 02</b>,
+                ne contenant pas de POP et n'ayant pas été forcé comme dangereux
+                remonteront dans les registres réglementaires des établissements
+                concernés, <b>quel que soit leur type de profil</b>.
+              </li>
+              <li>
+                Pour les autres codes déchets non dangereux ne contenant pas de
+                POP et n'ayant pas été forcé comme dangereux, les bordereaux
+                remonteront uniquement si l'établissement dispose au moins d'un
+                des sous-types de profil suivants :
+                <ul className="fr-list fr-list--circle">
+                  <li>
+                    Incinération de déchets non dangereux (rubriques 2771, 2740)
+                  </li>
+                  <li>
+                    Installation de stockage de déchets non dangereux (rubriques
+                    2720-2, 2760-2-a, 2760-2-b)
+                  </li>
+                  <li>
+                    Installation dans laquelle les déchets perdent leur statut
+                    de déchet
+                  </li>
+                  <li>
+                    Sinon, à défaut, ils ne remontent pas dans les registres
+                    réglementaires.
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
           <div className="fr-my-5v">
             <p>
               Plus d'informations{" "}
@@ -217,6 +255,40 @@ export const CompanyRegistryDndFromBsd = ({ company }: Props) => {
                 Les déchets non dangereux tracés avec Trackdéchets seront
                 consultables via l'ensemble des registres réglementaires et
                 exhaustif.
+              </li>
+            </ul>
+          </div>
+          <p className="fr-text--bold">
+            Précisions selon les codes déchets et types de profils établissement
+            :{" "}
+          </p>
+          <div className="fr-my-5v">
+            <ul className="fr-list">
+              <li>
+                Les bordereaux concernant les codes déchets terres ou sédiments
+                non dangereux, à savoir <b>17 05 04, 17 05 06 et 20 02 02</b>,
+                ne contenant pas de POP et n'ayant pas été forcé comme dangereux
+                remonteront dans les registres réglementaires des établissements
+                concernés, <b>quel que soit leur type de profil</b>.
+              </li>
+              <li>
+                Pour les autres codes déchets non dangereux ne contenant pas de
+                POP et n'ayant pas été forcé comme dangereux, les bordereaux
+                remonteront uniquement si l'établissement dispose au moins d'un
+                des sous-types de profil suivants :
+                <ul className="fr-list fr-list--circle">
+                  <li>
+                    Incinération de déchets non dangereux (rubriques 2771, 2740)
+                  </li>
+                  <li>
+                    Installation de stockage de déchets non dangereux (rubriques
+                    2720-2, 2760-2-a, 2760-2-b)
+                  </li>
+                  <li>
+                    Sinon, à défaut, ils ne remontent pas dans les registres
+                    réglementaires.
+                  </li>
+                </ul>
               </li>
             </ul>
           </div>

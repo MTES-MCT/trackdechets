@@ -6,16 +6,27 @@ on:
       - dev
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docker:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           filter: tree:0
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -26,4 +37,12 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
         with:
           main-branch-name: ${{ github.base_ref || github.ref_name }}
-      - run: npx nx affected -t docker:build --parallel=3
+      - run: npx nx run-many -t docker:build --all --parallel=3
+      - name: Tag and Push Images
+        run: |
+          TAG=$(echo "${{ github.head_ref || github.ref_name }}" | sed 's|/|-|g')
+          PROJECTS="api ui queues-runner queues-indexation queues-webhooks queues-gerico queues-bulk-indexation queues-bulk-indexation-master cron notifier"
+          for project in $PROJECTS; do
+            docker tag apps-${project}:latest ghcr.io/mtes-mct/trackdechets/${project}:${TAG}
+            docker push ghcr.io/mtes-mct/trackdechets/${project}:${TAG}
+          done

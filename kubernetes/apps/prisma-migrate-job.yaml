@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: prisma-migrate
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: prisma-migrate
     app.kubernetes.io/name: prisma-migrate
@@ -17,14 +17,14 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: migrate
-          image: ghcr.io/trackdechets/api:latest
+          image: ghcr.io/mtes-mct/trackdechets/api:latest
           command: ["npx", "prisma", "migrate", "deploy"]
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:

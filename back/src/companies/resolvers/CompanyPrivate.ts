@@ -8,12 +8,23 @@ import { toGqlCompanyPublic } from "../converters";
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user!.id;
-    return getCompanyUsers(
+    const users = await getCompanyUsers(
       parent.orgId,
       context.dataloaders,
       userId,
       context.user!.isAdmin
     );
+
+    return users.map(user => {
+      if (user.isPendingInvitation) {
+        return {
+          ...user,
+          isActive: null
+        };
+      }
+
+      return user;
+    });
   },
   userRole: async (parent, _, context) => {
     if (parent.userRole) {

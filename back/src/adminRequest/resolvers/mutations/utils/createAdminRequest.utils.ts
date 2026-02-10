@@ -3,6 +3,7 @@ import { sendMail } from "../../../../mailer/mailing";
 import {
   adminRequestInitialInfoToAuthorEmail,
   adminRequestInitialWarningToAdminEmail,
+  MessageVersion,
   renderMail
 } from "@td/mail";
 import {
@@ -22,8 +23,6 @@ import { getAdminRequestRepository } from "../../../repository";
 import { addDays } from "date-fns";
 import { isDefinedStrict } from "../../../../common/helpers";
 
-
-
 // Generates an 8 digit code, using only numbers. Can include and start with zeros
 export const generateCode = () => {
   return Math.floor(10000000 + Math.random() * 90000000).toString();
@@ -33,41 +32,12 @@ export const checkCanCreateAdminRequest = async (
   user: Express.User,
   adminRequestInput: ParsedCreateAdminRequestInput,
   company: Company,
-  companyAssociation: CompanyAssociation | null,
-  collaborator: User | null
+  companyAssociation: CompanyAssociation | null
 ) => {
   if (companyAssociation?.role === UserRole.ADMIN) {
     throw new UserInputError(
       "Vous êtes déjà administrateur de cet établissement."
     );
-  }
-
-  if (adminRequestInput.collaboratorEmail) {
-    if (!collaborator) {
-      throw new UserInputError(
-        "Ce collaborateur n'est pas inscrit sur Trackdéchets."
-      );
-    }
-
-    if (collaborator && collaborator.id === user.id) {
-      throw new UserInputError(
-        "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
-      );
-    }
-
-    const collaboratorCompanyAssociation =
-      await prisma.companyAssociation.findFirst({
-        where: {
-          userId: collaborator.id,
-          companyId: company.id
-        }
-      });
-
-    if (!collaboratorCompanyAssociation) {
-      throw new UserInputError(
-        "Ce collaborateur n'est pas rattaché à cet établissement."
-      );
-    }
   }
 
   const { findFirst, count } = getAdminRequestRepository(user);
@@ -124,6 +94,41 @@ export const checkCanCreateAdminRequest = async (
   }
 };
 
+export const checkCollaboratorForAdminRequest = async (
+  user: Express.User,
+  adminRequestInput: ParsedCreateAdminRequestInput,
+  company: Company,
+  collaborator: User | null
+) => {
+  if (!adminRequestInput.collaboratorEmail) return;
+
+  if (!collaborator) {
+    throw new UserInputError(
+      "Ce collaborateur n'est pas inscrit sur Trackdéchets."
+    );
+  }
+
+  if (collaborator && collaborator.id === user.id) {
+    throw new UserInputError(
+      "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
+    );
+  }
+
+  const collaboratorCompanyAssociation =
+    await prisma.companyAssociation.findFirst({
+      where: {
+        userId: collaborator.id,
+        companyId: company.id
+      }
+    });
+
+  if (!collaboratorCompanyAssociation) {
+    throw new UserInputError(
+      "Ce collaborateur n'est pas rattaché à cet établissement."
+    );
+  }
+};
+
 export const sendEmailToCompanyAdmins = async (
   author: User,
   company: Company,
@@ -140,22 +145,32 @@ export const sendEmailToCompanyAdmins = async (
   });
 
   if (adminsCompanyAssociations.length) {
+    const variables = {
+      company: { orgId: company.orgId, name: company.name },
+      user: { name: author.name, email: author.email },
+      adminRequest,
+      isValidationByCollaboratorApproval:
+        adminRequest.validationMethod ===
+        AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
+      isValidationByMail:
+        adminRequest.validationMethod === AdminRequestValidationMethod.SEND_MAIL
+    };
+
+    const messageVersions: MessageVersion[] = adminsCompanyAssociations.map(
+      association => ({
+        to: [
+          {
+            email: association.user.email,
+            name: association.user.name
+          }
+        ],
+        params: { body: "" }
+      })
+    );
+
     const mail = renderMail(adminRequestInitialWarningToAdminEmail, {
-      to: adminsCompanyAssociations.map(association => ({
-        email: association.user.email,
-        name: association.user.name
-      })),
-      variables: {
-        company: { orgId: company.orgId, name: company.name },
-        user: { name: author.name, email: author.email },
-        adminRequest,
-        isValidationByCollaboratorApproval:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.REQUEST_COLLABORATOR_APPROVAL,
-        isValidationByMail:
-          adminRequest.validationMethod ===
-          AdminRequestValidationMethod.SEND_MAIL
-      }
+      variables,
+      messageVersions
     });
 
     await sendMail(mail);
@@ -192,4 +207,3 @@ export const getAdminOnlyEndDate = (): Date => {
 
   return sameDayMidnight(resultDate);
 };
-

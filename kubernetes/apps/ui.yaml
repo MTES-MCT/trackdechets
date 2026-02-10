@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ui
-  namespace: trackdechets
+  namespace: trackdechets-frontend
   labels:
     app: ui
     app.kubernetes.io/name: ui
@@ -22,27 +22,27 @@ spec:
     spec:
       containers:
         - name: ui
-          image: ghcr.io/trackdechets/ui:latest
+          image: ghcr.io/mtes-mct/trackdechets/ui:dev
           ports:
             - name: http
               containerPort: 3000
               protocol: TCP
 
+          envFrom:
+            - configMapRef:
+                name: trackdechets-config
+            - secretRef:
+                name: frontend-secrets
+
           env:
             - name: PORT
               value: "3000"
-            - name: NODE_ENV
-              valueFrom:
-                configMapKeyRef:
-                  name: trackdechets-config
-                  key: NODE_ENV
-            - name: TZ
-              valueFrom:
-                configMapKeyRef:
-                  name: trackdechets-config
-                  key: TZ
+            # API_ENDPOINT is now provided by frontend-secrets from Scaleway Secret Manager
+            # If not set in secrets, fallback to default
+            # API_ENDPOINT is now provided by frontend-secrets from Scaleway Secret Manager
+            # If not set in secrets, fallback to cross-namespace service reference
             - name: API_ENDPOINT
-              value: "http://api:4000"
+              value: "http://api.trackdechets-backend.svc.cluster.local:4000"
 
           resources:
             requests:
@@ -85,7 +85,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ui
-  namespace: trackdechets
+  namespace: trackdechets-frontend
   labels:
     app: ui
 spec:
@@ -103,7 +103,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: ui
-  namespace: trackdechets
+  namespace: trackdechets-frontend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

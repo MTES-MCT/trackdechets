@@ -568,7 +568,7 @@ kubectl apply -k kubernetes/overlays/production
 kubectl set image deployment/api api=your-registry/trackdechets-api:v2.0.0 -n trackdechets
 ```
 
-ghcr.io/trackdechets/
+ghcr.io/mtes-mct/trackdechets/
 
 ### Database maintenance
 

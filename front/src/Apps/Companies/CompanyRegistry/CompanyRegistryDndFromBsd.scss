@@ -1,6 +1,12 @@
 .fr-list {
   list-style-type: var(--ul-type);
   padding-inline-start: var(--ul-start);
+  // Nested list with circle markers (hollow circles) instead of disc (filled circles)
+  .fr-list--circle {
+    list-style-type: circle;
+    // Override the CSS variable to ensure circle is used
+    --ul-type: circle;
+  }
 }
 
 .dnd-from-bsd-confirmation-modal {

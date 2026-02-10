@@ -664,6 +664,11 @@ export const getAdminRequestEmailPayloads = async () => {
   // Send a mail to collaborators
   const payloads: Mail[] = [];
   for (const adminRequest of adminRequests) {
+    // Careful with null collaboratorIds
+    if (!adminRequest.collaboratorId) {
+      continue;
+    }
+
     const collaborator = await prisma.user.findFirst({
       where: { id: adminRequest.collaboratorId! }
     });

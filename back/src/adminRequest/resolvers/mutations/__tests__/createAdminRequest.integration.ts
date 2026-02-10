@@ -120,7 +120,7 @@ describe("Mutation createAdminRequest", () => {
     );
   });
 
-  it("should throw error if collaborator email does not exist", async () => {
+  it("should not throw error if collaborator email does not exist (to not leak info)", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -140,14 +140,19 @@ describe("Mutation createAdminRequest", () => {
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      "Ce collaborateur n'est pas inscrit sur Trackdéchets."
-    );
+    // Then: should not reveal collaborator existence — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    // Request should have been created but without a collaborator id
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 
-  it("should throw error if collaborator does not belong to target company", async () => {
+  it("should not throw error if collaborator does not belong to target company (to not leak info)", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const collaborator = await userFactory({ email: "collaborator@mail.com" });
@@ -168,11 +173,16 @@ describe("Mutation createAdminRequest", () => {
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toEqual(
-      "Ce collaborateur n'est pas rattaché à cet établissement."
-    );
+    // Then: should not reveal collaborator existence/affiliation — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    // Request should have been created but without a collaborator id
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 
   it("should throw if requesting validation by collaborator email but providing no collaborator email", async () => {
@@ -479,7 +489,13 @@ describe("Mutation createAdminRequest", () => {
 
     expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+    const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
+    const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
+    const body =
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
+    const subject = adminCallArg.subject;
 
     expect(to).toMatchObject([
       { email: "admin@mail.com", name: "Company admin" }
@@ -529,6 +545,63 @@ describe("Mutation createAdminRequest", () => {
     expect(cleanse(body)).toBe(cleanse(expectedBody));
   });
 
+  it("should send separate mails to admins without leaking other recipients", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      name: "Super company"
+    });
+    await userInCompany("ADMIN", company.id, {
+      email: "admin1@mail.com",
+      name: "Admin One"
+    });
+    await userInCompany("ADMIN", company.id, {
+      email: "admin2@mail.com",
+      name: "Admin Two"
+    });
+
+    // No mails
+    const { sendMail } = require("../../../../mailer/mailing");
+    jest.mock("../../../../mailer/mailing");
+    (sendMail as jest.Mock).mockImplementation(() => Promise.resolve());
+
+    // When
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createAdminRequest">>(
+      CREATE_ADMIN_REQUEST,
+      {
+        variables: {
+          input: {
+            companyOrgId: company.orgId,
+            validationMethod: AdminRequestValidationMethod.SEND_MAIL
+          }
+        }
+      }
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+
+    // First call: mail to admins (should use messageVersions)
+    expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admins + author
+
+    const adminMail = (sendMail as jest.Mock).mock.calls[0][0];
+
+    // Ensure provider-specific bulk sending is used via messageVersions
+    expect(adminMail.messageVersions).toBeDefined();
+    expect(Array.isArray(adminMail.messageVersions)).toBe(true);
+    expect(adminMail.messageVersions.length).toBe(2);
+
+    // Ensure there's no global `to` exposing all recipients
+    expect(adminMail.to).toBeUndefined();
+
+    // Each messageVersion.to must contain only its recipient
+    const recipients = adminMail.messageVersions.map(v =>
+      v.to.map(t => t.email)
+    );
+    expect(recipients).toContainEqual(["admin1@mail.com"]);
+    expect(recipients).toContainEqual(["admin2@mail.com"]);
+  });
+
   it("should send mail to warn admins - verification = REQUEST_COLLABORATOR_APPROVAL", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -568,7 +641,13 @@ describe("Mutation createAdminRequest", () => {
 
     expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+    const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
+    const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
+    const body =
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
+    const subject = adminCallArg.subject;
 
     expect(to).toMatchObject([
       { email: "admin@mail.com", name: "Company admin" }
@@ -647,7 +726,13 @@ describe("Mutation createAdminRequest", () => {
 
     expect(sendMail as jest.Mock).toHaveBeenCalledTimes(2); // Admin + author
 
-    const { to, body, subject } = (sendMail as jest.Mock).mock.calls[0][0];
+    const adminCallArg = (sendMail as jest.Mock).mock.calls[0][0];
+    const to = adminCallArg.to ?? adminCallArg.messageVersions?.[0]?.to;
+    const body =
+      adminCallArg.body ??
+      adminCallArg.messageVersions?.[0]?.params?.body ??
+      adminCallArg.params?.body;
+    const subject = adminCallArg.subject;
 
     expect(to).toMatchObject([
       { email: "admin@mail.com", name: "Company admin" }
@@ -1280,10 +1365,14 @@ Si votre demande est acceptée ou refusée, vous serez informé(e) par courriel.
       }
     );
 
-    // Then
-    expect(errors).not.toBeUndefined();
-    expect(errors[0].message).toBe(
-      "Vous ne pouvez pas vous désigner vous-même en temps que collaborateur."
-    );
+    // Then: should not reveal user existence — request created, but collaborator not notified
+    expect(errors).toBeUndefined();
+
+    const companyAdminRequest = await prisma.adminRequest.findFirst({
+      where: { userId: user.id, companyId: company.id }
+    });
+
+    expect(companyAdminRequest).not.toBeNull();
+    expect(companyAdminRequest!.collaboratorId).toBeNull();
   });
 });

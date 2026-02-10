@@ -8,6 +8,7 @@ import { buildPdf as buildBsffPdf } from "../../../bsffs/pdf/generator";
 import { buildPdf as buildBsvhufPdf } from "../../../bsvhu/pdf/generator";
 import { emptyBsda, emptyBsdd, emptyBsvhu, emptyBsff } from "./emptyPdfData";
 import { logger } from "@td/logger";
+import { BsvhuWithTransportersAndIntermediaries } from "../../../bsvhu/types";
 
 const getEmptyBsdd = async () => {
   const { stream: html } = await generateEmptyBsddPdf(emptyBsdd);
@@ -28,7 +29,10 @@ const getEmptyBsff = async () => {
 };
 
 const getEmptyBsvhu = async () => {
-  const html = await buildBsvhufPdf(emptyBsvhu, true);
+  const html = await buildBsvhufPdf(
+    emptyBsvhu as BsvhuWithTransportersAndIntermediaries,
+    true
+  );
 
   const fileStream = createWriteStream("/tmp/bsvhu.pdf");
 

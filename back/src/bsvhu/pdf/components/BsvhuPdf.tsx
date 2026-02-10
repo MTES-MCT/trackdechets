@@ -372,6 +372,31 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
           </div>
         )}
         {/* End Broker informations */}
+
+        {/* Autres intermédiaires  */}
+        {bsvhu.intermediaries?.length ? (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>
+                  Autre{bsvhu?.intermediaries?.length > 1 ? "s" : ""}{" "}
+                  Intermédiaire{bsvhu?.intermediaries?.length > 1 ? "s" : ""}
+                </strong>
+              </p>
+              {bsvhu?.intermediaries?.map(intermediary => (
+                <div className="Row">
+                  <div className="Col">
+                    <FormCompanyFields company={intermediary} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
+        {/* End autres intermédiaires  */}
+
         {/* Transporter */}
         {bsvhu?.transporter && (
           <Transporter transporter={bsvhu.transporter} frameNumber={9} />
@@ -468,7 +493,9 @@ export function BsvhuPdf({ bsvhu, qrCode, renderEmpty }: Props) {
             </p>
             <p className="mb-3">
               N° du ou des lots entrant-s (*) :{" "}
-              {bsvhu?.identification?.numbers?.join(", ")}
+              {bsvhu?.destination?.reception?.identification?.numbers?.join(
+                ", "
+              )}
             </p>
           </div>
           <div className="BoxCol">

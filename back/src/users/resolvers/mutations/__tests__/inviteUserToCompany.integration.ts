@@ -20,6 +20,7 @@ const INVITE_USER_TO_COMPANY = `
     inviteUserToCompany(email: $email, siret: $siret, role: $role){
       users {
         email
+        isActive
       }
     }
   }
@@ -55,7 +56,10 @@ describe("mutation inviteUserToCompany", () => {
       );
       expect(data.inviteUserToCompany.users!.length).toBe(2);
       expect(data.inviteUserToCompany.users).toEqual(
-        expect.arrayContaining([{ email: admin.email }, { email: user.email }])
+        expect.arrayContaining([
+          { email: admin.email, isActive: true },
+          { email: user.email, isActive: true }
+        ])
       );
       const companyAssociations = await prisma.user
         .findUniqueOrThrow({ where: { id: user.id } })
@@ -82,6 +86,30 @@ describe("mutation inviteUserToCompany", () => {
       expect(userCompany?.siret).toEqual(company.siret);
     }
   );
+
+  test("aisActive should be null to prevent enumeration", async () => {
+    // Given
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+
+    // When
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+    const { data, errors } = await mutate<
+      Pick<Mutation, "inviteUserToCompany">
+    >(INVITE_USER_TO_COMPANY, {
+      variables: {
+        email: "test@mail.com",
+        siret: company.siret,
+        role: UserRole.MEMBER
+      }
+    });
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(
+      data.inviteUserToCompany.users!.find(u => u.email === "test@mail.com")
+        ?.isActive
+    ).toBe(null);
+  });
 
   test.each([
     UserRole.ADMIN,

@@ -1,6 +1,7 @@
 import { metrics } from "@opentelemetry/api";
+import { performance } from "node:perf_hooks";
 
-const METRIC_INTERVAL_MS = 30000;
+const METRIC_INTERVAL_MS = 10 * 1000; // 10 seconds
 
 export function initializeNodeRuntimeMetrics() {
   const meter = metrics.getMeter("nodejs-runtime-metrics");
@@ -48,7 +49,16 @@ export function initializeNodeRuntimeMetrics() {
     unit: "ms"
   });
 
+  const eventLoopUtilizationGauge = meter.createGauge(
+    "nodejs_eventloop_utilization",
+    {
+      description: "Event loop utilization ratio",
+      unit: "1"
+    }
+  );
+
   let lastCpuUsage = process.cpuUsage();
+  let lastEventLoopUtilization = performance.eventLoopUtilization();
 
   const recordRuntimeMetrics = () => {
     const memUsage = process.memoryUsage();
@@ -75,6 +85,12 @@ export function initializeNodeRuntimeMetrics() {
     cpuSystemHistogram.record(systemDelta);
 
     lastCpuUsage = currentCpuUsage;
+
+    const currentUtilization = performance.eventLoopUtilization(
+      lastEventLoopUtilization
+    );
+    eventLoopUtilizationGauge.record(currentUtilization.utilization);
+    lastEventLoopUtilization = currentUtilization;
   };
 
   const metricsInterval = setInterval(recordRuntimeMetrics, METRIC_INTERVAL_MS);

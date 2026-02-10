@@ -157,7 +157,8 @@ function destinationReceptionSignatureUpdateInput() {
       reception: {
         acceptationStatus: "ACCEPTED",
         date: new Date().toISOString() as any,
-        weight: 2.1
+        weight: 2.1,
+        refusedWeight: 0
       }
     }
   };
@@ -181,7 +182,8 @@ function destinationSignatureUpdateInput() {
       reception: {
         acceptationStatus: "ACCEPTED",
         date: new Date().toISOString() as any,
-        weight: 2.1
+        weight: 2.1,
+        refusedWeight: 0
       },
       operation: {
         code: "D 5",
@@ -211,7 +213,8 @@ function destinationToGroupInput(siret: string) {
     reception: {
       acceptationStatus: "ACCEPTED",
       date: new Date().toISOString() as any,
-      weight: 2.1
+      weight: 2.1,
+      refusedWeight: 0
     },
     operation: {
       code: "D 15",

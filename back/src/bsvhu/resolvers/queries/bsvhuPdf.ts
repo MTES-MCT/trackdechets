@@ -14,7 +14,8 @@ export const bsvhuPdfDownloadHandler: DownloadHandler<QueryBsvhuPdfArgs> = {
   handler: async (_, res, { id }) => {
     const bsvhu = await getBsvhuOrNotFound(id, {
       include: {
-        transporters: true
+        transporters: true,
+        intermediaries: true
       }
     });
     const readableStream = await buildPdf(bsvhu);

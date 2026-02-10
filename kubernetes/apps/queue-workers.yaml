@@ -7,7 +7,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-runner
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-runner
     app.kubernetes.io/name: queues-runner
@@ -27,14 +27,14 @@ spec:
     spec:
       containers:
         - name: queues-runner
-          image: ghcr.io/trackdechets/queues-runner:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-runner:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -59,7 +59,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: queues-runner
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -87,7 +87,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-indexation
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-indexation
     app.kubernetes.io/name: queues-indexation
@@ -107,14 +107,14 @@ spec:
     spec:
       containers:
         - name: queues-indexation
-          image: ghcr.io/trackdechets/queues-indexation:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-indexation:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -139,7 +139,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: queues-indexation
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -167,7 +167,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-bulk-indexation
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-bulk-indexation
     app.kubernetes.io/name: queues-bulk-indexation
@@ -187,14 +187,14 @@ spec:
     spec:
       containers:
         - name: queues-bulk-indexation
-          image: ghcr.io/trackdechets/queues-bulk-indexation:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -219,7 +219,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: queues-bulk-indexation
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -247,7 +247,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-bulk-indexation-master
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-bulk-indexation-master
     app.kubernetes.io/name: queues-bulk-indexation-master
@@ -269,14 +269,14 @@ spec:
     spec:
       containers:
         - name: queues-bulk-indexation-master
-          image: ghcr.io/trackdechets/queues-bulk-indexation-master:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-bulk-indexation-master:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -310,7 +310,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-webhooks
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-webhooks
     app.kubernetes.io/name: queues-webhooks
@@ -330,14 +330,14 @@ spec:
     spec:
       containers:
         - name: queues-webhooks
-          image: ghcr.io/trackdechets/queues-webhooks:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-webhooks:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -362,7 +362,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: queues-webhooks
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -390,7 +390,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: queues-gerico
-  namespace: trackdechets
+  namespace: trackdechets-backend
   labels:
     app: queues-gerico
     app.kubernetes.io/name: queues-gerico
@@ -410,14 +410,14 @@ spec:
     spec:
       containers:
         - name: queues-gerico
-          image: ghcr.io/trackdechets/queues-gerico:latest
+          image: ghcr.io/mtes-mct/trackdechets/queues-gerico:latest
           imagePullPolicy: Always
 
           envFrom:
             - configMapRef:
                 name: trackdechets-config
             - secretRef:
-                name: trackdechets-secrets
+                name: backend-secrets
 
           resources:
             requests:
@@ -442,7 +442,7 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: queues-gerico
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

@@ -14,13 +14,11 @@ import {
 import { subMonths } from "date-fns";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { generatePath, Link, useParams } from "react-router-dom";
 import { z } from "zod";
 import { datetimeToYYYYMMDD } from "../../../../common/datetime";
 import { Loader } from "../../../common/Components";
 import { DsfrNotificationError } from "../../../common/Components/Error/Error";
 import TdModal from "../../../common/Components/Modal/Modal";
-import routes from "../../../routes";
 import { BsdaJourneySummary } from "./BsdaJourneySummary";
 import { BsdaWasteSummary } from "./BsdaWasteSummary";
 import {
@@ -138,8 +136,6 @@ const schema = z.object({
 export type ZodBdsaWork = z.infer<typeof schema>;
 
 const SignBsdaWork = ({ bsdaId, onClose }) => {
-  const { siret } = useParams<{ siret: string }>();
-
   const { data } = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
     variables: {
       id: bsdaId
@@ -214,297 +210,269 @@ const SignBsdaWork = ({ bsdaId, onClose }) => {
 
   return (
     <TdModal onClose={onClose} title={title} ariaLabel={title} isOpen size="L">
-      {bsda.metadata?.errors?.some(
-        error => error?.requiredFor === BsdaSignatureType.Emission
-      ) ? (
-        <>
-          <p className="tw-mt-2 tw-text-red-700">
-            Vous devez mettre à jour le bordereau et renseigner les champs
-            obligatoires avant de le signer.
-          </p>
-          <ul className="tw-mb-2 tw-text-red-700 tw-list-disc">
-            {bsda.metadata?.errors.map((error, idx) => (
-              <li key={idx}>{error?.message}</li>
-            ))}
-          </ul>
-          <Link
-            to={generatePath(routes.dashboard.bsdas.edit, {
-              siret,
-              id: bsda.id
-            })}
-            className="fr-btn fr-btn--primary"
-          >
-            Mettre le bordereau à jour pour le signer
-          </Link>
-        </>
-      ) : (
-        <>
-          <BsdaWasteSummary bsda={bsda} showCap />
-          <BsdaJourneySummary bsda={bsda} />
-          {!!initialBsdas?.length && (
-            <div className="tw-pb-4">
-              <h4 className="fr-text fr-text--bold">BSDAs associés</h4>
-              <InitialBsdas bsdas={initialBsdas} />
-            </div>
-          )}
-          <FormProvider {...methods}>
-            <form
-              onSubmit={handleSubmit(async data => {
-                const { author, date, ...update } = data;
-                await updateBsda({
-                  variables: {
-                    id: bsda.id,
-                    input: {
-                      ...update,
-                      //@ts-ignore
-                      packagings: cleanPackagings(update.packagings)
-                    }
+      <>
+        <BsdaWasteSummary bsda={bsda} showCap />
+        <BsdaJourneySummary bsda={bsda} />
+        {!!initialBsdas?.length && (
+          <div className="tw-pb-4">
+            <h4 className="fr-text fr-text--bold">BSDAs associés</h4>
+            <InitialBsdas bsdas={initialBsdas} />
+          </div>
+        )}
+        <FormProvider {...methods}>
+          <form
+            onSubmit={handleSubmit(async data => {
+              const { author, date, ...update } = data;
+              await updateBsda({
+                variables: {
+                  id: bsda.id,
+                  input: {
+                    ...update,
+                    //@ts-ignore
+                    packagings: cleanPackagings(update.packagings)
                   }
-                });
-                await signBsda({
-                  variables: {
-                    id: bsda.id,
-                    input: {
-                      author,
-                      date,
-                      type: BsdaSignatureType.Work
-                    }
-                  }
-                });
-                onClose();
-              })}
-            >
-              <Select
-                label="Code famille"
-                nativeSelectProps={{
-                  ...register("waste.familyCode")
-                }}
-              >
-                <option value="">Sélectionnez une valeur...</option>
-                <option value="1">
-                  1 - amiante pur utilisé en bourrage ou en sac
-                </option>
-                <option value="2">
-                  2 - amiante mélangé dans des poudres ou des produits minéraux
-                  sans liaison forte
-                </option>
-                <option value="3">
-                  3 - amiante intégré dans des liquides ou des solutions
-                  visqueuses
-                </option>
-                <option value="4">4 - amiante tissé ou tressé</option>
-                <option value="5">5 - amiante en feuilles ou en plaques</option>
-                <option value="6">
-                  6 - amiante lié à des matériaux inertes
-                </option>
-                <option value="7">
-                  7 - amiante noyé dans une résine ou une matière plastique
-                </option>
-                <option value="8">
-                  8 - amiante dans des matériels et équipements
-                </option>
-                <option value="9">
-                  9 - tous les matériaux contaminés susceptibles d'émettre des
-                  fibres
-                </option>
-              </Select>
-
-              <Input
-                label={WASTE_NAME_LABEL}
-                nativeInputProps={{
-                  ...register("waste.materialName")
-                }}
-              />
-
-              <ToggleSwitch
-                label="Le déchet est soumis à l'ADR"
-                checked={Boolean(isSubjectToADR)}
-                onChange={(checked: boolean) => {
-                  setValue("waste.isSubjectToADR", checked);
-                }}
-                className="fr-mt-4w"
-              />
-
-              {isSubjectToADR && (
-                <Input
-                  label="Mention au titre du règlement ADR"
-                  className="fr-mt-2w"
-                  nativeInputProps={{
-                    ...register("waste.adr")
-                  }}
-                />
-              )}
-              <hr className="fr-mt-2w" />
-
-              <Input
-                label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
-                nativeInputProps={{
-                  ...register("waste.nonRoadRegulationMention")
-                }}
-              />
-
-              <ToggleSwitch
-                label={
-                  <span>
-                    Le déchet contient des{" "}
-                    <a
-                      className="fr-link force-external-link-content force-underline-link"
-                      href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      polluants organiques persistants
-                    </a>
-                  </span>
                 }
-                checked={Boolean(pop)}
-                onChange={(checked: boolean) => {
-                  setValue("waste.pop", checked);
-                }}
-                className="fr-mt-4w"
-              />
-              <hr className="fr-mt-2w" />
-
-              <h4 className="fr-h4">Conditionnement</h4>
-              <RhfPackagingList
-                fieldName="packagings"
-                packagingTypes={bsdaPackagingTypes}
-              />
-
-              <h4 className="fr-h4">Consistance</h4>
-              <RadioButtons
-                orientation="horizontal"
-                options={[
-                  {
-                    label: "Solide",
-                    nativeInputProps: {
-                      ...register("waste.consistence"),
-                      value: BsdaConsistence.Solide
-                    }
-                  },
-                  {
-                    label: "Pulvérulent",
-                    nativeInputProps: {
-                      ...register("waste.consistence"),
-                      value: BsdaConsistence.Pulverulent
-                    }
-                  },
-                  {
-                    label: "Pâteux",
-                    nativeInputProps: {
-                      ...register("waste.consistence"),
-                      value: BsdaConsistence.Pateux
-                    }
-                  },
-                  {
-                    label: "Autre",
-                    nativeInputProps: {
-                      ...register("waste.consistence"),
-                      value: BsdaConsistence.Other
-                    }
+              });
+              await signBsda({
+                variables: {
+                  id: bsda.id,
+                  input: {
+                    author,
+                    date,
+                    type: BsdaSignatureType.Work
                   }
-                ]}
+                }
+              });
+              onClose();
+            })}
+          >
+            <Select
+              label="Code famille"
+              nativeSelectProps={{
+                ...register("waste.familyCode")
+              }}
+            >
+              <option value="">Sélectionnez une valeur...</option>
+              <option value="1">
+                1 - amiante pur utilisé en bourrage ou en sac
+              </option>
+              <option value="2">
+                2 - amiante mélangé dans des poudres ou des produits minéraux
+                sans liaison forte
+              </option>
+              <option value="3">
+                3 - amiante intégré dans des liquides ou des solutions
+                visqueuses
+              </option>
+              <option value="4">4 - amiante tissé ou tressé</option>
+              <option value="5">5 - amiante en feuilles ou en plaques</option>
+              <option value="6">6 - amiante lié à des matériaux inertes</option>
+              <option value="7">
+                7 - amiante noyé dans une résine ou une matière plastique
+              </option>
+              <option value="8">
+                8 - amiante dans des matériels et équipements
+              </option>
+              <option value="9">
+                9 - tous les matériaux contaminés susceptibles d'émettre des
+                fibres
+              </option>
+            </Select>
+
+            <Input
+              label={WASTE_NAME_LABEL}
+              nativeInputProps={{
+                ...register("waste.materialName")
+              }}
+            />
+
+            <ToggleSwitch
+              label="Le déchet est soumis à l'ADR"
+              checked={Boolean(isSubjectToADR)}
+              onChange={(checked: boolean) => {
+                setValue("waste.isSubjectToADR", checked);
+              }}
+              className="fr-mt-4w"
+            />
+
+            {isSubjectToADR && (
+              <Input
+                label="Mention au titre du règlement ADR"
+                className="fr-mt-2w"
+                nativeInputProps={{
+                  ...register("waste.adr")
+                }}
               />
+            )}
+            <hr className="fr-mt-2w" />
 
-              <h4 className="fr-h4 fr-mt-4w">Quantité remise</h4>
-              <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
-                <div className="fr-col-12 fr-col-md-6">
-                  <NonScrollableInput
-                    label="Poids total en tonnes"
-                    nativeInputProps={{
-                      inputMode: "decimal",
-                      step: "0.001",
-                      type: "number",
-                      ...register("weight.value")
-                    }}
-                  />
+            <Input
+              label="Mentions au titre des règlements RID, ADNR, IMDG (optionnel)"
+              nativeInputProps={{
+                ...register("waste.nonRoadRegulationMention")
+              }}
+            />
 
-                  <p className="fr-info-text fr-mt-5v">
-                    Soit {(weight || 0) * 1000} kg
-                  </p>
-                </div>
+            <ToggleSwitch
+              label={
+                <span>
+                  Le déchet contient des{" "}
+                  <a
+                    className="fr-link force-external-link-content force-underline-link"
+                    href="https://www.ecologique-solidaire.gouv.fr/polluants-organiques-persistants-pop"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    polluants organiques persistants
+                  </a>
+                </span>
+              }
+              checked={Boolean(pop)}
+              onChange={(checked: boolean) => {
+                setValue("waste.pop", checked);
+              }}
+              className="fr-mt-4w"
+            />
+            <hr className="fr-mt-2w" />
 
-                <div className="fr-col-12 fr-col-md-6">
-                  <RadioButtons
-                    legend="Cette quantité est"
-                    orientation="horizontal"
-                    options={[
-                      {
-                        label: "réelle",
-                        nativeInputProps: {
-                          onChange: () => setValue("weight.isEstimate", false),
+            <h4 className="fr-h4">Conditionnement</h4>
+            <RhfPackagingList
+              fieldName="packagings"
+              packagingTypes={bsdaPackagingTypes}
+            />
 
-                          checked: isEstimate === false
-                        }
-                      },
-                      {
-                        label: "estimée",
-                        nativeInputProps: {
-                          onChange: () => setValue("weight.isEstimate", true),
-                          checked: isEstimate === true
-                        }
+            <h4 className="fr-h4">Consistance</h4>
+            <RadioButtons
+              orientation="horizontal"
+              options={[
+                {
+                  label: "Solide",
+                  nativeInputProps: {
+                    ...register("waste.consistence"),
+                    value: BsdaConsistence.Solide
+                  }
+                },
+                {
+                  label: "Pulvérulent",
+                  nativeInputProps: {
+                    ...register("waste.consistence"),
+                    value: BsdaConsistence.Pulverulent
+                  }
+                },
+                {
+                  label: "Pâteux",
+                  nativeInputProps: {
+                    ...register("waste.consistence"),
+                    value: BsdaConsistence.Pateux
+                  }
+                },
+                {
+                  label: "Autre",
+                  nativeInputProps: {
+                    ...register("waste.consistence"),
+                    value: BsdaConsistence.Other
+                  }
+                }
+              ]}
+            />
+
+            <h4 className="fr-h4 fr-mt-4w">Quantité remise</h4>
+            <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
+              <div className="fr-col-12 fr-col-md-6">
+                <NonScrollableInput
+                  label="Poids total en tonnes"
+                  nativeInputProps={{
+                    inputMode: "decimal",
+                    step: "0.001",
+                    type: "number",
+                    ...register("weight.value")
+                  }}
+                />
+
+                <p className="fr-info-text fr-mt-5v">
+                  Soit {(weight || 0) * 1000} kg
+                </p>
+              </div>
+
+              <div className="fr-col-12 fr-col-md-6">
+                <RadioButtons
+                  legend="Cette quantité est"
+                  orientation="horizontal"
+                  options={[
+                    {
+                      label: "réelle",
+                      nativeInputProps: {
+                        onChange: () => setValue("weight.isEstimate", false),
+
+                        checked: isEstimate === false
                       }
-                    ]}
-                  />
-                </div>
+                    },
+                    {
+                      label: "estimée",
+                      nativeInputProps: {
+                        onChange: () => setValue("weight.isEstimate", true),
+                        checked: isEstimate === true
+                      }
+                    }
+                  ]}
+                />
               </div>
+            </div>
 
-              {!isDechetterie && (
-                <>
-                  <h4 className="fr-h4 fr-mt-4w">Numéros de scellés</h4>
-                  <RhfTagsInputWrapper
-                    label="Numéros"
-                    fieldName={"waste.sealNumbers"}
-                  />
-                </>
+            {!isDechetterie && (
+              <>
+                <h4 className="fr-h4 fr-mt-4w">Numéros de scellés</h4>
+                <RhfTagsInputWrapper
+                  label="Numéros"
+                  fieldName={"waste.sealNumbers"}
+                />
+              </>
+            )}
+            <p className="fr-text fr-mt-2w fr-mb-2w">
+              En qualité <strong>d'entreprise de travaux</strong>, j'atteste que
+              les informations ci-dessus sont correctes. En signant ce document,
+              j'autorise le transporteur à prendre en charge le déchet.
+            </p>
+            <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
+              <Input
+                label="Date de prise en charge"
+                nativeInputProps={{
+                  type: "date",
+                  min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
+                  max: datetimeToYYYYMMDD(TODAY),
+                  ...register("date")
+                }}
+                state={formState.errors.date ? "error" : "default"}
+                stateRelatedMessage={formState.errors.date?.message}
+              />
+            </div>
+            <div className="fr-col-8 fr-mb-2w">
+              <Input
+                label="Nom et prénom"
+                state={formState.errors.author ? "error" : "default"}
+                nativeInputProps={{
+                  ...register("author")
+                }}
+                stateRelatedMessage={formState.errors.author?.message}
+              />
+            </div>
+            <div className="fr-mb-8w">
+              {error && <DsfrNotificationError apolloError={error} />}
+              {updateError && (
+                <DsfrNotificationError apolloError={updateError} />
               )}
-              <p className="fr-text fr-mt-2w fr-mb-2w">
-                En qualité <strong>d'entreprise de travaux</strong>, j'atteste
-                que les informations ci-dessus sont correctes. En signant ce
-                document, j'autorise le transporteur à prendre en charge le
-                déchet.
-              </p>
-              <div className="fr-col-8 fr-col-sm-4 fr-mb-2w">
-                <Input
-                  label="Date de prise en charge"
-                  nativeInputProps={{
-                    type: "date",
-                    min: datetimeToYYYYMMDD(subMonths(TODAY, 2)),
-                    max: datetimeToYYYYMMDD(TODAY),
-                    ...register("date")
-                  }}
-                  state={formState.errors.date ? "error" : "default"}
-                  stateRelatedMessage={formState.errors.date?.message}
-                />
-              </div>
-              <div className="fr-col-8 fr-mb-2w">
-                <Input
-                  label="Nom et prénom"
-                  state={formState.errors.author ? "error" : "default"}
-                  nativeInputProps={{
-                    ...register("author")
-                  }}
-                  stateRelatedMessage={formState.errors.author?.message}
-                />
-              </div>
-              <div className="fr-mb-8w">
-                {error && <DsfrNotificationError apolloError={error} />}
-                {updateError && (
-                  <DsfrNotificationError apolloError={updateError} />
-                )}
-              </div>
+            </div>
 
-              <hr className="fr-mt-2w" />
-              <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
-                <Button type="button" priority="secondary" onClick={onCancel}>
-                  Annuler
-                </Button>
-                <Button disabled={loading}>Signer</Button>
-              </div>
-            </form>
-          </FormProvider>
-        </>
-      )}
+            <hr className="fr-mt-2w" />
+            <div className="fr-btns-group fr-btns-group--right fr-btns-group--inline">
+              <Button type="button" priority="secondary" onClick={onCancel}>
+                Annuler
+              </Button>
+              <Button disabled={loading}>Signer</Button>
+            </div>
+          </form>
+        </FormProvider>
+      </>
     </TdModal>
   );
 };

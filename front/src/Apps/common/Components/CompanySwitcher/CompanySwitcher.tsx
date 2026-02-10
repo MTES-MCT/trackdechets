@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, gql } from "@apollo/client";
-import { Query } from "@td/codegen-ui";
+import { Query, UserRole } from "@td/codegen-ui";
 import { CompanySwitcherProps } from "./companySwitcherTypes";
 import { debounce } from "../../../../common/helper";
 import {
@@ -78,7 +78,10 @@ const CompanySwitcher = ({
     onClickOutside: () => setOpen(false)
   });
 
-  const { orgIds } = usePermissions(currentOrgId);
+  const {
+    orgIds,
+    orgPermissions: { role }
+  } = usePermissions(currentOrgId);
   const { company: defaultCompany } = useMyCompany(currentOrgId);
   const nbOfCompanies = orgIds.length;
 
@@ -155,17 +158,19 @@ const CompanySwitcher = ({
             ></span>
           )}
         </div>
-        <div className="company-switcher-item__infos">
-          <div className="company-switcher-item__siret">{company.orgId}</div>
-          {current && (
-            <p className="company-switcher-item__code fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
-              <span className="fr-sr-only">
-                Code signature de l'établissement
-              </span>
-              {company.securityCode}
-            </p>
-          )}
-        </div>
+        {role !== UserRole.Driver && (
+          <div className="company-switcher-item__infos">
+            <div className="company-switcher-item__siret">{company.orgId}</div>
+            {current && (
+              <p className="company-switcher-item__code fr-tag fr-tag--sm fr-icon-pen-nib-line fr-tag--icon-left">
+                <span className="fr-sr-only">
+                  Code signature de l'établissement
+                </span>
+                {company.securityCode}
+              </p>
+            )}
+          </div>
+        )}
       </div>
     );
   };

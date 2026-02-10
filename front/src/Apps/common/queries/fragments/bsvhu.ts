@@ -93,6 +93,7 @@ export const dashboardVhuFragment = gql`
       agrementNumber
       irregularSituation
       noSiret
+      notOnTD
       company {
         ...DashboardCompanyFragment
       }

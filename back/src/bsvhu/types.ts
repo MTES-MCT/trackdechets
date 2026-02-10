@@ -18,6 +18,11 @@ export type BsvhuWithTransporters = Prisma.BsvhuGetPayload<{
   include: typeof BsvhuWithTransportersInclude;
 }>;
 
+export type BsvhuWithTransportersAndIntermediaries = Prisma.BsvhuGetPayload<{
+  include: typeof BsvhuWithTransportersInclude &
+    typeof BsvhuWithIntermediariesInclude;
+}>;
+
 export type AllBsvhuSignatureType =
   | SignatureTypeInput
   | MultiModalSignatureType;

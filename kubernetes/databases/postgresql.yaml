@@ -6,7 +6,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: postgres
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   instances: 3
   imageName: ghcr.io/cloudnative-pg/postgresql:16.8
@@ -38,8 +38,8 @@ spec:
         name: postgres-credentials
 
   storage:
-    size: 50Gi
-    storageClass: standard
+    size: 5Gi
+    storageClass: sbs-default
 
   resources:
     requests:
@@ -50,21 +50,21 @@ spec:
       cpu: "2000m"
 
   # Connection pooling via PgBouncer
-  pooler:
-    enabled: true
-    type: rw
-    instances: 3
-    pgbouncer:
-      poolMode: transaction
-      parameters:
-        max_client_conn: "1000"
-        default_pool_size: "25"
-        max_db_connections: "100"
+  #pooler:
+  #  enabled: true
+  #  type: rw
+  #  instances: 3
+  #  pgbouncer:
+  #    poolMode: transaction
+  #    parameters:
+  #      max_client_conn: "1000"
+  #      default_pool_size: "25"
+  #      max_db_connections: "100"
 
   # Monitoring
-  monitoring:
-    enabled: true
-    podMonitorEnabled: true
+  #monitoring:
+  #  enabled: true
+  #  podMonitorEnabled: true
 
   # Backup configuration (configure for external S3)
   backup:
@@ -90,18 +90,18 @@ spec:
   primaryUpdateStrategy: unsupervised
 
   # Affinity rules to spread instances
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: cnpg.io/cluster
-                  operator: In
-                  values:
-                    - postgres
-            topologyKey: kubernetes.io/hostname
+  #affinity:
+  #  podAntiAffinity:
+  #    preferredDuringSchedulingIgnoredDuringExecution:
+  #        - weight: 100
+  #      podAffinityTerm:
+  #        labelSelector:
+  #         matchExpressions:
+  #            - key: cnpg.io/cluster
+  #              operator: In
+  #              values:
+  #                - postgres
+  #         topologyKey: kubernetes.io/hostname
 
 ---
 # Secret for PostgreSQL user credentials
@@ -109,7 +109,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-credentials
-  namespace: trackdechets
+  namespace: trackdechets-backend
 type: kubernetes.io/basic-auth
 stringData:
   username: trackdechets
@@ -121,7 +121,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-backup-credentials
-  namespace: trackdechets
+  namespace: trackdechets-backend
 type: Opaque
 stringData:
   ACCESS_KEY_ID: changeme
@@ -133,7 +133,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
   name: postgres-backup-schedule
-  namespace: trackdechets
+  namespace: trackdechets-backend
 spec:
   schedule: "0 2 * * *" # Daily at 2 AM
   backupOwnerReference: self

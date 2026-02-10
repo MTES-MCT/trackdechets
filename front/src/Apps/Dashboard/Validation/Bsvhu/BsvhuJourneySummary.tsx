@@ -35,15 +35,12 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
     isEmitterRegistered
   );
 
+  const signedByEmitter =
+    bsvhu.emitter?.emission?.signature || !canIrregularSituationSign;
+
   return (
     <Journey>
-      <JourneyStop
-        variant={
-          bsvhu.emitter?.emission?.signature || !canIrregularSituationSign
-            ? "complete"
-            : "active"
-        }
-      >
+      <JourneyStop variant={signedByEmitter ? "complete" : "active"}>
         <JourneyStopName>Producteur</JourneyStopName>
         <JourneyStopDescription>
           {bsvhu.emitter?.company?.name} ({bsvhu.emitter?.company?.siret})<br />
@@ -62,7 +59,7 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
                 // en charge le déchet après la signature émetteur
                 (idx > 0 &&
                     bsvhu.transporters[idx - 1].transport?.signature?.date) ||
-                  idx === 0
+                  (idx === 0 && signedByEmitter)
                 ? "active"
                 : "incomplete"
             }

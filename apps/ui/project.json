@@ -22,7 +22,14 @@
         "bundle": false,
         "main": "apps/ui/src/main.ts",
         "tsConfig": "apps/ui/tsconfig.app.json",
-        "assets": ["apps/ui/src/assets"],
+        "assets": [
+          "apps/ui/src/assets",
+          {
+            "input": "./front/build",
+            "glob": "**",
+            "output": "./front"
+          }
+        ],
         "generatePackageJson": true,
         "esbuildOptions": {
           "sourcemap": true,

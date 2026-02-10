@@ -3328,7 +3328,7 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  it("can update destinationReceptionWeight without specifying destinationReceptionRefusedWeight", async () => {
+  it("can NOT update destinationReceptionWeight without specifying destinationReceptionRefusedWeight", async () => {
     // Given
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
@@ -3340,7 +3340,7 @@ describe("Mutation.updateBsda", () => {
 
     // When
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -3360,23 +3360,9 @@ describe("Mutation.updateBsda", () => {
     });
 
     // Then
-    expect(errors).toBeUndefined();
-    expect(data.updateBsda.destination?.reception?.weight).toBe(4);
-    expect(data.updateBsda.destination?.reception?.acceptationStatus).toBe(
-      "PARTIALLY_REFUSED"
-    );
-    expect(data.updateBsda.destination?.reception?.refusedWeight).toBe(null);
-    expect(data.updateBsda.destination?.reception?.acceptedWeight).toBe(null);
-
-    const dbBsda = await prisma.bsda.findUniqueOrThrow({
-      where: { id: bsda.id }
-    });
-    expect(dbBsda.destinationReceptionWeight?.toNumber()).toBe(4000);
-    expect(dbBsda.destinationReceptionRefusedWeight?.toNumber()).toBe(
-      undefined
-    );
-    expect(dbBsda.destinationReceptionAcceptationStatus).toBe(
-      "PARTIALLY_REFUSED"
+    expect(errors).not.toBeUndefined();
+    expect(errors![0].message).toContain(
+      "La quantité refusée (destinationReceptionRefusedWeight) est requise"
     );
   });
 
