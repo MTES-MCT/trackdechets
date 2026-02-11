@@ -343,7 +343,23 @@ export function toBsdElastic(bsff: BsffForElastic): BsdElastic {
       ]),
       bsff.destinationCompanySiret,
       ...bsff.ficheInterventions.map(fiche => fiche.detenteurCompanySiret)
-    ].filter(Boolean)
+    ].filter(Boolean),
+    // Contacts
+    destinationCompanyContact: bsff.destinationCompanyContact ?? "",
+    destinationCompanyPhone: bsff.destinationCompanyPhone ?? "",
+    destinationCompanyMail: bsff.destinationCompanyMail ?? "",
+    emitterCompanyContact: bsff.emitterCompanyContact ?? "",
+    emitterCompanyPhone: bsff.emitterCompanyPhone ?? "",
+    emitterCompanyMail: bsff.emitterCompanyMail ?? "",
+    transporterCompanyContact: transporter?.transporterCompanyContact ?? "",
+    transporterCompanyPhone: transporter?.transporterCompanyPhone ?? "",
+    transporterCompanyMail: transporter?.transporterCompanyMail ?? "",
+    workerCompanyContact: "",
+    workerCompanyPhone: "",
+    workerCompanyMail: "",
+    nextDestinationCompanyContact: "",
+    nextDestinationCompanyPhone: "",
+    nextDestinationCompanyMail: ""
   };
 
   return bsd;
