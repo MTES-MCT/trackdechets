@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 import {
   BspaohStatus,
   Prisma,
@@ -17,6 +16,7 @@ import { getTransporterCompanyOrgId } from "@td/constants";
 import { getBspaohSubType } from "../common/subTypes";
 import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
+import { kgToTonRegistryV2 } from "../common/converter";
 import { getFirstTransporterSync } from "./converter";
 import {
   emptyIncomingWasteV2,
@@ -86,12 +86,7 @@ export const toIncomingWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bspaoh.emitterWasteWeightValue
-      ? new Decimal(bspaoh.emitterWasteWeightValue)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : bspaoh.emitterWasteWeightValue,
+    weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     initialEmitterCompanyAddress: null,
@@ -163,26 +158,11 @@ export const toIncomingWasteV2 = (
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteReceivedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
     destinationReceptionRefusedWeight:
-      bspaoh.destinationReceptionWasteRefusedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteRefusedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteRefusedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
     destinationReceptionAcceptedWeight:
-      bspaoh.destinationReceptionWasteAcceptedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteAcceptedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: null,
@@ -247,12 +227,7 @@ export const toOutgoingWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bspaoh.emitterWasteWeightValue
-      ? new Decimal(bspaoh.emitterWasteWeightValue)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : bspaoh.emitterWasteWeightValue,
+    weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
     volume: null,
     initialEmitterCompanyName: null,
@@ -338,27 +313,12 @@ export const toOutgoingWasteV2 = (
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteReceivedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
-      bspaoh.destinationReceptionWasteAcceptedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteAcceptedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
     destinationReceptionRefusedWeight:
-      bspaoh.destinationReceptionWasteRefusedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteRefusedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteRefusedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bspaoh.destinationOperationCode
@@ -438,12 +398,7 @@ export const toTransportedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    weight: bspaoh.emitterWasteWeightValue
-      ? new Decimal(bspaoh.emitterWasteWeightValue)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : bspaoh.emitterWasteWeightValue,
+    weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
@@ -522,27 +477,12 @@ export const toTransportedWasteV2 = (
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteReceivedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
-      bspaoh.destinationReceptionWasteAcceptedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteAcceptedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
     destinationReceptionRefusedWeight:
-      bspaoh.destinationReceptionWasteRefusedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteRefusedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteRefusedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -599,12 +539,7 @@ export const toAllWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bspaoh.emitterWasteWeightValue
-      ? new Decimal(bspaoh.emitterWasteWeightValue)
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : bspaoh.emitterWasteWeightValue,
+    weight: kgToTonRegistryV2(bspaoh.emitterWasteWeightValue),
     weightIsEstimate: bspaoh.emitterWasteWeightIsEstimate,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -687,27 +622,12 @@ export const toAllWasteV2 = (
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
     destinationReceptionWeight:
-      bspaoh.destinationReceptionWasteReceivedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteReceivedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteReceivedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
-      bspaoh.destinationReceptionWasteAcceptedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteAcceptedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteAcceptedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
     destinationReceptionRefusedWeight:
-      bspaoh.destinationReceptionWasteRefusedWeightValue
-        ? new Decimal(bspaoh.destinationReceptionWasteRefusedWeightValue)
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : bspaoh.destinationReceptionWasteRefusedWeightValue,
+      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bspaoh.destinationOperationCode
@@ -795,7 +715,7 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         bspaoh.destinationReceptionDate ??
-          bspaoh.destinationReceptionSignatureDate,
+        bspaoh.destinationReceptionSignatureDate,
         bspaoh.createdAt
       ),
       bspaohId: bspaoh.id
@@ -815,7 +735,7 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         transporter.transporterTakenOverAt ??
-          transporter.transporterTransportSignatureDate,
+        transporter.transporterTransportSignatureDate,
         bspaoh.createdAt
       ),
       bspaohId: bspaoh.id
@@ -834,7 +754,7 @@ const bspaohToLookupCreateInputs = (
         wasteCode: bspaoh.wasteCode,
         ...generateDateInfos(
           transporter.transporterTakenOverAt ??
-            transporter.transporterTransportSignatureDate,
+          transporter.transporterTransportSignatureDate,
           bspaoh.createdAt
         ),
         bspaohId: bspaoh.id
