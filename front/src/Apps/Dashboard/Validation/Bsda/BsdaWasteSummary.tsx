@@ -58,7 +58,7 @@ export function BsdaWasteSummary({ bsda, showCap, showScelles = true }: Props) {
             {bsda.weight?.isEstimate ? "Poids estimé" : "Poids réel"}
           </DsfrDataListTerm>
           <DsfrDataListDescription>
-            {`${bsda.weight?.value}t`}
+            {bsda.weight?.value ? `${bsda.weight?.value}t` : "-"}
           </DsfrDataListDescription>
         </DsfrDataListItem>
       )}
