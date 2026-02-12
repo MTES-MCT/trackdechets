@@ -34,7 +34,7 @@ export default async function edit(
 
   await checkCanUpdate(user, existingBsda, input);
   const {
-    parsedBsda: { createdAt, ...bsda },
+    parsedBsda: { createdAt, status, ...bsda },
     updatedFields
   } = await mergeInputAndParseBsdaAsync(existingBsda, input, {
     user,
