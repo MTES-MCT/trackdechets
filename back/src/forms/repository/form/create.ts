@@ -7,6 +7,10 @@ import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { getUserCompanies } from "../../../users/database";
 import { FormWithTransporters } from "../../types";
+import {
+  getBsdSuiteReadableIdFromFormInput,
+  renameExistingBsdSuiteReadableId
+} from "../../bsdSuiteCreation";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
@@ -17,6 +21,10 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
   deps => async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
+    const suiteReadableId = getBsdSuiteReadableIdFromFormInput(data);
+    if (suiteReadableId !== "") {
+      await renameExistingBsdSuiteReadableId(prisma, suiteReadableId);
+    }
     const form = await prisma.form.create({
       data,
       include: {
