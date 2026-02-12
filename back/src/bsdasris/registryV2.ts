@@ -24,6 +24,7 @@ import {
 import { getBsdasriSubType, getBsvhuSubType } from "../common/subTypes";
 import { getWasteDescription } from "./utils";
 import { splitAddress } from "../common/addresses";
+import { kgToTonRegistryV2 } from "../common/converter";
 import {
   deleteRegistryLookup,
   generateDateInfos,
@@ -53,7 +54,7 @@ const getFinalOperationsData = (bsdasri: RegistryV2Bsdasri) => {
       destinationFinalOperationCodes.push(ope.operationCode);
       destinationFinalOperationWeights.push(
         // conversion en tonnes
-        ope.quantity.dividedBy(1000).toDecimalPlaces(6).toNumber()
+        kgToTonRegistryV2(ope.quantity)
       );
       if (ope.finalBsdasri.destinationCompanySiret) {
         // cela devrait tout le temps être le cas
@@ -122,12 +123,7 @@ export const toIncomingWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
     initialEmitterCompanyAddress: null,
@@ -199,31 +195,15 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bsdasri.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
-    destinationReceptionRefusedWeight:
-      bsdasri.destinationReceptionWasteRefusedWeightValue
-        ? bsdasri.destinationReceptionWasteRefusedWeightValue
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : null,
+    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? bsdasri.destinationReceptionWasteWeightValue
-              .minus(bsdasri.destinationReceptionWasteRefusedWeightValue)
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
-          : bsdasri.destinationReceptionWasteWeightValue
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
+          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
+            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+
+          : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
@@ -301,10 +281,7 @@ export const toOutgoingWasteV2 = (
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
+      ? kgToTonRegistryV2(bsdasri.emitterWasteWeightValue)
       : null,
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     volume: null,
@@ -391,33 +368,16 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? bsdasri.destinationReceptionWasteWeightValue
-              .minus(bsdasri.destinationReceptionWasteRefusedWeightValue)
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
-          : bsdasri.destinationReceptionWasteWeightValue
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
+          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
+            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
-    destinationReceptionRefusedWeight:
-      bsdasri.destinationReceptionWasteRefusedWeightValue
-        ? bsdasri.destinationReceptionWasteRefusedWeightValue
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsdasri.destinationOperationCode
@@ -496,12 +456,7 @@ export const toTransportedWasteV2 = (
     wasteCodeBale: null,
     wastePop: false,
     wasteIsDangerous: true,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
@@ -576,33 +531,17 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? bsdasri.destinationReceptionWasteWeightValue
-              .minus(bsdasri.destinationReceptionWasteRefusedWeightValue)
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
-          : bsdasri.destinationReceptionWasteWeightValue
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
+          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
+            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
     destinationReceptionRefusedWeight:
-      bsdasri.destinationReceptionWasteRefusedWeightValue
-        ? bsdasri.destinationReceptionWasteRefusedWeightValue
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : null,
+      kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -662,12 +601,7 @@ export const toManagedWasteV2 = (
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
 
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     volume: null,
     managingStartDate: null,
@@ -753,12 +687,7 @@ export const toManagedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -839,12 +768,7 @@ export const toAllWasteV2 = (
     wasteIsDangerous: true,
     quantity: null,
     wasteContainsElectricOrHybridVehicles: null,
-    weight: bsdasri.emitterWasteWeightValue
-      ? bsdasri.emitterWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    weight: kgToTonRegistryV2(bsdasri.emitterWasteWeightValue),
     weightIsEstimate: bsdasri.emitterWasteWeightIsEstimate,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -933,33 +857,17 @@ export const toAllWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue
-      ? bsdasri.destinationReceptionWasteWeightValue
-          .dividedBy(1000)
-          .toDecimalPlaces(6)
-          .toNumber()
-      : null,
+    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? bsdasri.destinationReceptionWasteWeightValue
-              .minus(bsdasri.destinationReceptionWasteRefusedWeightValue)
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
-          : bsdasri.destinationReceptionWasteWeightValue
-              .dividedBy(1000)
-              .toDecimalPlaces(6)
-              .toNumber()
+          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
+            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
+
         : null,
-    destinationReceptionRefusedWeight:
-      bsdasri.destinationReceptionWasteRefusedWeightValue
-        ? bsdasri.destinationReceptionWasteRefusedWeightValue
-            .dividedBy(1000)
-            .toDecimalPlaces(6)
-            .toNumber()
-        : null,
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsdasri.destinationOperationCode
@@ -1037,7 +945,7 @@ const bsdasriToLookupCreateInputs = (
       wasteCode: bsdasri.wasteCode,
       ...generateDateInfos(
         bsdasri.destinationReceptionDate ??
-          bsdasri.destinationReceptionSignatureDate,
+        bsdasri.destinationReceptionSignatureDate,
         bsdasri.createdAt
       ),
       bsdasriId: bsdasri.id
@@ -1062,7 +970,7 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-            bsdasri.transporterTransportSignatureDate!,
+          bsdasri.transporterTransportSignatureDate!,
           bsdasri.createdAt
         ),
         bsdasriId: bsdasri.id
@@ -1080,7 +988,7 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-            bsdasri.transporterTransportSignatureDate!,
+          bsdasri.transporterTransportSignatureDate!,
           bsdasri.createdAt
         ),
         bsdasriId: bsdasri.id
