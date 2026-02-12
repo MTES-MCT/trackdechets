@@ -118,7 +118,7 @@ export function CompanyResult<T extends CompanyResultBase>({
             rel="noopener noreferrer"
             className="fr-link force-external-link-content force-underline-link"
           >
-            Informations sur l'entreprise
+            Informations sur l'établissement
           </a>
         </p>
       </div>

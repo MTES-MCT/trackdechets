@@ -183,7 +183,7 @@ export const titles = {
   "/password-reset-request":
     "Demande de réinitialisation de mot de passe — Trackdéchets",
   "/password-reset": "Réinitialiser mon mot de passe — Trackdéchets",
-  "/company/:orgId": "Fiche établissement — Trackdéchets",
+  "/company/:orgId": "Page établissement — Trackdéchets",
   "/wasteTree": "Liste des codes déchets — Trackdéchets",
   "/dashboard": "Tableau de bord — Trackdéchets",
   "/dashboard/:siret": "Tableau de bord — Trackdéchets",
