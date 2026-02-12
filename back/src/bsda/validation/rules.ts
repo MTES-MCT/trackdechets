@@ -30,6 +30,7 @@ export type BsdaEditableFields = Required<
   Omit<
     ZodBsda,
     | "id"
+    | "status"
     | "createdAt"
     | "isDraft"
     | "isDeleted"

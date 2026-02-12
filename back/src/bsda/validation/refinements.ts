@@ -770,11 +770,26 @@ export const checkBsdaDestinationReceptionRefusedWeight = (
   const {
     destinationReceptionWeight,
     destinationReceptionRefusedWeight,
-    destinationReceptionAcceptationStatus
+    destinationReceptionAcceptationStatus,
+    status
   } = bsd;
 
+  // If the BSDA has already been received, don't block it
+  const postReceptionStatuses = [
+    BsdaStatus.RECEIVED,
+    BsdaStatus.PROCESSED,
+    BsdaStatus.REFUSED,
+    BsdaStatus.AWAITING_CHILD
+  ];
+  if (
+    !isDefined(destinationReceptionRefusedWeight) &&
+    postReceptionStatuses.includes(status as BsdaStatus)
+  ) {
+    return;
+  }
+
   if (!isDefined(destinationReceptionRefusedWeight)) {
-    // If status is defined, it means that the reception happened. Refused weight is required
+    // If waste acceptation status is defined, it means that the reception happened. Refused weight is required
     if (isDefined(destinationReceptionAcceptationStatus)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
