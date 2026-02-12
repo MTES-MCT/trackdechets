@@ -195,14 +195,20 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bsdasri.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteWeightValue
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
-            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
-
+          ? kgToTonRegistryV2(
+              bsdasri.destinationReceptionWasteWeightValue.minus(
+                bsdasri.destinationReceptionWasteRefusedWeightValue
+              )
+            )
           : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
     destinationReceptionWeightIsEstimate: false,
@@ -368,16 +374,23 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
-            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          ? kgToTonRegistryV2(
+              bsdasri.destinationReceptionWasteWeightValue.minus(
+                bsdasri.destinationReceptionWasteRefusedWeightValue
+              )
+            )
           : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsdasri.destinationOperationCode
@@ -531,17 +544,23 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
-            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          ? kgToTonRegistryV2(
+              bsdasri.destinationReceptionWasteWeightValue.minus(
+                bsdasri.destinationReceptionWasteRefusedWeightValue
+              )
+            )
           : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
         : null,
-    destinationReceptionRefusedWeight:
-      kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -687,7 +706,9 @@ export const toManagedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -857,17 +878,23 @@ export const toAllWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsdasri.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight:
       bsdasri.destinationReceptionWasteWeightValue
         ? bsdasri.destinationReceptionWasteRefusedWeightValue
-          ? kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue
-            .minus(bsdasri.destinationReceptionWasteRefusedWeightValue))
+          ? kgToTonRegistryV2(
+              bsdasri.destinationReceptionWasteWeightValue.minus(
+                bsdasri.destinationReceptionWasteRefusedWeightValue
+              )
+            )
           : kgToTonRegistryV2(bsdasri.destinationReceptionWasteWeightValue)
-
         : null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsdasri.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsdasri.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsdasri.destinationOperationCode
@@ -945,7 +972,7 @@ const bsdasriToLookupCreateInputs = (
       wasteCode: bsdasri.wasteCode,
       ...generateDateInfos(
         bsdasri.destinationReceptionDate ??
-        bsdasri.destinationReceptionSignatureDate,
+          bsdasri.destinationReceptionSignatureDate,
         bsdasri.createdAt
       ),
       bsdasriId: bsdasri.id
@@ -970,7 +997,7 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-          bsdasri.transporterTransportSignatureDate!,
+            bsdasri.transporterTransportSignatureDate!,
           bsdasri.createdAt
         ),
         bsdasriId: bsdasri.id
@@ -988,7 +1015,7 @@ const bsdasriToLookupCreateInputs = (
         wasteCode: bsdasri.wasteCode,
         ...generateDateInfos(
           bsdasri.transporterTakenOverAt ??
-          bsdasri.transporterTransportSignatureDate!,
+            bsdasri.transporterTransportSignatureDate!,
           bsdasri.createdAt
         ),
         bsdasriId: bsdasri.id

@@ -97,15 +97,15 @@ export const toIncomingWasteV2 = (
     city: emitterCompanyCity,
     country: emitterCompanyCountry
   } = bsvhu.emitterCompanyStreet &&
-    bsvhu.emitterCompanyPostalCode &&
-    bsvhu.emitterCompanyCity
-      ? {
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
         street: bsvhu.emitterCompanyStreet,
         postalCode: bsvhu.emitterCompanyPostalCode,
         city: bsvhu.emitterCompanyCity,
         country: "FR"
       }
-      : splitAddress(bsvhu.emitterCompanyAddress);
+    : splitAddress(bsvhu.emitterCompanyAddress);
   const {
     street: destinationCompanyAddress,
     postalCode: destinationCompanyPostalCode,
@@ -184,7 +184,9 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bsvhu.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsvhu.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsvhu.destinationReceptionWeight
+    ),
     destinationReceptionRefusedWeight: null,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionWeightIsEstimate: false,
@@ -261,15 +263,15 @@ export const toOutgoingWasteV2 = (
     city: emitterCompanyCity,
     country: emitterCompanyCountry
   } = bsvhu.emitterCompanyStreet &&
-    bsvhu.emitterCompanyPostalCode &&
-    bsvhu.emitterCompanyCity
-      ? {
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
         street: bsvhu.emitterCompanyStreet,
         postalCode: bsvhu.emitterCompanyPostalCode,
         city: bsvhu.emitterCompanyCity,
         country: "FR"
       }
-      : splitAddress(bsvhu.emitterCompanyAddress);
+    : splitAddress(bsvhu.emitterCompanyAddress);
 
   const {
     street: transporter1CompanyAddress,
@@ -434,7 +436,9 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsvhu.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsvhu.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -540,15 +544,15 @@ export const toTransportedWasteV2 = (
     city: emitterCompanyCity,
     country: emitterCompanyCountry
   } = bsvhu.emitterCompanyStreet &&
-    bsvhu.emitterCompanyPostalCode &&
-    bsvhu.emitterCompanyCity
-      ? {
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
         street: bsvhu.emitterCompanyStreet,
         postalCode: bsvhu.emitterCompanyPostalCode,
         city: bsvhu.emitterCompanyCity,
         country: "FR"
       }
-      : splitAddress(bsvhu.emitterCompanyAddress);
+    : splitAddress(bsvhu.emitterCompanyAddress);
 
   const {
     street: transporter1CompanyAddress,
@@ -761,7 +765,9 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsvhu.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsvhu.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -786,15 +792,15 @@ export const toManagedWasteV2 = (
     city: emitterCompanyCity,
     country: emitterCompanyCountry
   } = bsvhu.emitterCompanyStreet &&
-    bsvhu.emitterCompanyPostalCode &&
-    bsvhu.emitterCompanyCity
-      ? {
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
         street: bsvhu.emitterCompanyStreet,
         postalCode: bsvhu.emitterCompanyPostalCode,
         city: bsvhu.emitterCompanyCity,
         country: "FR"
       }
-      : splitAddress(bsvhu.emitterCompanyAddress);
+    : splitAddress(bsvhu.emitterCompanyAddress);
 
   const {
     street: transporter1CompanyAddress,
@@ -1010,7 +1016,9 @@ export const toManagedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsvhu.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsvhu.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -1050,15 +1058,15 @@ export const toAllWasteV2 = (
     city: emitterCompanyCity,
     country: emitterCompanyCountry
   } = bsvhu.emitterCompanyStreet &&
-    bsvhu.emitterCompanyPostalCode &&
-    bsvhu.emitterCompanyCity
-      ? {
+  bsvhu.emitterCompanyPostalCode &&
+  bsvhu.emitterCompanyCity
+    ? {
         street: bsvhu.emitterCompanyStreet,
         postalCode: bsvhu.emitterCompanyPostalCode,
         city: bsvhu.emitterCompanyCity,
         country: "FR"
       }
-      : splitAddress(bsvhu.emitterCompanyAddress);
+    : splitAddress(bsvhu.emitterCompanyAddress);
 
   const {
     street: transporter1CompanyAddress,
@@ -1278,7 +1286,9 @@ export const toAllWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsvhu.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsvhu.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsvhu.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionAcceptedWeight: null,
     destinationReceptionRefusedWeight: null,
@@ -1389,7 +1399,7 @@ const bsvhuToLookupCreateInputs = (
       wasteCode: bsvhu.wasteCode,
       ...generateDateInfos(
         bsvhu.destinationReceptionDate ??
-        bsvhu.destinationOperationSignatureDate,
+          bsvhu.destinationOperationSignatureDate,
         bsvhu.createdAt
       ),
       bsvhuId: bsvhu.id
@@ -1414,7 +1424,7 @@ const bsvhuToLookupCreateInputs = (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!,
+            transporter.transporterTransportSignatureDate!,
           bsvhu.createdAt
         ),
         bsvhuId: bsvhu.id
@@ -1444,7 +1454,7 @@ const bsvhuToLookupCreateInputs = (
         wasteCode: bsvhu.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!,
+            transporter.transporterTransportSignatureDate!,
           bsvhu.createdAt
         ),
         bsvhuId: bsvhu.id
@@ -1474,7 +1484,7 @@ const bsvhuToLookupCreateInputs = (
       wasteCode: bsvhu.wasteCode,
       ...generateDateInfos(
         transporter.transporterTransportTakenOverAt ??
-        transporter.transporterTransportSignatureDate!,
+          transporter.transporterTransportSignatureDate!,
         bsvhu.createdAt
       ),
       bsvhuId: bsvhu.id

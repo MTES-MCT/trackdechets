@@ -137,10 +137,7 @@ export function processDecimal(
 export function kgToTonRegistryV2<T extends Decimal | number | null>(
   kg: T
 ): T extends null ? number | null : number {
-  return (kg
-    ? new Decimal(kg)
-        .dividedBy(1000)
-        .toDecimalPlaces(6)
-        .toNumber()
-    : null) as T extends null ? number | null : number;
+  return (
+    kg ? new Decimal(kg).dividedBy(1000).toDecimalPlaces(6).toNumber() : null
+  ) as T extends null ? number | null : number;
 }

@@ -330,7 +330,9 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bsda.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsda.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionRefusedWeight: kgToTonRegistryV2(quantityRefused),
     destinationReceptionAcceptedWeight: kgToTonRegistryV2(quantityAccepted),
     destinationReceptionWeightIsEstimate:
@@ -661,11 +663,15 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsda.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsda.destinationReceptionRefusedWeight),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -936,11 +942,15 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsda.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsda.destinationReceptionRefusedWeight),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -1201,11 +1211,15 @@ export const toManagedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsda.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsda.destinationReceptionRefusedWeight),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -1497,11 +1511,15 @@ export const toAllWasteV2 = (
     postTempStorageDestinationCountry,
     destinationReceptionAcceptationStatus:
       bsda.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight: kgToTonRegistryV2(bsda.destinationReceptionWeight),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionWeight
+    ),
     destinationReceptionWeightIsEstimate:
       bsda.destinationReceptionWeightIsEstimate,
     destinationReceptionAcceptedWeight: null,
-    destinationReceptionRefusedWeight: kgToTonRegistryV2(bsda.destinationReceptionRefusedWeight),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bsda.destinationReceptionRefusedWeight
+    ),
     destinationPlannedOperationCode: bsda.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bsda.destinationOperationCode
@@ -1635,7 +1653,7 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!,
+            transporter.transporterTransportSignatureDate!,
           bsda.createdAt
         ),
         bsdaId: bsda.id
@@ -1662,7 +1680,7 @@ const bsdaToLookupCreateInputs = (
         wasteCode: bsda.wasteCode,
         ...generateDateInfos(
           transporter.transporterTransportTakenOverAt ??
-          transporter.transporterTransportSignatureDate!,
+            transporter.transporterTransportSignatureDate!,
           bsda.createdAt
         ),
         bsdaId: bsda.id
@@ -1692,7 +1710,7 @@ const bsdaToLookupCreateInputs = (
       wasteCode: bsda.wasteCode,
       ...generateDateInfos(
         transporter.transporterTransportTakenOverAt ??
-        transporter.transporterTransportSignatureDate!,
+          transporter.transporterTransportSignatureDate!,
         bsda.createdAt
       ),
       bsdaId: bsda.id
