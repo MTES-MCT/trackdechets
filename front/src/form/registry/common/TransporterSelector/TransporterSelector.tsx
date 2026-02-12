@@ -30,11 +30,13 @@ export const INITIAL_TRANSPORTER = {
  * Returns only transporters that have at least one identifying field filled.
  * Use this before submit so the placeholder empty slot is not sent.
  */
-export function filterFilledTransporters<T extends { CompanyOrgId?: string; CompanyName?: string }>(
-  transporters: T[]
-): T[] {
+export function filterFilledTransporters<
+  T extends { CompanyOrgId?: string; CompanyName?: string }
+>(transporters: T[]): T[] {
   return transporters.filter(
-    t => (t.CompanyOrgId?.trim()?.length ?? 0) > 0 || (t.CompanyName?.trim()?.length ?? 0) > 0
+    t =>
+      (t.CompanyOrgId?.trim()?.length ?? 0) > 0 ||
+      (t.CompanyName?.trim()?.length ?? 0) > 0
   );
 }
 
@@ -122,8 +124,9 @@ export function TransporterSelector({
         const name = methods.getValues(`transporter.${index}.CompanyName`);
         // Lorsqu'aucun établissement n'a été sélectionné, on affiche simplement
         // "N - Transporteur" où N est le numéro du transporteur dans la liste
-        const accordionName = `${index + 1} - ${name && name.length > 0 ? name : "Transporteur"
-          }`;
+        const accordionName = `${index + 1} - ${
+          name && name.length > 0 ? name : "Transporteur"
+        }`;
         return (
           <TransporterAccordion
             key={field.id}

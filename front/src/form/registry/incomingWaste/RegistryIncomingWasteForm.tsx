@@ -14,7 +14,10 @@ import Loader from "../../../Apps/common/Components/Loader/Loaders";
 import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
-import { filterFilledTransporters, INITIAL_TRANSPORTER } from "../common/TransporterSelector/TransporterSelector";
+import {
+  filterFilledTransporters,
+  INITIAL_TRANSPORTER
+} from "../common/TransporterSelector/TransporterSelector";
 import {
   handleServerError,
   isoDateToHtmlDate,
@@ -43,7 +46,7 @@ const DEFAULT_VALUES: Partial<FormValues> = {
   initialEmitterMunicipalitiesInseeCodes: [],
   transporter: [
     {
-      ...INITIAL_TRANSPORTER,
+      ...INITIAL_TRANSPORTER
     }
   ]
 };

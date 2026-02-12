@@ -5,7 +5,7 @@ import {
   Mutation,
   Query,
   RegistryImportType,
-  RegistryLineReason,
+  RegistryLineReason
 } from "@td/codegen-ui";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -15,7 +15,10 @@ import { GET_REGISTRY_LOOKUPS } from "../../../dashboard/registry/shared";
 import { FormBuilder } from "../builder/FormBuilder";
 import { handleMutationResponse } from "../builder/handler";
 import { FormTransporter } from "../builder/types";
-import { filterFilledTransporters, INITIAL_TRANSPORTER } from "../common/TransporterSelector/TransporterSelector";
+import {
+  filterFilledTransporters,
+  INITIAL_TRANSPORTER
+} from "../common/TransporterSelector/TransporterSelector";
 import {
   handleServerError,
   isoDateToHtmlDate,
@@ -64,7 +67,7 @@ const DEFAULT_VALUES: Partial<FormValues> = {
   initialEmitterMunicipalitiesInseeCodes: [],
   transporter: [
     {
-      ...INITIAL_TRANSPORTER,
+      ...INITIAL_TRANSPORTER
     }
   ]
 };
