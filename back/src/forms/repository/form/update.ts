@@ -8,6 +8,10 @@ import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff, objectDiff } from "../../workflow/diff";
 import { getUserCompanies } from "../../../users/database";
 import { FormWithForwardedIn, FormWithTransporters } from "../../types";
+import {
+  getBsdSuiteReadableIdFromFormInput,
+  renameExistingBsdSuiteReadableId
+} from "../../bsdSuiteCreation";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -34,6 +38,10 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     });
 
     const hasPossibleSiretChange = checkIfHasPossibleSiretChange(data);
+    const suiteReadableId = getBsdSuiteReadableIdFromFormInput(data);
+    if (suiteReadableId !== "") {
+      await renameExistingBsdSuiteReadableId(prisma, suiteReadableId);
+    }
     const updatedForm = await prisma.form.update({
       where,
       data,

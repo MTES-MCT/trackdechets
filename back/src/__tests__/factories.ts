@@ -19,6 +19,10 @@ import {
 import { hashToken } from "../utils";
 import { createUser, getUserCompanies } from "../users/database";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../forms/database";
+import {
+  getBsdSuiteReadableIdFromFormInput,
+  renameExistingBsdSuiteReadableId
+} from "../forms/bsdSuiteCreation";
 import { CompanyRole } from "../common/validation/zod/schema";
 import { getDefaultNotifications } from "../users/notifications";
 
@@ -531,12 +535,18 @@ export const formFactory = async ({
     }
   };
 
+  const createData = {
+    readableId: getReadableId(),
+    ...formParams,
+    owner: { connect: { id: ownerId } }
+  };
+
+  const suiteReadableId = getBsdSuiteReadableIdFromFormInput(createData);
+  if (suiteReadableId !== "") {
+    await renameExistingBsdSuiteReadableId(prisma, suiteReadableId);
+  }
   const form = await prisma.form.create({
-    data: {
-      readableId: getReadableId(),
-      ...formParams,
-      owner: { connect: { id: ownerId } }
-    },
+    data: createData,
     include: {
       ...SIRETS_BY_ROLE_INCLUDE,
       forwardedIn: true,
