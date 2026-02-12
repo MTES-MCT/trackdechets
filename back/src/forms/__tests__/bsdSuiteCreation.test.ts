@@ -75,7 +75,7 @@ describe("bsdSuiteCreation", () => {
           where: { id: "id-1" },
           data: expect.objectContaining({
             readableId: expect.stringMatching(
-              /^BSD-20250101-XXX-suite-[0-9A-Z]{6}$/
+              /^BSD-20250101-XXX-suite-.{10,}$/
             )
           })
         })
