@@ -157,12 +157,15 @@ export const toIncomingWasteV2 = (
     destinationCompanyMail: bspaoh.destinationCompanyMail,
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
-    destinationReceptionRefusedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
-    destinationReceptionAcceptedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteRefusedWeightValue
+    ),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteAcceptedWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: null,
@@ -312,13 +315,16 @@ export const toOutgoingWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
-    destinationReceptionRefusedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteAcceptedWeightValue
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bspaoh.destinationOperationCode
@@ -476,13 +482,16 @@ export const toTransportedWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
-    destinationReceptionRefusedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteAcceptedWeightValue
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -621,13 +630,16 @@ export const toAllWasteV2 = (
 
     destinationReceptionAcceptationStatus:
       bspaoh.destinationReceptionAcceptationStatus,
-    destinationReceptionWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteReceivedWeightValue),
+    destinationReceptionWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteReceivedWeightValue
+    ),
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteAcceptedWeightValue),
-    destinationReceptionRefusedWeight:
-      kgToTonRegistryV2(bspaoh.destinationReceptionWasteRefusedWeightValue),
+    destinationReceptionAcceptedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteAcceptedWeightValue
+    ),
+    destinationReceptionRefusedWeight: kgToTonRegistryV2(
+      bspaoh.destinationReceptionWasteRefusedWeightValue
+    ),
     destinationPlannedOperationCode: null,
     destinationPlannedOperationMode: null,
     destinationOperationCodes: bspaoh.destinationOperationCode
@@ -715,7 +727,7 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         bspaoh.destinationReceptionDate ??
-        bspaoh.destinationReceptionSignatureDate,
+          bspaoh.destinationReceptionSignatureDate,
         bspaoh.createdAt
       ),
       bspaohId: bspaoh.id
@@ -735,7 +747,7 @@ const bspaohToLookupCreateInputs = (
       wasteCode: bspaoh.wasteCode,
       ...generateDateInfos(
         transporter.transporterTakenOverAt ??
-        transporter.transporterTransportSignatureDate,
+          transporter.transporterTransportSignatureDate,
         bspaoh.createdAt
       ),
       bspaohId: bspaoh.id
@@ -754,7 +766,7 @@ const bspaohToLookupCreateInputs = (
         wasteCode: bspaoh.wasteCode,
         ...generateDateInfos(
           transporter.transporterTakenOverAt ??
-          transporter.transporterTransportSignatureDate,
+            transporter.transporterTransportSignatureDate,
           bspaoh.createdAt
         ),
         bspaohId: bspaoh.id
