@@ -386,8 +386,18 @@ export const toIncomingWasteV2 = (
           .toDecimalPlaces(6)
           .toNumber()
       : destinationReceptionWeight,
-    destinationReceptionRefusedWeight,
-    destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: destinationReceptionRefusedWeight
+      ? new Decimal(destinationReceptionRefusedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: destinationReceptionAcceptedWeight
+      ? new Decimal(destinationReceptionAcceptedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionAcceptedWeight,
     destinationReceptionWeightIsEstimate: false,
     destinationReceptionVolume: null,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
@@ -714,8 +724,18 @@ export const toOutgoingWasteV2 = (
           .toNumber()
       : destinationReceptionWeight,
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: destinationReceptionAcceptedWeight
+      ? new Decimal(destinationReceptionAcceptedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: destinationReceptionRefusedWeight
+      ? new Decimal(destinationReceptionRefusedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes,
@@ -989,8 +1009,18 @@ export const toTransportedWasteV2 = (
           .toNumber()
       : destinationReceptionWeight,
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: destinationReceptionAcceptedWeight
+      ? new Decimal(destinationReceptionAcceptedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: destinationReceptionRefusedWeight
+      ? new Decimal(destinationReceptionRefusedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionRefusedWeight,
     destinationHasCiterneBeenWashedOut: null,
 
     gistridNumber: null,
@@ -1260,8 +1290,18 @@ export const toAllWasteV2 = (
           .toNumber()
       : destinationReceptionWeight,
     destinationReceptionWeightIsEstimate: false,
-    destinationReceptionAcceptedWeight,
-    destinationReceptionRefusedWeight,
+    destinationReceptionAcceptedWeight: destinationReceptionAcceptedWeight
+      ? new Decimal(destinationReceptionAcceptedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionAcceptedWeight,
+    destinationReceptionRefusedWeight: destinationReceptionRefusedWeight
+      ? new Decimal(destinationReceptionRefusedWeight)
+          .dividedBy(1000)
+          .toDecimalPlaces(6)
+          .toNumber()
+      : destinationReceptionRefusedWeight,
     destinationPlannedOperationCode: bsff.destinationPlannedOperationCode,
     destinationPlannedOperationMode: null,
     destinationOperationCodes,
