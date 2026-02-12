@@ -31,9 +31,8 @@ const Company = lazy(() => import("../../../../Pages/Company/Company"));
 
 const BANNER_MESSAGES = [
   <>
-    Depuis le <i>1er janvier 2026</i>, les acteurs soumis aux obligations du
-    registre national doivent effectuer l’ensemble de leurs déclarations via
-    l’onglet <i>"Mes registres"</i> de la plateforme Trackdéchets.
+    Partagez vos besoins afin de nous aider à proposer des formations
+    Trackdéchets plus adaptées et personnalisées.
   </>
 ];
 
@@ -71,10 +70,10 @@ export default function LayoutContainer() {
                 <SurveyBanner
                   messages={BANNER_MESSAGES}
                   button={{
-                    title: "En savoir plus",
-                    href: "https://faq.trackdechets.fr/registre-national/informations-generales"
+                    title: "Accéder au formulaire",
+                    href: "https://tally.so/r/gDqRV4"
                   }}
-                  persistedSurveyName="td-20260113"
+                  persistedSurveyName="td-20260210"
                 />
               }
             />
