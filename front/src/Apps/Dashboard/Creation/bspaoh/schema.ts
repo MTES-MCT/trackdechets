@@ -64,7 +64,7 @@ const zodEmitter = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["emission.detail.weight.isEstimate"],
-        message: `Vous devez péciser si le poids est estimé`
+        message: `Vous devez préciser si le poids est estimé`
       });
     }
     if (
@@ -74,7 +74,7 @@ const zodEmitter = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["emission.detail.weight.value"],
-        message: `Vous devez péciser le poids`
+        message: `Vous devez préciser le poids`
       });
     }
   });
