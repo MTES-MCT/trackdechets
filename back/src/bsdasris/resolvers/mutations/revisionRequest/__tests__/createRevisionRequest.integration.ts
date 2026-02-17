@@ -11,7 +11,7 @@ import {
   CANCELLABLE_BSDASRI_STATUSES,
   NON_CANCELLABLE_BSDASRI_STATUSES
 } from "../createRevisionRequest";
-import { BsdasriStatus } from "@td/prisma";
+import { BsdasriStatus, CompanyType } from "@td/prisma";
 
 const CREATE_BSDASRI_REVISION_REQUEST = `
   mutation CreateBsdasriRevisionRequest($input: CreateBsdasriRevisionRequestInput!) {
@@ -738,6 +738,343 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
     // Then
     expect(errors).toBeUndefined();
     expect(data.createBsdasriRevisionRequest.bsdasri.id).toBe(bsdasri.id);
+  });
+
+  describe("destinationOperationCode at revision", () => {
+    const ALLOWED_OPERATION_CODES = ["D9F", "D10", "R1", "D13", "R12"] as const;
+    const D13_R12_RESERVED_MESSAGE =
+      "Les codes R12 et D13 sont réservés aux installations de tri transit regroupement ou installations de collecte (Rubrique 2710)";
+    const INVALID_OPERATION_MESSAGE =
+      "Cette opération d'élimination / valorisation n'existe pas ou n'est pas appropriée";
+
+    it.each([...ALLOWED_OPERATION_CODES])(
+      "should allow revision with operation code %s when status is PROCESSED",
+      async code => {
+        const { company: destinationCompany } = await userWithCompanyFactory(
+          "ADMIN"
+        );
+        const { user, company } = await userWithCompanyFactory("ADMIN");
+        const bsdasri = await bsdasriFactory({
+          opt: {
+            emitterCompanySiret: company.siret,
+            destinationCompanySiret: destinationCompany.siret,
+            status: "PROCESSED",
+            destinationOperationCode: "D10",
+            destinationOperationMode: "ELIMINATION"
+          }
+        });
+
+        const mode =
+          code === "R1"
+            ? "VALORISATION_ENERGETIQUE"
+            : code === "D9F" || code === "D10"
+            ? "ELIMINATION"
+            : undefined;
+
+        const { mutate } = makeClient(user);
+        const { data, errors } = await mutate<
+          Pick<Mutation, "createBsdasriRevisionRequest">,
+          MutationCreateBsdasriRevisionRequestArgs
+        >(CREATE_BSDASRI_REVISION_REQUEST, {
+          variables: {
+            input: {
+              bsdasriId: bsdasri.id,
+              content: {
+                destination: {
+                  operation: { code, ...(mode && { mode }) }
+                }
+              },
+              comment: "A comment",
+              authoringCompanySiret: company.siret!
+            }
+          }
+        });
+
+        expect(errors).toBeUndefined();
+        expect(
+          data?.createBsdasriRevisionRequest.content.destination?.operation
+            ?.code
+        ).toBe(code);
+      }
+    );
+
+    it("should reject revision with operation code D12 (not in allowed list)", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "D12", mode: "ELIMINATION" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).not.toBeUndefined();
+      expect(errors![0].message).toBe(INVALID_OPERATION_MESSAGE);
+    });
+
+    it("should reject revision with D13 when destination is not WASTE_CENTER nor COLLECTOR", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "D13" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).not.toBeUndefined();
+      expect(errors![0].message).toBe(D13_R12_RESERVED_MESSAGE);
+    });
+
+    it("should reject revision with R12 when destination is not WASTE_CENTER nor COLLECTOR", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "R12" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).not.toBeUndefined();
+      expect(errors![0].message).toBe(D13_R12_RESERVED_MESSAGE);
+    });
+
+    it("should allow revision with D13 when destination is WASTE_CENTER", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { companyTypes: { set: [CompanyType.WASTE_CENTER] } }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "D13" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(
+        data?.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D13");
+    });
+
+    it("should allow revision with D13 when destination is COLLECTOR", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { companyTypes: { set: [CompanyType.COLLECTOR] } }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "D13" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(
+        data?.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("D13");
+    });
+
+    it("should allow revision with R12 when destination is WASTE_CENTER", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { companyTypes: { set: [CompanyType.WASTE_CENTER] } }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "R12" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(
+        data?.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("R12");
+    });
+
+    it("should allow revision with R12 when destination is COLLECTOR", async () => {
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "ADMIN",
+        { companyTypes: { set: [CompanyType.COLLECTOR] } }
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const bsdasri = await bsdasriFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: destinationCompany.siret,
+          status: "PROCESSED",
+          destinationOperationCode: "D10",
+          destinationOperationMode: "ELIMINATION"
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdasriRevisionRequest">,
+        MutationCreateBsdasriRevisionRequestArgs
+      >(CREATE_BSDASRI_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdasriId: bsdasri.id,
+            content: {
+              destination: {
+                operation: { code: "R12" }
+              }
+            },
+            comment: "A comment",
+            authoringCompanySiret: company.siret!
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(
+        data?.createBsdasriRevisionRequest.content.destination?.operation?.code
+      ).toBe("R12");
+    });
   });
 });
 
