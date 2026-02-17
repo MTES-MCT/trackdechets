@@ -751,7 +751,8 @@ describe("Mutation.createBsdasriRevisionRequest", () => {
       "should allow revision with operation code %s when status is PROCESSED",
       async code => {
         const { company: destinationCompany } = await userWithCompanyFactory(
-          "ADMIN"
+          "ADMIN",
+          { companyTypes: { set: [CompanyType.WASTE_CENTER] } }
         );
         const { user, company } = await userWithCompanyFactory("ADMIN");
         const bsdasri = await bsdasriFactory({
