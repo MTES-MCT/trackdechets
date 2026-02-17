@@ -170,6 +170,11 @@ export function RegistryIncomingWasteForm({ onClose }: Props) {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
+      methods.setValue("transporter", [
+        {
+          ...INITIAL_TRANSPORTER
+        }
+      ]);
     }
   }, [isDirectSupply, methods]);
   const wasteCode = methods.watch("wasteCode");
