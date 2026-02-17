@@ -310,7 +310,7 @@ async function checkEmitterIsNotEcoOrganisme(
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["emitter", "company", "siret"] as EditionRulePath,
-      message: `"L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...). Un autre champ dédié existe et doit être utilisé pour viser l'éco-organisme concerné : https://faq.trackdechets.fr/dechets-dangereux-classiques/les-eco-organismes-sur-trackdechets#ou-etre-vise-en-tant-queco-organisme",`
+      message: `L'émetteur ne peut pas être un éco-organisme. Merci de bien vouloir renseigner l'émetteur effectif de ce déchet (ex: déchetterie, producteur, TTR...).`
     });
   }
 }
