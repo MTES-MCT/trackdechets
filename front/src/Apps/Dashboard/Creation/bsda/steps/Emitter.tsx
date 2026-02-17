@@ -232,9 +232,9 @@ const EmitterBsda = () => {
                       mail: emitter?.company?.mail,
                       country: company.codePaysEtrangerEtablissement
                     };
+                  } else {
+                    clearCompanyError(emitter, "emitter", clearErrors);
                   }
-
-                  clearCompanyError(emitter, "emitter", clearErrors);
 
                   setValue("emitter", {
                     ...emitter,
@@ -246,12 +246,6 @@ const EmitterBsda = () => {
                 }
               }}
             />
-            {!emitter?.company?.siret &&
-              formState.errors?.emitter?.["company"]?.siret && (
-                <p className="fr-text--sm fr-error-text fr-mb-4v">
-                  {formState.errors?.emitter?.["company"]?.siret?.message}
-                </p>
-              )}
             <CompanyContactInfo
               fieldName={"emitter.company"}
               errorObject={formState.errors?.emitter?.["company"]}
