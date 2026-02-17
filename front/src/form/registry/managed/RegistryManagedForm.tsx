@@ -238,6 +238,11 @@ export function RegistryManagedForm({ onClose }: Props) {
       setDisabledFieldNames(prev =>
         prev.filter(field => field !== "transporter")
       );
+      methods.setValue("transporter", [
+        {
+          ...INITIAL_TRANSPORTER
+        }
+      ]);
     }
   }, [isDirectSupply, methods]);
 
