@@ -223,7 +223,7 @@ async function getFlatContent(
     flatContent.destinationOperationMode = parsed.destinationOperationMode;
   }
 
-  checkRevisionRules(fields, bsdasri);
+  await checkRevisionRules(fields, bsdasri);
 
   return flatContent;
 }
