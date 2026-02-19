@@ -213,7 +213,7 @@ const SignBsdaOperation = ({ bsdaId, onClose }) => {
             destinataire.
           </p>
           <Select
-            label="Traitement d'élimination / valorisation prévue (code D/R)"
+            label="Traitement d'élimination / valorisation effectué (code D/R)"
             className="fr-col-12 fr-mt-1w"
             nativeSelectProps={{
               ...register("destination.operation.code")
