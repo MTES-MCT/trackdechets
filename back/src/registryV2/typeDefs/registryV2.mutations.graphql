@@ -86,6 +86,11 @@ type Mutation {
     where: RegistryV2ExportWhere
   ): RegistryV2Export!
 
+  "Annule un export de registre"
+  cancelRegistryV2Export(
+    "Identifiant de l'export"
+    exportId: String!
+  ): RegistryV2Export!
   """
   Annule des déclarations au registre
   """

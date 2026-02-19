@@ -97,6 +97,7 @@ export function MyExports() {
     exportsLoading,
     registryExports,
     downloadRegistryExportFile,
+    cancelRegistryExport,
     gotoPage,
     refetch,
     error
@@ -174,13 +175,26 @@ export function MyExports() {
       ),
       file:
         registryExport.status === RegistryExportStatus.Pending ||
-        registryExport.status === RegistryExportStatus.Started ||
-        downloadLoadingExportId === registryExport.id ? (
+        registryExport.status === RegistryExportStatus.Started ? (
+          <div
+            className="tw-px-2"
+            style={{ flex: 1, flexDirection: "column", width: "fit-content" }}
+          >
+            <InlineLoader size={32} />
+            <div
+              className="fr-link fr-link--xs"
+              style={{ cursor: "pointer", textDecoration: "underline" }}
+              onClick={() => cancelRegistryExport(registryExport.id)}
+            >
+              Annuler
+            </div>
+          </div>
+        ) : downloadLoadingExportId === registryExport.id ? (
           <div className="tw-px-2" style={{ width: "fit-content" }}>
             <InlineLoader size={32} />
           </div>
         ) : registryExport.status === RegistryExportStatus.Successful ? (
-          <div className="tw-px-2">
+          <div className="tw-px-4">
             <Button
               title="Télécharger"
               priority="secondary"
@@ -219,6 +233,7 @@ export function MyExports() {
     registryExports,
     downloadLoadingExportId,
     downloadRegistryExportFile,
+    cancelRegistryExport,
     type
   ]);
 
