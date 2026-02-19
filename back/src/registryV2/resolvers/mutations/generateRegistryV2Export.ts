@@ -51,15 +51,15 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
       );
     }
 
-    const recentExportsByUserCount = await prisma.registryExport.count({
+    const runningExportsByUserCount = await prisma.registryExport.count({
       where: {
         createdById: user.id,
-        createdAt: { gte: subMinutes(new Date(), 5) }
+        status: { in: [RegistryExportStatus.PENDING, RegistryExportStatus.STARTED] }
       }
     });
-    if (recentExportsByUserCount >= 10 && !(user.isAdmin && asAdmin)) {
+    if (runningExportsByUserCount >= 10 && !(user.isAdmin && asAdmin)) {
       throw new TooManyRequestsError(
-        "Vous avez déjà réalisé 10 exports dans les 5 dernières minutes. Veuillez réessayer plus tard."
+        "Vous avez déjà 10 exports en cours ou en attente de traitement. Veuillez réessayer plus tard."
       );
     }
 
@@ -153,13 +153,13 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
         wasteTypes: where?.wasteType?._eq
           ? { equals: [where.wasteType._eq] }
           : where?.wasteType?._in?.length
-          ? { equals: where.wasteType._in.sort() }
-          : { isEmpty: true },
+            ? { equals: where.wasteType._in.sort() }
+            : { isEmpty: true },
         wasteCodes: where?.wasteCode?._eq
           ? { equals: [where.wasteCode._eq] }
           : where?.wasteCode?._in?.length
-          ? { equals: where.wasteCode._in.sort() }
-          : { isEmpty: true },
+            ? { equals: where.wasteCode._in.sort() }
+            : { isEmpty: true },
         declarationType: where?.declarationType?._eq
           ? where.declarationType._eq === "ALL"
             ? null
@@ -217,13 +217,13 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
         wasteTypes: where?.wasteType?._eq
           ? [where.wasteType._eq]
           : where?.wasteType?._in?.length
-          ? where.wasteType._in.sort()
-          : [],
+            ? where.wasteType._in.sort()
+            : [],
         wasteCodes: where?.wasteCode?._eq
           ? [where.wasteCode._eq]
           : where?.wasteCode?._in?.length
-          ? where.wasteCode._in.sort()
-          : [],
+            ? where.wasteCode._in.sort()
+            : [],
         declarationType: where?.declarationType?._eq
           ? where.declarationType._eq === "ALL"
             ? null
