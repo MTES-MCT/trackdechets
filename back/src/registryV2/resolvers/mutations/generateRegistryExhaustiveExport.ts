@@ -40,12 +40,15 @@ export function getGenerateRegistryExhaustiveExport({
       );
     }
 
-    const runningExportsByUserCount = await prisma.registryExhaustiveExport.count({
-      where: {
-        createdById: user.id,
-        status: { in: [RegistryExportStatus.PENDING, RegistryExportStatus.STARTED] }
-      }
-    });
+    const runningExportsByUserCount =
+      await prisma.registryExhaustiveExport.count({
+        where: {
+          createdById: user.id,
+          status: {
+            in: [RegistryExportStatus.PENDING, RegistryExportStatus.STARTED]
+          }
+        }
+      });
     if (runningExportsByUserCount >= 10) {
       throw new TooManyRequestsError(
         "Vous avez déjà 10 exports en cours ou en attente de traitement. Veuillez réessayer plus tard."
