@@ -240,10 +240,15 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
       }
     });
 
-    await enqueueRegistryExportJob({
-      exportId: registryExport.id,
-      dateRange
-    });
+    await enqueueRegistryExportJob(
+      {
+        exportId: registryExport.id,
+        dateRange
+      },
+      {
+        jobId: registryExport.id
+      }
+    );
 
     return registryExport;
   };

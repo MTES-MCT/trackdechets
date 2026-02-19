@@ -6,7 +6,12 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { ApolloError, useLazyQuery, useQuery } from "@apollo/client";
+import {
+  ApolloError,
+  useLazyQuery,
+  useMutation,
+  useQuery
+} from "@apollo/client";
 import { subHours } from "date-fns";
 
 import {
@@ -14,13 +19,16 @@ import {
   QueryRegistryV2ExportDownloadSignedUrlArgs,
   RegistryV2Export,
   RegistryExhaustiveExport,
-  RegistryExportStatus
+  RegistryExportStatus,
+  MutationCancelRegistryV2ExportArgs,
+  Mutation
 } from "@td/codegen-ui";
 import {
   downloadFromSignedUrl,
   GET_REGISTRY_V2_EXPORTS,
   GET_REGISTRY_V2_EXPORTS_AS_ADMIN,
-  REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL
+  REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL,
+  CANCEL_REGISTRY_V2_EXPORT
 } from "./shared";
 import { RegistryExhaustiveExportContext } from "./RegistryExhaustiveExportContext";
 
@@ -41,10 +49,12 @@ export type RegistryExportContextType =
   | (BaseRegistryExportContext & {
       type: "registryV2";
       registryExports: RegistryV2Export[] | undefined;
+      cancelRegistryExport: (exportId: string) => Promise<void>;
     })
   | (BaseRegistryExportContext & {
       type: "registryExhaustive";
       registryExports: RegistryExhaustiveExport[] | undefined;
+      cancelRegistryExport: (exportId: string) => Promise<void>;
     });
 
 export const RegistryV2ExportContext =
@@ -98,6 +108,14 @@ export const RegistryV2ExportProvider: React.FC<{
     Partial<QueryRegistryV2ExportDownloadSignedUrlArgs>
   >(REGISTRY_V2_EXPORT_DOWNLOAD_SIGNED_URL, { fetchPolicy: "no-cache" });
 
+  const [_cancelRegistryExport] = useMutation<
+    Pick<Mutation, "cancelRegistryV2Export">,
+    Partial<MutationCancelRegistryV2ExportArgs>
+  >(CANCEL_REGISTRY_V2_EXPORT, {
+    refetchQueries: [
+      asAdmin ? GET_REGISTRY_V2_EXPORTS_AS_ADMIN : GET_REGISTRY_V2_EXPORTS
+    ]
+  });
   const downloadRegistryExportFile = useCallback(
     async (exportId: string) => {
       setDownloadLoadingExportId(exportId);
@@ -115,6 +133,12 @@ export const RegistryV2ExportProvider: React.FC<{
     [setDownloadLoadingExportId, getDownloadLink]
   );
 
+  const cancelRegistryExport = useCallback(
+    async (exportId: string) => {
+      await _cancelRegistryExport({ variables: { exportId } });
+    },
+    [_cancelRegistryExport]
+  );
   const gotoPage = useCallback(
     (page: number) => {
       setPageIndex(page);
@@ -154,6 +178,7 @@ export const RegistryV2ExportProvider: React.FC<{
         downloadLoadingExportId,
         exportsLoading,
         registryExports: registryExports?.map(edge => edge.node),
+        cancelRegistryExport,
         downloadRegistryExportFile,
         gotoPage,
         refetch,

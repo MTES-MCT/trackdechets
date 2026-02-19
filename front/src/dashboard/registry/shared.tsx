@@ -246,6 +246,15 @@ export const GENERATE_REGISTRY_V2_EXPORT = gql`
   ${registryV2ExportFragment}
 `;
 
+export const CANCEL_REGISTRY_V2_EXPORT = gql`
+  mutation CancelRegistryV2Export($exportId: String!) {
+    cancelRegistryV2Export(exportId: $exportId) {
+      ...RegistryV2ExportFragment
+    }
+  }
+  ${registryV2ExportFragment}
+`;
+
 export const GENERATE_REGISTRY_V2_EXPORT_AS_ADMIN = gql`
   mutation GenerateRegistryV2ExportAsAdmin(
     $registryType: RegistryV2ExportType!
