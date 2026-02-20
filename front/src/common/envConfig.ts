@@ -56,6 +56,7 @@ export const envConfig = z
     VITE_MATOMO_TRACKER_SITE_ID: z.string().optional(),
     VITE_MATOMO_TRACKER_URL: z.string().optional(),
     VITE_REGISTRY_EXPORT_ISSUE_NOTICE: z.string().optional(),
-    VITE_NO_DATE_LIMIT_SIRETS: stringArray
+    VITE_NO_DATE_LIMIT_SIRETS: stringArray,
+    VITE_ENV_NAME: z.string().optional()
   })
   .parse(import.meta.env);

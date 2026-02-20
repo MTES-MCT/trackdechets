@@ -17,6 +17,7 @@ import {
   COMPANY_DIGEST_PDF,
   COMPANY_DIGEST
 } from "./queries";
+import { envConfig } from "../../../common/envConfig";
 
 const Description = () => (
   <div>
@@ -177,6 +178,8 @@ const CompanyDigestSheetForm = ({ company }) => {
   const currentYear = new Date().getFullYear();
   const lastYear = currentYear - 1;
 
+  const shouldDisplayFeature = envConfig.VITE_ENV_NAME === "production";
+
   if (error) {
     return <NotificationError apolloError={error} />;
   }
@@ -203,33 +206,43 @@ const CompanyDigestSheetForm = ({ company }) => {
         <span className="fr-badge fr-badge--purple-glycine">VERSION BETA</span>
       </h1>
 
-      <Alert description={Description()} severity="info" small />
-      <div className="fr-my-2w">
-        <CompanyDigestDownload
-          companyDigests={data?.companyDigests}
-          year={lastYear}
-          onClick={async () => {
-            await createCompanyDigest({
-              variables: { input: { year: lastYear, orgId: company.siret } }
-            });
-            refetch();
-          }}
+      {shouldDisplayFeature ? (
+        <>
+          <Alert description={Description()} severity="info" small />
+          <div className="fr-my-2w">
+            <CompanyDigestDownload
+              companyDigests={data?.companyDigests}
+              year={lastYear}
+              onClick={async () => {
+                await createCompanyDigest({
+                  variables: { input: { year: lastYear, orgId: company.siret } }
+                });
+                refetch();
+              }}
+            />
+          </div>
+          <div>
+            <CompanyDigestDownload
+              companyDigests={data?.companyDigests}
+              year={currentYear}
+              onClick={async () => {
+                await createCompanyDigest({
+                  variables: {
+                    input: { year: currentYear, orgId: company.siret }
+                  }
+                });
+                refetch();
+              }}
+            />
+          </div>
+        </>
+      ) : (
+        <Alert
+          description="La génération de la fiche établissement n'est pas disponible sur cet environnement."
+          severity="info"
+          small
         />
-      </div>
-      <div>
-        <CompanyDigestDownload
-          companyDigests={data?.companyDigests}
-          year={currentYear}
-          onClick={async () => {
-            await createCompanyDigest({
-              variables: {
-                input: { year: currentYear, orgId: company.siret }
-              }
-            });
-            refetch();
-          }}
-        />
-      </div>
+      )}
     </div>
   );
 };
