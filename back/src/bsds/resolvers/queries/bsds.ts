@@ -229,7 +229,6 @@ async function buildSearchAfter(
 
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   // This query is restricted to Session users (UI) and government accounts (gerico)
-
   applyAuthStrategies(context, [AuthType.Session]);
 
   const user = checkIsAuthenticated(context);
@@ -238,6 +237,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;
   const size = Math.max(Math.min(first!, MAX_SIZE), MIN_SIZE);
+
   await bsdSearchSchema.validate(args.where, { abortEarly: false });
 
   const query = await buildQuery(args, user);

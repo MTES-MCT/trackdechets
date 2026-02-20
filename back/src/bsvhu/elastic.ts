@@ -421,7 +421,26 @@ export function toBsdElastic(bsvhu: BsvhuForElastic): BsdElastic {
       bsvhu.traderCompanySiret,
       ...bsvhu.intermediaries.map(intermediary => intermediary.siret),
       ...bsvhu.intermediaries.map(intermediary => intermediary.vatNumber)
-    ].filter(Boolean)
+    ].filter(Boolean),
+    // Contacts
+    destinationCompanyContact: bsvhu.destinationCompanyContact ?? "",
+    destinationCompanyPhone: bsvhu.destinationCompanyPhone ?? "",
+    destinationCompanyMail: bsvhu.destinationCompanyMail ?? "",
+    emitterCompanyContact: bsvhu.emitterCompanyContact ?? "",
+    emitterCompanyPhone: bsvhu.emitterCompanyPhone ?? "",
+    emitterCompanyMail: bsvhu.emitterCompanyMail ?? "",
+    transporterCompanyContact: transporter?.transporterCompanyContact ?? "",
+    transporterCompanyPhone: transporter?.transporterCompanyPhone ?? "",
+    transporterCompanyMail: transporter?.transporterCompanyMail ?? "",
+    workerCompanyContact: "",
+    workerCompanyPhone: "",
+    workerCompanyMail: "",
+    nextDestinationCompanyContact:
+      bsvhu.destinationOperationNextDestinationCompanyContact ?? "",
+    nextDestinationCompanyPhone:
+      bsvhu.destinationOperationNextDestinationCompanyPhone ?? "",
+    nextDestinationCompanyMail:
+      bsvhu.destinationOperationNextDestinationCompanyMail ?? ""
   };
 }
 

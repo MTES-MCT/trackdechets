@@ -138,6 +138,23 @@ export interface BsdElastic {
     | BsvhuForElastic
     | BsffForElastic
     | BspaohForElastic;
+
+  // Contacts
+  emitterCompanyContact: string;
+  emitterCompanyPhone: string;
+  emitterCompanyMail: string;
+  destinationCompanyContact: string;
+  destinationCompanyPhone: string;
+  destinationCompanyMail: string;
+  transporterCompanyContact: string;
+  transporterCompanyPhone: string;
+  transporterCompanyMail: string;
+  nextDestinationCompanyContact: string;
+  nextDestinationCompanyPhone: string;
+  nextDestinationCompanyMail: string;
+  workerCompanyContact: string;
+  workerCompanyPhone: string;
+  workerCompanyMail: string;
 }
 
 const textField = {
@@ -245,6 +262,23 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   emitterPickupSiteName: textField,
   emitterPickupSiteAddress: textField,
   emitterCustomInfo: textField,
+
+  // Contacts
+  emitterCompanyContact: textField,
+  emitterCompanyPhone: textField,
+  emitterCompanyMail: textField,
+  destinationCompanyContact: textField,
+  destinationCompanyPhone: textField,
+  destinationCompanyMail: textField,
+  transporterCompanyContact: textField,
+  transporterCompanyPhone: textField,
+  transporterCompanyMail: textField,
+  nextDestinationCompanyContact: textField,
+  nextDestinationCompanyPhone: textField,
+  nextDestinationCompanyMail: textField,
+  workerCompanyContact: textField,
+  workerCompanyPhone: textField,
+  workerCompanyMail: textField,
 
   workerCompanyName: textField,
   workerCompanySiret: stringField,

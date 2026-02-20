@@ -113,6 +113,9 @@ export const filter_acceptation_sign_date = "Date d'acceptation";
 export const filter_operation_sign_date = "Date de traitement / d'opération";
 export const filter_tva_intra = "Numéro de TVA intracommunautaire";
 export const filter_next_destination_siret = "SIRET du destinataire ultérieur";
+export const filter_contact = "Contact";
+export const filter_contact_placeholder =
+  "Nom, courriel ou téléphone du contact";
 export const filter_given_name = "Raison sociale / SIRET";
 export const filter_cap = "Numéro de CAP";
 export const filter_seal_numbers = "Numéro du scellé (BSDA)";
