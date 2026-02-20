@@ -1,4 +1,5 @@
 import { Prisma } from "@td/prisma";
+import { Decimal } from "decimal.js";
 
 /**
  * Return null if all object values are null or an empty string
@@ -131,4 +132,12 @@ export function processDecimal(
   return maybeDecimal instanceof Prisma.Decimal
     ? maybeDecimal
     : new Prisma.Decimal(maybeDecimal);
+}
+
+export function kgToTonRegistryV2<T extends Decimal | number | null>(
+  kg: T
+): T extends null ? number | null : number {
+  return (
+    kg ? new Decimal(kg).dividedBy(1000).toDecimalPlaces(6).toNumber() : null
+  ) as T extends null ? number | null : number;
 }
