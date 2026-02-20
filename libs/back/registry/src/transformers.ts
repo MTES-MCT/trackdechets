@@ -221,6 +221,21 @@ function getCellValue(cell: Excel.Cell) {
     return cell.text;
   }
 
+  if (cell.type === Excel.ValueType.Hyperlink) {
+    const hyperlinkValue = cell.value as Excel.CellHyperlinkValue;
+    return hyperlinkValue.text || hyperlinkValue.hyperlink;
+  }
+
+  if (cell.type === Excel.ValueType.RichText) {
+    const richTextValue = cell.value as Excel.CellRichTextValue;
+    return richTextValue.richText.map(rt => rt.text).join("");
+  }
+
+  if (cell.type === Excel.ValueType.Formula) {
+    const formulaValue = cell.value as Excel.CellFormulaValue;
+    return formulaValue.result !== undefined ? String(formulaValue.result) : "";
+  }
+
   return cell.value;
 }
 
