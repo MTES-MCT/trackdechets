@@ -292,8 +292,16 @@ export function BsdasriRequestRevision({ bsdasri }: Props) {
                 D9F - Prétraitement par désinfection - Banaliseur
               </option>
               <option value="D10">D10 - Incinération</option>
+              <option value="D13">
+                D13 - Groupement avant désinfection en D9F ou incinération en
+                D10 sur un site relevant de la rubrique 2718
+              </option>
               <option value="R1">
                 R1 - Incinération + valorisation énergétique
+              </option>
+              <option value="R12">
+                R12 - Groupement avant incinération en R1, sur un site relevant
+                de la rubrique 2718
               </option>
             </Select>
             <RhfOperationModeSelect

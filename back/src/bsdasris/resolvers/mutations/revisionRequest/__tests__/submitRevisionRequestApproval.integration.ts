@@ -437,6 +437,90 @@ describe("Mutation.submitBsdasriRevisionRequestApproval", () => {
     expect(updatedBsdasri.status).toBe("CANCELED");
   });
 
+  it("should change the bsdasri status from PROCESSED to AWAITING_GROUP when operation code is revised from non-grouping to grouping", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "PROCESSED",
+        destinationOperationCode: "D 10"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "Change to grouping code",
+        destinationOperationCode: "R12"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
+      MutationSubmitBsdasriRevisionRequestApprovalArgs
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id }
+    });
+
+    expect(updatedBsdasri.status).toBe("AWAITING_GROUP");
+  });
+
+  it("should change the bsdasri status from AWAITING_GROUP to PROCESSED when operation code is revised from grouping to non-grouping", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "AWAITING_GROUP",
+        destinationOperationCode: "R12"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdasriRevisionRequest.create({
+      data: {
+        bsdasriId: bsdasri.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "Change to final code",
+        destinationOperationCode: "D 10"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdasriRevisionRequestApproval">,
+      MutationSubmitBsdasriRevisionRequestApprovalArgs
+    >(SUBMIT_BSDASRI_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdasri.id }
+    });
+
+    expect(updatedBsdasri.status).toBe("PROCESSED");
+  });
+
   it.each(NON_CANCELLABLE_BSDASRI_STATUSES)(
     "should fail if request is about cancelation & the BSDASRI has a non-cancellable status",
     async (status: BsdasriStatus) => {
