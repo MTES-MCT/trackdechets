@@ -6,6 +6,7 @@ import makeClient from "../../../../__tests__/testClient";
 import type { Mutation } from "@td/codegen-back";
 import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
+import { addDays } from "date-fns";
 
 const JOIN_WITH_INVITE = `
   mutation JoinWithInvite($inviteHash: String!, $name: String!, $password: String!){
@@ -24,7 +25,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash-shortname"
+        hash: "hash-shortname",
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -48,7 +50,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash-specialchars"
+        hash: "hash-specialchars",
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -82,17 +85,17 @@ describe("joinWithInvite mutation", () => {
     expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
 
-  it("should raise exception if invitation was already accepted", async () => {
+  it("should raise exception if invitation is expired", async () => {
     const company = await companyFactory();
-    const invitee = "john.snow@trackdechets.fr";
+    const invitee = "expired.invite@td.io";
 
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash",
-        acceptedAt: new Date()
+        hash: "expired-hash",
+        expiresAt: new Date(Date.now() - 1000 * 60 * 60 * 24)
       }
     });
     const { errors } = await mutate(JOIN_WITH_INVITE, {
@@ -103,7 +106,36 @@ describe("joinWithInvite mutation", () => {
       }
     });
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual("Cette invitation a déjà été acceptée");
+    expect(errors[0].message).toEqual("Cette invitation n'existe pas");
+  });
+
+  it("should raise exception if invitation was already accepted", async () => {
+    // Given
+    const company = await companyFactory();
+    const invitee = "john.snow@trackdechets.fr";
+
+    const invitation = await prisma.userAccountHash.create({
+      data: {
+        email: invitee,
+        companySiret: company.siret!,
+        role: "MEMBER",
+        hash: "hash",
+        acceptedAt: addDays(new Date(), -1)
+      }
+    });
+
+    // When
+    const { errors } = await mutate(JOIN_WITH_INVITE, {
+      variables: {
+        inviteHash: invitation.hash,
+        name: "John Snow",
+        password: "P4a$$woRd_1234"
+      }
+    });
+
+    // Then
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual("Cette invitation n'existe pas");
   });
 
   it.each([UserRole.ADMIN, UserRole.MEMBER, UserRole.READER, UserRole.DRIVER])(
@@ -117,7 +149,8 @@ describe("joinWithInvite mutation", () => {
           email: invitee,
           companySiret: company.siret!,
           role,
-          hash: "hash"
+          hash: "hash",
+          expiresAt: addDays(new Date(), 7)
         }
       });
 
@@ -175,7 +208,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: UserRole.MEMBER,
-        hash: "hash"
+        hash: "hash",
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -208,7 +242,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company1.siret!,
         role: "MEMBER",
-        hash: "hash1"
+        hash: "hash1",
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -217,7 +252,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company2.siret!,
         role: "MEMBER",
-        hash: "hash2"
+        hash: "hash2",
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -256,7 +292,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
+        hash: "hash",
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { errors: errs1 } = await mutate(JOIN_WITH_INVITE, {
@@ -291,7 +328,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
+        hash: "hash",
+        expiresAt: addDays(new Date(), 7)
       }
     });
 
@@ -321,7 +359,8 @@ describe("joinWithInvite mutation", () => {
         email: invitee,
         companySiret: company.siret!,
         role: "MEMBER",
-        hash: "hash"
+        hash: "hash",
+        expiresAt: addDays(new Date(), 7)
       }
     });
 

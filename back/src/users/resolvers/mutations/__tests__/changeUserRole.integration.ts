@@ -13,12 +13,13 @@ import { ErrorCode, NotCompanyAdminErrorMsg } from "../../../../common/errors";
 import { UserRole } from "@td/prisma";
 import { getDefaultNotifications } from "../../../notifications";
 import { getUserRoles } from "../../../../permissions/permissions";
+import { addDays } from "date-fns";
 
 const CHANGE_USER_ROLE = `
   mutation ChangeUserRole($userId: ID!, $orgId: ID!, $role: UserRole!){
     changeUserRole(userId: $userId, orgId: $orgId, role: $role){
       email
-      role
+      role 
     }
   }
 `;
@@ -195,7 +196,8 @@ describe("mutation changeUserRole", () => {
         hash: userAccoutHash,
         email: invitedUserEmail,
         role: "MEMBER",
-        companySiret: company.siret!
+        companySiret: company.siret!,
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const { data } = await mutate<Pick<Mutation, "changeUserRole">>(

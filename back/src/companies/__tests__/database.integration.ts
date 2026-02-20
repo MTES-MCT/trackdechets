@@ -10,6 +10,7 @@ import {
 } from "../database";
 import { createUserDataLoaders } from "../../users/dataloaders";
 import { AppDataloaders } from "../../types";
+import { addDays } from "date-fns";
 
 const dataloaders = createUserDataLoaders() as AppDataloaders;
 
@@ -24,7 +25,8 @@ describe("getInvitedUsers", () => {
         companySiret: company.siret!,
         hash: "hash1",
         role: "MEMBER",
-        acceptedAt: new Date()
+        acceptedAt: new Date(),
+        expiresAt: new Date()
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(
@@ -41,7 +43,8 @@ describe("getInvitedUsers", () => {
         email: "john.snow@trackdechets.fr",
         companySiret: company.siret!,
         hash: "hash2",
-        role: "MEMBER"
+        role: "MEMBER",
+        expiresAt: addDays(new Date(), 7)
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(

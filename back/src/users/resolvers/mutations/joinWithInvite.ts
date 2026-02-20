@@ -41,7 +41,11 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
 
   const { inviteHash, name, password } = args;
 
-  const existingHash = await getUserAccountHashOrNotFound({ hash: inviteHash });
+  const existingHash = await getUserAccountHashOrNotFound({
+    hash: inviteHash,
+    acceptedAt: null,
+    expiresAt: { gte: new Date() }
+  });
 
   if (existingHash.acceptedAt) {
     throw new UserInputError("Cette invitation a déjà été acceptée");
