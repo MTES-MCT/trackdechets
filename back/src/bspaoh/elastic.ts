@@ -106,7 +106,8 @@ function getWhere(bspaoh: Bspaoh, transporter): Pick<BsdElastic, WhereKeys> {
       break;
     }
 
-    case BspaohStatus.RECEIVED: {
+    case BspaohStatus.RECEIVED:
+    case BspaohStatus.PARTIALLY_REFUSED: {
       setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
       break;
     }

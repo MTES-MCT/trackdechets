@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2026.03.1] 10/03/2026
+
+#### :bug: Corrections de bugs
+
+- Afficher le BSPAOH dans l'onglet Pour action lorsqu'il est au statut PARTIALLY_REFUSED [PR 4676](https://github.com/MTES-MCT/trackdechets/pull/4676)
+
 # [2026.02.1] 10/02/2026
 
 ### :boom: Breaking changes
