@@ -4,10 +4,10 @@ import CompanySelector from "../common/components/company/CompanySelector";
 import { OPERATION } from "./utils/constants";
 import { RedErrorMessage } from "../../common/components";
 
-export default function Destination({ disabled }) {
+export default function Destination({ disabled, contactFieldsDisabled }) {
   return (
     <>
-      {disabled && (
+      {(disabled || contactFieldsDisabled) && (
         <div className="notification notification--error">
           Les champs ci-dessous ont été scellés via signature et ne sont plus
           modifiables.
@@ -16,6 +16,7 @@ export default function Destination({ disabled }) {
 
       <CompanySelector
         disabled={disabled}
+        contactFieldsDisabled={contactFieldsDisabled}
         registeredOnlyCompanies={true}
         name="destination.company"
         heading="Installation de destination"
