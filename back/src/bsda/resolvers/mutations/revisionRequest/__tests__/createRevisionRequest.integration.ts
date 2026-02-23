@@ -31,7 +31,7 @@ const CREATE_BSDA_REVISION_REQUEST = `
       }
       content {
         waste { code }
-        destination { 
+        destination {
           cap
           reception {
             weight

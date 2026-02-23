@@ -1950,6 +1950,7 @@ model BsdaRevisionRequest {
   approvals BsdaRevisionRequestApproval[]
 
   wasteCode                         String?
+  wasteFamilyCode                   String?
   wastePop                          Boolean?
   packagings                        Json?
   wasteSealNumbers                  String[]
@@ -1977,6 +1978,7 @@ model BsdaRevisionRequest {
   emitterPickupSiteInfos            String?
 
   initialWasteCode                         String?
+  initialWasteFamilyCode                   String?
   initialWastePop                          Boolean?
   initialPackagings                        Json?
   initialWasteSealNumbers                  String[]

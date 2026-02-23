@@ -646,6 +646,9 @@ input BsdaRevisionRequestWasteInput {
   "Rubrique Déchet"
   code: String
 
+  "Code famille"
+  familyCode: String
+
   """
   Nom usuel du matériau
 

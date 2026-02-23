@@ -268,6 +268,7 @@ export const initialBsdaReview = {
   },
   waste: {
     code: "",
+    familyCode: "",
     pop: null,
     sealNumbers: [],
     materialName: ""
@@ -304,7 +305,8 @@ export const validationBsdaSchema = z.object({
     cap: z.string().nullish(),
     sealNumbers: z.array(z.string()).nullish(),
     materialName: z.string().nullish(),
-    pop: z.boolean().nullish()
+    pop: z.boolean().nullish(),
+    familyCode: z.string().nullish()
   }),
   emitter: z.object({
     pickupSite: z.object({
