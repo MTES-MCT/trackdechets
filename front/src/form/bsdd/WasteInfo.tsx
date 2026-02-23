@@ -29,6 +29,7 @@ import {
   emptyBsddPackaging
 } from "../../Apps/Forms/Components/PackagingList/helpers";
 import { Consistence } from "@td/codegen-ui";
+import { FormikParcelsVisualizer } from "../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
 
 const SOIL_CODES = [
   "17 05 03*",
@@ -55,6 +56,10 @@ export default function WasteInfo({ disabled }) {
       setFieldValue("wasteDetails.isDangerous", true);
     }
   }, [values.wasteDetails?.code, setFieldValue]);
+
+  useEffect(() => {
+    setFieldValue("wasteDetails.code", "17 05 03*");
+  }, [setFieldValue]);
 
   const showDuplicateWarning = !!values.isDuplicateOf && !disabled;
 
@@ -397,6 +402,13 @@ export default function WasteInfo({ disabled }) {
             <Field
               component={ParcelNumbersSelector}
               name="wasteDetails.parcelNumbers"
+            />
+          </div>
+
+          <div className="form__row">
+            <FormikParcelsVisualizer
+              prefix="wasteDetails.parcelNumbers"
+              disabled={disabled}
             />
           </div>
         </>

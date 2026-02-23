@@ -17,7 +17,7 @@ export const getView = (lonLat: number[], zoom: number) => {
   });
 };
 
-export const createMap = (): {
+export const createMap = (target: HTMLElement): {
   map: Map;
   markerLayerId: string;
   parcelLayerId: string;
@@ -49,7 +49,7 @@ export const createMap = (): {
   const parcelLayerId = getUid(parcelLayer);
 
   const map = new Map({
-    target: "parcels-map",
+    target,
     maxTilesLoading: 5,
     layers: [
       new LayerWMS({
