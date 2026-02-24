@@ -1,5 +1,11 @@
 import React, { useMemo } from "react";
-import { Field, FieldArray, FieldArrayRenderProps, FieldProps, useFormikContext } from "formik";
+import {
+  Field,
+  FieldArray,
+  FieldArrayRenderProps,
+  FieldProps,
+  useFormikContext
+} from "formik";
 import TdSwitch from "../../../../common/components/Switch";
 import { Form, ParcelNumber as ParcelNumberType } from "@td/codegen-ui";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
@@ -7,7 +13,13 @@ import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
 import { FormikParcelsVisualizer } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
 
-function ParcelSummaryList({ parcels, onRemove }: { parcels: ParcelNumberType[]; onRemove: (idx: number) => void }) {
+function ParcelSummaryList({
+  parcels,
+  onRemove
+}: {
+  parcels: ParcelNumberType[];
+  onRemove: (idx: number) => void;
+}) {
   if (!parcels.length) return null;
 
   return (
@@ -27,7 +39,9 @@ function ParcelSummaryList({ parcels, onRemove }: { parcels: ParcelNumberType[];
             (parcel.number || parcel.parcelNumber)
           )
             parts.push(
-              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${parcel.number ?? parcel.parcelNumber}`
+              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${
+                parcel.number ?? parcel.parcelNumber
+              }`
             );
           if (parcel.lat !== undefined && parcel.lng !== undefined)
             parts.push(`GPS : ${parcel.lat}, ${parcel.lng}`);
@@ -89,7 +103,8 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
                 disabled={false}
                 onAddParcel={parcel => {
                   // Append new parcel if not duplicate
-                  const city = (parcel as any).address || (parcel as any).city || "";
+                  const city =
+                    (parcel as any).address || (parcel as any).city || "";
                   const isDuplicate = values.some(
                     (p: ParcelNumberType) =>
                       p.inseeCode === parcel.inseeCode &&

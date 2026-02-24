@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef
+} from "react";
 import { useFormikContext } from "formik";
 import Alert, { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
@@ -9,7 +15,11 @@ import Gp from "geoportal-access-lib";
 import { Map, MapBrowserEvent } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
-import { createEmpty as createEmptyExtent, extend as extendExtent, isEmpty as isEmptyExtent } from "ol/extent";
+import {
+  createEmpty as createEmptyExtent,
+  extend as extendExtent,
+  isEmpty as isEmptyExtent
+} from "ol/extent";
 import { Vector as VectorLayer } from "ol/layer";
 import { Vector as VectorSource } from "ol/source";
 import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
