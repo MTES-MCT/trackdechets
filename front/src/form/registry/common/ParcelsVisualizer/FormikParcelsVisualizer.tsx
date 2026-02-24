@@ -9,11 +9,9 @@ import Gp from "geoportal-access-lib";
 import { Map, MapBrowserEvent } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
-import {
-  createEmpty as createEmptyExtent,
-  extend as extendExtent,
-  isEmpty as isEmptyExtent
-} from "ol/extent";
+import { createEmpty as createEmptyExtent, extend as extendExtent, isEmpty as isEmptyExtent } from "ol/extent";
+import { Vector as VectorLayer } from "ol/layer";
+import { Vector as VectorSource } from "ol/source";
 import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
 import "ol/ol.css";
 import { formatError } from "../../builder/error";
@@ -139,19 +137,24 @@ export function FormikParcelsVisualizer({
 
   // Map initialization: only on mount (or when disabled/hideIfDisabled changes)
   useEffect(() => {
-    console.log('[FormikParcelsVisualizer] useEffect mount', { disabled, hideIfDisabled });
+    console.log("[FormikParcelsVisualizer] useEffect mount", {
+      disabled,
+      hideIfDisabled
+    });
     if (disabled && hideIfDisabled) {
       return;
     }
     if (!mapContainerRef.current) {
-      console.log('[FormikParcelsVisualizer] No map container ref');
+      console.log("[FormikParcelsVisualizer] No map container ref");
       return;
     }
     if (mapRef.current) {
-      console.log('[FormikParcelsVisualizer] Map already initialized, skipping');
+      console.log(
+        "[FormikParcelsVisualizer] Map already initialized, skipping"
+      );
       return; // Only initialize once
     }
-    console.log('[FormikParcelsVisualizer] Initializing map');
+    console.log("[FormikParcelsVisualizer] Initializing map");
     Gp.Services.getConfig({
       customConfigFile: "/mapbox/customConfig.json",
       callbackSuffix: "",
@@ -167,14 +170,14 @@ export function FormikParcelsVisualizer({
             severity: "error",
             field: null
           });
-          console.log('[FormikParcelsVisualizer] Map creation error');
+          console.log("[FormikParcelsVisualizer] Map creation error");
           return;
         }
-        console.log('[FormikParcelsVisualizer] Map initialized');
+        console.log("[FormikParcelsVisualizer] Map initialized");
       }
     });
     return () => {
-      console.log('[FormikParcelsVisualizer] Cleanup: unmounting map');
+      console.log("[FormikParcelsVisualizer] Cleanup: unmounting map");
       if (mapRef.current) {
         mapRef.current.setTarget(undefined);
         mapRef.current = null;
@@ -182,9 +185,11 @@ export function FormikParcelsVisualizer({
       // Robust cleanup: remove all children from map container
       if (mapContainerRef.current) {
         while (mapContainerRef.current.firstChild) {
-          mapContainerRef.current.removeChild(mapContainerRef.current.firstChild);
+          mapContainerRef.current.removeChild(
+            mapContainerRef.current.firstChild
+          );
         }
-        console.log('[FormikParcelsVisualizer] Map container children cleared');
+        console.log("[FormikParcelsVisualizer] Map container children cleared");
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -195,8 +200,26 @@ export function FormikParcelsVisualizer({
     if (!mapRef.current || !parcelLayerId || !markerLayerId) return;
     // Remove all features from layers
     const map = mapRef.current;
-    const parcelLayer = map.getLayers().getArray().find(layer => (parcelLayerId && layer && (layer && layer.get && layer.get('ol_uid') == parcelLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == parcelLayerId);
-    const markerLayer = map.getLayers().getArray().find(layer => (markerLayerId && layer && (layer && layer.get && layer.get('ol_uid') == markerLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == markerLayerId);
+    const parcelLayer = map
+      .getLayers()
+      .getArray()
+      .find(
+        layer =>
+          parcelLayerId &&
+          layer &&
+          typeof layer.get === "function" &&
+          layer.get("ol_uid") === parcelLayerId
+      ) as VectorLayer<VectorSource> | undefined;
+    const markerLayer = map
+      .getLayers()
+      .getArray()
+      .find(
+        layer =>
+          markerLayerId &&
+          layer &&
+          typeof layer.get === "function" &&
+          layer.get("ol_uid") === markerLayerId
+      ) as VectorLayer<VectorSource> | undefined;
     if (parcelLayer && parcelLayer.getSource) {
       parcelLayer.getSource().clear();
     }
@@ -231,11 +254,7 @@ export function FormikParcelsVisualizer({
           if (coord) {
             const lonLat = lonLatFromCoordinatesString(coord);
             if (lonLat) {
-              const res = addPointToMap(
-                new Point(lonLat),
-                map,
-                markerLayerId
-              );
+              const res = addPointToMap(new Point(lonLat), map, markerLayerId);
               if (res) {
                 globalExtent = extendExtent(globalExtent, res.extent);
               }
@@ -266,18 +285,45 @@ export function FormikParcelsVisualizer({
         const parcel = await res.getParcel(lonLat[1], lonLat[0]);
         if (parcel && parcel.inseeCode && parcel.parcelNumber) {
           // Replace any existing parcel with the new one
-          formik.setFieldValue(`${prefix}InseeCodes`, [{ value: parcel.inseeCode }]);
-          formik.setFieldValue(`${prefix}Numbers`, [{ value: parcel.parcelNumber }]);
+          formik.setFieldValue(`${prefix}InseeCodes`, [
+            { value: parcel.inseeCode }
+          ]);
+          formik.setFieldValue(`${prefix}Numbers`, [
+            { value: parcel.parcelNumber }
+          ]);
           // Remove all previously selected parcels from the map
           if (mapRef.current && parcelLayerId) {
             const map = mapRef.current;
-            const parcelLayer = map.getLayers().getArray().find(layer => (parcelLayerId && layer && (layer && layer.get && layer.get('ol_uid') == parcelLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+            const parcelLayer =
+              map
+                .getLayers()
+                .getArray()
+                .find(
+                  layer =>
+                    parcelLayerId &&
+                    layer &&
+                    layer &&
+                    layer.get &&
+                    layer.get("ol_uid") == parcelLayerId
+                ) ||
+              map
+                .getLayers()
+                .getArray()
+                .find(
+                  layer =>
+                    layer && layer.get && layer.get("ol_uid") == parcelLayerId
+                );
             if (parcelLayer && parcelLayer.getSource) {
               parcelLayer.getSource().clear();
             }
             // Add new parcel
             const utils = await import("./utils");
-            await utils.addParcelToMap(parcel.inseeCode, parcel.parcelNumber, map, parcelLayerId);
+            await utils.addParcelToMap(
+              parcel.inseeCode,
+              parcel.parcelNumber,
+              map,
+              parcelLayerId
+            );
           }
           setInseeCode(parcel.inseeCode);
           setParcelNumber(parcel.parcelNumber);
@@ -299,7 +345,9 @@ export function FormikParcelsVisualizer({
   const setSelectedAddress = (address: AddressSuggestion) => {
     setAddressInput(address.fulltext);
     if (mapRef.current) {
-      mapRef.current.setView(getView(fromLonLat([address.lng, address.lat]), 11));
+      mapRef.current.setView(
+        getView(fromLonLat([address.lng, address.lat]), 11)
+      );
     }
   };
 
@@ -433,7 +481,27 @@ export function FormikParcelsVisualizer({
                       // Remove all previously selected parcels from the map
                       if (mapRef.current && parcelLayerId) {
                         const map = mapRef.current;
-                        const parcelLayer = map.getLayers().getArray().find(layer => (parcelLayerId && layer && (layer && layer.get && layer.get('ol_uid') == parcelLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+                        const parcelLayer =
+                          map
+                            .getLayers()
+                            .getArray()
+                            .find(
+                              layer =>
+                                parcelLayerId &&
+                                layer &&
+                                layer &&
+                                layer.get &&
+                                layer.get("ol_uid") == parcelLayerId
+                            ) ||
+                          map
+                            .getLayers()
+                            .getArray()
+                            .find(
+                              layer =>
+                                layer &&
+                                layer.get &&
+                                layer.get("ol_uid") == parcelLayerId
+                            );
                         if (parcelLayer && parcelLayer.getSource) {
                           parcelLayer.getSource().clear();
                         }
@@ -459,7 +527,12 @@ export function FormikParcelsVisualizer({
                   <Button
                     type="button"
                     priority="secondary"
-                    disabled={disabled || (inseeCodes.length === 1 && inseeCodes[0]?.value === inseeCode && numbers[0]?.value === parcelNumber)}
+                    disabled={
+                      disabled ||
+                      (inseeCodes.length === 1 &&
+                        inseeCodes[0]?.value === inseeCode &&
+                        numbers[0]?.value === parcelNumber)
+                    }
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
@@ -481,15 +554,24 @@ export function FormikParcelsVisualizer({
                       let lat, lng, city;
                       try {
                         const utils = await import("./utils");
-                        const coordsRes = await utils.getCoordinatesFromParcel(inseeCode, parcelNumber);
+                        const coordsRes = await utils.getCoordinatesFromParcel(
+                          inseeCode,
+                          parcelNumber
+                        );
                         if (coordsRes) {
                           lat = coordsRes.lat;
                           lng = coordsRes.lng;
                           // Try to fetch city/address from coordinates
                           try {
-                            const resp = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${lng}&lat=${lat}`);
+                            const resp = await fetch(
+                              `https://api-adresse.data.gouv.fr/reverse/?lon=${lng}&lat=${lat}`
+                            );
                             const data = await resp.json();
-                            if (data.features && data.features[0] && data.features[0].properties) {
+                            if (
+                              data.features &&
+                              data.features[0] &&
+                              data.features[0].properties
+                            ) {
                               city = data.features[0].properties.city;
                             }
                           } catch {}
@@ -498,7 +580,16 @@ export function FormikParcelsVisualizer({
                       // Only show this parcel on the map (clear previous)
                       if (mapRef.current && parcelLayerId) {
                         const map = mapRef.current;
-                        const parcelLayer = map.getLayers().getArray().find(layer => parcelLayerId && layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+                        const parcelLayer = map
+                          .getLayers()
+                          .getArray()
+                          .find(
+                            layer =>
+                              parcelLayerId &&
+                              layer &&
+                              layer.get &&
+                              layer.get("ol_uid") == parcelLayerId
+                          );
                         if (parcelLayer && parcelLayer.getSource) {
                           parcelLayer.getSource().clear();
                         }
@@ -526,7 +617,14 @@ export function FormikParcelsVisualizer({
                         formik.setFieldValue(`${prefix}Numbers`, newNumbers);
                         setClientError(null);
                         if (onAddParcel) {
-                          onAddParcel({ inseeCode, parcelNumber, lat, lng, city, address: addressInput });
+                          onAddParcel({
+                            inseeCode,
+                            parcelNumber,
+                            lat,
+                            lng,
+                            city,
+                            address: addressInput
+                          });
                         }
                       } else {
                         setClientError({
@@ -574,7 +672,10 @@ export function FormikParcelsVisualizer({
                         });
                         return;
                       }
-                      const res = displayCoordinates(coordinatesInput, mapRef.current);
+                      const res = displayCoordinates(
+                        coordinatesInput,
+                        mapRef.current
+                      );
                       if (!res) {
                         setClientError({
                           text: "Affichage du point impossible : les informations renseignées semblent incorrectes",

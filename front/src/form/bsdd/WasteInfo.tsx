@@ -29,7 +29,6 @@ import {
   emptyBsddPackaging
 } from "../../Apps/Forms/Components/PackagingList/helpers";
 import { Consistence } from "@td/codegen-ui";
-import { FormikParcelsVisualizer } from "../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
 
 const SOIL_CODES = [
   "17 05 03*",

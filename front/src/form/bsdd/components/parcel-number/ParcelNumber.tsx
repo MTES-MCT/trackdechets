@@ -1,18 +1,13 @@
-import {
-  Field,
-  FieldArray,
-  FieldArrayRenderProps,
-  FieldProps,
-  useFormikContext
-} from "formik";
 import React, { useMemo } from "react";
+import { Field, FieldArray, FieldArrayRenderProps, FieldProps, useFormikContext } from "formik";
 import TdSwitch from "../../../../common/components/Switch";
-import { Form, ParcelNumber } from "@td/codegen-ui";
+import { Form, ParcelNumber as ParcelNumberType } from "@td/codegen-ui";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
 import { FormikParcelsVisualizer } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
-function ParcelSummaryList({ parcels, onRemove }) {
+
+function ParcelSummaryList({ parcels, onRemove }: { parcels: ParcelNumberType[]; onRemove: (idx: number) => void }) {
   if (!parcels.length) return null;
 
   return (
@@ -22,7 +17,7 @@ function ParcelSummaryList({ parcels, onRemove }) {
         {parcels.map((parcel, idx) => {
           if (Object.keys(parcel).length === 0) return null;
 
-          const parts = [];
+          const parts: string[] = [];
           if (parcel.inseeCode) parts.push(`INSEE : ${parcel.inseeCode}`);
           if (parcel.parcelNumber || parcel.number)
             parts.push(`Parcelle : ${parcel.parcelNumber ?? parcel.number}`);
@@ -32,9 +27,7 @@ function ParcelSummaryList({ parcels, onRemove }) {
             (parcel.number || parcel.parcelNumber)
           )
             parts.push(
-              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${
-                parcel.number ?? parcel.parcelNumber
-              }`
+              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${parcel.number ?? parcel.parcelNumber}`
             );
           if (parcel.lat !== undefined && parcel.lng !== undefined)
             parts.push(`GPS : ${parcel.lat}, ${parcel.lng}`);
@@ -65,7 +58,7 @@ function ParcelSummaryList({ parcels, onRemove }) {
 
 export function ParcelNumbersSelector({ field }: FieldProps) {
   const { setFieldValue } = useFormikContext<Form>();
-  const values: ParcelNumber[] = field.value ?? [];
+  const values: ParcelNumberType[] = field.value ?? [];
   const showParcelNumberSelector = values && values.length > 0;
 
   function handleparcelNumberToggle() {
@@ -96,15 +89,18 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
                 disabled={false}
                 onAddParcel={parcel => {
                   // Append new parcel if not duplicate
-                  const city = parcel.address || parcel.city || "";
+                  const city = (parcel as any).address || (parcel as any).city || "";
                   const isDuplicate = values.some(
-                    p => p.inseeCode === parcel.inseeCode && p.parcelNumber === parcel.parcelNumber
+                    (p: ParcelNumberType) =>
+                      p.inseeCode === parcel.inseeCode &&
+                      p.parcelNumber === parcel.parcelNumber
                   );
                   if (!isDuplicate) {
-                    setFieldValue(field.name, [
-                      ...values,
-                      { ...parcel, city }
-                    ], false);
+                    setFieldValue(
+                      field.name,
+                      [...values, { ...parcel, city }],
+                      false
+                    );
                   }
                 }}
               />
