@@ -6,18 +6,22 @@ import {
   FieldProps,
   useFormikContext
 } from "formik";
+
+import {
+  toParcelNumberType,
+  FormikParcelsVisualizer
+} from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
+import type { ParcelNumber } from "@td/codegen-ui";
+
 import TdSwitch from "../../../../common/components/Switch";
-import { Form, ParcelNumber as ParcelNumberType } from "@td/codegen-ui";
-import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
-import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
+import Tooltip from "@codegouvfr/react-dsfr/Tooltip";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
-import { FormikParcelsVisualizer } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
 
 function ParcelSummaryList({
   parcels,
   onRemove
 }: {
-  parcels: ParcelNumberType[];
+  parcels: ParcelNumber[];
   onRemove: (idx: number) => void;
 }) {
   if (!parcels.length) return null;
@@ -29,26 +33,18 @@ function ParcelSummaryList({
         {parcels.map((parcel, idx) => {
           if (Object.keys(parcel).length === 0) return null;
 
+          const p = toParcelNumberType(parcel);
+
           const parts: string[] = [];
-          if (parcel.inseeCode) parts.push(`INSEE : ${parcel.inseeCode}`);
-          if (parcel.parcelNumber || parcel.number)
-            parts.push(`Parcelle : ${parcel.parcelNumber ?? parcel.number}`);
-          if (
-            parcel.prefix &&
-            parcel.section &&
-            (parcel.number || parcel.parcelNumber)
-          )
+          if (p.inseeCode) parts.push(`INSEE : ${p.inseeCode}`);
+          if (p.number) parts.push(`Parcelle : ${p.number}`);
+          if (p.prefix && p.section && p.number)
             parts.push(
-              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${
-                parcel.number ?? parcel.parcelNumber
-              }`
+              `Parcelle détaillée : ${p.prefix}-${p.section}-${p.number}`
             );
-          if (parcel.lat !== undefined && parcel.lng !== undefined)
-            parts.push(`GPS : ${parcel.lat}, ${parcel.lng}`);
-          if (parcel.x !== undefined && parcel.y !== undefined)
-            parts.push(`GPS (x/y) : ${parcel.x}, ${parcel.y}`);
-          if (parcel.city) parts.push(`Adresse : ${parcel.city}`);
-          if (parcel.featureId) parts.push(`FeatureId : ${parcel.featureId}`);
+          if (p.x !== undefined && p.y !== undefined)
+            parts.push(`GPS (x/y) : ${p.x}, ${p.y}`);
+          if (p.city) parts.push(`Adresse : ${p.city}`);
           if (parts.length === 0) parts.push("Parcelle incomplète");
 
           return (
@@ -60,7 +56,7 @@ function ParcelSummaryList({
                 onClick={() => onRemove(idx)}
                 aria-label="Supprimer"
               >
-                <IconDelete1 aria-hidden />
+                Supprimer
               </button>
             </li>
           );
@@ -71,8 +67,8 @@ function ParcelSummaryList({
 }
 
 export function ParcelNumbersSelector({ field }: FieldProps) {
-  const { setFieldValue } = useFormikContext<Form>();
-  const values: ParcelNumberType[] = field.value ?? [];
+  const { setFieldValue } = useFormikContext<any>();
+  const values: ParcelNumber[] = field.value ?? [];
   const showParcelNumberSelector = values && values.length > 0;
 
   function handleparcelNumberToggle() {
@@ -105,11 +101,14 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
                   // Append new parcel if not duplicate
                   const city =
                     (parcel as any).address || (parcel as any).city || "";
+
                   const isDuplicate = values.some(
-                    (p: ParcelNumberType) =>
+                    (p: ParcelNumber) =>
                       p.inseeCode === parcel.inseeCode &&
-                      p.parcelNumber === parcel.parcelNumber
+                      parcel.parcelNumber ===
+                        `${p.prefix}-${p.section}-${p.number}`
                   );
+
                   if (!isDuplicate) {
                     setFieldValue(
                       field.name,

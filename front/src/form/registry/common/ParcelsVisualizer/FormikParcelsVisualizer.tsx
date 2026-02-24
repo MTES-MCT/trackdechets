@@ -40,6 +40,42 @@ import {
   AddressSuggestion
 } from "./utils";
 import { AddressInput } from "./AddressInput";
+import { ParcelNumber } from "@td/codegen-ui";
+
+export function toParcelNumberType(parcel: any): ParcelNumber {
+  // If already in correct format, return as is
+  if (parcel && parcel.prefix && parcel.section && parcel.number) {
+    return parcel;
+  }
+  // Try to split parcelNumber (format: prefix-section-number)
+  let prefix = "";
+  let section = "";
+  let number = "";
+  if (parcel.parcelNumber && typeof parcel.parcelNumber === "string") {
+    const parts = parcel.parcelNumber.split("-");
+    if (parts.length === 3) {
+      prefix = parts[0];
+      section = parts[1];
+      number = parts[2];
+    } else if (parts.length === 2) {
+      prefix = parts[0];
+      section = parts[1];
+    } else {
+      number = parcel.parcelNumber;
+    }
+  }
+  return {
+    ...parcel,
+    prefix: parcel.prefix || prefix,
+    section: parcel.section || section,
+    number: parcel.number || number,
+    city: parcel.city,
+    inseeCode: parcel.inseeCode,
+    x: parcel.x,
+    y: parcel.y,
+    featureId: parcel.featureId
+  };
+}
 
 export type Parcel = {
   inseeCode?: string;
@@ -94,11 +130,13 @@ export function FormikParcelsVisualizer({
     [formik.values, prefix]
   );
 
-  const parcels: Parcel[] = inseeCodes.map((insee: any, i: number) => ({
-    inseeCode: insee.value,
-    parcelNumber: numbers[i]?.value,
-    featureId: insee.featureId
-  }));
+  const parcels: ParcelNumber[] = inseeCodes.map((insee: any, i: number) =>
+    toParcelNumberType({
+      inseeCode: insee.value,
+      parcelNumber: numbers[i]?.value,
+      featureId: insee.featureId
+    })
+  );
   const coords: Parcel[] = coordinates.map((c: any) => ({
     coordinates: c.value,
     featureId: c.featureId
