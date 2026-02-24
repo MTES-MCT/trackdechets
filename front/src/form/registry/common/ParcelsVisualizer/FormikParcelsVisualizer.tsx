@@ -45,13 +45,15 @@ export type FormikParcelsVisualizerProps = {
   disabled?: boolean;
   hideIfDisabled?: boolean;
   title?: string;
+  onAddParcel?: (parcel: { inseeCode: string; parcelNumber: string }) => void;
 };
 
 export function FormikParcelsVisualizer({
   prefix,
   disabled,
   hideIfDisabled = false,
-  title
+  title,
+  onAddParcel
 }: FormikParcelsVisualizerProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<Map | null>(null); // Persist map instance
@@ -68,6 +70,7 @@ export function FormikParcelsVisualizer({
   const [coordinatesInput, setCoordinatesInput] = useState<string>("");
   const [parcelNumber, setParcelNumber] = useState<string>("");
   const [inseeCode, setInseeCode] = useState<string>("");
+  const [addressInput, setAddressInput] = useState<string>("");
 
   // Get values from Formik
   const inseeCodes = useMemo(
@@ -250,12 +253,38 @@ export function FormikParcelsVisualizer({
   }, [parcels, coords, parcelLayerId, markerLayerId]);
 
   useEffect(() => {
-    const handler = (e: MapBrowserEvent<MouseEvent>) => {
+    const handler = async (e: MapBrowserEvent<MouseEvent>) => {
       if (disabled) {
         return;
       }
       const lonLat = toLonLat(e.coordinate);
       setCoordinatesInput(`${lonLat[1]} ${lonLat[0]}`);
+
+      // Reverse geocode to get parcel info
+      try {
+        const res = await import("./utils");
+        const parcel = await res.getParcel(lonLat[1], lonLat[0]);
+        if (parcel && parcel.inseeCode && parcel.parcelNumber) {
+          // Replace any existing parcel with the new one
+          formik.setFieldValue(`${prefix}InseeCodes`, [{ value: parcel.inseeCode }]);
+          formik.setFieldValue(`${prefix}Numbers`, [{ value: parcel.parcelNumber }]);
+          // Remove all previously selected parcels from the map
+          if (mapRef.current && parcelLayerId) {
+            const map = mapRef.current;
+            const parcelLayer = map.getLayers().getArray().find(layer => (parcelLayerId && layer && (layer && layer.get && layer.get('ol_uid') == parcelLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+            if (parcelLayer && parcelLayer.getSource) {
+              parcelLayer.getSource().clear();
+            }
+            // Add new parcel
+            const utils = await import("./utils");
+            await utils.addParcelToMap(parcel.inseeCode, parcel.parcelNumber, map, parcelLayerId);
+          }
+          setInseeCode(parcel.inseeCode);
+          setParcelNumber(parcel.parcelNumber);
+        }
+      } catch (err) {
+        // Ignore errors, just don't autofill
+      }
     };
     if (mapRef.current) {
       mapRef.current.on("singleclick", handler);
@@ -265,9 +294,10 @@ export function FormikParcelsVisualizer({
         mapRef.current.un("singleclick", handler);
       }
     };
-  }, [disabled]);
+  }, [disabled, parcelLayerId, formik, prefix]);
 
   const setSelectedAddress = (address: AddressSuggestion) => {
+    setAddressInput(address.fulltext);
     if (mapRef.current) {
       mapRef.current.setView(getView(fromLonLat([address.lng, address.lat]), 11));
     }
@@ -400,6 +430,14 @@ export function FormikParcelsVisualizer({
                         });
                         return;
                       }
+                      // Remove all previously selected parcels from the map
+                      if (mapRef.current && parcelLayerId) {
+                        const map = mapRef.current;
+                        const parcelLayer = map.getLayers().getArray().find(layer => (parcelLayerId && layer && (layer && layer.get && layer.get('ol_uid') == parcelLayerId))) || map.getLayers().getArray().find(layer => layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+                        if (parcelLayer && parcelLayer.getSource) {
+                          parcelLayer.getSource().clear();
+                        }
+                      }
                       const res = await displayParcel(
                         inseeCode,
                         parcelNumber,
@@ -421,7 +459,7 @@ export function FormikParcelsVisualizer({
                   <Button
                     type="button"
                     priority="secondary"
-                    disabled={disabled}
+                    disabled={disabled || (inseeCodes.length === 1 && inseeCodes[0]?.value === inseeCode && numbers[0]?.value === parcelNumber)}
                     onClick={async () => {
                       if (!inseeCode) {
                         setClientError({
@@ -439,6 +477,32 @@ export function FormikParcelsVisualizer({
                         });
                         return;
                       }
+                      // Fetch coordinates and city/address
+                      let lat, lng, city;
+                      try {
+                        const utils = await import("./utils");
+                        const coordsRes = await utils.getCoordinatesFromParcel(inseeCode, parcelNumber);
+                        if (coordsRes) {
+                          lat = coordsRes.lat;
+                          lng = coordsRes.lng;
+                          // Try to fetch city/address from coordinates
+                          try {
+                            const resp = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${lng}&lat=${lat}`);
+                            const data = await resp.json();
+                            if (data.features && data.features[0] && data.features[0].properties) {
+                              city = data.features[0].properties.city;
+                            }
+                          } catch {}
+                        }
+                      } catch {}
+                      // Only show this parcel on the map (clear previous)
+                      if (mapRef.current && parcelLayerId) {
+                        const map = mapRef.current;
+                        const parcelLayer = map.getLayers().getArray().find(layer => parcelLayerId && layer && layer.get && layer.get('ol_uid') == parcelLayerId);
+                        if (parcelLayer && parcelLayer.getSource) {
+                          parcelLayer.getSource().clear();
+                        }
+                      }
                       const res = await addParcelToMap(
                         inseeCode,
                         parcelNumber,
@@ -446,6 +510,7 @@ export function FormikParcelsVisualizer({
                         parcelLayerId
                       );
                       if (res) {
+                        // Append to the result list (allow multiple)
                         const newInseeCodes = [
                           ...inseeCodes,
                           { value: inseeCode, featureId: res.featureId }
@@ -460,6 +525,9 @@ export function FormikParcelsVisualizer({
                         );
                         formik.setFieldValue(`${prefix}Numbers`, newNumbers);
                         setClientError(null);
+                        if (onAddParcel) {
+                          onAddParcel({ inseeCode, parcelNumber, lat, lng, city, address: addressInput });
+                        }
                       } else {
                         setClientError({
                           text: "Ajout de la parcelle impossible : les informations renseignées semblent incorrectes",

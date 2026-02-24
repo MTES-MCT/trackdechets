@@ -267,6 +267,8 @@ export const addParcelToMap = async (
         VectorSource<Geometry>
       >;
       if (parcelLayer) {
+        // Always clear previous features before adding a new one
+        parcelLayer.getSource().clear();
         const feature = new Feature(res.geometry);
         const featureId = getUid(feature);
         parcelLayer.getSource().addFeature(feature);

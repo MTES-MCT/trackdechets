@@ -11,88 +11,108 @@ import { Form, ParcelNumber } from "@td/codegen-ui";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import { IconDelete1 } from "../../../../Apps/common/Components/Icons/Icons";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
+import { FormikParcelsVisualizer } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
+function ParcelSummaryList({ parcels, onRemove }) {
+  if (!parcels.length) return null;
 
-const newParcelNumber = {
-  city: "",
-  inseeCode: "",
-  prefix: "",
-  number: "",
-  section: ""
-};
+  return (
+    <div className="tw-mb-4">
+      <h6 className="tw-mb-2">Parcelles ajoutées :</h6>
+      <ul className="tw-list-disc tw-ml-6">
+        {parcels.map((parcel, idx) => {
+          if (Object.keys(parcel).length === 0) return null;
+
+          const parts = [];
+          if (parcel.inseeCode) parts.push(`INSEE : ${parcel.inseeCode}`);
+          if (parcel.parcelNumber || parcel.number)
+            parts.push(`Parcelle : ${parcel.parcelNumber ?? parcel.number}`);
+          if (
+            parcel.prefix &&
+            parcel.section &&
+            (parcel.number || parcel.parcelNumber)
+          )
+            parts.push(
+              `Parcelle détaillée : ${parcel.prefix}-${parcel.section}-${
+                parcel.number ?? parcel.parcelNumber
+              }`
+            );
+          if (parcel.lat !== undefined && parcel.lng !== undefined)
+            parts.push(`GPS : ${parcel.lat}, ${parcel.lng}`);
+          if (parcel.x !== undefined && parcel.y !== undefined)
+            parts.push(`GPS (x/y) : ${parcel.x}, ${parcel.y}`);
+          if (parcel.city) parts.push(`Adresse : ${parcel.city}`);
+          if (parcel.featureId) parts.push(`FeatureId : ${parcel.featureId}`);
+          if (parts.length === 0) parts.push("Parcelle incomplète");
+
+          return (
+            <li key={idx} className="tw-flex tw-items-center tw-mb-1">
+              <span>{parts.join(" | ")}</span>
+              <button
+                type="button"
+                className="tw-ml-2 tw-text-red-600 hover:tw-text-red-800"
+                onClick={() => onRemove(idx)}
+                aria-label="Supprimer"
+              >
+                <IconDelete1 aria-hidden />
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 export function ParcelNumbersSelector({ field }: FieldProps) {
   const { setFieldValue } = useFormikContext<Form>();
   const values: ParcelNumber[] = field.value ?? [];
-  const showParcelNumberSelector = values.length > 0;
+  const showParcelNumberSelector = values && values.length > 0;
 
   function handleparcelNumberToggle() {
     if (showParcelNumberSelector) {
-      setFieldValue(field.name, null, false);
+      setFieldValue(field.name, [], false);
     } else {
-      setFieldValue(field.name, [newParcelNumber], false);
+      setFieldValue(field.name, [{}], false);
     }
   }
 
   return (
     <div>
-      <TdSwitch
-        checked={showParcelNumberSelector}
-        onChange={handleparcelNumberToggle}
-        label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments (optionnel)"
-      />
+      <div className="fr-mb-2w">
+        <TdSwitch
+          checked={showParcelNumberSelector}
+          onChange={handleparcelNumberToggle}
+          label="Je souhaite ajouter une parcelle cadastrale pour la traçabilité des terres et sédiments (optionnel)"
+        />
+      </div>
 
       {showParcelNumberSelector && (
         <FieldArray
           name={field.name}
           render={arrayHelpers => (
-            <div>
-              {values.map((parcelNumber, index) => (
-                <div
-                  className="tw-p-4 tw-mb-4 tw-border-2 tw-rounded"
-                  key={index}
-                >
-                  <div className="tw-float-right tw-m-4">
-                    <button
-                      type="button"
-                      onClick={() => arrayHelpers.remove(index)}
-                      aria-label="Supprimer"
-                    >
-                      <IconDelete1 aria-hidden />
-                    </button>
-                  </div>
-                  <div className="form__row">
-                    <label>
-                      Commune sur laquelle se trouve la parcelle
-                      <Field
-                        type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.city`}
-                        className="td-input td-input--medium"
-                      />
-                    </label>
-                  </div>
-                  <div className="form__row">
-                    <label>
-                      Code INSEE de la commune
-                      <Field
-                        type="text"
-                        name={`wasteDetails.parcelNumbers.${index}.inseeCode`}
-                        className="td-input td-input--small"
-                      />
-                    </label>
-                  </div>
-
-                  <ParcelDetails {...{ index, parcelNumber, arrayHelpers }} />
-                </div>
-              ))}
-              <div className="form__row">
-                <button
-                  className="btn btn--outline-primary btn--small"
-                  type="button"
-                  onClick={() => arrayHelpers.push(newParcelNumber)}
-                >
-                  Ajouter un numéro de parcelle
-                </button>
-              </div>
-            </div>
+            <>
+              <FormikParcelsVisualizer
+                prefix={field.name + "."}
+                disabled={false}
+                onAddParcel={parcel => {
+                  // Append new parcel if not duplicate
+                  const city = parcel.address || parcel.city || "";
+                  const isDuplicate = values.some(
+                    p => p.inseeCode === parcel.inseeCode && p.parcelNumber === parcel.parcelNumber
+                  );
+                  if (!isDuplicate) {
+                    setFieldValue(field.name, [
+                      ...values,
+                      { ...parcel, city }
+                    ], false);
+                  }
+                }}
+              />
+              <ParcelSummaryList
+                parcels={values}
+                onRemove={arrayHelpers.remove}
+              />
+            </>
           )}
         />
       )}

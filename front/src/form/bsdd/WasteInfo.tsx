@@ -404,13 +404,6 @@ export default function WasteInfo({ disabled }) {
               name="wasteDetails.parcelNumbers"
             />
           </div>
-
-          <div className="form__row">
-            <FormikParcelsVisualizer
-              prefix="wasteDetails.parcelNumbers"
-              disabled={disabled}
-            />
-          </div>
         </>
       ) : null}
     </>
