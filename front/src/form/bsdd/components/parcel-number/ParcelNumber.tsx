@@ -6,11 +6,13 @@ import TdSwitch from "../../../../common/components/Switch";
 import Tooltip from "../../../../Apps/common/Components/Tooltip/Tooltip";
 import TagsInput from "../../../../common/components/tags-input/TagsInput";
 import {
+  fetchCityNameByInseeCode,
+  fetchCommuneByCoords
+} from "../../../../common/api/geoApi";
+import {
   FormikParcelsVisualizer,
   type ParcelFromMap
 } from "../../../registry/common/ParcelsVisualizer/FormikParcelsVisualizer";
-
-const CITY_API_URL = "https://geo.api.gouv.fr/communes";
 
 /**
  * Split a parcel number string "prefix-section-number" (e.g. "000-AB-25")
@@ -30,30 +32,26 @@ function splitParcelNumber(parcelNumber: string): {
 }
 
 /**
- * Format a ParcelNumber as a display label (e.g. "75056 | 000-AB-25").
+ * Format a ParcelNumber as a display label.
+ * Cadastre: "75056 | 000-AB-25 | Paris"
+ * GPS:      "GPS : 48.852197, 2.310674"
  */
 function formatParcelLabel(parcel: ParcelNumber): string {
+  // GPS-based parcel (non-cadastered land)
+  if (parcel.x != null && parcel.y != null && !parcel.prefix) {
+    const label = `GPS : ${parcel.x}, ${parcel.y}`;
+    return parcel.city ? `${label} | ${parcel.city}` : label;
+  }
+
+  // Cadastre-based parcel
   const parts: string[] = [];
   if (parcel.inseeCode) parts.push(parcel.inseeCode);
   if (parcel.prefix && parcel.section && parcel.number) {
     parts.push(`${parcel.prefix}-${parcel.section}-${parcel.number}`);
   }
   if (parcel.city) parts.push(parcel.city);
-  return parts.join(" | ") || "Parcelle incomplète";
-}
 
-/**
- * Fetch the city name from an INSEE code using the geo.api.gouv.fr API.
- */
-async function fetchCityName(inseeCode: string): Promise<string> {
-  try {
-    const response = await fetch(`${CITY_API_URL}/${inseeCode}?fields=nom`);
-    if (!response.ok) return "";
-    const data = await response.json();
-    return data?.nom ?? "";
-  } catch {
-    return "";
-  }
+  return parts.join(" | ") || "Parcelle incomplète";
 }
 
 /**
@@ -63,7 +61,14 @@ function isDuplicateParcel(
   existing: ParcelNumber[],
   newParcel: ParcelFromMap
 ): boolean {
+  // GPS mode
+  if (newParcel.x != null && newParcel.y != null) {
+    return existing.some(p => p.x === newParcel.x && p.y === newParcel.y);
+  }
+
+  // Cadastre mode
   const { prefix, section, number } = splitParcelNumber(newParcel.parcelNumber);
+
   return existing.some(
     p =>
       p.inseeCode === newParcel.inseeCode &&
@@ -97,10 +102,27 @@ export function ParcelNumbersSelector({ field }: FieldProps) {
     async (parcel: ParcelFromMap) => {
       if (isDuplicateParcel(values, parcel)) return;
 
+      // GPS coordinate mode (non-cadastered land)
+      if (parcel.x != null && parcel.y != null) {
+        const commune = await fetchCommuneByCoords(parcel.x, parcel.y);
+        const newParcelNumber: ParcelNumber = {
+          city: commune?.city ?? "",
+          inseeCode: commune?.inseeCode,
+          x: parcel.x,
+          y: parcel.y
+        };
+
+        setFieldValue(field.name, [...values, newParcelNumber], false);
+
+        return;
+      }
+
+      // Cadastre mode
       const { prefix, section, number } = splitParcelNumber(
         parcel.parcelNumber
       );
-      const city = await fetchCityName(parcel.inseeCode);
+
+      const city = await fetchCityNameByInseeCode(parcel.inseeCode);
 
       const newParcelNumber: ParcelNumber = {
         city,

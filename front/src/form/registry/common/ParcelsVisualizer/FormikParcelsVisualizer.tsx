@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import Alert, { AlertProps } from "@codegouvfr/react-dsfr/Alert";
 import { Button } from "@codegouvfr/react-dsfr/Button";
 import { Input } from "@codegouvfr/react-dsfr/Input";
+import { SegmentedControl } from "@codegouvfr/react-dsfr/SegmentedControl";
 import clsx from "clsx";
 import Gp from "geoportal-access-lib";
 import { Map, MapBrowserEvent } from "ol";
+import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
 import "geoportal-extensions-openlayers/dist/GpPluginOpenLayers.css";
 import "ol/ol.css";
@@ -15,7 +17,10 @@ import {
   getView,
   createMap,
   getParcel,
+  lonLatFromCoordinatesString,
+  addPointToMap,
   addParcelToMap,
+  displayCoordinates,
   displayParcel,
   AddressSuggestion
 } from "./utils";
@@ -23,11 +28,17 @@ import { AddressInput } from "./AddressInput";
 
 /**
  * Data returned by the map when a parcel is selected.
- * `parcelNumber` is in "prefix-section-number" format (e.g. "000-AB-25").
+ *
+ * Cadastre mode: `inseeCode` + `parcelNumber` (format "prefix-section-number").
+ * GPS mode: `x` (latitude) + `y` (longitude) in WGS 84.
  */
 export type ParcelFromMap = {
   inseeCode: string;
   parcelNumber: string;
+  /** Latitude (WGS 84) — for non-cadastered parcels */
+  x?: number;
+  /** Longitude (WGS 84) — for non-cadastered parcels */
+  y?: number;
 };
 
 type FormikParcelsVisualizerProps = {
@@ -41,6 +52,11 @@ type FormikParcelsVisualizerProps = {
   /** Labels to display as tags for currently selected parcels */
   tags?: string[];
 };
+
+enum Mode {
+  CODE = "CODE",
+  GPS = "GPS"
+}
 
 /**
  * A self-contained map component for selecting cadastral parcels.
@@ -63,9 +79,12 @@ export function FormikParcelsVisualizer({
   const [clientError, setClientError] = useState<{
     text: string;
     severity: AlertProps.Severity;
-    field: "inseeCode" | "parcelNumber" | null;
+    field: "inseeCode" | "parcelNumber" | "coordinates" | null;
   } | null>(null);
+  const [mode, setMode] = useState<Mode>(Mode.CODE);
+  const [markerLayerId, setMarkerLayerId] = useState<string | null>(null);
   const [parcelLayerId, setParcelLayerId] = useState<string | null>(null);
+  const [coordinatesInput, setCoordinatesInput] = useState("");
   const [parcelNumber, setParcelNumber] = useState("");
   const [inseeCode, setInseeCode] = useState("");
 
@@ -83,6 +102,7 @@ export function FormikParcelsVisualizer({
         try {
           const res = createMap(mapContainerRef.current!);
           mapRef.current = res.map;
+          setMarkerLayerId(res.markerLayerId);
           setParcelLayerId(res.parcelLayerId);
         } catch {
           setClientError({
@@ -114,26 +134,30 @@ export function FormikParcelsVisualizer({
       if (disabled) return;
 
       const lonLat = toLonLat(e.coordinate);
-      const parcel = await getParcel(lonLat[1], lonLat[0]);
 
-      if (parcel) {
-        setParcelNumber(parcel.parcelNumber);
-        setInseeCode(parcel.inseeCode);
-        setClientError(null);
-        await addParcelToMap(
-          parcel.inseeCode,
-          parcel.parcelNumber,
-          map,
-          parcelLayerId
-        );
+      if (mode === Mode.CODE) {
+        const parcel = await getParcel(lonLat[1], lonLat[0]);
+        if (parcel) {
+          setParcelNumber(parcel.parcelNumber);
+          setInseeCode(parcel.inseeCode);
+          setClientError(null);
+          await addParcelToMap(
+            parcel.inseeCode,
+            parcel.parcelNumber,
+            map,
+            parcelLayerId
+          );
+        } else {
+          setParcelNumber("");
+          setInseeCode("");
+          setClientError({
+            text: "Aucune parcelle à ces coordonnées, utilisez les coordonnées GPS si vous voulez ajouter ce point",
+            severity: "info",
+            field: null
+          });
+        }
       } else {
-        setParcelNumber("");
-        setInseeCode("");
-        setClientError({
-          text: "Aucune parcelle à ces coordonnées",
-          severity: "info",
-          field: null
-        });
+        setCoordinatesInput(`${lonLat[1]} ${lonLat[0]}`);
       }
     };
 
@@ -141,7 +165,7 @@ export function FormikParcelsVisualizer({
     return () => {
       map.un("singleclick", handler);
     };
-  }, [disabled, parcelLayerId]);
+  }, [disabled, mode, parcelLayerId]);
 
   // ---------------------------------------------------------------------------
   // Address search: navigate map to address
@@ -237,76 +261,201 @@ export function FormikParcelsVisualizer({
       <div className="fr-mb-2w">
         <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--top">
           <div className={clsx(styles.controls, "fr-col-md-6")}>
+            <SegmentedControl
+              hideLegend
+              segments={[
+                {
+                  label: "Cadastre",
+                  nativeInputProps: {
+                    defaultChecked: true,
+                    value: Mode.CODE,
+                    onChange: v => setMode(v.currentTarget.value as Mode)
+                  }
+                },
+                {
+                  label: "Coordonnées GPS",
+                  nativeInputProps: {
+                    value: Mode.GPS,
+                    onChange: v => setMode(v.currentTarget.value as Mode)
+                  }
+                }
+              ]}
+            />
             <AddressInput
               disabled={disabled}
               onAddressSelected={setSelectedAddress}
             />
             <div className={styles.or}>{"ou"}</div>
+            {mode === Mode.CODE ? (
+              <div className="fr-mt-1w">
+                <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
+                  <div className={clsx("fr-col-md-6", styles.controlledInput)}>
+                    <Input
+                      label="Commune"
+                      className="fr-mb-1w"
+                      hintText="Code INSEE"
+                      disabled={disabled}
+                      state={
+                        clientError?.field === "inseeCode" ? "error" : undefined
+                      }
+                      nativeInputProps={{
+                        type: "text",
+                        placeholder: "75056",
+                        value: inseeCode,
+                        onChange: e => setInseeCode(e.currentTarget.value)
+                      }}
+                    />
+                  </div>
+                  <div
+                    className={clsx(
+                      "fr-col-md-6",
+                      styles.parcelNumber,
+                      styles.controlledInput
+                    )}
+                  >
+                    <Input
+                      label="Numéro de parcelle"
+                      className="fr-mb-1w"
+                      hintText="Préfixe-Section-Numéro"
+                      disabled={disabled}
+                      state={
+                        clientError?.field === "parcelNumber"
+                          ? "error"
+                          : undefined
+                      }
+                      nativeInputProps={{
+                        type: "text",
+                        placeholder: "000-AB-125",
+                        value: parcelNumber,
+                        onChange: e => setParcelNumber(e.currentTarget.value)
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className={styles.gpsButtons}>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    disabled={disabled}
+                    onClick={handleDisplayParcel}
+                  >
+                    Afficher sur la carte
+                  </Button>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    disabled={disabled}
+                    onClick={handleAddParcel}
+                  >
+                    Ajouter la parcelle
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="fr-mt-1w">
+                <div className={clsx("fr-col-md-12", styles.controlledInput)}>
+                  <Input
+                    label="Coordonnées GPS"
+                    className="fr-mb-1w"
+                    hintText="Format: un point pour les décimales"
+                    disabled={disabled}
+                    state={
+                      clientError?.field === "coordinates" ? "error" : undefined
+                    }
+                    nativeInputProps={{
+                      placeholder: "48.852197 2.310674",
+                      type: "text",
+                      value: coordinatesInput,
+                      onChange: e => setCoordinatesInput(e.currentTarget.value)
+                    }}
+                  />
+                </div>
+                <div className={styles.gpsButtons}>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!coordinatesInput) {
+                        setClientError({
+                          text: "Affichage du point impossible : veuillez renseigner les coordonnées GPS",
+                          severity: "error",
+                          field: "coordinates"
+                        });
+                        return;
+                      }
+                      const res = displayCoordinates(
+                        coordinatesInput,
+                        mapRef.current
+                      );
+                      if (!res) {
+                        setClientError({
+                          text: "Affichage du point impossible : les informations renseignées semblent incorrectes",
+                          severity: "warning",
+                          field: null
+                        });
+                        return;
+                      }
+                      setClientError(null);
+                    }}
+                  >
+                    Afficher sur la carte
+                  </Button>
+                  <Button
+                    type="button"
+                    priority="secondary"
+                    disabled={disabled}
+                    onClick={() => {
+                      if (!coordinatesInput) {
+                        setClientError({
+                          text: "Ajout du point impossible : veuillez renseigner les coordonnées GPS",
+                          severity: "error",
+                          field: "coordinates"
+                        });
+                        return;
+                      }
+                      const lonLat =
+                        lonLatFromCoordinatesString(coordinatesInput);
+                      if (!lonLat) {
+                        setClientError({
+                          text: "Ajout du point impossible : les informations renseignées semblent incorrectes",
+                          severity: "warning",
+                          field: null
+                        });
+                        return;
+                      }
+                      const res = addPointToMap(
+                        new Point(lonLat),
+                        mapRef.current,
+                        markerLayerId
+                      );
+                      if (!res) {
+                        setClientError({
+                          text: "Ajout du point impossible : les informations renseignées semblent incorrectes",
+                          severity: "warning",
+                          field: null
+                        });
+                        return;
+                      }
+                      setClientError(null);
 
-            <div className="fr-mt-1w">
-              <div className="fr-grid-row fr-grid-row--gutters fr-grid-row--bottom">
-                <div className={clsx("fr-col-md-6", styles.controlledInput)}>
-                  <Input
-                    label="Commune"
-                    className="fr-mb-1w"
-                    hintText="Code INSEE"
-                    disabled={disabled}
-                    state={
-                      clientError?.field === "inseeCode" ? "error" : undefined
-                    }
-                    nativeInputProps={{
-                      type: "text",
-                      placeholder: "75056",
-                      value: inseeCode,
-                      onChange: e => setInseeCode(e.currentTarget.value)
+                      // Parse raw lat/lng from input ("lat lng") and notify parent
+                      const parts = coordinatesInput.trim().split(/\s+/);
+                      const lat = Number(parts[0]);
+                      const lng = Number(parts[1]);
+                      onAddParcel({
+                        inseeCode: "",
+                        parcelNumber: "",
+                        x: lat,
+                        y: lng
+                      });
                     }}
-                  />
-                </div>
-                <div
-                  className={clsx(
-                    "fr-col-md-6",
-                    styles.parcelNumber,
-                    styles.controlledInput
-                  )}
-                >
-                  <Input
-                    label="Numéro de parcelle"
-                    className="fr-mb-1w"
-                    hintText="Préfixe-Section-Numéro"
-                    disabled={disabled}
-                    state={
-                      clientError?.field === "parcelNumber"
-                        ? "error"
-                        : undefined
-                    }
-                    nativeInputProps={{
-                      type: "text",
-                      placeholder: "000-AB-125",
-                      value: parcelNumber,
-                      onChange: e => setParcelNumber(e.currentTarget.value)
-                    }}
-                  />
+                  >
+                    Ajouter le point
+                  </Button>
                 </div>
               </div>
-              <div className={styles.gpsButtons}>
-                <Button
-                  type="button"
-                  priority="secondary"
-                  disabled={disabled}
-                  onClick={handleDisplayParcel}
-                >
-                  Afficher sur la carte
-                </Button>
-                <Button
-                  type="button"
-                  priority="secondary"
-                  disabled={disabled}
-                  onClick={handleAddParcel}
-                >
-                  Ajouter la parcelle
-                </Button>
-              </div>
-            </div>
+            )}
 
             {clientError && (
               <Alert
