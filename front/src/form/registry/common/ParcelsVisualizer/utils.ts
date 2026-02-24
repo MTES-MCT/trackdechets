@@ -18,7 +18,7 @@ export const getView = (lonLat: number[], zoom: number) => {
 };
 
 export const createMap = (
-  target: HTMLElement
+  target: HTMLElement | string = "parcels-map"
 ): {
   map: Map;
   markerLayerId: string;
