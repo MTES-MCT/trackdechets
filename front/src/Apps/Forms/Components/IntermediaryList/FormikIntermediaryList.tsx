@@ -92,7 +92,7 @@ function FormikIntermediaryList({
                   <hr />
                 </div>
               ))}
-              {values.intermediaries.length < 3 && (
+              {values.intermediaries.length < 5 && (
                 // Pas plus de trois intermédiaires
                 <div className="fr-grid-row fr-grid-row--right fr-mb-4w">
                   <button
