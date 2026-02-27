@@ -117,6 +117,12 @@ type Mutation {
     dateRange: DateFilter!
   ): RegistryExhaustiveExport!
 
+  "Annule un export de registre exhaustif"
+  cancelRegistryExhaustiveExport(
+    "Identifiant de l'export"
+    exportId: String!
+  ): RegistryExhaustiveExport!
+
   createTexsAnalysisFile(
     "Clé du fichier d'analyse des terres excavées et sédiments ou déchets entrants"
     s3FileKey: String!

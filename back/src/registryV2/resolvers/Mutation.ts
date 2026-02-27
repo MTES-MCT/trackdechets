@@ -12,6 +12,7 @@ import { cancelRegistryV2Lines } from "./mutations/cancelRegistryV2Lines";
 import { getGenerateRegistryExhaustiveExport } from "./mutations/generateRegistryExhaustiveExport";
 import { createTexsAnalysisFile } from "./mutations/createTexsAnalysisFile";
 import { cancelRegistryV2Export } from "./mutations/cancelRegistryV2Export";
+import { cancelRegistryExhaustiveExport } from "./mutations/cancelRegistryExhaustiveExport";
 
 export const Mutation: MutationResolvers = {
   importFile: importFile as any,
@@ -36,5 +37,6 @@ export const Mutation: MutationResolvers = {
     asAdmin: true
   }) as any,
   createTexsAnalysisFile,
-  cancelRegistryV2Export: cancelRegistryV2Export as any
+  cancelRegistryV2Export: cancelRegistryV2Export as any,
+  cancelRegistryExhaustiveExport: cancelRegistryExhaustiveExport as any
 };

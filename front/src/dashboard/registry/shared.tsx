@@ -368,6 +368,15 @@ export const GENERATE_REGISTRY_EXHAUSTIVE_EXPORT_AS_ADMIN = gql`
   ${registryExhaustiveExportFragment}
 `;
 
+export const CANCEL_REGISTRY_EXHAUSTIVE_EXPORT = gql`
+  mutation CancelRegistryExhaustiveExport($exportId: String!) {
+    cancelRegistryExhaustiveExport(exportId: $exportId) {
+      ...RegistryExhaustiveExportFragment
+    }
+  }
+  ${registryExhaustiveExportFragment}
+`;
+
 export const GET_REGISTRY_EXHAUSTIVE_EXPORTS = gql`
   query RegistryExhaustiveExports($first: Int = 20, $skip: Int = 0) {
     registryExhaustiveExports(first: $first, skip: $skip) {
@@ -564,9 +573,9 @@ export function getStatusFromStats({
 }): RegistryImportStatus {
   if (
     numberOfCancellations +
-      numberOfEdits +
-      numberOfInsertions +
-      numberOfSkipped ===
+    numberOfEdits +
+    numberOfInsertions +
+    numberOfSkipped ===
     0
   ) {
     // No data was processed. Mark the import as failed

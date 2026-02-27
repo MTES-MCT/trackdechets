@@ -155,13 +155,13 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
         wasteTypes: where?.wasteType?._eq
           ? { equals: [where.wasteType._eq] }
           : where?.wasteType?._in?.length
-          ? { equals: where.wasteType._in.sort() }
-          : { isEmpty: true },
+            ? { equals: where.wasteType._in.sort() }
+            : { isEmpty: true },
         wasteCodes: where?.wasteCode?._eq
           ? { equals: [where.wasteCode._eq] }
           : where?.wasteCode?._in?.length
-          ? { equals: where.wasteCode._in.sort() }
-          : { isEmpty: true },
+            ? { equals: where.wasteCode._in.sort() }
+            : { isEmpty: true },
         declarationType: where?.declarationType?._eq
           ? where.declarationType._eq === "ALL"
             ? null
@@ -219,13 +219,13 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
         wasteTypes: where?.wasteType?._eq
           ? [where.wasteType._eq]
           : where?.wasteType?._in?.length
-          ? where.wasteType._in.sort()
-          : [],
+            ? where.wasteType._in.sort()
+            : [],
         wasteCodes: where?.wasteCode?._eq
           ? [where.wasteCode._eq]
           : where?.wasteCode?._in?.length
-          ? where.wasteCode._in.sort()
-          : [],
+            ? where.wasteCode._in.sort()
+            : [],
         declarationType: where?.declarationType?._eq
           ? where.declarationType._eq === "ALL"
             ? null
@@ -240,15 +240,10 @@ export function getGenerateRegistryV2Export({ asAdmin }: { asAdmin: boolean }) {
       }
     });
 
-    await enqueueRegistryExportJob(
-      {
-        exportId: registryExport.id,
-        dateRange
-      },
-      {
-        jobId: registryExport.id
-      }
-    );
+    await enqueueRegistryExportJob({
+      exportId: registryExport.id,
+      dateRange
+    });
 
     return registryExport;
   };

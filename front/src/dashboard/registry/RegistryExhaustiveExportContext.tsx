@@ -1,13 +1,16 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { subHours } from "date-fns";
 
 import {
   Query,
   RegistryExportStatus,
-  QueryRegistryExhaustiveExportDownloadSignedUrlArgs
+  QueryRegistryExhaustiveExportDownloadSignedUrlArgs,
+  Mutation,
+  MutationCancelRegistryExhaustiveExportArgs
 } from "@td/codegen-ui";
 import {
+  CANCEL_REGISTRY_EXHAUSTIVE_EXPORT,
   downloadFromSignedUrl,
   GET_REGISTRY_EXHAUSTIVE_EXPORTS,
   GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN,
@@ -66,6 +69,18 @@ export const RegistryExhaustiveExportProvider: React.FC<{
     fetchPolicy: "no-cache"
   });
 
+  const [_cancelRegistryExport] = useMutation<
+    Pick<Mutation, "cancelRegistryExhaustiveExport">,
+    Partial<MutationCancelRegistryExhaustiveExportArgs>
+  >(CANCEL_REGISTRY_EXHAUSTIVE_EXPORT, {
+    refetchQueries: [
+      asAdmin ? GET_REGISTRY_EXHAUSTIVE_EXPORTS_AS_ADMIN : GET_REGISTRY_EXHAUSTIVE_EXPORTS
+    ],
+    onError: () => {
+      refetch();
+    }
+  });
+
   const downloadRegistryExportFile = useCallback(
     async (exportId: string) => {
       setDownloadLoadingExportId(exportId);
@@ -81,6 +96,13 @@ export const RegistryExhaustiveExportProvider: React.FC<{
       }
     },
     [setDownloadLoadingExportId, getDownloadLink]
+  );
+
+  const cancelRegistryExport = useCallback(
+    async (exportId: string) => {
+      await _cancelRegistryExport({ variables: { exportId } });
+    },
+    [_cancelRegistryExport]
   );
 
   const gotoPage = useCallback(
@@ -122,6 +144,7 @@ export const RegistryExhaustiveExportProvider: React.FC<{
         downloadLoadingExportId,
         exportsLoading,
         registryExports: registryExports?.map(edge => edge.node),
+        cancelRegistryExport,
         downloadRegistryExportFile,
         gotoPage,
         refetch,
