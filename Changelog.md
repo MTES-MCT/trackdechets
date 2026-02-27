@@ -19,6 +19,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Afficher le BSPAOH dans l'onglet Pour action lorsqu'il est au statut PARTIALLY_REFUSED [PR 4676](https://github.com/MTES-MCT/trackdechets/pull/4676)
 - Remontée du message d'erreur "L'émetteur visé sur le bordereau ne peut pas être un éco-organisme." sous le company selector à la sélection d'un EO sur l'onglet Émetteur BSDA [PR 4687](https://github.com/MTES-MCT/trackdechets/pull/4687)
 
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout de la possibilité d'annuler un export de registre en cours [PR 4696](https://github.com/MTES-MCT/trackdechets/pull/4696)
+
 # [2026.02.1] 10/02/2026
 
 ### :boom: Breaking changes
