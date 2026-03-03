@@ -523,15 +523,15 @@ export const formFactory = async ({
     transporters: {
       ...(opt.transporters?.createMany
         ? {
-          createMany: opt.transporters!.createMany
-        }
-        : {
-          create: {
-            ...formdata.transporters!.create,
-            ...opt.transporters?.create,
-            number: 1
+            createMany: opt.transporters!.createMany
           }
-        })
+        : {
+            create: {
+              ...formdata.transporters!.create,
+              ...opt.transporters?.create,
+              number: 1
+            }
+          })
     }
   };
 

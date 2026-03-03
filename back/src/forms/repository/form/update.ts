@@ -47,16 +47,16 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       data,
       include: hasPossibleSiretChange
         ? {
-          ...SIRETS_BY_ROLE_INCLUDE,
-          forwardedIn: true,
-          transporters: true,
-          forwarding: { select: { readableId: true } }
-        }
+            ...SIRETS_BY_ROLE_INCLUDE,
+            forwardedIn: true,
+            transporters: true,
+            forwarding: { select: { readableId: true } }
+          }
         : {
-          forwardedIn: true,
-          transporters: true,
-          forwarding: { select: { readableId: true } }
-        }
+            forwardedIn: true,
+            transporters: true,
+            forwarding: { select: { readableId: true } }
+          }
     });
 
     // update transporters ordering when connecting transporters records
@@ -203,9 +203,9 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 export function checkIfHasPossibleSiretChange(data: Prisma.FormUpdateInput) {
   return Boolean(
     data.recipientCompanySiret ||
-    data.intermediaries ||
-    data.transporters ||
-    data.forwardedIn
+      data.intermediaries ||
+      data.transporters ||
+      data.forwardedIn
   );
 }
 
