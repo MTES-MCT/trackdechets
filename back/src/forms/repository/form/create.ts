@@ -22,7 +22,7 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
     const { prisma, user } = deps;
 
     const suiteReadableId = getBsdSuiteReadableIdFromFormInput(data);
-    if (suiteReadableId !== "") {
+    if (suiteReadableId) {
       await renameExistingBsdSuiteReadableId(prisma, suiteReadableId);
     }
     const form = await prisma.form.create({

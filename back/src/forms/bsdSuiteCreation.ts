@@ -20,17 +20,17 @@ type ForwardedInCreateWithReadableId = {
 /**
  * Returns the intended BSD suite readableId when the form input creates a
  * forwardedIn (BSD suite) via forwardedIn.create with readableId ending in "-suite",
- * or "" otherwise. Used to decide whether to free the readableId proactively before create/update.
+ * or null otherwise. Used to decide whether to free the readableId proactively before create/update.
  */
 export function getBsdSuiteReadableIdFromFormInput(
   data: Prisma.FormCreateInput | Prisma.FormUpdateInput
-): string {
+): string | null {
   const forwardedIn = data.forwardedIn;
-  if (!forwardedIn) return "";
-  if (!forwardedIn.create) return "";
+  if (!forwardedIn) return null;
+  if (!forwardedIn.create) return null;
   const create = forwardedIn.create as ForwardedInCreateWithReadableId;
-  if (!create?.readableId) return "";
-  return create.readableId.endsWith("-suite") ? create.readableId : "";
+  if (!create?.readableId) return null;
+  return create.readableId.endsWith("-suite") ? create.readableId : null;
 }
 
 /**

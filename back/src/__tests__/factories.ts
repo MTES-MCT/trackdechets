@@ -523,15 +523,15 @@ export const formFactory = async ({
     transporters: {
       ...(opt.transporters?.createMany
         ? {
-            createMany: opt.transporters!.createMany
-          }
+          createMany: opt.transporters!.createMany
+        }
         : {
-            create: {
-              ...formdata.transporters!.create,
-              ...opt.transporters?.create,
-              number: 1
-            }
-          })
+          create: {
+            ...formdata.transporters!.create,
+            ...opt.transporters?.create,
+            number: 1
+          }
+        })
     }
   };
 
@@ -542,7 +542,7 @@ export const formFactory = async ({
   };
 
   const suiteReadableId = getBsdSuiteReadableIdFromFormInput(createData);
-  if (suiteReadableId !== "") {
+  if (suiteReadableId) {
     await renameExistingBsdSuiteReadableId(prisma, suiteReadableId);
   }
   const form = await prisma.form.create({
