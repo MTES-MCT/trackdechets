@@ -380,7 +380,7 @@ export const RegistryV2ExportModalProvider: React.FC<{
           if (registryDelegationsData?.registryDelegations.edges.length === 1) {
             const tmpSiret =
               registryDelegationsData.registryDelegations.edges[0].node.delegate
-                .siret;
+                .orgId;
             if (tmpSiret) {
               delegateSiret = tmpSiret;
             }

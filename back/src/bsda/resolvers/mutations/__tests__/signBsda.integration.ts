@@ -34,6 +34,7 @@ import { AllBsdaSignatureType } from "../../../types";
 import gql from "graphql-tag";
 import { cleanse } from "../../../../__tests__/utils";
 import { getOperationModes } from "@td/constants";
+import { addDays } from "date-fns";
 
 jest.mock("../../../pdf/generator");
 (buildPdfAsBase64 as jest.Mock).mockResolvedValue("");
@@ -1507,6 +1508,43 @@ describe("Mutation.Bsda.sign", () => {
 
       // final operation should be set
       expect(signedBsda.finalOperations).toHaveLength(1);
+    });
+
+    it("[Legacy BSDA] should be able to sign operation even if quantity refused = null", async () => {
+      // Given
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.RECEIVED,
+          destinationCompanySiret: company.siret,
+          destinationReceptionAcceptationStatus: "ACCEPTED",
+          destinationReceptionRefusedWeight: null,
+          destinationReceptionWeight: 10,
+          destinationReceptionDate: addDays(new Date(), -1),
+          destinationReceptionSignatureAuthor: "Fred",
+          destinationOperationCode: "R 5",
+          destinationOperationMode: "RECYCLAGE",
+          destinationOperationDate: new Date()
+        }
+      });
+
+      // When
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      // Then
+      expect(errors).toBeUndefined();
     });
 
     it("TRA-16750 - should set final operation with code D9F", async () => {

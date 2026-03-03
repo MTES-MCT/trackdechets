@@ -1,5 +1,6 @@
 import {
   BsdaConsistence,
+  BsdaStatus,
   BsdaType,
   OperationMode,
   WasteAcceptationStatus
@@ -115,6 +116,7 @@ export const rawBsdaSchema = z.object({
     .string()
     .max(50)
     .default(() => getReadableId(ReadableIdPrefix.BSDA)),
+  status: z.nativeEnum(BsdaStatus).nullish(),
   // on ajoute `createdAt` au schéma de validation pour appliquer certaines
   // règles de façon contextuelles en fonction de la date de création du BSDA.
   // Cela permet de faire évoluer le schéma existant lors d'une MEP sans bloquer
