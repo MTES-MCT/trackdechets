@@ -17,36 +17,36 @@ describe("bsdSuiteCreation", () => {
       );
     });
 
-    it("returns empty string when no forwardedIn", () => {
-      expect(getBsdSuiteReadableIdFromFormInput({} as any)).toBe("");
+    it("returns null when no forwardedIn", () => {
+      expect(getBsdSuiteReadableIdFromFormInput({} as any)).toBe(null);
       expect(
         getBsdSuiteReadableIdFromFormInput({
           readableId: "X",
           forwardedIn: undefined
         } as any)
-      ).toBe("");
+      ).toBe(null);
     });
 
-    it("returns empty string when forwardedIn.create readableId does not end with -suite", () => {
+    it("returns null when forwardedIn.create readableId does not end with -suite", () => {
       const data = {
         forwardedIn: {
           create: { readableId: "BSD-20250101-XXX" }
         }
       } as any;
-      expect(getBsdSuiteReadableIdFromFormInput(data)).toBe("");
+      expect(getBsdSuiteReadableIdFromFormInput(data)).toBe(null);
     });
 
-    it("returns empty string when forwardedIn is update or disconnect (update input)", () => {
+    it("returns null when forwardedIn is update or disconnect (update input)", () => {
       expect(
         getBsdSuiteReadableIdFromFormInput({
           forwardedIn: { update: {} }
         } as any)
-      ).toBe("");
+      ).toBe(null);
       expect(
         getBsdSuiteReadableIdFromFormInput({
           forwardedIn: { disconnect: true }
         } as any)
-      ).toBe("");
+      ).toBe(null);
     });
   });
 
