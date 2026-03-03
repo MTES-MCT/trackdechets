@@ -26,7 +26,8 @@ interface CompanyContactInfoProps {
  *
  */
 export default function CompanyContactInfo({
-  fieldName
+  fieldName,
+  disabled
 }: CompanyContactInfoProps) {
   const [, { error: contactError, touched: contactTouched }] = useField({
     name: `${fieldName}.contact`
@@ -48,6 +49,7 @@ export default function CompanyContactInfo({
             {({ field }) => (
               <Input
                 label="Personne à contacter"
+                disabled={disabled}
                 state={contactError && contactTouched ? "error" : "default"}
                 stateRelatedMessage={contactError}
                 nativeInputProps={field}
@@ -62,6 +64,7 @@ export default function CompanyContactInfo({
             {({ field }) => (
               <Input
                 label="Téléphone"
+                disabled={disabled}
                 state={phoneError && phoneTouched ? "error" : "default"}
                 stateRelatedMessage={phoneError}
                 nativeInputProps={field}
@@ -74,6 +77,7 @@ export default function CompanyContactInfo({
             {({ field }) => (
               <Input
                 label="Courriel"
+                disabled={disabled}
                 state={mailError && mailTouched ? "error" : "default"}
                 stateRelatedMessage={mailError}
                 nativeInputProps={{ ...field, type: "email" }}
