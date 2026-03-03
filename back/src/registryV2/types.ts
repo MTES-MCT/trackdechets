@@ -837,7 +837,7 @@ export const emptyAllWasteV2: Omit<
   intermediary2CompanyName: null,
   intermediary3CompanySiret: null,
   intermediary3CompanyName: null,
-  intermediary4ompanySiret: null,
+  intermediary4CompanySiret: null,
   intermediary4CompanyName: null,
   intermediary5CompanySiret: null,
   intermediary5CompanyName: null,
