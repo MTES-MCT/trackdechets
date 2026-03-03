@@ -7,6 +7,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 # [2026.03.1] 10/03/2026
 
+#### :nail_care: Améliorations
+
+- Par défaut, afficher le composant du transporteur ouvert sur les formulaires de déclarations au registre national [PR 4677](https://github.com/MTES-MCT/trackdechets/pull/4677)
+
 #### :bug: Corrections de bugs
 
 - Résolution de conflits sur readableId de BSD suite [PR 4674](https://github.com/MTES-MCT/trackdechets/pull/4674)
