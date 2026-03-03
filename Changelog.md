@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Résolution de conflits sur readableId de BSD suite [PR 4674](https://github.com/MTES-MCT/trackdechets/pull/4674)
 - Conversion des poids sur export registre BSFF en tonnes [PR 4675](https://github.com/MTES-MCT/trackdechets/pull/4675)
 - Afficher le BSPAOH dans l'onglet Pour action lorsqu'il est au statut PARTIALLY_REFUSED [PR 4676](https://github.com/MTES-MCT/trackdechets/pull/4676)
+- Remontée du message d'erreur "L'émetteur visé sur le bordereau ne peut pas être un éco-organisme." sous le company selector à la sélection d'un EO sur l'onglet Émetteur BSDA [PR 4687](https://github.com/MTES-MCT/trackdechets/pull/4687)
 
 # [2026.02.1] 10/02/2026
 
