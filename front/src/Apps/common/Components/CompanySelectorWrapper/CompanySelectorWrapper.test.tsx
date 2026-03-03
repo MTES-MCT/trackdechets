@@ -73,7 +73,9 @@ describe("CompanySelectorWrapper", () => {
       </MockedProvider>
     );
 
-    const companyLink = await screen.findByText("Lien vers la page entreprise");
+    const companyLink = await screen.findByText(
+      "Lien vers la page établissement"
+    );
     expect(companyLink).toBeInTheDocument();
     expect(companyLink).toHaveAttribute(
       "href",
