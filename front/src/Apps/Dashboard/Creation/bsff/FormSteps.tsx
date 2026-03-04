@@ -1,4 +1,4 @@
-import { Bsff, BsdType, Query, QueryBsffArgs } from "@td/codegen-ui";
+import { Bsff, BsdType, BsffType, Query, QueryBsffArgs } from "@td/codegen-ui";
 import { useQuery } from "@apollo/client";
 import { GET_BSFF_FORM } from "../../../common/queries/bsff/queries";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -74,15 +74,20 @@ const BsffFormSteps = ({ bsdId }: Readonly<Props>) => {
     }
   });
 
+  const type = methods.watch("type");
+
   const tabsContent = useMemo(
     () => ({
       waste: <WasteBsff />,
-      emitter: <EmitterBsff />,
+      emitter:
+        type === BsffType.CollectePetitesQuantites ? (
+          <EmitterBsff />
+        ) : undefined,
       detenteur: <DetenteurBsff />,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
-    []
+    [type]
   );
 
   const loading = false;

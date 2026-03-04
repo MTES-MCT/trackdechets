@@ -1,7 +1,8 @@
 import {
   BsffEmitterInput,
   BsffTransporterInput,
-  TransportMode
+  TransportMode,
+  BsffType
 } from "@td/codegen-ui";
 import { getInitialCompany } from "../../../../common/data/initialState";
 
@@ -30,6 +31,7 @@ const initialTransporter: BsffTransporterInput = {
 };
 
 export default {
+  type: BsffType.CollectePetitesQuantites,
   emitter: {
     company: getInitialEmitterCompany()
   },
