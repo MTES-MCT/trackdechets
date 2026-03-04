@@ -36,7 +36,11 @@ export type NormalizedError = {
   message: string;
 };
 
-export type SupportedBsdTypes = BsdType.Bsvhu | BsdType.Bspaoh | BsdType.Bsda;
+export type SupportedBsdTypes =
+  | BsdType.Bsvhu
+  | BsdType.Bspaoh
+  | BsdType.Bsda
+  | BsdType.Bsff;
 
 export type TabError = {
   tabId: TabId;
