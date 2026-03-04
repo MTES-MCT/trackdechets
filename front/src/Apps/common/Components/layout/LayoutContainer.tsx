@@ -159,24 +159,6 @@ export default function LayoutContainer() {
           />
 
           <Route
-            path={routes.dashboard.bsffs.create}
-            element={
-              <RequireAuth>
-                <BsffFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
-            path={routes.dashboard.bsffs.edit}
-            element={
-              <RequireAuth>
-                <BsffFormContainer />
-              </RequireAuth>
-            }
-          />
-
-          <Route
             path={routes.dashboard.bsdasris.create}
             element={
               <RequireAuth>

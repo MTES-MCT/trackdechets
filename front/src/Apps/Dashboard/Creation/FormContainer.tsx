@@ -5,6 +5,7 @@ import TdModal from "../../common/Components/Modal/Modal";
 import { BsdTypename } from "../../common/types/bsdTypes";
 import BsvhuFormSteps from "./bsvhu/BsvhuFormSteps";
 import BsdaFormSteps from "./bsda/FormSteps";
+import BsffFormSteps from "./bsff/FormSteps";
 
 interface FormContainerProps {
   bsdTypeName: BsdTypename;
@@ -23,6 +24,9 @@ const FormContainer = ({ bsdTypeName }: FormContainerProps) => {
     ),
     [BsdTypename.Bsda]: (
       <BsdaFormSteps bsdId={id} publishErrorsFromRedirect={publishErrors} />
+    ),
+    [BsdTypename.Bsff]: (
+      <BsffFormSteps bsdId={id} publishErrorsFromRedirect={publishErrors} />
     )
   };
   return (
