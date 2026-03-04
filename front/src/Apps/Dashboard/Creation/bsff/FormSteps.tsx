@@ -13,6 +13,7 @@ import WasteBsff from "./steps/Waste";
 import EmitterBsff from "./steps/Emitter";
 import DestinationBsff from "./steps/Destination";
 import TransporterBsff from "./steps/Transporter";
+import DetenteurBsff from "./steps/Detenteur";
 
 interface Props {
   bsdId?: string;
@@ -77,6 +78,7 @@ const BsffFormSteps = ({ bsdId }: Readonly<Props>) => {
     () => ({
       waste: <WasteBsff />,
       emitter: <EmitterBsff />,
+      detenteur: <DetenteurBsff />,
       transporter: <TransporterBsff />,
       destination: <DestinationBsff />
     }),
